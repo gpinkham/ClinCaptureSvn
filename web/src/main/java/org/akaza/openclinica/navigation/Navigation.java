@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
+ * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
+ * 
+ * You should have received a copy of the Lesser GNU General Public License along with this program.  
+ \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
+ ******************************************************************************/
+
 package org.akaza.openclinica.navigation;
 
 import java.util.Arrays;
@@ -37,6 +50,8 @@ public class Navigation {
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
 			"/ChangeDefinitionCRFOrdinal", "/DoubleDataEntry", "/CreateOneDiscrepancyNote", "/MatchPassword",
 			"/pages/handleSDVPost", "/pages/handleSDVRemove"));
+	// set of pages with special processing 
+	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects"));
 	private static String defaultShortURL = "/MainMenu";
 
 	public static void removeUrl(HttpServletRequest request, String excludeUrl) throws Exception {
@@ -77,7 +92,7 @@ public class Navigation {
 	 * Here incoming request-URLs are (or aren't) added to visitedURLs-stack. You can add business-logic here.
 	 */
 	private static void processRequestURL(Stack<String> visitedURLs, HttpServletRequest request) {
-		// delete contextPath part of URL to do saved links shorter
+		// delete contextPath part of URL to make saved links shorter
 		String requestShortURI = request.getRequestURI().replaceAll(request.getContextPath(), "");
 		String requestShortURL = requestShortURI;
 
@@ -91,8 +106,12 @@ public class Navigation {
 					visitedURLs.pop();
 				}
 				if (!exclusionURLs.contains(requestShortURI)) {
-					if (!visitedURLs.peek().split("\\?")[0].equals(requestShortURI)) {
-						visitedURLs.push(requestShortURL);
+					if (!specialURLs.contains(requestShortURI)) {
+						if (!visitedURLs.peek().split("\\?")[0].equals(requestShortURI)){
+							visitedURLs.push(requestShortURL);
+						}
+					} else {
+						specialProcessingForURL(visitedURLs, requestShortURL);
 					}
 				} else {
 					visitedURLs.push("skip!");
@@ -105,6 +124,21 @@ public class Navigation {
 			} else {
 				visitedURLs.push(defaultShortURL);
 			}
+		}
+	}
+	
+	private static void specialProcessingForURL(Stack<String> visitedURLs, String requestShortURL) {
+		String requestShortURI = requestShortURL.split("\\?")[0];
+		if ("/ListEventsForSubjects".equals(requestShortURI)) {
+			if (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects") ||
+					visitedURLs.peek().split("\\?")[0].equals("/ListStudySubjects")) {
+				visitedURLs.pop();
+				visitedURLs.push(requestShortURL);
+			} else {
+				visitedURLs.push(requestShortURL);
+			}
+		} else {
+			visitedURLs.push(requestShortURL);
 		}
 	}
 }

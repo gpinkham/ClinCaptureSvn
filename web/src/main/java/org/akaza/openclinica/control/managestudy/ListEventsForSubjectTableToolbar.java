@@ -150,9 +150,9 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
 		public String enabled() {
 			String js = "var selectedValue = document.getElementById('sedDropDown').options[document.getElementById('sedDropDown').selectedIndex].value;  "
 					+ " if (selectedValue != null && selectedValue != 0 ) { "
-					+ "window.location='ListEventsForSubjects?module=submit&defId='+selectedValue;}"
+					+ "window.location='ListEventsForSubjects?module=submit&defId='+selectedValue+'&useJmesa=true';}"
 					+ " if (selectedValue != null && selectedValue == 0 ) { "
-					+ "window.location='ListStudySubjects' } ";
+					+ "window.location='ListStudySubjects?useJmesa=true' } ";
 			HtmlBuilder html = new HtmlBuilder();
 			html.append(resword.getString("events") + ": ");
 			html.select().id("sedDropDown").onchange(js).close();

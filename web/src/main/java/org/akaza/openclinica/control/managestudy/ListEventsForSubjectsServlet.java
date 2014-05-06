@@ -136,7 +136,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 
 	@Override
 	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_LIST_EVENTS_FOR_SUBJECTS_URL;
+		return ListStudySubjectsServlet.SAVED_LAST_VISITED_PAGE_URL;
 	}
 
 	@Override
@@ -148,21 +148,15 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		String savedUrl = (String) request.getSession().getAttribute(SAVED_LIST_EVENTS_FOR_SUBJECTS_URL);
 		if (savedUrl != null && !currentDefId.equals(parseDefId(currentDefId, savedUrl))) {
 			savedUrl = null;
-			request.getSession().removeAttribute(SAVED_LIST_EVENTS_FOR_SUBJECTS_URL);
+			request.getSession().removeAttribute(ListStudySubjectsServlet.SAVED_LAST_VISITED_PAGE_URL);
 		}
 		savedUrl = savedUrl != null ? savedUrl.replaceAll(".*" + request.getContextPath() + "/ListStudySubjects", "")
 				: null;
 
-		String pageSize = (String) request.getSession().getAttribute(
-				ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
-		if (pageSize == null) {
-			pageSize = "15";
-		}
-
 		return request.getMethod().equalsIgnoreCase("POST") && savedUrl != null ? savedUrl : "?module="
 				+ fp.getString("module") + "&defId=" + fp.getString("defId") + "&maxRows=15&showMoreLink="
 				+ showMoreLink + "&listEventsForSubject_tr_=true&listEventsForSubject_p_=1&listEventsForSubject_mr_="
-				+ pageSize;
+				+ ListStudySubjectsServlet.getPageSize(request);
 	}
 
 	@Override
@@ -182,10 +176,11 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 
 	@Override
 	protected String getSavedUrl(String key, HttpServletRequest request) {
-		String pageSize = (String) request.getSession().getAttribute(
-				ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
+		if (request.getQueryString() != null && request.getQueryString().contains("useJmesa=true")) {
+			return request.getRequestURL() + getDefaultUrl(request);
+		}
 		String savedUrl = (String) request.getSession().getAttribute(key);
-		return savedUrl == null || pageSize == null ? savedUrl : savedUrl.replaceFirst(
-				"&listEventsForSubject_mr_=\\d{2,}", "&listEventsForSubject_mr_=" + pageSize);
+		return savedUrl == null? savedUrl : savedUrl.replaceFirst("&listEventsForSubject_mr_=\\d{2,}", 
+				"&listEventsForSubject_mr_=" + ListStudySubjectsServlet.getPageSize(request));
 	}
 }

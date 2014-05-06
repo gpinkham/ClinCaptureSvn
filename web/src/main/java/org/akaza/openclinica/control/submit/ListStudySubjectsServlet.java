@@ -49,6 +49,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 
 	public static final String SAVED_SUBJECT_MATRIX_URL = "savedSubjectMatrixUrl";
 	public static final String SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX = "savedPageSizeForSubjectMatrix";
+	public static final String SAVED_LAST_VISITED_PAGE_URL = "savedLastPageUrl";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -167,7 +168,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 
 	@Override
 	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_SUBJECT_MATRIX_URL;
+		return SAVED_LAST_VISITED_PAGE_URL;
 	}
 
 	@Override
@@ -175,7 +176,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		boolean showMoreLink;
 		FormProcessor fp = new FormProcessor(request);
 		showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
-		String savedUrl = (String) request.getSession().getAttribute(SAVED_SUBJECT_MATRIX_URL);
+		String savedUrl = (String) request.getSession().getAttribute(SAVED_LAST_VISITED_PAGE_URL);
 		savedUrl = savedUrl != null ? savedUrl.replaceAll(".*" + request.getContextPath() + "/ListStudySubjects", "")
 				: null;
 		return request.getMethod().equalsIgnoreCase("POST") && savedUrl != null ? savedUrl
@@ -183,30 +184,38 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 						+ fp.getString("module")
 						+ "&maxRows=15&showMoreLink="
 						+ showMoreLink
-						+ "&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_=15&findSubjects_s_0_studySubject.createdDate=desc"
+						+ "&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_=" + getPageSize(request) + "&findSubjects_s_0_studySubject.createdDate=desc"
 						+ (fp.getString("navBar").equalsIgnoreCase("yes") ? ("&findSubjects_f_studySubject.label=" + fp
 								.getString("findSubjects_f_studySubject.label")) : "");
 	}
 
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
-		return request.getQueryString() == null || !request.getQueryString().contains("&findSubjects_p_=");
+		return request.getQueryString() == null || !request.getQueryString().contains("&findSubjects_p_=");	
 	}
 	
 	@Override
 	protected void saveUrl(String key, String value, HttpServletRequest request) {
 		if (value != null){
 			String pageSize = value.contains("findSubjects_mr_")? 
-					value.replaceFirst(".*&findSubjects_mr_=(\\d{2,})&.*", "$1") : "15";
-			request.getSession().setAttribute(ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX, pageSize);
+					value.replaceFirst(".*&findSubjects_mr_=(\\d{2,}).*", "$1") : "15";
+			request.getSession().setAttribute(SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX, pageSize);
 			request.getSession().setAttribute(key, value);
 		}
 	}	
 	
 	@Override
 	protected String getSavedUrl(String key, HttpServletRequest request) {
-		String pageSize = (String) request.getSession().getAttribute(ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
+		if (request.getQueryString() != null && request.getQueryString().contains("useJmesa=true")) {
+			return request.getRequestURL() + getDefaultUrl(request);
+		}
 		String savedUrl = (String) request.getSession().getAttribute(key);
-		return savedUrl == null || pageSize == null? savedUrl : savedUrl.replaceFirst("&findSubjects_mr_=\\d{2,}&", "&findSubjects_mr_="+pageSize+"&");
+		return savedUrl == null? savedUrl : savedUrl.replaceFirst(
+				"&findSubjects_mr_=\\d{2,}&", "&findSubjects_mr_=" + getPageSize(request)+"&");
+	}
+	
+	public static String getPageSize(HttpServletRequest request) {
+		String pageSize = (String) request.getSession().getAttribute(SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
+		return pageSize == null? "15" : pageSize;
 	}
 }
