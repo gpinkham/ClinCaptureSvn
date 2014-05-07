@@ -555,6 +555,8 @@ function initSdvProgress(action) {
 						var studyId = $("input[id=sdvWStudyId]").val();
 						
 						window.location.href = redirectPrefix + studyId + redirectSufix + "&sdv_f_sdvStatus=" + sdvStep;
+					} else {
+						sdvProgressChart.setSelection([]);
 					}
 				}
 

@@ -75,9 +75,9 @@ public class WidgetsLayoutController {
 
 	@Autowired
 	private WidgetService widgetService;
-	
-	 @Autowired
-	 private MessageSource messageSource;
+
+	@Autowired
+	private MessageSource messageSource;
 
 	@RequestMapping("/configureHomePage")
 	public ModelMap configureHomePageHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -382,7 +382,11 @@ public class WidgetsLayoutController {
 
 		ArrayList<EventCRFBean> nextYear = (ArrayList<EventCRFBean>) eCrfdao.findSDVedEventCRFsByStudyAndYear(sb,
 				sdvProgressYear + 1);
-		boolean nextDataExists = nextYear.size() > 0;
+
+		Calendar sdvCal = Calendar.getInstance();
+		int currentYear = sdvCal.get(Calendar.YEAR);
+
+		boolean nextDataExists = sdvProgressYear < currentYear ? true : nextYear.size() > 0;
 
 		EventCRFSDVFilter sdvFilterDone = new EventCRFSDVFilter(sb.getId());
 		sdvFilterDone.addFilter("sdvStatus", "complete");
@@ -393,8 +397,7 @@ public class WidgetsLayoutController {
 
 		List<Integer> countValues = new ArrayList<Integer>(Collections.nCopies(12, 0));
 
-		Calendar sdvCal = Calendar.getInstance();
-		int currentYear = sdvCal.get(Calendar.YEAR);
+		
 		int currentMonth = sdvCal.get(Calendar.MONTH);
 
 		for (EventCRFBean ecrf : ecrfs) {

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis"
+		id="2014-05-05-TICKET1114-1-UPDATE-ACCESS-TO-SDV">
+		<comment>Add access to SDV widget for Study Administrator</comment>
+		<update tableName="widget">
+			<column name="have_access" value="1,2,6" />
+			<column name="display_as_default" value="1,2,6" />
+			<where>widget_name = 'SDV Progress'</where>
+		</update>
+	</changeSet>
+</databaseChangeLog> 
