@@ -565,9 +565,12 @@ Parser.prototype.createRule = function() {
 				ele: $(".dotted-border")[index]
 			})
 		}
-        var date = Date.parse(pred);
-		if (date != null) {
-            pred = date.toString("yyyy-MM-dd");
+        // check dates
+		if (parser.isDateValue(pred)) {
+			var date = Date.parse(pred);
+			if (date != null) {
+				pred = date.toString("yyyy-MM-dd");
+			}
 		}
 		expression.push(pred);
 
@@ -623,7 +626,7 @@ Parser.prototype.getRule = function() {
 	} else {
 		// Ensure one alert is displayed
 		if ($(".alert").size() == 0) {
-			$("#designSurface").find(".panel-body").prepend(createAlert(this.isValid(this.rule.expression).message));
+			$(".targettable").find(".panel-body").prepend(createAlert(this.isValid(this.rule.expression).message));
 		}
 		return false;
 	}
@@ -653,7 +656,10 @@ Parser.prototype.render = function(rule) {
 	this.setTargets(rule.targets);
 	// Select target item
 	parser.selectTarget();
-	this.setEvaluates(rule.evaluates);
+	// Don't select evalutes for show/hide
+	if (rule.actions[0].type != 'showHide') {
+		this.setEvaluates(rule.evaluates);
+	}
 	// executions
 	this.setDataImportExecute(rule.di);
 	this.setDoubleDataEntryExecute(rule.dde);
@@ -694,7 +700,7 @@ Parser.prototype.isValid = function(expression) {
 		message = "Please specify when the rule should be run";
 	}
 
-	if ($("input[name=ruleInvoke]:checked").length == 0) {
+	if (!$("input[name=ruleInvoke]").is(':checked') && this.getActions()[0].type != 'showHide') {
 		valid = false;
 		message = "A rule is supposed to evaluate to true or false. Please specify";
 	}
@@ -1638,12 +1644,16 @@ Parser.prototype.setExpression = function(expression) {
 						droppable.attr("study-oid", this.extractStudy(this.getStudy()).oid);
 						droppable.text(itm.name);
 					} else {
-                        var value = expression[e];
-                        var date = Date.parse(value);
-                        if (wasDateType && date != null) {
-                            value = date.toString(getCookie('ccDateFormat'));
-                        }
-						droppable.text(value);
+						if (this.isDateValue(expression[e])) {
+							var value = expression[e];
+							var date = Date.parse(value);
+							if (wasDateType && date != null) {
+								value = date.toString(getCookie('ccDateFormat'));
+							}
+							droppable.text(value);
+						} else {
+							droppable.text(expression[e]);	
+						}
 					}
 					currDroppable.after(droppable);
 					currDroppable = droppable;
@@ -2079,4 +2089,8 @@ Parser.prototype.resetActions = function(target) {
 	$(".dotted-border-lg").hide();
 	$(".dotted-border-lg").children().hide();
 	$("input[name='action']").not(target).attr("previous-state", false);
+}
+
+Parser.prototype.isDateValue = function(val) {
+	return /^\d+[-]\w+[-]\d{4}/.test(val);
 }

@@ -234,19 +234,30 @@ $(function() {
 		element: $(".value"),
 		accept: ".data p, div[id='items'] td"
 	});
-
 	// ======================= End of creating droppables =======================
 
 	// ============================= Event handlers =============================
 	$(document).on('blur', '#ruleName', function() {
 		parser.setName($(this).val());
-	})
+	});
+	$('input[name=ruleInvoke]').click(function() {
+		if ($(this).attr('previous-state') == 'checked') {
+			$(this).prop('checked', false);
+			$(this).attr("previous-state", false);
+		} else {
+			$(this).attr("previous-state", 'checked');
+		}
+	});
 	// Handles the setting of what the rule evaluates to
 	$(document).on('change', 'input[name="ruleInvoke"]', function() {
-		if ($("#evaluateTrue").is(":checked")) {
-			parser.setEvaluates(true);
+		if ($('input[action=show], input[action=hide]').is(':checked')) {
+			showHideOnEvaluationAlert();
 		} else {
-			parser.setEvaluates(false);
+			if ($("#evaluateTrue").is(":checked")) {
+				parser.setEvaluates(true);
+			} else {
+				parser.setEvaluates(false);
+			}
 		}
 	});
 	// Handles the setting of initial data entry action
@@ -408,38 +419,46 @@ $(function() {
 
 	// === Show/Hide action ====
 	$("input[action=show]").click(function() {
-		parser.resetActions(this);
-		var checked = $(this).attr("previous-state");
-		if (checked == 'checked') {
-			parser.setShowHideAction({
-				show: false,
-				hide: false
-			});
-			$(this).attr("previous-state", false);
+		if ($('input[name=ruleInvoke]').is(':checked')) {
+			showHideOnEvaluationAlert();
 		} else {
-			parser.setShowHideAction({
-				show: true,
-				hide: false
-			});
-			$(this).attr("previous-state", 'checked');
+			parser.resetActions(this);
+			var checked = $(this).attr("previous-state");
+			if (checked == 'checked') {
+				parser.setShowHideAction({
+					show: false,
+					hide: false
+				});
+				$(this).attr("previous-state", false);
+			} else {
+				parser.setShowHideAction({
+					show: true,
+					hide: false
+				});
+				$(this).attr("previous-state", 'checked');
+			}
 		}
 	});
 
 	$("input[action=hide]").click(function() {
-		parser.resetActions(this);
-		var checked = $(this).attr("previous-state");
-		if (checked == 'checked') {
-			parser.setShowHideAction({
-				hide: false,
-				show: false
-			});
-			$(this).attr("previous-state", false);
+		if ($('input[name=ruleInvoke]').is(':checked')) {
+			showHideOnEvaluationAlert();
 		} else {
-			parser.setShowHideAction({
-				hide: true,
-				show: false
-			});
-			$(this).attr("previous-state", 'checked');
+			parser.resetActions(this);
+			var checked = $(this).attr("previous-state");
+			if (checked == 'checked') {
+				parser.setShowHideAction({
+					hide: false,
+					show: false
+				});
+				$(this).attr("previous-state", false);
+			} else {
+				parser.setShowHideAction({
+					hide: true,
+					show: false
+				});
+				$(this).attr("previous-state", 'checked');
+			}
 		}
 	});
 
@@ -514,7 +533,7 @@ Array.prototype.chunk = function(arr) {
     return [this.slice(0, arr)].concat(this.slice(arr).chunk(arr));
 };
 
-var resizeBody = function() {
+function resizeBody() {
     var height = parseInt($(window).height());
     $("body").css("height", height + "px");
     var wrapperHeight = parseInt($(".navbar").offset().top) - parseInt($(".inner-scrollbar-wrapper").offset().top) - 20;
@@ -523,10 +542,16 @@ var resizeBody = function() {
     $(".data-scrollbar").css("height", wrapperHeight + 20 + "px");
 }
 
-$( window ).load(function() {
+$(window).load(function() {
     resizeBody();
 });
 
-$( window ).resize(function(){
+$(window).resize(function(){
     resizeBody();
 });
+
+function showHideOnEvaluationAlert() {
+	$('.alert').remove();
+	$('input[action=show], input[action=hide]').prop('checked', false);
+	$('.targettable .panel-body').prepend(createAlert('Rule evaluation is not valid for a Show or Hide action. Please unselect True/False evaluation.'));
+}

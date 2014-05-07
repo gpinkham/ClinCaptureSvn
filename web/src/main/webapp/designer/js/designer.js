@@ -628,36 +628,19 @@ function createDroppable(params) {
 		}
 	})
 
-	function isDate(val) {
-		return Date.parse(val) != null;
-	}
-
 	params.element.dblclick(function() {
 		params.element.tooltip("hide");
- 		params.element.addClass("bordered");
+		params.element.addClass("bordered");
 		var input = $("<input>");
-		if (isDate($(this).text())) {
-			input.attr("type", "date");
+		if (parser.isDateValue($(this).text())) {
 			input.val($(this).text());
-			var msie = window.navigator.userAgent.indexOf('MSIE ');
-			var trident = window.navigator.userAgent.indexOf('Trident/');
-			if (typeof InstallTrigger !== 'undefined' || msie > 0 || trident > 0) {
-				input.data({date: new Date(input.val())}).datepicker('update').children("input").val(new Date(input.val()));
-				input.datepicker().on("hide", function() {
-					if ($(this).val()) {
-						params.element.text($(this).val());
-					} 
-				});
-			} else {
-				input.blur(function() {
-					if ($(this).val()) {
-						params.element.text($(this).val());
-					} else {
-						params.element.text("Data");
-					}
-					$(this).remove();
-				});
-			}
+			input.data({date: new Date(input.val())
+			}).datepicker('update').children("input").val(new Date(input.val()));
+			input.datepicker().on("hide", function() {
+				if ($(this).val()) {
+					params.element.text($(this).val());
+				}
+			});
 		} else {
 			input.val($(this).text());
 			input.blur(function() {
@@ -676,7 +659,7 @@ function createDroppable(params) {
 		$(this).text("");
 		$(this).append(input);
 		// focus/select
-		input.focus(); 
+		input.focus();
 		input.select();
 
 		params.element.css('font-weight', 'bold');

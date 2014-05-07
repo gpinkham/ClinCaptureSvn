@@ -427,3 +427,6 @@ td.group, td.ui-draggable {
 .sortable {
   padding: 5rem !important;
 }
+.delete {
+  margin-top: -1rem;
+}
