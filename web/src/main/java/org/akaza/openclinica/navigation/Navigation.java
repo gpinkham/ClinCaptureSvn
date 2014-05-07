@@ -13,12 +13,12 @@
 
 package org.akaza.openclinica.navigation;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
-import javax.servlet.http.HttpServletRequest;
 
 @SuppressWarnings({ "unchecked" })
 public class Navigation {
@@ -49,7 +49,7 @@ public class Navigation {
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
 			"/ChangeDefinitionCRFOrdinal", "/DoubleDataEntry", "/CreateOneDiscrepancyNote", "/MatchPassword",
-			"/pages/handleSDVPost", "/pages/handleSDVRemove"));
+			"/pages/handleSDVPost", "/pages/handleSDVRemove", "/CompleteCrfDelete"));
 	// set of pages with special processing 
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects"));
 	private static String defaultShortURL = "/MainMenu";

@@ -167,8 +167,5 @@
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" name="<fmt:message key="view_crf_rules" bundle="${resword}"/>" value="<fmt:message key="view_crf_rules" bundle="${resword}"/>" class="button_long" onClick="window.location.href='ViewRuleAssignment?ruleAssignments_f_crfName=<c:out value="${crfName}"/>'"/>
 <input type="button" name="<fmt:message key="run_crf_rules" bundle="${resword}"/>" value="<fmt:message key="run_crf_rules" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRule?crfId=<c:out value="${crf.id}"/>&action=dryRun'"/>
-<c:if test="${userRole.role.id eq 1}">
-    <input type="button" name="<fmt:message key="delete" bundle="${resword}"/>" value="<fmt:message key="delete" bundle="${resword}"/>" class="button_medium_red" onClick="return confirmDialog({ message: '<fmt:message key="are_you_sure_want_to_delete" bundle="${respage}"/>', height: 165, width: 500, redirectLink: 'CompleteCrfDelete?crfId=<c:out value="${crf.id}"/>'});"/>
-</c:if>
 
 <jsp:include page="../include/footer.jsp"/>
