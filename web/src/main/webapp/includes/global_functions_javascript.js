@@ -3842,7 +3842,7 @@ function confirmDialog(params){
             	$("#confirmDialog").remove(); 
             }
         },
-
+        
         open: function(event, ui) {
 
             openDialog({ 
@@ -3862,6 +3862,10 @@ function openDialog(params) {
 	$(".ui-dialog-titlebar-close", $(params.dialogDiv).parent()).hide();
     $('.ui-dialog-titlebar').css('border', '1px Solid ' + themeColorCode);
     $('.ui-widget-content').css('border', '0');
+    
+    if($.browser.msie){
+    	$(params.dialogDiv).focus();
+    }
     
     if(params.cancelButtonValue)
     	setButtonAttributes(params.cancelButtonValue);
