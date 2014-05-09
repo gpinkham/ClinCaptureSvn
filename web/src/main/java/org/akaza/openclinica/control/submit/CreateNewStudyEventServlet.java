@@ -21,6 +21,7 @@
 package org.akaza.openclinica.control.submit;
 
 import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -56,6 +57,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,6 +69,8 @@ import java.util.Map;
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 @Component
 public class CreateNewStudyEventServlet extends Controller {
+
+	public static final String OPEN_FIRST_CRF = "openFirstCrf";
 
 	public static final String INPUT_PAGE_TO_SHOW_POPUP = "page";
 
@@ -709,6 +713,10 @@ public class CreateNewStudyEventServlet extends Controller {
 					jsonObject.put("eventDefs", eventDefs);
 					jsonObject.put("pageMessages", pageMessages);
 					response.getWriter().write(jsonObject.toString());
+				} else if (fp.getString(OPEN_FIRST_CRF).equalsIgnoreCase("true")) {
+					response.sendRedirect(request.getContextPath()
+							+ Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName() + "?eventId=" + studyEvent.getId()
+							+ "&openFirstCrf=true");
 				} else {
 					response.sendRedirect(request.getContextPath()
 							+ Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName() + "?eventId=" + studyEvent.getId());
