@@ -53,7 +53,7 @@
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-<div class="textbox_center">
+<div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr valign="top"><td class="table_header_column"><fmt:message key="name" bundle="${resword}"/>:</td><td class="table_cell">  
   <c:out value="${definitionToRestore.name}"/>
@@ -87,7 +87,7 @@
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-<div class="textbox_center">
+<div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
  <c:forEach var ="crf" items="${eventDefinitionCRFs}">   
    <tr valign="top" bgcolor="#F5F5F5">             
@@ -143,7 +143,7 @@
      <c:set var="studySubjectIDLabel" value="${study.studyParameterConfig.studySubjectIdLabel}"/>
 </c:if>
 
-<div class="textbox_center">
+<div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%"> 
   <tr valign="top">
   <td class="table_header_column_top">${studySubjectIDLabel}</td>
@@ -186,14 +186,19 @@
  <!--<p><a href='RestoreEventDefinition?action=submit&id=<c:out value="${definitionToRestore.id}"/>' onClick='return confirm("If you restore this definition, all the data and subjects will be restored. Are you sure you want to restore it?");'><fmt:message key="restore_event_definition" bundle="${resword}"/></a>      
 </p>-->
 <br>
-<form action='RestoreEventDefinition?action=submit&id=<c:out value="${definitionToRestore.id}"/>' method="POST">
- <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
- 
- <input type="submit" name="submit" title="<fmt:message key="restore_event_definition" bundle="${resword}"/>" value="<fmt:message key="submit" bundle="${resword}"/>" onClick='return confirmSubmit({ message: "<fmt:message key="if_you_restore_this_definition" bundle="${resword}"/>", height: 150, width: 500, submit: this });' class="button_medium">
- <%-- <input type="button" onclick="confirmCancel('ListEventDefinition');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>--%>    
+<form id="RestoreEventDefinitionForm"
+	action='RestoreEventDefinition?action=submit&id=<c:out value="${definitionToRestore.id}"/>'
+	method="POST">
+	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+		value='<fmt:message key="back" bundle="${resword}"/>'
+		class="button_medium"
+		onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+
+	<input type="button" id="RestoreFrom"
+		title='<fmt:message key="restore_event_definition" bundle="${resword}"/>'
+		value='<fmt:message key="submit" bundle="${resword}"/>'
+		onClick='return confirmSubmit({ message: "<fmt:message key="if_you_restore_this_definition" bundle="${resword}"/>", height: "auto", width: 500, form: document.getElementById("RestoreEventDefinitionForm"), disableSet: $("[class=button_medium]")});'
+		class="button_medium">
 </form>
 
 <c:import url="../include/workflow.jsp">

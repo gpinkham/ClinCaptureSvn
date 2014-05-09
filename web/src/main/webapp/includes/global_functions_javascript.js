@@ -3953,6 +3953,20 @@ function confirmMarkAsComplete(params){
     return false;
 }
 
+/*=======================================================================================
+ * This function show confirmation dialog for actions.
+ * 
+ * @param <int> or <String> width - width of pop-up (required);
+ * @param <int> or <String> height - height of pop-up (required);
+ * @param <String> message - message that will be shown in pop-up (required);
+ * @param <javascript object> form - form that will be submited if user select 'Yes' (optional);
+ * @param <javascript object> submit - button that will be clicked if user select 'Yes' (optional);
+ * @param <javascript object> disable - button or input that will be disabled if user select 'Yes' (optional);
+ * @param <jquery object or objects> disableSet - set of buttons or inputs that will be disabled if user select 'Yes' (optional);
+ * @param <String> submit - page to redirect if user will select 'Yes' (optional);
+ * @param <boolean> goBack - if user will select 'Yes' history.go(-1) action will be performed (optional);
+ * @return <boolean> false;
+ =======================================================================================*/
 function confirmSubmit(params){
 	
 	$("<div id='confirmDialog' title='Confirm Action'>" +
@@ -3979,10 +3993,19 @@ function confirmSubmit(params){
             	} else if(params.goBack) {
             		history.go(-1);
             	}
+
+				if(params.disable){
+					params.disable.style.color = "#e6e6e6";
+					params.disable.disabled = true;
+				}
+				if(params.disableSet){
+					params.disableSet.css("color","#e6e6e6");
+					params.disableSet.attr("disabled","true");
+				}
             		
         	},
             'No': function() { 
-            	$("#confirmDialog").remove(); 
+            	$("#confirmDialog").remove();
             }
         },
 

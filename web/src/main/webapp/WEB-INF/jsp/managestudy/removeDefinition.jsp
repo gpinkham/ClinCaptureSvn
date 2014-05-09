@@ -178,16 +178,22 @@
  
  </div>
 </div></div></div></div></div></div></div></div>
-</div> 
+</div>
 <br>
-	<form action='RemoveEventDefinition?action=submit&id=<c:out value="${definitionToRemove.id}"/>' method="POST">
+<form id="RemoveEventDefinitionForm"
+	action='RemoveEventDefinition?action=submit&id=<c:out value="${definitionToRemove.id}"/>'
+	method="POST">
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+		value="<fmt:message key="back" bundle="${resword}"/>"
+		class="button_medium"
+		onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
-	<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" title="<fmt:message key="remove_event_definition" bundle="${resword}"/>" class="button_medium" onClick='return confirmSubmit({ message: "<fmt:message key="if_you_remove_this_definition" bundle="${resword}"/>", height: 150, width: 500, submit: this });'>
-<%-- <input type="button" onclick="confirmCancel('ListEventDefinition');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/> --%>   
+	<input type="submit" name="Submit"
+		value="<fmt:message key="submit" bundle="${resword}"/>"
+		title="<fmt:message key="remove_event_definition" bundle="${resword}"/>"
+		class="button_medium"
+		onClick='return confirmSubmit({ message: "<fmt:message key="if_you_remove_this_definition" bundle="${resword}"/>", height: 150, width: 500, form: document.getElementById("RemoveEventDefinitionForm"), disableSet: $("[class=button_medium]") });'>
+
 </form>
 
 <c:import url="../include/workflow.jsp">
