@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -155,6 +157,7 @@ public class RemoveStudySubjectServlet extends Controller {
 				// remove all study events
 				// remove all event crfs
 				EventCRFDAO ecdao = getEventCRFDAO();
+				CodedItemService codedItemsService = getCodedItemService();
 
 				for (DisplayStudyEventBean dispEvent : displayEvents) {
 					StudyEventBean event = dispEvent.getStudyEvent();
@@ -180,11 +183,16 @@ public class RemoveStudySubjectServlet extends Controller {
 								ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
 								for (Object itemData : itemDatas) {
 									ItemDataBean item = (ItemDataBean) itemData;
+									CodedItem codedItem = codedItemsService.findCodedItem(item.getId());
 									if (!item.getStatus().equals(Status.DELETED)) {
 										item.setStatus(Status.AUTO_DELETED);
 										item.setUpdater(ub);
 										item.setUpdatedDate(new Date());
 										iddao.update(item);
+									}
+									if(codedItem != null) {
+										codedItem.setStatus(com.clinovo.model.Status.CodeStatus.REMOVED.toString());
+										codedItemsService.saveCodedItem(codedItem);
 									}
 								}
 							}

@@ -20,9 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -43,6 +42,9 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Restores a removed study event definition and all its related data
@@ -138,6 +140,7 @@ public class RestoreEventDefinitionServlet extends SecureController {
 				// restore all events
 
 				EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+				CodedItemService codedItemService = getCodedItemService();
 
 				for (int j = 0; j < events.size(); j++) {
 					StudyEventBean event = (StudyEventBean) events.get(j);
@@ -161,11 +164,23 @@ public class RestoreEventDefinitionServlet extends SecureController {
 								ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
 								for (int a = 0; a < itemDatas.size(); a++) {
 									ItemDataBean item = (ItemDataBean) itemDatas.get(a);
+
 									if (item.getStatus().equals(Status.AUTO_DELETED)) {
 										item.setStatus(Status.AVAILABLE);
 										item.setUpdater(ub);
 										item.setUpdatedDate(new Date());
 										iddao.update(item);
+									}
+
+									CodedItem codedItem = codedItemService.findCodedItem(item.getId());
+									if (codedItem != null) {
+										if (codedItem.getHttpPath() == null || codedItem.getHttpPath().isEmpty()) {
+											codedItem.setStatus(com.clinovo.model.Status.CodeStatus.NOT_CODED.toString());
+										} else {
+											codedItem.setStatus(com.clinovo.model.Status.CodeStatus.CODED.toString());
+										}
+
+										codedItemService.saveCodedItem(codedItem);
 									}
 								}
 							}

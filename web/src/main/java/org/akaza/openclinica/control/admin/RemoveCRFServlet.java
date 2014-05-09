@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -179,6 +181,8 @@ public class RemoveCRFServlet extends SecureController {
 				}
 
 				ItemDataDAO idao = new ItemDataDAO(sm.getDataSource());
+				CodedItemService codedItemsService = getCodedItemService();
+
 				for (int i = 0; i < eventCRFs.size(); i++) {
 					EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(i);
 					if (!eventCRF.getStatus().equals(Status.DELETED)) {
@@ -190,11 +194,16 @@ public class RemoveCRFServlet extends SecureController {
 						ArrayList items = idao.findAllByEventCRFId(eventCRF.getId());
 						for (int j = 0; j < items.size(); j++) {
 							ItemDataBean item = (ItemDataBean) items.get(j);
+							CodedItem codedItem = codedItemsService.findCodedItem(item.getId());
 							if (!item.getStatus().equals(Status.DELETED)) {
 								item.setStatus(Status.AUTO_DELETED);
 								item.setUpdater(ub);
 								item.setUpdatedDate(new Date());
 								idao.update(item);
+							}
+							if(codedItem != null) {
+								codedItem.setStatus(com.clinovo.model.Status.CodeStatus.REMOVED.toString());
+								codedItemsService.saveCodedItem(codedItem);
 							}
 						}
 					}

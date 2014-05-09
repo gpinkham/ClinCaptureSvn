@@ -20,9 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -43,6 +42,9 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 @SuppressWarnings({ "rawtypes", "serial" })
 public class RemoveEventDefinitionServlet extends SecureController {
@@ -137,6 +139,7 @@ public class RemoveEventDefinitionServlet extends SecureController {
 				// remove all events
 
 				EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+				CodedItemService codedItemsService = getCodedItemService();
 
 				for (int j = 0; j < events.size(); j++) {
 					StudyEventBean event = (StudyEventBean) events.get(j);
@@ -160,11 +163,17 @@ public class RemoveEventDefinitionServlet extends SecureController {
 								ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
 								for (int a = 0; a < itemDatas.size(); a++) {
 									ItemDataBean item = (ItemDataBean) itemDatas.get(a);
+									CodedItem codedItem = codedItemsService.findCodedItem(item.getId());
 									if (!item.getStatus().equals(Status.DELETED)) {
 										item.setStatus(Status.AUTO_DELETED);
 										item.setUpdater(ub);
 										item.setUpdatedDate(new Date());
 										iddao.update(item);
+
+										if(codedItem != null) {
+											codedItem.setStatus(com.clinovo.model.Status.CodeStatus.REMOVED.toString());
+											codedItemsService.saveCodedItem(codedItem);
+										}
 									}
 								}
 							}
