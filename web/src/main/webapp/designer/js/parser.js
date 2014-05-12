@@ -1579,7 +1579,6 @@ Parser.prototype.setInsertActionMessage = function(message) {
 };
 
 Parser.prototype.setExpression = function(expression) {
-    var wasDateType = false;
 	if (expression instanceof Array) {
 		this.rule.expression = expression;
 		var currDroppable = $(".dotted-border");
@@ -1587,7 +1586,6 @@ Parser.prototype.setExpression = function(expression) {
 			var itm = this.getItem(expression[e]);
 			if (e === 0) {
 				if (itm) {
-                    wasDateType = itm.type == "date";
 					var preds = expression[e].split(".");
 					if (preds.length == 4) {
 						$(".dotted-border").attr("event-oid", preds[3]);
@@ -1648,10 +1646,10 @@ Parser.prototype.setExpression = function(expression) {
 						droppable.attr("study-oid", this.extractStudy(this.getStudy()).oid);
 						droppable.text(itm.name);
 					} else {
-						if (this.isDateValue(expression[e])) {
+						if (this.isDateValue(expression[e], true)) {
 							var value = expression[e];
 							var date = Date.parse(value);
-							if (wasDateType && date != null) {
+							if (date != null) {
 								value = date.toString(getCookie('ccDateFormat'));
 							}
 							droppable.text(value);
@@ -2095,6 +2093,7 @@ Parser.prototype.resetActions = function(target) {
 	$("input[name='action']").not(target).attr("previous-state", false);
 };
 
-Parser.prototype.isDateValue = function(val) {
-	return /^\d+[-]\w+[-]\d{4}/.test(val);
+Parser.prototype.isDateValue = function(val, expressionFormat) {
+    var date = Date.parse(val);
+    return date != null && date.toString(expressionFormat ? "yyyy-MM-dd" : getCookie('ccDateFormat')) == val;
 };
