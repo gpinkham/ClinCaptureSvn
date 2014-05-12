@@ -89,8 +89,8 @@ function createTable(params) {
 	}
 	thead.append(thRow);
 	table.append(thead);
-	table.append($("<tbody>"))
-	return table
+	table.append($("<tbody>"));
+	return table;
 }
 
 /* =========================================================================
@@ -244,7 +244,7 @@ function createPagination(params) {
 		});
 		rEl.append(rAEL);
 		ul.append(rEl);
-		return ul
+		return ul;
 	}
 }
 
@@ -259,7 +259,7 @@ function createPagination(params) {
 function resetTable(params) {
 
 	params.table.find("tbody > tr").remove();
-	var alphaArr = params.arr[currentPageIndex]
+	var alphaArr = params.arr[currentPageIndex];
 	for (var chunk in alphaArr) {
 		var tr = alphaArr[chunk];
 		$(tr).find("td").toArray().map(function(x) {
@@ -500,8 +500,8 @@ function addDroppable(popov) {
 	div.append(evalBtn);
 	div.css("text-align", "center");
 	modalContent.append(div);
-	modalDialog.append(modalContent)
-	modalOuterDiv.append(modalDialog)
+	modalDialog.append(modalContent);
+	modalOuterDiv.append(modalDialog);
 	modalOuterDiv.modal({
 		backdrop: false
 	});
@@ -568,7 +568,14 @@ function createAlert(text) {
 	}, 5000);
 	return div;
 }
-
+/* ===========================================================================
+ * Set onclick actions for items in expression
+ * ========================================================================== */
+function updateOnClickActions() {
+	$('.dotted-border.group').click(function() {
+		showCRFItem(this);
+	});
+}
 /* ===========================================================================
  * Handles erratic responses from a server.
  *
@@ -626,7 +633,7 @@ function createDroppable(params) {
 			params.ui = ui;	
 			handleDropEvent(params);
 		}
-	})
+	});
 
 	params.element.dblclick(function() {
 		params.element.tooltip("hide");
@@ -913,7 +920,7 @@ function loadStudyEvents(study) {
 				$(this).siblings(".selected").removeClass("selected");
 				$(this).addClass("selected");
 
-				var currentEvent = study.events[$(this).attr("id")]
+				var currentEvent = study.events[$(this).attr("id")];
 				loadEventCRFs({
 					study: study,
 					studyEvent: currentEvent
@@ -1022,7 +1029,7 @@ function loadEventCRFs(params) {
 			itemArr.push(tr);
 		}
 
-		$("div[id='crfs']").append(crfTable)
+		$("div[id='crfs']").append(crfTable);
 		currentPageIndex = 0;
 
 		// Global
@@ -1242,7 +1249,7 @@ function resetStudy(params) {
 	parser.setStudy(params.study.id);
 	loadStudyEvents(params.study);
 	// Cascade load
-	var topEvent = params.study.events[Object.keys(params.study.events)[0]]
+	var topEvent = params.study.events[Object.keys(params.study.events)[0]];
 	loadEventCRFs({
 		study: params.study,
 		studyEvent: topEvent

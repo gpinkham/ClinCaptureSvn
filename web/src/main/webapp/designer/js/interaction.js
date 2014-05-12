@@ -240,6 +240,9 @@ $(function() {
 	$(document).on('blur', '#ruleName', function() {
 		parser.setName($(this).val());
 	});
+	$('.dotted-border.group').click(function() {
+		showCRFItem(this);
+	});
 	$('input[name=ruleInvoke]').click(function() {
 		if ($(this).attr('previous-state') == 'checked') {
 			$(this).prop('checked', false);
@@ -488,10 +491,10 @@ $(function() {
 		var data = JSON.parse(sessionStorage.getItem("studies"));
 		// Only study
 		if (selected === 1) {
-			var study = data[$("table").find(".selected").attr("id")]
-			var studyEvent = study.events[Object.keys(study.events)[0]]
+			var study = data[$("table").find(".selected").attr("id")];
+			var studyEvent = study.events[Object.keys(study.events)[0]];
 			if (studyEvent) {
-				var crf = studyEvent.crfs[Object.keys(studyEvent.crfs)[0]]
+				var crf = studyEvent.crfs[Object.keys(studyEvent.crfs)[0]];
 				createBreadCrumb({
 					crf: crf.name,
 					study: study.name,
@@ -505,7 +508,7 @@ $(function() {
 				});
 			}
 		}
-	})
+	});
 
 	$("#validate").click(function() {
 		parser.validate();

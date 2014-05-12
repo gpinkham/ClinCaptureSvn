@@ -34,35 +34,35 @@ Parser.prototype.getStudy = function() {
 	if (this.rule) {
 		return this.rule.study;
 	}
-}
+};
 
 Parser.prototype.setStudy = function(study) {
 	this.rule.study = study;
-}
+};
 
 Parser.prototype.getCopy = function() {
 	return this.rule.copied;
-}
+};
 
 Parser.prototype.setCopy = function(copied) {
 	this.rule.copied = copied;
-}
+};
 
 Parser.prototype.getEditing = function() {
 	return this.rule.editing;
-}
+};
 
 Parser.prototype.setEditing = function(editing) {
 	this.rule.editing = editing;
-}
+};
 
 Parser.prototype.getRuleSet = function() {
 	return this.rule.ruleSet;
-}
+};
 
 Parser.prototype.setRuleSet = function(ruleSet) {
 	this.rule.ruleSet = ruleSet;
-}
+};
 
 /* ========================================================================
  * Fetch studies from CC. The studies come with events/crf and items added.
@@ -96,6 +96,8 @@ Parser.prototype.fetchStudies = function() {
 				sessionStorage.removeItem("context");
 			}
 			$(".spinner").remove();
+			// Wait till items will be added to DOM structure and update click events for them;
+			setTimeout(updateOnClickActions,400);
 		},
 		error: function(response) {
 			handleErrorResponse({
@@ -103,7 +105,7 @@ Parser.prototype.fetchStudies = function() {
 			});
 		}
 	});
-}
+};
 
 /* ========================================================================
  * Fetch a specific rule from CC for editing in the designer. The rule is
@@ -134,7 +136,7 @@ Parser.prototype.fetchRuleForEditing = function() {
 			});
 		}
 	});
-}
+};
 
 /* ===========================================================================
  * For start groups and conditinal drop surface, this functions determines what
@@ -153,7 +155,7 @@ Parser.prototype.determineNext = function(currentElement) {
 	} else {
 		return "EVAL";
 	}
-}
+};
 
 /* ==============================================================================
  * This function creates the next valid droppable surface based off the existing
@@ -386,7 +388,9 @@ Parser.prototype.createNextDroppable = function(params) {
 			}
 		}
 	}
-}
+	// Update onClick actions for newly added elements;
+	updateOnClickActions();
+};
 
 Parser.prototype.getInsertActionDestination = function(id) {
 	for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
@@ -395,7 +399,7 @@ Parser.prototype.getInsertActionDestination = function(id) {
 			return dest;
 		}
 	}
-}
+};
 
 /* ======================================================
  * Determines if the element is of type 'text' on the UI
@@ -407,7 +411,7 @@ Parser.prototype.getInsertActionDestination = function(id) {
  * ====================================================== */
 Parser.prototype.isText = function(element) {
 	return element.is('.text');
-}
+};
 
 /* ======================================================
  * Determines if the element is of type 'date' on the UI
@@ -419,7 +423,7 @@ Parser.prototype.isText = function(element) {
  * ====================================================== */
 Parser.prototype.isDate = function(element) {
 	return element.is('.date');
-}
+};
 
 /* ======================================================
  * Determines if the element is of type 'empty' on the UI
@@ -431,7 +435,7 @@ Parser.prototype.isDate = function(element) {
  * ====================================================== */
 Parser.prototype.isEmpty = function(element) {
 	return element.is('.empty');
-}
+};
 
 /* ======================================================
  * Determines if the element is of type 'number' on the UI
@@ -443,7 +447,7 @@ Parser.prototype.isEmpty = function(element) {
  * ====================================================== */
 Parser.prototype.isNumber = function(element) {
 	return element.is('.number');
-}
+};
 
 /* =============================================================
  * Determines if the element is of type 'current-date' on the UI
@@ -455,7 +459,7 @@ Parser.prototype.isNumber = function(element) {
  * ====================================================== */
 Parser.prototype.isCurrentDate = function(element) {
 	return element.is('.current-date');
-}
+};
 
 Parser.prototype.getItemDuplicates = function(itemName) {
 	var duplicates = [];
@@ -477,7 +481,7 @@ Parser.prototype.getItemDuplicates = function(itemName) {
 		});
 	});
 	return duplicates;
-}
+};
 
 Parser.prototype.isDuplicated = function(params) {
 	var duped = this.getItemDuplicates(params.name).map(function(x) {
@@ -486,7 +490,7 @@ Parser.prototype.isDuplicated = function(params) {
 		return array[0] === array[index];
 	});
 	return duped;
-}
+};
 
 Parser.prototype.isRepeatItem = function(itemName) {
 	var item = this.getItem(itemName);
@@ -494,7 +498,7 @@ Parser.prototype.isRepeatItem = function(itemName) {
 		return true;
 	}
 	return false;
-}
+};
 
 Parser.prototype.getRuleCRFItems = function() {
 	var items = [];
@@ -511,7 +515,7 @@ Parser.prototype.getRuleCRFItems = function() {
 		}
 	}
 	return items;
-}
+};
 
 /* ==============================================================================
  * Creates a rule based on what the user has dropped on the drop surfaces and the
@@ -536,7 +540,7 @@ Parser.prototype.createRule = function() {
 			}
 		}
 		return true;
-	}
+	};
 	var study = this.extractStudy(this.getStudy());
 	var expressionPredicates = $(".dotted-border:not(:empty), .target:not(:empty)");
 	var oids = expressionPredicates.toArray().map(function(x) {
@@ -563,7 +567,7 @@ Parser.prototype.createRule = function() {
 			pred = parser.constructExpressionPath({
 				quantified: quantified,
 				ele: $(".dotted-border")[index]
-			})
+			});
 		}
         // check dates
 		if (parser.isDateValue(pred)) {
@@ -589,7 +593,7 @@ Parser.prototype.createRule = function() {
 			}
 		}
 	}
-}
+};
 
 Parser.prototype.constructExpressionPath = function(params) {
 	if (params.quantified) {
@@ -597,7 +601,7 @@ Parser.prototype.constructExpressionPath = function(params) {
 	} else {
 		return $(params.ele).attr("event-oid") + "." + $(params.ele).attr("crf-oid") + "." + $(params.ele).attr("group-oid") + "." + $(params.ele).attr("item-oid");
 	}
-}
+};
 
 Parser.prototype.getRule = function() {
 	this.createRule();
@@ -630,7 +634,7 @@ Parser.prototype.getRule = function() {
 		}
 		return false;
 	}
-}
+};
 
 Parser.prototype.render = function(rule) {
 	this.rule.targets = [];
@@ -667,7 +671,7 @@ Parser.prototype.render = function(rule) {
 	this.setAdministrativeEditingExecute(rule.ae);
 	// Show the delete expression button
 	$("#deleteButton").removeClass("hidden");
-}
+};
 
 /* ===========================================================================================
  * Determines if what has been designed by the user is valid according to the following rules:
@@ -775,8 +779,8 @@ Parser.prototype.isValid = function(expression) {
 	return {
 		valid: valid,
 		message: message
-	}
-}
+	};
+};
 
 /* ==============================================================================
  * Determines if the a given predicate is an operator according to the CC spec.
@@ -805,7 +809,7 @@ Parser.prototype.isOp = function(predicate) {
 
 	var dOps = ['eq', 'ne', 'lt', 'gt', 'lte', 'gte', 'nct', 'ct', 'and', 'or', 'not'];
 	return ops.indexOf(predicate) > -1 || dOps.indexOf(predicate) > -1;
-}
+};
 
 /* ===========================================================
  * Determines if the a given predicate is an allowed operator
@@ -820,7 +824,7 @@ Parser.prototype.isAllowedOp = function(predicate) {
 	// Divide
 	ops.push(unescape(JSON.parse('"\u00F7"')));
 	return ops.indexOf(predicate) > -1;
-}
+};
 
 /* ==============================================================
  * Determines if the a given predicate is a conditional operator
@@ -833,7 +837,7 @@ Parser.prototype.isAllowedOp = function(predicate) {
 Parser.prototype.isConditionalOp = function(predicate) {
 	var ops = ['AND', 'OR'];
 	return ops.indexOf(predicate) > -1;
-}
+};
 
 /* =====================================================================
  * Converts between design operator representation to CC representation
@@ -867,7 +871,7 @@ Parser.prototype.getOp = function(predicate) {
 			return "*";
 		}
 	}
-}
+};
 
 Parser.prototype.getLocalOp = function(predicate) {
 	if (this.isAllowedOp(predicate)) {
@@ -898,7 +902,7 @@ Parser.prototype.getLocalOp = function(predicate) {
 		} 
 	}
 	return false;
-}
+};
 
 /* =====================================================================
  * Checks if the targets exists among the added targets
@@ -916,7 +920,7 @@ Parser.prototype.isAddedTarget = function(target) {
 			return true;
 		}
 	}
-}
+};
 
 Parser.prototype.isAddedInsertTarget = function(target) {
 	for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
@@ -924,11 +928,11 @@ Parser.prototype.isAddedInsertTarget = function(target) {
 			return true;
 		}
 	}
-}
+};
 
 Parser.prototype.isAddedShowHideTarget = function(target) {
 	return this.getShowHideAction() && this.getShowHideAction().destinations.indexOf(this.constructCRFPath(target)) > -1;
-}
+};
 
 /* ===========================================================================
  * Finds a CRF item from the original data returns from CC given an item name
@@ -957,7 +961,7 @@ Parser.prototype.findItem = function(identifier) {
 		});
 	});
 	return item;
-}
+};
 
 Parser.prototype.findStudyItem = function(params) {
 	for (var e in params.study.events) {
@@ -1001,7 +1005,7 @@ Parser.prototype.findStudyItem = function(params) {
 			}
 		}
 	}
-}
+};
 
 Parser.prototype.findItemBySelectedProperties = function(params) {
 	var item = null;
@@ -1028,7 +1032,7 @@ Parser.prototype.findItemBySelectedProperties = function(params) {
 		}
 	});
 	return item;
-}
+};
 
 Parser.prototype.getVersionCRF = function(params) {
 	var cf = null;
@@ -1036,24 +1040,24 @@ Parser.prototype.getVersionCRF = function(params) {
 		evt.crfs.forEach(function(crf) {
 			crf.versions.forEach(function(ver) {
 				if (ver.oid == params.ver) {
-					cf = crf
+					cf = crf;
 				}
 			});
 		});
 	});
 	return cf;
-}
+};
 
 Parser.prototype.setName = function(name) {
 	if (name && name.length > 0) {
 		this.rule.name = name;
 		$("#ruleName").val(this.rule.name);
 	}
-}
+};
 
 Parser.prototype.getName = function() {
 	return this.rule.name;
-}
+};
 
 Parser.prototype.setEvaluates = function(evaluates) {
 	if (evaluates) {
@@ -1063,11 +1067,11 @@ Parser.prototype.setEvaluates = function(evaluates) {
 		this.rule.evaluates = false;
 		$("#evaluateFalse").prop("checked", true);
 	}
-}
+};
 
 Parser.prototype.getEvaluates = function() {
 	return this.rule.evaluates;
-}
+};
 
 Parser.prototype.setInitialDataEntryExecute = function(execute) {
 	if (execute) {
@@ -1077,11 +1081,11 @@ Parser.prototype.setInitialDataEntryExecute = function(execute) {
 		this.rule.ide = false;
 		$("#ide").prop("checked", execute);
 	}
-}
+};
 
 Parser.prototype.getInitialDataEntryExecute = function() {
 	return this.rule.ide ? this.rule.ide : false;
-}
+};
 
 Parser.prototype.setDoubleDataEntryExecute = function(execute) {
 	if (execute) {
@@ -1091,11 +1095,11 @@ Parser.prototype.setDoubleDataEntryExecute = function(execute) {
 		this.rule.dde = false;
 		$("#dde").prop("checked", execute);
 	}
-}
+};
 
 Parser.prototype.getDoubleDataEntryExecute = function() {
 	return this.rule.dde ? this.rule.dde : false;
-}
+};
 
 Parser.prototype.setAdministrativeEditingExecute = function(execute) {
 	if (execute) {
@@ -1105,11 +1109,11 @@ Parser.prototype.setAdministrativeEditingExecute = function(execute) {
 		this.rule.ae = false;
 		$("#ae").prop("checked", execute);
 	}
-}
+};
 
 Parser.prototype.getAdministrativeEditingExecute = function() {
 	return this.rule.ae ? this.rule.ae : false;
-}
+};
 
 Parser.prototype.setDataImportExecute = function(execute) {
 	if (execute) {
@@ -1119,11 +1123,11 @@ Parser.prototype.setDataImportExecute = function(execute) {
 		this.rule.di = false;
 		$("#dataimport").prop("checked", execute);
 	}
-}
+};
 
 Parser.prototype.getDataImportExecute = function() {
 	return this.rule.di ? this.rule.di : false;
-}
+};
 
 Parser.prototype.setActions = function(params) {
 	if (params.actions.length > 0) {
@@ -1159,11 +1163,11 @@ Parser.prototype.setActions = function(params) {
 			} 
 		}
 	}
-}
+};
 
 Parser.prototype.getActions = function() {
 	return this.rule.actions;
-}
+};
 
 Parser.prototype.getDiscrepancyAction = function() {
 	if (this.rule.actions.length > 0) {
@@ -1174,7 +1178,7 @@ Parser.prototype.getDiscrepancyAction = function() {
 			}
 		}
 	}
-}
+};
 
 Parser.prototype.setDiscrepancyAction = function(params) {
 	if (params) {
@@ -1197,7 +1201,7 @@ Parser.prototype.setDiscrepancyAction = function(params) {
 					$(".dotted-border-lg").hide();
 				}
 			}
-		}
+		};
 		if (params.selected) {
 			if (this.getActions().length > 0 && this.getDiscrepancyAction()) {
 				action = this.getDiscrepancyAction();
@@ -1213,7 +1217,7 @@ Parser.prototype.setDiscrepancyAction = function(params) {
 		}
 		action.render(params.selected);
 	}
-}
+};
 
 Parser.prototype.getEmailAction = function() {
 	if (this.rule.actions.length > 0) {
@@ -1224,7 +1228,7 @@ Parser.prototype.getEmailAction = function() {
 			}
 		}
 	}
-}
+};
 
 Parser.prototype.setEmailAction = function(params) {
 	if (params) {
@@ -1251,7 +1255,7 @@ Parser.prototype.setEmailAction = function(params) {
 					$(".dotted-border-lg").hide();
 				}
 			}
-		}
+		};
 		if (params.selected && !params.context) {
 			if (this.getActions().length > 0 && this.getEmailAction()) {
 				action = this.getEmailAction();
@@ -1268,7 +1272,7 @@ Parser.prototype.setEmailAction = function(params) {
 		}
 		action.render(params.selected);
 	}
-}
+};
 
 Parser.prototype.getInsertAction = function() {
 	if (this.rule.actions.length > 0) {
@@ -1279,7 +1283,7 @@ Parser.prototype.getInsertAction = function() {
 			}
 		}
 	}
-}
+};
 
 Parser.prototype.setInsertAction = function(params) {
 	if (params) {
@@ -1313,7 +1317,7 @@ Parser.prototype.setInsertAction = function(params) {
 				});
 				$(".insert-properties").append(div);
 			}
-		}
+		};
 		if (params.selected) {
 			if (this.getActions().length > 0 && this.getInsertAction()) {
 				action = this.getInsertAction();
@@ -1340,7 +1344,7 @@ Parser.prototype.setInsertAction = function(params) {
 		}
 		action.render(params.selected);
 	}
-}
+};
 
 Parser.prototype.getShowHideAction = function() {
 	if (this.rule.actions.length > 0) {
@@ -1351,11 +1355,11 @@ Parser.prototype.getShowHideAction = function() {
 			}
 		}
 	}
-}
+};
 
 Parser.prototype.setShowHideActionMessage = function(message) {
 	this.getShowHideAction().message = message;	
-}
+};
 
 Parser.prototype.setShowHideAction = function(params) {
 	if (params) {
@@ -1398,7 +1402,7 @@ Parser.prototype.setShowHideAction = function(params) {
 			}
 			$("input[action=show]").prop("checked", visible.show);
 			$("input[action=hide]").prop("checked", visible.hide);
-		}
+		};
 		if (params.hide || params.show) {
 			if (this.getActions().length > 0 && this.getShowHideAction()) {
 				action = this.getShowHideAction();
@@ -1431,7 +1435,7 @@ Parser.prototype.setShowHideAction = function(params) {
 		}
 		action.render(params);
 	}
-}
+};
 
 Parser.prototype.setDestinationValue = function(params) {
 	var act = this.getInsertAction();
@@ -1457,7 +1461,7 @@ Parser.prototype.setDestinationValue = function(params) {
 		}
 		act.render(act);
 	}
-}
+};
 
 Parser.prototype.addNewInsertActionInputs = function() {
 
@@ -1489,7 +1493,7 @@ Parser.prototype.addNewInsertActionInputs = function() {
 	});
 
 	$(".insert-properties").append(div);
-}
+};
 
 Parser.prototype.setDestinations = function(dests) {
 	if (dests.length > 0) {
@@ -1538,14 +1542,14 @@ Parser.prototype.setDestinations = function(dests) {
 			});
 			if (x === 0) {
 				div.find("label").show();
-				$(".insert-properties").find(".row").before(div)
+				$(".insert-properties").find(".row").before(div);
 			} else {
 				div.find("label").hide();
 				$(".insert-properties").find(".row").last().before(div);
 			}
 		}
 	}
-}
+};
 
 Parser.prototype.setShowHideDestinations = function(dests) {
 	if (dests.length > 0) {
@@ -1568,11 +1572,11 @@ Parser.prototype.setShowHideDestinations = function(dests) {
 			x === 0 ? div.before(cloned) : $(".space-left-neg > .input-group").last().before(cloned);
 		}
 	}
-}
+};
 
 Parser.prototype.setInsertActionMessage = function(message) {
 	this.getInsertAction().message = message;
-}
+};
 
 Parser.prototype.setExpression = function(expression) {
     var wasDateType = false;
@@ -1686,7 +1690,7 @@ Parser.prototype.setExpression = function(expression) {
 	if (!$(".sortable").is(".ui-sortable")) {
 		createSortable();
 	}
-}
+};
 
 Parser.prototype.setTargets = function(targets) {
 	if (targets.length > 0) {
@@ -1764,7 +1768,7 @@ Parser.prototype.setTargets = function(targets) {
 			this.rule.targets.push(tar);
 		}
 	}
-}
+};
 
 Parser.prototype.extractTarget = function(params) {
 	var target = Object.create(null);
@@ -1782,11 +1786,11 @@ Parser.prototype.extractTarget = function(params) {
 		}).oid;
 	}	
 	return target;
-}
+};
 
 Parser.prototype.getTargets = function() {
 	return this.rule.targets;
-}
+};
 
 Parser.prototype.selectTarget = function() {
 	var study = this.extractStudy(this.rule.study);
@@ -1796,7 +1800,7 @@ Parser.prototype.selectTarget = function() {
 			$("tr.selected").each(function() {
 				$(this).removeClass("selected");
 			});
-			row.parent().click()
+			row.parent().click();
 			// Event
 			this.recursiveSelect({
 				click: true,
@@ -1823,7 +1827,7 @@ Parser.prototype.selectTarget = function() {
 			});
 		}
 	}
-}
+};
 
 Parser.prototype.deleteTarget = function(target) {
 	if ($(target).siblings("input").is(".target")) {
@@ -1866,7 +1870,7 @@ Parser.prototype.deleteTarget = function(target) {
 			}	
 		}
 	}
-}
+};
 
 /* =================================================================
  * Validates the designed rule using the CC Test Rule servlet
@@ -1899,10 +1903,10 @@ Parser.prototype.validate = function() {
 					response: response
 				});
 			}
-		})
+		});
 	}
 	$(".spinner").remove();
-}
+};
 
 /* =================================================================
  * Displays the validation results from testing a rule in CC.
@@ -1937,12 +1941,12 @@ Parser.prototype.displayValidationResults = function(rule) {
 				response: response
 			});
 		}
-	})
-}
+	});
+};
 
 Parser.prototype.getParameter = function(name) {
 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))|| null;
-}
+};
 
 Parser.prototype.getParameterValue = function(name) {
 	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
@@ -1953,15 +1957,15 @@ Parser.prototype.getParameterValue = function(name) {
 	} else {
 		return results[1];
 	}
-}
+};
 
 Parser.prototype.extractEventNameFromExpression = function(predicate) {
 	return new RegExp("^(\\w+)(?=\.)").exec(predicate)[1];
-}
+};
 
 Parser.prototype.extractItemOIDFromExpression = function(predicate) {
 	return new RegExp("\.([^\.]+)$").exec(predicate)[1];
-}
+};
 
 Parser.prototype.extractStudy = function(id) {
 	var studies = JSON.parse(sessionStorage.getItem("studies"));
@@ -1970,21 +1974,21 @@ Parser.prototype.extractStudy = function(id) {
 			return studies[x];
 		}
 	}
-}
+};
 
 Parser.prototype.constructCRFPath = function(itemName) {
 	var item = this.getItem(itemName);
 	return item.crfOid + "." + item.group + "." + item.oid;
-}
+};
 
 Parser.prototype.constructCRFVersionPath = function(target) {
 	return target.versionify ? target.version + "." + target.group + "." + target.oid : this.constructCRFPath(target.name);
-}
+};
 
 Parser.prototype.constructEventPath = function(itemName) {
 	var item = this.getItem(itemName);
 	return item.eventOid + "." + this.constructCRFPath(itemName);
-}
+};
 
 Parser.prototype.constructRepeatItemPath = function(target) {
 	// event oid?
@@ -1996,7 +2000,7 @@ Parser.prototype.constructRepeatItemPath = function(target) {
 		name = name.length > 0 ? name + "." + target.crf : target.crf;
 	}
 	return name + "." + target.group + "[" + target.line + "]" + "." + target.oid;
-}
+};
 
 Parser.prototype.eventify = function(targetEvent) {
 	var targetName = $(targetEvent).parent().siblings(".target").val();
@@ -2007,11 +2011,11 @@ Parser.prototype.eventify = function(targetEvent) {
 			break;
 		}
 	}
-}
+};
 
 Parser.prototype.isEventified = function(expression) {
 	return expression.slice(0, "SE_".length) == "SE_";
-}
+};
 
 Parser.prototype.versionify = function(targetEvent) {
 	var targetName = $(targetEvent).parent().siblings(".target").val();
@@ -2022,7 +2026,7 @@ Parser.prototype.versionify = function(targetEvent) {
 			break;
 		}
 	}
-}
+};
 
 Parser.prototype.linefy = function(targetEvent) {
 	var targetName = $(targetEvent).siblings(".target").val();
@@ -2038,7 +2042,7 @@ Parser.prototype.linefy = function(targetEvent) {
 			break;
 		}
 	}
-}
+};
 // This function is a bit involved - consider refactoring
 Parser.prototype.recursiveSelect = function(params) {
 	var next = $("div[id=" + params.type + "]").find("a:contains(" + unescape(JSON.parse('"\u00BB\u00BB"')) + ")");
@@ -2059,7 +2063,7 @@ Parser.prototype.recursiveSelect = function(params) {
 	if (params.click) {
 		$("td[oid=" + params.candidate + "]").parent().trigger('click', [{x:false}]);
 	}
-}
+};
 
 Parser.prototype.getItem = function(expression) {
 	if (expression.indexOf(".") == -1) {
@@ -2073,7 +2077,7 @@ Parser.prototype.getItem = function(expression) {
 	} else {
 		return this.findItem(this.extractItemOIDFromExpression(expression));
 	}
-}
+};
 
 Parser.prototype.resetActions = function(target) {
 	function isShowHideTarget(item) {
@@ -2089,8 +2093,8 @@ Parser.prototype.resetActions = function(target) {
 	$(".dotted-border-lg").hide();
 	$(".dotted-border-lg").children().hide();
 	$("input[name='action']").not(target).attr("previous-state", false);
-}
+};
 
 Parser.prototype.isDateValue = function(val) {
 	return /^\d+[-]\w+[-]\d{4}/.test(val);
-}
+};
