@@ -71,9 +71,10 @@ public class ImportRuleServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+		
 		UserAccountBean ub = getUserAccountBean(request);
 		// Reset the study if RS is saving a rule for a different study
+		StudyBean originalScope = null;
 		if ((request.getParameter("study") != null && !request.getParameter("study").isEmpty())
 				&& getCurrentStudy(request).getId() != Integer.parseInt(request.getParameter("study"))) {
 			originalScope = (StudyBean) request.getSession().getAttribute(STUDY);

@@ -140,8 +140,6 @@ public abstract class Controller extends BaseController {
 	public static final String BOOSTRAP_DATE_FORMAT = "bootstrapDateFormat";
 	public static final String BOOTSTRAP_DATAPICKER_DATE_FORMAT = "bootstrap_datapicker_date_format";
 
-	protected StudyBean originalScope = null;
-
 	protected void addPageMessage(String message, HttpServletRequest request) {
 		addPageMessage(message, request, logger);
 	}

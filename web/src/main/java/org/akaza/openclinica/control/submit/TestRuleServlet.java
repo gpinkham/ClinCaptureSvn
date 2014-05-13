@@ -114,7 +114,9 @@ public class TestRuleServlet extends Controller {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		// Reset the study if RS is testing a rule for a different study
-		if ((request.getParameter("study") != null && !request.getParameter("study").isEmpty()) && getCurrentStudy(request).getId() != Integer.parseInt(request.getParameter("study"))) {
+		StudyBean originalScope = null;
+		if ((request.getParameter("study") != null && !request.getParameter("study").isEmpty()) 
+				&& getCurrentStudy(request).getId() != Integer.parseInt(request.getParameter("study"))) {
 			originalScope = (StudyBean) request.getSession().getAttribute(STUDY);
 			request.getSession().setAttribute(STUDY, getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study"))));
 		}
