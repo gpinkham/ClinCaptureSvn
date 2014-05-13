@@ -121,8 +121,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	public static final int POPUP_BASE_WIDTH = 600;
 	public static final String POPUP_BASE_WIDTH_PX = "width: " + POPUP_BASE_WIDTH + "px";
 
-	private Role userRole;
-
 	final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>();
 
 	// To avoid showing title in other pages, the request element is used to determine where the request came from.
@@ -283,7 +281,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		if (sortForMainMenuServlet) {
 			prepareLimit(limit);
 		}
-		userRole = ((StudyUserRoleBean) tableFacade.getWebContext().getSessionAttribute("userRole")).getRole();
+		Role userRole = ((StudyUserRoleBean) tableFacade.getWebContext().getSessionAttribute("userRole")).getRole();
 
 		FindSubjectsFilter subjectFilter = getSubjectFilter(limit);
 
@@ -549,8 +547,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			ListIterator<StudyGroupClassBean> it = dynamicGroupClasses.listIterator();
 			while (it.hasNext()) {
 				sgcb = it.next();
-				studyEventDefinitionsList = (ArrayList<StudyEventDefinitionBean>) studyEventDefinitionDao
-						.findAllAvailableAndOrderedByStudyGroupClassId(sgcb.getId());
+				studyEventDefinitionsList = studyEventDefinitionDao.findAllAvailableAndOrderedByStudyGroupClassId(sgcb
+						.getId());
 				if (studyEventDefinitionsList.size() != 0) {
 					sgcb.setEventDefinitions(studyEventDefinitionsList);
 				} else {
@@ -905,7 +903,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		String status = "Not+Closed";
 		if (flagColor.equals("red")) {
 			imagePath = "images/icon_Note.gif";
-			status = "New";
 		}
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink
