@@ -840,9 +840,9 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 	public static void setParameterForDN(String toOverwrite, String field, String parameterName, String value,
 			HttpServletRequest request) {
-		if (request.getSession().getAttribute("dnAdditionalCreatingParameters") != null) {
-			Map<String, HashMap<String, String>> dnAdditionalCreatingParameters = (Map<String, HashMap<String, String>>) request
-					.getSession().getAttribute("dnAdditionalCreatingParameters");
+		Map<String, HashMap<String, String>> dnAdditionalCreatingParameters = (Map<String, HashMap<String, String>>) request
+				.getSession().getAttribute("dnAdditionalCreatingParameters");
+		if (dnAdditionalCreatingParameters != null) {
 			if (field != null && dnAdditionalCreatingParameters.get(field) != null) {
 				changeParameter(toOverwrite, field, parameterName, value, dnAdditionalCreatingParameters);
 			}
@@ -863,13 +863,11 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 	}
 
 	public static Map<String, String> getMapWithParameters(String field, HttpServletRequest request) {
-		if (request.getSession().getAttribute("dnAdditionalCreatingParameters") != null) {
-
-			Map<String, HashMap<String, String>> dnAdditionalCreatingParameters = (Map<String, HashMap<String, String>>) request
-					.getSession().getAttribute("dnAdditionalCreatingParameters");
+		Map<String, HashMap<String, String>> dnAdditionalCreatingParameters = (Map<String, HashMap<String, String>>) request
+				.getSession().getAttribute("dnAdditionalCreatingParameters");
+		if (dnAdditionalCreatingParameters != null) {
 			return dnAdditionalCreatingParameters.containsKey(field) ? dnAdditionalCreatingParameters.get(field)
 					: new HashMap<String, String>();
-
 		} else {
 			return new HashMap<String, String>();
 		}

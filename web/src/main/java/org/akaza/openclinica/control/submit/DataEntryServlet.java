@@ -256,6 +256,8 @@ public abstract class DataEntryServlet extends Controller {
 	private static final String DNS_TO_TRANSFORM = "listOfDNsToTransform";
 
 	private static final String WARNINGS_LIST = "warningsIsDisplayed";
+	
+	public static final String DN_ADDITIONAL_CR_PARAMS = "dnAdditionalCreatingParameters";
 
 	@Override
 	protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -424,6 +426,7 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		if (!fp.getString(GO_EXIT).equals("")) {
+			clearSession(request);
 			session.removeAttribute(GROUP_HAS_DATA);
 			session.removeAttribute("to_create_crf");
 			session.removeAttribute("mayProcessUploading");
@@ -647,7 +650,7 @@ public abstract class DataEntryServlet extends Controller {
 			logMe("Entering Checks !submitted entered end forwarding page " + System.currentTimeMillis());
 			logMe("Time Took for this block" + (System.currentTimeMillis() - t));
 			request.getSession()
-					.setAttribute("dnAdditionalCreatingParameters", createDNParametersMap(request, section));
+					.setAttribute(DN_ADDITIONAL_CR_PARAMS, createDNParametersMap(request, section));
 			forwardPage(getJSPPage(), request, response);
 			return;
 		} else {
@@ -1314,11 +1317,10 @@ public abstract class DataEntryServlet extends Controller {
 				request.setAttribute("hasError", "true");
 				session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 				setUpPanel(request, section);
-				request.getSession().setAttribute("dnAdditionalCreatingParameters",
-						createDNParametersMap(request, section));
+				request.getSession().setAttribute(DN_ADDITIONAL_CR_PARAMS, createDNParametersMap(request, section));
 				forwardPage(getJSPPage(), request, response);
 			} else {
-
+				clearSession(request);
 				boolean success = true;
 				boolean temp = true;
 
@@ -1923,6 +1925,7 @@ public abstract class DataEntryServlet extends Controller {
 
 	private void clearSession(HttpServletRequest request) {
 		request.getSession().removeAttribute(WARNINGS_LIST);
+		request.getSession().removeAttribute(DN_ADDITIONAL_CR_PARAMS);
 		request.getSession().removeAttribute(CreateDiscrepancyNoteServlet.SUBMITTED_DNS_MAP);
 		request.getSession().removeAttribute(CreateDiscrepancyNoteServlet.TRANSFORMED_SUBMITTED_DNS);
 		request.getSession().removeAttribute(DNS_TO_TRANSFORM);
