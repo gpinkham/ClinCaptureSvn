@@ -95,7 +95,7 @@ Parser.prototype.fetchStudies = function() {
 				parser.render(JSON.parse(sessionStorage.getItem("context")));
 				sessionStorage.removeItem("context");
 			}
-			$(".spinner").remove();
+			removeLoader();
 			// Wait till items will be added to DOM structure and update click events for them;
 			setTimeout(updateOnClickActions,400);
 		},
@@ -1894,7 +1894,7 @@ Parser.prototype.validate = function() {
 			success: function(response) {
 				rule.validation = response;
 				parser.displayValidationResults(rule);
-				$(".spinner").remove();
+				removeLoader();
 			},
 			error: function(response) {
 				handleErrorResponse({
@@ -1903,7 +1903,7 @@ Parser.prototype.validate = function() {
 			}
 		});
 	}
-	$(".spinner").remove();
+	removeLoader();
 };
 
 /* =================================================================

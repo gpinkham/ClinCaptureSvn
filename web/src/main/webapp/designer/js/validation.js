@@ -19,7 +19,7 @@ $(function() {
 	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true&restore=true");
 	var rule = JSON.parse(sessionStorage.getItem("rule"));
 	if (rule.validation) {
-		console.log(rule.xml)
+		console.log(rule.xml);
 		var validation = JSON.parse(rule.validation);
 		sessionStorage.setItem("status", "load");
 		// if a rule passed validation
@@ -93,7 +93,7 @@ $(function() {
 		cleanUp();
 		$(this).click();
 	});
-})
+});
 
 /* =================================================================
  * Saves a given validated rule to CC
@@ -137,7 +137,7 @@ function saveRule(rule) {
 				cleanUp();
 				window.open(rule.submission + "/designer/rule.html", '_self');
 			} catch (e) {
-				$(".spinner").remove();
+				removeLoader();
 				bootbox.alert({
 					backdrop: false,
 					message: "The rule was not saved! Check the server logs for details"

@@ -583,7 +583,7 @@ function updateOnClickActions() {
  * => response - The response from the server (must be a valid http response)
  * ========================================================================== */
 function handleErrorResponse(params) {
-	$(".spinner").remove();
+	removeLoader();
 	if (params.response.status === 404) {
 		bootbox.alert({
 			backdrop: false,
@@ -1189,11 +1189,20 @@ function loadCRFVersionItems(params) {
 }
 
 function createLoader() {
+	
+	$("a[id='exit']").attr("href","#");
 	var modalOuterDiv = createDiv({
 		divClass: "spinner"
 	});
 	modalOuterDiv.append($('<img src="images/loader.gif" alt="Loading...">'));
 	return modalOuterDiv;
+}
+
+function removeLoader() {
+
+	$(".spinner").remove();
+	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
+	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true&restore=true");
 }
 
 function createPrompt(params) {
