@@ -546,7 +546,6 @@ function resizeBody() {
 
 	var breadHeight = 34;
 	var navHeight = parseInt($(".navbar").offset().top) - parseInt($(".data-scrollbar").offset().top) - breadHeight - 40;
-	console.log(navHeight);
 	$(".data-scrollbar").css("height", navHeight + "px");
 }
 
