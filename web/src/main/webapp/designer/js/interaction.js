@@ -539,10 +539,15 @@ Array.prototype.chunk = function(arr) {
 function resizeBody() {
     var height = parseInt($(window).height());
     $("body").css("height", height + "px");
+
     var wrapperHeight = parseInt($(".navbar").offset().top) - parseInt($(".inner-scrollbar-wrapper").offset().top) - 20;
     var percent = parseInt((wrapperHeight / height) * 100);
     $(".inner-scrollbar-wrapper").css("height", percent + "%");
-    $(".data-scrollbar").css("height", wrapperHeight + 20 + "px");
+
+	var breadHeight = 34;
+	var navHeight = parseInt($(".navbar").offset().top) - parseInt($(".data-scrollbar").offset().top) - breadHeight - 40;
+	console.log(navHeight);
+	$(".data-scrollbar").css("height", navHeight + "px");
 }
 
 $(window).load(function() {

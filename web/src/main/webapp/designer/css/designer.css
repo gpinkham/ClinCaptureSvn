@@ -373,6 +373,7 @@ div {
 .inner-scrollbar-wrapper {
   width: 98%;
   overflow-y: auto;
+  padding-bottom: 1px;
 }
 
 .inner-scrollbar {
@@ -394,7 +395,9 @@ div {
 }
 
 .data-scrollbar {
-  overflow-y: auto;
+	overflow-y: auto;
+	height: auto;
+	max-height: 500px;
 }
 
 td.group, td.ui-draggable {

@@ -105,7 +105,7 @@ function createTable(params) {
  * ========================================================================= */
 function createBreadCrumb(params) {
 
-	$("#data").find(".panel-body > .breadcrumb").remove();
+	$(".data > .panel-primary > .panel-body > .space-top > .breadcrumb").remove();
 
 	var ol = $("<ol>");
 	ol.addClass("breadcrumb");
@@ -165,7 +165,7 @@ function createBreadCrumb(params) {
 	}
 
 	ol.prepend(studyCrumb);
-	$("#data").find(".panel-body").append(ol);
+	$(".data > .panel-primary > .panel-body > .space-top").append(ol);
 	return ol;
 }
 
