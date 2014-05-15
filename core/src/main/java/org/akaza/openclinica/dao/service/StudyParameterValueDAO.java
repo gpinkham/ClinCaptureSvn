@@ -103,6 +103,15 @@ public class StudyParameterValueDAO extends AuditableEntityDAO implements IStudy
 
 		return spvb;
 	}
+	
+	public com.clinovo.model.System getSystemEntityFromHashMap(HashMap hm) {
+		com.clinovo.model.System systemProp = new com.clinovo.model.System();
+		systemProp.setValue((String) hm.get("value"));
+		systemProp.setId(((Integer) hm.get("id")).intValue());
+		systemProp.setName((String) hm.get("name"));
+		
+		return systemProp;
+	}
 
 	public Object getParameterEntityFromHashMap(HashMap hm) {
 		// study_parameter_id serial NOT NULL,
@@ -125,27 +134,24 @@ public class StudyParameterValueDAO extends AuditableEntityDAO implements IStudy
 
 	@Override
 	public void setTypesExpected() {
-		// study_parameter_value_id serial NOT NULL,
-		// study_id int4,
-		// value varchar(50),
-		// parameter varchar(50),
-
+		
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.INT);
 		this.setTypeExpected(3, TypeNames.STRING);
 		this.setTypeExpected(4, TypeNames.STRING);
-
+	}
+	
+	public void setTypesExpectedForSystemProperty() {
+		
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+		this.setTypeExpected(2, TypeNames.STRING);
+		this.setTypeExpected(3, TypeNames.STRING);
 	}
 
 	public void setTypesExpectedForParameter() {
-		// study_parameter_id serial NOT NULL,
-		// handle varchar(50),
-		// name varchar(50),
-		// description varchar(255),
-		// default_value varchar(50),
-		// inheritable bool DEFAULT true,
-		// overridable bool,
+		
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.STRING);
@@ -190,6 +196,24 @@ public class StudyParameterValueDAO extends AuditableEntityDAO implements IStudy
 		}
 		return sp;
 
+	}
+	
+	public com.clinovo.model.System findSystemPropertyByName(String handle) {
+		com.clinovo.model.System systemProperty = new com.clinovo.model.System();
+		this.setTypesExpectedForSystemProperty();
+		
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), handle);
+		
+		String sql = digester.getQuery("findSystemPropertyByName");
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
+		
+		if(it.hasNext()) {
+			systemProperty = this.getSystemEntityFromHashMap((HashMap)it.next());
+		}
+		
+		return systemProperty;
 	}
 
 	public boolean setParameterValue(int studyId, String parameterHandle, String value) {

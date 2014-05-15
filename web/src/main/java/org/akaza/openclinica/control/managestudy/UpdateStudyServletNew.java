@@ -511,7 +511,36 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setStartDateTimeLabel(fp.getString("startDateTimeLabel"));
 		study.getStudyParameterConfig().setEndDateTimeLabel(fp.getString("endDateTimeLabel"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
+		
+		//Data Import
+		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
+		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport")); 
+		study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
+		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport")); 
 
+		// Medical coding 
+		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName")); 
+		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification")); 
+		study.getStudyParameterConfig().setMedicalCodingContextNeeded(fp.getString("medicalCodingContextNeeded")); 
+		study.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("medicalCodingApprovalNeeded")); 
+		
+		//Randomization
+		study.getStudyParameterConfig().setAssignRandomizationResultTo(fp.getString("assignRandomizationResultTo")); 
+		study.getStudyParameterConfig().setRandomizationTrialId(fp.getString("randomizationTrialId")); 
+			 
+		try { 
+		
+			// Create custom dictionary 
+			if (study.getStudyParameterConfig().getAutoCodeDictionaryName() != null 
+					&& !study.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) { 
+				getDictionaryService().createDictionary(study.getStudyParameterConfig().getAutoCodeDictionaryName(), 
+						study); 
+			} 
+		} catch (CodeException e) { 
+		
+			logger.info("Custom dictionary with similar name exists"); 
+		} 
+		
 		if (!errors.isEmpty()) {
 			fp.getRequest().setAttribute("formMessages", errors);
 		}
@@ -702,6 +731,7 @@ public class UpdateStudyServletNew extends Controller {
 		StudyParameterValueBean spv = new StudyParameterValueBean();
 
 		spv.setStudyId(study1.getId());
+		
 		spv.setParameter("collectDob");
 		spv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
 		updateParameter(spvdao, spv);
@@ -825,12 +855,69 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setParameter("allowSdvWithOpenQueries");
 		spv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
 		updateParameter(spvdao, spv);
+		
+		spv.setParameter("markImportedCRFAsCompleted"); 
+		spv.setValue(study1.getStudyParameterConfig().getMarkImportedCRFAsCompleted()); 
+		updateParameter(spvdao, spv); 
+			 
+		spv.setParameter("autoScheduleEventDuringImport"); 
+		spv.setValue(study1.getStudyParameterConfig().getAutoScheduleEventDuringImport()); 
+		updateParameter(spvdao, spv); 
+		 
+		spv.setParameter("autoCreateSubjectDuringImport"); 
+		spv.setValue(study1.getStudyParameterConfig().getAutoCreateSubjectDuringImport()); 
+		updateParameter(spvdao, spv); 
+		
+		spv.setParameter("replaceExisitingDataDuringImport"); 
+		spv.setValue(study1.getStudyParameterConfig().getReplaceExisitingDataDuringImport()); 
+		updateParameter(spvdao, spv); 
+			 
+		spv.setParameter("allowCodingVerification"); 
+		spv.setValue(study1.getStudyParameterConfig().getAllowCodingVerification()); 
+		updateParameter(spvdao, spv); 
+		 	 
+		spv.setParameter("autoCodeDictionaryName"); 
+		spv.setValue(study1.getStudyParameterConfig().getAutoCodeDictionaryName()); 
+		updateParameter(spvdao, spv); 
+		 	 
+		spv.setParameter("medicalCodingApprovalNeeded"); 
+		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApprovalNeeded()); 
+		updateParameter(spvdao, spv); 
+		 
+		spv.setParameter("medicalCodingContextNeeded"); 
+		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingContextNeeded()); 
+		updateParameter(spvdao, spv); 
+		
+		spv.setParameter("assignRandomizationResultTo"); 
+		spv.setValue(study1.getStudyParameterConfig().getAssignRandomizationResultTo()); 
+		updateParameter(spvdao, spv); 
+		 
+		spv.setParameter("randomizationTrialId"); 
+		spv.setValue(study1.getStudyParameterConfig().getRandomizationTrialId()); 
+		updateParameter(spvdao, spv); 
+			 
+		try { 
+			 
+			// Create custom dictionary 
+			if (study1.getStudyParameterConfig().getAutoCodeDictionaryName() != null 
+					&& !study1.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) { 
+				getDictionaryService().createDictionary(study1.getStudyParameterConfig().getAutoCodeDictionaryName(), 
+						study1); 
+			} 
+		} catch (CodeException e) { 
+		 
+			logger.info("Custom dictionary with similar name exists"); 
+		}
 
 		StudyBean curStudy = (StudyBean) request.getSession().getAttribute("study");
 		if (curStudy != null && study1.getId() == curStudy.getId()) {
 			request.getSession().setAttribute("study", study1);
 		}
 		// update manage_pedigrees for all sites
+		updateSiteParameters(study1, ub, sdao, spvdao);
+	}
+
+	private void updateSiteParameters(StudyBean study1, UserAccountBean ub, StudyDAO sdao, StudyParameterValueDAO spvdao) {
 		ArrayList children = (ArrayList) sdao.findAllByParent(study1.getId());
 		for (Object aChildren : children) {
 			StudyBean child = (StudyBean) aChildren;
@@ -936,7 +1023,38 @@ public class UpdateStudyServletNew extends Controller {
 			childspv.setParameter("allowSdvWithOpenQueries");
 			childspv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
 			updateParameter(spvdao, childspv);
-
+			
+			childspv.setParameter("markImportedCRFAsCompleted"); 
+			childspv.setValue(study1.getStudyParameterConfig().getMarkImportedCRFAsCompleted()); 
+			updateParameter(spvdao, childspv); 
+				 	 
+			childspv.setParameter("autoScheduleEventDuringImport"); 
+			childspv.setValue(study1.getStudyParameterConfig().getAutoScheduleEventDuringImport()); 
+			updateParameter(spvdao, childspv); 
+				 	 
+			childspv.setParameter("autoCreateSubjectDuringImport"); 
+			childspv.setValue(study1.getStudyParameterConfig().getAutoCreateSubjectDuringImport()); 
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("replaceExisitingDataDuringImport"); 
+			childspv.setValue(study1.getStudyParameterConfig().getReplaceExisitingDataDuringImport()); 
+			updateParameter(spvdao, childspv); 
+			
+			childspv.setParameter("allowCodingVerification"); 
+			childspv.setValue(study1.getStudyParameterConfig().getAllowCodingVerification()); 
+			updateParameter(spvdao, childspv); 
+			 
+			childspv.setParameter("autoCodeDictionaryName"); 
+			childspv.setValue(study1.getStudyParameterConfig().getAutoCodeDictionaryName()); 
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("assignRandomizationResultTo"); 
+			childspv.setValue(study1.getStudyParameterConfig().getAssignRandomizationResultTo()); 
+			updateParameter(spvdao, childspv); 
+			 
+			childspv.setParameter("randomizationTrialId"); 
+			childspv.setValue(study1.getStudyParameterConfig().getRandomizationTrialId()); 
+			updateParameter(spvdao, childspv); 
 		}
 	}
 

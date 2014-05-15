@@ -801,21 +801,14 @@
       <fmt:message key="medicalCodingApprovalNeeded" bundle="${resword}"/>
     </td>
     <td class="table_cell">
-      <c:choose>
-        <c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded== ''}">
-          <fmt:message key="blank" bundle="${resword}"/>
-        </c:when>
-        <c:otherwise>
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-        </c:otherwise>
-      </c:choose>
+	    <c:choose>
+			<c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == 'yes'}">
+				<fmt:message key="no" bundle="${resword}" />
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="no" bundle="${resword}" />
+			</c:otherwise>
+		</c:choose>
     </td>
   </tr>
 
@@ -833,6 +826,44 @@
               </c:otherwise>
           </c:choose>
       </td>
+  </tr>
+  
+  <tr valign="top">
+      <td class="table_header_column">
+          <fmt:message key="assign_randomization_parameters_to" bundle="${resword}"/>
+      </td>
+      <td class="table_cell">
+          <c:choose>
+              <c:when test="${studyToView.studyParameterConfig.assignRandomizationResultTo == 'dngroup'}">
+                  <fmt:message key="systemProperty.assignRandomizationResultTo.dngroup.radioLabel" bundle="${resword}"/>
+              </c:when>
+              <c:when test="${studyToView.studyParameterConfig.assignRandomizationResultTo == 'ssid'}">
+                  <fmt:message key="systemProperty.assignRandomizationResultTo.ssid.radioLabel" bundle="${resword}"/>
+              </c:when>
+              <c:when test="${studyToView.studyParameterConfig.assignRandomizationResultTo == 'none'}">
+                  <fmt:message key="systemProperty.assignRandomizationResultTo.none.radioLabel" bundle="${resword}"/>
+              </c:when>
+              <c:otherwise>
+                  <fmt:message key="blank" bundle="${resword}"/>
+              </c:otherwise>
+          </c:choose>
+      </td>
+  </tr>
+  
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="systemProperty.randomizationTrialId.label" bundle="${resword}"/>
+    </td>
+    <td class="table_cell">
+      <c:choose>
+        <c:when test="${studyToView.studyParameterConfig.randomizationTrialId== ''}">
+          <fmt:message key="blank" bundle="${resword}"/>
+        </c:when>
+        <c:otherwise>
+          ${studyToView.studyParameterConfig.randomizationTrialId}
+        </c:otherwise>
+      </c:choose>
+    </td>
   </tr>
 
 </table>

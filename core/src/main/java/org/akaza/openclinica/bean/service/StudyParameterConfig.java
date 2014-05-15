@@ -105,6 +105,10 @@ public class StudyParameterConfig {
     private String medicalCodingApprovalNeeded = "no";
     private String medicalCodingContextNeeded = "no";
     
+    //Randomization
+    private String assignRandomizationResultTo = "none";
+    private String randomizationTrialId = "";
+    
 
 	public StudyParameterConfig() {
 		
@@ -550,4 +554,32 @@ public class StudyParameterConfig {
     public void setMedicalCodingApiKey(String medicalCodingApiKey) {
         this.medicalCodingApiKey = medicalCodingApiKey;
     }
+
+	/**
+	 * @return the assignRandomizationResultTo
+	 */
+	public String getAssignRandomizationResultTo() {
+		return assignRandomizationResultTo;
+	}
+
+	/**
+	 * @param assignRandomizationResultTo the assignRandomizationResultTo to set
+	 */
+	public void setAssignRandomizationResultTo(String assignRandomizationResultTo) {
+		this.assignRandomizationResultTo = assignRandomizationResultTo;
+	}
+
+	/**
+	 * @return the randomizationTrialId
+	 */
+	public String getRandomizationTrialId() {
+		return randomizationTrialId;
+	}
+
+	/**
+	 * @param randomizationTrialId the randomizationTrialId to set
+	 */
+	public void setRandomizationTrialId(String randomizationTrialId) {
+		this.randomizationTrialId = randomizationTrialId;
+	}
 }

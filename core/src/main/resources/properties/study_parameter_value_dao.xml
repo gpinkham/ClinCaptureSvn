@@ -22,6 +22,14 @@
 	 </sql>
 	</query>
 	<query>
+	 <name>
+		findSystemPropertyByName
+	 </name>	
+	 <sql>
+		select * from system where name=?
+	 </sql>
+	</query>
+	<query>
 		<name>findAllParameters</name>
 		<sql>SELECT * FROM study_parameter
 		</sql>

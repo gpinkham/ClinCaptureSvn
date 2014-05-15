@@ -1,14 +1,13 @@
 package com.clinovo.service;
 
+import com.clinovo.command.SystemCommand;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Role;
 import org.junit.Test;
 
-import com.clinovo.command.SystemCommand;
-
 public class SystemServiceTest extends DefaultAppContextTest {
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void testThatUpdateSystemPropertiesWorksFine() throws Exception {
 		systemService.updateSystemProperties(new SystemCommand());
 	}

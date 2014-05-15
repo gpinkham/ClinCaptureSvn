@@ -15,9 +15,13 @@
 
 package com.clinovo.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
+import com.clinovo.command.SystemCommand;
+import com.clinovo.service.SystemService;
+import com.clinovo.util.FileUtil;
+import com.clinovo.util.MayProceedUtil;
+import com.clinovo.util.PageMessagesUtil;
+import com.clinovo.util.SessionUtil;
+import com.clinovo.validation.SystemValidator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.control.core.BaseController;
@@ -34,13 +38,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.clinovo.command.SystemCommand;
-import com.clinovo.service.SystemService;
-import com.clinovo.util.FileUtil;
-import com.clinovo.util.MayProceedUtil;
-import com.clinovo.util.PageMessagesUtil;
-import com.clinovo.util.SessionUtil;
-import com.clinovo.validation.SystemValidator;
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/system")
@@ -60,9 +58,6 @@ public class SystemController {
 
 	@Autowired
 	private CoreResources coreResources;
-
-	@Autowired
-	private DataSource datasource;
 
 	@Autowired
 	private MessageSource messageSource;
