@@ -84,7 +84,7 @@
 	<!-- Search cell (for multi-page tables) -->
 
 		<c:if test="${searchFormDisplayed != 0}">
-			<form action="<c:out value="${table.postAction}" />?module=${module}" method="POST">
+			<form action="<c:out value="${table.postAction}" />?module=${module}" method="GET">
 		</c:if>
 	
 		<td width="33%" valign="top" align="center" class="table_actions">
