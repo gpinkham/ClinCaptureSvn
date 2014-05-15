@@ -56,7 +56,7 @@ function confirmGoTo(Message, Address){
 	confirmDialog({ message: Message, height: 150, width: 500, redirectLink: Address });
 }
 function confirmBack(Message){
-	confirmSubmit({ message: Message, height: 150, width: 500, goBack: true });
+	return confirmSubmit({ message: Message, height: 150, width: 500, goBack: true });
 }
 
 function changeIcon(){

@@ -430,8 +430,10 @@ function reverseRowsOrder() {
         document.write('<tr id="' + trId + '">');
         for (var j = 0; j <= rows[i].length - 1; j++) {
             var td = rows[i][j];
-            document.getElementById(trId).innerHTML = document.getElementById(trId).innerHTML + td.outerHTML;
-            td.outerHTML = "";
+            $(trId).html(document.getElementById(trId).innerHTML + td.outerHTML);
+            if(!$.browser.msie) {
+            	td.outerHTML = "";
+            }  
         }
         document.write('</tr>');
     }
@@ -605,7 +607,7 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
                                 <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                                   "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
                                 <td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
-                                  "button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" />
+                                  "button_medium" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>');" />
                                   <%--<input type="button" id="seh" name="BTN_Exit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
                                   "button_medium" onClick="javascript: return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');" /> --%></td>
                                 <c:choose>
@@ -1666,7 +1668,7 @@ table-->
                     </c:choose>
                     <td><input type="submit" id="srl" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                       "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
-                    <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom', this);" />
+                    <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkGoBackEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>');" />
                     <%-- <input type="button" id="srl" name="BTN_Exit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
                                   "button_medium" onClick="javascript: return checkGoBackEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');" />--%></td>
                     
