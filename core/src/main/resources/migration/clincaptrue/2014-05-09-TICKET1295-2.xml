@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?> 
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" 
+	        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd"> 
+ 
+ 	<changeSet author="Frank" id="2014-05-09-TICKET1295-2-UPDATE-SYSTEM-GROUP"> 
+        <update tableName="system_group"> 
+            <column name="is_study_specific" valueBoolean="true" /> 
+            <where>name = 'randomization'</where> 
+        </update> 
+    </changeSet> 
+    
+    <changeSet author="Frank" id="2014-05-09-TICKET1295-2-DROP-COLUMNS-FROM-STUDY-PARAMETER"> 
+        <comment>Drop columns from study_parameter previously added by 2014-04-22-TICKET1295</comment> 
+        <dropColumn columnName="system_group_id" tableName="study_parameter" /> 
+        <dropColumn columnName="control_type" tableName="study_parameter" /> 
+        <dropColumn columnName="control_values" tableName="study_parameter" /> 
+        <dropColumn columnName="display_order" tableName="study_parameter" /> 
+        <dropColumn columnName="crc" tableName="study_parameter" /> 
+        <dropColumn columnName="investigator" tableName="study_parameter" /> 
+        <dropColumn columnName="monitor" tableName="study_parameter" /> 
+        <dropColumn columnName="admin" tableName="study_parameter" /> 
+        <dropColumn columnName="root" tableName="study_parameter" /> 
+        <dropColumn columnName="control_size" tableName="study_parameter" /> 
+    </changeSet>
+
+    <changeSet author="Frank" id="2014-05-09-TICKET1295-2-INSERT-SYSTEM-DATA"> 
+    
+    	<insert tableName="system"> 
+            <column name="id" value="64" /> 
+            <column name="name" value="markImportedCRFAsCompleted" /> 
+            <column name="value" value="no" /> 
+            <column name="value_type" value="STRING" /> 
+            <column name="required" value="FALSE" /> 
+            <column name="type" value="RADIO" /> 
+            <column name="type_values" value="yes,no" />
+            <column name="size" value="60" /> 
+            <column name="show_measurements" value="FALSE" /> 
+            <column name="show_description" value="FALSE" /> 
+            <column name="show_note" value="FALSE" /> 
+            <column name="group_id" value="12" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <column name="order_id" value="1" /> 
+            <column name="version" value="1" /> 
+        </insert> 
+        
+        <insert tableName="system"> 
+            <column name="id" value="65" /> 
+            <column name="name" value="autoScheduleEventDuringImport" /> 
+            <column name="value" value="no" /> 
+            <column name="value_type" value="STRING" /> 
+            <column name="required" value="FALSE" /> 
+            <column name="type" value="RADIO" /> 
+            <column name="type_values" value="yes,no" />
+            <column name="size" value="60" /> 
+            <column name="show_measurements" value="FALSE" /> 
+            <column name="show_description" value="FALSE" /> 
+            <column name="show_note" value="FALSE" /> 
+            <column name="group_id" value="12" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <column name="order_id" value="2" /> 
+            <column name="version" value="1" /> 
+        </insert> 
+        
+        <insert tableName="system"> 
+            <column name="id" value="66" /> 
+            <column name="name" value="autoCreateSubjectDuringImport" /> 
+            <column name="value" value="no" /> 
+            <column name="value_type" value="STRING" /> 
+            <column name="required" value="FALSE" /> 
+            <column name="type" value="RADIO" /> 
+            <column name="type_values" value="yes,no" />
+            <column name="size" value="60" /> 
+            <column name="show_measurements" value="FALSE" /> 
+            <column name="show_description" value="FALSE" /> 
+            <column name="show_note" value="FALSE" /> 
+            <column name="group_id" value="12" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <column name="order_id" value="3" /> 
+            <column name="version" value="1" /> 
+        </insert> 
+        
+        <insert tableName="system"> 
+            <column name="id" value="67" /> 
+            <column name="name" value="replaceExisitingDataDuringImport" /> 
+            <column name="value" value="no" /> 
+            <column name="value_type" value="STRING" /> 
+            <column name="required" value="FALSE" /> 
+            <column name="type" value="RADIO" /> 
+            <column name="type_values" value="yes,no" />
+            <column name="size" value="60" /> 
+            <column name="show_measurements" value="FALSE" /> 
+            <column name="show_description" value="FALSE" /> 
+            <column name="show_note" value="FALSE" /> 
+            <column name="group_id" value="12" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <column name="order_id" value="4" /> 
+            <column name="version" value="1" /> 
+        </insert> 
+        
+        <insert tableName="system"> 
+            <column name="id" value="68" /> 
+            <column name="name" value="allowCodingVerification" /> 
+            <column name="value" value="no" /> 
+            <column name="value_type" value="STRING" /> 
+            <column name="required" value="FALSE" /> 
+            <column name="type" value="RADIO" /> 
+            <column name="type_values" value="yes,no" />
+            <column name="size" value="60" /> 
+            <column name="show_measurements" value="FALSE" /> 
+            <column name="show_description" value="FALSE" /> 
+            <column name="show_note" value="FALSE" /> 
+            <column name="group_id" value="10" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <column name="order_id" value="1" /> 
+            <column name="version" value="1" /> 
+        </insert> 
+        
+        <insert tableName="system"> 
+            <column name="id" value="69" /> 
+            <column name="name" value="defaultBioontologyURL" /> 
+            <column name="value" value="http://data.bioontology.org" /> 
+            <column name="value_type" value="STRING" /> 
+            <column name="required" value="FALSE" /> 
+            <column name="type" value="TEXT" /> 
+            <column name="type_values" value="" />
+            <column name="size" value="60" /> 
+            <column name="show_measurements" value="FALSE" /> 
+            <column name="show_description" value="FALSE" /> 
+            <column name="show_note" value="FALSE" /> 
+            <column name="group_id" value="10" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="READ" /> 
+            <column name="root" value="WRITE" />  
+            <column name="order_id" value="2" /> 
+            <column name="version" value="1" /> 
+        </insert> 
+        
+        <insert tableName="system"> 
+            <column name="id" value="70" /> 
+            <column name="name" value="medicalCodingApiKey" /> 
+            <column name="value" value="1cfae05f-9e67-486f-820b-b393dec5764b" /> 
+            <column name="value_type" value="STRING" /> 
+            <column name="required" value="FALSE" /> 
+            <column name="type" value="TEXT" /> 
+            <column name="type_values" value="" />
+            <column name="size" value="60" /> 
+            <column name="show_measurements" value="FALSE" /> 
+            <column name="show_description" value="FALSE" /> 
+            <column name="show_note" value="FALSE" /> 
+            <column name="group_id" value="10" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="READ" /> 
+            <column name="root" value="WRITE" />  
+            <column name="order_id" value="3" /> 
+            <column name="version" value="1" /> 
+        </insert> 
+        
+        <insert tableName="system"> 
+            <column name="id" value="71" /> 
+            <column name="name" value="autoCodeDictionaryName" /> 
+            <column name="value" value="" /> 
+            <column name="value_type" value="STRING" /> 
+            <column name="required" value="FALSE" /> 
+            <column name="type" value="TEXT" /> 
+            <column name="type_values" value="" />
+            <column name="size" value="60" /> 
+            <column name="show_measurements" value="FALSE" /> 
+            <column name="show_description" value="FALSE" /> 
+            <column name="show_note" value="FALSE" /> 
+            <column name="group_id" value="10" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <column name="order_id" value="4" /> 
+            <column name="version" value="1" /> 
+        </insert> 
+        
+        <insert tableName="system"> 
+            <column name="id" value="72" /> 
+            <column name="name" value="medicalCodingApprovalNeeded" /> 
+            <column name="value" value="no" /> 
+            <column name="value_type" value="STRING" /> 
+            <column name="required" value="FALSE" /> 
+            <column name="type" value="RADIO" /> 
+            <column name="type_values" value="yes,no" />
+            <column name="size" value="60" /> 
+            <column name="show_measurements" value="FALSE" /> 
+            <column name="show_description" value="FALSE" /> 
+            <column name="show_note" value="FALSE" /> 
+            <column name="group_id" value="10" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="READ" /> 
+            <column name="root" value="READ" />  
+            <column name="order_id" value="5" /> 
+            <column name="version" value="1" /> 
+        </insert> 
+        
+        <insert tableName="system"> 
+            <column name="id" value="73" /> 
+            <column name="name" value="medicalCodingContextNeeded" /> 
+            <column name="value" value="no" /> 
+            <column name="value_type" value="STRING" /> 
+            <column name="required" value="FALSE" /> 
+            <column name="type" value="RADIO" /> 
+            <column name="type_values" value="yes,no" />
+            <column name="size" value="60" /> 
+            <column name="show_measurements" value="FALSE" /> 
+            <column name="show_description" value="FALSE" /> 
+            <column name="show_note" value="FALSE" /> 
+            <column name="group_id" value="10" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <column name="order_id" value="6" /> 
+            <column name="version" value="1" /> 
+        </insert> 
+    </changeSet> 	 
+</databaseChangeLog> 

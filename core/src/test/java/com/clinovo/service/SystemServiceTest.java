@@ -1,10 +1,10 @@
 package com.clinovo.service;
 
-import com.clinovo.command.SystemCommand;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.junit.Test;
+
+import com.clinovo.command.SystemCommand;
 
 public class SystemServiceTest extends DefaultAppContextTest {
 
@@ -35,7 +35,6 @@ public class SystemServiceTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatGetSystemPropertyGroupsReturnsCorrectSize() {
-		assertTrue(systemService.getSystemPropertyGroups(Role.SYSTEM_ADMINISTRATOR, (StudyBean) studyDAO.findByPK(1))
-				.size() > 0);
+		assertTrue(systemService.getSystemPropertyGroups(Role.SYSTEM_ADMINISTRATOR).size() > 0);
 	}
 }

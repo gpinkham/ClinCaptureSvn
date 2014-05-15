@@ -15,24 +15,14 @@
 
 package com.clinovo.service.impl;
 
-import com.clinovo.command.SystemCommand;
-import com.clinovo.command.SystemGroupHolder;
-import com.clinovo.dao.SystemDAO;
-import com.clinovo.exception.CodeException;
-import com.clinovo.model.PropertyAccess;
-import com.clinovo.model.PropertyType;
-import com.clinovo.model.System;
-import com.clinovo.model.SystemGroup;
-import com.clinovo.service.DictionaryService;
-import com.clinovo.service.SystemService;
-import com.clinovo.util.FileUtil;
-import com.clinovo.util.PropertyUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.service.StudyParameter;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +30,15 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import com.clinovo.command.SystemCommand;
+import com.clinovo.command.SystemGroupHolder;
+import com.clinovo.dao.SystemDAO;
+import com.clinovo.model.PropertyType;
+import com.clinovo.model.System;
+import com.clinovo.model.SystemGroup;
+import com.clinovo.service.DictionaryService;
+import com.clinovo.service.SystemService;
+import com.clinovo.util.FileUtil;
 
 @Service
 @Transactional
@@ -82,7 +77,7 @@ public class SystemServiceImpl implements SystemService {
 		return systemDAO.getAllProperties(groupId, role);
 	}
 
-	public List<SystemGroupHolder> getSystemPropertyGroups(Role role, StudyBean study) {
+	public List<SystemGroupHolder> getSystemPropertyGroups(Role role) {
 
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(datasource);
 		List<SystemGroupHolder> systemPropertyGroups = new ArrayList<SystemGroupHolder>();
@@ -92,11 +87,11 @@ public class SystemServiceImpl implements SystemService {
 		for (SystemGroup group : groupList) {
 			addGroup = false;
 			SystemGroupHolder groupHolder = new SystemGroupHolder(group);
-			addGroup = processGroupProperties(role, study, groupHolder, addGroup, spvdao);
+			addGroup = processGroupProperties(role, groupHolder, addGroup, spvdao);
 
 			for (SystemGroup subGroup : systemDAO.getAllChildGroups(group.getId())) {
 				SystemGroupHolder subGroupHolder = new SystemGroupHolder(subGroup);
-				addGroup = processGroupProperties(role, study, subGroupHolder, addGroup, spvdao);
+				addGroup = processGroupProperties(role, subGroupHolder, addGroup, spvdao);
 				groupHolder.getSubGroups().add(subGroupHolder);
 			}
 			if (addGroup) {
@@ -106,19 +101,13 @@ public class SystemServiceImpl implements SystemService {
 		return systemPropertyGroups;
 	}
 
-	private boolean processGroupProperties(Role role, StudyBean study, SystemGroupHolder groupHolder, boolean addGroup,
+	private boolean processGroupProperties(Role role, SystemGroupHolder groupHolder, boolean addGroup,
 			StudyParameterValueDAO spvdao) {
 
-		if (!groupHolder.getGroup().getIsStudySpecific()) {
-			groupHolder.setSystemProperties(systemDAO.getAllProperties(groupHolder.getGroup().getId(), role));
-			processDynamicProperties(groupHolder.getSystemProperties());
-			addGroup = !addGroup && groupHolder.getSystemProperties().size() > 0 || addGroup;
-		} else {
-
-			// Process SystemProperties for study specific SystemGroup
-			processStudySpecificProperties(study, groupHolder, spvdao);
-			addGroup = true;
-		}
+		groupHolder.setSystemProperties(systemDAO.getAllProperties(groupHolder.getGroup().getId(), role));
+		processDynamicProperties(groupHolder.getSystemProperties());
+		addGroup = !addGroup && groupHolder.getSystemProperties().size() > 0 || addGroup;
+		
 		return addGroup;
 	}
 
@@ -132,95 +121,8 @@ public class SystemServiceImpl implements SystemService {
 		}
 	}
 
-	/***
-	 * Get study parameters specific to SystemGroup and generate appropriate SystemProperties
-	 * 
-	 * @param study
-	 * @param groupHolder
-	 * @param spvdao
-	 */
-	private void processStudySpecificProperties(StudyBean study, SystemGroupHolder groupHolder,
-			StudyParameterValueDAO spvdao) {
-
-		StudyParameterValueBean spv;
-		ArrayList<StudyParameter> parameters = spvdao.findParametersBySystemGroup(groupHolder.getGroup().getId());
-		groupHolder.setSystemProperties(new ArrayList<System>());
-
-		int index = 1;
-		for (StudyParameter parameter : parameters) {
-			spv = spvdao.findByHandleAndStudy(study.getId(), parameter.getHandle());
-			setStudySpecificSystemProperty(groupHolder, parameter, spv, index++, study.getStatus().isPending());
-		}
-	}
-
-	/***
-	 * Creates SystemProperty based on StudyParameter and adds it to group's SystemProperties
-	 * 
-	 * @param group
-	 * @param parameter
-	 * @param paramValue
-	 */
-	private void setStudySpecificSystemProperty(SystemGroupHolder group, StudyParameter parameter,
-			StudyParameterValueBean paramValue, int index, boolean inDesign) {
-
-		System systemProperty = new System();
-		PropertyType propertyType;
-		PropertyAccess propertyAccess;
-
-		systemProperty.setGroupId(group.getGroup().getId());
-		systemProperty.setSize(parameter.getControlSize());
-		systemProperty.setTypeValues(parameter.getControlValues());
-		systemProperty.setName(parameter.getName());
-
-		if ((paramValue.getValue().equals("") || paramValue.getValue().equals(null))
-				&& parameter.getControlValues().equals("yes,no")) {
-			systemProperty.setValue("no");
-		} else {
-			systemProperty.setValue(paramValue.getValue());
-		}
-		systemProperty.setId(index);
-
-		propertyType = PropertyUtil.getPropertyTypeByString(parameter.getControlType());
-		if (propertyType != null) {
-			systemProperty.setType(propertyType);
-		}
-
-		propertyAccess = PropertyUtil.getPropertyAccessByString(parameter.getAdmin(), !inDesign);
-		if (propertyAccess != null) {
-			systemProperty.setAdmin(propertyAccess);
-		}
-
-		propertyAccess = PropertyUtil.getPropertyAccessByString(parameter.getCrc(), !inDesign);
-		if (propertyAccess != null) {
-			systemProperty.setCrc(propertyAccess);
-		}
-
-		propertyAccess = PropertyUtil.getPropertyAccessByString(parameter.getInvestigator(), !inDesign);
-		if (propertyAccess != null) {
-			systemProperty.setInvestigator(propertyAccess);
-		}
-
-		propertyAccess = PropertyUtil.getPropertyAccessByString(parameter.getMonitor(), !inDesign);
-		if (propertyAccess != null) {
-			systemProperty.setMonitor(propertyAccess);
-		}
-
-		propertyAccess = PropertyUtil.getPropertyAccessByString(parameter.getRoot(), !inDesign);
-		if (propertyAccess != null) {
-			systemProperty.setRoot(propertyAccess);
-		}
-
-		// Add property to group
-		group.getSystemProperties().add(systemProperty);
-	}
-
 	public void updateSystemProperties(SystemCommand systemCommand) throws Exception {
 		FileUtil.changeLogo(systemCommand);
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(datasource);
-		StudyDAO sdao = new StudyDAO(datasource);
-		// Get full object for currentStudy
-		StudyBean study = (StudyBean) sdao.findByPK(systemCommand.getCurrentStudy().getId());
-		systemCommand.setCurrentStudy(study);
 
 		for (SystemGroupHolder systemGroupHolder : systemCommand.getSystemPropertyGroups()) {
 			for (SystemGroupHolder systemSubGroupHolder : systemGroupHolder.getSubGroups()) {
@@ -228,14 +130,9 @@ public class SystemServiceImpl implements SystemService {
 					updateSystemProperty(systemCommand, systemProperty);
 				}
 			}
-			if (systemGroupHolder.getGroup().getIsStudySpecific()) {
-				if (study.getStatus().isPending()) {
-					updateStudySpecificProperties(systemGroupHolder, study, spvdao, sdao);
-				}
-			} else {
-				for (com.clinovo.model.System systemProperty : systemGroupHolder.getSystemProperties()) {
-					updateSystemProperty(systemCommand, systemProperty);
-				}
+			
+			for (com.clinovo.model.System systemProperty : systemGroupHolder.getSystemProperties()) {
+				updateSystemProperty(systemCommand, systemProperty);
 			}
 		}
 		CoreResources.prepareDataInfoProperties();
@@ -287,45 +184,6 @@ public class SystemServiceImpl implements SystemService {
 				systemDAO.saveOrUpdate(systemProperty);
 				CoreResources.setField(systemProperty.getName(), systemProperty.getValue());
 			}
-		}
-	}
-
-	private void updateStudySpecificProperties(SystemGroupHolder group, StudyBean study, StudyParameterValueDAO spvdao,
-			StudyDAO sdao) {
-
-		StudyParameterValueBean spv;
-		for (System property : group.getSystemProperties()) {
-			Object valueObj = property.getValue();
-			if (valueObj == null) {
-				continue;
-			}
-			spv = new StudyParameterValueBean();
-			spv.setStudyId(study.getId());
-			spv.setParameter(property.getName());
-			spv.setValue(property.getValue());
-			updateStudyParameter(spvdao, spv);
-			if (property.getName().equals("autoCodeDictionaryName")) {
-				// Update Dicionary
-				updateDictionary(study, property);
-			}
-		}
-	}
-
-	private void updateDictionary(StudyBean study, System property) {
-
-		try {
-			dictionaryService.createDictionary(property.getName(), study);
-		} catch (CodeException e) {
-			// Custom dictionary with similar name exists
-		}
-	}
-
-	private void updateStudyParameter(StudyParameterValueDAO spvdao, StudyParameterValueBean spv) {
-		StudyParameterValueBean spv1 = spvdao.findByHandleAndStudy(spv.getStudyId(), spv.getParameter());
-		if (spv1.getId() > 0) {
-			spvdao.update(spv);
-		} else {
-			spvdao.create(spv);
 		}
 	}
 }

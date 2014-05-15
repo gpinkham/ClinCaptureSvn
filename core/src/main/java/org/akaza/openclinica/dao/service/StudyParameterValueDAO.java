@@ -120,15 +120,6 @@ public class StudyParameterValueDAO extends AuditableEntityDAO implements IStudy
 		sp.setDefaultValue((String) hm.get("default_value"));
 		sp.setInheritable(((Boolean) hm.get("inheritable")).booleanValue());
 		sp.setOverridable(((Boolean) hm.get("overridable")).booleanValue());
-		sp.setSystemGroupId(((Integer) hm.get("system_group_id")).intValue());
-		sp.setControlType((String) hm.get("control_type"));
-		sp.setControlValues((String) hm.get("control_values"));
-		sp.setCrc((String) hm.get("crc"));
-		sp.setInvestigator((String) hm.get("investigator"));
-		sp.setMonitor((String) hm.get("monitor"));
-		sp.setAdmin((String) hm.get("admin"));
-		sp.setRoot((String) hm.get("root"));
-		sp.setControlSize(((Integer) hm.get("control_size")).intValue());
 		return sp;
 	}
 
@@ -163,16 +154,6 @@ public class StudyParameterValueDAO extends AuditableEntityDAO implements IStudy
 		this.setTypeExpected(5, TypeNames.STRING);
 		this.setTypeExpected(6, TypeNames.BOOL);
 		this.setTypeExpected(7, TypeNames.BOOL);
-		this.setTypeExpected(8, TypeNames.INT);
-		this.setTypeExpected(9, TypeNames.STRING);
-		this.setTypeExpected(10, TypeNames.STRING);
-		this.setTypeExpected(11, TypeNames.INT);
-		this.setTypeExpected(12, TypeNames.STRING);
-		this.setTypeExpected(13, TypeNames.STRING);
-		this.setTypeExpected(14, TypeNames.STRING);
-		this.setTypeExpected(15, TypeNames.STRING);
-		this.setTypeExpected(16, TypeNames.STRING);
-		this.setTypeExpected(17, TypeNames.INT);
 	}
 
 	public StudyParameterValueBean findByHandleAndStudy(int studyId, String handle) {
@@ -278,16 +259,6 @@ public class StudyParameterValueDAO extends AuditableEntityDAO implements IStudy
 		this.setTypeExpected(9, TypeNames.STRING);
 		this.setTypeExpected(10, TypeNames.BOOL);
 		this.setTypeExpected(11, TypeNames.BOOL);
-		this.setTypeExpected(12, TypeNames.INT);
-		this.setTypeExpected(13, TypeNames.STRING);
-		this.setTypeExpected(14, TypeNames.STRING);
-		this.setTypeExpected(15, TypeNames.INT);
-		this.setTypeExpected(16, TypeNames.STRING);
-		this.setTypeExpected(17, TypeNames.STRING);
-		this.setTypeExpected(18, TypeNames.STRING);
-		this.setTypeExpected(19, TypeNames.STRING);
-		this.setTypeExpected(20, TypeNames.STRING);
-		this.setTypeExpected(21, TypeNames.INT);
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(study.getId()));
 
@@ -309,15 +280,6 @@ public class StudyParameterValueDAO extends AuditableEntityDAO implements IStudy
 			sp.setDefaultValue((String) hm.get("default_value"));
 			sp.setInheritable(((Boolean) hm.get("inheritable")).booleanValue());
 			sp.setOverridable(((Boolean) hm.get("overridable")).booleanValue());
-			sp.setSystemGroupId(((Integer) hm.get("system_group_id")).intValue());
-			sp.setControlType((String) hm.get("control_type"));
-			sp.setControlValues((String) hm.get("control_values"));
-			sp.setCrc((String) hm.get("crc"));
-			sp.setInvestigator((String) hm.get("investigator"));
-			sp.setMonitor((String) hm.get("monitor"));
-			sp.setAdmin((String) hm.get("admin"));
-			sp.setRoot((String) hm.get("root"));
-			sp.setControlSize(((Integer) hm.get("control_size")).intValue());
 
 			StudyParamsConfig config = new StudyParamsConfig();
 			config.setParameter(sp);

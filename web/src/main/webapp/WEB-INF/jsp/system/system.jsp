@@ -47,7 +47,6 @@
 
 <form:form id="systemForm" method="post" commandName="systemCommand" enctype="multipart/form-data">
     <form:hidden path="formWithStateFlag"/>
-    <form:hidden path="currentStudy.id"/>
 	<div class="sysProps">
 		<span class="first_level_header"><fmt:message key="systemPropertiesHeader" bundle="${resword}" /></span><br/>
         <spring:bind path="systemCommand.*">
