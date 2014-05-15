@@ -2211,6 +2211,7 @@ function createNewEvent(page, event) {
                         jQuery("#button_unlockStudySubject_" + params['popupQueryStudySubjectId']).remove();
                         jQuery("#button_lockStudySubject_" + params['popupQueryStudySubjectId']).removeAttr("style");
                         jQuery("#button_signStudySubject_" + params['popupQueryStudySubjectId']).removeAttr("style");
+                        
                         for (var h = 0; h < result.eventDefs.length; h++) {
                             var eventDef = result.eventDefs[h];
                             if (eventDef != undefined && eventDef.eventDivId != undefined) {
@@ -2223,42 +2224,47 @@ function createNewEvent(page, event) {
                                     eventDiv[0].repeatingEvent = eventDef.repeatingEvent;
                                     eventDiv[0].getScheduledContent = true;
                                     
-                                    var newMOFuncBody = jQuery.trim(aElement.attr("onmouseover").toString().match(/{((?:.|\n)+)}/)[1]).toString();
-                                    newMOFuncBody = newMOFuncBody.replace(/'studyEventId':''/g, "'studyEventId':'" + eventId + "'")
-                                    		.replace(/\"studyEventId\":\"\"/g, "\"studyEventId\":\"" + eventId + "\"");
-                                    
-                                    aElement.attr("onmouseover", "");
-                                    var confEvent = function(element, funcBody) {
-                                        element.unbind("mouseover").bind("mouseover", function(event){
-                                            eval(funcBody);
-                                        });
-                                    };
-                                    confEvent(aElement, newMOFuncBody);
-                    
-                                    var newCLFuncBody = jQuery.trim(aElement.attr("onclick").toString().match(/{((?:.|\n)+)}/)[1]).toString();
-                                    newCLFuncBody = newCLFuncBody.replace(/'studyEventId':''/g, "'studyEventId':'" + eventId + "'")
-                                    		.replace(/\"studyEventId\":\"\"/g, "\"studyEventId\":\"" + eventId + "\"");
-                                    
-                                    aElement.attr("onclick", "");
-                                    var confEvent = function(element, funcBody) {
-                                        element.unbind("click").bind("click", function(event){
-                                            eval(funcBody);
-                                        });
-                                    };
-                                    confEvent(aElement, newCLFuncBody);
-                                    
+                                    if(aElement.attr("onmouseover") != null) {
+                                        var newMOFuncBody = jQuery.trim(aElement.attr("onmouseover").toString().match(/{((?:.|\n)+)}/)[1]).toString();
+                                        newMOFuncBody = newMOFuncBody.replace(/'studyEventId':''/g, "'studyEventId':'" + eventId + "'")
+                                            .replace(/\"studyEventId\":\"\"/g, "\"studyEventId\":\"" + eventId + "\"");
+                                        aElement.attr("onmouseover", "");
+                                        var confEvent = function (element, funcBody) {
+                                            element.unbind("mouseover").bind("mouseover", function (event) {
+                                                eval(funcBody);
+                                            });
+                                        };
+                                        confEvent(aElement, newMOFuncBody);
+                                    }
+
+                                    if (aElement.attr("onclick") != null) {
+                                        var newCLFuncBody = jQuery.trim(aElement.attr("onclick").toString().match(/{((?:.|\n)+)}/)[1]).toString();
+                                        newCLFuncBody = newCLFuncBody.replace(/'studyEventId':''/g, "'studyEventId':'" + eventId + "'")
+                                        		.replace(/\"studyEventId\":\"\"/g, "\"studyEventId\":\"" + eventId + "\"");
+                                        aElement.attr("onclick", "");
+                                        var confEvent = function(element, funcBody) {
+                                            element.unbind("click").bind("click", function(event){
+                                                eval(funcBody);
+                                            });
+                                        };
+                                        confEvent(aElement, newCLFuncBody);
+                                    }
+
                                     if (eventDef.popupToDisplayEntireEvent && aElement.find("img").attr("src").indexOf("icon_NotStarted.gif") > 0) {
                                         aElement.find("img").attr("src", "images/icon_Scheduled.gif");
                                         aElement.find("img").attr("style", "position: relative;");
                                     }
-                                    eventDiv.css("visibility", "hidden");
+
                                     if (eventDef.repeatingEvent && parseInt(eventDef.totalEvents) > 1) {
                                         aElement.html(aElement.find("img")[0].outerHTML + "<span class=\"re_indicator\">x" + eventDef.totalEvents + "</span>");
                                     }
                                 }
                             }
                         }
+
+                        $("div[id='Event_" + currentPopupUid + "']").css("visibility", "hidden");
                         gfRemoveOverlay();
+
                         if (result.pageMessages.length > 0) {
                             jQuery("#sidebar_Alerts_closed").attr("style", "display: none;");
                             jQuery("#sidebar_Alerts_open").attr("style", "display: block;");
