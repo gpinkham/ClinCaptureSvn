@@ -2759,6 +2759,14 @@ saveCodedItem = function(item) {
         },
         error: function(e) {
 
+            if($("#sidebar_Alerts_open").css("display") == 'none') {
+
+                leftnavExpand('sidebar_Alerts_open');
+                leftnavExpand('sidebar_Alerts_closed');
+            }
+            //append error to the alert box
+            $("#sidebar_Alerts_open .sidebar_tab_content").html('')
+                .append("<div class='alert'>Dictionary is not available. Please contact yous system administrator.</div>");
             console.log("Error:" + e);
         }
     });
@@ -2865,6 +2873,14 @@ codeAndAlias = function(item) {
         },
         error: function(e) {
 
+            if($("#sidebar_Alerts_open").css("display") == 'none') {
+
+                leftnavExpand('sidebar_Alerts_open');
+                leftnavExpand('sidebar_Alerts_closed');
+            }
+            //append error to the alert box
+            $("#sidebar_Alerts_open .sidebar_tab_content").html('')
+                .append("<div class='alert'>Dictionary is not available. Please contact yous system administrator.</div>");
             console.log("Error:" + e);
         }
     });
@@ -3196,6 +3212,8 @@ codeItemFields = function(item) {
         return $.trim($(this).text()) == "EXT:" || $.trim($(this).text()) == "LLT:" || $.trim($(this).text()) == "MPN:";
     }).next().text();
 
+    $("<div class='ui-widget-overlay' style='width:" + $(document).width() + "px; height:" + $(document).height() + "px; z-index: 1005;' />").appendTo('body');
+
     $.ajax({
 
         type: "POST",
@@ -3211,8 +3229,11 @@ codeItemFields = function(item) {
             $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () { return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());}).closest('tbody').find('input').css('visibility', 'visible');
             $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () { return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());}).parent('tr').after(data);
             $(item).css('visibility', 'hidden');
+            $('.ui-widget-overlay').remove();
         },
         error: function(e) {
+
+            $('.ui-widget-overlay').remove();
 
             console.log("Error:" + e);
         }

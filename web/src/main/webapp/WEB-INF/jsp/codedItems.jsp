@@ -25,7 +25,7 @@
 
 <script type="text/javascript">
     $('html').click(function (e) {
-        if($(e.target).closest('#pageNavPosition').length === 0) {
+        if($(e.target).closest('#pageNavPosition').length === 0 && $(e.target).closest('.ui-widget-overlay').length === 0) {
             if($(e.target).closest('#tablepaging_result').filter(function () {return $(this).siblings("#response").size() === 1; }).length === 0) {
                 $('#tablepaging_result').filter(function () {
                     return $(this).siblings("#response").size() === 1; }).parent("div").html('');

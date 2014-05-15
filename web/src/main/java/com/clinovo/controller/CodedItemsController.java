@@ -14,34 +14,6 @@
  *******************************************************************************/
 package com.clinovo.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.*;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
-import org.akaza.openclinica.view.StudyInfoPanel;
-import org.akaza.openclinica.web.job.CodingTriggerService;
-import org.quartz.SchedulerException;
-import org.quartz.impl.JobDetailImpl;
-import org.quartz.impl.StdScheduler;
-import org.quartz.impl.triggers.SimpleTriggerImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-
 import com.clinovo.coding.Search;
 import com.clinovo.coding.model.Classification;
 import com.clinovo.coding.model.ClassificationElement;
@@ -49,11 +21,41 @@ import com.clinovo.coding.source.impl.BioPortalSearchInterface;
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemElement;
 import com.clinovo.model.CodedItemsTableFactory;
+import com.clinovo.model.Dictionary;
 import com.clinovo.model.Status.CodeStatus;
 import com.clinovo.model.Term;
 import com.clinovo.model.TermElement;
 import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DictionaryService;
 import com.clinovo.service.TermService;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.view.StudyInfoPanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -68,16 +70,17 @@ public class CodedItemsController {
 	@Autowired
     private DataSource datasource;
 
-    @Autowired
-    private OpenClinicaSchedulerFactoryBean scheduler;
-
-	private Search search = new Search();
-
 	@Autowired
 	private TermService termService;
+
+	@Autowired
+	private DictionaryService dictionaryService;
 	
 	@Autowired
 	private CodedItemService codedItemService;
+
+	private Search search = new Search();
+	Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private ItemDataDAO ItemDataDAO;
 	private StudyParameterValueDAO studyParamDAO;
@@ -213,8 +216,8 @@ public class CodedItemsController {
   
  			classification.setHttpPath(term.getHttpPath());
  			classification.setClassificationElement(generateClassificationElements(term.getTermElementList()));
-  
- 			generateCodedItemElements(codedItem.getCodedItemElements(), classification.getClassificationElement());
+
+			generateCodedItemFields(codedItem.getCodedItemElements(), classification.getClassificationElement());
 
  			codedItem.setAutoCoded(true);
  			codedItem.setPreferredTerm(term.getPreferredName());
@@ -264,8 +267,7 @@ public class CodedItemsController {
         return model;
 
     }
-	
-  	
+
  	@RequestMapping("/autoCode")
  	public void autoCodeItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
  
@@ -286,8 +288,8 @@ public class CodedItemsController {
  
  				classification.setHttpPath(term.getHttpPath());
  				classification.setClassificationElement(generateClassificationElements(term.getTermElementList()));
- 
- 				generateCodedItemElements(item.getCodedItemElements(), classification.getClassificationElement());
+
+				generateCodedItemFields(item.getCodedItemElements(), classification.getClassificationElement());
 
                 item.setPreferredTerm(term.getPreferredName());
                 item.setHttpPath(term.getHttpPath());
@@ -322,30 +324,30 @@ public class CodedItemsController {
 	 * @throws Exception For all exception
 	 */
 
-    @RequestMapping("/saveCodedItem")
-    public String saveCodedItemHandler(HttpServletRequest request) throws Exception {
+	@RequestMapping("/saveCodedItem")
+	public String saveCodedItemHandler(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(request.getLocale());
 
-        String itemId = request.getParameter("item");
-        String categoryList = request.getParameter("categoryList");
-        String verbatimTerm = request.getParameter("verbatimTerm");
-        String codeSearchTerm = request.getParameter("coderSearchTerm");
-        
-        CodedItem codedItem = codedItemService.findCodedItem(Integer.valueOf(itemId));
-        StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "defaultBioontologyURL");
-        StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "medicalCodingApiKey");
+		String itemId = request.getParameter("item");
+		String categoryList = request.getParameter("categoryList");
+		String verbatimTerm = request.getParameter("verbatimTerm");
+		String codeSearchTerm = request.getParameter("coderSearchTerm");
 
-        codedItem.setStatus((String.valueOf(CodeStatus.IN_PROCESS)));
-        codedItem.setPreferredTerm(codeSearchTerm);
+		CodedItem codedItem = codedItemService.findCodedItem(Integer.valueOf(itemId));
+		StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "defaultBioontologyURL");
+		StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "medicalCodingApiKey");
 
-        codedItemService.saveCodedItem(codedItem);
+		try {
+			provideCoding(verbatimTerm, false, categoryList, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), codedItem.getItemId());
 
-        createCodeItemJob(itemId, verbatimTerm, categoryList, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), false);
+		} catch (Exception ex) {
 
-        // Redirect to main
-        return "codedItems";
-    }
+			logger.error(ex.getMessage());
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY);
+		}
+		return "codedItems";
+	}
 
 	/**
 	 * Handle for uncoding a given coded item.
@@ -356,34 +358,34 @@ public class CodedItemsController {
 	 * 
 	 * @throws Exception For all exceptions
 	 */
-    @RequestMapping("/uncodeCodedItem")
-    public String unCodeCodedItemHandler(HttpServletRequest request) throws Exception {
+	@RequestMapping("/uncodeCodedItem")
+	public String unCodeCodedItemHandler(HttpServletRequest request) throws Exception {
 
-        ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(request.getLocale());
 
-        String codedItemItemDataId = request.getParameter("item");
+		String codedItemItemDataId = request.getParameter("item");
 
-        CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
-        ItemDataBean itemData = (ItemDataBean) getItemDataDAO().findByPK(codedItem.getItemId());
+		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
+		ItemDataBean itemData = (ItemDataBean) getItemDataDAO().findByPK(codedItem.getItemId());
 
-        for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
+		for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
 
-            codedItemElement.setItemCode("");
-        }
+			codedItemElement.setItemCode("");
+		}
 
 		if (codedItem.isAutoCoded()) {
 
 			codedItem.setAutoCoded(false);
 		}
 
-        codedItem.setHttpPath("");
-        codedItem.setStatus(String.valueOf(CodeStatus.NOT_CODED));
-        codedItem.setPreferredTerm(itemData.getValue());
+		codedItem.setHttpPath("");
+		codedItem.setStatus(String.valueOf(CodeStatus.NOT_CODED));
+		codedItem.setPreferredTerm(itemData.getValue());
 
-        codedItemService.saveCodedItem(codedItem);
+		codedItemService.saveCodedItem(codedItem);
 
-        return "codedItems";
-    }
+		return "codedItems";
+	}
 
 	/**
 	 * Handle for getting specified item additional fields
@@ -399,7 +401,7 @@ public class CodedItemsController {
 
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
- 		String codedItemUrl = request.getParameter("codedItemUrl");
+		String codedItemUrl = request.getParameter("codedItemUrl");
 		String term = request.getParameter("term");
 
 		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
@@ -443,7 +445,7 @@ public class CodedItemsController {
 	 *             For all exceptions
 	 */
 	@RequestMapping("/codeAndAlias")
-	public String codeAndAliasHandler(HttpServletRequest request) throws Exception {
+	public String codeAndAliasHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
@@ -467,31 +469,33 @@ public class CodedItemsController {
 		}
 
 		if (codedItem != null) {
+			try {
 
-			codedItem.setStatus((String.valueOf(CodeStatus.IN_PROCESS)));
-			codedItem.setPreferredTerm(codeSearchTerm);
-			codedItemService.saveCodedItem(codedItem);
+				provideCoding(verbatimTerm, isAlias, categoryList, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), codedItem.getItemId());
+			} catch (Exception ex) {
 
-			createCodeItemJob(item, verbatimTerm, categoryList, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), isAlias);
+				logger.error(ex.getMessage());
+				response.sendError(HttpServletResponse.SC_BAD_GATEWAY);
+			}
 		}
 
 		return "codedItems";
 	}
-	
+
 	private List<CodedItem> getItems(List<CodedItem> items, CodeStatus status) {
-		
+
 		List<CodedItem> matchingItems = new ArrayList<CodedItem>();
-		
-		for(CodedItem item : items) {
-			
-			if(item.getStatus().equals(String.valueOf(status))) {
+
+		for (CodedItem item : items) {
+
+			if (item.getStatus().equals(String.valueOf(status))) {
 				matchingItems.add(item);
 			}
 		}
-		
+
 		return matchingItems;
 	}
-	
+
 	private StudyDAO getStudyDAO() {
 
 		if (studyDAO == null) {
@@ -506,76 +510,170 @@ public class CodedItemsController {
 		if (studyParamDAO == null) {
 			studyParamDAO = new StudyParameterValueDAO(datasource);
 		}
-		
+
 		return studyParamDAO;
 	}
-	
+
 	private ItemDataDAO getItemDataDAO() {
 
 		if (ItemDataDAO == null) {
 			ItemDataDAO = new ItemDataDAO(datasource);
 		}
-		
+
 		return ItemDataDAO;
 	}
 
-	private void createCodeItemJob(String itemDataId, String verbatimTerm, String categoryList, String codeSearchTerm, String bioontologyUrl, String bioontologyApiKey, boolean isAlias) throws SchedulerException {
+	private ArrayList<ClassificationElement> generateClassificationElements(List<TermElement> termElementList) {
 
-        CodingTriggerService codingTriggerService = new CodingTriggerService();
-        SimpleTriggerImpl trigger = codingTriggerService.generateCodeItemService(itemDataId, verbatimTerm, categoryList, codeSearchTerm, bioontologyUrl, bioontologyApiKey, isAlias);
-        trigger.setDescription(itemDataId + " " + verbatimTerm);
+		ArrayList<ClassificationElement> classElementList = new ArrayList<ClassificationElement>();
 
-        JobDetailImpl jobDetailBean = new JobDetailImpl();
+		for (TermElement termElement : termElementList) {
 
-        jobDetailBean.setGroup(trigger.getGroup());
-        jobDetailBean.setName(trigger.getName());
-        jobDetailBean.setJobClass(org.akaza.openclinica.web.job.CodingStatefulJob.class);
-        jobDetailBean.setJobDataMap(trigger.getJobDataMap());
-        jobDetailBean.setDurability(true);
+			ClassificationElement classElement = new ClassificationElement();
+			classElement.setElementName(termElement.getElementName());
+			classElement.setCodeName(termElement.getTermName());
+			classElement.setCodeValue(termElement.getTermCode());
 
-        getStdScheduler().scheduleJob(jobDetailBean, trigger);
-    }
+			classElementList.add(classElement);
 
-    private ArrayList<ClassificationElement> generateClassificationElements(List<TermElement> termElementList) {
+		}
 
-        ArrayList<ClassificationElement> classElementList = new ArrayList<ClassificationElement>();
+		return classElementList;
+	}
 
-        for(TermElement termElement : termElementList) {
+	private CodedItem provideCoding(String verbatimTerm, boolean isAlias, String categoryList, String codeSearchTerm, String bioontologyUrl, String bioontologyApiKey, int codedItemId) throws Exception {
 
-            ClassificationElement classElement = new ClassificationElement();
-            classElement.setElementName(termElement.getElementName());
-            classElement.setCodeName(termElement.getTermName());
-            classElement.setCodeValue(termElement.getTermCode());
+		StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(datasource);
 
-            classElementList.add(classElement);
+		CodedItem codedItem = codedItemService.findCodedItem(codedItemId);
+		codedItem.setPreferredTerm(codeSearchTerm);
 
-        }
+		Classification classificationResult = getClassificationFromCategoryString(categoryList);
+		search.setSearchInterface(new BioPortalSearchInterface());
 
-        return classElementList;
-    }
+		if (codedItem.getDictionary().equals("WHOD")) {
 
-    private void generateCodedItemElements(List<CodedItemElement> codedItemElements, List<ClassificationElement> classificationElements) {
-        for (CodedItemElement codedItemElement : codedItemElements) {
+			String termUniqKey = classificationResult.getHttpPath();
+			termUniqKey = termUniqKey.substring(termUniqKey.indexOf("@"), termUniqKey.length());
 
-            for (ClassificationElement classificationElement : classificationElements) {
+			for (ClassificationElement whodClassElement : classificationResult.getClassificationElement()) {
+				whodClassElement.setCodeName(whodClassElement.getCodeName().replaceAll(" &amp; ", " and ").replaceAll(" ", "_") + termUniqKey);
+			}
 
-                if (codedItemElement.getItemName().equals(classificationElement.getElementName())) {
+			addClassificationResultSufix(classificationResult);
+		}
 
-                    codedItemElement.setItemCode(classificationElement.getCodeName());
+		//get codes for all verb terms & save it in classification
+		search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "), bioontologyUrl, bioontologyApiKey);
 
-                } else if (codedItemElement.getItemName().equals(classificationElement.getElementName() + "C")) {
+		//replace all terms & codes from classification to coded elements
+		generateCodedItemFields(codedItem.getCodedItemElements(), classificationResult.getClassificationElement());
 
-                    codedItemElement.setItemCode(classificationElement.getCodeValue());
+		//if isAlias is true, create term using completed classification
+		if (isAlias) {
 
-                }  else if (codedItemElement.getItemName().equals("MPSEQ") && classificationElement.getElementName().equals("CMP")) {
+			StudyParameterValueBean configuredDictionary = studyParameterValueDAO.findByHandleAndStudy(codedItem.getStudyId(), "autoCodeDictionaryName");
+			Dictionary dictionary = dictionaryService.findDictionary(configuredDictionary.getValue());
+
+			Term term = new Term();
+
+			term.setDictionary(dictionary);
+			term.setLocalAlias(verbatimTerm.toLowerCase());
+			term.setPreferredName(codeSearchTerm.toLowerCase());
+			term.setHttpPath(classificationResult.getHttpPath());
+			term.setExternalDictionaryName(codedItem.getDictionary());
+			term.setTermElementList(generateTermElementList(classificationResult.getClassificationElement()));
+
+			termService.saveTerm(term);
+		}
+
+		codedItem.setStatus((String.valueOf(CodeStatus.CODED)));
+		codedItem.setHttpPath(classificationResult.getHttpPath());
+
+		codedItemService.saveCodedItem(codedItem);
+
+		return codedItem;
+	}
+
+	private void addClassificationResultSufix(Classification classificationResult) {
+
+		int countryIndex = classificationResult.getClassificationElement().size() - 3;
+		String countryField = classificationResult.getClassificationElement().get(countryIndex).getCodeName() + "_con";
+		classificationResult.getClassificationElement().get(countryIndex).setCodeName(countryField);
+
+		int componentIndex = classificationResult.getClassificationElement().size() - 4;
+		String componentField = classificationResult.getClassificationElement().get(componentIndex).getCodeName() + "_com";
+		classificationResult.getClassificationElement().get(componentIndex).setCodeName(componentField);
+
+		for (int index = 0; index < classificationResult.getClassificationElement().size() && index < componentIndex; index++) {
+			String actField = classificationResult.getClassificationElement().get(index).getCodeName() + "_act";
+			classificationResult.getClassificationElement().get(index).setCodeName(actField);
+		}
+	}
+
+	private Classification getClassificationFromCategoryString(String categoryList) {
+
+		Classification classification = new Classification();
+		List<String> list = new ArrayList<String>(Arrays.asList(categoryList.split("\\|")));
+
+		for (int i = 0; i < list.size(); i++) {
+
+			if (list.get(i).equals("HTTP")) {
+				classification.setHttpPath(list.get(i + 1));
+				i++;
+			} else if (!list.get(i).isEmpty()) {
+
+				ClassificationElement classificationElement = new ClassificationElement();
+				classificationElement.setElementName(list.get(i));
+				classificationElement.setCodeName(list.get(i + 1));
+				classification.addClassificationElement(classificationElement);
+				i++;
+			}
+		}
+
+		if (classification.getHttpPath().indexOf("whod") > 0) {
+
+			String whodKey = classification.getHttpPath().substring(classification.getHttpPath().indexOf("@"), classification.getHttpPath().length());
+
+			for (ClassificationElement classificationElement : classification.getClassificationElement()) {
+				classificationElement.setCodeName(classificationElement.getCodeName().replaceAll(" ", "_").replaceAll(" & ", "_and_") + whodKey);
+			}
+		}
+
+		return classification;
+	}
+
+	private List<TermElement> generateTermElementList(List<ClassificationElement> classificationElementList) {
+
+		List<TermElement> termElementList = new ArrayList<TermElement>();
+
+		for (ClassificationElement classElement : classificationElementList) {
+
+			TermElement newTermElement = new TermElement(classElement.getCodeName(), classElement.getCodeValue(), classElement.getElementName());
+			termElementList.add(newTermElement);
+		}
+
+		return termElementList;
+	}
+
+	private void generateCodedItemFields(List<CodedItemElement> codedItemElements, List<ClassificationElement> classificationElements) {
+
+		for (CodedItemElement codedItemElement : codedItemElements) {
+			for (ClassificationElement classificationElement : classificationElements) {
+
+				String name = codedItemElement.getItemName();
+
+				if (name.equals(classificationElement.getElementName())) {
+
+					codedItemElement.setItemCode(classificationElement.getCodeName().replaceAll(classificationElement.getCodeValue(), ""));
+				} else if (name.equals(classificationElement.getElementName() + "C")) {
+
+					codedItemElement.setItemCode(classificationElement.getCodeValue());
+				} else if (name.equals("MPSEQ") && classificationElement.getElementName().equals("CMP")) {
 
 					codedItemElement.setItemCode(classificationElement.getCodeValue());
 				}
-            }
-        }
-    }
-
-    public StdScheduler getStdScheduler() {
-        return (StdScheduler) scheduler.getScheduler();
-    }
+			}
+		}
+	}
 }

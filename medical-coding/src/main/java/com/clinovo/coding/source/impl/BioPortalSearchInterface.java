@@ -68,8 +68,9 @@ public class BioPortalSearchInterface implements SearchInterface {
 
 			String codeHttpPath = jsonObjectElement.get("@id").getAsString();
 			String prefLabel = jsonObjectElement.get("prefLabel").getAsString();
-
-			if (prefLabel.indexOf("_com") < 0) {
+			boolean isPrefLabel = prefLabel.indexOf("_com") < 0 && prefLabel.indexOf("_act") < 0 && prefLabel.indexOf("_key") < 0 && prefLabel.indexOf("_con") < 0;
+			
+			if (isPrefLabel) {
 
 				String whodPreferredTerm = dictionary.equals(WHOD) ? prefLabel.substring(prefLabel.indexOf("@"), prefLabel.length()).indexOf("Y") > 0 ? "Yes" : prefLabel.substring(prefLabel.indexOf("@"), prefLabel.length()).indexOf("N") > 0 ? "No" : "" : "";
 				prefLabel = dictionary.equals(WHOD) ? prefLabel.substring(0, prefLabel.indexOf("@")).replaceAll("_and_", "_&_").replaceAll("_", " ") : prefLabel;

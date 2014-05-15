@@ -22,28 +22,23 @@ import com.clinovo.service.CodedItemService;
 import com.clinovo.service.TermService;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
 import org.jmesa.view.html.HtmlBuilder;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Controller
 public class CodedItemAutoUpdater {
-
-    @Autowired
-    private OpenClinicaSchedulerFactoryBean scheduler;
 
     @Autowired
     private TermService termService;
@@ -57,32 +52,16 @@ public class CodedItemAutoUpdater {
     private String themeColor;
 
     @RequestMapping(value = "/checkCodedItemsStatus")
-    public void checkCodedItemsStatus(HttpServletRequest request, HttpServletResponse response) throws SchedulerException, IOException {
+    public void checkCodedItemsStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         String codedItemIdList = request.getParameter("arr");
         List<String> codedItemIdListString = new ArrayList<String>(Arrays.asList(codedItemIdList.split(",")));
         List<Integer> codedItemIdListInt = convertStringListToIntList(codedItemIdListString);
-        List<Integer> codedItemsInProgress = new ArrayList<Integer>();
 
         themeColor = (String) request.getSession().getAttribute("newThemeColor");
         String showContext = request.getParameter("showContext");
         themeColor = themeColor == null ? "blue" : themeColor;
         showContext = showContext == null ? "false" : showContext;
-
-        for (JobExecutionContext jobExContext : getJobsList()) {
-
-            JobDataMap dataMap = jobExContext.getMergedJobDataMap();
-
-            for (int codedItemId : codedItemIdListInt) {
-
-                if (dataMap.getIntegerFromString("codedItem") == codedItemId) {
-
-                    codedItemsInProgress.add(dataMap.getIntegerFromString("codedItem"));
-                }
-            }
-        }
-
-        codedItemIdListInt.removeAll(codedItemsInProgress);
 
         response.getWriter().println(buildResponseBox(codedItemIdListInt, showContext));
     }
@@ -205,11 +184,6 @@ public class CodedItemAutoUpdater {
         }
 
         return intList;
-    }
-
-    private List<JobExecutionContext> getJobsList() throws SchedulerException {
-
-        return scheduler.getScheduler().getCurrentlyExecutingJobs();
     }
 
     public String getThemeColor() {
