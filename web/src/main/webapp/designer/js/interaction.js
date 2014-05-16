@@ -559,6 +559,5 @@ $(window).resize(function(){
 
 function showHideOnEvaluationAlert() {
 	$('.alert').remove();
-	$('input[action=show], input[action=hide]').prop('checked', false);
 	$('.targettable .panel-body').prepend(createAlert('Rule evaluation is not valid for a Show or Hide action. Please unselect True/False evaluation.'));
 }
