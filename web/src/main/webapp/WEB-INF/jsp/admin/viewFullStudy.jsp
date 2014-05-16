@@ -69,6 +69,8 @@
   }
 </script>
 
+<!-- *JSP* ${pageContext.page['class'].simpleName} -->
+
 <h1>
 	<span class="first_level_header">
 		<c:out value="${studyToView.name}"/>
@@ -489,25 +491,98 @@
 <br>
 
 <a href="javascript:leftnavExpand('sectionee');">
-	<img id="excl_sectionee" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> F: <fmt:message key="discrepancy_descriptions" bundle="${resword}"/>]</span></a>
-	<div id="sectionee" style="display:none">
-		<div style="width: 600px">
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-<div class="tablebox_center">
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<img id="excl_sectionee" src="images/bt_Expand.gif" border="0"> 
+		<span class="table_title_Admin">
+			<fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> F: <fmt:message key="discrepancy_descriptions" bundle="${resword}"/>]
+		</span></a>
 
-  <tr valign="top"><td class="table_header_column">Reason For Change Descriptions</td>
-  	<td class="table_cell">
-  	<c:forEach var="term" items="${dnDescriptions}">
-  		<c:out value="${term.name }"/><br>
-  	</c:forEach>
-  	
-  	</td>
-  </tr>
-  </table>
-  </div></div></div></div></div></div></div></div></div></div>
-	</div>
-	<br>
+<div id="sectionee" style="display:none">
+
+	<!-- Update Discrepancies Descriptions  -->
+	<a href="javascript:leftnavExpand('section6_1');" style="padding-left:20px;">
+		<img id="excl_section6_1" src="images/bt_Expand.gif" border="0"> 
+		<span class="table_title_Admin">
+			<fmt:message key="update_discrepancies_descriptions" bundle="${resword}"/>
+		</span>
+	</a>
+
+	<div id="section6_1" name="" style="display:none"><div style="width: 600px">
+	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+	<div class="tablebox_center">
+
+		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td class="table_header_column"><fmt:message key="description" bundle="${resword}"/></td>
+				<td width="20%" class="table_header_column"><fmt:message key="visibility" bundle="${resword}"/>	</td>
+			</tr>
+			<c:forEach var="term" items="${dDescriptionsMap['dnUpdateDescriptions']}">
+			<tr>
+				<td class="table_cell">${term.name}</td>
+				<td class="table_cell">${term.visibilityLevel}</td>
+			</tr>
+			</c:forEach>
+		</table>
+
+	</div></div></div></div></div></div></div></div></div>
+	</div></div><br>
+	
+	<!-- Close Discrepancies Descriptions -->
+	<a href="javascript:leftnavExpand('section6_2');" style="padding-left:20px;">
+		<img id="excl_section6_2" src="images/bt_Expand.gif" border="0"> 
+		<span class="table_title_Admin">
+			<fmt:message key="close_discrepancies_descriptions" bundle="${resword}"/>
+		</span>
+	</a>
+
+	<div id="section6_2" name="" style="display:none"><div style="width: 600px">
+	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+	<div class="tablebox_center">
+
+		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td class="table_header_column"><fmt:message key="description" bundle="${resword}"/></td>
+				<td width="20%" class="table_header_column"><fmt:message key="visibility" bundle="${resword}"/>	</td>
+			</tr>
+			<c:forEach var="term" items="${dDescriptionsMap['dnCloseDescriptions']}">
+			<tr>
+				<td class="table_cell">${term.name}</td>
+				<td class="table_cell">${term.visibilityLevel}</td>
+			</tr>
+			</c:forEach>
+		</table>
+
+	</div></div></div></div></div></div></div></div></div>
+	</div></div><br>
+
+	<!-- Reason for Change Descriptions -->
+	<a href="javascript:leftnavExpand('section6_3');" style="padding-left:20px;">
+		<img id="excl_section6_3" src="images/bt_Expand.gif" border="0"> 
+		<span class="table_title_Admin">
+			<fmt:message key="reason_for_change_descriptions" bundle="${resword}"/>
+		</span>
+	</a>
+
+	<div id="section6_3" name="" style="display:none"><div style="width: 600px">
+	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+	<div class="tablebox_center">
+
+		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td class="table_header_column"><fmt:message key="description" bundle="${resword}"/></td>
+				<td width="20%" class="table_header_column"><fmt:message key="visibility" bundle="${resword}"/>	</td>
+			</tr>
+			<c:forEach var="term" items="${dDescriptionsMap['dnRFCDescriptions']}">
+			<tr>
+				<td class="table_cell">${term.name}</td>
+				<td class="table_cell">${term.visibilityLevel}</td>
+			</tr>
+			</c:forEach>
+		</table>
+
+	</div></div></div></div></div></div></div></div></div>
+	</div></div><br>
+</div>
+<br>
 
 <a href="javascript:leftnavExpand('sectionf');">
 	<img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> 

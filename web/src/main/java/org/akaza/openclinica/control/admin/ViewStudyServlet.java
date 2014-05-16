@@ -20,8 +20,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.util.ArrayList;
-
+import com.clinovo.model.DiscrepancyDescription;
+import com.clinovo.service.DiscrepancyDescriptionService;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -35,8 +35,10 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import com.clinovo.model.DiscrepancyDescriptionType;
-import com.clinovo.service.DiscrepancyDescriptionService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Processes the reuqest of 'view study details'
@@ -44,7 +46,7 @@ import com.clinovo.service.DiscrepancyDescriptionService;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class ViewStudyServlet extends SecureController {
 	/**
 	 * Checks whether the user has the correct privilege
@@ -89,7 +91,7 @@ public class ViewStudyServlet extends SecureController {
 			if ("yes".equalsIgnoreCase(viewFullRecords)) {
 				UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
 				ArrayList sites = new ArrayList();
-				ArrayList userRoles = new ArrayList();
+				ArrayList userRoles;
 				if (this.currentStudy.getParentStudyId() > 0 && this.currentRole.getRole().getId() > 3) {
 					sites.add(this.currentStudy);
 					userRoles = udao.findAllUsersByStudy(currentStudy.getId());
@@ -101,16 +103,15 @@ public class ViewStudyServlet extends SecureController {
 				// find all subjects in the study, include ones in sites
 				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 				EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-				DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess.getApplicationContext(context)
-						.getBean("discrepancyDescriptionService");
-				
-				// find all events in the study, include ones in sites
-				ArrayList definitions = seddao.findAllAvailableByStudy(study);
-				ArrayList dRFCDescriptions = (ArrayList) dDescriptionService.findAllByStudyIdAndTypeId(studyId, 
-						DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId());
+				DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess
+						.getApplicationContext(context).getBean("discrepancyDescriptionService");
 
-				for (int i = 0; i < definitions.size(); i++) {
-					StudyEventDefinitionBean def = (StudyEventDefinitionBean) definitions.get(i);
+				// find all events in the study, include ones in sites
+				List<StudyEventDefinitionBean> definitions = seddao.findAllAvailableByStudy(study);
+				Map<String, List<DiscrepancyDescription>> dDescriptionsMap = dDescriptionService
+						.findAllSortedDescriptionsFromStudy(studyId);
+
+				for (StudyEventDefinitionBean def : definitions) {
 					ArrayList crfs = (ArrayList) edcdao.findAllActiveParentsByEventDefinitionId(def.getId());
 					def.setCrfNum(crfs.size());
 
@@ -118,7 +119,7 @@ public class ViewStudyServlet extends SecureController {
 
 				request.setAttribute("sitesToView", sites);
 				request.setAttribute("siteNum", sites.size() + "");
-				request.setAttribute("dRFCDescriptions", dRFCDescriptions);
+				request.setAttribute("dDescriptionsMap", dDescriptionsMap);
 
 				request.setAttribute("userRolesToView", userRoles);
 				request.setAttribute("userNum", userRoles.size() + "");
