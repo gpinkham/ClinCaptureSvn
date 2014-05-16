@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,9 +26,19 @@ public class BaseControllerTest extends AbstractContextSentiveTest{
 	// Managed controllers
 	protected final String TERM_CONTROLLER = "/deleteTerm";
 	protected final String CODED_ITEM_CONTROLLER = "/codedItems";
+	protected final String CONFIGURE_HOME_PAGE = "/configureHomePage";
+	protected final String SAVE_HOME_PAGE = "/saveHomePage";
+	protected final String NDS_ASSIGNED_TO_ME_WIDGET = "/initNdsAssignedToMeWidget";
+	protected final String EVENTS_COMPLETION_WIDGET = "/initEventsCompletionWidget";
+	protected final String SUBJECTS_STATUS_COUNT_WIDGET = "/initSubjectStatusCount";
+	protected final String STUDY_PROGRESS_WIDGET = "/initStudyProgress";
+	protected final String SDV_PROGRESS_WIDGET = "/initSdvProgressWidget";
 
 	@Autowired
 	protected WebApplicationContext wac;
+	
+	@Autowired
+	protected MessageSource messageSource;
 
 	@Before
 	public void setup() throws Exception {
