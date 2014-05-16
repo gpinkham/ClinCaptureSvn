@@ -573,7 +573,9 @@ function createAlert(text) {
  * ========================================================================== */
 function updateOnClickActions() {
 	$('.dotted-border.group').click(function() {
-		showCRFItem(this);
+		if($(this).attr('item-oid')) {
+			showCRFItem(this);
+		}		
 	});
 }
 /* ===========================================================================
@@ -1349,18 +1351,30 @@ function handleClickDrop(ele) {
 	params.ui.draggable = $(ele);
 	// Get a matching drop surface, if more than one, select last
 	if ($(ele).is('.group')) {
-		if ($('.dotted-border.' + 'group').last().text() == ')') {
-			params.element = $('.dotted-border.' + 'group').eq(-2);
-			handleDropEvent(params);
-		} else {
-			params.element = $('.dotted-border.' + 'group').last();
-			handleDropEvent(params);
-		}
+		params.element = getDropSurfaceElement(ele);
+		handleDropEvent(params);		
 	} else if ($(ele).is('.compare')) {
 		params.element = $('.dotted-border.' + 'compare').last();
 		handleDropEvent(params);
 	} else if ($(ele).is('.condition')) {
 		params.element = $('.dotted-border.' + 'condition').last();
 		handleDropEvent(params);
+	}
+}
+
+function getDropSurfaceElement(clickedElement){
+	//If left parenthesis is clicked
+	if($(clickedElement).is('.leftPAREN')){
+		//If there's more than one element and Group or Data is left most surface
+		if($('.dotted-border.' + 'group').length > 1 && $('.dotted-border.' + 'group').first().text() == 'Group or Data') {
+			return $('.dotted-border.' + 'group').first();
+		} else {
+			return $('.dotted-border.' + 'group').last();
+		}
+	}	
+	else if ($('.dotted-border.' + 'group').last().text() == ')') {
+		return $('.dotted-border.' + 'group').eq(-2);
+	} else {
+		return $('.dotted-border.' + 'group').last();
 	}
 }
