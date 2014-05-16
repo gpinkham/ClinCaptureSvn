@@ -801,7 +801,7 @@ Parser.prototype.isOp = function(predicate) {
 	// not contains
 	ops.push(unescape(JSON.parse('"\u2209"')));
 	// contains
-	ops.push(unescape(JSON.parse('"\u220B"')));
+	ops.push(unescape(JSON.parse('"\u2208"')));
 	// divide
 	ops.push(unescape(JSON.parse('"\u00F7"')));
 	// multiply
@@ -865,7 +865,7 @@ Parser.prototype.getOp = function(predicate) {
 			return "gte";
 		} else if (predicate === unescape(JSON.parse('"\u2209"'))) {
 			return "nct";
-		} else if (predicate === unescape(JSON.parse('"\u220B"'))) {
+		} else if (predicate === unescape(JSON.parse('"\u2208"'))) {
 			return "ct";
 		} else if (predicate === unescape(JSON.parse('"\u0078"'))) {
 			return "*";
@@ -892,7 +892,7 @@ Parser.prototype.getLocalOp = function(predicate) {
 		} else if (predicate === 'nct') {
 			return unescape(JSON.parse('"\u2209"'));
 		} else if (predicate === "ct") {
-			return unescape(JSON.parse('"\u220B"'));
+			return unescape(JSON.parse('"\u2208"'));
 		} else if (predicate === "*") {
 			return "x";
 		} else if (predicate === "and") {
