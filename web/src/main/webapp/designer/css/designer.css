@@ -88,7 +88,11 @@ body .panel-body {
   width: 30% !important;
   position: fixed !important;
 }
-  
+
+.panel-primary-custom {
+  margin-bottom: 2px;
+}
+
 .data .panel {
   float: left;
   width: 100%;
