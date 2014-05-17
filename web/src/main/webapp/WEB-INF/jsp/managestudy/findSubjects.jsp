@@ -35,7 +35,7 @@
             if(data == 'true'){
                 formName.submit();
             }else{
-            	alertDialog({ message:data, height: 150, width: 500 });
+                alert(data);
             }
         });
     }
