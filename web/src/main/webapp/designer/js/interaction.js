@@ -240,7 +240,7 @@ $(function() {
 	$(document).on('blur', '#ruleName', function() {
 		parser.setName($(this).val());
 	});
-	$('.dotted-border.group').click(function() {
+	$('.dotted-border.group[item-oid]').on('click', function() {
 		showCRFItem(this);
 	});
 	$('input[name=ruleInvoke]').click(function() {

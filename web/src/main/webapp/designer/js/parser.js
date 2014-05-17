@@ -96,8 +96,6 @@ Parser.prototype.fetchStudies = function() {
 				sessionStorage.removeItem("context");
 			}
 			removeLoader();
-			// Wait till items will be added to DOM structure and update click events for them;
-			setTimeout(updateOnClickActions,400);
 		},
 		error: function(response) {
 			handleErrorResponse({
@@ -388,8 +386,6 @@ Parser.prototype.createNextDroppable = function(params) {
 			}
 		}
 	}
-	// Update onClick actions for newly added elements;
-	updateOnClickActions();
 };
 
 Parser.prototype.getInsertActionDestination = function(id) {

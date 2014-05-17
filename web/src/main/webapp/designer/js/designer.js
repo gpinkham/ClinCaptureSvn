@@ -568,16 +568,7 @@ function createAlert(text) {
 	}, 5000);
 	return div;
 }
-/* ===========================================================================
- * Set onclick actions for items in expression
- * ========================================================================== */
-function updateOnClickActions() {
-	$('.dotted-border.group').click(function() {
-		if($(this).attr('item-oid')) {
-			showCRFItem(this);
-		}		
-	});
-}
+
 /* ===========================================================================
  * Handles erratic responses from a server.
  *
