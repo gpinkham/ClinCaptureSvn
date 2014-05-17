@@ -73,8 +73,7 @@ public class AddCRFToDefinitionServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_permission_to_update_study_event_definition")
+		addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
@@ -104,36 +103,16 @@ public class AddCRFToDefinitionServlet extends Controller {
 			}
 		}
 		request.getSession().setAttribute("crfsWithVersion", crfs);
-		if (submit != null) {
+		if (!StringUtil.isBlank(submit)) {
 			addCRF(request, response);
 		} else {
 			if (StringUtil.isBlank(actionName)) {
-				FormProcessor fp = new FormProcessor(request);
-				EntityBeanTable table = fp.getEntityBeanTable();
-				ArrayList allRows = CRFRow.generateRowsFromBeans(crfs);
-				String[] columns = { resword.getString("CRF_name"), resword.getString("date_created"),
-						resword.getString("owner"), resword.getString("date_updated"),
-						resword.getString("last_updated_by"), resword.getString("selected") };
-				table.setColumns(new ArrayList(Arrays.asList(columns)));
-				table.hideColumnLink(5);
-				table.setQuery("AddCRFToDefinition", new HashMap());
-				table.setRows(allRows);
-				table.computeDisplay();
-
-				request.setAttribute("table", table);
+				request.setAttribute("table", createTable(request, crfs));
 				forwardPage(Page.UPDATE_EVENT_DEFINITION2, request, response);
+				
 			} else if (actionName.equalsIgnoreCase("next")) {
-				Integer pageNumber = Integer.valueOf(request.getParameter("pageNum"));
-				if (pageNumber != null) {
-					if (pageNumber == 2) {
-						String nextListPage = request.getParameter("next_list_page");
-						if (nextListPage != null && nextListPage.equalsIgnoreCase("true")) {
-							confirmDefinition(request, response);
-						}
-					} else {
-						confirmDefinition(request, response);
-					}
-				}
+				
+				confirmDefinition(request, response);
 			}
 		}
 	}
@@ -160,27 +139,7 @@ public class AddCRFToDefinitionServlet extends Controller {
 		}
 		request.getSession().setAttribute("tmpCRFIdMap", tmpCRFIdMap);
 
-		EntityBeanTable table = fp.getEntityBeanTable();
-		ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
-		String[] columns = { resword.getString("CRF_name"), resword.getString("date_created"),
-				resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),
-				resword.getString("selected") };
-		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(5);
-		StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
-		HashMap args = new HashMap();
-		args.put("actionName", "next");
-		args.put("pageNum", "1");
-		args.put("name", def1.getName());
-		args.put("repeating", Boolean.toString(def1.isRepeating()));
-		args.put("category", def1.getCategory());
-		args.put("description", def1.getDescription());
-		args.put("type", def1.getType());
-		table.setQuery("AddCRFToDefinition", args);
-		table.setRows(allRows);
-		table.computeDisplay();
-
-		request.setAttribute("table", table);
+		request.setAttribute("table", createTable(request, crfsWithVersion));
 		forwardPage(Page.UPDATE_EVENT_DEFINITION2, request, response);
 	}
 
@@ -274,5 +233,24 @@ public class AddCRFToDefinitionServlet extends Controller {
 			addPageMessage(respage.getString("has_have_been_added_need_confirmation"), request);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}
+	}
+	
+	private EntityBeanTable createTable(HttpServletRequest request, ArrayList crfs) throws Exception {
+		
+		FormProcessor fp = new FormProcessor(request);
+		EntityBeanTable table = fp.getEntityBeanTable();
+		ArrayList allRows = CRFRow.generateRowsFromBeans(crfs);
+		String[] columns = { resword.getString("CRF_name"), resword.getString("date_created"),
+				resword.getString("owner"), resword.getString("date_updated"),
+				resword.getString("last_updated_by"), resword.getString("selected") };
+		table.setColumns(new ArrayList(Arrays.asList(columns)));
+		table.hideColumnLink(5);
+		HashMap args = new HashMap();
+		args.put("actionName", "next");
+		table.setQuery("AddCRFToDefinition", args);
+		table.setRows(allRows);
+		table.computeDisplay();
+		
+		return table;
 	}
 }

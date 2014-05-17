@@ -76,7 +76,8 @@
 			</td>
 
 			<td>
-				<input type="button" name="SubmitButton" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" onclick="$('input[name=actionName]').val('next'); $('#addCRFToDefinition').append('<input type=\'hidden\' name=\'Submit\'/>'); $('#addCRFToDefinition').submit();">
+				<input type="button" name="SubmitButton" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" 
+					onclick="$('input[name=actionName]').val(''); $('#addCRFToDefinition').append('<input type=\'hidden\' name=\'Submit\' value=\'submit\'/>'); $('#addCRFToDefinition').submit();">
 			</td>
 		</tr>
 	</table>
