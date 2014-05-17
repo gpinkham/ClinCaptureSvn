@@ -567,9 +567,9 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.RemoveCRFFromDefinitionServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RestoreCRFFromDefinitionServlet</servlet-name>
+        <servlet-name>restoreCRFFromDefinitionServlet</servlet-name>
         <display-name>RestoreCRFFromDefinition</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RestoreCRFFromDefinitionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>addCRFToDefinitionServlet</servlet-name>
@@ -1677,7 +1677,7 @@
         <url-pattern>/RemoveCRFFromDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RestoreCRFFromDefinitionServlet</servlet-name>
+        <servlet-name>restoreCRFFromDefinitionServlet</servlet-name>
         <url-pattern>/RestoreCRFFromDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
