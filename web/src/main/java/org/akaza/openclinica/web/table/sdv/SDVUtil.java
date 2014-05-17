@@ -13,26 +13,6 @@
 
 package org.akaza.openclinica.web.table.sdv;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -86,6 +66,25 @@ import org.jmesa.view.html.editor.HtmlCellEditor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
@@ -218,10 +217,12 @@ public class SDVUtil {
 		boolean allowSdvWithOpenQueries = "no".equals(currentStudy.getStudyParameterConfig()
 				.getAllowSdvWithOpenQueries()) ? false : true;
 		if (!limit.isComplete()) {
-			int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, allowSdvWithOpenQueries);
+			int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, currentStudy.getParentStudyId(),
+					allowSdvWithOpenQueries);
 			tableFacade.setTotalRows(totalRows);
 		} else if ("true".equalsIgnoreCase(restore)) {
-			int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, allowSdvWithOpenQueries);
+			int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, currentStudy.getParentStudyId(),
+					allowSdvWithOpenQueries);
 			int pageNum = limit.getRowSelect().getPage();
 			int maxRows = limit.getRowSelect().getMaxRows();
 			tableFacade.setMaxRows(maxRows);
@@ -232,16 +233,21 @@ public class SDVUtil {
 		EventCRFSDVSort eventCRFSDVSort = getEventCRFSDVSort(limit);
 
 		int rowStart = limit.getRowSelect().getRowStart();
-		int rowEnd = limit.getRowSelect().getRowEnd();
+		// to prevent problem, when url restoring old rowEnd value from the session, set rowEnd to 15
+		int rowEnd = limit.getRowSelect().getRowEnd() < 15 ? 15 : limit.getRowSelect().getRowEnd();
+
 		Collection<SubjectSDVContainer> items = getFilteredItems(eventCRFSDVFilter, eventCRFSDVSort, rowStart, rowEnd,
-				studyId, request);
+				studyId, currentStudy, request);
+		tableFacade.setTotalRows(items.size());
 		tableFacade.setItems(items);
 	}
 
-	public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, Integer studyId, boolean allowSdvWithOpenQueries) {
+	public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, int studyId, int parentStudyId,
+			boolean allowSdvWithOpenQueries) {
 
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		return eventCRFDAO.getCountOfAvailableWithFilter(studyId, studyId, eventCRFSDVFilter, allowSdvWithOpenQueries);
+		return eventCRFDAO.getCountOfAvailableWithFilter(studyId, parentStudyId > 0 ? parentStudyId : studyId,
+				eventCRFSDVFilter, allowSdvWithOpenQueries);
 
 	}
 
@@ -272,14 +278,14 @@ public class SDVUtil {
 	}
 
 	private Collection<SubjectSDVContainer> getFilteredItems(EventCRFSDVFilter filterSet, EventCRFSDVSort sortSet,
-			int rowStart, int rowEnd, int studyId, HttpServletRequest request) {
+			int rowStart, int rowEnd, int studyId, StudyBean currentStudy, HttpServletRequest request) {
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		boolean allowSdvWithOpenQueries = "no".equals(currentStudy.getStudyParameterConfig()
 				.getAllowSdvWithOpenQueries()) ? false : true;
 
-		List<EventCRFBean> eventCRFBeans = eventCRFDAO.getAvailableWithFilterAndSort(studyId, studyId, filterSet,
-				sortSet, allowSdvWithOpenQueries, rowStart, rowEnd);
+		List<EventCRFBean> eventCRFBeans = eventCRFDAO.getAvailableWithFilterAndSort(studyId,
+				currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : studyId, filterSet, sortSet,
+				allowSdvWithOpenQueries, rowStart, rowEnd);
 		return getSubjectRows(eventCRFBeans, request);
 	}
 

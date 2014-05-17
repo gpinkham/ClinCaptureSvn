@@ -15,6 +15,8 @@ package org.akaza.openclinica.dao.submit;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.dao.EventCRFSDVFilter;
+import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
 
@@ -24,14 +26,31 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 	public void testFindAllNotReturnNull() throws OpenClinicaException {
 		assertNotNull(eventCRFDAO.findAll());
 	}
-	
+
 	@Test
 	public void testFindAllHasCorrectSize() throws OpenClinicaException {
 		assertEquals(7, eventCRFDAO.findAll().size());
 	}
-	
+
 	@Test
 	public void testFindByPKReturnsCorrectValue() throws OpenClinicaException {
 		assertEquals("Krikor", ((EventCRFBean) eventCRFDAO.findByPK(1)).getInterviewerName());
+	}
+
+	@Test
+	public void testGetAvailableWithFilterAndSortReturnsCorrectSizeOfSDVed() {
+		int studyId = 1;
+		int parentStudyId = 1;
+		EventCRFSDVFilter filter = new EventCRFSDVFilter(1);
+		EventCRFSDVSort sort = new EventCRFSDVSort();
+		boolean allowSdvWithOpenQueries = true;
+		int rowStart = 0;
+		int rowEnd = 15;
+		assertNotNull(eventCRFDAO.getAvailableWithFilterAndSort(studyId, parentStudyId, filter, sort,
+				allowSdvWithOpenQueries, rowStart, rowEnd));
+		assertEquals(
+				0,
+				eventCRFDAO.getAvailableWithFilterAndSort(studyId, parentStudyId, filter, sort,
+						allowSdvWithOpenQueries, rowStart, rowEnd).size());
 	}
 }

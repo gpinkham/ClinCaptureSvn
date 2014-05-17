@@ -37,7 +37,6 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
 import javax.sql.DataSource;
-
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -456,7 +455,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 
 		this.execute(digester.getQuery("setSDVStatus"), variables);
 	}
-	
+
 	public Collection findSDVedEventCRFsByStudyAndYear(StudyBean study, int year) {
 
 		HashMap variables = new HashMap();
@@ -673,6 +672,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		if (!allowSdvWithOpenQueries) {
 			variables.put(3, studyId);
 			variables.put(4, parentStudyId);
+			variables.put(5, parentStudyId);
 
 			sql = sql + digester.getQuery("notAllowSdvWithOpenQueries");
 		}
@@ -728,6 +728,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		if (!allowSdvWithOpenQueries) {
 			variables.put(3, studyId);
 			variables.put(4, parentStudyId);
+			variables.put(5, parentStudyId);
 
 			sql = sql + digester.getQuery("notAllowSdvWithOpenQueries");
 		}
@@ -765,10 +766,9 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(2, studyId);
 		String sql = digester.getQuery("getAvailableForSDVEntitiesByStudyId").replaceFirst("entity", entityProperty);
 		ArrayList rows = this.select(sql, variables);
-		Iterator it = rows.iterator();
 
-		while (it.hasNext()) {
-			result.add((String) ((HashMap) it.next()).get("property"));
+		for (Object row : rows) {
+			result.add((String) ((HashMap) row).get("property"));
 		}
 		return result;
 	}
