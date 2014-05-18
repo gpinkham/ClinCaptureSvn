@@ -31,17 +31,22 @@ if (!Array.prototype.forEach) {
 	};
 }
 
-function checkGoBackEntryStatus(strImageName, Message) {
+function checkGoBackEntryStatus(strImageName, Message, submit) {
     closing = false;        
     objImage = MM_findObj(strImageName);
-
     if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-        return confirmBack(Message);
+		return confirmSubmit({
+			message : Message,
+			height : 150,
+			width : 500,
+			submit : submit
+		});
     } else {
-      history.go(-1);
+		$(submit).submit();
     }
     return true;
 }
+
 function checkGoToEntryStatus(strImageName, Message, Adress) {
     closing = false;        
     objImage = MM_findObj(strImageName);

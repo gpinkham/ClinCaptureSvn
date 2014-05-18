@@ -605,9 +605,7 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
                                 <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                                   "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
                                 <td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
-                                  "button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" />
-                                  <%--<input type="button" id="seh" name="BTN_Exit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
-                                  "button_medium" onClick="javascript: return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');" /> --%></td>
+                                  "button_medium" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>',this);" /></td>
                                 <c:choose>
                                     <c:when test="${! empty formMessages}">
                                         <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif"></td>
@@ -1666,10 +1664,7 @@ table-->
                     </c:choose>
                     <td><input type="submit" id="srl" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                       "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
-                    <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom', this);" />
-                    <%-- <input type="button" id="srl" name="BTN_Exit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
-                                  "button_medium" onClick="javascript: return checkGoBackEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');" />--%></td>
-                    
+                    <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkGoBackEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>',this);" /></td>
                     <c:choose>
                         <c:when test="${! empty formMessages}">
                             <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif">&nbsp;</td>
