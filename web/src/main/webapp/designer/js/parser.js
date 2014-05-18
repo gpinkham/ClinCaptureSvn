@@ -1584,7 +1584,7 @@ Parser.prototype.setExpression = function(expression) {
 				if (itm) {
 					var preds = expression[e].split(".");
 					if (preds.length == 4) {
-						$(".dotted-border").attr("event-oid", preds[3]);
+						$(".dotted-border").attr("event-oid", preds[0]);
 						$(".dotted-border").attr("crf-oid", preds[preds.length - 3]);
 						$(".dotted-border").attr("item-oid", preds[preds.length - 1]);
 						$(".dotted-border").attr("group-oid", preds[preds.length - 2]);
@@ -1623,7 +1623,7 @@ Parser.prototype.setExpression = function(expression) {
 						var itm = this.getItem(expression[e]);
 						var preds = expression[e].split(".");
 						if (preds.length == 4) {
-							droppable.attr("event-oid", preds[3]);
+							droppable.attr("event-oid", preds[0]);
 							droppable.attr("crf-oid", preds[preds.length - 3]);
 							droppable.attr("item-oid", preds[preds.length - 1]);
 							droppable.attr("group-oid", preds[preds.length - 2]);
