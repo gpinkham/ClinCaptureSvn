@@ -205,7 +205,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		if (isDesignerRequest) {
 			return new ExportType[] {};
 		}
-		return new ExportType[] { ExportType.CSV, ExportType.EXCEL, ExportType.PDF };
+		return new ExportType[] { ExportType.PDF, ExportType.JEXCEL };
 	}
 
 	@Override

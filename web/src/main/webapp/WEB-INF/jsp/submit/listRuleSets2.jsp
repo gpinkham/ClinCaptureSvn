@@ -82,7 +82,9 @@
     </form>
 </div>
 
-<script>$("img[title*='PDF']").attr('title', '<fmt:message key="view_rules_download_xml" bundle="${resword}"/>' );</script>
+<script>
+	$("img[title*='PDF']").attr('title', '<fmt:message key="view_rules_download_xml" bundle="${resword}"/>' ).attr('src', '/clincapture/images/table/csv.gif');
+</script>
 <br>
     <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
     <input type="button" name="createRule" value="<fmt:message key="create_rule" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='designer/rule.html';"/>
