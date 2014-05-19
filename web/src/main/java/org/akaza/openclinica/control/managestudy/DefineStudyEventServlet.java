@@ -21,14 +21,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -44,7 +36,6 @@ import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -55,6 +46,15 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.CRFRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author jxu
@@ -121,19 +121,7 @@ public class DefineStudyEventServlet extends Controller {
 		String actionName = request.getParameter("actionName");
 		ArrayList crfsWithVersion = (ArrayList) request.getSession().getAttribute("crfsWithVersion");
 		if (crfsWithVersion == null) {
-			crfsWithVersion = new ArrayList();
-			CRFDAO cdao = getCRFDAO();
-			CRFVersionDAO cvdao = getCRFVersionDAO();
-			ArrayList crfs = (ArrayList) cdao.findAllByStatus(Status.AVAILABLE);
-
-			for (Object crf1 : crfs) {
-				CRFBean crf = (CRFBean) crf1;
-				ArrayList versions = cvdao.findAllByCRFId(crf.getId());
-				if (!versions.isEmpty()) {
-					crfsWithVersion.add(crf);
-				}
-
-			}
+			crfsWithVersion = (ArrayList) getCRFDAO().findAllActiveCrfs();
 			request.getSession().setAttribute("crfsWithVersion", crfsWithVersion);
 		}
 		if (StringUtil.isBlank(actionName)) {
@@ -235,7 +223,7 @@ public class DefineStudyEventServlet extends Controller {
 	private void confirmDefinition1(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
-        StudyBean currentStudy = getCurrentStudy(fp.getRequest());
+		StudyBean currentStudy = getCurrentStudy(fp.getRequest());
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("type", Validator.NO_BLANKS);
 		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
@@ -244,30 +232,26 @@ public class DefineStudyEventServlet extends Controller {
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
 		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-		//Clinovo start #134 start
+		// Clinovo start #134 start
 		String calendaredVisitType = fp.getString("type");
 		if ("calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
 			v.addValidation("maxDay", Validator.IS_REQUIRED);
-			v.addValidation("maxDay", Validator.IS_A_FLOAT,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			v.addValidation("maxDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
 			v.addValidation("minDay", Validator.IS_REQUIRED);
-			v.addValidation("minDay", Validator.IS_A_FLOAT,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			v.addValidation("minDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
 			v.addValidation("schDay", Validator.IS_REQUIRED);
-			v.addValidation("schDay", Validator.IS_A_FLOAT,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
-			if("".equalsIgnoreCase(fp.getString("isReference"))) {
-					v.addValidation("emailUser", Validator.NO_BLANKS);
+			v.addValidation("schDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			if ("".equalsIgnoreCase(fp.getString("isReference"))) {
+				v.addValidation("emailUser", Validator.NO_BLANKS);
 			}
 			v.addValidation("emailDay", Validator.IS_REQUIRED);
-			v.addValidation("emailDay", Validator.IS_A_FLOAT,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
-            request.getSession().setAttribute("maxDay", fp.getString("maxDay"));
-            request.getSession().setAttribute("minDay", fp.getString("minDay"));
-            request.getSession().setAttribute("schDay", fp.getString("schDay"));
-            request.getSession().setAttribute("emailUser", fp.getString("emailUser"));
-            request.getSession().setAttribute("emailDay", fp.getString("emailDay"));
-            request.getSession().setAttribute("isReference", fp.getString("isReference"));
+			v.addValidation("emailDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			request.getSession().setAttribute("maxDay", fp.getString("maxDay"));
+			request.getSession().setAttribute("minDay", fp.getString("minDay"));
+			request.getSession().setAttribute("schDay", fp.getString("schDay"));
+			request.getSession().setAttribute("emailUser", fp.getString("emailUser"));
+			request.getSession().setAttribute("emailDay", fp.getString("emailDay"));
+			request.getSession().setAttribute("isReference", fp.getString("isReference"));
 
 		}
 		HashMap errors = v.validate();
@@ -277,32 +261,34 @@ public class DefineStudyEventServlet extends Controller {
 		int emailDay = fp.getInt("emailDay");
 		String emailUser = fp.getString("emailUser");
 		if (!(maxDay >= schDay)) {
-			Validator.addError(errors, "maxDay",resexception.getString("daymax_greate_or_equal_dayschedule"));
+			Validator.addError(errors, "maxDay", resexception.getString("daymax_greate_or_equal_dayschedule"));
 		}
-		if(!(minDay<=schDay)) {
-			Validator.addError(errors, "minDay",resexception.getString("daymin_less_or_equal_dayschedule"));
+		if (!(minDay <= schDay)) {
+			Validator.addError(errors, "minDay", resexception.getString("daymin_less_or_equal_dayschedule"));
 		}
-		if (!(minDay<=maxDay)) {
-			Validator.addError(errors, "minDay",resexception.getString("daymin_less_or_equal_daymax"));
+		if (!(minDay <= maxDay)) {
+			Validator.addError(errors, "minDay", resexception.getString("daymin_less_or_equal_daymax"));
 		}
-		if(!(emailDay <= schDay)) {
-			Validator.addError(errors, "emailDay",resexception.getString("dayemail_less_or_equal_dayschedule"));
+		if (!(emailDay <= schDay)) {
+			Validator.addError(errors, "emailDay", resexception.getString("dayemail_less_or_equal_dayschedule"));
 		}
-		if (!checkUserName(currentStudy, emailUser) && "calendared_visit".equalsIgnoreCase(calendaredVisitType) && "".equalsIgnoreCase(fp.getString("isReference"))) {
+		if (!checkUserName(currentStudy, emailUser) && "calendared_visit".equalsIgnoreCase(calendaredVisitType)
+				&& "".equalsIgnoreCase(fp.getString("isReference"))) {
 			Validator.addError(errors, "emailUser", resexception.getString("this_user_name_does_not_exist"));
 		}
-        request.getSession().setAttribute("definition", createStudyEventDefinition(request));
-				if (errors.isEmpty()) {
-					logger.info("no errors in the first section");
-					prepareServletForStepTwo(fp, response, true);
-				} else {
-					logger.trace("has validation errors in the first section");
-					request.setAttribute("formMessages", errors);
-					setOrGetDefinition(request);
-					forwardPage(Page.DEFINE_STUDY_EVENT1, request, response);
-				}	
-		
+		request.getSession().setAttribute("definition", createStudyEventDefinition(request));
+		if (errors.isEmpty()) {
+			logger.info("no errors in the first section");
+			prepareServletForStepTwo(fp, response, true);
+		} else {
+			logger.trace("has validation errors in the first section");
+			request.setAttribute("formMessages", errors);
+			setOrGetDefinition(request);
+			forwardPage(Page.DEFINE_STUDY_EVENT1, request, response);
+		}
+
 	}
+
 	private void prepareServletForStepTwo(FormProcessor fp, HttpServletResponse response, boolean checkForm) {
 		/*
 		 * The tmpCRFIdMap will hold all the selected CRFs in the session when the user is navigating through the list.
@@ -436,7 +422,7 @@ public class DefineStudyEventServlet extends Controller {
 			} else {
 				edcBean.setElectronicSignature(false);
 			}
-			
+
 			if (!StringUtil.isBlank(emailCRFTo)) {
 				edcBean.setEmailTo(emailCRFTo);
 			} else {
@@ -460,8 +446,8 @@ public class DefineStudyEventServlet extends Controller {
 				}
 
 			}
-			nullString = (nullString != "") ? nullString.substring(0, nullString.length() - 1) : "";
-			
+			nullString = (!nullString.equals("")) ? nullString.substring(0, nullString.length() - 1) : "";
+
 			edcBean.setNullValues(nullString);
 			edcBean.setStudyId(ub.getActiveStudyId());
 			eventDefinitionCRFs.add(edcBean);

@@ -46,7 +46,12 @@
 	</query>
     <query>
         <name>findAllActiveCrfs</name>
-        <sql>SELECT c.* FROM crf_version cv join crf c on c.crf_id = cv.crf_id where c.status_id = 1 and cv.status_id = 1 order by c.name</sql>
+        <sql>
+			SELECT DISTINCT crf.* 
+			FROM crf_version JOIN crf ON crf.crf_id = crf_version.crf_id 
+			WHERE crf.status_id = 1 AND crf_version.status_id = 1 
+			ORDER BY crf.name
+		</sql>
     </query>
 	<query>
 		<name>findAllByLimit</name>

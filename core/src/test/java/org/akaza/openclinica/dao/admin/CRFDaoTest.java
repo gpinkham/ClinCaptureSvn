@@ -82,7 +82,7 @@ public class CRFDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatFindAllActiveCrfsReturnsCorrectSize() throws OpenClinicaException {
-		assertEquals(4, crfdao.findAllActiveCrfs().size());
+		assertEquals(3, crfdao.findAllActiveCrfs().size());
 	}
 
 	@Test

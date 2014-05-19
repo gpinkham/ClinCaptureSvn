@@ -20,12 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -45,6 +39,13 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.CRFRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Processes request to add new CRFs info study event definition
@@ -73,7 +74,8 @@ public class AddCRFToDefinitionServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition")
+		addPageMessage(
+				respage.getString("no_have_permission_to_update_study_event_definition")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
@@ -85,7 +87,7 @@ public class AddCRFToDefinitionServlet extends Controller {
 		String submit = request.getParameter("Submit");
 
 		CRFDAO cdao = getCRFDAO();
-		ArrayList crfs = (ArrayList) cdao.findAllByStatus(Status.AVAILABLE);
+		ArrayList crfs = (ArrayList) cdao.findAllActiveCrfs();
 		ArrayList edcs = (ArrayList) request.getSession().getAttribute("eventDefinitionCRFs");
 		if (edcs == null) {
 			edcs = new ArrayList();
@@ -109,9 +111,9 @@ public class AddCRFToDefinitionServlet extends Controller {
 			if (StringUtil.isBlank(actionName)) {
 				request.setAttribute("table", createTable(request, crfs));
 				forwardPage(Page.UPDATE_EVENT_DEFINITION2, request, response);
-				
+
 			} else if (actionName.equalsIgnoreCase("next")) {
-				
+
 				confirmDefinition(request, response);
 			}
 		}
@@ -234,15 +236,15 @@ public class AddCRFToDefinitionServlet extends Controller {
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}
 	}
-	
+
 	private EntityBeanTable createTable(HttpServletRequest request, ArrayList crfs) throws Exception {
-		
+
 		FormProcessor fp = new FormProcessor(request);
 		EntityBeanTable table = fp.getEntityBeanTable();
 		ArrayList allRows = CRFRow.generateRowsFromBeans(crfs);
 		String[] columns = { resword.getString("CRF_name"), resword.getString("date_created"),
-				resword.getString("owner"), resword.getString("date_updated"),
-				resword.getString("last_updated_by"), resword.getString("selected") };
+				resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),
+				resword.getString("selected") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(5);
 		HashMap args = new HashMap();
@@ -250,7 +252,7 @@ public class AddCRFToDefinitionServlet extends Controller {
 		table.setQuery("AddCRFToDefinition", args);
 		table.setRows(allRows);
 		table.computeDisplay();
-		
+
 		return table;
 	}
 }
