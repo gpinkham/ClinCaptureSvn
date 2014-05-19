@@ -14,27 +14,6 @@
  *******************************************************************************/
 package com.clinovo.servlet;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -74,6 +53,26 @@ import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @SuppressWarnings({ "unchecked", "serial" })
 public class RulesServlet extends HttpServlet {
 
@@ -83,13 +82,15 @@ public class RulesServlet extends HttpServlet {
 		PrintWriter writer = response.getWriter();
 		try {
 
-			DataSource datasource = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(DataSource.class);
+			DataSource datasource = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(
+					DataSource.class);
 			if ("fetch".equals(action)) {
 
 				JSONArray studies = new JSONArray();
 				StudyDAO studyDAO = new StudyDAO(datasource);
 				UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
-				List<StudyBean> availableStudies = studyDAO.findAllActiveStudiesWhereUserHasRole(userAccountBean.getName());
+				List<StudyBean> availableStudies = studyDAO.findAllActiveStudiesWhereUserHasRole(userAccountBean
+						.getName());
 				for (StudyBean x : availableStudies) {
 					if (!x.isSite(x.getParentStudyId())) {
 
@@ -154,7 +155,7 @@ public class RulesServlet extends HttpServlet {
 						// Rule Ref
 						Element ref = document.createElement("RuleRef");
 						ref.setAttribute("OID", ruleDef.getAttribute("OID"));
-						
+
 						List<Element> acts = createAction(actions.getString(act), rule, document);
 						for (Element el : acts) {
 							ref.appendChild(el);
@@ -187,9 +188,11 @@ public class RulesServlet extends HttpServlet {
 				writer.write(xWriter.getBuffer().toString());
 
 			} else if ("edit".equals(action)) {
-				RuleDao dao = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(RuleDao.class);
-				RuleSetRuleDao rDao = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(RuleSetRuleDao.class);
-				
+				RuleDao dao = SpringServletAccess.getApplicationContext(this.getServletContext())
+						.getBean(RuleDao.class);
+				RuleSetRuleDao rDao = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(
+						RuleSetRuleDao.class);
+
 				JSONObject object = new JSONObject();
 				RuleBean rule = dao.findById(Integer.parseInt(request.getParameter("id")));
 				JSONArray ruleActions = new JSONArray();
@@ -204,12 +207,13 @@ public class RulesServlet extends HttpServlet {
 						act.put("to", emailAction.getTo());
 						act.put("body", emailAction.getMessage());
 					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.FILE_DISCREPANCY_NOTE)) {
-						DiscrepancyNoteActionBean discrepancyAction = (DiscrepancyNoteActionBean) ruleSetRule.getActions().get(0);
+						DiscrepancyNoteActionBean discrepancyAction = (DiscrepancyNoteActionBean) ruleSetRule
+								.getActions().get(0);
 						act.put("type", "discrepancy");
 						act.put("message", discrepancyAction.getMessage());
 					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.INSERT)) {
 						InsertActionBean insertAction = (InsertActionBean) ruleSetRule.getActions().get(0);
-						act.put("type","insert");
+						act.put("type", "insert");
 						act.put("message", insertAction.getCuratedMessage());
 						// Destinations
 						JSONArray destinations = new JSONArray();
@@ -227,7 +231,8 @@ public class RulesServlet extends HttpServlet {
 							destinations.put(dest);
 						}
 						act.put("destinations", destinations);
-					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.SHOW) || ruleSetRule.getActions().get(0).getActionType().equals(ActionType.HIDE)) {
+					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.SHOW)
+							|| ruleSetRule.getActions().get(0).getActionType().equals(ActionType.HIDE)) {
 						act.put("type", "showHide");
 						for (int x = 0; x < ruleSetRule.getActions().size(); x++) {
 							RuleActionBean vAction = ruleSetRule.getActions().get(x);
@@ -248,21 +253,25 @@ public class RulesServlet extends HttpServlet {
 							}
 						}
 					}
-					
+
 					ruleActions.put(act);
 
 				} catch (JSONException e) {
 					response.sendError(500, e.getMessage());
 				}
 				// Rule run
-				object.put("di", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun().getImportDataEntry());
-				object.put("dde", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun().getDoubleDataEntry());
-				object.put("ide", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun().getInitialDataEntry());
-				object.put("ae", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun().getAdministrativeDataEntry());
+				object.put("di", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun()
+						.getImportDataEntry());
+				object.put("dde", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun()
+						.getDoubleDataEntry());
+				object.put("ide", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun()
+						.getInitialDataEntry());
+				object.put("ae", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun()
+						.getAdministrativeDataEntry());
 				// Targets
 				JSONObject tar = new JSONObject();
 				JSONArray targets = new JSONArray();
-				
+
 				String targetPath = rule.getRuleSetRules().get(0).getRuleSetBean().getOriginalTarget().getValue();
 				String name = targetPath.replaceAll("\\[\\w+\\]", "").trim();
 				tar.put("name", name);
@@ -283,7 +292,7 @@ public class RulesServlet extends HttpServlet {
 				object.put("targets", targets);
 				object.put("oid", rule.getOid());
 				object.put("actions", ruleActions);
-				
+
 				if (!rule.getDescription().isEmpty()) {
 					object.put("name", rule.getDescription());
 				} else {
@@ -308,25 +317,28 @@ public class RulesServlet extends HttpServlet {
 		StudyEventDefinitionDAO eventDAO = new StudyEventDefinitionDAO(datasource);
 		List<StudyEventDefinitionBean> studyEvents = eventDAO.findAllByStudy(study);
 		for (StudyEventDefinitionBean evt : studyEvents) {
-			JSONObject obj = new JSONObject();
-			obj.put("id", evt.getId());
-			obj.put("oid", evt.getOid());
-			obj.put("name", evt.getName());
-			obj.put("ordinal", evt.getOrdinal());
-			obj.put("description", evt.getDescription());
-			JSONArray crfs = getStudyEventCRFs(evt, study, datasource);
-			obj.put("crfs", crfs);
-			events.put(obj);
+			if (!evt.getStatus().equals(Status.DELETED)) {
+				JSONObject obj = new JSONObject();
+				obj.put("id", evt.getId());
+				obj.put("oid", evt.getOid());
+				obj.put("name", evt.getName());
+				obj.put("ordinal", evt.getOrdinal());
+				obj.put("description", evt.getDescription());
+				JSONArray crfs = getStudyEventCRFs(evt, study, datasource);
+				obj.put("crfs", crfs);
+				events.put(obj);
+			}
 		}
 		return events;
 	}
 
-	private JSONArray getStudyEventCRFs(StudyEventDefinitionBean evt, StudyBean study, DataSource datasource) throws Exception {
+	private JSONArray getStudyEventCRFs(StudyEventDefinitionBean evt, StudyBean study, DataSource datasource)
+			throws Exception {
 		JSONArray crfs = new JSONArray();
 		CRFDAO crfDAO = new CRFDAO(datasource);
 		EventDefinitionCRFDAO eCrfDAO = new EventDefinitionCRFDAO(datasource);
-		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eCrfDAO.findAllByDefinition(study,
-				evt.getId());
+		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eCrfDAO
+				.findAllActiveByEventDefinitionId(study, evt.getId());
 		for (EventDefinitionCRFBean crf : eventCRFs) {
 			JSONObject obj = new JSONObject();
 			CRFBean cf = (CRFBean) crfDAO.findByPK(crf.getCrfId());
@@ -336,8 +348,10 @@ public class RulesServlet extends HttpServlet {
 				obj.put("name", cf.getName());
 				obj.put("version", cf.getVersionNumber());
 				JSONArray versions = getCRFVersions(cf, datasource);
-				obj.put("versions", versions);
-				crfs.put(obj);
+				if (versions.length() > 0) {
+					obj.put("versions", versions);
+					crfs.put(obj);
+				}
 			}
 		}
 		return crfs;
@@ -348,13 +362,15 @@ public class RulesServlet extends HttpServlet {
 		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(datasource);
 		List<CRFVersionBean> vers = (List<CRFVersionBean>) crfVersionDAO.findAllByCRFId(cf.getId());
 		for (CRFVersionBean ver : vers) {
-			JSONObject obj = new JSONObject();
-			obj.put("id", ver.getId());
-			obj.put("oid", ver.getOid());
-			obj.put("name", ver.getName());
-			JSONArray items = getCRFVersionItems(ver, datasource);
-			obj.put("items", items);
-			versions.put(obj);
+			if (!ver.getStatus().equals(Status.DELETED)) {
+				JSONObject obj = new JSONObject();
+				obj.put("id", ver.getId());
+				obj.put("oid", ver.getOid());
+				obj.put("name", ver.getName());
+				JSONArray items = getCRFVersionItems(ver, datasource);
+				obj.put("items", items);
+				versions.put(obj);
+			}
 		}
 		return versions;
 	}
@@ -381,7 +397,8 @@ public class RulesServlet extends HttpServlet {
 			obj.put("description", item.getDescription());
 			obj.put("ordinal", itemFormMetaData.getOrdinal());
 			// Repeat item?
-			ItemGroupMetadataBean itemGroupMeta = (ItemGroupMetadataBean) itemGroupMetaDAO.findByItemAndCrfVersion(item.getId(), crfVersion.getId());
+			ItemGroupMetadataBean itemGroupMeta = (ItemGroupMetadataBean) itemGroupMetaDAO.findByItemAndCrfVersion(
+					item.getId(), crfVersion.getId());
 			if (itemGroupMeta.isRepeatingGroup()) {
 				obj.put("repeat", true);
 			}
@@ -424,7 +441,7 @@ public class RulesServlet extends HttpServlet {
 				oid = oid.substring(0, oid.length() - 1) + (Integer.valueOf(matcher.group(0)) + 1);
 				return checkOIDAvailability(oid, oids);
 			}
-		} 
+		}
 		return oid;
 	}
 
@@ -463,7 +480,7 @@ public class RulesServlet extends HttpServlet {
 			actions.add(action);
 		} else if (act.getString("type").equalsIgnoreCase("showHide")) {
 			run.setAttribute("Batch", "false");
-			// Message element	
+			// Message element
 			Element message = document.createElement("Message");
 			message.setTextContent(act.getString("message"));
 			// Show action
@@ -514,7 +531,7 @@ public class RulesServlet extends HttpServlet {
 		}
 		return actions;
 	}
-	
+
 	private String getItemEvent(String targetPath, JSONObject tar) throws JSONException {
 		String[] preds = targetPath.split("\\.");
 		if (preds.length == 4) {
@@ -524,7 +541,7 @@ public class RulesServlet extends HttpServlet {
 			return targetPath;
 		}
 	}
-	
+
 	private String getItemLine(String targetPath, JSONObject tar) throws JSONException {
 		Pattern pattern = Pattern.compile("(?<=\\[)(\\w+)(?=\\])");
 		Matcher matcher = pattern.matcher(targetPath);
@@ -534,7 +551,7 @@ public class RulesServlet extends HttpServlet {
 		}
 		return null;
 	}
-	
+
 	private boolean isVersionified(String targetPath) {
 		String crf = "";
 		String[] preds = targetPath.split("\\.");
@@ -547,7 +564,7 @@ public class RulesServlet extends HttpServlet {
 		Matcher matcher = pattern.matcher(crf);
 		return matcher.find();
 	}
-	
+
 	private String getItemVersion(String targetPath) {
 		String[] preds = targetPath.split("\\.");
 		if (preds.length == 3) {
@@ -558,7 +575,7 @@ public class RulesServlet extends HttpServlet {
 			return targetPath;
 		}
 	}
-	
+
 	private String getItemGroup(String targetPath) throws JSONException {
 		targetPath = targetPath.replaceAll("\\[\\w+\\]", "").trim();
 		String[] preds = targetPath.split("\\.");

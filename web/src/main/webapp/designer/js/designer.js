@@ -1257,7 +1257,7 @@ function resetStudy(params) {
 		studyEvent: topEvent
 	});
 
-	if (topEvent) {
+	if (topEvent && topEvent.crfs.length > 0) {
 		// bold event
 		parser.recursiveSelect({
 			type: "events",
