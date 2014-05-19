@@ -20,12 +20,7 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.clinovo.util.CompleteCRFDeleteUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -44,6 +39,13 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.ListCRFRow;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * Lists all the CRF and their CRF versions
@@ -121,6 +123,11 @@ public class ListCRFServlet extends RememberLastPage {
 		for (Object crf : crfs) {
 			CRFBean eb = (CRFBean) crf;
 			logger.info("crf id:" + eb.getId());
+
+			CompleteCRFDeleteUtil.setRuleSetDao(getRuleSetDao());
+			CompleteCRFDeleteUtil.setSessionManager(getSessionManager(request));
+			CompleteCRFDeleteUtil.validateCRF(eb);
+
 			ArrayList versions = (ArrayList) vdao.findAllByCRF(eb.getId());
 
 			// check whether the speadsheet is available on the server

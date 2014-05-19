@@ -13,26 +13,13 @@
 
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.CompleteCRFDeleteUtil;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -41,16 +28,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("serial")
 @Component
 public class CompleteCRFDeleteServlet extends Controller {
 
-	private static String CRF_ID = "crfId";
+	private static final String CRF_ID = "crfId";
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
@@ -63,44 +48,28 @@ public class CompleteCRFDeleteServlet extends Controller {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		FormProcessor fp = new FormProcessor(request);
 		int crfId = fp.getInt(CRF_ID);
 
-		EventCRFDAO eventCRFDao = getEventCRFDAO();
-		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
+		CRFDAO crfDao = getCRFDAO();
+		CRFBean crfBean = (CRFBean) crfDao.findByPK(crfId);
 
-		List<EventCRFBean> eventCrfBeanList = eventCRFDao.findAllByCRF(crfId);
-		if (eventCrfBeanList.size() > 0) {
-			addPageMessage(respage.getString("some_subjects_have_already_opened_DE_stage"), request);
-		}
+		CompleteCRFDeleteUtil.setRuleSetDao(getRuleSetDao());
+		CompleteCRFDeleteUtil.setSessionManager(getSessionManager(request));
+		CompleteCRFDeleteUtil.validateCRF(crfBean);
 
-		List<DiscrepancyNoteBean> crfDiscrepancyNotes = collectAllDnFromEventCrfList(eventCrfBeanList);
-		if (crfDiscrepancyNotes.size() > 0) {
-			addPageMessage(respage.getString("some_dn_have_already_opened"), request);
-		}
+		if (crfBean.isDeletable()) {
 
-		List<EventDefinitionCRFBean> eventDefinitionCrfListFiltered = eventDefinitionCrfListFilter((List<EventDefinitionCRFBean>) eventDefinitionCrfDao.findAllByCRF(crfId));
-		if (eventDefinitionCrfListFiltered.size() > 0) {
-			addPageMessage(respage.getString("some_study_event_already_contain"), request);
-		}
+			crfDao.deleteCrfById(crfId);
 
-		List<RuleSetBean> crfInTargetRuleSetList = ruleSetListFilter(crfId);
-		boolean crfUsedInRuleExpression = false;
+			addPageMessage(respage.getString("the_crf_has_been_removed"), request);
+			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 
-		if (crfInTargetRuleSetList.size() > 0) {
-			addPageMessage(respage.getString("some_rules_have_already_created"), request);
 		} else {
-			crfUsedInRuleExpression = checkCrfInRuleExpressions(crfId);
-			if (crfUsedInRuleExpression) {
-				addPageMessage(respage.getString("some_rules_have_already_created"), request);
-			}
-		}
-
-		if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0 || eventDefinitionCrfListFiltered.size() > 0 || crfInTargetRuleSetList.size() > 0 || crfUsedInRuleExpression) {
 
 			String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
 
@@ -114,107 +83,9 @@ public class CompleteCRFDeleteServlet extends Controller {
 					logger.error("Redirect: " + e.getMessage());
 				}
 			} else {
+
 				forwardPage(Page.CRF_LIST_SERVLET, request, response);
 			}
-		} else {
-
-			CRFDAO crfDao = getCRFDAO();
-			crfDao.deleteCrfById(crfId);
-
-			addPageMessage(respage.getString("the_crf_has_been_removed"), request);
-			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 		}
-
-	}
-
-	@SuppressWarnings("unchecked")
-	private boolean checkCrfInRuleExpressions(int crfId) {
-
-		CRFVersionDAO crfVersionDao = getCRFVersionDAO();
-		ItemDAO itemDao = getItemDAO();
-		RuleSetDao ruleSetDao = getRuleSetDao();
-		StudyDAO studyDao = getStudyDAO();
-
-		List<CRFVersionBean> crfVersionList = (List<CRFVersionBean>) crfVersionDao.findAllByCRF(crfId);
-		List<String> itemOidList = new ArrayList<String>();
-
-		for (CRFVersionBean crfVersionBean : crfVersionList) {
-			List<ItemBean> crfVersionItemList = itemDao.findAllItemsByVersionId(crfVersionBean.getId());
-			if (crfVersionItemList.size() > 0) {
-				for (ItemBean item : crfVersionItemList) {
-					itemOidList.add(item.getOid());
-				}
-			}
-		}
-
-		List<RuleSetBean> ruleSetBeanListFromStudies = new ArrayList<RuleSetBean>();
-		List<StudyBean> studyList = (List<StudyBean>) studyDao.findAll();
-
-		for (StudyBean study : studyList) {
-			List<RuleSetBean> studyRuleSetBeanList = ruleSetDao.findAllByStudy(study);
-			if (studyRuleSetBeanList.size() > 0) {
-				ruleSetBeanListFromStudies.addAll(studyRuleSetBeanList);
-			}
-		}
-
-		boolean crfItemUsedInExpression = false;
-		for (RuleSetBean ruleSetBean : ruleSetBeanListFromStudies) {
-			for (RuleSetRuleBean ruleSetRuleBean : ruleSetBean.getRuleSetRules()) {
-				String expression = ruleSetRuleBean.getRuleBean().getExpression().getValue();
-				for (String itemOid : itemOidList) {
-					if (expression.indexOf(itemOid) > 0) {
-						crfItemUsedInExpression = true;
-						return crfItemUsedInExpression;
-					}
-				}
-			}
-		}
-
-		return crfItemUsedInExpression;
-	}
-
-	@SuppressWarnings("unchecked")
-	private List<RuleSetBean> ruleSetListFilter(int crfId) {
-
-		RuleSetDao ruleSetDao = getRuleSetDao();
-		StudyDAO studyDao = getStudyDAO();
-		CRFDAO crfDao = getCRFDAO();
-
-		List<RuleSetBean> ruleSetBeanList = new ArrayList<RuleSetBean>();
-		List<StudyBean> studyList = (List<StudyBean>) studyDao.findAll();
-		CRFBean crfBean = (CRFBean) crfDao.findByPK(crfId);
-
-		for (StudyBean study : studyList) {
-			List<RuleSetBean> studyRuleSetBeanList = ruleSetDao.findByCrf(crfBean, study);
-			if (studyRuleSetBeanList.size() > 0) {
-				ruleSetBeanList.addAll(studyRuleSetBeanList);
-			}
-		}
-		return ruleSetBeanList;
-	}
-
-	private List<EventDefinitionCRFBean> eventDefinitionCrfListFilter(List<EventDefinitionCRFBean> eventDefinitionCrfList) {
-
-		List<EventDefinitionCRFBean> eventDefinitionCrfListFiltered = new ArrayList<EventDefinitionCRFBean>();
-
-		for (EventDefinitionCRFBean eventDefCrfBean : eventDefinitionCrfList) {
-			if (!eventDefCrfBean.getStatus().isDeleted()) {
-				eventDefinitionCrfListFiltered.add(eventDefCrfBean);
-			}
-		}
-
-		return eventDefinitionCrfListFiltered;
-	}
-
-	private List<DiscrepancyNoteBean> collectAllDnFromEventCrfList(List<EventCRFBean> eventCrfBeans) {
-
-		DiscrepancyNoteDAO discrepancyNoteDao = getDiscrepancyNoteDAO();
-		List<DiscrepancyNoteBean> dnList = new ArrayList<DiscrepancyNoteBean>();
-
-		for (EventCRFBean eventCrfBean : eventCrfBeans) {
-			dnList.addAll(discrepancyNoteDao.findAllItemNotesByEventCRF(eventCrfBean.getId()));
-		}
-
-		return dnList;
 	}
 }

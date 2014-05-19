@@ -22,13 +22,19 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -59,6 +65,7 @@ public class ViewCRFServlet extends SecureController {
 
 	private static final String CRF = "crf";
 	private static final String CRF_ID = "crfId";
+	private static final String ASSOCIATED_EVENT_LIST = "associatedEventList";
 	private RuleSetServiceInterface ruleSetService;
 
 	@Override
@@ -113,6 +120,10 @@ public class ViewCRFServlet extends SecureController {
 				String studyHtml = renderStudiesTable(studyBeans);
 				request.setAttribute("studiesTableHTML", studyHtml);
 			}
+
+			EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(sm.getDataSource());
+			List<StudyEventDefinitionBean> studyEventDefList = studyEventDefinitionListFilter((List<EventDefinitionCRFBean>) eventDefinitionCrfDao.findAllByCRF(crfId));
+			request.setAttribute(ASSOCIATED_EVENT_LIST, studyEventDefList);
 
 			request.setAttribute(CRF, crf);
 			forwardPage(Page.VIEW_CRF);
@@ -250,6 +261,26 @@ public class ViewCRFServlet extends SecureController {
 		ruleSetService = this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
 				.getApplicationContext(context).getBean("ruleSetService");
 		return ruleSetService;
+	}
+
+	private List<StudyEventDefinitionBean> studyEventDefinitionListFilter(List<EventDefinitionCRFBean> eventDefinitionCrfList) {
+
+		List<StudyEventDefinitionBean> studyEventDefinitionListFiltered = new ArrayList<StudyEventDefinitionBean>();
+		StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(sm.getDataSource());
+		UserAccountDAO userAccountDao = new UserAccountDAO(sm.getDataSource());
+
+		for (EventDefinitionCRFBean eventDefCrfBean : eventDefinitionCrfList) {
+			if (!eventDefCrfBean.getStatus().isDeleted()) {
+
+				StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(eventDefCrfBean.getStudyEventDefinitionId());
+				UserAccountBean userAccountBean = (UserAccountBean) userAccountDao.findByPK(studyEventDefinition.getOwnerId());
+				studyEventDefinition.setOwner(userAccountBean);
+
+				studyEventDefinitionListFiltered.add(studyEventDefinition);
+			}
+		}
+
+		return studyEventDefinitionListFiltered;
 	}
 
 }

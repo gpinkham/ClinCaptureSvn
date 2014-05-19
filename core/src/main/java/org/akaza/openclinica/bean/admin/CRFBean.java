@@ -35,6 +35,7 @@ public class CRFBean extends AuditableEntityBean {
 	private String description = "";
 	private ArrayList versions;// not in DB
 	private boolean selected = false; // not in DB
+	private boolean deletable = false; //not in DB
 
 	private String oid;
 	private OidGenerator oidGenerator;
@@ -134,5 +135,13 @@ public class CRFBean extends AuditableEntityBean {
 
 	public void setStudyId(int studyId) {
 		this.studyId = studyId;
+	}
+
+	public boolean isDeletable() {
+		return deletable;
+	}
+
+	public void setDeletable(boolean deletable) {
+		this.deletable = deletable;
 	}
 }

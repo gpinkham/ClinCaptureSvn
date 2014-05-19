@@ -130,7 +130,7 @@
                                             name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
                                 </td>
                                 <td>
-                                    <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${version.id}"/>')"
+                                    <a href="javascript:openDocWindow('PrintCRF?id=${version.id}')"
                                        onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
                                        onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
                                             name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
@@ -161,10 +161,47 @@
 </div>
  <br/>
 
+<span class="table_title_Admin"><fmt:message key="associated_event_definitions" bundle="${resword}"/></span></span>
+<div style="width: 100%">
+    <div class="box_T">
+        <div class="box_L">
+            <div class="box_R">
+                <div class="box_B">
+                    <div class="box_TL">
+                        <div class="box_TR">
+                            <div class="box_BL">
+                                <div class="box_BR">
+                                    <div class="tablebox_center">
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr valign="top">
+                                                <td class="table_header_row_left"><fmt:message key="study_event" bundle="${resword}"/></td>
+                                                <td class="table_header_row"><fmt:message key="study_ID" bundle="${resword}"/></td>
+                                                <td class="table_header_row"><fmt:message key="date_created" bundle="${resword}"/></td>
+                                                <td class="table_header_row"><fmt:message key="owner" bundle="${resword}"/></td>
+                                            </tr>
+                                            <c:forEach var="eventDefinition" items="${associatedEventList}">
+                                                <tr valign="top">
+                                                    <td class="table_cell_left"><c:out value="${eventDefinition.name}"/></td>
+                                                    <td class="table_cell"><c:out value="${eventDefinition.studyId}"/></td>
+                                                    <td class="table_cell"><c:out value="${eventDefinition.createdDate}"/></td>
+                                                    <td class="table_cell"><c:out value="${eventDefinition.owner.name}"/></td>
+                                                </tr>
+                                            </c:forEach>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+					class="button_medium"					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" name="<fmt:message key="view_crf_rules" bundle="${resword}"/>" value="<fmt:message key="view_crf_rules" bundle="${resword}"/>" class="button_long" onClick="window.location.href='ViewRuleAssignment?ruleAssignments_f_crfName=<c:out value="${crfName}"/>'"/>
 <input type="button" name="<fmt:message key="run_crf_rules" bundle="${resword}"/>" value="<fmt:message key="run_crf_rules" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRule?crfId=<c:out value="${crf.id}"/>&action=dryRun'"/>
 
