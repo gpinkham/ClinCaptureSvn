@@ -382,19 +382,19 @@ function createPopover(droppable) {
 		$(".popover").remove();
 		evt.stopPropagation();
 		$(this).popover('show');
+		if (droppable.attr('item-oid')) {
+			showCRFItem(this);
+		}
+		$(".tooltip").remove();
 	}).on('shown.bs.popover', function (x) {
-  		$(".tooltip").each(function() {
-  			$(this).remove();
-  		});
+  		$(".tooltip").remove();
   		// Edit tool-tip
   		createToolTip({
   			element: $(this).find("#edit-pop"),
   			title: "Add a new box"
   		});
 		$(this).find("#edit-pop").on('show.bs.tooltip', function(x) {
-			$(".tooltip").each(function() {
-				$(this).remove();
-			});
+			$(".tooltip").remove();
 		});
   		// Delete tool-tip
   		createToolTip({
@@ -402,9 +402,7 @@ function createPopover(droppable) {
   			title: "Remove the current element from the expression"
   		});
   		$(this).find("#del-pop").on('show.bs.tooltip', function(x) {
-			$(".tooltip").each(function() {
-				$(this).remove();
-			});
+			$(".tooltip").remove();
 		});
   		// kill event
   		x.stopPropagation();

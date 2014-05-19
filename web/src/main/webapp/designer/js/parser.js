@@ -187,10 +187,6 @@ Parser.prototype.createNextDroppable = function(params) {
 			createPopover(RPAREN);
 			createPopover(dataPredicate);
 		}
-		// Enable showing selected item td
-		params.element.click(function() {
-			showCRFItem(this);
-		});
 	} else if (params.element.is(".target")) {
 		if (!this.isAddedTarget(selectedItem)) {
 			if (params.existingValue) {

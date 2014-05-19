@@ -240,9 +240,6 @@ $(function() {
 	$(document).on('blur', '#ruleName', function() {
 		parser.setName($(this).val());
 	});
-	$('.dotted-border.group[item-oid]').on('click', function() {
-		showCRFItem(this);
-	});
 	$('input[name=ruleInvoke]').click(function() {
 		if ($(this).attr('previous-state') == 'checked') {
 			$(this).prop('checked', false);
