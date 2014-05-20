@@ -27,6 +27,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
@@ -45,6 +46,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
@@ -96,6 +98,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	private EventCRFDAO eventCRFDAO;
 	private EventDefinitionCRFDAO eventDefintionCRFDAO;
 	private CRFDAO crfDAO;
+	private CRFVersionDAO crfVersionDAO;
 	private DiscrepancyNoteDAO discrepancyNoteDAO;
 	private StudyBean studyBean;
 	private String[] columnNames = new String[] {};
@@ -300,7 +303,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				d.getProps().put("studySubject.createdDate", null);
 				for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
 					CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
-					d.getProps().put("crf_" + crf.getId(), getCRFStatusId(studySubjectBean, null, null, null));
+					d.getProps().put("crf_" + crf.getId(), getCRFStatusId(studySubjectBean, null, null, null, null));
 					d.getProps().put("crf_" + crf.getId() + "_eventCrf", null);
 					d.getProps().put("crf_" + crf.getId() + "_crf", crf);
 					d.getProps().put("crf_" + crf.getId() + "_eventDefinitionCrf",
@@ -321,7 +324,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 					d.getProps().put(
 							"crf_" + crf.getId(),
 							getCRFStatusId(studySubjectBean, studyEventBean, studyEventBean.getSubjectEventStatus(),
-									eventCRFBean));
+									crf, eventCRFBean));
 					if (eventCRFBean != null) {
 						d.getProps().put("crf_" + crf.getId() + "_eventCrf", eventCRFBean);
 					} else {
@@ -605,6 +608,16 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 	public void setCrfDAO(CRFDAO crfDAO) {
 		this.crfDAO = crfDAO;
+	}
+
+	public CRFVersionDAO getCRFVersionDAO() {
+
+		return crfVersionDAO;
+	}
+
+	public void setCRFVersionDAO(CRFVersionDAO crfVersionDAO) {
+
+		this.crfVersionDAO = crfVersionDAO;
 	}
 
 	public DiscrepancyNoteDAO getDiscrepancyNoteDAO() {
@@ -1079,7 +1092,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private int getCRFStatusId(StudySubjectBean studySubjectBean, StudyEventBean studyEvent,
-			SubjectEventStatus subjectEventStatus, EventCRFBean eventCrf) {
+			SubjectEventStatus subjectEventStatus, CRFBean crfBean, EventCRFBean eventCrf) {
 
 		int eventCRFStatusId;
 
@@ -1099,21 +1112,24 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 			if (subjectEventStatus.isLocked()) {
 				eventCRFStatusId = Status.LOCKED.getId();
-			} else if (!studySubjectBean.getStatus().isDeleted()) {
-				eventCRFStatusId = Status.NOT_STARTED.getId();
-			} else {
+			} else if (studySubjectBean.getStatus().isDeleted()) {
 				eventCRFStatusId = Status.DELETED.getId();
+			} else {
+				eventCRFStatusId = !getCRFVersionDAO().findAllActiveByCRF(crfBean.getId()).isEmpty() ? Status.NOT_STARTED
+						.getId() : Status.LOCKED.getId();
 			}
 
 		} else {
 			// if study event already scheduled and event CRF already started
 
-			if ((subjectEventStatus.isStopped() || subjectEventStatus.isSkipped()) && !eventCrf.isNotStarted()) {
+			if ((subjectEventStatus.isStopped() || subjectEventStatus.isSkipped() || !((CRFVersionBean) getCRFVersionDAO()
+					.findByPK(eventCrf.getCRFVersionId())).getStatus().isAvailable()) && !eventCrf.isNotStarted()) {
 				eventCRFStatusId = Status.LOCKED.getId();
 			} else if (subjectEventStatus.isLocked()) {
 				eventCRFStatusId = Status.LOCKED.getId();
 			} else if (eventCrf.isNotStarted()) {
-				eventCRFStatusId = Status.NOT_STARTED.getId();
+				eventCRFStatusId = !getCRFVersionDAO().findAllActiveByCRF(crfBean.getId()).isEmpty() ? Status.NOT_STARTED
+						.getId() : Status.LOCKED.getId();
 			} else if (eventCrf.getStage().isInitialDE()) {
 				eventCRFStatusId = Status.DATA_ENTRY_STARTED.getId();
 			} else if (eventCrf.getStage().isInitialDE_Complete()) {
@@ -1121,15 +1137,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			} else if (eventCrf.getStage().isDoubleDE()) {
 				eventCRFStatusId = Status.DOUBLE_DATA_ENTRY.getId();
 			} else if (eventCrf.getStage().isDoubleDE_Complete()) {
-
-				if (subjectEventStatus.isSigned()) {
-					eventCRFStatusId = Status.SIGNED.getId();
-				} else if (eventCrf.isSdvStatus()) {
-					eventCRFStatusId = Status.SOURCE_DATA_VERIFIED.getId();
-				} else {
-					eventCRFStatusId = Status.COMPLETED.getId();
-				}
-
+				eventCRFStatusId = subjectEventStatus.isSigned() ? Status.SIGNED.getId()
+						: eventCrf.isSdvStatus() ? Status.SOURCE_DATA_VERIFIED.getId() : Status.COMPLETED.getId();
 			} else {
 				eventCRFStatusId = Status.DELETED.getId();
 			}

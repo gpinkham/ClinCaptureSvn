@@ -112,6 +112,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		factory.setEventCRFDAO(getEventCRFDAO());
 		factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
 		factory.setCrfDAO(getCRFDAO());
+		factory.setCRFVersionDAO(getCRFVersionDAO());
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
 		factory.setSelectedStudyEventDefinition((StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(
 				definitionId));
@@ -180,7 +181,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 			return request.getRequestURL() + getDefaultUrl(request);
 		}
 		String savedUrl = (String) request.getSession().getAttribute(key);
-		return savedUrl == null? savedUrl : savedUrl.replaceFirst("&listEventsForSubject_mr_=\\d{2,}", 
+		return savedUrl == null ? savedUrl : savedUrl.replaceFirst("&listEventsForSubject_mr_=\\d{2,}",
 				"&listEventsForSubject_mr_=" + ListStudySubjectsServlet.getPageSize(request));
 	}
 }
