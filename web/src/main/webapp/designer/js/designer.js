@@ -1341,12 +1341,13 @@ function handleClickDrop(ele) {
 	// Get a matching drop surface, if more than one, select last
 	if ($(ele).is('.group')) {
 		params.element = getDropSurfaceElement(ele);
-		handleDropEvent(params);		
 	} else if ($(ele).is('.compare')) {
 		params.element = $('.dotted-border.' + 'compare').last();
-		handleDropEvent(params);
 	} else if ($(ele).is('.condition')) {
 		params.element = $('.dotted-border.' + 'condition').last();
+	}
+	// Do not overwrite by click
+	if (!params.element.is('.bordered')) {
 		handleDropEvent(params);
 	}
 }
