@@ -519,8 +519,8 @@ $(function() {
 	});
 
 	$('body').on('click', function(e, data){
-		if (!data) {
-			$(".tops").remove();
+        if (!data && !$(e.target).is('a')) {
+            $(".tops").remove();
 			$(".popover").remove();
 		}
 	});
