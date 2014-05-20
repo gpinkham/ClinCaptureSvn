@@ -469,11 +469,11 @@ $(document).ready(function() {
 			<c:when test='${not empty discrepancyNote.assignedUserId and not (discrepancyNote.assignedUserId eq 0)}'>
 				<c:set var="userAccountId1" value="${discrepancyNote.assignedUserId}"/>
 			</c:when>
-            <c:when test='${not empty eventCrfOwnerId}'>
+            <c:when test='${(not empty eventCrfOwnerId) and (eventCrfOwnerId > 0)}'>
                 <c:set var="userAccountId1" value="${eventCrfOwnerId}"/>
             </c:when>
 			<c:otherwise>
-				<c:set var="userAccountId1" value="0"/>
+				<c:set var="userAccountId1" value="${userBean.id}"/>
 			</c:otherwise>
 			</c:choose>
 			<select name="userAccountId" id="userAccountId" class="formfieldL formFieldLSelect" >
