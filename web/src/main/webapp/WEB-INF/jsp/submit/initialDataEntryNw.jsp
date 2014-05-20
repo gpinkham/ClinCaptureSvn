@@ -36,6 +36,7 @@
     <script type="text/javascript" language="JavaScript">
         //this has been declared here so that it is accessible from other functions in the global_functions_javascript.js
         var checkboxObject;
+        var formChanged;
     </script>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui.min.js"></script>
@@ -46,7 +47,11 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
-
+	<script type="text/javascript" language="JavaScript">
+        $(document).ready(function() {
+        	formChanged = false;
+   		});	
+    </script>
     <!-- Added for the new Calender -->
 	<!-- *JSP* submit/initialDataEntryNw.jsp -->
         <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
@@ -605,7 +610,7 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
                                 <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                                   "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
                                 <td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
-                                  "button_medium" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>',this);" /></td>
+                                  "button_medium" onClick="return checkIDEExitStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>');" /></td>
                                 <c:choose>
                                     <c:when test="${! empty formMessages}">
                                         <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif"></td>
@@ -1664,7 +1669,7 @@ table-->
                     </c:choose>
                     <td><input type="submit" id="srl" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                       "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
-                    <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkGoBackEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>',this);" /></td>
+                    <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkIDEExitStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>');" /></td>
                     <c:choose>
                         <c:when test="${! empty formMessages}">
                             <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif">&nbsp;</td>

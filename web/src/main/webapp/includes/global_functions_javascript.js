@@ -47,6 +47,14 @@ function checkGoBackEntryStatus(strImageName, Message, submit) {
     return true;
 }
 
+function checkIDEExitStatus(strImageName, Message) {
+	closing = false;        
+	if(formChanged){
+		return confirmBack(Message);
+    }
+    return true;
+}
+
 function checkGoToEntryStatus(strImageName, Message, Adress) {
     closing = false;        
     objImage = MM_findObj(strImageName);
@@ -61,7 +69,7 @@ function confirmGoTo(Message, Address){
 	confirmDialog({ message: Message, height: 150, width: 500, redirectLink: Address });
 }
 function confirmBack(Message){
-	confirmSubmit({ message: Message, height: 150, width: 500, goBack: true });
+	return confirmSubmit({ message: Message, height: 150, width: 500, goBack: true });
 }
 
 function changeIcon(){

@@ -32,7 +32,8 @@
             if(data == 'true'){
                 window.location = url;
             }else{
-                alert(data);return false;
+            	alertDialog({ message:data, height: 150, width: 500 });
+            	return false;
             }
         });
     }
@@ -42,7 +43,7 @@
             if(data == 'true'){
                 formName.submit();
             }else{
-                alert(data);
+            	alertDialog({ message:data, height: 150, width: 500 });
             }
         });
     }

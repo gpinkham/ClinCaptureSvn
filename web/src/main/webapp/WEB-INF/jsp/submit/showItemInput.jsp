@@ -461,6 +461,9 @@ function changeImage(obj) {
 	turnOnIsDataChangedParamOfDN(obj.name); 
 	setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); 
 	setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');
+	if(formChanged != undefined){
+		formChanged = true;
+	}
 }
 </script>
 
