@@ -100,6 +100,7 @@ public class UpdateCRFServlet extends SecureController {
 		if (StringUtil.isBlank(action)) {
 			session.setAttribute(CRF, crf);
 			forwardPage(Page.UPDATE_CRF);
+			return;
 
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
@@ -146,7 +147,7 @@ public class UpdateCRFServlet extends SecureController {
 			logger.info("has errors");
 			request.setAttribute("formMessages", errors);
 			forwardPage(Page.UPDATE_CRF);
-
+			return;
 		} else {
 			logger.info("no errors");
 			CRFBean crf = (CRFBean) session.getAttribute(CRF);
@@ -156,6 +157,7 @@ public class UpdateCRFServlet extends SecureController {
 			session.setAttribute(CRF, crf);
 
 			forwardPage(Page.UPDATE_CRF_CONFIRM);
+			return;
 		}
 
 	}

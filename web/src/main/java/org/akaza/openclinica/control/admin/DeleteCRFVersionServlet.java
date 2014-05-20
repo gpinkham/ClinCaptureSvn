@@ -121,6 +121,7 @@ public class DeleteCRFVersionServlet extends Controller {
 			if (ACTION_CONFIRM.equalsIgnoreCase(action) || (ACTION_SUBMIT.equalsIgnoreCase(action) && !canDelete)) {
 				request.setAttribute(VERSION_TO_DELETE, version);
 				forwardPage(Page.DELETE_CRF_VERSION, request, response);
+				return;
 			} else if (ACTION_SUBMIT.equalsIgnoreCase(action)
 					&& !fp.getString(CONFIRM_PAGE_PASSED_PARAMETER).equals(FormProcessor.DEFAULT_STRING)) {
 				ArrayList items = cvdao.findNotSharedItemsByVersion(versionId);

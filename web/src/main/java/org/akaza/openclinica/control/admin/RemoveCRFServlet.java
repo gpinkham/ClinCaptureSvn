@@ -128,11 +128,13 @@ public class RemoveCRFServlet extends SecureController {
 					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
 							+ respage.getString("change_active_study_or_contact"));
 					forwardPage(Page.MENU_SERVLET);
+					return;
 				}
 
 				request.setAttribute("crfToRemove", crf);
 				request.setAttribute("eventCRFs", eventCRFs);
 				forwardPage(Page.REMOVE_CRF);
+				return;
 
 			} else if (ACTION_SUBMIT.equalsIgnoreCase(action)
 					&& !fp.getString(CONFIRM_PAGE_PASSED_PARAMETER).equals(FormProcessor.DEFAULT_STRING)) {

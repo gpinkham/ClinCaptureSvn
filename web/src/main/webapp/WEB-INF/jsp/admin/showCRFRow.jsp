@@ -68,7 +68,7 @@
                    onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><img
               name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
             </td>
-              <c:if test="${(userRole.role.id eq 1 or userRole.role.id eq 2) and currRow.bean.deletable}">
+              <c:if test="${(userRole.role.id eq 1 or userRole.role.id eq 2) and currRow.bean.deletable and userRole.sysAdmin}">
                   <td><a href="javascript:void(0);" onClick="return confirmDialog({ message: '<fmt:message key="are_you_sure_want_to_delete" bundle="${respage}"/>', height: 165, width: 500, redirectLink: 'CompleteCrfDelete?crfId=<c:out value="${currRow.bean.id}"/>'});"
                          onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
                          onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"><img name="bt_Delete1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>

@@ -68,6 +68,7 @@ public class CompleteCRFDeleteServlet extends Controller {
 
 			addPageMessage(respage.getString("the_crf_has_been_removed"), request);
 			forwardPage(Page.CRF_LIST_SERVLET, request, response);
+			return;
 
 		} else {
 

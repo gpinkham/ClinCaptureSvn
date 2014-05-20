@@ -106,11 +106,13 @@ public class RestoreCRFServlet extends SecureController {
 					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
 							+ respage.getString("change_active_study_or_contact"));
 					forwardPage(Page.MENU_SERVLET);
+					return;
 				}
 
 				request.setAttribute("crfToRestore", crf);
 				request.setAttribute("eventCRFs", eventCRFs);
 				forwardPage(Page.RESTORE_CRF);
+				return;
 			} else if (ACTION_SUBMIT.equalsIgnoreCase(action)
 					&& !fp.getString(CONFIRM_PAGE_PASSED_PARAMETER).equals(FormProcessor.DEFAULT_STRING)) {
 
