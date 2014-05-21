@@ -310,7 +310,7 @@ public final class SubjectEventStatusUtil {
 
 		if (!justScheduled && !hasStarted) {
 			if (hasRequiredCRFs) {
-				state = requiredCrfIds.size() > 0 ? State.DES : State.DEC;
+				state = requiredCrfIds.size() > 0 ? State.DES : state;
 			}
 			if (hasSDVedCRFs && hasSDVRequiredCRFs && !notAllStartedSDVRequiredCRFsAreSDVed && state == State.DEC) {
 				state = State.SDV;
