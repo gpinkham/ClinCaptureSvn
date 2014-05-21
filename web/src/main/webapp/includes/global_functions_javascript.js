@@ -47,14 +47,6 @@ function checkGoBackEntryStatus(strImageName, Message, submit) {
     return true;
 }
 
-function checkIDEExitStatus(strImageName, Message) {
-	closing = false;        
-	if(formChanged){
-		return confirmBack(Message);
-    }
-    return true;
-}
-
 function checkGoToEntryStatus(strImageName, Message, Adress) {
     closing = false;        
     objImage = MM_findObj(strImageName);
@@ -4027,6 +4019,7 @@ function confirmSubmit(params){
             		params.form.submit();
             	} else if(params.submit) {
             		params.submit.setAttribute("onClick", "");
+            		params.submit.setAttribute("onclick", "");
             		params.submit.click();
             	} else if(params.pageName) {
             		window.location = params.pageName;

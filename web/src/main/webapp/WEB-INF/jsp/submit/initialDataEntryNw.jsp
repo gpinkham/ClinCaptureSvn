@@ -194,7 +194,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 
 
 <script type="text/javascript" language="JavaScript">
-    // <![CDATA[
+	// <![CDATA[
     function getSib(theSibling){
         var sib;
         do {
@@ -435,8 +435,12 @@ function reverseRowsOrder() {
         document.write('<tr id="' + trId + '">');
         for (var j = 0; j <= rows[i].length - 1; j++) {
             var td = rows[i][j];
-            document.getElementById(trId).innerHTML = document.getElementById(trId).innerHTML + td.outerHTML;
-            td.outerHTML = "";
+            if ($.browser.msie  && parseInt($.browser.version, 10) === 7) {
+            	$(trId).html(document.getElementById(trId).innerHTML + td.outerHTML);
+            } else {
+            	document.getElementById(trId).innerHTML = document.getElementById(trId).innerHTML + td.outerHTML;
+                td.outerHTML = "";
+            }
         }
         document.write('</tr>');
     }
@@ -610,7 +614,7 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
                                 <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                                   "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
                                 <td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
-                                  "button_medium" onClick="return checkIDEExitStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>');" /></td>
+                                  "button_medium" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
                                 <c:choose>
                                     <c:when test="${! empty formMessages}">
                                         <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif"></td>
@@ -665,16 +669,6 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
                                         <td colspan="2">&nbsp;</td>
                                     </c:otherwise>
                                 </c:choose>
-
-                                    <%-- below removed tbh, 102007 --%>
-                                    <%--
-
-                                            <td><input type="submit" name="submittedResume" value="Save" class="button_medium" /></td>
-                                            <td><input type="submit" name="submittedExit" value="Exit" class="button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" /></td>
-
-                                    --%>
-
-                                    <%--<td valign="bottom"><img name="DataStatus_top" src="images/icon_UnchangedData.gif"></td>--%>
                             </tr>
                         </table>
                     </td>
@@ -1669,7 +1663,7 @@ table-->
                     </c:choose>
                     <td><input type="submit" id="srl" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                       "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
-                    <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkIDEExitStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>');" /></td>
+                    <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkGoBackEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
                     <c:choose>
                         <c:when test="${! empty formMessages}">
                             <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif">&nbsp;</td>
