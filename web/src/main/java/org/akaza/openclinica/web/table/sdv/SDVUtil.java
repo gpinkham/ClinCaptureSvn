@@ -238,7 +238,7 @@ public class SDVUtil {
 
 		Collection<SubjectSDVContainer> items = getFilteredItems(eventCRFSDVFilter, eventCRFSDVSort, rowStart, rowEnd,
 				studyId, currentStudy, request);
-		tableFacade.setTotalRows(items.size());
+
 		tableFacade.setItems(items);
 	}
 
