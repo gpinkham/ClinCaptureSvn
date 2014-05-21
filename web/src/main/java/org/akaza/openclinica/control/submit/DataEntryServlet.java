@@ -256,7 +256,7 @@ public abstract class DataEntryServlet extends Controller {
 	private static final String DNS_TO_TRANSFORM = "listOfDNsToTransform";
 
 	private static final String WARNINGS_LIST = "warningsIsDisplayed";
-	
+
 	public static final String DN_ADDITIONAL_CR_PARAMS = "dnAdditionalCreatingParameters";
 
 	@Override
@@ -426,7 +426,7 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		if (!fp.getString(GO_EXIT).equals("")) {
-			clearSession(request);
+			request.getSession().removeAttribute(DN_ADDITIONAL_CR_PARAMS);
 			session.removeAttribute(GROUP_HAS_DATA);
 			session.removeAttribute("to_create_crf");
 			session.removeAttribute("mayProcessUploading");
@@ -614,6 +614,7 @@ public abstract class DataEntryServlet extends Controller {
 			session.setAttribute("rulesErrors", null);
 			session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, null);
 			clearSession(request);
+			request.getSession().removeAttribute(DN_ADDITIONAL_CR_PARAMS);
 
 			FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
 			session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
@@ -649,8 +650,7 @@ public abstract class DataEntryServlet extends Controller {
 			}
 			logMe("Entering Checks !submitted entered end forwarding page " + System.currentTimeMillis());
 			logMe("Time Took for this block" + (System.currentTimeMillis() - t));
-			request.getSession()
-					.setAttribute(DN_ADDITIONAL_CR_PARAMS, createDNParametersMap(request, section));
+			request.getSession().setAttribute(DN_ADDITIONAL_CR_PARAMS, createDNParametersMap(request, section));
 			forwardPage(getJSPPage(), request, response);
 			return;
 		} else {
@@ -1320,7 +1320,7 @@ public abstract class DataEntryServlet extends Controller {
 				request.getSession().setAttribute(DN_ADDITIONAL_CR_PARAMS, createDNParametersMap(request, section));
 				forwardPage(getJSPPage(), request, response);
 			} else {
-				clearSession(request);
+				request.getSession().removeAttribute(DN_ADDITIONAL_CR_PARAMS);
 				boolean success = true;
 				boolean temp = true;
 
@@ -1397,7 +1397,7 @@ public abstract class DataEntryServlet extends Controller {
 						currentStudy);
 				AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEW_DATE, fdn, dndao, ecb.getId(), "EventCRF",
 						currentStudy);
-				transformSubmittedDNsToFVC(dndao, request);
+				transformSubmittedDNsToFVC(ub, dndao, request);
 				allItems = section.getDisplayItemGroups();
 
 				logger.debug("all items before saving into DB" + allItems.size());
@@ -1702,11 +1702,11 @@ public abstract class DataEntryServlet extends Controller {
 							return;
 						}
 					}
-					
+
 					// send email with CRF-report
-					if (markSuccessfully && "complete".equals(edcb.getEmailStep())) sendEmailWithCRFReport(crfVersionBean, 
-							crfBean, ssb, edcb, ecb, currentStudy, locale, request);
-					
+					if (markSuccessfully && "complete".equals(edcb.getEmailStep()))
+						sendEmailWithCRFReport(crfVersionBean, crfBean, ssb, edcb, ecb, currentStudy, locale, request);
+
 					// now write the event crf bean to the database
 					String annotations = fp.getString(INPUT_ANNOTATIONS);
 					setEventCRFAnnotations(annotations, request);
@@ -1881,9 +1881,10 @@ public abstract class DataEntryServlet extends Controller {
 		ReportCRFService reportCRFService = (ReportCRFService) SpringServletAccess.getApplicationContext(
 				getServletContext()).getBean("reportCRFService");
 		try {
-			String reportFilePath = reportCRFService.createPDFReport(ecb.getId(), currentStudy, locale, resword, request
-					.getRequestURL().toString().replaceAll(request.getServletPath(), ""), this.getServletContext()
-					.getRealPath("/"), SQLInitServlet.getField("filePath") + ReportCRFService.CRF_REPORT_DIR + File.separator, getSessionManager(request));
+			String reportFilePath = reportCRFService.createPDFReport(ecb.getId(), currentStudy, locale, resword,
+					request.getRequestURL().toString().replaceAll(request.getServletPath(), ""), this
+							.getServletContext().getRealPath("/"), SQLInitServlet.getField("filePath")
+							+ ReportCRFService.CRF_REPORT_DIR + File.separator, getSessionManager(request));
 			if (!StringUtil.isBlank(reportFilePath) && "complete".equals(edcb.getEmailStep())) {
 				StringBuilder body = new StringBuilder();
 				body.append(MessageFormat.format(respage.getString("crf_report_email_body"), "completed"));
@@ -1925,7 +1926,6 @@ public abstract class DataEntryServlet extends Controller {
 
 	private void clearSession(HttpServletRequest request) {
 		request.getSession().removeAttribute(WARNINGS_LIST);
-		request.getSession().removeAttribute(DN_ADDITIONAL_CR_PARAMS);
 		request.getSession().removeAttribute(CreateDiscrepancyNoteServlet.SUBMITTED_DNS_MAP);
 		request.getSession().removeAttribute(CreateDiscrepancyNoteServlet.TRANSFORMED_SUBMITTED_DNS);
 		request.getSession().removeAttribute(DNS_TO_TRANSFORM);
@@ -1979,7 +1979,7 @@ public abstract class DataEntryServlet extends Controller {
 		request.getSession().setAttribute(DNS_TO_TRANSFORM, listOfDNsToTransform);
 	}
 
-	private void transformSubmittedDNsToFVC(DiscrepancyNoteDAO dndao, HttpServletRequest request) {
+	private void transformSubmittedDNsToFVC(UserAccountBean ub, DiscrepancyNoteDAO dndao, HttpServletRequest request) {
 		// we should transform submitted DNs to FVC, close them
 
 		List<DiscrepancyNoteBean> listDNsToTransform = (ArrayList<DiscrepancyNoteBean>) request.getSession()
@@ -2007,13 +2007,14 @@ public abstract class DataEntryServlet extends Controller {
 			// for RFC we need to show validation error-message
 			if (!transformedSavedDNIds.contains(dn.getId()) && dn.getId() > 0) {
 				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.ANNOTATION.getId())
-					DiscrepancyNoteUtil.transformSavedAnnotationToFVC(dn, "", ResolutionStatus.CLOSED.getId(), dndao);
+					DiscrepancyNoteUtil.transformSavedAnnotationToFVC(dn, ub, "", ResolutionStatus.UPDATED.getId(),
+							dndao);
 				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId())
-					DiscrepancyNoteUtil.transformSavedRFCToFVC(dn, "", ResolutionStatus.CLOSED.getId(), dndao);
+					DiscrepancyNoteUtil.transformSavedRFCToFVC(dn, ub, "", ResolutionStatus.UPDATED.getId(), dndao);
 				transformedDNs.add(dn);
 			} else if (!transformedUnSavedDNFieldNames.contains(dn.getField()) && !StringUtil.isBlank(dn.getField())) {
 				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.ANNOTATION.getId()) {
-					DiscrepancyNoteUtil.transformAnnotationToFVC(dn, "", ResolutionStatus.CLOSED.getId());
+					DiscrepancyNoteUtil.transformAnnotationToFVC(dn, ub, "", ResolutionStatus.UPDATED.getId());
 					transformedDNs.add(dn);
 				}
 				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.FAILEDVAL.getId()) {
@@ -3162,9 +3163,9 @@ public abstract class DataEntryServlet extends Controller {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-		
-		return getDataEntryService(getServletContext()).getDisplayBean(hasGroup, includeUngroupedItems,
-				isSubmitted, getServletPage(request), study, ecb, sb, edcb, eventDefinitionCRFId, sm);	
+
+		return getDataEntryService(getServletContext()).getDisplayBean(hasGroup, includeUngroupedItems, isSubmitted,
+				getServletPage(request), study, ecb, sb, edcb, eventDefinitionCRFId, sm);
 	}
 
 	/**
@@ -3177,11 +3178,12 @@ public abstract class DataEntryServlet extends Controller {
 	protected ArrayList getAllDisplayBeans(HttpServletRequest request) throws Exception {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
- 		ArrayList<SectionBean> allSectionBeans = (ArrayList<SectionBean>) request.getAttribute(ALL_SECTION_BEANS);
+		ArrayList<SectionBean> allSectionBeans = (ArrayList<SectionBean>) request.getAttribute(ALL_SECTION_BEANS);
 
- 		return getDataEntryService(getServletContext()).getAllDisplayBeans(allSectionBeans, ecb, study, getServletPage(request));
+		return getDataEntryService(getServletContext()).getAllDisplayBeans(allSectionBeans, ecb, study,
+				getServletPage(request));
 	}
-	
+
 	/**
 	 * gets the available dynamics service
 	 */
@@ -3970,7 +3972,8 @@ public abstract class DataEntryServlet extends Controller {
 									dib.setData(idb);
 									logger.debug("--> set data " + idb.getId() + ": " + idb.getValue());
 
-									if (getDataEntryService(getServletContext()).shouldLoadDBValues(dib, getServletPage(request))) {
+									if (getDataEntryService(getServletContext()).shouldLoadDBValues(dib,
+											getServletPage(request))) {
 										logger.debug("+++should load db values is true, set value");
 										dib.loadDBValue();
 										logger.debug("+++data loaded: " + idb.getName() + ": " + idb.getOrdinal() + " "
@@ -4082,7 +4085,8 @@ public abstract class DataEntryServlet extends Controller {
 							dib.setData(idb);
 							logger.debug("--> set data " + idb.getId() + ": " + idb.getValue());
 
-							if (getDataEntryService(getServletContext()).shouldLoadDBValues(dib, getServletPage(request))) {
+							if (getDataEntryService(getServletContext()).shouldLoadDBValues(dib,
+									getServletPage(request))) {
 								logger.debug("+++should load db values is true, set value");
 								dib.loadDBValue();
 								logger.debug("+++data loaded: " + idb.getName() + ": " + idb.getOrdinal() + " "
@@ -4893,16 +4897,16 @@ public abstract class DataEntryServlet extends Controller {
 
 		return result;
 	}
-	
+
 	protected DynamicsMetadataService getItemMetadataService(ServletContext context) {
-		DynamicsMetadataService itemMetadataService = (DynamicsMetadataService) SpringServletAccess.getApplicationContext(context).getBean(
-				"dynamicsMetadataService");
+		DynamicsMetadataService itemMetadataService = (DynamicsMetadataService) SpringServletAccess
+				.getApplicationContext(context).getBean("dynamicsMetadataService");
 		return itemMetadataService;
 	}
-		
+
 	protected DataEntryService getDataEntryService(ServletContext context) {
-		DataEntryService dataEntryService = (DataEntryService) SpringServletAccess.getApplicationContext(context).getBean(
-				"dataEntryService");
+		DataEntryService dataEntryService = (DataEntryService) SpringServletAccess.getApplicationContext(context)
+				.getBean("dataEntryService");
 		return dataEntryService;
 	}
 }

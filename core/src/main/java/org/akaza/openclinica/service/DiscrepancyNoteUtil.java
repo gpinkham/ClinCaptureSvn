@@ -1574,31 +1574,32 @@ public class DiscrepancyNoteUtil {
 		return resolutionStatus;
 	}
 
-	public static void transformSavedRFCToFVC(DiscrepancyNoteBean dn, String detailedNote, Integer resStatusId,
-			DiscrepancyNoteDAO dndao) {
-		transformSavedDNTo(dn, "", "", DiscrepancyNoteType.REASON_FOR_CHANGE.getId(),
+	public static void transformSavedRFCToFVC(DiscrepancyNoteBean dn, UserAccountBean ub, String detailedNote,
+			Integer resStatusId, DiscrepancyNoteDAO dndao) {
+		transformSavedDNTo(dn, ub, "", "", DiscrepancyNoteType.REASON_FOR_CHANGE.getId(),
 				DiscrepancyNoteType.FAILEDVAL.getId(), resStatusId, dndao);
 	}
 
-	public static void transformSavedAnnotationToFVC(DiscrepancyNoteBean dn, String detailedNote, Integer resStatusId,
-			DiscrepancyNoteDAO dndao) {
-		transformSavedDNTo(dn, "", "", DiscrepancyNoteType.ANNOTATION.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
-				resStatusId, dndao);
+	public static void transformSavedAnnotationToFVC(DiscrepancyNoteBean dn, UserAccountBean ub, String detailedNote,
+			Integer resStatusId, DiscrepancyNoteDAO dndao) {
+		transformSavedDNTo(dn, ub, "", "", DiscrepancyNoteType.ANNOTATION.getId(),
+				DiscrepancyNoteType.FAILEDVAL.getId(), resStatusId, dndao);
 	}
 
-	public static void transformSavedAnnotationToFVC(int dnId, String detailedNote, Integer resStatusId,
-			DiscrepancyNoteDAO dndao) {
+	public static void transformSavedAnnotationToFVC(int dnId, UserAccountBean ub, String detailedNote,
+			Integer resStatusId, DiscrepancyNoteDAO dndao) {
 		DiscrepancyNoteBean dn = (DiscrepancyNoteBean) dndao.findByPK(dnId);
-		transformSavedDNTo(dn, "", "", DiscrepancyNoteType.ANNOTATION.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
-				resStatusId, dndao);
+		transformSavedDNTo(dn, ub, "", "", DiscrepancyNoteType.ANNOTATION.getId(),
+				DiscrepancyNoteType.FAILEDVAL.getId(), resStatusId, dndao);
 	}
 
-	private static void transformSavedDNTo(DiscrepancyNoteBean dn, String description, String detailedNotes,
-			Integer oldTypeId, Integer typeId, Integer resStatusId, DiscrepancyNoteDAO dndao) {
+	private static void transformSavedDNTo(DiscrepancyNoteBean dn, UserAccountBean ub, String description,
+			String detailedNotes, Integer oldTypeId, Integer typeId, Integer resStatusId, DiscrepancyNoteDAO dndao) {
 
 		if (oldTypeId != dn.getDiscrepancyNoteTypeId())
 			return;
-
+		if (ub != null)
+			dn.setAssignedUserId(ub.getId());
 		if (!StringUtil.isBlank(description))
 			dn.setDescription(description);
 		if (!StringUtil.isBlank(detailedNotes))
@@ -1620,21 +1621,24 @@ public class DiscrepancyNoteUtil {
 		dndao.update(parentDN);
 	}
 
-	public static void transformAnnotationToFVC(DiscrepancyNoteBean dn, String detailedNote, Integer resStatusId) {
-		transformDNTo(dn, "", "", DiscrepancyNoteType.ANNOTATION.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
+	public static void transformAnnotationToFVC(DiscrepancyNoteBean dn, UserAccountBean ub, String detailedNote,
+			Integer resStatusId) {
+		transformDNTo(dn, ub, "", "", DiscrepancyNoteType.ANNOTATION.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
 				resStatusId);
 	}
 
-	public static void transformRFCToFVC(DiscrepancyNoteBean dn, String detailedNote, Integer resStatusId) {
-		transformDNTo(dn, "", "", DiscrepancyNoteType.REASON_FOR_CHANGE.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
-				resStatusId);
+	public static void transformRFCToFVC(DiscrepancyNoteBean dn, UserAccountBean ub, String detailedNote,
+			Integer resStatusId) {
+		transformDNTo(dn, ub, "", "", DiscrepancyNoteType.REASON_FOR_CHANGE.getId(),
+				DiscrepancyNoteType.FAILEDVAL.getId(), resStatusId);
 	}
 
-	private static DiscrepancyNoteBean transformDNTo(DiscrepancyNoteBean dn, String description, String detailedNotes,
-			Integer oldTypeId, Integer typeId, Integer resStatusId) {
+	private static DiscrepancyNoteBean transformDNTo(DiscrepancyNoteBean dn, UserAccountBean ub, String description,
+			String detailedNotes, Integer oldTypeId, Integer typeId, Integer resStatusId) {
 		if (oldTypeId != dn.getDiscrepancyNoteTypeId())
 			return dn;
-
+		if (ub != null)
+			dn.setAssignedUserId(ub.getId());
 		if (!StringUtil.isBlank(description))
 			dn.setDescription(description);
 		if (!StringUtil.isBlank(detailedNotes))
@@ -1646,7 +1650,7 @@ public class DiscrepancyNoteUtil {
 
 		return dn;
 	}
-	
+
 	public static ArrayList<StudyUserRoleBean> generateUserAccounts(int studySubjectId, StudyBean currentStudy,
 			UserAccountDAO udao, StudyDAO studyDAO) {
 		StudyBean subjectStudy = studyDAO.findByStudySubjectId(studySubjectId);
@@ -1669,7 +1673,7 @@ public class DiscrepancyNoteUtil {
 
 		return userAccounts;
 	}
-	
+
 	private static StudyUserRoleBean createRootUserRole(UserAccountBean rootUserAccount, int studyId) {
 		StudyUserRoleBean rootUserRole = rootUserAccount.getSysAdminRole();
 
@@ -1685,17 +1689,18 @@ public class DiscrepancyNoteUtil {
 
 		return rootUserRole;
 	}
-	
+
 	public static StudySubjectBean getStudySubject(int subjectId, StudyBean currentStudy, DataSource dataSource) {
 		StudySubjectBean ssub = new StudySubjectBean();
-		if (subjectId <= 0) 
+		if (subjectId <= 0)
 			return ssub;
 		StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
 		StudyDAO sdao = new StudyDAO(dataSource);
 		ssub = (StudySubjectBean) ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
 		if (ssub.getId() <= 0 && currentStudy.getParentStudyId() > 0)
-			ssub = (StudySubjectBean) ssdao.findBySubjectIdAndStudy(subjectId, (StudyBean) sdao.findByPK(currentStudy.getParentStudyId()));
-		
+			ssub = (StudySubjectBean) ssdao.findBySubjectIdAndStudy(subjectId,
+					(StudyBean) sdao.findByPK(currentStudy.getParentStudyId()));
+
 		return ssub;
 	}
 
