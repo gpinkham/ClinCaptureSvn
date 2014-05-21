@@ -207,7 +207,7 @@ public class ImportRuleServlet extends Controller {
 			XMLContext xmlContext = new XMLContext();
 			// create and set a Mapping instance
 			Mapping mapping = xmlContext.createMapping();
-			mapping.loadMapping(getCoreResources().getURL("mapping.xml"));
+				mapping.loadMapping(getCoreResources().getURL("mapping.xml"));
 
 			xmlContext.addMapping(mapping);
 			// create a new Unmarshaller

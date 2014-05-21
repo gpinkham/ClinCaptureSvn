@@ -74,7 +74,7 @@ public class InsertActionValidator implements Validator {
 
 	public void validateOidInPropertyBean(RuleSetBean ruleSetBean, PropertyBean propertyBean, Errors e, String p) {
 		if (getExpressionService().isExpressionPartial(ruleSetBean.getTarget().getValue())) {
-			if (getExpressionService().getExpressionSize(propertyBean.getOid()) > 3) {
+			if (getExpressionService().getExpressionSize(propertyBean.getOid()) > 4) {
 				e.rejectValue(p + "oid", "oid.invalid", "OID: " + propertyBean.getOid() + " is Invalid.");
 			}
 			try {
@@ -110,8 +110,8 @@ public class InsertActionValidator implements Validator {
 					ruleSetBean.getTarget().getValue());
 			ItemBean item = getExpressionService().getItemBeanFromExpression(expression);
 
-			if (!getExpressionService().isInsertActionExpressionValid(propertyBean.getOid(), ruleSetBean, 3)
-					|| item == null) {
+			if (!(getExpressionService().isInsertActionExpressionValid(propertyBean.getOid(), ruleSetBean, 3) || getExpressionService()
+					.isInsertActionExpressionValid(propertyBean.getOid(), ruleSetBean, 4)) || item == null) {
 				e.rejectValue(p + "oid", "oid.invalid", "OID: " + propertyBean.getOid() + " is Invalid.");
 			}
 		}

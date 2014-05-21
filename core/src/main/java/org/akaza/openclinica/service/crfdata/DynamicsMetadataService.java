@@ -19,6 +19,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
@@ -34,6 +35,7 @@ import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -508,22 +510,34 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 					ruleSet.getTarget().getValue());
 			ItemBean itemBeanB = getExpressionService().getItemBeanFromExpression(expression);
 			ItemGroupBean itemGroupBeanB = getExpressionService().getItemGroupExpression(expression);
-			ItemGroupMetadataBean itemGroupMetadataBeanB = null;
-			Boolean isGroupBRepeating = null;
-			String itemGroupBOrdinal = null;
+			String studyEventDefenitionOid = getExpressionService().getStudyEventDefenitionOid(expression);
+			StudyEventDefinitionBean studyEventDefinitionBeanB = studyEventDefenitionOid == null ? null
+					: getStudyEventDefinitionDAO().findByOid(studyEventDefenitionOid);
+			ItemGroupMetadataBean itemGroupMetadataBeanB;
+			Boolean isGroupBRepeating;
+			String itemGroupBOrdinal;
+			StudyEventBean studyEventBeanB;
 			EventCRFBean eventCrfBeanB = null;
+			if (studyEventDefinitionBeanB != null) {
+				studyEventBeanB = (StudyEventBean) getStudyEventDAO().findByStudySubjectIdAndDefinitionIdAndOrdinal(
+						eventCrfBeanA.getStudySubjectId(), studyEventDefinitionBeanB.getId(),
+						studyEventBeanA.getSampleOrdinal());
+			} else {
+				studyEventBeanB = studyEventBeanA;
+			}
 			Boolean isItemInSameForm = getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemBeanB.getId(),
-					eventCrfBeanA.getCRFVersionId()).getId() != 0 ? true : false;
+					eventCrfBeanA.getCRFVersionId()).getId() != 0
+					&& studyEventBeanA.equals(studyEventBeanB);
 			// Item Does not below to same form
 			if (!isItemInSameForm) {
 				List<EventCRFBean> eventCrfs = getEventCRFDAO().findAllByStudyEventAndCrfOrCrfVersionOid(
-						studyEventBeanA, getExpressionService().getCrfOid(expression));
+						studyEventBeanB, getExpressionService().getCrfOid(expression));
 				if (eventCrfs.size() == 0) {
 					CRFVersionBean crfVersion = getExpressionService().getCRFVersionFromExpression(expression);
 					CRFBean crf = getExpressionService().getCRFFromExpression(expression);
 					int crfVersionId = 0;
 					EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFDAO(ds)
-							.findByStudyEventDefinitionIdAndCRFId(studyEventBeanA.getStudyEventDefinitionId(),
+							.findByStudyEventDefinitionIdAndCRFId(studyEventBeanB.getStudyEventDefinitionId(),
 									crf.getId());
 					if (eventDefinitionCRFBean.getId() != 0) {
 						crfVersionId = crfVersion != null ? crfVersion.getId() : eventDefinitionCRFBean
@@ -534,6 +548,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 					eventCrfBeanB = eventCrfBeanA.copy();
 					eventCrfBeanB.setId(0);
 					eventCrfBeanB.setCRFVersionId(crfVersionId);
+					eventCrfBeanB.setStudyEventId(studyEventBeanB.getId());
 					eventCrfBeanB = (EventCRFBean) getEventCRFDAO().create(eventCrfBeanB);
 
 				} else {
@@ -1012,6 +1027,10 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 	public StudyEventDAO getStudyEventDAO() {
 		return new StudyEventDAO(ds);
+	}
+
+	public StudyEventDefinitionDAO getStudyEventDefinitionDAO() {
+		return new StudyEventDefinitionDAO(ds);
 	}
 
 	public ExpressionService getExpressionService() {

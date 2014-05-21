@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?> 
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" 
+	        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="skirpichenok" id="2014-05-21-TICKET1383-01">
+        <comment>Add column to rule_expression table for ability to know the correct event and crf version for target (it's required for rule editing).</comment>
+        <addColumn tableName="rule_expression">
+            <column name="target_event_oid" type="VARCHAR(40)"/>
+            <column name="target_version_oid" type="VARCHAR(40)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog> 

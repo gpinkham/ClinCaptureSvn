@@ -47,6 +47,9 @@ public class ExpressionBean extends AbstractAuditableMutableDomainObject {
 	private String value;
 	private String contextName;
 
+	private String targetEventOid;
+	private String targetVersionOid;
+
 	public ExpressionBean() {
 	}
 
@@ -91,6 +94,36 @@ public class ExpressionBean extends AbstractAuditableMutableDomainObject {
 	public void setContextName(String contextName) {
 		this.contextName = contextName;
 		this.context = Context.getByName(contextName);
+	}
+
+	/**
+	 * @return targetEventOid
+	 */
+	@Column(name = "target_event_oid")
+	public String getTargetEventOid() {
+		return targetEventOid;
+	}
+
+	/**
+	 * @param targetEventOid
+	 */
+	public void setTargetEventOid(String targetEventOid) {
+		this.targetEventOid = targetEventOid;
+	}
+
+	/**
+	 * @return targetVersionOid
+	 */
+	@Column(name = "target_version_oid")
+	public String getTargetVersionOid() {
+		return targetVersionOid;
+	}
+
+	/**
+	 * @param targetVersionOid
+	 */
+	public void setTargetVersionOid(String targetVersionOid) {
+		this.targetVersionOid = targetVersionOid;
 	}
 
 	@Override

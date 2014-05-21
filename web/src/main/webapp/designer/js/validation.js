@@ -28,7 +28,7 @@ $(function() {
 			$(".success").show();
 			$("#failure").hide();
 			$(".alert-info").hide();
-			$(".alert-success").text("Rule is valid: " + rule.expression);
+			$(".alert-success").text("Rule is valid: " + rule.targets[0].expression);
 			if (rule.targets) {
 				for (var x = 0; x < rule.targets.length; x++) {
 					var list = $("<li class='list-group-item'>");

@@ -47,6 +47,7 @@ import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -132,8 +133,12 @@ public class RulesServlet extends HttpServlet {
 					// Target
 					Element rTarget = document.createElement("Target");
 					rTarget.setAttribute("Context", "OC_RULES_V1");
+					rTarget.setAttribute("EventOid", rTargets.getJSONObject(x).getString("evt"));
+					rTarget.setAttribute("VersionOid", rTargets.getJSONObject(x).getString("version"));
+
 					// Content
 					rTarget.setTextContent(rTargets.getJSONObject(x).getString("name"));
+					String expression = rTargets.getJSONObject(x).getString("expression");
 					// Rule target children
 					rAssigment.appendChild(rTarget);
 					for (int act = 0; act < actions.length(); act++) {
@@ -141,11 +146,11 @@ public class RulesServlet extends HttpServlet {
 						Element ruleDef = document.createElement("RuleDef");
 						// attributes
 						ruleDef.setAttribute("Name", rule.getString("name"));
-						ruleDef.setAttribute("OID", generateOID(rule.getString("expression"), currentCount));
+						ruleDef.setAttribute("OID", generateOID(expression, currentCount));
 						// Increment the count
 						currentCount = currentCount + 1;
 						Element expr = document.createElement("Expression");
-						expr.setTextContent(rule.getString("expression"));
+						expr.setTextContent(expression);
 						// Description - it comes before expression
 						Element description = document.createElement("Description");
 						description.setTextContent(rule.getString("name"));
@@ -272,7 +277,8 @@ public class RulesServlet extends HttpServlet {
 				JSONObject tar = new JSONObject();
 				JSONArray targets = new JSONArray();
 
-				String targetPath = rule.getRuleSetRules().get(0).getRuleSetBean().getOriginalTarget().getValue();
+				ExpressionBean originalTarget = rule.getRuleSetRules().get(0).getRuleSetBean().getOriginalTarget();
+				String targetPath = originalTarget.getValue();
 				String name = targetPath.replaceAll("\\[\\w+\\]", "").trim();
 				tar.put("name", name);
 				if (targetPath.split("\\.").length > 3) {
@@ -285,6 +291,12 @@ public class RulesServlet extends HttpServlet {
 				if (getItemLine(targetPath, tar) != null) {
 					tar.put("line", getItemLine(targetPath, tar));
 				}
+				if (originalTarget.getTargetEventOid() != null) {
+					tar.put("target-event-oid", originalTarget.getTargetEventOid());
+				}
+				if (originalTarget.getTargetVersionOid() != null) {
+					tar.put("target-version-oid", originalTarget.getTargetVersionOid());
+				}				
 				tar.put("crf", getItemVersion(targetPath));
 				tar.put("group", getItemGroup(targetPath));
 				targets.put(tar);

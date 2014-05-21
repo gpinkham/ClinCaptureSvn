@@ -180,6 +180,12 @@
         <field name="ContextName" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
             <bind-xml name="Context" node="attribute"/>
        </field>
+       <field name="TargetEventOid" type="string">
+            <bind-xml name="EventOid" node="attribute"/>
+       </field>
+       <field name="TargetVersionOid" type="string">
+            <bind-xml name="VersionOid" node="attribute"/>
+       </field>
        <field name="Value" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
             <bind-xml node="text"/>         
        </field>

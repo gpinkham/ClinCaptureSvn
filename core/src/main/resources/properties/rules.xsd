@@ -128,10 +128,12 @@
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute name="Context" type="contextType" use="optional"/>
+                <xs:attribute name="EventOid" type="xs:string" use="optional"/>
+                <xs:attribute name="VersionOid" type="xs:string" use="optional"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
-    
+
     <xs:complexType name="PropertyType">
         <xs:sequence>
             <xs:element name="ValueExpression" type="TargetType" minOccurs="0"/>

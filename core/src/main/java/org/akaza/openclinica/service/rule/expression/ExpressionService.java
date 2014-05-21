@@ -54,7 +54,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -308,40 +307,44 @@ public class ExpressionService {
 
 	public String evaluateExpression(String expression) throws OpenClinicaSystemException {
 		String value = null;
-		String fullExpression = expression;
-		List<ItemDataBean> itemDatas = new ArrayList<ItemDataBean>();
-		Map<Integer, ItemBean> itemBeansI = new HashMap<Integer, ItemBean>();
 		if (expressionWrapper.getRuleSet() != null) {
-			boolean expressionIsPartial = isExpressionPartial(expression);
-			if (expressionIsPartial) {
-				fullExpression = constructFullExpressionFromPartial(expression, expressionWrapper.getRuleSet()
-						.getTarget().getValue());
-				itemDatas = getItemDatas(fullExpression);
-				itemBeansI = new HashMap<Integer, ItemBean>();
+			if (isExpressionPartial(expression)) {
+				String fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper
+						.getRuleSet().getTarget().getValue());
+				List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
+				Map<Integer, ItemBean> itemBeansI = new HashMap<Integer, ItemBean>();
 				if (items != null) {
 					for (ItemBean item : items.values()) {
 						itemBeansI.put(item.getId(), item);
 					}
 				}
-			}
-			fullExpression = fixGroupOrdinal(fullExpression, expressionWrapper.getRuleSet().getTarget().getValue(),
-					itemDatas, expressionWrapper.getEventCrf());
-			if (checkSyntax(fullExpression)) {
-				String valueFromForm = null;
-				if (items == null) {
-					valueFromForm = getValueFromForm(fullExpression);
-				} else {
-					valueFromForm = getValueFromForm(fullExpression, items);
+				fullExpression = fixGroupOrdinal(fullExpression, expressionWrapper.getRuleSet().getTarget().getValue(),
+						itemDatas, expressionWrapper.getEventCrf());
+				if (checkSyntax(fullExpression)) {
+					String valueFromForm;
+					if (items == null) {
+						valueFromForm = getValueFromForm(fullExpression);
+					} else {
+						valueFromForm = getValueFromForm(fullExpression, items);
+					}
+					String valueFromDb = getValueFromDb(fullExpression, itemDatas, itemBeansI);
+					logger.debug("valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
+					if (valueFromForm == null && valueFromDb == null) {
+						throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { fullExpression,
+								expressionWrapper.getRuleSet().getTarget().getValue() });
+					}
+					value = valueFromForm == null ? valueFromDb : valueFromForm;
 				}
-				String valueFromDb = null;
-				valueFromDb = expressionIsPartial ? getValueFromDb(fullExpression, itemDatas, itemBeansI)
-						: getValueFromDbb(expression);
-				logger.debug("valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
-				if (valueFromForm == null && valueFromDb == null) {
-					throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { fullExpression,
-							expressionWrapper.getRuleSet().getTarget().getValue() });
+			} else {
+				// So Expression is not Partial
+				if (checkSyntax(expression)) {
+					String valueFromDb = getValueFromDbb(expression);
+					if (valueFromDb == null) {
+						throw new OpenClinicaSystemException("OCRERR_0018", new Object[] { expression });
+					}
+					logger.debug("valueFromDb : {}", valueFromDb);
+					value = valueFromDb;
 				}
-				value = valueFromForm == null ? valueFromDb : valueFromForm;
 			}
 		}
 		return value;
@@ -491,6 +494,28 @@ public class ExpressionService {
 
 	public Boolean isExpressionPartial(String expression) {
 		return !(expression.split(ESCAPED_SEPERATOR).length == 4);
+	}
+
+	public String constructFullExpressionIfPartialProvided(String expression, String ruleSetTargetExpression) {
+		if (expression == null) {
+			logger.info("expression is null.");
+			return expression;
+		} else {
+			String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
+			switch (splitExpression.length) {
+			case 1:
+				return deContextualizeExpression(3, expression, ruleSetTargetExpression);
+			case 2:
+				return deContextualizeExpression(2, expression, ruleSetTargetExpression);
+			case 3:
+				return deContextualizeExpression(1, expression, ruleSetTargetExpression);
+			case 4:
+				return expression;
+			default:
+				throw new OpenClinicaSystemException(
+						"Full Expression cannot be constructed from provided expression : " + expression);
+			}
+		}
 	}
 
 	public String constructFullExpressionIfPartialProvided(String expression, CRFVersionBean crfVersion,

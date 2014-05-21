@@ -264,6 +264,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			params.element.removeClass("bordered");
 			// Destination
 			var dest = null;
+            path = (this.rule.targets[0] != undefined && this.rule.targets[0].evt != selectedItem.eventOid ? selectedItem.eventOid + "." : "") + path;
 			if (this.getInsertActionDestination(params.element.parents(".row").attr("id"))) {
  				dest = this.getInsertActionDestination(params.element.parents(".row").attr("id"));
  				dest.oid = path;
@@ -509,6 +510,21 @@ Parser.prototype.getRuleCRFItems = function() {
 	return items;
 };
 
+Parser.prototype.createAttrMap = function(attributes) {
+    var map = {};
+    $.makeArray(attributes).map(function(attr, index) {
+        map[attr.name] = attr.value;
+    });
+    return map;
+}
+
+Parser.prototype.createTargetAttrMap = function(target) {
+    return {
+        'event-oid' : target['target-event-oid'] != undefined ? target['target-event-oid'] : target.evt,
+        'version-oid' : target['target-version-oid'] != undefined ? target['target-version-oid'] : target.version
+    }
+}
+
 /* ==============================================================================
  * Creates a rule based on what the user has dropped on the drop surfaces and the
  * entered details.
@@ -537,7 +553,7 @@ Parser.prototype.createRule = function() {
 	var expressionPredicates = $(".dotted-border:not(:empty), .target:not(:empty)");
 	var oids = expressionPredicates.toArray().map(function(x) {
 		if ($(x).is(".group") || $(x).is(".target")) {
-			var tar = parser.getItem($(x).text());
+			var tar = parser.getItem($(x).text(), parser.createAttrMap($(x).get(0).attributes));
 			if (tar && typeof(tar) !== "function") {
 				return tar.eventOid;
 			}
@@ -547,44 +563,47 @@ Parser.prototype.createRule = function() {
 			return x;
 		}
 	});
-	var expression = [];
-	var quantified = oids.every(this.quantify);
-	$(".dotted-border").each(function(index) {
-		var pred = $($(".dotted-border")[index]).text();
-		if (parser.isOp(pred)) {
-			pred = parser.isConditionalOp(pred) ? pred = pred.toLowerCase() : pred = parser.getOp(pred);
-		}
-		var item = parser.getItem(pred);
-		if (item) {
-			pred = parser.constructExpressionPath({
-				quantified: quantified,
-				ele: $(".dotted-border")[index]
-			});
-		}
-        // check dates
-		if (parser.isDateValue(pred)) {
-			var date = Date.parse(pred);
-			if (date != null) {
-				pred = date.toString("yyyy-MM-dd");
-			}
-		}
-		expression.push(pred);
 
-	});
-	parser.rule.expression = expression;
-	if (parser.isValid(expression).valid) {
-		for (var x = 0; x < parser.rule.targets.length; x++) {
-			var target = parser.rule.targets[x];
-			if (target.linefy) {
-				target.name = this.constructRepeatItemPath(target);
-			} else if (target.versionify) {
-				target.name = this.constructCRFVersionPath(target);
-			} else {
-				var formPath = target.crf + "." + target.group + "." + target.oid;
-				target.name = target.eventify ? (target.evt + "." + formPath) : formPath;
-			}
-		}
-	}
+    for (var x = 0; x < parser.rule.targets.length; x++) {
+        var target = parser.rule.targets[x];
+        if (target.linefy) {
+            target.name = this.constructRepeatItemPath(target);
+        } else if (target.versionify) {
+            target.name = this.constructCRFVersionPath(target);
+        } else {
+            var formPath = target.crf + "." + target.group + "." + target.oid;
+            target.name = target.eventify ? (target.evt + "." + formPath) : formPath;
+        }
+
+        var expression = [];
+
+        $(".dotted-border").each(function(index) {
+            var pred = $($(".dotted-border")[index]).text();
+            if (parser.isOp(pred)) {
+                pred = parser.isConditionalOp(pred) ? pred = pred.toLowerCase() : pred = parser.getOp(pred);
+            }
+            var attrMap = parser.createAttrMap($($(".dotted-border")[index]).get(0).attributes);
+            var item = parser.getItem(pred, attrMap);
+            if (item) {
+                pred = parser.constructExpressionPath({
+                    quantified: !(attrMap['crf-oid'] == target.crf && attrMap['version-oid'] == target.version && attrMap['event-oid'] == target.evt) ? false : true,
+                    ele: $(".dotted-border")[index]
+                });
+            }
+            // check dates
+            if (parser.isDateValue(pred)) {
+                var date = Date.parse(pred);
+                if (date != null) {
+                    pred = date.toString("yyyy-MM-dd");
+                }
+            }
+            expression.push(pred);
+
+        });
+        if (parser.isValid(expression).valid) {
+            target.expression = expression;
+        }
+    }
 };
 
 Parser.prototype.constructExpressionPath = function(params) {
@@ -597,7 +616,21 @@ Parser.prototype.constructExpressionPath = function(params) {
 
 Parser.prototype.getRule = function() {
 	this.createRule();
-	if (this.isValid(this.rule.expression).valid) {
+    var message = undefined;
+    var ruleIsValid = false;
+    for (var x = 0; x < parser.rule.targets.length; x++) {
+        var target = parser.rule.targets[x];
+        var msg = this.isValid(target.expression);
+        if (!msg.valid) {
+            message = msg.message;
+            ruleIsValid = false;
+            break;
+        } else {
+            ruleIsValid = true;
+        }
+    }
+
+	if (ruleIsValid) {
 		var rule = Object.create(null);
 
 		rule.name = this.getName();
@@ -616,13 +649,16 @@ Parser.prototype.getRule = function() {
 		rule.ae = this.getAdministrativeEditingExecute();
 		
 		rule.evaluates = this.getEvaluates();
-		rule.expression = this.rule.expression.join().replace(/\,/g, " ");
+        for (var x = 0; x < parser.rule.targets.length; x++) {
+            var target = parser.rule.targets[x];
+            target.expression = target.expression.join().replace(/\,/g, " ");
+        }
 		rule.submission = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 		return rule;
 	} else {
 		// Ensure one alert is displayed
-		if ($(".alert").size() == 0) {
-			$(".targettable").find(".panel-body").prepend(createAlert(this.isValid(this.rule.expression).message));
+		if ($(".alert").size() == 0 && message != undefined) {
+			$(".targettable").find(".panel-body").prepend(createAlert(message));
 		}
 		return false;
 	}
@@ -642,7 +678,7 @@ Parser.prototype.render = function(rule) {
 		this.setCopy(rule.copied);
 		this.setEditing(rule.editing);
 		this.setRuleSet(rule.ruleSet);
-		this.setExpression(rule.expression);
+		this.setExpression(rule.expression != undefined ? rule.expression : rule.targets[0].expression, this.createTargetAttrMap(rule.targets[0]));
 		// Actions
 		this.setActions({
 			context: false,
@@ -684,84 +720,86 @@ Parser.prototype.render = function(rule) {
  * ========================================================================================== */
 Parser.prototype.isValid = function(expression) {
 
-	var valid = true;
-	var message = "";
-	if (this.rule.actions.length === 0) {
-		valid = false;
-		message = "A rule is supposed to fire an action. Please select the action(s) to take if the rule evaluates as intended.";
-	}
+    var valid = true;
+    var message = "";
+    if (this.rule.actions.length === 0) {
+        valid = false;
+        message = "A rule is supposed to fire an action. Please select the action(s) to take if the rule evaluates as intended.";
+    }
 
-	if (!$("#ide").is(":checked") && !$("#ae").is(":checked") && !$("#dde").is(":checked") && !$("#dataimport").is(":checked")) {
-		valid = false;
-		message = "Please specify when the rule should be run";
-	}
+    if (!$("#ide").is(":checked") && !$("#ae").is(":checked") && !$("#dde").is(":checked") && !$("#dataimport").is(":checked")) {
+        valid = false;
+        message = "Please specify when the rule should be run";
+    }
 
-	if (!$("input[name=ruleInvoke]").is(':checked') && this.getActions()[0].type != 'showHide') {
-		valid = false;
-		message = "A rule is supposed to evaluate to true or false. Please specify";
-	}
+    if (!$("input[name=ruleInvoke]").is(':checked') && this.getActions()[0].type != 'showHide') {
+        valid = false;
+        message = "A rule is supposed to evaluate to true or false. Please specify";
+    }
 
-	if (this.rule.targets.length === 0) {
-		valid = false;
-		message = "Please specify a rule target";
-	}
+    if (this.rule.targets.length === 0) {
+        valid = false;
+        message = "Please specify a rule target";
+    }
 
-	if ($("#ruleName").val().length == 0) {
-		valid = false;
-		message = "Please specify the rule description";
-	}
+    if ($("#ruleName").val().length == 0) {
+        valid = false;
+        message = "Please specify the rule description";
+    }
 
-	if ($("input[action=discrepancy]").is(":checked")) {
-		if ($(".discrepancy-properties").find("textarea").val().length <= 0) {
-			valid = false;
-			message = "A discrepancy action was selected but no discrepancy text has been specified.";
-			$(".discrepancy-properties").find("textarea").focus();
-		}
-	}
+    if ($("input[action=discrepancy]").is(":checked")) {
+        if ($(".discrepancy-properties").find("textarea").val().length <= 0) {
+            valid = false;
+            message = "A discrepancy action was selected but no discrepancy text has been specified.";
+            $(".discrepancy-properties").find("textarea").focus();
+        }
+    }
 
-	if ($("input[action=email]").is(":checked")) {
-		if ($(".email-properties").find("textarea").val().length <= 0) {
-			valid = false;
-			message = "Please provide a valid email message";
-			$(".email-properties").find("textarea").focus();
-		}
-	}
+    if ($("input[action=email]").is(":checked")) {
+        if ($(".email-properties").find("textarea").val().length <= 0) {
+            valid = false;
+            message = "Please provide a valid email message";
+            $(".email-properties").find("textarea").focus();
+        }
+    }
 
-	if ($("input[action=email]").is(":checked")) {
-		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-		if (!re.test($(".to").val().trim())) {
-			valid = false;
-			message = "The email address is invalid. Check the email and try again.";
-			$(".to").focus();
-		}
-	}
+    if ($("input[action=email]").is(":checked")) {
+        var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (!re.test($(".to").val().trim())) {
+            valid = false;
+            message = "The email address is invalid. Check the email and try again.";
+            $(".to").focus();
+        }
+    }
 
-	if ($("input[action=insert]").is(":checked")) {
-		if (this.getInsertAction() && this.getInsertAction().destinations.length < 1) {
-			valid = false;
-			message = "An insert action was selected but the items to insert values into are not specified.";	
-		}
-	}
+    if ($("input[action=insert]").is(":checked")) {
+        if (this.getInsertAction() && this.getInsertAction().destinations.length < 1) {
+            valid = false;
+            message = "An insert action was selected but the items to insert values into are not specified.";
+        }
+    }
 
-	if ($("input[name='ruleInvoke']").is(":checked")) {
-		if (this.getShowHideAction() && this.getShowHideAction().destinations.length < 1) {
-			valid = false;
-			message = "An show/hide action was selected but the items to show/hide are not specified.";	
-		}
-	}
+    if ($("input[name='ruleInvoke']").is(":checked")) {
+        if (this.getShowHideAction() && this.getShowHideAction().destinations.length < 1) {
+            valid = false;
+            message = "An show/hide action was selected but the items to show/hide are not specified.";
+        }
+    }
 
-	for (var x = 0; x < expression.length; x++) {
-		if (expression[x] === "Group or Data" || expression[x] === "Compare or Calculate" || expression[x] === "Condition") {
-			var index = expression.indexOf(expression[x]);
-			expression.splice(index, 1);
-		}
-	}
+    if (expression != undefined) {
+        for (var x = 0; x < expression.length; x++) {
+            if (expression[x] === "Group or Data" || expression[x] === "Compare or Calculate" || expression[x] === "Condition") {
+                var index = expression.indexOf(expression[x]);
+                expression.splice(index, 1);
+            }
+        }
 
-	// It should not be empty
-	if (expression.length < 3) {
-		valid = false;
-		message = "Cannot validate an empty or incomplete expressions.";
-	}
+        // It should not be empty
+        if (expression.length < 3) {
+            valid = false;
+            message = "Cannot validate an empty or incomplete expressions.";
+        }
+    }
 
 	if ($(".invalid").size() > 0) {
 		valid = false;
@@ -934,14 +972,16 @@ Parser.prototype.isAddedShowHideTarget = function(target) {
  *
  * Returns the returned CRF item
  * ========================================================================= */
-Parser.prototype.findItem = function(identifier) {
+Parser.prototype.findItem = function(identifier, attrMap) {
 	var item = null;
 	var study = this.extractStudy(this.getStudy());
 	study.events.forEach(function(evt) {
 		evt.crfs.forEach(function(crf) {
 			crf.versions.forEach(function(ver) {
 				ver.items.forEach(function(itm) {
-					if (itm.oid === identifier || itm.name == identifier) {
+                    if ((itm.oid === identifier || itm.name == identifier) &&
+                        (attrMap == undefined || attrMap['event-oid'] == undefined || attrMap['version-oid'] == undefined ||
+                        (attrMap['event-oid'] == evt.oid && attrMap['version-oid'] == ver.oid))) {
 						itm.crfOid = crf.oid;
 						itm.eventOid = evt.oid;
 						itm.crfVersionOid = ver.oid;
@@ -1570,12 +1610,12 @@ Parser.prototype.setInsertActionMessage = function(message) {
 	this.getInsertAction().message = message;
 };
 
-Parser.prototype.setExpression = function(expression) {
+Parser.prototype.setExpression = function(expression, attrMap) {
 	if (expression instanceof Array) {
 		this.rule.expression = expression;
 		var currDroppable = $(".dotted-border");
 		for (var e = 0; e < expression.length; e++) {
-			var itm = this.getItem(expression[e]);
+			var itm = this.getItem(expression[e], attrMap);
 			if (e === 0) {
 				if (itm) {
 					var preds = expression[e].split(".");
@@ -1616,7 +1656,7 @@ Parser.prototype.setExpression = function(expression) {
 				} else {
 					var droppable = createStartExpressionDroppable();
 					if (itm) {
-						var itm = this.getItem(expression[e]);
+						var itm = this.getItem(expression[e], attrMap);
 						var preds = expression[e].split(".");
 						if (preds.length == 4) {
 							droppable.attr("event-oid", preds[0]);
@@ -1666,7 +1706,7 @@ Parser.prototype.setExpression = function(expression) {
 			}
 		});
 		for (var x = 0; x < expr.length; x++) {
-			var itm = this.getItem(expr[x]);
+			var itm = this.getItem(expr[x], attrMap);
 			if (itm) {
 				rawExpression.push(expr[x]);
 			} else {
@@ -1674,7 +1714,7 @@ Parser.prototype.setExpression = function(expression) {
 				rawExpression.push(pred);
 			}
 		}
-		this.setExpression(rawExpression);
+		this.setExpression(rawExpression, attrMap);
 	}
 	// Make them sortable
 	if (!$(".sortable").is(".ui-sortable")) {
@@ -1762,7 +1802,7 @@ Parser.prototype.setTargets = function(targets) {
 
 Parser.prototype.extractTarget = function(params) {
 	var target = Object.create(null);
-	var tt = this.getItem(params.name);
+	var tt = this.getItem(params.name, this.createTargetAttrMap(params.target));
 	target.oid = tt.oid;
 	target.name = tt.name;
 	target.crf = params.target.crf;
@@ -1878,8 +1918,8 @@ Parser.prototype.validate = function() {
 			type: "POST",
 			data: {
 				rs: true,
-				rule: rule.expression,
-				target: rule.targets[0].name,
+                rule: rule.targets[0].expression,
+                target: rule.targets[0].name,
 				testRuleActions: rule.evaluateTo
 			},
 			url: rule.study ? rule.submission + "/TestRule?action=validate&study=" + rule.study : rule.submission + "/TestRule?action=validate",
@@ -2055,9 +2095,9 @@ Parser.prototype.recursiveSelect = function(params) {
 	}
 };
 
-Parser.prototype.getItem = function(expression) {
+Parser.prototype.getItem = function(expression, attrMap) {
 	if (expression.indexOf(".") == -1) {
-		return this.findItem(expression);
+		return this.findItem(expression, attrMap);
 	} else if (this.isEventified(expression)) {
 		return this.findStudyItem({
 			study: this.extractStudy(this.rule.study),
@@ -2065,7 +2105,7 @@ Parser.prototype.getItem = function(expression) {
 			evt: this.extractEventNameFromExpression(expression)
 		});
 	} else {
-		return this.findItem(this.extractItemOIDFromExpression(expression));
+		return this.findItem(this.extractItemOIDFromExpression(expression), attrMap);
 	}
 };
 
