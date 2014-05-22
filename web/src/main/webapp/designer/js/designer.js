@@ -621,7 +621,7 @@ function createDroppable(params) {
 		hoverClass: "ui-state-active",
 		drop: function(evt, ui) {
 			// prevent drop on sorting
-			if (ui.draggable.is('ui-draggable:not(div)')) {
+			if (ui.draggable.is('.ui-draggable:not(div)')) {
 				params.ui = ui;	
 				handleDropEvent(params);
 			}
