@@ -393,7 +393,7 @@ public class WidgetsLayoutController {
 		EventCRFSDVSort sdvSortDone = new EventCRFSDVSort();
 		boolean sdvWithOpenQueries = sb.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes");
 		ArrayList<EventCRFBean> ecrfs = (ArrayList<EventCRFBean>) eCrfdao.getAvailableWithFilterAndSort(
-				sb.getId(), sb.getId(), sdvFilterDone, sdvSortDone, sdvWithOpenQueries, 0, 9999);
+				sb.getId(), sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilterDone, sdvSortDone, sdvWithOpenQueries, 0, 9999);
 
 		List<Integer> countValues = new ArrayList<Integer>(Collections.nCopies(12, 0));
 
@@ -433,7 +433,7 @@ public class WidgetsLayoutController {
 		sdvFilter.addFilter("sdvStatus", "not done");
 		EventCRFSDVSort sdvSort = new EventCRFSDVSort();
 		ArrayList<EventCRFBean> availableForSDV = (ArrayList<EventCRFBean>) eCrfdao.getAvailableWithFilterAndSort(
-				sb.getId(), sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries, 0, 99999);
+				sb.getId(), sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries, 0, 99999);
 
 		List<Integer> countAvailableCRFs = new ArrayList<Integer>(Collections.nCopies(12, 0));
 

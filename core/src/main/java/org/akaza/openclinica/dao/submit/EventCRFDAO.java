@@ -666,7 +666,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 
 		HashMap variables = new HashMap();
 		variables.put(1, studyId);
-		variables.put(2, parentStudyId);
+		variables.put(2, studyId);
 		String sql = digester.getQuery("getCountOfAvailableWithFilter");
 		sql += filter.execute("");
 		if (!allowSdvWithOpenQueries) {
@@ -720,7 +720,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 
 		HashMap variables = new HashMap();
 		variables.put(1, studyId);
-		variables.put(2, parentStudyId);
+		variables.put(2, studyId);
 
 		String sql = digester.getQuery("getAvailableWithFilterAndSort");
 		sql = sql + filter.execute("");
