@@ -216,17 +216,13 @@ public class SDVUtil {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		boolean allowSdvWithOpenQueries = "no".equals(currentStudy.getStudyParameterConfig()
 				.getAllowSdvWithOpenQueries()) ? false : true;
-		if (!limit.isComplete()) {
-			int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, currentStudy.getParentStudyId(),
-					allowSdvWithOpenQueries);
-			tableFacade.setTotalRows(totalRows);
-		} else if ("true".equalsIgnoreCase(restore)) {
-			int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, currentStudy.getParentStudyId(),
-					allowSdvWithOpenQueries);
+		int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, currentStudy.getParentStudyId(),
+				allowSdvWithOpenQueries);
+		tableFacade.setTotalRows(totalRows);
+		if ("true".equalsIgnoreCase(restore)) {
 			int pageNum = limit.getRowSelect().getPage();
 			int maxRows = limit.getRowSelect().getMaxRows();
 			tableFacade.setMaxRows(maxRows);
-			tableFacade.setTotalRows(totalRows);
 			limit.getRowSelect().setPage(pageNum);
 		}
 
