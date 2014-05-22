@@ -26,15 +26,18 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.List;
 
 @SuppressWarnings({ "serial", "unchecked" })
@@ -81,17 +84,22 @@ public class RestoreCRFFromDefinitionServlet extends Controller {
 			// event crf definition id
 			int id = Integer.valueOf(idString.trim());
 			CRFDAO crfdao = getCRFDAO();
+			CRFVersionDAO cvdao = getCRFVersionDAO();
 			for (EventDefinitionCRFBean edc : edcs) {
 				if (edc.getCrfId() == id) {
 					CRFBean crf = (CRFBean) crfdao.findByPK(edc.getCrfId());
-					if (crf.getStatus().getId() == Status.AVAILABLE.getId()) {
+					CRFVersionBean defaultCrfVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
+					if (crf.getStatus().getId() != Status.AVAILABLE.getId()) {
+						pageMessage = respage.getString("restore_event_crf_failed_crf_is_not_available");
+					} else if (edc.getVersions().size() == 0
+							|| defaultCrfVersion.getStatusId() != Status.AVAILABLE.getId()) {
+						pageMessage = respage.getString("restore_event_crf_failed_crf_version_is_not_available");
+					} else {
 						edc.setStatus(Status.AVAILABLE);
 						edc.setOldStatus(Status.DELETED);
 						crfName = edc.getCrfName();
 						pageMessage = crfName + " " + respage.getString("has_been_restored");
 						break;
-					} else {
-						pageMessage = respage.getString("restore_event_crf_failed_crf_is_not_available");
 					}
 				}
 			}
