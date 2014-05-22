@@ -616,16 +616,18 @@ function createDraggable(params) {
  *  - accept - the intend target[s] for this element
  * ==================================================================== */
 function createDroppable(params) {
-
 	params.element.droppable({
 		accept: params.accept,
 		hoverClass: "ui-state-active",
 		drop: function(evt, ui) {
-			params.ui = ui;	
-			handleDropEvent(params);
+			// prevent drop on sorting
+			if (ui.draggable.is('ui-draggable:not(div)')) {
+				params.ui = ui;	
+				handleDropEvent(params);
+			}
 		}
 	});
-
+	// Handle double click on drop surface
 	params.element.dblclick(function() {
 		params.element.tooltip("hide");
 		params.element.addClass("bordered");
@@ -675,8 +677,7 @@ function createSortable() {
 		stop: function(event, ui) {
 			ui.item.removeClass("sort");
 		}
-	});
-	$(".sortable").disableSelection();
+	}).disableSelection();
 }
 
 function handleDropEvent(params) {
