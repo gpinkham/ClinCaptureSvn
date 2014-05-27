@@ -137,23 +137,6 @@
      }
      return true;
   }
-
-  function leftnavExpand(strLeftNavRowElementName){
-    var objLeftNavRowElement;
-
-    objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
-    if (objLeftNavRowElement != null) {
-      if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-        objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
-        objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
-        if(objLeftNavRowElement.display == "none"){
-            objExCl.src = "images/bt_Expand.gif";
-        }else{
-            objExCl.src = "images/bt_Collapse.gif";
-        }
-      }
-    }
-  
    //-->
 </script>
 <P><fmt:message key="field_required" bundle="${resword}"/></P>
@@ -362,7 +345,7 @@
 </div></div></div></div></div></div></div></div>
 </div> </div><br>
 
-<a class="scheduleLink" href="javascript:leftnavExpand('schedule0');">
+<a class="scheduleLink" href="javascript:leftnavExpand_ext('schedule0', true, '${newThemeColor}');">
     <img id="excl_schedule0" src="images/bt_Expand.gif" border="0"> <fmt:message key="schedule_another_event" bundle="${resword}"/></a>
 
 <div id="schedule0" style="display: <c:out value="${display0}"/>">
@@ -428,8 +411,8 @@
 				</td>
 				<td>
                     <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled0'); return false;">
-				    <img name="flag_schLocation" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation0&column=location','spanAlert-locationScheduled0'); return false;">
+				    <img name="flag_schLocation0" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
                 </td>
 			</tr>
 			<tr>
@@ -515,7 +498,7 @@
 <br>
 </div>
 
-<a class="scheduleLink" href="javascript:leftnavExpand('schedule1');">
+<a class="scheduleLink" href="javascript:leftnavExpand_ext('schedule1', true, '${newThemeColor}');">
     <img id="excl_schedule1" src="images/bt_Expand.gif" border="0"> <fmt:message key="schedule_another_event" bundle="${resword}"/> </a></div>
 
 <div id="schedule1" style="display: <c:out value="${display1}"/>">
@@ -581,8 +564,8 @@
 				</td>
 				<td>
                     <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled1'); return false;">
-				    <img name="flag_schLocation" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation1&column=location','spanAlert-locationScheduled1'); return false;">
+				    <img name="flag_schLocation1" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
 			<tr>
 				<td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="locationScheduled1"/></jsp:include></td>
@@ -669,7 +652,7 @@
 </div>
 
 
-<a class="scheduleLink" href="javascript:leftnavExpand('schedule2');">
+<a class="scheduleLink" href="javascript:leftnavExpand_ext('schedule2', true, '${newThemeColor}');">
     <img id="excl_schedule2" src="images/bt_Expand.gif" border="0"> <fmt:message key="schedule_another_event" bundle="${resword}"/> </a></div>
 
 <div id="schedule2" style="display:<c:out value="${display2}"/>">
@@ -735,8 +718,8 @@
 				</td>
 				<td>
                     <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled2'); return false;">
-				<img name="flag_schLocation" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation2&column=location','spanAlert-locationScheduled2'); return false;">
+				<img name="flag_schLocation2" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
 			<tr>
 				<td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="locationScheduled2"/></jsp:include></td>
@@ -823,7 +806,7 @@
 </div>
 
 
-<a class="scheduleLink" href="javascript:leftnavExpand('schedule3');">
+<a class="scheduleLink" href="javascript:leftnavExpand_ext('schedule3', true, '${newThemeColor}');">
     <img id="excl_schedule3" src="images/bt_Expand.gif" border="0"> <fmt:message key="schedule_another_event" bundle="${resword}"/> </a></div>
 
 <div id="schedule3" style="display:<c:out value="${display3}"/>">
@@ -890,8 +873,8 @@
 				</td>
 				<td>
                     <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled3'); return false;">
-				<img name="flag_schLocation" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation3&column=location','spanAlert-locationScheduled3'); return false;">
+				<img name="flag_schLocation3" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
 			<tr>
 				<td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="locationScheduled3"/></jsp:include></td>
