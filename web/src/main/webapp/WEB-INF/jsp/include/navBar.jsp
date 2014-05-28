@@ -127,7 +127,7 @@
                 </c:otherwise>
             </c:choose>
             &nbsp;|&nbsp;
-            <a href="${urlPrefix}j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a>
+            <a href="${urlPrefix}j_spring_security_logout" onClick="clearLastAccessedObjects();"><fmt:message key="log_out" bundle="${resword}"/></a>
         
         </td>
         </tr>
@@ -471,7 +471,7 @@
             <div class="taskLink"><a href="javascript: window.location.href=('${pageContext.request.contextPath}/Contact');" > <fmt:message key="nav_support" bundle="${resword}"/> </a></div>
         </div>
         <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}j_spring_security_logout"><fmt:message key="nav_log_out" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="${urlPrefix}j_spring_security_logout" onClick="clearLastAccessedObjects();"><fmt:message key="nav_log_out" bundle="${resword}"/></a></div>
             <div class="taskLink"><a href="http://www.clinovo.com/clincapture/forum/" target="_blank" > <fmt:message key="forums" bundle="${resword}"/> </a></div>
             <div class="taskLink"><a href="javascript: openDefWindow('${pageContext.request.contextPath}/help/about.jsp');" > <fmt:message key="about" bundle="${resword}"/> </a></div>
         </div>

@@ -24,7 +24,7 @@
             if(data == 'true'){
                 window.location = url;
             }else{
-                alert(data);
+            	alertDialog({ message:data, height: 150, width: 500 });
             }
         });
     }
@@ -46,6 +46,7 @@
         }
         createHiddenInputFieldsForLimitAndSubmit(id);
     }
+    
     function onInvokeExportAction(id) {
         var parameterString = createParameterStringForLimit(id);
         location.href = '${pageContext.request.contextPath}/ListStudySubjects?'+ parameterString;
@@ -67,6 +68,12 @@
 		jQuery("div[id^='Event_']").parent().parent().parent().parent().parent().attr("align", "center");
 		jQuery("tr.header").attr("align", "center");
 	});
+	
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
+    
 </script>
 
 <!-- then instructions-->
@@ -120,6 +127,7 @@
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
 
 <br>
+<input id="accessAttributeName" type="hidden" value="data-cc-subjectMatrixId">
 <jsp:include page="../include/footer.jsp"/>
 
 <script type="text/javascript">

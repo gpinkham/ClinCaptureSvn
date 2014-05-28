@@ -41,6 +41,11 @@
             return false;
         });
     });
+    
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
 
 </script>
 
@@ -98,4 +103,5 @@
 <c:import url="../include/workflow.jsp">
    <c:param name="module" value="submit"/>
 </c:import>
+<input id="accessAttributeName" type="hidden" value="data-cc-subjectMatrixId">
 <jsp:include page="../include/footer.jsp"/>

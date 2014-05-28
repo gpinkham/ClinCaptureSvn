@@ -304,11 +304,15 @@ function StatusBoxSkip2(StatusBoxID,StatusBoxNum,StatusBoxJumpTo) {
 function EnableScrollArrows2(StatusBoxID, StatusBoxNum) {
     StatusBoxValue = 1;
     for (var i = 1; i <= StatusBoxNum; i++) {
-        if (i == 1 ) {
-            document.getElementById('Event_' + StatusBoxID + '_' + i).style.display = "";
-        } else {
-            document.getElementById('Event_' + StatusBoxID + '_' + i).style.display = "none";
-        }
+    	
+    	if(document.getElementById('Event_' + StatusBoxID + '_' + i) != undefined){
+    		if (i == 1 ) {
+                document.getElementById('Event_' + StatusBoxID + '_' + i).style.display = "";
+            } else {
+                document.getElementById('Event_' + StatusBoxID + '_' + i).style.display = "none";
+            }
+    	}
+        
         if (document.getElementById('Menu_off_' + StatusBoxID + '_' + i) != null) {
             document.getElementById('Menu_off_' + StatusBoxID + '_' + i).style.display = "none";
         }
@@ -376,7 +380,8 @@ function loadCRFList(StatusBoxID, StatusBoxNum) {
 	var idAttribute = StatusBoxID + "_" + StatusBoxNum;
     var href = jQuery("tr[id^='Menu_on_" + idAttribute + "'] a[href^='UpdateStudyEvent']").attr("href");
     jQuery("a#" + StatusBoxID).attr("href", href);
-    var studyEventId = parseInt(document.getElementById('Event_' + idAttribute).getAttribute("rel"));
+    var eventElement = document.getElementById('Event_' + idAttribute);
+    var studyEventId = parseInt(eventElement.getAttribute("rel"));
     jQuery('.crfListTable').remove();
     jQuery('#crfListWrapper_' + idAttribute).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
     jQuery('#crfListWrapper_' + idAttribute).css("height", "18px");

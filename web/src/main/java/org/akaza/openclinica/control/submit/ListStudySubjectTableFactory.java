@@ -877,7 +877,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href("ViewStudySubject?id=" + studySubject.getId());
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"");
+		actionLink.append("onClick=\"setAccessedObjected(this);\"");
+		actionLink.append("data-cc-subjectMatrixId=" + studySubject.getId()).close();
 		actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view"))
 				.title(resword.getString("view")).append("hspace=\"4\"").end().aEnd();
 		return actionLink.toString();
@@ -890,7 +892,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				"RemoveStudySubject?action=confirm&id=" + studySubject.getId() + "&subjectId="
 						+ studySubject.getSubjectId() + "&studyId=" + studySubject.getStudyId());
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('bt_Remove1','images/bt_Remove.gif');\"").close();
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_Remove1','images/bt_Remove.gif');\"");
+		actionLink.append("onClick=\"javascript:setAccessedObjected(this);\"").close();
 		actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove"))
 				.title(resword.getString("remove")).append("hspace=\"4\"").end().aEnd();
 		return actionLink.toString();
@@ -910,7 +913,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				.href("ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label="
 						+ studySubject.getLabel() + "&&listNotes_f_discrepancyNoteBean.resolutionStatus=" + status);
 		actionLink.append("onMouseDown=\"javascript:setImage('ndIcon','" + imagePath + "');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('ndIcon','" + imagePath + "');\"").close();
+		actionLink.append("onMouseUp=\"javascript:setImage('ndIcon','" + imagePath + "');\"");
+		actionLink.append("onClick=\"javascript:setAccessedObjected(this);\"").close();
 		actionLink.img().name("ndIcon").src(imagePath).border("0").alt(resword.getString("view_discrepancy_notes"))
 				.title(resword.getString("view_discrepancy_notes")).end().aEnd();
 
@@ -927,8 +931,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			actionLink.a().id("button_signStudySubject_" + studySubject.getId())
 					.href("SignStudySubject?id=" + studySubject.getId()).style(showHidden ? "display: none;" : "");
 			actionLink.append("onMouseDown=\"javascript:setImage('icon_signed_blue','images/icon_SignedBlue.gif');\"");
-			actionLink.append("onMouseUp=\"javascript:setImage('icon_signed_blue','images/icon_SignedBlue.gif');\"")
-					.close();
+			actionLink.append("onMouseUp=\"javascript:setImage('icon_signed_blue','images/icon_SignedBlue.gif');\"");
+			actionLink.append("onClick=\"javascript:setAccessedObjected(this);\"").close();
 			actionLink.img().name("bt_Sign1").src("images/icon_SignedBlue.gif").border("0")
 					.alt(resword.getString("sign")).title(resword.getString("sign")).append("hspace=\"4\"").end()
 					.aEnd();
@@ -950,7 +954,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					.href("pages/viewSubjectAggregate?sbb=true&studyId="
 							+ studyBean.getId()
 							+ "&studySubjectId=&theStudySubjectId=0&redirection=viewSubjectAggregate&maxRows=15&showMoreLink=true&s_sdv_tr_=true&s_sdv_p_=1&s_sdv_mr_=15&s_sdv_f_studySubjectId="
-							+ studySubject.getLabel()).close();
+							+ studySubject.getLabel());
+							actionLink.append("onClick=\"javascript:setAccessedObjected(this);\"").close();
 			actionLink.img().src("images/icon_DoubleCheck_Action.gif").border("0")
 					.alt(resword.getString("perform_sdv")).title(resword.getString("perform_sdv"))
 					.append("hspace=\"4\"").end().aEnd();
@@ -969,7 +974,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href("ReassignStudySubject?id=" + studySubject.getId());
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Reassign1','images/bt_Reassign_d.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('bt_Reassign1','images/bt_Reassign.gif');\"").close();
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_Reassign1','images/bt_Reassign.gif');\"");
+		actionLink.append("onClick=\"javascript:setAccessedObjected(this);\"").close();
 		actionLink.img().name("bt_Reassign1").src("images/bt_Reassign.gif").border("0")
 				.alt(resword.getString("reassign")).title(resword.getString("reassign")).append("hspace=\"4\"").end()
 				.aEnd();
@@ -993,14 +999,16 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			HtmlBuilder actionLink1 = new HtmlBuilder();
 			actionLink1.a().id("button_unlockStudySubject_" + studySubject.getId())
 					.href("LockStudySubject?id=" + studySubject.getId() + "&action=unlock")
-					.style(allLocked && hasLockedBy ? "" : "display: none;").close();
+					.style(allLocked && hasLockedBy ? "" : "display: none;");
+			actionLink1.append("onClick=\"javascript:setAccessedObjected(this);\"").close();
 			actionLink1.img().src("images/bt__Unlock.png").border("0").alt(resword.getString("unlockStudySubject"))
 					.title(resword.getString("unlockStudySubject")).append("hspace=\"4\"").end().aEnd();
 
 			HtmlBuilder actionLink2 = new HtmlBuilder();
 			actionLink2.a().id("button_lockStudySubject_" + studySubject.getId())
 					.href("LockStudySubject?id=" + studySubject.getId() + "&action=lock")
-					.style(!allLocked ? "" : "display: none;").close();
+					.style(!allLocked ? "" : "display: none;");
+			actionLink2.append("onClick=\"javascript:setAccessedObjected(this);\"").close();
 			actionLink2.img().src("images/bt__Lock.png").border("0").alt(resword.getString("lockStudySubject"))
 					.title(resword.getString("lockStudySubject")).append("hspace=\"4\"").end().aEnd();
 
@@ -1016,7 +1024,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				"RestoreStudySubject?action=confirm&id=" + studySubject.getId() + "&subjectId="
 						+ studySubject.getSubjectId() + "&studyId=" + studySubject.getStudyId());
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"").close();
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"");
+		actionLink.append("onClick=\"javascript:setAccessedObjected(this);\"").close();
 		actionLink.img().name("bt_Restore1").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore"))
 				.title(resword.getString("restore")).append("hspace=\"4\"").end().aEnd();
 		HtmlBuilder transparentButton = new HtmlBuilder();
@@ -1426,8 +1435,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			actionLink.a().href(
 					"javascript:openDocWindow('ViewCalendaredEventsForSubject?id=" + studySubject.getId() + "')");
 			actionLink.append("onMouseDown=\"javascript:setImage('bt_Calendar','images/" + iconColor + "_d.gif');\"");
-			actionLink.append("onMouseUp=\"javascript:setImage('bt_Calendar','images/" + iconColor + ".gif');\"")
-					.close();
+			actionLink.append("onMouseUp=\"javascript:setImage('bt_Calendar','images/" + iconColor + ".gif');\"");
+			actionLink.append("onClick=\"javascript:setAccessedObjected(this);\"").close();
 			actionLink.img().name("bt_Calendar").src("images/" + iconColor + ".gif").border("0");
 			actionLink.alt(resword.getString("view_calendared_parameters"))
 					.title(resword.getString("view_calendared_parameters")).append("hspace=\"4\"").end().aEnd();

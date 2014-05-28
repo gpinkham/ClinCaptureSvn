@@ -69,7 +69,7 @@
 
 <!-- LOG OUT BUTTON -->
 
-	<a class="buttontext" href="j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a>
+	<a class="buttontext" href="j_spring_security_logout" onClick="clearLastAccessedObjects();"><fmt:message key="log_out" bundle="${resword}"/></a>
 
 <!-- end LOG OUT BUTTON -->
 

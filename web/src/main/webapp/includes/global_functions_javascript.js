@@ -237,7 +237,7 @@ function hideCols(tableId,columnNumArray,showTable){
             document.getElementById('showMoreLink').value="true";
         }
     }
-
+    
     var tbl  = document.getElementById(tableId);
     var tbodys = tbl.getElementsByTagName('tbody');
 
@@ -291,6 +291,7 @@ function hideCols(tableId,columnNumArray,showTable){
         }
     }
 
+    highlightLastAccessedObject();
 }
 
 function toggleName(str){
@@ -1966,7 +1967,7 @@ var hideCurrentPopup = function(ev) {
     }
 };
 
-function getSchedulePage(params) {
+function getSchedulePage(params, targetElement) {
     var element = jQuery('#eventScheduleWrapper_' + params.statusBoxId);
     if (element.length == 1) {
         jQuery('#eventScheduleWrapper_' + params.statusBoxId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
@@ -1986,6 +1987,7 @@ function getSchedulePage(params) {
                     eval(jsCode);
                 });
                 jQuery("*").unbind("mousedown", hideCurrentPopup).bind("mousedown", hideCurrentPopup);
+                setAccessedObjected(targetElement);
             }
         });
        
@@ -2023,7 +2025,7 @@ function adjustCrfListTable(studyEventId, statusBoxId) {
   });
 }
 
-function getCRFList(params) {
+function getCRFList(params, targetElement) {
     jQuery('#crfListWrapper_' + params.statusBoxId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
     jQuery('#crfListWrapper_' + params.statusBoxId).css("height", "18px");
     jQuery.ajax({
@@ -2037,6 +2039,7 @@ function getCRFList(params) {
             jQuery('#crfListWrapper_' + params.statusBoxId).html(data);
             jQuery("*").unbind("mousedown", hideCurrentPopup).bind("mousedown", hideCurrentPopup);
             adjustCrfListTable(params.studyEventId, params.statusBoxId);
+            setAccessedObjected(targetElement);
         }
     });
 }
@@ -2053,21 +2056,23 @@ function canShowPopup() {
 function showPopup(params, event) {
     clearInterval(popupInterval);
     var coords = analyzeEvent(event);
+    var targetElement = event.target ? event.target : event.srcElement;
     popupInterval = setInterval(function() {
         clearInterval(popupInterval);
-        hideAllTooltips(params, coords.top, coords.left);
+        hideAllTooltips(params, coords.top, coords.left, targetElement);
     }, 1000);
 }
 
 function justShowPopup(params, event) {
     clearInterval(popupInterval);
     var coords = analyzeEvent(event);
+    var targetElement = event.target ? event.target : event.srcElement;
     setTimeout(function() {
-        hideAllTooltips(params, coords.top, coords.left);
+        hideAllTooltips(params, coords.top, coords.left, targetElement);
     }, 200);
 }
 
-function getScheduledEventContent(params, top, left, localDivId, localDivRel) {
+function getScheduledEventContent(params, top, left, localDivId, localDivRel, targetElement) {
     jQuery('#eventScheduleWrapper_' + params.statusBoxId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
     jQuery('#eventScheduleWrapper_' + params.statusBoxId).css("height", "18px");
     
@@ -2092,12 +2097,13 @@ function getScheduledEventContent(params, top, left, localDivId, localDivRel) {
             if (localDiv[0].repeatingEvent && parseInt(localDiv[0].totalEvents) > 1) {
                 localDiv.attr("style", localDiv.attr("style").replace("width: 608px;", "width: 658px;"));
             }
-            hideAllTooltips(params, top, left);
+            setAccessedObjected(targetElement);
+            hideAllTooltips(params, top, left, targetElement);
         }
     });
 }
 
-function hideAllTooltips(params, top, left) {
+function hideAllTooltips(params, top, left, targetElement) {
     try {
         jQuery(".calendar").remove();
         hideContentForCurrentPopup();
@@ -2108,7 +2114,7 @@ function hideAllTooltips(params, top, left) {
         objHolder.style.left = left;
         objHolder.style.display = 'block';
         objHolder.style.visibility = 'visible';
-
+        
         if (params.statusBoxId != undefined) {
             currentPopupUid = params.statusBoxId;
 
@@ -2123,7 +2129,7 @@ function hideAllTooltips(params, top, left) {
                 }
                 if (eventDiv[0].getScheduledContent) {
                     eventDiv[0].getScheduledContent = undefined;
-                    getScheduledEventContent(params, top, left, eventDiv.attr("id"), eventDiv.attr("rel"));
+                    getScheduledEventContent(params, top, left, eventDiv.attr("id"), eventDiv.attr("rel"), targetElement);
                     return;
                 }
             }
@@ -2139,9 +2145,9 @@ function hideAllTooltips(params, top, left) {
                 	document.getElementById('Menu_off_' + params.statusBoxId).style.display = "none";
                 }	
                 if (params.studyEventId != '') {
-                    getCRFList(params);
+                    getCRFList(params, targetElement);
                 } else {
-                    getSchedulePage(params);
+                    getSchedulePage(params, targetElement);
                 }
             }
         }
@@ -2198,7 +2204,7 @@ function createNewEvent(page, event) {
         });
         try {
             params['popupQuery'] = jQuery(element).closest("div[id^='Event_']").attr("id");
-            params['popupQueryStudySubjectId'] = jQuery(element).closest("div[id^='Event_']").attr("rel");
+            params['popupQueryStudySubjectId'] = jQuery(element).closest("div[id^='Event_']").attr("rel");;
             params['page'] = page;    //determines page name, on which user perfoms scheduling
             if (page == pageTitle_SMForSelectedEvent) {
             	params['selectedEventDefId'] = jQuery("#sedDropDown").val();    //determines event definition name, SM filtered for
@@ -4084,4 +4090,84 @@ function hideUnhideStudyParamRow(element) {
 	} else {
 		$("tr." + rowClass).hide();
 	}
+}
+
+function setAccessedObjected(element) {
+	
+	var attrName = $("#accessAttributeName").val();
+	var tr = $(element).closest("tr");
+	var dataElement = $(tr).find("a["+attrName+"]");
+	var idValue = $(dataElement).attr(attrName);
+	var newHtml = "";
+	localStorage[attrName] = idValue;
+	clearHighlight();
+	$(tr).find('td').each(function(){
+		if($(this).is(":visible")){
+			$(this).addClass("borderHighlight");
+		}		
+	});	
+	
+	//Remove inherited border highlight from cell contents
+	if($.browser.msie){
+		removeInheritedHighlightForIE(tr[0]);
+	} else {
+		removeInheritedHighlight(tr);
+	}
+}
+
+
+function removeInheritedHighlight(tr) {
+	
+	$(tr).find('td').each(function() {
+		removeHighlightFromCellDescendants(this);
+	});
+}
+
+function removeInheritedHighlightForIE(row){
+	
+	for (var i = 0; i < row.cells.length; i++) {
+		removeHighlightFromCellDescendants(row.cells[i]);
+    }
+}
+
+function clearHighlight(){
+	
+	$("td.borderHighlight").each(function(){
+		$(this).removeClass("borderHighlight");
+	})
+}
+
+function highlightLastAccessedObject() {
+	
+	var attrName = $("#accessAttributeName").val();
+	if(attrName){
+		
+		var dataElement = $("a[" + attrName + "='" + localStorage[attrName] + "']");
+		if(dataElement && $(dataElement).is("a")){
+			setAccessedObjected(dataElement)
+		}
+	}	
+}
+
+function getLastAccessedId(){
+	
+	var attrName = $("#accessAttributeName").val();
+	return localStorage[attrName];
+}
+
+function setLastAccessedId(id){
+	
+	var attrName = $("#accessAttributeName").val();
+	localStorage[attrName] = id;
+}
+
+function clearLastAccessedObjects(){
+	localStorage.removeItem("data-cc-subjectMatrixId");
+}
+
+function removeHighlightFromCellDescendants(td){
+	
+	$(td).find(".borderHighlight").each(function(){	
+		$(this).removeClass("borderHighlight");
+	});
 }

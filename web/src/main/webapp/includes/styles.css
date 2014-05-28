@@ -2664,3 +2664,8 @@ a.dnShortcut:hover {
 	text-align: justified;
 	word-wrap: normal;
 }
+
+td.borderHighlight{
+	border-top: 2px solid orange !important; 
+	border-bottom: 2px solid orange !important;
+}
