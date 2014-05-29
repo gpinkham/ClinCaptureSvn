@@ -56,8 +56,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.bean.DisplayStudySubjectRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 
-import com.clinovo.dao.SystemDAO;
-
 /**
  * @author jxu
  */

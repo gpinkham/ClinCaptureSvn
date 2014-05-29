@@ -20,15 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -40,6 +31,14 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+
 @SuppressWarnings({ "unchecked", "serial" })
 @Component
 public class DownloadAttachedFileServlet extends Controller {
@@ -48,7 +47,9 @@ public class DownloadAttachedFileServlet extends Controller {
 	 * Checks whether the user has the correct privilege
 	 * 
 	 * @param request
+	 *            HttpServletRequest
 	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -93,9 +94,10 @@ public class DownloadAttachedFileServlet extends Controller {
 
 		FormProcessor fp = new FormProcessor(request);
 		String filePathName = "";
+		String fileNameOid = "";
 		String fileName = fp.getString("fileName");
 		File f = new File(fileName);
-		if (fileName != null && fileName.length() > 0) {
+		if (fileName.length() > 0) {
 			int parentStudyId = currentStudy.getParentStudyId();
 			String testPath = Utils.getAttachedFileRootPath();
 			String tail = File.separator + f.getName();
@@ -104,13 +106,17 @@ public class DownloadAttachedFileServlet extends Controller {
 			if (temp.exists()) {
 				filePathName = testName;
 				logger.info(currentStudy.getName() + " existing filePathName=" + filePathName);
+				fileNameOid = currentStudy.getOid();
 			} else {
 				if (currentStudy.isSite(parentStudyId)) {
-					testName = testPath + ((StudyBean) getStudyDAO().findByPK(parentStudyId)).getOid() + tail;
+					String testOid = ((StudyBean) getStudyDAO().findByPK(parentStudyId)).getOid();
+					testName = testPath + testOid + tail;
 					temp = new File(testName);
 					if (temp.exists()) {
 						filePathName = testName;
 						logger.info("parent existing filePathName=" + filePathName);
+						fileNameOid = testOid;
+
 					}
 				} else {
 					ArrayList<StudyBean> sites = (ArrayList<StudyBean>) getStudyDAO().findAllByParent(
@@ -122,19 +128,22 @@ public class DownloadAttachedFileServlet extends Controller {
 						if (test.exists()) {
 							filePathName = testName;
 							logger.info("site of currentStudy existing filePathName=" + filePathName);
+							fileNameOid = s.getOid();
 							break;
 						}
 					}
 				}
 			}
 		}
-		logger.info("filePathName=" + filePathName + " fileName=" + fileName);
+		logger.info("filePathName = " + filePathName + " fileName = " + fileName);
 		File file = new File(filePathName);
+		String realName = file.getName();
+		logger.info("realName = " + realName);
 		if (!file.exists() || file.length() <= 0) {
 			addPageMessage("File " + filePathName + " " + respage.getString("not_exist"), request);
 		} else {
 			// response.setContentType("application/octet-stream");
-			response.setHeader("Content-disposition", "attachment; filename=\"" + fileName + "\";");
+			response.setHeader("Content-disposition", "attachment; filename=\"" + fileNameOid + realName + "\";");
 			response.setHeader("Pragma", "public");
 
 			ServletOutputStream outStream = response.getOutputStream();
@@ -147,7 +156,7 @@ public class DownloadAttachedFileServlet extends Controller {
 				byte[] bbuf = new byte[(int) file.length()];
 				inStream = new DataInputStream(new FileInputStream(file));
 				int length;
-				while (inStream != null && (length = inStream.read(bbuf)) != -1) {
+				while ((length = inStream.read(bbuf)) != -1) {
 					outStream.write(bbuf, 0, length);
 				}
 
