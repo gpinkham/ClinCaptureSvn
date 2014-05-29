@@ -73,6 +73,8 @@
 			src="<c:out value="${contextPath}" />/includes/scriptaculous.js?load=effects"></script>
 		<script type="text/JavaScript" language="JavaScript"
 			src="<c:out value="${contextPath}" />/includes/effects.js"></script>
+		<script type="text/JavaScript" language="JavaScript" 
+			src="<c:out value="${contextPath}" />/includes/jmesa/jquery-ui.min.js"></script>
 		<!-- Added for the new Calender -->
 
 		<link rel="stylesheet" type="text/css" media="all"
