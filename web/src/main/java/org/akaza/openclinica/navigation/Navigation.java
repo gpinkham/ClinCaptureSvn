@@ -54,7 +54,8 @@ public class Navigation {
 			"/ChangeDefinitionCRFOrdinal", "/DoubleDataEntry", "/CreateOneDiscrepancyNote", "/MatchPassword",
 			"/pages/handleSDVPost", "/pages/handleSDVRemove", "/CompleteCrfDelete"));
 	// set of pages with special processing 
-	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects"));
+	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects", 
+			"/ViewRuleAssignment"));
 	private static String defaultShortURL = "/MainMenu";
 
 	public static void removeUrl(HttpServletRequest request, String excludeUrl) throws Exception {
@@ -140,6 +141,8 @@ public class Navigation {
 			} else {
 				visitedURLs.push(requestShortURL);
 			}
+		} else if ("/ViewRuleAssignment".equals(requestShortURI)){
+			visitedURLs.push("/ViewRuleAssignment?read=true&restore=true");
 		} else {
 			visitedURLs.push(requestShortURL);
 		}
