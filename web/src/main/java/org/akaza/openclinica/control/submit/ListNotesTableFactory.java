@@ -819,13 +819,15 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			// This createNoteURL uses the same method as in ResolveDiscrepancyServlet
 			String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true);
 			builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
-			builder.close();
+			builder.append("onClick=\"setAccessedObjected(this);\"");
+			builder.append("data-cc-ndId=" + dnb.getId()).close();
 			builder.img().name("bt_View1").src("images/bt_View_d.gif").border("0").alt(resword.getString("view"))
 					.title(resword.getString("view")).align("left").append("hspace=\"6\"").close();
 			builder.aEnd();
 			if (!getCurrentStudy().getStatus().isLocked()) {
 				if (!dnb.getEntityType().equals("eventCrf")) {
 					builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
+					builder.append("onClick=\"setAccessedObjected(this);\"");
 					builder.close();
 					builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0")
 							.alt(resword.getString("view_within_record"))
@@ -835,6 +837,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 				} else {
 					if (dnb.getStageId() == 5) {
 						builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
+						builder.append("onClick=\"setAccessedObjected(this);\"");
 						builder.close();
 						builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0")
 								.alt(resword.getString("view_within_record"))

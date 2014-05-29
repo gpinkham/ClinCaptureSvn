@@ -41,6 +41,11 @@
     	var form = document.getElementById(elementId);
     	form.submit();
     	}
+    
+   	$(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
 </script>
 
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -301,4 +306,5 @@
 <%-- end --%>
 
 <!-- END WORKFLOW BOX -->
+<input id="accessAttributeName" type="hidden" value="data-cc-ndId">
 <jsp:include page="../include/footer.jsp"/>

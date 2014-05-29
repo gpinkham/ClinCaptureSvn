@@ -4163,6 +4163,7 @@ function setLastAccessedId(id){
 
 function clearLastAccessedObjects(){
 	localStorage.removeItem("data-cc-subjectMatrixId");
+	localStorage.removeItem("data-cc-ndId");
 }
 
 function removeHighlightFromCellDescendants(td){
