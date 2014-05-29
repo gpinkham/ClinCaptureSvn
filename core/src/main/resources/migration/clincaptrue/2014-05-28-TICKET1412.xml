@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="Frank" id="2014-05-28-TICKET1412">
+		<comment>Remove old MC URL and API Key</comment>
+		<sql>
+			DELETE FROM study_parameter_value WHERE parameter = 'defaultBioontologyURL' OR parameter = 'medicalCodingApiKey';
+		</sql>
+	</changeSet>
+</databaseChangeLog>

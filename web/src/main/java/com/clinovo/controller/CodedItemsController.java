@@ -14,20 +14,15 @@
  *******************************************************************************/
 package com.clinovo.controller;
 
-import com.clinovo.coding.Search;
-import com.clinovo.coding.model.Classification;
-import com.clinovo.coding.model.ClassificationElement;
-import com.clinovo.coding.source.impl.BioPortalSearchInterface;
-import com.clinovo.model.CodedItem;
-import com.clinovo.model.CodedItemElement;
-import com.clinovo.model.CodedItemsTableFactory;
-import com.clinovo.model.Dictionary;
-import com.clinovo.model.Status.CodeStatus;
-import com.clinovo.model.Term;
-import com.clinovo.model.TermElement;
-import com.clinovo.service.CodedItemService;
-import com.clinovo.service.DictionaryService;
-import com.clinovo.service.TermService;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -49,13 +44,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.clinovo.coding.Search;
+import com.clinovo.coding.model.Classification;
+import com.clinovo.coding.model.ClassificationElement;
+import com.clinovo.coding.source.impl.BioPortalSearchInterface;
+import com.clinovo.dao.SystemDAO;
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.CodedItemElement;
+import com.clinovo.model.CodedItemsTableFactory;
+import com.clinovo.model.Dictionary;
+import com.clinovo.model.Status.CodeStatus;
+import com.clinovo.model.Term;
+import com.clinovo.model.TermElement;
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DictionaryService;
+import com.clinovo.service.TermService;
 
 
 /**
@@ -66,6 +69,8 @@ import java.util.List;
 public class CodedItemsController {
 
 	private StudyDAO studyDAO;
+	@Autowired
+	private SystemDAO systemDAO;
 	
 	@Autowired
     private DataSource datasource;
@@ -235,8 +240,8 @@ public class CodedItemsController {
 			// Don't attempt to code the item again
 			if (!codedItem.isCoded()) {
 
-                StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "defaultBioontologyURL");
-                StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "medicalCodingApiKey");
+                com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
+                com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
 
                 search.setSearchInterface(new BioPortalSearchInterface());
 
@@ -335,8 +340,8 @@ public class CodedItemsController {
 		String codeSearchTerm = request.getParameter("coderSearchTerm");
 
 		CodedItem codedItem = codedItemService.findCodedItem(Integer.valueOf(itemId));
-		StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "defaultBioontologyURL");
-		StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "medicalCodingApiKey");
+		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
+        com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
 
 		try {
 			provideCoding(verbatimTerm, false, categoryList, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), codedItem.getItemId());
@@ -404,12 +409,10 @@ public class CodedItemsController {
 		String codedItemUrl = request.getParameter("codedItemUrl");
 		String term = request.getParameter("term");
 
-		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
-
 		search.setSearchInterface(new BioPortalSearchInterface());
 
-		StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "defaultBioontologyURL");
-		StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingApiKey");
+		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
+        com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
 
 		Classification classificationWithTerms = search.getClassificationWithTerms(codedItemUrl, bioontologyUrl.getValue(), bioontologyApiKey.getValue());
 
@@ -458,8 +461,8 @@ public class CodedItemsController {
 		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
 
 		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "autoCodeDictionaryName");
-		StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "defaultBioontologyURL");
-		StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingApiKey");
+		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
+        com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
 
 		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(item));
 

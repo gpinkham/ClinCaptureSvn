@@ -1,5 +1,6 @@
 package org.akaza.openclinica.control.core;
 
+import com.clinovo.dao.SystemDAO;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.StudySubjectIdService;
@@ -208,6 +209,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
     private WidgetService widgetService;
     @Autowired
     private UserAccountService userAccountService;
+    @Autowired
+	private SystemDAO systemDAO;
 
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
@@ -485,4 +488,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public UserAccountService getUserAccountService() {
 		return userAccountService;
 	}  
+	
+	public SystemDAO getSystemDAO(){
+		return systemDAO;
+	}
 }

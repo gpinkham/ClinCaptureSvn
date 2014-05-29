@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.DisplayStudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -54,6 +56,8 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.bean.DisplayStudySubjectRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 
+import com.clinovo.dao.SystemDAO;
+
 /**
  * @author jxu
  */
@@ -68,7 +72,9 @@ public abstract class ListStudySubjectServlet extends Controller {
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		StudyBean currentStudy = getCurrentStudy(request);
-
+		
+		com.clinovo.model.System syetemParam;
+		
 		FormProcessor fp = new FormProcessor(request);
 
 		request.setAttribute("closeInfoShowIcons", true);
@@ -188,11 +194,11 @@ public abstract class ListStudySubjectServlet extends Controller {
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "allowCodingVerification");
         currentStudy.getStudyParameterConfig().setAllowCodingVerification(parentSPV.getValue());
         
-        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "defaultBioontologyURL");
-        currentStudy.getStudyParameterConfig().setDefaultBioontologyURL(parentSPV.getValue());
+        syetemParam = getSystemDAO().findByName("defaultBioontologyURL");
+        currentStudy.getStudyParameterConfig().setDefaultBioontologyURL(syetemParam.getValue());
 
-        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "medicalCodingApiKey");
-        currentStudy.getStudyParameterConfig().setMedicalCodingApiKey(parentSPV.getValue());
+        syetemParam = getSystemDAO().findByName("medicalCodingApiKey");
+        currentStudy.getStudyParameterConfig().setMedicalCodingApiKey(syetemParam.getValue());
         
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "autoCodeDictionaryName");
         currentStudy.getStudyParameterConfig().setAutoCodeDictionaryName(parentSPV.getValue());

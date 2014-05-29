@@ -329,8 +329,6 @@ public class UpdateSubStudyServlet extends Controller {
 		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
 				fp.getString("replaceExisitingDataDuringImport"));
 		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
-		study.getStudyParameterConfig().setDefaultBioontologyURL(
-				fp.getString("defaultBioontologyURL"));
 		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
 
 		ArrayList parameters = study.getStudyParameters();
