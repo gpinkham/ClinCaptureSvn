@@ -2,13 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<jsp:useBean scope='request' id='strResStatus' class='java.lang.String' />
-<jsp:useBean scope='request' id='strUserAccountId' class='java.lang.String' />
-<jsp:useBean scope='request' id='writeToDB' class='java.lang.String' /> 
-<jsp:useBean scope='request' id='unlock' class='java.lang.String' />
-<jsp:useBean scope='request' id='autoView' class='java.lang.String' />
-<jsp:useBean scope='request' id='dnDescriptions' class='java.util.ArrayList' />
-<jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
+
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
@@ -306,19 +300,30 @@ $(document).ready(function() {
 	        <td class="table_cell_noborder"><fmt:message key="subject" bundle="${resword}"/>:&nbsp;&nbsp;</td>
 	        <td class="table_cell_noborder"><b><c:out value="${discrepancyNote.subjectName}"/></b></td>
 	        <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="event" bundle="${resword}"/>:&nbsp;&nbsp;</td>
-	        <td class="table_cell_noborder"><b><c:out value="${discrepancyNote.eventName =='' ? 'N/A' : discrepancyNote.eventName}"/></b></td>
+	        <td class="table_cell_noborder">
+				<b>
+				<c:choose>
+                    <c:when test="${discrepancyNote.eventName != null && discrepancyNote.eventName != ''}">
+                        <c:out value="${discrepancyNote.eventName}"/>
+                    </c:when>
+                    <c:otherwise>
+						<fmt:message key='N/A' bundle='${resword}'/>
+                    </c:otherwise>
+                </c:choose>
+				</b>
+			</td>
     	</tr>
         <tr>
             <td class="table_cell_noborder"><fmt:message key="event_date" bundle="${resword}"/>:&nbsp;&nbsp;</td>
             <td class="table_cell_noborder">
-                <c:choose>
+                <b><c:choose>
                     <c:when test="${discrepancyNote.eventStart == null}">
-                        <b><fmt:message key="N/A" bundle="${resword}"/></b>
+                        <fmt:message key="N/A" bundle="${resword}"/>
                     </c:when>
                     <c:otherwise>
-                        <b><fmt:formatDate value="${discrepancyNote.eventStart}" pattern="${dteFormat}"/></b>
+						<fmt:formatDate value="${discrepancyNote.eventStart}" pattern="${dteFormat}"/>
                     </c:otherwise>
-                </c:choose> 
+                </c:choose></b>
             </td>
             <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</td>
             <td class="table_cell_noborder"><b><c:out value="${discrepancyNote.crfName == '' ? 'N/A' : discrepancyNote.crfName}"/></b></td>
@@ -329,7 +334,7 @@ $(document).ready(function() {
             <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="More" bundle="${resword}"/>:&nbsp;&nbsp;</td>
             <td class="table_cell_noborder">
             <c:choose>
-            <c:when test="${name eq 'itemData' ||name eq 'ItemData'}">
+            <c:when test="${name eq 'itemData' || name eq 'ItemData'}">
                 <a href="javascript: openDocWindow('ViewItemDetail?itemId=${item.id}')">
                 <fmt:message key="Data_Dictionary" bundle="${resword}"/></a>
             </c:when>

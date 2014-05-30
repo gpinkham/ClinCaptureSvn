@@ -1129,7 +1129,9 @@ public abstract class Controller extends BaseController {
 			CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
 			note.setCrfName(crf.getName());
 			StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
-			note.setSubjectName(ss.getName());
+			if (StringUtil.isBlank(note.getSubjectName())) {
+				note.setSubjectName(ss.getName());
+			}
 			note.setEventCRFId(ec.getId());
 
 		} else if ("studyEvent".equalsIgnoreCase(note.getEntityType())) {
@@ -1142,9 +1144,10 @@ public abstract class Controller extends BaseController {
 					.findByPK(event.getStudyEventDefinitionId());
 			note.setEventName(sed.getName());
 			note.setEventStart(event.getDateStarted());
-
-			StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
-			note.setSubjectName(ss.getName());
+			if (StringUtil.isBlank(note.getSubjectName())) {
+				StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
+				note.setSubjectName(ss.getName());
+			}
 
 		} else if ("studySub".equalsIgnoreCase(note.getEntityType())) {
 			int studySubjectId = note.getEntityId();

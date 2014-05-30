@@ -263,7 +263,6 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			} else if ("studySub".equalsIgnoreCase(name)) {
 				SubjectDAO sdao = new SubjectDAO(getDataSource());
 				SubjectBean sub = (SubjectBean) sdao.findByPK(ssub.getSubjectId());
-				request.setAttribute("noteSubject", ssub);
 
 				if (!StringUtil.isBlank(column)) {
 					if ("enrollment_date".equalsIgnoreCase(column)) {
@@ -351,8 +350,6 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 
 				se.setName(sedb.getName());
 				request.setAttribute("studyEvent", se);
-				request.setAttribute("noteSubject",
-						new StudySubjectDAO(getDataSource()).findByPK(se.getStudySubjectId()));
 
 				if (!StringUtil.isBlank(column)) {
 					if ("location".equalsIgnoreCase(column)) {

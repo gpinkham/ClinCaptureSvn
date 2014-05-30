@@ -7,19 +7,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
-
-<jsp:useBean id="id" scope="request" class="java.lang.String"/>
-<jsp:useBean id="name" scope="request" class="java.lang.String"/>
-<jsp:useBean id="field" scope="request" class="java.lang.String"/>
-<jsp:useBean id="column" scope="request" class="java.lang.String"/>
-<jsp:useBean id="viewDNLink" scope="request" class="java.lang.String"/>
-<jsp:useBean id="boxDNMap" scope="session" class="java.util.HashMap"/>
-<jsp:useBean scope='session' id='boxToShow'  class="java.lang.String"/>
-<jsp:useBean id="typeID0" scope="request" class="java.lang.String"/>
-<jsp:useBean id="y" scope="request" class="java.lang.String"/>
-<jsp:useBean id="refresh" scope="request" class="java.lang.String"/>
-
-
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <html> 
 <head>
@@ -162,10 +149,11 @@
                     <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="event" bundle="${resword}"/>:&nbsp;&nbsp;</td>
                     <td class="table_cell_noborder">
                         <b><c:choose>
-                            <c:when test="${studyEvent != null}">
+                            <c:when test="${studyEvent.name != null && studyEvent.name != ''}">
                                 <c:out value="${studyEvent.name}"/><c:if test="${studyEventOrdinal ne null}">(x${studyEventOrdinal})</c:if>
                             </c:when>
-                            <c:otherwise>N/A
+                            <c:otherwise>
+								<fmt:message key='N/A' bundle='${resword}'/>
                             </c:otherwise>
                         </c:choose></b>
                     </td>
@@ -173,34 +161,54 @@
             	<tr>
                     <td class="table_cell_noborder"><fmt:message key="event_date" bundle="${resword}"/>:&nbsp;&nbsp;</td>
                     <td class="table_cell_noborder">
-                        <b><c:choose>
-                            <c:when test="${studyEvent != null}">
+                        
+						<b><c:choose>
+                            <c:when test="${studyEvent.dateStarted != null}">
                                 <fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;
                             </c:when>
-                            <c:otherwise>N/A
+                            <c:otherwise>
+								<fmt:message key='N/A' bundle='${resword}'/>
                             </c:otherwise>
                         </c:choose></b>
                     </td>
                     <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</td>
                     <td class="table_cell_noborder">
                         <b><c:choose>
-                            <c:when test="${crf != null}">
+                            <c:when test="${crf.name != null && crf.name != ''}">
                                 <c:out value="${crf.name}"/>
                             </c:when>
-                            <c:otherwise>N/A
+                            <c:otherwise>
+								<fmt:message key='N/A' bundle='${resword}'/>
                             </c:otherwise>
                         </c:choose></b>
                     </td>
             	</tr> 
             	<tr>
                     <td class="table_cell_noborder"><fmt:message key="Current_Value" bundle="${resword}"/>:&nbsp;&nbsp;</td>
-                    <td class="table_cell_noborder"><b><c:out value="${entityValue}"/>&nbsp;</b></td>
+                    <td class="table_cell_noborder">
+						<b>
+						<c:choose>
+							<c:when test="${entityValue != null && entityValue != ''}">
+								<c:out value="${entityValue}"/>
+							</c:when>
+							<c:otherwise>
+								<fmt:message key='N/A' bundle='${resword}'/>
+							</c:otherwise>
+						</c:choose>
+						&nbsp;
+						</b>
+					</td>
                     <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="More" bundle="${resword}"/>:&nbsp;&nbsp;</td>
                     <td class="table_cell_noborder">
-                    <c:if test="${name eq 'itemData' ||name eq 'ItemData'}">
-                        <a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')">
-                        <fmt:message key="Data_Dictionary" bundle="${resword}"/></a>
-                    </c:if>
+					<c:choose>
+						<c:when test="${name eq 'itemData' || name eq 'ItemData'}">
+							<a href="javascript: openDocWindow('ViewItemDetail?itemId=${item.id}')">
+							<fmt:message key="Data_Dictionary" bundle="${resword}"/></a>
+						</c:when>
+						<c:otherwise>
+							<b><fmt:message key="N/A" bundle="${resword}"/></b>
+						</c:otherwise>
+					</c:choose>
                     </td>  
                 </tr>
                 <c:if test="${name eq 'itemData' ||name eq 'ItemData'}">

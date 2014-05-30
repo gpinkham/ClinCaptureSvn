@@ -36,7 +36,11 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
@@ -46,7 +50,9 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 // TODO: support YYYY-MM-DD HH:MM time formats
 
@@ -63,8 +69,6 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 	public static final String INPUT_STUDY_SUBJECT_LABEL = "studySubjectLabel";
 
 	public static final String INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT = "studySubjectId";
-
-	public static final String INPUT_EVENT_DEF_ID_FROM_VIEWSUBJECT = "eventDefId";
 
 	public static final String INPUT_STARTDATE_PREFIX = "start";
 
@@ -94,7 +98,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.setStudyInfoShown(false);
 		FormProcessor fp = new FormProcessor(request);
-		FormDiscrepancyNotes discNotes = null;
+		FormDiscrepancyNotes discNotes;
 		int studySubjectId = fp.getInt(INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT);
 		// input from manage subject matrix, user has specified definition id
 		int studyEventDefinitionId = fp.getInt(INPUT_STUDY_EVENT_DEFINITION);
@@ -115,7 +119,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 						resword.getString("study_event") + resterm.getString("could_not_be")
 								+ resterm.getString("added") + "."
 								+ respage.getString("study_subject_has_been_deleted"), request);
-				request.setAttribute("id", new Integer(studySubjectId).toString());
+				request.setAttribute("id", Integer.toString(studySubjectId));
 				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 			}
 			request.setAttribute(INPUT_REQUEST_STUDY_SUBJECT, "no");
@@ -134,26 +138,25 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
 		ArrayList eventDefinitions = CreateNewStudyEventServlet.selectNotStartedOrRepeatingSortedEventDefs(ssb,
 				studyWithEventDefinitions.getId(), seddao, sgcdao, sedao);
-		ArrayList eventDefinitionsScheduled = eventDefinitions;
 
 		SimpleDateFormat local_df = getLocalDf(request);
 		if (!fp.isSubmitted()) {
 
 			HashMap presetValues = new HashMap();
 
-			presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", new Integer(-1));
-			presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", new Integer(-1));
-			presetValues.put(INPUT_STARTDATE_PREFIX + "Half", new String(""));
-			presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", new Integer(-1));
-			presetValues.put(INPUT_ENDDATE_PREFIX + "Minute", new Integer(-1));
-			presetValues.put(INPUT_ENDDATE_PREFIX + "Half", new String(""));
+			presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", -1);
+			presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", -1);
+			presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
+			presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", -1);
+			presetValues.put(INPUT_ENDDATE_PREFIX + "Minute", -1);
+			presetValues.put(INPUT_ENDDATE_PREFIX + "Half", "");
 			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
-				presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Hour", new Integer(-1));
-				presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Minute", new Integer(-1));
-				presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Half", new String(""));
-				presetValues.put(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Hour", new Integer(-1));
-				presetValues.put(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Minute", new Integer(-1));
-				presetValues.put(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Half", new String(""));
+				presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Hour", -1);
+				presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Minute", -1);
+				presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Half", "");
+				presetValues.put(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Hour", -1);
+				presetValues.put(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Minute", -1);
+				presetValues.put(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Half", "");
 			}
 
 			// SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
@@ -190,13 +193,12 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 			logger.info("found def.w.CRF list, size " + eventDefinitions.size());
 			setPresetValues(presetValues, request);
 
-			ArrayList subjects = new ArrayList();
-			setupBeans(request, response, subjects, eventDefinitions);
+			setupBeans(request, response, eventDefinitions);
 
 			discNotes = new FormDiscrepancyNotes();
 			request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
-			request.setAttribute("eventDefinitionsScheduled", eventDefinitionsScheduled);
+			request.setAttribute("eventDefinitionsScheduled", eventDefinitions);
 			setInputMessages(new HashMap(), request);
 
 			forwardPage(Page.PAGE_TO_CREATE_NEW_STUDY_EVENT, request, response);
@@ -291,12 +293,12 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 			StudyEventDefinitionBean definition = (StudyEventDefinitionBean) seddao.findByPK(fp
 					.getInt(INPUT_STUDY_EVENT_DEFINITION));
 
-			StudySubjectBean studySubject = (StudySubjectBean) sdao.findByLabelAndStudy(
-					fp.getString(INPUT_STUDY_SUBJECT_LABEL), currentStudy);
+			StudySubjectBean studySubject = sdao.findByLabelAndStudy(fp.getString(INPUT_STUDY_SUBJECT_LABEL),
+					currentStudy);
 			if (request.getAttribute(INPUT_STUDY_SUBJECT) != null) {
 				studySubject = (StudySubjectBean) request.getAttribute(INPUT_STUDY_SUBJECT);
 			}
-			if (studySubject.getLabel() == "") {
+			if (studySubject.getLabel().equals("")) {
 				// add an error here, tbh
 				System.out.println("tripped the error here 20091109");
 				Validator.addError(errors, INPUT_STUDY_SUBJECT,
@@ -348,9 +350,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 				}
 			}
 
-			String prevStartPrefix = INPUT_STARTDATE_PREFIX;
-			Set<Integer> pickedSeds = new TreeSet<Integer>();
-			pickedSeds.add(studyEventDefinitionId);
+			String prevStartPrefix;
 			HashMap<Integer, Integer> scheduledSeds = new HashMap<Integer, Integer>();
 			scheduledSeds.put(studyEventDefinitionId, -1);
 			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
@@ -428,12 +428,8 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 				prefixes[0] = INPUT_STARTDATE_PREFIX;
 				prefixes[1] = INPUT_ENDDATE_PREFIX;
 				int b = ADDITIONAL_SCHEDULED_NUM + 2;
-				for (int i = 2; i < b; ++i) {
-					prefixes[i] = INPUT_STARTDATE_PREFIX_SCHEDULED[i - 2];
-				}
-				for (int i = b; i < ADDITIONAL_SCHEDULED_NUM + b; ++i) {
-					prefixes[i] = INPUT_ENDDATE_PREFIX_SCHEDULED[i - b];
-				}
+				System.arraycopy(INPUT_STARTDATE_PREFIX_SCHEDULED, 0, prefixes, 2, b - 2);
+				System.arraycopy(INPUT_ENDDATE_PREFIX_SCHEDULED, 0, prefixes, b, ADDITIONAL_SCHEDULED_NUM + b - b);
 				fp.setCurrentDateTimeValuesAsPreset(prefixes);
 
 				if (hasScheduledEvent) {
@@ -443,12 +439,10 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 				}
 
 				setPresetValues(fp.getPresetValues(), request);
-				ArrayList subjects = new ArrayList();
-				setupBeans(request, response, subjects, eventDefinitions);
-				request.setAttribute("eventDefinitionsScheduled", eventDefinitionsScheduled);
+				setupBeans(request, response, eventDefinitions);
+				request.setAttribute("eventDefinitionsScheduled", eventDefinitions);
 				forwardPage(Page.PAGE_TO_CREATE_NEW_STUDY_EVENT, request, response);
 			} else {
-				System.out.println("error is empty");
 
 				StudyEventBean studyEvent = new StudyEventBean();
 				studyEvent.setStudyEventDefinitionId(definition.getId());
@@ -463,10 +457,6 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 				studyEvent.setDateStarted(start);
 				// comment to find bug 1389, tbh
 				logger.info("found start date: " + local_df.format(start));
-				Date startScheduled2[] = new Date[ADDITIONAL_SCHEDULED_NUM];
-				for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
-					startScheduled2[i] = getInputStartDateScheduled(fp, i);
-				}
 				if (!"".equals(strEnd)) {
 					if ("-1".equals(getInputEndHour(fp)) && "-1".equals(getInputEndMinute(fp))
 							&& "".equals(getInputEndHalf(fp))) {
@@ -571,8 +561,6 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 				request.setAttribute(EnterDataForStudyEventServlet.INPUT_EVENT_ID, String.valueOf(studyEvent.getId()));
 				response.encodeRedirectURL("EnterDataForStudyEvent?eventId=" + studyEvent.getId());
 				forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET, request, response);
-
-				return;
 			}
 		}
 	}
@@ -617,15 +605,12 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 
 		ArrayList allEvents = sedao.findAllByDefinitionAndSubject(studyEventDefinition, studySubject);
 
-		if (allEvents.size() > 0) {
-			return false;
-		}
+		return allEvents.size() <= 0;
 
-		return true;
 	}
 
-	private void setupBeans(HttpServletRequest request, HttpServletResponse response, ArrayList subjects,
-			ArrayList eventDefinitions) throws Exception {
+	private void setupBeans(HttpServletRequest request, HttpServletResponse response, ArrayList eventDefinitions)
+			throws Exception {
 		addEntityList("eventDefinitions", eventDefinitions,
 				restext.getString("cannot_create_event_because_no_event_definitions"),
 				Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
