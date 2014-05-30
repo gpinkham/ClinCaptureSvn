@@ -16,18 +16,22 @@
 package com.clinovo.util;
 
 import com.clinovo.coding.SearchException;
+import com.clinovo.coding.model.Classification;
 import com.clinovo.coding.model.ClassificationElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-public class CompleteClassificationFieldsUtil {
+public final class CompleteClassificationFieldsUtil {
 
 	enum ICD910 {CAT, GRP}
 
 	enum MEDDRA {SOC, HLGT, HLT}
 
-	enum WHOD {ATC7, ATC6, ATC5, ATC4, ATC3, ATC2, ATC1, CMP, CNTR}
+	enum WHOD_FIRST_PART {MPN, MPNC, CMP, UMBRELLA, GENERIC, PREFERRED}
+
+	enum WHOD_SECOND_PART {ATC7, ATC6, ATC5, ATC4, ATC3, ATC2, ATC1, CNTR}
 
 	@SuppressWarnings("rawtypes")
 	public static void completeClassificationNameFields(ArrayList<ClassificationElement> classificationElements, String dictionary) throws SearchException {
@@ -46,7 +50,7 @@ public class CompleteClassificationFieldsUtil {
 
 			//remove VA uniq key
 			classificationElements.remove(0);
-			dictionaryValuesList = new ArrayList<WHOD>(Arrays.asList(WHOD.values()));
+			dictionaryValuesList = new ArrayList<WHOD_SECOND_PART>(Arrays.asList(WHOD_SECOND_PART.values()));
 
 			for (ClassificationElement whodClassificationElement : classificationElements) {
 				String classificationElement = whodClassificationElement.getCodeName().replaceAll("_", " ").replaceAll(" and ", " & ");
@@ -81,5 +85,59 @@ public class CompleteClassificationFieldsUtil {
 				classificationElements.get(i).setElementName(dictionaryValuesList.get(i).toString());
 			}
 		}
+	}
+
+	public static List<Classification> firstResponse(List<Classification> classificationResponse, String dictionary, String prefLabel, String codeHttpPath) throws SearchException {
+		List dictionaryValuesList = new ArrayList<WHOD_FIRST_PART>(Arrays.asList(WHOD_FIRST_PART.values()));
+
+		if (dictionary.equals("WHOD")) {
+
+			List<String> elements = Arrays.asList(prefLabel.split("@"));
+			Classification classification = new Classification();
+			classification.setHttpPath(codeHttpPath);
+
+			for (int i = 0; i < dictionaryValuesList.size(); i++) {
+
+				String codeName = elements.get(i).replaceAll("_and_", "_&_").replaceAll("_", " ");
+				codeName = codeName.equals("Y") ? "Yes" : codeName.equals("N") ? "No" : codeName;
+
+				ClassificationElement classificationElement = new ClassificationElement();
+				classificationElement.setElementName(dictionaryValuesList.get(i).toString());
+				classificationElement.setCodeName(codeName);
+
+				classification.addClassificationElement(classificationElement);
+			}
+			classificationResponse.add(classification);
+
+		} else {
+
+			Classification classification = new Classification();
+			classification.setHttpPath(codeHttpPath);
+
+			ClassificationElement classificationElement = new ClassificationElement();
+			classificationElement.setElementName(getFirstElementName(dictionary));
+			classificationElement.setCodeName(prefLabel);
+
+			classification.addClassificationElement(classificationElement);
+
+			classificationResponse.add(classification);
+		}
+
+		return classificationResponse;
+
+	}
+
+
+	private static String getFirstElementName(String termDictionary) throws SearchException {
+
+		if ("meddra".equalsIgnoreCase(termDictionary)) {
+
+			return "LLT";
+		} else if ("icd 10".equalsIgnoreCase(termDictionary) || "icd 9cm".equalsIgnoreCase(termDictionary)) {
+
+			return "EXT";
+		}
+
+		throw new SearchException("Unknown dictionary type specified");
 	}
 }

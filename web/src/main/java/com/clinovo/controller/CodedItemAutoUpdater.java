@@ -149,13 +149,17 @@ public class CodedItemAutoUpdater {
 			for (CodedItemElement codedItemIteration : codedItem.getCodedItemElements()) {
 
 				if ((codedItemElement.getItemName() + "C").equals(codedItemIteration.getItemName())) {
+					if (!codedItemElement.getItemCode().isEmpty()) {
+						codedItemWithFilterFields.addCodedItemElements(codedItemElement);
+						break;
+					}
+				} else if (codedItemElement.getItemName().equals("CMP") || codedItemElement.getItemName().equals("CNTR")
+						|| codedItemElement.getItemName().equals("MPNC")) {
 
-					codedItemWithFilterFields.addCodedItemElements(codedItemElement);
-					break;
-				} else if (codedItemElement.getItemName().equals("CMP")) {
-
-					codedItemWithFilterFields.addCodedItemElements(codedItemElement);
-					break;
+					if (!codedItemElement.getItemCode().isEmpty()) {
+						codedItemWithFilterFields.addCodedItemElements(codedItemElement);
+						break;
+					}
 				}
 			}
 		}

@@ -68,29 +68,13 @@ public class BioPortalSearchInterface implements SearchInterface {
 
 			String codeHttpPath = jsonObjectElement.get("@id").getAsString();
 			String prefLabel = jsonObjectElement.get("prefLabel").getAsString();
-			boolean isPrefLabel = prefLabel.indexOf("_com") < 0 && prefLabel.indexOf("_act") < 0 && prefLabel.indexOf("_key") < 0 && prefLabel.indexOf("_con") < 0;
+			boolean isPrefLabel = prefLabel.indexOf("_act") < 0 && prefLabel.indexOf("_key") < 0 && prefLabel.indexOf("_con") < 0;
 			
 			if (isPrefLabel) {
 
-				String whodPreferredTerm = dictionary.equals(WHOD) ? prefLabel.substring(prefLabel.indexOf("@"), prefLabel.length()).indexOf("Y") > 0 ? "Yes" : prefLabel.substring(prefLabel.indexOf("@"), prefLabel.length()).indexOf("N") > 0 ? "No" : "" : "";
-				prefLabel = dictionary.equals(WHOD) ? prefLabel.substring(0, prefLabel.indexOf("@")).replaceAll("_and_", "_&_").replaceAll("_", " ") : prefLabel;
-
-				ClassificationElement classificationElement = new ClassificationElement();
-				classificationElement.setElementName(getFirstElementName(termDictionary));
-				classificationElement.setCodeName(prefLabel);
-
-				Classification classification = new Classification();
-				classification.setHttpPath(codeHttpPath);
-				classification.addClassificationElement(classificationElement);
-
-				if (dictionary.equals(WHOD)) {
-					ClassificationElement prefClassificationElement = new ClassificationElement();
-					prefClassificationElement.setElementName("Preferred");
-					prefClassificationElement.setCodeName(whodPreferredTerm);
-					classification.addClassificationElement(prefClassificationElement);
-				}
-
-				classifications.add(classification);
+				List<Classification> classificationResponse = new ArrayList<Classification>();
+				CompleteClassificationFieldsUtil.firstResponse(classificationResponse, dictionary, prefLabel, codeHttpPath);
+				classifications.addAll(classificationResponse);
 			}
 		}
 		Collections.sort(classifications, new ClassificationSortByReference());
@@ -282,27 +266,11 @@ public class BioPortalSearchInterface implements SearchInterface {
 		throw new SearchException("Unknown dictionary type specified");
 	}
 
-	private String getFirstElementName(String termDictionary) throws SearchException {
-
-		if ("meddra".equalsIgnoreCase(termDictionary)) {
-
-			return "LLT";
-		} else if ("icd 10".equalsIgnoreCase(termDictionary) || "icd 9cm".equalsIgnoreCase(termDictionary)) {
-
-			return "EXT";
-		} else if ("whod".equalsIgnoreCase(termDictionary)) {
-
-			return "MPN";
-		}
-
-		throw new SearchException("Unknown dictionary type specified");
-	}
-
 	private class ClassificationSortByReference implements Comparator<Classification> {
 		public int compare(Classification o1, Classification o2) {
 			for (ClassificationElement classification : o1.getClassificationElement()) {
 				for (ClassificationElement classification2 : o2.getClassificationElement()) {
-					if (classification.getElementName().equals("Preferred") && classification.getElementName().equals(classification2.getElementName())) {
+					if (classification.getElementName().equals("PREFERRED") && classification.getElementName().equals(classification2.getElementName())) {
 						if ((classification.getCodeName().equals("No") && classification2.getCodeName().equals("Yes"))) {
 							return 1;
 						} else if (classification.getCodeName().equals("Yes") && classification2.getCodeName().equals("No")) {

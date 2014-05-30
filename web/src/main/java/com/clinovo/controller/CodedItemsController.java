@@ -556,11 +556,10 @@ public class CodedItemsController {
 
 		if (codedItem.getDictionary().equals("WHOD")) {
 
-			String termUniqKey = classificationResult.getHttpPath();
-			termUniqKey = termUniqKey.substring(termUniqKey.indexOf("@"), termUniqKey.length());
+			String whodKey = getWhodKey(classificationResult);
 
 			for (ClassificationElement whodClassElement : classificationResult.getClassificationElement()) {
-				whodClassElement.setCodeName(whodClassElement.getCodeName().replaceAll(" &amp; ", " and ").replaceAll(" ", "_") + termUniqKey);
+				whodClassElement.setCodeName(whodClassElement.getCodeName().replaceAll(" &amp; ", " and ").replaceAll(" ", "_") + whodKey);
 			}
 
 			addClassificationResultSufix(classificationResult);
@@ -600,17 +599,15 @@ public class CodedItemsController {
 
 	private void addClassificationResultSufix(Classification classificationResult) {
 
-		int countryIndex = classificationResult.getClassificationElement().size() - 3;
+		int countryIndex = classificationResult.getClassificationElement().size() - 4;
 		String countryField = classificationResult.getClassificationElement().get(countryIndex).getCodeName() + "_con";
 		classificationResult.getClassificationElement().get(countryIndex).setCodeName(countryField);
 
-		int componentIndex = classificationResult.getClassificationElement().size() - 4;
-		String componentField = classificationResult.getClassificationElement().get(componentIndex).getCodeName() + "_com";
-		classificationResult.getClassificationElement().get(componentIndex).setCodeName(componentField);
-
-		for (int index = 0; index < classificationResult.getClassificationElement().size() && index < componentIndex; index++) {
-			String actField = classificationResult.getClassificationElement().get(index).getCodeName() + "_act";
-			classificationResult.getClassificationElement().get(index).setCodeName(actField);
+		for (int index = 0; index < classificationResult.getClassificationElement().size(); index++) {
+			if (index < countryIndex && index > 2) {
+				String actField = classificationResult.getClassificationElement().get(index).getCodeName() + "_act";
+				classificationResult.getClassificationElement().get(index).setCodeName(actField);
+			}
 		}
 	}
 
@@ -634,16 +631,21 @@ public class CodedItemsController {
 			}
 		}
 
-		if (classification.getHttpPath().indexOf("whod") > 0) {
+		return classification;
+	}
 
-			String whodKey = classification.getHttpPath().substring(classification.getHttpPath().indexOf("@"), classification.getHttpPath().length());
-
-			for (ClassificationElement classificationElement : classification.getClassificationElement()) {
-				classificationElement.setCodeName(classificationElement.getCodeName().replaceAll(" ", "_").replaceAll(" & ", "_and_") + whodKey);
+	private String getWhodKey(Classification classification) {
+		String codeNum = "";
+		String generic = "";
+		for (ClassificationElement classificationElement : classification.getClassificationElement()) {
+			if (classificationElement.getElementName().equalsIgnoreCase("MPNC")) {
+				codeNum = classificationElement.getCodeName();
+			} else if (classificationElement.getElementName().equalsIgnoreCase("generic")) {
+				generic = classificationElement.getCodeName().replace("Yes", "Y").replace("No", "N");
 			}
 		}
 
-		return classification;
+		return "@" + codeNum + generic;
 	}
 
 	private List<TermElement> generateTermElementList(List<ClassificationElement> classificationElementList) {
@@ -670,9 +672,6 @@ public class CodedItemsController {
 
 					codedItemElement.setItemCode(classificationElement.getCodeName().replaceAll(classificationElement.getCodeValue(), ""));
 				} else if (name.equals(classificationElement.getElementName() + "C")) {
-
-					codedItemElement.setItemCode(classificationElement.getCodeValue());
-				} else if (name.equals("MPSEQ") && classificationElement.getElementName().equals("CMP")) {
 
 					codedItemElement.setItemCode(classificationElement.getCodeValue());
 				}

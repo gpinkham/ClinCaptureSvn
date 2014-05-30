@@ -3238,7 +3238,17 @@ codeItemFields = function(item) {
         success: function(data) {
 
             $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () { return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());}).closest('tbody').find('input').css('visibility', 'visible');
-            $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () { return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());}).parent('tr').after(data);
+            if ($("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='termDictionary']").text() == 'WHOD') {
+                $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () {
+                    return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());
+                }).closest('tbody').find('tr > td').filter(function () {
+                    return $.trim($(this).text()) === 'CMP:';
+                }).parent('tr').after(data);
+            } else {
+                $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () {
+                    return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());
+                }).parent('tr').after(data);
+            }
             $(item).css('visibility', 'hidden');
             $('.ui-widget-overlay').remove();
         },

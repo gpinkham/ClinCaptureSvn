@@ -284,14 +284,17 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
                 for (CodedItemElement codedItemIteration : codedItem.getCodedItemElements()) {
 
-                    if ((codedItemElement.getItemName() + "C").equals(codedItemIteration.getItemName())) {
-
-                        codedItemWithFilterFields.addCodedItemElements(codedItemElement);
-                        break;
-                    } else if (codedItemElement.getItemName().equals("CMP")) {
-
-						codedItemWithFilterFields.addCodedItemElements(codedItemElement);
-						break;
+					if ((codedItemElement.getItemName() + "C").equals(codedItemIteration.getItemName())) {
+						if (!codedItemElement.getItemCode().isEmpty()) {
+							codedItemWithFilterFields.addCodedItemElements(codedItemElement);
+							break;
+						}
+					} else if (codedItemElement.getItemName().equals("CMP") || codedItemElement.getItemName().equals("CNTR")
+							|| codedItemElement.getItemName().equals("MPNC")) {
+						if (!codedItemElement.getItemCode().isEmpty()) {
+							codedItemWithFilterFields.addCodedItemElements(codedItemElement);
+							break;
+						}
 					}
                 }
             }
