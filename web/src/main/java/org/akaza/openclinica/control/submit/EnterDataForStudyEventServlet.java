@@ -414,7 +414,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 				}
 
 				dedcrf.getEdc().setVersions(versions);
-				if (versions != null && versions.size() != 0) {
+				if (versions.size() != 0) {
 					boolean isLocked = false;
 					for (Object version : versions) {
 						CRFVersionBean crfvb = (CRFVersionBean) version;
@@ -467,7 +467,8 @@ public class EnterDataForStudyEventServlet extends Controller {
 		List<DiscrepancyNoteBean> dateEndDNotes = new ArrayList<DiscrepancyNoteBean>();
 		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
 			// method discrepancyNoteBean.getEvent.getId() return 0 for all DNs
-			if (discrepancyNoteBean.getEventName().equalsIgnoreCase(sedBean.getName())) {
+			if (discrepancyNoteBean.getEventName().equalsIgnoreCase(sedBean.getName())
+					&& discrepancyNoteBean.getEntityId() == seb.getId()) {
 				if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
 					locationDNotes.add(discrepancyNoteBean);
 				} else if ("date_start".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
