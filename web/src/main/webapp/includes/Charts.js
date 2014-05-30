@@ -974,6 +974,7 @@ function checkCookiesDialog() {
 	if (result != "test") {
 		$(".widget>div>div").remove();
 		$(".widget>div>table").remove();
+		$(".widget_big>div>div").remove();
 		displayCookiesErrorMessage();
 	}
 }
