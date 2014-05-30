@@ -2585,8 +2585,9 @@ function showHideCodedItemContext(item) {
 }
 
 codeItem = function(item) {
-
-    var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {
+	
+	setAccessedObjected(item);
+    var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {    	
         return $(this).attr('src').indexOf('icon_Locked_long.gif') > 0;});
     if ($(item).attr('block') == 'true' || isLocked.size() > 0) {
 
@@ -2595,7 +2596,6 @@ codeItem = function(item) {
             showHideCodedItemContext(item);
             return;
         }
-
         return;
     }
 
@@ -3300,10 +3300,14 @@ function hideMedicalCodingAlertBox(ajaxResponse) {
 }
 
 function showMedicalCodingUncodeAlertBox(item) {
-
-    var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {
-        return $(this).attr('src').indexOf('icon_Locked_long.gif') > 0;});
-    if(isLocked.size() > 0) { return; };
+	
+	setAccessedObjected(item);
+    var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {    	
+        return $(this).attr('src').indexOf('icon_Locked_long.gif') > 0;
+    });
+    if(isLocked.size() > 0) { 
+    	return; 
+	}
 
     if ($("#alertBox").length == 0) {
 
@@ -3323,18 +3327,20 @@ function showMedicalCodingUncodeAlertBox(item) {
                 height: 150,
                 width: 500,
                 buttons:{ 'Submit': function() {
-                    var answer = $('input[name=answer]:checked' ).val();
-                    if(answer == 'Code') {
-                        uncodeCodeItem(item);
-                    } else if(answer == 'Alias') {
-                        deleteTerm(item);
-                    } else if(answer == 'Both') {
-                        uncodeCodeItem(item);
-                        deleteTerm(item);
-                    }
-                    $("#alertBox").remove();
-                },
-                    'Cancel': function() { $("#alertBox").remove();  }
+	                    var answer = $('input[name=answer]:checked' ).val();
+	                    if(answer == 'Code') {
+	                        uncodeCodeItem(item);
+	                    } else if(answer == 'Alias') {
+	                        deleteTerm(item);
+	                    } else if(answer == 'Both') {
+	                        uncodeCodeItem(item);
+	                        deleteTerm(item);
+	                    }
+	                    $("#alertBox").remove();
+	                },
+                    'Cancel': function() { 
+                    	$("#alertBox").remove(); 
+                	}
                 },
 
                 open: function(event, ui) {
@@ -3359,7 +3365,12 @@ function showMedicalCodingUncodeAlertBox(item) {
                 modal : true,
                 height: 150,
                 width: 450,
-                buttons: { 'Submit': function() { uncodeCodeItem(item); $("#alertBox").remove(); }, 'Cancel': function() { $("#alertBox").remove(); }},
+                buttons: { 'Submit': function() { 
+	                	uncodeCodeItem(item); $("#alertBox").remove(); 
+                	}, 
+                	'Cancel': function() { 
+                		$("#alertBox").remove();
+            		}},
                 open: function(event, ui) {
 
                 	openDialog({ 
@@ -4174,6 +4185,7 @@ function setLastAccessedId(id){
 function clearLastAccessedObjects(){
 	localStorage.removeItem("data-cc-subjectMatrixId");
 	localStorage.removeItem("data-cc-ndId");
+	localStorage.removeItem("data-cc-mcItemId");
 }
 
 function removeHighlightFromCellDescendants(td){

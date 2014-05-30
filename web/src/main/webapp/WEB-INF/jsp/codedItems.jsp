@@ -32,6 +32,10 @@
             }
         }
     });
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
 </script>
 
 <script type="text/javascript">
@@ -264,5 +268,5 @@
 		</tr>
 	</table>
 </div>
-
+<input id="accessAttributeName" type="hidden" value="data-cc-mcItemId">
 <jsp:include page="include/footer.jsp"/>

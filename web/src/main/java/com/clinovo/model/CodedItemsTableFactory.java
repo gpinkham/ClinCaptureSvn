@@ -355,7 +355,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
                 String disabled = (codedItem.getStatus().equals("CODED") || codedItem.getStatus().equals("IN_PROCESS")) ? " block='true' " : " block='false' ";
 
-                builder.a().onclick("codeItem(this)").append(disabled).name("Code").append("itemId=\"" + codedItem.getItemId() + "\"").close();
+                builder.a().onclick("codeItem(this)").append(disabled).name("Code").append("itemId=\"" + codedItem.getItemId() + "\"")
+                .append("data-cc-mcItemId=\"" + codedItem.getItemId() + "\"").close();
             }
 
             builder.img().style("float:left; height:17px").border("0").title(ResourceBundleProvider.getResWord("code"))
@@ -404,7 +405,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             builder.a().name("goToEcrf").append("itemId=\"" + itemId + "\"").append(" onmouseup=\"javascript:setImage('Complete','../images/"+ getEventCrfStatusIcon(eventCRFBean) + "');\"")
                     .href("../ViewSectionDataEntry?eventCRFId=" + eventCRFBean.getId()
                             + "&eventDefinitionCRFId=" + eventDefCRFBean.getId()
-                            + "&tabId=1&eventId=" + eventCRFBean.getStudyEventId() + "&amp;viewFull=yes").close()
+                            + "&tabId=1&eventId=" + eventCRFBean.getStudyEventId() + "&amp;viewFull=yes")
+                            .onclick("setAccessedObjected(this)").close()
                     .img().border("0").title(ResourceBundleProvider.getResWord("openCrf")).alt(ResourceBundleProvider.getResWord("openCrf"))
                     .style("height:17px").src("../images/"+ getEventCrfStatusIcon(eventCRFBean) + "").close().aEnd();
 
