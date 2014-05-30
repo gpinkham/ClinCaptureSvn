@@ -3,22 +3,11 @@ package org.akaza.openclinica.control.core;
 import com.clinovo.dao.SystemDAO;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
+import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.service.UserAccountService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
-
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -73,6 +62,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.ServletContextAware;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 @SuppressWarnings({ "rawtypes", "serial" })
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
@@ -201,16 +200,18 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private CodedItemService codedItemService;
 	@Autowired
 	private DictionaryService dictionaryService;
-    @Autowired
-    private StudySubjectIdService studySubjectIdService;
-    @Autowired
-    private WidgetsLayoutService widgetsLayoutService;
-    @Autowired
-    private WidgetService widgetService;
-    @Autowired
-    private UserAccountService userAccountService;
-    @Autowired
+	@Autowired
+	private StudySubjectIdService studySubjectIdService;
+	@Autowired
+	private WidgetsLayoutService widgetsLayoutService;
+	@Autowired
+	private WidgetService widgetService;
+	@Autowired
+	private UserAccountService userAccountService;
+	@Autowired
 	private SystemDAO systemDAO;
+	@Autowired
+	private DiscrepancyDescriptionService discrepancyDescriptionService;
 
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
@@ -473,9 +474,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return dictionaryService;
 	}
 
-    public StudySubjectIdService getStudySubjectIdService() {
-        return studySubjectIdService;
-    }
+	public StudySubjectIdService getStudySubjectIdService() {
+		return studySubjectIdService;
+	}
 
 	public WidgetsLayoutService getWidgetsLayoutService() {
 		return widgetsLayoutService;
@@ -483,13 +484,17 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public WidgetService getWidgetService() {
 		return widgetService;
-	}   
-	
+	}
+
 	public UserAccountService getUserAccountService() {
 		return userAccountService;
-	}  
-	
-	public SystemDAO getSystemDAO(){
+	}
+
+	public SystemDAO getSystemDAO() {
 		return systemDAO;
+	}
+
+	public DiscrepancyDescriptionService getDiscrepancyDescriptionService() {
+		return discrepancyDescriptionService;
 	}
 }

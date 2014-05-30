@@ -57,6 +57,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Processes the request of removing a top level study, all the data assoicated with this study will be removed
@@ -64,7 +65,7 @@ import java.util.Date;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 @Component
 public class RemoveStudyServlet extends Controller {
 	/**
@@ -103,19 +104,19 @@ public class RemoveStudyServlet extends Controller {
 
 		StudyBean study = (StudyBean) sdao.findByPK(studyId);
 		// find all sites
-		ArrayList sites = (ArrayList) sdao.findAllByParent(studyId);
+		List<StudyBean> sites = (List<StudyBean>) sdao.findAllByParent(studyId);
 
 		// find all user and roles in the study, include ones in sites
 		UserAccountDAO udao = getUserAccountDAO();
-		ArrayList userRoles = udao.findAllByStudyId(studyId);
+		ArrayList<StudyUserRoleBean> userRoles = udao.findAllByStudyId(studyId);
 
 		// find all subjects in the study, include ones in sites
 		StudySubjectDAO ssdao = getStudySubjectDAO();
-		ArrayList subjects = ssdao.findAllByStudy(study);
+		List<StudySubjectBean> subjects = ssdao.findAllByStudy(study);
 
 		// find all events in the study, include ones in sites
 		StudyEventDefinitionDAO sefdao = getStudyEventDefinitionDAO();
-		ArrayList definitions = sefdao.findAllByStudy(study);
+		ArrayList<StudyEventDefinitionBean> definitions = sefdao.findAllByStudy(study);
 
 		String action = request.getParameter("action");
 		if (studyId == 0) {
@@ -143,8 +144,7 @@ public class RemoveStudyServlet extends Controller {
 				sdao.update(study);
 
 				// remove all sites
-				for (int i = 0; i < sites.size(); i++) {
-					StudyBean site = (StudyBean) sites.get(i);
+				for (StudyBean site : sites) {
 					if (!site.getStatus().equals(Status.DELETED)) {
 						site.setOldStatus(site.getStatus());
 						site.setStatus(Status.AUTO_DELETED);
@@ -155,8 +155,7 @@ public class RemoveStudyServlet extends Controller {
 				}
 
 				// remove all users and roles
-				for (int i = 0; i < userRoles.size(); i++) {
-					StudyUserRoleBean role = (StudyUserRoleBean) userRoles.get(i);
+				for (StudyUserRoleBean role : userRoles) {
 					getUserAccountService().autoRemoveStudyUserRole(role, currentUser);
 				}
 
@@ -176,8 +175,7 @@ public class RemoveStudyServlet extends Controller {
 				}
 
 				// remove all subjects
-				for (int i = 0; i < subjects.size(); i++) {
-					StudySubjectBean subject = (StudySubjectBean) subjects.get(i);
+				for (StudySubjectBean subject : subjects) {
 					if (!subject.getStatus().equals(Status.DELETED)) {
 						subject.setStatus(Status.AUTO_DELETED);
 						subject.setUpdater(currentUser);
@@ -192,18 +190,17 @@ public class RemoveStudyServlet extends Controller {
 				StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
 				SubjectGroupMapDAO sgmdao = getSubjectGroupMapDAO();
 
-				ArrayList groups = sgcdao.findAllByStudy(study);
-				for (int i = 0; i < groups.size(); i++) {
-					StudyGroupClassBean group = (StudyGroupClassBean) groups.get(i);
+				ArrayList<StudyGroupClassBean> groups = sgcdao.findAllByStudy(study);
+				for (StudyGroupClassBean group : groups) {
 					if (!group.getStatus().equals(Status.DELETED)) {
 						group.setStatus(Status.AUTO_DELETED);
 						group.setUpdater(currentUser);
 						group.setUpdatedDate(new Date());
 						sgcdao.update(group);
 						// all subject_group_map
-						ArrayList subjectGroupMaps = sgmdao.findAllByStudyGroupClassId(group.getId());
-						for (int j = 0; j < subjectGroupMaps.size(); j++) {
-							SubjectGroupMapBean sgMap = (SubjectGroupMapBean) subjectGroupMaps.get(j);
+						ArrayList<SubjectGroupMapBean> subjectGroupMaps = sgmdao.findAllByStudyGroupClassId(group
+								.getId());
+						for (SubjectGroupMapBean sgMap : subjectGroupMaps) {
 							if (!sgMap.getStatus().equals(Status.DELETED)) {
 								sgMap.setStatus(Status.AUTO_DELETED);
 								sgMap.setUpdater(currentUser);
@@ -214,9 +211,9 @@ public class RemoveStudyServlet extends Controller {
 					}
 				}
 
-				ArrayList groupClasses = sgcdao.findAllActiveByStudy(study);
-				for (int i = 0; i < groupClasses.size(); i++) {
-					StudyGroupClassBean gc = (StudyGroupClassBean) groupClasses.get(i);
+				ArrayList<StudyGroupClassBean> groupClasses = (ArrayList<StudyGroupClassBean>) sgcdao
+						.findAllActiveByStudy(study);
+				for (StudyGroupClassBean gc : groupClasses) {
 					if (!gc.getStatus().equals(Status.DELETED)) {
 						gc.setStatus(Status.AUTO_DELETED);
 						gc.setUpdater(currentUser);
@@ -228,16 +225,15 @@ public class RemoveStudyServlet extends Controller {
 				// remove all event definitions and event
 				EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 				StudyEventDAO sedao = getStudyEventDAO();
-				for (int i = 0; i < definitions.size(); i++) {
-					StudyEventDefinitionBean definition = (StudyEventDefinitionBean) definitions.get(i);
+				for (StudyEventDefinitionBean definition : definitions) {
 					if (!definition.getStatus().equals(Status.DELETED)) {
 						definition.setStatus(Status.AUTO_DELETED);
 						definition.setUpdater(currentUser);
 						definition.setUpdatedDate(new Date());
 						sefdao.update(definition);
-						ArrayList edcs = (ArrayList) edcdao.findAllByDefinition(definition.getId());
-						for (int j = 0; j < edcs.size(); j++) {
-							EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcs.get(j);
+						ArrayList<EventDefinitionCRFBean> edcs = (ArrayList) edcdao.findAllByDefinition(definition
+								.getId());
+						for (EventDefinitionCRFBean edc : edcs) {
 							if (!edc.getStatus().equals(Status.DELETED)) {
 								edc.setStatus(Status.AUTO_DELETED);
 								edc.setUpdater(currentUser);
@@ -246,23 +242,21 @@ public class RemoveStudyServlet extends Controller {
 							}
 						}
 
-						ArrayList events = (ArrayList) sedao.findAllByDefinition(definition.getId());
+						ArrayList<StudyEventBean> events = (ArrayList) sedao.findAllByDefinition(definition.getId());
 						EventCRFDAO ecdao = getEventCRFDAO();
 
-						for (int j = 0; j < events.size(); j++) {
-							StudyEventBean event = (StudyEventBean) events.get(j);
+						for (StudyEventBean event : events) {
 							if (!event.getStatus().equals(Status.DELETED)) {
 								event.setStatus(Status.AUTO_DELETED);
 								event.setUpdater(currentUser);
 								event.setUpdatedDate(new Date());
 								sedao.update(event);
 
-								ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+								ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(event);
 								CodedItemService codedItemService = getCodedItemService();
 								ItemDataDAO iddao = getItemDataDAO();
 
-								for (int k = 0; k < eventCRFs.size(); k++) {
-									EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
+								for (EventCRFBean eventCRF : eventCRFs) {
 									if (!eventCRF.getStatus().equals(Status.DELETED)) {
 										eventCRF.setOldStatus(eventCRF.getStatus());
 										eventCRF.setStatus(Status.AUTO_DELETED);
@@ -270,9 +264,8 @@ public class RemoveStudyServlet extends Controller {
 										eventCRF.setUpdatedDate(new Date());
 										ecdao.update(eventCRF);
 
-										ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-										for (int a = 0; a < itemDatas.size(); a++) {
-											ItemDataBean item = (ItemDataBean) itemDatas.get(a);
+										ArrayList<ItemDataBean> itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
+										for (ItemDataBean item : itemDatas) {
 											if (!item.getStatus().equals(Status.DELETED)) {
 												item.setOldStatus(item.getStatus());
 												item.setStatus(Status.AUTO_DELETED);
@@ -297,9 +290,8 @@ public class RemoveStudyServlet extends Controller {
 				}// for definitions
 
 				DatasetDAO datadao = getDatasetDAO();
-				ArrayList dataset = datadao.findAllByStudyId(study.getId());
-				for (int i = 0; i < dataset.size(); i++) {
-					DatasetBean data = (DatasetBean) dataset.get(i);
+				ArrayList<DatasetBean> datasets = datadao.findAllByStudyId(study.getId());
+				for (DatasetBean data : datasets) {
 					if (!data.getStatus().equals(Status.DELETED)) {
 						data.setStatus(Status.AUTO_DELETED);
 						data.setUpdater(currentUser);

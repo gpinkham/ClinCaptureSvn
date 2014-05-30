@@ -22,10 +22,11 @@ package org.akaza.openclinica.control.admin;
 
 import com.clinovo.model.DiscrepancyDescription;
 import com.clinovo.service.DiscrepancyDescriptionService;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -35,7 +36,10 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,12 +51,17 @@ import java.util.Map;
  * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
-public class ViewStudyServlet extends SecureController {
+@Component
+public class ViewStudyServlet extends Controller {
 	/**
 	 * Checks whether the user has the correct privilege
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -61,39 +70,43 @@ public class ViewStudyServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		FormProcessor fp = new FormProcessor(request);
 		int studyId = fp.getInt("id");
 		if (studyId == 0) {
-			addPageMessage(respage.getString("please_choose_a_study_to_view"));
-			forwardPage(Page.STUDY_LIST_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_study_to_view"), request);
+			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 		} else {
 			if (currentStudy.getId() != studyId && currentStudy.getParentStudyId() != studyId) {
-				checkRoleByUserAndStudy(ub, studyId, 0);
+				checkRoleByUserAndStudy(request, response, ub, studyId, 0);
 			}
 
 			String viewFullRecords = fp.getString("viewFull");
 			StudyBean study = (StudyBean) sdao.findByPK(studyId);
 
-			StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+			StudyConfigService scs = getStudyConfigService();
 			study = scs.setParametersForStudy(study);
 
 			request.setAttribute("studyToView", study);
 			if ("yes".equalsIgnoreCase(viewFullRecords)) {
-				UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+				UserAccountDAO udao = getUserAccountDAO();
 				ArrayList sites = new ArrayList();
 				ArrayList userRoles;
-				if (this.currentStudy.getParentStudyId() > 0 && this.currentRole.getRole().getId() > 3) {
-					sites.add(this.currentStudy);
+				if (currentStudy.getParentStudyId() > 0 && currentRole.getRole().getId() > 3) {
+					sites.add(currentStudy);
 					userRoles = udao.findAllUsersByStudy(currentStudy.getId());
 				} else {
 					sites = (ArrayList) sdao.findAllByParent(studyId);
@@ -101,10 +114,9 @@ public class ViewStudyServlet extends SecureController {
 				}
 
 				// find all subjects in the study, include ones in sites
-				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-				EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-				DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess
-						.getApplicationContext(context).getBean("discrepancyDescriptionService");
+				StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
+				EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
+				DiscrepancyDescriptionService dDescriptionService = getDiscrepancyDescriptionService();
 
 				// find all events in the study, include ones in sites
 				List<StudyEventDefinitionBean> definitions = seddao.findAllAvailableByStudy(study);
@@ -126,18 +138,19 @@ public class ViewStudyServlet extends SecureController {
 
 				request.setAttribute("definitionsToView", definitions);
 				request.setAttribute("defNum", definitions.size() + "");
-				forwardPage(Page.VIEW_FULL_STUDY);
+				forwardPage(Page.VIEW_FULL_STUDY, request, response);
 
 			} else {
-				forwardPage(Page.VIEW_STUDY);
+				forwardPage(Page.VIEW_STUDY, request, response);
 			}
 		}
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}
