@@ -46,6 +46,7 @@
 	</span>
 </h1>
 <form action="UpdateSubject" method="post">
+<input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag != null ? formWithStateFlag : ''}" />
 <input type="hidden" name="action" value="submit">
 <input type="hidden" name="id" value="<c:out value="${subjectToUpdate.id}"/>">
 <input type="hidden" name="studySubId" value="<c:out value="${studySubId}"/>">
@@ -63,7 +64,7 @@
 	</tr>
 
 	<tr valign="top">
-		<td class="table_header_column">${parameters['genderLabel']}:</td>				
+		<td class="table_header_column">${parameters['genderLabel']}:</td>
 		<td class="table_cell">
 		<c:if test="${parameters['genderRequired']}">
 			<c:choose>
@@ -77,10 +78,10 @@
 					<fmt:message key="not_specified" bundle="${resword}"/>
 				</c:otherwise>
 			</c:choose>
-		</c:if>	
+		</c:if>
 		</td>
     </tr>
-    
+
 	<c:choose>
 		<c:when test="${parameters['collectDob'] != '2'}">
 			<tr valign="top">
@@ -99,7 +100,7 @@
 			</tr>
 		</c:otherwise>
     </c:choose>
-	
+
 </table>
 </div>
 </div></div></div></div></div></div></div></div>
@@ -109,9 +110,9 @@
  <input type="button" name="BTN_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
-					onClick="javascript: window.location.href=('UpdateSubject?action=back&amp;id=${subjectToUpdate.id}');" />
+                    onClick="$('input[name=action]').val('back'); submitFormWithState();" />
  <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
- <input type="button" onclick="javascript:history.go(-2);"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
+ <input type="button" onClick="confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
 </form>
 
 <c:import url="../include/workflow.jsp">

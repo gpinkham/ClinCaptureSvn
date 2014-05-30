@@ -57,7 +57,7 @@
 
 <P><fmt:message key="field_required" bundle="${resword}"/></P>
 <form action="UpdateSubject" method="post">
-
+<input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag != null ? formWithStateFlag : ''}" />
 <input type="hidden" name="action" value="confirm">
 <input type="hidden" name="id" value="<c:out value="${subjectToUpdate.id}"/>">
 <input type="hidden" name="studySubId" value="<c:out value="${studySubId}"/>">
@@ -304,42 +304,9 @@
 </div>
 </div></div></div></div></div></div></div></div>
 
-<script>
-		var updateSubjectFormState = {};
-		jQuery(window).load(function() {
-		updateSubjectFormState.gender = jQuery("input[name=gender]:checked").val();
-		});
-
-
-    function saveEditUserFormState(stateHolder) {
-        stateHolder.uniqueIdentifier = jQuery("input[name=uniqueIdentifier]").val();
-        stateHolder.gender = jQuery("input[name=gender]:checked").val();
-        stateHolder.dateOfBirth = jQuery("input[name=dateOfBirth]").val();
-        stateHolder.yearOfBirth = jQuery("input[name=yearOfBirth]").val();
-    }
-
-    function back_checkEditUserFormState() {
-        
-    	var newState = {};
-        saveEditUserFormState(newState);
-        if ((updateSubjectFormState.uniqueIdentifier != undefined && updateSubjectFormState.uniqueIdentifier != newState.uniqueIdentifier) ||
-            (updateSubjectFormState.gender != undefined && updateSubjectFormState.gender != newState.gender) ||
-            (updateSubjectFormState.dateOfBirth != undefined && updateSubjectFormState.dateOfBirth != newState.dateOfBirth) ||
-            (updateSubjectFormState.yearOfBirth != undefined && updateSubjectFormState.yearOfBirth != newState.yearOfBirth) ||
-			($("input[name=isDataChanged]").val() == 'true')) {
-        	confirmBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');
-        } 
-         else{
-        	 goBackSmart('${navigationURL}', '${defaultURL}');
-         }
-    }
- 
-    saveEditUserFormState(updateSubjectFormState);
-</script>
-
 </br>
 </div>
-<input type="button" onclick="back_checkEditUserFormState();"  name="BTN_Smart_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/>
+<input type="button" onclick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"  name="BTN_Smart_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/>
 
 <c:if test="${parameters['genderRequired'] || parameters['collectDob'] != 3 || (parameters['subjectPersonIdRequired'] != 'not used' && parameters['subjectPersonIdRequired'] != 'copyFromSSID')}">
 	<input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">

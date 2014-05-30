@@ -869,9 +869,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UpdateSubjectServlet</servlet-name>
+        <servlet-name>updateSubjectServlet</servlet-name>
         <display-name>UpdateSubject</display-name>
-        <servlet-class>org.akaza.openclinica.control.admin.UpdateSubjectServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>viewStudyServlet</servlet-name>
@@ -1857,7 +1857,7 @@
         <url-pattern>/ListSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>UpdateSubjectServlet</servlet-name>
+        <servlet-name>updateSubjectServlet</servlet-name>
         <url-pattern>/UpdateSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

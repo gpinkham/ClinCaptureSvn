@@ -166,6 +166,7 @@ public abstract class SecureController extends HttpServlet {
 	private DictionaryService dictionaryService;
 
 	public static final String BR = "<br/>";
+	public static final String FORM_WITH_STATE_FLAG = "formWithStateFlag";
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
 
 	protected ServletContext context;
@@ -431,6 +432,8 @@ public abstract class SecureController extends HttpServlet {
 		resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
 		local_df = new SimpleDateFormat(resformat.getString("date_format_string"), locale);
+
+		request.setAttribute(FORM_WITH_STATE_FLAG, request.getParameter(FORM_WITH_STATE_FLAG));
 
 		String includeReportingVar = "includeReporting";
 		if (!SQLInitServlet.getField("pentaho.url").trim().equals("")) {

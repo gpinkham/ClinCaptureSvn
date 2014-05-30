@@ -133,7 +133,7 @@ public final class CompleteClassificationFieldsUtil {
 		if ("meddra".equalsIgnoreCase(termDictionary)) {
 
 			return "LLT";
-		} else if ("icd 10".equalsIgnoreCase(termDictionary) || "icd 9cm".equalsIgnoreCase(termDictionary)) {
+		} else if ("icd10".equalsIgnoreCase(termDictionary) || "icd9cm".equalsIgnoreCase(termDictionary)) {
 
 			return "EXT";
 		}
