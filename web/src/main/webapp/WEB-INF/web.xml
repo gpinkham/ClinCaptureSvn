@@ -570,14 +570,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewEventDefinitionServlet</servlet-name>
+        <servlet-name>viewEventDefinitionServlet</servlet-name>
         <display-name>ViewEventDefinition</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewEventDefinitionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewEventDefinitionReadOnlyServlet</servlet-name>
+        <servlet-name>viewEventDefinitionReadOnlyServlet</servlet-name>
         <display-name>ViewEventDefinitionReadOnly</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewEventDefinitionReadOnlyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>createCRFServlet</servlet-name>
@@ -686,9 +686,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewSiteServlet</servlet-name>
+        <servlet-name>viewSiteServlet</servlet-name>
         <display-name>ViewSite</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewSiteServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>removeSiteServlet</servlet-name>
@@ -726,9 +726,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewStudyUserServlet</servlet-name>
+        <servlet-name>viewStudyUserServlet</servlet-name>
         <display-name>ViewStudyUser</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewStudyUserServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 	
 	<!-- Export Excel -->
@@ -801,14 +801,14 @@
     </servlet>
 
     <servlet>
-        <servlet-name>ViewCRFVersionServlet</servlet-name>
+        <servlet-name>viewCRFVersionServlet</servlet-name>
         <display-name>ViewCRFVersion</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewCRFVersionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewEventCRFServlet</servlet-name>
+        <servlet-name>viewEventCRFServlet</servlet-name>
         <display-name>ViewEventCRF</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewEventCRFServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ChangeParametersForDNoteServlet</servlet-name>
@@ -907,9 +907,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewStudySubjectAuditLogServlet</servlet-name>
+        <servlet-name>viewStudySubjectAuditLogServlet</servlet-name>
         <display-name>ViewStudySubjectAuditLog</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewStudySubjectAuditLogServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>viewSectionDataEntryServlet</servlet-name>
@@ -982,9 +982,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewStudyEventsServlet</servlet-name>
+        <servlet-name>viewStudyEventsServlet</servlet-name>
         <display-name>ViewStudyEvents</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewStudyEventsServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>deleteCRFVersionServlet</servlet-name>
@@ -1032,9 +1032,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewSubjectGroupClassServlet</servlet-name>
+        <servlet-name>viewSubjectGroupClassServlet</servlet-name>
         <display-name>ViewSubjectGroupClass</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewSubjectGroupClassServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RemoveSubjectGroupClassServlet</servlet-name>
@@ -1082,9 +1082,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewNoteServlet</servlet-name>
+        <servlet-name>viewNoteServlet</servlet-name>
         <display-name>ViewNote</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewNoteServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>resolveDiscrepancyServlet</servlet-name>
@@ -1105,9 +1105,9 @@
     </servlet>
 
     <servlet>
-        <servlet-name>ViewCRFVersionPreview</servlet-name>
+        <servlet-name>viewCRFVersionPreview</servlet-name>
         <display-name>ViewCRFVersionPreview</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewCRFVersionPreview</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -1249,9 +1249,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewItemAuditLogServlet</servlet-name>
+        <servlet-name>viewItemAuditLogServlet</servlet-name>
         <display-name>ViewItemAuditLogServlet</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewItemAuditLogServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewStudySubjectjsp</servlet-name>
@@ -1406,7 +1406,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>ViewCRFVersionPreview</servlet-name>
+        <servlet-name>viewCRFVersionPreview</servlet-name>
         <url-pattern>/ViewCRFVersionPreview</url-pattern>
     </servlet-mapping>
 
@@ -1653,11 +1653,11 @@
         <url-pattern>/AddCRFToDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewEventDefinitionServlet</servlet-name>
+        <servlet-name>viewEventDefinitionServlet</servlet-name>
         <url-pattern>/ViewEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewEventDefinitionReadOnlyServlet</servlet-name>
+        <servlet-name>viewEventDefinitionReadOnlyServlet</servlet-name>
         <url-pattern>/ViewEventDefinitionReadOnly</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1709,7 +1709,7 @@
         <url-pattern>/ListSite</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewSiteServlet</servlet-name>
+        <servlet-name>viewSiteServlet</servlet-name>
         <url-pattern>/ViewSite</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1741,7 +1741,7 @@
         <url-pattern>/ListStudyUser</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewStudyUserServlet</servlet-name>
+        <servlet-name>viewStudyUserServlet</servlet-name>
         <url-pattern>/ViewStudyUser</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1789,11 +1789,11 @@
         <url-pattern>/RestoreEventCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewCRFVersionServlet</servlet-name>
+        <servlet-name>viewCRFVersionServlet</servlet-name>
         <url-pattern>/ViewCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewEventCRFServlet</servlet-name>
+        <servlet-name>viewEventCRFServlet</servlet-name>
         <url-pattern>/ViewEventCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1865,7 +1865,7 @@
         <url-pattern>/ViewTableOfContent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewStudySubjectAuditLogServlet</servlet-name>
+        <servlet-name>viewStudySubjectAuditLogServlet</servlet-name>
         <url-pattern>/ViewStudySubjectAuditLog</url-pattern>
     </servlet-mapping>
 	
@@ -1943,7 +1943,7 @@
         <url-pattern>/UpdateStudyEvent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewStudyEventsServlet</servlet-name>
+        <servlet-name>viewStudyEventsServlet</servlet-name>
         <url-pattern>/ViewStudyEvents</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1983,7 +1983,7 @@
         <url-pattern>/UpdateSubjectGroupClass</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewSubjectGroupClassServlet</servlet-name>
+        <servlet-name>viewSubjectGroupClassServlet</servlet-name>
         <url-pattern>/ViewSubjectGroupClass</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2023,7 +2023,7 @@
         <url-pattern>/ViewNotes</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewNoteServlet</servlet-name>
+        <servlet-name>viewNoteServlet</servlet-name>
         <url-pattern>/ViewNote</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2104,7 +2104,7 @@
         <url-pattern>/PrintAllEventCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewItemAuditLogServlet</servlet-name>
+        <servlet-name>viewItemAuditLogServlet</servlet-name>
         <url-pattern>/ViewItemAuditLog</url-pattern>
     </servlet-mapping>
 

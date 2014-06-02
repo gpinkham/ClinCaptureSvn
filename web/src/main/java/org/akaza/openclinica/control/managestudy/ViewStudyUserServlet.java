@@ -24,18 +24,27 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings({ "serial" })
-public class ViewStudyUserServlet extends SecureController {
+@Component
+public class ViewStudyUserServlet extends Controller {
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -44,26 +53,27 @@ public class ViewStudyUserServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study") + " "
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_USER_IN_STUDY_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountDAO udao = new UserAccountDAO(getDataSource());
 		String name = request.getParameter("name");
 		String studyIdString = request.getParameter("studyId");
 
 		{
 
 			if (StringUtil.isBlank(name) || StringUtil.isBlank(studyIdString)) {
-				addPageMessage(respage.getString("please_choose_a_user_to_view"));
-				forwardPage(Page.LIST_USER_IN_STUDY_SERVLET);
+				addPageMessage(respage.getString("please_choose_a_user_to_view"), request);
+				forwardPage(Page.LIST_USER_IN_STUDY_SERVLET, request, response);
 			} else {
-				int studyId = Integer.valueOf(studyIdString.trim()).intValue();
+				int studyId = Integer.parseInt(studyIdString.trim());
 				UserAccountBean user = (UserAccountBean) udao.findByUserName(name);
 
 				request.setAttribute("user", user);
@@ -71,17 +81,16 @@ public class ViewStudyUserServlet extends SecureController {
 				StudyUserRoleBean uRole = udao.findRoleByUserNameAndStudyId(name, studyId);
 				request.setAttribute("uRole", uRole);
 
-				StudyDAO sdao = new StudyDAO(sm.getDataSource());
+				StudyDAO sdao = new StudyDAO(getDataSource());
 				StudyBean study = (StudyBean) sdao.findByPK(studyId);
 				request.setAttribute("uStudy", study);
 				request.setAttribute("roleMap", Role.roleMap);
 				// To provide the view with the correct date format
 				// pattern, locale sensitive
-				String pattn = "";
-				pattn = ResourceBundleProvider.getFormatBundle().getString("date_format_string");
+				String pattn = ResourceBundleProvider.getFormatBundle().getString("date_format_string");
 				request.setAttribute("dateFormatPattern", pattn);
 				request.setAttribute("action", "");
-				forwardPage(Page.VIEW_USER_IN_STUDY);
+				forwardPage(Page.VIEW_USER_IN_STUDY, request, response);
 
 			}
 		}

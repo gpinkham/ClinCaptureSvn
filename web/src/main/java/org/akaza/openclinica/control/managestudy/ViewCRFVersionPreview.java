@@ -21,23 +21,32 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
-import java.util.Iterator;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class ViewCRFVersionPreview extends SecureController {
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class ViewCRFVersionPreview extends Controller {
 	/**
 	 * Checks whether the user has the right permission to proceed function
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -45,21 +54,22 @@ public class ViewCRFVersionPreview extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_active_study_or_contact"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study") + " "
+						+ respage.getString("change_active_study_or_contact"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		int crfId = fp.getInt("crfId");
 		// CRFVersionBean
 		// SectionBean
 		CRFVersionBean version = new CRFVersionBean();
 		List sections;
-		Map<String, Map> crfMap = (Map) session.getAttribute("preview_crf");
+		Map<String, Map> crfMap = (Map) request.getSession().getAttribute("preview_crf");
 		Map<String, String> crfIdnameInfo = null;
 		if (crfMap != null) {
 			crfIdnameInfo = crfMap.get("crf_info");
@@ -70,9 +80,9 @@ public class ViewCRFVersionPreview extends SecureController {
 		String crfName = "";
 		String verNumber = "";
 		if (crfIdnameInfo != null) {
-			Map.Entry mapEnt = null;
-			for (Iterator iter = crfIdnameInfo.entrySet().iterator(); iter.hasNext();) {
-				mapEnt = (Map.Entry) iter.next();
+			Map.Entry mapEnt;
+			for (Map.Entry<String, String> stringStringEntry : crfIdnameInfo.entrySet()) {
+				mapEnt = (Map.Entry) stringStringEntry;
 				if (((String) mapEnt.getKey()).equalsIgnoreCase("crf_name")) {
 					crfName = (String) mapEnt.getValue();
 				}
@@ -103,7 +113,7 @@ public class ViewCRFVersionPreview extends SecureController {
 		sections = beanFactory.createSectionBeanList(sectionsMap, itemsMap, crfName, groupsMap);
 		request.setAttribute("sections", sections);
 		request.setAttribute("version", version);
-		forwardPage(Page.VIEW_CRF_VERSION);
+		forwardPage(Page.VIEW_CRF_VERSION, request, response);
 
 	}
 }

@@ -22,10 +22,13 @@ package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
@@ -37,7 +40,10 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyEventRow;
+import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +51,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -55,9 +60,8 @@ import java.util.Map;
  * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
-public class ViewStudyEventsServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class ViewStudyEventsServlet extends Controller {
 
 	public static final String INPUT_STARTDATE = "startDate";
 
@@ -77,9 +81,10 @@ public class ViewStudyEventsServlet extends SecureController {
 	 * Checks whether the user has the right permission to proceed function
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -89,13 +94,17 @@ public class ViewStudyEventsServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, restext.getString("not_correct_role"), "1");
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
+		SimpleDateFormat local_df = getLocalDf(request);
+
 		FormProcessor fp = new FormProcessor(request);
 		// checks which module requests are from
 		String module = fp.getString(MODULE);
@@ -126,14 +135,14 @@ public class ViewStudyEventsServlet extends SecureController {
 			presetValues.put(INPUT_ENDDATE, local_df.format(defaultEndDate));
 			startDate = defaultStartDate;
 			endDate = defaultEndDate;
-			setPresetValues(presetValues);
+			setPresetValues(presetValues, request);
 		} else {
 			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 			v.addValidation(INPUT_STARTDATE, Validator.IS_A_DATE);
 			v.addValidation(INPUT_ENDDATE, Validator.IS_A_DATE);
-			errors = v.validate();
+			HashMap errors = v.validate();
 			if (!errors.isEmpty()) {
-				setInputMessages(errors);
+				setInputMessages(errors, request);
 				startDate = defaultStartDate;
 				endDate = defaultEndDate;
 			}
@@ -141,12 +150,12 @@ public class ViewStudyEventsServlet extends SecureController {
 			fp.addPresetValue(INPUT_ENDDATE, fp.getString(INPUT_ENDDATE));
 			fp.addPresetValue(INPUT_DEF_ID, fp.getInt(INPUT_DEF_ID));
 			fp.addPresetValue(INPUT_STATUS_ID, fp.getInt(INPUT_STATUS_ID));
-			setPresetValues(fp.getPresetValues());
+			setPresetValues(fp.getPresetValues(), request);
 		}
 
 		request.setAttribute(STATUS_MAP, SubjectEventStatus.toArrayList());
 
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
 		ArrayList<StudyEventDefinitionBean> definitions = seddao.findAllAvailableByStudy(currentStudy);
 		request.setAttribute(DEFINITION_MAP, definitions);
 
@@ -159,22 +168,25 @@ public class ViewStudyEventsServlet extends SecureController {
 				+ statusId + "&" + "sedId=" + sedId + "&submitted=" + fp.getInt("submitted");
 		request.setAttribute("queryUrl", queryUrl);
 		if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
-			allEvents = genEventsForPrint(definitions, startDate, endDate, definitionId, statusId);
+			allEvents = genEventsForPrint(currentStudy, definitions, startDate, endDate, definitionId, statusId);
 			request.setAttribute("allEvents", allEvents);
-			forwardPage(Page.VIEW_STUDY_EVENTS_PRINT);
+			forwardPage(Page.VIEW_STUDY_EVENTS_PRINT, request, response);
 		} else {
-			forwardPage(Page.VIEW_STUDY_EVENTS);
+			forwardPage(Page.VIEW_STUDY_EVENTS, request, response);
 		}
 
 	}
 
 	private ArrayList genTables(FormProcessor fp, ArrayList<StudyEventDefinitionBean> definitions, Date startDate,
 			Date endDate, int sedId, int definitionId, int statusId) {
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+		StudyBean currentStudy = getCurrentStudy(fp.getRequest());
+		StudyUserRoleBean currentRole = getCurrentRole(fp.getRequest());
+		SimpleDateFormat local_df = getLocalDf(fp.getRequest());
+		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
+		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		ArrayList allEvents = new ArrayList();
 		definitions = findDefinitionById(definitions, definitionId);
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 		Map<Integer, ArrayList<StudyEventBean>> studyEventDefinitionEventsMap = new HashMap<Integer, ArrayList<StudyEventBean>>();
 		ArrayList studySubjects = ssdao.findAllByStudyId(currentStudy.getId());
 		for (Object studySubject : studySubjects) {
@@ -305,6 +317,8 @@ public class ViewStudyEventsServlet extends SecureController {
 	/**
 	 * Generates an arraylist of study events for printing
 	 * 
+	 * @param currentStudy
+	 *            StudyBean
 	 * @param definitions
 	 *            ArrayList<StudyEventDefinitionBean>
 	 * @param startDate
@@ -317,13 +331,13 @@ public class ViewStudyEventsServlet extends SecureController {
 	 *            int
 	 * @return ArrayList
 	 */
-	private ArrayList genEventsForPrint(ArrayList<StudyEventDefinitionBean> definitions, Date startDate, Date endDate,
-			int definitionId, int statusId) {
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+	private ArrayList genEventsForPrint(StudyBean currentStudy, ArrayList<StudyEventDefinitionBean> definitions,
+			Date startDate, Date endDate, int definitionId, int statusId) {
+		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
+		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		ArrayList allEvents = new ArrayList();
 		definitions = findDefinitionById(definitions, definitionId);
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 		List<StudySubjectBean> studySubjects = ssdao.findAllByStudyId(currentStudy.getId());
 		for (StudyEventDefinitionBean sed : definitions) {
 			ViewEventDefinitionBean ved = new ViewEventDefinitionBean();

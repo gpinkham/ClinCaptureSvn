@@ -20,15 +20,15 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -39,6 +39,11 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 
 /**
  * @author jxu
@@ -47,12 +52,18 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  *         Code Templates
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class ViewSiteServlet extends SecureController {
+@Component
+public class ViewSiteServlet extends Controller {
 	/**
 	 * Checks whether the user has the correct privilege
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
@@ -60,17 +71,19 @@ public class ViewSiteServlet extends SecureController {
 		if (currentStudy.getId() == siteId) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study") + " "
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
 
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		String idString = "";
+		StudyDAO sdao = new StudyDAO(getDataSource());
+		String idString;
 		if (request.getAttribute("siteId") == null) {
 			idString = request.getParameter("id");
 		} else {
@@ -78,21 +91,18 @@ public class ViewSiteServlet extends SecureController {
 		}
 		logger.info("site id:" + idString);
 		if (StringUtil.isBlank(idString)) {
-			addPageMessage(respage.getString("please_choose_a_site_to_edit"));
-			forwardPage(Page.SITE_LIST_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_site_to_edit"), request);
+			forwardPage(Page.SITE_LIST_SERVLET, request, response);
 		} else {
-			int siteId = Integer.valueOf(idString.trim()).intValue();
+			int siteId = Integer.parseInt(idString.trim());
 			StudyBean study = (StudyBean) sdao.findByPK(siteId);
 
-			checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
-			// if (currentStudy.getId() != study.getId()) {
+			checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
 
-			ArrayList configs = new ArrayList();
-			StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+			ArrayList configs;
+			StudyParameterValueDAO spvdao = new StudyParameterValueDAO(getDataSource());
 			configs = spvdao.findParamConfigByStudy(study);
 			study.setStudyParameters(configs);
-
-			// }
 
 			String parentStudyName = "";
 			if (study.getParentStudyId() > 0) {
@@ -102,19 +112,19 @@ public class ViewSiteServlet extends SecureController {
 			request.setAttribute("parentName", parentStudyName);
 			request.setAttribute("siteToView", study);
 			request.setAttribute("idToSort", request.getAttribute("idToSort"));
-			viewSiteEventDefinitions(study);
+			viewSiteEventDefinitions(request, study);
 
-			forwardPage(Page.VIEW_SITE);
+			forwardPage(Page.VIEW_SITE, request, response);
 		}
 	}
 
-	private void viewSiteEventDefinitions(StudyBean siteToView) {
+	private void viewSiteEventDefinitions(HttpServletRequest request, StudyBean siteToView) {
 		int siteId = siteToView.getId();
-		ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
-		StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
-		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
+		ArrayList<StudyEventDefinitionBean> seds;
+		StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(getDataSource());
+		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
+		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
+		CRFDAO cdao = new CRFDAO(getDataSource());
 		seds = sedDao.findAllAvailableByStudy(siteToView);
 		for (StudyEventDefinitionBean sed : seds) {
 			int defId = sed.getId();

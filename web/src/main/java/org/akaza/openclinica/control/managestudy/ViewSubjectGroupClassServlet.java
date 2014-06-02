@@ -20,14 +20,15 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
 import org.akaza.openclinica.bean.core.GroupClassType;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -37,6 +38,11 @@ import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 
 /**
  * Views details of a Subject Group Class
@@ -44,59 +50,66 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "serial"})
-public class ViewSubjectGroupClassServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@Component
+public class ViewSubjectGroupClassServlet extends Controller {
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
 		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + "\n"
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study") + "\n"
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		FormProcessor fp = new FormProcessor(request);
 		int classId = fp.getInt("id");
 
 		if (classId == 0) {
 
-			addPageMessage(respage.getString("please_choose_a_subject_group_class_to_view"));
-			forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_subject_group_class_to_view"), request);
+			forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
 		} else {
-			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
-			StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
-			StudyDAO studyDao = new StudyDAO(sm.getDataSource());
+			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(getDataSource());
+			StudyGroupDAO sgdao = new StudyGroupDAO(getDataSource());
+			StudyDAO studyDao = new StudyDAO(getDataSource());
 
 			StudyGroupClassBean group = (StudyGroupClassBean) sgcdao.findByPK(classId);
 			StudyBean study = (StudyBean) studyDao.findByPK(group.getStudyId());
-			
-			checkRoleByUserAndStudy(ub, group.getStudyId(), study.getParentStudyId());
-			
+
+			checkRoleByUserAndStudy(request, response, ub, group.getStudyId(), study.getParentStudyId());
+
 			if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()) {
-				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-				ArrayList orderedDefinitions = seddao.findAllOrderedByStudyGroupClassId(group.getId());
-				
-				EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-				for (int i = 0; i < orderedDefinitions.size(); i++) {
-					StudyEventDefinitionBean def = (StudyEventDefinitionBean) orderedDefinitions.get(i);
+				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
+				ArrayList<StudyEventDefinitionBean> orderedDefinitions = (ArrayList<StudyEventDefinitionBean>) seddao
+						.findAllOrderedByStudyGroupClassId(group.getId());
+
+				EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
+				for (StudyEventDefinitionBean def : orderedDefinitions) {
 					def.setCrfNum(edcdao.findAllActiveParentsByEventDefinitionId(def.getId()).size());
 				}
 				request.setAttribute("orderedDefinitions", orderedDefinitions);
-				
-			} else {
-				SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
-				ArrayList studyGroups = sgdao.findAllByGroupClass(group);
 
-				for (int i = 0; i < studyGroups.size(); i++) {
-					StudyGroupBean sg = (StudyGroupBean) studyGroups.get(i);
+			} else {
+				SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(getDataSource());
+				ArrayList<StudyGroupBean> studyGroups = (ArrayList<StudyGroupBean>) sgdao.findAllByGroupClass(group);
+
+				for (StudyGroupBean sg : studyGroups) {
 					ArrayList subjectMaps = sgmdao.findAllByStudyGroupClassAndGroup(group.getId(), sg.getId());
 					sg.setSubjectMaps(subjectMaps);
 				}
@@ -104,7 +117,7 @@ public class ViewSubjectGroupClassServlet extends SecureController {
 				request.setAttribute("studyGroups", studyGroups);
 			}
 			request.setAttribute("group", group);
-			forwardPage(Page.VIEW_SUBJECT_GROUP_CLASS);
+			forwardPage(Page.VIEW_SUBJECT_GROUP_CLASS, request, response);
 		}
 	}
 }

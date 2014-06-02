@@ -23,6 +23,7 @@ package org.akaza.openclinica.control.managestudy;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -31,7 +32,10 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
+import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
 /**
@@ -40,31 +44,33 @@ import java.util.ArrayList;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@Component
 public class ViewEventDefinitionReadOnlyServlet extends ViewEventDefinitionServlet {
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
 
-		StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(getDataSource());
 		FormProcessor fp = new FormProcessor(request);
 		int defId = fp.getInt("id", true);
 
 		if (defId == 0) {
-			addPageMessage(respage.getString("please_choose_a_definition_to_view"));
-			forwardPage(Page.LIST_DEFINITION_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_definition_to_view"), request);
+			forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 		} else {
 			// definition id
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
 
-			EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
-			ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllByDefinition(this.currentStudy, defId);
+			EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(getDataSource());
+			ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList<EventDefinitionCRFBean>) edao
+					.findAllByDefinition(currentStudy, defId);
 
-			CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-			CRFDAO cdao = new CRFDAO(sm.getDataSource());
+			CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
+			CRFDAO cdao = new CRFDAO(getDataSource());
 
-			for (int i = 0; i < eventDefinitionCRFs.size(); i++) {
-				EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
+			for (EventDefinitionCRFBean edc : eventDefinitionCRFs) {
 				ArrayList versions = (ArrayList) cvdao.findAllByCRF(edc.getCrfId());
 				edc.setVersions(versions);
 				CRFBean crf = (CRFBean) cdao.findByPK(edc.getCrfId());
@@ -80,8 +86,8 @@ public class ViewEventDefinitionReadOnlyServlet extends ViewEventDefinitionServl
 
 			request.setAttribute("definition", sed);
 			request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
-			request.setAttribute("defSize", new Integer(eventDefinitionCRFs.size()));
-			forwardPage(Page.VIEW_EVENT_DEFINITION_READONLY);
+			request.setAttribute("defSize", eventDefinitionCRFs.size());
+			forwardPage(Page.VIEW_EVENT_DEFINITION_READONLY, request, response);
 		}
 
 	}

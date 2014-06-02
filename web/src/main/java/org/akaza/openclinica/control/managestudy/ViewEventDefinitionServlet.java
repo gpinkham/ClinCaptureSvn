@@ -20,15 +20,16 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -36,6 +37,11 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 
 /**
  * View the details of a study event definition
@@ -43,55 +49,64 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
-public class ViewEventDefinitionServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@Component
+public class ViewEventDefinitionServlet extends Controller {
 	/**
 	 * Checks whether the user has the correct privilege
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study") + " "
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET, resexception.getString("not_director"),
 				"1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
-		StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(getDataSource());
 		FormProcessor fp = new FormProcessor(request);
 		int defId = fp.getInt("id", true);
 
 		if (defId == 0) {
-			addPageMessage(respage.getString("please_choose_a_definition_to_view"));
-			forwardPage(Page.LIST_DEFINITION_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_definition_to_view"), request);
+			forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 		} else {
 			// definition id
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
 
 			if (currentStudy.getId() != sed.getStudyId()) {
-				addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_active_study_or_contact"));
-				forwardPage(Page.MENU_SERVLET);
+				addPageMessage(
+						respage.getString("no_have_correct_privilege_current_study") + " "
+								+ respage.getString("change_active_study_or_contact"), request);
+				forwardPage(Page.MENU_SERVLET, request, response);
 				return;
 			}
 
-			checkRoleByUserAndStudy(ub, sed.getStudyId(), 0);
+			checkRoleByUserAndStudy(request, response, ub, sed.getStudyId(), 0);
 
-			EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
-			ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllByDefinition(this.currentStudy, defId);
+			EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(getDataSource());
+			ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList<EventDefinitionCRFBean>) edao
+					.findAllByDefinition(currentStudy, defId);
 
-			CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-			CRFDAO cdao = new CRFDAO(sm.getDataSource());
+			CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
+			CRFDAO cdao = new CRFDAO(getDataSource());
 
-			for (int i = 0; i < eventDefinitionCRFs.size(); i++) {
-				EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
+			for (EventDefinitionCRFBean edc : eventDefinitionCRFs) {
 				ArrayList versions = (ArrayList) cvdao.findAllByCRF(edc.getCrfId());
 				edc.setVersions(versions);
 				CRFBean crf = (CRFBean) cdao.findByPK(edc.getCrfId());
@@ -108,10 +123,10 @@ public class ViewEventDefinitionServlet extends SecureController {
 
 			request.setAttribute("definition", sed);
 			request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
-			request.setAttribute("defSize", new Integer(eventDefinitionCRFs.size()));
+			request.setAttribute("defSize", eventDefinitionCRFs.size());
 			// request.setAttribute("eventDefinitionCRFs", new
 			// ArrayList(tm.values()));
-			forwardPage(Page.VIEW_EVENT_DEFINITION);
+			forwardPage(Page.VIEW_EVENT_DEFINITION, request, response);
 		}
 
 	}

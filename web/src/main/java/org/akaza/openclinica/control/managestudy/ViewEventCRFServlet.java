@@ -28,7 +28,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -39,7 +39,10 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
 /**
@@ -48,33 +51,35 @@ import java.util.ArrayList;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class ViewEventCRFServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class ViewEventCRFServlet extends Controller {
 	/**
      *
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		//
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		int eventCRFId = fp.getInt("id", true);
 		int studySubId = fp.getInt("studySubId", true);
 
-		StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-		ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-		ItemDAO idao = new ItemDAO(sm.getDataSource());
-		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(sm.getDataSource());
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
-		SectionDAO secdao = new SectionDAO(sm.getDataSource());
+		StudySubjectDAO subdao = new StudySubjectDAO(getDataSource());
+		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+		ItemDAO idao = new ItemDAO(getDataSource());
+		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
+		CRFDAO cdao = new CRFDAO(getDataSource());
+		SectionDAO secdao = new SectionDAO(getDataSource());
 
 		if (eventCRFId == 0) {
-			addPageMessage(respage.getString("please_choose_an_event_CRF_to_view"));
-			forwardPage(Page.LIST_STUDY_SUBJECTS);
+			addPageMessage(respage.getString("please_choose_an_event_CRF_to_view"), request);
+			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
 		} else {
 			StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 			request.setAttribute("studySub", studySub);
@@ -83,14 +88,12 @@ public class ViewEventCRFServlet extends SecureController {
 			CRFBean crf = cdao.findByVersionId(eventCRF.getCRFVersionId());
 			request.setAttribute("crf", crf);
 
-			ArrayList sections = secdao.findAllByCRFVersionId(eventCRF.getCRFVersionId());
-			for (int j = 0; j < sections.size(); j++) {
-				SectionBean section = (SectionBean) sections.get(j);
-				ArrayList itemData = iddao.findAllByEventCRFId(eventCRFId);
+			ArrayList<SectionBean> sections = secdao.findAllByCRFVersionId(eventCRF.getCRFVersionId());
+			for (SectionBean section : sections) {
+				ArrayList<ItemDataBean> itemData = iddao.findAllByEventCRFId(eventCRFId);
 
 				ArrayList displayItemData = new ArrayList();
-				for (int i = 0; i < itemData.size(); i++) {
-					ItemDataBean id = (ItemDataBean) itemData.get(i);
+				for (ItemDataBean id : itemData) {
 					DisplayItemBean dib = new DisplayItemBean();
 					ItemBean item = (ItemBean) idao.findByPK(id.getItemId());
 					ItemFormMetadataBean ifm = ifmdao.findByItemIdAndCRFVersionId(item.getId(),
@@ -106,8 +109,8 @@ public class ViewEventCRFServlet extends SecureController {
 			}
 
 			request.setAttribute("sections", sections);
-			request.setAttribute("studySubId", new Integer(studySubId).toString());
-			forwardPage(Page.VIEW_EVENT_CRF);
+			request.setAttribute("studySubId", Integer.toString(studySubId));
+			forwardPage(Page.VIEW_EVENT_CRF, request, response);
 		}
 	}
 
