@@ -564,9 +564,6 @@ public class Page {
 	public final static String servletPath = "/OpenClinica";
 
 	public final static Page ADMIN_SYSTEM = new Page(path + "admin/index.jsp", "Administer System Menu");
-	public final static Page MANAGE_STUDY = new Page(path + "managestudy/index.jsp", "Manage Study Menu");
-	public final static Page MANAGE_STUDY_BODY = new Page(path + "managestudy/managestudy_body.jsp",
-			"Manage Study Menu");
 
 	public final static Page CREATE_JOB_EXPORT = new Page(path + "admin/createExportJob.jsp", "Create Export Job");
 	public final static Page UPDATE_JOB_EXPORT = new Page(path + "admin/updateExportJob.jsp", "Update Export Job");
@@ -584,7 +581,6 @@ public class Page {
 	public final static Page TECH_ADMIN_SYSTEM = new Page(path + "techadmin/index.jsp", "Technical Administrator Menu");
 	public final static Page VIEW_SCHEDULER = new Page(path + "admin/viewScheduler.jsp", "View System Scheduler");
 	public final static Page ADMIN_SYSTEM_SERVLET = new Page("/AdminSystem", "Administer System Servlet");
-	public final static Page MANAGE_STUDY_SERVLET = new Page("/ManageStudy", "Manage Study Servlet");
 
 	public final static Page SUBMIT_DATA = new Page(path + "submit/index.jsp", "Submit Data Menu");
 	// public final static Page SUBMIT_DATA_SERVLET = new Page("/SubmitData",
@@ -658,8 +654,6 @@ public class Page {
 	public final static Page VIEW_CRF_VERSION = new Page(path + "managestudy/viewCRFVersion.jsp", "View a CRF Version");
 
 	// TODO do we need both versions here??? tbh
-	public final static Page LIST_STUDY_SUBJECT = new Page(path + "managestudy/listStudySubject.jsp",
-			"list subjects in a study");
 	public final static Page LIST_STUDY_SUBJECT_SERVLET = new Page("/ListStudySubject", "list subjects in a study");
 	public final static Page VIEW_STUDY_SUBJECT = new Page(path + "managestudy/viewStudySubject.jsp",
 			"View Subject in a study");
@@ -774,8 +768,6 @@ public class Page {
 			"View Discrepancy Notes in Study");
 	public final static Page VIEW_SINGLE_NOTE = new Page("/WEB-INF/jsp/managestudy/viewNote.jsp", "View Single Note");
 
-	public final static Page LIST_EVENTS_FOR_SUBJECT = new Page("/WEB-INF/jsp/submit/listEventsForSubject.jsp",
-			"List Events For Subject");
 	public final static Page LIST_EVENTS_FOR_SUBJECTS_SERVLET = new Page("/ListEventsForSubjects",
 			"List Selected Event For Subjects");
 	public final static Page LIST_EVENTS_FOR_SUBJECTS = new Page("/WEB-INF/jsp/managestudy/listEventsForSubjects.jsp",
@@ -784,14 +776,11 @@ public class Page {
 			"Data Entry");
 	public final static Page VIEW_SECTION_DATA_ENTRY_PRINT_GROUPS = new Page(
 			"/WEB-INF/jsp/managestudy/viewGroupSectionsPrint.jsp", "Print View for Group Tables");
-	public final static Page LIST_SUBJECT_DISC_NOTE = new Page("/WEB-INF/jsp/managestudy/listSubjectDiscNote.jsp",
-			"List Disc Notes By Subject");
+
 	public final static Page LIST_DNOTES_FOR_CRF = new Page("/WEB-INF/jsp/submit/listDNotesForCRF.jsp",
 			"List Disc Notes By Subject and CRF");
 	public final static Page CHOOSE_DOWNLOAD_FORMAT = new Page("/WEB-INF/jsp/submit/chooseDownloadFormat.jsp",
 			"Choose download format");
-	public final static Page LIST_SUBJECT_DISC_NOTE_SERVLET = new Page("/ListDiscNotesSubjectServlet",
-			"List Disc Notes Servlet");
 
 	public final static Page FILE_UPLOAD = new Page("/WEB-INF/jsp/submit/uploadFile.jsp", "Form For File Uploading");
 	public final static Page UPLOAD_FILE_SERVLET = new Page("/UploadFile", "Upload File");

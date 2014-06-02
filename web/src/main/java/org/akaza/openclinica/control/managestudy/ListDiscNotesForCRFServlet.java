@@ -113,7 +113,7 @@ public class ListDiscNotesForCRFServlet extends Controller {
 		int definitionId = fp.getInt("defId");
 		if (definitionId <= 0) {
 			addPageMessage(respage.getString("please_choose_an_ED_ta_to_vies_details"), request);
-			forwardPage(Page.LIST_SUBJECT_DISC_NOTE_SERVLET, request, response);
+			forwardPage(Page.LIST_DNOTES_FOR_CRF, request, response);
 			return;
 		}
 

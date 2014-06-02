@@ -281,13 +281,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>listDiscNotesSubjectServlet</servlet-name>
-        <display-name>ListDiscNotesSubjectServlet</display-name>
-        <description>ListDiscNotesSubjectServlet</description>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>listDiscNotesForCRFServlet</servlet-name>
         <display-name>ListDiscNotesForCRFServlet</display-name>
         <description>ListDiscNotesForCRFServlet</description>
@@ -642,11 +635,6 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>manageStudyServlet</servlet-name>
-        <display-name>ManageStudy</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>submitDataServlet</servlet-name>
         <display-name>SubmitData</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -758,11 +746,6 @@
     </servlet>
     <servlet>
         <servlet-name>listStudySubjectsServlet</servlet-name>
-        <display-name>ListStudySubject</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>listStudySubjectsManageServlet</servlet-name>
         <display-name>ListStudySubject</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
@@ -1108,11 +1091,6 @@
         <display-name>ResolveDiscrepancy</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>listEventsForSubjectServlet</servlet-name>
-        <display-name>ListEventsForSubject</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
 
     <servlet>
         <servlet-name>listEventsForSubjectsServlet</servlet-name>
@@ -1307,11 +1285,6 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>listDiscNotesSubjectServlet</servlet-name>
-        <url-pattern>/ListDiscNotesSubjectServlet</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
         <servlet-name>listDiscNotesForCRFServlet</servlet-name>
         <url-pattern>/ListDiscNotesForCRFServlet</url-pattern>
     </servlet-mapping>
@@ -1496,11 +1469,6 @@
     <servlet-mapping>
         <servlet-name>auditLogStudyServlet</servlet-name>
         <url-pattern>/AuditLogStudy</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>manageStudyServlet</servlet-name>
-        <url-pattern>/ManageStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>requestPasswordServlet</servlet-name>
@@ -1779,10 +1747,6 @@
     <servlet-mapping>
         <servlet-name>SetStudyUserRoleServlet</servlet-name>
         <url-pattern>/SetStudyUserRole</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>listStudySubjectsManageServlet</servlet-name>
-        <url-pattern>/ListStudySubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>listStudySubjectsServlet</servlet-name>
@@ -2067,10 +2031,6 @@
         <url-pattern>/ResolveDiscrepancy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>listEventsForSubjectServlet</servlet-name>
-        <url-pattern>/ListEventsForSubject</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>listEventsForSubjectsServlet</servlet-name>
         <url-pattern>/ListEventsForSubjects</url-pattern>
     </servlet-mapping>
@@ -2131,10 +2091,6 @@
         <url-pattern>/ViewStudySubject1</url-pattern>
     </servlet-mapping>
     <!-- just for testing purposes -->
-    <servlet-mapping>
-        <servlet-name>manageStudyServlet</servlet-name>
-        <url-pattern>/ManageStudy1</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>printAllSiteEventCRFServlet</servlet-name>
         <url-pattern>/PrintAllSiteEventCRF</url-pattern>

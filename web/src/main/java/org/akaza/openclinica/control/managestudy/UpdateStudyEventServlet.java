@@ -162,9 +162,9 @@ public class UpdateStudyEventServlet extends Controller {
 		if (StringUtil.isBlank(fromResolvingNotes)) {
 			session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
 			session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
-			checkStudyLocked(Page.MANAGE_STUDY, respage.getString("current_study_locked"), request, response);
+			checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"), request, response);
 			if (currentRole.getRole() != Role.INVESTIGATOR) {
-				checkStudyFrozen(Page.MANAGE_STUDY, respage.getString("current_study_frozen"), request, response);
+				checkStudyFrozen(Page.MENU_SERVLET, respage.getString("current_study_frozen"), request, response);
 			}
 		}
 

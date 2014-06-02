@@ -237,7 +237,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 		DiscrepancyNoteBean discrepancyNoteBean = (DiscrepancyNoteBean) dndao.findByPK(noteId);
 
 		if (!discrepancyNoteBean.isActive()) {
-			throw new InconsistentStateException(Page.MANAGE_STUDY_SERVLET,
+			throw new InconsistentStateException(Page.MENU_SERVLET,
 					resexception.getString("you_are_trying_resolve_discrepancy_not_exist"));
 		}
 

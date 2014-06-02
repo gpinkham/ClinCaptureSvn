@@ -287,7 +287,7 @@ public class StudyInfoPanel {
 			
 			} else if (page.equals(Page.ADMIN_SYSTEM)) {
 				// blank here , info set in servlet itself
-			} else if (page.equals(Page.VIEW_STUDY_SUBJECT) || page.equals(Page.LIST_EVENTS_FOR_SUBJECT)) {
+			} else if (page.equals(Page.VIEW_STUDY_SUBJECT)) {
 				this.reset();
 				this.setStudyInfoShown(true);
 				this.setOrderedData(true);
@@ -375,7 +375,7 @@ public class StudyInfoPanel {
 				this.setSubmitDataModule(false);
 				this.setCreateDataset(false);
 
-			} else if (page.equals(Page.LIST_STUDY_SUBJECT) || page.equals(Page.LIST_STUDY_SUBJECTS)
+			} else if (page.equals(Page.LIST_STUDY_SUBJECTS)
 					|| page.equals(Page.SUBMIT_DATA) || page.equals(Page.SUBMIT_DATA_SERVLET)) {
 				this.reset();
 				this.setStudyInfoShown(true);

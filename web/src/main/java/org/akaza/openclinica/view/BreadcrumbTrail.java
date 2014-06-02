@@ -378,22 +378,11 @@ public class BreadcrumbTrail {
 				trail.add(new BreadcrumbBean(resworkflow.getString("home"), "MainMenu", Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("openclinica_enterprise"), "#", Status.PENDING));
 
-			} else if (jspPage.equals(Page.MANAGE_STUDY)) {
-				trail = new ArrayList();
-				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "#", Status.PENDING));
-			} else if (jspPage.equals(Page.MANAGE_STUDY_BODY)) {
-				trail = new ArrayList();
-				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "#", Status.PENDING));
 			} else if (jspPage.equals(Page.LIST_USER_IN_STUDY)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_users"), "ListStudyUser", Status.PENDING));
 
-			} else if (jspPage.equals(Page.LIST_STUDY_SUBJECT)) {
-				trail = new ArrayList();
-				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));
-				trail.add(new BreadcrumbBean(resworkflow.getString("manage_subjects"), "ListStudySubject",
-						Status.PENDING));
 			} else if (jspPage.equals(Page.SITE_LIST)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));
