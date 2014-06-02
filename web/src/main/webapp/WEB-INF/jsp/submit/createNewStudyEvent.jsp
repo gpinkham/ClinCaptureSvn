@@ -418,9 +418,9 @@
 				<td>
                     <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
                     <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-						<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=schLocation0&column=location','spanAlert-locationScheduled0', '', event); return false;">
-							<img name="flag_schLocation0" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
-							<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=schLocation0&column=location">
+						<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=locationScheduled0&column=location','spanAlert-locationScheduled0', '', event); return false;">
+							<img name="flag_locationScheduled0" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+							<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=locationScheduled0&column=location">
 						</a>							
 					</c:if>
                 </td>
@@ -583,9 +583,9 @@
 				<td>
                     <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
                     <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-						<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=schLocation1&column=location','spanAlert-locationScheduled1', '', event); return false;">
-							<img name="flag_schLocation1" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
-							<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=schLocation1&column=location">
+						<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=locationScheduled1&column=location','spanAlert-locationScheduled1', '', event); return false;">
+							<img name="flag_locationScheduled1" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+							<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=locationScheduled1&column=location">
 						</a>
 					</c:if>
 				</td>
@@ -750,9 +750,9 @@
 				<td>
                     <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
                     <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-						<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=schLocation2&column=location','spanAlert-locationScheduled2', '', event); return false;">
-							<img name="flag_schLocation2" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
-							<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=schLocation2&column=location">
+						<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=locationScheduled2&column=location','spanAlert-locationScheduled2', '', event); return false;">
+							<img name="flag_locationScheduled2" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+							<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=locationScheduled2&column=location">
 						</a>
 					</c:if>
 				</td>
@@ -918,9 +918,9 @@
 				<td>
                     <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
                     <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-						<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=schLocation3&column=location','spanAlert-locationScheduled3', '', event); return false;">
-							<img name="flag_schLocation3" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
-							<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=location&column=location">
+						<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=locationScheduled3&column=location','spanAlert-locationScheduled3', '', event); return false;">
+							<img name="flag_locationScheduled3" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+							<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&stSubjectId=${chosenStudySubject.id}&name=studyEvent&field=locationScheduled3&column=location">
 						</a>
 					</c:if>
 				</td>
