@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings("rawtypes")
 public final class CompleteClassificationFieldsUtil {
 
 	enum ICD910 {CAT, GRP}
@@ -33,7 +34,6 @@ public final class CompleteClassificationFieldsUtil {
 
 	enum WHOD_SECOND_PART {ATC7, ATC6, ATC5, ATC4, ATC3, ATC2, ATC1, CNTR}
 
-	@SuppressWarnings("rawtypes")
 	public static void completeClassificationNameFields(ArrayList<ClassificationElement> classificationElements, String dictionary) throws SearchException {
 
 		ArrayList dictionaryValuesList;
@@ -86,7 +86,7 @@ public final class CompleteClassificationFieldsUtil {
 			}
 		}
 	}
-
+	
 	public static List<Classification> firstResponse(List<Classification> classificationResponse, String dictionary, String prefLabel, String codeHttpPath) throws SearchException {
 		List dictionaryValuesList = new ArrayList<WHOD_FIRST_PART>(Arrays.asList(WHOD_FIRST_PART.values()));
 

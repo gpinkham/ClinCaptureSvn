@@ -14,18 +14,18 @@ $(document).ready(function($) {
 	<h2><fmt:message key="nds_assigned_to_me_widget_header" bundle="${resword}"/></h2>
 	<div class="chart_wrapper" align="left">
 		<ul class="stacked_bar">
-			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='New' bundle='${resterm}'/>"><li class="new stack">
-					<div class="pop-up"></div>				
+			<a href="#"><li class="new stack">
+					<div class="pop-up"></div>
 			</li></a>
-			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Updated' bundle='${resterm}'/>"><li class="updated stack">
-					<div class="pop-up"></div>			
+			<a href="#"><li class="updated stack">
+					<div class="pop-up"></div>
 			</li></a>
-			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Resolution_Proposed' bundle='${resterm}'/>" class="optional"><li class="resolution_proposed stack">
-					<div class="pop-up"></div>				
+			<a href="#" class="optional"><li class="resolution_proposed stack">
+					<div class="pop-up"></div>
 			</li></a>
-			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Closed' bundle='${resterm}'/>"><li class="closed stack">
-					<div class="pop-up"></div>				
-			</li></a>			
+			<a href="#"><li class="closed stack">
+					<div class="pop-up"></div>
+			</li></a>
 		</ul>
 	</div>
 	<table class="captions">
@@ -36,15 +36,26 @@ $(document).ready(function($) {
 			<td></td>
 			<td></td>
 		</tr>
-	</table>	
+	</table>
 	<table class="signs">
 		<tr align="left">
-			<td><div class="new sign">&nbsp</div> - <fmt:message key="new" bundle="${resword}"/></td>
-			<td><div class="updated sign">&nbsp</div> - <fmt:message key="updated" bundle="${resword}"/></td>
+			<td>
+				<div class="popup_legend_min"></div>
+				<div class="new sign">&nbsp;</div> - <fmt:message key="new" bundle="${resword}"/></td>
+			<td>
+				<div class="popup_legend_min"></div>
+				<div class="updated sign">&nbsp;</div> - <fmt:message key="updated" bundle="${resword}"/></td>
 		</tr>
 		<tr align="left">
-			<td class="optional"><div class="resolution_proposed sign">&nbsp</div> - <fmt:message key="Resolution_Proposed" bundle="${resword}"/></td>
-			<td><div class="closed sign">&nbsp</div> - <fmt:message key="closed" bundle="${resword}"/></td>
+			<td class="optional">
+				<div class="popup_legend_min"></div>
+				<div class="resolution_proposed sign">&nbsp;</div> - <fmt:message key="Resolution_Proposed" bundle="${resword}"/></td>
+			<td>
+				<div class="popup_legend_min"></div>
+				<div class="closed sign">&nbsp;</div> - <fmt:message key="closed" bundle="${resword}"/></td>
 		</tr>
-	</table>	
+	</table>
+	<form class="hidden" id="ndsWidgetForm">
+		<input type="hidden" id="cUser" value="${userBean.name}" />
+	</form>
 </div>

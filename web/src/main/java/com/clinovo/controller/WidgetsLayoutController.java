@@ -307,6 +307,37 @@ public class WidgetsLayoutController {
 		return page;
 	}
 
+	@RequestMapping("/getEventsCompletionLegendValues")
+	public void getEventsCompletionLegendValues(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
+
+		StudyEventDAO studyEventDAO = new StudyEventDAO(datasource);
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+
+		SubjectEventStatus[] subjectEventStatuses = { SubjectEventStatus.SCHEDULED,
+				SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SIGNED,
+				SubjectEventStatus.LOCKED, SubjectEventStatus.SKIPPED, SubjectEventStatus.STOPPED,
+				SubjectEventStatus.SOURCE_DATA_VERIFIED };
+
+		List<StudyEventDefinitionBean> studyEventDefinitions = getListOfEventsDefinitions(sb);
+		int countOfSubject = getCountOfSubjects(sb);
+		int countOfStartedEvents = 0;
+		int countOfNotStartedEvents;
+		List<Integer> listOfEventsWithStatuses = new ArrayList<Integer>();
+
+		for (SubjectEventStatus eventStatus : subjectEventStatuses) {
+			int countOfEventsWithStatus = studyEventDAO.getCountofEventsBasedOnEventStatus(sb, eventStatus);
+			int countOfEventsNoRepeats = studyEventDAO.getCountOfEventsBasedOnEventStatusNoRepeats(sb, eventStatus);
+			listOfEventsWithStatuses.add(countOfEventsWithStatus);
+			countOfStartedEvents += countOfEventsNoRepeats;
+		}
+
+		countOfNotStartedEvents = countOfSubject * studyEventDefinitions.size() - countOfStartedEvents;
+		listOfEventsWithStatuses.add(countOfNotStartedEvents);
+
+		response.getWriter().println(listOfEventsWithStatuses);
+	}
+
 	@RequestMapping("/initSubjectStatusCount")
 	public String initSubjectStatusCountWidget(HttpServletRequest request, HttpServletResponse response, Model model)
 			throws IOException {
@@ -370,7 +401,7 @@ public class WidgetsLayoutController {
 
 		setRequestHeadersAndUpdateLocale(response, request);
 
-		int sdvProgressYear = Integer.parseInt((String) request.getParameter("sdvProgressYear"));
+		int sdvProgressYear = Integer.parseInt(request.getParameter("sdvProgressYear"));
 		sdvProgressYear = sdvProgressYear == 0 ? Calendar.getInstance().get(Calendar.YEAR) : sdvProgressYear;
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
 
@@ -386,13 +417,13 @@ public class WidgetsLayoutController {
 		Calendar sdvCal = Calendar.getInstance();
 		int currentYear = sdvCal.get(Calendar.YEAR);
 
-		boolean nextDataExists = sdvProgressYear < currentYear ? true : nextYear.size() > 0;
+		boolean nextDataExists = sdvProgressYear < currentYear || nextYear.size() > 0;
 
 		EventCRFSDVFilter sdvFilterDone = new EventCRFSDVFilter(sb.getId());
 		sdvFilterDone.addFilter("sdvStatus", "complete");
 		EventCRFSDVSort sdvSortDone = new EventCRFSDVSort();
 		boolean sdvWithOpenQueries = sb.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes");
-		ArrayList<EventCRFBean> ecrfs = (ArrayList<EventCRFBean>) eCrfdao.getAvailableWithFilterAndSort(
+		ArrayList<EventCRFBean> ecrfs = eCrfdao.getAvailableWithFilterAndSort(
 				sb.getId(), sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilterDone, sdvSortDone, sdvWithOpenQueries, 0, 9999);
 
 		List<Integer> countValues = new ArrayList<Integer>(Collections.nCopies(12, 0));
@@ -432,7 +463,7 @@ public class WidgetsLayoutController {
 		EventCRFSDVFilter sdvFilter = new EventCRFSDVFilter(sb.getId());
 		sdvFilter.addFilter("sdvStatus", "not done");
 		EventCRFSDVSort sdvSort = new EventCRFSDVSort();
-		ArrayList<EventCRFBean> availableForSDV = (ArrayList<EventCRFBean>) eCrfdao.getAvailableWithFilterAndSort(
+		ArrayList<EventCRFBean> availableForSDV = eCrfdao.getAvailableWithFilterAndSort(
 				sb.getId(), sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries, 0, 99999);
 
 		List<Integer> countAvailableCRFs = new ArrayList<Integer>(Collections.nCopies(12, 0));

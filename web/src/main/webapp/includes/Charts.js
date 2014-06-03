@@ -272,14 +272,12 @@ function saveLayoutAndExit() {
 }
 /* /Customize page */
 
-/* Initialization of widgets */
 
+/* Initialization of widgets */
 
 /*
  * Initialize NDs Assigned To Me widget.
  */
-
-/* Initialization of widgets */
 function initNdsAssignedToMeWidget() {
 	var url = getCurentUrl();
 
@@ -308,16 +306,64 @@ function initNdsAssignedToMeWidget() {
 			var totalNds = newNds + updatedNds + closedNds
 					+ resolutionProposedDns;
 			captionLimit = countCaptionLimit(totalNds);
-			
+
 			var captionSelector = ".dns_assigned_to_me .captions td";
 			setCaption(captionSelector, captionLimit);
 			
 			var valuesSecelctor = ".dns_assigned_to_me .stack";
 			setStacksLenghts(valuesSecelctor, array, captionLimit);
+			
+			var element = document.getElementById('toolbar');
+
+			if (!element) {
+				setDataToLegend("percents",".dns_assigned_to_me",array);
+				activateNDsWidgetLegend();
+			} else {
+				$(".dns_assigned_to_me .pop-up-visible").css('display', 'none');
+			}
 		},
 		error : function(e) {
 			console.log("Error:" + e);
 		}
+	});
+}
+
+/*
+ * Function for adding onClick action for "NDs assigned to me" widget's legend
+ * and bars.
+ */
+function activateNDsWidgetLegend() {
+
+	var urlPrefix = "ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=";
+	var currentUser = $("form#ndsWidgetForm input#cUser").val();
+	var urlSufix = "&listNotes_f_discrepancyNoteBean.resolutionStatus=";
+	var Statuses = [ "New", "Updated", "Closed", "Resolution Proposed" ];
+
+	$(".dns_assigned_to_me .pop-up-visible").css('display', 'table');
+
+	$(".dns_assigned_to_me .stacked_bar a").each(
+			function(index) {
+				$(this).attr("href",
+						urlPrefix + currentUser + urlSufix + Statuses[index]);
+			});
+
+	$(".dns_assigned_to_me .signs td").each(
+			function(index) {
+				$(this).click(
+						function() {
+							window.location.href = urlPrefix + currentUser
+									+ urlSufix + Statuses[index];
+						});
+
+				$(this).css("cursor", "pointer");
+			});
+
+	$(".dns_assigned_to_me .signs td").mouseover(function() {
+		$(this).find(".popup_legend_min").css({display : "block","margin-top":"-20px"});
+	});
+
+	$(".dns_assigned_to_me .signs td").mouseout(function() {
+		$(this).find(".popup_legend_min").css({display : "none"});
 	});
 }
 
@@ -367,7 +413,6 @@ function initEventsCompletionWidget(action) {
 				$(".events_completion input#previous").css("display", "none");
 			}
             $(".events_completion #events_completion_container").show(500, function () {
-                $(".events_completion .pop-up-visible").css('display', '');
                 $(".events_completion .pop-up").css('display', '');
             });
 
@@ -402,12 +447,80 @@ function initEventsCompletionWidget(action) {
 
 			if (element) {
 				$(".events_completion .chart_wrapper a").attr("href", "#");
+			} else {
+				activateEventCompletionLegend();
 			}
 		},
 		error : function(e) {
 			console.log("Error:" + e);
 		}
 	});
+}
+
+/*
+ * Function for activation legend for "Events Completion Widget"
+ */
+function getEventsCompletionLegendValues() {
+
+	var element = document.getElementById('toolbar');
+	var statusNames = [ 'Scheduled', 'Data Entry Started', 'Completed',
+			'Signed', 'Locked', 'Skipped', 'Stopped', 'Source Data Verified', 'Not Scheduled'];
+
+	if (!element) {
+		var url = getCurentUrl();
+
+		$.ajax({
+			type : "POST",
+			url : url + "getEventsCompletionLegendValues",
+			data : {
+				studyId : $("#studyId").val()
+			},
+			success : function(html) {
+				
+				var resArray =  html.replace(/\s+|[\[\]]+/g,'').split(',');
+
+				setDataToLegend("both", ".events_completion", resArray, statusNames);
+
+				$(".events_completion .signs td").mouseover(function() {
+					$(this).find(".popup_legend_medium").css({display : "block","margin-top":"-39px"});
+				});
+
+				$(".events_completion .signs td").mouseout(function() {
+					$(this).find(".popup_legend_medium").css({display : "none"});
+				});
+			},
+			error : function(e) {
+				console.log("Error:" + e);
+			}
+		});
+	}
+}
+
+/*
+ * Function for adding onClick action for "Events Completion" widget's legend
+ * and bars.
+ */
+function activateEventCompletionLegend() {
+
+	var startEndDates = getEventsFilterDates();
+	var startDate = startEndDates[0];
+	var endDate = startEndDates[1];
+	var urlPrefix = "ViewStudyEvents?startDate=";
+	var statuses = [ 1, 3, 4, 8, 7, 6, 5, 9, 0 ];
+
+	$(".events_completion .pop-up-visible").css('display', '');
+
+	$(".events_completion .signs td").each(
+			function(index) {
+				$(this).click(
+						function() {
+							window.location.href = urlPrefix + startDate
+									+ "&endDate=" + endDate + "&statusId="
+									+ statuses[index] + "&submitted=1";
+						});
+
+				$(this).css("cursor", "pointer");
+			});
 }
 
 /*
@@ -472,8 +585,8 @@ function initSubjectStatusCount() {
 
 
 /*
-* Get values for Subject Status Count Widget from .subjects_status_count form
-*/
+ * Get values for Subject Status Count Widget from .subjects_status_count form
+ */
 function getSubjectStatusWidgetData() {
 
 	var data = new google.visualization.DataTable();
@@ -749,6 +862,49 @@ function setCaption(selector, maxValue) {
 
 		counter++;
 	});
+}
+
+
+/*
+ * This function will set values for widget's legend
+ *
+ * @param displayType - value format that will be shown in pop-up
+ * @param selector - parent's selector for widget
+ * @param values - array of values to put into pop-ups
+ */
+function setDataToLegend(displayType, selector, values, names) {
+
+	var total = 0;
+	for ( var i = 0; i < values.length; i++) {
+		total += parseInt(values[i]) === "NaN" ? 0 : parseInt(values[i]);
+	}
+
+	var percent = total / 100;
+
+	if (displayType === "both") {
+
+		$(selector)
+				.find("div[class^=popup_legend_] p")
+				.each(
+						function(index) {
+
+							var displayedValue = values[index] / percent % 1 === 0 ? values[index]
+									/ percent
+									: (values[index] / percent).toFixed(2);
+							$(this).html(names[index] + "<br><b>" + values[index] +" (" + displayedValue + "%)</b>");
+						});
+	} else if (displayType === "percents") {
+
+		$(selector)
+		.find("div[class^=popup_legend_]")
+		.each(
+				function(index) {
+					var displayedValue = values[index] / percent % 1 === 0 ? values[index]
+					/ percent
+					: (values[index] / percent).toFixed(2);
+					$(this).html(displayedValue + "%");
+				});
+	}
 }
 
 function setStacksLenghts(selector, values, captionLimit) {

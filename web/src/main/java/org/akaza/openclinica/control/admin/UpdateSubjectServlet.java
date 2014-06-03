@@ -56,7 +56,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings({ "serial" })
+@SuppressWarnings({ "serial", "unchecked", "rawtypes" })
 @Component
 public class UpdateSubjectServlet extends Controller {
 
@@ -89,7 +89,6 @@ public class UpdateSubjectServlet extends Controller {
 		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
@@ -288,8 +287,7 @@ public class UpdateSubjectServlet extends Controller {
 	 * Processes 'confirm' request, validate the subject object
 	 * 
 	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
+	 */	
 	private void confirm(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		SubjectBean subject = (SubjectBean) request.getSession().getAttribute("subjectToUpdate");
 		FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(

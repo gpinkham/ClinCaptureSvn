@@ -7,6 +7,7 @@
 
 <script>
 $(document).ready(function($) {
+	setTimeout(function() { getEventsCompletionLegendValues(); }, 300);
 	setTimeout(function() { initEventsCompletionWidget("init"); }, 700);
 });
 </script>
@@ -31,19 +32,37 @@ $(document).ready(function($) {
 	</table>
 	<table class="signs">
 		<tr align="left">
-			<td><div class="scheduled sign"></div> - Scheduled</td>
-			<td><div class="data_entry_started sign"></div> - Data Entry Started</td>
-			<td><div class="completed sign"></div> - Completed</td>
+			<td>
+				<div class="popup_legend_medium"><p></p></div>
+				<div class="scheduled sign"></div> - <fmt:message bundle="${resword}" key="scheduled" /></td>
+			<td>
+				<div class="popup_legend_medium"><p></p></div>
+				<div class="data_entry_started sign"></div> - <fmt:message bundle="${resword}" key="data_entry_started" /></td>
+			<td>
+				<div class="popup_legend_medium"><p></p></div>
+				<div class="completed sign"></div> - <fmt:message bundle="${resword}" key="completed" /></td>
 		</tr>
 		<tr align="left">
-			<td><div class="signed sign"></div> - Signed</td>		
-			<td><div class="locked sign"></div> - Locked</td>
-			<td><div class="skipped sign"></div> - Skipped</td>
+			<td>
+				<div class="popup_legend_medium"><p></p></div>
+				<div class="signed sign"></div> - <fmt:message bundle="${resword}" key="subjectEventSigned" /></td>		
+			<td>
+				<div class="popup_legend_medium"><p></p></div>
+				<div class="locked sign"></div> - <fmt:message bundle="${resword}" key="locked" /></td>
+			<td>
+				<div class="popup_legend_medium"><p></p></div>
+				<div class="skipped sign"></div> - <fmt:message bundle="${resword}" key="skipped" /></td>
 		</tr>
 		<tr align="left">
-			<td><div class="stopped sign"></div> - Stopped</td>
-			<td><div class="not_scheduled sign"></div> - Not Scheduled</td>
-			<td><div class="sdved sign"></div> - Source Data Verified</td>
+			<td>
+				<div class="popup_legend_medium"><p></p></div>
+				<div class="stopped sign"></div> - <fmt:message bundle="${resword}" key="stopped" /></td>
+			<td>
+				<div class="popup_legend_medium"><p></p></div>
+				<div class="sdved sign"></div> - <fmt:message bundle="${resword}" key="sourceDataVerified" /></td>
+			<td>
+				<div class="popup_legend_medium"><p></p></div>
+				<div class="not_scheduled sign"></div> - <fmt:message bundle="${resword}" key="notScheduled" /></td>
 		</tr>
 	</table>
 	<table>
@@ -54,6 +73,6 @@ $(document).ready(function($) {
 			<td align="right">
 				<input type="button" name="BTN_Forvard" id="next" value="Next" class="button_medium" onClick="javascript: initEventsCompletionWidget('goForward');"/>
 			</td>
-		</tr>
-	</table>	
+		</tr> 
+	</table>
 </div>
