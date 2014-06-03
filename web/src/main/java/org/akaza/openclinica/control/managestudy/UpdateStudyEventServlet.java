@@ -21,21 +21,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
@@ -79,11 +64,25 @@ import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.calendar.CalendarLogic;
 import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.SignUtil;
+import org.akaza.openclinica.util.StudyEventDefinitionUtil;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.quartz.impl.StdScheduler;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author jxu
@@ -113,7 +112,8 @@ public class UpdateStudyEventServlet extends Controller {
 	public static final String INPUT_LOCATION = "location";
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -128,7 +128,8 @@ public class UpdateStudyEventServlet extends Controller {
 
 	}
 
-	private void redirectToStudySubjectView(HttpServletRequest request, HttpServletResponse response, int studySubjectId) throws Exception {
+	private void redirectToStudySubjectView(HttpServletRequest request, HttpServletResponse response, int studySubjectId)
+			throws Exception {
 		Map storedAttributes = new HashMap();
 		storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
 		request.getSession().setAttribute(BaseController.STORED_ATTRIBUTES, storedAttributes);
@@ -181,7 +182,8 @@ public class UpdateStudyEventServlet extends Controller {
 		if (studySubjectId > 0) {
 			ssub = (StudySubjectBean) ssdao.findByPK(studySubjectId);
 			request.setAttribute("studySubject", ssub);
-			request.setAttribute("id", studySubjectId + "");// for the workflow box, so it can link back to view study subject
+			request.setAttribute("id", studySubjectId + "");// for the workflow box, so it can link back to view study
+															// subject
 		}
 
 		Status s = ssub.getStatus();
@@ -298,7 +300,7 @@ public class UpdateStudyEventServlet extends Controller {
 				studyEvent.setSubjectEventStatus(SubjectEventStatus.LOCKED);
 			} else if (ses == SubjectEventStatus.UNLOCK) {
 				studyEvent.setSubjectEventStatus(studyEvent.getPrevSubjectEventStatus());
-			} else if (ses.equals(SubjectEventStatus.NOT_SCHEDULED)){
+			} else if (ses.equals(SubjectEventStatus.NOT_SCHEDULED)) {
 				request.setAttribute("enent_id", studyEventId);
 				request.setAttribute("deletedDurringUpdateStudyEvent", "true");
 				forwardPage(Page.DELETE_STUDY_EVENT_SERVLET, request, response);
@@ -477,14 +479,18 @@ public class UpdateStudyEventServlet extends Controller {
 					ssdao.update(ssub);
 				} else if (ses == SubjectEventStatus.LOCKED) {
 					int count = 0;
+					List<Integer> studyEventDefinitionIds = StudyEventDefinitionUtil
+							.getStudyEventDefinitionIdsForStudySubject(ssub, studyBean, getDynamicEventDao(),
+									getStudyGroupClassDAO(), seddao);
 					List<StudyEventBean> studyEventList = sedao.findAllByStudySubject(ssub);
 					for (StudyEventBean studyEventBean : studyEventList) {
+						studyEventDefinitionIds.remove((Integer) studyEventBean.getStudyEventDefinitionId());
 						if (studyEventBean.getId() != studyEvent.getId()
 								&& studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
 							count++;
 						}
 					}
-					if (count == studyEventList.size() - 1) {
+					if (count == studyEventList.size() - 1 && studyEventDefinitionIds.size() == 0) {
 						ssub.setStatus(Status.LOCKED);
 						ssdao.update(ssub);
 					}
