@@ -22,6 +22,7 @@ import com.clinovo.service.CodedItemService;
 import com.clinovo.service.TermService;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.html.HtmlBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -62,6 +63,8 @@ public class CodedItemAutoUpdater {
         String showContext = request.getParameter("showContext");
         themeColor = themeColor == null ? "blue" : themeColor;
         showContext = showContext == null ? "false" : showContext;
+
+		ResourceBundleProvider.updateLocale(request.getLocale());
 
         response.getWriter().println(buildResponseBox(codedItemIdListInt, showContext));
     }
@@ -119,7 +122,7 @@ public class CodedItemAutoUpdater {
                     .append(" prefToAppend=\"" + prefToAppend + "\" ")
                     .close()
                     .tr(1).style(httpPathDisplay).close()
-                    .td(1).close().append("HTTP: ").tdEnd()
+                    .td(1).close().append(ResourceBundleProvider.getResWord("http") + ": ").tdEnd()
 					.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href("http://bioportal.bioontology.org/ontologies/"
 					+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid=" + codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
 					.td(3).width("360px").colspan("2").close().tdEnd()
@@ -127,7 +130,7 @@ public class CodedItemAutoUpdater {
 
             for (CodedItemElement codedItemElement : codedItemElementsFilter(codedItem).getCodedItemElements()) {
 
-                builder.tr(1).close().td(1).close().append(" " + codedItemElement.getItemName() + ": ").tdEnd()
+                builder.tr(1).close().td(1).style("white-space: nowrap;").close().append(" " + ResourceBundleProvider.getResWord(codedItemElement.getItemName().toLowerCase()) + ": ").tdEnd()
                         .td(2).close().append(codedItemElement.getItemCode()).tdEnd().tdEnd()
                         .td(3).width("360px").colspan("2").close().tdEnd()
                         .td(4).close().tdEnd().trEnd(1).trEnd(1);
@@ -164,17 +167,17 @@ public class CodedItemAutoUpdater {
 			}
 		}
 
-        Collections.sort(codedItemWithFilterFields.getCodedItemElements(), new codedElementSortByItemDataId());
+        Collections.sort(codedItemWithFilterFields.getCodedItemElements(), new codedElementSortById());
 
         return codedItemWithFilterFields;
     }
 
-    private class codedElementSortByItemDataId implements Comparator<Object> {
+    private class codedElementSortById implements Comparator<Object> {
 
         public int compare(Object o1, Object o2) {
             CodedItemElement p1 = (CodedItemElement) o1;
             CodedItemElement p2 = (CodedItemElement) o2;
-            return p1.getItemDataId() - p2.getItemDataId();
+            return p1.getId() - p2.getId();
         }
     }
 

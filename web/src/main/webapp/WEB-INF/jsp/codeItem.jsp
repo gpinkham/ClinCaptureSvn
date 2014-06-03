@@ -25,7 +25,9 @@
                 <c:set var="counter" value="${counter + 1}"/>
                 <tbody>
                 <tr <c:out value="${displayHttp}"/>>
-                    <td>HTTP:</td>
+                    <td  id="<fmt:message key='http' bundle="${resword}"/>">
+                        <fmt:message key='http' bundle="${resword}"/>:
+                    </td>
                     <c:set var="hyperlinkColor" value="#789EC5"/>
                     <c:if test="${(color == 'violet')}">
                         <c:set var="hyperlinkColor" value="#aa62c6"/>
@@ -52,8 +54,9 @@
                             <tr>
                         </c:otherwise>
                     </c:choose>
-                        <td>
-                            <c:out value="${classElement.elementName}"/>:
+                        <td id="<c:out value="${classElement.elementName}"/>" style="white-space: nowrap;">
+                            <c:set var="classElementName"><c:out value="${fn:toLowerCase(classElement.elementName)}"/></c:set>
+                            <fmt:message key='${classElementName}' bundle="${resword}"/>:
                         </td>
                             <td width="360px"><c:out value="${classElement.codeName}"/>
                         </td>

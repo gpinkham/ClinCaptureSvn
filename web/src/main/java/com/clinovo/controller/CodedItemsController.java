@@ -23,8 +23,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -33,6 +36,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -154,6 +158,7 @@ public class CodedItemsController {
 		factory.setTerms(termService.findAll());
 		factory.setCrfDAO(new CRFDAO(datasource));
 		factory.setEventCRFDAO(new EventCRFDAO(datasource));
+		factory.setCrfVersionDAO(new CRFVersionDAO(datasource));
 		factory.setItemDataDAO(new ItemDataDAO(datasource));
         factory.setStudyEventDAO(new StudyEventDAO(datasource));
 		factory.setStudySubjectDAO(new StudySubjectDAO(datasource));
@@ -278,38 +283,48 @@ public class CodedItemsController {
  
  		List<CodedItem> items = new ArrayList<CodedItem>();
  		ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
+		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(datasource);
+		StudyEventDAO studyEventDAO = new StudyEventDAO(datasource);
  		List<CodedItem> skippedItems = new ArrayList<CodedItem>();
  
  		List<CodedItem> uncodedItems = codedItemService.findCodedItemsByStatus(CodeStatus.NOT_CODED);
- 
- 		for (CodedItem item : uncodedItems) {
- 
- 			ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(item.getItemId());
- 			Term term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(), item.getDictionary());
- 
- 			if (term != null) {
- 
- 				Classification classification = new Classification();
- 
- 				classification.setHttpPath(term.getHttpPath());
- 				classification.setClassificationElement(generateClassificationElements(term.getTermElementList()));
 
-				generateCodedItemFields(item.getCodedItemElements(), classification.getClassificationElement());
+		for (CodedItem item : uncodedItems) {
 
-                item.setPreferredTerm(term.getPreferredName());
-                item.setHttpPath(term.getHttpPath());
- 				item.setAutoCoded(true);
- 				item.setStatus((String.valueOf(CodeStatus.CODED)));
- 
- 				codedItemService.saveCodedItem(item);
+			StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByPK(item.getEventCrfId());
+			CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDAO.findByPK(item.getCrfVersionId());
 
- 				items.add(item);
- 
- 			} else {
- 
- 				skippedItems.add(item);
- 			}
- 		}
+			boolean crfIsLocked = studyEventBean.getSubjectEventStatus().isLocked() || studyEventBean.getSubjectEventStatus().isStopped() || studyEventBean.getSubjectEventStatus().isSkipped() || !crfVersionBean.getStatus().equals(Status.AVAILABLE);
+
+			if (!crfIsLocked) {
+
+				ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(item.getItemId());
+				Term term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(), item.getDictionary());
+
+				if (term != null) {
+
+					Classification classification = new Classification();
+
+					classification.setHttpPath(term.getHttpPath());
+					classification.setClassificationElement(generateClassificationElements(term.getTermElementList()));
+
+					generateCodedItemFields(item.getCodedItemElements(), classification.getClassificationElement());
+
+					item.setPreferredTerm(term.getPreferredName());
+					item.setHttpPath(term.getHttpPath());
+					item.setAutoCoded(true);
+					item.setStatus((String.valueOf(CodeStatus.CODED)));
+
+					codedItemService.saveCodedItem(item);
+
+					items.add(item);
+
+				} else {
+
+					skippedItems.add(item);
+				}
+			}
+		}
  
  		request.setAttribute("autoCodedItems", items);
  		request.setAttribute("skippedItems", skippedItems);
@@ -419,7 +434,7 @@ public class CodedItemsController {
 		if (codedItemUrl.indexOf("MEDDRA") > 0 || codedItemUrl.indexOf("MDR") > 0) {
 			ClassificationElement ptElement = new ClassificationElement();
 			ptElement.setCodeName(term);
-			ptElement.setElementName("PT");
+			ptElement.setElementName(ResourceBundleProvider.getResWord("pt"));
 			classificationWithTerms.addClassificationElement(ptElement);
 		} else if (codedItemUrl.indexOf("whod") > 0) {
 

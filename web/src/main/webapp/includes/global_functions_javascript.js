@@ -2724,7 +2724,7 @@ getMedicalCodingCategoryList = function(item) {
 
         return $(this).find('td').map(function(index) {
 
-            var returnValue = $(this).html() == '' || $(this).html().indexOf('INPUT') > 0 || $(this).html().indexOf('input') > 0 ? null : $.trim($(this).html());
+            var returnValue = $(this).html() == '' || $(this).html().indexOf('INPUT') > 0 || $(this).html().indexOf('input') > 0 ? null : $(this).attr('id').length > 0 ? $(this).attr('id') : $.trim($(this).html());
             returnValue = returnValue != null && returnValue.indexOf("href") > 0 ? $.trim($(this).find("a").text()) : returnValue;
 
             return returnValue;
@@ -3220,7 +3220,7 @@ codeItemFields = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
     var term = $(item).closest('tbody').find('td').filter(function () {
-        return $.trim($(this).text()) == "EXT:" || $.trim($(this).text()) == "LLT:" || $.trim($(this).text()) == "MPN:";
+        return $.trim($(this).attr('id')) == "EXT" || $.trim($(this).attr('id')) == "LLT" || $.trim($(this).attr('id')) == "MPN";
     }).next().text();
 
     $("<div class='ui-widget-overlay' style='width:" + $(document).width() + "px; height:" + $(document).height() + "px; z-index: 1005;' />").appendTo('body');
@@ -3242,7 +3242,7 @@ codeItemFields = function(item) {
                 $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () {
                     return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());
                 }).closest('tbody').find('tr > td').filter(function () {
-                    return $.trim($(this).text()) === 'CMP:';
+                    return $.trim($(this).attr('id')) === 'CMP';
                 }).parent('tr').after(data);
             } else {
                 $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () {

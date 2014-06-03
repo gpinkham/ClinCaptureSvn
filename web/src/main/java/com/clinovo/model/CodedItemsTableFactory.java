@@ -20,11 +20,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.core.*;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
@@ -33,6 +34,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -65,6 +67,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private List<Term> terms;
 	private EventDefinitionCRFDAO eventDefCRFDAO;
 	private StudySubjectDAO studySubjectDAO;
+	private CRFVersionDAO crfVersionDAO;
 	private StudyEventDefinitionDAO studyEventDefDao;
     private CRFDAO crfDAO;
     private StudyEventDAO studyEventDAO;
@@ -143,10 +146,6 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
             return "Coded";
             
-        } else if ((codedItem.getStatus().equals("IN_PROCESS"))) {
-
-            return "In Process";
-            
         } else if (codedItem.getStatus().equals("CODE_NOT_FOUND")) {
         	
         	return "Code not Found";
@@ -155,7 +154,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
       return "Unknown";
     }
 
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
     private class ItemDataValueCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
 
@@ -222,7 +221,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
 					return builder.toString();
 
-				} else if (codedItem.getStatus().equals("CODED") || codedItem.getStatus().equals("IN_PROCESS")) {
+				} else if (codedItem.getStatus().equals("CODED")) {
 
                     builder.append("Search: ").input().style("border:1px solid #a6a6a6; margin-bottom: 2px; color:#4D4D4D").disabled().type("text").value(codedItem.getPreferredTerm()).close();
                 } else {
@@ -255,7 +254,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
                 builder.table(1).id("tablepaging").styleClass("itemsTable").style("display:" + showContextValue + ";").close()
                         .tr(1).style(codedItem.getDictionary().equals("WHOD") ? "display:none;" : "").close()
-                        .td(1).close().append("HTTP: ").tdEnd()
+                        .td(1).close().append(ResourceBundleProvider.getResWord("http") + ": ").tdEnd()
 						.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href("http://bioportal.bioontology.org/ontologies/"
 						+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid=" + codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
 						.td(3).width("360px").colspan("2").close().tdEnd()
@@ -264,7 +263,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
                 for (CodedItemElement codedItemElement : codedItemElementsFilter(codedItem).getCodedItemElements()) {
 
-                    builder.tr(1).close().td(1).close().append(" " + codedItemElement.getItemName() + ": ").tdEnd()
+                    builder.tr(1).style("white-space: nowrap;").close().td(1).close().append(" " + ResourceBundleProvider.getResWord(codedItemElement.getItemName().toLowerCase()) + ": ").tdEnd()
                             .td(2).close().append(codedItemElement.getItemCode()).tdEnd().tdEnd()
                             .td(3).width("360px").colspan("2").close().tdEnd()
                             .td(4).close().tdEnd().trEnd(1).trEnd(1);
@@ -299,17 +298,17 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                 }
             }
 
-            Collections.sort(codedItemWithFilterFields.getCodedItemElements(), new codedElementSortByItemDataId());
+            Collections.sort(codedItemWithFilterFields.getCodedItemElements(), new codedElementSortById());
 
             return codedItemWithFilterFields;
         }
 
-        private class codedElementSortByItemDataId implements Comparator {
+        private class codedElementSortById implements Comparator {
 
             public int compare(Object o1, Object o2) {
                 CodedItemElement p1 = (CodedItemElement) o1;
                 CodedItemElement p2 = (CodedItemElement) o2;
-                return p1.getItemDataId() - p2.getItemDataId();
+                return p1.getId() - p2.getId();
             }
         }
     }
@@ -353,7 +352,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
             } else {
 
-                String disabled = (codedItem.getStatus().equals("CODED") || codedItem.getStatus().equals("IN_PROCESS")) ? " block='true' " : " block='false' ";
+                String disabled = (codedItem.getStatus().equals("CODED")) ? " block='true' " : " block='false' ";
 
                 builder.a().onclick("codeItem(this)").append(disabled).name("Code").append("itemId=\"" + codedItem.getItemId() + "\"")
                 .append("data-cc-mcItemId=\"" + codedItem.getItemId() + "\"").close();
@@ -416,10 +415,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         private String getEventCrfStatusIcon(EventCRFBean eventCRFBean) {
 
             StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCRFBean.getStudyEventId());
-
+			CRFVersionBean crfVersion = (CRFVersionBean) crfVersionDAO.findByPK(eventCRFBean.getCRFVersionId());
             String goToEcrfIcon = "";
 
-            if (studyEventBean.getSubjectEventStatus().isLocked() || studyEventBean.getSubjectEventStatus().isStopped() || studyEventBean.getSubjectEventStatus().isSkipped()) {
+            if (studyEventBean.getSubjectEventStatus().isLocked() || studyEventBean.getSubjectEventStatus().isStopped() || studyEventBean.getSubjectEventStatus().isSkipped() || !crfVersion.getStatus().equals(Status.AVAILABLE)) {
 
                 goToEcrfIcon = "icon_Locked_long.gif";
             } else  if (eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
@@ -579,6 +578,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     public void setEventCRFDAO(EventCRFDAO eventCRFDAO) {
         this.eventCRFDAO = eventCRFDAO;
     }
+
+	public void setCrfVersionDAO(CRFVersionDAO crfVersionDAO) {
+		this.crfVersionDAO = crfVersionDAO;
+	}
 
     public void setEventDefinitionCRFDAO(EventDefinitionCRFDAO eventDefenitionCRFDAO) {
         this.eventDefCRFDAO = eventDefenitionCRFDAO;
