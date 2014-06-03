@@ -14,18 +14,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -53,6 +41,16 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author jxu
@@ -161,6 +159,10 @@ public class CreateSubStudyServlet extends Controller {
 								scg.getValue().setValue(fp.getString("defaultBioontologyURL"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCodeDictionaryName")) {
 								scg.getValue().setValue(fp.getString("autoCodeDictionaryName"));
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("assignRandomizationResultTo")) {
+								scg.getValue().setValue(fp.getString("assignRandomizationResultTo"));
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("randomizationTrialId")) {
+								scg.getValue().setValue(fp.getString("randomizationTrialId"));
 							}
 							configs.add(scg);
 						}
@@ -461,11 +463,18 @@ public class CreateSubStudyServlet extends Controller {
 					study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("subjectPersonIdRequired")
 						&& !fp.getString("subjectPersonIdRequired").isEmpty()) {
-					scg.getValue().setValue(
-							fp.getString("subjectPersonIdRequired"));
-					study.getStudyParameterConfig().setSubjectPersonIdRequired(
-							fp.getString("subjectPersonIdRequired"));
-				};
+					scg.getValue().setValue(fp.getString("subjectPersonIdRequired"));
+					study.getStudyParameterConfig().setSubjectPersonIdRequired(fp.getString("subjectPersonIdRequired"));
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("assignRandomizationResultTo")
+						&& !fp.getString("assignRandomizationResultTo").isEmpty()) {
+					scg.getValue().setValue(fp.getString("assignRandomizationResultTo"));
+					study.getStudyParameterConfig().setAutoCodeDictionaryName(
+							fp.getString("assignRandomizationResultTo"));
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("randomizationTrialId")
+						&& !fp.getString("randomizationTrialId").isEmpty()) {
+					scg.getValue().setValue(fp.getString("randomizationTrialId"));
+					study.getStudyParameterConfig().setSubjectPersonIdRequired(fp.getString("randomizationTrialId"));
+				}
 			}
 		}
 
