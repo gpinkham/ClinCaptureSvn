@@ -26,6 +26,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleAuditBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -95,12 +96,12 @@ public class UpdateRuleSetRuleServlet extends Controller {
 			if (action.equals("remove")) {
 				for (RuleSetRuleBean theRuleSetRule : rs.getRuleSetRules()) {
 					theRuleSetRule.setUpdaterAndDate(ub);
-					removeRule(theRuleSetRule);
+					removeRule(theRuleSetRule, ub);
 				}
 			} else if (action.equals("restore")) {
 				for (RuleSetRuleBean theRuleSetRule : rs.getRuleSetRules()) {
 					theRuleSetRule.setUpdaterAndDate(ub);
-					restoreRule(theRuleSetRule);
+					restoreRule(theRuleSetRule, ub);
 				}
 			} else if (action.equals("delete")) {
 				for (RuleSetRuleBean theRuleSetRule : rs.getRuleSetRules()) {
@@ -114,9 +115,9 @@ public class UpdateRuleSetRuleServlet extends Controller {
 		if (ruleSetRule != null) {
 			ruleSetRule.setUpdaterAndDate(ub);
 			if (action.equals("remove")) {
-				removeRule(ruleSetRule);
+				removeRule(ruleSetRule, ub);
 			} else if (action.equals("restore")) {
-				restoreRule(ruleSetRule);
+				restoreRule(ruleSetRule, ub);
 			} else if (action.equals("delete")) {
 				deleteRule(ruleSetRule);
 			}
@@ -136,7 +137,7 @@ public class UpdateRuleSetRuleServlet extends Controller {
 		session.flush();
 	}
 
-	private void removeRule(RuleSetRuleBean ruleSetRule) {
+	private void removeRule(RuleSetRuleBean ruleSetRule, UserAccountBean ub) {
 		RuleSetBean ruleSet = ruleSetRule.getRuleSetBean();
 		getRuleDao().getSessionFactory().getCurrentSession().clear();
 		Session session = getRuleDao().getSessionFactory().getCurrentSession();
@@ -146,12 +147,13 @@ public class UpdateRuleSetRuleServlet extends Controller {
 		if (ruleSet.getRuleSetRuleSize() <= 1) {
 			ruleSet.setStatus(Status.DELETED);
 			session.update(ruleSet);
+			createRuleSetRuleAuditBean(ruleSetRule, ub, Status.DELETED, session);
 		}
 		transaction.commit();
 		session.flush();
 	}
 
-	private void restoreRule(RuleSetRuleBean ruleSetRule) {
+	private void restoreRule(RuleSetRuleBean ruleSetRule, UserAccountBean ub) {
 		RuleSetBean ruleSet = ruleSetRule.getRuleSetBean();
 		getRuleDao().getSessionFactory().getCurrentSession().clear();
 		Session session = getRuleDao().getSessionFactory().getCurrentSession();
@@ -161,8 +163,18 @@ public class UpdateRuleSetRuleServlet extends Controller {
 		if (ruleSet.getRuleSetRuleSize() <= 1) {
 			ruleSet.setStatus(Status.AVAILABLE);
 			session.update(ruleSet);
+			createRuleSetRuleAuditBean(ruleSetRule, ub, Status.AVAILABLE, session);
 		}
 		transaction.commit();
 		session.flush();
+	}
+
+	private void createRuleSetRuleAuditBean(RuleSetRuleBean ruleSetRuleBean, UserAccountBean ub, Status status,
+			Session session) {
+		RuleSetRuleAuditBean ruleSetRuleAuditBean = new RuleSetRuleAuditBean();
+		ruleSetRuleAuditBean.setRuleSetRuleBean(ruleSetRuleBean);
+		ruleSetRuleAuditBean.setUpdater(ub);
+		ruleSetRuleAuditBean.setStatus(status);
+		session.saveOrUpdate(ruleSetRuleAuditBean);
 	}
 }
