@@ -23,12 +23,14 @@ package org.akaza.openclinica.control.managestudy;
 import org.akaza.openclinica.bean.core.GroupClassType;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -38,7 +40,10 @@ import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
 /**
@@ -47,14 +52,20 @@ import java.util.ArrayList;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
-public class RestoreSubjectGroupClassServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@Component
+public class RestoreSubjectGroupClassServlet extends Controller {
 	/**
      *
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		checkStudyLocked(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, respage.getString("current_study_locked"));
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
+		checkStudyLocked(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, respage.getString("current_study_locked"), request,
+				response);
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -63,92 +74,95 @@ public class RestoreSubjectGroupClassServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET,
 				resexception.getString("not_study_director"), "1");
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		String action = request.getParameter("action");
 		FormProcessor fp = new FormProcessor(request);
 		int classId = fp.getInt("id");
 
 		if (classId == 0) {
-			addPageMessage(respage.getString("please_choose_a_subject_group_class_to_restore"));
-			forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_subject_group_class_to_restore"), request);
+			forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
 		} else {
-			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
-			StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
-			StudyDAO studyDao = new StudyDAO(sm.getDataSource());
-			SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
+			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(getDataSource());
+			StudyGroupDAO sgdao = new StudyGroupDAO(getDataSource());
+			StudyDAO studyDao = new StudyDAO(getDataSource());
+			SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(getDataSource());
 
 			if (action.equalsIgnoreCase("confirm")) {
-				clearSession();
-				
+				clearSession(request);
+
 				StudyGroupClassBean group = (StudyGroupClassBean) sgcdao.findByPK(classId);
 				StudyBean study = (StudyBean) studyDao.findByPK(group.getStudyId());
-				
-				checkRoleByUserAndStudy(ub, group.getStudyId(), study.getParentStudyId());
-				
+
+				checkRoleByUserAndStudy(request, response, ub, group.getStudyId(), study.getParentStudyId());
+
 				if (group.getStatus().equals(Status.AVAILABLE)) {
-					addPageMessage(respage.getString("this_subject_group_class_is_available_cannot_restore"));
-					forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET);
+					addPageMessage(respage.getString("this_subject_group_class_is_available_cannot_restore"), request);
+					forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
 					return;
 				}
-				
+
 				if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()) {
-					StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-					ArrayList orderedDefinitions = seddao.findAllOrderedByStudyGroupClassId(group.getId());
-					
-					EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-					for (int i = 0; i < orderedDefinitions.size(); i++) {
-						StudyEventDefinitionBean def = (StudyEventDefinitionBean) orderedDefinitions.get(i);
+					StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
+					ArrayList<StudyEventDefinitionBean> orderedDefinitions = (ArrayList<StudyEventDefinitionBean>) seddao
+							.findAllOrderedByStudyGroupClassId(group.getId());
+
+					EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
+					for (StudyEventDefinitionBean def : orderedDefinitions) {
 						def.setCrfNum(edcdao.findAllActiveParentsByEventDefinitionId(def.getId()).size());
 					}
 					request.setAttribute("orderedDefinitions", orderedDefinitions);
-					
-				} else {
-					ArrayList studyGroups = sgdao.findAllByGroupClass(group);
 
-					for (int i = 0; i < studyGroups.size(); i++) {
-						StudyGroupBean sg = (StudyGroupBean) studyGroups.get(i);
+				} else {
+					ArrayList<StudyGroupBean> studyGroups = (ArrayList<StudyGroupBean>) sgdao
+							.findAllByGroupClass(group);
+
+					for (StudyGroupBean sg : studyGroups) {
 						ArrayList subjectMaps = sgmdao.findAllByStudyGroupClassAndGroup(group.getId(), sg.getId());
 						sg.setSubjectMaps(subjectMaps);
 					}
 					request.setAttribute("studyGroups", studyGroups);
 				}
-				session.setAttribute("group", group);
-				
-				forwardPage(Page.RESTORE_SUBJECT_GROUP_CLASS);
-				
+				request.getSession().setAttribute("group", group);
+
+				forwardPage(Page.RESTORE_SUBJECT_GROUP_CLASS, request, response);
+
 			} else if (action.equalsIgnoreCase("submit")) {
-				StudyGroupClassBean group = (StudyGroupClassBean) session.getAttribute("group");
+				StudyGroupClassBean group = (StudyGroupClassBean) request.getSession().getAttribute("group");
 				group.setStatus(Status.AVAILABLE);
 				group.setUpdater(ub);
 				sgcdao.update(group);
 
-				ArrayList subjectMaps = sgmdao.findAllByStudyGroupClassId(group.getId());
-				for (int i = 0; i < subjectMaps.size(); i++) {
-					SubjectGroupMapBean sgmb = (SubjectGroupMapBean) subjectMaps.get(i);
+				ArrayList<SubjectGroupMapBean> subjectMaps = (ArrayList<SubjectGroupMapBean>) sgmdao
+						.findAllByStudyGroupClassId(group.getId());
+				for (SubjectGroupMapBean sgmb : subjectMaps) {
 					if (sgmb.getStatus().equals(Status.AUTO_DELETED)) {
 						sgmb.setStatus(Status.AVAILABLE);
 						sgmb.setUpdater(ub);
 						sgmdao.update(sgmb);
 					}
 				}
-				addPageMessage(respage.getString("this_subject_group_class_was_restored_succesfully"));
-				forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET);
+				addPageMessage(respage.getString("this_subject_group_class_was_restored_succesfully"), request);
+				forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
 			} else {
-				addPageMessage(respage.getString("no_action_specified"));
-				forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET);
+				addPageMessage(respage.getString("no_action_specified"), request);
+				forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
 			}
 
 		}
 	}
 
-	private void clearSession() {
-		session.removeAttribute("group");
+	private void clearSession(HttpServletRequest request) {
+		request.getSession().removeAttribute("group");
 	}
 }

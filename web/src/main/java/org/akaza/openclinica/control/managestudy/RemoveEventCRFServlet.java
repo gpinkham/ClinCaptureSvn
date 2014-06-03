@@ -20,14 +20,13 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-
 import com.clinovo.model.CodedItem;
 import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -37,7 +36,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -51,6 +50,12 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Removes an Event CRF
@@ -58,15 +63,20 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
-public class RemoveEventCRFServlet extends SecureController {
+@SuppressWarnings({ "serial" })
+@Component
+public class RemoveEventCRFServlet extends Controller {
 	/**
      * 
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"));
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -76,27 +86,32 @@ public class RemoveEventCRFServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		FormProcessor fp = new FormProcessor(request);
 		int eventCRFId = fp.getInt("id");// eventCRFId
 		int studySubId = fp.getInt("studySubId");// studySubjectId
-		checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"));
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"), request,
+				response);
+		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
+		StudySubjectDAO subdao = new StudySubjectDAO(getDataSource());
+		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+		StudyDAO sdao = new StudyDAO(getDataSource());
 
 		if (eventCRFId == 0) {
-			addPageMessage(respage.getString("please_choose_an_event_CRF_to_remove"));
-			request.setAttribute("id", new Integer(studySubId).toString());
-			forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+			addPageMessage(respage.getString("please_choose_an_event_CRF_to_remove"), request);
+			request.setAttribute("id", Integer.toString(studySubId));
+			forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 		} else {
 			EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
@@ -104,9 +119,9 @@ public class RemoveEventCRFServlet extends SecureController {
 			request.setAttribute("studySub", studySub);
 
 			// construct info needed on view event crf page
-			CRFDAO cdao = new CRFDAO(sm.getDataSource());
-			CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+			CRFDAO cdao = new CRFDAO(getDataSource());
+			CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
+			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
 
 			int crfVersionId = eventCRF.getCRFVersionId();
 			CRFBean cb = cdao.findByVersionId(crfVersionId);
@@ -125,7 +140,7 @@ public class RemoveEventCRFServlet extends SecureController {
 			event.setStudyEventDefinition(sed);
 			request.setAttribute("event", event);
 
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 
 			StudyBean study = (StudyBean) sdao.findByPK(studySub.getStudyId());
 			EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId,
@@ -136,25 +151,26 @@ public class RemoveEventCRFServlet extends SecureController {
 			dec.setFlags(eventCRF, ub, currentRole, edc.isDoubleEntry());
 
 			// find all item data
-			ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+			ItemDataDAO iddao = new ItemDataDAO(getDataSource());
 
-			ArrayList itemData = iddao.findAllByEventCRFId(eventCRF.getId());
+			ArrayList<ItemDataBean> itemData = iddao.findAllByEventCRFId(eventCRF.getId());
 
 			request.setAttribute("items", itemData);
 
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (eventCRF.getStatus().equals(Status.DELETED) || eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-					addPageMessage(respage.getString("this_event_CRF_is_removed_for_this_study") + " "
-							+ respage.getString("please_contact_sysadmin_for_more_information"));
-					request.setAttribute("id", new Integer(studySubId).toString());
-					forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+					addPageMessage(
+							respage.getString("this_event_CRF_is_removed_for_this_study") + " "
+									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					request.setAttribute("id", Integer.toString(studySubId));
+					forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 					return;
 				}
 
 				request.setAttribute("displayEventCRF", dec);
 
-				forwardPage(Page.REMOVE_EVENT_CRF);
+				forwardPage(Page.REMOVE_EVENT_CRF, request, response);
 			} else {
 				logger.info("submit to remove the event CRF from study");
 
@@ -163,11 +179,10 @@ public class RemoveEventCRFServlet extends SecureController {
 				eventCRF.setUpdatedDate(new Date());
 				ecdao.update(eventCRF);
 
-                CodedItemService codedItemService = getCodedItemService();
+				CodedItemService codedItemService = getCodedItemService();
 
 				// remove all the item data
-				for (int a = 0; a < itemData.size(); a++) {
-					ItemDataBean item = (ItemDataBean) itemData.get(a);
+				for (ItemDataBean item : itemData) {
 					if (!item.getStatus().equals(Status.DELETED)) {
 						item.setStatus(Status.AUTO_DELETED);
 						item.setUpdater(ub);
@@ -175,23 +190,23 @@ public class RemoveEventCRFServlet extends SecureController {
 						iddao.update(item);
 					}
 
-                    CodedItem codedItem = codedItemService.findCodedItem(item.getId());
+					CodedItem codedItem = codedItemService.findCodedItem(item.getId());
 
-                    if(codedItem != null) {
+					if (codedItem != null) {
 
-                        codedItem.setStatus("REMOVED");
-                        codedItemService.saveCodedItem(codedItem);
-                    }
+						codedItem.setStatus("REMOVED");
+						codedItemService.saveCodedItem(codedItem);
+					}
 				}
 
 				String emailBody = respage.getString("the_event_CRF") + " " + cb.getName() + " "
 						+ respage.getString("has_been_removed_from_the_event")
 						+ event.getStudyEventDefinition().getName() + ".";
 
-				addPageMessage(emailBody);
-				sendEmail(emailBody);
-				request.setAttribute("id", new Integer(studySubId).toString());
-				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+				addPageMessage(emailBody, request);
+				sendEmail(emailBody, request);
+				request.setAttribute("id", Integer.toString(studySubId));
+				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 			}
 		}
 	}
@@ -200,14 +215,17 @@ public class RemoveEventCRFServlet extends SecureController {
 	 * Send email to director and administrator
 	 * 
 	 * @param emailBody
+	 *            String
 	 */
-	private void sendEmail(String emailBody) throws Exception {
+	private void sendEmail(String emailBody, HttpServletRequest request) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
 
 		logger.info("Sending email...");
 		// to study director
 
-		sendEmail(ub.getEmail().trim(), respage.getString("remove_event_CRF_from_event"), emailBody, false);
-		sendEmail(EmailEngine.getAdminEmail(), respage.getString("remove_event_CRF_from_event"), emailBody, false);
+		sendEmail(ub.getEmail().trim(), respage.getString("remove_event_CRF_from_event"), emailBody, false, request);
+		sendEmail(EmailEngine.getAdminEmail(), respage.getString("remove_event_CRF_from_event"), emailBody, false,
+				request);
 		logger.info("Sending email done..");
 	}
 

@@ -20,13 +20,13 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -34,58 +34,71 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 
 @SuppressWarnings({ "rawtypes", "serial" })
-public class UnlockCRFVersionServlet extends SecureController {
+@Component
+public class UnlockCRFVersionServlet extends Controller {
 	/**
     *
     */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		FormProcessor fp = new FormProcessor(request);
 
 		int crfVersionId = fp.getInt("id");
 		String action = fp.getString("action");
 
 		if (crfVersionId == 0) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study"));
-			forwardPage(Page.CRF_LIST_SERVLET);
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study"), request);
+			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 			return;
 		}
 
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
+		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
+		CRFDAO cdao = new CRFDAO(getDataSource());
 
 		CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(crfVersionId);
 		CRFBean crf = (CRFBean) cdao.findByPK(version.getCrfId());
 
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		ArrayList eventCRFs = ecdao.findAllStudySubjectByCRFVersion(crfVersionId);
 
 		if (StringUtil.isBlank(action)) {
 			request.setAttribute("crfVersionToUnlock", version);
 			request.setAttribute("crf", crf);
 			request.setAttribute("eventSubjectsUsingVersion", eventCRFs);
-			forwardPage(Page.CONFIRM_UNLOCKING_CRF_VERSION);
+			forwardPage(Page.CONFIRM_UNLOCKING_CRF_VERSION, request, response);
 
 		} else if ("confirm".equalsIgnoreCase(action)) {
 			version.setStatus(Status.AVAILABLE);
 			version.setUpdater(ub);
 			cvdao.update(version);
-			addPageMessage(respage.getString("crf_version_unlocked_successfully"));
-			forwardPage(Page.CRF_LIST_SERVLET);
+			addPageMessage(respage.getString("crf_version_unlocked_successfully"), request);
+			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 		}
 	}
 

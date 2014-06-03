@@ -20,15 +20,12 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -36,6 +33,12 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * @author jxu
@@ -43,13 +46,18 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
  *         Code Templates
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class SetStudyUserRoleServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class SetStudyUserRoleServlet extends Controller {
 	/**
      *
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -58,31 +66,35 @@ public class SetStudyUserRoleServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study") + " "
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_USER_IN_STUDY_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
+		UserAccountDAO udao = new UserAccountDAO(getDataSource());
+		StudyDAO sdao = new StudyDAO(getDataSource());
 		String name = request.getParameter("name");
 		String studyIdString = request.getParameter("studyId");
 		if (StringUtil.isBlank(name) || StringUtil.isBlank(studyIdString)) {
-			addPageMessage(respage.getString("please_choose_a_user_to_set_role_for"));
-			forwardPage(Page.LIST_USER_IN_STUDY_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_user_to_set_role_for"), request);
+			forwardPage(Page.LIST_USER_IN_STUDY_SERVLET, request, response);
 		} else {
 			String action = request.getParameter("action");
 			FormProcessor fp = new FormProcessor(request);
 			UserAccountBean user = (UserAccountBean) udao.findByUserName(name);
 			StudyBean userStudy = (StudyBean) sdao.findByPK(fp.getInt("studyId"));
 			if ("confirm".equalsIgnoreCase(action)) {
-				int studyId = Integer.valueOf(studyIdString.trim()).intValue();
-                StudyBean study = (StudyBean) sdao.findByPK(studyId);
-                request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
+				int studyId = Integer.valueOf(studyIdString.trim());
+				StudyBean study = (StudyBean) sdao.findByPK(studyId);
+				request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
 
 				request.setAttribute("user", user);
 
@@ -114,10 +126,10 @@ public class SetStudyUserRoleServlet extends SecureController {
 				}
 				request.setAttribute("roles", roles);
 
-				forwardPage(Page.SET_USER_ROLE_IN_STUDY);
+				forwardPage(Page.SET_USER_ROLE_IN_STUDY, request, response);
 			} else {
 				// set role
-                Page forwardTo = Page.LIST_USER_IN_STUDY_SERVLET;
+				Page forwardTo = Page.LIST_USER_IN_STUDY_SERVLET;
 				String userName = fp.getString("name");
 				int studyId = fp.getInt("studyId");
 				int roleId = fp.getInt("roleId");
@@ -130,19 +142,19 @@ public class SetStudyUserRoleServlet extends SecureController {
 				sur.setUpdater(ub);
 				sur.setUpdatedDate(new Date());
 				udao.updateStudyUserRole(sur, userName);
-                addPageMessage(sendEmail(user, sur));
+				addPageMessage(sendEmail(user, sur), request);
 				if (ub.getId() == user.getId()) {
-					session.setAttribute("reloadUserBean", true);
+					request.getSession().setAttribute("reloadUserBean", true);
 					if (!ub.isSysAdmin() && !ub.isTechAdmin() && sur.getRole() != Role.STUDY_ADMINISTRATOR
 							&& sur.getRole() != Role.STUDY_DIRECTOR) {
 						forwardTo = Page.MENU_SERVLET;
 						Navigation.removeUrl(request, "/ListStudyUser");
-						addPageMessage(restext
-								.getString("no_have_correct_privilege_current_study_to_manage_user_roles")
-								+ respage.getString("change_study_contact_sysadmin"));
+						addPageMessage(
+								restext.getString("no_have_correct_privilege_current_study_to_manage_user_roles")
+										+ respage.getString("change_study_contact_sysadmin"), request);
 					}
 				}
-				forwardPage(forwardTo);
+				forwardPage(forwardTo, request, response);
 			}
 
 		}
@@ -151,21 +163,19 @@ public class SetStudyUserRoleServlet extends SecureController {
 	/**
 	 * Send email to the user, director and administrator
 	 * 
-	 * @param request
-	 * @param response
+	 * @param u
+	 *            UserAccountBean
+	 * @param sub
+	 *            StudyUserRoleBean
 	 */
 	private String sendEmail(UserAccountBean u, StudyUserRoleBean sub) throws Exception {
 
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = new StudyDAO(getDataSource());
 		StudyBean study = (StudyBean) sdao.findByPK(sub.getStudyId());
 		logger.info("Sending email...");
-		String body = u.getFirstName() + " " + u.getLastName() + " (" + resword.getString("username") + ": "
-				+ u.getName() + ") " + respage.getString("has_been_granted_the_role") + " "
-				+ sub.getRole().getDescription() + " " + respage.getString("in_the_study_site") + " " + study.getName()
-				+ ".";
-
-		return body;
-
+		return u.getFirstName() + " " + u.getLastName() + " (" + resword.getString("username") + ": " + u.getName()
+				+ ") " + respage.getString("has_been_granted_the_role") + " " + sub.getRole().getDescription() + " "
+				+ respage.getString("in_the_study_site") + " " + study.getName() + ".";
 	}
 
 }

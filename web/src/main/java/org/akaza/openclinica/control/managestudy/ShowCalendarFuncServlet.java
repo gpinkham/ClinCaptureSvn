@@ -13,35 +13,35 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-
-
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"serial"})
-public class ShowCalendarFuncServlet extends SecureController {
-	
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+
+@SuppressWarnings({ "serial" })
+@Component
+public class ShowCalendarFuncServlet extends Controller {
+
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 
 	}
-	
-	@SuppressWarnings({ "rawtypes"})
+
+	@SuppressWarnings({ "rawtypes" })
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
 		request.setAttribute("studyName", currentStudy.getName());
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		ArrayList events = seddao.findAllByStudy(currentStudy);
 		request.setAttribute("events", events);
-		forwardPage(Page.SHOW_CALENDAR_FUNC);
+		forwardPage(Page.SHOW_CALENDAR_FUNC, request, response);
 	}
 }
-
-
-	
-	
-	
-

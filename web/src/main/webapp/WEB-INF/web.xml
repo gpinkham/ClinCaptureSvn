@@ -211,7 +211,7 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RssReaderServlet</servlet-name>
+        <servlet-name>rssReaderServlet</servlet-name>
         <description>RssReaderServlet</description>
         <servlet-class>org.akaza.openclinica.control.RssReaderServlet</servlet-class>
     </servlet>
@@ -555,9 +555,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RemoveCRFFromDefinitionServlet</servlet-name>
+        <servlet-name>removeCRFFromDefinitionServlet</servlet-name>
         <display-name>RemoveCRFFromDefinition</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RemoveCRFFromDefinitionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>restoreCRFFromDefinitionServlet</servlet-name>
@@ -701,14 +701,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RemoveEventDefinitionServlet</servlet-name>
+        <servlet-name>removeEventDefinitionServlet</servlet-name>
         <display-name>RemoveEventDefinition</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RemoveEventDefinitionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RestoreEventDefinitionServlet</servlet-name>
+        <servlet-name>restoreEventDefinitionServlet</servlet-name>
         <display-name>RestoreEventDefinition</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RestoreEventDefinitionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>lockEventDefinitionServlet</servlet-name>
@@ -716,9 +716,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UnlockEventDefinitionServlet</servlet-name>
+        <servlet-name>unlockEventDefinitionServlet</servlet-name>
         <display-name>UnlockEventDefinition</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.UnlockEventDefinitionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>listStudyUserServlet</servlet-name>
@@ -740,9 +740,9 @@
 	
 	
     <servlet>
-        <servlet-name>SetStudyUserRoleServlet</servlet-name>
+        <servlet-name>setStudyUserRoleServlet</servlet-name>
         <display-name>SetStudyUserRole</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.SetStudyUserRoleServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>listStudySubjectsServlet</servlet-name>
@@ -790,14 +790,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RemoveEventCRFServlet</servlet-name>
+        <servlet-name>removeEventCRFServlet</servlet-name>
         <display-name>RemoveEventCRF</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RemoveEventCRFServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RestoreEventCRFServlet</servlet-name>
+        <servlet-name>restoreEventCRFServlet</servlet-name>
         <display-name>RestoreEventCRF</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RestoreEventCRFServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -816,9 +816,9 @@
         <servlet-class>org.akaza.openclinica.control.submit.ChangeParametersForDNoteServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ReassignStudySubjectServlet</servlet-name>
+        <servlet-name>reassignStudySubjectServlet</servlet-name>
         <display-name>ReassignStudySubject</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ReassignStudySubjectServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -937,9 +937,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ShowCalendarFuncServlet</servlet-name>
+        <servlet-name>showCalendarFuncServlet</servlet-name>
         <display-name>ShowCalendarFunc</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ShowCalendarFuncServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>viewCalendaredEventsForSubjectServlet</servlet-name>
@@ -1037,14 +1037,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RemoveSubjectGroupClassServlet</servlet-name>
+        <servlet-name>removeSubjectGroupClassServlet</servlet-name>
         <display-name>RemoveSubjectGroupClass</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RemoveSubjectGroupClassServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RestoreSubjectGroupClassServlet</servlet-name>
+        <servlet-name>restoreSubjectGroupClassServlet</servlet-name>
         <display-name>RestoreSubjectGroupClass</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RestoreSubjectGroupClassServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>createDiscrepancyNoteServlet</servlet-name>
@@ -1195,9 +1195,9 @@
     </servlet>
 
     <servlet>
-        <servlet-name>SignStudySubjectServlet</servlet-name>
+        <servlet-name>signStudySubjectServlet</servlet-name>
         <display-name>SignStudySubject</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.SignStudySubjectServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -1213,9 +1213,9 @@
     </servlet>
 
     <servlet>
-        <servlet-name>UnlockCRFVersionServlet</servlet-name>
+        <servlet-name>unlockCRFVersionServlet</servlet-name>
         <display-name>UnlockCRFVersion</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.UnlockCRFVersionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
 
@@ -1270,12 +1270,12 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>UnlockCRFVersionServlet</servlet-name>
+        <servlet-name>unlockCRFVersionServlet</servlet-name>
         <url-pattern>/UnlockCRFVersion</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>SignStudySubjectServlet</servlet-name>
+        <servlet-name>signStudySubjectServlet</servlet-name>
         <url-pattern>/SignStudySubject</url-pattern>
     </servlet-mapping>
 
@@ -1641,7 +1641,7 @@
         <url-pattern>/CreateNewStudyEvent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RemoveCRFFromDefinitionServlet</servlet-name>
+        <servlet-name>removeCRFFromDefinitionServlet</servlet-name>
         <url-pattern>/RemoveCRFFromDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1721,11 +1721,11 @@
         <url-pattern>/RestoreSite</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RemoveEventDefinitionServlet</servlet-name>
+        <servlet-name>removeEventDefinitionServlet</servlet-name>
         <url-pattern>/RemoveEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RestoreEventDefinitionServlet</servlet-name>
+        <servlet-name>restoreEventDefinitionServlet</servlet-name>
         <url-pattern>/RestoreEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1733,7 +1733,7 @@
         <url-pattern>/LockEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>UnlockEventDefinitionServlet</servlet-name>
+        <servlet-name>unlockEventDefinitionServlet</servlet-name>
         <url-pattern>/UnlockEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1745,7 +1745,7 @@
         <url-pattern>/ViewStudyUser</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>SetStudyUserRoleServlet</servlet-name>
+        <servlet-name>setStudyUserRoleServlet</servlet-name>
         <url-pattern>/SetStudyUserRole</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1781,11 +1781,11 @@
         <url-pattern>/DeleteStudyEvent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RemoveEventCRFServlet</servlet-name>
+        <servlet-name>removeEventCRFServlet</servlet-name>
         <url-pattern>/RemoveEventCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RestoreEventCRFServlet</servlet-name>
+        <servlet-name>restoreEventCRFServlet</servlet-name>
         <url-pattern>/RestoreEventCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1801,7 +1801,7 @@
         <url-pattern>/ChangeParametersForDNote</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ReassignStudySubjectServlet</servlet-name>
+        <servlet-name>reassignStudySubjectServlet</servlet-name>
         <url-pattern>/ReassignStudySubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1895,7 +1895,7 @@
         <url-pattern>/PrintSubjectCaseBook</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ShowCalendarFuncServlet</servlet-name>
+        <servlet-name>showCalendarFuncServlet</servlet-name>
         <url-pattern>/ShowCalendarFunc</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1987,11 +1987,11 @@
         <url-pattern>/ViewSubjectGroupClass</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RemoveSubjectGroupClassServlet</servlet-name>
+        <servlet-name>removeSubjectGroupClassServlet</servlet-name>
         <url-pattern>/RemoveSubjectGroupClass</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RestoreSubjectGroupClassServlet</servlet-name>
+        <servlet-name>restoreSubjectGroupClassServlet</servlet-name>
         <url-pattern>/RestoreSubjectGroupClass</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2075,7 +2075,7 @@
         <url-pattern>/ViewLogMessage</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RssReaderServlet</servlet-name>
+        <servlet-name>rssReaderServlet</servlet-name>
         <url-pattern>/RssReader</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2125,7 +2125,7 @@
 
     <servlet>
         <servlet-name>randomizeServlet</servlet-name>
-        <servlet-class>com.clinovo.servlet.RandomizeServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

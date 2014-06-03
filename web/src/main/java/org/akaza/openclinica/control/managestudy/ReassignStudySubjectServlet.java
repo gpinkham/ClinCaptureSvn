@@ -23,11 +23,13 @@ package org.akaza.openclinica.control.managestudy;
 import org.akaza.openclinica.bean.admin.DisplayStudyBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -36,7 +38,10 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,15 +52,20 @@ import java.util.Date;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
-public class ReassignStudySubjectServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@Component
+public class ReassignStudySubjectServlet extends Controller {
 	/**
      *
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"));
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -64,25 +74,27 @@ public class ReassignStudySubjectServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		String action = request.getParameter("action");
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-		SubjectDAO subdao = new SubjectDAO(sm.getDataSource());
+		StudyDAO sdao = new StudyDAO(getDataSource());
+		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
+		SubjectDAO subdao = new SubjectDAO(getDataSource());
 		FormProcessor fp = new FormProcessor(request);
 
 		int studySubId = fp.getInt("id");
 		if (studySubId == 0) {
-			addPageMessage(respage.getString("please_choose_a_subject_to_reassign"));
-			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
-			return;
+			addPageMessage(respage.getString("please_choose_a_subject_to_reassign"), request);
+			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 		} else {
 			StudySubjectBean studySub = (StudySubjectBean) ssdao.findByPK(studySubId);
 			int subjectId = studySub.getSubjectId();
@@ -90,11 +102,12 @@ public class ReassignStudySubjectServlet extends SecureController {
 			SubjectBean subject = (SubjectBean) subdao.findByPK(subjectId);
 			request.setAttribute("subject", subject);
 
-			SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
-			ArrayList groupMaps = (ArrayList) sgmdao.findAllByStudySubject(studySubId);
+			SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(getDataSource());
+			ArrayList<SubjectGroupMapBean> groupMaps = (ArrayList<SubjectGroupMapBean>) sgmdao
+					.findAllByStudySubject(studySubId);
 
 			if (StringUtil.isBlank(action)) {
-				ArrayList studies = null;
+				ArrayList studies;
 				DisplayStudyBean displayStudy = new DisplayStudyBean();
 				StudyBean study = (StudyBean) sdao.findByPK(studySub.getStudyId());
 				if (study.getParentStudyId() > 0) {// current in site
@@ -111,12 +124,12 @@ public class ReassignStudySubjectServlet extends SecureController {
 				}
 				// request.setAttribute("studies", studies);
 				request.setAttribute("displayStudy", displayStudy);
-				forwardPage(Page.REASSIGN_STUDY_SUBJECT);
+				forwardPage(Page.REASSIGN_STUDY_SUBJECT, request, response);
 			} else {
 				int studyId = fp.getInt("studyId");
 				if (studyId == 0) {
-					addPageMessage(respage.getString("please_choose_a_study_site_to_reassign_the_subject"));
-					forwardPage(Page.REASSIGN_STUDY_SUBJECT);
+					addPageMessage(respage.getString("please_choose_a_study_site_to_reassign_the_subject"), request);
+					forwardPage(Page.REASSIGN_STUDY_SUBJECT, request, response);
 					return;
 				}
 				StudyBean st = (StudyBean) sdao.findByPK(studyId);
@@ -124,8 +137,8 @@ public class ReassignStudySubjectServlet extends SecureController {
 					StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(studySub.getLabel(),
 							studyId, studySub.getId());
 					if (sub1.getId() > 0) {
-						addPageMessage(respage.getString("the_study_subject_ID_used_by_another_in_study_site"));
-						forwardPage(Page.REASSIGN_STUDY_SUBJECT);
+						addPageMessage(respage.getString("the_study_subject_ID_used_by_another_in_study_site"), request);
+						forwardPage(Page.REASSIGN_STUDY_SUBJECT, request, response);
 						return;
 					}
 					// YW << comment out this message
@@ -138,7 +151,7 @@ public class ReassignStudySubjectServlet extends SecureController {
 					// YW >>
 
 					request.setAttribute("newStudy", st);
-					forwardPage(Page.REASSIGN_STUDY_SUBJECT_CONFIRM);
+					forwardPage(Page.REASSIGN_STUDY_SUBJECT_CONFIRM, request, response);
 				} else {
 					logger.info("submit to reassign the subject");
 					studySub.setUpdatedDate(new Date());
@@ -146,8 +159,7 @@ public class ReassignStudySubjectServlet extends SecureController {
 					studySub.setStudyId(studyId);
 					ssdao.update(studySub);
 
-					for (int i = 0; i < groupMaps.size(); i++) {
-						SubjectGroupMapBean sgm = (SubjectGroupMapBean) groupMaps.get(i);
+					for (SubjectGroupMapBean sgm : groupMaps) {
 						sgm.setUpdatedDate(new Date());
 						sgm.setUpdater(ub);
 						sgm.setStatus(Status.DELETED);
@@ -156,8 +168,8 @@ public class ReassignStudySubjectServlet extends SecureController {
 					MessageFormat mf = new MessageFormat("");
 					mf.applyPattern(respage.getString("subject_reassigned"));
 					Object[] arguments = { studySub.getLabel(), st.getName() };
-					addPageMessage(mf.format(arguments));
-					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+					addPageMessage(mf.format(arguments), request);
+					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 
 				}
 

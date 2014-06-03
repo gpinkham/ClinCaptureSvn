@@ -14,32 +14,6 @@
  *******************************************************************************/
 package com.clinovo.servlet;
 
-import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
-import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
-import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
-import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-
 import com.clinovo.context.SubmissionContext;
 import com.clinovo.context.impl.JSONSubmissionContext;
 import com.clinovo.exception.RandomizationException;
@@ -47,20 +21,47 @@ import com.clinovo.model.Randomization;
 import com.clinovo.model.RandomizationResult;
 import com.clinovo.rule.ext.HttpTransportProtocol;
 import com.clinovo.util.RandomizationUtil;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
+import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
+import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
+import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * End-point for all randomization calls
- *
+ * 
  */
 @SuppressWarnings("serial")
-public class RandomizeServlet extends SecureController {
+@Component
+public class RandomizeServlet extends Controller {
 
-	private RandomizationResult result = null;
-	private RuleSetServiceInterface ruleSetService;
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -72,17 +73,20 @@ public class RandomizeServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
-
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		log.info("Processing randomize request");
+
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		PrintWriter writer = response.getWriter();
 
@@ -92,14 +96,14 @@ public class RandomizeServlet extends SecureController {
 
 			String eligibility = request.getParameter("eligibility");
 
-			if (isCrfComplete(crfId)) {
+			if (isCrfComplete(currentStudy, ub, crfId)) {
 
 				if (eligibility != null) {
 
 					// YES
 					if ("0".equals(eligibility)) {
 
-						randomize(writer);
+						randomize(request, writer);
 
 					} else if ("1".equals(eligibility)) {
 
@@ -108,7 +112,7 @@ public class RandomizeServlet extends SecureController {
 					}
 				} else {
 
-					randomize(writer);
+					randomize(request, writer);
 				}
 
 			} else {
@@ -125,13 +129,14 @@ public class RandomizeServlet extends SecureController {
 		}
 	}
 
-	private void randomize(PrintWriter writer) throws Exception {
+	private void randomize(HttpServletRequest request, PrintWriter writer) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
 
-		result = initiateRandomizationCall(request);		
-		result.setStudyId(String.valueOf(getStudyId()));
-		
+		RandomizationResult result = initiateRandomizationCall(request);
+		result.setStudyId(String.valueOf(getStudyId(currentStudy, getStudyDAO())));
+
 		// Set expected context
-		RandomizationUtil.setSessionManager(sm);
+		RandomizationUtil.setSessionManager(getSessionManager(request));
 		RandomizationUtil.setCurrentStudy(currentStudy);
 
 		// Assign subject to group
@@ -147,7 +152,7 @@ public class RandomizeServlet extends SecureController {
 
 			log.info("Subject" + result.getPatientId() + "was randomized successfully");
 		}
-	
+
 		JSONObject randomizationResult = new JSONObject();
 
 		DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
@@ -161,8 +166,9 @@ public class RandomizeServlet extends SecureController {
 	}
 
 	private RandomizationResult initiateRandomizationCall(HttpServletRequest request) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
 
-		String trialId = "";
+		String trialId;
 
 		// Get Trial Id configured in the CRF
 		String crfConfiguredTrialId = request.getParameter("trialId");
@@ -197,7 +203,7 @@ public class RandomizeServlet extends SecureController {
 		String strataLevel = request.getParameter("strataLevel").equals("null") ? "" : request
 				.getParameter("strataLevel");
 
-		String siteId = getSite();
+		String siteId = getSite(currentStudy);
 		String patientId = request.getParameter("subject");
 
 		Randomization randomization = new Randomization();
@@ -222,12 +228,10 @@ public class RandomizeServlet extends SecureController {
 		HttpTransportProtocol protocol = new HttpTransportProtocol();
 		protocol.setSubmissionContext(context);
 
-		RandomizationResult result = protocol.call();
-
-		return result;
+		return protocol.call();
 	}
 
-	private boolean isCrfComplete(String crfId) {
+	private boolean isCrfComplete(StudyBean currentStudy, UserAccountBean ub, String crfId) {
 
 		log.info("Asserting the status of crf with id: {0} ", crfId);
 
@@ -235,14 +239,10 @@ public class RandomizeServlet extends SecureController {
 		HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> result = getRuleSetService()
 				.runRulesInBulk(crfId, ExecutionMode.DRY_RUN, currentStudy, ub);
 
-		if (result.isEmpty()) {
-			return true;
-		} else {
-			return false;
-		}
+		return result.isEmpty();
 	}
 
-	protected String getSite() throws RandomizationException {
+	protected String getSite(StudyBean currentStudy) throws RandomizationException {
 
 		if (currentStudy.isSite(currentStudy.getId())) {
 
@@ -254,30 +254,18 @@ public class RandomizeServlet extends SecureController {
 		}
 	}
 
-	protected int getStudyId() {
-		
-		StudyBean study = null;
-		StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+	protected int getStudyId(StudyBean currentStudy, StudyDAO studyDAO) {
+
+		StudyBean study;
 
 		if (currentStudy.getParentStudyId() > 0) {
-			
+
 			study = (StudyBean) studyDAO.findByPK(currentStudy.getParentStudyId());
 		} else {
-			
+
 			study = currentStudy;
 		}
-		
+
 		return study.getId();
-	}
-
-	private RuleSetServiceInterface getRuleSetService() {
-
-		ruleSetService = this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
-				.getApplicationContext(context).getBean("ruleSetService");
-		ruleSetService.setMailSender((JavaMailSenderImpl) SpringServletAccess.getApplicationContext(context).getBean(
-				"mailSender"));
-		ruleSetService.setContextPath(getContextPath());
-		ruleSetService.setRequestURLMinusServletPath(getRequestURLMinusServletPath());
-		return ruleSetService;
 	}
 }

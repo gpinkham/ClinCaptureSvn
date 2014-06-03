@@ -13,6 +13,21 @@
 
 package org.akaza.openclinica.control;
 
+import com.sun.syndication.feed.synd.SyndEntryImpl;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.fetcher.FeedFetcher;
+import com.sun.syndication.fetcher.FetcherException;
+import com.sun.syndication.fetcher.impl.HashMapFeedInfoCache;
+import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
+import com.sun.syndication.io.FeedException;
+import org.akaza.openclinica.web.SQLInitServlet;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.jmesa.view.html.HtmlBuilder;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -20,67 +35,43 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.akaza.openclinica.web.SQLInitServlet;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.jmesa.view.html.HtmlBuilder;
-
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.fetcher.FeedFetcher;
-import com.sun.syndication.fetcher.FetcherException;
-import com.sun.syndication.fetcher.impl.FeedFetcherCache;
-import com.sun.syndication.fetcher.impl.HashMapFeedInfoCache;
-import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
-import com.sun.syndication.io.FeedException;
-
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({ "unchecked" })
 public class RssReaderServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	FeedFetcherCache feedInfoCache = HashMapFeedInfoCache.getInstance();
-	FeedFetcher feedFetcher = new HttpURLFeedFetcher(feedInfoCache);
-	String rssUrl = SQLInitServlet.getField("rss.url");
-	String rssMore = SQLInitServlet.getField("rss.more");
-	String text1 = SQLInitServlet.getField("about.text1");
-	String text2 = SQLInitServlet.getField("about.text2");
-	ResourceBundle resword, resformat;
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", req.getLocale());
-		resformat = ResourceBundle.getBundle("org.akaza.openclinica.i18n.format", req.getLocale());
+		String rssUrl = SQLInitServlet.getField("rss.url");
+		ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", req.getLocale());
+		ResourceBundle resformat = ResourceBundle.getBundle("org.akaza.openclinica.i18n.format", req.getLocale());
 		PrintWriter pw = new PrintWriter(resp.getOutputStream());
 		if (rssUrl == null || rssUrl.length() == 0) {
-			about(pw);
+			about(resword, pw);
 		} else {
-			getFeed(pw);
+			getFeed(resword, resformat, pw);
 		}
 	}
 
-	void getFeed(PrintWriter pw) {
-
-		SyndFeed feed = null;
+	void getFeed(ResourceBundle resword, ResourceBundle resformat, PrintWriter pw) {
+		SyndFeed feed;
 		String htmlFeed = null;
-
 		try {
+			String rssUrl = SQLInitServlet.getField("rss.url");
+			FeedFetcher feedFetcher = new HttpURLFeedFetcher(HashMapFeedInfoCache.getInstance());
 			feed = feedFetcher.retrieveFeed(new URL(rssUrl));
-			htmlFeed = feedHtml(feed);
+			htmlFeed = feedHtml(resword, resformat, feed);
 		} catch (IllegalArgumentException e) {
-			htmlFeed = errorFeedHtml(e.getMessage());
+			htmlFeed = errorFeedHtml(resword);
 			e.printStackTrace();
 		} catch (FeedException e) {
-			htmlFeed = errorFeedHtml(e.getMessage());
+			htmlFeed = errorFeedHtml(resword);
 			e.printStackTrace();
 		} catch (FetcherException e) {
-			htmlFeed = errorFeedHtml(e.getMessage());
+			htmlFeed = errorFeedHtml(resword);
 			e.printStackTrace();
 		} catch (Exception e) {
-			htmlFeed = errorFeedHtml(e.getMessage());
+			htmlFeed = errorFeedHtml(resword);
 			e.printStackTrace();
 		} finally {
 			pw.println(htmlFeed);
@@ -88,26 +79,28 @@ public class RssReaderServlet extends HttpServlet {
 		}
 	}
 
-	void about(PrintWriter pw) {
+	void about(ResourceBundle resword, PrintWriter pw) {
+		String text1 = SQLInitServlet.getField("about.text1");
+		String text2 = SQLInitServlet.getField("about.text2");
 		HtmlBuilder htmlBuilder = new HtmlBuilder();
 		htmlBuilder.h1().close().append(resword.getString("about")).h1End().ul().close();
 		htmlBuilder.li().close().append(text1).liEnd();
 		htmlBuilder.li().close().append(text2).liEnd();
-		htmlBuilder.ulEnd().toString();
-
-		pw.println(htmlBuilder.toString());
+		String html = htmlBuilder.ulEnd().toString();
+		pw.println(html);
 		pw.close();
 
 	}
 
-	String feedHtml(SyndFeed feed) {
+	String feedHtml(ResourceBundle resword, ResourceBundle resformat, SyndFeed feed) {
+		String rssMore = SQLInitServlet.getField("rss.more");
 		HtmlBuilder htmlBuilder = new HtmlBuilder();
 		htmlBuilder.h1().close().append(resword.getString("news")).h1End().ul().close();
 		List<SyndEntryImpl> theFeeds = feed.getEntries();
 
 		for (int i = 0; i < (theFeeds.size() >= 4 ? 4 : theFeeds.size()); i++) {
 			SyndEntryImpl syndFeed = theFeeds.get(i);
-			String description = null;
+			String description;
 
 			if (syndFeed.getDescription().getValue().length() > 50) {
 				Integer k = 50;
@@ -134,7 +127,7 @@ public class RssReaderServlet extends HttpServlet {
 
 	}
 
-	String errorFeedHtml(String error) {
+	String errorFeedHtml(ResourceBundle resword) {
 		HtmlBuilder htmlBuilder = new HtmlBuilder();
 		htmlBuilder.h1().close().append(resword.getString("news")).h1End().ul().close();
 		htmlBuilder.li().close().append(resword.getString("couldnot_retrieve_news")).liEnd();
