@@ -870,53 +870,6 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return studySubjects;
 	}
 
-	public Integer getCountWithFilter(ListDiscNotesForCRFFilter filter, StudyBean currentStudy) {
-		setTypesExpected();
-
-		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
-		String sql = digester.getQuery("getCountWithFilterListDiscNotes");
-		sql += filter.execute("");
-
-		ArrayList rows = this.select(sql, variables);
-		Iterator it = rows.iterator();
-
-		if (it.hasNext()) {
-			return (Integer) ((HashMap) it.next()).get("count");
-		} else {
-			return null;
-		}
-	}
-
-	public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, ListDiscNotesForCRFFilter filter,
-			ListDiscNotesForCRFSort sort, int rowStart, int rowEnd) {
-		ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
-		setTypesExpected();
-
-		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
-		String sql = digester.getQuery("getWithFilterAndSortListDiscNotes");
-		sql = sql + filter.execute("");
-
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
-			sql += " )x)  where r between " + (rowStart + 1) + " and " + rowEnd;
-			sql = sql + sort.execute("");
-		} else {
-			sql = sql + sort.execute("");
-			sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
-		}
-
-		ArrayList rows = this.select(sql, variables);
-
-		for (Object row : rows) {
-			StudySubjectBean studySubjectBean = (StudySubjectBean) this.getEntityFromHashMap((HashMap) row);
-			studySubjects.add(studySubjectBean);
-		}
-		return studySubjects;
-	}
-
 	public Integer getCountWithFilter(FindSubjectsFilter filter, StudyBean currentStudy) {
 		setTypesExpected();
 

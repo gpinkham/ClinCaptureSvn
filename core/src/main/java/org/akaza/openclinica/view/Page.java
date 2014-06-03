@@ -777,8 +777,6 @@ public class Page {
 	public final static Page VIEW_SECTION_DATA_ENTRY_PRINT_GROUPS = new Page(
 			"/WEB-INF/jsp/managestudy/viewGroupSectionsPrint.jsp", "Print View for Group Tables");
 
-	public final static Page LIST_DNOTES_FOR_CRF = new Page("/WEB-INF/jsp/submit/listDNotesForCRF.jsp",
-			"List Disc Notes By Subject and CRF");
 	public final static Page CHOOSE_DOWNLOAD_FORMAT = new Page("/WEB-INF/jsp/submit/chooseDownloadFormat.jsp",
 			"Choose download format");
 

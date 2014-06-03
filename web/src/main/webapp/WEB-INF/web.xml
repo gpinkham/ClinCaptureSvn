@@ -281,13 +281,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>listDiscNotesForCRFServlet</servlet-name>
-        <display-name>ListDiscNotesForCRFServlet</display-name>
-        <description>ListDiscNotesForCRFServlet</description>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>viewJobServlet</servlet-name>
         <display-name>ViewJobServlet</display-name>
         <description>ViewJobServlet</description>
@@ -1282,11 +1275,6 @@
     <servlet-mapping>
         <servlet-name>updateStudyServletNew</servlet-name>
         <url-pattern>/UpdateStudyNew</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>listDiscNotesForCRFServlet</servlet-name>
-        <url-pattern>/ListDiscNotesForCRFServlet</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
