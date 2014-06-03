@@ -23,18 +23,12 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
-
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -45,6 +39,13 @@ import org.akaza.openclinica.web.bean.CalendarEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 @Component
@@ -57,19 +58,19 @@ public class ViewCalendaredEventsForSubjectServlet extends Controller {
 
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		StudyBean currentStudy = getCurrentStudy(request);
-		logger.info("servlet is connected");
+		logger.debug("servlet is connected");
 		FormProcessor fp = new FormProcessor(request);
 		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
 		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 		ArrayList events = new ArrayList();
 		int subjectId = fp.getInt("id", true);
-		StudySubjectBean ssBean = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
-		ArrayList<StudyEventBean> seBeans = sedao.findAllBySubjectId(subjectId);
+		StudySubjectBean ssBean = (StudySubjectBean) ssdao.findByPKAndStudy(subjectId, currentStudy);
+		ArrayList<StudyEventBean> seBeans = sedao.findAllByStudySubject(ssBean);
 		for (StudyEventBean seBean : seBeans) {
 			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(seBean
 					.getStudyEventDefinitionId());
-			logger.info("looking up type: " + sedBean.getType());
+			logger.debug("looking up type: " + sedBean.getType());
 			if ("calendared_visit".equalsIgnoreCase(sedBean.getType())
 					&& !seBean.getSubjectEventStatus().isNotScheduled()) {
 				// try to found reference event for this event
@@ -102,7 +103,7 @@ public class ViewCalendaredEventsForSubjectServlet extends Controller {
 						events.add(calendFuncBean);
 					}
 				} else {
-					logger.info("This event is RV or Event without RV");
+					logger.debug("This event is RV or Event without RV");
 					calendFuncBean.setEventName(sedBean.getName());
 					if ("true".equalsIgnoreCase(String.valueOf(sedBean.getReferenceVisit()))) {
 						calendFuncBean.setReferenceVisit("Yes");
