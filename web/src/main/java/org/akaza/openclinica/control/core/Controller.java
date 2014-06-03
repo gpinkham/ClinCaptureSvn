@@ -1216,6 +1216,16 @@ public abstract class Controller extends BaseController {
 			request.setAttribute("startDateLabel", config.getStartDateTimeLabel());
 		}
 	}
+	
+	public static void setDomainName(HttpServletRequest request) {
+		String domainName = request.getParameter(DOMAIN_NAME);
+
+		if (domainName != null) {
+			request.getSession().setAttribute(DOMAIN_NAME, domainName);
+		} else {
+			request.getSession().setAttribute(DOMAIN_NAME, request.getServerName());
+		}
+	}
 
 	public int getIntById(HashMap h, Integer key) {
 		Integer value = (Integer) h.get(key);

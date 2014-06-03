@@ -94,6 +94,7 @@
                         <!-- Login box contents -->
                         <div ID="login" align="left">
                             <form action="<c:url value='/j_spring_security_check'/>" method="post" autocomplete='off'>
+                            	<input type="hidden" name="domain_name" value="" />
                                 <input type="password" style="display:none"/>
                                 <h1><fmt:message key="login" bundle="${resword}"/></h1>
                                 <b><fmt:message key="user_name" bundle="${resword}"/></b>
@@ -120,6 +121,8 @@
 
     <script type="text/javascript">
         jQuery(document).ready(function() {
+        	
+        	jQuery('input[name=domain_name]').val(document.location.host);
 
             jQuery('#requestPassword').click(function() {
                 jQuery.blockUI({ message: jQuery('#requestPasswordForm'), css:{left: "200px", top:"180px" } });

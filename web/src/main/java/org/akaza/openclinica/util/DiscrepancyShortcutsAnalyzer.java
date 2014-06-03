@@ -26,6 +26,7 @@ public class DiscrepancyShortcutsAnalyzer {
 	public static final String SERVLET_PATH = "servletPath";
 	public static final String SECTION_ID = "sectionId";
 	public static final String TAB_ID = "tabId";
+	public static final String DOMAIN_NAME = "domain_name";
 
 	private boolean hasNotes;
 
@@ -208,7 +209,7 @@ public class DiscrepancyShortcutsAnalyzer {
 		if (servletPath.equalsIgnoreCase("/ResolveDiscrepancy")
 				|| servletPath.equalsIgnoreCase("/ViewSectionDataEntry")
 				|| servletPath.equalsIgnoreCase("/ViewSectionDataEntryRESTUrlServlet")) {
-			link = currentSectionId == ifmbean.getSectionId() ? "" : fp.getRequest().getRequestURL().toString()
+			link = currentSectionId == ifmbean.getSectionId() ? "" : fp.getRequest().getScheme() + "://" + fp.getRequest().getSession().getAttribute(DOMAIN_NAME) + fp.getRequest().getRequestURI()
 					.replaceAll(fp.getRequest().getServletPath(), "/ViewSectionDataEntry")
 					+ "?eventCRFId="
 					+ eventCrfBean.getId()
@@ -224,7 +225,7 @@ public class DiscrepancyShortcutsAnalyzer {
 					+ eventDefinitionCRFId
 					+ (fp.getString("exitTo", true).isEmpty() ? "" : "&exitTo=" + fp.getString("exitTo", true));
 		} else {
-			link = currentTabId == tabNum ? "" : fp.getRequest().getRequestURL().toString()
+			link = currentTabId == tabNum ? "" : fp.getRequest().getScheme() + "://" + fp.getRequest().getSession().getAttribute(DOMAIN_NAME) + fp.getRequest().getRequestURI()
 					.replaceAll(fp.getRequest().getServletPath(), servletPath)
 					+ "?eventCRFId="
 					+ eventCrfBean.getId()

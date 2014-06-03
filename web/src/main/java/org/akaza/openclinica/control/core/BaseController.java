@@ -124,6 +124,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public static final String MODULE = "module";// to determine which module
 
 	public static final String NOT_USED = "not_used";
+	
+	public static final String DOMAIN_NAME = "domain_name";
 
 	private static final Map<Integer, Integer> unavailableCRFList = new HashMap<Integer, Integer>();
 
