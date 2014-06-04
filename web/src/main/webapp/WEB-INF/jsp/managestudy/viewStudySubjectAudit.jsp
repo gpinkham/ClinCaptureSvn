@@ -22,13 +22,6 @@
 	</c:if>
 </head>
 
-<jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
-<jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
-<jsp:useBean scope="request" id="events" class="java.util.ArrayList"/>
-<jsp:useBean scope="request" id="eventCRFAudits" class="java.util.ArrayList"/>
-<jsp:useBean scope="request" id="allDeletedEventCRFs" class="java.util.ArrayList"/>
-
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 
@@ -77,11 +70,11 @@
 	<tr>
         <td class="table_header_column"><c:out value="${studySub.label}"/></td>
         <c:if test="${secondaryIdShow}">
-            <td class="table_header_column"><c:out value="${studySub.secondaryLabel}"/></td>
+            <td class="table_header_column"><c:out value="${studySub.secondaryLabel}"/>&nbsp</td>
         </c:if>
-        <td class="table_header_column"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}" /></td>
-        <td class="table_header_column"><c:out value="${subject.uniqueIdentifier}"/></td>
-        <td class="table_header_column"><c:out value="${studySub.owner.name}"/></td>
+        <td class="table_header_column"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/>&nbsp</td>
+        <td class="table_header_column"><c:out value="${subject.uniqueIdentifier}"/>&nbsp;</td>
+        <td class="table_header_column"><c:out value="${studySub.owner.name}"/>&nbsp;</td>
         <td class="table_header_column"><c:out value="${studySub.status.name}"/></td>
 
     </tr>
@@ -172,8 +165,8 @@
     <td class="table_header_column"><fmt:message key="occurrence_number" bundle="${resword}"/></td>
     <td class="table_header_column"><c:out value="${event.sampleOrdinal}"/>&nbsp;</td>
 </tr>
-<tr>
-<tr><td colspan="2">&nbsp;</td></tr>
+<tr><td colspan="2" class="table_header_column" style="border-style: solid; border-right-width: 0px;">&nbsp;</td></tr>
+
 <tr>
     <td colspan="2">
             <%--Audit for deleted event crfs --%>
@@ -342,7 +335,7 @@
                             <td class="table_header_column">
 								<c:choose>
 									<c:when test="${eventCRFAudit.itemId != 0}">
-										<a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${eventCRFAudit.itemId}"/>')" title="<c:out value="${eventCRFAudit.itemDescription}"/>">
+										<a href="javascript: openDocWindow('ViewItemDetail?itemId=${eventCRFAudit.itemId}')" title="<c:out value="${eventCRFAudit.itemDescription}"/>">
 											<c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.ordinal}"/>)
 										</a>
 									</c:when>
