@@ -150,6 +150,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 			}
 
 			SubjectBean subject = (SubjectBean) sdao.findByPK(studySubject.getSubjectId());
+			studySubject.setDateOfBirth(subject.getDateOfBirth());
+			studySubject.setUniqueIdentifier(subject.getUniqueIdentifier());
 
 			/* Show both study subject and subject audit events together */
 			// Study subject value changed
@@ -163,10 +165,10 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 					auditBean.setNewValue(Status.get(Integer.parseInt(auditBean.getNewValue())).getName());
 				}
 			}
-			studySubjectAudits.addAll(studySubjectAuditEvents);
-
 			// Global subject value changed
 			studySubjectAudits.addAll(adao.findSubjectAuditEvents(subject.getId()));
+			
+			studySubjectAudits.addAll(studySubjectAuditEvents);
 
 			studySubjectAudits.addAll(adao.findStudySubjectGroupAssignmentAuditEvents(studySubject.getId()));
 
@@ -265,8 +267,9 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 
 		for (Object studySubjectAudit : studySubjectAudits) {
 			AuditBean audit = (AuditBean) studySubjectAudit;
-			excelRow = new String[] { audit.getAuditEventTypeName(), dateTimeFormat(audit.getAuditDate()),
-					audit.getUserName(), audit.getEntityName(), audit.getOldValue(), audit.getNewValue() };
+			excelRow = new String[] { ResourceBundleProvider.getAuditEventsBundle().getString(audit.getAuditEventTypeName()), 
+					dateTimeFormat(audit.getAuditDate()), audit.getUserName(), audit.getEntityName(), 
+					audit.getOldValue(), audit.getNewValue() };
 			for (int i = 0; i < excelRow.length; i++) {
 				Label label = new Label(i, row, excelRow[i]);
 				excelSheet.addCell(label);
@@ -432,9 +435,10 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 						else
 							newValue = studyEvent.getNewValue();
 
-						excelRow = new String[] { studyEvent.getAuditEventTypeName(),
+						excelRow = new String[] { ResourceBundleProvider.getAuditEventsBundle().getString(studyEvent.getAuditEventTypeName()),
 								dateTimeFormat(studyEvent.getAuditDate()), studyEvent.getUserName(),
-								studyEvent.getEntityName() + "(" + studyEvent.getOrdinal() + ")", oldValue, newValue };
+								studyEvent.getEntityName() + (event.getStudyEventDefinition().isRepeating()? 
+										"(" + studyEvent.getOrdinal() + ")" : ""), oldValue, newValue };
 						for (int i = 0; i < excelRow.length; i++) {
 							label = new Label(i, row, excelRow[i]);
 							excelSheet.addCell(label);
@@ -536,7 +540,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 								newValue = eventCrfAudit.getNewValue();
 							}
 
-							excelRow = new String[] { eventCrfAudit.getAuditEventTypeName(),
+							excelRow = new String[] { ResourceBundleProvider.getAuditEventsBundle().getString(eventCrfAudit.getAuditEventTypeName()),
 									dateTimeFormat(eventCrfAudit.getAuditDate()), eventCrfAudit.getUserName(),
 									eventCrfAudit.getEntityName() + "(" + eventCrfAudit.getOrdinal() + ")", oldValue,
 									newValue };
