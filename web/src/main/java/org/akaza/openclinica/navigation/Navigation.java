@@ -52,7 +52,7 @@ public class Navigation {
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
 			"/ChangeDefinitionCRFOrdinal", "/DoubleDataEntry", "/CreateOneDiscrepancyNote", "/MatchPassword",
-			"/pages/handleSDVPost", "/pages/handleSDVRemove", "/CompleteCrfDelete"));
+			"/pages/handleSDVPost", "/pages/handleSDVRemove", "/CompleteCrfDelete", "/pages/sdvStudySubjects"));
 	// set of pages with special processing 
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects", 
 			"/ViewRuleAssignment"));
