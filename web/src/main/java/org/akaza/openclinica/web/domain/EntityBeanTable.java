@@ -74,7 +74,7 @@ import org.akaza.openclinica.view.Link;
  * 
  * <li>Put the table in the request: <br/>
  * <code>setTable(table);
- * <br/>This method is inherited from SecureController.
+ * <br/>This method is inherited from Controller.
  * 
  * <li> Send the user to the JSP with forwardPage as usual.
  * </ul>

@@ -36,7 +36,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.control.core.SecureController;
+
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -310,6 +310,6 @@ public class RemoveStudyServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return SecureController.ADMIN_SERVLET_CODE;
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 }

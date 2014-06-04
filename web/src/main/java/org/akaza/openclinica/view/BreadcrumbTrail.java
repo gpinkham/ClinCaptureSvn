@@ -69,7 +69,7 @@ public class BreadcrumbTrail {
 	}
 
 	/**
-	 * method to be called right before forwardPage() in the SecureController. Generates an arraylist of breadcrumb
+	 * method to be called right before forwardPage() in the Controller. Generates an arraylist of breadcrumb
 	 * beans, which is then set to the request/session. Has the possibility of getting quite long, since we will be
 	 * setting up all breadcrumb bean configurations here based on the Page submitted to us.
 	 * 

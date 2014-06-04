@@ -662,11 +662,6 @@
         <display-name>InitialDataEntry</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>DataEntryServlet</servlet-name>
-        <display-name>DataEntry</display-name>
-        <servlet-class>org.akaza.openclinica.control.submit.DataEntryServlet</servlet-class>
-    </servlet>
 
     <servlet>
         <servlet-name>doubleDataEntryServlet</servlet-name>
@@ -701,16 +696,6 @@
     <servlet>
         <servlet-name>restoreEventDefinitionServlet</servlet-name>
         <display-name>RestoreEventDefinition</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>lockEventDefinitionServlet</servlet-name>
-        <display-name>LockEventDefinition</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>unlockEventDefinitionServlet</servlet-name>
-        <display-name>UnlockEventDefinition</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
@@ -1075,11 +1060,6 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>viewNoteServlet</servlet-name>
-        <display-name>ViewNote</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>resolveDiscrepancyServlet</servlet-name>
         <display-name>ResolveDiscrepancy</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -1094,12 +1074,6 @@
     <servlet>
         <servlet-name>viewSectionDataEntryPreview</servlet-name>
         <display-name>ViewSectionDataEntryPreview</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-
-    <servlet>
-        <servlet-name>viewCRFVersionPreview</servlet-name>
-        <display-name>ViewCRFVersionPreview</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
@@ -1239,11 +1213,6 @@
     <servlet>
         <servlet-name>printAllEventCRFServlet</servlet-name>
         <display-name>PrintAllEventCRFServlet</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>viewItemAuditLogServlet</servlet-name>
-        <display-name>ViewItemAuditLogServlet</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
@@ -1391,11 +1360,6 @@
     <servlet-mapping>
         <servlet-name>importCRFDataServlet</servlet-name>
         <url-pattern>/ImportCRFData</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>viewCRFVersionPreview</servlet-name>
-        <url-pattern>/ViewCRFVersionPreview</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
@@ -1607,10 +1571,6 @@
         <servlet-name>initialDataEntryServlet</servlet-name>
         <url-pattern>/InitialDataEntry</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DataEntryServlet</servlet-name>
-        <url-pattern>/DataEntry</url-pattern>
-    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>doubleDataEntryServlet</servlet-name>
@@ -1715,14 +1675,6 @@
     <servlet-mapping>
         <servlet-name>restoreEventDefinitionServlet</servlet-name>
         <url-pattern>/RestoreEventDefinition</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>lockEventDefinitionServlet</servlet-name>
-        <url-pattern>/LockEventDefinition</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>unlockEventDefinitionServlet</servlet-name>
-        <url-pattern>/UnlockEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>listStudyUserServlet</servlet-name>
@@ -2011,10 +1963,6 @@
         <url-pattern>/ViewNotes</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>viewNoteServlet</servlet-name>
-        <url-pattern>/ViewNote</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>resolveDiscrepancyServlet</servlet-name>
         <url-pattern>/ResolveDiscrepancy</url-pattern>
     </servlet-mapping>
@@ -2090,10 +2038,6 @@
     <servlet-mapping>
         <servlet-name>printAllEventCRFServlet</servlet-name>
         <url-pattern>/PrintAllEventCRF</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>viewItemAuditLogServlet</servlet-name>
-        <url-pattern>/ViewItemAuditLog</url-pattern>
     </servlet-mapping>
 
     <servlet>

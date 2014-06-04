@@ -29,7 +29,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.control.core.SecureController;
+
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -170,7 +170,7 @@ public class RemoveSubjectServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return SecureController.ADMIN_SERVLET_CODE;
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 
 }

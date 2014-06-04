@@ -494,8 +494,6 @@ public class Page {
 	public final static Page AUDIT_LOGS_STUDY = new Page("/WEB-INF/jsp/admin/studyAuditLog.jsp",
 			"Audit Log display by Study");
 
-	public final static Page AUDIT_LOGS_ITEMS = new Page("/WEB-INF/jsp/admin/auditItem.jsp", "Audit Log for Item");
-
 	/**
 	 * Page for extract datasets main, tbh
 	 */
@@ -766,7 +764,6 @@ public class Page {
 			"/WEB-INF/jsp/managestudy/viewNotesPrint.jsp", "View Discrepancy Notes in Study Print");
 	public final static Page VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET = new Page("/ViewNotes",
 			"View Discrepancy Notes in Study");
-	public final static Page VIEW_SINGLE_NOTE = new Page("/WEB-INF/jsp/managestudy/viewNote.jsp", "View Single Note");
 
 	public final static Page LIST_EVENTS_FOR_SUBJECTS_SERVLET = new Page("/ListEventsForSubjects",
 			"List Selected Event For Subjects");

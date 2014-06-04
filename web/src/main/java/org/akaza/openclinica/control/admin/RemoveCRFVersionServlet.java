@@ -32,7 +32,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.control.core.SecureController;
+
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -206,7 +206,7 @@ public class RemoveCRFVersionServlet extends Controller {
 
 		if (keyValue != null) {
 			Map storedAttributes = new HashMap();
-			storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+			storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
 			request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
 			response.sendRedirect(response.encodeRedirectURL(keyValue));
 		} else {
@@ -219,7 +219,7 @@ public class RemoveCRFVersionServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

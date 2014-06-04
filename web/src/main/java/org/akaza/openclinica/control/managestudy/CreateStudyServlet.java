@@ -42,7 +42,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.control.core.SecureController;
+
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -1107,7 +1107,7 @@ public class CreateStudyServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return SecureController.ADMIN_SERVLET_CODE;
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 
 }

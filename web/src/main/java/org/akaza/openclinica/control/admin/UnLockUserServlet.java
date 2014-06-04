@@ -25,7 +25,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.control.core.SecureController;
+
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -162,6 +162,6 @@ public class UnLockUserServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return SecureController.ADMIN_SERVLET_CODE;
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 }

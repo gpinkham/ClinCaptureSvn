@@ -37,7 +37,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.control.core.SecureController;
+
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -169,7 +169,7 @@ public class RestoreStudyServlet extends Controller {
 							.findRoleByUserNameAndStudyId(currentUser.getName(), currentStudy.getId());
 					StudyUserRoleBean rInParent = udao.findRoleByUserNameAndStudyId(currentUser.getName(),
 							currentStudy.getParentStudyId());
-					// according to logic in SecureController.java: inherited
+					// according to logic in Controller.java: inherited
 					// role from parent study, pick the higher role
 					currentRole.setRole(Role.get(Role.max(r.getRole(), rInParent.getRole()).getId()));
 				}
@@ -301,7 +301,7 @@ public class RestoreStudyServlet extends Controller {
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
 		if (getUserAccountBean(request).isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

@@ -157,7 +157,7 @@ public class RestoreSiteServlet extends Controller {
 							.findRoleByUserNameAndStudyId(currentUser.getName(), currentStudy.getId());
 					StudyUserRoleBean rInParent = udao.findRoleByUserNameAndStudyId(currentUser.getName(),
 							currentStudy.getParentStudyId());
-					// according to logic in SecureController.java: inherited
+					// according to logic in Controller.java: inherited
 					// role from parent study, pick the higher role
 					currentRole.setRole(Role.max(r.getRole(), rInParent.getRole()));
 				}
