@@ -2,6 +2,7 @@
 
 var TabValue = 0;
 var PrevTabNumber = 0;
+var targetRowElement;
 
 	  
 function IncreaseTabValue() 
@@ -301,7 +302,10 @@ function StatusBoxSkip2(StatusBoxID,StatusBoxNum,StatusBoxJumpTo) {
     }
 }
 
-function EnableScrollArrows2(StatusBoxID, StatusBoxNum) {
+function EnableScrollArrows2(StatusBoxID, StatusBoxNum, targetElement) {
+	if(targetElement) {
+		targetRowElement = targetElement;
+	}
     StatusBoxValue = 1;
     for (var i = 1; i <= StatusBoxNum; i++) {
     	
@@ -341,7 +345,7 @@ function EnableScrollArrows2(StatusBoxID, StatusBoxNum) {
         leftnavExpand('bt_Scroll_Event_' + StatusBoxID + '_next_dis');
         leftnavExpand('bt_Scroll_Event_' + StatusBoxID + '_next');
     }
-    loadCRFList(StatusBoxID,1);
+    loadCRFList(StatusBoxID, 1);
 }
 
 function adjustCrfListTable2(studyEventId, StatusBoxID, StatusBoxNum) {
@@ -394,6 +398,7 @@ function loadCRFList(StatusBoxID, StatusBoxNum) {
             jQuery('#crfListWrapper_' + idAttribute).css("height", "auto");
             jQuery('#crfListWrapper_' + idAttribute).html(data);
             adjustCrfListTable2(studyEventId, StatusBoxID, StatusBoxNum);
+            setAccessedObjected(targetRowElement);
         }
     });
 }

@@ -2135,7 +2135,7 @@ function hideAllTooltips(params, top, left, targetElement) {
             }
 
             if (params.statusBoxNum != undefined) {
-                EnableScrollArrows2(params.statusBoxId, params.statusBoxNum);
+                EnableScrollArrows2(params.statusBoxId, params.statusBoxNum, targetElement);
                 jQuery("*").unbind("mousedown", hideCurrentPopup).bind("mousedown", hideCurrentPopup);
             } else {
                 if (document.getElementById('Menu_on_' + params.statusBoxId) != undefined) {
@@ -4115,15 +4115,19 @@ function hideUnhideStudyParamRow(element) {
 
 function setAccessedObjected(element) {
 	
+	if(isBrowserIE7OrLower()) {
+		return;
+	}
+	
 	var attrName = $("#accessAttributeName").val();
 	var tr = $(element).closest("tr");
 	var dataElement = $(tr).find("a["+attrName+"]");
 	var idValue = $(dataElement).attr(attrName);
 	var newHtml = "";
-	localStorage[attrName] = idValue;
+	setIdByAttributeName(attrName, idValue);
 	clearHighlight();
 	$(tr).find('td').each(function(){
-		if($(this).is(":visible")){
+		if($(this).is(":visible")) {
 			$(this).addClass("borderHighlight");
 		}		
 	});	
@@ -4163,7 +4167,7 @@ function highlightLastAccessedObject() {
 	var attrName = $("#accessAttributeName").val();
 	if(attrName){
 		
-		var dataElement = $("a[" + attrName + "='" + localStorage[attrName] + "']");
+		var dataElement = $("a[" + attrName + "='" + getIdByAttributeName(attrName) + "']");
 		if(dataElement && $(dataElement).is("a")){
 			setAccessedObjected(dataElement)
 		}
@@ -4173,13 +4177,25 @@ function highlightLastAccessedObject() {
 function getLastAccessedId(){
 	
 	var attrName = $("#accessAttributeName").val();
-	return localStorage[attrName];
+	return getIdByAttributeName(attrName);
 }
 
 function setLastAccessedId(id){
 	
 	var attrName = $("#accessAttributeName").val();
-	localStorage[attrName] = id;
+	setIdByAttributeName(attrName, id);
+}
+
+function getIdByAttributeName(attrName) {
+	if(!isBrowserIE7OrLower()){
+		return localStorage[attrName];
+	}
+}
+
+function setIdByAttributeName(attrName, idValue) {
+	if(!isBrowserIE7OrLower()){
+		localStorage[attrName] = idValue;
+	}
 }
 
 function clearLastAccessedObjects(){
@@ -4193,4 +4209,11 @@ function removeHighlightFromCellDescendants(td){
 	$(td).find(".borderHighlight").each(function(){	
 		$(this).removeClass("borderHighlight");
 	});
+}
+
+function isBrowserIE7OrLower(){
+	if($.browser.msie  && parseInt($.browser.version, 10) < 8) {
+		return true;
+	}
+	return false;
 }
