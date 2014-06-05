@@ -96,6 +96,7 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 		postData.put("Initials", randomization.getInitials());
 		postData.put("PatientID", randomization.getPatientId());
 		postData.put("TrialID", Integer.parseInt(randomization.getTrialId()));
+		postData.put("TestOnly", randomization.getTestOnly());
 		
 		// Strata
 		if (randomization.getStratificationLevel() != null 

@@ -314,6 +314,8 @@ public abstract class Controller extends BaseController {
 		session.setAttribute("newThemeColor", newThemeColor);
 		String assignRandomizationResultTo = CoreResources.getField("assignRandomizationResultTo");
 		session.setAttribute("assignRandomizationResultTo", assignRandomizationResultTo);
+		String randomizationEnviroment = CoreResources.getField("randomizationEnviroment");
+		session.setAttribute("randomizationEnviroment", randomizationEnviroment);
 		ApplicationContext applicationContext = SpringServletAccess.getApplicationContext(getServletContext());
 		try {
 			session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));

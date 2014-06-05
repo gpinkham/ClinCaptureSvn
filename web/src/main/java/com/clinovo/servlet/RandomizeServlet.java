@@ -205,6 +205,7 @@ public class RandomizeServlet extends Controller {
 
 		String siteId = getSite(currentStudy);
 		String patientId = request.getParameter("subject");
+		String randomizationEnviroment = (String) request.getSession().getAttribute("randomizationEnviroment");
 
 		Randomization randomization = new Randomization();
 
@@ -217,6 +218,7 @@ public class RandomizeServlet extends Controller {
 		randomization.setTrialId(trialId);
 		randomization.setPatientId(patientId);
 		randomization.setStratificationLevel(strataLevel);
+		randomization.setTestOnly(Boolean.toString(randomizationEnviroment.equals("test")));
 
 		// Https details
 		randomization.setRandomizationUrl(CoreResources.getField("randomizationUrl"));

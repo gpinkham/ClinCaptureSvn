@@ -286,6 +286,12 @@ public class CoreResources implements ResourceLoaderAware {
 			dataInfo.setProperty("assignRandomizationResultTo", assignRandomizationResultTo);
 		}
 
+		String randomizationEnviroment = dataInfo.getProperty("randomizationEnviroment");
+		if (randomizationEnviroment == null || randomizationEnviroment.isEmpty()) {
+			randomizationEnviroment = "prod";
+			dataInfo.setProperty("randomizationEnviroment", randomizationEnviroment);
+		}
+
 		prepareMailProps();
 		// setRuleDesignerProps();
 		if (dataInfo.getProperty("crfFileExtensions") != null) {

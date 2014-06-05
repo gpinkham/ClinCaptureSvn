@@ -28,6 +28,7 @@ public class Randomization {
 	private String trialId;
 	private String initials;
 	private String patientId;
+	private String testOnly;
 	
 	// Auth details
 	private String username;
@@ -111,4 +112,11 @@ public class Randomization {
 		return this.level;
 	}
 
+	public String getTestOnly() {
+		return testOnly;
+	}
+
+	public void setTestOnly(String testOnly) {
+		this.testOnly = testOnly;
+	}
 }
