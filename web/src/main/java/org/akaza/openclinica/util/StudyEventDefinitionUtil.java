@@ -11,7 +11,7 @@ import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public final class StudyEventDefinitionUtil {
 
 	private StudyEventDefinitionUtil() {
