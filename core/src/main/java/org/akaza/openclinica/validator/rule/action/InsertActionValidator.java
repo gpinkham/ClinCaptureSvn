@@ -82,29 +82,6 @@ public class InsertActionValidator implements Validator {
 			} catch (OpenClinicaSystemException ose) {
 				e.rejectValue(p + "oid", "oid.invalid", "OID: " + propertyBean.getOid() + " is Invalid.");
 			}
-			// Use OID in destinationProperty to get CRF
-			CRFBean destinationPropertyOidCrf = getExpressionService().getCRFFromExpression(propertyBean.getOid());
-			if (destinationPropertyOidCrf == null) {
-				ItemBean item = getExpressionService().getItemBeanFromExpression(propertyBean.getOid());
-				destinationPropertyOidCrf = getCrfDAO().findByItemOid(item.getOid());
-			}
-			// Use Target get CRF
-			CRFBean targetCrf = getExpressionService().getCRFFromExpression(ruleSetBean.getTarget().getValue());
-			if (targetCrf == null) {
-				ItemBean item = getExpressionService().getItemBeanFromExpression(ruleSetBean.getTarget().getValue());
-				targetCrf = getCrfDAO().findByItemOid(item.getOid());
-
-			}
-			// Get All event definitions the selected CRF belongs to
-			List<StudyEventDefinitionBean> destinationPropertyStudyEventDefinitions = getStudyEventDefinitionDAO()
-					.findAllByCrf(destinationPropertyOidCrf);
-			List<StudyEventDefinitionBean> targetStudyEventDefinitions = getStudyEventDefinitionDAO().findAllByCrf(
-					targetCrf);
-			Collection intersection = CollectionUtils.intersection(destinationPropertyStudyEventDefinitions,
-					targetStudyEventDefinitions);
-			if (intersection.size() == 0) {
-				e.rejectValue(p + "oid", "oid.invalid", "OID: " + propertyBean.getOid() + " is Invalid.");
-			}
 		} else {
 			String expression = getExpressionService().constructFullExpressionFromPartial(propertyBean.getOid(),
 					ruleSetBean.getTarget().getValue());
