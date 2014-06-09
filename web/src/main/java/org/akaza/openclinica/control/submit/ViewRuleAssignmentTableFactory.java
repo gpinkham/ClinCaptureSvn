@@ -262,8 +262,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		/*
 		 * Because we are using the State feature (via stateAttr) we can do a check to see if we have a complete limit
 		 * already. See the State feature for more details Very important to set the totalRow before trying to get the
-		 * row start and row end variables. Very important to set the totalRow before trying to get the row start and
-		 * row end variables.
+		 * row start and row end variables.
 		 */
 		int newTotalRows = getRuleSetService().getCountWithFilter(viewRuleAssignmentFilter);
 		if (!limit.isComplete()
