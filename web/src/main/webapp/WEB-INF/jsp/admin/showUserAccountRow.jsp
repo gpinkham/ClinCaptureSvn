@@ -36,7 +36,7 @@
 	<%-- ACTIONS --%>
 	<td class="table_cell">
 	 <table border="0" cellpadding="0" cellspacing="0">
-	 <tr>
+	 <tr class="innerTable">
 		<c:choose>
 		<c:when test='${(currRow.bean.techAdmin && !(userBean.techAdmin))}'>
 			</c:when>
@@ -49,28 +49,31 @@
 					  </fmt:message>
 					</c:set>
 					
-					<c:set var="onClick" value="return confirmDialog({ message: '${confirmQuestion}', height: 150, width: 500, aLink: this });"/>
+					<c:set var="onClick" value="return confirmDialog({ message: '${confirmQuestion}', height: 150, width: 500, aLink: this, highlightRow:true });"/>
 					<%-- <img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>
 					<img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>
 					<img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a> --%>
 					<td><a href="DeleteUser?action=4&userId=<c:out value="${currRow.bean.id}"/>" onClick="<c:out value="${onClick}" />"
 					onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
-				    onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');">	<img name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
+				    onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
+				    data-cc-userId="${currRow.bean.id}">	<img name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
 				   	</td>
 			</c:when>
 			<c:otherwise>
 				<td><a href="ViewUserAccount?userId=<c:out value="${currRow.bean.id}"/>"
 					onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
 					onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
-					><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a></td>
+					onclick="setAccessedObjected(this)"><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a></td>
 				<td><a href="EditUserAccount?userId=<c:out value="${currRow.bean.id}"/>"
 					onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
 					onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
-					><img name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a></td>
+					data-cc-userId="${currRow.bean.id}"
+					onclick="setAccessedObjected(this)"><img name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a></td>
 			    <c:if test="${currRow.bean.name ne 'root'}">
                     <td><a href="SetUserRole?action=confirm&userId=<c:out value="${currRow.bean.id}"/>"
                       onMouseDown="javascript:setImage('bt_SetRole1','images/bt_SetRole_d.gif');"
-                      onMouseUp="javascript:setImage('bt_SetRole1','images/bt_SetRole.gif');"><img
+                      onMouseUp="javascript:setImage('bt_SetRole1','images/bt_SetRole.gif');"
+                      onclick="setAccessedObjected(this)"><img
                       name="bt_SetRole1" src="images/bt_SetRole.gif" border="0" alt="<fmt:message key="set_role" bundle="${resword}"/>" title="<fmt:message key="set_role" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
                 </c:if>
@@ -80,7 +83,7 @@
 				 </fmt:message>
 				</c:set> 
 				
-				<c:set var="onClick" value="return confirmDialog({ message: '${confirmQuestion}', height: 150, width: 500, aLink: this });"/>
+				<c:set var="onClick" value="return confirmDialog({ message: '${confirmQuestion}', height: 150, width: 500, aLink: this, highlightRow:true });"/>
                 <c:choose>
                     <c:when test="${currRow.bean.name eq 'root'}"></c:when>
                     <c:when test="${currRow.bean.id eq userBean.id}"></c:when>
@@ -96,7 +99,7 @@
 				<td><a href="UnLockUser?userId=<c:out value="${currRow.bean.id}"/>"
                     onMouseDown="javascript:setImage('bt_Unlock1','images/bt_Unlock.gif');"
                     onMouseUp="javascript:setImage('bt_Unlock1','images/bt_Unlock.gif');"
-                    ><img name="bt_Unlock1" src="images/bt_Unlock.gif" border="0" alt="<fmt:message key="unlock" bundle="${resword}"/>" title="<fmt:message key="unlock" bundle="${resword}"/>" align="left" hspace="6"></a>
+                    onclick="setAccessedObjected(this)"><img name="bt_Unlock1" src="images/bt_Unlock.gif" border="0" alt="<fmt:message key="unlock" bundle="${resword}"/>" title="<fmt:message key="unlock" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </td>
                 </c:if>
 			</c:otherwise>
@@ -146,7 +149,7 @@
 				<fmt:param value="${study}"/>
 			</fmt:message>
 			</c:set>
-			<c:set var="onClick" value="return confirmDialog({ message: '${confirmQuestion}', height: 150, width: 500, aLink: this });"/>
+			<c:set var="onClick" value="return confirmDialog({ message: '${confirmQuestion}', height: 150, width: 500, aLink: this, highlightRow:true });"/>
 			<tr valign="top">
 				<td class="table_cell_left">&nbsp;</td>
                 <td class="table_cell_left">&nbsp;</td>
@@ -179,7 +182,8 @@
                                 <a href="EditStudyUserRole?studyId=<c:out value="${sur.studyId}" />&userName=<c:out value="${currRow.bean.name}"/>"
                                    onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
                                    onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
-                                        ><img name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
+                                   data-cc-userId="${currRow.bean.id}_${sur.studyId}"
+                                   onclick="setAccessedObjected(this);"><img name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
                             </c:otherwise>
                         </c:choose>
 					</c:if>
@@ -217,7 +221,7 @@
 									<fmt:param value="${study}"/>
 								</fmt:message>
 							</c:set>
-							<c:set var="onClick" value="return confirmDialog({ message: '${confirmQuestion}', height: 150, width: 500, aLink: this });"/>
+							<c:set var="onClick" value="return confirmDialog({ message: '${confirmQuestion}', height: 150, width: 500, aLink: this, highlightRow:true  });"/>
 					
                         	<a href="DeleteStudyUserRole?studyId=<c:out value="${sur.studyId}" />&userId=<c:out value="${currRow.bean.id}"/>&action=3" onClick="<c:out value="${onClick}" />"
                         		onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"

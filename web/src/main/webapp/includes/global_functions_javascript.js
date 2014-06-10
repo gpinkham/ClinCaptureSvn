@@ -4215,6 +4215,7 @@ function clearLastAccessedObjects(){
 	localStorage.removeItem("data-cc-sdvStudySubjectId");
 	localStorage.removeItem("data-cc-ruleId");
     localStorage.removeItem("data-cc-groupId");
+    localStorage.removeItem("data-cc-userId");
 }
 
 function removeHighlightFromCellDescendants(td){

@@ -5,6 +5,14 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <jsp:include page="../include/admin-header.jsp"/>
 
+<script type="text/javascript" language="javascript">
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
+    
+</script>
+
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -79,4 +87,5 @@
 
 <script>$("#contentTable td.table_header_row:last").css("width", "200px");</script>
 
+<input id="accessAttributeName" type="hidden" value="data-cc-userId">
 <jsp:include page="../include/footer.jsp"/>
