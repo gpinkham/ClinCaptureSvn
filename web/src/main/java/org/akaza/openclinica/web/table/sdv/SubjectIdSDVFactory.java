@@ -310,7 +310,9 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 			if (numberOfCompletedEventCRFs > 0 && !subjectHasUnclosedNDsInStudy) {
 				sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ")
 						.append("class='sdvCheck'").append(" name='").append("sdvCheck_")
-						.append(studySubjectBean.getId()).append("' /></center>");
+						.append(studySubjectBean.getId())
+						.append("' onclick='setAccessedObjected(this)'")
+						.append(" /></center>");
 			}
 
 		}
@@ -322,12 +324,15 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		if (studyGroupBeans != null && !studyGroupBeans.isEmpty()) {
 			row.setGroup(studyGroupBeans.get(0).getName());
 		}
-		StringBuilder actions = new StringBuilder("<table><tr><td>");
+		StringBuilder actions = new StringBuilder("<table><tr class=\"innerTable\"><td>");
 		StringBuilder urlPrefix = new StringBuilder("<a href=\"");
 		StringBuilder path = new StringBuilder(contextPath)
 				.append("/pages/viewAllSubjectSDVtmp?" + (showBackButton ? "sbb=true&" : "") + "studyId=")
 				.append(studyId).append("&sdv_f_studySubjectId=");
-		path.append(studySubjectBean.getLabel());
+		path.append(studySubjectBean.getLabel())
+				.append("\" data-cc-sdvStudySubjectId=\"")
+				.append(studySubjectBean.getLabel())
+				.append("\" onclick=\"setAccessedObjected(this)\"");
 		urlPrefix.append(path).append("\">");
 		actions.append(urlPrefix).append(SDVUtil.VIEW_ICON_HTML).append("</a></td>");
 
@@ -336,7 +341,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 			StringBuilder jsCodeString = new StringBuilder("this.form.method='GET'; this.form.action='")
 					.append(contextPath).append("/pages/sdvStudySubject").append("';")
 					.append("this.form.theStudySubjectId.value='").append(studySubjectBean.getId()).append("';")
-					.append("this.form.submit();");
+					.append("this.form.submit();setAccessedObjected(this);");
 
 			actions.append("<td><input type=\"image\" src=\"").append(contextPath)
 					.append("/images/icon_DoubleCheck_Action.gif\"").append(" name=\"sdvSubmit\" ")

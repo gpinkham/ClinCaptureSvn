@@ -46,6 +46,10 @@
     function onInvokeExportAction(id) {
         var parameterString = createParameterStringForLimit(id);
     }
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
 </script>
 
 <h1>
@@ -133,6 +137,7 @@
 	</form>
 </div>
 
+<input id="accessAttributeName" type="hidden" value="data-cc-sdvStudySubjectId"/>
 <jsp:include page="include/footer.jsp"/>
 </body>
 </html>

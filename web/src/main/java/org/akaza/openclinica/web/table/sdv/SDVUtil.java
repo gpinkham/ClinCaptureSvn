@@ -808,15 +808,15 @@ public class SDVUtil {
 			// The checkbox is next to the study subject id
 			StringBuilder sdvStatus = new StringBuilder("");
 			if (crfBean.isSdvStatus()) {
-				sdvStatus.append("<center><a href='javascript:void(0)' onclick='prompt(document.sdvForm,");
+				sdvStatus.append("<center><a href='javascript:void(0)' onclick='prompt(document.sdvForm, ");
 				sdvStatus.append(crfBean.getId());
-				sdvStatus.append(")'>");
+				sdvStatus.append(", this)'>");
 				sdvStatus.append(getIconForSdvStatusPrefix()).append("DoubleCheck").append(ICON_FORCRFSTATUS_SUFFIX)
 						.append("</a></center>");
 			} else {
 				sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ")
 						.append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME).append(crfBean.getId())
-						.append("' /></center>");
+						.append("' onclick='setAccessedObjected(this)' /></center>");
 			}
 			tempSDVBean.setSdvStatus(sdvStatus.toString());
 			tempSDVBean.setStudySubjectId(studySubjectBean.getLabel());
@@ -856,7 +856,7 @@ public class SDVUtil {
 						.append(ICON_FORSVN_SUFFIX).append("onclick=\"")
 						.append("this.form.method='GET'; this.form.action='").append(request.getContextPath())
 						.append("/pages/handleSDVGet").append("';").append("this.form.crfId.value='")
-						.append(crfBean.getId()).append("';").append("this.form.submit();").append("\" />");
+						.append(crfBean.getId()).append("';").append("this.form.submit(); setAccessedObjected(this);").append("\" />");
 			}
 
 			tempSDVBean.setSdvStatusActions(actions.toString());
@@ -874,7 +874,10 @@ public class SDVUtil {
 		html.a().onclick(
 				"openDocWindow('" + request.getContextPath()
 						+ "/ViewSectionDataEntry?cw=1&eventDefinitionCRFId=&eventCRFId=" + eventDefinitionCRFId
-						+ "&tabId=1&studySubjectId=" + studySubjectId + "');");
+						+ "&tabId=1&studySubjectId=" + studySubjectId + "'); setAccessedObjected(this);")
+				.append(" data-cc-sdvCrfId='")
+				.append(eventDefinitionCRFId)
+				.append("'");
 		html.href("#").close();
 
 		/*

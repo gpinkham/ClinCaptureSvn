@@ -49,6 +49,10 @@
     function onInvokeExportAction(id) {
         var parameterString = createParameterStringForLimit(id);
     }
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
 </script>
 
 <h1>
@@ -98,7 +102,7 @@
 </div>
 
 <script type="text/javascript">
-    function prompt(formObj,crfId){
+    function prompt(formObj,crfId,element){
     	
     	formObj.action='${pageContext.request.contextPath}/pages/handleSDVRemove';
         formObj.crfId.value=crfId;
@@ -108,6 +112,7 @@
     		width: 500,
     		form: formObj
     	});
+        setAccessedObjected(element);
  	}
 </script>
 
@@ -137,5 +142,5 @@
 			onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();" />
 	</form>
 </div>
-
+<input id="accessAttributeName" type="hidden" value="data-cc-sdvCrfId"/>
 <jsp:include page="include/footer.jsp"/>

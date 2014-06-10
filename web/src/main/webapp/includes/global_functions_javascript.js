@@ -4121,6 +4121,10 @@ function setAccessedObjected(element) {
 	
 	var attrName = $("#accessAttributeName").val();
 	var tr = $(element).closest("tr");
+	if($(tr).hasClass("innerTable")){
+		var table = $(element).closest("table");
+		tr = $(table).closest("tr");
+	}
 	var dataElement = $(tr).find("a["+attrName+"]");
 	var idValue = $(dataElement).attr(attrName);
 	var newHtml = "";
@@ -4203,6 +4207,8 @@ function clearLastAccessedObjects(){
 	localStorage.removeItem("data-cc-ndId");
 	localStorage.removeItem("data-cc-mcItemId");
 	localStorage.removeItem("data-cc-studyAuditLogId");	
+	localStorage.removeItem("data-cc-sdvCrfId");
+	localStorage.removeItem("data-cc-sdvStudySubjectId");
 }
 
 function removeHighlightFromCellDescendants(td){
