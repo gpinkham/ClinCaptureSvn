@@ -24,6 +24,10 @@
         var parameterString = createParameterStringForLimit(id);
         location.href = '${pageContext.request.contextPath}/ListSubject?'+ parameterString;
     }
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
 </script>
 
 
@@ -78,5 +82,5 @@
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
-
+<input id="accessAttributeName" type="hidden" value="data-cc-subjectId">
 <jsp:include page="../include/footer.jsp"/>

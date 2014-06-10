@@ -315,6 +315,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 		// if you really need use builder.onmouseout("javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');");
 		// or builder.onmouseover("javascript:setImage('bt_Edit1','images/bt_Edit.gif');");
 		// but don't forget about color theme - you can brake it!
+		builder.onclick("setAccessedObjected(this)");
 		builder.close();
 		builder.img().name("bt_Edit1").src("images/bt_Edit.gif").border("0").alt(resword.getString("edit"))
 				.title(resword.getString("edit")).align("left").append("hspace=\"6\"").close();
@@ -325,6 +326,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	private String removeSubjectLink(Integer subjectId) {
 		HtmlBuilder builder = new HtmlBuilder();
 		builder.a().href("RemoveSubject?action=confirm&id=" + subjectId);
+		builder.onclick("setAccessedObjected(this)");
 		builder.close();
 		builder.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove"))
 				.title(resword.getString("remove")).append("hspace=\"2\"").close();
@@ -335,7 +337,8 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	private String viewSubjectLink(Integer subjectId) {
 		HtmlBuilder builder = new HtmlBuilder();
 		builder.a().href("ViewSubject?action=show&id=" + subjectId);
-		builder.close();
+		builder.onclick("setAccessedObjected(this)");
+		builder.append(" data-cc-subjectId=\"" + subjectId + "\"").close();
 		builder.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view"))
 				.title(resword.getString("view")).align("left").append("hspace=\"6\"").close();
 		builder.aEnd();
@@ -345,6 +348,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	private String restoreSubjectLink(Integer subjectId) {
 		HtmlBuilder builder = new HtmlBuilder();
 		builder.a().href("RestoreSubject?action=confirm&id=" + subjectId);
+		builder.onclick("setAccessedObjected(this)");
 		builder.close();
 		builder.img().name("bt_Restore3").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore"))
 				.title(resword.getString("restore")).align("left").append("hspace=\"6\"").close();
