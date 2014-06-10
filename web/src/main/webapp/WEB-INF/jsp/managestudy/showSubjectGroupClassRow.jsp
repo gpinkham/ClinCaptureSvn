@@ -55,11 +55,13 @@
 		</c:choose>
       <td class="table_cell">    
        <table border="0" cellpadding="0" cellspacing="0">
-         <tr>
+         <tr class="innerTable">
           <td>
            <a href="ViewSubjectGroupClass?id=<c:out value="${currRow.bean.id}"/>"
 	         onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-	         onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img 
+	         onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
+	         onclick="setAccessedObjected(this)"
+	          data-cc-groupId="${currRow.bean.id}"><img 
 	         name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 	     </td>
 	     
@@ -70,12 +72,14 @@
            <c:if test="${!study.status.locked}">   
            <td><a href="UpdateSubjectGroupClass?id=<c:out value="${currRow.bean.id}"/>"
 			onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-			onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img 
+			onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
+			onclick="setAccessedObjected(this)"><img 
 			name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
 		   </td>
            <td><a href="RemoveSubjectGroupClass?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
 			onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-			onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><img 
+			onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
+			onclick="setAccessedObjected(this)"><img 
 			name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
 		   </td>		     
            </c:if>
@@ -86,7 +90,8 @@
                <td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></td>
                <td><a href="RestoreSubjectGroupClass?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
 		      onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
-		      onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><img 
+		      onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
+		      onclick="setAccessedObjected(this)"><img 
 		      name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
 		     </td>
              </c:if>

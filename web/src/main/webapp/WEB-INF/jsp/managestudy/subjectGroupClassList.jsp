@@ -51,6 +51,10 @@
 			}
         }
     }
+  jQuery(window).load(function(){
+
+  	highlightLastAccessedObject();
+  });
 </script>
 
 
@@ -236,5 +240,5 @@
     <c:if test="${study.parentStudyId == 0}">
     	<input type="button" onclick="window.location.href=('CreateSubjectGroupClass');" name="BTN_Group" value="<fmt:message key="create_group" bundle="${resword}"/>" class="button_medium"/>
    	</c:if>      
- 
+ <input id="accessAttributeName" type="hidden" value="data-cc-groupId">
 <jsp:include page="../include/footer.jsp"/>
