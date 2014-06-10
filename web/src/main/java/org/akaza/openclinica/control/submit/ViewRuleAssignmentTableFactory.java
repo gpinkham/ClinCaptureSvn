@@ -760,7 +760,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			RuleSetRuleBean ruleSetRule = (RuleSetRuleBean) ((HashMap<Object, Object>) item).get("ruleSetRule");
 			HtmlBuilder actionTable = new HtmlBuilder();
 
-			actionTable.table(0).border("0").end().tr(0).end();
+			actionTable.table(0).border("0").end().tr(0).append(" class=\"innerTable\"").end();
 			actionTable.td(0).end().append(buildEditRuleLink(ruleId, ruleSetRule.getId(), ruleSetRule.getRuleBean().getStudyId())).tdEnd();
 			actionTable.td(0).end().append(viewLinkBuilder(ruleSetId)).tdEnd();
 			
@@ -805,7 +805,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href("ViewRuleSet?ruleSetId=" + ruleSetId);
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"");
+		actionLink.append("onclick=\"setAccessedObjected(this)\"").close();
 		actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt("View").title("View")
 				.append("hspace=\"2px\"").end().aEnd();
 		return actionLink.toString();
@@ -816,18 +817,18 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href("RunRuleSet?ruleSetId=" + ruleSetId + "&ruleId=" + ruleId);
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');\"").close();
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');\"");
+		actionLink.append("onclick=\"setAccessedObjected(this)\"").close();
 		actionLink.img().name("bt_Run1").src("images/bt_ExexuteRules.gif").border("0").alt("Run").title("Run")
 				.append("hspace=\"2px\"").end().aEnd();
 		return actionLink.toString();
-
 	}
 
 	private String deleteLinkBuilder(Integer ruleSetRuleId, Integer ruleSetId) {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href("UpdateRuleSetRule?action=delete&ruleSetRuleId=" + ruleSetRuleId + "&ruleSetId=" + ruleSetId);
 		actionLink.append("onClick=\"return confirmDialog({ message:'"
-				+ resword.getString("are_you_sure_to_delete_this_rule") + "', height:150, width:500, aLink:this });\"");
+				+ resword.getString("are_you_sure_to_delete_this_rule") + "', height:150, width:500, aLink:this, highlightRow:true });\"");
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');\"");
 		actionLink.append("onMouseUp=\"javascript:setImage('bt_Delete1','images/bt_Delete.gif');\"").close();
 		actionLink.img().name("bt_Delete1").src("images/bt_Delete.gif").border("0").alt(resword.getString("delete"))
@@ -840,7 +841,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href("UpdateRuleSetRule?action=remove&ruleSetRuleId=" + ruleSetRuleId + "&ruleSetId=" + ruleSetId);
 		actionLink.append("onClick=\"return confirmDialog({ message:'" + resword.getString("rule_if_you_remove_this")
-				+ "', height:150, width:500, aLink:this });\"");
+				+ "', height:150, width:500, aLink:this, highlightRow:true });\"");
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Remove1','images/bt_Remove.gif');\"");
 		actionLink.append("onMouseUp=\"javascript:setImage('bt_Remove1','images/bt_Remove.gif');\"").close();
 		actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove"))
@@ -853,7 +854,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href("UpdateRuleSetRule?action=restore&ruleSetRuleId=" + ruleSetRuleId + "&ruleSetId=" + ruleSetId);
 		actionLink.append("onClick=\"return confirmDialog({ message:'" + resword.getString("rule_if_you_restore_this")
-				+ "', height:150, width:500, aLink:this });\"");
+				+ "', height:150, width:500, aLink:this, highlightRow:true }); \"");
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Restore3','images/bt_Restore_d.gif');\"");
 		actionLink.append("onMouseUp=\"javascript:setImage('bt_Restore3','images/bt_Restore.gif');\"").close();
 		actionLink.img().name("bt_Restore3").src("images/bt_Restore.gif").border("0").alt("Restore").title("Restore")
@@ -866,7 +867,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href("DownloadRuleSetXml?ruleSetRuleIds=" + ruleSetRuleId);
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Download','images/bt_Download_d.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('bt_Download','images/bt_Download.gif');\"").close();
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_Download','images/bt_Download.gif');\"");
+		actionLink.append("onclick=\"setAccessedObjected(this)\"").close();
 		actionLink.img().name("bt_Download").src("images/bt_Download.gif").border("0").alt("Download XML")
 				.title("Download XML").append("hspace=\"2px\"").end().aEnd();
 		return actionLink.toString();
@@ -877,7 +879,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href("TestRule?ruleSetRuleId=" + ruleSetRuleId);
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_Reassign_d.gif');\"").close();
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_Reassign_d.gif');\"");
+		actionLink.append("onclick=\"setAccessedObjected(this)\"").close();
 		actionLink.img().name("bt_test").src("images/bt_Reassign_d.gif").border("0").alt("Test").title("Test")
 				.append("hspace=\"2px\"").end().aEnd();
 		return actionLink.toString();
@@ -888,7 +891,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href("designer/rule.html?action=edit&id=" + ruleId + "&rId=" + ruleSetRuleId + "&study=" + study);
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Edit1','images/bt_Edit.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('bt_Edit1','images/bt_Edit.gif');\"").close();
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_Edit1','images/bt_Edit.gif');\"");
+		actionLink.append("data-cc-ruleId=\"" + ruleId + "\" onclick=\"setAccessedObjected(this)\"").close();
 		actionLink.img().name("bt_Edit1").src("images/bt_Edit.gif").border("0").alt("Edit").title("Edit")
 				.append("hspace=\"2px\"").end().aEnd();
 		return actionLink.toString();

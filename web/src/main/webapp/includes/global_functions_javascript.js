@@ -3910,6 +3910,10 @@ function confirmDialog(params){
             	okButtonValue: "Yes", 
             	imagesFolderPath: determineImagesPath()
     		});
+
+        	if(params.aLink && params.highlightRow) {
+        		setAccessedObjected(params.aLink);
+        	}
         }
     });
     return false;
@@ -4209,6 +4213,7 @@ function clearLastAccessedObjects(){
 	localStorage.removeItem("data-cc-studyAuditLogId");	
 	localStorage.removeItem("data-cc-sdvCrfId");
 	localStorage.removeItem("data-cc-sdvStudySubjectId");
+	localStorage.removeItem("data-cc-ruleId");
 }
 
 function removeHighlightFromCellDescendants(td){

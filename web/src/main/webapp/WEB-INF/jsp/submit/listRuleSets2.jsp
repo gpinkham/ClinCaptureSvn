@@ -37,6 +37,10 @@
         var parameterString = createParameterStringForLimit(id);
         location.href = '${pageContext.request.contextPath}/ViewRuleAssignment?'+ parameterString;
     }
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
 </script>
 
 
@@ -94,4 +98,5 @@
 <br>
 
 <br>
+<input id="accessAttributeName" type="hidden" value="data-cc-ruleId">
 <jsp:include page="../include/footer.jsp"/>
