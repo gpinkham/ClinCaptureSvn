@@ -25,10 +25,12 @@
       <td class="table_cell <c:out value='${className}'/>"><c:out value="${currRow.bean.parent.status.name}"/></td> 
       <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
-	    <tr>
+	    <tr class="innerTable">
 	      <td><a href="ViewStudy?id=<c:out value="${currRow.bean.parent.id}"/>&viewFull=yes"
 			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img 
+			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
+			data-cc-studyId="${currRow.bean.parent.id}"
+			onclick="setAccessedObjected(this);"><img 
 		    name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 		  </td>
           <c:choose>
@@ -36,14 +38,15 @@
           <td>
             <c:choose>
                 <c:when test="${(study.parentStudyId > 0 && study.parentStudyId == currRow.bean.parent.id) || (study.id == currRow.bean.parent.id)}">
-                    <a href="#" onclick="return alertDialog({message: '<fmt:message key="you_are_trying_to_remove_the_current_study" bundle="${resword}"/>', height: 150, width: 500 });"/>
+                    <a href="#" onclick="alertDialog({message: '<fmt:message key="you_are_trying_to_remove_the_current_study" bundle="${resword}"/>', height: 150, width: 500 }); setAccessedObjected(this);"/>
                     <img name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6">
                     </a>
                 </c:when>
                 <c:otherwise>
                     <a href="RemoveStudy?action=confirm&id=<c:out value="${currRow.bean.parent.id}"/>"
                        onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                       onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');">
+                       onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
+                       onclick="setAccessedObjected(this);">
                         <img name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6">
                     </a>
                 </c:otherwise>
@@ -53,7 +56,8 @@
          <c:otherwise>
           <td><a href="RestoreStudy?action=confirm&id=<c:out value="${currRow.bean.parent.id}"/>"
 			onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
-			onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><img 
+			onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
+			onclick="setAccessedObjected(this);"><img 
 			name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
 		 </td>          
          </c:otherwise>
@@ -82,11 +86,13 @@
       <td class="table_cell <c:out value='${className}'/>"><c:out value="${child.status.name}"/></td>
       <td class="table_cell">
         <table border="0" cellpadding="0" cellspacing="0">
-	    <tr>
+	    <tr class="innerTable">
 	     <td>
 	      <a href="ViewSite?id=<c:out value="${child.id}"/>"
 			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img 
+			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
+			data-cc-studyId="${currRow.bean.parent.id}_${child.id}"
+			onclick="setAccessedObjected(this);"><img 
 		    name="bt_View1" src="images/bt_View.gif" border="0"  alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 		  </td>
           <td>&nbsp;</td>  
