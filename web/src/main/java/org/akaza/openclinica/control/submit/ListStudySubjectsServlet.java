@@ -22,6 +22,7 @@ package org.akaza.openclinica.control.submit;
 
 import java.util.Date;
 import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -50,6 +51,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	public static final String SAVED_SUBJECT_MATRIX_URL = "savedSubjectMatrixUrl";
 	public static final String SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX = "savedPageSizeForSubjectMatrix";
 	public static final String SAVED_LAST_VISITED_PAGE_URL = "savedLastPageUrl";
+	public static final String SAVED_LAST_VIEW_BY_EVENT = "savedLastViewByEvent";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -78,7 +80,6 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
-
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 
@@ -93,6 +94,13 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 				request.getSession().removeAttribute(getUrlKey(request));
 			}
 		}
+		//If View by Event was last view, then redirect to that page.
+		if(isViewByEventLastView(request)){
+			forwardPage(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET, request, response);
+			unSetLastViewedByEvent(request);
+			return;
+		}
+		
 		if (shouldRedirect(request, response)) {
 			return;
 		}
@@ -206,10 +214,13 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	
 	@Override
 	protected String getSavedUrl(String key, HttpServletRequest request) {
-		if (request.getQueryString() != null && request.getQueryString().contains("useJmesa=true")) {
+		
+		if (request.getQueryString() != null) {
 			return request.getRequestURL() + getDefaultUrl(request);
 		}
+		
 		String savedUrl = (String) request.getSession().getAttribute(key);
+		
 		return savedUrl == null? savedUrl : savedUrl.replaceFirst(
 				"&findSubjects_mr_=\\d{2,}&", "&findSubjects_mr_=" + getPageSize(request)+"&");
 	}
@@ -217,5 +228,21 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	public static String getPageSize(HttpServletRequest request) {
 		String pageSize = (String) request.getSession().getAttribute(SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
 		return pageSize == null? "15" : pageSize;
+	}
+
+	private boolean isViewByEventLastView(HttpServletRequest request) {
+		Object lastView = request.getSession().getAttribute(SAVED_LAST_VIEW_BY_EVENT);
+		if (lastView != null) {
+			if (request.getQueryString() != null && request.getQueryString().contains("&findSubjects_p_=")) {
+				unSetLastViewedByEvent(request);
+				return false;
+			}
+			return Boolean.parseBoolean(lastView.toString());
+		}
+		return false;
+	}
+
+	public static void unSetLastViewedByEvent(HttpServletRequest request) {
+		request.getSession().removeAttribute(SAVED_LAST_VIEW_BY_EVENT);
 	}
 }

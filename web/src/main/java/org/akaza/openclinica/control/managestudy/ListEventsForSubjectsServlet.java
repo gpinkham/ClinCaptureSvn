@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +45,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 1L;
 	public static final String SAVED_LIST_EVENTS_FOR_SUBJECTS_URL = "savedListEventsForSubjectsUrl";
+	public static final String SAVED_LAST_VISITED_PAGE_URL = "savedLastEventPageUrl";
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -90,9 +92,17 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		request.setAttribute(MODULE, module);
 
 		int definitionId = fp.getInt("defId");
-		if (definitionId <= 0) {
+		if (definitionId < 0) {
 			addPageMessage(respage.getString("please_choose_an_ED_ta_to_vies_details"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
+			return;
+		}
+		
+		if (definitionId == 0) {
+			StringBuffer requestURL = request.getRequestURL();
+			String url = requestURL.substring(0, requestURL.lastIndexOf("/"));
+			ListStudySubjectsServlet.unSetLastViewedByEvent(request);
+			response.sendRedirect(url + Page.LIST_STUDY_SUBJECTS_SERVLET.getFileName());
 			return;
 		}
 
@@ -124,7 +134,8 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		request.setAttribute("studyGroupClasses", getStudyGroupClassesByCurrentStudy(request));
 		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
 		request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
-
+		request.getSession().setAttribute(ListStudySubjectsServlet.SAVED_LAST_VIEW_BY_EVENT, true);
+		
 		forwardPage(Page.LIST_EVENTS_FOR_SUBJECTS, request, response);
 	}
 
@@ -137,7 +148,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 
 	@Override
 	protected String getUrlKey(HttpServletRequest request) {
-		return ListStudySubjectsServlet.SAVED_LAST_VISITED_PAGE_URL;
+		return SAVED_LAST_VISITED_PAGE_URL;
 	}
 
 	@Override
