@@ -9,7 +9,14 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <jsp:include page="../include/managestudy-header.jsp"/>
+<script type="text/javascript" language="javascript">
+    
+	jQuery(window).load(function(){
 
+    	highlightLastAccessedObject();
+    });
+    
+</script>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -65,4 +72,5 @@
 					class="button_medium"
 					onClick="window.location.href=('CreateSubStudy');"/>
  
+ <input id="accessAttributeName" type="hidden" value="data-cc-siteId">
 <jsp:include page="../include/footer.jsp"/>
