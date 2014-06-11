@@ -8,6 +8,13 @@
 
 <jsp:include page="../include/extract-header.jsp"/>
 
+<script type="text/javascript" language="javascript">
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
+    
+</script>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -70,5 +77,5 @@
 </br>
 
 
-
+<input id="accessAttributeName" type="hidden" value="data-cc-datasetId">
 <jsp:include page="../include/footer.jsp"/>

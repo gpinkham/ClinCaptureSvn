@@ -4240,6 +4240,7 @@ function clearLastAccessedObjects(){
     localStorage.removeItem("data-cc-importJobId");
     localStorage.removeItem("data-cc-runningJobId");
     localStorage.removeItem("data-cc-auditUserId");
+    localStorage.removeItem("data-cc-datasetId");
 }
 
 function removeHighlightFromCellDescendants(td){
