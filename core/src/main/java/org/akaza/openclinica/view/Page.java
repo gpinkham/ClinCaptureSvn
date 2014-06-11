@@ -455,7 +455,8 @@ public class Page {
 			"Verify Imported Rules");
 	public final static Page VIEW_RULES = new Page("/WEB-INF/jsp/submit/viewRules.jsp", "View Rules");
 	public final static Page VIEW_EXECUTED_RULES = new Page("/WEB-INF/jsp/submit/viewExecutedRules.jsp", "View Rules");
-	public final static Page LIST_RULE_SETS_SERVLET = new Page("/ViewRuleAssignment?read=true&restore=true", "List Rule Assignments");
+	public final static Page LIST_RULE_SETS_SERVLET = new Page("/ViewRuleAssignment?read=true&restore=true",
+			"List Rule Assignments");
 	public final static Page REMOVE_RULE_SET = new Page("/WEB-INF/jsp/submit/removeRuleSet.jsp", "Remove RuleSet");
 	public final static Page RESTORE_RULE_SET = new Page("/WEB-INF/jsp/submit/restoreRuleSet.jsp", "Remove RuleSet");
 	public final static Page VIEW_EXECUTED_RULES_FROM_CRF = new Page(
@@ -736,7 +737,7 @@ public class Page {
 			"/WEB-INF/jsp/managestudy/updateStudyEventSigned.jsp", "Upate Study Event");
 	public final static Page VIEW_STUDY_EVENTS = new Page("/WEB-INF/jsp/managestudy/viewStudyEvents.jsp",
 			"View Study Events");
-
+	public final static Page VIEW_STUDY_EVENTS_SERVLET = new Page("/ViewStudyEvents", "View Study Events");
 	public final static Page VIEW_STUDY_EVENTS_PRINT = new Page("/WEB-INF/jsp/managestudy/viewStudyEventsPrint.jsp",
 			"View Study Events");
 
@@ -848,12 +849,12 @@ public class Page {
 	public static Page setNewPage(String fileName, String title) {
 		return new Page(fileName, title);
 	}
-	
+
 	public static boolean isDDEServletPage(Page page) {
-		return page == null? false : Page.DOUBLE_DATA_ENTRY_SERVLET.equals(page);
+		return page == null ? false : Page.DOUBLE_DATA_ENTRY_SERVLET.equals(page);
 	}
-	
+
 	public static boolean isAdminEditServletPage(Page page) {
-		return page == null? false : Page.DOUBLE_DATA_ENTRY_SERVLET.equals(page);
+		return page == null ? false : Page.DOUBLE_DATA_ENTRY_SERVLET.equals(page);
 	}
 }

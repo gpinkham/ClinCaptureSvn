@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -28,7 +28,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,18 @@ import java.util.Map;
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
-public class ViewStudyEventsServlet extends Controller {
+public class ViewStudyEventsServlet extends RememberLastPage {
+
+	public static final String SAVED_VIEW_STUDY_EVENTS_URL = "savedViewStudyEventsUrl";
+	public static final String VIEW_STUDY_EVENTS_STATUS_ID = "viewStudyEvents_statusId";
+	public static final String VIEW_STUDY_EVENTS_DEFINITION_ID = "viewStudyEvents_definitionId";
+	public static final String VIEW_STUDY_EVENTS_START_DATE = "viewStudyEvents_startDate";
+	public static final String VIEW_STUDY_EVENTS_END_DATE = "viewStudyEvents_endDate";
+	public static final String VIEW_STUDY_EVENTS_SED_ID = "viewStudyEvents_sedId";
+
+	public static final String POST = "post";
+
+	public static final String SED_ID = "sedId";
 
 	public static final String INPUT_STARTDATE = "startDate";
 
@@ -102,60 +114,68 @@ public class ViewStudyEventsServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if (shouldRedirect(request, response)) {
+			return;
+		}
 		StudyBean currentStudy = getCurrentStudy(request);
-		SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat localDf = getLocalDf(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		// checks which module requests are from
 		String module = fp.getString(MODULE);
 		request.setAttribute(MODULE, module);
 
-		int sedId = fp.getInt("sedId");
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.set(Calendar.DAY_OF_MONTH, 1);
+		Date defaultStartDate = calendar.getTime();
+		calendar.add(Calendar.MONTH, 1);
+		calendar.add(Calendar.DAY_OF_MONTH, -1);
+		Date defaultEndDate = calendar.getTime();
+
+		int sedId = fp.getInt(SED_ID);
 		int statusId = fp.getInt(INPUT_STATUS_ID);
 		int definitionId = fp.getInt(INPUT_DEF_ID);
 		Date startDate = fp.getDate(INPUT_STARTDATE);
 		Date endDate = fp.getDate(INPUT_ENDDATE);
 
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());
-		int month = cal.get(Calendar.MONTH) + 1;
-		int year = cal.get(Calendar.YEAR);
-		String defaultStartDateString = month + "/01/" + year;
-		Date defaultStartDate = new SimpleDateFormat("MM/dd/yy").parse(defaultStartDateString);
+		if (request.getMethod().equalsIgnoreCase(POST)) {
+			request.getSession().setAttribute(VIEW_STUDY_EVENTS_SED_ID, fp.getInt(SED_ID));
+			request.getSession().setAttribute(VIEW_STUDY_EVENTS_STATUS_ID, fp.getInt(INPUT_STATUS_ID));
+			request.getSession().setAttribute(VIEW_STUDY_EVENTS_DEFINITION_ID, fp.getInt(INPUT_DEF_ID));
+			request.getSession().setAttribute(VIEW_STUDY_EVENTS_START_DATE, fp.getDate(INPUT_STARTDATE));
+			request.getSession().setAttribute(VIEW_STUDY_EVENTS_END_DATE, fp.getDate(INPUT_ENDDATE));
+		} else if (userDoesNotUseJmesaTableForNavigation(request)) {
+			sedId = request.getSession().getAttribute(VIEW_STUDY_EVENTS_SED_ID) != null ? (Integer) request
+					.getSession().getAttribute(VIEW_STUDY_EVENTS_SED_ID) : sedId;
+			statusId = request.getSession().getAttribute(VIEW_STUDY_EVENTS_STATUS_ID) != null ? (Integer) request
+					.getSession().getAttribute(VIEW_STUDY_EVENTS_STATUS_ID) : statusId;
+			definitionId = request.getSession().getAttribute(VIEW_STUDY_EVENTS_DEFINITION_ID) != null ? (Integer) request
+					.getSession().getAttribute(VIEW_STUDY_EVENTS_DEFINITION_ID) : definitionId;
+			startDate = request.getSession().getAttribute(VIEW_STUDY_EVENTS_START_DATE) != null ? (Date) request
+					.getSession().getAttribute(VIEW_STUDY_EVENTS_START_DATE) : defaultStartDate;
+			endDate = request.getSession().getAttribute(VIEW_STUDY_EVENTS_END_DATE) != null ? (Date) request
+					.getSession().getAttribute(VIEW_STUDY_EVENTS_END_DATE) : defaultStartDate;
+		}
 
-		cal.setTime(defaultStartDate);
-		cal.add(Calendar.DATE, 30);
-		Date defaultEndDate = cal.getTime();
+		request.setAttribute(SED_ID, sedId);
+		request.setAttribute(INPUT_STATUS_ID, statusId);
+		request.setAttribute(INPUT_DEF_ID, definitionId);
+		request.setAttribute(INPUT_STARTDATE, localDf.format(startDate));
+		request.setAttribute(INPUT_ENDDATE, localDf.format(endDate));
 
-		if (!fp.isSubmitted()) {
-			logger.info("not submitted");
-			HashMap presetValues = new HashMap();
-
-			presetValues.put(INPUT_STARTDATE, local_df.format(defaultStartDate));
-			presetValues.put(INPUT_ENDDATE, local_df.format(defaultEndDate));
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
+		v.addValidation(INPUT_STARTDATE, Validator.IS_A_DATE);
+		v.addValidation(INPUT_ENDDATE, Validator.IS_A_DATE);
+		HashMap errors = v.validate();
+		if (!errors.isEmpty()) {
+			setInputMessages(errors, request);
 			startDate = defaultStartDate;
 			endDate = defaultEndDate;
-			setPresetValues(presetValues, request);
-		} else {
-			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
-			v.addValidation(INPUT_STARTDATE, Validator.IS_A_DATE);
-			v.addValidation(INPUT_ENDDATE, Validator.IS_A_DATE);
-			HashMap errors = v.validate();
-			if (!errors.isEmpty()) {
-				setInputMessages(errors, request);
-				startDate = defaultStartDate;
-				endDate = defaultEndDate;
-			}
-			fp.addPresetValue(INPUT_STARTDATE, fp.getString(INPUT_STARTDATE));
-			fp.addPresetValue(INPUT_ENDDATE, fp.getString(INPUT_ENDDATE));
-			fp.addPresetValue(INPUT_DEF_ID, fp.getInt(INPUT_DEF_ID));
-			fp.addPresetValue(INPUT_STATUS_ID, fp.getInt(INPUT_STATUS_ID));
-			setPresetValues(fp.getPresetValues(), request);
 		}
 
 		request.setAttribute(STATUS_MAP, SubjectEventStatus.toArrayList());
 
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		ArrayList<StudyEventDefinitionBean> definitions = seddao.findAllAvailableByStudy(currentStudy);
 		request.setAttribute(DEFINITION_MAP, definitions);
 
@@ -163,8 +183,8 @@ public class ViewStudyEventsServlet extends Controller {
 
 		request.setAttribute("allEvents", allEvents);
 
-		String queryUrl = INPUT_STARTDATE + "=" + local_df.format(startDate) + "&" + INPUT_ENDDATE + "="
-				+ local_df.format(endDate) + "&" + INPUT_DEF_ID + "=" + definitionId + "&" + INPUT_STATUS_ID + "="
+		String queryUrl = INPUT_STARTDATE + "=" + localDf.format(startDate) + "&" + INPUT_ENDDATE + "="
+				+ localDf.format(endDate) + "&" + INPUT_DEF_ID + "=" + definitionId + "&" + INPUT_STATUS_ID + "="
 				+ statusId + "&" + "sedId=" + sedId + "&submitted=" + fp.getInt("submitted");
 		request.setAttribute("queryUrl", queryUrl);
 		if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
@@ -179,14 +199,14 @@ public class ViewStudyEventsServlet extends Controller {
 
 	private ArrayList genTables(FormProcessor fp, ArrayList<StudyEventDefinitionBean> definitions, Date startDate,
 			Date endDate, int sedId, int definitionId, int statusId) {
+		SimpleDateFormat localDf = getLocalDf(fp.getRequest());
 		StudyBean currentStudy = getCurrentStudy(fp.getRequest());
 		StudyUserRoleBean currentRole = getCurrentRole(fp.getRequest());
-		SimpleDateFormat local_df = getLocalDf(fp.getRequest());
-		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+		StudyEventDAO sedao = getStudyEventDAO();
+		EventCRFDAO ecdao = getEventCRFDAO();
 		ArrayList allEvents = new ArrayList();
 		definitions = findDefinitionById(definitions, definitionId);
-		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
+		StudySubjectDAO ssdao = getStudySubjectDAO();
 		Map<Integer, ArrayList<StudyEventBean>> studyEventDefinitionEventsMap = new HashMap<Integer, ArrayList<StudyEventBean>>();
 		ArrayList studySubjects = ssdao.findAllByStudyId(currentStudy.getId());
 		for (Object studySubject : studySubjects) {
@@ -298,8 +318,8 @@ public class ViewStudyEventsServlet extends Controller {
 			args.put("sedId", Integer.toString(sed.getId()));
 			args.put("definitionId", Integer.toString(definitionId));
 			args.put("statusId", Integer.toString(statusId));
-			args.put("startDate", local_df.format(startDate));
-			args.put("endDate", local_df.format(endDate));
+			args.put("startDate", localDf.format(startDate));
+			args.put("endDate", localDf.format(endDate));
 			table.setQuery("ViewStudyEvents", args);
 			table.setRows(allEventRows);
 			table.computeDisplay();
@@ -317,8 +337,6 @@ public class ViewStudyEventsServlet extends Controller {
 	/**
 	 * Generates an arraylist of study events for printing
 	 * 
-	 * @param currentStudy
-	 *            StudyBean
 	 * @param definitions
 	 *            ArrayList<StudyEventDefinitionBean>
 	 * @param startDate
@@ -333,11 +351,11 @@ public class ViewStudyEventsServlet extends Controller {
 	 */
 	private ArrayList genEventsForPrint(StudyBean currentStudy, ArrayList<StudyEventDefinitionBean> definitions,
 			Date startDate, Date endDate, int definitionId, int statusId) {
-		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+		StudyEventDAO sedao = getStudyEventDAO();
+		EventCRFDAO ecdao = getEventCRFDAO();
 		ArrayList allEvents = new ArrayList();
 		definitions = findDefinitionById(definitions, definitionId);
-		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
+		StudySubjectDAO ssdao = getStudySubjectDAO();
 		List<StudySubjectBean> studySubjects = ssdao.findAllByStudyId(currentStudy.getId());
 		for (StudyEventDefinitionBean sed : definitions) {
 			ViewEventDefinitionBean ved = new ViewEventDefinitionBean();
@@ -453,5 +471,49 @@ public class ViewStudyEventsServlet extends Controller {
 			return b;
 		}
 		return a;
+	}
+
+	@Override
+	protected String getUrlKey(HttpServletRequest request) {
+		return SAVED_VIEW_STUDY_EVENTS_URL;
+	}
+
+	@Override
+	protected String getDefaultUrl(HttpServletRequest request) {
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.set(Calendar.DAY_OF_MONTH, 1);
+		Date defaultStartDate = calendar.getTime();
+		calendar.add(Calendar.MONTH, 1);
+		calendar.add(Calendar.DAY_OF_MONTH, -1);
+		Date defaultEndDate = calendar.getTime();
+		FormProcessor fp = new FormProcessor(request);
+		SimpleDateFormat localDf = getLocalDf(request);
+		int sedId = fp.getInt(SED_ID);
+		int statusId = fp.getInt(INPUT_STATUS_ID);
+		int definitionId = fp.getInt(INPUT_DEF_ID);
+		String startDate = request.getParameter(INPUT_STARTDATE) == null ? localDf.format(defaultStartDate) : localDf
+				.format(fp.getDate(INPUT_STARTDATE));
+		String endDate = request.getParameter(INPUT_ENDDATE) == null ? localDf.format(defaultEndDate) : localDf
+				.format(fp.getDate(INPUT_ENDDATE));
+		String eblFiltered = fp.getString("ebl_filtered");
+		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
+		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
+		String eblSortAscending = fp.getString("ebl_sortAscending");
+		String defaultUrl = new StringBuilder().append("").append("?sedId=").append(sedId).append("&statusId=")
+				.append(statusId).append("&definitionId=").append(definitionId).append("&startDate=").append(startDate)
+				.append("&endDate=").append(endDate).append("&ebl_page=1&ebl_sortColumnInd=")
+				.append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0")).append("&ebl_sortAscending=")
+				.append((!eblSortAscending.isEmpty() ? eblSortAscending : "1")).append("&ebl_filtered=")
+				.append((!eblFiltered.isEmpty() ? eblFiltered : "0")).append("&ebl_filterKeyword=")
+				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1").toString();
+		if (request.getParameter("refreshPage") != null) {
+			saveUrl(getUrlKey(request), request.getRequestURL() + defaultUrl, request);
+		}
+		return defaultUrl;
+	}
+
+	@Override
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
+		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
 	}
 }

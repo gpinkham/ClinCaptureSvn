@@ -516,7 +516,7 @@ function activateEventCompletionLegend() {
 						function() {
 							window.location.href = urlPrefix + startDate
 									+ "&endDate=" + endDate + "&statusId="
-									+ statuses[index] + "&submitted=1";
+									+ statuses[index] + "&refreshPage=1";
 						});
 
 				$(this).css("cursor", "pointer");
@@ -773,7 +773,7 @@ function initStudyProgress() {
 									+ "&statusId="
 									+ spData.getValue(selectedItem.row,
 											2).toString()
-									+ "&submitted=1";
+									+ "&refreshPage=1";
 						}
 					}
 
