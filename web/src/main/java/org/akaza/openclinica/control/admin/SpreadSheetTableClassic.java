@@ -1207,7 +1207,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 
 						cell = sheet.getRow(k).getCell(3);
 						String instructions = getValue(cell);
-						if (instructions != null && instructions.length() > 2000) {
+						if (instructions != null && instructions.length() > 10000) {
 							errors.add(resPageMsg.getString("section_instruction_length_error"));
 						}
 						cell = sheet.getRow(k).getCell(4);
