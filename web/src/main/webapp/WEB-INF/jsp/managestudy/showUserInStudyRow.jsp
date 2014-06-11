@@ -17,10 +17,12 @@
       <td class="table_cell"><c:out value="${currRow.bean.status.name}"/></td>
       <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
-		<tr>
+		<tr class="innerTable">
 		 <td><a href="ViewStudyUser?name=<c:out value="${currRow.bean.userName}"/>&studyId=<c:out value="${currRow.bean.studyId}"/>"
 			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');">
+			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
+			data-cc-userInStudyId="${currRow.bean.userName}_${currRow.bean.studyId}"
+			onclick="setAccessedObjected(this)">
 			<img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 		</td>      
  
@@ -28,7 +30,8 @@
         	<td>
         		<a href="SetStudyUserRole?action=confirm&name=<c:out value="${currRow.bean.userName}"/>&studyId=<c:out value="${currRow.bean.studyId}"/>"
 		  			onMouseDown="javascript:setImage('bt_SetRole1','images/bt_SetRole_d.gif');"
-		 			onMouseUp="javascript:setImage('bt_SetRole1','images/bt_SetRole.gif');">
+		 			onMouseUp="javascript:setImage('bt_SetRole1','images/bt_SetRole.gif');"
+		 			onclick="setAccessedObjected(this)">
 		  			<img name="bt_SetRole1" src="images/bt_SetRole.gif" border="0" alt="<fmt:message key="set_role" bundle="${resword}"/>" title="<fmt:message key="set_role" bundle="${resword}"/>" align="left" hspace="6"></a>
 			</td>
 		</c:if>
@@ -55,7 +58,7 @@
                </fmt:message>
          	</c:set>
          	
-           	<c:set var="onClick" value="return confirmDialog({ message:'${confirmQuestion}', height:150, width:500, aLink:this });"/>
+           	<c:set var="onClick" value="return confirmDialog({ message:'${confirmQuestion}', height:150, width:500, aLink:this, highlightRow:true });"/>
            	  
             <c:if test="${currRow.bean.status.deleted}">
             	<td>
