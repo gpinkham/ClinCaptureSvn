@@ -8,6 +8,14 @@
 
 <jsp:include page="../include/admin-header.jsp"/>
 
+<script type="text/javascript" language="javascript">
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
+    
+</script>
+
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -68,4 +76,5 @@
            
 <br><br>
 
+<input id="accessAttributeName" type="hidden" value="data-cc-exportJobId">
 <jsp:include page="../include/footer.jsp"/>

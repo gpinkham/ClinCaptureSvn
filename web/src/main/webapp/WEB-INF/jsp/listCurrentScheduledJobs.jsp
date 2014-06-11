@@ -9,6 +9,15 @@
 
 
 <jsp:include page="include/managestudy_top_pages.jsp"/>
+
+<script type="text/javascript" language="javascript">
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
+    
+</script>
+
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="include/sideAlert.jsp"/>
@@ -102,6 +111,7 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+<input id="accessAttributeName" type="hidden" value="data-cc-runningJobId">
 <jsp:include page="include/footer.jsp"/>
 </body>
 <script language="JavaScript">

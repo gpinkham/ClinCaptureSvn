@@ -13,17 +13,6 @@
 
 package org.akaza.openclinica.controller;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -52,6 +41,16 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * 
@@ -187,7 +186,7 @@ public class ScheduledJobController {
 				StringBuilder checkbox = new StringBuilder("");
 				checkbox.append("<input style='margin-right: 5px' type='checkbox' ").append("' />");
 
-				StringBuilder actions = new StringBuilder("<table><tr><td>");
+				StringBuilder actions = new StringBuilder("<table><tr class='innerTable'><td>");
 				String contextPath = request.getContextPath();
 				StringBuilder jsCodeString = new StringBuilder("this.form.method='GET'; this.form.action='")
 						.append(contextPath).append("/pages/cancelScheduledJob").append("';")
@@ -195,11 +194,12 @@ public class ScheduledJobController {
 						.append("this.form.theJobGroupName.value='").append(st.getJobGroup()).append("';")
 						.append("this.form.theTriggerName.value='").append(st.getName()).append("';")
 						.append("this.form.theTriggerGroupName.value='").append(st.getGroup()).append("';")
-						.append("this.form.submit();");
+						.append("this.form.submit();").append("setAccessedObjected(this);");
 
 				actions.append("<td><input type=\"button\" class=\"button\" value=\"Cancel Job\" name=\"cancelJob\" ")
-						.append("onclick=\"").append(jsCodeString.toString()).append("\" /></td>");
-				actions.append("</tr></table>");
+						.append("onclick=\"").append(jsCodeString.toString()).append("\" />");
+				actions.append("<a href='#' data-cc-runningJobId='" + st.getName() + "' style='display: none;'></a>");
+				actions.append("</td></tr></table>");
 
 				jobs.setCheckbox(checkbox.toString());
 				// jobs.setDatasetId((Integer)st.getJobDataMap().get("dsId")+"");

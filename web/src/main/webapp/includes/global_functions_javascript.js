@@ -4236,6 +4236,9 @@ function clearLastAccessedObjects(){
     localStorage.removeItem("data-cc-siteId");
     localStorage.removeItem("data-cc-studyId");
     localStorage.removeItem("data-cc-crfId");
+    localStorage.removeItem("data-cc-exportJobId");
+    localStorage.removeItem("data-cc-importJobId");
+    localStorage.removeItem("data-cc-runningJobId");
 }
 
 function removeHighlightFromCellDescendants(td){
