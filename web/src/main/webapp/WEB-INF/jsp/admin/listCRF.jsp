@@ -15,7 +15,13 @@
  <c:import url="../include/managestudy-header.jsp"/>
 </c:otherwise>
 </c:choose>
+<script type="text/javascript" language="javascript">
+    jQuery(window).load(function(){
 
+    	highlightLastAccessedObject(true);
+    });
+    
+</script>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -78,5 +84,5 @@
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" style="position:relative;" name="<fmt:message key="create_CRF" bundle="${resword}"/>" value="<fmt:message key="create_CRF" bundle="${resword}"/>" class="button_long" onClick="window.location.href='CreateCRFVersion'" />
 
-
+<input id="accessAttributeName" type="hidden" value="data-cc-crfId">
 <jsp:include page="../include/footer.jsp"/>

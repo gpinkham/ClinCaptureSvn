@@ -4124,11 +4124,7 @@ function setAccessedObjected(element) {
 	}
 	
 	var attrName = $("#accessAttributeName").val();
-	var tr = $(element).closest("tr");
-	if($(tr).hasClass("innerTable")){
-		var table = $(element).closest("table");
-		tr = $(table).closest("tr");
-	}
+	var tr = getElementRow(element);
 	var dataElement = $(tr).find("a["+attrName+"]");
 	var idValue = $(dataElement).attr(attrName);
 	var newHtml = "";
@@ -4148,6 +4144,14 @@ function setAccessedObjected(element) {
 	}
 }
 
+function getElementRow(element) {
+	var tr = $(element).closest("tr");
+	if($(tr).hasClass("innerTable")){ 
+	 	var table = $(element).closest("table"); 
+	 	tr = $(table).closest("tr"); 
+	} 
+	return tr;
+}
 
 function removeInheritedHighlight(tr) {
 	
@@ -4163,21 +4167,33 @@ function removeInheritedHighlightForIE(row){
     }
 }
 
-function clearHighlight(){
+function clearHighlight(withRowSpan) {
 	
 	$("td.borderHighlight").each(function(){
 		$(this).removeClass("borderHighlight");
-	})
+	});
+	if(withRowSpan) {
+		$("td.borderHighlightTop").each(function(){
+			$(this).removeClass("borderHighlightTop");
+		});
+		$("td.borderHighlightBottom").each(function(){
+			$(this).removeClass("borderHighlightBottom");
+		});
+	}
 }
 
-function highlightLastAccessedObject() {
+function highlightLastAccessedObject(hasRowSpan) {
 	
 	var attrName = $("#accessAttributeName").val();
 	if(attrName){
 		
 		var dataElement = $("a[" + attrName + "='" + getIdByAttributeName(attrName) + "']");
-		if(dataElement && $(dataElement).is("a")){
-			setAccessedObjected(dataElement)
+		if(dataElement && $(dataElement).is("a")) {
+			if(!hasRowSpan) {
+				setAccessedObjected(dataElement);
+			} else {
+				setAccessedObjectWithRowspans(dataElement);
+			}			
 		}
 	}	
 }
@@ -4219,6 +4235,7 @@ function clearLastAccessedObjects(){
     localStorage.removeItem("data-cc-subjectId");
     localStorage.removeItem("data-cc-siteId");
     localStorage.removeItem("data-cc-studyId");
+    localStorage.removeItem("data-cc-crfId");
 }
 
 function removeHighlightFromCellDescendants(td){
@@ -4234,3 +4251,61 @@ function isBrowserIE7OrLower(){
 	}
 	return false;
 }
+
+function setAccessedObjectWithRowspans(element) {
+	if(isBrowserIE7OrLower()) {
+		return;
+	}
+	//Get attribute name e.g. data-cc-crfId
+	var attrName = $("#accessAttributeName").val();
+	//Get row with element containing the attribute
+	var tr = getElementRow(element);
+	//Get the element containing the attribute
+	var dataElement = $(tr).find("a["+attrName+"]");
+	//Get attribute value
+	var idValue = $(dataElement).attr(attrName);
+	//Refine attribute value accordingly
+	if(idValue.indexOf("_") > -1) {
+		idValue = idValue.substring(0, idValue.indexOf("_"));
+	}
+	//Working backwards: Get dataElement with attribute value idValue
+	dataElement = $("a["+attrName+"='"+idValue+"']");
+	//Clear highlight with rowspan
+	clearHighlight(true);
+	setAccessedObjected(dataElement);
+	//Get row containing datElement;
+	tr = getElementRow(dataElement);
+	refineHighlightForRowspans(element, tr);
+}
+
+function refineHighlightForRowspans(element, row) {
+	var rowspan = 1;
+	//Highligh only top border for single rowspan cells and set maximum rowspan value
+	$(row).find('td.borderHighlight').each(function() {
+		if (parseInt($(this).attr("rowspan")) > rowspan) {
+			rowspan = parseInt($(this).attr("rowspan"));
+		}
+		if($(this).is(":visible") && parseInt($(this).attr("rowspan")) == 1) {
+			$(this).removeClass("borderHighlight");
+			$(this).addClass("borderHighlightTop");
+		}		
+	});	
+	
+	//Get the last row spanned and highlight the bottom border of the cells
+	var lastRow = getLastRowSpanned(row, rowspan);
+	$(lastRow).children('td').each(function() {
+		if($(this).is(":visible")) {
+			$(this).addClass("borderHighlightBottom");
+		}		
+	});	
+}
+
+function getLastRowSpanned(firstRow, rowspan) {
+	var nextRow = $(firstRow).next("tr");
+	for(var i=2; i<rowspan; i++) {
+		nextRow = $(nextRow).next("tr");
+	}
+	return nextRow;
+}
+
+

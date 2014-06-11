@@ -33,10 +33,11 @@
   <td class="table_cell">&nbsp;</td>
   <td class="table_cell">
     <table border="0" cellpadding="0" cellspacing="0">
-      <tr>
+      <tr class="innerTable">
         <td><a href="ViewCRF?crfId=<c:out value="${currRow.bean.id}"/>"
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-               onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
+               onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
+               data-cc-crfId="${currRow.bean.id}" onclick="setAccessedObjectWithRowspans(this)"><img
           name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
         </td>
         <c:choose>
@@ -45,18 +46,21 @@
               <td>
                 <a href="InitUpdateCRF?crfId=<c:out value="${currRow.bean.id}"/>"
                    onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-                   onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img
+                   onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
+                   onclick="setAccessedObjectWithRowspans(this)"><img
                   name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
               </td>
               <td><a href="RemoveCRF?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
                      onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                     onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><img
+                     onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
+                     onclick="setAccessedObjectWithRowspans(this)"><img
                 name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
               </td>
             </c:if>
             <td><a href="InitCreateCRFVersion?crfId=<c:out value="${currRow.bean.id}"/>&name=<c:out value="${currRow.bean.name}"/>"
                    onMouseDown="javascript:setImage('bt_NewVersion1','images/bt_NewVersion_d.gif');"
-                   onMouseUp="javascript:setImage('bt_NewVersion1','images/bt_NewVersion.gif');"><img
+                   onMouseUp="javascript:setImage('bt_NewVersion1','images/bt_NewVersion.gif');"
+                   onclick="setAccessedObjectWithRowspans(this)"><img
               name="bt_NewVersion1" src="images/bt_NewVersion.gif" border="0" alt="<fmt:message key="create_new_version" bundle="${resword}"/>" title="<fmt:message key="create_new_version" bundle="${resword}"/>" align="left" hspace="6"></a>
             </td>
           </c:when>
@@ -65,16 +69,18 @@
 			</td>
             <td><a href="RestoreCRF?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
                    onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
-                   onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><img
+                   onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
+                   onclick="setAccessedObjectWithRowspans(this)"><img
               name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
             </td>
-              <c:if test="${(userRole.role.id eq 1 or userRole.role.id eq 2) and currRow.bean.deletable and userRole.sysAdmin}">
-                  <td><a href="javascript:void(0);" onClick="return confirmDialog({ message: '<fmt:message key="are_you_sure_want_to_delete" bundle="${respage}"/>', height: 165, width: 500, redirectLink: 'CompleteCrfDelete?crfId=<c:out value="${currRow.bean.id}"/>'});"
-                         onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
-                         onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"><img name="bt_Delete1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
-                  </td>
-              </c:if>
-          </c:otherwise>
+             
+            <c:if test="${(userRole.role.id eq 1 or userRole.role.id eq 2) and currRow.bean.deletable and userRole.sysAdmin}">
+                 <td><a href="javascript:void(0);" onClick="setAccessedObjectWithRowspans(this); return confirmDialog({ message: '<fmt:message key="are_you_sure_want_to_delete" bundle="${respage}"/>', height: 165, width: 500, redirectLink: 'CompleteCrfDelete?crfId=<c:out value="${currRow.bean.id}"/>'});"
+                        onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
+                        onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"><img name="bt_Delete1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
+                 </td>
+         	</c:if>
+         </c:otherwise>
         </c:choose>
       </tr>
     </table>
@@ -102,7 +108,8 @@
         <c:when test="${version.downloadable}">
           <a href="DownloadVersionSpreadSheet?crfId=<c:out value="${currRow.bean.id}"/>&crfVersionId=<c:out value="${version.id}"/>"
              onMouseDown="javascript:setImage('bt_Download1','images/bt_Download_d.gif');"
-             onMouseUp="javascript:setImage('bt_Download1','images/bt_Download.gif');"><img
+             onMouseUp="javascript:setImage('bt_Download1','images/bt_Download.gif');"
+             onclick="setAccessedObjectWithRowspans(this)"><img
             name="bt_Download1" src="images/bt_Download.gif" border="0" alt="<fmt:message key="download_spreadsheet" bundle="${resword}"/>" title="<fmt:message key="download_spreadsheet" bundle="${resword}"/>" align="left" hspace="6">
           </a>
         </c:when>
@@ -113,24 +120,27 @@
     </td>
     <td class="table_cell">
       <table border="0" cellpadding="0" cellspacing="0">
-        <tr>
+        <tr class="innerTable">
           <td>
             <a href="ViewSectionDataEntry?crfId=<c:out value="${currRow.bean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes"
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-               onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
+               onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
+               data-cc-crfId="${currRow.bean.id}_${version.id}" onclick="setAccessedObjectWithRowspans(this)"><img
               name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
           </td>
           <c:if test="${version.status.available && userBean.sysAdmin}">
               <td><a href="LockCRFVersion?id=<c:out value="${version.id}"/>"
                 onMouseDown="javascript:setImage('bt_Lock1','images/bt_Lock_d.gif');"
-                onMouseUp="javascript:setImage('bt_Lock1','images/bt_Lock.gif');"><img
+                onMouseUp="javascript:setImage('bt_Lock1','images/bt_Lock.gif');"
+                onclick="setAccessedObjectWithRowspans(this)"><img
                 name="bt_Lock1" src="images/bt__Lock.png" border="0" alt="<fmt:message key="lock" bundle="${resword}"/>" title="<fmt:message key="lock" bundle="${resword}"/>" align="left" hspace="6"></a>
               </td>
 		  </c:if>
 		  <c:if test="${version.status.name=='locked'}">             
              <td><a href="UnlockCRFVersion?id=<c:out value="${version.id}"/>"
 			  onMouseDown="javascript:setImage('bt_Unlock1','images/bt_Unlock_d.gif');"
-			  onMouseUp="javascript:setImage('bt_Unlock1','images/bt_Unlock.gif');"><img 
+			  onMouseUp="javascript:setImage('bt_Unlock1','images/bt_Unlock.gif');"
+			  onclick="setAccessedObjectWithRowspans(this)"><img 
 			  name="bt_Unlock1" src="images/bt__Unlock.png" border="0" alt="<fmt:message key="unlock" bundle="${resword}"/>" title="<fmt:message key="unlock" bundle="${resword}"/>" align="left" hspace="6"></a>
 		     </td>       
           </c:if>
@@ -140,7 +150,8 @@
 				</td>
                 <td><a href="RemoveCRFVersion?action=confirm&id=<c:out value="${version.id}"/>"
                        onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                       onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><img
+                       onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
+                       onclick="setAccessedObjectWithRowspans(this)"><img
                   name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </td>                
               </c:when>
@@ -150,7 +161,8 @@
 			</td>
                 <td><a href="RestoreCRFVersion?action=confirm&id=<c:out value="${version.id}"/>"
                        onMouseDown="javascript:setImage('bt_Restor1','images/bt_Restore_d.gif');"
-                       onMouseUp="javascript:setImage('bt_Restore1','images/bt_Restore.gif');"><img
+                       onMouseUp="javascript:setImage('bt_Restore1','images/bt_Restore.gif');"
+                       onclick="setAccessedObjectWithRowspans(this)"><img
                   name="bt_Restore1" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </td>
              </c:when>
@@ -173,7 +185,8 @@
           <c:if test="${userBean.sysAdmin}">
             <td><a href="DeleteCRFVersion?action=confirm&verId=<c:out value="${version.id}"/>"
                    onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
-                   onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"><img
+                   onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"
+                   onclick="setAccessedObjectWithRowspans(this)"><img
               name="bt_Delete1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
             </td>
           </c:if>
