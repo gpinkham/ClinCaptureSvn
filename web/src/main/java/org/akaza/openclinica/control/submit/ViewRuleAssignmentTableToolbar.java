@@ -98,7 +98,7 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
 		 * @see ListStudySubjectTableFactory#configureColumns(org.jmesa.facade.TableFacade, java.util.Locale)
 		 */
 		String getIndexes() {
-			return "0,1,3,4,8,10,12";
+			return "0,1,3,4,8,10";
 		}
 
 	}
