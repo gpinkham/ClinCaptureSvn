@@ -36,14 +36,13 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletResponse;
 
 public class AuditUserLoginTableFactory extends AbstractTableFactory {
 
@@ -204,21 +203,17 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 
 	private class ActionsCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
+			BasicCellEditor bce = new BasicCellEditor();
 			String value = "";
-			Integer userAccountId = (Integer) new BasicCellEditor().getValue(item, "userAccountId", rowcount);
+			Integer userAccountId = (Integer) bce.getValue(item, "userAccountId", rowcount);
+			String loginAttemptDate = bce.getValue(item, "loginAttemptDate", rowcount).toString();
 			if (userAccountId != null) {
 				StringBuilder url = new StringBuilder();
 				url.append("<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewUserAccount?userId=");
-
 				url.append(userAccountId.toString());
-				url.append("&amp;viewFull=yes\"><img hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" src=\"images/bt_View.gif\" name=\"bt_View1\"/></a>");
-				/*
-				 * url .append(
-				 * "<a onmouseup=\"javascript:setImage('bt_Edit','images/bt_Edit.gif');\" href=\"EditUserAccount?userId="
-				 * ); url.append(userAccountId.toString()); url .append(
-				 * "\"><img hspace=\"6\" border=\"0\" align=\"left\" title=\"Edit\" alt=\"Edit\" src=\"images/bt_Edit.gif\" name=\"bt_Edit1\"/></a>"
-				 * );
-				 */
+				url.append("&amp;viewFull=yes\" onclick=\"setAccessedObjected(this)\" data-cc-auditUserId=\"");
+				url.append(loginAttemptDate);
+				url.append("\"><img hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" src=\"images/bt_View.gif\" name=\"bt_View1\"/></a>");
 				value = url.toString();
 			}
 			return value;

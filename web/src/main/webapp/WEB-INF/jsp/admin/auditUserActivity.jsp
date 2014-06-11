@@ -29,6 +29,10 @@
         var parameterString = createParameterStringForLimit(id);
         location.href = '${pageContext.request.contextPath}/AuditUserActivity?'+ parameterString;
     }
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
 </script>
 
 <!-- then instructions-->
@@ -84,4 +88,5 @@
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
+<input id="accessAttributeName" type="hidden" value="data-cc-auditUserId">
 <jsp:include page="../include/footer.jsp"/>
