@@ -2247,4 +2247,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			return 0;
 		}
 	}
+
+	public List<Integer> findAllEvCRFIdsWithUnclosedDNsByStSubId(int studySubjectId) {
+		List<Integer> result = new ArrayList<Integer>();
+		unsetTypeExpected();
+		setTypeExpected(1, TypeNames.INT);
+		HashMap variables = new HashMap();
+		variables.put(1, studySubjectId);
+		for (Object o : select(digester.getQuery("findAllEvCRFIdsWithUnclosedDNsByStSubId"), variables)) {
+			result.add((Integer) ((HashMap) o).get("event_crf_id"));
+		}
+		return result;
+	}
 }

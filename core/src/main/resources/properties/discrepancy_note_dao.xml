@@ -670,6 +670,20 @@
 
         </sql>
     </query>
+	<query>
+        <name>findAllEvCRFIdsWithUnclosedDNsByStSubId</name>
+        <sql>
+            SELECT distinct itd.event_crf_id
+            FROM item_data itd, discrepancy_note dn, dn_item_data_map dsm
+			where dsm.study_subject_id = ?
+			AND dsm.column_name='value'
+			AND dsm.discrepancy_note_id = dn.discrepancy_note_id
+			AND dn.entity_type='itemData'
+			AND dn.parent_dn_id is null
+			AND (dn.resolution_status_id = '1' OR dn.resolution_status_id = '2')
+			AND dsm.item_data_id = itd.item_data_id
+        </sql>
+    </query>
     <query>
         <name>findAllByStudyEventAndColumn</name>
         <sql>
