@@ -146,6 +146,16 @@
          and (c.source_study_id !=? or c.source_study_id is null) 
       </sql>
     </query>
+	<query>
+		<name>findAllActiveByDefinitionsForCurrentStudy</name>
+		<sql>select distinct c.* from crf c,event_definition_crf edc
+			where edc.study_id=?
+			and c.crf_id=edc.crf_id
+			and c.status_id=1
+			and edc.status_id=1
+			and (c.source_study_id = ? or c.source_study_id is null)
+		</sql>
+	</query>
     <query>
       <name>getCountofCRFs</name>
       <sql>select count(crf.crf_id) from crf where crf.status_id != 5</sql>

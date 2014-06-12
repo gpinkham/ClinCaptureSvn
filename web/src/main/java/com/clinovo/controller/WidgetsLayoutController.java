@@ -22,6 +22,8 @@ import com.clinovo.model.WidgetsLayout;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
@@ -32,9 +34,11 @@ import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
 import org.akaza.openclinica.dao.EventCRFSDVSort;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.ListEventsForSubjectFilter;
+import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -423,12 +427,12 @@ public class WidgetsLayoutController {
 		sdvFilterDone.addFilter("sdvStatus", "complete");
 		EventCRFSDVSort sdvSortDone = new EventCRFSDVSort();
 		boolean sdvWithOpenQueries = sb.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes");
-		ArrayList<EventCRFBean> ecrfs = eCrfdao.getAvailableWithFilterAndSort(
-				sb.getId(), sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilterDone, sdvSortDone, sdvWithOpenQueries, 0, 9999);
+		ArrayList<EventCRFBean> ecrfs = eCrfdao.getAvailableWithFilterAndSort(sb.getId(),
+				sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilterDone, sdvSortDone,
+				sdvWithOpenQueries, 0, 9999);
 
 		List<Integer> countValues = new ArrayList<Integer>(Collections.nCopies(12, 0));
 
-		
 		int currentMonth = sdvCal.get(Calendar.MONTH);
 
 		for (EventCRFBean ecrf : ecrfs) {
@@ -442,9 +446,9 @@ public class WidgetsLayoutController {
 				int eStartMonth = (ecrfYear == sdvProgressYear) ? month : 0;
 				int eEndMonth = (sdvProgressYear != currentYear) ? 11 : currentMonth;
 
-				for(int i = eStartMonth; i <= eEndMonth; i++) {
+				for (int i = eStartMonth; i <= eEndMonth; i++) {
 
-					countValues.set(i, countValues.get(i) + 1); 
+					countValues.set(i, countValues.get(i) + 1);
 				}
 			}
 		}
@@ -463,8 +467,9 @@ public class WidgetsLayoutController {
 		EventCRFSDVFilter sdvFilter = new EventCRFSDVFilter(sb.getId());
 		sdvFilter.addFilter("sdvStatus", "not done");
 		EventCRFSDVSort sdvSort = new EventCRFSDVSort();
-		ArrayList<EventCRFBean> availableForSDV = eCrfdao.getAvailableWithFilterAndSort(
-				sb.getId(), sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries, 0, 99999);
+		ArrayList<EventCRFBean> availableForSDV = eCrfdao.getAvailableWithFilterAndSort(sb.getId(),
+				sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries,
+				0, 99999);
 
 		List<Integer> countAvailableCRFs = new ArrayList<Integer>(Collections.nCopies(12, 0));
 
@@ -475,18 +480,18 @@ public class WidgetsLayoutController {
 			avCal.setTime(avCRF.getUpdatedDate());
 			int avYear = avCal.get(Calendar.YEAR);
 
-			if (avYear <= sdvProgressYear){
+			if (avYear <= sdvProgressYear) {
 
 				int avMonth = avCal.get(Calendar.MONTH);
 				int startMonth = (avYear == sdvProgressYear) ? avMonth : 0;
 				int endMonth = (sdvProgressYear != currentYear) ? 11 : currentMonth;
 
-				for(int i = startMonth; i <= endMonth; i++) {
+				for (int i = startMonth; i <= endMonth; i++) {
 
-					countAvailableCRFs.set(i, countAvailableCRFs.get(i) + 1); 
+					countAvailableCRFs.set(i, countAvailableCRFs.get(i) + 1);
 				}
 			}
-			
+
 		}
 
 		model.addAttribute("sdvAvailableECRFs", countAvailableCRFs);
@@ -496,6 +501,67 @@ public class WidgetsLayoutController {
 		model.addAttribute("sdvPreviousYearExists", previousDataExists);
 
 		return "widgets/includes/sdvProgressChart";
+	}
+
+	@RequestMapping("/initNdsPerCrfWidget")
+	public String initNdsPerCrfWidget(HttpServletRequest request, HttpServletResponse response, Model model) {
+
+		setRequestHeadersAndUpdateLocale(response, request);
+
+		String page = "widgets/includes/ndsPerCrfChart";
+
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+		CRFDAO crfdao = new CRFDAO(datasource);
+		EventCRFDAO eCrfdao = new EventCRFDAO(datasource);
+		DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(datasource);
+
+		List<CRFBean> crfs = (List<CRFBean>) crfdao.findAllActiveByDefinitionsForCurrentStudy(sb.getId());
+		LinkedHashMap<String, List<Integer>> dataColumns = new LinkedHashMap<String, List<Integer>>();
+		ResolutionStatus[] statuses = { ResolutionStatus.OPEN, ResolutionStatus.UPDATED,
+				ResolutionStatus.NOT_APPLICABLE, ResolutionStatus.CLOSED };
+
+		int start = Integer.parseInt(request.getParameter("start"));
+		int maxDispay = 8;
+		String action = request.getParameter("action");
+
+		if (action.equals("goForward")) {
+			start += maxDispay;
+		}
+
+		if (action.equals("goBack")) {
+			start -= maxDispay;
+		}
+
+		for (int i = start; i < crfs.size() && i < start + maxDispay; i++) {
+
+			boolean eCrfExist = true;
+
+			String crfName = crfs.get(i).getName();
+			List<Integer> contNdsWithStatuses = new ArrayList<Integer>();
+
+			for (ResolutionStatus status : statuses) {
+
+				ListNotesFilter filter = new ListNotesFilter();
+				filter.addFilter("crfName", crfName);
+				filter.addFilter("discrepancyNoteBean.resolutionStatus", status.getId());
+
+				int count = dnDao.countViewNotesWithFilter(sb, filter);
+
+				contNdsWithStatuses.add(count);
+			}
+
+			dataColumns.put(crfName, contNdsWithStatuses);
+		}
+
+		boolean hasPrevious = start != 0;
+		boolean hasNext = start + maxDispay < crfs.size();
+
+		model.addAttribute("ndsCrfHasPrevious", hasPrevious);
+		model.addAttribute("ndsCrfHasNext", hasNext);
+		model.addAttribute("ndsCrfStart", start);
+		model.addAttribute("ndsCrfDataColumns", dataColumns);
+
+		return page;
 	}
 
 	private Integer getCountOfSubjects(StudyBean sb) {

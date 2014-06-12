@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	
+	<changeSet author="denis" id="2014-06-03-TICKET1418-UPDATE-SEQENCE">
+		<preConditions onFail="MARK_RAN">
+			<dbms type="postgresql" />
+		</preConditions>
+		<sql splitStatements="false">
+			SELECT nextval('widget_id_seq')
+		</sql>
+	</changeSet>
+
+	<changeSet author="denis" id="2014-06-03-TICKET1418-CREATE-NDSPERCRF-WIDGET">
+		<comment>Create "NDs Per CRF" widget</comment>
+		<insert tableName="widget">
+			<column name="version" value="0" />
+			<column name="widget_name" value="NDS Per CRF" />
+			<column name="have_access" value="1,2,3,4,5,6,7" />
+			<column name="display_as_default" value="1,2,3,4,5,6,7" />
+			<column name="study_metrics" value="TRUE" />
+			<column name="site_metrics" value="TRUE" />
+			<column name="two_column_widget" value="TRUE" />
+		</insert>
+	</changeSet>
+</databaseChangeLog>

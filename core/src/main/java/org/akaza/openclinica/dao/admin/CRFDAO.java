@@ -217,6 +217,21 @@ public class CRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	public Collection findAllActiveByDefinitionsForCurrentStudy(int studyId) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, studyId);
+		variables.put(2, studyId);
+		ArrayList alist = this.select(digester.getQuery("findAllActiveByDefinitionsForCurrentStudy"), variables);
+
+		ArrayList al = new ArrayList();
+		for (Object anAlist : alist) {
+			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
+			al.add(eb);
+		}
+		return al;
+	}
+
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}

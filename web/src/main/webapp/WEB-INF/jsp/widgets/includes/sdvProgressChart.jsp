@@ -28,6 +28,6 @@
 
 <form class="hidden" id="sdv_progress">
 	<input type="text" value="${sdvProgressYear}" id="sdvProgressYear" />
-	<input type="text" id="currentColor" value="${newThemeColor}">
+	<input type="text" class="currentColor" value="${newThemeColor}">
 </form>
 <input type="hidden" value="${study.id}" id="sdvWStudyId">

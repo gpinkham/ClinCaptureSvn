@@ -86,6 +86,17 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	}
 
 	@Test
+	public void testThatInitNdsPerCrfReturnsCode200() throws Exception {
+
+		StudyBean sb = new StudyBean();
+		sb.setId(1);
+
+		this.mockMvc.perform(
+				get(NDS_PER_CRF_WIDGET).param("start", "0").param("action", "init").sessionAttr("study", sb))
+				.andExpect(status().isOk());
+	}
+
+	@Test
 	public void testThatConfigureHomePageReturnsModelWithAllAttributes() throws Exception {
 
 		UserAccountBean ub = new UserAccountBean();
@@ -253,5 +264,41 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 						MockMvcRequestBuilders.post(SDV_PROGRESS_WIDGET).param("sdvProgressYear", "0")
 								.sessionAttr("study", sb)).andExpect(
 						MockMvcResultMatchers.view().name("widgets/includes/sdvProgressChart"));
+	}
+
+	@Test
+	public void testThatInitNdsPerCrfWidgetReturnsModelWithAlAttribures() throws Exception {
+
+		StudyBean sb = new StudyBean();
+		sb.setId(1);
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(NDS_PER_CRF_WIDGET).param("start", "0").param("action", "init")
+						.sessionAttr("study", sb)).andExpect(
+				MockMvcResultMatchers.model().attributeExists("ndsCrfHasPrevious", "ndsCrfHasNext", "ndsCrfStart",
+						"ndsCrfDataColumns"));
+	}
+
+	@Test
+	public void testThatInitNdsPerCrfWidgetReturnsCorrectNumberOfAttributes() throws Exception {
+
+		StudyBean sb = new StudyBean();
+		sb.setId(1);
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(NDS_PER_CRF_WIDGET).param("start", "0").param("action", "init")
+						.sessionAttr("study", sb)).andExpect(MockMvcResultMatchers.model().size(4));
+	}
+
+	@Test
+	public void testThatInitNdsPerCrfWidgetReturnsCorrectUrl() throws Exception {
+
+		StudyBean sb = new StudyBean();
+		sb.setId(1);
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(NDS_PER_CRF_WIDGET).param("start", "0").param("action", "init")
+						.sessionAttr("study", sb)).andExpect(
+				MockMvcResultMatchers.view().name("widgets/includes/ndsPerCrfChart"));
 	}
 }
