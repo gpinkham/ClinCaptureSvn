@@ -22,8 +22,8 @@ package org.akaza.openclinica.bean.core;
 
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
@@ -32,10 +32,9 @@ import java.util.ResourceBundle;
  * @author ssachs
  * 
  */
-@SuppressWarnings({"serial", "rawtypes"})
+@SuppressWarnings({ "serial", "rawtypes", "unchecked" })
 public class Term extends EntityBean {
 
-	Locale locale;
 	ResourceBundle resterm;
 	protected String description;
 
@@ -88,8 +87,7 @@ public class Term extends EntityBean {
 	public static boolean contains(int id, List list) {
 		Term t = new Term(id, "");
 
-		for (int i = 0; i < list.size(); i++) {
-			Term temp = (Term) list.get(i);
+		for (Term temp : (List<Term>) list) {
 			if (temp.equals(t)) {
 				return true;
 			}
@@ -100,8 +98,7 @@ public class Term extends EntityBean {
 	public static Term get(int id, List list) {
 		Term t = new Term(id, "");
 
-		for (int i = 0; i < list.size(); i++) {
-			Term temp = (Term) list.get(i);
+		for (Term temp : (List<Term>) list) {
 			if (temp.equals(t)) {
 				return temp;
 			}
@@ -118,6 +115,22 @@ public class Term extends EntityBean {
 		} else {
 			return "";
 		}
+	}
+
+	public String getNormalizedName() {
+		String name = getName();
+		if (name != null) {
+			List<String> wordList = Arrays.asList(name.split("\\s"));
+			StringBuilder builder = new StringBuilder();
+			for (String word : wordList) {
+				if (wordList.indexOf(word) > 0)
+					builder.append(" ");
+				builder.append(word.isEmpty() ? " " : (Character.toString(word.charAt(0)).toUpperCase() + word
+						.substring(1)));
+			}
+			return builder.toString();
+		} else
+			return null;
 	}
 
 	public String getCode() {

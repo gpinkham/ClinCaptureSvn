@@ -108,10 +108,12 @@ public class SDVUtil {
 		return "<img hspace='2' border='0'  title='SDV Complete' alt='SDV Complete' src='" + prefix + "images/icon_";
 	}
 
-	String getIconForCrfStatusPrefix() {
+	String getIconForCrfStatusPrefix(int statusId) {
+		DataEntryStage stage = DataEntryStage.get(statusId);
+		stage = stage.equals(DataEntryStage.ADMINISTRATIVE_EDITING) ? DataEntryStage.INITIAL_DATA_ENTRY : stage;
 		String prefix = pathPrefix == null ? "../" : pathPrefix;
-		return "<img hspace='2' border='0'  title='Event CRF Status' alt='Event CRF Status' src='" + prefix
-				+ "images/icon_";
+		return "<img hspace='2' border='0'  title='" + stage.getNormalizedName() + "' alt='"
+				+ stage.getNormalizedName() + "' src='" + prefix + "images/icon_";
 	}
 
 	String getIconForSubjectSufix() {
@@ -120,24 +122,19 @@ public class SDVUtil {
 				+ "images/bt_View.gif\" name=\"bt_View1\"/></a>";
 	}
 
+	String getIconForViewCrf() {
+		String prefix = pathPrefix == null ? "../" : pathPrefix;
+		return "<img hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" src=\"" + prefix
+				+ "images/bt_View.gif\" name=\"bt_View1\"/></a>";
+	}
+
 	String getIconForViewHtml() {
 		String prefix = pathPrefix == null ? "../" : pathPrefix;
 		return "<img src=\"" + prefix + "images/bt_View.gif\" border=\"0\" />";
 	}
 
-	public final static Map<Integer, String> SUBJECT_EVENT_STATUS_ICONS = new HashMap<Integer, String>();
 	public final static Map<Integer, String> CRF_STATUS_ICONS = new HashMap<Integer, String>();
 	static {
-		SUBJECT_EVENT_STATUS_ICONS.put(0, "Invalid");
-		SUBJECT_EVENT_STATUS_ICONS.put(1, "Scheduled");
-		SUBJECT_EVENT_STATUS_ICONS.put(2, "NotStarted");
-		SUBJECT_EVENT_STATUS_ICONS.put(3, "InitialDE");
-		SUBJECT_EVENT_STATUS_ICONS.put(4, "DEcomplete");
-		SUBJECT_EVENT_STATUS_ICONS.put(5, "Stopped");
-		SUBJECT_EVENT_STATUS_ICONS.put(6, "Skipped");
-		SUBJECT_EVENT_STATUS_ICONS.put(7, "Locked");
-		SUBJECT_EVENT_STATUS_ICONS.put(8, "Signed");
-
 		CRF_STATUS_ICONS.put(0, "Invalid");
 		CRF_STATUS_ICONS.put(1, "NotStarted");
 		CRF_STATUS_ICONS.put(2, "InitialDE");
@@ -787,8 +784,7 @@ public class SDVUtil {
 
 				}
 
-				tempSDVBean.setCrfStatus(getCRFStatusIconPath(status, request, studySubjectBean.getId(),
-						crfBean.getId(), crfBean.getCRFVersionId()));
+				tempSDVBean.setCrfStatus(getCRFStatusIconPath(status));
 			}
 
 			tempSDVBean.setStudyEventStatus(studyEventBean.getStatus().getName());
@@ -850,13 +846,23 @@ public class SDVUtil {
 			}
 
 			actions = new StringBuilder("");
+
+			StringBuilder builder = new StringBuilder();
+			builder.append("<a href='#' onclick='setAccessedObjected(this); location.href = \"")
+					.append(request.getContextPath()).append("/ViewSectionDataEntry?eventCRFId=")
+					.append(crfBean.getId()).append("&eventDefinitionCRFId=").append(eventDefinitionCRFBean.getId())
+					.append("&tabId=1&eventId=").append(studyEventBean.getId())
+					.append("\"' data-cc-sdvCrfId='" + crfBean.getId() + "'>").append(getIconForViewCrf());
+			actions.append(builder.toString());
+
 			if (!crfBean.isSdvStatus()) {
 				actions.append("<input type=\"image\" name=\"sdvSubmit\" ").append("src=\"")
 						.append((request.getContextPath())).append("/images/icon_DoubleCheck_Action")
 						.append(ICON_FORSVN_SUFFIX).append("onclick=\"")
 						.append("this.form.method='GET'; this.form.action='").append(request.getContextPath())
 						.append("/pages/handleSDVGet").append("';").append("this.form.crfId.value='")
-						.append(crfBean.getId()).append("';").append("this.form.submit(); setAccessedObjected(this);").append("\" />");
+						.append(crfBean.getId()).append("';").append("this.form.submit(); setAccessedObjected(this);")
+						.append("\" />");
 			}
 
 			tempSDVBean.setSdvStatusActions(actions.toString());
@@ -867,18 +873,10 @@ public class SDVUtil {
 		return allRows;
 	}
 
-	private String getCRFStatusIconPath(int statusId, HttpServletRequest request, int studySubjectId,
-			int eventDefinitionCRFId, int crfVersionId) {
+	private String getCRFStatusIconPath(int statusId) {
 
 		HtmlBuilder html = new HtmlBuilder();
-		html.a().onclick(
-				"openDocWindow('" + request.getContextPath()
-						+ "/ViewSectionDataEntry?cw=1&eventDefinitionCRFId=&eventCRFId=" + eventDefinitionCRFId
-						+ "&tabId=1&studySubjectId=" + studySubjectId + "'); setAccessedObjected(this);")
-				.append(" data-cc-sdvCrfId='")
-				.append(eventDefinitionCRFId)
-				.append("'");
-		html.href("#").close();
+		html.a().close();
 
 		/*
 		 * StringBuilder builderHref = new StringBuilder("<a href='javascript:void(0)' onclick=\"");
@@ -888,7 +886,7 @@ public class SDVUtil {
 		 * .append(studySubjectId).append("'\">");
 		 */
 
-		StringBuilder builder = new StringBuilder(html.toString()).append(getIconForCrfStatusPrefix());
+		StringBuilder builder = new StringBuilder(html.toString()).append(getIconForCrfStatusPrefix(statusId));
 
 		if (statusId > 0 && statusId < 8) {
 
