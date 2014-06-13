@@ -60,13 +60,8 @@
 			<tr>
 				<td valign="top" class="table_tools">
 					<c:if test="${table.paginated && (table.currPageNumber > 1)}">
-						<%--<a href="<c:out value="${firstPageQuery}"/>"><img src="images/arrow_first.gif" border="0" alt="<fmt:message key="first_page" bundle="${resword}"/>" title="<fmt:message key="first_page" bundle="${resword}"/>"></a>--%>
-						<%--<a href="<c:out value="${prevPageQuery}"/>"><img src="images/arrow_back.gif" border="0" alt="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>"></a>--%>
 						<a href="#" onclick="document.forms[1].action='<c:out value="${firstPageQuery}"/>';document.forms[1].submit()"><img src="images/arrow_first.gif" border="0" alt="<fmt:message key="first_page" bundle="${resword}"/>" title="<fmt:message key="first_page" bundle="${resword}"/>"></a>
 						<a href="#" onclick="document.forms[1].action='<c:out value="${prevPageQuery}"/>';document.forms[1].submit()"><img src="images/arrow_back.gif" border="0" alt="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>"></a>
-                        <%--<a href="#" onclick="document.crfForm.action='<c:out value="${firstPageQuery}"/>';document.crfForm.submit()"><img src="images/arrow_first.gif" border="0" alt="<fmt:message key="first_page" bundle="${resword}"/>" title="<fmt:message key="first_page" bundle="${resword}"/>"></a>--%>
-                        <%--<a href="#" onclick="document.crfForm.action='<c:out value="${prevPageQuery}"/>';document.crfForm.submit()"><img src="images/arrow_back.gif" border="0" alt="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>"></a>--%>
-
 					</c:if>
 				</td>
 				<td valign="top" class="table_tools">
@@ -76,35 +71,11 @@
 					</c:choose>
 				<td valign="top" class="table_tools">
 					<c:if test="${table.paginated && (table.currPageNumber < table.totalPageNumbers)}">
-                        <%--<a href="<c:out value="${nextPageQuery}"/>"><img src="images/arrow_next.gif" border="0" alt="<fmt:message key="next" bundle="${resword}"/>" title="<fmt:message key="next" bundle="${resword}"/>"></a>--%>
-                        <%--<a href="<c:out value="${lastPageQuery}"/>"><img src="images/arrow_last.gif" border="0" alt="<fmt:message key="last_page" bundle="${resword}"/>" title="<fmt:message key="last_page" bundle="${resword}"/>"></a>--%>
 						<a href="#" onclick="document.forms[1].action='<c:out value="${nextPageQuery}"/>';document.forms[1].submit()"><img src="images/arrow_next.gif" border="0" alt="<fmt:message key="next" bundle="${resword}"/>" title="<fmt:message key="next" bundle="${resword}"/>"></a>
 						<a href="#" onclick="document.forms[1].action='<c:out value="${lastPageQuery}"/>';document.forms[1].submit()"><img src="images/arrow_last.gif" border="0" alt="<fmt:message key="last_page" bundle="${resword}"/>" title="<fmt:message key="last_page" bundle="${resword}"/>"></a>
-                        <%--<a href="#" onclick="document.crfForm.action='<c:out value="${nextPageQuery}"/>';document.crfForm.submit()"><img src="images/arrow_next.gif" border="0" alt="<fmt:message key="next" bundle="${resword}"/>" title="<fmt:message key="next" bundle="${resword}"/>"></a>--%>
-                        <%--<a href="#" onclick="document.crfForm.action='<c:out value="${lastPageQuery}"/>';document.crfForm.submit()"><img src="images/arrow_last.gif" border="0" alt="<fmt:message key="last_page" bundle="${resword}"/>" title="<fmt:message key="last_page" bundle="${resword}"/>"></a>--%>
 					</c:if>
 				</td>
 			</tr>
-            <%--<tr>
- 				<td valign="top" class="table_tools">
- 					<c:if test="${table.paginated && (table.currPageNumber > 1)}">
-						<a href="<c:out value="${firstPageQuery}"/>"><img src="images/arrow_first.gif" border="0" alt="<fmt:message key="first_page" bundle="${resword}"/>" title="<fmt:message key="first_page" bundle="${resword}"/>"></a>
-						<a href="<c:out value="${prevPageQuery}"/>"><img src="images/arrow_back.gif" border="0" alt="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>"></a>
- 					</c:if>
- 				</td>
-                <td valign="top" class="table_tools">
-					<c:choose>
-						<c:when test="${empty table.rows}"> <fmt:message key="no_pages" bundle="${resword}"/></c:when>
-						<c:otherwise> <fmt:message key="page" bundle="${resword}"/> <c:out value="${table.currPageNumber}" /> <fmt:message key="of" bundle="${resword}"/> <c:out value="${table.totalPageNumbers}" /> </c:otherwise>
-					</c:choose>
-                </td>
-                 <td valign="top" class="table_tools">
- 					<c:if test="${table.paginated && (table.currPageNumber < table.totalPageNumbers)}">
-						<a href="<c:out value="${nextPageQuery}"/>"><img src="images/arrow_next.gif" border="0" alt="<fmt:message key="next" bundle="${resword}"/>" title="<fmt:message key="next" bundle="${resword}"/>"></a>
-						<a href="<c:out value="${lastPageQuery}"/>"><img src="images/arrow_last.gif" border="0" alt="<fmt:message key="last_page" bundle="${resword}"/>" title="<fmt:message key="last_page" bundle="${resword}"/>"></a>
- 					</c:if>
- 				</td>
- 			</tr>--%>
         </table>
 		</td>
 
@@ -118,16 +89,6 @@
 
 		<td width="33%" valign="top" align="center" class="table_actions">
 
-
-				<jsp:include page="showSubmitted.jsp" />
-				<c:forEach var="postArg" items="${table.postArgs}">
-					<input type="hidden" name="<c:out value="${postArg.key}"/>" value="<c:out value="${postArg.value}"/>" />
-				</c:forEach>
-				<input type="hidden" name="ebl_page" value="<c:out value="${table.currPageNumber}" />" />
-				<input type="hidden" name="ebl_sortColumnInd" value="<c:out value="${table.sortingColumnInd}"/>" />
-				<input type="hidden" name="ebl_sortAscending" value="<c:out value="${ascending}"/>"/>
-				<input type="hidden" name="ebl_filtered" value="1" />
-				<input type="hidden" name="ebl_paginated" value="<c:out value="${paginated}"/>" />
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top">
@@ -136,7 +97,9 @@
 						</div>
 					</td>
 					<td valign="top">
-						<input type="submit" name="FindButton" class="button_search" value="<fmt:message key="find" bundle="${resword}"/>"/>
+						<c:set var="searchQuery" value="${table.baseGetQuery}&ebl_page=1&ebl_sortColumnInd=${table.sortingColumnInd}&ebl_sortAscending=${ascending}&ebl_filtered=1&ebl_paginated=${paginated}" />
+						<input type="button" name="FindButton" class="button_search" value="<fmt:message key="find" bundle="${resword}"/>"
+							   onclick="document.forms[1].action='<c:out value="${searchQuery}"/>';document.forms[1].submit();" />
 					</td>
 				</tr>
 			</table>
