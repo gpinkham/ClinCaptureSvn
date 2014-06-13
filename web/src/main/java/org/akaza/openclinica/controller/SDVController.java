@@ -31,6 +31,7 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.StudyInfoPanel;
@@ -366,7 +367,7 @@ public class SDVController {
 		List<Integer> studySubjectIds = new ArrayList<Integer>();
 		studySubjectIds.add(studySubjectId);
 		boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(),
-				true);
+				isSdvWithOpenQueriesAllowed(request), true);
 
 		if (updateCRFs) {
 			pageMessages.add(resPageMessages.getString("subject_sdved"));
@@ -390,7 +391,7 @@ public class SDVController {
 		List<Integer> studySubjectIds = new ArrayList<Integer>();
 
 		studySubjectIds.add(studySubjectId);
-		boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(),
+		boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(), true,
 				false);
 
 		if (updateCRFs) {
@@ -435,9 +436,10 @@ public class SDVController {
 			sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
 
 		}
+		
 		List<Integer> studySubjectIds = sdvUtil.getListOfStudySubjectIds(parameterMap.keySet());
 		boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(),
-				true);
+				isSdvWithOpenQueriesAllowed(request), true);
 
 		if (updateCRFs) {
 			pageMessages.add(resPageMessages.getString("event_crf_sdved"));
@@ -451,6 +453,13 @@ public class SDVController {
 		// The name of the view, as in allSdvResult.jsp
 		return null;
 
+	}
+
+	private boolean isSdvWithOpenQueriesAllowed(HttpServletRequest request) {
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+		String allowSdvWithOpenQueries = currentStudy == null? "" : currentStudy.getStudyParameterConfig()
+				.getAllowSdvWithOpenQueries();
+		return !"no".equals(allowSdvWithOpenQueries);
 	}
 
 	private UserAccountBean getCurrentUser(HttpServletRequest request) {

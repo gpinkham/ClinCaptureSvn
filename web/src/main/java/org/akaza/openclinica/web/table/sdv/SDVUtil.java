@@ -1002,7 +1002,8 @@ public class SDVUtil {
 
 	}
 
-	public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, int userId, boolean setVerification) {
+	public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, int userId, boolean isSdvWithOpenQueriesAllowed,
+			boolean setVerification) {
 
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
@@ -1016,12 +1017,19 @@ public class SDVUtil {
 		if (studySubjectIds == null || studySubjectIds.isEmpty()) {
 			return true;
 		}
-
+		
+		List<Integer> exceptedEventCrfIdForSubjectList = new ArrayList<Integer>();
 		for (Integer studySubjectId : studySubjectIds) {
+			if (!isSdvWithOpenQueriesAllowed) {
+				exceptedEventCrfIdForSubjectList = dndao.findAllEvCRFIdsWithUnclosedDNsByStSubId(studySubjectId);
+			}
 			ArrayList<EventCRFBean> eventCrfs = eventCRFDAO.getEventCRFsByStudySubjectCompleteOrLocked(studySubjectId);
 			StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
 			StudyBean studyBean = (StudyBean) studyDAO.findByPK(studySubject.getStudyId());
 			for (EventCRFBean eventCRFBean : eventCrfs) {
+				if (!isSdvWithOpenQueriesAllowed && exceptedEventCrfIdForSubjectList.contains(eventCRFBean.getId()))
+					continue;
+				
 				try {
 					eventCRFDAO.setSDVStatus(setVerification, userId, eventCRFBean.getId());
 				} catch (Exception exc) {
