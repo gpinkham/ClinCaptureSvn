@@ -82,7 +82,7 @@ public class DynamicEventDaoTest extends DefaultAppContextTest {
 	@Test
 	public void testFindByPKReturnsDynamicEventWithStudyGroupClassId() throws OpenClinicaException {
 		DynamicEventBean dyn2 = (DynamicEventBean) dynamicEventDao.findByPK(2);
-		assertEquals(2, dyn2.getStudyGroupClassId());
+		assertEquals(3, dyn2.getStudyGroupClassId());
 	}
 
 	@Test

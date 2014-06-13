@@ -21,16 +21,13 @@ import com.clinovo.model.Widget;
 import com.clinovo.model.WidgetsLayout;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
 import org.akaza.openclinica.dao.EventCRFSDVSort;
@@ -58,7 +55,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -258,21 +254,6 @@ public class WidgetsLayoutController {
 
 		for (int i = displayFrom; i < studyEventDefinitions.size() && i < displayFrom + maxDisplayNumber; i++) {
 			DisplayWidgetsRowWithName currentRow = new DisplayWidgetsRowWithName();
-			int dynamicGroupClassIdToFilterBy = 0;
-			DynamicEventBean dynamicEventBean = dedao
-					.findByStudyEventDefinitionId(studyEventDefinitions.get(i).getId());
-
-			if (dynamicEventBean != null) {
-
-				for (StudyGroupClassBean studyGroupClassBean : (ArrayList<StudyGroupClassBean>) sgcdao
-						.findAllActiveDynamicGroupsByStudyId(studyId)) {
-					if (studyGroupClassBean.getId() == dynamicEventBean.getStudyGroupClassId()
-							&& !studyGroupClassBean.isDefault()) {
-						dynamicGroupClassIdToFilterBy = studyGroupClassBean.getId();
-						break;
-					}
-				}
-			}
 
 			LinkedHashMap<String, Integer> countOfSubjectEventStatuses = new LinkedHashMap<String, Integer>();
 			int countOfSubjectsStartedEvent = 0;
@@ -280,7 +261,7 @@ public class WidgetsLayoutController {
 			for (SubjectEventStatus subjectEventStatus : subjectEventStatuses) {
 
 				ListEventsForSubjectFilter listEventsForSubjectFilter = new ListEventsForSubjectFilter(
-						studyEventDefinitions.get(i).getId(), dynamicGroupClassIdToFilterBy);
+						studyEventDefinitions.get(i).getId(), sgcdao);
 				String property = "event.status";
 				String value = subjectEventStatus.getId() + "";
 				listEventsForSubjectFilter.addFilter(property, value);

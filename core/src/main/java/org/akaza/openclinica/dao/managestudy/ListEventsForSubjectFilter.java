@@ -15,6 +15,7 @@ package org.akaza.openclinica.dao.managestudy;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
@@ -26,9 +27,9 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 	private List<Filter> filters = new ArrayList<Filter>();
 	private HashMap<String, String> columnMapping = new HashMap<String, String>();
 	private int studyEventDefinitionId;
-	private int dynamicGroupClassIdToFilterBy;
+	private StudyGroupClassDAO studyGroupClassDAO;
 
-	public ListEventsForSubjectFilter(int studyEventDefinitionId, int dynamicGroupClassIdToFilterBy) {
+	public ListEventsForSubjectFilter(int studyEventDefinitionId, StudyGroupClassDAO studyGroupClassDAO) {
 		columnMapping.put("studySubject.label", "ss.label");
 		columnMapping.put("studySubject.status", "ss.status_id");
 		columnMapping.put("studySubject.oid", "ss.oc_oid");
@@ -36,7 +37,15 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 		columnMapping.put("enrolledAt", "ST.unique_identifier");
 		columnMapping.put("subject.charGender", "s.gender");
 		this.studyEventDefinitionId = studyEventDefinitionId;
-		this.dynamicGroupClassIdToFilterBy = dynamicGroupClassIdToFilterBy;
+		this.studyGroupClassDAO = studyGroupClassDAO;
+	}
+
+	public StudyGroupClassDAO getStudyGroupClassDAO() {
+		return studyGroupClassDAO;
+	}
+
+	public int getStudyEventDefinitionId() {
+		return studyEventDefinitionId;
 	}
 
 	public void addFilter(String property, Object value) {
@@ -47,10 +56,16 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
 		StringBuilder theCriteria = new StringBuilder("");
 
-		if (dynamicGroupClassIdToFilterBy != 0) {
-			theCriteria.append(" AND (( ss.dynamic_group_class_id = ").append(dynamicGroupClassIdToFilterBy)
+		// in case if the selected event definition is bound to an available dynamic group class (except default one) -
+		// need to add proper filter on subjects, to retrieve only those, who were randomized to this dynamic group,
+		// or those, who have already existing study events bound to the selected event definition
+		StudyGroupClassBean dynamicGroupClassToFilterOn = getStudyGroupClassDAO()
+				.findAvailableDynamicGroupByStudyEventDefinitionId(getStudyEventDefinitionId());
+		if (dynamicGroupClassToFilterOn.isActive() && !dynamicGroupClassToFilterOn.isDefault()) {
+
+			theCriteria.append(" AND (( ss.dynamic_group_class_id = ").append(dynamicGroupClassToFilterOn.getId())
 					.append(") OR (se.study_event_id IS NOT NULL AND se.study_event_definition_id = ")
-					.append(studyEventDefinitionId).append(")) ");
+					.append(getStudyEventDefinitionId()).append(")) ");
 		}
 
 		for (Filter filter : filters) {
@@ -73,25 +88,30 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 			} else if (property.equals("event.status")) {
 
 				if (value.equals(String.valueOf(SubjectEventStatus.NOT_SCHEDULED.getId()))) {
-					sqlCriteria.append(" AND ss.status_id NOT IN (").append(Status.DELETED.getId()).append(", ")
-							.append(Status.LOCKED.getId()).append(")")
+					sqlCriteria
+							.append(" AND ss.status_id NOT IN (")
+							.append(Status.DELETED.getId())
+							.append(", ")
+							.append(Status.LOCKED.getId())
+							.append(")")
 							.append(" AND (se.study_subject_id IS NULL OR (se.study_event_definition_id != ")
-							.append(studyEventDefinitionId)
+							.append(getStudyEventDefinitionId())
 							.append(" AND (SELECT count(*) FROM study_subject ss1 LEFT JOIN study_event ON ss1.study_subject_id = study_event.study_subject_id")
-							.append(" WHERE study_event.study_event_definition_id =").append(studyEventDefinitionId)
+							.append(" WHERE study_event.study_event_definition_id =")
+							.append(getStudyEventDefinitionId())
 							.append(" AND ss.study_subject_id = ss1.study_subject_id) =0))");
 				} else if (value.equals(String.valueOf(SubjectEventStatus.LOCKED.getId()))) {
 					sqlCriteria.append(" AND ( ss.status_id = ").append(Status.LOCKED.getId())
-							.append(" OR ( se.study_event_definition_id = ").append(studyEventDefinitionId)
+							.append(" OR ( se.study_event_definition_id = ").append(getStudyEventDefinitionId())
 							.append(" AND se.subject_event_status_id = ").append(value).append(" ))");
 				} else if (value.equals(String.valueOf(SubjectEventStatus.REMOVED.getId()))) {
 					sqlCriteria.append(" AND ( ss.status_id = ").append(Status.DELETED.getId())
-							.append(" OR ( se.study_event_definition_id = ").append(studyEventDefinitionId)
+							.append(" OR ( se.study_event_definition_id = ").append(getStudyEventDefinitionId())
 							.append(" AND se.subject_event_status_id = ").append(value).append(" ))");
 				} else {
 					sqlCriteria.append(" AND").append(" ( se.study_event_definition_id = ")
-							.append(studyEventDefinitionId).append(" AND se.subject_event_status_id = ").append(value)
-							.append(" )");
+							.append(getStudyEventDefinitionId()).append(" AND se.subject_event_status_id = ")
+							.append(value).append(" )");
 				}
 
 			} else if (property.startsWith("sgc_")) {
@@ -113,18 +133,30 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
 				if (value.equals(Status.NOT_STARTED.getName())) {
 
-					sqlCriteria.append(" AND ss.status_id NOT IN (").append(Status.AUTO_DELETED.getId()).append(", ")
-							.append(Status.DELETED.getId()).append(", ").append(Status.LOCKED.getId()).append(")")
-							.append(" AND se.subject_event_status_id <> ").append(SubjectEventStatus.LOCKED.getId())
+					sqlCriteria
+							.append(" AND ss.status_id NOT IN (")
+							.append(Status.AUTO_DELETED.getId())
+							.append(", ")
+							.append(Status.DELETED.getId())
+							.append(", ")
+							.append(Status.LOCKED.getId())
+							.append(")")
+							.append(" AND se.subject_event_status_id <> ")
+							.append(SubjectEventStatus.LOCKED.getId())
 							.append(" AND (((SELECT COUNT(study_event.study_event_id)")
 							.append(" FROM study_event")
-							.append(" WHERE study_event.study_event_definition_id = ").append(studyEventDefinitionId)
+							.append(" WHERE study_event.study_event_definition_id = ")
+							.append(getStudyEventDefinitionId())
 							.append(" AND ss.study_subject_id = study_event.study_subject_id) = 0)")
-							.append(" OR (se.study_event_definition_id = ").append(studyEventDefinitionId)
-							.append(" AND EXISTS (SELECT * FROM crf_version WHERE crf_id = ").append(crfId)
-							.append(" AND status_id = ").append(Status.AVAILABLE.getId())
+							.append(" OR (se.study_event_definition_id = ")
+							.append(getStudyEventDefinitionId())
+							.append(" AND EXISTS (SELECT * FROM crf_version WHERE crf_id = ")
+							.append(crfId)
+							.append(" AND status_id = ")
+							.append(Status.AVAILABLE.getId())
 							.append(") AND ((SELECT COUNT(ec.event_crf_id) FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
-							.append(" WHERE cv.crf_id = ").append(crfId)
+							.append(" WHERE cv.crf_id = ")
+							.append(crfId)
 							.append(" AND ec.study_event_id = se.study_event_id ) = 0")
 							.append(" OR (SELECT COUNT(ec.event_crf_id) FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
 							.append(" WHERE cv.crf_id = ").append(crfId)
@@ -132,7 +164,9 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
 				} else if (value.equals(Status.DATA_ENTRY_STARTED.getName())) {
 
-					sqlCriteria.append(" AND se.study_event_definition_id = ").append(studyEventDefinitionId)
+					sqlCriteria
+							.append(" AND se.study_event_definition_id = ")
+							.append(getStudyEventDefinitionId())
 							.append(" AND se.study_event_id IN")
 							.append(" (SELECT study_event_id")
 							.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
@@ -143,31 +177,41 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
 				} else if (value.equals(Status.INITIAL_DATA_ENTRY_COMPLETED.getName())) {
 
-					sqlCriteria.append(" AND se.study_event_definition_id = ").append(studyEventDefinitionId)
+					sqlCriteria
+							.append(" AND se.study_event_definition_id = ")
+							.append(getStudyEventDefinitionId())
 							.append(" AND se.study_event_id IN")
 							.append(" (SELECT study_event_id")
 							.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
-							.append(" WHERE crf_id = ").append(crfId)
-							.append(" AND ec.status_id = ").append(Status.PENDING.getId())
+							.append(" WHERE crf_id = ")
+							.append(crfId)
+							.append(" AND ec.status_id = ")
+							.append(Status.PENDING.getId())
 							.append(" AND ec.date_completed IS NOT NULL")
 							.append(" AND ec.validator_id = 0 AND ec.date_validate_completed IS NULL AND cv.status_id = ")
 							.append(Status.AVAILABLE.getId()).append(")");
 
 				} else if (value.equals(Status.DOUBLE_DATA_ENTRY.getName())) {
 
-					sqlCriteria.append(" AND se.study_event_definition_id = ").append(studyEventDefinitionId)
+					sqlCriteria
+							.append(" AND se.study_event_definition_id = ")
+							.append(getStudyEventDefinitionId())
 							.append(" AND se.study_event_id IN")
 							.append(" (SELECT study_event_id")
 							.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
-							.append(" WHERE crf_id = ").append(crfId)
-							.append(" AND ec.status_id = ").append(Status.PENDING.getId())
+							.append(" WHERE crf_id = ")
+							.append(crfId)
+							.append(" AND ec.status_id = ")
+							.append(Status.PENDING.getId())
 							.append(" AND ec.date_completed IS NOT NULL")
 							.append(" AND ec.validator_id > 0 AND ec.date_validate_completed IS NULL AND cv.status_id = ")
 							.append(Status.AVAILABLE.getId()).append(")");
 
 				} else if (value.equals(Status.COMPLETED.getName())) {
 
-					sqlCriteria.append(" AND se.study_event_definition_id = ").append(studyEventDefinitionId)
+					sqlCriteria
+							.append(" AND se.study_event_definition_id = ")
+							.append(getStudyEventDefinitionId())
 							.append(" AND se.study_event_id IN")
 							.append(" (SELECT study_event_id")
 							.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
@@ -179,7 +223,9 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
 				} else if (value.equals(Status.SOURCE_DATA_VERIFIED.getName())) {
 
-					sqlCriteria.append(" AND se.study_event_definition_id = ").append(studyEventDefinitionId)
+					sqlCriteria
+							.append(" AND se.study_event_definition_id = ")
+							.append(getStudyEventDefinitionId())
 							.append(" AND se.study_event_id IN")
 							.append(" (SELECT study_event_id")
 							.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
@@ -190,7 +236,9 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
 				} else if (value.equals(Status.SIGNED.getName())) {
 
-					sqlCriteria.append(" AND se.study_event_definition_id = ").append(studyEventDefinitionId)
+					sqlCriteria
+							.append(" AND se.study_event_definition_id = ")
+							.append(getStudyEventDefinitionId())
 							.append(" AND se.study_event_id IN")
 							.append(" (SELECT study_event_id")
 							.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
@@ -202,13 +250,21 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
 				} else if (value.equals(Status.LOCKED.getName())) {
 
-					sqlCriteria.append(" AND ((se.study_event_definition_id = ").append(studyEventDefinitionId)
-							.append(" AND ( se.subject_event_status_id = ").append(SubjectEventStatus.LOCKED.getId())
-							.append(" OR ((se.subject_event_status_id = ").append(SubjectEventStatus.SKIPPED.getId())
-							.append(" OR se.subject_event_status_id = ").append(SubjectEventStatus.STOPPED.getId())
+					sqlCriteria
+							.append(" AND ((se.study_event_definition_id = ")
+							.append(getStudyEventDefinitionId())
+							.append(" AND ( se.subject_event_status_id = ")
+							.append(SubjectEventStatus.LOCKED.getId())
+							.append(" OR ((se.subject_event_status_id = ")
+							.append(SubjectEventStatus.SKIPPED.getId())
+							.append(" OR se.subject_event_status_id = ")
+							.append(SubjectEventStatus.STOPPED.getId())
 							.append(" OR (SELECT cv.status_id FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
-							.append(" WHERE ec.study_event_id = se.study_event_id AND cv.crf_id = ").append(crfId)
-							.append(" ) NOT IN (").append(Status.AVAILABLE.getId()).append("))")
+							.append(" WHERE ec.study_event_id = se.study_event_id AND cv.crf_id = ")
+							.append(crfId)
+							.append(" ) NOT IN (")
+							.append(Status.AVAILABLE.getId())
+							.append("))")
 							.append(" AND se.study_event_id IN")
 							.append(" (SELECT study_event_id")
 							.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
@@ -221,7 +277,9 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
 				} else if (value.equals(Status.DELETED.getName())) {
 
-					sqlCriteria.append(" AND (se.study_event_definition_id = ").append(studyEventDefinitionId)
+					sqlCriteria
+							.append(" AND (se.study_event_definition_id = ")
+							.append(getStudyEventDefinitionId())
 							.append(" AND se.study_event_id IN")
 							.append(" (SELECT study_event_id")
 							.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
@@ -231,8 +289,6 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
 				}
 
-			} else if (property.equals("studySubject.createdDate")) {
-				// do nothing
 			} else {
 
 				sqlCriteria.append(" AND ").append(" UPPER(").append(columnMapping.get(property))
@@ -246,7 +302,7 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 	}
 
 	public boolean isEmpty() {
-		return filters.isEmpty() ? true : false;
+		return filters.isEmpty();
 	}
 
 	public String getFilterValueByProperty(String property) {

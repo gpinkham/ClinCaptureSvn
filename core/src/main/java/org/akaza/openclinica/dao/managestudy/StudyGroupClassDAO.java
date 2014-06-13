@@ -20,13 +20,6 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.GroupClassType;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -36,12 +29,19 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * @author jxu
  * 
  *         The data access object that users will access the database for study group class objects
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class StudyGroupClassDAO extends AuditableEntityDAO {
 	protected void setQueryNames() {
 		findAllByStudyName = "findAllByStudy";
@@ -104,15 +104,15 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		super.setEntityAuditInformation(eb, hm);
 		// STUDY_GROUP_ID NAME STUDY_ID OWNER_ID DATE_CREATED
 		// GROUP_TYPE_ID STATUS_ID DATE_UPDATED UPDATE_ID
-		eb.setId(((Integer) hm.get("study_group_class_id")).intValue());
+		eb.setId((Integer) hm.get("study_group_class_id"));
 		eb.setName((String) hm.get("name"));
-		eb.setStudyId(((Integer) hm.get("study_id")).intValue());
-		eb.setGroupClassTypeId(((Integer) hm.get("group_class_type_id")).intValue());
-		String classTypeName = GroupClassType.get(((Integer) hm.get("group_class_type_id")).intValue()).getName();
+		eb.setStudyId((Integer) hm.get("study_id"));
+		eb.setGroupClassTypeId((Integer) hm.get("group_class_type_id"));
+		String classTypeName = GroupClassType.get((Integer) hm.get("group_class_type_id")).getName();
 		eb.setGroupClassTypeName(classTypeName);
 		eb.setSubjectAssignment((String) hm.get("subject_assignment"));
 		eb.setDefault((Boolean) hm.get("is_default"));
-		eb.setDynamicOrdinal(((Integer) hm.get("dynamic_ordinal")).intValue());
+		eb.setDynamicOrdinal((Integer) hm.get("dynamic_ordinal"));
 		return eb;
 	}
 
@@ -120,9 +120,8 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 		ArrayList alist = this.select(digester.getQuery("findAll"));
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyGroupClassBean eb = (StudyGroupClassBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyGroupClassBean eb = (StudyGroupClassBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
@@ -137,14 +136,13 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		this.setTypeExpected(14, TypeNames.STRING);
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(study.getId()));
-		variables.put(new Integer(2), new Integer(study.getId()));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
 
 		ArrayList alist = this.select(digester.getQuery("findAllByStudy"), variables);
 
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			StudyGroupClassBean group = (StudyGroupClassBean) this.getEntityFromHashMap(hm);
 			group.setStudyName((String) hm.get("study_name"));
 			logger.info("study Name" + group.getStudyName());
@@ -154,12 +152,12 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 
 		return answer;
 	}
-	
+
 	@Override
 	public ArrayList findAllActiveByStudy(StudyBean study) {
 		return this.findAllActiveByStudy(study, false);
 	}
-	
+
 	public ArrayList findAllActiveByStudy(StudyBean study, boolean filterOnDynamic) {
 		return findAllActiveByStudyId(study.getId(), filterOnDynamic);
 	}
@@ -172,21 +170,19 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		this.setTypeExpected(14, TypeNames.STRING);
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyId));
-		variables.put(new Integer(2), new Integer(studyId));
+		variables.put(1, studyId);
+		variables.put(2, studyId);
 
 		ArrayList alist = this.select(digester.getQuery("findAllActiveByStudy"), variables);
 
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			StudyGroupClassBean group = (StudyGroupClassBean) this.getEntityFromHashMap(hm);
 			group.setStudyName((String) hm.get("study_name"));
-			
+
 			group.setGroupClassTypeName((String) hm.get("type_name"));
 			group.setSelected(false);
-			if (filterOnDynamic && group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId())
-			{
+			if (filterOnDynamic && group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()) {
 				logger.trace("found dynamic event, filtering " + group.getId() + " " + group.getName());
 			} else {
 				answer.add(group);
@@ -195,30 +191,29 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 
 		return answer;
 	}
-	
+
 	public ArrayList findAllActiveDynamicGroupsByStudyId(int studyId) {
 		ArrayList dynAnswer = new ArrayList();
 		ArrayList oldAnswer = this.findAllActiveByStudyId(studyId, false);
-		Iterator it = oldAnswer.iterator();
-		while (it.hasNext()) {
-			StudyGroupClassBean possibleBean = (StudyGroupClassBean) it.next();
+		for (Object anOldAnswer : oldAnswer) {
+			StudyGroupClassBean possibleBean = (StudyGroupClassBean) anOldAnswer;
 			if (possibleBean.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()) {
 				logger.trace("found dynamic event: " + possibleBean.getId() + " " + possibleBean.getName());
 				dynAnswer.add(possibleBean);
 			}
 		}
-		
+
 		return dynAnswer;
 	}
-	
+
 	public StudyGroupClassBean findByNameAndStudyId(String studyGroupName, int studyId) {
-		
+
 		StudyGroupClassBean eb = new StudyGroupClassBean();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), studyGroupName);
-		variables.put(new Integer(2), new Integer(studyId));
+		variables.put(1, studyGroupName);
+		variables.put(2, studyId);
 
 		ArrayList alist = this.select(digester.getQuery("findByNameAndStudyId"), variables);
 
@@ -228,13 +223,13 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		}
 		return eb;
 	}
-	
+
 	public EntityBean findByStudySubjectId(int id) {
 		StudyGroupClassBean eb = new StudyGroupClassBean();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(id));
+		variables.put(1, id);
 
 		String sql = digester.getQuery("findByStudySubjectId");
 		ArrayList alist = this.select(sql, variables);
@@ -247,11 +242,8 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
- 
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public EntityBean findByPK(int id) {
@@ -259,7 +251,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(id));
+		variables.put(1, id);
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList alist = this.select(sql, variables);
@@ -271,17 +263,17 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 
 		return eb;
 	}
-	
+
 	public EntityBean findDefaultByStudyId(int studyId) {
 		StudyGroupClassBean eb = new StudyGroupClassBean();
 		ArrayList allDefaultGroups = findAllDefault();
-		for (int i = 0; i < allDefaultGroups.size(); i++){
-			StudyGroupClassBean sgcb = (StudyGroupClassBean) allDefaultGroups.get(i);
+		for (Object allDefaultGroup : allDefaultGroups) {
+			StudyGroupClassBean sgcb = (StudyGroupClassBean) allDefaultGroup;
 			if (sgcb.getStudyId() == studyId) {
 				eb = sgcb;
 			}
 		}
-			
+
 		return eb;
 	}
 
@@ -291,32 +283,32 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 		ArrayList alist = this.select(digester.getQuery("findAllDefault"));
 
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			StudyGroupClassBean group = (StudyGroupClassBean) this.getEntityFromHashMap(hm);
 			answer.add(group);
 		}
 
 		return answer;
 	}
-	
-	public EntityBean findByStudyId(int studyId) {
-		StudyGroupClassBean eb = new StudyGroupClassBean();
-		this.setTypesExpected();
 
+	public StudyGroupClassBean findAvailableDynamicGroupByStudyEventDefinitionId(int studyEventDefinitionId) {
+
+		StudyGroupClassBean studyGroupClassBean = new StudyGroupClassBean();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyId));
 
-		String sql = digester.getQuery("findByStudyId");
-		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
+		this.setTypesExpected();
+		variables.put(1, studyEventDefinitionId);
+
+		String sql = digester.getQuery("findAvailableDynamicGroupByStudyEventDefinitionId");
+		List<HashMap<String, Object>> resultList = this.select(sql, variables);
+		Iterator<HashMap<String, Object>> it = resultList.iterator();
 
 		if (it.hasNext()) {
-			eb = (StudyGroupClassBean) this.getEntityFromHashMap((HashMap) it.next());
+			studyGroupClassBean = (StudyGroupClassBean) this.getEntityFromHashMap(it.next());
 		}
 
-		return eb;
+		return studyGroupClassBean;
 	}
 
 	/**
@@ -328,18 +320,18 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		int id = getNextPK();
 		// INSERT INTO study_group_class
 		// (STUDY_GROUP_CLASS_ID,NAME,STUDY_ID,OWNER_ID,DATE_CREATED, GROUP_CLASS_TYPE_ID,
-		// STATUS_ID,subject_assignment, is_default, dynamic_ordinal) 
+		// STATUS_ID,subject_assignment, is_default, dynamic_ordinal)
 		// VALUES (?,?,?,?,NOW(),?,?,?,?,?)
-		variables.put(new Integer(1), new Integer(id));
-		variables.put(new Integer(2), sb.getName());
-		variables.put(new Integer(3), new Integer(sb.getStudyId()));
-		variables.put(new Integer(4), new Integer(sb.getOwner().getId()));
-		variables.put(new Integer(5), new Integer(sb.getGroupClassTypeId()));
+		variables.put(1, id);
+		variables.put(2, sb.getName());
+		variables.put(3, sb.getStudyId());
+		variables.put(4, sb.getOwner().getId());
+		variables.put(5, sb.getGroupClassTypeId());
 		// Date_created is now()
-		variables.put(new Integer(6), new Integer(sb.getStatus().getId()));
-		variables.put(new Integer(7), sb.getSubjectAssignment());
-		variables.put(new Integer(8), sb.isDefault());
-		variables.put(new Integer(9), new Integer(sb.getDynamicOrdinal()));
+		variables.put(6, sb.getStatus().getId());
+		variables.put(7, sb.getSubjectAssignment());
+		variables.put(8, sb.isDefault());
+		variables.put(9, sb.getDynamicOrdinal());
 		this.execute(digester.getQuery("create"), variables);
 		if (isQuerySuccessful()) {
 			sb.setId(id);
@@ -359,17 +351,17 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		// GROUP_class_TYPE_ID=?,
 		// STATUS_ID=?, DATE_UPDATED=?,UPDATE_ID=?,
 		// subject_assignment=?, is_default=?, dynamic_ordinal=? WHERE STUDY_GROUP_class_ID=?
-		variables.put(new Integer(1), sb.getName());
-		variables.put(new Integer(2), new Integer(sb.getStudyId()));
-		variables.put(new Integer(3), new Integer(sb.getGroupClassTypeId()));
+		variables.put(1, sb.getName());
+		variables.put(2, sb.getStudyId());
+		variables.put(3, sb.getGroupClassTypeId());
 
-		variables.put(new Integer(4), new Integer(sb.getStatus().getId()));
-		variables.put(new Integer(5), new java.util.Date());
-		variables.put(new Integer(6), new Integer(sb.getUpdater().getId()));
-		variables.put(new Integer(7), sb.getSubjectAssignment());
-		variables.put(new Integer(8), sb.isDefault());
-		variables.put(new Integer(9), new Integer(sb.getDynamicOrdinal()));
-		variables.put(new Integer(10), new Integer(sb.getId()));
+		variables.put(4, sb.getStatus().getId());
+		variables.put(5, new java.util.Date());
+		variables.put(6, sb.getUpdater().getId());
+		variables.put(7, sb.getSubjectAssignment());
+		variables.put(8, sb.isDefault());
+		variables.put(9, sb.getDynamicOrdinal());
+		variables.put(10, sb.getId());
 		String sql = digester.getQuery("update");
 		this.execute(sql, variables);
 
@@ -386,7 +378,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 
 		if (al.size() > 0) {
 			HashMap h = (HashMap) al.get(0);
-			pk = ((Integer) h.get("key")).intValue();
+			pk = (Integer) h.get("key");
 		}
 
 		return pk;
@@ -395,43 +387,39 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 	public int getMaxDynamicOrdinalByStudyId(int studyId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
-		
+
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyId));
+		variables.put(1, studyId);
 
 		int MaxDynamicOrdinal = 0;
 		ArrayList al = select(digester.getQuery("getMaxDynamicOrdinalByStudyId"), variables);
-		
+
 		if (al.size() > 0) {
 			HashMap h = (HashMap) al.get(0);
-			MaxDynamicOrdinal = ((Integer) h.get("max_ord")).intValue();
+			MaxDynamicOrdinal = (Integer) h.get("max_ord");
 		}
 
 		return MaxDynamicOrdinal;
 	}
-	
+
 	public void updateDynamicOrdinal(int newDynamicOrdinal, int studyId, int studyGroupClassId) {
 		HashMap variables = new HashMap();
-		
-		variables.put(new Integer(1), newDynamicOrdinal);
-		variables.put(new Integer(2), studyId);
-		variables.put(new Integer(3), studyGroupClassId);
-		
+
+		variables.put(1, newDynamicOrdinal);
+		variables.put(2, studyId);
+		variables.put(3, studyGroupClassId);
+
 		String sql = digester.getQuery("updateDynamicOrdinal");
 		this.execute(sql, variables);
 	}
-	
+
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 }

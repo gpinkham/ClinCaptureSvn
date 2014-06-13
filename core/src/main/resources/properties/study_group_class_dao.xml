@@ -52,6 +52,15 @@
 		</sql>
 	</query>
 	<query>
+		<name>findAvailableDynamicGroupByStudyEventDefinitionId</name>
+		<sql>
+			SELECT study_group_class.*
+			FROM dynamic_event LEFT JOIN study_group_class
+				ON dynamic_event.study_group_class_id = study_group_class.study_group_class_id
+			WHERE dynamic_event.study_event_definition_id = ? AND study_group_class.status_id = 1
+		</sql>
+	</query>
+	<query>
 		<name>create</name>
 		<sql>
 			INSERT INTO study_group_class 

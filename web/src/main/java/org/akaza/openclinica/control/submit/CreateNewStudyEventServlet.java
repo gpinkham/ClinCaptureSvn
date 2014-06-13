@@ -21,7 +21,6 @@
 package org.akaza.openclinica.control.submit;
 
 import com.clinovo.util.ValidatorHelper;
-
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -57,7 +56,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -683,7 +681,7 @@ public class CreateNewStudyEventServlet extends Controller {
 											+ "_"
 											+ scheduledDefinitionIds[i]
 											+ (pageToShowPopup.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET
-											.getFileName()) ? "ev" : "") + "_";
+													.getFileName()) ? "ev" : "") + "_";
 									processEvents(eventDefs, eventDivId, studyEventScheduled.getId(),
 											(StudyEventDefinitionBean) seddao.findByPK(scheduledDefinitionIds[i]),
 											studySubject, sed, pageToShowPopup, selectedEventDefId);
@@ -756,11 +754,10 @@ public class CreateNewStudyEventServlet extends Controller {
 			Collections.reverse(studyEvents);
 
 			return factory
-					.eventDivBuilder(subject, rowCount, studyEvents, studyEvents.size(), sed, studySubject,
-							((StringUtil.isBlank(eventCRFId) || eventCRFId.equalsIgnoreCase("undefined")) ? null
-									: eventCRFId), ((StringUtil.isBlank(eventDefintionCRFId) || eventDefintionCRFId
-									.equalsIgnoreCase("undefined")) ? null : eventDefintionCRFId), true
-					);
+					.eventDivBuilder(rowCount, studyEvents, studyEvents.size(), sed, studySubject, ((StringUtil
+							.isBlank(eventCRFId) || eventCRFId.equalsIgnoreCase("undefined")) ? null : eventCRFId),
+							((StringUtil.isBlank(eventDefintionCRFId) || eventDefintionCRFId
+									.equalsIgnoreCase("undefined")) ? null : eventDefintionCRFId), true);
 
 		} else {
 
@@ -905,7 +902,7 @@ public class CreateNewStudyEventServlet extends Controller {
 				ArrayList<StudyEventDefinitionBean> orderedEventDefinitionsFromDynGroup = seddao
 						.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup.getId());
 				for (StudyEventDefinitionBean eventDefinition : orderedEventDefinitionsFromDynGroup) {
-					if (dynGroup.isDefault() 
+					if (dynGroup.isDefault()
 							|| (ssb.getDynamicGroupClassId() != 0 && dynGroup.getId() == ssb.getDynamicGroupClassId())) {
 						// eventDefs from defDynGroup and subject's dynGroup
 						if (StudyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())) {

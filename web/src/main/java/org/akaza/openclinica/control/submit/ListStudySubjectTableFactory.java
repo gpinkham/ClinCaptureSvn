@@ -450,7 +450,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 
 	protected FindSubjectsFilter getSubjectFilter(Limit limit) {
-		FindSubjectsFilter findSubjectsFilter = new FindSubjectsFilter();
+		FindSubjectsFilter findSubjectsFilter = new FindSubjectsFilter(getStudyGroupClassDAO());
 		FilterSet filterSet = limit.getFilterSet();
 		Collection<Filter> filters = filterSet.getFilters();
 		for (Filter filter : filters) {
@@ -955,7 +955,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 							+ studyBean.getId()
 							+ "&studySubjectId=&theStudySubjectId=0&redirection=viewSubjectAggregate&maxRows=15&showMoreLink=true&s_sdv_tr_=true&s_sdv_p_=1&s_sdv_mr_=15&s_sdv_f_studySubjectId="
 							+ studySubject.getLabel());
-							actionLink.append("onClick=\"javascript:setAccessedObjected(this);\"").close();
+			actionLink.append("onClick=\"javascript:setAccessedObjected(this);\"").close();
 			actionLink.img().src("images/icon_DoubleCheck_Action.gif").border("0")
 					.alt(resword.getString("perform_sdv")).title(resword.getString("perform_sdv"))
 					.append("hspace=\"4\"").end().aEnd();

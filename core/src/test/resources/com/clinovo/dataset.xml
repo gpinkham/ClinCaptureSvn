@@ -897,31 +897,37 @@
     <study_group_class study_group_class_id="2" name="study group 2" study_id="1" owner_id="1" date_created="2013-11-29"
                        group_class_type_id="2" status_id="1" subject_assignment="Arm" is_default="false"
                        dynamic_ordinal="3"/>
+	<study_group_class study_group_class_id="3" name="study group 3" study_id="1" owner_id="1" date_created="2013-11-29"
+					   group_class_type_id="4" status_id="1" is_default="false"
+					   dynamic_ordinal="1"/>
+	<study_group_class study_group_class_id="4" name="study group 4" study_id="1" owner_id="1" date_created="2013-11-29"
+					   group_class_type_id="4" status_id="1" is_default="false"
+					   dynamic_ordinal="2"/>
 
-    <dynamic_event dynamic_event_id="1" study_group_class_id="2" study_event_definition_id="1" study_id="1" ordinal="1"
+    <dynamic_event dynamic_event_id="1" study_group_class_id="3" study_event_definition_id="1" study_id="1" ordinal="1"
                    update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 1"
                    description="test dynamic event 1"/>
-    <dynamic_event dynamic_event_id="2" study_group_class_id="2" study_event_definition_id="2" study_id="1" ordinal="2"
+    <dynamic_event dynamic_event_id="2" study_group_class_id="3" study_event_definition_id="2" study_id="1" ordinal="2"
                    update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 2"
                    description="test dynamic event 2"/>
-    <dynamic_event dynamic_event_id="3" study_group_class_id="2" study_event_definition_id="3" study_id="1" ordinal="3"
+    <dynamic_event dynamic_event_id="3" study_group_class_id="3" study_event_definition_id="3" study_id="1" ordinal="3"
                    update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 3"
                    description="test dynamic event 3"/>
-    <dynamic_event dynamic_event_id="4" study_group_class_id="2" study_event_definition_id="5" study_id="1" ordinal="3"
+    <dynamic_event dynamic_event_id="4" study_group_class_id="3" study_event_definition_id="4" study_id="1" ordinal="4"
+                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 4"
+                   description="test dynamic event 4"/>
+    <dynamic_event dynamic_event_id="5" study_group_class_id="3" study_event_definition_id="5" study_id="1" ordinal="5"
                    update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 5"
                    description="test dynamic event 5"/>
-    <dynamic_event dynamic_event_id="6" study_group_class_id="2" study_event_definition_id="6" study_id="1" ordinal="4"
+    <dynamic_event dynamic_event_id="6" study_group_class_id="4" study_event_definition_id="6" study_id="1" ordinal="1"
                    update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 6"
                    description="test dynamic event 6"/>
-    <dynamic_event dynamic_event_id="7" study_group_class_id="1" study_event_definition_id="1" study_id="1" ordinal="1"
-                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 1"
-                   description="test dynamic event 1"/>
-    <dynamic_event dynamic_event_id="8" study_group_class_id="1" study_event_definition_id="3" study_id="1" ordinal="2"
-                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 3"
-                   description="test dynamic event 3"/>
-    <dynamic_event dynamic_event_id="9" study_group_class_id="1" study_event_definition_id="7" study_id="1" ordinal="3"
+    <dynamic_event dynamic_event_id="7" study_group_class_id="4" study_event_definition_id="7" study_id="1" ordinal="2"
                    update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 7"
                    description="test dynamic event 7"/>
+    <dynamic_event dynamic_event_id="8" study_group_class_id="4" study_event_definition_id="8" study_id="1" ordinal="3"
+                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 8"
+                   description="test dynamic event 8"/>
 
     <dictionary id="1" name="Test Dictionary"
                 description="This is a test dictionary" type="1" date_created="2013-08-19"

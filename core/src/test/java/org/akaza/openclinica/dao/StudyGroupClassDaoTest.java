@@ -122,6 +122,30 @@ public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 		assertEquals(7, ((StudyGroupClassBean) studyGroupClassDAO.findByPK(1)).getDynamicOrdinal());
 	}
 
+	@Test
+	public void testThatFindAvailableDynamicGroupByStudyEventDefinitionIdReturnsInactiveStudyGroupClassBean() {
+
+		int studyEventDefinitionId = 9;
+		int inactiveIdCode = 0;
+		StudyGroupClassBean studyGroupClassBean;
+
+		studyGroupClassBean = studyGroupClassDAO
+				.findAvailableDynamicGroupByStudyEventDefinitionId(studyEventDefinitionId);
+		assertEquals(inactiveIdCode, studyGroupClassBean.getId());
+	}
+
+	@Test
+	public void testThatFindAvailableDynamicGroupByStudyEventDefinitionIdReturnsValidStudyGroupClassBean() {
+
+		int studyEventDefinitionId = 2;
+		int expectedStudyGroupClassBeanId = 3;
+		StudyGroupClassBean studyGroupClassBean;
+
+		studyGroupClassBean = studyGroupClassDAO
+				.findAvailableDynamicGroupByStudyEventDefinitionId(studyEventDefinitionId);
+		assertEquals(expectedStudyGroupClassBeanId, studyGroupClassBean.getId());
+	}
+
 	private EntityBean createStudyGroupClass() {
 
 		UserAccountBean userAccountBean = new UserAccountBean();

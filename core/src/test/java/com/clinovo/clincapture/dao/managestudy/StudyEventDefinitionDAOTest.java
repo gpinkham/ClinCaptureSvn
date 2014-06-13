@@ -13,15 +13,15 @@
 
 package com.clinovo.clincapture.dao.managestudy;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("unchecked")
 public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
@@ -31,14 +31,14 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		int studyId = 1;
 		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllActiveNotClassGroupedByStudyId(studyId);
-		assertEquals(3, result.size());
+		assertEquals(1, result.size());
 	}
 
-	@Test	
+	@Test
 	public void testFindAllActiveBySubjectAndStudyId() throws OpenClinicaException {
 		int studyId = 1;
 		StudySubjectBean ssb = new StudySubjectBean();
-		ssb.setDynamicGroupClassId(1);
+		ssb.setDynamicGroupClassId(3);
 		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllActiveBySubjectAndStudyId(ssb,
 				studyId);
 		assertEquals(6, result.size());
@@ -48,7 +48,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 	public void testFindAllActiveBySubjectFromActiveDynGroupAndStudyId_1() throws OpenClinicaException {
 		int studyId = 1;
 		StudySubjectBean ssb = new StudySubjectBean();
-		ssb.setDynamicGroupClassId(1);
+		ssb.setDynamicGroupClassId(3);
 		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb, studyId);
 		assertEquals(6, result.size());
@@ -58,10 +58,10 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 	public void testFindAllActiveBySubjectFromActiveDynGroupAndStudyId_2() throws OpenClinicaException {
 		int studyId = 1;
 		StudySubjectBean ssb = new StudySubjectBean();
-		ssb.setDynamicGroupClassId(2);
+		ssb.setDynamicGroupClassId(4);
 		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb, studyId);
-		assertEquals(8, result.size());
+		assertEquals(4, result.size());
 	}
 
 	@Test
@@ -70,14 +70,14 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		List<String> result = studyEventDefinitionDAO.getEventNamesFromStudy(studyId);
 		assertNotNull(result);
 	}
-	
+
 	@Test
 	public void testGetEventNamesFromStudyCorrectSize() throws OpenClinicaException {
 		int studyId = 1;
 		List<String> result = studyEventDefinitionDAO.getEventNamesFromStudy(studyId);
 		assertEquals(9, result.size());
 	}
-	
+
 	@Test
 	public void testFindAllAvailableByStudy_excludingEventDefinitionsRemoved() throws OpenClinicaException {
 		final int studyId = 1;
@@ -87,22 +87,24 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllAvailableByStudy(sb);
 		assertEquals(expactedSize, result.size());
 	}
-		
+
 	@Test
-	public void testFindAllAvailableAndOrderedByStudyGroupClassId_excludingEventDefinitionsRemoved_Test1() throws OpenClinicaException {
-		final int studyGroupClassId = 1;
-		final int expactedSize = 2;
+	public void testFindAllAvailableAndOrderedByStudyGroupClassId_excludingEventDefinitionsRemoved_Test1()
+			throws OpenClinicaException {
+		final int studyGroupClassId = 3;
+		final int expactedSize = 4;
 		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllAvailableAndOrderedByStudyGroupClassId(studyGroupClassId);
 		assertEquals(expactedSize, result.size());
-	}	
-		
+	}
+
 	@Test
-	public void testFindAllAvailableAndOrderedByStudyGroupClassId_excludingEventDefinitionsRemoved_Test2() throws OpenClinicaException {
-		final int studyGroupClassId = 2;
-		final int expactedSize = 3;
+	public void testFindAllAvailableAndOrderedByStudyGroupClassId_excludingEventDefinitionsRemoved_Test2()
+			throws OpenClinicaException {
+		final int studyGroupClassId = 4;
+		final int expactedSize = 1;
 		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllAvailableAndOrderedByStudyGroupClassId(studyGroupClassId);
 		assertEquals(expactedSize, result.size());
-	}	
+	}
 }
