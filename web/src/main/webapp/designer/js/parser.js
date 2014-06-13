@@ -550,8 +550,7 @@ Parser.prototype.createRule = function() {
 		return true;
 	};
 	var study = this.extractStudy(this.getStudy());
-	var expressionPredicates = $(".dotted-border:not(:empty), .target:not(:empty)");
-	var oids = expressionPredicates.toArray().map(function(x) {
+	var oids = $(".dotted-border:not(:empty), .target:not(:empty)").toArray().map(function(x) {
 		if ($(x).is(".group") || $(x).is(".target")) {
 			var tar = parser.getItem($(x).text(), parser.createAttrMap($(x).get(0).attributes));
 			if (tar && typeof(tar) !== "function") {
@@ -1803,18 +1802,20 @@ Parser.prototype.setTargets = function(targets) {
 Parser.prototype.extractTarget = function(params) {
 	var target = Object.create(null);
 	var tt = this.getItem(params.name, this.createTargetAttrMap(params.target));
-	target.oid = tt.oid;
-	target.name = tt.name;
-	target.crf = params.target.crf;
-	target.group = params.target.group;
-	target.evt = params.target.eventify ? params.target.evt : tt.eventOid;
-	target.version = params.target.versionify ? params.target.version : tt.crfVersionOid;
-	if (params.target.versionify) {
-		target.crf = this.getVersionCRF({
-			ver: target.version,
-			study: this.extractStudy(this.getStudy())
-		}).oid;
-	}	
+	if (tt) {
+		target.oid = tt.oid;
+		target.name = tt.name;
+		target.crf = params.target.crf;
+		target.group = params.target.group;
+		target.evt = params.target.eventify ? params.target.evt : tt.eventOid;
+		target.version = params.target.versionify ? params.target.version : tt.crfVersionOid;
+		if (params.target.versionify) {
+			target.crf = this.getVersionCRF({
+				ver: target.version,
+				study: this.extractStudy(this.getStudy())
+			}).oid;
+		}
+	}
 	return target;
 };
 
@@ -2129,3 +2130,11 @@ Parser.prototype.isDateValue = function(val, expressionFormat) {
     var date = Date.parse(val);
     return date != null && date.toString(expressionFormat ? "yyyy-MM-dd" : getCookie('ccDateFormat')) == val;
 };
+
+Parser.prototype.resetTarget = function(params) {
+	for (var x = 0; x < this.rule.targets.length; x++) {
+		if (this.rule.targets[x].oid == params.oid) {
+			this.rule.targets[x].evt = params.evt
+		}
+	}
+}

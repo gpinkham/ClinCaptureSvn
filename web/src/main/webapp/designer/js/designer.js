@@ -1207,6 +1207,7 @@ function createPrompt(params) {
 				className: "btn-success",
 				callback: function() {
 					params.reset = false;
+					params.changeStudy = true;
 					resetStudy(params);
 					parser.setCopy(true);
 					// Add targets, insert items and show/hide items
@@ -1251,26 +1252,31 @@ function resetStudy(params) {
 	loadStudyEvents(params.study);
 	// Cascade load
 	var topEvent = params.study.events[Object.keys(params.study.events)[0]];
-	loadEventCRFs({
-		study: params.study,
-		studyEvent: topEvent
-	});
-
 	if (topEvent && topEvent.crfs.length > 0) {
 		// bold event
 		parser.recursiveSelect({
 			type: "events",
 			candidate: topEvent.oid
 		});
-		loadCRFVersions({
-			evt: topEvent,
+		loadEventCRFs({
 			study: params.study,
-			crf: topEvent.crfs[Object.keys(topEvent.crfs)[0]]
+			studyEvent: topEvent
 		});
 		// bold crf
 		parser.recursiveSelect({
 			type: "crfs",
 			candidate: topEvent.crfs[Object.keys(topEvent.crfs)[0]].oid
+		});
+		loadCRFVersions({
+			evt: topEvent,
+			study: params.study,
+			crf: topEvent.crfs[Object.keys(topEvent.crfs)[0]]
+		});
+		// bold version
+		parser.recursiveSelect({
+			click: true,
+			type: "versions",
+			candidate: topEvent.crfs[Object.keys(topEvent.crfs)[0]].versions[0].oid
 		});
 		loadCRFVersionItems({
 			evt: topEvent.oid,
@@ -1278,19 +1284,29 @@ function resetStudy(params) {
 			crf: topEvent.crfs[Object.keys(topEvent.crfs)[0]].oid,
 			version: topEvent.crfs[Object.keys(topEvent.crfs)[0]].versions[0]
 		});
-		// bold crf version
-		parser.recursiveSelect({
-			type: "versions",
-			candidate: topEvent.crfs[Object.keys(topEvent.crfs)[0]].versions[0].oid
-		});
 	}
 	// boot-strap crumb
 	createBreadCrumb({
 		study: params.study.name
 	});
-
 	if (params.reset) {
 		resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
+	}
+	if (params.changeStudy) {
+		// Reset the parameters
+		$(".dotted-border:not(:empty), .target:not(:empty)").each(function() {
+			var item = parser.findStudyItem({
+				study: params.study,
+				name: $(this).val()
+			});
+			// These change with the study
+			$(this).attr('event-oid', item.eventOid);
+			$(this).attr('study-oid', params.study.oid);
+			parser.resetTarget({
+				evt: item.eventOid,
+				oid: $(this).attr('item-oid')
+			});
+		});
 	}
 }
 
