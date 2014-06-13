@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -497,9 +498,18 @@ public class WidgetsLayoutController {
 		DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(datasource);
 
 		List<CRFBean> crfs = (List<CRFBean>) crfdao.findAllActiveByDefinitionsForCurrentStudy(sb.getId());
+
+
+		Collections.sort(crfs, new Comparator<CRFBean>() {
+			public int compare(final CRFBean object1, final CRFBean object2) {
+				return object1.getName().compareTo(object2.getName());
+			}
+		});
+
+
 		LinkedHashMap<String, List<Integer>> dataColumns = new LinkedHashMap<String, List<Integer>>();
-		ResolutionStatus[] statuses = { ResolutionStatus.OPEN, ResolutionStatus.UPDATED,
-				ResolutionStatus.NOT_APPLICABLE, ResolutionStatus.CLOSED };
+		ResolutionStatus[] statuses = { ResolutionStatus.CLOSED, ResolutionStatus.UPDATED, ResolutionStatus.OPEN,
+				ResolutionStatus.NOT_APPLICABLE };
 
 		int start = Integer.parseInt(request.getParameter("start"));
 		int maxDispay = 8;

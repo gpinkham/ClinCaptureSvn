@@ -856,7 +856,7 @@ function initNdsPerCrf(action){
 
 			var options = new getVerticalBarOptions();
 			options.bar.groupWidth = "45%";
-			options.colors = ['#FF0000','#E5A200','#9AB6D4','#32A656'];
+			options.colors = ['#32A656','#E5A200','#FF0000','#9AB6D4'];
 			options.height = 240;
 			var ndsPerCrfChart = new google.visualization.ColumnChart(document.getElementById('nds_per_crf_chart'));
 			ndsPerCrfChart.draw(data, options);
@@ -866,7 +866,7 @@ function initNdsPerCrf(action){
 
 				function selectHandler() {
 
-					var statuses = ["New", "Updated", "Not+Applicable","Closed"];
+					var statuses = [ "Closed", "Updated", "New", "Not+Applicable"];
 					var selectedItem = ndsPerCrfChart.getSelection()[0];
 
 					var crfName = $("#nds_per_crf_form input[type=text]:nth-child(" + (selectedItem.row+1) + ")").val().replace(/\s/g, '+');
@@ -908,7 +908,7 @@ function getNdsPerCrfWidgetData() {
 	var data = new google.visualization.DataTable();
 
 	data.addColumn('string', 'CRF Name');
-	data.addColumn('number', 'New');
+	data.addColumn('number', 'Closed');
 	data.addColumn({
 		type : 'number',
 		role : 'annotation'
@@ -918,13 +918,13 @@ function getNdsPerCrfWidgetData() {
 		type : 'number',
 		role : 'annotation'
 	});
-	data.addColumn('number', 'Notes');
+	data.addColumn('number', 'New');
 	data.addColumn({
 		type : 'number',
 		role : 'annotation'
 	});
 
-	data.addColumn('number', 'Closed');
+	data.addColumn('number', 'Notes');
 	data.addColumn({
 		type : 'number',
 		role : 'annotation'
