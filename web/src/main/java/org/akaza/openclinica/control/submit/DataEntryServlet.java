@@ -1417,8 +1417,6 @@ public abstract class DataEntryServlet extends Controller {
 							DisplayItemGroupBean displayGroup = dgbs.get(j);
 							List<DisplayItemBean> items = displayGroup.getItems();
 
-							int nextOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, displayGroup.getItemGroupBean()) + 1;
-
 							for (DisplayItemBean displayItem : items) {
 								String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
 								displayItem.setEditFlag(displayGroup.getEditFlag());
@@ -1427,9 +1425,9 @@ public abstract class DataEntryServlet extends Controller {
 										&& !newUploadedFiles.containsKey(fileName)) {
 									displayItem.getData().setValue("");
 								}
-								temp = writeToDB(displayItem, iddao, nextOrdinal, request);
+								temp = writeToDB(displayItem, iddao, displayGroup.getOrdinal() + 1, request);
 								logger.debug("just executed writeToDB - 1");
-								logger.debug("next ordinal: " + nextOrdinal);
+								logger.debug("ordinal: " + displayGroup.getOrdinal() + 1);
 								if (temp && newUploadedFiles.containsKey(fileName)) {
 									newUploadedFiles.remove(fileName);
 								}
