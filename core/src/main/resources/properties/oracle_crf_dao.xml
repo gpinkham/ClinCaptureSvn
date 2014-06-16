@@ -1,6 +1,14 @@
 <?xml version="1.0"?>
 <queries>
 	<query>
+		<name>getCurrentPK</name>
+		<sql> select crf_id_seq.currval as key from dual</sql>
+	</query>
+	<query>
+		<name>getNextPK</name>
+		<sql> select crf_id_seq.nextval as key from dual</sql>
+	</query>
+	<query>
 		<name>findByPK</name>
 		<sql>SELECT * FROM CRF WHERE
 		CRF_ID = ?</sql>
@@ -59,10 +67,10 @@
 	</query>
 	<query>
 		<name>create</name>
-		<sql>INSERT INTO CRF (STATUS_ID,NAME,
+		<sql>INSERT INTO CRF (STATUS_ID, NAME,
 		DESCRIPTION, OWNER_ID,
-		DATE_CREATED)
-		VALUES (?,?,?,?,sysdate)</sql>
+		DATE_CREATED, OC_OID, AUTO_LAYOUT)
+		VALUES (?,?,?,?,sysdate,?,?)</sql>
 	</query>
 	<query>
 		<name>update</name>

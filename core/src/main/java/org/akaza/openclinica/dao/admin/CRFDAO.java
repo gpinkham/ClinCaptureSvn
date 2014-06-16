@@ -25,6 +25,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
@@ -45,6 +46,8 @@ import java.util.List;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class CRFDAO extends AuditableEntityDAO {
 
+	private static String dbType = CoreResources.getDBType();
+
 	@Override
 	protected void setDigesterName() {
 		digesterName = SQLFactory.getInstance().DAO_CRF;
@@ -52,11 +55,22 @@ public class CRFDAO extends AuditableEntityDAO {
 
 	public CRFDAO(DataSource ds) {
 		super(ds);
+		setQueryNames();
 	}
 
 	public CRFDAO(DataSource ds, DAODigester digester) {
 		super(ds);
+		setQueryNames();
 		this.digester = digester;
+	}
+
+	private String getDBType() {
+		return dbType;
+	}
+
+	private void setQueryNames() {
+		getCurrentPKName = "getCurrentPK";
+		getNextPKName = "getNextPK";
 	}
 
 	@Override
@@ -64,7 +78,6 @@ public class CRFDAO extends AuditableEntityDAO {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.INT);
-		// this.setTypeExpected(3,TypeNames.STRING);//label
 		this.setTypeExpected(3, TypeNames.STRING);// name
 		this.setTypeExpected(4, TypeNames.STRING);// description
 		this.setTypeExpected(5, TypeNames.INT);// owner id
@@ -73,6 +86,13 @@ public class CRFDAO extends AuditableEntityDAO {
 		this.setTypeExpected(8, TypeNames.INT);// update id
 		this.setTypeExpected(9, TypeNames.STRING);// oc_oid
 		this.setTypeExpected(10, TypeNames.INT);// study_id
+
+		// set type for auto_layout property
+		if (getDBType().equals("oracle")) {
+			this.setTypeExpected(11, TypeNames.INT);
+		} else {
+			this.setTypeExpected(11, TypeNames.BOOL);
+		}
 	}
 
 	public EntityBean update(EntityBean eb) {
@@ -95,9 +115,17 @@ public class CRFDAO extends AuditableEntityDAO {
 		variables.put(3, cb.getDescription());
 		variables.put(4, cb.getOwner().getId());
 		variables.put(5, getValidOid(cb, cb.getName()));
-		this.execute(digester.getQuery("create"), variables);
+
+		// set auto_layout property
+		if (getDBType().equals("oracle")) {
+			variables.put(6, 1);
+		} else {
+			variables.put(6, Boolean.TRUE);
+		}
+
+		this.executeWithPK(digester.getQuery("create"), variables, null);
 		if (isQuerySuccessful()) {
-			cb.setActive(true);
+			cb.setId(getLatestPK());
 		}
 		return cb;
 	}
@@ -110,6 +138,14 @@ public class CRFDAO extends AuditableEntityDAO {
 		eb.setDescription((String) hm.get("description"));
 		eb.setOid((String) hm.get("oc_oid"));
 		eb.setStudyId((Integer) hm.get("source_study_id"));
+
+		// get auto_layout property
+		if (getDBType().equals("oracle")) {
+			eb.setAutoLayout(((Integer) hm.get("auto_layout")) == 1);
+		} else {
+			eb.setAutoLayout((Boolean) hm.get("auto_layout"));
+		}
+
 		return eb;
 	}
 

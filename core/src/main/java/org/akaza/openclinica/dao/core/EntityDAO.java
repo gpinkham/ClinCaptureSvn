@@ -163,6 +163,16 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		setTypes.put(num, type);
 	}
 
+	/**
+	 * getTypeExpected, returns the type of object to retrieve from the database
+	 *
+	 * @param num the order the column should be extracted from the database
+	 * @return a proper type id from TypeNames
+	 */
+	public Integer getTypeExpected(int num) {
+		return (Integer) setTypes.get(num);
+	}
+
 	public void unsetTypeExpected() {
 		setTypes = new HashMap();
 	}
@@ -454,10 +464,14 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				logger.debug("Executing static query, EntityDAO: " + query);
 			}
 		} catch (SQLException sqle) {
+
 			signalFailure(sqle);
 			if (logger.isWarnEnabled()) {
 				logger.warn("Exeception while executing static statement, GenericDAO.execute: " + query + ":message: "
 						+ sqle.getMessage());
+			}
+
+			if (logger.isErrorEnabled()) {
 				logger.error(sqle.getMessage(), sqle);
 			}
 		} finally {
@@ -505,10 +519,14 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				logger.debug("Executing dynamic query, EntityDAO: " + query);
 			}
 		} catch (SQLException sqle) {
+
 			signalFailure(sqle);
 			if (logger.isWarnEnabled()) {
 				logger.warn("Exeception while executing dynamic statement, EntityDAO.execute: " + query + ": "
 						+ sqle.getMessage());
+			}
+
+			if (logger.isErrorEnabled()) {
 				logger.error(sqle.getMessage(), sqle);
 			}
 		} finally {
@@ -555,10 +573,14 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				logger.debug("Executing dynamic query, EntityDAO: " + query);
 			}
 		} catch (SQLException sqle) {
+
 			signalFailure(sqle);
 			if (logger.isWarnEnabled()) {
 				logger.warn("Exeception while executing dynamic statement, EntityDAO.execute: " + query + ": "
 						+ sqle.getMessage());
+			}
+
+			if (logger.isErrorEnabled()) {
 				logger.error(sqle.getMessage(), sqle);
 			}
 		} finally {
@@ -631,11 +653,16 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			}
 
 		} catch (SQLException sqle) {
+
 			signalFailure(sqle);
 			if (logger.isWarnEnabled()) {
 				logger.warn("Exception while executing dynamic statement, EntityDAO.execute: " + query + ": "
 						+ sqle.getMessage());
 				sqle.printStackTrace();
+			}
+
+			if (logger.isErrorEnabled()) {
+				logger.error(sqle.getMessage(), sqle);
 			}
 		} finally {
 			if (!isTrasactional) {
@@ -673,7 +700,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 				for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 					String column = rsmd.getColumnName(i).toLowerCase();
-					Integer type = (Integer) setTypes.get(Integer.valueOf(i));
+					Integer type = getTypeExpected(i);
 					// @pgawade 18-May-2011 Fix for issue #9703 - temporarily
 					// commented out the following log statement
 					// as in case of viewing SDV page, type value for one of

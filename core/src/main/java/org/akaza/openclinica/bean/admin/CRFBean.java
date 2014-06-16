@@ -41,6 +41,12 @@ public class CRFBean extends AuditableEntityBean {
 	private OidGenerator oidGenerator;
 	private int studyId;
 
+	/**
+	 * Determines if a given CRF should use auto-layout or not.
+	 * True indicates that auto layout should be applied, False otherwise
+	 */
+	private boolean autoLayout;
+
 	public CRFBean() {
 		this.oidGenerator = new CrfOidGenerator();
 		versions = new ArrayList();
@@ -143,5 +149,19 @@ public class CRFBean extends AuditableEntityBean {
 
 	public void setDeletable(boolean deletable) {
 		this.deletable = deletable;
+	}
+
+	/**
+	 * @return Returns the autoLayout.
+	 */
+	public boolean isAutoLayout() {
+		return autoLayout;
+	}
+
+	/**
+	 * @param autoLayout The autoLayout to set.
+	 */
+	public void setAutoLayout(boolean autoLayout) {
+		this.autoLayout = autoLayout;
 	}
 }

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -15,11 +15,73 @@ package org.akaza.openclinica.dao.admin;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.junit.Before;
 import org.junit.Test;
 
+import org.mockito.internal.util.reflection.Whitebox;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class CRFDaoTest extends DefaultAppContextTest {
+
+	private String dbTypeOracle;
+	private String dbTypePostgres;
+	private CRFBean testCRFBean;
+	private Map<Integer, Integer> expectedSetTypes;
+	private Map<String, Object> crfBeanProperties;
+
+	@Before
+	public void setUp() {
+
+		dbTypeOracle = "oracle";
+		dbTypePostgres = "postgres";
+
+		testCRFBean = new CRFBean();
+		testCRFBean.setId(12);
+		testCRFBean.setStatusId(Status.AVAILABLE.getId());
+		testCRFBean.setStatus(Status.AVAILABLE);
+		testCRFBean.setStudyId(1);
+		testCRFBean.setName("TestForm");
+		testCRFBean.setDescription("TestForm description");
+		testCRFBean.setOid("F_10_TESTFORM");
+		testCRFBean.setAutoLayout(true);
+		UserAccountBean owner = new UserAccountBean();
+		owner.setId(1);
+		testCRFBean.setOwner(owner);
+		UserAccountBean updater = new UserAccountBean();
+		updater.setId(1);
+		testCRFBean.setUpdater(updater);
+
+		expectedSetTypes = new HashMap<Integer, Integer>();
+		expectedSetTypes.put(1, TypeNames.INT);
+		expectedSetTypes.put(2, TypeNames.INT);
+		expectedSetTypes.put(3, TypeNames.STRING);
+		expectedSetTypes.put(4, TypeNames.STRING);
+		expectedSetTypes.put(5, TypeNames.INT);
+		expectedSetTypes.put(6, TypeNames.DATE);
+		expectedSetTypes.put(7, TypeNames.DATE);
+		expectedSetTypes.put(8, TypeNames.INT);
+		expectedSetTypes.put(9, TypeNames.STRING);
+		expectedSetTypes.put(10, TypeNames.INT);
+		expectedSetTypes.put(11, TypeNames.BOOL);
+
+		crfBeanProperties = new HashMap<String, Object>();
+		crfBeanProperties.put("crf_id", testCRFBean.getId());
+		crfBeanProperties.put("name", testCRFBean.getName());
+		crfBeanProperties.put("description", testCRFBean.getDescription());
+		crfBeanProperties.put("oc_oid", testCRFBean.getOid());
+		crfBeanProperties.put("source_study_id", testCRFBean.getStudyId());
+		crfBeanProperties.put("status_id", testCRFBean.getStatus().getId());
+		crfBeanProperties.put("owner_id", testCRFBean.getOwner().getId());
+		crfBeanProperties.put("update_id", testCRFBean.getUpdater().getId());
+		crfBeanProperties.put("auto_layout", testCRFBean.isAutoLayout());
+
+	}
 
 	@Test
 	public void testThatFindByOidReturnsCRFWithCorrectOID() throws OpenClinicaException {
@@ -91,11 +153,205 @@ public class CRFDaoTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatRemoveCrfByIdRemovesCrf() throws OpenClinicaException {
-		crfdao.deleteCrfById(4);
-		CRFBean crf = (CRFBean) crfdao.findByPK(4);
+	public void testThatRemoveCrfByIdRemovesCrfSuccessfully() throws Exception {
 
-		assertEquals(0, crf.getId());
-		assertNull(crf.getOid());
+		// deleting records from tables item_data and event_crf,
+		// which are bound to crf with id = 3
+		itemDataDAO.delete(63);
+		eventCRFDAO.delete(14);
+
+		// now we are able to delete crf
+		crfdao.deleteCrfById(3);
+		CRFBean crfBean = (CRFBean) crfdao.findByPK(3);
+		assertFalse(crfBean.isActive());
+	}
+
+	@Test
+	public void testThatSetTypesExpectedSetsCorrectDataTypeForCRFId() {
+
+		int typeId = 1;
+		crfdao.setTypesExpected();
+		assertTrue(expectedSetTypes.get(typeId) == crfdao.getTypeExpected(typeId));
+	}
+
+	@Test
+	public void testThatSetTypesExpectedSetsCorrectDataTypeForCRFStatusId() {
+
+		int typeId = 2;
+		crfdao.setTypesExpected();
+		assertTrue(expectedSetTypes.get(typeId) == crfdao.getTypeExpected(typeId));
+	}
+
+	@Test
+	public void testThatSetTypesExpectedSetsCorrectDataTypeForCRFName() {
+
+		int typeId = 3;
+		crfdao.setTypesExpected();
+		assertTrue(expectedSetTypes.get(typeId) == crfdao.getTypeExpected(typeId));
+	}
+
+	@Test
+	public void testThatSetTypesExpectedSetsCorrectDataTypeForCRFDescription() {
+
+		int typeId = 4;
+		crfdao.setTypesExpected();
+		assertTrue(expectedSetTypes.get(typeId) == crfdao.getTypeExpected(typeId));
+	}
+
+	@Test
+	public void testThatSetTypesExpectedSetsCorrectDataTypeForCRFOwnerId() {
+
+		int typeId = 5;
+		crfdao.setTypesExpected();
+		assertTrue(expectedSetTypes.get(typeId) == crfdao.getTypeExpected(typeId));
+	}
+
+	@Test
+	public void testThatSetTypesExpectedSetsCorrectDataTypeForCRFDateCreated() {
+
+		int typeId = 6;
+		crfdao.setTypesExpected();
+		assertTrue(expectedSetTypes.get(typeId) == crfdao.getTypeExpected(typeId));
+	}
+
+	@Test
+	public void testThatSetTypesExpectedSetsCorrectDataTypeForCRFDateUpdated() {
+
+		int typeId = 7;
+		crfdao.setTypesExpected();
+		assertTrue(expectedSetTypes.get(typeId) == crfdao.getTypeExpected(typeId));
+	}
+
+	@Test
+	public void testThatSetTypesExpectedSetsCorrectDataTypeForCRFUpdaterId() {
+
+		int typeId = 8;
+		crfdao.setTypesExpected();
+		assertTrue(expectedSetTypes.get(typeId) == crfdao.getTypeExpected(typeId));
+	}
+
+	@Test
+	public void testThatSetTypesExpectedSetsCorrectDataTypeForCRFOID() {
+
+		int typeId = 9;
+		crfdao.setTypesExpected();
+		assertTrue(expectedSetTypes.get(typeId) == crfdao.getTypeExpected(typeId));
+	}
+
+	@Test
+	public void testThatSetTypesExpectedSetsCorrectDataTypeForCRFStudyId() {
+
+		int typeId = 10;
+		crfdao.setTypesExpected();
+		assertTrue(expectedSetTypes.get(typeId) == crfdao.getTypeExpected(typeId));
+	}
+
+	@Test
+	public void testThatSetTypesExpectedSetsCorrectDataTypeForCRFAutolayoutForDBTypeOracle() {
+
+		Whitebox.setInternalState(crfdao, "dbType", dbTypeOracle);
+
+		int typeId = 11;
+		expectedSetTypes.put(typeId, TypeNames.INT);
+		crfdao.setTypesExpected();
+		assertTrue(expectedSetTypes.get(typeId) == crfdao.getTypeExpected(typeId));
+
+		Whitebox.setInternalState(crfdao, "dbType", dbTypePostgres);
+	}
+
+	@Test
+	public void testThatSetTypesExpectedSetsCorrectDataTypeForCRFAutolayoutForDBTypePostgres() {
+
+		int typeId = 11;
+		crfdao.setTypesExpected();
+		assertTrue(expectedSetTypes.get(typeId) == crfdao.getTypeExpected(typeId));
+	}
+
+	@Test
+	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectId() {
+
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		assertTrue(tempCRFBean.getId() == crfBeanProperties.get("crf_id"));
+	}
+
+	@Test
+	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectName() {
+
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		assertTrue(tempCRFBean.getName().equals(crfBeanProperties.get("name")));
+	}
+
+	@Test
+	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectDescription() {
+
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		assertTrue(tempCRFBean.getDescription().equals(crfBeanProperties.get("description")));
+	}
+
+	@Test
+	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectOID() {
+
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		assertTrue(tempCRFBean.getOid().equals(crfBeanProperties.get("oc_oid")));
+	}
+
+	@Test
+	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectStudyId() {
+
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		assertTrue(tempCRFBean.getStudyId() == crfBeanProperties.get("source_study_id"));
+	}
+
+	@Test
+	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectStatusId() {
+
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		assertTrue(tempCRFBean.getStatus().getId() == crfBeanProperties.get("status_id"));
+	}
+
+	@Test
+	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectOwnerId() {
+
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		assertTrue(tempCRFBean.getOwnerId() == crfBeanProperties.get("owner_id"));
+	}
+
+	@Test
+	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectUpdaterId() {
+
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		assertTrue(tempCRFBean.getUpdaterId() == crfBeanProperties.get("update_id"));
+	}
+
+	@Test
+	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectAutolayoutForDBTypeOracle() {
+
+		Whitebox.setInternalState(crfdao, "dbType", dbTypeOracle);
+
+		crfBeanProperties.put("auto_layout", 0);
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		assertFalse(tempCRFBean.isAutoLayout());
+
+		Whitebox.setInternalState(crfdao, "dbType", dbTypePostgres);
+	}
+
+	@Test
+	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectAutolayoutForDBTypePostgres() {
+
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		assertTrue(tempCRFBean.isAutoLayout());
+	}
+
+	@Test
+	public void testThatCreateReturnsActiveCRFBean() {
+
+		CRFBean crfBean = new CRFBean();
+		crfBean.setStatus(Status.AVAILABLE);
+		crfBean.setName(testCRFBean.getName());
+		crfBean.setDescription(testCRFBean.getDescription());
+		crfBean.setOwner(testCRFBean.getOwner());
+
+		crfBean = (CRFBean) crfdao.create(crfBean);
+		assertTrue(crfBean.isActive());
 	}
 }

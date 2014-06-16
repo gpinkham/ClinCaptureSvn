@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="aram" id="2014-06-11-TICKET1455">
+		<preConditions onFail="MARK_RAN">
+			<dbms type="postgresql" />
+		</preConditions>
+		<comment>
+			Adding column 'auto_layout' into the table 'crf' for PostgreSQL.
+			Determines if a given CRF should use auto-layout or not. True indicates that auto layout should be applied, False otherwise.
+		</comment>
+		<addColumn tableName="crf">
+			<column name="auto_layout" type="BOOLEAN" defaultValueBoolean="false" />
+		</addColumn>
+	</changeSet>
+
+</databaseChangeLog>
