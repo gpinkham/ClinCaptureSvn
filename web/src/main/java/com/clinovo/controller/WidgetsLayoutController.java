@@ -498,14 +498,36 @@ public class WidgetsLayoutController {
 		DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(datasource);
 
 		List<CRFBean> crfs = (List<CRFBean>) crfdao.findAllActiveByDefinitionsForCurrentStudy(sb.getId());
+		List<NDsPerCRFDisplay> displays = new ArrayList<NDsPerCRFDisplay>();
 
+		for (CRFBean crf : crfs) {
 
-		Collections.sort(crfs, new Comparator<CRFBean>() {
-			public int compare(final CRFBean object1, final CRFBean object2) {
-				return object1.getName().compareTo(object2.getName());
+			NDsPerCRFDisplay currentDisplay = new NDsPerCRFDisplay();
+			currentDisplay.setCrfName(crf.getName());
+
+			ListNotesFilter filter = new ListNotesFilter();
+			filter.addFilter("crfName", crf.getName());
+
+			currentDisplay.setCountOfNds(dnDao.countViewNotesWithFilter(sb, filter));
+			displays.add(currentDisplay);
+		}
+
+		Collections.sort(displays, new Comparator<NDsPerCRFDisplay>() {
+			public int compare(final NDsPerCRFDisplay display1, final NDsPerCRFDisplay display2) {
+
+				int compareResult;
+
+				if (display1.getCountOfNds() < display2.getCountOfNds()) {
+					compareResult = 1;
+				} else if (display1.getCountOfNds() > display2.getCountOfNds()) {
+					compareResult = -1;
+				} else {
+					compareResult = display1.getCrfName().compareTo(display2.getCrfName());
+				}
+
+				return compareResult;
 			}
 		});
-
 
 		LinkedHashMap<String, List<Integer>> dataColumns = new LinkedHashMap<String, List<Integer>>();
 		ResolutionStatus[] statuses = { ResolutionStatus.CLOSED, ResolutionStatus.UPDATED, ResolutionStatus.OPEN,
@@ -523,11 +545,11 @@ public class WidgetsLayoutController {
 			start -= maxDispay;
 		}
 
-		for (int i = start; i < crfs.size() && i < start + maxDispay; i++) {
+		for (int i = start; i < displays.size() && i < start + maxDispay; i++) {
 
 			boolean eCrfExist = true;
 
-			String crfName = crfs.get(i).getName();
+			String crfName = displays.get(i).getCrfName();
 			List<Integer> contNdsWithStatuses = new ArrayList<Integer>();
 
 			for (ResolutionStatus status : statuses) {
@@ -545,7 +567,7 @@ public class WidgetsLayoutController {
 		}
 
 		boolean hasPrevious = start != 0;
-		boolean hasNext = start + maxDispay < crfs.size();
+		boolean hasNext = start + maxDispay < displays.size();
 
 		model.addAttribute("ndsCrfHasPrevious", hasPrevious);
 		model.addAttribute("ndsCrfHasNext", hasNext);
@@ -591,5 +613,27 @@ public class WidgetsLayoutController {
 		response.setHeader("Cache-Control", "no-store");
 
 		ResourceBundleProvider.updateLocale(request.getLocale());
+	}
+
+	class NDsPerCRFDisplay {
+
+		private String crfName;
+		private Integer countOfNds;
+
+		public String getCrfName() {
+			return crfName;
+		}
+
+		public void setCrfName(String crfName) {
+			this.crfName = crfName;
+		}
+
+		public Integer getCountOfNds() {
+			return countOfNds;
+		}
+
+		public void setCountOfNds(Integer countOfNds) {
+			this.countOfNds = countOfNds;
+		}
 	}
 }

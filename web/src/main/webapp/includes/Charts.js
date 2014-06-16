@@ -857,7 +857,8 @@ function initNdsPerCrf(action){
 			var options = new getVerticalBarOptions();
 			options.bar.groupWidth = "45%";
 			options.colors = ['#32A656','#E5A200','#FF0000','#9AB6D4'];
-			options.height = 240;
+			options.height = 200;
+			options.chartArea.height = "60%";
 			var ndsPerCrfChart = new google.visualization.ColumnChart(document.getElementById('nds_per_crf_chart'));
 			ndsPerCrfChart.draw(data, options);
 
