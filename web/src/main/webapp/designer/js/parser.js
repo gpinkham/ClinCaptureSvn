@@ -2137,4 +2137,56 @@ Parser.prototype.resetTarget = function(params) {
 			this.rule.targets[x].evt = params.evt
 		}
 	}
-}
+};
+
+/* =================================================================
+ * Checks if study has crf
+ *
+ * Argument Object [params] parameters:
+ * - versionOid - the target element to be updated
+ * - study - the study being changed to
+ * ============================================================== */
+Parser.prototype.studyHasCrfVersion = function(params) {	
+	for (var e in params.study.events) {
+		var evt = params.study.events[e];		
+		for (var c in evt.crfs) {
+			var crf = evt.crfs[c];
+			for (var v in crf.versions) {
+				var ver = crf.versions[v];
+				if(ver.oid == params.versionOid) {
+					return true;
+				}				
+			}
+		}		
+	}
+	return false;
+};
+
+/* =================================================================
+ * Get study item by name. Return null if no item exists
+ *
+ * Argument Object [params] parameters:
+ * - itemName - the target element to be updated
+ * - study - the study being changed to
+ * ============================================================== */
+Parser.prototype.getStudyItemByName = function(params) {	
+	for (var e in params.study.events) {
+		var evt = params.study.events[e];		
+		for (var c in evt.crfs) {
+			var crf = evt.crfs[c];
+			for (var v in crf.versions) {
+				var ver = crf.versions[v];
+				for (var i in ver.items) {
+					var itm = ver.items[i];
+					if (itm.name == params.itemName || itm.oid == params.itemName) {
+						itm.crfOid = crf.oid;
+						itm.eventOid = evt.oid;
+						itm.crfVersionOid = ver.oid;
+						return itm;
+					}
+				}				
+			}
+		}		
+	}
+	return null;
+};

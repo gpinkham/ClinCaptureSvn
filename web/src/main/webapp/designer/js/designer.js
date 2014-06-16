@@ -685,6 +685,9 @@ function handleDropEvent(params) {
 	params.element.text("");
 	params.element.removeClass("init");
 	params.element.addClass("bordered");
+	if(params.element.hasClass("invalid")) {
+		params.element.removeClass("invalid");
+	}
 	if (parser.isText(params.ui.draggable)) {
 		handleTextDrop(params.element);
 	} else if (parser.isDate(params.ui.draggable)) {
@@ -834,14 +837,17 @@ function loadStudies(studies) {
 				var currentStudy = data[$(row).attr("id")];
 				if (parser.getStudy() !== data[$(row).attr("id")].id && 
 					($("div[id='studies']").find("table > tbody > tr").size() > 1 && $(".dotted-border").size() > 2) && !editing) {
+					var target = $("input.target").first();
 					createPrompt({
 						row: row,
-						study: currentStudy
+						study: currentStudy,
+						target: target
 					});
 				} else {
 					resetStudy({
 						row: row,
-						study: currentStudy
+						study: currentStudy,
+						click: false
 					});
 				}
 				editing = false;
@@ -1208,7 +1214,7 @@ function createPrompt(params) {
 				callback: function() {
 					params.reset = false;
 					params.changeStudy = true;
-					resetStudy(params);
+					copyTarget(params);
 					parser.setCopy(true);
 					// Add targets, insert items and show/hide items
 					var crfItems = parser.getRuleCRFItems();
@@ -1274,7 +1280,7 @@ function resetStudy(params) {
 		});
 		// bold version
 		parser.recursiveSelect({
-			click: true,
+			click: params.click,
 			type: "versions",
 			candidate: topEvent.crfs[Object.keys(topEvent.crfs)[0]].versions[0].oid
 		});
@@ -1369,7 +1375,7 @@ function handleClickDrop(ele) {
 	}
 }
 
-function getDropSurfaceElement(clickedElement){
+function getDropSurfaceElement(clickedElement) {
 	//If left parenthesis is clicked
 	if($(clickedElement).is('.leftPAREN')){
 		//If there's more than one element and Group or Data is left most surface
@@ -1383,5 +1389,65 @@ function getDropSurfaceElement(clickedElement){
 		return $('.dotted-border.' + 'group').eq(-2);
 	} else {
 		return $('.dotted-border.' + 'group').last();
+	}
+}
+
+/* =================================================================
+ * Updates target attribute values during rule copy to make sure 
+ * breadcrumb and item highlight remain intact
+ *
+ * Argument Object [params] parameters:
+ * - target - the target element to be updated
+ * - study - the study being changed to
+ * - row - row of the study to be highlighted
+ * ============================================================== */
+function copyTarget(params) {
+	//Reset study
+	resetStudy(params);
+	//Check if study has crf version of copied rule
+	var studyHasCrfVersion = parser.studyHasCrfVersion({
+			study: params.study,
+			versionOid : $(params.target).attr("version-oid")
+		});
+	
+	if(studyHasCrfVersion) {
+		//If study has crf version, change study oid on target element and perform click
+		$(params.target).attr('study-oid', params.study.oid);
+		$(params.target).click();
+	} else {
+		//Else find next best alternative (item with same name in any of the study's crfs)
+		findNextBestAlternative(params);
+	}
+}
+
+/* =================================================================
+ * Find next best alternative item in study for rule copy and
+ * select it.
+ *
+ * Argument Object [params] parameters:
+ * - target - the target element to be updated
+ * - study - the study being changed to
+ * ============================================================== */
+function findNextBestAlternative(params) {
+	var item = parser.getStudyItemByName({
+		study: params.study,
+		itemName : $(params.target).val()
+	});
+	if(item && item != null) {
+		//If next best item exits, update target element with item params and perform click
+		$(params.target).attr('study-oid', params.study.oid);
+		$(params.target).attr('item-oid', item.oid);
+		$(params.target).attr('group-oid', item.group);
+		$(params.target).attr('event-oid', item.eventOid);
+		$(params.target).attr('crf-oid', item.crfOid);
+		$(params.target).attr('version-oid', item.crfVersionOid);
+		$(params.target).click();
+	} else {
+		//Else fail copy with messages
+		$(params.target).addClass('invalid');
+		$("a[href='#studies']").click();
+		if ($(".alert").size() == 0) {
+			$(".targettable").find(".panel-body").prepend(createAlert("The target item doesn't exist in the current study."));
+		}
 	}
 }
