@@ -21,14 +21,9 @@
 package org.akaza.openclinica.control.login;
 
 import com.clinovo.util.ValidatorHelper;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -37,6 +32,11 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.MessageFormat;
+import java.util.HashMap;
 
 /**
  * Sends user message to the administrator
@@ -48,14 +48,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContactServlet extends Controller {
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        //
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		//
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 
 		String action = request.getParameter("action");
 
@@ -101,18 +102,23 @@ public class ContactServlet extends Controller {
 	private void sendEmail(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		MessageFormat msg = new MessageFormat("");
 		String emailBody;
-		
-        UserAccountBean ub = getUserAccountBean(request);
+
+		UserAccountBean ub = getUserAccountBean(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		String name = fp.getString("name");
 		String email = fp.getString("email");
 		String subject = fp.getString("subject");
 		String message = fp.getString("message");
+		StudyUserRoleBean role = getCurrentRole(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		logger.info("Sending email...");
-		
-		msg.applyPattern(restext.getString("support_email_message_html"));
-		emailBody = msg.format(new Object[] {name, email, subject, message});
+
+		msg.applyPattern(restext.getString("support_email_message_html_full"));
+		emailBody = msg.format(new Object[] { name, role.getName(),
+				currentStudy.getParentStudyId() == 0 ? resword.getString("study") : resword.getString("site"),
+				currentStudy.getName(), request.getRequestURL().toString().replaceFirst(request.getServletPath(), ""),
+				email, subject, message });
 
 		sendEmail(EmailEngine.getAdminEmail(), subject, emailBody, true, request);
 
