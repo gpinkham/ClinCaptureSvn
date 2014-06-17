@@ -48,7 +48,7 @@
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-<div class="textbox_center">
+<div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr valign="top"><td class="table_header_column"><fmt:message key="event_definition_name" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${displayEvent.studyEvent.studyEventDefinition.name}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="location" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${displayEvent.studyEvent.location}"/></td></tr>
@@ -71,7 +71,7 @@
  <div style="width: 600px">
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-  <div class="textbox_center">
+  <div class="tablebox_center">
   <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
 		<td class="table_header_column_top"><fmt:message key="CRF_name" bundle="${resword}"/></td>
@@ -80,7 +80,7 @@
 		<td class="table_header_column_top"><fmt:message key="interviewer_name" bundle="${resword}"/></td>
 		<td class="table_header_column_top"><fmt:message key="owner" bundle="${resword}"/></td>
 		<td class="table_header_column_top"><fmt:message key="completion_status" bundle="${resword}"/></td>	
-		<td class="table_header_column_top"><fmt:message key="status" bundle="${resword}"/></td>	
+		<td class="table_header_column_top table_header_without_right_border"><fmt:message key="status" bundle="${resword}"/></td>
 	 </tr>
  <c:forEach var="dec" items="${displayEvent.displayEventCRFs}">
 	<tr>

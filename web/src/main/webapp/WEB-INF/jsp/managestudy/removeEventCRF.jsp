@@ -52,7 +52,7 @@
 <div style="width: 600px">   
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-<div class="textbox_center">
+<div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%"> 
   <tr valign="top"><td class="table_header_column"><fmt:message key="event_definition_name" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${event.studyEventDefinition.name}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="location" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${event.location}"/></td></tr>
@@ -73,7 +73,7 @@
 <div style="width: 600px">
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-<div class="textbox_center">
+<div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%"> 
     <tr>
 		<td class="table_header_column_top"><fmt:message key="CRF_name" bundle="${resword}"/></td>
@@ -81,11 +81,11 @@
 		<td class="table_header_column_top"><fmt:message key="date_interviewed" bundle="${resword}"/></td>
 		<td class="table_header_column_top"><fmt:message key="interviewer_name" bundle="${resword}"/></td>
 		<td class="table_header_column_top"><fmt:message key="owner" bundle="${resword}"/></td>
-		<td class="table_header_column_top"><fmt:message key="completion_status" bundle="${resword}"/></td>	
+		<td class="table_header_column_top table_header_without_right_border"><fmt:message key="completion_status" bundle="${resword}"/></td>
 		
 	 </tr> 
 	<tr>
-		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.crf.name}" /></td>
+		<td class="table_cell_left"><c:out value="${displayEventCRF.eventCRF.crf.name}" /></td>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.crfVersion.name}" /></td>
 		<td class="table_cell"><fmt:formatDate value="${displayEventCRF.eventCRF.dateInterviewed}" pattern="${dteFormat}"/>&nbsp;</td>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.interviewerName}"/>&nbsp;</td>
@@ -105,16 +105,16 @@
  <div style="width: 600px">
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-<div class="textbox_center">
+<div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%"> 
     <tr>
 		<td class="table_header_column_top"><fmt:message key="Id" bundle="${resword}"/></td>
-		<td class="table_header_column_top"><fmt:message key="value" bundle="${resword}"/></td>	
+		<td class="table_header_column_top table_header_without_right_border"><fmt:message key="value" bundle="${resword}"/></td>
 	 </tr>
 	 <c:set var="count" value="0"/>
   <c:forEach var="item" items="${items}"> 
 	<tr>
-		<td class="table_cell"><c:out value="${item.itemId}" /></td>
+		<td class="table_cell_left"><c:out value="${item.itemId}" /></td>
 		<td class="table_cell"><c:out value="${item.value}" />&nbsp;</td>	
 	
 		
