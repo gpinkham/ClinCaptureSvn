@@ -26,7 +26,6 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
-
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -34,12 +33,11 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author jxu
@@ -60,9 +58,11 @@ public class SetUserRoleServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.LIST_USER_ACCOUNTS_SERVLET, resexception.getString("not_admin"), "1");
+		throw new InsufficientPermissionException(Page.LIST_USER_ACCOUNTS_SERVLET, resexception.getString("not_admin"),
+				"1");
 
 	}
 
@@ -79,6 +79,8 @@ public class SetUserRoleServlet extends Controller {
 		List<StudyBean> studyListWithRoleAssigned;
 		List<StudyBean> siteListByParent;
 		boolean isStudyLevelUser;
+		boolean withoutRoles = false;
+		StudyBean selectedStudy;
 
 		if (pageIsChanged != null) {
 			request.setAttribute("pageIsChanged", pageIsChanged);
@@ -101,16 +103,32 @@ public class SetUserRoleServlet extends Controller {
 
 				studyListRoleCanBeAssignedTo = sdao.findAllActiveStudiesWhereUserHasRole(currentUser.getName());
 				studyListWithRoleAssigned = sdao.findAllActiveWhereUserHasRole(user.getName());
-				isStudyLevelUser = user.getRoles().get(0).isStudyLevelRole();
 
-				if (isStudyLevelUser) {
-					studyListRoleCanBeAssignedTo.removeAll(studyListWithRoleAssigned);
-					finalStudyListNotHaveRole = studyListRoleCanBeAssignedTo;
+				if (user.getRoles().size() > 0) {
+					isStudyLevelUser = user.getRoles().get(0).isStudyLevelRole();
+					if (isStudyLevelUser) {
+						studyListRoleCanBeAssignedTo.removeAll(studyListWithRoleAssigned);
+						finalStudyListNotHaveRole = studyListRoleCanBeAssignedTo;
+					} else {
+						finalStudyListNotHaveRole = new ArrayList<StudyBean>();
+						for (StudyBean sb : studyListRoleCanBeAssignedTo) {
+							siteListByParent = sdao.findAllByParentAndActive(sb.getId());
+							siteListByParent.removeAll(studyListWithRoleAssigned);
+							if (!siteListByParent.isEmpty()) {
+								finalStudyListNotHaveRole.add(sb);
+								finalStudyListNotHaveRole.addAll(siteListByParent);
+							}
+						}
+					}
 				} else {
+					withoutRoles = true;
+					selectedStudy = (StudyBean) sdao.findByPK(studyId);
+					request.setAttribute("selectedStudy", selectedStudy == null || selectedStudy.getId() == 0 ? null
+							: selectedStudy);
+					isStudyLevelUser = !(selectedStudy != null && selectedStudy.getParentStudyId() > 0);
 					finalStudyListNotHaveRole = new ArrayList<StudyBean>();
 					for (StudyBean sb : studyListRoleCanBeAssignedTo) {
 						siteListByParent = sdao.findAllByParentAndActive(sb.getId());
-						siteListByParent.removeAll(studyListWithRoleAssigned);
 						if (!siteListByParent.isEmpty()) {
 							finalStudyListNotHaveRole.add(sb);
 							finalStudyListNotHaveRole.addAll(siteListByParent);
@@ -119,6 +137,7 @@ public class SetUserRoleServlet extends Controller {
 				}
 
 				request.setAttribute("user", user);
+				request.setAttribute("withoutRoles", withoutRoles);
 				request.setAttribute("isStudyLevelUser", isStudyLevelUser);
 				request.setAttribute("studies", finalStudyListNotHaveRole);
 				StudyUserRoleBean uRole = new StudyUserRoleBean();
@@ -154,7 +173,8 @@ public class SetUserRoleServlet extends Controller {
 					if (currentUser.getId() == user.getId()) {
 						request.getSession().setAttribute("reloadUserBean", true);
 					}
-					addPageMessage(new StringBuilder("").append(user.getFirstName()).append(" ").append(user.getLastName())
+					addPageMessage(
+							new StringBuilder("").append(user.getFirstName()).append(" ").append(user.getLastName())
 									.append(" (").append(resword.getString("username")).append(": ")
 									.append(user.getName()).append(") ")
 									.append(respage.getString("has_been_granted_the_role")).append(" \"")

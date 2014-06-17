@@ -15,6 +15,10 @@
         objFlag = MM_findObj('pageIsChanged');
         objFlag.value='true';
     }
+    function sendUrl() {
+        document.getElementById('changeRoles').value = 'true';
+        document.forms[1].submit();
+    }
 </script>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
@@ -86,28 +90,48 @@
                             <tr><td></td><td class="formlabel"><fmt:message key="last_name" bundle="${resword}"/>:</td><td><c:out value="${user.lastName}"/></td></tr>
                             <tr><td></td><td class="formlabel"><fmt:message key="study_name" bundle="${resword}"/>:</td>
                                 <td onchange="javascript:changeIcon();"><div class="formfieldXL_BG">
-                                    <select name="studyId" class="formfieldXL" onchange="changeFlag();">
-                                        <c:forEach var="userStudy" items="${studies}" varStatus="status">
-                                        	<c:choose>
-                                        		<c:when test="${isStudyLevelUser}">
-                                        			<option value="<c:out value="${userStudy.id}"/>"><c:out value="${userStudy.name}"/></option>
-                                            	</c:when>
-                                           		<c:otherwise>
-                                            		<c:choose>
-                                            			<c:when test="${userStudy.parentStudyId == 0}">
-                                        					<optgroup label="<c:out value="${userStudy.name}"/>" >
-                                            			</c:when>
-                                            			<c:otherwise>
-                                        					<option value="<c:out value="${userStudy.id}"/>">&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${userStudy.name}"/></option>
-                                        					<c:if test="${status.last || studies[status.index + 1].parentStudyId == 0}">
-                                        						</optgroup>
-                                        					</c:if>
-                                           				</c:otherwise>
-                                            		</c:choose>
-                                            	</c:otherwise>
-                                            </c:choose>
-                                        </c:forEach>
-                                    </select>
+                                    <c:choose>
+                                        <c:when test="${withoutRoles}">
+                                            <select name="studyId" class="formfieldXL" onchange="sendUrl();">
+                                                <option value="0">-<fmt:message key="select" bundle="${resword}"/>-</option>
+                                                <c:forEach var="study" items="${studies}">
+                                                    <c:set var="selectedFlag" value="${selectedStudy.id == study.id ? 'selected' : ''}"/>
+                                                    <c:choose>
+                                                        <c:when test="${study.parentStudyId > 0}">
+                                                            <option value='<c:out value="${study.id}" />' ${selectedFlag}>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <option value='<c:out value="${study.id}" />' ${selectedFlag}><c:out value="${study.name}" /></option>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </c:forEach>
+                                            </select>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <select name="studyId" class="formfieldXL" onchange="changeFlag();">
+                                                <c:forEach var="userStudy" items="${studies}" varStatus="status">
+                                                    <c:choose>
+                                                        <c:when test="${isStudyLevelUser}">
+                                                            <option value="<c:out value="${userStudy.id}"/>"><c:out value="${userStudy.name}"/></option>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <c:choose>
+                                                                <c:when test="${userStudy.parentStudyId == 0}">
+                                                                    <optgroup label="<c:out value="${userStudy.name}"/>" >
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <option value="<c:out value="${userStudy.id}"/>">&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${userStudy.name}"/></option>
+                                                                    <c:if test="${status.last || studies[status.index + 1].parentStudyId == 0}">
+                                                                        </optgroup>
+                                                                    </c:if>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </c:forEach>
+                                            </select>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                                 </td>
                             </tr>
@@ -115,13 +139,15 @@
                                 <td onchange="javascript:changeIcon();">
                                 	<div class="formfieldXL_BG">
                                     	<c:set var="role1" value="${uRole.role}"/>
-                                   		<select name="roleId" class="formfieldXL" onchange="javascript:'changeFlag();'">
-                                        	<c:forEach var="currRole" items="${roles}">
-                                            	<c:if test="${currRole.key == inclRoleCode1 || currRole.key == inclRoleCode2 || currRole.key == inclRoleCode3}">
-                                               		<option value='<c:out value="${currRole.key}" />' <c:if test="${role1.id == currRole.key}">selected</c:if>><c:out value="${currRole.value}" /></option>
-                                            	</c:if>
-                                        	</c:forEach>
-                                    	</select>
+                                        <select name="roleId" class="formfieldXL" onchange="javascript:'changeFlag();'">
+                                            <c:if test="${not withoutRoles || selectedStudy ne null}">
+                                                <c:forEach var="currRole" items="${roles}">
+                                                    <c:if test="${currRole.key == inclRoleCode1 || currRole.key == inclRoleCode2 || currRole.key == inclRoleCode3}">
+                                                        <option value='<c:out value="${currRole.key}" />' <c:if test="${role1.id == currRole.key}">selected</c:if>><c:out value="${currRole.value}" /></option>
+                                                    </c:if>
+                                                </c:forEach>
+                                            </c:if>
+                                        </select>
                                 	</div>
                                 </td>
                             </tr>
