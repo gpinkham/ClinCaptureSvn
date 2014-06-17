@@ -1220,11 +1220,6 @@
         <display-name>viewStudySubjectjsp</display-name>
         <jsp-file>/WEB-INF/jsp/manageStudy/viewStudySubject.jsp</jsp-file>
     </servlet>
-    <servlet>
-        <servlet-name>completeCRFDeleteServlet</servlet-name>
-        <display-name>CompleteCRFDelete</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
 
     <servlet-mapping>
         <servlet-name>lockCRFVersionServlet</servlet-name>
@@ -2048,11 +2043,6 @@
     <servlet-mapping>
         <servlet-name>urlRewriterServlet</servlet-name>
         <url-pattern>/ClinicalData/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>completeCRFDeleteServlet</servlet-name>
-        <url-pattern>/CompleteCrfDelete</url-pattern>
     </servlet-mapping>
 
     <servlet>

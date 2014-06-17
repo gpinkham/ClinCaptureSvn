@@ -180,9 +180,11 @@
             DELETE FROM section WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
             DELETE FROM versioning_map WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
             DELETE FROM item WHERE item.item_id NOT IN (SELECT item_id FROM versioning_map);
+            DELETE FROM event_crf where crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?) and not_started = true;
             DELETE FROM crf_version WHERE crf_id = ?;
             DELETE FROM item_group WHERE crf_id = ?;
             DELETE FROM event_definition_crf WHERE crf_id = ?;
-            DELETE FROM crf WHERE crf_id = ?;</sql>
+            DELETE FROM crf WHERE crf_id = ?;
+        </sql>
     </query>
 </queries>

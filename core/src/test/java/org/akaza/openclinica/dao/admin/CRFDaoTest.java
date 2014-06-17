@@ -17,11 +17,10 @@ import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.mockito.internal.util.reflection.Whitebox;
 
 import java.util.HashMap;
@@ -33,7 +32,7 @@ public class CRFDaoTest extends DefaultAppContextTest {
 	private String dbTypePostgres;
 	private CRFBean testCRFBean;
 	private Map<Integer, Integer> expectedSetTypes;
-	private Map<String, Object> crfBeanProperties;
+	private HashMap<String, Object> crfBeanProperties;
 
 	@Before
 	public void setUp() {
@@ -270,57 +269,57 @@ public class CRFDaoTest extends DefaultAppContextTest {
 	@Test
 	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectId() {
 
-		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
-		assertTrue(tempCRFBean.getId() == crfBeanProperties.get("crf_id"));
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap<String, Object>) crfBeanProperties);
+		assertTrue(tempCRFBean.getId() == (Integer) crfBeanProperties.get("crf_id"));
 	}
 
 	@Test
 	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectName() {
 
-		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap<String, Object>) crfBeanProperties);
 		assertTrue(tempCRFBean.getName().equals(crfBeanProperties.get("name")));
 	}
 
 	@Test
 	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectDescription() {
 
-		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap<String, Object>) crfBeanProperties);
 		assertTrue(tempCRFBean.getDescription().equals(crfBeanProperties.get("description")));
 	}
 
 	@Test
 	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectOID() {
 
-		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap<String, Object>) crfBeanProperties);
 		assertTrue(tempCRFBean.getOid().equals(crfBeanProperties.get("oc_oid")));
 	}
 
 	@Test
 	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectStudyId() {
 
-		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
-		assertTrue(tempCRFBean.getStudyId() == crfBeanProperties.get("source_study_id"));
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap<String, Object>) crfBeanProperties);
+		assertTrue(tempCRFBean.getStudyId() == (Integer) crfBeanProperties.get("source_study_id"));
 	}
 
 	@Test
 	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectStatusId() {
 
-		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
-		assertTrue(tempCRFBean.getStatus().getId() == crfBeanProperties.get("status_id"));
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap<String, Object>) crfBeanProperties);
+		assertTrue(tempCRFBean.getStatus().getId() == (Integer) crfBeanProperties.get("status_id"));
 	}
 
 	@Test
 	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectOwnerId() {
 
-		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
-		assertTrue(tempCRFBean.getOwnerId() == crfBeanProperties.get("owner_id"));
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap<String, Object>) crfBeanProperties);
+		assertTrue(tempCRFBean.getOwnerId() == (Integer) crfBeanProperties.get("owner_id"));
 	}
 
 	@Test
 	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectUpdaterId() {
 
-		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
-		assertTrue(tempCRFBean.getUpdaterId() == crfBeanProperties.get("update_id"));
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap<String, Object>) crfBeanProperties);
+		assertTrue(tempCRFBean.getUpdaterId() == (Integer) crfBeanProperties.get("update_id"));
 	}
 
 	@Test
@@ -329,7 +328,7 @@ public class CRFDaoTest extends DefaultAppContextTest {
 		Whitebox.setInternalState(crfdao, "dbType", dbTypeOracle);
 
 		crfBeanProperties.put("auto_layout", 0);
-		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap<String, Object>) crfBeanProperties);
 		assertFalse(tempCRFBean.isAutoLayout());
 
 		Whitebox.setInternalState(crfdao, "dbType", dbTypePostgres);
@@ -338,7 +337,7 @@ public class CRFDaoTest extends DefaultAppContextTest {
 	@Test
 	public void testThatGetEntityFromHashMapReturnsCRFBeanWithCorrectAutolayoutForDBTypePostgres() {
 
-		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap) crfBeanProperties);
+		CRFBean tempCRFBean = (CRFBean) crfdao.getEntityFromHashMap((HashMap<String, Object>) crfBeanProperties);
 		assertTrue(tempCRFBean.isAutoLayout());
 	}
 

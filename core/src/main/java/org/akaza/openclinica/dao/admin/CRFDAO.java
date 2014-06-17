@@ -442,6 +442,7 @@ public class CRFDAO extends AuditableEntityDAO {
 		variables.put(7, crfId);
 		variables.put(8, crfId);
 		variables.put(9, crfId);
+		variables.put(10, crfId);
 		this.execute(sql, variables);
 	}
 }

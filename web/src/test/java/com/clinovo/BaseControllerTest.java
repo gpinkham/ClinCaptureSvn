@@ -33,6 +33,7 @@ public class BaseControllerTest extends AbstractContextSentiveTest{
 	protected final String SUBJECTS_STATUS_COUNT_WIDGET = "/initSubjectStatusCount";
 	protected final String STUDY_PROGRESS_WIDGET = "/initStudyProgress";
 	protected final String SDV_PROGRESS_WIDGET = "/initSdvProgressWidget";
+	protected final String COMPLETE_CRF_DELETE = "/completeCRFDelete";
 	protected final String NDS_PER_CRF_WIDGET = "/initNdsPerCrfWidget";
 
 	@Autowired

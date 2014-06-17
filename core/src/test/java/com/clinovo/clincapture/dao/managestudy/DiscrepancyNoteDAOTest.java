@@ -442,4 +442,17 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		assertNotNull(discrepancyNoteDAO.findAllEvCRFIdsWithUnclosedDNsByStSubId(studySubjectId));
 		assertEquals(0, discrepancyNoteDAO.findAllEvCRFIdsWithUnclosedDNsByStSubId(studySubjectId).size());
 	}
+
+	@Test
+	public void testThatFindAllByCRFIdNotEmpty() {
+
+		assertEquals(1, discrepancyNoteDAO.findAllByCRFId(1).size());
+	}
+
+	@Test
+	public void testThatFindAllByCRFIdContainsSubjectLabel() {
+
+		assertEquals("ssID1", discrepancyNoteDAO.findAllByCRFId(1).get(0).getStudySub().getLabel());
+	}
+
 }

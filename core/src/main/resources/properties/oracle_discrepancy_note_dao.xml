@@ -1250,5 +1250,21 @@
             ) )as a
         </sql>
     </query>
+    <query>
+        <name>findAllByCRFId</name>
+        <sql>
+            SELECT distinct dn.*, ss.label
+            FROM item_data itd, discrepancy_note dn, study_subject ss, dn_item_data_map dsm, event_crf ec, crf_version cv
+            where cv.crf_id = ?
+            AND ec.crf_version_id = cv.crf_version_id
+            AND itd.event_crf_id = ec.event_crf_id
+            AND dsm.item_data_id = itd.item_data_id
+            AND dsm.column_name='value'
+            AND dsm.discrepancy_note_id = dn.discrepancy_note_id
+            AND dn.entity_type='itemData'
+            AND dn.parent_dn_id is null
+            AND ss.study_subject_id = dsm.study_subject_id
+        </sql>
+    </query>
 </queries>
 

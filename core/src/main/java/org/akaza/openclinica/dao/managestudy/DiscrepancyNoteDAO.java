@@ -2259,4 +2259,27 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 		return result;
 	}
+
+	public ArrayList<DiscrepancyNoteBean> findAllByCRFId(int crfId) {
+
+		this.setTypesExpected();
+		this.setTypeExpected(12, TypeNames.STRING);
+
+		ArrayList<DiscrepancyNoteBean> returnedNotelist = new ArrayList<DiscrepancyNoteBean>();
+
+		HashMap variables = new HashMap();
+		variables.put(1, crfId);
+
+		ArrayList rows = select(digester.getQuery("findAllByCRFId"), variables);
+		Iterator it = rows.iterator();
+		while (it.hasNext()) {
+			HashMap hm = (HashMap) it.next();
+			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
+			String studySubLabel = String.valueOf((hm).get("label"));
+			eb.getStudySub().setLabel(studySubLabel);
+			returnedNotelist.add(eb);
+		}
+
+		return returnedNotelist;
+	}
 }

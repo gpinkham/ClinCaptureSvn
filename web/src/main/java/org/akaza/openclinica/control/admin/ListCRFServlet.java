@@ -20,7 +20,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.CompleteCRFDeleteUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -103,6 +102,12 @@ public class ListCRFServlet extends RememberLastPage {
 		request.getSession().removeAttribute("version");
 		FormProcessor fp = new FormProcessor(request);
 
+		String controllerMessage = (String) request.getSession().getAttribute("controllerMessage");
+		if (controllerMessage != null) {
+			addPageMessage(controllerMessage, request);
+			request.getSession().removeAttribute("controllerMessage");
+		}
+
 		if (!(ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR))) {
 			addPageMessage(
 					respage.getString("no_have_correct_privilege_current_study") + " "
@@ -123,10 +128,6 @@ public class ListCRFServlet extends RememberLastPage {
 		for (Object crf : crfs) {
 			CRFBean eb = (CRFBean) crf;
 			logger.info("crf id:" + eb.getId());
-
-			CompleteCRFDeleteUtil.setRuleSetDao(getRuleSetDao());
-			CompleteCRFDeleteUtil.setSessionManager(getSessionManager(request));
-			CompleteCRFDeleteUtil.validateCRF(eb);
 
 			ArrayList versions = (ArrayList) vdao.findAllByCRF(eb.getId());
 
