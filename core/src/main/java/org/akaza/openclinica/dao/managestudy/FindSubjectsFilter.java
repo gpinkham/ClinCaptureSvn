@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.dao.managestudy;
 
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -113,11 +114,15 @@ public class FindSubjectsFilter implements CriteriaCommand {
 				} else {
 
 					theCriteria
+							.append(" AND ss.status_id NOT IN (").append(Status.DELETED.getId()).append(", ")
+							.append(Status.AUTO_DELETED.getId()).append(", ").append(Status.LOCKED.getId()).append(")")
 							.append(" AND (se.study_subject_id IS NULL OR (se.study_event_definition_id != ")
 							.append(eventDefinitionId)
-							.append(" AND (SELECT count(*) FROM study_subject ss1 LEFT JOIN study_event ON ss1.study_subject_id = study_event.study_subject_id")
+							.append(" AND ss.study_subject_id NOT IN (SELECT DISTINCT ss1.study_subject_id ")
+							.append(" FROM study_subject ss1 LEFT JOIN study_event")
+							.append(" ON ss1.study_subject_id = study_event.study_subject_id")
 							.append(" WHERE study_event.study_event_definition_id = ").append(eventDefinitionId)
-							.append(" AND ss.study_subject_id = ss1.study_subject_id) = 0))");
+							.append(")))");
 				}
 
 			} else if (property.startsWith("sgc_")) {
