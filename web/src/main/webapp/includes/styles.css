@@ -2695,3 +2695,7 @@ td.borderHighlightTop{
 td.borderHighlightBottom{
 	border-bottom: 2px solid orange !important;
 }
+
+#ruleAssignments > thead > tr.filter > td:last-child {
+    white-space: nowrap;
+}

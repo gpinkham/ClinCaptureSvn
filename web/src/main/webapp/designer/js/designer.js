@@ -1404,15 +1404,22 @@ function getDropSurfaceElement(clickedElement) {
 function copyTarget(params) {
 	//Reset study
 	resetStudy(params);
-	//Check if study has crf version of copied rule
-	var studyHasCrfVersion = parser.studyHasCrfVersion({
+	//Get crf version of copied rule from the current study
+	var crfVersion = parser.getCrfVersionByOid({
 			study: params.study,
 			versionOid : $(params.target).attr("version-oid")
 		});
 	
-	if(studyHasCrfVersion) {
+	if(crfVersion !== null) {
 		//If study has crf version, change study oid on target element and perform click
 		$(params.target).attr('study-oid', params.study.oid);
+		$(params.target).attr('event-oid', crfVersion.eventOid);
+		$(params.target).attr('crf-oid', crfVersion.crfOid);
+		if($(params.target).hasClass("invalid")) {
+			$(params.target).removeClass("invalid");
+		}
+		//Update in-memory target object
+		updateTargetInRule(params);
 		$(params.target).click();
 	} else {
 		//Else find next best alternative (item with same name in any of the study's crfs)
@@ -1441,6 +1448,11 @@ function findNextBestAlternative(params) {
 		$(params.target).attr('event-oid', item.eventOid);
 		$(params.target).attr('crf-oid', item.crfOid);
 		$(params.target).attr('version-oid', item.crfVersionOid);
+		if($(params.target).hasClass("invalid")) {
+			$(params.target).removeClass("invalid");
+		}
+		//Update in-memory target object
+		updateTargetInRule(params);
 		$(params.target).click();
 	} else {
 		//Else fail copy with messages
@@ -1448,6 +1460,26 @@ function findNextBestAlternative(params) {
 		$("a[href='#studies']").click();
 		if ($(".alert").size() == 0) {
 			$(".targettable").find(".panel-body").prepend(createAlert("The target item doesn't exist in the current study."));
+		}
+	}
+}
+
+/* =================================================================
+ * Updates the target in the parser.rule object with the updated
+ * attributes
+ *
+ * Argument Object [params] parameters:
+ * - target - the target element to be updated
+ * ============================================================== */
+function updateTargetInRule(params) {
+	var rule = parser.getRule();
+	for(var x=0; x < rule.targets.length; x++) {
+		var target = rule.targets[x];
+		if(target.oid == $(params.target).attr('item-oid')) {
+			target.crf = $(params.target).attr('crf-oid');
+			target.evt = $(params.target).attr('event-oid');
+			target.group = $(params.target).attr('group-oid');
+			target.version = $(params.target).attr('version-oid');
 		}
 	}
 }

@@ -2140,13 +2140,15 @@ Parser.prototype.resetTarget = function(params) {
 };
 
 /* =================================================================
- * Checks if study has crf
+ * Get crf version from current study if it exists
  *
  * Argument Object [params] parameters:
- * - versionOid - the target element to be updated
- * - study - the study being changed to
+ * - versionOid - the oid of the version to get returned
+ * - study - the study being checked for crf version
+ * 
+ * Returns version if found, null otherwise
  * ============================================================== */
-Parser.prototype.studyHasCrfVersion = function(params) {	
+Parser.prototype.getCrfVersionByOid = function(params) {	
 	for (var e in params.study.events) {
 		var evt = params.study.events[e];		
 		for (var c in evt.crfs) {
@@ -2154,12 +2156,14 @@ Parser.prototype.studyHasCrfVersion = function(params) {
 			for (var v in crf.versions) {
 				var ver = crf.versions[v];
 				if(ver.oid == params.versionOid) {
-					return true;
+					ver.crfOid = crf.oid;
+					ver.eventOid = evt.oid;
+					return ver;
 				}				
 			}
 		}		
 	}
-	return false;
+	return null;
 };
 
 /* =================================================================
