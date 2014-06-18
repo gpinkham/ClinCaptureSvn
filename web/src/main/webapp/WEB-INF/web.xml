@@ -940,11 +940,6 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>changeDefinitionOrdinalServlet</servlet-name>
-        <display-name>ChangeDefinitionOrdinal</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>changeDefinitionCRFOrdinalServlet</servlet-name>
         <display-name>ChangeDefinitionCRFOrdinal</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -1856,10 +1851,6 @@
     <servlet-mapping>
         <servlet-name>HelpThemeServlet</servlet-name>
         <url-pattern>/HelpThemeServlet</url-pattern> 
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>changeDefinitionOrdinalServlet</servlet-name>
-        <url-pattern>/ChangeDefinitionOrdinal</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>changeDefinitionCRFOrdinalServlet</servlet-name>

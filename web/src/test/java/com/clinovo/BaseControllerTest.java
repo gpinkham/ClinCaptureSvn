@@ -35,6 +35,7 @@ public class BaseControllerTest extends AbstractContextSentiveTest{
 	protected final String SDV_PROGRESS_WIDGET = "/initSdvProgressWidget";
 	protected final String COMPLETE_CRF_DELETE = "/completeCRFDelete";
 	protected final String NDS_PER_CRF_WIDGET = "/initNdsPerCrfWidget";
+	protected final String CHANGE_ORDINAL_CONTROLLER = "/changeDefinitionOrdinal";
 
 	@Autowired
 	protected WebApplicationContext wac;

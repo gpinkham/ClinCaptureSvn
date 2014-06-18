@@ -22,26 +22,38 @@
  </c:choose>
 <tr valign="top">     
       <td class="table_cell_left">
-      <%--<c:out value="${currRow.bean.ordinal}"/>--%>
-      <c:choose>
-        <c:when test="${count==0}">
-            <c:choose>
-            <c:when test="${defSize>1}">
-            <a href="ChangeDefinitionOrdinal?current=<c:out value="${nextRow.bean.id}"/>&previous=<c:out value="${currRow.bean.id}"/>"><img src="images/bt_sort_descending.gif" border="0" alt="<fmt:message key="move_down" bundle="${resword}"/>" title="<fmt:message key="move_down" bundle="${resword}"/>" /></a>
-           </c:when>
-           <c:otherwise>
-            &nbsp;
-           </c:otherwise>
-           </c:choose>
-        </c:when>
-        <c:when test="${count==last}">
-           <a href="ChangeDefinitionOrdinal?current=<c:out value="${currRow.bean.id}"/>&previous=<c:out value="${prevRow.bean.id}"/>"><img src="images/bt_sort_ascending.gif" alt="<fmt:message key="move_up" bundle="${resword}"/>" title="<fmt:message key="move_up" bundle="${resword}"/>" border="0"/></a>         
-        </c:when>
-        <c:otherwise>
-          <a href="ChangeDefinitionOrdinal?current=<c:out value="${currRow.bean.id}"/>&previous=<c:out value="${prevRow.bean.id}"/>"><img src="images/bt_sort_ascending.gif" alt="<fmt:message key="move_up" bundle="${resword}"/>" title="<fmt:message key="move_up" bundle="${resword}"/>" border="0" /></a>
-          <a href="ChangeDefinitionOrdinal?previous=<c:out value="${currRow.bean.id}"/>&current=<c:out value="${nextRow.bean.id}"/>"><img src="images/bt_sort_descending.gif" alt="<fmt:message key="move_down" bundle="${resword}"/>" title="<fmt:message key="move_down" bundle="${resword}"/>" border="0" /></a>
-        </c:otherwise>
-      </c:choose>
+          <c:choose>
+              <c:when test="${count==0}">
+                  <c:choose>
+                      <c:when test="${defSize>1}">
+                          <a href="#" onClick="changeDefinitionOrdinal({current: <c:out value="${nextRow.bean.id}"/>, previous: <c:out value="${currRow.bean.id}"/>, context: '${pageContext.request.contextPath}', servlet: 'changeDefinitionOrdinal'})">
+                              <img src="images/bt_sort_descending.gif" border="0"
+                                   alt="<fmt:message key="move_down" bundle="${resword}"/>"
+                                   title="<fmt:message key="move_down" bundle="${resword}"/>"/>
+                          </a>
+                      </c:when>
+                      <c:otherwise>
+                          &nbsp;
+                      </c:otherwise>
+                  </c:choose>
+              </c:when>
+              <c:when test="${count==last}">
+                  <a href="#" onClick="changeDefinitionOrdinal({current: <c:out value="${currRow.bean.id}"/>, previous: <c:out value="${prevRow.bean.id}"/>, context: '${pageContext.request.contextPath}', servlet: 'changeDefinitionOrdinal'})">
+                      <img src="images/bt_sort_ascending.gif" alt="<fmt:message key="move_up" bundle="${resword}"/>"
+                           title="<fmt:message key="move_up" bundle="${resword}"/>"
+                           border="0"/>
+                  </a>
+              </c:when>
+              <c:otherwise>
+                  <a href="#" onClick="changeDefinitionOrdinal({current: <c:out value="${currRow.bean.id}"/>, previous: <c:out value="${prevRow.bean.id}"/>, context: '${pageContext.request.contextPath}', servlet: 'changeDefinitionOrdinal'})">
+                      <img src="images/bt_sort_ascending.gif" alt="<fmt:message key="move_up" bundle="${resword}"/>" title="<fmt:message key="move_up" bundle="${resword}"/>" border="0"/>
+                  </a>
+                  <a href="#" onClick="changeDefinitionOrdinal({previous: <c:out value="${currRow.bean.id}"/>, current: <c:out value="${nextRow.bean.id}"/>, context: '${pageContext.request.contextPath}', servlet: 'changeDefinitionOrdinal'})">
+                      <img src="images/bt_sort_descending.gif" alt="<fmt:message key="move_down" bundle="${resword}"/>"
+                           title="<fmt:message key="move_down" bundle="${resword}"/>" border="0"/>
+                  </a>
+              </c:otherwise>
+          </c:choose>
       </td>   
       <td class="table_cell"><c:out value="${currRow.bean.name}"/></td>
       <td class="table_cell"><c:out value="${currRow.bean.oid}"/></td>
@@ -105,14 +117,6 @@
 			name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
 		</td>
         </c:if>
-        <%--remove this for now until we clarify the new requirement-01/17/2008
-		<c:if test="${currRow.bean.lockable}">
-		  <td><a href="LockEventDefinition?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
-			onMouseDown="javascript:setImage('bt_Lock1','images/bt_Lock_d.gif');"
-			onMouseUp="javascript:setImage('bt_Lock1','images/bt_Lock.gif');"><img 
-			name="bt_Lock1" src="images/bt_Lock.gif" border="0" alt="<fmt:message key="lock" bundle="${resword}"/>" title="<fmt:message key="lock" bundle="${resword}"/>" align="left" hspace="6"></a>
-		  </td>
-		</c:if>  --%>      
         </c:when>
         <c:otherwise>
         <c:if test="${currRow.bean.status.deleted && (!study.status.locked)}">
@@ -128,14 +132,6 @@
         </c:otherwise>
        </c:choose>     
       </c:if>
-      <%--
-       <c:if test="${userBean.sysAdmin &&  currRow.bean.status.locked}">             
-        <td><a href="UnlockEventDefinition?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
-			onMouseDown="javascript:setImage('bt_Unlock1','images/bt_Unlock_d.gif');"
-			onMouseUp="javascript:setImage('bt_Unlock1','images/bt_Unlock.gif');"><img 
-			name="bt_Unlock1" src="images/bt_Unlock.gif" border="0" alt="<fmt:message key="unlock" bundle="${resword}"/>" title="<fmt:message key="unlock" bundle="${resword}"/>" align="left" hspace="6"></a>
-		  </td>       
-       </c:if>--%>
     
     </c:if>
     

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="vitaly" id="2014-06-12-TICKET942-1" dbms="postgresql">
+        <comment>Updating ordinals in study event definition table to remove broken ordinals</comment>
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION fix_orders() RETURNS void AS
+            'DECLARE rec RECORD;
+                     studies RECORD;
+                        BEGIN
+                            FOR studies in SELECT DISTINCT study_id as sid FROM study_event_definition
+                                LOOP
+                                   FOR rec in select ordinal, ROW_NUMBER() OVER (ORDER BY ordinal) as cnt, sed.study_event_definition_id as id from study_event_definition sed where sed.study_id = studies.sid order by ordinal
+                                       LOOP
+                                          UPDATE study_event_definition set ordinal = rec.cnt where rec.id = study_event_definition.study_event_definition_id;
+                                       END LOOP;
+                                END LOOP;
+                        END;'
+            LANGUAGE plpgsql VOLATILE;
+            COMMIT;
+            SELECT fix_orders();
+        </sql>
+    </changeSet>
+    <changeSet author="vitaly" id="2014-06-12-TICKET942-2" dbms="oracle">
+        <comment>Updating ordinals in study event definition table to remove broken ordinals</comment>
+        <sql splitStatements="false">
+            CREATE OR REPLACE Procedure fix_orders IS
+                cursor studies is SELECT DISTINCT study_id as sid FROM study_event_definition
+                BEGIN
+                    FOR study in studies
+                        LOOP
+                            cursor recs is select ordinal, ROW_NUMBER() OVER (ORDER BY ordinal) as cnt, sed.study_event_definition_id as id from study_event_definition sed where sed.study_id = study.sid order by ordinal
+                                FOR rec in recs
+                                    LOOP
+                                        UPDATE study_event_definition set ordinal = rec.cnt where rec.id = study_event_definition.study_event_definition_id;
+                                    END LOOP;
+                        END LOOP;
+                END;
+            EXECUTE fix_orders();
+            DROP PROCEDURE fix_orders;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

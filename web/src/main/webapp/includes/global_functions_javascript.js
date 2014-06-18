@@ -4314,4 +4314,15 @@ function getLastRowSpanned(firstRow, rowspan) {
 	return nextRow;
 }
 
+function changeDefinitionOrdinal(params) {
+    jQuery.ajax({
+        url: params.context + '/pages/' + params.servlet,
+        type: 'POST',
+        data: { current: params.current, previous: params.previous },
+        success: function () {
+            location.reload();
+        }
+    });
+}
+
 

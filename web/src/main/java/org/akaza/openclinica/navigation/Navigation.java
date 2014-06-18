@@ -46,7 +46,7 @@ public class Navigation {
 	// ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintAllEventCRF", "/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
-			"/ViewItemDetail", "/PrintCRF", "/ChangeDefinitionOrdinal", "/PrintEventCRF", "/ViewRulesAssignment",
+			"/ViewItemDetail", "/PrintCRF", "/PrintEventCRF", "/ViewRulesAssignment",
 			"/DownloadRuleSetXml", "/UpdateRuleSetRule", "/pages/handleSDVGet", "/DownloadVersionSpreadSheet",
 			"/PrintAllSiteEventCRF", "/DeleteUser", "/UnLockUser", "/DeleteStudyUserRole", "/PauseJob", "/SelectItems",
 			"/CreateDiscrepancyNote", "/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile", "/help",
