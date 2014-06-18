@@ -25,7 +25,6 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
-
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -35,11 +34,10 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
-import java.text.MessageFormat;
-import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.MessageFormat;
+import java.util.Date;
 
 // allows both deletion and restoration of a study user role
 @SuppressWarnings({ "serial" })
@@ -76,12 +74,12 @@ public class UnLockUserServlet extends Controller {
 		MessageFormat messageFormat = new MessageFormat("");
 		Object[] argsForMessage = { user.getName() };
 
-		String message = "";
+		String message;
 
 		if (!user.isActive()) {
 
 			messageFormat.applyPattern(respage.getString("the_specified_user_not_exits"));
-			message = messageFormat.format(new Object[] {userId});
+			message = messageFormat.format(new Object[] { userId });
 
 		} else if (user.getAccountNonLocked()) {
 
@@ -106,6 +104,7 @@ public class UnLockUserServlet extends Controller {
 			user.setAccountNonLocked(Boolean.TRUE);
 			user.setStatus(Status.AVAILABLE);
 			user.setLockCounter(0);
+			user.setEnabled(true);
 
 			Date currDate = new Date();
 			user.setLastVisitDate(currDate);
@@ -139,7 +138,7 @@ public class UnLockUserServlet extends Controller {
 	private void sendRestoreEmail(UserAccountBean u, String password, HttpServletRequest request) throws Exception {
 		logger.info("Sending restore and password reset notification to " + u.getName());
 		StudyBean currentStudy = getCurrentStudy(request);
-		
+
 		String body = resword.getString("dear") + u.getFirstName() + " " + u.getLastName() + ",<br><br>";
 		body += restext.getString("your_account_has_been_unlocked_and_password_reset") + ":<br><br>";
 		body += resword.getString("user_name") + ": " + u.getName() + "<br>";
@@ -148,7 +147,7 @@ public class UnLockUserServlet extends Controller {
 		body += "<A HREF='" + SQLInitServlet.getSystemURL() + "'>";
 		body += SQLInitServlet.getField("sysURL") + "</A> <br><br>";
 		StudyDAO sdao = getStudyDAO();
-		StudyBean emailParentStudy = new StudyBean();
+		StudyBean emailParentStudy;
 		if (currentStudy.getParentStudyId() > 0) {
 			emailParentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
 		} else {
@@ -156,7 +155,8 @@ public class UnLockUserServlet extends Controller {
 		}
 		body += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
 		logger.info("Sending email...begin");
-		sendEmail(u.getEmail().trim(), restext.getString("your_new_openclinica_account_has_been_restored"), body, false, request);
+		sendEmail(u.getEmail().trim(), restext.getString("your_new_openclinica_account_has_been_restored"), body,
+				false, request);
 		logger.info("Sending email...done");
 	}
 
