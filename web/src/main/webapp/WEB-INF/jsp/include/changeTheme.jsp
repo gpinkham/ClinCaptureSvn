@@ -152,6 +152,8 @@
                     'url(images/violet/button_Search_BG.gif)');
             $('input.button_search').css('background-image',
                     'url(images/violet/button_Search_BG.gif)');
+            $('button.button_search').css('background-image',
+                    'url(images/violet/button_Search_BG.gif)');
             $('.sidebar').css('color', '#AA62C6');
 
             $("img[src*='images/code_blue.png']").each(function () {
@@ -284,6 +286,7 @@
             $('input.navSearchButton:submit').css('background-image', 'url(images/green/bt_navSearch.gif)');
             $('input.button_search:submit').css('background-image', 'url(images/green/button_Search_BG.gif)');
             $('input.button_search').css('background-image', 'url(images/green/button_Search_BG.gif)');
+            $('button.button_search').css('background-image', 'url(images/green/button_Search_BG.gif)');
             $('.sidebar').css('color', '#75b894');
 
             $("img[src*='images/code_blue.png']").each(function () {
