@@ -59,7 +59,8 @@
 	</span>
 </h1>
 
-<form id="addCRFToDefinition" name="crfForm" action="AddCRFToDefinition"  method="post">
+<form id="addCRFToDefinition" name="crfForm" action="AddCRFToDefinition"  method="post"
+	  onkeydown="if (event.keyCode == 13) {event.preventDefault ? event.preventDefault() : $.event.fix(event).preventDefault();} return true;">
 	<input type="hidden" name="actionName" value="">
 	<input type="hidden" name="pageNum" value="2">
 

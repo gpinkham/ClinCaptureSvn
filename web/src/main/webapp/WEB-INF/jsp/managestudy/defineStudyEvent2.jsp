@@ -68,7 +68,8 @@
 
 <p><fmt:message key="select_CRFs_to_define_study_event" bundle="${restext}"/></p>
 <br>
-<form name="crfForm" action="DefineStudyEvent" method="post">
+<form name="crfForm" action="DefineStudyEvent" method="post"
+	  onkeydown="if (event.keyCode == 13) {event.preventDefault ? event.preventDefault() : $.event.fix(event).preventDefault();} return true;">
 <input type="hidden" name="actionName" value="next">
 <input type="hidden" name="pageNum" value="2">
 

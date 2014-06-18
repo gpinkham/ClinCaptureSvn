@@ -47,7 +47,7 @@
 		<td>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
-	<table border="0" cellpadding="0" cellspacing="0">
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 
 <!-- Table Actions row (pagination, search, tools) -->
 
@@ -93,13 +93,14 @@
 				<tr>
 					<td valign="top">
 						<div class="formfieldM_BG">
-						<input name="ebl_filterKeyword" type="text" class="formfieldM" value="<c:out value="${table.keywordFilter}"/>"/>
+						<input name="ebl_filterKeyword" type="text" class="formfieldM" value="<c:out value="${table.keywordFilter}"/>"
+							   onkeydown="if (event.keyCode === 13 && $(this).val() != '') { $(document.forms[1]).find('input[name=FindButton]').trigger('click');}"/>
 						</div>
 					</td>
 					<td valign="top">
 						<c:set var="searchQuery" value="${table.baseGetQuery}&ebl_page=1&ebl_sortColumnInd=${table.sortingColumnInd}&ebl_sortAscending=${ascending}&ebl_filtered=1&ebl_paginated=${paginated}" />
-						<input type="button" name="FindButton" class="button_search" value="<fmt:message key="find" bundle="${resword}"/>"
-							   onclick="document.forms[1].action='<c:out value="${searchQuery}"/>';document.forms[1].submit();" />
+						<input type="button" name="FindButton" class="button_search" value="<fmt:message key='find' bundle='${resword}'/>"
+							   onclick="document.forms[1].action='<c:out value="${searchQuery}"/>';document.forms[1].submit();"/>
 					</td>
 				</tr>
 			</table>
