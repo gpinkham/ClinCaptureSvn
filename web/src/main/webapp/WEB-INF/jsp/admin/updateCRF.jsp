@@ -51,6 +51,7 @@
 
 <P>* <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 <form action="UpdateCRF" method="post">
+<input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag}">
 <input type="hidden" name="action" value="confirm">
 <div style="width: 450px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -59,14 +60,14 @@
 <table border="0" cellpadding="0" cellspacing="0">
   <tr valign="top"><td class="formlabel"><fmt:message key="name" bundle="${resword}"/>:</td>
    <td>
-    <div class="formfieldXL_BG"><input type="text" name="name" onchange="javascript:changeIcon();" value="<c:out value="${crf.name}"/>" class="formfieldXL"></div>
+    <div class="formfieldXL_BG"><input type="text" name="name" value="<c:out value="${crf.name}"/>" class="formfieldXL"></div>
    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include>
    </td><td class="formlabel">*</td>
    </tr>
   <tr valign="top"><td class="formlabel"><fmt:message key="description" bundle="${resword}"/>:</td>
   <td>
   <div class="formtextareaXL4_BG">
-  <textarea class="formtextareaXL4" name="description" onchange="javascript:changeIcon();" rows="4" cols="50"><c:out value="${crf.description}"/></textarea>
+  <textarea class="formtextareaXL4" name="description" rows="4" cols="50"><c:out value="${crf.description}"/></textarea>
   </div><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include></td></tr>
   </tr>
 
@@ -77,8 +78,8 @@
 </div>
  <input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
 					value="<fmt:message key="back" bundle="${resword}"/>" 
-					class="button_medium" 
-					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
+					class="button_medium"
+                    onClick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 
  <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
  <%-- <input type="button" onclick="confirmCancel('ListCRF');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>--%>

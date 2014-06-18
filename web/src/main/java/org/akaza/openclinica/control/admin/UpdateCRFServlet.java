@@ -114,7 +114,9 @@ public class UpdateCRFServlet extends Controller {
 			request.getSession().setAttribute(CRF, crf);
 			forwardPage(Page.UPDATE_CRF, request, response);
 		} else {
-			if ("confirm".equalsIgnoreCase(action)) {
+			if ("back".equalsIgnoreCase(action)) {
+				forwardPage(Page.UPDATE_CRF, request, response);
+			} else if ("confirm".equalsIgnoreCase(action)) {
 				confirmCRF(request, response);
 
 			} else if ("submit".equalsIgnoreCase(action)) {
