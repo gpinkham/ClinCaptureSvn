@@ -2277,6 +2277,7 @@ span.re_indicator {
     margin-left: 4px;
     margin-right: -20px;
     white-space: nowrap;
+    position: absolute;
 }
 
 table.crfListTable {
@@ -2686,6 +2687,10 @@ a.dnShortcut:hover {
 td.borderHighlight{
 	border-top: 2px solid orange !important; 
 	border-bottom: 2px solid orange !important;
+}
+
+#findSubjects > thead > tr.header > td {
+    min-width: 50px;
 }
 
 td.borderHighlightTop{
