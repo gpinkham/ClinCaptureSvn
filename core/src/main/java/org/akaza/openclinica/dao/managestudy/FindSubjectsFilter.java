@@ -107,22 +107,44 @@ public class FindSubjectsFilter implements CriteriaCommand {
 							.append(eventDefinitionId).append("))");
 				}
 
-				if (subjectEventStatusId != SubjectEventStatus.NOT_SCHEDULED.getId()) {
+				String notScheduledFilter = new StringBuilder("")
+						.append(" AND (se.study_subject_id IS NULL OR (se.study_event_definition_id != ")
+						.append(eventDefinitionId)
+						.append(" AND ss.study_subject_id NOT IN (SELECT DISTINCT ss1.study_subject_id ")
+						.append(" FROM study_subject ss1 LEFT JOIN study_event")
+						.append(" ON ss1.study_subject_id = study_event.study_subject_id")
+						.append(" WHERE study_event.study_event_definition_id = ").append(eventDefinitionId)
+						.append(")))").toString();
 
-					theCriteria.append(" AND ").append(" ( se.study_event_definition_id = ").append(eventDefinitionId)
-							.append(" AND se.subject_event_status_id = ").append(subjectEventStatusId).append(" )");
-				} else {
+				if (subjectEventStatusId == SubjectEventStatus.NOT_SCHEDULED.getId()) {
 
 					theCriteria
 							.append(" AND ss.status_id NOT IN (").append(Status.DELETED.getId()).append(", ")
 							.append(Status.AUTO_DELETED.getId()).append(", ").append(Status.LOCKED.getId()).append(")")
-							.append(" AND (se.study_subject_id IS NULL OR (se.study_event_definition_id != ")
-							.append(eventDefinitionId)
-							.append(" AND ss.study_subject_id NOT IN (SELECT DISTINCT ss1.study_subject_id ")
-							.append(" FROM study_subject ss1 LEFT JOIN study_event")
-							.append(" ON ss1.study_subject_id = study_event.study_subject_id")
-							.append(" WHERE study_event.study_event_definition_id = ").append(eventDefinitionId)
-							.append(")))");
+							.append(notScheduledFilter);
+
+				} else if (subjectEventStatusId == SubjectEventStatus.REMOVED.getId()) {
+
+					theCriteria
+							.append(" AND ((ss.status_id IN (").append(Status.DELETED.getId()).append(", ")
+							.append(Status.AUTO_DELETED.getId()).append(")")
+							.append(notScheduledFilter).append(")")
+							.append(" OR ( se.study_event_definition_id = ").append(eventDefinitionId)
+							.append(" AND se.subject_event_status_id = ").append(subjectEventStatusId).append(" ))");
+
+				} else if (subjectEventStatusId == SubjectEventStatus.LOCKED.getId()) {
+
+					theCriteria
+							.append(" AND ((ss.status_id = ").append(Status.LOCKED.getId())
+							.append(notScheduledFilter).append(")")
+							.append(" OR ( se.study_event_definition_id = ").append(eventDefinitionId)
+							.append(" AND se.subject_event_status_id = ").append(subjectEventStatusId).append(" ))");
+
+				} else {
+
+					theCriteria
+							.append(" AND ( se.study_event_definition_id = ").append(eventDefinitionId)
+							.append(" AND se.subject_event_status_id = ").append(subjectEventStatusId).append(" )");
 				}
 
 			} else if (property.startsWith("sgc_")) {

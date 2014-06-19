@@ -234,15 +234,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	@Override
 	public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {
 		super.configureTableFacade(response, tableFacade);
-		int stratFrom = getColumnNamesMap(tableFacade);
+		int startFrom = getColumnNamesMap(tableFacade);
 		tableFacade.addFilterMatcher(new MatcherKey(Character.class), new CharFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(Status.class), new StatusFilterMatcher());
 
-		for (int i = stratFrom; i < stratFrom + studyGroupClasses.size(); i++) {
+		for (int i = startFrom; i < startFrom + studyGroupClasses.size(); i++) {
 			tableFacade
 					.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectGroupFilterMatcher());
 		}
-		for (int i = stratFrom + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
+		for (int i = startFrom + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
 			tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]),
 					new SubjectEventStatusFilterMatcher());
 		}
@@ -722,8 +722,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	public class SubjectEventStatusFilterMatcher implements FilterMatcher {
 		public boolean evaluate(Object itemValue, String filterValue) {
-			String item = StringUtils.lowerCase(SubjectEventStatus.getSubjectEventStatusName((Integer) itemValue));
-			return filterValue.equals(resterms.getString(item));
+			// No need to evaluate itemValue and filterValue.
+			return true;
 		}
 	}
 
