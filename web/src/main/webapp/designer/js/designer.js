@@ -1303,19 +1303,19 @@ function resetStudy(params) {
 		$(".dotted-border:not(:empty), .target:not(:empty)").each(function() {
 			var item = parser.findStudyItem({
 				study: params.study,
-				name: $(this).val()
+				name: $(this).text()
 			});
-			// These change with the study
-			$(this).attr('event-oid', item.eventOid);
-			$(this).attr('study-oid', params.study.oid);
-			parser.resetTarget({
-				evt: item.eventOid,
-				oid: $(this).attr('item-oid')
-			});
+            if (item) {
+                $(this).attr('event-oid', item.eventOid);
+                $(this).attr('study-oid', params.study.oid);
+                parser.resetTarget({
+                    evt: item.eventOid,
+                    oid: $(params.target).attr('item-oid')
+                });
+            }
 		});
 	}
 }
-
 function showCRFItem(ele) {
 	parser.recursiveSelect({
 		click: true,
