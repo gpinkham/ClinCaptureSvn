@@ -1103,4 +1103,24 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(1, eventCRFId);
 		this.execute(digester.getQuery("deleteEventCRFDNMap"), variables);
 	}
+	
+	public ArrayList<Integer> findAllIdsWithRequiredSDVCodesBySSubjectId(int studySujectId) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+		
+		HashMap variables = new HashMap();
+		variables.put(1, studySujectId);
+		variables.put(2, 1);
+		variables.put(3, 2);
+		variables.put(4, 1);
+		variables.put(5, 2);
+		String sql = digester.getQuery("findAllIdsWithSDVCodesBySSubjectId");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
+			al.add((Integer) hm.get("event_crf_id"));
+		}
+		return al;
+	}
 }

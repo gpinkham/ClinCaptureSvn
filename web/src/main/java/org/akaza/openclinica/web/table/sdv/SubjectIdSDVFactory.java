@@ -283,24 +283,29 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
 		int numberOfCompletedEventCRFs = stats.get("numberOfCompletedEventCRFs");
 		int numberOfSDVdEventCRFs = stats.get("numberOfSDVdEventCRFs");
+		int numberOfCompletedRequiredEventCRFs = stats.get("numberOfCompletedRequiredEventCRFs");
+		int numberOfSDVdRequiredEventCRFs = stats.get("numberOfSDVdRequiredEventCRFs");
 		boolean studySubjectSDVd = stats.get("studySubjectSDVd") == 1;
 		boolean shouldDisplaySDVButton = stats.get("shouldDisplaySDVButton") == 1;
 		String allowSdvWithOpenQueries = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries();
-		boolean areAllCompletedEventCRFsHaveUnclosedDNs = allowSdvWithOpenQueries.equals("no")
-				&& stats.get("areAllCompletedEventCRFsHaveUnclosedDNs") == 1;
+		boolean areAllCompletedRequiredEventCRFsHaveUnclosedDNs = allowSdvWithOpenQueries.equals("no")
+				&& stats.get("areAllCompletedRequiredEventCRFsHaveUnclosedDNs") == 1;
 
 		row.setNumberCRFComplete(numberOfCompletedEventCRFs + "");
 		row.setNumberOfCRFsSDV(numberOfSDVdEventCRFs + "");
 
 		StringBuilder sdvStatus = new StringBuilder("");
-		if (studySubjectSDVd || (numberOfSDVdEventCRFs > 0 && numberOfCompletedEventCRFs == numberOfSDVdEventCRFs)) {
+		boolean areCRFsSDVed = numberOfSDVdRequiredEventCRFs > 0 ? (numberOfCompletedRequiredEventCRFs == numberOfSDVdRequiredEventCRFs) 
+				: numberOfSDVdEventCRFs > 0 ? (numberOfCompletedEventCRFs == numberOfSDVdEventCRFs) : false;
+		
+		if (studySubjectSDVd || areCRFsSDVed) {
 			sdvStatus.append("<center><a href='javascript:void(0)' onclick='prompt(document.sdvForm,");
 			sdvStatus.append(studySubjectBean.getId());
 			sdvStatus.append(")'>");
 			sdvStatus.append(getIconForCrfStatusPrefix()).append("DoubleCheck").append(ICON_FORCRFSTATUS_SUFFIX)
 					.append("</a></center>");
 		} else {
-			if (numberOfCompletedEventCRFs > 0 && !areAllCompletedEventCRFsHaveUnclosedDNs) {
+			if (numberOfCompletedRequiredEventCRFs > 0 && !areAllCompletedRequiredEventCRFsHaveUnclosedDNs) {
 				sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ")
 						.append("class='sdvCheck'").append(" name='").append("sdvCheck_")
 						.append(studySubjectBean.getId()).append("' onclick='setAccessedObjected(this)'")
@@ -326,8 +331,8 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		urlPrefix.append(path).append("\">");
 		actions.append(urlPrefix).append(SDVUtil.VIEW_ICON_HTML).append("</a></td>");
 
-		if (!studySubjectSDVd && shouldDisplaySDVButton && numberOfCompletedEventCRFs > 0
-				&& !areAllCompletedEventCRFsHaveUnclosedDNs) {
+		if (!studySubjectSDVd && shouldDisplaySDVButton && numberOfCompletedRequiredEventCRFs > 0
+				&& !areAllCompletedRequiredEventCRFsHaveUnclosedDNs) {
 			actions.append("<td><input type=\"image\" src=\"").append(contextPath)
 					.append("/images/icon_DoubleCheck_Action.gif\"").append(" name=\"sdvSubmit\" ")
 					.append("onclick=\"").append("this.form.method='GET'; this.form.action='").append(contextPath)
@@ -351,16 +356,20 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 		EventDefinitionCRFDAO eventDefinitionCrfDAO = new EventDefinitionCRFDAO(dataSource);
 		CRFDAO crfDAO = new CRFDAO(dataSource);
+		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		StudyEventBean studyEventBean;
 		Integer numberOfCompletedEventCRFs = 0;
 		Integer numberOfSDVdEventCRFs = 0;
+		Integer numberOfCompletedRequiredEventCRFs = 0;
+		Integer numberOfSDVdRequiredEventCRFs = 0;
 		List<Integer> eventCRFDefIds = eventDefinitionCrfDAO.getRequiredEventCRFDefIdsThatShouldBeSDVd(studyBean);
 		List<Integer> eventCRFDefIdsCopy = new ArrayList<Integer>(eventCRFDefIds);
 		HashMap<String, Integer> stats = new HashMap<String, Integer>();
+		List<Integer> eventCRFIdWithRequiredSDVCodesList = eventCRFDAO.findAllIdsWithRequiredSDVCodesBySSubjectId(studySubject.getId());
 
 		if (studyBean.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("no")) {
-			stats.put("areAllCompletedEventCRFsHaveUnclosedDNs",
-					areAllCompletedEventCRFsHaveUnclosedDNs(studySubject, eventCRFBeans) ? 1 : 0);
+			stats.put("areAllCompletedRequiredEventCRFsHaveUnclosedDNs",
+					areAllCompletedRequiredEventCRFsHaveUnclosedDNs(studySubject, eventCRFIdWithRequiredSDVCodesList, eventCRFBeans) ? 1 : 0);
 		}
 
 		boolean canNotMarkAsSDVd = eventCRFDefIds.size() == 0;
@@ -382,10 +391,14 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 			// get number of completed event crfs
 			if (eventBean.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) {
 				numberOfCompletedEventCRFs++;
+				if (eventCRFIdWithRequiredSDVCodesList.contains(eventBean.getId())) 
+					numberOfCompletedRequiredEventCRFs++;
 			}
 			// get number of completed event SDVd eventeventDefinitionCrfDAOs
 			if (eventBean.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE && eventBean.isSdvStatus()) {
 				numberOfSDVdEventCRFs++;
+				if (eventCRFIdWithRequiredSDVCodesList.contains(eventBean.getId())) 
+					numberOfSDVdRequiredEventCRFs++;
 			}
 			if (eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
 					|| eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED) {
@@ -403,20 +416,23 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
 		stats.put("numberOfCompletedEventCRFs", numberOfCompletedEventCRFs);
 		stats.put("numberOfSDVdEventCRFs", numberOfSDVdEventCRFs);
+		stats.put("numberOfCompletedRequiredEventCRFs", numberOfCompletedRequiredEventCRFs);
+		stats.put("numberOfSDVdRequiredEventCRFs", numberOfSDVdRequiredEventCRFs);
 		stats.put("studySubjectSDVd", !canNotMarkAsSDVd && eventCRFDefIds.size() == 0 ? 1 : 0);
 		stats.put("shouldDisplaySDVButton", !canNotMarkAsSDVd && eventCRFDefIdsCopy.size() == 0 ? 1 : 0);
 		return stats;
 	}
 
-	private boolean areAllCompletedEventCRFsHaveUnclosedDNs(StudySubjectBean studySubject,
-			List<EventCRFBean> eventCRFBeans) {
+	private boolean areAllCompletedRequiredEventCRFsHaveUnclosedDNs(StudySubjectBean studySubject,
+			List<Integer> eventCRFIdWithRequiredSDVCodesList, List<EventCRFBean> eventCRFBeans) {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(dataSource);
 		List<Integer> eventCRFIdWithUnclosedDNsList = dndao.findAllEvCRFIdsWithUnclosedDNsByStSubId(studySubject
 				.getId());
 
 		for (EventCRFBean eventBean : eventCRFBeans) {
 			if (eventBean.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE && !eventBean.isSdvStatus()
-					&& !eventCRFIdWithUnclosedDNsList.contains(eventBean.getId())) {
+					&& (eventCRFIdWithRequiredSDVCodesList.contains(eventBean.getId()) 
+							&& !eventCRFIdWithUnclosedDNsList.contains(eventBean.getId()))) {
 				return false;
 			}
 		}

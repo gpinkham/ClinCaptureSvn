@@ -653,4 +653,20 @@
 			itd.event_crf_id = evc.event_crf_id order by evc.event_crf_id))
         </sql>
     </query>
+	<query>
+		<name>findAllIdsWithSDVCodesBySSubjectId</name>
+		<sql>
+			SELECT distinct ec.event_crf_id
+			FROM event_crf ec, study_event se, event_definition_crf edc, crf_version cv, crf
+			WHERE 
+			ec.study_subject_id = ?
+			AND cv.crf_version_id = ec.crf_version_id
+			AND crf.crf_id = cv.crf_id
+			AND se.study_event_id = ec.study_event_id
+			AND se.study_subject_id = ec.study_subject_id
+			AND edc.study_event_definition_id = se.study_event_definition_id
+			AND edc.crf_id = crf.crf_id
+			AND edc.source_data_verification_code in (?,?,?,?)
+		</sql>
+	</query>
 </queries>
