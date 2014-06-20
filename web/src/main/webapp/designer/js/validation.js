@@ -16,7 +16,7 @@
 $(function() {
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 	$("a[id='back']").attr("href", c + "/designer/rule.html");
-	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true&restore=true");
+	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment");
 	var rule = JSON.parse(sessionStorage.getItem("rule"));
 	if (rule.validation) {
 		console.log(rule.xml);

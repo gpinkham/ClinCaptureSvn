@@ -269,7 +269,7 @@
                 <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
                 <c:if test="${!(study.parentStudyId > 0 && (userRole.studyAdministrator || userBean.name == 'root'))}">
-                    <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true&ruleAssignments_restore=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
                     <c:if test="${countOfElementsOnTheRightSide >= 3}">
                         <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
                     </c:if>
@@ -420,7 +420,7 @@
                 <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
                 <c:if test="${!(study.parentStudyId > 0 && userRole.studyAdministrator)}">
-                    <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true&ruleAssignments_restore=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
                     <c:if test="${countOfElementsOnTheRightSide >= 3}">
                         <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
                     </c:if>

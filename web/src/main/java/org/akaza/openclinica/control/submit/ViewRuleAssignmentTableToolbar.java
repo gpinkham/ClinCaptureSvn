@@ -66,11 +66,11 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
 		public String enabled() {
 			HtmlBuilder html = new HtmlBuilder();
 			if (showMoreLink) {
-				html.a().id("showMore").href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],true);")
+				html.a().id("showMore").href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],true); onInvokeAction('ruleAssignments','filter');")
 						.close();
 				html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
 				html.a().id("hide").style("display: none;")
-						.href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],false);").close();
+						.href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],false); onInvokeAction('ruleAssignments','filter');").close();
 				html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
 				html.script()
@@ -80,13 +80,13 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
 								+ "],false);" + " if($.browser.msie){" + " $('tr.header td div:last').each(function(){"
 								+ " $(this).click();" + "var ah = $(this).height();"
 								+ "$('tr.header td div').each(function(){" + "$(this).css('height',ah);" + "});"
-								+ "});" + "}" + "});").scriptEnd();
+								+ "});" + "}" + "}); onInvokeAction('ruleAssignments','filter');").scriptEnd();
 			} else {
-				html.a().id("hide").href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],false);")
+				html.a().id("hide").href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],false); onInvokeAction('ruleAssignments','filter');")
 						.close();
 				html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 				html.a().id("showMore").style("display: none;")
-						.href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],true);").close();
+						.href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],true); onInvokeAction('ruleAssignments','filter');").close();
 				html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
 			}
 			return html.toString();

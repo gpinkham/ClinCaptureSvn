@@ -34,6 +34,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -51,13 +52,19 @@ import org.springframework.stereotype.Component;
  * @author Krikor krumlian
  */
 @Component
-public class ViewRuleAssignmentNewServlet extends Controller {
+public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 9116068126651934226L;
+	public static final String RULE_LIST_PAGE = "ruleListUrl";
 	protected final Logger log = LoggerFactory.getLogger(ViewRuleAssignmentNewServlet.class);
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		if (shouldRedirect(request, response)) {
+			return;
+		}
+
 		FormProcessor fp = new FormProcessor(request);
 		boolean isDesigner = false;
         boolean showMoreLink;
@@ -177,5 +184,29 @@ public class ViewRuleAssignmentNewServlet extends Controller {
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+	}
+
+	@Override
+	protected String getUrlKey(HttpServletRequest request) {
+		return RULE_LIST_PAGE;
+	}
+
+	@Override
+	protected String getDefaultUrl(HttpServletRequest request) {
+
+		FormProcessor fp = new FormProcessor(request);
+		return "?module=" + fp.getString("module")
+				+ "&maxRows=15&showMoreLink=true&ruleAssignments_tr_=true&ruleAssignments_p_=1&ruleAssignments_mr_=15";
+	}
+
+	@Override
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
+		return request.getQueryString() == null || !request.getQueryString().contains("ruleAssignments");
+	}
+
+	@Override
+	protected String getSavedUrl(String key, HttpServletRequest request) {
+		String savedUrl = (String) request.getSession().getAttribute(key);
+		return savedUrl == null ? savedUrl : savedUrl.replace("&ruleAssignments_e_=pdf", "").replace("&ruleAssignments_e_=jexcel", "");
 	}
 }

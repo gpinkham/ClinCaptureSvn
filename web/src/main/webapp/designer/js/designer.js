@@ -1200,7 +1200,7 @@ function removeLoader() {
 
 	$(".spinner").remove();
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
-	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true&restore=true");
+	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment");
 }
 
 function createPrompt(params) {

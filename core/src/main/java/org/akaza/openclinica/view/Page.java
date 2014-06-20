@@ -455,8 +455,7 @@ public class Page {
 			"Verify Imported Rules");
 	public final static Page VIEW_RULES = new Page("/WEB-INF/jsp/submit/viewRules.jsp", "View Rules");
 	public final static Page VIEW_EXECUTED_RULES = new Page("/WEB-INF/jsp/submit/viewExecutedRules.jsp", "View Rules");
-	public final static Page LIST_RULE_SETS_SERVLET = new Page("/ViewRuleAssignment?read=true&restore=true",
-			"List Rule Assignments");
+	public final static Page LIST_RULE_SETS_SERVLET = new Page("/ViewRuleAssignment", "List Rule Assignments");
 	public final static Page REMOVE_RULE_SET = new Page("/WEB-INF/jsp/submit/removeRuleSet.jsp", "Remove RuleSet");
 	public final static Page RESTORE_RULE_SET = new Page("/WEB-INF/jsp/submit/restoreRuleSet.jsp", "Remove RuleSet");
 	public final static Page VIEW_EXECUTED_RULES_FROM_CRF = new Page(

@@ -132,7 +132,7 @@
 </c:otherwise>
 </c:choose>
 <%-- <input type="button" onclick="goBack()"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/> --%>
-<input type="button" name="cancel" id="GoToManageRules" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onclick="window.location.href=('ViewRuleAssignment?read=true');"/>
+<input type="button" name="cancel" id="GoToManageRules" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onclick="window.location.href=('ViewRuleAssignment');"/>
 
 </p>
 
@@ -530,7 +530,7 @@
 </c:otherwise>
 </c:choose>
 <%-- <input type="button" onclick="goBack()"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/> --%>
-<input type="button" name="cancel" id="GoToManageRules" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onclick="window.location.href=('ViewRuleAssignment?read=true');"/>
+<input type="button" name="cancel" id="GoToManageRules" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onclick="window.location.href=('ViewRuleAssignment');"/>
 
 </form>
 
