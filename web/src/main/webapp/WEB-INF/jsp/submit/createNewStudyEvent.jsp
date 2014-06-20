@@ -116,10 +116,10 @@
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
 <script type="text/JavaScript" language="JavaScript">
   <!--
- function myCancel() {
+function myCancel() {
 
     cancelButton=document.getElementById('cancel');
-    if ( cancelButton != null) {
+    if (cancelButton != null) {
     	confirmDialog({ 
     		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
     		height: 150,
@@ -130,10 +130,27 @@
      }
      return true;
   }
+  
+function setDNFlag(strImageName,strParentWinImageFullPath, resolutionStatusId) {
+    var objImage;
+    objImage = MM_findObj(strImageName);
+    if (objImage != null) {
+        objImage.src = strParentWinImageFullPath;
+    }
+}
    //-->
 </script>
-<P><fmt:message key="field_required" bundle="${resword}"/></P>
 
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:forEach var="updatedDiscrepancyNote" items="${notSavedDNs}">
+	<script type="text/JavaScript" language="JavaScript">	
+		$(document).ready(function() {
+			setDNFlag('flag_${updatedDiscrepancyNote.field}', '${contextPath}/${updatedDiscrepancyNote.resStatus.iconFilePath}');
+		});
+	</script>
+</c:forEach>
+
+<P><fmt:message key="field_required" bundle="${resword}"/></P>
 <form action="CreateNewStudyEvent" method="post">
 <input type="hidden" id="openFirstCrf" name="openFirstCrf" value="false"/>
 <input type="hidden" id="formWithStateFlag" value=""/>

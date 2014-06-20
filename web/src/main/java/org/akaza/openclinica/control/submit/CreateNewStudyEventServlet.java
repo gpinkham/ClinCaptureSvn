@@ -26,6 +26,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -58,6 +59,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -103,6 +105,9 @@ public class CreateNewStudyEventServlet extends Controller {
 	public final static String[] INPUT_ENDDATE_PREFIX_SCHEDULED = { "endScheduled0", "endScheduled1", "endScheduled2",
 			"endScheduled3" };
 	public final static String[] DISPLAY_SCHEDULED = { "display0", "display1", "display2", "display3" };
+	
+	public final static String[] EVENT_FIELDS = { INPUT_LOCATION, INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX };
+	
 	public final static int ADDITIONAL_SCHEDULED_NUM = 4;
 
 	private void processEvents(JSONArray eventDefs, String eventDivId, int studyEventId,
@@ -548,7 +553,8 @@ public class CreateNewStudyEventServlet extends Controller {
 				setPresetValues(fp.getPresetValues(), request);
 				setupBeans(request, response, eventDefinitions);
 				request.setAttribute("eventDefinitionsScheduled", eventDefinitionsScheduled);
-
+				sendToRequestListOfDNsToShowCorrectFlags(request);
+				
 				if (popupQuery) {
 					response.setContentType("application/json");
 					JSONObject jsonObject = new JSONObject();
@@ -605,8 +611,8 @@ public class CreateNewStudyEventServlet extends Controller {
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
 						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 				DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
-				String[] eventFields = { INPUT_LOCATION, INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX };
-				for (String element : eventFields) {
+				
+				for (String element : EVENT_FIELDS) {
 					AddNewSubjectServlet.saveFieldNotes(element, fdn, dndao, studyEvent.getId(), "studyEvent",
 							currentStudy);
 				}
@@ -699,7 +705,6 @@ public class CreateNewStudyEventServlet extends Controller {
 							}
 						}
 					}
-
 				}
 
 				request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -721,6 +726,29 @@ public class CreateNewStudyEventServlet extends Controller {
 				}
 			}
 		}
+	}
+
+	private void sendToRequestListOfDNsToShowCorrectFlags(HttpServletRequest request) {
+		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
+				AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+
+		List<String> allFieldNames = new ArrayList<String>();
+		List<DiscrepancyNoteBean> notSavedDNs = new ArrayList<DiscrepancyNoteBean>();
+		allFieldNames.addAll(Arrays.asList(INPUT_SCHEDULED_LOCATION));
+		allFieldNames.addAll(Arrays.asList(INPUT_STARTDATE_PREFIX_SCHEDULED));
+		allFieldNames.addAll(Arrays.asList(INPUT_ENDDATE_PREFIX_SCHEDULED));
+		allFieldNames.addAll(Arrays.asList(EVENT_FIELDS));
+
+		for (String fieldName : allFieldNames) {
+			if (fdn.getFieldNotes() != null && fdn.getFieldNotes().get(fieldName) != null) {
+				List<DiscrepancyNoteBean> dns = (List<DiscrepancyNoteBean>) fdn.getFieldNotes().get(fieldName);
+				if (dns.size() > 0) {
+					notSavedDNs.add(dns.get(0));
+				}
+			}
+		}
+
+		request.setAttribute("notSavedDNs", notSavedDNs);
 	}
 
 	private String getEventDivForScheduledEvent(HttpServletRequest request, String pageToShowPopup,
