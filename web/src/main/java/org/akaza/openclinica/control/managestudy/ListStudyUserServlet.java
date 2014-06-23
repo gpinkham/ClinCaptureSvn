@@ -20,19 +20,12 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
@@ -40,6 +33,14 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyUserRoleRow;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Lists all the users in a study
@@ -50,11 +51,10 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 @Component
-public class ListStudyUserServlet extends Controller {
+public class ListStudyUserServlet extends RememberLastPage {
 
-	/**
-     *
-     */
+	public static final String LIST_STUDY_USER = "listStudyUserUrl";
+
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -68,13 +68,17 @@ public class ListStudyUserServlet extends Controller {
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_study_director"), "1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		if (shouldRedirect(request, response)) {
+			return;
+		}
+
 		StudyBean currentStudy = getCurrentStudy(request);
 
 		FormProcessor fp = new FormProcessor(request);
@@ -118,5 +122,30 @@ public class ListStudyUserServlet extends Controller {
 		request.setAttribute("study", currentStudy);
 		forwardPage(Page.LIST_USER_IN_STUDY, request, response);
 
+	}
+
+	@Override
+	protected String getUrlKey(HttpServletRequest request) {
+		return LIST_STUDY_USER;
+	}
+
+	@Override
+	protected String getDefaultUrl(HttpServletRequest request) {
+		FormProcessor fp = new FormProcessor(request);
+		String eblFiltered = fp.getString("ebl_filtered");
+		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
+		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
+		String eblSortAscending = fp.getString("ebl_sortAscending");
+		return new StringBuilder("").append("?submitted=1&module=").append(fp.getString("module"))
+				.append("&ebl_page=1&ebl_sortColumnInd=")
+				.append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0")).append("&ebl_sortAscending=")
+				.append((!eblSortAscending.isEmpty() ? eblSortAscending : "1")).append("&ebl_filtered=")
+				.append((!eblFiltered.isEmpty() ? eblFiltered : "0")).append("&ebl_filterKeyword=")
+				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1").toString();
+	}
+
+	@Override
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
+		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
 	}
 }
