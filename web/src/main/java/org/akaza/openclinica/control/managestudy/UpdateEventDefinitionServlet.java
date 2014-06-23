@@ -231,6 +231,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 		StudyBean currentStudy = getCurrentStudy(request);
 
 		ArrayList edcs = (ArrayList) request.getSession().getAttribute("eventDefinitionCRFs");
+		ArrayList childEdcs = (ArrayList) request.getSession().getAttribute("childEventDefCRFs");
 
 		SignStateRestorer signStateRestorer = (SignStateRestorer) request.getSession().getAttribute("signStateRestorer");
 
@@ -280,6 +281,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 			}
 		}
+		//Update child edcs
+		updateChildEdcs(request, childEdcs, ub, cdao, currentStudy, sed);
 
 		ArrayList<StudyEventBean> studyEventList = (ArrayList<StudyEventBean>) sedao
 				.findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved(study, sed.getId());
@@ -289,6 +292,34 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"), request);
 		forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
+	}
+	
+	/***
+	 * Update child event definition crfs
+	 * @param request
+	 * @param childEdcs
+	 * @param ub
+	 * @param cdao
+	 * @param currentStudy
+	 * @param sed
+	 */
+	private void updateChildEdcs(HttpServletRequest request, ArrayList childEdcs, UserAccountBean ub, EventDefinitionCRFDAO cdao, 
+			StudyBean currentStudy, StudyEventDefinitionBean sed) {
+		for (Object childEdc1 : childEdcs) {
+			EventDefinitionCRFBean childEdc = (EventDefinitionCRFBean) childEdc1;
+			if (childEdc.getId() > 0) {
+				childEdc.setUpdater(ub);
+				childEdc.setUpdatedDate(new Date());
+				cdao.update(childEdc);
+
+				if (childEdc.getStatus().equals(Status.DELETED) || childEdc.getStatus().equals(Status.AUTO_DELETED)) {
+					removeAllEventsItems(currentStudy, ub, childEdc, sed);
+				}
+				if (childEdc.getOldStatus() != null && childEdc.getOldStatus().equals(Status.DELETED)) {
+					restoreAllEventsItems(request, childEdc, sed);
+				}
+			}
+		}
 	}
 
 	public void removeAllEventsItems(StudyBean currentStudy, UserAccountBean ub, EventDefinitionCRFBean edc,
@@ -544,6 +575,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 	public static void clearSession(HttpSession session) {
 		session.removeAttribute("definition");
 		session.removeAttribute("eventDefinitionCRFs");
+		session.removeAttribute("childEventDefCRFs");
 		session.removeAttribute("tmpCRFIdMap");
 		session.removeAttribute("crfsWithVersion");
 		session.removeAttribute("eventDefinitionCRFs");

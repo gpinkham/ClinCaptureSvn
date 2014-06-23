@@ -161,6 +161,8 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 
 			EventDefinitionCRFDAO edao = getEventDefinitionCRFDAO();
 			ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllParentsByDefinition(defId);
+			//Get list of child EventDefinitionCRFs for cascading actions
+			ArrayList<EventDefinitionCRFBean> childEventDefCRFs = edao.findAllChildrenByDefinition(defId);
 
 			CRFVersionDAO cvdao = getCRFVersionDAO();
 			CRFDAO cdao = getCRFDAO();
@@ -179,9 +181,23 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 				edc.setDefaultVersionName(defaultVersion.getName());
 				newEventDefinitionCRFs.add(edc);
 			}
+			
+			for (EventDefinitionCRFBean childEdc : childEventDefCRFs) {
+				ArrayList versions = (ArrayList) cvdao.findAllActiveByCRF(childEdc.getCrfId());
+				childEdc.setVersions(versions);
+				CRFBean crf = (CRFBean) cdao.findByPK(childEdc.getCrfId());
+				childEdc.setCrfName(crf.getName());
+				childEdc.setCrf(crf);
+				childEdc.setNullFlags(processNullValues(childEdc));
+
+				CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(childEdc.getDefaultVersionId());
+				childEdc.setDefaultVersionName(defaultVersion.getName());
+			}
 
 			request.getSession().setAttribute("definition", sed);
 			request.getSession().setAttribute("eventDefinitionCRFs", newEventDefinitionCRFs);
+			//store child list to session
+			request.getSession().setAttribute("childEventDefCRFs", childEventDefCRFs);
 			// changed above to new list because static, in-place updating is updating all EDCs
 
 			request.getSession().setAttribute("signStateRestorer", prepareSignStateRestorer(newEventDefinitionCRFs));

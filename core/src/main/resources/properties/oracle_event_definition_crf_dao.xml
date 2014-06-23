@@ -44,6 +44,15 @@
 			</sql>
 		</query>
 		<query>
+			<name>findAllChildrenByDefinition</name>
+			<!-- Find all that have parents
+			     and currently those are for study  -->
+			<sql>SELECT * FROM EVENT_DEFINITION_CRF Where study_event_definition_id=?
+			     and parent_id is not null
+			     order by ordinal asc
+			</sql>
+		</query>
+		<query>
 			<name>findAllByDefinitionAndSiteIdAndParentStudyId</name>
 			<!-- find for the site given site_id or its parentStudy_id:
 			     SELECT * FROM EVENT_DEFINITION_CRF Where study_event_definition_id=?

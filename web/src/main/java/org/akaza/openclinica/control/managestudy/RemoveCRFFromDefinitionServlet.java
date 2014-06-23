@@ -20,6 +20,11 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -30,10 +35,6 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 
 /**
  * Remove the reference to a CRF from a study event definition
@@ -72,6 +73,8 @@ public class RemoveCRFFromDefinitionServlet extends Controller {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ArrayList<EventDefinitionCRFBean> edcs = (ArrayList<EventDefinitionCRFBean>) request.getSession().getAttribute(
 				"eventDefinitionCRFs");
+		ArrayList<EventDefinitionCRFBean> childEdcs = (ArrayList<EventDefinitionCRFBean>) request.getSession().getAttribute(
+				"childEventDefCRFs");
 		ArrayList updatedEdcs = new ArrayList();
 		if (edcs != null && edcs.size() > 1) {
 			String idString = request.getParameter("id");
@@ -83,8 +86,11 @@ public class RemoveCRFFromDefinitionServlet extends Controller {
 				// crf id
 				int id = Integer.valueOf(idString.trim());
 				for (EventDefinitionCRFBean edc : edcs) {
+					//Set edc status to deleted. Also make sure its child rows are also updated
 					if (edc.getCrfId() == id) {
 						edc.setStatus(Status.DELETED);
+						//Update children if any
+						setChildEdcsToAutoRemoved(childEdcs, edc);
 					}
 					if (edc.getId() > 0 || !edc.getStatus().equals(Status.DELETED)) {
 						updatedEdcs.add(edc);
@@ -92,6 +98,7 @@ public class RemoveCRFFromDefinitionServlet extends Controller {
 					}
 				}
 				request.getSession().setAttribute("eventDefinitionCRFs", updatedEdcs);
+				request.getSession().setAttribute("childEventDefCRFs", childEdcs);
 				addPageMessage(respage.getString("has_been_removed_need_confirmation"), request);
 				forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 			}
@@ -99,6 +106,14 @@ public class RemoveCRFFromDefinitionServlet extends Controller {
 		} else {
 			addPageMessage(respage.getString("an_ED_needs_to_have_least_one_CRF"), request);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
+		}
+	}
+	
+	private void setChildEdcsToAutoRemoved (ArrayList<EventDefinitionCRFBean> childEdcs, EventDefinitionCRFBean parentEdc) {
+		for (EventDefinitionCRFBean childEdc : childEdcs) {
+			if (childEdc.getParentId() == parentEdc.getId()) {
+				childEdc.setStatus(Status.AUTO_DELETED);
+			}
 		}
 	}
 }

@@ -215,6 +215,28 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		}
 		return al;
 	}
+	
+	/**
+	 * Find all EventDefinitionCRFBean which have no parent EventDefinitionCRFBean.
+	 * 
+	 * @param definitionId
+	 * @return
+	 */
+	public ArrayList<EventDefinitionCRFBean> findAllChildrenByDefinition(int definitionId) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(definitionId));
+
+		String sql = digester.getQuery("findAllChildrenByDefinition");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList<EventDefinitionCRFBean> al = new ArrayList<EventDefinitionCRFBean>();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
+		}
+		return al;
+	}
 
 	/**
 	 * Find all EventDefinitionCRFBean for the site

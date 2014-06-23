@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="Frank" id="2014-06-20-TICKET1475">
+		<comment>Set status for children of removed event definition crfs to auto-removed</comment>
+		<sql>
+			UPDATE event_definition_crf SET status_id = 7
+			WHERE parent_id IS NOT NULL
+			AND parent_id IN (SELECT event_definition_crf_id FROM event_definition_crf WHERE status_id = 5)
+		</sql>
+	</changeSet>
+</databaseChangeLog>
