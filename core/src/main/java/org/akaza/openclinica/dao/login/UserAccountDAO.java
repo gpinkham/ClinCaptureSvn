@@ -59,7 +59,7 @@ import java.util.Locale;
  *         <P>
  *         expand on query to get all that from a select star?
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class UserAccountDAO extends AuditableEntityDAO {
 
 	@Override
