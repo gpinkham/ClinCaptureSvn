@@ -17,8 +17,7 @@
 </c:choose>
 <script type="text/javascript" language="javascript">
     jQuery(window).load(function(){
-
-    	highlightLastAccessedObject(true);
+    	highlightLastAccessedObject(rowHighlightTypes.ROWSPAN);
     });
     
 </script>

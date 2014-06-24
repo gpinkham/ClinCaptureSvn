@@ -5,6 +5,7 @@ var firstFormState;
 var dnShortcutAnchors = ["firstNewDn", "firstUpdatedDn", "firstResolutionProposed", "firstClosedDn", "firstAnnotation"];
 var dnShortcutLinks = ["dnShortcutTotalNew", "dnShortcutTotalUpdated", "dnShortcutTotalResolutionProposed", "dnShortcutTotalClosed", "dnShortcutTotalAnnotations"];
 var dnFlagImages = ["icon_Note.gif", "icon_flagYellow.gif", "icon_flagBlack.gif", "icon_flagGreen.gif", "icon_flagWhite.gif"];
+var rowHighlightTypes = {NORMAL: 0, ROWSPAN: 1, MULTIPLE: 2};
 
 var pageTitle_SMForAllOfEvents = "/ListStudySubjects";
 var pageTitle_SMForSelectedEvent = "/ListEventsForSubjects";
@@ -4182,17 +4183,21 @@ function clearHighlight(withRowSpan) {
 	}
 }
 
-function highlightLastAccessedObject(hasRowSpan) {
+function highlightLastAccessedObject(rowHighlightType) {
 	
 	var attrName = $("#accessAttributeName").val();
 	if(attrName){
 		
 		var dataElement = $("a[" + attrName + "='" + getIdByAttributeName(attrName) + "']");
 		if(dataElement && $(dataElement).is("a")) {
-			if(!hasRowSpan) {
+			if(!rowHighlightType) {
 				setAccessedObjected(dataElement);
 			} else {
-				setAccessedObjectWithRowspans(dataElement);
+				if (rowHighlightType == rowHighlightTypes.ROWSPAN) {
+					setAccessedObjectWithRowspans(dataElement);
+				} else if (rowHighlightType == rowHighlightTypes.MULTIPLE) {
+					setAccessedObjectWithMultipleRows(dataElement);
+				}
 			}			
 		}
 	}	
@@ -4273,14 +4278,16 @@ function setAccessedObjectWithRowspans(element) {
 	//Refine attribute value accordingly
 	if(idValue.indexOf("_") > -1) {
 		idValue = idValue.substring(0, idValue.indexOf("_"));
+		//Working backwards: Get dataElement with attribute value idValue
+		dataElement = $("a["+attrName+"='"+idValue+"']");
+		//Get row containing datElement;
+		tr = getElementRow(dataElement);
 	}
-	//Working backwards: Get dataElement with attribute value idValue
-	dataElement = $("a["+attrName+"='"+idValue+"']");
+	
 	//Clear highlight with rowspan
 	clearHighlight(true);
 	setAccessedObjected(dataElement);
-	//Get row containing datElement;
-	tr = getElementRow(dataElement);
+	//Refine highlights to cater for rowspans
 	refineHighlightForRowspans(element, tr);
 }
 
@@ -4312,6 +4319,49 @@ function getLastRowSpanned(firstRow, rowspan) {
 		nextRow = $(nextRow).next("tr");
 	}
 	return nextRow;
+}
+
+function setAccessedObjectWithMultipleRows(element) {
+	if(isBrowserIE7OrLower()) {
+		return;
+	}
+	var rowCountAttr = "data-cc-rowCount";
+	//Get attribute name e.g. data-cc-crfId
+	var attrName = $("#accessAttributeName").val();
+	//Get row with element containing the attribute
+	var tr = getElementRow(element);
+	//Get the element containing the attribute
+	var dataElement = $(tr).find("a["+attrName+"]");
+	//Get attribute value
+	var idValue = $(dataElement).attr(attrName);
+	//Refine attribute value accordingly
+	if(idValue.indexOf("_") > -1) {
+		idValue = idValue.substring(0, idValue.indexOf("_"));
+		//Working backwards: Get dataElement with attribute value idValue
+		dataElement = $("a["+attrName+"='"+idValue+"']");
+		//Get row containing datElement;
+		tr = getElementRow(dataElement);
+	}	
+	//Clear highlight with rowspan/multiple rows
+	clearHighlight(true);
+	
+	//Get number of rows
+	var rowNum = parseInt($(dataElement).attr(rowCountAttr));
+	//Get last row in group
+	var lastRow = getLastRowSpanned(tr, ++rowNum);
+	//Highlight first and last rows
+	highlightRow(tr, "borderHighlightTop");
+	highlightRow(lastRow, "borderHighlightBottom");
+	//Persist last accessed object
+	setIdByAttributeName(attrName, idValue);
+}
+
+function highlightRow(row, cssClass) {
+	$(row).children('td').each(function() {
+		if($(this).is(":visible")) {
+			$(this).addClass(cssClass);
+		}		
+	});	
 }
 
 function changeDefinitionOrdinal(params) {

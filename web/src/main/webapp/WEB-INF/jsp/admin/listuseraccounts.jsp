@@ -6,9 +6,8 @@
 <jsp:include page="../include/admin-header.jsp"/>
 
 <script type="text/javascript" language="javascript">
-    jQuery(window).load(function(){
-
-    	highlightLastAccessedObject();
+    jQuery(window).load(function() {
+    	highlightLastAccessedObject(rowHighlightTypes.MULTIPLE);
     });
     
 </script>
