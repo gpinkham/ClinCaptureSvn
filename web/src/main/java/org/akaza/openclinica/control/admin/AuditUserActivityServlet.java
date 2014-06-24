@@ -22,8 +22,11 @@ package org.akaza.openclinica.control.admin;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
+import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -34,9 +37,11 @@ import org.springframework.stereotype.Component;
  * @author Krikor Krumlian
  */
 @Component
-public class AuditUserActivityServlet extends Controller {
+public class AuditUserActivityServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 1L;
+	
+	public static final String LIST_USER_AUDIT_LOGS = "listUserAuditLogsUrl"; 
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -54,6 +59,9 @@ public class AuditUserActivityServlet extends Controller {
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if (shouldRedirect(request, response)) {
+			return;
+		}
 		AuditUserLoginTableFactory factory = new AuditUserLoginTableFactory();
 		factory.setAuditUserLoginDao(getAuditUserLoginDao());
 		String auditUserLoginHtml = factory.createTable(request, response).render();
@@ -65,5 +73,23 @@ public class AuditUserActivityServlet extends Controller {
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
 		return Controller.ADMIN_SERVLET_CODE;
+	}
+
+	@Override
+	protected String getUrlKey(HttpServletRequest request) {
+		return LIST_USER_AUDIT_LOGS;
+	}
+
+	@Override
+	protected String getDefaultUrl(HttpServletRequest request) {
+		FormProcessor fp = new FormProcessor(request);
+		String module = fp.getString("module") != null ? fp.getString("module") : "admin";
+		return "?module=" + module
+				+ "&crfId=0&maxRows=15&userLogins_tr_=true&userLogins_p_=1&userLogins_mr_=15";
+	}
+
+	@Override
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
+		return request.getQueryString() == null || !request.getQueryString().contains("&userLogins_p_="); 
 	}
 }
