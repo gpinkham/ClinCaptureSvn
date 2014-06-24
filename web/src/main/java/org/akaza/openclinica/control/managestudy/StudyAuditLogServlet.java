@@ -26,7 +26,8 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
+import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -41,8 +42,10 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings({ "serial" })
 @Component
-public class StudyAuditLogServlet extends Controller {
+public class StudyAuditLogServlet extends RememberLastPage {
 
+	public static final String STUDY_AUDIT_LOG_URL = "studyAuditLogUrl";
+	
 	public static String getLink(int userId) {
 		return "AuditLogStudy";
 	}
@@ -54,6 +57,10 @@ public class StudyAuditLogServlet extends Controller {
 	 */
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		if (shouldRedirect(request, response)) {
+			return;
+		}
         StudyBean currentStudy = getCurrentStudy(request);
 
 		StudySubjectDAO subdao = getStudySubjectDAO();
@@ -90,6 +97,24 @@ public class StudyAuditLogServlet extends Controller {
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
+	}
+
+	@Override
+	protected String getUrlKey(HttpServletRequest request) {
+		return STUDY_AUDIT_LOG_URL;
+	}
+
+	@Override
+	protected String getDefaultUrl(HttpServletRequest request) {
+		FormProcessor fp = new FormProcessor(request);
+		String module = fp.getString("module") != null ? fp.getString("module") : "submit";
+		return "?module=" + module
+				+ "&maxRows=15&studyAuditLogs_tr_=true&studyAuditLogs_p_=1&studyAuditLogs_mr_=15";
+	}
+
+	@Override
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
+		return request.getQueryString() == null || !request.getQueryString().contains("&studyAuditLogs_p_="); 
 	}
 
 }
