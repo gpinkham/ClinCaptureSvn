@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -134,33 +134,22 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 				if (value.equals(Status.NOT_STARTED.getName())) {
 
 					sqlCriteria
-							.append(" AND ss.status_id NOT IN (")
-							.append(Status.AUTO_DELETED.getId())
-							.append(", ")
-							.append(Status.DELETED.getId())
-							.append(", ")
-							.append(Status.LOCKED.getId())
-							.append(")")
-							.append(" AND se.subject_event_status_id <> ")
-							.append(SubjectEventStatus.LOCKED.getId())
-							.append(" AND (((SELECT COUNT(study_event.study_event_id)")
+							.append(" AND ss.status_id NOT IN (").append(Status.AUTO_DELETED.getId()).append(", ")
+							.append(Status.DELETED.getId()).append(", ").append(Status.LOCKED.getId()).append(")")
+							.append(" AND ( NOT EXISTS (SELECT study_event.study_event_id")
 							.append(" FROM study_event")
-							.append(" WHERE study_event.study_event_definition_id = ")
-							.append(getStudyEventDefinitionId())
-							.append(" AND ss.study_subject_id = study_event.study_subject_id) = 0)")
-							.append(" OR (se.study_event_definition_id = ")
-							.append(getStudyEventDefinitionId())
-							.append(" AND EXISTS (SELECT * FROM crf_version WHERE crf_id = ")
-							.append(crfId)
-							.append(" AND status_id = ")
-							.append(Status.AVAILABLE.getId())
-							.append(") AND ((SELECT COUNT(ec.event_crf_id) FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
-							.append(" WHERE cv.crf_id = ")
-							.append(crfId)
-							.append(" AND ec.study_event_id = se.study_event_id ) = 0")
-							.append(" OR (SELECT COUNT(ec.event_crf_id) FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+							.append(" WHERE study_event.study_event_definition_id = ").append(getStudyEventDefinitionId())
+							.append(" AND ss.study_subject_id = study_event.study_subject_id)")
+							.append(" OR (se.study_event_definition_id = ").append(getStudyEventDefinitionId())
+							.append(" AND se.subject_event_status_id != ").append(SubjectEventStatus.LOCKED.getId())
+							.append(" AND EXISTS (SELECT * FROM crf_version WHERE crf_id = ").append(crfId)
+							.append(" AND status_id = ").append(Status.AVAILABLE.getId())
+							.append(" ) AND ( NOT EXISTS (SELECT ec.event_crf_id FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
 							.append(" WHERE cv.crf_id = ").append(crfId)
-							.append(" AND ec.study_event_id = se.study_event_id AND ec.not_started = TRUE) = 1)))");
+							.append(" AND ec.study_event_id = se.study_event_id )")
+							.append(" OR EXISTS (SELECT ec.event_crf_id FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+							.append(" WHERE cv.crf_id = ").append(crfId)
+							.append(" AND ec.study_event_id = se.study_event_id AND ec.not_started = TRUE))))");
 
 				} else if (value.equals(Status.DATA_ENTRY_STARTED.getName())) {
 
