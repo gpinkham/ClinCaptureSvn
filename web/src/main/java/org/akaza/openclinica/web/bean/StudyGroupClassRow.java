@@ -30,7 +30,7 @@ public class StudyGroupClassRow extends EntityBeanRow {
 	public static final int COL_NAME = 0;
 	public static final int COL_TYPE = 1;
 	public static final int COL_SUBJECT_ASSIGNMENT = 2;
-	public static final int COL_STATUS = 3;
+	public static final int COL_STATUS = 7;
 
 	@Override
 	protected int compareColumn(Object row, int sortingColumn) {
