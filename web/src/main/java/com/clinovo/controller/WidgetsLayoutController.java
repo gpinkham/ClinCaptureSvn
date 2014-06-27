@@ -21,6 +21,7 @@ import com.clinovo.model.Widget;
 import com.clinovo.model.WidgetsLayout;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
@@ -28,12 +29,15 @@ import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
 import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
+import org.akaza.openclinica.dao.managestudy.FindSubjectsSort;
 import org.akaza.openclinica.dao.managestudy.ListEventsForSubjectFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -55,18 +59,24 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 @Controller
 @SuppressWarnings({ "unused", "rawtypes", "unchecked" })
 public class WidgetsLayoutController {
+
+	private static final int FILTER_START = 0;
+
+	private static final int FILTER_END = 99999;
 
 	@Autowired
 	private DataSource datasource;
@@ -573,6 +583,134 @@ public class WidgetsLayoutController {
 		model.addAttribute("ndsCrfHasNext", hasNext);
 		model.addAttribute("ndsCrfStart", start);
 		model.addAttribute("ndsCrfDataColumns", dataColumns);
+
+		return page;
+	}
+
+	@RequestMapping("/initEnrollmentProgressWidget")
+	public String initEnrollmentProgressWidget(HttpServletRequest request, HttpServletResponse response, Model model) {
+
+		setRequestHeadersAndUpdateLocale(response, request);
+
+		String page = "widgets/includes/enrollmentProgressChart";
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+		StudySubjectDAO ssDao = new StudySubjectDAO(datasource);
+		StudyGroupClassDAO studyGroupClassDAO = new StudyGroupClassDAO(datasource);
+
+		int displayedYear = Integer.parseInt(request.getParameter("currentYear"));
+		displayedYear = displayedYear == 0 ? Calendar.getInstance().get(Calendar.YEAR) : displayedYear;
+
+		FindSubjectsFilter previousYearFilter = new FindSubjectsFilter(studyGroupClassDAO);
+		previousYearFilter.addFilter("studySubject.createdYear", displayedYear - 1);
+		int previousYearData = ssDao.getCountWithFilter(previousYearFilter, sb);
+
+		boolean previousYearDataExists = previousYearData > 0;
+
+		FindSubjectsFilter nextYearFilter = new FindSubjectsFilter(studyGroupClassDAO);
+		nextYearFilter.addFilter("studySubject.createdYear", displayedYear + 1);
+		int nextYearData = ssDao.getCountWithFilter(nextYearFilter, sb);
+
+		Calendar calendar = Calendar.getInstance();
+		int currentYear = calendar.get(Calendar.YEAR);
+		int currentMonth = calendar.get(Calendar.MONTH);
+
+		boolean nextYearDataExists = nextYearData > 0 || displayedYear < currentYear;
+
+		FindSubjectsSort findSubjectsSort = new FindSubjectsSort();
+		FindSubjectsFilter findSubjectsFilter = new FindSubjectsFilter(studyGroupClassDAO);
+
+		List<StudySubjectBean> listOfSubjects = ssDao.getWithFilterAndSort(sb, findSubjectsFilter, findSubjectsSort, FILTER_START, FILTER_END);
+
+		LinkedHashMap<String, LinkedHashMap<Status, Integer>> dataRows = new LinkedHashMap<String, LinkedHashMap<Status, Integer>>();
+		List<String> months = new ArrayList<String>();
+
+		for (int i = 1; i <= 12; i++) {
+
+			LinkedHashMap<Status, Integer> blankStatuses = new LinkedHashMap<Status, Integer>();
+			blankStatuses.put(Status.LOCKED, 0);
+			blankStatuses.put(Status.DELETED, 0);
+			blankStatuses.put(Status.SIGNED, 0);
+			blankStatuses.put(Status.AVAILABLE, 0);
+
+			dataRows.put(messageSource.getMessage("short.month." + i, null, request.getLocale()), blankStatuses);
+			months.add(messageSource.getMessage("short.month." + i, null, request.getLocale()));
+		}
+
+		for (StudySubjectBean subject : listOfSubjects) {
+
+			Calendar subjectCreatedCalendar = Calendar.getInstance();
+			subjectCreatedCalendar.setTime(subject.getCreatedDate());
+
+			int subjectCreatedYear = subjectCreatedCalendar.get(Calendar.YEAR);
+			int subjectCreatedMonth = subjectCreatedCalendar.get(Calendar.MONTH);
+			Date newDate = new Date(0);
+
+			Calendar subjectUpdatedCalendar = Calendar.getInstance();
+			if (subject.getUpdatedDate() != null) {
+				subjectUpdatedCalendar.setTime(subject.getUpdatedDate());
+			} else {
+				subject.setUpdatedDate(newDate);
+				subjectUpdatedCalendar.setTime(newDate);
+			}
+
+			int subjectUpdatedYear = subjectUpdatedCalendar.get(Calendar.YEAR);
+			int subjectUpdatedMonth = subjectUpdatedCalendar.get(Calendar.MONTH);
+			boolean wasSubjectAvailableAtLeastMonthInDisplayedYear = subjectCreatedYear <= displayedYear
+					&& (subject.getStatus() == Status.AVAILABLE || (subjectUpdatedYear >= displayedYear 
+					&& ((subjectUpdatedYear == subjectCreatedYear && subjectUpdatedMonth != subjectCreatedMonth) 
+							|| subjectUpdatedYear != subjectCreatedYear)));
+
+			// Add info about time when subjects were available
+			if (wasSubjectAvailableAtLeastMonthInDisplayedYear) {
+
+				int cStartMonth = subjectCreatedYear == displayedYear ? subjectCreatedMonth : 0;
+				int cEndMonth = displayedYear != currentYear ? 11 : currentMonth;
+
+				if (subject.getUpdatedDate() != newDate && subject.getStatus().getId() != Status.AVAILABLE.getId()
+						&& subjectUpdatedYear == displayedYear) {
+
+					cEndMonth = subjectUpdatedMonth - 1;
+				}
+
+				for (int j = cStartMonth; j <= cEndMonth; j++) {
+
+					String dataRowMonth = months.get(j);
+					LinkedHashMap<Status, Integer> dataRowValues = dataRows.get(dataRowMonth);
+					int currentValue = dataRowValues.get(Status.AVAILABLE);
+
+					dataRowValues.put(Status.AVAILABLE, currentValue + 1);
+					dataRows.put(dataRowMonth, dataRowValues);
+				}
+			}
+
+			// Add info about subject's latest update
+			if (subject.getUpdatedDate() != newDate && subject.getStatus() != Status.AVAILABLE
+					&& subjectUpdatedYear <= displayedYear) {
+
+				int uStartMonth = subjectUpdatedYear == displayedYear ? subjectUpdatedMonth : 0;
+				int uEndMoth = displayedYear != currentYear ? 11 : currentMonth;
+
+				for (int j = uStartMonth; j <= uEndMoth; j++) {
+
+					String dataRowMonth = months.get(j);
+					Status updatedStatus = subject.getStatus() == Status.AUTO_DELETED ? Status.DELETED : subject
+							.getStatus();
+
+					String updatedDataRowMonth = months.get(j);
+					LinkedHashMap<Status, Integer> updatedDataRowValues = dataRows.get(updatedDataRowMonth);
+
+					int uCurrentValue = updatedDataRowValues.get(updatedStatus);
+
+					updatedDataRowValues.put(updatedStatus, uCurrentValue + 1);
+					dataRows.put(dataRowMonth, updatedDataRowValues);
+				}
+			}
+		}
+
+		model.addAttribute("epYear", displayedYear);
+		model.addAttribute("epDataRows", dataRows);
+		model.addAttribute("epPreviousYearExists", previousYearDataExists);
+		model.addAttribute("epNextYearExists", nextYearDataExists);
 
 		return page;
 	}

@@ -339,7 +339,7 @@ function activateNDsWidgetLegend() {
 	var urlPrefix = "ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=";
 	var currentUser = $("form#ndsWidgetForm input#cUser").val();
 	var urlSufix = "&listNotes_f_discrepancyNoteBean.resolutionStatus=";
-	var Statuses = [ "New", "Updated", "Closed", "Resolution Proposed" ];
+	var Statuses = [ "New", "Updated", "Resolution Proposed", "Closed" ];
 
 	$(".dns_assigned_to_me .pop-up-visible").css('display', 'table');
 
@@ -967,18 +967,135 @@ function getNdsPerCrfWidgetData() {
 	return data;
 }
 
+/*
+ * Initialize Enrollment Progress widget. This function will be used for three tipes of
+ * actions:
+ * 1. Init - will be run when user opens home page
+ * 2. Next - will upload data for next year (if exists)
+ * 3. Back - will upload data for previous year (if exists)
+ * 
+ * Depending on returned data - "Next" or "Previous" buttons will be hidden.
+ *
+ * @returns enrollmentProgressChart.jsp (append it to .sdv_progress_container).
+ */
+function initEnrollmentProgress(action) {
+
+	var url = getCurentUrl();
+	var displayedYear = parseInt($("#epYear").val());
+
+	if (action === "init") {
+		displayedYear = 0;
+	} else if (action === "next") {
+		displayedYear += 1;
+	} else if (action === "back") {
+		displayedYear -= 1;
+	}
+
+	var data = {
+		currentYear : displayedYear
+	};
+
+	$.ajax({
+		type : "POST",
+		url : url + "initEnrollmentProgressWidget",
+		data : data,
+		success : function(html) {
+
+			$(".enrollment_progress .enrollment_progress_container").html(html);
+			setButtonsColor(".enrollment_progress");
+
+			var data = getEnrollmentProgressWidgetData();
+			displayedYear = $(".enrollment_progress #epYear").val();
+
+			var options = new getVerticalBarOptions();
+			options.colors = ['#868686', '#32a656', '#ff0000', '#7fd0ff'];
+			options.hAxis.title = displayedYear;
+
+			var enrollmentProgressChart = new google.visualization.ColumnChart(document.getElementById('enrollment_progress_chart'));
+			enrollmentProgressChart.draw(data, options);
+			var element = document.getElementById('toolbar');
+
+			if (!element) {
+
+				function selectHandler() {
+
+					var selectedItem = enrollmentProgressChart.getSelection()[0];
+					var currentYear = new Date().getFullYear();
+					var currentMonth = new Date().getMonth();
+
+					if (selectedItem && selectedItem.row == currentMonth && currentYear == displayedYear) {
+
+						var arr = ["locked","signed","removed","available"];
+						var statusNumber = (selectedItem.column % 2 == 0 ? selectedItem.column - 2 : selectedItem.column - 1) / 2;
+						var currentStatus = arr[statusNumber];
+						var redirectPrefix = "ListStudySubjects?module=admin&maxRows=15&showMoreLink=false&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_=15&findSubjects_f_studySubject.status=";
+						
+						window.location.href = redirectPrefix + currentStatus;
+
+					} else {
+						enrollmentProgressChart.setSelection([]);
+					}
+				}
+
+				google.visualization.events.addListener(enrollmentProgressChart, 'select',
+						selectHandler);
+			}
+		},
+		error : function(e) {
+			console.log("Error:" + e);
+		}
+	});
+}
+
+/*
+ * Get values for Enrollment Progress Widget from enrollment_progress form
+ */
+function getEnrollmentProgressWidgetData() {
+
+	var regexp = /^stat\-(.+)$/;
+	var i;
+	// Set the order of statuses in chart
+	var arr = [ "locked", "signed", "removed", "available" ];
+	var data = new google.visualization.DataTable();
+
+	data.addColumn('string', 'Month');
+
+	for (i = 0; i < arr.length; i++) {
+
+		data.addColumn('number', arr[i].capitalizeFirstLetter());
+		data.addColumn({
+			type : 'number',
+			role : 'annotation'
+		});
+	}
+
+	$("form#enrollment_progress input[type=hidden]").each(function() {
+
+		var currentValues = getNodeAttributes($(this), regexp);
+		var currentMonth = $(this).val();
+		var row = [];
+		row.push(currentMonth);
+
+		for (i = 0; i < arr.length; i++) {
+
+			row.push(parseInt(currentValues[arr[i]]));
+			row.push(parseInt(currentValues[arr[i]]));
+		}
+
+		data.addRow(row);
+	});
+
+	return data;
+}
 /* /Initialization of widgets */
 
+
 /* Supporting functions */
-
-
 /* 
 * Calculate limit of caption for table
 * 
 * @param total - the maximum value that will be displayed in the chart
 */
-
-/* Supporting functions */
 function countCaptionLimit(total) {
 	if (total < 4) {
 		total = 4;
@@ -1014,7 +1131,6 @@ function setCaption(selector, maxValue) {
 		counter++;
 	});
 }
-
 
 /*
  * This function will set values for widget's legend
@@ -1130,11 +1246,11 @@ function getPieOptions() {
 	};
 	this.colors = [ '#8ac819' ];
 	this.fontSize = 11;
-	this.fontName = 'Tahoma';
+	this.fontName = '"Tahoma"';
 	this.tooltip = {
 		textStyle : {
 			color : '#4D4D4D',
-			fontName : 'Tahoma',
+			fontName : '"Tahoma"',
 			fontSize : 11,
 			showColorCode : false
 		}
@@ -1175,7 +1291,7 @@ function getVerticalBarOptions() {
 	};
 	this.annotations = {
 		textStyle : {
-			fontName : 'Tahoma',
+			fontName : '"Tahoma"',
 			fontSize : 10,
 			bold : false,
 			italic : false,
@@ -1196,7 +1312,7 @@ function getVerticalBarOptions() {
 	};
 
 	this.fontSize = 11;
-	this.fontName = 'Tahoma';
+	this.fontName = '"Tahoma"';
 	this.bar = {
 		groupWidth : '70%'
 	};
@@ -1342,4 +1458,33 @@ function displayCookiesErrorMessage() {
 				.css('color', '#75b894');
 	}
 }
+
+/*
+ * This function returns all attributes of DOM node:
+ * 
+ * @param node - jQuery object, which attributes will be taken. 
+ * @param regexp - regular expression, by which object will be searched.
+ */
+function getNodeAttributes(node, regexp) {
+
+	var attributes = {};
+
+	$.each(node.get(0).attributes, function(index, attr) {
+
+		if (regexp.test(attr.nodeName)) {
+			var key = attr.nodeName.match(regexp)[1];
+			attributes[key] = attr.nodeValue;
+		}
+	});
+
+	return attributes;
+}
+
+/*
+ * This method will capitalize the first letter in the string.
+ */ 
+String.prototype.capitalizeFirstLetter = function() {
+
+	return this.charAt(0).toUpperCase() + this.slice(1);
+};
 /* /Supporting functions */

@@ -257,7 +257,6 @@ public class CRFDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(1, studyId);
-		variables.put(2, studyId);
 		ArrayList alist = this.select(digester.getQuery("findAllActiveByDefinitionsForCurrentStudy"), variables);
 
 		ArrayList al = new ArrayList();

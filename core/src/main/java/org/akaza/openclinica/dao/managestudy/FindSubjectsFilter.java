@@ -87,6 +87,10 @@ public class FindSubjectsFilter implements CriteriaCommand {
 
 				theCriteria.append(" AND ").append(columnMapping.get(property)).append(" = ").append(value.toString());
 
+			} else if (property.equals("studySubject.createdYear")) { 
+
+				theCriteria.append(" AND ").append("EXTRACT(YEAR FROM ss.date_created)").append(" = ").append(value.toString());
+
 			} else if (property.startsWith("sed_")) {
 
 				int eventDefinitionId = Integer.valueOf(property.split("_")[1]);

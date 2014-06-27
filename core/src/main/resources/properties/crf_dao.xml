@@ -161,7 +161,6 @@
 			and c.crf_id=edc.crf_id
 			and c.status_id=1
 			and edc.status_id=1
-			and (c.source_study_id = ? or c.source_study_id is null)
 		</sql>
 	</query>
     <query>

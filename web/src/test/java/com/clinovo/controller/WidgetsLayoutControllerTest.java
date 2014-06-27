@@ -301,4 +301,40 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 						.sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/ndsPerCrfChart"));
 	}
+
+	@Test
+	public void testThatInitEnrollmentProgressWidgetReturnsCorrectNumberOfAttributes() throws Exception {
+
+		StudyBean sb = new StudyBean();
+		sb.setId(1);
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(ENROLLMENT_PROGRESS_WIDGET).param("currentYear", "0")
+						.sessionAttr("study", sb)).andExpect(MockMvcResultMatchers.model().size(4));
+	}
+
+	@Test
+	public void testThatInitEnrollmentProgressWidgetReturnsModelWithAllAttributes() throws Exception {
+
+		StudyBean sb = new StudyBean();
+		sb.setId(1);
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(ENROLLMENT_PROGRESS_WIDGET).param("currentYear", "0")
+						.sessionAttr("study", sb)).andExpect(
+				MockMvcResultMatchers.model().attributeExists("epYear", "epDataRows", "epPreviousYearExists",
+						"epNextYearExists"));
+	}
+
+	@Test
+	public void testThatInitEnrollmentProgressWidgetReturnsCorrectUrl() throws Exception {
+
+		StudyBean sb = new StudyBean();
+		sb.setId(1);
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(ENROLLMENT_PROGRESS_WIDGET).param("currentYear", "0")
+						.sessionAttr("study", sb)).andExpect(
+				MockMvcResultMatchers.view().name("widgets/includes/enrollmentProgressChart"));
+	}
 }
