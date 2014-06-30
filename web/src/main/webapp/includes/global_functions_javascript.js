@@ -4147,8 +4147,8 @@ function setAccessedObjected(element) {
 
 function getElementRow(element) {
 	var tr = $(element).closest("tr");
-	if($(tr).hasClass("innerTable")){ 
-	 	var table = $(element).closest("table"); 
+	while ($(tr).hasClass("innerTable")) { 
+	 	var table = $(tr).closest("table"); 
 	 	tr = $(table).closest("tr"); 
 	} 
 	return tr;
@@ -4247,6 +4247,7 @@ function clearLastAccessedObjects(){
     localStorage.removeItem("data-cc-auditUserId");
     localStorage.removeItem("data-cc-datasetId");
     localStorage.removeItem("data-cc-userInStudyId");
+    localStorage.removeItem("data-cc-subjectStudyEventId");
 }
 
 function removeHighlightFromCellDescendants(td){

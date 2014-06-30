@@ -47,6 +47,9 @@
             }
         });
     }
+    jQuery(window).load(function() {
+    	highlightLastAccessedObject(rowHighlightTypes.NORMAL);
+    });
 </script>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
@@ -485,5 +488,5 @@
 <!-- End Main Content Area -->
 
 
-
+<input id="accessAttributeName" type="hidden" value="data-cc-subjectStudyEventId" />
 <jsp:include page="../include/footer.jsp"/>
