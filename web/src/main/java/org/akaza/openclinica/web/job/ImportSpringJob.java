@@ -50,7 +50,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
+import org.akaza.openclinica.bean.service.NamespaceFilter;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -62,7 +62,6 @@ import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -100,6 +99,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Import Spring Job, a job running asynchronously on the Tomcat server using Spring and Quartz.
@@ -111,8 +112,6 @@ import org.xml.sax.InputSource;
 public class ImportSpringJob extends QuartzJobBean {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
-	XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
 
 	ResourceBundle respage;
 	ResourceBundle resword;
@@ -381,9 +380,7 @@ public class ImportSpringJob extends QuartzJobBean {
 		StringBuilder msg = new StringBuilder();
 		StringBuilder auditMsg = new StringBuilder();
 		List<Map<String, Object>> auditItemList = new ArrayList<Map<String, Object>>();
-		String propertiesPath = CoreResources.PROPERTIES_DIR;
 
-		File xsdFile2 = new File(propertiesPath + File.separator + "ODM1-2-1.xsd");
 		boolean fail = false;
 		ODMContainer odmContainer;
 		BufferedWriter out;
@@ -412,36 +409,26 @@ public class ImportSpringJob extends QuartzJobBean {
 			auditMsg.append(firstLine);
 			JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);
 			javax.xml.bind.Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			// Create SAXSource
+
+			XMLReader reader = XMLReaderFactory.createXMLReader();
+			NamespaceFilter namespaceFilter = new NamespaceFilter("http://www.cdisc.org/ns/odm/v1.3", true);
+			namespaceFilter.setParent(reader);
+
 			InputSource inputSource = new InputSource(new FileInputStream(f));
-			SAXSource saxSource = new SAXSource(inputSource);
+			SAXSource saxSource = new SAXSource(namespaceFilter, inputSource);
 			try {
 				odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
-				logger.debug("Found crf data container for study oid: "
-						+ odmContainer.getCrfDataPostImportContainer().getStudyOID());
-				logger.debug("found length of subject list: "
-						+ odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
+				logger.debug("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
+				logger.debug("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
 			} catch (Exception me1) {
-				// fail against one, try another
-				try {
-					schemaValidator.validateAgainstSchema(f, xsdFile2);
-					// for backwards compatibility, we also try to validate vs
-					odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
-				} catch (Exception me2) {
-					// not sure if we want to report me2
 
-					MessageFormat mf = new MessageFormat("");
-					mf.applyPattern(respage.getString("your_xml_is_not_well_formed"));
-					Object[] arguments = { me1.getMessage() };
-					msg.append(mf.format(arguments) + "<br/>");
-					auditMsg.append(mf.format(arguments) + "<br/>");
-					// break here with an exception
-					logger.error("found an error with XML: " + msg.toString());
-					// throw new Exception(msg.toString());
-					// instead of breaking the entire operation, we should
-					// continue looping
-					continue;
-				}
+				MessageFormat mf = new MessageFormat("");
+				mf.applyPattern(respage.getString("your_xml_is_not_well_formed"));
+				Object[] arguments = { me1.getMessage() };
+				msg.append(mf.format(arguments) + "<br/>");
+				auditMsg.append(mf.format(arguments) + "<br/>");
+				logger.error("found an error with XML: " + msg.toString());
+				continue;
 			}
 			// next: check, then import
 			List<String> errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer,

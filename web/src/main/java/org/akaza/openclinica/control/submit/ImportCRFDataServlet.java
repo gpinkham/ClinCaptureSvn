@@ -42,13 +42,12 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
-import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
+import org.akaza.openclinica.bean.service.NamespaceFilter;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -61,6 +60,8 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.springframework.stereotype.Component;
 import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Create a new CRF verison by uploading excel file. Makes use of several other classes to validate and provide accurate
@@ -124,8 +125,6 @@ public class ImportCRFDataServlet extends Controller {
 		String action = request.getParameter("action");
 		CRFVersionBean version = (CRFVersionBean) request.getSession().getAttribute("version");
 
-		File xsdFile2 = new File(SpringServletAccess.getPropertiesDir(getServletContext()) + "ODM1-2-1.xsd");
-
 		if (StringUtil.isBlank(action)) {
 			logger.info("action is blank");
 			request.setAttribute("version", version);
@@ -165,33 +164,27 @@ public class ImportCRFDataServlet extends Controller {
 			request.getSession().removeAttribute("odmContainer");
 			JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			// Create SAXSource
+
+			XMLReader reader = XMLReaderFactory.createXMLReader();
+			NamespaceFilter namespaceFilter = new NamespaceFilter("http://www.cdisc.org/ns/odm/v1.3", true);
+			namespaceFilter.setParent(reader);
+
 			InputSource inputSource = new InputSource(new FileInputStream(f));
-			SAXSource saxSource = new SAXSource(inputSource);
+			SAXSource saxSource = new SAXSource(namespaceFilter, inputSource);
+
 			try {
 				odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
-				logger.debug("Found crf data container for study oid: "
-						+ odmContainer.getCrfDataPostImportContainer().getStudyOID());
-				logger.debug("found length of subject list: "
-						+ odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
+				logger.debug("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
+				logger.debug("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
 				addPageMessage(respage.getString("passed_xml_validation"), request);
 			} catch (Exception me1) {
 				me1.printStackTrace();
-				logger.info("found exception with xml transform");
-				logger.info("trying 1.2.1");
-				try {
-					XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
-					schemaValidator.validateAgainstSchema(f, xsdFile2);
-					odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
-				} catch (Exception me2) {
-					// not sure if we want to report me2
-					MessageFormat mf = new MessageFormat("");
-					mf.applyPattern(respage.getString("your_xml_is_not_well_formed"));
-					Object[] arguments = { me2.getMessage() };
-					addPageMessage(mf.format(arguments), request);
-					forwardPage(Page.IMPORT_CRF_DATA, request, response);
-					return;
-				}
+				MessageFormat mf = new MessageFormat("");
+				mf.applyPattern(respage.getString("your_xml_is_not_well_formed"));
+				Object[] arguments = { me1.getMessage() };
+				addPageMessage(mf.format(arguments), request);
+				forwardPage(Page.IMPORT_CRF_DATA, request, response);
+				return;
 			}
 
 			List<String> errors = new ImportCRFDataService(getStudySubjectIdService(), getDataSource(), request.getLocale()).validateStudyMetadata(
