@@ -269,4 +269,5 @@
 	</table>
 </div>
 <input id="accessAttributeName" type="hidden" value="data-cc-mcItemId">
+<input id="locked_crf_message" type="hidden" value="<fmt:message key="operation_cannot_be_performed_on_a_locked_crf" bundle="${resmessages}"/>">
 <jsp:include page="include/footer.jsp"/>

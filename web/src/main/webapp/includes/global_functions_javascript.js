@@ -2588,14 +2588,18 @@ function showHideCodedItemContext(item) {
 codeItem = function(item) {
 	
 	setAccessedObjected(item);
-    var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {    	
-        return $(this).attr('src').indexOf('icon_Locked_long.gif') > 0;});
+    var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {
+        return $(this).attr('src').indexOf('icon_Locked_long.gif') > 0;
+    });
     if ($(item).attr('block') == 'true' || isLocked.size() > 0) {
 
         if ($(item).parent().siblings("td").find("div[name='itemStatus']").text() == 'Coded') {
 
             showHideCodedItemContext(item);
             return;
+        } else {
+            var locked_ecrf_message = $("#locked_crf_message").val();
+            alertDialog({ message: locked_ecrf_message, height: 150, width: 500 });
         }
         return;
     }
@@ -3303,12 +3307,14 @@ function hideMedicalCodingAlertBox(ajaxResponse) {
 function showMedicalCodingUncodeAlertBox(item) {
 	
 	setAccessedObjected(item);
-    var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {    	
+    var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {
         return $(this).attr('src').indexOf('icon_Locked_long.gif') > 0;
     });
-    if(isLocked.size() > 0) { 
-    	return; 
-	}
+    if (isLocked.size() > 0) {
+        var locked_ecrf_message = $("#locked_crf_message").val();
+        alertDialog({ message: locked_ecrf_message, height: 150, width: 500 });
+        return;
+    }
 
     if ($("#alertBox").length == 0) {
 
