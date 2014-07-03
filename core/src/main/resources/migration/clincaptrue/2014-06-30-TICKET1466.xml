@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2014-06-30-TICKET1466-01">
+		<comment>Add column into Study Subject table, to store randomization date.</comment>
+		<addColumn tableName="study_subject">
+			<column name="randomization_date" type="date" />
+		</addColumn >
+	</changeSet>
+
+	<changeSet author="denis" id="2014-06-30-TICKET1466-02">
+		<comment>Add column into Study Subject table, to store randomization result.</comment>
+		<addColumn tableName="study_subject">
+			<column name="randomization_result" type="varchar(255)" />
+		</addColumn >
+	</changeSet>
+
+</databaseChangeLog>

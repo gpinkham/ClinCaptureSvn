@@ -21,9 +21,9 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Date;
 
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings({ "rawtypes", "serial" })
 public class StudySubjectBean extends AuditableEntityBean {
-	
+
 	private String label = "";
 
 	private int subjectId;
@@ -49,7 +49,7 @@ public class StudySubjectBean extends AuditableEntityBean {
 	 * An array of the groups this subject belongs to. Each element is a StudyGroupMapBean object. Not in the database.
 	 */
 	private ArrayList studyGroupMaps;
-	
+
 	private int dynamicGroupClassId;
 
 	private Date eventStartDate;// not in DB, for adding subject from subject matrix
@@ -60,6 +60,10 @@ public class StudySubjectBean extends AuditableEntityBean {
 	private String oid;
 
 	private OidGenerator oidGenerator = new StudySubjectOidGenerator();
+
+	private Date randomizationDate;
+
+	private String randomizationResult;
 
 	public StudySubjectBean() {
 		studyGroupMaps = new ArrayList();
@@ -83,7 +87,7 @@ public class StudySubjectBean extends AuditableEntityBean {
 	public void setOidGenerator(OidGenerator oidGenerator) {
 		this.oidGenerator = oidGenerator;
 	}
-	
+
 	public void setDynamicGroupClassId(int dynamicGroupClassId) {
 		this.dynamicGroupClassId = dynamicGroupClassId;
 	}
@@ -113,7 +117,7 @@ public class StudySubjectBean extends AuditableEntityBean {
 	public int getDynamicGroupClassId() {
 		return dynamicGroupClassId;
 	}
-	
+
 	/**
 	 * @param studyName
 	 *            The studyName to set.
@@ -283,4 +287,19 @@ public class StudySubjectBean extends AuditableEntityBean {
 		this.isDobCollected = isDobCollected;
 	}
 
+	public Date getRandomizationDate() {
+		return randomizationDate;
+	}
+
+	public void setRandomizationDate(Date randomizationDate) {
+		this.randomizationDate = randomizationDate;
+	}
+
+	public String getRandomizationResult() {
+		return randomizationResult;
+	}
+
+	public void setRandomizationResult(String randomizationResult) {
+		this.randomizationResult = randomizationResult;
+	}
 }

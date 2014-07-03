@@ -20,16 +20,6 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
-import java.sql.Connection;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -43,6 +33,15 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 
 @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 public class StudySubjectDAO extends AuditableEntityDAO {
@@ -120,6 +119,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		ind++; // oc oid
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // dynamic_group_class_id
+		this.setTypeExpected(ind, TypeNames.DATE);
+		ind++; // Randomzation Date
+		this.setTypeExpected(ind, TypeNames.STRING);
+		ind++; // Randomization Result
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; //
 		this.setTypeExpected(ind, TypeNames.INT);
@@ -225,6 +228,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		eb.setOid((String) hm.get("oc_oid"));
 		eb.setStudyName((String) hm.get("unique_identifier"));
 		eb.setDynamicGroupClassId((Integer) hm.get("dynamic_group_class_id"));
+		eb.setRandomizationDate((Date) hm.get("randomization_date"));
+		eb.setRandomizationResult((String) hm.get("randomization_result"));
 		return eb;
 	}
 
