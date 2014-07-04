@@ -207,19 +207,28 @@ public class SDVUtil {
 	public void setDataAndLimitVariables(TableFacade tableFacade, int studyId, HttpServletRequest request) {
 
 		Limit limit = tableFacade.getLimit();
-
+		int pageNum = 0;
+		int maxRows = 0; 
+		//Store pageNum and maxRows if they already exist in limit
+		if (limit.getRowSelect() != null) {
+			pageNum = limit.getRowSelect().getPage();
+			maxRows = limit.getRowSelect().getMaxRows();
+		}
 		EventCRFSDVFilter eventCRFSDVFilter = getEventCRFSDVFilter(limit, studyId);
-		String restore = request.getAttribute(limit.getId() + "_restore") + "";
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		boolean allowSdvWithOpenQueries = "no".equals(currentStudy.getStudyParameterConfig()
 				.getAllowSdvWithOpenQueries()) ? false : true;
 		int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, currentStudy.getParentStudyId(),
 				allowSdvWithOpenQueries);
-		tableFacade.setTotalRows(totalRows);
-		if ("true".equalsIgnoreCase(restore)) {
-			int pageNum = limit.getRowSelect().getPage();
-			int maxRows = limit.getRowSelect().getMaxRows();
+		//If maxRows was previously set, we need to set it again in the tableFacade before we 
+		//setTotalRows
+		if (maxRows > 0) {
 			tableFacade.setMaxRows(maxRows);
+		}
+		tableFacade.setTotalRows(totalRows);
+		//If pageNum was previously set, it might have been lost during the setTotalRows operation
+		//so we need to set it back
+		if (pageNum > 0) {			
 			limit.getRowSelect().setPage(pageNum);
 		}
 
