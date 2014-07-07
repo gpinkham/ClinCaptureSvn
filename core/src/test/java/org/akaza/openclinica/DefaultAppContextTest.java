@@ -18,11 +18,6 @@ import com.clinovo.service.SystemService;
 import com.clinovo.service.TermService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
-
-import java.util.Date;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
@@ -58,6 +53,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.sql.DataSource;
+import java.util.Date;
 
 /**
  * To avoid the constant loading of beans from the application context, which can take a lot of memory on the test, we
@@ -187,7 +185,22 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 
 		Session session = sessionFactory.getCurrentSession();
 		if (dbDriverClassName.contains(POSTGRESQL)) {
-			Integer max = (Integer) session.createSQLQuery("SELECT max(id) from dictionary").uniqueResult();
+			Integer max = (Integer) session.createSQLQuery("SELECT max(discrepancy_note_id) from discrepancy_note")
+					.uniqueResult();
+			session.createSQLQuery("ALTER SEQUENCE discrepancy_note_discrepancy_note_id_seq RESTART WITH " + (max + 1))
+					.executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(dynamic_event_id) from dynamic_event").uniqueResult();
+			session.createSQLQuery("ALTER SEQUENCE dynamic_event_dynamic_event_id_seq RESTART WITH " + (max + 1))
+					.executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(study_group_class_id) from study_group_class")
+					.uniqueResult();
+			session.createSQLQuery(
+					"ALTER SEQUENCE study_group_class_study_group_class_id_seq RESTART WITH " + (max + 1))
+					.executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(id) from dictionary").uniqueResult();
 			session.createSQLQuery("ALTER SEQUENCE dictionary_id_seq RESTART WITH " + (max + 1)).executeUpdate();
 
 			max = (Integer) session.createSQLQuery("SELECT max(id) from term").uniqueResult();
@@ -210,40 +223,67 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			session.createSQLQuery("ALTER SEQUENCE crf_crf_id_seq RESTART WITH " + (max + 1)).executeUpdate();
 
 		} else if (dbDriverClassName.contains(ORACLE)) {
-			Integer max = (Integer) session.createSQLQuery("SELECT max(id) from dictionary").uniqueResult();
+			Integer max = (Integer) session.createSQLQuery("SELECT max(discrepancy_note_id) from discrepancy_note")
+					.uniqueResult();
+			session.createSQLQuery("DROP SEQUENCE discrepancy_note_discrepancy_note_id_seq").executeUpdate();
+			session.createSQLQuery(
+					"CREATE SEQUENCE discrepancy_note_discrepancy_note_id_seq START WITH " + (max + 1)
+							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(dynamic_event_id) from dynamic_event").uniqueResult();
+			session.createSQLQuery("DROP SEQUENCE dynamic_event_dynamic_event_id_seq").executeUpdate();
+			session.createSQLQuery(
+					"CREATE SEQUENCE dynamic_event_dynamic_event_id_seq START WITH " + (max + 1)
+							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(study_group_class_id) from study_group_class")
+					.uniqueResult();
+			session.createSQLQuery("DROP SEQUENCE study_group_class_study_group_class_id_seq").executeUpdate();
+			session.createSQLQuery(
+					"CREATE SEQUENCE study_group_class_study_group_class_id_seq START WITH " + (max + 1)
+							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(id) from dictionary").uniqueResult();
 			session.createSQLQuery("DROP SEQUENCE dictionary_id_seq").executeUpdate();
-			session.createSQLQuery("CREATE SEQUENCE dictionary_id_seq START WITH " + (max + 1)
+			session.createSQLQuery(
+					"CREATE SEQUENCE dictionary_id_seq START WITH " + (max + 1)
 							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
 
 			max = (Integer) session.createSQLQuery("SELECT max(id) from term").uniqueResult();
 			session.createSQLQuery("DROP SEQUENCE term_id_seq").executeUpdate();
-			session.createSQLQuery("CREATE SEQUENCE term_id_seq START WITH " + (max + 1)
+			session.createSQLQuery(
+					"CREATE SEQUENCE term_id_seq START WITH " + (max + 1)
 							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
 
 			max = (Integer) session.createSQLQuery("SELECT max(id) from coded_item").uniqueResult();
 			session.createSQLQuery("DROP SEQUENCE coded_item_id_seq").executeUpdate();
-			session.createSQLQuery("CREATE SEQUENCE coded_item_id_seq START WITH " + (max + 1)
+			session.createSQLQuery(
+					"CREATE SEQUENCE coded_item_id_seq START WITH " + (max + 1)
 							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
 
 			max = (Integer) session.createSQLQuery("SELECT max(id) from coded_item_element").uniqueResult();
 			session.createSQLQuery("DROP SEQUENCE coded_item_element_id_seq").executeUpdate();
-			session.createSQLQuery("CREATE SEQUENCE coded_item_element_id_seq START WITH " + (max + 1)
+			session.createSQLQuery(
+					"CREATE SEQUENCE coded_item_element_id_seq START WITH " + (max + 1)
 							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
 
 			max = (Integer) session.createSQLQuery("SELECT max(id) from widgets_layout").uniqueResult();
 			session.createSQLQuery("DROP SEQUENCE widgets_layout_id_seq").executeUpdate();
-			session.createSQLQuery("CREATE SEQUENCE widgets_layout_id_seq START WITH " + (max + 1)
+			session.createSQLQuery(
+					"CREATE SEQUENCE widgets_layout_id_seq START WITH " + (max + 1)
 							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
 
 			max = (Integer) session.createSQLQuery("SELECT max(id) from widget").uniqueResult();
 			session.createSQLQuery("DROP SEQUENCE widget_id_seq").executeUpdate();
-			session.createSQLQuery("CREATE SEQUENCE widget_id_seq START WITH " + (max + 1)
+			session.createSQLQuery(
+					"CREATE SEQUENCE widget_id_seq START WITH " + (max + 1)
 							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
 
 			max = (Integer) session.createSQLQuery("SELECT max(crf_id) from crf").uniqueResult();
-			session.createSQLQuery("DROP SEQUENCE crf_id_seq").executeUpdate();
-			session.createSQLQuery("CREATE SEQUENCE crf_id_seq START WITH " + (max + 1)
-					+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+			session.createSQLQuery("DROP SEQUENCE crf_crf_id_seq").executeUpdate();
+			session.createSQLQuery(
+					"CREATE SEQUENCE crf_crf_id_seq START WITH " + (max + 1)
+							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
 		}
 
 		UserAccountBean ub = (UserAccountBean) userAccountDAO.findByPK(1);

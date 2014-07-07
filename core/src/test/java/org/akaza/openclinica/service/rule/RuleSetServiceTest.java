@@ -13,15 +13,6 @@
 
 package org.akaza.openclinica.service.rule;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.sax.SAXSource;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -39,6 +30,15 @@ import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.InputSource;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.sax.SAXSource;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("rawtypes")
 public class RuleSetServiceTest extends DefaultAppContextTest {
@@ -123,11 +123,8 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 
 	@Test
 	public void testImportRunRules() throws Exception {
-        discrepancyNoteDAO.unsetTypeExpected();
-        discrepancyNoteDAO.setTypeExpected(1, TypeNames.INT);
-        ArrayList list = discrepancyNoteDAO.select("SELECT max(discrepancy_note_id) as max from discrepancy_note;");
-        Integer max = (Integer)((HashMap)list.get(0)).get("max");
-        discrepancyNoteDAO.execute("ALTER SEQUENCE discrepancy_note_discrepancy_note_id_seq RESTART WITH " + (max + 1) + ";");
+		discrepancyNoteDAO.unsetTypeExpected();
+		discrepancyNoteDAO.setTypeExpected(1, TypeNames.INT);
 		int total = discrepancyNoteDAO.findAll().size();
 		List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
 		ArrayList<SubjectDataBean> subjectDataBeans = container.getCrfDataPostImportContainer().getSubjectData();
