@@ -104,7 +104,7 @@
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showSubjectGroupClassRow.jsp" /></c:import>
 <br>
 
-<form action="ListSubjectGroupClass?action=submit_order" method="post">
+<form action="ListSubjectGroupClass?${pageContext.request.queryString}&action=submit_order" method="post">
 <c:if test="${fn:length(availableDynGroups) > 0}">
 	<a href="javascript:leftnavExpandExt('dynGroupsOrder', true);">
 		<img id="excl_dynGroupsOrder" src="images/bt_Collapse.gif" border="0"> 

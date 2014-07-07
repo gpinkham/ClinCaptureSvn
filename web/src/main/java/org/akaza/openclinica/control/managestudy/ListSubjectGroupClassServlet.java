@@ -91,11 +91,11 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
-		if (shouldRedirect(request, response)) { 
-		 	return; 
-		} 
-		
+
+		if (shouldRedirect(request, response)) {
+		 	return;
+		}
+
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -215,6 +215,12 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
     @Override 
     protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) { 
 		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page="); 
- 	} 
+ 	}
+
+	@Override
+	protected String getSavedUrl(String key, HttpServletRequest request) {
+		String savedUrl = (String) request.getSession().getAttribute(key);
+		return savedUrl == null ? savedUrl : savedUrl.replace("&action=submit_order", "");
+	}
 
 }
