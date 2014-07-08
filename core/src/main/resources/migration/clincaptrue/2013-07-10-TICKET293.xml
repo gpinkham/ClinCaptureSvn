@@ -19,18 +19,12 @@
         </sql>
     </changeSet>
     <changeSet author="skirpichenok" id="2013-07-10-TICKET293-04">
+        <validCheckSum>6fe6feac8cfd12ad446cffc1941b7fc9</validCheckSum>
+        <validCheckSum>b517f3c1cddac94d184ddfe38213ad6</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="5">select count(discrepancy_note_type_id) from discrepancy_note_type where (discrepancy_note_type_id = 2 and name = 'Incomplete') or (discrepancy_note_type_id = 3 and name = 'Unclear/Unreadable') or (discrepancy_note_type_id = 4 and name = 'Annotation') or (discrepancy_note_type_id = 6 and name = 'Query') or (discrepancy_note_type_id = 7 and name = 'Reason for Change')</sqlCheck>
         </preConditions>
         <sql splitStatements="false">
-            update discrepancy_note set discrepancy_note_type_id = 8 where discrepancy_note_type_id = 2;
-            update discrepancy_note set discrepancy_note_type_id = 9 where discrepancy_note_type_id = 3;
-            update discrepancy_note set discrepancy_note_type_id = 2 where discrepancy_note_type_id = 4;
-            update discrepancy_note set discrepancy_note_type_id = 3 where discrepancy_note_type_id = 6;
-            update discrepancy_note set discrepancy_note_type_id = 4 where discrepancy_note_type_id = 7;
-            update discrepancy_note set discrepancy_note_type_id = 6 where discrepancy_note_type_id = 8;
-            update discrepancy_note set discrepancy_note_type_id = 7 where discrepancy_note_type_id = 9;
-
             update discrepancy_note_type set discrepancy_note_type_id = 8 where name = 'Incomplete';
             update discrepancy_note_type set discrepancy_note_type_id = 9 where name = 'Unclear/Unreadable';
             update discrepancy_note_type set discrepancy_note_type_id = 2 where name = 'Annotation';
