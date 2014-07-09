@@ -42,10 +42,6 @@
 
 <!-- org.akaza.openclinica.bean.core.AuditableEntityBean -->
 
-<jsp:useBean scope="request" id="displayStudy" class="org.akaza.openclinica.bean.admin.DisplayStudyBean"/>
-<jsp:useBean scope="session" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
-<jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <h1>
 	<span class="first_level_header">
 		<fmt:message key="reassign_study_subject" bundle="${resworkflow}"/> 
@@ -74,84 +70,106 @@
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 
- <tr>
-   <td class="table_header_column">${studySubjectIDLabel}</td>
-   <td class="table_cell"><c:out value="${studySub.label}"/></td>
- </tr>
+	<tr>
+		<td class="table_header_column">${studySubjectIDLabel}</td>
+		<td class="table_cell"><c:out value="${studySub.label}"/></td>
+	</tr>
 
- <tr>
-   <td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/></td>
-   <td class="table_cell"><c:out value="${subject.uniqueIdentifier}"/></td>
- </tr>
+ 	<tr>
+   		<td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/></td>
+   		<td class="table_cell"><c:out value="${subject.uniqueIdentifier}"/></td>
+ 	</tr>
 
- <c:if test="${genderShow}">
-     <tr>
-       <td class="table_header_column">${genderLabel}</td>
-       <td class="table_cell"><c:out value="${subject.gender}"/></td>
-     </tr>
- </c:if>
+	<c:if test="${genderShow}">
+		<tr>
+			<td class="table_header_column">${genderLabel}</td>
+			<td class="table_cell"><c:out value="${subject.gender}"/></td>
+		</tr>
+	</c:if>
 
- <tr>
-   <td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/></td>
-   <td class="table_cell"><fmt:formatDate value="${subject.createdDate}" pattern="${dteFormat}"/></td>
- </tr>
- </table>
- </div>
+	<tr>
+   		<td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/></td>
+   		<td class="table_cell"><fmt:formatDate value="${subject.createdDate}" pattern="${dteFormat}"/></td>
+	</tr>
+</table>
+</div>
 </div></div></div></div></div></div></div></div>
 </div>
 <br>
 <p><strong><fmt:message key="please_choose_a_study_in_the_following_list2" bundle="${restext}"/></strong></P>
-    
-   <table border="0" cellpadding="0" cellspacing="0"> 
-   <tr><td>   	 
-        <c:choose> 	 
-         <c:when test="${displayStudy.parent.id==studySub.studyId }">      
-                      
-          <input type="radio" checked name="studyId" value="<c:out value="${displayStudy.parent.id}"/>"><b><c:out value="${displayStudy.parent.name}"/> <fmt:message key="currently_in" bundle="${restext}"/></b>         
-                  	 
-         </c:when> 	 
-         <c:otherwise>          
-          <c:if test="${displayStudy.status.available}">
-                <input type="radio" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>"><b><c:out value="${displayStudy.parent.name}"/> </b>
-          </c:if>
-          <c:if test="${displayStudy.status.locked}">
-                <input type="radio" disabled="true" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>"><b><c:out value="${displayStudy.parent.name}"/> </b>
-          </c:if>
-         </c:otherwise>
-        </c:choose> 
-        <br>        
-     </td></tr> 
-      <c:forEach var="child" items="${displayStudy.children}">
-      <tr><td>
-         <c:choose> 	 
-         <c:when test="${child.id==studySub.studyId }">      
-           &nbsp;&nbsp;<div class="homebox_bullets"><input type="radio" checked name="studyId" value="<c:out value="${child.id}"/>"><c:out value="${child.name}"/> <fmt:message key="currently_in" bundle="${restext}"/></div>
-         </c:when> 	 
-         <c:otherwise>          
-            <c:if test="${child.status.available}"> 
-                &nbsp;&nbsp;<div class="homebox_bullets"><input type="radio" name="studyId" value="<c:out value="${child.id}"/>"><c:out value="${child.name}"/></div>
-            </c:if>
-             <c:if test="${child.status.locked}">
-                 &nbsp;&nbsp;<div class="homebox_bullets"><input type="radio" disabled="true" name="studyId" value="<c:out value="${child.id}"/>"><c:out value="${child.name}"/></div>
-             </c:if>
-         </c:otherwise>
-        </c:choose>       
-      
-      </td></tr>
-      </c:forEach>
-    
-   </table>
-  <p>                          <%-- location.href = '<%=request.getContextPath()%>/ViewStudySubject?id=${studySub.id}' --%>
-      <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-      <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
-  </p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td>
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<c:choose> 	 
+		<c:when test="${displayStudy.parent.id==studySub.studyId }">           
+			<tr>
+				<td class="table_cell">
+					<input type="radio" checked name="studyId" value="<c:out value="${displayStudy.parent.id}"/>"><b><c:out value="${displayStudy.parent.name}"/> <fmt:message key="currently_in" bundle="${restext}"/></b>         	 
+					&nbsp;&nbsp;&nbsp;&nbsp;
+				</td>
+			</tr> 
+		</c:when> 	 
+		<c:otherwise>          
+			<c:if test="${displayStudy.status.available}">
+				<tr>
+					<td class="table_cell">
+						<input type="radio" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>"><b><c:out value="${displayStudy.parent.name}"/> </b>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+					</td>
+				</tr> 
+			</c:if>
+			<c:if test="${displayStudy.status.locked}">
+				<tr>
+					<td class="table_cell">
+						<input type="radio" disabled="true" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>"><b><c:out value="${displayStudy.parent.name}"/> </b>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+					</td>
+				</tr> 
+			</c:if>
+		</c:otherwise>
+	</c:choose>      
+    <c:forEach var="child" items="${displayStudy.children}">
+    <tr>
+		<td class="table_cell">
+			<c:choose> 	 
+				<c:when test="${child.id==studySub.studyId }">      
+					&nbsp;&nbsp;<img src="images/bullet.gif">
+					<input type="radio" checked name="studyId" value="<c:out value="${child.id}"/>"><c:out value="${child.name}"/> <fmt:message key="currently_in" bundle="${restext}"/>
+					&nbsp;&nbsp;&nbsp;&nbsp;
+				</c:when> 	 
+				<c:otherwise>          
+					<c:if test="${child.status.available}"> 
+						&nbsp;&nbsp;<img src="images/bullet.gif">
+						<input type="radio" name="studyId" value="<c:out value="${child.id}"/>"><c:out value="${child.name}"/>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+					</c:if>
+					<c:if test="${child.status.locked}">
+						&nbsp;&nbsp;<img src="images/bullet.gif">
+						<input type="radio" disabled="true" name="studyId" value="<c:out value="${child.id}"/>"><c:out value="${child.name}"/>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+					</c:if>
+				</c:otherwise>
+			</c:choose>       
+		</td>
+	</tr>
+    </c:forEach>
+</table>
+<br>
+</div></div></div></div></div></div></div>
+</div>
+</td></tr>
+</table>
+<p>                          <%-- location.href = '<%=request.getContextPath()%>/ViewStudySubject?id=${studySub.id}' --%>
+    <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+		value="<fmt:message key="back" bundle="${resword}"/>"
+		class="button_medium"
+		onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+    <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+</p>
 
 
 </form>
- <br><br>
-
+<br><br>
 
 <jsp:include page="../include/footer.jsp"/>
