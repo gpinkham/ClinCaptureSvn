@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="vitaly" id="2014-07-10-TICKET1513">
+        <comment>Insert rows into system and system_group tables for evaluation feature</comment>
+
+        <insert tableName="system_group">
+            <column name="id" value="13" />
+            <column name="name" value="crf_evaluation" />
+            <column name="parent_id" value="0" />
+            <column name="order_id" value="13" />
+            <column name="version" value="1" />
+            <column name="is_study_specific" valueBoolean="true" />
+        </insert>
+
+        <insert tableName="system">
+            <column name="id" value="75"/>
+            <column name="name" value="allowCrfEvaluation"/>
+            <column name="value" value="no"/>
+            <column name="value_type" value="STRING"/>
+            <column name="required" value="FALSE"/>
+            <column name="type" value="RADIO"/>
+            <column name="type_values" value="yes,no"/>
+            <column name="size" value="60"/>
+            <column name="show_measurements" value="FALSE"/>
+            <column name="show_description" value="TRUE"/>
+            <column name="show_note" value="FALSE"/>
+            <column name="group_id" value="13"/>
+            <column name="crc" value="HIDDEN"/>
+            <column name="investigator" value="HIDDEN"/>
+            <column name="monitor" value="HIDDEN"/>
+            <column name="admin" value="WRITE"/>
+            <column name="root" value="WRITE"/>
+            <column name="order_id" value="5"/>
+            <column name="version" value="1"/>
+        </insert>
+
+        <insert tableName="system">
+            <column name="id" value="76"/>
+            <column name="name" value="evaluateWithContext"/>
+            <column name="value" value="no"/>
+            <column name="value_type" value="STRING"/>
+            <column name="required" value="FALSE"/>
+            <column name="type" value="RADIO"/>
+            <column name="type_values" value="yes,no"/>
+            <column name="size" value="60"/>
+            <column name="show_measurements" value="FALSE"/>
+            <column name="show_description" value="FALSE"/>
+            <column name="show_note" value="FALSE"/>
+            <column name="group_id" value="13"/>
+            <column name="crc" value="HIDDEN"/>
+            <column name="investigator" value="HIDDEN"/>
+            <column name="monitor" value="HIDDEN"/>
+            <column name="admin" value="WRITE"/>
+            <column name="root" value="WRITE"/>
+            <column name="order_id" value="6"/>
+            <column name="version" value="1"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
+
