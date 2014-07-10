@@ -139,5 +139,6 @@
 
 <input id="accessAttributeName" type="hidden" value="data-cc-sdvStudySubjectId"/>
 <jsp:include page="include/footer.jsp"/>
+<script>window.sdvPage = true;</script>
 </body>
 </html>

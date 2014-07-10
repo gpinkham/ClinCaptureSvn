@@ -1518,7 +1518,6 @@ function openNewWindow(inURL, name, features, windowSize) {
     docView.focus();
 }
 
-
 //-------------------------------------------------------------------------
 // Function: MM_findObjInParentWin
 //
@@ -1536,6 +1535,10 @@ function MM_findObjInParentWin(strParentWinImageName) { //v4.0
     return objImage;
 }
 
+function refreshPage() {
+    location.reload();
+}
+
 //-------------------------------------------------------------------------
 // Function: setImageInParentWin
 //
@@ -1546,6 +1549,9 @@ function MM_findObjInParentWin(strParentWinImageName) { //v4.0
 function setImageInParentWin(strParentWinImageName,strParentWinImageFullPath, resolutionStatusId) {
     var objImage;
     if (window.opener && !window.opener.closed) {
+        if (window.opener.opener && !window.opener.opener.closed && window.opener.opener.sdvPage) {
+            window.opener.opener.refreshPage();
+        }
         objImage = MM_findObjInParentWin(strParentWinImageName);
         if (objImage != null) {
             objImage.src = strParentWinImageFullPath;

@@ -87,6 +87,7 @@ body .panel-body {
   margin-top: 1rem;
   width: 30% !important;
   position: fixed !important;
+  height: 75.9%;
 }
 
 .panel-primary-custom {
@@ -114,7 +115,7 @@ body .panel-body {
   height: 100%;
   border-radius: 4px 4px 0px 0px;
   border-bottom: none !important;
-}
+  }
 
 @-moz-document url-prefix() {
   .row {
