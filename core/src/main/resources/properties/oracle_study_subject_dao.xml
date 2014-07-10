@@ -277,14 +277,15 @@
             VALUES (?,?,?,?,sysdate,?,?,?,?,?)
 		</sql>
 	</query>
-	<query>
-		<name>update</name>
-		<sql>
-		  UPDATE study_subject SET LABEL=?,  SUBJECT_ID=?,  STUDY_ID=?,
-		  STATUS_ID=?, ENROLLMENT_DATE=?, DATE_UPDATED=?,
-		  UPDATE_ID=?, SECONDARY_LABEL=?, DYNAMIC_GROUP_CLASS_ID=? WHERE STUDY_SUBJECT_ID=?
-	    </sql>
-	</query>
+    <query>
+        <name>update</name>
+        <sql>
+            UPDATE study_subject SET LABEL=?,  SUBJECT_ID=?,  STUDY_ID=?,
+            STATUS_ID=?, ENROLLMENT_DATE=?, DATE_UPDATED=?,
+            UPDATE_ID=?, SECONDARY_LABEL=?, DYNAMIC_GROUP_CLASS_ID=?,
+            RANDOMIZATION_DATE=?, RANDOMIZATION_RESULT=? WHERE STUDY_SUBJECT_ID=?
+        </sql>
+    </query>
 	<query>
 		<name>getCurrentPK</name>
 		<sql>SELECT study_subject_id_seq.currval AS key from dual</sql>

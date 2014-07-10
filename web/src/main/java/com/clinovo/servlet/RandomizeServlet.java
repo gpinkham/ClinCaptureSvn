@@ -21,10 +21,12 @@ import com.clinovo.model.Randomization;
 import com.clinovo.model.RandomizationResult;
 import com.clinovo.rule.ext.HttpTransportProtocol;
 import com.clinovo.util.RandomizationUtil;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -40,6 +42,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -141,6 +144,13 @@ public class RandomizeServlet extends Controller {
 
 		// Assign subject to group
 		String assignRandomizationResultTo = (String) request.getSession().getAttribute("assignRandomizationResultTo");
+
+		HashMap<String, ItemDataBean> itemsMap = RandomizationUtil
+				.getRandomizationItemData(request);
+
+		// Save randomization result and update all statuses
+		RandomizationUtil.saveRandomizationResultToDatabase(result, itemsMap);
+		RandomizationUtil.checkAndUpdateEventCRFAndStudyEventStatuses(itemsMap);
 
 		if (assignRandomizationResultTo.equals("dngroup")) {
 

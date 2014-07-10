@@ -156,6 +156,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <!-- For randomization -->
 <input type="hidden" name="crfId" value="<c:out value="${section.crf.id}"/>" />
 <input type="hidden" name="assignRandomizationResultTo" value="${assignRandomizationResultTo}"/>
+<input type="hidden" name="randomizationMessage" value="<fmt:message key="randomization_successful_message" bundle="${restext}"/>"/>
 
 <c:choose>
 	<c:when test="${assignRandomizationResultTo eq 'ssid'}">

@@ -2384,21 +2384,23 @@ $(function() {
 ========================================================================================== */
 function randomizeSubject() {
 
-      disableRandomizeCRFButtons(true);
+	disableRandomizeCRFButtons(true);
 
-    var crf = $("input:hidden[name='crfId']").val();
-    
-    var eligibility = null;
+	var crf = $("input:hidden[name='crfId']").val();
+	var eventCrfId = $("input:hidden[name='eventCRFId']").val();
+	var dateInputId = $("#Rand_Date").find(":input").attr("id").replace('input','');
+	var resultInputId = $("#Rand_Result").find(":input").attr("id").replace('input','');
+	var eligibility = null;
 
-    // Check if the subject eligibility is defined
-    if($("#Rand_Eligibility :radio").size() > 0) {
+	// Check if the subject eligibility is defined
+	if($("#Rand_Eligibility :radio").size() > 0) {
 
         // Check if selection has been done
         if($("input[type=radio]:checked", "#Rand_Eligibility").length > 0) {
             
             eligibility = $("input[type=radio]:checked", "#Rand_Eligibility").val();
 
-        } 
+        }
     }
 
    var strataLevels = [];
@@ -2423,20 +2425,20 @@ function randomizeSubject() {
         if($("#Rand_TrialIDs :select").find(":selected") !== undefined) {
 
             var opt3 = $("#Rand_TrialIDs :select").find(":selected").text();
-           
-           trialId = $("input:hidden[eleid='requiredParam3']").attr(opt3);
+
+            trialId = $("input:hidden[eleid='requiredParam3']").attr(opt3);
 
         } else {
-            
+
             alertDialog({ message: $("input:hidden[name='requiredParam3Missing']").val(), height: 150, width: 500 });
 
             return false;
         }
     } else {
-        
+
         trialId = $("input[eleid='randomize']").attr("trialId");
     }
-    
+
 	var subject = $("input:hidden[name='subjectLabel']").val();
 
 	if ($("input:hidden[name='assignRandomizationResultTo']").val() == "ssid"
@@ -2445,7 +2447,6 @@ function randomizeSubject() {
 		alert($("input[name=personIdMissing]").val());
 
 		return false;
-
 	}
 
     $.ajax({
@@ -2455,12 +2456,14 @@ function randomizeSubject() {
         data: {
 
             crf: crf,
+            eventCrfId: eventCrfId,
+            dateInputId: dateInputId,
+            resultInputId: resultInputId,
             subject: subject,
             trialId: trialId,
             eligibility: eligibility,
             strataLevel: JSON.stringify(strataLevels)
         },
-
 
         success: function(data) {
             
@@ -2501,9 +2504,9 @@ function randomizeSubject() {
                 alertDialog({ message: exceptionPattern.exec(data)[1], height: 150, width: 500 });
 
             } else {
-                
+
                 var result = JSON.parse(data);
-                
+
                 var dateInput = $("#Rand_Date").find(":input");
                 var resultInput = $("#Rand_Result").find(":input");
 
@@ -2517,6 +2520,9 @@ function randomizeSubject() {
                 $(resultInput).attr("readonly", "readonly");
 
                 $("input[type='submit']").removeAttr("disabled");
+
+                var errorMessage = $("input[name=randomizationMessage]").val();
+                alertDialog({ message: errorMessage, height: 150, width: 500 });
             }
         }
     });

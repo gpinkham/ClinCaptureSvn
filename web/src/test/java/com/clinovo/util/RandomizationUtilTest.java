@@ -6,36 +6,55 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import com.clinovo.exception.RandomizationException;
 import com.clinovo.model.RandomizationResult;
 
 public class RandomizationUtilTest {
 
+	private MockHttpServletRequest request;
+
 	@Before
 	public void setUp() {
 
 
 		StudySubjectDAO studySubjectDAO = createStudySubjectDAOMock();
+		SubjectDAO subjectDAO = createSubjectDAOMock();
 		StudyGroupClassDAO studyGroupDAO = createStudyGroupDAOMock(createSubjectGroup());
+		ItemDataDAO itemDataDAO = createItemDataDAOMock();
 
 		RandomizationUtil.setStudyGroupDAO(studyGroupDAO);
 		RandomizationUtil.setStudySubjectDAO(studySubjectDAO);
+		RandomizationUtil.setItemDataDAO(itemDataDAO);
+		RandomizationUtil.setSubjectDAO(subjectDAO);
 
 		SessionManager manager = Mockito.mock(SessionManager.class);
 		Mockito.when(manager.getDataSource()).thenReturn(null);
 		RandomizationUtil.setSessionManager(manager);
+
+		request = new MockHttpServletRequest();
+		request.getSession().setAttribute("userBean", createUserAccountBean());
+		request.setParameter("eventCrfId", "1");
+		request.setParameter("dateInputId", "1");
+		request.setParameter("resultInputId", "1");
 	}
 
 	@Test
@@ -155,6 +174,22 @@ public class RandomizationUtilTest {
 		RandomizationUtil.setStudySubjectDAO(dao);
 		RandomizationUtil.assignSubjectToGroup(createRandomizationResult());
 	}
+	
+	@Test
+	public void testThatGetRandomizationItemDataReturnsValidObjects() {
+
+		HashMap<String, ItemDataBean> listOfItems = RandomizationUtil.getRandomizationItemData(request);
+		assertEquals(2, listOfItems.size());
+	}
+	
+	@Test
+	public void testThatGetRandomizationItemDataReturnsValidSetOfItems() {
+
+		HashMap<String, ItemDataBean> listOfItems = RandomizationUtil.getRandomizationItemData(request);
+
+		assertNotNull(listOfItems.get("resultItem"));
+		assertNotNull(listOfItems.get("dateItem"));
+	}
 
 	private RandomizationResult createRandomizationResult() {
 
@@ -190,6 +225,20 @@ public class RandomizationUtilTest {
 
 		return dao;
 	}
+	
+	private SubjectDAO createSubjectDAOMock() {
+
+		SubjectBean subject = new SubjectBean();
+		subject.setUniqueIdentifier("some-subject-uid");
+
+		SubjectDAO dao = Mockito.mock(SubjectDAO.class);
+
+		Mockito.when(dao.isQuerySuccessful()).thenReturn(Boolean.TRUE);
+		Mockito.when(dao.update(Mockito.any(EntityBean.class))).thenReturn(new StudyGroupClassBean());
+		Mockito.when(dao.findByUniqueIdentifierAndStudy(Mockito.anyString(), Mockito.anyInt())).thenReturn(subject);
+
+		return dao;
+	}
 
 	private StudyGroupClassBean createSubjectGroup() {
 
@@ -198,5 +247,21 @@ public class RandomizationUtilTest {
 		studyGroupClassBean.setName("test-group");
 
 		return studyGroupClassBean;
+	}
+
+	private ItemDataDAO createItemDataDAOMock() {
+
+		ItemDataDAO dao = Mockito.mock(ItemDataDAO.class);
+		
+		Mockito.when(dao.findByItemIdAndEventCRFId(Mockito.anyInt(), Mockito.anyInt())).thenReturn(new ItemDataBean());
+
+		return dao;
+	}
+
+	private UserAccountBean createUserAccountBean() {
+
+		UserAccountBean ub = new UserAccountBean();
+
+		return ub;
 	}
 }

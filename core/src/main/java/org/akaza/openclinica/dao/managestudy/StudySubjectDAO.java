@@ -1033,6 +1033,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		ind++;
 		variables.put(ind, sb.getDynamicGroupClassId());
 		ind++;
+		variables.put(new Integer(ind), sb.getRandomizationDate());
+		ind++;
+		variables.put(new Integer(ind), sb.getRandomizationResult());
+		ind++;
 		variables.put(ind, sb.getId());
 
 		String sql = digester.getQuery("update");
