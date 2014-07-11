@@ -255,15 +255,180 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
-	public ArrayList findAllByStudySDV(int studyId, int parentStudyId, StudySubjectSDVFilter filter,
-			StudySubjectSDVSort sort, int rowStart, int rowEnd) {
+	public boolean isStudySubjectReadyToBeSDVed(StudyBean currentStudy, StudySubjectBean studySubject) {
+		int result = 0;
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+
+		int studyId = currentStudy.getId();
+		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
+				.getId();
+		boolean withoutDns = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries().equalsIgnoreCase("no");
+
+		HashMap variables = new HashMap();
+
+		variables.put(1, studySubject.getId());
+		variables.put(2, parentStudyId);
+		variables.put(3, parentStudyId);
+		variables.put(4, studyId);
+		variables.put(5, parentStudyId);
+		variables.put(6, parentStudyId);
+		variables.put(7, parentStudyId);
+		variables.put(8, parentStudyId);
+		variables.put(9, parentStudyId);
+		variables.put(10, parentStudyId);
+		variables.put(11, parentStudyId);
+		variables.put(12, studyId);
+		variables.put(13, parentStudyId);
+		variables.put(14, parentStudyId);
+		variables.put(15, parentStudyId);
+		variables.put(16, parentStudyId);
+		variables.put(17, parentStudyId);
+		variables.put(18, parentStudyId);
+		variables.put(19, parentStudyId);
+		variables.put(20, studyId);
+		variables.put(21, parentStudyId);
+		variables.put(22, parentStudyId);
+		variables.put(23, parentStudyId);
+		variables.put(24, parentStudyId);
+		variables.put(25, parentStudyId);
+
+		String sql = digester.getQuery("isStudySubjectSDVed") + " "
+				+ digester.getQuery("readyToBeSdvStudySubjectFilter");
+
+		if (withoutDns) {
+			ListNotesFilter listNotesFilter = new ListNotesFilter();
+			listNotesFilter.addFilter("studySubject.id", "mss.study_subject_id");
+			listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "123");
+			sql += " AND (SELECT count(distinct dns.discrepancy_note_id) FROM ( "
+					+ new DiscrepancyNoteDAO(ds).getSQLViewNotesWithFilterAndSortLimits(currentStudy, listNotesFilter,
+							new ListNotesSort(), 0, 100, false).replaceAll("\\?", "" + studyId) + " ) dns ) = 0 ";
+		}
+
+		ArrayList rows = this.select(sql, variables);
+		Iterator it = rows.iterator();
+
+		if (it.hasNext()) {
+			result = (Integer) ((HashMap) it.next()).get("study_subject_id");
+		}
+
+		return studySubject.getId() == result;
+	}
+
+	public boolean isStudySubjectSDVed(StudyBean currentStudy, StudySubjectBean studySubject) {
+		int result = 0;
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+
+		int studyId = currentStudy.getId();
+		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
+				.getId();
+		boolean withoutDns = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries().equalsIgnoreCase("no");
+
+		HashMap variables = new HashMap();
+
+		variables.put(1, studySubject.getId());
+		variables.put(2, parentStudyId);
+		variables.put(3, parentStudyId);
+		variables.put(4, studyId);
+		variables.put(5, parentStudyId);
+		variables.put(6, parentStudyId);
+		variables.put(7, parentStudyId);
+		variables.put(8, parentStudyId);
+		variables.put(9, parentStudyId);
+		variables.put(10, parentStudyId);
+		variables.put(11, parentStudyId);
+		variables.put(12, studyId);
+		variables.put(13, parentStudyId);
+		variables.put(14, parentStudyId);
+		variables.put(15, parentStudyId);
+		variables.put(16, parentStudyId);
+		variables.put(17, parentStudyId);
+		variables.put(18, parentStudyId);
+		variables.put(19, parentStudyId);
+		variables.put(20, studyId);
+		variables.put(21, parentStudyId);
+		variables.put(22, parentStudyId);
+		variables.put(23, parentStudyId);
+		variables.put(24, parentStudyId);
+		variables.put(25, parentStudyId);
+
+		String sql = digester.getQuery("isStudySubjectSDVed") + " " + digester.getQuery("sdvStudySubjectFilter");
+
+		if (withoutDns) {
+			ListNotesFilter listNotesFilter = new ListNotesFilter();
+			listNotesFilter.addFilter("studySubject.id", "mss.study_subject_id");
+			listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "123");
+			sql += " AND (SELECT count(distinct dns.discrepancy_note_id) FROM ( "
+					+ new DiscrepancyNoteDAO(ds).getSQLViewNotesWithFilterAndSortLimits(currentStudy, listNotesFilter,
+							new ListNotesSort(), 0, 100, false).replaceAll("\\?", "" + studyId) + " ) dns ) = 0 ";
+		}
+
+		ArrayList rows = this.select(sql, variables);
+		Iterator it = rows.iterator();
+
+		if (it.hasNext()) {
+			result = (Integer) ((HashMap) it.next()).get("study_subject_id");
+		}
+
+		return studySubject.getId() == result;
+	}
+
+	public ArrayList findAllByStudySDV(StudyBean currentStudy, StudySubjectSDVFilter filter, StudySubjectSDVSort sort,
+			int rowStart, int rowEnd) {
+		int studyId = currentStudy.getId();
+		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
+				.getId();
+		boolean withoutDns = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries().equalsIgnoreCase("no");
+
+		ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
+
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
+
 		variables.put(1, studyId);
-		variables.put(2, parentStudyId);
+		variables.put(2, studyId);
+
 		String sql = digester.getQuery("findAllByStudySDV");
-		sql = sql + filter.execute("");
+
+		String sqlFilter = filter.execute("");
+		if (sqlFilter.contains(digester.getQuery("sdvStudySubjectFilter"))
+				|| sqlFilter.contains(digester.getQuery("sdvStudySubjectFilter"))) {
+			variables.put(3, parentStudyId);
+			variables.put(4, parentStudyId);
+			variables.put(5, studyId);
+			variables.put(6, parentStudyId);
+			variables.put(7, parentStudyId);
+			variables.put(8, parentStudyId);
+			variables.put(9, parentStudyId);
+			variables.put(10, parentStudyId);
+			variables.put(11, parentStudyId);
+			variables.put(12, parentStudyId);
+			variables.put(13, studyId);
+			variables.put(14, parentStudyId);
+			variables.put(15, parentStudyId);
+			variables.put(16, parentStudyId);
+			variables.put(17, parentStudyId);
+			variables.put(18, parentStudyId);
+			variables.put(19, parentStudyId);
+			variables.put(20, parentStudyId);
+			variables.put(21, studyId);
+			variables.put(22, parentStudyId);
+			variables.put(23, parentStudyId);
+			variables.put(24, parentStudyId);
+			variables.put(25, parentStudyId);
+			variables.put(26, parentStudyId);
+		}
+		sql += sqlFilter;
+
+		if (withoutDns) {
+			ListNotesFilter listNotesFilter = new ListNotesFilter();
+			listNotesFilter.addFilter("studySubject.id", "mss.study_subject_id");
+			listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "123");
+			sql += " AND (SELECT count(distinct dns.discrepancy_note_id) FROM ( "
+					+ new DiscrepancyNoteDAO(ds).getSQLViewNotesWithFilterAndSortLimits(currentStudy, listNotesFilter,
+							new ListNotesSort(), 0, 100, false).replaceAll("\\?", "" + studyId) + " ) dns ) = 0 ";
+		}
 
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			sql += ")x) where r between " + (rowStart + 1) + " and " + rowEnd;
@@ -272,6 +437,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 			sql = sql + sort.execute("");
 			sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
 		}
+
 		ArrayList rows = this.select(sql, variables);
 
 		for (Object row : rows) {
@@ -299,16 +465,63 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
-	public int countAllByStudySDV(int studyId, int parentStudyId, StudySubjectSDVFilter filter) {
+	public String getSdvStudySubjectFilter() {
+		return digester.getQuery("sdvStudySubjectFilter");
+	}
+
+	public int countAllByStudySDV(StudyBean currentStudy, StudySubjectSDVFilter filter) {
+		int studyId = currentStudy.getId();
+		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
+				.getId();
+		boolean withoutDns = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries().equalsIgnoreCase("no");
+
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap variables = new HashMap();
 		variables.put(1, studyId);
-		variables.put(2, parentStudyId);
+		variables.put(2, studyId);
 
 		String sql = digester.getQuery("countAllByStudySDV");
-		sql += filter.execute("");
+
+		String sqlFilter = filter.execute("");
+		if (sqlFilter.contains(digester.getQuery("sdvStudySubjectFilter"))
+				|| sqlFilter.contains(digester.getQuery("sdvStudySubjectFilter"))) {
+			variables.put(3, parentStudyId);
+			variables.put(4, parentStudyId);
+			variables.put(5, studyId);
+			variables.put(6, parentStudyId);
+			variables.put(7, parentStudyId);
+			variables.put(8, parentStudyId);
+			variables.put(9, parentStudyId);
+			variables.put(10, parentStudyId);
+			variables.put(11, parentStudyId);
+			variables.put(12, parentStudyId);
+			variables.put(13, studyId);
+			variables.put(14, parentStudyId);
+			variables.put(15, parentStudyId);
+			variables.put(16, parentStudyId);
+			variables.put(17, parentStudyId);
+			variables.put(18, parentStudyId);
+			variables.put(19, parentStudyId);
+			variables.put(20, parentStudyId);
+			variables.put(21, studyId);
+			variables.put(22, parentStudyId);
+			variables.put(23, parentStudyId);
+			variables.put(24, parentStudyId);
+			variables.put(25, parentStudyId);
+			variables.put(26, parentStudyId);
+		}
+		sql += sqlFilter;
+
+		if (withoutDns) {
+			ListNotesFilter listNotesFilter = new ListNotesFilter();
+			listNotesFilter.addFilter("studySubject.id", "mss.study_subject_id");
+			listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "123");
+			sql += " AND (SELECT count(distinct dns.discrepancy_note_id) FROM ( "
+					+ new DiscrepancyNoteDAO(ds).getSQLViewNotesWithFilterAndSortLimits(currentStudy, listNotesFilter,
+							new ListNotesSort(), 0, 100, false).replaceAll("\\?", "" + studyId) + " ) dns ) = 0 ";
+		}
 
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();

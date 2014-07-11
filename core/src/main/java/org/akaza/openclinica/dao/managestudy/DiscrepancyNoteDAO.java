@@ -477,23 +477,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return getViewNotesWithFilterAndSortLimits(currentStudy, filter, sort, offset, limit, false);
 	}
 
-	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortLimits(StudyBean currentStudy,
-			ListNotesFilter filter, ListNotesSort sort, int offset, int limit, boolean eventCrfOnly) {
-		setTypesExpected();
-		this.setTypeExpected(12, TypeNames.STRING);
-		this.setTypeExpected(13, TypeNames.INT);
-		this.setTypeExpected(14, TypeNames.INT);
-		this.setTypeExpected(15, TypeNames.STRING);
-		this.setTypeExpected(16, TypeNames.STRING);
-		this.setTypeExpected(17, TypeNames.STRING);
-		this.setTypeExpected(18, TypeNames.STRING);
-		this.setTypeExpected(19, TypeNames.INT);
-
-		Map variables = new HashMap();
-		for (int i = 1; i <= (eventCrfOnly ? 4 : 10); i++) {
-			variables.put(i, currentStudy.getId());
-		}
-
+	public String getSQLViewNotesWithFilterAndSortLimits(StudyBean currentStudy, ListNotesFilter filter,
+			ListNotesSort sort, int offset, int limit, boolean eventCrfOnly) {
 		StringBuilder sql = new StringBuilder("SELECT dns.* FROM ( ");
 
 		String filterPart = filter.execute("");
@@ -528,9 +513,33 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			sql.append(" order by label asc, age asc ");
 		}
 
-		sql.append(" offset ").append(offset).append(" limit ").append(limit);
+		if (offset >= 0 && limit > 0) {
+			sql.append(" offset ").append(offset).append(" limit ").append(limit);
+		}
 
-		ArrayList rows = select(sql.toString(), variables);
+		return sql.toString();
+	}
+
+	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortLimits(StudyBean currentStudy,
+			ListNotesFilter filter, ListNotesSort sort, int offset, int limit, boolean eventCrfOnly) {
+		setTypesExpected();
+		this.setTypeExpected(12, TypeNames.STRING);
+		this.setTypeExpected(13, TypeNames.INT);
+		this.setTypeExpected(14, TypeNames.INT);
+		this.setTypeExpected(15, TypeNames.STRING);
+		this.setTypeExpected(16, TypeNames.STRING);
+		this.setTypeExpected(17, TypeNames.STRING);
+		this.setTypeExpected(18, TypeNames.STRING);
+		this.setTypeExpected(19, TypeNames.INT);
+
+		Map variables = new HashMap();
+		for (int i = 1; i <= (eventCrfOnly ? 4 : 10); i++) {
+			variables.put(i, currentStudy.getId());
+		}
+
+		ArrayList rows = select(
+				getSQLViewNotesWithFilterAndSortLimits(currentStudy, filter, sort, offset, limit, eventCrfOnly),
+				variables);
 		Iterator it = rows.iterator();
 		ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
 		while (it.hasNext()) {
@@ -779,7 +788,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		variables.put(1, entityId);
 		variables.put(2, column);
 		if ("subject".equalsIgnoreCase(entityName)) {
-			int parentStudyId = study.getParentStudyId() == 0? study.getId() : study.getParentStudyId();
+			int parentStudyId = study.getParentStudyId() == 0 ? study.getId() : study.getParentStudyId();
 			variables.put(3, parentStudyId);
 			variables.put(4, parentStudyId);
 			variables.put(5, parentStudyId);
@@ -2270,10 +2279,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		HashMap variables = new HashMap();
 		variables.put(1, crfId);
 
-		ArrayList rows = select(digester.getQuery("findAllByCRFId"), variables);
-		Iterator it = rows.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		ArrayList<HashMap> rows = select(digester.getQuery("findAllByCRFId"), variables);
+		for (HashMap hm : rows) {
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			String studySubLabel = String.valueOf((hm).get("label"));
 			eb.getStudySub().setLabel(studySubLabel);

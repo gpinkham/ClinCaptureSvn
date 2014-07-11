@@ -39,6 +39,7 @@ public class ListNotesFilter implements CriteriaCommand {
 	public ListNotesFilter() {
 		columnMapping.put("discrepancyNoteBean.id", "dn.discrepancy_note_id");
 		columnMapping.put("studySubject.label", "ss.label");
+		columnMapping.put("studySubject.id", "ss.study_subject_id");
 		columnMapping.put("siteId", "ss.label");
 		columnMapping.put("studySubject.labelExact", "ss.label");
 		columnMapping.put("discrepancyNoteBean.createdDate", "dn.date_created");
@@ -90,6 +91,8 @@ public class ListNotesFilter implements CriteriaCommand {
 			} else if (property.equals("studySubject.labelExact")) {
 				criteria += " and  UPPER(" + columnMapping.get(property) + ") = UPPER('" + value.toString() + "')"
 						+ " ";
+			} else if (property.equals("studySubject.id")) {
+				criteria += " and " + columnMapping.get(property) + " = " + value.toString() + " ";
 			} else if (property.equals("studySubject.label") || property.equals("discrepancyNoteBean.description")) {
 				criteria += " and UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')"
 						+ " ";
@@ -172,7 +175,7 @@ public class ListNotesFilter implements CriteriaCommand {
 		if (stringValue.length() > 0) {
 			result.append(" and (");
 			for (int i = 0; i < stringValue.length(); i++) {
-				result.append(" or " + "dn.resolution_status_id = " + stringValue.charAt(i));
+				result.append(" or " + "dn.resolution_status_id = ").append(stringValue.charAt(i));
 			}
 			result.append(")");
 		}
@@ -184,9 +187,9 @@ public class ListNotesFilter implements CriteriaCommand {
 		StringBuilder result = new StringBuilder();
 
 		if (!stringValue.equalsIgnoreCase(ResourceBundleProvider.getResTerm("not_assigned"))) {
-			result.append(" and " + property + " like '" + stringValue + "' ");
+			result.append(" and ").append(property).append(" like '").append(stringValue).append("' ");
 		} else {
-			result.append(" and " + property + " is NULL ");
+			result.append(" and ").append(property).append(" is NULL ");
 		}
 
 		return result.toString();

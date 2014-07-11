@@ -97,9 +97,7 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 		CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
 		CRFVersionBean crfVersion = (CRFVersionBean) crfVersionDao.findByPK(2);
 
-		List<RuleSetBean> ruleSets = ruleSetService.getRuleSetsByCrfStudyAndStudyEventDefinition(study,
-				studyEventDefinition, crfVersion);
-		return ruleSets;
+		return ruleSetService.getRuleSetsByCrfStudyAndStudyEventDefinition(study, studyEventDefinition, crfVersion);
 	}
 
 	@Test
@@ -135,7 +133,7 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 					containers.add(idrrContainer);
 				}
 			}
-			if (containers != null && !containers.isEmpty()) {
+			if (!containers.isEmpty()) {
 				ruleSetService.runRulesInImportData(runRulesOptimisation, getDataSource().getConnection(), containers,
 						studyBean, ub, ExecutionMode.DRY_RUN);
 			}
@@ -158,7 +156,7 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 					containers.add(idrrContainer);
 				}
 			}
-			if (containers != null && !containers.isEmpty()) {
+			if (!containers.isEmpty()) {
 				ruleSetService.runRulesInImportData(runRulesOptimisation, getDataSource().getConnection(), containers,
 						studyBean, ub, ExecutionMode.DRY_RUN);
 			}
