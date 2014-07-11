@@ -13,8 +13,24 @@
 
 package org.akaza.openclinica.web.crfdata;
 
-import com.clinovo.service.StudySubjectIdService;
-import com.clinovo.util.ValidatorHelper;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -68,22 +84,9 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
-import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import com.clinovo.clincapture.web.crfdata.ImportDataRefiner;
+import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.util.ValidatorHelper;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ImportCRFDataService {
@@ -410,6 +413,7 @@ public class ImportCRFDataService {
 			HashMap<String, String> hardValidationErrors, ArrayList<Integer> permittedEventCRFIds)
 			throws OpenClinicaException {
 
+		ImportDataRefiner importDataRefiner = new ImportDataRefiner();
 		DisplayItemBeanWrapper displayItemBeanWrapper = null;
 		HashMap validationErrors;
 		List<DisplayItemBeanWrapper> wrappers = new ArrayList<DisplayItemBeanWrapper>();
@@ -515,6 +519,9 @@ public class ImportCRFDataService {
 					EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO
 							.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), crfVersion.getId());
 					Collections.sort(itemGroupDataBeans, new ItemGroupComparator());
+					//Refine Item Group Data
+					List<ItemBean> crfVersionItems = (List<ItemBean>) itemDAO.findAllItemsByVersionId(crfVersion.getId());
+					importDataRefiner.refineImportItemGroupData(itemGroupDataBeans, crfVersionItems);
 					if (permittedEventCRFIds.contains(eventCRFBean.getId())) {
 						for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
 							GroupOrdinalInfo goi = addGroupOrdinal(groupOrdinalMap, crfVersion, itemGroupDataBean);
@@ -541,13 +548,16 @@ public class ImportCRFDataService {
 									logger.debug("   found " + itemBean.getName());
 									DisplayItemBean displayItemBean = new DisplayItemBean();
 									displayItemBean.setItem(itemBean);
-
+									displayItemBean.setAutoAdded(importItemDataBean.getAutoAdded());
+									
 									ItemFormMetadataBean metadataBean = itemFormMetadataDAO
 											.findAllByCRFVersionIdAndItemId(crfVersion.getId(), itemBean.getId());
 									logger.debug("      found metadata item bean: " + metadataBean);
 									ItemDataBean itemDataBean = createItemDataBean(itemBean, eventCRFBean,
 											importItemDataBean.getValue(), ub, goi.groupOrdinal);
-									if (!doNotAddItems) {
+									//Do not add auto added item to  groupItemList to avoid duplicate 
+									//entries in blank item groups processing
+									if (!doNotAddItems && !importItemDataBean.getAutoAdded()) {
 										groupItemList.add(itemBean);
 									}
 									String newKey = crfVersion.getOid() + "_" + goi.groupOrdinal + "_"

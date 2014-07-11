@@ -1,9 +1,18 @@
 package com.clinovo.clincapture.web.crfdata;
 
-import com.clinovo.service.StudySubjectIdService;
-import com.clinovo.util.ValidatorHelper;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.sax.SAXSource;
+
 import org.akaza.openclinica.AbstractContextSentiveTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
@@ -14,14 +23,8 @@ import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.xml.sax.InputSource;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.sax.SAXSource;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.util.ValidatorHelper;
 
 public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 
@@ -85,6 +88,16 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 		} else {
 			fail("XML not found!");
 		}
+	}
+
+	private int filterAutoAddedCount(List<DisplayItemBeanWrapper> wrappers, int index) {
+		int countFilterAutoAdded = 0;
+		for (DisplayItemBean item : wrappers.get(index).getDisplayItemBeans()) {
+			if (!item.getAutoAdded()) {
+				countFilterAutoAdded++;
+			}
+		}
+		return countFilterAutoAdded;
 	}
 
 	@Test
@@ -227,7 +240,8 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 		List<DisplayItemBeanWrapper> wrappers = holder1.service.lookupValidationErrors(holder1.validatorHelper,
 				holder1.container, holder1.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder1.permittedEventCRFIds);
-		assertEquals(wrappers.get(0).getDisplayItemBeans().size(), 6);
+		int countFilterAutoAdd = filterAutoAddedCount(wrappers, 0);
+		assertEquals(countFilterAutoAdd, 6);
 	}
 
 	@Test
@@ -235,7 +249,9 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 		List<DisplayItemBeanWrapper> wrappers = holder2.service.lookupValidationErrors(holder2.validatorHelper,
 				holder2.container, holder2.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder2.permittedEventCRFIds);
-		assertEquals(wrappers.get(0).getDisplayItemBeans().size() + wrappers.get(1).getDisplayItemBeans().size(), 48);
+		int countFilterAutoAdd = filterAutoAddedCount(wrappers, 0);
+		countFilterAutoAdd += filterAutoAddedCount(wrappers, 1);
+		assertEquals(countFilterAutoAdd, 48);
 	}
 
 	@Test
@@ -243,6 +259,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 		List<DisplayItemBeanWrapper> wrappers = holder3.service.lookupValidationErrors(holder3.validatorHelper,
 				holder3.container, holder3.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder3.permittedEventCRFIds);
-		assertEquals(wrappers.get(0).getDisplayItemBeans().size(), 34);
+		int countFilterAutoAdd = filterAutoAddedCount(wrappers, 0);
+		assertEquals(countFilterAutoAdd, 34);
 	}
 }

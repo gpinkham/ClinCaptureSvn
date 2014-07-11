@@ -436,7 +436,7 @@
 								<c:forEach var="itemData" items="${itemGroupData.itemData}">
 									<c:set var="oidKey"
 										value="${itemData.itemOID}_${studyEventRepeatKey}_${groupRepeatKey}_${subjectDataBean.subjectOID}" />
-									<c:if test="${empty validationErrors[oidKey]}">
+									<c:if test="${(empty validationErrors[oidKey]) and itemData.autoAdded == false}">
 										<tr valign="top">
 											<td class="table_cell_left"></td>
 											<td class="table_cell"></td>

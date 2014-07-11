@@ -36,6 +36,7 @@ public class DisplayItemBean implements Comparable {
 	private ItemFormMetadataBean metadata;
 	private String editFlag = "";// used for items in a group
 	private ItemDataBean dbData; // used for DDE, items in a group
+	private boolean autoAdded; //used for data import
 
 	// adding totals here for display purposes
 
@@ -654,5 +655,19 @@ public class DisplayItemBean implements Comparable {
 
 	public void setFirstAnnotation(boolean firstAnnotation) {
 		this.firstAnnotation = firstAnnotation;
+	}
+
+	/**
+	 * @return the autoAdded
+	 */
+	public boolean getAutoAdded() {
+		return autoAdded;
+	}
+
+	/**
+	 * @param autoAdded the autoAdded to set
+	 */
+	public void setAutoAdded(boolean autoAdded) {
+		this.autoAdded = autoAdded;
 	}
 }

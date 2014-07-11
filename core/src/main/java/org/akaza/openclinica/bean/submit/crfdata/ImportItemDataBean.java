@@ -43,6 +43,8 @@ public class ImportItemDataBean {
     
 	private boolean hasValueWithNull; // this is just a flag, it is not an attribute/element
 	
+	private boolean autoAdded;
+	
 	@XmlAttribute(name = "ItemOID")
 	public String getItemOID() {
 		return itemOID;
@@ -125,5 +127,19 @@ public class ImportItemDataBean {
 
 	public void setSkip(boolean skip) {
 		this.skip = skip;
+	}
+
+	/**
+	 * @return the autoAdded
+	 */
+	public boolean getAutoAdded() {
+		return autoAdded;
+	}
+
+	/**
+	 * @param autoAdded the autoAdded to set
+	 */
+	public void setAutoAdded(boolean autoAdded) {
+		this.autoAdded = autoAdded;
 	}
 }
