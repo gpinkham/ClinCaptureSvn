@@ -748,6 +748,42 @@
       </td>
   </tr>
 
+  <tr valign="top">
+      <td class="formlabel">
+          <fmt:message key="systemProperty.allowCrfEvaluation.label" bundle="${resword}"/>?
+      </td>
+      <td>
+          <c:choose>
+              <c:when test="${studyToView.studyParameterConfig.allowCrfEvaluation == 'yes'}">
+                  <input type="radio" checked name="allowCrfEvaluation" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                  <input type="radio" name="allowCrfEvaluation" value="no"><fmt:message key="no" bundle="${resword}"/>
+              </c:when>
+              <c:otherwise>
+                  <input type="radio" name="allowCrfEvaluation" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                  <input type="radio" checked name="allowCrfEvaluation" value="no"><fmt:message key="no" bundle="${resword}"/>
+              </c:otherwise>
+          </c:choose>
+      </td>
+  </tr>
+
+  <tr valign="top">
+      <td class="formlabel">
+          <fmt:message key="systemProperty.evaluateWithContext.label" bundle="${resword}"/>?
+      </td>
+      <td>
+          <c:choose>
+              <c:when test="${studyToView.studyParameterConfig.evaluateWithContext == 'yes'}">
+                  <input type="radio" checked name="evaluateWithContext" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                  <input type="radio" name="evaluateWithContext" value="no"><fmt:message key="no" bundle="${resword}"/>
+              </c:when>
+              <c:otherwise>
+                  <input type="radio" name="evaluateWithContext" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                  <input type="radio" checked name="evaluateWithContext" value="no"><fmt:message key="no" bundle="${resword}"/>
+              </c:otherwise>
+          </c:choose>
+      </td>
+  </tr>
+
   <tr>
       <td>&nbsp;</td>
   </tr>

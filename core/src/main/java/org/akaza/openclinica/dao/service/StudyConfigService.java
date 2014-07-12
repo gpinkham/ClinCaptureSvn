@@ -164,7 +164,11 @@ public class StudyConfigService {
 		    	spc.setAssignRandomizationResultTo(spv.getValue());
 		    } else if (handle.equalsIgnoreCase("randomizationTrialId")) {
 		    	spc.setRandomizationTrialId(spv.getValue());
-		    }
+		    } else if (handle.equalsIgnoreCase("allowCrfEvaluation")) {
+				spc.setAllowCrfEvaluation(spv.getValue());
+			} else if (handle.equalsIgnoreCase("evaluateWithContext")) {
+				spc.setEvaluateWithContext(spv.getValue());
+			}
 		} else if (spv.getId() == 0) {
 			setSystemParameterValues(spvdao, spc, handle);
 		}
@@ -206,7 +210,11 @@ public class StudyConfigService {
 		    	spc.setAssignRandomizationResultTo(value);
 		    } else if (handle.equalsIgnoreCase("randomizationTrialId")) {
 		    	spc.setRandomizationTrialId(value);
-		    }
+			} else if (handle.equalsIgnoreCase("allowCrfEvaluation")) {
+				spc.setAllowCrfEvaluation(value);
+			} else if (handle.equalsIgnoreCase("evaluateWithContext")) {
+				spc.setEvaluateWithContext(value);
+			}
 		}
 	}
 

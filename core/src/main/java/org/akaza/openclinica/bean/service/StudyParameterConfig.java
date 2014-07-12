@@ -108,7 +108,10 @@ public class StudyParameterConfig {
     //Randomization
     private String assignRandomizationResultTo = "none";
     private String randomizationTrialId = "";
-    
+
+	//Evaluation
+	private String allowCrfEvaluation = "no";
+	private String evaluateWithContext = "no";
 
 	public StudyParameterConfig() {
 		
@@ -581,5 +584,21 @@ public class StudyParameterConfig {
 	 */
 	public void setRandomizationTrialId(String randomizationTrialId) {
 		this.randomizationTrialId = randomizationTrialId;
+	}
+
+	public String getAllowCrfEvaluation() {
+		return allowCrfEvaluation;
+	}
+
+	public void setAllowCrfEvaluation(String allowCrfEvaluation) {
+		this.allowCrfEvaluation = allowCrfEvaluation;
+	}
+
+	public String getEvaluateWithContext() {
+		return evaluateWithContext;
+	}
+
+	public void setEvaluateWithContext(String evaluateWithContext) {
+		this.evaluateWithContext = evaluateWithContext;
 	}
 }

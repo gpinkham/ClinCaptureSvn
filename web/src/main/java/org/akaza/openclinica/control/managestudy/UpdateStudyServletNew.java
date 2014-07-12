@@ -526,8 +526,12 @@ public class UpdateStudyServletNew extends Controller {
 		
 		//Randomization
 		study.getStudyParameterConfig().setAssignRandomizationResultTo(fp.getString("assignRandomizationResultTo")); 
-		study.getStudyParameterConfig().setRandomizationTrialId(fp.getString("randomizationTrialId")); 
-			 
+		study.getStudyParameterConfig().setRandomizationTrialId(fp.getString("randomizationTrialId"));
+
+		//Evaluation
+		study.getStudyParameterConfig().setAllowCrfEvaluation(fp.getString("allowCrfEvaluation"));
+		study.getStudyParameterConfig().setEvaluateWithContext(fp.getString("evaluateWithContext"));
+
 		try { 
 		
 			// Create custom dictionary 
@@ -894,8 +898,16 @@ public class UpdateStudyServletNew extends Controller {
 		 
 		spv.setParameter("randomizationTrialId"); 
 		spv.setValue(study1.getStudyParameterConfig().getRandomizationTrialId()); 
-		updateParameter(spvdao, spv); 
-			 
+		updateParameter(spvdao, spv);
+
+		spv.setParameter("allowCrfEvaluation");
+		spv.setValue(study1.getStudyParameterConfig().getAllowCrfEvaluation());
+		updateParameter(spvdao, spv);
+
+		spv.setParameter("evaluateWithContext");
+		spv.setValue(study1.getStudyParameterConfig().getEvaluateWithContext());
+		updateParameter(spvdao, spv);
+
 		try { 
 			 
 			// Create custom dictionary 

@@ -760,6 +760,9 @@ public class CreateStudyServlet extends Controller {
 		newStudy.getStudyParameterConfig().setMedicalCodingContextNeeded(fp.getString("medicalCodingContextNeeded"));
 		newStudy.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("medicalCodingApprovalNeeded"));
 
+		newStudy.getStudyParameterConfig().setAllowCrfEvaluation(fp.getString("allowCrfEvaluation"));
+		newStudy.getStudyParameterConfig().setEvaluateWithContext(fp.getString("evaluateWithContext"));
+
 		request.getSession().setAttribute("newStudy", newStudy);
 
 		if (errors.isEmpty()) {
@@ -952,6 +955,14 @@ public class CreateStudyServlet extends Controller {
         spv.setParameter("medicalCodingContextNeeded");
         spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingContextNeeded());
         spvdao.create(spv);
+
+		spv.setParameter("allowCrfEvaluation");
+		spv.setValue(newStudy.getStudyParameterConfig().getAllowCrfEvaluation());
+		spvdao.create(spv);
+
+		spv.setParameter("evaluateWithContext");
+		spv.setValue(newStudy.getStudyParameterConfig().getEvaluateWithContext());
+		spvdao.create(spv);
 
 		logger.info("study parameters created done");
 

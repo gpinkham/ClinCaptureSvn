@@ -1157,6 +1157,38 @@
       </c:choose>
     </td>
   </tr>
+
+    <tr valign="top">
+        <td class="table_header_column">
+            <fmt:message key="systemProperty.allowCrfEvaluation.label" bundle="${resword}" />?
+        </td>
+        <td class="table_cell">
+            <c:choose>
+                <c:when test="${studyToView.studyParameterConfig.allowCrfEvaluation == 'yes'}">
+                    <fmt:message key="yes" bundle="${resword}" />
+                </c:when>
+                <c:otherwise>
+                    <fmt:message key="no" bundle="${resword}" />
+                </c:otherwise>
+            </c:choose>
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td class="table_header_column">
+            <fmt:message key="systemProperty.evaluateWithContext.label" bundle="${resword}" />?
+        </td>
+        <td class="table_cell">
+            <c:choose>
+                <c:when test="${studyToView.studyParameterConfig.evaluateWithContext == 'yes'}">
+                    <fmt:message key="yes" bundle="${resword}" />
+                </c:when>
+                <c:otherwise>
+                    <fmt:message key="no" bundle="${resword}" />
+                </c:otherwise>
+            </c:choose>
+        </td>
+    </tr>
   
 </table>
 

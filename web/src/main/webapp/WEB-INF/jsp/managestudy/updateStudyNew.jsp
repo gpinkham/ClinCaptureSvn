@@ -2137,8 +2137,51 @@
 				<input type="text" name="autoCodeDictionaryName" value="${studyToView.studyParameterConfig.autoCodeDictionaryName}" maxlength="255" size="35"> 
 				<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="autoCodeDictionaryName"/></jsp:include> 
 			</td> 
-		</tr> 	 	 
-		<tr> 
+		</tr>
+        <tr valign="top" style="border: 1px solid black;width: 100%;">
+            <td class="formlabel" style="border-top: 1px solid black;text-align: left;">
+                <fmt:message key="systemProperty.crf_evaluation.name" bundle="${resword}"/>:
+            </td>
+            <td style=" border-top: 1px solid black; text-align: left;">
+                &nbsp;
+            </td>
+        </tr>
+        <tr valign="top">
+            <td class="formlabel">
+                <fmt:message key="systemProperty.allowCrfEvaluation.label" bundle="${resword}"/>?
+            </td>
+            <td>
+                <c:choose>
+                    <c:when test="${studyToView.studyParameterConfig.allowCrfEvaluation == 'yes'}">
+                        <input type="radio" checked name="allowCrfEvaluation" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                        <input type="radio" name="allowCrfEvaluation" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="radio" name="allowCrfEvaluation" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                        <input type="radio" checked name="allowCrfEvaluation" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+                    </c:otherwise>
+                </c:choose>
+            </td>
+        </tr>
+
+        <tr valign="top">
+            <td class="formlabel">
+                <fmt:message key="systemProperty.evaluateWithContext.label" bundle="${resword}"/>?
+            </td>
+            <td>
+                <c:choose>
+                    <c:when test="${studyToView.studyParameterConfig.evaluateWithContext == 'yes'}">
+                        <input type="radio" checked name="evaluateWithContext" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                        <input type="radio" name="evaluateWithContext" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="radio" name="evaluateWithContext" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                        <input type="radio" checked name="evaluateWithContext" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+                    </c:otherwise>
+                </c:choose>
+            </td>
+        </tr>
+        <tr>
 			<td>&nbsp;</td> 
 		</tr>	
 	</table>
