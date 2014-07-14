@@ -1228,15 +1228,15 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		ind++;
 		variables.put(ind, sb.getStatus().getId());
 		ind++;
+
 		Date enrollmentDate = sb.getEnrollmentDate();
 		if (enrollmentDate == null) {
 			nullVars.put(ind, Types.DATE);
 			variables.put(ind, null);
-			ind++;
 		} else {
 			variables.put(ind, enrollmentDate);
-			ind++;
 		}
+		ind++;
 
 		variables.put(ind, new java.util.Date());
 		ind++;
@@ -1246,10 +1246,25 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		ind++;
 		variables.put(ind, sb.getDynamicGroupClassId());
 		ind++;
-		variables.put(new Integer(ind), sb.getRandomizationDate());
+
+		Date randomizationDate = sb.getRandomizationDate();
+		if (randomizationDate == null) {
+			nullVars.put(ind, Types.DATE);
+			variables.put(ind, null);
+		} else {
+			variables.put(ind, randomizationDate);
+		}
 		ind++;
-		variables.put(new Integer(ind), sb.getRandomizationResult());
+
+		String randomizationResult = sb.getRandomizationResult();
+		if (randomizationResult == null) {
+			nullVars.put(ind, Types.VARCHAR);
+			variables.put(ind, null);
+		} else {
+			variables.put(ind, randomizationResult);
+		}
 		ind++;
+
 		variables.put(ind, sb.getId());
 
 		String sql = digester.getQuery("update");
