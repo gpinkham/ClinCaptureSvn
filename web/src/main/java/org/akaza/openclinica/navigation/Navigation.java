@@ -25,11 +25,11 @@ public class Navigation {
 
 	// "skip!"-set of pages, non pop-ups
 	private static Set<String> exclusionURLs = new HashSet<String>(Arrays.asList("/PageToCreateNewStudyEvent",
-			"/CRFListForStudyEvent", "/InitialDataEntry", "/VerifyImportedCRFData", "/AdministrativeEditing",
-			"/UpdateStudySubject", "/RemoveStudySubject", "/ResolveDiscrepancy", "/RestoreStudySubject",
-			"/UpdateStudyEvent", "/RemoveStudyEvent", "/RestoreStudyEvent", "/DeleteEventCRF", "/RemoveEventCRF",
-			"/RestoreEventCRF", "/InitUpdateSubStudy", "/UpdateSubStudy", "/DeleteStudyEvent", "/EditStudyUserRole",
-			"/ViewSectionDataEntry", "/CreateSubjectGroupClass", "/SetStudyUserRole", "/UpdateProfile",
+			"/CRFListForStudyEvent", "/VerifyImportedCRFData", "/UpdateStudySubject", "/RemoveStudySubject", 
+			"/ResolveDiscrepancy", "/RestoreStudySubject", "/UpdateStudyEvent", "/RemoveStudyEvent", 
+			"/RestoreStudyEvent", "/DeleteEventCRF", "/RemoveEventCRF",	"/RestoreEventCRF", "/InitUpdateCRF",
+			"/InitUpdateSubStudy", "/UpdateSubStudy", "/DeleteStudyEvent", "/EditStudyUserRole", 
+			"/ViewSectionDataEntry", "/CreateSubjectGroupClass", "/SetStudyUserRole", "/UpdateProfile", 
 			"/SectionPreview", "/DefineStudyEvent", "/InitUpdateEventDefinition", "/UpdateEventDefinition",
 			"/RemoveEventDefinition", "/RemoveSubject", "/RemoveStudy", "/ViewUserAccount", "/EditUserAccount",
 			"/SetUserRole", "/ViewUserAccount", "/Configure", "/CreateUserAccount", "/UpdateJobImport",
@@ -40,20 +40,20 @@ public class Navigation {
 			"/CreateDataset", "/EditSelected", "/EditDataset", "/pages/managestudy/chooseCRFVersion",
 			"/pages/managestudy/confirmCRFVersionChange", "/pages/managestudy/changeCRFVersion", "/CreateCRFVersion",
 			"/RemoveCRF", "/RemoveCRFVersion", "/RestoreCRF", "/RestoreCRFVersion", "/DeleteCRFVersion",
-			"/LockCRFVersion", "/UnlockCRFVersion", "/CreateSubStudy", "/RemoveCRFFromDefinition", "/RestoreCRFFromDefinition",
-			"/AddCRFToDefinition", "/InitUpdateCRF"
-			));
+			"/LockCRFVersion", "/UnlockCRFVersion", "/CreateSubStudy", "/RemoveCRFFromDefinition", 
+			"/RestoreCRFFromDefinition", "/AddCRFToDefinition"));
 	// ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintAllEventCRF", "/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
-			"/ViewItemDetail", "/PrintCRF", "/PrintEventCRF", "/ViewRulesAssignment",
+			"/ViewItemDetail", "/PrintCRF", "/PrintEventCRF", "/ViewRulesAssignment", "/SelectItems",
 			"/DownloadRuleSetXml", "/UpdateRuleSetRule", "/pages/handleSDVGet", "/DownloadVersionSpreadSheet",
-			"/PrintAllSiteEventCRF", "/DeleteUser", "/UnLockUser", "/DeleteStudyUserRole", "/PauseJob", "/SelectItems",
-			"/CreateDiscrepancyNote", "/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile", "/help",
-			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc",
+			"/PrintAllSiteEventCRF", "/DeleteUser", "/UnLockUser", "/DeleteStudyUserRole", "/PauseJob", 
+			"/CreateDiscrepancyNote", "/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile", 
+			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc", "/help",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
 			"/ChangeDefinitionCRFOrdinal", "/DoubleDataEntry", "/CreateOneDiscrepancyNote", "/MatchPassword",
-			"/pages/handleSDVPost", "/pages/handleSDVRemove", "/CompleteCrfDelete", "/pages/sdvStudySubjects"));
+			"/pages/handleSDVPost", "/pages/handleSDVRemove", "/CompleteCrfDelete", "/pages/sdvStudySubjects", 
+			"/InitialDataEntry", "/AdministrativeEditing"));
 	// set of pages with special processing 
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects"));
 	private static String defaultShortURL = "/MainMenu";

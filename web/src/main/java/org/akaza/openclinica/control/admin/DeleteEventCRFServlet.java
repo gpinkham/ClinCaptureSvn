@@ -51,6 +51,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.navigation.HelpNavigationServlet;
 import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
@@ -61,10 +62,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeleteEventCRFServlet extends Controller {
 
-	public static final String DELETE_EVENT_CRF_REFERER = "deleteEventCRFReferer";
-	public static final String REFERER = "referer";
-	public static final String DELETE_EVENT_CRF = "DeleteEventCRF";
-	public static final String RESTORE_EVENT_CRF = "RestoreEventCRF";
 	public static String STUDY_SUB_ID = "ssId";
 	public static String EVENT_CRF_ID = "ecId";
 
@@ -91,13 +88,8 @@ public class DeleteEventCRFServlet extends Controller {
 	}
 
 	private void smartForward(Page page, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String url = (String) request.getSession().getAttribute(DELETE_EVENT_CRF_REFERER);
-		request.getSession().removeAttribute(DELETE_EVENT_CRF_REFERER);
-		if (url != null) {
-			response.sendRedirect(url);
-		} else {
-			forwardPage(page, request, response);
-		}
+		
+		response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
 	}
 
 	@Override
@@ -106,12 +98,6 @@ public class DeleteEventCRFServlet extends Controller {
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		FormProcessor fp = new FormProcessor(request);
-
-		String referer = request.getHeader(REFERER);
-		if (referer != null && !referer.contains(DELETE_EVENT_CRF) && !referer.contains(RESTORE_EVENT_CRF)) {
-			request.getSession().setAttribute(DELETE_EVENT_CRF_REFERER, request.getHeader(REFERER));
-			logger.debug("=== set referer " + referer);
-		}
 
 		int studySubId = fp.getInt(STUDY_SUB_ID, true);
 		int eventCRFId = fp.getInt(EVENT_CRF_ID);

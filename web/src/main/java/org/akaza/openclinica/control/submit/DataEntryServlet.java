@@ -1803,7 +1803,9 @@ public abstract class DataEntryServlet extends Controller {
 								session.removeAttribute("to_create_crf");
 
 								request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
-								forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET, request, response);
+								forwardPage(Page.setNewPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName()
+										+ "?eventId=" + ecb.getStudyEventId(), 
+										Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getTitle()), request, response);
 							} else {
 								// use clicked 'save'
 								addPageMessage(respage.getString("data_saved_continue_entering_edit_later"), request);
@@ -1845,7 +1847,9 @@ public abstract class DataEntryServlet extends Controller {
 										}
 									}
 									// end
-									forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET, request, response);
+									forwardPage(Page.setNewPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName()
+											+ "?eventId=" + ecb.getStudyEventId(), 
+											Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getTitle()), request, response);
 									return;
 
 								}
