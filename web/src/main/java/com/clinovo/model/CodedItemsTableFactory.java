@@ -14,6 +14,8 @@
  *******************************************************************************/
 package com.clinovo.model;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -56,6 +58,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
  */
 @SuppressWarnings("rawtypes")
 public class CodedItemsTableFactory extends AbstractTableFactory {
+
+	private final static String BIOONTOLOGY_URL = "http://bioportal.bioontology.org";
+	private final static String BIOONTOLOGY_WS_URL = "http://data.bioontology.org";
 
 	private int studyId = -1;
 	private StudyDAO studyDAO;
@@ -229,9 +234,14 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                     builder.append("Search: ").input().style("border:1px solid #a6a6a6 ;margin-bottom: 2px; color:#4D4D4D").type("text").value(codedItem.getPreferredTerm()).close();
                 }
 
-                String codedItemContextBox = contextBoxBuilder(codedItem);
+				String codedItemContextBox = null;
+				try {
+					codedItemContextBox = contextBoxBuilder(codedItem);
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				}
 
-                builder.div().id(String.valueOf(codedItem.getItemId())).close().append(" " + codedItemContextBox + " ").divEnd();
+				builder.div().id(String.valueOf(codedItem.getItemId())).close().append(" " + codedItemContextBox + " ").divEnd();
 
                 builder.div().style("width:420px").close().divEnd();
             }
@@ -239,7 +249,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             return builder.toString();
         }
 
-        private String contextBoxBuilder(CodedItem codedItem) {
+        private String contextBoxBuilder(CodedItem codedItem) throws MalformedURLException {
 
             HtmlBuilder builder = new HtmlBuilder();
 
@@ -255,7 +265,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                 builder.table(1).id("tablepaging").styleClass("itemsTable").style("display:" + showContextValue + ";").close()
                         .tr(1).style(codedItem.getDictionary().equals("WHOD") ? "display:none;" : "").close()
                         .td(1).close().append(ResourceBundleProvider.getResWord("http") + ": ").tdEnd()
-						.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href("http://bioportal.bioontology.org/ontologies/"
+						.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href(normalizeUrl(codedItem.getHttpPath(), codedItem.getDictionary())
 						+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid=" + codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
 						.td(3).width("360px").colspan("2").close().tdEnd()
                         .td(4).close().tdEnd().trEnd(1);
@@ -274,6 +284,16 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
             return builder.toString();
         }
+
+		private String normalizeUrl(String bioontologyUrl, String dictionary) throws MalformedURLException {
+
+			if (bioontologyUrl.equals(BIOONTOLOGY_WS_URL) || "MEDDRA".equals(dictionary)) {
+				return BIOONTOLOGY_URL;
+			} else {
+				URL url = new URL(bioontologyUrl);
+				return url.getProtocol() + "://" + url.getHost();
+			}
+		}
 
         private CodedItem codedItemElementsFilter(CodedItem codedItem) {
 

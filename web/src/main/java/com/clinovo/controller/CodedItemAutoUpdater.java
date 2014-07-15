@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,6 +54,9 @@ public class CodedItemAutoUpdater {
 
     private String themeColor;
 
+	private final static String BIOONTOLOGY_URL = "http://bioportal.bioontology.org";
+	private final static String BIOONTOLOGY_WS_URL = "http://data.bioontology.org";
+
     @RequestMapping(value = "/checkCodedItemsStatus")
     public void checkCodedItemsStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -69,7 +74,7 @@ public class CodedItemAutoUpdater {
         response.getWriter().println(buildResponseBox(codedItemIdListInt, showContext));
     }
 
-    private List<String> buildResponseBox(List<Integer> codedItemIdListInt, String showContext) {
+    private List<String> buildResponseBox(List<Integer> codedItemIdListInt, String showContext) throws MalformedURLException {
 
         List<String> codedItemToAppend = new ArrayList<String>();
 
@@ -96,7 +101,7 @@ public class CodedItemAutoUpdater {
         return codedItemToAppend;
     }
 
-    private String contextBoxBuilder(CodedItem codedItem, String alise, String prefTerm, String showContext) {
+    private String contextBoxBuilder(CodedItem codedItem, String alise, String prefTerm, String showContext) throws MalformedURLException {
 
         String termToAppend = "";
         String prefToAppend = "";
@@ -123,7 +128,7 @@ public class CodedItemAutoUpdater {
                     .close()
                     .tr(1).style(httpPathDisplay).close()
                     .td(1).close().append(ResourceBundleProvider.getResWord("http") + ": ").tdEnd()
-					.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href("http://bioportal.bioontology.org/ontologies/"
+					.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href(normalizeUrl(codedItem.getHttpPath(), codedItem.getDictionary())
 					+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid=" + codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
 					.td(3).width("360px").colspan("2").close().tdEnd()
                     .td(4).close().tdEnd().trEnd(1);
@@ -142,6 +147,16 @@ public class CodedItemAutoUpdater {
 
         return builder.toString();
     }
+
+	private String normalizeUrl(String bioontologyUrl, String dictionary) throws MalformedURLException {
+
+		if (bioontologyUrl.equals(BIOONTOLOGY_WS_URL) || "MEDDRA".equals(dictionary)) {
+			return BIOONTOLOGY_URL;
+		} else {
+			URL url = new URL(bioontologyUrl);
+			return url.getProtocol() + "://" + url.getHost();
+		}
+	}
 
     private CodedItem codedItemElementsFilter(CodedItem codedItem) {
 

@@ -36,9 +36,9 @@
                         <c:set var="hyperlinkColor" value="#75b894"/>
                     </c:if>
                     <td>
-                        <c:set var="bioportalUrl" value="${(fn:replace(obj.httpPath, '/MDR/', '/MEDDRA/'))}"/>
+                        <c:set var="objectHttpPath" value="${(fn:replace(obj.httpPath, '/MDR/', '/MEDDRA/'))}"/>
                         <a target="_blank" style="color:<c:out value="${hyperlinkColor}"/>"
-                           href="http://bioportal.bioontology.org/ontologies/<c:out value="${fn:toUpperCase(fn:replace(itemDictionary, ' ', ''))}"/>?p=classes&conceptid=<c:out value="${bioportalUrl}"/>">
+                           href="${bioontologyUrl}/ontologies/<c:out value="${fn:toUpperCase(fn:replace(itemDictionary, ' ', ''))}"/>?p=classes&conceptid=<c:out value="${objectHttpPath}"/>">
                             <c:out value="${obj.httpPath}"/>
                         </a>
                     </td>

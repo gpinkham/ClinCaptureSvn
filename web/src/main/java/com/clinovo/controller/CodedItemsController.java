@@ -15,6 +15,8 @@
 package com.clinovo.controller;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,6 +95,9 @@ public class CodedItemsController {
 
 	private ItemDataDAO ItemDataDAO;
 	private StudyParameterValueDAO studyParamDAO;
+
+	private final static String BIOONTOLOGY_URL = "http://bioportal.bioontology.org";
+	private final static String BIOONTOLOGY_WS_URL = "http://data.bioontology.org";
 
 	/**
 	 * Handle for retrieving all the coded items.
@@ -212,6 +217,9 @@ public class CodedItemsController {
 
         boolean configuredDictionaryIsAvailable = configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty() ? true : false;
 
+		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
+		com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
+
         if (configuredDictionaryIsAvailable) {
 
             ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
@@ -245,9 +253,6 @@ public class CodedItemsController {
 			// Don't attempt to code the item again
 			if (!codedItem.isCoded()) {
 
-                com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
-                com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
-
                 search.setSearchInterface(new BioPortalSearchInterface());
 
                 try {
@@ -269,6 +274,7 @@ public class CodedItemsController {
             }
  		}
 
+		model.addAttribute("bioontologyUrl", normalizeUrl(bioontologyUrl.getValue(), codedItem.getDictionary()));
  		model.addAttribute("itemDictionary", dictionary);
         model.addAttribute("itemDataId", codedItem.getItemId());
         model.addAttribute("codedElementList", classifications);
@@ -278,7 +284,17 @@ public class CodedItemsController {
 
     }
 
- 	@RequestMapping("/autoCode")
+	private String normalizeUrl(String bioontologyUrl, String dictionary) throws MalformedURLException {
+
+		if (bioontologyUrl.equals(BIOONTOLOGY_WS_URL) || "MEDDRA".equals(dictionary)) {
+			return BIOONTOLOGY_URL;
+		} else {
+			URL url = new URL(bioontologyUrl);
+			return url.getProtocol() + "://" + url.getHost();
+		}
+	}
+
+	@RequestMapping("/autoCode")
  	public void autoCodeItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
  
  		List<CodedItem> items = new ArrayList<CodedItem>();
