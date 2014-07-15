@@ -393,9 +393,20 @@
             </c:when>
             <c:when test="${userRole.studyCoder}">
                 <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
-                <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
-                    <div class="taskLink"><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a></div>
-                </c:if>
+                <c:choose>
+	                <c:when test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
+	                	<div class="taskLeftColumn">
+	                    	<div class="taskLink"><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a></div>
+	                    </div>
+	                    <div class="taskRightColumn">	
+	                    	<div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
+	                    </div>
+	                    <br clear="all">
+	                </c:when>
+	                <c:otherwise>
+	                	<div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
+	                </c:otherwise>
+                </c:choose>
             </c:when>
             <c:when test="${userRole.studyAdministrator}">
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
