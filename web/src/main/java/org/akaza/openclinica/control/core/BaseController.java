@@ -8,6 +8,7 @@ import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.service.UserAccountService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
+import com.clinovo.service.EventCRFService;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -214,6 +215,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private SystemDAO systemDAO;
 	@Autowired
 	private DiscrepancyDescriptionService discrepancyDescriptionService;
+	@Autowired
+	private EventCRFService eventCRFService;
 
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
@@ -498,5 +501,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public DiscrepancyDescriptionService getDiscrepancyDescriptionService() {
 		return discrepancyDescriptionService;
+	}
+
+	public EventCRFService getEventCRFService() {
+		return eventCRFService;
 	}
 }

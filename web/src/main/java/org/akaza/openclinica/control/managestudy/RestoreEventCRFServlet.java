@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -67,22 +65,19 @@ import java.util.Date;
 @SuppressWarnings({ "serial", "unchecked" })
 @Component
 public class RestoreEventCRFServlet extends Controller {
+
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		if (ub.isSysAdmin()) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
-			return;
-		}
-
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
@@ -90,7 +85,8 @@ public class RestoreEventCRFServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
+
+		UserAccountBean currentUser = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		FormProcessor fp = new FormProcessor(request);
@@ -98,10 +94,10 @@ public class RestoreEventCRFServlet extends Controller {
 		int studySubId = fp.getInt("studySubId");// studySubjectId
 		checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"), request,
 				response);
-		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-		StudySubjectDAO subdao = new StudySubjectDAO(getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-		StudyDAO sdao = new StudyDAO(getDataSource());
+		StudyEventDAO sedao = getStudyEventDAO();
+		StudySubjectDAO subdao = getStudySubjectDAO();
+		EventCRFDAO ecdao = getEventCRFDAO();
+		StudyDAO sdao = getStudyDAO();
 
 		if (eventCRFId == 0) {
 			addPageMessage(respage.getString("please_choose_an_event_CRF_to_restore"), request);
@@ -113,12 +109,10 @@ public class RestoreEventCRFServlet extends Controller {
 			StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 			// YW 11-07-2007, an event CRF could not be restored if its study
 			// subject has been removed
-			Status s = studySub.getStatus();
-			if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
-				addPageMessage(
-						resword.getString("event_CRF") + resterm.getString("could_not_be")
-								+ resterm.getString("restored") + "."
-								+ respage.getString("study_subject_has_been_deleted"), request);
+			if (studySub.getStatus().isDeleted()) {
+				addPageMessage(new StringBuilder("").append(resword.getString("event_CRF")).append(resterm.getString("could_not_be"))
+						.append(resterm.getString("restored")).append(".").append(respage.getString("study_subject_has_been_deleted"))
+						.toString(), request);
 				request.setAttribute("id", Integer.toString(studySubId));
 				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 			}
@@ -126,8 +120,8 @@ public class RestoreEventCRFServlet extends Controller {
 			request.setAttribute("studySub", studySub);
 
 			// construct info needed on view event crf page
-			CRFDAO cdao = new CRFDAO(getDataSource());
-			CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
+			CRFDAO cdao = getCRFDAO();
+			CRFVersionDAO cvdao = getCRFVersionDAO();
 
 			int crfVersionId = eventCRF.getCRFVersionId();
 			CRFBean cb = cdao.findByVersionId(crfVersionId);
@@ -143,12 +137,12 @@ public class RestoreEventCRFServlet extends Controller {
 			StudyEventBean event = (StudyEventBean) sedao.findByPK(studyEventId);
 
 			int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
-			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
+			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(studyEventDefinitionId);
 			event.setStudyEventDefinition(sed);
 			request.setAttribute("event", event);
 
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
+			EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 
 			StudyBean study = (StudyBean) sdao.findByPK(studySub.getStudyId());
 			EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId,
@@ -156,10 +150,10 @@ public class RestoreEventCRFServlet extends Controller {
 
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
 			dec.setEventCRF(eventCRF);
-			dec.setFlags(eventCRF, ub, currentRole, edc.isDoubleEntry());
+			dec.setFlags(eventCRF, currentUser, currentRole, edc.isDoubleEntry());
 
 			// find all item data
-			ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+			ItemDataDAO iddao = getItemDataDAO();
 
 			ArrayList<ItemDataBean> itemData = iddao.findAllByEventCRFId(eventCRF.getId());
 
@@ -167,9 +161,8 @@ public class RestoreEventCRFServlet extends Controller {
 
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
-				if (!eventCRF.getStatus().equals(Status.DELETED) && !eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-					addPageMessage(
-							respage.getString("this_event_CRF_avilable_for_study") + " " + " "
+				if (!eventCRF.getStatus().isDeleted()) {
+					addPageMessage(respage.getString("this_event_CRF_avilable_for_study") + " "
 									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
 					request.setAttribute("id", Integer.toString(studySubId));
 					forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
@@ -182,50 +175,20 @@ public class RestoreEventCRFServlet extends Controller {
 			} else {
 				logger.info("submit to restore the event CRF from study");
 
-				eventCRF.setStatus(Status.AVAILABLE);
-				eventCRF.setUpdater(ub);
-				eventCRF.setUpdatedDate(new Date());
-				ecdao.update(eventCRF);
+				getEventCRFService().restoreEventCRF(eventCRF, currentUser);
 
 				boolean hasStarted = hasStarted(event, ecdao);
 
 				event.setSubjectEventStatus(!hasStarted ? SubjectEventStatus.SCHEDULED
 						: SubjectEventStatus.DATA_ENTRY_STARTED);
 				event.setStatus(Status.AVAILABLE);
-				event.setUpdater(ub);
+				event.setUpdater(currentUser);
 				event.setUpdatedDate(new Date());
 				sedao.update(event);
 
-				CodedItemService codedItemService = getCodedItemService();
-
-				// restore all the item data
-				for (ItemDataBean item : itemData) {
-					if (item.getStatus().equals(Status.AUTO_DELETED)) {
-						item.setStatus(Status.AVAILABLE);
-						item.setUpdater(ub);
-						item.setUpdatedDate(new Date());
-						iddao.update(item);
-					}
-
-					CodedItem codedItem = codedItemService.findCodedItem(item.getId());
-
-					if (codedItem != null) {
-
-						if (codedItem.getHttpPath() == null || codedItem.getHttpPath().isEmpty()) {
-
-							codedItem.setStatus("NOT_CODED");
-						} else {
-
-							codedItem.setStatus("CODED");
-						}
-
-						codedItemService.saveCodedItem(codedItem);
-					}
-				}
-
-				String emailBody = respage.getString("the_event_CRF") + cb.getName() + " "
-						+ respage.getString("has_been_restored_to_the_event") + " "
-						+ event.getStudyEventDefinition().getName() + ".";
+				String emailBody = new StringBuilder("").append(respage.getString("the_event_CRF")).append(cb.getName())
+						.append(" ").append(respage.getString("has_been_restored_to_the_event")).append(" ")
+						.append(event.getStudyEventDefinition().getName()).append(".").toString();
 
 				addPageMessage(emailBody, request);
 				sendEmail(emailBody, request);
@@ -236,6 +199,7 @@ public class RestoreEventCRFServlet extends Controller {
 	}
 
 	private boolean hasStarted(StudyEventBean event, EventCRFDAO ecdao) {
+
 		boolean hasStarted = false;
 		ArrayList<EventCRFBean> eCRFs = (ArrayList<EventCRFBean>) ecdao.findAllByStudyEvent(event);
 		for (EventCRFBean eCRF : eCRFs) {
@@ -251,6 +215,7 @@ public class RestoreEventCRFServlet extends Controller {
 	 *            String
 	 */
 	private void sendEmail(String emailBody, HttpServletRequest request) throws Exception {
+
 		UserAccountBean ub = getUserAccountBean(request);
 
 		logger.info("Sending email...");

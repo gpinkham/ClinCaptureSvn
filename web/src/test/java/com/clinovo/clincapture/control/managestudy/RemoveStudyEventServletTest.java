@@ -15,6 +15,7 @@ package com.clinovo.clincapture.control.managestudy;
 
 import java.util.ResourceBundle;
 
+import com.clinovo.service.EventCRFService;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
@@ -46,8 +47,9 @@ public class RemoveStudyEventServletTest extends DefaultAppContextTest {
 
 	private StudyUserRoleBean currentRole;
 
-	@Mock
-	private RemoveStudyEventServlet removeStudyEventServlet;
+	@Mock private RemoveStudyEventServlet removeStudyEventServlet;
+
+	@Mock private EventCRFService eventCRFService;
 
 	private ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
 
@@ -74,6 +76,7 @@ public class RemoveStudyEventServletTest extends DefaultAppContextTest {
 		Mockito.doReturn(crfdao).when(removeStudyEventServlet).getCRFDAO();
 		Mockito.doReturn(crfVersionDao).when(removeStudyEventServlet).getCRFVersionDAO();
 		Mockito.doReturn(codedItemService).when(removeStudyEventServlet).getCodedItemService();
+		Mockito.doReturn(eventCRFService).when(removeStudyEventServlet).getEventCRFService();
 
 		Whitebox.setInternalState(removeStudyEventServlet, "respage", respage);
 		Whitebox.setInternalState(removeStudyEventServlet, "resexception", resexception);
@@ -128,7 +131,7 @@ public class RemoveStudyEventServletTest extends DefaultAppContextTest {
 		int studyEventId = 1;
 		int studySubId = 1;
 		String action = "confirm";
-		DisplayStudyEventBean displayEventBean = null;
+		DisplayStudyEventBean displayEventBean;
 		
 		currentUser = new UserAccountBean();
 		currentUser.setId(1);

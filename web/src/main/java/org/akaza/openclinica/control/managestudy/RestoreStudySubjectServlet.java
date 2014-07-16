@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -30,8 +28,6 @@ import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -42,7 +38,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
@@ -66,16 +61,14 @@ import java.util.Date;
 public class RestoreStudySubjectServlet extends Controller {
 	
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+
         UserAccountBean ub = getUserAccountBean(request);
         StudyUserRoleBean currentRole = getCurrentRole(request);
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_locked"), request, response);
 		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_frozen"), request, response);
-		if (ub.isSysAdmin()) {
-			return;
-		}
-
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
 			return;
 		}
@@ -89,7 +82,8 @@ public class RestoreStudySubjectServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
+
+        UserAccountBean currentUser = getUserAccountBean(request);
         StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String studySubIdString = request.getParameter("id");
@@ -122,7 +116,8 @@ public class RestoreStudySubjectServlet extends Controller {
 
 			// find study events
 			StudyEventDAO sedao = getStudyEventDAO();
-			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, getDataSource(), ub, currentRole, false);
+			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, getDataSource(),
+					currentUser, currentRole, false);
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (studySub.getStatus().equals(Status.AVAILABLE)) {
@@ -142,66 +137,35 @@ public class RestoreStudySubjectServlet extends Controller {
 				logger.info("submit to restore the subject from study");
 				// restore subject from study
 				studySub.setStatus(Status.AVAILABLE);
-				studySub.setUpdater(ub);
+				studySub.setUpdater(currentUser);
 				studySub.setUpdatedDate(new Date());
 				subdao.update(studySub);
 
-				// restore all study events
-				// restore all event crfs
-				EventCRFDAO ecdao = getEventCRFDAO();
+				EventCRFDAO ecdao =  getEventCRFDAO();
 
+				// restore all study events
                 for (DisplayStudyEventBean dispEvent : displayEvents) {
+
                     StudyEventBean event = dispEvent.getStudyEvent();
                     if (event.getStatus().equals(Status.AUTO_DELETED)) {
                         event.setStatus(Status.AVAILABLE);
-                        event.setUpdater(ub);
+                        event.setUpdater(currentUser);
                         event.setUpdatedDate(new Date());
                         sedao.update(event);
-                    }
 
-                    ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+						ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
-                    SubjectEventStatusUtil.determineSubjectEventState(event, study, eventCRFs, new DAOWrapper(studydao,
-                            sedao, subdao, ecdao, edcdao, discDao));
+						getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
 
-                    ItemDataDAO iddao = getItemDataDAO();
-					CodedItemService codedItemsService = getCodedItemService();
-
-                    for (Object eventCRF1 : eventCRFs) {
-                        EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
-                        if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-                            eventCRF.setStatus(Status.AVAILABLE);
-                            eventCRF.setUpdater(ub);
-                            eventCRF.setUpdatedDate(new Date());
-                            ecdao.update(eventCRF);
-                            // remove all the item data
-                            ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-                            for (Object itemData : itemDatas) {
-                                ItemDataBean item = (ItemDataBean) itemData;
-                                if (item.getStatus().equals(Status.AUTO_DELETED)) {
-                                    item.setStatus(Status.AVAILABLE);
-                                    item.setUpdater(ub);
-                                    item.setUpdatedDate(new Date());
-                                    iddao.update(item);
-                                }
-
-								CodedItem codedItem = codedItemsService.findCodedItem(item.getId());
-								if (codedItem != null) {
-									if (codedItem.getHttpPath() == null || codedItem.getHttpPath().isEmpty()) {
-										codedItem.setStatus(com.clinovo.model.Status.CodeStatus.NOT_CODED.toString());
-									} else {
-										codedItem.setStatus(com.clinovo.model.Status.CodeStatus.CODED.toString());
-									}
-
-									codedItemsService.saveCodedItem(codedItem);
-								}
-							}
-                        }
+						SubjectEventStatusUtil.determineSubjectEventState(event, study, eventCRFs, new DAOWrapper(studydao,
+								sedao, subdao, ecdao, edcdao, discDao));
                     }
                 }
 
-				String emailBody = respage.getString("the_subject") + " " + studySub.getLabel() + " "
-						+ (study.isSite(study.getParentStudyId()) ? respage.getString("has_been_restored_to_the_site") : respage.getString("has_been_restored_to_the_study")) + " " + study.getName() + ".";
+				String emailBody = new StringBuilder("").append(respage.getString("the_subject")).append(" ").append(studySub.getLabel()).append(" ")
+						.append((study.isSite(study.getParentStudyId()) ? respage.getString("has_been_restored_to_the_site") : respage.getString("has_been_restored_to_the_study")))
+						.append(" ").append(study.getName()).append(".").toString();
+
 				addPageMessage(emailBody, request);
 				
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);

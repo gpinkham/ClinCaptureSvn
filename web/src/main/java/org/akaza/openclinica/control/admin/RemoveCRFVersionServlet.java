@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -29,7 +27,6 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.Controller;
 
@@ -38,7 +35,6 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -75,6 +71,7 @@ public class RemoveCRFVersionServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -82,8 +79,7 @@ public class RemoveCRFVersionServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
 	}
@@ -91,7 +87,8 @@ public class RemoveCRFVersionServlet extends Controller {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
+
+		UserAccountBean currentUser = getUserAccountBean(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		int versionId = fp.getInt(CRF_VERSION_ID_PARAMETER, true);
@@ -111,7 +108,7 @@ public class RemoveCRFVersionServlet extends Controller {
 			eventCRFs = evdao.findAllByCRFVersion(versionId);
 
 			if (ACTION_CONFIRM.equalsIgnoreCase(action)) {
-				if (!ub.isSysAdmin() && (version.getOwnerId() != ub.getId())) {
+				if (!currentUser.isSysAdmin() && (version.getOwnerId() != currentUser.getId())) {
 					addPageMessage(
 							respage.getString("no_have_correct_privilege_current_study") + " "
 									+ respage.getString("change_active_study_or_contact"), request);
@@ -129,57 +126,22 @@ public class RemoveCRFVersionServlet extends Controller {
 				logger.info("submit to remove the crf version");
 				// version
 				version.setStatus(Status.DELETED);
-				version.setUpdater(ub);
+				version.setUpdater(currentUser);
 				version.setUpdatedDate(new Date());
 				cvdao.update(version);
-				// added below tbh 092007, seems that we don't remove the event
-				// crfs in the second pass
-				for (EventCRFBean ecbean : eventCRFs) {
-					ecbean.setStatus(Status.AUTO_DELETED);
-					ecbean.setUpdater(ub);
-					ecbean.setUpdatedDate(new Date());
-					evdao.update(ecbean);
-				}
-				// added above tbh 092007, to fix task
-				// all sections
+
 				secdao = getSectionDAO();
 				List<SectionBean> sections = secdao.findAllByCRFVersionId(version.getId());
 				for (SectionBean section : sections) {
 					if (!section.getStatus().equals(Status.DELETED)) {
 						section.setStatus(Status.AUTO_DELETED);
-						section.setUpdater(ub);
+						section.setUpdater(currentUser);
 						section.setUpdatedDate(new Date());
 						secdao.update(section);
 					}
 				}
 
-				// all item data related to event crfs
-				ItemDataDAO idao = getItemDataDAO();
-				CodedItemService codedItemsService = getCodedItemService();
-
-				for (EventCRFBean eventCRF : eventCRFs) {
-					if (!eventCRF.getStatus().equals(Status.DELETED)) {
-						eventCRF.setStatus(Status.AUTO_DELETED);
-						eventCRF.setUpdater(ub);
-						eventCRF.setUpdatedDate(new Date());
-						evdao.update(eventCRF);
-
-						List<ItemDataBean> items = idao.findAllByEventCRFId(eventCRF.getId());
-						for (ItemDataBean item : items) {
-							if (!item.getStatus().equals(Status.DELETED)) {
-								item.setStatus(Status.AUTO_DELETED);
-								item.setUpdater(ub);
-								item.setUpdatedDate(new Date());
-								idao.update(item);
-							}
-							CodedItem codedItem = codedItemsService.findCodedItem(item.getId());
-							if(codedItem != null) {
-								codedItem.setStatus(com.clinovo.model.Status.CodeStatus.REMOVED.toString());
-								codedItemsService.saveCodedItem(codedItem);
-							}
-						}
-					}
-				}
+				getEventCRFService().setEventCRFsToAutoRemovedState(eventCRFs, currentUser);
 
 				ArrayList versionList = (ArrayList) cvdao.findAllByCRF(version.getCrfId());
 				if (versionList.size() > 0) {
@@ -193,9 +155,8 @@ public class RemoveCRFVersionServlet extends Controller {
 				// Remove coded items
 				getCodedItemService().removeByCRFVersion(versionId);
 
-				addPageMessage(
-						respage.getString("the_CRF") + version.getName() + " "
-								+ respage.getString("has_been_removed_succesfully"), request);
+				addPageMessage(new StringBuilder("").append(respage.getString("the_CRF_version")).append(version.getName())
+						.append(" ").append(respage.getString("has_been_removed_succesfully")).toString(), request);
 
 			} else {
 				addPageMessage(respage.getString("invalid_http_request_parameters"), request);

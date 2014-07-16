@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -30,7 +28,6 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -39,7 +36,6 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -69,6 +65,7 @@ public class RestoreCRFServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -76,8 +73,7 @@ public class RestoreCRFServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
 	}
@@ -85,7 +81,8 @@ public class RestoreCRFServlet extends Controller {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
+
+		UserAccountBean currentUser = getUserAccountBean(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		int crfId = fp.getInt(CRF_ID_PARAMETER, true);
@@ -111,9 +108,8 @@ public class RestoreCRFServlet extends Controller {
 
 			if (ACTION_CONFIRM.equalsIgnoreCase(action)) {
 
-				if (!ub.isSysAdmin() && (crf.getOwnerId() != ub.getId())) {
-					addPageMessage(
-							respage.getString("no_have_correct_privilege_current_study") + " "
+				if (!currentUser.isSysAdmin() && (crf.getOwnerId() != currentUser.getId())) {
+					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
 									+ respage.getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
@@ -128,7 +124,7 @@ public class RestoreCRFServlet extends Controller {
 
 				logger.info("submit to restore the crf");
 				crf.setStatus(Status.AVAILABLE);
-				crf.setUpdater(ub);
+				crf.setUpdater(currentUser);
 				crf.setUpdatedDate(new Date());
 				cdao.update(crf);
 
@@ -136,7 +132,7 @@ public class RestoreCRFServlet extends Controller {
 				for (CRFVersionBean version : versions) {
 					if (version.getStatus().equals(Status.AUTO_DELETED)) {
 						version.setStatus(Status.AVAILABLE);
-						version.setUpdater(ub);
+						version.setUpdater(currentUser);
 						version.setUpdatedDate(new Date());
 						cvdao.update(version);
 
@@ -144,7 +140,7 @@ public class RestoreCRFServlet extends Controller {
 						for (SectionBean section : sections) {
 							if (section.getStatus().equals(Status.AUTO_DELETED)) {
 								section.setStatus(Status.AVAILABLE);
-								section.setUpdater(ub);
+								section.setUpdater(currentUser);
 								section.setUpdatedDate(new Date());
 								secdao.update(section);
 							}
@@ -155,55 +151,22 @@ public class RestoreCRFServlet extends Controller {
 					}
 				}
 
-				edcdao = new EventDefinitionCRFDAO(getDataSource());
+				edcdao = getEventDefinitionCRFDAO();
 				edcs = (ArrayList) edcdao.findAllByCRF(crfId);
 				for (Object edc1 : edcs) {
 					EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edc1;
 					if (edc.getStatus().equals(Status.AUTO_DELETED)) {
 						edc.setStatus(Status.AVAILABLE);
-						edc.setUpdater(ub);
+						edc.setUpdater(currentUser);
 						edc.setUpdatedDate(new Date());
 						edcdao.update(edc);
 					}
 				}
 
-				ItemDataDAO idao = getItemDataDAO();
-				CodedItemService codedItemService = getCodedItemService();
+				getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
 
-				for (EventCRFBean eventCRF : eventCRFs) {
-					if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-						eventCRF.setStatus(Status.AVAILABLE);
-						eventCRF.setUpdater(ub);
-						eventCRF.setUpdatedDate(new Date());
-						evdao.update(eventCRF);
-
-						ArrayList items = idao.findAllByEventCRFId(eventCRF.getId());
-						for (Object item1 : items) {
-							ItemDataBean item = (ItemDataBean) item1;
-							if (item.getStatus().equals(Status.AUTO_DELETED)) {
-								item.setStatus(Status.AVAILABLE);
-								item.setUpdater(ub);
-								item.setUpdatedDate(new Date());
-								idao.update(item);
-							}
-
-							CodedItem codedItem = codedItemService.findCodedItem(item.getId());
-							if (codedItem != null) {
-								if (codedItem.getHttpPath() == null || codedItem.getHttpPath().isEmpty()) {
-									codedItem.setStatus(com.clinovo.model.Status.CodeStatus.NOT_CODED.toString());
-								} else {
-									codedItem.setStatus(com.clinovo.model.Status.CodeStatus.CODED.toString());
-								}
-
-								codedItemService.saveCodedItem(codedItem);
-							}
-						}
-					}
-				}
-
-				addPageMessage(
-						respage.getString("the_CRF") + crf.getName() + " "
-								+ respage.getString("has_been_restored_succesfully"), request);
+				addPageMessage(new StringBuilder("").append(respage.getString("the_CRF")).append(crf.getName()).append(" ")
+						.append(respage.getString("has_been_restored_succesfully")).toString(), request);
 			} else {
 				addPageMessage(respage.getString("invalid_http_request_parameters"), request);
 			}

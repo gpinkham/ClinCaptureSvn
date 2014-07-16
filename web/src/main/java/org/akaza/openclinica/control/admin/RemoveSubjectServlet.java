@@ -25,8 +25,6 @@ import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 
@@ -34,8 +32,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -56,6 +52,7 @@ public class RemoveSubjectServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+
 		UserAccountBean ub = getUserAccountBean(request);
 
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
@@ -64,8 +61,7 @@ public class RemoveSubjectServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
@@ -73,7 +69,8 @@ public class RemoveSubjectServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
+
+		UserAccountBean currentUser = getUserAccountBean(request);
 
 		SubjectDAO sdao = new SubjectDAO(getDataSource());
 		FormProcessor fp = new FormProcessor(request);
@@ -103,7 +100,7 @@ public class RemoveSubjectServlet extends Controller {
 				logger.info("submit to remove the subject");
 				// change all statuses to deleted
 				subject.setStatus(Status.DELETED);
-				subject.setUpdater(ub);
+				subject.setUpdater(currentUser);
 				subject.setUpdatedDate(new Date());
 				sdao.update(subject);
 
@@ -112,54 +109,32 @@ public class RemoveSubjectServlet extends Controller {
 					StudySubjectBean studySub = (StudySubjectBean) studySub1;
 					if (!studySub.getStatus().equals(Status.DELETED)) {
 						studySub.setStatus(Status.AUTO_DELETED);
-						studySub.setUpdater(ub);
+						studySub.setUpdater(currentUser);
 						studySub.setUpdatedDate(new Date());
 						ssdao.update(studySub);
 					}
 				}
 
-				EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-
 				for (Object event1 : events) {
+
 					StudyEventBean event = (StudyEventBean) event1;
 					if (!event.getStatus().equals(Status.DELETED)) {
+
 						event.setStatus(Status.AUTO_DELETED);
 						event.setSubjectEventStatus(SubjectEventStatus.REMOVED);
-						event.setUpdater(ub);
+						event.setUpdater(currentUser);
 						event.setUpdatedDate(new Date());
 						sedao.update(event);
 
-						ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
-
-						ItemDataDAO iddao = new ItemDataDAO(getDataSource());
-						for (Object eventCRF1 : eventCRFs) {
-							EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
-							if (!eventCRF.getStatus().equals(Status.DELETED)) {
-								eventCRF.setStatus(Status.AUTO_DELETED);
-								eventCRF.setUpdater(ub);
-								eventCRF.setUpdatedDate(new Date());
-								ecdao.update(eventCRF);
-								// remove all the item data
-								ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-								for (Object itemData : itemDatas) {
-									ItemDataBean item = (ItemDataBean) itemData;
-									if (!item.getStatus().equals(Status.DELETED)) {
-										item.setStatus(Status.AUTO_DELETED);
-										item.setUpdater(ub);
-										item.setUpdatedDate(new Date());
-										iddao.update(item);
-									}
-								}
-							}
-						}
+						getEventCRFService().removeEventCRFsByStudyEvent(event, currentUser);
 					}
 				}
 
-				String emailBody = respage.getString("the_subject") + " " + subject.getUniqueIdentifier() + " "
-						+ respage.getString("has_been_removed_succesfully");
+				String emailBody = new StringBuilder("").append(respage.getString("the_subject")).append(" ")
+						.append(subject.getUniqueIdentifier()).append(" ")
+						.append(respage.getString("has_been_removed_succesfully")).toString();
 
 				addPageMessage(emailBody, request);
-				// sendEmail(emailBody);
 
 				forwardPage(Page.SUBJECT_LIST_SERVLET, request, response);
 

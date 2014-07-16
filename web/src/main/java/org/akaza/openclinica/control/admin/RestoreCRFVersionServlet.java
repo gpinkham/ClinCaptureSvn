@@ -20,15 +20,12 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.Controller;
 
@@ -36,7 +33,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -66,6 +62,7 @@ public class RestoreCRFVersionServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -73,8 +70,7 @@ public class RestoreCRFVersionServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
 	}
@@ -82,7 +78,8 @@ public class RestoreCRFVersionServlet extends Controller {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
+
+		UserAccountBean currentUser = getUserAccountBean(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		int versionId = fp.getInt(CRF_VERSION_ID_PARAMETER, true);
@@ -102,9 +99,8 @@ public class RestoreCRFVersionServlet extends Controller {
 			eventCRFs = evdao.findAllByCRFVersion(versionId);
 
 			if (ACTION_CONFIRM.equalsIgnoreCase(action)) {
-				if (!ub.isSysAdmin() && (version.getOwnerId() != ub.getId())) {
-					addPageMessage(
-							respage.getString("no_have_correct_privilege_current_study") + " "
+				if (!currentUser.isSysAdmin() && (version.getOwnerId() != currentUser.getId())) {
+					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
 									+ respage.getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
@@ -119,73 +115,28 @@ public class RestoreCRFVersionServlet extends Controller {
 				logger.info("submit to restore the crf version");
 				// version
 				version.setStatus(Status.AVAILABLE);
-				version.setUpdater(ub);
+				version.setUpdater(currentUser);
 				version.setUpdatedDate(new Date());
 				cvdao.update(version);
-				// below added by tbh 092007, update all eventcrfs which are
-				// auto_deleted, tbh
-				for (EventCRFBean ecbean : eventCRFs) {
-					if (ecbean.getStatus().equals(Status.AUTO_DELETED)) {
-						ecbean.setStatus(Status.AVAILABLE);
-						ecbean.setUpdatedDate(new Date());
-						ecbean.setUpdater(ub);
-						evdao.update(ecbean);
-					}
-				}
 
 				secdao = getSectionDAO();
-				// above added tbh, 092007
-				// all sections
 				List<SectionBean> sections = secdao.findAllByCRFVersionId(version.getId());
 				for (SectionBean section : sections) {
 					if (section.getStatus().equals(Status.AUTO_DELETED)) {
 						section.setStatus(Status.AVAILABLE);
-						section.setUpdater(ub);
+						section.setUpdater(currentUser);
 						section.setUpdatedDate(new Date());
 						secdao.update(section);
 					}
 				}
 
-				// all item data related to event crfs
-				ItemDataDAO idao = getItemDataDAO();
-				CodedItemService codedItemService = getCodedItemService();
-
-				for (EventCRFBean eventCRF : eventCRFs) {
-					if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-						eventCRF.setStatus(Status.AVAILABLE);
-						eventCRF.setUpdater(ub);
-						eventCRF.setUpdatedDate(new Date());
-						evdao.update(eventCRF);
-
-						List<ItemDataBean> items = idao.findAllByEventCRFId(eventCRF.getId());
-						for (ItemDataBean item : items) {
-							if (item.getStatus().equals(Status.AUTO_DELETED)) {
-								item.setStatus(Status.AVAILABLE);
-								item.setUpdater(ub);
-								item.setUpdatedDate(new Date());
-								idao.update(item);
-							}
-							CodedItem codedItem = codedItemService.findCodedItem(item.getId());
-							if (codedItem != null) {
-								if (codedItem.getHttpPath() == null || codedItem.getHttpPath().isEmpty()) {
-									codedItem.setStatus(com.clinovo.model.Status.CodeStatus.NOT_CODED.toString());
-								} else {
-									codedItem.setStatus(com.clinovo.model.Status.CodeStatus.CODED.toString());
-								}
-
-								codedItemService.saveCodedItem(codedItem);
-							}
-						}
-
-					}
-				}
+				getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
 
 				// Restore coded items
 				getCodedItemService().restoreByCRFVersion(versionId);
 
-				addPageMessage(
-						respage.getString("the_CRF_version") + version.getName() + " "
-								+ respage.getString("has_been_restored_succesfully"), request);
+				addPageMessage(new StringBuilder("").append(respage.getString("the_CRF_version")).append(version.getName())
+						.append(" ").append(respage.getString("has_been_restored_succesfully")).toString(), request);
 
 			} else {
 				addPageMessage(respage.getString("invalid_http_request_parameters"), request);

@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -32,7 +30,6 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -43,7 +40,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -70,7 +66,9 @@ public class RestoreSiteServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+
 		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"), request, response);
+
 		if (getUserAccountBean(request).isSysAdmin()
 				|| getCurrentRole(request).getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
@@ -194,10 +192,8 @@ public class RestoreSiteServlet extends Controller {
 						subject.setUpdatedDate(new Date());
 						ssdao.update(subject);
 
-						ArrayList<StudyEventBean> events = (ArrayList<StudyEventBean>) sedao
-								.findAllByStudySubject(subject);
+						ArrayList<StudyEventBean> events = (ArrayList<StudyEventBean>) sedao.findAllByStudySubject(subject);
 						EventCRFDAO ecdao = getEventCRFDAO();
-						CodedItemService codedItemService = getCodedItemService();
 
 						for (StudyEventBean event : events) {
 							if (event.getStatus().equals(Status.AUTO_DELETED)) {
@@ -206,41 +202,9 @@ public class RestoreSiteServlet extends Controller {
 								event.setUpdatedDate(new Date());
 								sedao.update(event);
 
-								ArrayList<EventCRFBean> eventCRFs = (ArrayList<EventCRFBean>) ecdao
-										.findAllByStudyEvent(event);
+								ArrayList<EventCRFBean> eventCRFs = (ArrayList<EventCRFBean>) ecdao.findAllByStudyEvent(event);
 
-								ItemDataDAO iddao = getItemDataDAO();
-								for (EventCRFBean eventCRF : eventCRFs) {
-									// YW << fix broken page for storing site
-									// >> YW
-									if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-										eventCRF.setStatus(eventCRF.getOldStatus());
-										eventCRF.setUpdater(currentUser);
-										eventCRF.setUpdatedDate(new Date());
-										ecdao.update(eventCRF);
-
-										ArrayList<ItemDataBean> itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-										for (ItemDataBean item : itemDatas) {
-											if (item.getStatus().equals(Status.AUTO_DELETED)) {
-												item.setStatus(item.getOldStatus());
-												item.setUpdater(currentUser);
-												item.setUpdatedDate(new Date());
-												iddao.update(item);
-											}
-											CodedItem codedItem = codedItemService.findCodedItem(item.getId());
-
-											if (codedItem != null) {
-                                                if (codedItem.getHttpPath() == null || codedItem.getHttpPath().isEmpty()) {
-													codedItem.setStatus("NOT_CODED");
-												} else {
-													codedItem.setStatus("CODED");
-												}
-
-												codedItemService.saveCodedItem(codedItem);
-											}
-										}
-									}
-								}
+								getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
 							}
 						}
 					}

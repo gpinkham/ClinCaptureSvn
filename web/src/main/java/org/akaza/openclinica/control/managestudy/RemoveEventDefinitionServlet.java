@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -32,8 +30,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -41,8 +37,6 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -61,16 +55,17 @@ public class RemoveEventDefinitionServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
+
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
@@ -79,7 +74,8 @@ public class RemoveEventDefinitionServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
+
+		UserAccountBean currentUser = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 
 		String idString = request.getParameter("id");
@@ -88,10 +84,8 @@ public class RemoveEventDefinitionServlet extends Controller {
 		StudyEventDefinitionDAO sdao = getStudyEventDefinitionDAO();
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
 
-		// checkRoleByUserAndStudy(ub.getName(), sed.getStudyId(), 0);
 		if (currentStudy.getId() != sed.getStudyId()) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
 							+ respage.getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
@@ -138,7 +132,7 @@ public class RemoveEventDefinitionServlet extends Controller {
 				logger.info("submit to remove the definition");
 				// remove definition
 				sed.setStatus(Status.DELETED);
-				sed.setUpdater(ub);
+				sed.setUpdater(currentUser);
 				sed.setUpdatedDate(new Date());
 				sdao.update(sed);
 
@@ -146,54 +140,28 @@ public class RemoveEventDefinitionServlet extends Controller {
 				for (EventDefinitionCRFBean edc : eventDefinitionCRFs) {
 					if (!edc.getStatus().equals(Status.DELETED)) {
 						edc.setStatus(Status.AUTO_DELETED);
-						edc.setUpdater(ub);
+						edc.setUpdater(currentUser);
 						edc.setUpdatedDate(new Date());
 						edao.update(edc);
 					}
 				}
+
 				// remove all events
-
-				EventCRFDAO ecdao = getEventCRFDAO();
-				CodedItemService codedItemsService = getCodedItemService();
-
 				for (StudyEventBean event : events) {
+
 					if (!event.getStatus().equals(Status.DELETED)) {
 						event.setStatus(Status.AUTO_DELETED);
-						event.setUpdater(ub);
+						event.setUpdater(currentUser);
 						event.setUpdatedDate(new Date());
 						sedao.update(event);
 
-						ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(event);
-						// remove all the item data
-						ItemDataDAO iddao = getItemDataDAO();
-						for (EventCRFBean eventCRF : eventCRFs) {
-							if (!eventCRF.getStatus().equals(Status.DELETED)) {
-								eventCRF.setStatus(Status.AUTO_DELETED);
-								eventCRF.setUpdater(ub);
-								eventCRF.setUpdatedDate(new Date());
-								ecdao.update(eventCRF);
-
-								ArrayList<ItemDataBean> itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-								for (ItemDataBean item : itemDatas) {
-									CodedItem codedItem = codedItemsService.findCodedItem(item.getId());
-									if (!item.getStatus().equals(Status.DELETED)) {
-										item.setStatus(Status.AUTO_DELETED);
-										item.setUpdater(ub);
-										item.setUpdatedDate(new Date());
-										iddao.update(item);
-
-										if (codedItem != null) {
-											codedItem.setStatus(com.clinovo.model.Status.CodeStatus.REMOVED.toString());
-											codedItemsService.saveCodedItem(codedItem);
-										}
-									}
-								}
-							}
-						}
+						getEventCRFService().removeEventCRFsByStudyEvent(event, currentUser);
 					}
 				}
-				String emailBody = respage.getString("the_SED") + sed.getName() + " "
-						+ respage.getString("has_been_removed_from_the_study") + currentStudy.getName() + ".";
+
+				String emailBody = new StringBuilder("").append(respage.getString("the_SED")).append(sed.getName())
+						.append(" ").append(respage.getString("has_been_removed_from_the_study"))
+						.append(currentStudy.getName()).append(".").toString();
 
 				addPageMessage(emailBody, request);
 				forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);

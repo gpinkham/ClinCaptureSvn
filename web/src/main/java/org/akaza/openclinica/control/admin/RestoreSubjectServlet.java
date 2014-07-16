@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -25,8 +25,6 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -37,7 +35,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
@@ -52,23 +49,20 @@ import java.util.Date;
 
 /**
  * Restores a subject to system, also restore all the related data
- * 
+ *
  * @author jxu
- * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class RestoreSubjectServlet extends Controller {
 	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
+	 * @param request  HttpServletRequest
+	 * @param response HttpServletResponse
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+
 		UserAccountBean ub = getUserAccountBean(request);
 
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
@@ -78,16 +72,15 @@ public class RestoreSubjectServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean currentUser = getUserAccountBean(request);
 
 		SubjectDAO sdao = getSubjectDAO();
 		FormProcessor fp = new FormProcessor(request);
@@ -118,7 +111,7 @@ public class RestoreSubjectServlet extends Controller {
 				logger.info("submit to restore the subject");
 				// change all statuses to AVAILABLE
 				subject.setStatus(Status.AVAILABLE);
-				subject.setUpdater(ub);
+				subject.setUpdater(currentUser);
 				subject.setUpdatedDate(new Date());
 				sdao.update(subject);
 
@@ -127,7 +120,7 @@ public class RestoreSubjectServlet extends Controller {
 					StudySubjectBean studySub = (StudySubjectBean) studySub1;
 					if (studySub.getStatus().equals(Status.AUTO_DELETED)) {
 						studySub.setStatus(Status.AVAILABLE);
-						studySub.setUpdater(ub);
+						studySub.setUpdater(currentUser);
 						studySub.setUpdatedDate(new Date());
 						ssdao.update(studySub);
 					}
@@ -142,43 +135,23 @@ public class RestoreSubjectServlet extends Controller {
 					StudyEventBean event = (StudyEventBean) event1;
 					if (event.getStatus().equals(Status.AUTO_DELETED)) {
 						event.setStatus(Status.AVAILABLE);
-						event.setUpdater(ub);
+						event.setUpdater(currentUser);
 						event.setUpdatedDate(new Date());
 						sedao.update(event);
 
 						ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
+						getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
+
 						StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(event.getStudySubjectId());
 						StudyBean study = (StudyBean) studydao.findByPK(studySub.getStudyId());
 						SubjectEventStatusUtil.determineSubjectEventState(event, study, eventCRFs, new DAOWrapper(
 								studydao, sedao, subdao, ecdao, edcdao, discDao));
-
-						ItemDataDAO iddao = getItemDataDAO();
-						for (Object eventCRF1 : eventCRFs) {
-							EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
-							if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-								eventCRF.setStatus(Status.AVAILABLE);
-								eventCRF.setUpdater(ub);
-								eventCRF.setUpdatedDate(new Date());
-								ecdao.update(eventCRF);
-								// restore all the item data
-								ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-								for (Object itemData : itemDatas) {
-									ItemDataBean item = (ItemDataBean) itemData;
-									if (item.getStatus().equals(Status.AUTO_DELETED)) {
-										item.setStatus(Status.AVAILABLE);
-										item.setUpdater(ub);
-										item.setUpdatedDate(new Date());
-										iddao.update(item);
-									}
-								}
-							}
-						}
 					}
 				}
 
-				String emailBody = respage.getString("the_subject") + subject.getName() + " "
-						+ respage.getString("has_been_restored_succesfully");
+				String emailBody = new StringBuilder("").append(respage.getString("the_subject"))
+						.append(subject.getName()).append(" ").append(respage.getString("has_been_restored_succesfully")).toString();
 
 				addPageMessage(emailBody, request);
 

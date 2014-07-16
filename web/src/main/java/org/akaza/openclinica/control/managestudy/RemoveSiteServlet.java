@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -31,8 +29,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -42,8 +38,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -69,21 +63,21 @@ public class RemoveSiteServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+
 		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"), request, response);
 		if (getUserAccountBean(request).isSysAdmin()
 				|| getCurrentRole(request).getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET, resexception.getString("not_study_director"), "1");
-
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
 		StudyDAO sdao = getStudyDAO();
 		String idString = request.getParameter("id");
 		logger.info("site id:" + idString);
@@ -92,11 +86,10 @@ public class RemoveSiteServlet extends Controller {
 		UserAccountBean currentUser = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		int siteId = Integer.valueOf(idString.trim()).intValue();
+		int siteId = Integer.valueOf(idString.trim());
 		StudyBean study = (StudyBean) sdao.findByPK(siteId);
 		if (currentStudy.getId() != study.getParentStudyId()) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
 							+ respage.getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
@@ -180,7 +173,6 @@ public class RemoveSiteServlet extends Controller {
 						ssdao.update(subject);
 
 						ArrayList events = sedao.findAllByStudySubject(subject);
-						EventCRFDAO ecdao = getEventCRFDAO();
 
 						for (int j = 0; j < events.size(); j++) {
 							StudyEventBean event = (StudyEventBean) events.get(j);
@@ -190,41 +182,7 @@ public class RemoveSiteServlet extends Controller {
 								event.setUpdatedDate(new Date());
 								sedao.update(event);
 
-								ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
-
-								ItemDataDAO iddao = getItemDataDAO();
-								CodedItemService codedItemService = getCodedItemService();
-
-								for (int k = 0; k < eventCRFs.size(); k++) {
-									EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-									if (!eventCRF.getStatus().equals(Status.DELETED)) {
-										eventCRF.setOldStatus(eventCRF.getStatus());
-										eventCRF.setStatus(Status.AUTO_DELETED);
-										eventCRF.setUpdater(currentUser);
-										eventCRF.setUpdatedDate(new Date());
-										ecdao.update(eventCRF);
-
-										ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-										for (int a = 0; a < itemDatas.size(); a++) {
-											ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-											if (!item.getStatus().equals(Status.DELETED)) {
-												item.setOldStatus(item.getStatus());
-												item.setStatus(Status.AUTO_DELETED);
-												item.setUpdater(currentUser);
-												item.setUpdatedDate(new Date());
-												iddao.update(item);
-											}
-
-											CodedItem codedItem = codedItemService.findCodedItem(item.getId());
-
-											if (codedItem != null) {
-
-												codedItem.setStatus("REMOVED");
-												codedItemService.saveCodedItem(codedItem);
-											}
-										}
-									}
-								}
+								getEventCRFService().removeEventCRFsByStudyEvent(event, currentUser);
 							}
 						}
 					}

@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -35,7 +33,6 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -46,7 +43,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -70,6 +66,7 @@ public class RemoveStudyEventServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
 		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
 
@@ -77,8 +74,7 @@ public class RemoveStudyEventServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
@@ -86,10 +82,11 @@ public class RemoveStudyEventServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
 		FormProcessor fp = new FormProcessor(request);
 		int studyEventId = fp.getInt("id");// studyEventId
 		int studySubId = fp.getInt("studySubId");// studySubjectId
-		UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean currentUser = getUserAccountBean(request);
 
 		StudyEventDAO sedao = getStudyEventDAO();
 		StudySubjectDAO subdao = getStudySubjectDAO();
@@ -137,55 +134,16 @@ public class RemoveStudyEventServlet extends Controller {
 
 				event.setSubjectEventStatus(SubjectEventStatus.REMOVED);
 				event.setStatus(Status.DELETED);
-				event.setUpdater(ub);
+				event.setUpdater(currentUser);
 				event.setUpdatedDate(new Date());
 				sedao.update(event);
 
-				// remove all event crfs
-				EventCRFDAO ecdao = getEventCRFDAO();
+				getEventCRFService().removeEventCRFsByStudyEvent(event, currentUser);
 
-				ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(event);
-
-				ItemDataDAO iddao = getItemDataDAO();
-				for (EventCRFBean eventCRF : eventCRFs) {
-					if (!eventCRF.getStatus().equals(Status.DELETED)) {
-						eventCRF.setStatus(Status.AUTO_DELETED);
-						eventCRF.setUpdater(ub);
-						eventCRF.setUpdatedDate(new Date());
-						ecdao.update(eventCRF);
-						// remove all the item data
-
-						CodedItemService codedItemService = getCodedItemService();
-
-						ArrayList<ItemDataBean> itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-						for (ItemDataBean item : itemDatas) {
-							if (!item.getStatus().equals(Status.DELETED)) {
-								item.setStatus(Status.AUTO_DELETED);
-								item.setUpdater(ub);
-								item.setUpdatedDate(new Date());
-								iddao.update(item);
-							}
-
-							CodedItem codedItem = codedItemService.findCodedItem(item.getId());
-
-							if (codedItem != null) {
-
-								codedItem.setStatus("REMOVED");
-								codedItemService.saveCodedItem(codedItem);
-							}
-						}
-					}
-				}
-
-				String emailBody = new StringBuilder("")
-						.append(respage.getString("the_event"))
-						.append(" ")
-						.append(event.getStudyEventDefinition().getName())
-						.append(" ")
-						.append(respage.getString("has_been_removed_from_the_subject_record_for"))
-						.append(" ")
-						.append(studySub.getLabel())
-						.append(" ")
+				String emailBody = new StringBuilder("").append(respage.getString("the_event")).append(" ")
+						.append(event.getStudyEventDefinition().getName()).append(" ")
+						.append(respage.getString("has_been_removed_from_the_subject_record_for")).append(" ")
+						.append(studySub.getLabel()).append(" ")
 						.append(study.isSite(study.getParentStudyId()) ? respage.getString("in_the_site") : respage
 								.getString("in_the_study")).append(" ").append(study.getName()).append(".").toString();
 

@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -34,7 +32,6 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.core.Controller;
 
@@ -48,7 +45,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -74,12 +70,12 @@ public class RestoreStudyServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+
 		if (getUserAccountBean(request).isSysAdmin()) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
@@ -87,6 +83,7 @@ public class RestoreStudyServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
 		StudyDAO sdao = getStudyDAO();
 		FormProcessor fp = new FormProcessor(request);
 		int studyId = fp.getInt("id");
@@ -217,8 +214,8 @@ public class RestoreStudyServlet extends Controller {
 						definition.setUpdater(currentUser);
 						definition.setUpdatedDate(new Date());
 						sefdao.update(definition);
-						ArrayList<EventDefinitionCRFBean> edcs = (ArrayList) edcdao.findAllByDefinition(definition
-								.getId());
+
+						ArrayList<EventDefinitionCRFBean> edcs = (ArrayList) edcdao.findAllByDefinition(definition.getId());
 						for (EventDefinitionCRFBean edc : edcs) {
 							if (edc.getStatus().equals(Status.AUTO_DELETED)) {
 								edc.setStatus(Status.AVAILABLE);
@@ -230,7 +227,6 @@ public class RestoreStudyServlet extends Controller {
 
 						ArrayList<StudyEventBean> events = (ArrayList) sedao.findAllByDefinition(definition.getId());
 						EventCRFDAO ecdao = getEventCRFDAO();
-						CodedItemService codedItemService = getCodedItemService();
 
 						for (StudyEventBean event : events) {
 							if (event.getStatus().equals(Status.AUTO_DELETED)) {
@@ -241,39 +237,7 @@ public class RestoreStudyServlet extends Controller {
 
 								ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(event);
 
-								ItemDataDAO iddao = getItemDataDAO();
-								for (EventCRFBean eventCRF : eventCRFs) {
-									if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-										eventCRF.setStatus(eventCRF.getOldStatus());
-										eventCRF.setUpdater(currentUser);
-										eventCRF.setUpdatedDate(new Date());
-										ecdao.update(eventCRF);
-
-										ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-										for (Object itemData : itemDatas) {
-											ItemDataBean item = (ItemDataBean) itemData;
-											if (item.getStatus().equals(Status.AUTO_DELETED)) {
-												item.setStatus(item.getOldStatus());
-												item.setUpdater(currentUser);
-												item.setUpdatedDate(new Date());
-												iddao.update(item);
-											}
-
-											CodedItem codedItem = codedItemService.findCodedItem(item.getId());
-
-											if (codedItem != null) {
-												if (codedItem.getHttpPath() == null
-														|| codedItem.getHttpPath().isEmpty()) {
-													codedItem.setStatus("NOT_CODED");
-												} else {
-													codedItem.setStatus("CODED");
-												}
-
-												codedItemService.saveCodedItem(codedItem);
-											}
-										}
-									}
-								}
+								getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
 							}
 						}
 					}

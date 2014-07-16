@@ -23,12 +23,10 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -43,7 +41,6 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -54,7 +51,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -88,14 +84,14 @@ public class RestoreStudyEventServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		int studyEventId = fp.getInt("id");// studyEventId
 		int studySubId = fp.getInt("studySubId");// studySubjectId
-		UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean currentUser = getUserAccountBean(request);
 
 		StudyEventDAO sedao = getStudyEventDAO();
 		StudySubjectDAO subdao = getStudySubjectDAO();
 
 		if (studyEventId == 0) {
 			addPageMessage(respage.getString("please_choose_a_SE_to_restore"), request);
-			request.setAttribute("id", new Integer(studySubId).toString());
+			request.setAttribute("id", Integer.toString(studySubId));
 			forwardToViewStudySubjectPage(request, response);
 		} else {
 
@@ -108,7 +104,7 @@ public class RestoreStudyEventServlet extends Controller {
 				addPageMessage(new StringBuilder("").append(resword.getString("study_event"))
 						.append(resterm.getString("could_not_be")).append(resterm.getString("restored"))
 						.append(".").append(respage.getString("study_subject_has_been_deleted")).toString(), request);
-				request.setAttribute("id", new Integer(studySubId).toString());
+				request.setAttribute("id", Integer.toString(studySubId));
 				forwardToViewStudySubjectPage(request, response);
 			}
 			// YW
@@ -129,7 +125,7 @@ public class RestoreStudyEventServlet extends Controller {
 				if (event.getStatus().equals(Status.AVAILABLE)) {
 					addPageMessage(new StringBuilder("").append(respage.getString("this_event_is_already_available_for_study"))
 							.append(" ").append(respage.getString("please_contact_sysadmin_for_more_information")).toString(), request);
-					request.setAttribute("id", new Integer(studySubId).toString());
+					request.setAttribute("id", Integer.toString(studySubId));
 					forwardToViewStudySubjectPage(request, response);
 					return;
 				}
@@ -151,57 +147,21 @@ public class RestoreStudyEventServlet extends Controller {
 				forwardPage(Page.RESTORE_STUDY_EVENT, request, response);
 			} else if ("submit".equalsIgnoreCase(action)) {
 				logger.info("submit to restore the event to study");
+
 				// restore event to study
 				event.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
 				event.setStatus(Status.AVAILABLE);
-				event.setUpdater(ub);
+				event.setUpdater(currentUser);
 				event.setUpdatedDate(new Date());
 				sedao.update(event);
 
-				// restore event crfs
 				EventCRFDAO ecdao = getEventCRFDAO();
-
-				ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
-
+				List<EventCRFBean> eventCRFs = (ArrayList<EventCRFBean>) ecdao.findAllByStudyEvent(event);
 				boolean hasStarted = false;
-				ItemDataDAO iddao = getItemDataDAO();
 
-				CodedItemService codedItemService = getCodedItemService();
+				getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
 
-				for (int k = 0; k < eventCRFs.size(); k++) {
-					EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-					if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-						eventCRF.setStatus(Status.AVAILABLE);
-						eventCRF.setUpdater(ub);
-						eventCRF.setUpdatedDate(new Date());
-						ecdao.update(eventCRF);
-						// remove all the item data
-						ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-						for (int a = 0; a < itemDatas.size(); a++) {
-							ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-							if (item.getStatus().equals(Status.AUTO_DELETED)) {
-								item.setStatus(Status.AVAILABLE);
-								item.setUpdater(ub);
-								item.setUpdatedDate(new Date());
-								iddao.update(item);
-							}
-
-							CodedItem codedItem = codedItemService.findCodedItem(item.getId());
-
-							if (codedItem != null) {
-
-								if (codedItem.getHttpPath() == null || codedItem.getHttpPath().isEmpty()) {
-
-									codedItem.setStatus("NOT_CODED");
-								} else {
-
-									codedItem.setStatus("CODED");
-								}
-
-								codedItemService.saveCodedItem(codedItem);
-							}
-						}
-					}
+				for (EventCRFBean eventCRF: eventCRFs) {
 					hasStarted = !hasStarted ? !eventCRF.isNotStarted() : hasStarted;
 				}
 
@@ -216,8 +176,7 @@ public class RestoreStudyEventServlet extends Controller {
 						.append(study.getName()).append(".").toString();
 
 				addPageMessage(emailBody, request);
-				// sendEmail(emailBody);
-				request.setAttribute("id", new Integer(studySubId).toString());
+				request.setAttribute("id", Integer.toString(studySubId));
 				forwardToViewStudySubjectPage(request, response);
 			}
 		}
@@ -252,7 +211,7 @@ public class RestoreStudyEventServlet extends Controller {
 		int i;
 		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
 			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-			definitionsById.put(new Integer(edc.getStudyEventDefinitionId()), edc);
+			definitionsById.put(edc.getStudyEventDefinitionId(), edc);
 		}
 
 		StudyEventDAO sedao = getStudyEventDAO();
