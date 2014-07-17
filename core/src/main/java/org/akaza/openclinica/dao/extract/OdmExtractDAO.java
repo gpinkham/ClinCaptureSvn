@@ -2347,9 +2347,9 @@ public class OdmExtractDAO extends DatasetDAO {
 						se.setEndDate(new SimpleDateFormat("yyyy-MM-dd").format(endDate));
 					}
 				}
-				if (dataset.isShowEventStatus()) {
-					se.setStatus(SubjectEventStatus.get((Integer) row.get("event_status_id")).getName());
-				}
+				
+				se.setStatus(SubjectEventStatus.get((Integer) row.get("event_status_id")).getName());
+				
 				se.setStudyEventRepeatKey(studyEventRepeating ? sampleOrdinal + "" : "-1");
 				sub.getExportStudyEventData().add(se);
 				formprev = "";
@@ -2430,6 +2430,7 @@ public class OdmExtractDAO extends DatasetDAO {
 			int validatorId) {
 		DataEntryStage stage = DataEntryStage.INVALID;
 		Status status = Status.get(ecStatusId);
+		String result = "";
 
 		if (stage.equals(DataEntryStage.INVALID) || status.equals(Status.INVALID)) {
 			stage = DataEntryStage.UNCOMPLETED;
@@ -2461,15 +2462,24 @@ public class OdmExtractDAO extends DatasetDAO {
 				stage = DataEntryStage.LOCKED;
 			} else if (cvStatusId != 1) {
 				stage = DataEntryStage.LOCKED;
-			}
+			} 
 		} catch (NullPointerException e) {
 			logger.debug("caught NPE here");
 		}
 
 		logger.debug("returning " + stage.getName());
 
-		return stage == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE && sdvStatus ? SubjectEventStatus.SOURCE_DATA_VERIFIED
-				.getName() : stage.getName();
+		if (stage == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE && sdvStatus
+				&& (seSubjectEventStatus == null || !seSubjectEventStatus.equals(SubjectEventStatus.SIGNED.getName()))) {
+			result = SubjectEventStatus.SOURCE_DATA_VERIFIED.getName();
+		} else if (stage == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE && seSubjectEventStatus != null
+				&& seSubjectEventStatus.equals(SubjectEventStatus.SIGNED.getName())) {
+			result = SubjectEventStatus.SIGNED.getName();
+		} else {
+			result = stage.getName();
+		}
+
+		return result;
 	}
 
 	protected void setStudyParemeterConfig(StudyBean study) {
@@ -2706,7 +2716,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
 	protected String getOCSubjectEventFormSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint,
 			int datasetItemStatusId, String studySubjectIds, String parentStudyIds) {
-		return "select ss.oc_oid as study_subject_oid, ss.label, ss.unique_identifier, ss.secondary_label, ss.gender, ss.date_of_birth,"
+		return "select distinct ss.oc_oid as study_subject_oid, ss.label, ss.unique_identifier, ss.secondary_label, ss.gender, ss.date_of_birth,"
 				+ " ss.status_id, ss.sgc_id, ss.sgc_name, ss.sg_name, sed.ordinal as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating,"
 				+ " se.sample_ordinal as sample_ordinal, se.se_location, se.date_start, se.date_end, se.start_time_flag,"
 				+ " se.end_time_flag, se.subject_event_status_id as event_status_id, edc.ordinal as crf_order,"
