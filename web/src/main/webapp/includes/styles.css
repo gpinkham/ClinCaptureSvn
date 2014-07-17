@@ -889,6 +889,18 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     vertical-align: top;
 }
 
+/* Updated style for table cells */
+.table_cell_br, .table_cell_br_colored {
+	padding: 0.2em;
+	border: 1px solid #CCCCCC;
+	vertical-align: top;
+}
+ 
+.table_cell_br_colored {
+	color: #789EC5;
+}
+/* / Updated style for table cells */
+
 .table_horizontal  tr td, .table_vertical tr td{
 	padding: 3px 6px;
 	border-style: solid;
