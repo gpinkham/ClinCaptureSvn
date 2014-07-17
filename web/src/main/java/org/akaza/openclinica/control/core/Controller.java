@@ -78,7 +78,6 @@ import org.akaza.openclinica.view.StudyInfoPanelLine;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -143,7 +142,7 @@ public abstract class Controller extends BaseController {
 	protected void addPageMessage(String message, HttpServletRequest request) {
 		addPageMessage(message, request, logger);
 	}
-	
+
 	public static void addPageMessage(String message, HttpServletRequest request, Logger aLogger) {
 		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
 
@@ -184,26 +183,32 @@ public abstract class Controller extends BaseController {
 		request.setAttribute(PRESET_VALUES, presetValues);
 	}
 
-	protected void setTable(EntityBeanTable table, HttpServletRequest request) {
-		request.setAttribute(BEAN_TABLE, table);
-	}
-
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 	}
 
 	/**
-	 * Process request
+	 * Process request.
 	 * 
-	 * @throws Exception
 	 * @param request
 	 *            HttpServletRequest
 	 * @param response
 	 *            HttpServletResponse
+	 * @throws Exception
 	 */
 	protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
+	/**
+	 * Checks whether the user has the right permission to proceed function.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @throws InsufficientPermissionException
+	 *             custom InsufficientPermissionException
+	 */
 	protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException;
 
@@ -321,7 +326,8 @@ public abstract class Controller extends BaseController {
 			session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
 		} catch (NumberFormatException nfe) {
 			// 3600 is the datainfo.properties maxInactiveInterval on
-			session.setMaxInactiveInterval(3600);
+			final int defMaxInactiveInterval = 3600;
+			session.setMaxInactiveInterval(defMaxInactiveInterval);
 		}
 
 		// If the session already has a value with key SUPPORT_URL don't reset
@@ -385,7 +391,8 @@ public abstract class Controller extends BaseController {
 					currentStudy.setStudyParameters(studyParameters);
 
 					StudyConfigService scs = getStudyConfigService();
-					if (currentStudy.getParentStudyId() <= 0) {// top study
+					if (currentStudy.getParentStudyId() <= 0) {
+						// top study
 						scs.setParametersForStudy(currentStudy);
 
 					} else {
@@ -406,8 +413,7 @@ public abstract class Controller extends BaseController {
 				}
 			}
 
-			if (this instanceof ListStudySubjectsServlet && currentStudy != null
-					&& currentStudy.getStatus() != Status.AVAILABLE) {
+			if (this instanceof ListStudySubjectsServlet && currentStudy.getStatus() != Status.AVAILABLE) {
 				String startWith = BR;
 				ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
 				if (pageMessages == null) {
@@ -423,8 +429,7 @@ public abstract class Controller extends BaseController {
 			if (currentRole == null || currentRole.getId() <= 0) {
 				// if current study has been "removed", current role will be
 				// kept as "invalid"
-				if (ub.getId() > 0 && currentStudy != null && currentStudy.getId() > 0
-						&& !currentStudy.getStatus().getName().equals("removed")) {
+				if (ub.getId() > 0 && currentStudy.getId() > 0 && !currentStudy.getStatus().getName().equals("removed")) {
 					currentRole = ub.getRoleByStudy(currentStudy.getId());
 					if (currentStudy.getParentStudyId() > 0) {
 						// Checking if currentStudy has been removed or not will
@@ -438,16 +443,16 @@ public abstract class Controller extends BaseController {
 					currentRole = new StudyUserRoleBean();
 				}
 				session.setAttribute("userRole", currentRole);
-			}
-			// For the case that current role is not "invalid" but current
-			// active study has been removed.
-			else if (currentRole.getId() > 0
-					&& currentStudy != null
-					&& (currentStudy.getStatus().equals(Status.DELETED) || currentStudy.getStatus().equals(
-							Status.AUTO_DELETED))) {
-				currentRole.setRole(Role.INVALID);
-				currentRole.setStatus(Status.DELETED);
-				session.setAttribute("userRole", currentRole);
+			} else {
+				// For the case that current role is not "invalid" but current
+				// active study has been removed.
+				if (currentRole.getId() > 0
+						&& (currentStudy.getStatus().equals(Status.DELETED) || currentStudy.getStatus().equals(
+								Status.AUTO_DELETED))) {
+					currentRole.setRole(Role.INVALID);
+					currentRole.setStatus(Status.DELETED);
+					session.setAttribute("userRole", currentRole);
+				}
 			}
 
 			request.setAttribute("isAdminServlet", getAdminServlet(request));
@@ -462,40 +467,46 @@ public abstract class Controller extends BaseController {
 
 			processRequest(request, response);
 
+			final int millisecondsInSec = 1000;
 			long endTime = System.currentTimeMillis();
-			long reportTime = (endTime - startTime) / 1000;
+			long reportTime = (endTime - startTime) / millisecondsInSec;
 			logger.info("Time taken [" + reportTime + " seconds]");
 			// If the time taken is over 5 seconds, write it to the stats table
-			if (reportTime > 5) {
+			final int maxReportTime = 5;
+			if (reportTime > maxReportTime) {
 				getUsageStatsServiceDAO().savePageLoadTimeToDB(this.getClass().toString(), Long.toString(reportTime));
 			}
 			// Call the usagestats dao here and record a time in the db
 		} catch (InconsistentStateException ise) {
 			ise.printStackTrace();
 			logger.warn("InconsistentStateException: org.akaza.openclinica.control.Controller: " + ise.getMessage());
-			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
 				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+			}
 			addPageMessage(ise.getOpenClinicaMessage(), request);
 			forwardPage(ise.getGoTo(), request, response);
 		} catch (InsufficientPermissionException ipe) {
 			ipe.printStackTrace();
 			logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.Controller: "
 					+ ipe.getMessage());
-			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
 				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+			}
 			forwardPage(ipe.getGoTo(), request, response);
 		} catch (OutOfMemoryError ome) {
 			ome.printStackTrace();
 			long heapSize = Runtime.getRuntime().totalMemory();
 			logger.error("OutOfMemory Exception - " + heapSize);
-			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
 				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+			}
 			session.setAttribute("ome", "yes");
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("Error has occurred.", e);
-			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
 				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+			}
 			forwardPage(Page.ERROR, request, response);
 		}
 	}
@@ -626,8 +637,9 @@ public abstract class Controller extends BaseController {
 			process(request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
-			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
 				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+			}
 		}
 	}
 
@@ -648,8 +660,9 @@ public abstract class Controller extends BaseController {
 			process(request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
-			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
 				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+			}
 		}
 	}
 
@@ -678,7 +691,8 @@ public abstract class Controller extends BaseController {
 		try {
 			if (checkTrail) {
 				BreadcrumbTrail bt = new BreadcrumbTrail();
-				if (request.getSession() != null) {// added bu jxu, fixed bug for log out
+				if (request.getSession() != null) {
+					// added bu jxu, fixed bug for log out
 					ArrayList trail = (ArrayList) request.getSession().getAttribute("trail");
 					if (trail == null) {
 						trail = bt.generateTrail(jspPage, request);
@@ -924,10 +938,6 @@ public abstract class Controller extends BaseController {
 		return dynamicGroupClasses;
 	}
 
-	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByCurrentStudy(HttpServletRequest request) {
-		return getDynamicGroupClassesByStudyId(request, getCurrentStudy(request).getId());
-	}
-
 	protected UserDetails getUserDetails() {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (principal instanceof UserDetails) {
@@ -960,10 +970,10 @@ public abstract class Controller extends BaseController {
 	public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail,
 			String successMessage, String failMessage, Boolean sendMessage, HttpServletRequest request)
 			throws Exception {
-		return sendEmailWithAttach(to, from, subject, body, htmlEmail, successMessage, failMessage, 
-				sendMessage, new String[0], request);
+		return sendEmailWithAttach(to, from, subject, body, htmlEmail, successMessage, failMessage, sendMessage,
+				new String[0], request);
 	}
-	
+
 	public Boolean sendEmailWithAttach(String to, String from, String subject, String body, Boolean htmlEmail,
 			String successMessage, String failMessage, Boolean sendMessage, String[] files, HttpServletRequest request)
 			throws Exception {
@@ -1109,8 +1119,8 @@ public abstract class Controller extends BaseController {
 			}
 
 			if (note.getDiscrepancyNoteTypeId() == 0) {
-				note.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());// default
-				// value
+				// default value
+				note.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());
 			}
 
 		} else if ("eventCrf".equalsIgnoreCase(note.getEntityType())) {
@@ -1218,7 +1228,7 @@ public abstract class Controller extends BaseController {
 			request.setAttribute("startDateLabel", config.getStartDateTimeLabel());
 		}
 	}
-	
+
 	public static void setDomainName(HttpServletRequest request) {
 		String domainName = request.getParameter(DOMAIN_NAME);
 
@@ -1241,20 +1251,13 @@ public abstract class Controller extends BaseController {
 	public String getActionForStage(DataEntryStage stage) {
 		if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
 			return ACTION_CONTINUE_INITIAL_DATA_ENTRY;
-		}
-
-		else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
+		} else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
 			return ACTION_START_DOUBLE_DATA_ENTRY;
-		}
-
-		else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
 			return ACTION_CONTINUE_DOUBLE_DATA_ENTRY;
-		}
-
-		else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)) {
+		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)) {
 			return ACTION_ADMINISTRATIVE_EDITING;
 		}
-
 		return "";
 	}
 
@@ -1420,10 +1423,20 @@ public abstract class Controller extends BaseController {
 	 * Each of the event CRFs with its corresponding CRFBean. Then generates a list of DisplayEventCRFBeans, one for
 	 * each event CRF.
 	 * 
+	 * @param ds
+	 *            DataSource
 	 * @param eventCRFs
 	 *            The list of event CRFs for this study event.
 	 * @param eventDefinitionCRFs
-	 *            The list of event definition CRFs for this study event.
+	 *            list of the eventDefinitionCRFs
+	 * @param ub
+	 *            UserAccountBean
+	 * @param currentRole
+	 *            StudyUserRoleBean
+	 * @param status
+	 *            SubjectEventStatus
+	 * @param study
+	 *            StudyBean
 	 * @return The list of DisplayEventCRFBeans for this study event.
 	 */
 	public ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs,
@@ -1494,6 +1507,8 @@ public abstract class Controller extends BaseController {
 	 *            All of the event definition CRFs for this study event.
 	 * @param eventCRFs
 	 *            All of the event CRFs for this study event.
+	 * @param status
+	 *            SubjectEventStatus
 	 * @return The list of event definitions for which no event CRF exists.
 	 */
 	public ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs, SubjectEventStatus status) {
@@ -1525,7 +1540,8 @@ public abstract class Controller extends BaseController {
 			EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
 			int crfId = cvdao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
 			ArrayList idata = iddao.findAllByEventCRFId(ecrf.getId());
-			if (!idata.isEmpty()) {// this crf has data already
+			if (!idata.isEmpty()) {
+				// this crf has data already
 				completed.put(crfId, Boolean.TRUE);
 			} else {
 				startedButIncompleted.put(crfId, ecrf);
@@ -1598,31 +1614,6 @@ public abstract class Controller extends BaseController {
 		}
 
 		return displayEvents;
-	}
-
-	public DisplayStudyEventBean getDisplayStudyEventsForStudySubject(StudyEventBean event, DataSource ds,
-			UserAccountBean ub, StudyUserRoleBean currentRole, StudyBean study) {
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-		EventCRFDAO ecdao = new EventCRFDAO(ds);
-		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
-
-		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
-		event.setStudyEventDefinition(sed);
-
-		// find all active crfs in the definition
-		ArrayList eventDefinitionCRFs = edcdao.findAllActiveByEventDefinitionId(sed.getId());
-
-		ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
-
-		// construct info needed on view study event page
-		DisplayStudyEventBean de = new DisplayStudyEventBean();
-		de.setStudyEvent(event);
-		de.setDisplayEventCRFs(getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub, currentRole,
-				event.getSubjectEventStatus(), study));
-		ArrayList al = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus());
-		de.setUncompletedCRFs(al);
-
-		return de;
 	}
 
 	protected List<DiscrepancyNoteBean> extractCoderNotes(List<DiscrepancyNoteBean> notes, HttpServletRequest request) {

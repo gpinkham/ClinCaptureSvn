@@ -10,14 +10,6 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
-/*
- * OpenClinica is distributed under the
- * GNU Lesser General Public License (GNU LGPL).
-
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
- */
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
@@ -55,10 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Handles user request of "view study events"
- * 
- * @author jxu
- * 
+ * Handles user request of "view study events".
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
@@ -89,27 +78,18 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 
 	public static final String PRINT = "print";
 
-	/**
-	 * Checks whether the user has the right permission to proceed function
-	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		if (ub.isSysAdmin()) {
-			return;
+		if (!ub.isSysAdmin() && !SubmitDataServlet.mayViewData(ub, currentRole)) {
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study")
+							+ respage.getString("change_study_contact_sysadmin"), request);
+			throw new InsufficientPermissionException(Page.MENU_SERVLET, restext.getString("not_correct_role"), "1");
 		}
-
-		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
-			return;
-		}
-
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, restext.getString("not_correct_role"), "1");
 	}
 
 	@Override
@@ -208,9 +188,8 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		definitions = findDefinitionById(definitions, definitionId);
 		StudySubjectDAO ssdao = getStudySubjectDAO();
 		Map<Integer, ArrayList<StudyEventBean>> studyEventDefinitionEventsMap = new HashMap<Integer, ArrayList<StudyEventBean>>();
-		ArrayList studySubjects = ssdao.findAllByStudyId(currentStudy.getId());
-		for (Object studySubject : studySubjects) {
-			StudySubjectBean ssb = (StudySubjectBean) studySubject;
+		List<StudySubjectBean> studySubjects = ssdao.findAllByStudyId(currentStudy.getId());
+		for (StudySubjectBean ssb : studySubjects) {
 			ArrayList<StudyEventBean> evts = sedao.findAllByStudySubject(ssb);
 			for (StudyEventBean seb : evts) {
 				seb.setStudySubjectLabel(ssb.getLabel());
@@ -283,7 +262,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 					} else if (se.getDateEnded() != null && se.getDateEnded().after(lastCompletionDate)) {
 						lastCompletionDate = se.getDateEnded();
 					}
-				} else if (se.getSubjectEventStatus().getId() > 4) {
+				} else if (se.getSubjectEventStatus().getId() > SubjectEventStatus.COMPLETED.getId()) {
 					subjectDiscontinued++;
 				}
 			}
@@ -295,25 +274,28 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 			ved.setLastCompletionDate(lastCompletionDate);
 
 			EntityBeanTable table;
-			if (sedId == sed.getId()) {// apply finding function or ordering
+			if (sedId == sed.getId()) {
+				// apply finding function or ordering
 				// function
 				// to a specific table
 				table = fp.getEntityBeanTable();
 			} else {
 				table = new EntityBeanTable();
 			}
-			table.setSortingIfNotExplicitlySet(1, false);// sort by event
+			// sort by event
 			// start date,
 			// desc
+			table.setSortingIfNotExplicitlySet(1, false);
 			ArrayList allEventRows = StudyEventRow.generateRowsFromBeans((ArrayList) events);
 
+			final int columnThree = 3;
 			String[] columns = {
 					currentStudy == null ? resword.getString("study_subject_ID") : currentStudy
 							.getStudyParameterConfig().getStudySubjectIdLabel(),
 					resword.getString("event_date_started"), resword.getString("subject_event_status"),
 					resword.getString("actions") };
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
-			table.hideColumnLink(3);
+			table.hideColumnLink(columnThree);
 			HashMap args = new HashMap();
 			args.put("sedId", Integer.toString(sed.getId()));
 			args.put("definitionId", Integer.toString(definitionId));
@@ -335,7 +317,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 	}
 
 	/**
-	 * Generates an arraylist of study events for printing
+	 * Generates an arraylist of study events for printing.
 	 * 
 	 * @param definitions
 	 *            ArrayList<StudyEventDefinitionBean>
@@ -418,7 +400,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 					} else if (se.getDateEnded().after(lastCompletionDate)) {
 						lastCompletionDate = se.getDateEnded();
 					}
-				} else if (se.getSubjectEventStatus().getId() > 4) {
+				} else if (se.getSubjectEventStatus().getId() > SubjectEventStatus.COMPLETED.getId()) {
 					// dropped out/stopped/skipped/relapse
 					subjectDiscontinued++;
 				}
@@ -499,17 +481,18 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
 		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
 		String eblSortAscending = fp.getString("ebl_sortAscending");
-		String defaultUrl = new StringBuilder().append("").append("?sedId=").append(sedId).append("&statusId=")
-				.append(statusId).append("&definitionId=").append(definitionId).append("&startDate=").append(startDate)
-				.append("&endDate=").append(endDate).append("&ebl_page=1&ebl_sortColumnInd=")
+		StringBuilder sb = new StringBuilder();
+		sb.append("").append("?sedId=").append(sedId).append("&statusId=").append(statusId).append("&definitionId=")
+				.append(definitionId).append("&startDate=").append(startDate).append("&endDate=").append(endDate)
+				.append("&ebl_page=1&ebl_sortColumnInd=")
 				.append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0")).append("&ebl_sortAscending=")
 				.append((!eblSortAscending.isEmpty() ? eblSortAscending : "1")).append("&ebl_filtered=")
 				.append((!eblFiltered.isEmpty() ? eblFiltered : "0")).append("&ebl_filterKeyword=")
-				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1").toString();
+				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1");
 		if (request.getParameter("refreshPage") != null) {
-			saveUrl(getUrlKey(request), request.getRequestURL() + defaultUrl, request);
+			saveUrl(getUrlKey(request), request.getRequestURL() + sb.toString(), request);
 		}
-		return defaultUrl;
+		return sb.toString();
 	}
 
 	@Override

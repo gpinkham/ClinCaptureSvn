@@ -10,14 +10,6 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
-/*
- * OpenClinica is distributed under the
- * GNU Lesser General Public License (GNU LGPL).
-
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
- */
 package org.akaza.openclinica.dao.managestudy;
 
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -33,6 +25,7 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.exception.OpenClinicaException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -42,10 +35,17 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
+/**
+ * StudySubjectDAO class. It performs the CRUD operations related to study subject items.
+ */
 @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 public class StudySubjectDAO extends AuditableEntityDAO {
 
+	/**
+	 * Method that sets the query names.
+	 */
 	public void setQueryNames() {
 		findAllByStudyName = "findAllByStudy";
 		findByPKAndStudyName = "findByPKAndStudy";
@@ -53,16 +53,38 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
 	}
 
+	/**
+	 * StudySubjectDAO constructor.
+	 * 
+	 * @param ds
+	 *            the jdbc DataSource object
+	 */
 	public StudySubjectDAO(DataSource ds) {
 		super(ds);
 		setQueryNames();
 	}
 
+	/**
+	 * StudySubjectDAO constructor.
+	 * 
+	 * @param ds
+	 *            the jdbc DataSource object
+	 * @param connection
+	 *            the jdbc Connection object
+	 */
 	public StudySubjectDAO(DataSource ds, Connection connection) {
 		super(ds, connection);
 		setQueryNames();
 	}
 
+	/**
+	 * StudySubjectDAO constructor.
+	 * 
+	 * @param ds
+	 *            the jdbc DataSource object
+	 * @param digester
+	 *            the DAODigester object
+	 */
 	public StudySubjectDAO(DataSource ds, DAODigester digester) {
 		super(ds);
 		this.digester = digester;
@@ -128,6 +150,9 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind, TypeNames.INT);
 	}
 
+	/**
+	 * Method that sets expected types for some DAO methods.
+	 */
 	public void setTypesExpectedFilter() {
 
 		this.unsetTypeExpected();
@@ -168,47 +193,12 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind, TypeNames.STRING);
 	}
 
-	public void setDNTypesExpected() {
-
-		this.unsetTypeExpected();
-		int ind = 1;
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // study_subject_id
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // label
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // secondary_label
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // subject_id
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // study_id
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // status_id
-
-		this.setTypeExpected(ind, TypeNames.DATE);
-		ind++; // enrollment_date
-		this.setTypeExpected(ind, TypeNames.DATE);
-		ind++; // date_created
-		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
-		ind++; // date_updated
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // owner_id
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // update_id
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // oc oid
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // dynamic_group_class_id
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; //
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; //
-		this.setTypeExpected(ind, TypeNames.STRING);
-	}
-
 	/**
-	 * <p>
-	 * getEntityFromHashMap, the method that gets the object from the database query.
+	 * Method that gets the object from the database query.
+	 * 
+	 * @param hm
+	 *            HashMap
+	 * @return Object
 	 */
 	public Object getEntityFromHashMap(HashMap hm) {
 		StudySubjectBean eb = new StudySubjectBean();
@@ -233,16 +223,33 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * Method that returns List of groups by study subject, study id and parent study id.
+	 * 
+	 * @param studySubjectId
+	 *            study subject id
+	 * @param studyId
+	 *            study id
+	 * @param parentStudyId
+	 *            parent study id
+	 * @return ArrayList
+	 */
 	public ArrayList getGroupByStudySubject(int studySubjectId, int studyId, int parentStudyId) {
 
 		HashMap variables = new HashMap();
-		variables.put(1, studySubjectId);
-		variables.put(2, studyId);
-		variables.put(3, parentStudyId);
+		int index = 1;
+		variables.put(index++, studySubjectId);
+		variables.put(index++, studyId);
+		variables.put(index, parentStudyId);
 
 		return executeFindAllQuery("getGroupByStudySubject", variables);
 	}
 
+	/**
+	 * Method that returns Collection of all study subjects.
+	 * 
+	 * @return Collection
+	 */
 	public Collection findAll() {
 		this.setTypesExpected();
 		String sql = digester.getQuery("findAll");
@@ -255,6 +262,15 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method that checks that study subject is ready to be source data verified.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param studySubject
+	 *            StudySubjectBean
+	 * @return boolean
+	 */
 	public boolean isStudySubjectReadyToBeSDVed(StudyBean currentStudy, StudySubjectBean studySubject) {
 		int result = 0;
 		this.unsetTypeExpected();
@@ -267,31 +283,33 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
 		HashMap variables = new HashMap();
 
-		variables.put(1, studySubject.getId());
-		variables.put(2, parentStudyId);
-		variables.put(3, parentStudyId);
-		variables.put(4, studyId);
-		variables.put(5, parentStudyId);
-		variables.put(6, parentStudyId);
-		variables.put(7, parentStudyId);
-		variables.put(8, parentStudyId);
-		variables.put(9, parentStudyId);
-		variables.put(10, parentStudyId);
-		variables.put(11, parentStudyId);
-		variables.put(12, studyId);
-		variables.put(13, parentStudyId);
-		variables.put(14, parentStudyId);
-		variables.put(15, parentStudyId);
-		variables.put(16, parentStudyId);
-		variables.put(17, parentStudyId);
-		variables.put(18, parentStudyId);
-		variables.put(19, parentStudyId);
-		variables.put(20, studyId);
-		variables.put(21, parentStudyId);
-		variables.put(22, parentStudyId);
-		variables.put(23, parentStudyId);
-		variables.put(24, parentStudyId);
-		variables.put(25, parentStudyId);
+		final int pageSize = 100;
+		int index = 1;
+		variables.put(index++, studySubject.getId());
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, studyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, studyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, studyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index, parentStudyId);
 
 		String sql = digester.getQuery("isStudySubjectSDVed") + " "
 				+ digester.getQuery("readyToBeSdvStudySubjectFilter");
@@ -302,7 +320,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 			listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "123");
 			sql += " AND (SELECT count(distinct dns.discrepancy_note_id) FROM ( "
 					+ new DiscrepancyNoteDAO(ds).getSQLViewNotesWithFilterAndSortLimits(currentStudy, listNotesFilter,
-							new ListNotesSort(), 0, 100, false).replaceAll("\\?", "" + studyId) + " ) dns ) = 0 ";
+							new ListNotesSort(), 0, pageSize, false).replaceAll("\\?", "" + studyId) + " ) dns ) = 0 ";
 		}
 
 		ArrayList rows = this.select(sql, variables);
@@ -315,6 +333,15 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return studySubject.getId() == result;
 	}
 
+	/**
+	 * Method that checks that study subject is source data verified.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param studySubject
+	 *            StudySubjectBean
+	 * @return boolean
+	 */
 	public boolean isStudySubjectSDVed(StudyBean currentStudy, StudySubjectBean studySubject) {
 		int result = 0;
 		this.unsetTypeExpected();
@@ -327,31 +354,33 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
 		HashMap variables = new HashMap();
 
-		variables.put(1, studySubject.getId());
-		variables.put(2, parentStudyId);
-		variables.put(3, parentStudyId);
-		variables.put(4, studyId);
-		variables.put(5, parentStudyId);
-		variables.put(6, parentStudyId);
-		variables.put(7, parentStudyId);
-		variables.put(8, parentStudyId);
-		variables.put(9, parentStudyId);
-		variables.put(10, parentStudyId);
-		variables.put(11, parentStudyId);
-		variables.put(12, studyId);
-		variables.put(13, parentStudyId);
-		variables.put(14, parentStudyId);
-		variables.put(15, parentStudyId);
-		variables.put(16, parentStudyId);
-		variables.put(17, parentStudyId);
-		variables.put(18, parentStudyId);
-		variables.put(19, parentStudyId);
-		variables.put(20, studyId);
-		variables.put(21, parentStudyId);
-		variables.put(22, parentStudyId);
-		variables.put(23, parentStudyId);
-		variables.put(24, parentStudyId);
-		variables.put(25, parentStudyId);
+		final int pageSize = 100;
+		int index = 1;
+		variables.put(index++, studySubject.getId());
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, studyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, studyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, studyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index++, parentStudyId);
+		variables.put(index, parentStudyId);
 
 		String sql = digester.getQuery("isStudySubjectSDVed") + " " + digester.getQuery("sdvStudySubjectFilter");
 
@@ -361,7 +390,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 			listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "123");
 			sql += " AND (SELECT count(distinct dns.discrepancy_note_id) FROM ( "
 					+ new DiscrepancyNoteDAO(ds).getSQLViewNotesWithFilterAndSortLimits(currentStudy, listNotesFilter,
-							new ListNotesSort(), 0, 100, false).replaceAll("\\?", "" + studyId) + " ) dns ) = 0 ";
+							new ListNotesSort(), 0, pageSize, false).replaceAll("\\?", "" + studyId) + " ) dns ) = 0 ";
 		}
 
 		ArrayList rows = this.select(sql, variables);
@@ -374,6 +403,22 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return studySubject.getId() == result;
 	}
 
+	/**
+	 * Method that returns List of study subjects by currentStudy, StudySubjectSDVFilter, StudySubjectSDVSort, rowStart
+	 * and rowEnd.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            StudySubjectSDVFilter
+	 * @param sort
+	 *            StudySubjectSDVSort
+	 * @param rowStart
+	 *            rowStart
+	 * @param rowEnd
+	 *            rowEnd
+	 * @return boolean
+	 */
 	public ArrayList findAllByStudySDV(StudyBean currentStudy, StudySubjectSDVFilter filter, StudySubjectSDVSort sort,
 			int rowStart, int rowEnd) {
 		int studyId = currentStudy.getId();
@@ -385,39 +430,40 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-
-		variables.put(1, studyId);
-		variables.put(2, studyId);
+		final int pageSize = 100;
+		int index = 1;
+		variables.put(index++, studyId);
+		variables.put(index++, studyId);
 
 		String sql = digester.getQuery("findAllByStudySDV");
 
 		String sqlFilter = filter.execute("");
 		if (sqlFilter.contains(digester.getQuery("sdvStudySubjectFilter"))
 				|| sqlFilter.contains(digester.getQuery("sdvStudySubjectFilter"))) {
-			variables.put(3, parentStudyId);
-			variables.put(4, parentStudyId);
-			variables.put(5, studyId);
-			variables.put(6, parentStudyId);
-			variables.put(7, parentStudyId);
-			variables.put(8, parentStudyId);
-			variables.put(9, parentStudyId);
-			variables.put(10, parentStudyId);
-			variables.put(11, parentStudyId);
-			variables.put(12, parentStudyId);
-			variables.put(13, studyId);
-			variables.put(14, parentStudyId);
-			variables.put(15, parentStudyId);
-			variables.put(16, parentStudyId);
-			variables.put(17, parentStudyId);
-			variables.put(18, parentStudyId);
-			variables.put(19, parentStudyId);
-			variables.put(20, parentStudyId);
-			variables.put(21, studyId);
-			variables.put(22, parentStudyId);
-			variables.put(23, parentStudyId);
-			variables.put(24, parentStudyId);
-			variables.put(25, parentStudyId);
-			variables.put(26, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, studyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, studyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, studyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index, parentStudyId);
 		}
 		sql += sqlFilter;
 
@@ -427,7 +473,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 			listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "123");
 			sql += " AND (SELECT count(distinct dns.discrepancy_note_id) FROM ( "
 					+ new DiscrepancyNoteDAO(ds).getSQLViewNotesWithFilterAndSortLimits(currentStudy, listNotesFilter,
-							new ListNotesSort(), 0, 100, false).replaceAll("\\?", "" + studyId) + " ) dns ) = 0 ";
+							new ListNotesSort(), 0, pageSize, false).replaceAll("\\?", "" + studyId) + " ) dns ) = 0 ";
 		}
 
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
@@ -447,14 +493,22 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return studySubjects;
 	}
 
+	/**
+	 * Method that returns count of study subjects by label.
+	 * 
+	 * @param label
+	 *            study subject label
+	 * @return Integer
+	 */
 	public Integer countByLabel(String label) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(1, label);
-		variables.put(2, label);
-		variables.put(3, label);
+		int index = 1;
+		variables.put(index++, label);
+		variables.put(index++, label);
+		variables.put(index, label);
 
 		ArrayList alist = this.select(digester.getQuery("countByLabel"), variables);
 		Iterator it = alist.iterator();
@@ -465,10 +519,24 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that returns the SDV COMPLETE filter for a study subject.
+	 * 
+	 * @return String
+	 */
 	public String getSdvStudySubjectFilter() {
 		return digester.getQuery("sdvStudySubjectFilter");
 	}
 
+	/**
+	 * Method that returns count of study subjects by currentStudy and StudySubjectSDVFilter.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            StudySubjectSDVFilter
+	 * @return int
+	 */
 	public int countAllByStudySDV(StudyBean currentStudy, StudySubjectSDVFilter filter) {
 		int studyId = currentStudy.getId();
 		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
@@ -479,38 +547,40 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		variables.put(2, studyId);
+		int index = 1;
+		final int pageSize = 100;
+		variables.put(index++, studyId);
+		variables.put(index++, studyId);
 
 		String sql = digester.getQuery("countAllByStudySDV");
 
 		String sqlFilter = filter.execute("");
 		if (sqlFilter.contains(digester.getQuery("sdvStudySubjectFilter"))
 				|| sqlFilter.contains(digester.getQuery("sdvStudySubjectFilter"))) {
-			variables.put(3, parentStudyId);
-			variables.put(4, parentStudyId);
-			variables.put(5, studyId);
-			variables.put(6, parentStudyId);
-			variables.put(7, parentStudyId);
-			variables.put(8, parentStudyId);
-			variables.put(9, parentStudyId);
-			variables.put(10, parentStudyId);
-			variables.put(11, parentStudyId);
-			variables.put(12, parentStudyId);
-			variables.put(13, studyId);
-			variables.put(14, parentStudyId);
-			variables.put(15, parentStudyId);
-			variables.put(16, parentStudyId);
-			variables.put(17, parentStudyId);
-			variables.put(18, parentStudyId);
-			variables.put(19, parentStudyId);
-			variables.put(20, parentStudyId);
-			variables.put(21, studyId);
-			variables.put(22, parentStudyId);
-			variables.put(23, parentStudyId);
-			variables.put(24, parentStudyId);
-			variables.put(25, parentStudyId);
-			variables.put(26, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, studyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, studyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, studyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index++, parentStudyId);
+			variables.put(index, parentStudyId);
 		}
 		sql += sqlFilter;
 
@@ -520,7 +590,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 			listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "123");
 			sql += " AND (SELECT count(distinct dns.discrepancy_note_id) FROM ( "
 					+ new DiscrepancyNoteDAO(ds).getSQLViewNotesWithFilterAndSortLimits(currentStudy, listNotesFilter,
-							new ListNotesSort(), 0, 100, false).replaceAll("\\?", "" + studyId) + " ) dns ) = 0 ";
+							new ListNotesSort(), 0, pageSize, false).replaceAll("\\?", "" + studyId) + " ) dns ) = 0 ";
 		}
 
 		ArrayList rows = this.select(sql, variables);
@@ -533,14 +603,26 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that checks that subject can be source data verified.
+	 * 
+	 * @param studySubjectId
+	 *            study subject id
+	 * @param studyId
+	 *            study id
+	 * @param parentStudyId
+	 *            parent study id
+	 * @return boolean
+	 */
 	public boolean allowSDVSubject(int studySubjectId, int studyId, int parentStudyId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.BOOL);
 
 		HashMap variables = new HashMap();
-		variables.put(1, studySubjectId);
-		variables.put(2, parentStudyId);
-		variables.put(3, studyId);
+		int index = 1;
+		variables.put(index++, studySubjectId);
+		variables.put(index++, parentStudyId);
+		variables.put(index, studyId);
 
 		String sql = digester.getQuery("allowSDVSubject");
 
@@ -554,6 +636,11 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that returns the greatest label.
+	 * 
+	 * @return int
+	 */
 	public int findTheGreatestLabel() {
 		this.setTypesExpected();
 		String sql = digester.getQuery("findAll");
@@ -580,34 +667,69 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return greatestLabel;
 	}
 
+	/**
+	 * Method that returns collection of all study subjects by strOrderByColumn, blnAscendingSort and strSearchPhrase.
+	 * 
+	 * @param strOrderByColumn
+	 *            order by column value as string
+	 * @param blnAscendingSort
+	 *            ascending sort value as string
+	 * @param strSearchPhrase
+	 *            search phrase
+	 * @return Collection collection of study subjects
+	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}
 
+	/**
+	 * Method that returns list of ordered by label study subjects by StudyBean.
+	 * 
+	 * @param sb
+	 *            StudyBean
+	 * @return ArrayList list of study subjects
+	 */
 	public ArrayList findAllByStudyOrderByLabel(StudyBean sb) {
 		HashMap variables = new HashMap();
-		variables.put(1, sb.getId());
-		variables.put(2, sb.getId());
+		int index = 1;
+		variables.put(index++, sb.getId());
+		variables.put(index, sb.getId());
 
 		return executeFindAllQuery("findAllByStudyOrderByLabel", variables);
 	}
 
+	/**
+	 * Method that returns list of active and ordered by label study subjects by StudyBean.
+	 * 
+	 * @param sb
+	 *            StudyBean
+	 * @return ArrayList list of study subjects
+	 */
 	public ArrayList findAllActiveByStudyOrderByLabel(StudyBean sb) {
 		HashMap variables = new HashMap();
-		variables.put(1, sb.getId());
-		variables.put(2, sb.getId());
+		int index = 1;
+		variables.put(index++, sb.getId());
+		variables.put(index, sb.getId());
 
 		return executeFindAllQuery("findAllActiveByStudyOrderByLabel", variables);
 	}
 
+	/**
+	 * Method that returns list of study subjects by currentStudy.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return ArrayList list of study subjects
+	 */
 	public ArrayList findAllWithStudyEvent(StudyBean currentStudy) {
 		ArrayList answer = new ArrayList();
 
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
+		int index = 1;
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
 
 		String sql = digester.getQuery("findAllWithStudyEvent");
 		ArrayList alist = this.select(sql, variables);
@@ -620,13 +742,21 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method that returns list of study subjects by subjectId.
+	 * 
+	 * @param subjectId
+	 *            subject id
+	 * @return ArrayList list of study subjects
+	 */
 	public ArrayList findAllBySubjectId(int subjectId) {
 		ArrayList answer = new ArrayList();
 
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, subjectId);
+		int index = 1;
+		variables.put(index, subjectId);
 
 		String sql = digester.getQuery("findAllBySubjectId");
 		ArrayList alist = this.select(sql, variables);
@@ -639,14 +769,26 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method that returns study subject by label, studyId and studySubjectId.
+	 * 
+	 * @param label
+	 *            study subject label
+	 * @param studyId
+	 *            study id
+	 * @param studySubjectId
+	 *            study subject id
+	 * @return EntityBean study subject bean
+	 */
 	public EntityBean findAnotherBySameLabel(String label, int studyId, int studySubjectId) {
 		StudySubjectBean eb = new StudySubjectBean();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, label);
-		variables.put(2, studyId);
-		variables.put(3, studySubjectId);
+		int index = 1;
+		variables.put(index++, label);
+		variables.put(index++, studyId);
+		variables.put(index, studySubjectId);
 
 		String sql = digester.getQuery("findAnotherBySameLabel");
 		ArrayList alist = this.select(sql, variables);
@@ -659,14 +801,26 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * Method that returns study subject in sites by label, studyId and studySubjectId.
+	 * 
+	 * @param label
+	 *            study subject label
+	 * @param studyId
+	 *            study id
+	 * @param studySubjectId
+	 *            study subject id
+	 * @return EntityBean study subject bean
+	 */
 	public EntityBean findAnotherBySameLabelInSites(String label, int studyId, int studySubjectId) {
 		StudySubjectBean eb = new StudySubjectBean();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, label);
-		variables.put(2, studyId);
-		variables.put(3, studySubjectId);
+		int index = 1;
+		variables.put(index++, label);
+		variables.put(index++, studyId);
+		variables.put(index, studySubjectId);
 
 		String sql = digester.getQuery("findAnotherBySameLabelInSites");
 		ArrayList alist = this.select(sql, variables);
@@ -679,12 +833,20 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
-	public EntityBean findByPK(int ID) {
+	/**
+	 * Method that returns study subject by id.
+	 * 
+	 * @param id
+	 *            study subject id
+	 * @return EntityBean study subject bean
+	 */
+	public EntityBean findByPK(int id) {
 		StudySubjectBean eb = new StudySubjectBean();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, ID);
+		int index = 1;
+		variables.put(index, id);
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList alist = this.select(sql, variables);
@@ -697,14 +859,24 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * Method that returns study subject by label and study.
+	 * 
+	 * @param label
+	 *            study subject label
+	 * @param study
+	 *            study bean
+	 * @return StudySubjectBean study subject bean
+	 */
 	public StudySubjectBean findByLabelAndStudy(String label, StudyBean study) {
 		StudySubjectBean answer = new StudySubjectBean();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, label);
-		variables.put(2, study.getId());
-		variables.put(3, study.getId());
+		int index = 1;
+		variables.put(index++, label);
+		variables.put(index++, study.getId());
+		variables.put(index, study.getId());
 
 		String sql = digester.getQuery("findByLabelAndStudy");
 
@@ -719,25 +891,26 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Finds a study subject which has the same label provided in the same study
+	 * Method that returns study subject by label and studyId.
 	 * 
 	 * @param label
-	 *            String
+	 *            study subject label
 	 * @param studyId
-	 *            int
+	 *            study id
 	 * @param id
-	 *            int
-	 * @return StudySubjectBean
+	 *            id (it equals to zero. so it's not used)
+	 * @return StudySubjectBean study subject bean
 	 */
 	public StudySubjectBean findSameByLabelAndStudy(String label, int studyId, int id) {
 		StudySubjectBean answer = new StudySubjectBean();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, label);
-		variables.put(2, studyId);
-		variables.put(3, studyId);
-		variables.put(4, id);
+		int index = 1;
+		variables.put(index++, label);
+		variables.put(index++, studyId);
+		variables.put(index++, studyId);
+		variables.put(index, id);
 
 		String sql = digester.getQuery("findSameByLabelAndStudy");
 
@@ -752,7 +925,12 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * @deprecated Creates a new studysubject
+	 * Method that creates a new study subject.
+	 * 
+	 * @param eb
+	 *            EntityBean
+	 * @return EntityBean
+	 * @deprecated Creates a new study subject
 	 */
 	@Deprecated
 	public EntityBean create(EntityBean eb) {
@@ -803,7 +981,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	 *            The study subject to create.
 	 * @param withGroup
 	 *            <code>true</code> if the group id has been set (primarily for use with genetic studies);
-	 *            <code>false</false> otherwise.
+	 *            <code>false</code> otherwise.
 	 * @return The study subject with id set to the insert id if the operation was successful, or 0 otherwise.
 	 */
 	public StudySubjectBean create(StudySubjectBean sb, boolean withGroup) {
@@ -858,16 +1036,34 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return sb;
 	}
 
+	/**
+	 * Method that creates a study subject with group.
+	 * 
+	 * @param sb
+	 *            StudySubjectBean
+	 * @return String study subject oid
+	 */
 	public StudySubjectBean createWithGroup(StudySubjectBean sb) {
 		return create(sb, true);
 	}
 
+	/**
+	 * Method that creates a study subject without group.
+	 * 
+	 * @param sb
+	 *            StudySubjectBean
+	 * @return String study subject oid
+	 */
 	public StudySubjectBean createWithoutGroup(StudySubjectBean sb) {
 		return create(sb, false);
 	}
 
 	/**
-	 * Creates a valid OID for the StudySubject
+	 * Method that returns study subject oid by StudySubjectBean.
+	 * 
+	 * @param ssb
+	 *            StudySubjectBean
+	 * @return String study subject oid
 	 */
 	private String getOid(StudySubjectBean ssb) {
 
@@ -892,14 +1088,24 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
 	}
 
+	/**
+	 * Method that return study subject by oid and studyId.
+	 * 
+	 * @param oid
+	 *            study subject by oid
+	 * @param studyId
+	 *            study id
+	 * @return StudySubjectBean study subject bean
+	 */
 	public StudySubjectBean findByOidAndStudy(String oid, int studyId) {
 		StudySubjectBean studySubjectBean;
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, oid);
-		variables.put(2, studyId);
-		variables.put(3, studyId);
+		int index = 1;
+		variables.put(index++, oid);
+		variables.put(index++, studyId);
+		variables.put(index, studyId);
 		String sql = digester.getQuery("findByOidAndStudy");
 
 		ArrayList rows = this.select(sql, variables);
@@ -913,12 +1119,20 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that return study subject by oid.
+	 * 
+	 * @param oid
+	 *            study subject by oid
+	 * @return StudySubjectBean study subject bean
+	 */
 	public StudySubjectBean findByOid(String oid) {
 		StudySubjectBean studySubjectBean;
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, oid);
+		int index = 1;
+		variables.put(index, oid);
 		String sql = digester.getQuery("findByOid");
 
 		ArrayList rows = this.select(sql, variables);
@@ -931,33 +1145,50 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that returns list of study subjects by currentStudy, FindSubjectsFilter, FindSubjectsSort, rowStart and
+	 * rowEnd.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            FindSubjectsFilter
+	 * @param sort
+	 *            FindSubjectsSort
+	 * @param rowStart
+	 *            rowStart
+	 * @param rowEnd
+	 *            rowEnd
+	 * @return Integer count of the study subjects
+	 */
 	public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, FindSubjectsFilter filter,
 			FindSubjectsSort sort, int rowStart, int rowEnd) {
 		ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
 		setTypesExpected();
 		String partialSql;
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
+		int index = 1;
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
 		String sql = digester.getQuery("getWithFilterAndSort");
 		sql = sql + filter.execute("");
 		// Order by Clause for the defect id 0005480
 
 		partialSql = sort.execute("");
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
-			if (partialSql.equals(""))
+			if (partialSql.equals("")) {
 				sql += " ORDER BY SS.label )x)where r between " + (rowStart + 1) + " and " + rowEnd;
-			else
+			} else {
 				sql += ")x)where r between " + (rowStart + 1) + " and " + rowEnd;
-
+			}
 			sql = sql + partialSql;
 		} else {
-
 			sql = sql + partialSql;
-			if (partialSql.equals(""))
+			if (partialSql.equals("")) {
 				sql = sql + "  ORDER BY SS.label LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
-			else
+			} else {
 				sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+			}
 		}
 
 		ArrayList rows = this.select(sql, variables);
@@ -969,11 +1200,19 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return studySubjects;
 	}
 
+	/**
+	 * Method that returns count of the study subjects by study / site.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean (study or site)
+	 * @return Integer count of the study subjects
+	 */
 	public Integer getCountofStudySubjectsAtStudyOrSite(StudyBean currentStudy) {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
+		int index = 1;
+		variables.put(index, currentStudy.getId());
 		String sql = digester.getQuery("getCountofStudySubjectsAtStudyOrSite");
 
 		ArrayList rows = this.select(sql, variables);
@@ -986,12 +1225,20 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
-	public Integer getCountofStudySubjectsAtStudy(StudyBean currentStudy) {
+	/**
+	 * Method that returns count of the study subjects by study.
+	 * 
+	 * @param study
+	 *            StudyBean
+	 * @return Integer count of the study subjects
+	 */
+	public Integer getCountofStudySubjectsAtStudy(StudyBean study) {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
+		int index = 1;
+		variables.put(index++, study.getId());
+		variables.put(index, study.getId());
 		String sql = digester.getQuery("getCountofStudySubjectsAtStudy");
 
 		ArrayList rows = this.select(sql, variables);
@@ -1004,12 +1251,20 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that returns count of the study subjects by currentStudy.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return Integer count of the study subjects
+	 */
 	public Integer getCountofStudySubjects(StudyBean currentStudy) {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
+		int index = 1;
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
 		String sql = digester.getQuery("getCountofStudySubjects");
 
 		ArrayList rows = this.select(sql, variables);
@@ -1022,13 +1277,23 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that returns count of the study subjects by currentStudy and status.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param status
+	 *            Status
+	 * @return Integer count of the study subjects
+	 */
 	public Integer getCountofStudySubjectsBasedOnStatus(StudyBean currentStudy, Status status) {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
-		variables.put(3, status.getId());
+		int index = 1;
+		variables.put(index++, currentStudy.getId());
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, status.getId());
 		String sql = digester.getQuery("getCountofStudySubjectsBasedOnStatus");
 
 		ArrayList rows = this.select(sql, variables);
@@ -1041,12 +1306,22 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that returns count of the study subjects by ListDiscNotesSubjectFilter and currentStudy.
+	 * 
+	 * @param filter
+	 *            ListDiscNotesSubjectFilter
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return Integer count of the study subjects
+	 */
 	public Integer getCountWithFilter(ListDiscNotesSubjectFilter filter, StudyBean currentStudy) {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
+		int index = 1;
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
 		String sql = digester.getQuery("getCountWithFilterListDiscNotes");
 		sql += filter.execute("");
 
@@ -1060,14 +1335,31 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that returns list of study subjects by currentStudy, ListDiscNotesSubjectFilter, ListDiscNotesSubjectSort,
+	 * rowStart and rowEnd.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListDiscNotesSubjectFilter
+	 * @param sort
+	 *            ListDiscNotesSubjectSort
+	 * @param rowStart
+	 *            rowStart
+	 * @param rowEnd
+	 *            rowEnd
+	 * @return Integer count of the study subjects
+	 */
 	public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, ListDiscNotesSubjectFilter filter,
 			ListDiscNotesSubjectSort sort, int rowStart, int rowEnd) {
 		ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
+		int index = 1;
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
 		String sql = digester.getQuery("getWithFilterAndSortListDiscNotes");
 		sql = sql + filter.execute("");
 
@@ -1088,12 +1380,22 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return studySubjects;
 	}
 
+	/**
+	 * Method that returns count of the study subjects by FindSubjectsFilter and currentStudy.
+	 * 
+	 * @param filter
+	 *            FindSubjectsFilter
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return Integer count of the study subjects
+	 */
 	public Integer getCountWithFilter(FindSubjectsFilter filter, StudyBean currentStudy) {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
+		int index = 1;
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
 		String sql = digester.getQuery("getCountWithFilter");
 		sql += filter.execute("");
 
@@ -1107,14 +1409,31 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that returns list of study subjects by currentStudy, StudyAuditLogFilter, StudyAuditLogSort, rowStart and
+	 * rowEnd.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            StudyAuditLogFilter
+	 * @param sort
+	 *            StudyAuditLogSort
+	 * @param rowStart
+	 *            rowStart
+	 * @param rowEnd
+	 *            rowEnd
+	 * @return Integer count of the study subjects
+	 */
 	public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, StudyAuditLogFilter filter,
 			StudyAuditLogSort sort, int rowStart, int rowEnd) {
 		ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
 		setTypesExpectedFilter();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
+		int index = 1;
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
 		String sql = digester.getQuery("getWithFilterAndSortAuditLog");
 		sql = sql + filter.execute("");
 
@@ -1136,12 +1455,22 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return studySubjects;
 	}
 
+	/**
+	 * Method that returns count of the study subjects by StudyAuditLogFilter and currentStudy.
+	 * 
+	 * @param filter
+	 *            StudyAuditLogFilter
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return Integer count of the study subjects
+	 */
 	public Integer getCountWithFilter(StudyAuditLogFilter filter, StudyBean currentStudy) {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
+		int index = 1;
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
 		String sql = digester.getQuery("getCountWithFilterAuditLog");
 		sql += filter.execute("");
 
@@ -1155,14 +1484,31 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that returns list of study subjects by currentStudy, ListEventsForSubjectFilter, ListEventsForSubjectSort,
+	 * rowStart and rowEnd.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListEventsForSubjectFilter
+	 * @param sort
+	 *            ListEventsForSubjectSort
+	 * @param rowStart
+	 *            rowStart
+	 * @param rowEnd
+	 *            rowEnd
+	 * @return Integer count of the study subjects
+	 */
 	public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, ListEventsForSubjectFilter filter,
 			ListEventsForSubjectSort sort, int rowStart, int rowEnd) {
 		ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
+		int index = 1;
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
 		String sql = digester.getQuery("getWithFilterAndSort");
 		sql = sql + filter.execute("");
 
@@ -1183,12 +1529,22 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return studySubjects;
 	}
 
+	/**
+	 * Method that returns count of the study subjects by ListEventsForSubjectFilter and currentStudy.
+	 * 
+	 * @param filter
+	 *            ListEventsForSubjectFilter
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return Integer count of the study subjects
+	 */
 	public Integer getCountWithFilter(ListEventsForSubjectFilter filter, StudyBean currentStudy) {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
+		int index = 1;
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
 		String sql = digester.getQuery("getCountWithFilter");
 		sql += filter.execute("");
 
@@ -1203,14 +1559,26 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Updates a StudySubject updated clinovo #121 - 12/19/2012
+	 * Method that updates a study subject item.
+	 * 
+	 * @param eb
+	 *            EntityBean
+	 * @return EntityBean
 	 */
 	public EntityBean update(EntityBean eb) {
 		Connection con = null;
 		return update(eb, null);
 	}
 
-	/* this function allows to run transactional updates for an action */
+	/**
+	 * Method that updates a study subject item. This method allows to run transactional updates for an action.
+	 * 
+	 * @param eb
+	 *            EntityBean
+	 * @param con
+	 *            Connection
+	 * @return EntityBean
+	 */
 	public EntityBean update(EntityBean eb, Connection con) {
 		StudySubjectBean sb = (StudySubjectBean) eb;
 		HashMap variables = new HashMap();
@@ -1276,15 +1644,51 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return sb;
 	}
 
+	/**
+	 * Method that returns collection of study subjects by currentUser, ationType, strOrderByColumn, blnAscendingSort
+	 * and strSearchPhrase.
+	 * 
+	 * @param objCurrentUser
+	 *            current user object
+	 * @param intActionType
+	 *            action type
+	 * @param strOrderByColumn
+	 *            order by column as string value
+	 * @param blnAscendingSort
+	 *            ascending sort as string value
+	 * @param strSearchPhrase
+	 *            string search phrase
+	 * @throws OpenClinicaException
+	 *             the custom OpenClinicaException
+	 * @return Collection collection of study subjects
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
-			boolean blnAscendingSort, String strSearchPhrase) {
+			boolean blnAscendingSort, String strSearchPhrase) throws OpenClinicaException {
 		return new ArrayList();
 	}
 
+	/**
+	 * Method that returns collection of study subjects by currentUser and ationType.
+	 * 
+	 * @param objCurrentUser
+	 *            current user object
+	 * @param intActionType
+	 *            action type
+	 * @return Collection collection of study subjects
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
 		return new ArrayList();
 	}
 
+	/**
+	 * Method that returns the study subject by subjectId and study.
+	 * 
+	 * @param subjectId
+	 *            subject id
+	 * @param study
+	 *            StudyBean
+	 * @return StudySubjectBean study subject bean
+	 */
 	public StudySubjectBean findBySubjectIdAndStudy(int subjectId, StudyBean study) {
 		StudySubjectBean answer = new StudySubjectBean();
 
@@ -1292,9 +1696,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, subjectId);
-		variables.put(2, study.getId());
-		variables.put(3, study.getId());
+		int index = 1;
+		variables.put(index++, subjectId);
+		variables.put(index++, study.getId());
+		variables.put(index, study.getId());
 
 		String sql = digester.getQuery("findBySubjectIdAndStudy");
 
@@ -1307,14 +1712,28 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
-	public ArrayList findAllByStudyId(int studyId) {
+	/**
+	 * Method that returns list of study subjects by studyId.
+	 * 
+	 * @param studyId
+	 *            study id
+	 * @return List<StudySubjectBean> list of study subjects
+	 */
+	public List<StudySubjectBean> findAllByStudyId(int studyId) {
 		return findAllByStudyIdAndLimit(studyId, false);
 	}
 
-	public ArrayList findAllWithAllStatesByStudyId(int studyId) {
-		ArrayList answer = new ArrayList();
+	/**
+	 * Method that returns list of study subjects by studyId.
+	 * 
+	 * @param studyId
+	 *            study id
+	 * @return List<StudySubjectBean> list of study subjects
+	 */
+	public List<StudySubjectBean> findAllWithAllStatesByStudyId(int studyId) {
+		List<StudySubjectBean> answer = new ArrayList();
 
-		this.setTypesExpected();
+		this.unsetTypeExpected();
 		int ind = 1;
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // unique_identifier
@@ -1344,15 +1763,20 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // update_id
 		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // secondary_label
+		ind++; // oc_oid
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // dynamic_group_class_id
+		this.setTypeExpected(ind, TypeNames.DATE);
+		ind++; // randomization_date
+		this.setTypeExpected(ind, TypeNames.STRING);
+		ind++; // randomization_result
 		this.setTypeExpected(ind, TypeNames.STRING);
 		// studyName
 
 		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		variables.put(2, studyId);
+		int index = 1;
+		variables.put(index++, studyId);
+		variables.put(index, studyId);
 
 		String sql = digester.getQuery("findAllWithAllStatesByStudyId");
 
@@ -1384,10 +1808,19 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
-	public ArrayList findAllByStudyIdAndLimit(int studyId, boolean isLimited) {
-		ArrayList answer = new ArrayList();
+	/**
+	 * Method that returns list of study subjects by studyId and isLimited.
+	 * 
+	 * @param studyId
+	 *            study id
+	 * @param isLimited
+	 *            parameter that limits the records amount to 5
+	 * @return List<StudySubjectBean> list of study subjects
+	 */
+	public List<StudySubjectBean> findAllByStudyIdAndLimit(int studyId, boolean isLimited) {
+		List<StudySubjectBean> answer = new ArrayList();
 
-		this.setTypesExpected();
+		this.unsetTypeExpected();
 		int ind = 1;
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // unique_identifier
@@ -1417,15 +1850,20 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // update_id
 		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // secondary_label
+		ind++; // oc_oid
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // dynamic_group_class_id
+		this.setTypeExpected(ind, TypeNames.DATE);
+		ind++; // randomization_date
+		this.setTypeExpected(ind, TypeNames.STRING);
+		ind++; // randomization_result
 		this.setTypeExpected(ind, TypeNames.STRING);
 		// studyName
 
 		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		variables.put(2, studyId);
+		int index = 1;
+		variables.put(index++, studyId);
+		variables.put(index, studyId);
 
 		String sql;
 		if (isLimited) {
@@ -1461,6 +1899,13 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method that returns the study subject ids as string by study id.
+	 * 
+	 * @param studyIds
+	 *            study ids as string
+	 * @return String study subject ids
+	 */
 	public String findStudySubjectIdsByStudyIds(String studyIds) {
 		String studySubjectIds = "";
 		this.unsetTypeExpected();
@@ -1476,7 +1921,14 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return studySubjectIds;
 	}
 
-	public String findNextLabel(String SiteId) {
+	/**
+	 * Method that returns the next study subject label.
+	 * 
+	 * @param siteId
+	 *            site id
+	 * @return String study subject label
+	 */
+	public String findNextLabel(String siteId) {
 		this.setTypesExpected();
 		String sql = digester.getQuery("findAll");
 		ArrayList alist = this.select(sql);
@@ -1493,7 +1945,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 			String currentLabel = sb.getLabel();
 			int delimiterposition = currentLabel.lastIndexOf('-');
 			if (delimiterposition > 0) {
-				if (currentLabel.substring(0, delimiterposition).equals(SiteId)) {
+				if (currentLabel.substring(0, delimiterposition).equals(siteId)) {
 					int labelInt;
 					try {
 						labelInt = Integer.parseInt(currentLabel.substring(currentLabel.lastIndexOf('-') + 1));
@@ -1508,14 +1960,17 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 		greatestNum += 1;
 
+		final int ten = 10;
+		final int oneHundred = 10;
+
 		String numericLabel;
-		if (greatestNum < 10) {
+		if (greatestNum < ten) {
 			numericLabel = "00" + greatestNum;
-		} else if (greatestNum < 100) {
+		} else if (greatestNum < oneHundred) {
 			numericLabel = "0" + greatestNum;
 		} else {
 			numericLabel = Integer.toString(greatestNum);
 		}
-		return SiteId + "-" + numericLabel;
+		return siteId + "-" + numericLabel;
 	}
 }
