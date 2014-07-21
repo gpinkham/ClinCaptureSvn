@@ -52,9 +52,9 @@
 				<input type="hidden" name="studyId" value="<c:out value="${newStudy.id}"/>">
 				<p><fmt:message key="you_choose_to_reassign_subject2" bundle="${restext}"/> <b><c:out value="${subject.uniqueIdentifier}"/></b> <fmt:message key="to_study" bundle="${restext}"/>  <b><c:out value="${newStudy.name}"/></b>.</p>
 				<br>
-				<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+				<input type="button" name="BTN_Back" id="GoToPreviousPage"
 						value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"
-						onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+						onClick="javascript: window.location = 'ReassignStudySubject?id=<c:out value="${studySub.id}"/>&studyId=${newStudy.id}&action=back'" />
 				<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
 			</form>
 		</td>

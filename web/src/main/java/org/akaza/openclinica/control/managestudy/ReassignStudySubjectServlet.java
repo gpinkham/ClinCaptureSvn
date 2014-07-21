@@ -102,27 +102,8 @@ public class ReassignStudySubjectServlet extends Controller {
 			SubjectBean subject = (SubjectBean) subdao.findByPK(subjectId);
 			request.setAttribute("subject", subject);
 
-			SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(getDataSource());
-			ArrayList<SubjectGroupMapBean> groupMaps = (ArrayList<SubjectGroupMapBean>) sgmdao
-					.findAllByStudySubject(studySubId);
-
+			DisplayStudyBean displayStudy = getDisplayStudy(sdao, studySub);
 			if (StringUtil.isBlank(action)) {
-				ArrayList studies;
-				DisplayStudyBean displayStudy = new DisplayStudyBean();
-				StudyBean study = (StudyBean) sdao.findByPK(studySub.getStudyId());
-				if (study.getParentStudyId() > 0) {// current in site
-					studies = (ArrayList) sdao.findAllByParent(study.getParentStudyId());
-					StudyBean parent = (StudyBean) sdao.findByPK(study.getParentStudyId());
-					displayStudy.setParent(parent);
-					// studies.add(parent);
-					displayStudy.setChildren(studies);
-				} else {
-					studies = (ArrayList) sdao.findAllByParent(study.getId());
-					displayStudy.setParent(study);
-					displayStudy.setChildren(studies);
-					// studies.add(study);
-				}
-				// request.setAttribute("studies", studies);
 				request.setAttribute("displayStudy", displayStudy);
 				forwardPage(Page.REASSIGN_STUDY_SUBJECT, request, response);
 			} else {
@@ -133,6 +114,7 @@ public class ReassignStudySubjectServlet extends Controller {
 					return;
 				}
 				StudyBean st = (StudyBean) sdao.findByPK(studyId);
+
 				if ("confirm".equalsIgnoreCase(action)) {
 					StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(studySub.getLabel(),
 							studyId, studySub.getId());
@@ -141,40 +123,69 @@ public class ReassignStudySubjectServlet extends Controller {
 						forwardPage(Page.REASSIGN_STUDY_SUBJECT, request, response);
 						return;
 					}
-					// YW << comment out this message
-					// if (groupMaps.size() > 0) {
-					// addPageMessage("Warning: This subject has Group data
-					// assoicated with current study,"
-					// + "the group data will be lost if it is reassigned to
-					// another study.");
-					// }
-					// YW >>
 
 					request.setAttribute("newStudy", st);
 					forwardPage(Page.REASSIGN_STUDY_SUBJECT_CONFIRM, request, response);
-				} else {
-					logger.info("submit to reassign the subject");
-					studySub.setUpdatedDate(new Date());
-					studySub.setUpdater(ub);
+				} else if ("back".equalsIgnoreCase(action)) {
+					request.setAttribute("displayStudy", displayStudy);
 					studySub.setStudyId(studyId);
-					ssdao.update(studySub);
-
-					for (SubjectGroupMapBean sgm : groupMaps) {
-						sgm.setUpdatedDate(new Date());
-						sgm.setUpdater(ub);
-						sgm.setStatus(Status.DELETED);
-						sgmdao.update(sgm);
-					}
-					MessageFormat mf = new MessageFormat("");
-					mf.applyPattern(respage.getString("subject_reassigned"));
-					Object[] arguments = { studySub.getLabel(), st.getName() };
-					addPageMessage(mf.format(arguments), request);
+					request.setAttribute("studySub", studySub);
+					forwardPage(Page.REASSIGN_STUDY_SUBJECT, request, response);
+				} else {
+					addPageMessage(checkAndUpdateSubject(studyId, studySub, displayStudy, ub, ssdao, st), request);
 					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
-
 				}
-
 			}
 		}
 	}
 
+	private DisplayStudyBean getDisplayStudy(StudyDAO sdao, StudySubjectBean studySub) {
+		ArrayList studies;
+		DisplayStudyBean displayStudy = new DisplayStudyBean();
+		StudyBean study = (StudyBean) sdao.findByPK(studySub.getStudyId());
+		if (study.getParentStudyId() > 0) {// current in site
+			studies = (ArrayList) sdao.findAllByParent(study.getParentStudyId());
+			StudyBean parent = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			displayStudy.setParent(parent);
+			displayStudy.setChildren(studies);
+		} else {
+			studies = (ArrayList) sdao.findAllByParent(study.getId());
+			displayStudy.setParent(study);
+			displayStudy.setChildren(studies);
+		}
+		return displayStudy;
+	}
+
+	private String checkAndUpdateSubject(int newStudyId, StudySubjectBean studySub, DisplayStudyBean displayStudy,
+			UserAccountBean ub, StudySubjectDAO ssdao, StudyBean st) {
+		SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(getDataSource());
+		ArrayList<SubjectGroupMapBean> groupMaps = (ArrayList<SubjectGroupMapBean>) sgmdao
+				.findAllByStudySubject(studySub.getId());
+		MessageFormat mf = new MessageFormat("");
+		for (StudyBean study : (ArrayList<StudyBean>) displayStudy.getChildren()) {
+			if (study.getId() == newStudyId) {
+				logger.info("submit to reassign the subject");
+				studySub.setUpdatedDate(new Date());
+				studySub.setUpdater(ub);
+				studySub.setStudyId(newStudyId);
+				ssdao.update(studySub);
+
+				for (SubjectGroupMapBean sgm : groupMaps) {
+					sgm.setUpdatedDate(new Date());
+					sgm.setUpdater(ub);
+					sgm.setStatus(Status.DELETED);
+					sgmdao.update(sgm);
+				}
+
+				mf.applyPattern(respage.getString("subject_reassigned"));
+				Object[] arguments = { studySub.getLabel(), st.getName() };
+
+				return mf.format(arguments);
+			}
+		}
+		mf.applyPattern(respage.getString("subject_not_reassigned"));
+		Object[] arguments = { studySub.getLabel() };
+
+		return mf.format(arguments);
+	}
 }
