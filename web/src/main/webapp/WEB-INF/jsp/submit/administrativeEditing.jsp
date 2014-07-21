@@ -168,6 +168,10 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 	<input type="hidden" name="userPhone" value="${userBean.phone}"/>
 	<!-- /Interviewer information -->
 </c:if>
+<!-- Messages -->
+<input type="hidden" name="randDataEntryStepMessage" value='<fmt:message key="randomization_des_message" bundle="${restext}"/>'/>
+<!-- /Messages -->
+
 <script type="text/javascript" language="JavaScript">
     // <![CDATA[
     function getSib(theSibling){

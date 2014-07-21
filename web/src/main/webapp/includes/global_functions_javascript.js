@@ -2398,6 +2398,15 @@ function randomizeSubject() {
 	var resultInputId = $("#Rand_Result").find(":input").attr("id").replace('input','');
 	var eligibility = null;
 
+	// Check if the data entry step is IDE
+	if($("form[id=mainForm]").attr("action") !== "InitialDataEntry") {
+ 
+		alertDialog({ message: $("input:hidden[name='randDataEntryStepMessage']").val(), height: 150, width: 500 });
+		$("input[type='submit']").removeAttr("disabled");
+		
+		return false;
+	}
+
 	// Check if the subject eligibility is defined
 	if($("#Rand_Eligibility :radio").size() > 0) {
 
