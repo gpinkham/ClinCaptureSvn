@@ -221,7 +221,7 @@ $(document).ready(function() {
   		</c:otherwise>
   		</c:choose>
   		<c:choose>
-  		<c:when test="${referenceVisitAlredyExist == 'true'}">
+  		<c:when test="${referenceVisitAlreadyExist == 'true'}">
   		<span class="alert"><fmt:message key="reference_visit_already_exist" bundle="${resword}"/></span>
   		</c:when>
   		</c:choose></td>

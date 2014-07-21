@@ -151,6 +151,13 @@
 							</td>
 						</tr>
 
+                        <tr>
+                            <td class="table_cell" colspan="4">
+                                <fmt:message key="evaluated_crf" bundle="${resword}"/>:
+                                <input type="checkbox" onchange="javascript:changeIcon();" name="evaluatedCRF<c:out value="${count}"/>" value="yes">
+                            </td>
+                        </tr>
+
                         <tr valign="top">
                             <td class="table_header_column" colspan="4"><fmt:message key="choose_null_values"  bundle="${resword}"/> (<a href="<fmt:message key="nullValue" bundle="${resformat}"/>" target="def_win" onClick="openDefWindow('<fmt:message key="nullValue" bundle="${resformat}"/>'); return false;"><fmt:message key="what_is_null_value"  bundle="${resword}"/></a>)</td>
                         </tr>

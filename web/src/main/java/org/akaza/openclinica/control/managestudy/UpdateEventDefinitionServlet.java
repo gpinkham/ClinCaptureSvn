@@ -72,12 +72,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class UpdateEventDefinitionServlet extends Controller {
 
-	/**
-     * 
-     */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -85,8 +81,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(
-				respage.getString("no_have_permission_to_update_study_event_definition") + "<br>"
+		addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition") + "<br>"
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
@@ -107,8 +102,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 			} else if ("addCrfs".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute(
-						"definition");
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 				saveEventDefinitionToSession(sed, fp);
 				saveEventDefinitionCRFsToSession(fp);
 				response.sendRedirect(request.getContextPath() + "/AddCRFToDefinition");
@@ -121,10 +115,6 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 	}
 
-	/**
-	 * 
-	 * @throws Exception
-	 */
 	private void confirmDefinition(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
@@ -132,13 +122,10 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 		v.addValidation("name", Validator.NO_BLANKS);
-		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				2000);
-		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-		// Clinovo start
+		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+
 		String calendaredVisitType = fp.getString("type");
 		if ("calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
 			v.addValidation("maxDay", Validator.IS_REQUIRED);
@@ -163,7 +150,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 				request.getSession().setAttribute("changedReference", false);
 			}
 		}
-		//
+
 		int minDay = fp.getInt("minDay");
 		int maxDay = fp.getInt("maxDay");
 		int schDay = fp.getInt("schDay");
@@ -211,21 +198,14 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 		} else {
 			logger.info("no errors");
-			// request will show values for error messages instead of session for sed
-			// Clinovo start
 			saveEventDefinitionToSession(sed, fp);
-
 		}
-		// end
+
 		saveEventDefinitionCRFsToSession(fp);
 
 		forwardPage(Page.UPDATE_EVENT_DEFINITION_CONFIRM, request, response);
 	}
 
-	/**
-	 * Updates the definition
-	 * 
-	 */
 	private void submitDefinition(HttpServletRequest request, HttpServletResponse response) {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -258,7 +238,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 		for (Object edc1 : edcs) {
 			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edc1;
-			if (edc.getId() > 0) {// need to do update
+			if (edc.getId() > 0) {
 				edc.setUpdater(ub);
 				edc.setUpdatedDate(new Date());
 				logger.info("Status:" + edc.getStatus().getName());
@@ -273,7 +253,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 					restoreAllEventsItems(request, edc, sed);
 				}
 
-			} else { // to insert
+			} else {
 				edc.setOwner(ub);
 				edc.setCreatedDate(new Date());
 				edc.setStatus(Status.AVAILABLE);
@@ -281,7 +261,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 			}
 		}
-		//Update child edcs
+
 		updateChildEdcs(request, childEdcs, ub, cdao, currentStudy, sed);
 
 		ArrayList<StudyEventBean> studyEventList = (ArrayList<StudyEventBean>) sedao
@@ -293,17 +273,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"), request);
 		forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 	}
-	
-	/***
-	 * Update child event definition crfs
-	 * @param request
-	 * @param childEdcs
-	 * @param ub
-	 * @param cdao
-	 * @param currentStudy
-	 * @param sed
-	 */
-	private void updateChildEdcs(HttpServletRequest request, ArrayList childEdcs, UserAccountBean ub, EventDefinitionCRFDAO cdao, 
+
+	private void updateChildEdcs(HttpServletRequest request, ArrayList childEdcs, UserAccountBean ub, EventDefinitionCRFDAO cdao,
 			StudyBean currentStudy, StudyEventDefinitionBean sed) {
 		for (Object childEdc1 : childEdcs) {
 			EventDefinitionCRFBean childEdc = (EventDefinitionCRFBean) childEdc1;
@@ -322,17 +293,15 @@ public class UpdateEventDefinitionServlet extends Controller {
 		}
 	}
 
-	public void removeAllEventsItems(StudyBean currentStudy, UserAccountBean ub, EventDefinitionCRFBean edc,
-			StudyEventDefinitionBean sed) {
+	public void removeAllEventsItems(StudyBean currentStudy, UserAccountBean ub, EventDefinitionCRFBean edc, StudyEventDefinitionBean sed) {
 		StudyEventDAO seDao = new StudyEventDAO(getDataSource());
 		EventCRFDAO ecrfDao = new EventCRFDAO(getDataSource());
 		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
 
-		// Getting Study Events
 		ArrayList seList = seDao.findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), edc.getCrf().getOid());
 		for (Object aSeList : seList) {
 			StudyEventBean seBean = (StudyEventBean) aSeList;
-			// Getting Event CRFs
+
 			ArrayList ecrfList = ecrfDao.findAllByStudyEventAndCrfOrCrfVersionOid(seBean, edc.getCrf().getOid());
 			for (Object anEcrfList : ecrfList) {
 				EventCRFBean ecrfBean = (EventCRFBean) anEcrfList;
@@ -341,7 +310,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 				ecrfBean.setUpdater(ub);
 				ecrfBean.setUpdatedDate(new Date());
 				ecrfDao.update(ecrfBean);
-				// Getting Item Data
+
 				ArrayList itemData = iddao.findAllByEventCRFId(ecrfBean.getId());
 				// remove all the item data
 				for (Object anItemData : itemData) {
@@ -396,11 +365,10 @@ public class UpdateEventDefinitionServlet extends Controller {
 		EventCRFDAO ecrfDao = getEventCRFDAO();
 		ItemDataDAO iddao = getItemDataDAO();
 
-		// All Study Events
 		ArrayList seList = seDao.findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), edc.getCrf().getOid());
 		for (Object aSeList : seList) {
 			StudyEventBean seBean = (StudyEventBean) aSeList;
-			// All Event CRFs
+
 			ArrayList ecrfList = ecrfDao.findAllByStudyEventAndCrfOrCrfVersionOid(seBean, edc.getCrf().getOid());
 			for (Object anEcrfList : ecrfList) {
 				EventCRFBean ecrfBean = (EventCRFBean) anEcrfList;
@@ -408,9 +376,9 @@ public class UpdateEventDefinitionServlet extends Controller {
 				ecrfBean.setUpdater(ub);
 				ecrfBean.setUpdatedDate(new Date());
 				ecrfDao.update(ecrfBean);
-				// All Item Data
+
 				ArrayList itemData = iddao.findAllByEventCRFId(ecrfBean.getId());
-				// remove all the item data
+
 				for (Object anItemData : itemData) {
 					ItemDataBean item = (ItemDataBean) anItemData;
 					if (item.getStatus().equals(Status.DELETED) || item.getStatus().equals(Status.AUTO_DELETED)) {
@@ -422,7 +390,6 @@ public class UpdateEventDefinitionServlet extends Controller {
 				}
 			}
 		}
-
 	}
 
 	private void checkReferenceVisit(HttpServletRequest request) {
@@ -431,7 +398,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 		for (StudyEventDefinitionBean studyEventDefinition : definitions) {
 			if (studyEventDefinition.getReferenceVisit()) {
 				logger.trace("Reference visit already exist");
-				request.getSession().setAttribute("referenceVisitAlredyExist", true);
+				request.getSession().setAttribute("referenceVisitAlreadyExist", true);
 				break;
 			}
 		}
@@ -463,7 +430,6 @@ public class UpdateEventDefinitionServlet extends Controller {
 		for (int i = 0; i < edcs.size(); i++) {
 			EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.get(i);
 			if (!edcBean.getStatus().equals(Status.DELETED) && !edcBean.getStatus().equals(Status.AUTO_DELETED)) {
-				// only get inputs from web page if AVAILABLE
 				int defaultVersionId = fp.getInt("defaultVersionId" + i);
 				edcBean.setDefaultVersionId(defaultVersionId);
 				CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
@@ -477,13 +443,13 @@ public class UpdateEventDefinitionServlet extends Controller {
 				int sdvId = fp.getInt("sdvOption" + i);
 				String emailStep = fp.getString("emailOnStep" + i);
 				String emailTo = fp.getString("mailTo" + i);
+				String evaluatedCrf = fp.getString("evaluatedCRF" + i);
 
 				if (!StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim())) {
 					edcBean.setHideCrf(true);
 				} else {
 					edcBean.setHideCrf(false);
 				}
-
 				if (!StringUtil.isBlank(requiredCRF) && "yes".equalsIgnoreCase(requiredCRF.trim())) {
 					edcBean.setRequiredCRF(true);
 				} else {
@@ -506,6 +472,12 @@ public class UpdateEventDefinitionServlet extends Controller {
 					edcBean.setDecisionCondition(true);
 				} else {
 					edcBean.setDecisionCondition(false);
+				}
+
+				if (!StringUtil.isBlank(evaluatedCrf) && "yes".equalsIgnoreCase(evaluatedCrf.trim())) {
+					edcBean.setEvaluatedCRF(true);
+				} else {
+					edcBean.setEvaluatedCRF(false);
 				}
 
 				String nullString = "";

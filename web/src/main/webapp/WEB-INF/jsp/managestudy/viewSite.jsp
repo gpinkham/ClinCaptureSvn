@@ -490,6 +490,7 @@
 		<td valign="top" class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
 		<td valign="top" class="table_header_row"><fmt:message key="send_email_on" bundle="${resword}"/></td>
 		<td valign="top" class="table_header_row"><fmt:message key="email_crf_to" bundle="${resword}"/></td>
+        <td valign="top" class="table_header_row"><fmt:message key="evaluated_crf" bundle="${resword}"/></td>
 		<td valign="top" class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>
 	</tr>
 
@@ -576,6 +577,17 @@
 		<td class="table_cell">
 			<c:out value="${crf.emailTo}"/>&nbsp;
 		</td>
+
+        <td class="table_cell">
+            <c:choose>
+                <c:when test="${crf.evaluatedCRF == true}">
+                    <fmt:message key="yes" bundle="${resword}"/>
+                </c:when>
+                <c:otherwise>
+                    <fmt:message key="no" bundle="${resword}"/>
+                </c:otherwise>
+            </c:choose>
+        </td>
 
 		<td class="table_cell">
 			<table border="0" cellpadding="0" cellspacing="0">

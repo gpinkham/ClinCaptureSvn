@@ -95,6 +95,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		this.setTypeExpected(21, TypeNames.INT); // parent_id
 		this.setTypeExpected(22, TypeNames.STRING); // email_step
 		this.setTypeExpected(23, TypeNames.STRING); // email_to
+		this.setTypeExpected(24, TypeNames.BOOL); //evaluated_crf
 	}
 
 	/**
@@ -134,6 +135,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		eb.setEmailTo(emailTo != null ? emailTo : "");
 		String emailStep = (String) hm.get("email_step");
 		eb.setEmailStep(emailStep != null ? emailStep : "");
+		eb.setEvaluatedCRF(((Boolean) hm.get("evaluated_crf")));
 		return eb;
 	}
 
@@ -305,12 +307,12 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		return eb;
 	}
 	
-	public EntityBean findByPK(int ID) {
+	public EntityBean findByPK(int id) {
 		EventDefinitionCRFBean eb = new EventDefinitionCRFBean();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(ID));
+		variables.put(new Integer(1), new Integer(id));
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList alist = this.select(sql, variables);
@@ -365,6 +367,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		}
 		variables.put(new Integer(19), new String(sb.getEmailStep()));
 		variables.put(new Integer(20), new String(sb.getEmailTo()));
+		variables.put(new Integer(21), new Boolean(sb.isEvaluatedCRF()));
 		this.execute(digester.getQuery("create"), variables, nullVars);
 
 		if (isQuerySuccessful()) {
@@ -399,7 +402,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		variables.put(new Integer(8), sb.getNullValues());
 		variables.put(new Integer(9), new Integer(sb.getDefaultVersionId()));
 		variables.put(new Integer(10), new Integer(sb.getStatus().getId()));
-		variables.put(new Integer(11), new java.util.Date());// DATE_Updated
+		variables.put(new Integer(11), new java.util.Date()); // DATE_Updated
 		variables.put(new Integer(12), new Integer(sb.getUpdater().getId()));
 		variables.put(new Integer(13), new Integer(sb.getOrdinal()));
 		variables.put(new Integer(14), new Boolean(sb.isElectronicSignature()));
@@ -412,10 +415,10 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		} else {
 			variables.put(new Integer(18), new Integer(sb.getParentId()));
 		}
-		variables.put(new Integer (19), new String(sb.getEmailStep()));
-		variables.put(new Integer (20), new String(sb.getEmailTo()));
-		variables.put(new Integer(21), new Integer(sb.getId()));
-
+		variables.put(new Integer(19), new String(sb.getEmailStep()));
+		variables.put(new Integer(20), new String(sb.getEmailTo()));
+		variables.put(new Integer(21), new Boolean(sb.isEvaluatedCRF()));
+		variables.put(new Integer(22), new Integer(sb.getId()));
 
 		String sql = digester.getQuery("update");
 		this.execute(sql, variables, nullVars);
@@ -496,8 +499,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
-	public Collection findAllByEventDefinitionIdAndSiteIdAndParentStudyId(int definitionId, int siteId,
-			int parentStudyId) {
+	public Collection findAllByEventDefinitionIdAndSiteIdAndParentStudyId(int definitionId, int siteId, int parentStudyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(definitionId));
@@ -556,8 +558,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
-	public Collection findAllActiveByEventDefinitionIdAndSiteIdAndParentStudyId(int definitionId, int siteId,
-			int parentStudyId) {
+	public Collection findAllActiveByEventDefinitionIdAndSiteIdAndParentStudyId(int definitionId, int siteId, int parentStudyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(definitionId));

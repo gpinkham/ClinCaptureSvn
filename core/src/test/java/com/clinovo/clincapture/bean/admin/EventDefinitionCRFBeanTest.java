@@ -17,7 +17,6 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,12 +28,9 @@ public class EventDefinitionCRFBeanTest {
 		edc = new EventDefinitionCRFBean();
 	}
 
-	@After
-	public void tearDown() throws Exception {
-	}
-
 	@Test
 	public void testAllDefaultValues() {
+
 		assertEquals(0, edc.getStudyEventDefinitionId());
 		assertEquals(false, edc.isHideCrf());
 		assertEquals(false, edc.isHidden());
@@ -48,6 +44,7 @@ public class EventDefinitionCRFBeanTest {
 		assertEquals("", edc.getSelectedVersionIds());
 		assertEquals("", edc.getEmailStep());
 		assertEquals("", edc.getEmailTo());
+		assertEquals(false, edc.isEvaluatedCRF());
 
 		assertNotNull(edc.getOwnerId());
 		assertNotNull(edc.getUpdaterId());

@@ -816,7 +816,18 @@
 				<span class="alert" style="display:none"><fmt:message key="enter_valid_email" bundle="${resnotes}"/></span>
 			</td>
 		</tr>
-
+        <tr>
+            <td class="table_cell" colspan="4"><fmt:message key="evaluated_crf" bundle="${resword}"/>:
+                <c:choose>
+                    <c:when test="${!edc.evaluatedCRF}">
+                        <input type="checkbox" disabled name="evaluatedCRF<c:out value="${num}"/>" value="yes">
+                    </c:when>
+                    <c:otherwise>
+                        <input checked="checked" disabled type="checkbox" name="evaluatedCRF<c:out value="${num}"/>" value="yes">
+                    </c:otherwise>
+                </c:choose>
+            </td>
+        </tr>
 		<c:set var="count" value="${count+1}"/>
 		</c:if>
 

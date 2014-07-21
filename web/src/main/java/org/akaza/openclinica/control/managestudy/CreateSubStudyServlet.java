@@ -14,6 +14,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -44,7 +45,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,29 +54,21 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * @author jxu
+ * The servlet for creating sub study of user's current active study
  * 
- *         Creates a sub study of user's current active study
- * 
- *         Modified by ywang: [10-10-2007], enable setting overidable study parameters of a sub study.
  */
 @SuppressWarnings({ "unchecked", "serial", "rawtypes" })
 @Component
 public class CreateSubStudyServlet extends Controller {
+
 	public static final String INPUT_VER_DATE = "protocolDateVerification";
 	public static final String INPUT_START_DATE = "startDate";
 	public static final String INPUT_END_DATE = "endDate";
+	public static final String YES = "yes";
 
-	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -83,12 +76,8 @@ public class CreateSubStudyServlet extends Controller {
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + "\n"
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET, resexception.getString("not_study_director"),
-				"1");
-
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + "\n" + respage.getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET, resexception.getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -101,7 +90,7 @@ public class CreateSubStudyServlet extends Controller {
 		String action = request.getParameter("action");
 		request.getSession().setAttribute("sdvOptions", this.setSDVOptions());
 
-		SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat localDf = getLocalDf(request);
 
 		if (StringUtil.isBlank(action)) {
 			if (currentStudy.getParentStudyId() > 0) {
@@ -150,8 +139,7 @@ public class CreateSubStudyServlet extends Controller {
 								scg.getValue().setValue(fp.getString("autoCreateSubjectDuringImport"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")) {
 								scg.getValue().setValue(fp.getString("allowSdvWithOpenQueries"));
-							} else if (scg.getParameter().getHandle()
-									.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("replaceExisitingDataDuringImport")) {
 								scg.getValue().setValue(fp.getString("replaceExisitingDataDuringImport"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowCodingVerification")) {
 								scg.getValue().setValue(fp.getString("allowCodingVerification"));
@@ -170,24 +158,7 @@ public class CreateSubStudyServlet extends Controller {
 				}
 				newStudy.setStudyParameters(configs);
 
-				try {
-					local_df.parse(fp.getString(INPUT_START_DATE));
-					fp.addPresetValue(INPUT_START_DATE, local_df.format(fp.getDate(INPUT_START_DATE)));
-				} catch (ParseException pe) {
-					fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
-				}
-				try {
-					local_df.parse(fp.getString(INPUT_END_DATE));
-					fp.addPresetValue(INPUT_END_DATE, local_df.format(fp.getDate(INPUT_END_DATE)));
-				} catch (ParseException pe) {
-					fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
-				}
-				try {
-					local_df.parse(fp.getString(INPUT_VER_DATE));
-					fp.addPresetValue(INPUT_VER_DATE, local_df.format(fp.getDate(INPUT_VER_DATE)));
-				} catch (ParseException pe) {
-					fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
-				}
+				addPresetValues(localDf, fp);
 				setPresetValues(fp.getPresetValues(), request);
 
 				request.getSession().setAttribute("newStudy", newStudy);
@@ -201,21 +172,21 @@ public class CreateSubStudyServlet extends Controller {
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
 				confirmStudy(request, response, errors);
-
 			} else if ("back".equalsIgnoreCase(action)) {
+
 				StudyBean newStudy = (StudyBean) request.getSession().getAttribute("newStudy");
 				try {
-					fp.addPresetValue(INPUT_START_DATE, local_df.format(newStudy.getDatePlannedEnd()));
+					fp.addPresetValue(INPUT_START_DATE, localDf.format(newStudy.getDatePlannedEnd()));
 				} catch (Exception pe) {
 					fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
 				}
 				try {
-					fp.addPresetValue(INPUT_END_DATE, local_df.format(newStudy.getDatePlannedStart()));
+					fp.addPresetValue(INPUT_END_DATE, localDf.format(newStudy.getDatePlannedStart()));
 				} catch (Exception pe) {
 					fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 				}
 				try {
-					fp.addPresetValue(INPUT_VER_DATE, local_df.format(newStudy.getProtocolDateVerification()));
+					fp.addPresetValue(INPUT_VER_DATE, localDf.format(newStudy.getProtocolDateVerification()));
 				} catch (Exception pe) {
 					fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
 				}
@@ -233,10 +204,16 @@ public class CreateSubStudyServlet extends Controller {
 	/**
 	 * Validates the first section of study and save it into study bean
 	 * 
-	 * @throws Exception
+	 * @param request
+	 *            the incoming request
+	 * @param response
+	 *            the response to redirect to
+	 * @param errors
+	 *            the map with previous action errors
+	 * @throws <code>Exception</code> for all exceptions
 	 */
-	private void confirmStudy(HttpServletRequest request, HttpServletResponse response, HashMap errors)
-			throws Exception {
+	private void confirmStudy(HttpServletRequest request, HttpServletResponse response, HashMap errors) throws Exception {
+
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
@@ -257,26 +234,16 @@ public class CreateSubStudyServlet extends Controller {
 			v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
 		}
 
-		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 20);
-		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				64);
-		v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
-		v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 20);
+		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
+		v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
+		v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
 		errors.putAll(v.validate());
 
@@ -298,12 +265,10 @@ public class CreateSubStudyServlet extends Controller {
 			Validator.addError(errors, "description", resexception.getString("maximum_lenght_brief_summary_2000"));
 		}
 		if (fp.getString("prinInvestigator").trim().length() > 255) {
-			Validator.addError(errors, "prinInvestigator",
-					resexception.getString("maximum_lenght_principal_investigator_255"));
+			Validator.addError(errors, "prinInvestigator", resexception.getString("maximum_lenght_principal_investigator_255"));
 		}
 		if (fp.getInt("expectedTotalEnrollment") <= 0) {
-			Validator.addError(errors, "expectedTotalEnrollment",
-					respage.getString("expected_total_enrollment_must_be_a_positive_number"));
+			Validator.addError(errors, "expectedTotalEnrollment", respage.getString("expected_total_enrollment_must_be_a_positive_number"));
 		}
 
 		StudyBean newSite = this.createStudyBean(request);
@@ -311,61 +276,49 @@ public class CreateSubStudyServlet extends Controller {
 		request.getSession().setAttribute("newStudy", newSite);
 		request.getSession().setAttribute("definitions", this.createSiteEventDefinitions(request, parentStudy));
 
-		SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat localDf = getLocalDf(request);
 
 		if (errors.isEmpty()) {
 			logger.info("no errors");
 			forwardPage(Page.CONFIRM_CREATE_SUB_STUDY, request, response);
 
 		} else {
-			try {
-				local_df.parse(fp.getString(INPUT_START_DATE));
-				fp.addPresetValue(INPUT_START_DATE, local_df.format(fp.getDate(INPUT_START_DATE)));
-			} catch (ParseException pe) {
-				fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
-			}
-			try {
-				local_df.parse(fp.getString(INPUT_END_DATE));
-				fp.addPresetValue(INPUT_END_DATE, local_df.format(fp.getDate(INPUT_END_DATE)));
-			} catch (ParseException pe) {
-				fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
-			}
-			try {
-				local_df.parse(fp.getString(INPUT_VER_DATE));
-				fp.addPresetValue(INPUT_VER_DATE, local_df.format(fp.getDate(INPUT_VER_DATE)));
-			} catch (ParseException pe) {
-				fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
-			}
+			addPresetValues(localDf, fp);
 			setPresetValues(fp.getPresetValues(), request);
 			logger.info("has validation errors");
+
 			request.setAttribute("formMessages", errors);
 			request.setAttribute("statuses", Status.toActiveArrayList());
 			forwardPage(Page.CREATE_SUB_STUDY, request, response);
 		}
-
 	}
 
 	/**
 	 * Constructs study bean from request
 	 * 
-	 * @return HttpServletRequest
+	 * @param request
+	 *            the incoming request
+	 * @return <code>StudyBean</code> bean that will be displayed on UX
 	 */
 	private StudyBean createStudyBean(HttpServletRequest request) {
+
 		FormProcessor fp = new FormProcessor(request);
 		StudyBean study = (StudyBean) request.getSession().getAttribute("newStudy");
+
 		study.setName(fp.getString("name"));
 		study.setIdentifier(fp.getString("uniqueProId"));
 		study.setSecondaryIdentifier(fp.getString("secondProId"));
 		study.setSummary(fp.getString("description"));
 		study.setPrincipalInvestigator(fp.getString("prinInvestigator"));
 		study.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
-		java.util.Date endDate;
-		java.util.Date startDate;
-		java.util.Date protocolDate;
-		SimpleDateFormat local_df = getLocalDf(request);
+
+		Date endDate;
+		Date startDate;
+		Date protocolDate;
+		SimpleDateFormat localDf = getLocalDf(request);
 		try {
-			local_df.setLenient(false);
-			startDate = local_df.parse(fp.getString("startDate"));
+			localDf.setLenient(false);
+			startDate = localDf.parse(fp.getString("startDate"));
 
 		} catch (ParseException fe) {
 			startDate = study.getDatePlannedStart();
@@ -374,8 +327,8 @@ public class CreateSubStudyServlet extends Controller {
 		study.setDatePlannedStart(startDate);
 
 		try {
-			local_df.setLenient(false);
-			endDate = local_df.parse(fp.getString("endDate"));
+			localDf.setLenient(false);
+			endDate = localDf.parse(fp.getString("endDate"));
 
 		} catch (ParseException fe) {
 			endDate = study.getDatePlannedEnd();
@@ -383,8 +336,8 @@ public class CreateSubStudyServlet extends Controller {
 		study.setDatePlannedEnd(endDate);
 
 		try {
-			local_df.setLenient(false);
-			protocolDate = local_df.parse(fp.getString(INPUT_VER_DATE));
+			localDf.setLenient(false);
+			protocolDate = localDf.parse(fp.getString(INPUT_VER_DATE));
 
 		} catch (ParseException fe) {
 			protocolDate = study.getProtocolDateVerification();
@@ -407,8 +360,10 @@ public class CreateSubStudyServlet extends Controller {
 		for (Object parameter : parameters) {
 			StudyParamsConfig scg = (StudyParamsConfig) parameter;
 			if (scg.getValue().getId() > 0 && scg.getParameter().isOverridable()) {
+
 				logger.info("parameter:" + scg.getParameter().getHandle());
 				logger.info("value:" + scg.getValue().getValue());
+
 				if (scg.getParameter().getHandle().equalsIgnoreCase("interviewerNameRequired")
 						&& !fp.getString("interviewerNameRequired").isEmpty()) {
 					scg.getValue().setValue(fp.getString("interviewerNameRequired"));
@@ -482,10 +437,15 @@ public class CreateSubStudyServlet extends Controller {
 	}
 
 	/**
-	 * Inserts the new study into database
+	 * Saves study bean from session
 	 * 
+	 * @param request
+	 *            the incoming request
+	 * @param response
+	 *            the response to redirect to
 	 */
-	private void submitStudy(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void submitStudy(HttpServletRequest request, HttpServletResponse response) {
+
 		StudyDAO sdao = getStudyDAO();
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -509,8 +469,8 @@ public class CreateSubStudyServlet extends Controller {
 		study.setGenetic(parent.isGenetic());
 		study = (StudyBean) sdao.create(study);
 
-		for (int i = 0; i < currentStudy.getStudyParameters().size(); i++) {
-			StudyParamsConfig scg = (StudyParamsConfig) currentStudy.getStudyParameters().get(i);
+		for (Object studyParameter : currentStudy.getStudyParameters()) {
+			StudyParamsConfig scg = (StudyParamsConfig) studyParameter;
 			if (scg.getValue().getId() > 0 && !scg.getParameter().isOverridable()) {
 				study.getStudyParameters().add(scg);
 			}
@@ -534,11 +494,21 @@ public class CreateSubStudyServlet extends Controller {
 		forwardPage(Page.SITE_LIST_SERVLET, request, response);
 	}
 
+	/**
+	 * Create site event definitions with unique parameters for current site
+	 * 
+	 * @param request
+	 *            the incoming request
+	 * @param site
+	 *            the site for creating specific event definitions
+	 * @return the list with study event definitions
+	 */
 	private ArrayList<StudyEventDefinitionBean> createSiteEventDefinitions(HttpServletRequest request, StudyBean site) {
+
 		FormProcessor fp = new FormProcessor(request);
-		ArrayList<StudyEventDefinitionBean> seds;
 		StudyBean parentStudy = (StudyBean) getStudyDAO().findByPK(site.getParentStudyId());
-		seds = (ArrayList<StudyEventDefinitionBean>) request.getSession().getAttribute("definitions");
+		ArrayList<StudyEventDefinitionBean> seds = (ArrayList<StudyEventDefinitionBean>) request.getSession().getAttribute("definitions");
+
 		if (seds == null || seds.size() <= 0) {
 			StudyEventDefinitionDAO sedDao = getStudyEventDefinitionDAO();
 			seds = sedDao.findAllAvailableByStudy(parentStudy);
@@ -560,6 +530,7 @@ public class CreateSubStudyServlet extends Controller {
 					int sdvId = fp.getInt("sdvOption" + order);
 					String emailCRFTo = fp.getString("mailTo" + order);
 					String emailOnStep = fp.getString("emailOnStep" + order);
+					String evaluatedCRF = fp.getString("evaluatedCRF" + order);
 					ArrayList<String> selectedVersionIdList = fp.getStringArray("versionSelection" + order);
 					int selectedVersionIdListSize = selectedVersionIdList.size();
 					String selectedVersionIds = "";
@@ -571,11 +542,11 @@ public class CreateSubStudyServlet extends Controller {
 					}
 
 					boolean changed = false;
-					boolean isRequired = !StringUtil.isBlank(requiredCRF) && "yes".equalsIgnoreCase(requiredCRF.trim());
-					boolean isDouble = !StringUtil.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim());
-					boolean hasPassword = !StringUtil.isBlank(electronicSignature)
-							&& "yes".equalsIgnoreCase(electronicSignature.trim());
-					boolean isHide = !StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim());
+					boolean isRequired = !StringUtil.isBlank(requiredCRF) && YES.equalsIgnoreCase(requiredCRF.trim());
+					boolean isDouble = !StringUtil.isBlank(doubleEntry) && YES.equalsIgnoreCase(doubleEntry.trim());
+					boolean hasPassword = !StringUtil.isBlank(electronicSignature) && YES.equalsIgnoreCase(electronicSignature.trim());
+					boolean isHide = !StringUtil.isBlank(hideCRF) && YES.equalsIgnoreCase(hideCRF.trim());
+					boolean isEvaluatedCRF = !StringUtil.isBlank(evaluatedCRF) && YES.equalsIgnoreCase(evaluatedCRF.trim());
 
 					int dbDefaultVersionId = edcBean.getDefaultVersionId();
 					if (defaultVersionId != dbDefaultVersionId) {
@@ -622,12 +593,15 @@ public class CreateSubStudyServlet extends Controller {
 					}
 					if (!emailCRFTo.equals(edcBean.getEmailTo())) {
 						changed = true;
-
 						if (StringUtil.isBlank(emailOnStep)) {
 							edcBean.setEmailTo("");
 						} else {
 							edcBean.setEmailTo(emailCRFTo);
 						}
+					}
+					if (isEvaluatedCRF != edcBean.isEvaluatedCRF()) {
+						changed = true;
+						edcBean.setEvaluatedCRF(isEvaluatedCRF);
 					}
 
 					changes.put(sed.getId() + "-" + edcBean.getId(), changed);
@@ -639,10 +613,17 @@ public class CreateSubStudyServlet extends Controller {
 		return seds;
 	}
 
+	/**
+	 * Saves created study event definitions from session
+	 * 
+	 * @param request
+	 *            the incoming request
+	 * @param site
+	 *            the site for creating specific event definitions
+	 */
 	private void submitSiteEventDefinitions(HttpServletRequest request, StudyBean site) {
 		UserAccountBean ub = getUserAccountBean(request);
-		ArrayList<StudyEventDefinitionBean> seds;
-		seds = (ArrayList<StudyEventDefinitionBean>) request.getSession().getAttribute("definitions");
+		ArrayList<StudyEventDefinitionBean> seds = (ArrayList<StudyEventDefinitionBean>) request.getSession().getAttribute("definitions");
 		HashMap<String, Boolean> changes = (HashMap<String, Boolean>) request.getSession().getAttribute("changed");
 		for (StudyEventDefinitionBean sed : seds) {
 			EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
@@ -667,14 +648,23 @@ public class CreateSubStudyServlet extends Controller {
 		request.getSession().removeAttribute("sdvOptions");
 	}
 
+	/**
+	 * Prepare eCRF definitions and active eCRFs versions for current study
+	 * 
+	 * @param site
+	 *            the incoming request
+	 * @return the list with <code>StudyEventDefinitionBean</code> that will be placed on UX
+	 */
 	private ArrayList<StudyEventDefinitionBean> initDefinitions(StudyBean site) {
-		ArrayList<StudyEventDefinitionBean> seds;
+
 		StudyEventDefinitionDAO sedDao = getStudyEventDefinitionDAO();
 		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 		CRFVersionDAO cvdao = getCRFVersionDAO();
 		CRFDAO cdao = getCRFDAO();
+
 		StudyBean parentStudy = (StudyBean) getStudyDAO().findByPK(site.getParentStudyId());
-		seds = sedDao.findAllAvailableByStudy(parentStudy);
+		ArrayList<StudyEventDefinitionBean> seds = sedDao.findAllAvailableByStudy(parentStudy);
+
 		for (StudyEventDefinitionBean sed : seds) {
 			int defId = sed.getId();
 			ArrayList<EventDefinitionCRFBean> edcs = (ArrayList<EventDefinitionCRFBean>) edcdao
@@ -685,16 +675,15 @@ public class CreateSubStudyServlet extends Controller {
 				CRFBean crf = (CRFBean) cdao.findByPK(edcBean.getCrfId());
 				int crfStatusId = crf.getStatusId();
 				if (!(edcStatusId == 5 || edcStatusId == 7 || crfStatusId == 5 || crfStatusId == 7)) {
-					ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) cvdao.findAllActiveByCRF(edcBean
-							.getCrfId());
+					ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) cvdao.findAllActiveByCRF(edcBean.getCrfId());
 					edcBean.setVersions(versions);
 					edcBean.setCrfName(crf.getName());
 					CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
 					edcBean.setDefaultVersionName(defaultVersion.getName());
-					String sversionIds = edcBean.getSelectedVersionIds();
+					String sVersionIds = edcBean.getSelectedVersionIds();
 					ArrayList<Integer> idList = new ArrayList<Integer>();
-					if (sversionIds.length() > 0) {
-						String[] ids = sversionIds.split("\\,");
+					if (sVersionIds.length() > 0) {
+						String[] ids = sVersionIds.split("\\,");
 						for (String id : ids) {
 							idList.add(Integer.valueOf(id));
 						}
@@ -704,6 +693,7 @@ public class CreateSubStudyServlet extends Controller {
 				}
 			}
 			logger.debug("definitionCrfs size=" + defCrfs.size() + " total size=" + edcs.size());
+
 			sed.setCrfs(defCrfs);
 			sed.setCrfNum(defCrfs.size());
 		}
@@ -711,12 +701,35 @@ public class CreateSubStudyServlet extends Controller {
 	}
 
 	private ArrayList<String> setSDVOptions() {
+
 		ArrayList<String> sdvOptions = new ArrayList<String>();
 		sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());
 		sdvOptions.add(SourceDataVerification.PARTIALREQUIRED.toString());
 		sdvOptions.add(SourceDataVerification.NOTREQUIRED.toString());
 		sdvOptions.add(SourceDataVerification.NOTAPPLICABLE.toString());
 		return sdvOptions;
+	}
+
+	private void addPresetValues(SimpleDateFormat localDf, FormProcessor fp) {
+
+		try {
+			localDf.parse(fp.getString(INPUT_START_DATE));
+			fp.addPresetValue(INPUT_START_DATE, localDf.format(fp.getDate(INPUT_START_DATE)));
+		} catch (ParseException pe) {
+			fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
+		}
+		try {
+			localDf.parse(fp.getString(INPUT_END_DATE));
+			fp.addPresetValue(INPUT_END_DATE, localDf.format(fp.getDate(INPUT_END_DATE)));
+		} catch (ParseException pe) {
+			fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
+		}
+		try {
+			localDf.parse(fp.getString(INPUT_VER_DATE));
+			fp.addPresetValue(INPUT_VER_DATE, localDf.format(fp.getDate(INPUT_VER_DATE)));
+		} catch (ParseException pe) {
+			fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
+		}
 	}
 
 	@Override

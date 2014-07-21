@@ -70,20 +70,18 @@ public class UpdateSubStudyServlet extends Controller {
 	public static final String SDV_OPTIONS = "sdvOptions";
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"), request, response);
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_DIRECTOR)
 				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
-
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.STUDY_LIST, resexception.getString("not_study_director"), "1");
 	}
 
@@ -100,7 +98,7 @@ public class UpdateSubStudyServlet extends Controller {
 			return;
 		}
 
-		SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat localDf = getLocalDf(request);
 		StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
 
 		logger.info("study from session:" + study.getName() + "\n" + study.getCreatedDate() + "\n");
@@ -112,13 +110,13 @@ public class UpdateSubStudyServlet extends Controller {
 			FormProcessor fp = new FormProcessor(request);
 			logger.info("start date:" + study.getDatePlannedEnd());
 			if (study.getDatePlannedEnd() != null) {
-				fp.addPresetValue(INPUT_END_DATE, local_df.format(study.getDatePlannedEnd()));
+				fp.addPresetValue(INPUT_END_DATE, localDf.format(study.getDatePlannedEnd()));
 			}
 			if (study.getDatePlannedStart() != null) {
-				fp.addPresetValue(INPUT_START_DATE, local_df.format(study.getDatePlannedStart()));
+				fp.addPresetValue(INPUT_START_DATE, localDf.format(study.getDatePlannedStart()));
 			}
 			if (study.getProtocolDateVerification() != null) {
-				fp.addPresetValue(INPUT_VER_DATE, local_df.format(study.getProtocolDateVerification()));
+				fp.addPresetValue(INPUT_VER_DATE, localDf.format(study.getProtocolDateVerification()));
 			}
 
 			setPresetValues(fp.getPresetValues(), request);
@@ -131,12 +129,20 @@ public class UpdateSubStudyServlet extends Controller {
 	}
 
 	/**
-	 * Validates the first section of study and save it into study bean * *
+	 * Validates the first section of study and save it into study bean
 	 * 
-	 * @throws Exception
+	 * @param request
+	 *            the incoming request
+	 * @param response
+	 *            the response to redirect to
+	 * @param errors
+	 *            the map with previous action errors
+	 * @param parentStudy
+	 *            the parent study bean for parent study status validation
+	 * @throws <code>Exception</code> for all exceptions
 	 */
-	private void confirmStudy(HttpServletRequest request, HttpServletResponse response, HashMap errors,
-			StudyBean parentStudy) throws Exception {
+	private void confirmStudy(HttpServletRequest request, HttpServletResponse response, HashMap errors, StudyBean parentStudy) throws Exception {
+
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 		v.addValidation("name", Validator.NO_BLANKS);
@@ -155,26 +161,16 @@ public class UpdateSubStudyServlet extends Controller {
 		if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
 			v.addValidation("facConEmail", Validator.IS_A_EMAIL);
 		}
-		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 20);
-		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				64);
-		v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
-		v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 20);
+		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
+		v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
+		v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
 		errors.putAll(v.validate());
 
@@ -212,7 +208,7 @@ public class UpdateSubStudyServlet extends Controller {
 			}
 		}
 
-		SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat localDf = getLocalDf(request);
 		StudyBean study = createStudyBean(request);
 		request.getSession().setAttribute(NEW_STUDY, study);
 
@@ -230,22 +226,22 @@ public class UpdateSubStudyServlet extends Controller {
 		} else {
 			logger.info("has validation errors");
 			try {
-				local_df.parse(fp.getString(INPUT_START_DATE));
-				fp.addPresetValue(INPUT_START_DATE, local_df.format(fp.getDate(INPUT_START_DATE)));
+				localDf.parse(fp.getString(INPUT_START_DATE));
+				fp.addPresetValue(INPUT_START_DATE, localDf.format(fp.getDate(INPUT_START_DATE)));
 			} catch (ParseException pe) {
 				fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
 			}
 
 			try {
-				local_df.parse(fp.getString(INPUT_VER_DATE));
-				fp.addPresetValue(INPUT_VER_DATE, local_df.format(fp.getDate(INPUT_VER_DATE)));
+				localDf.parse(fp.getString(INPUT_VER_DATE));
+				fp.addPresetValue(INPUT_VER_DATE, localDf.format(fp.getDate(INPUT_VER_DATE)));
 			} catch (ParseException pe) {
 				fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
 			}
 
 			try {
-				local_df.parse(fp.getString(INPUT_END_DATE));
-				fp.addPresetValue(INPUT_END_DATE, local_df.format(fp.getDate(INPUT_END_DATE)));
+				localDf.parse(fp.getString(INPUT_END_DATE));
+				fp.addPresetValue(INPUT_END_DATE, localDf.format(fp.getDate(INPUT_END_DATE)));
 			} catch (ParseException pe) {
 				fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 			}
@@ -255,11 +251,14 @@ public class UpdateSubStudyServlet extends Controller {
 			request.setAttribute("statuses", Status.toStudyUpdateMembersList());
 			forwardPage(Page.UPDATE_SUB_STUDY, request, response);
 		}
-
 	}
 
 	/**
 	 * Constructs study bean from request
+	 * 
+	 * @param request
+	 *            the incoming request
+	 * @return <code>StudyBean</code> bean that will be displayed on UX
 	 */
 	private StudyBean createStudyBean(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
@@ -271,14 +270,14 @@ public class UpdateSubStudyServlet extends Controller {
 		study.setPrincipalInvestigator(fp.getString("prinInvestigator"));
 		study.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
 
-		SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat localDf = getLocalDf(request);
 
 		java.util.Date endDate;
 		java.util.Date startDate;
 		java.util.Date protocolDate;
 		try {
-			local_df.setLenient(false);
-			startDate = local_df.parse(fp.getString("startDate"));
+			localDf.setLenient(false);
+			startDate = localDf.parse(fp.getString("startDate"));
 
 		} catch (ParseException fe) {
 			startDate = study.getDatePlannedStart();
@@ -287,8 +286,8 @@ public class UpdateSubStudyServlet extends Controller {
 		study.setDatePlannedStart(startDate);
 
 		try {
-			local_df.setLenient(false);
-			endDate = local_df.parse(fp.getString("endDate"));
+			localDf.setLenient(false);
+			endDate = localDf.parse(fp.getString("endDate"));
 
 		} catch (ParseException fe) {
 			endDate = study.getDatePlannedEnd();
@@ -296,8 +295,8 @@ public class UpdateSubStudyServlet extends Controller {
 		study.setDatePlannedEnd(endDate);
 
 		try {
-			local_df.setLenient(false);
-			protocolDate = local_df.parse(fp.getString(INPUT_VER_DATE));
+			localDf.setLenient(false);
+			protocolDate = localDf.parse(fp.getString(INPUT_VER_DATE));
 
 		} catch (ParseException fe) {
 			protocolDate = study.getProtocolDateVerification();
@@ -326,8 +325,7 @@ public class UpdateSubStudyServlet extends Controller {
 		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));
         study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
-		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
-				fp.getString("replaceExisitingDataDuringImport"));
+		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
 		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
 		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
 
@@ -350,15 +348,13 @@ public class UpdateSubStudyServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		HttpSession httpSession = request.getSession();
 		FormProcessor fp = new FormProcessor(request);
-		ArrayList<StudyEventDefinitionBean> seds;
-		seds = (ArrayList<StudyEventDefinitionBean>) httpSession.getAttribute(DEFINITIONS);
+		ArrayList<StudyEventDefinitionBean> seds = (ArrayList<StudyEventDefinitionBean>) httpSession.getAttribute(DEFINITIONS);
 		for (StudyEventDefinitionBean sed : seds) {
 			EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 			ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
 			int start = 0;
 			for (EventDefinitionCRFBean edcBean : edcs) {
-				int edcStatusId = edcBean.getStatus().getId();
-				if (!(edcStatusId == 5 || edcStatusId == 7)) {
+				if (!(edcBean.getStatus().isDeleted())) {
 					String order = start + "-" + edcBean.getId();
 					int defaultVersionId = fp.getInt("defaultVersionId" + order);
 					String requiredCRF = fp.getString("requiredCRF" + order);
@@ -368,6 +364,7 @@ public class UpdateSubStudyServlet extends Controller {
 					String electronicSignature = fp.getString("electronicSignature" + order);
 					String hideCRF = fp.getString("hideCRF" + order);
 					int sdvId = fp.getInt("sdvOption" + order);
+					String evaluatedCRF = fp.getString("evaluatedCRF" + order);
 					ArrayList<String> selectedVersionIdList = fp.getStringArray("versionSelection" + order);
 					int selectedVersionIdListSize = selectedVersionIdList.size();
 					String selectedVersionIds = "";
@@ -380,9 +377,9 @@ public class UpdateSubStudyServlet extends Controller {
 					boolean changed = false;
 					boolean isRequired = !StringUtil.isBlank(requiredCRF) && YES.equalsIgnoreCase(requiredCRF.trim());
 					boolean isDouble = !StringUtil.isBlank(doubleEntry) && YES.equalsIgnoreCase(doubleEntry.trim());
-					boolean hasPassword = !StringUtil.isBlank(electronicSignature)
-							&& YES.equalsIgnoreCase(electronicSignature.trim());
+					boolean hasPassword = !StringUtil.isBlank(electronicSignature) && YES.equalsIgnoreCase(electronicSignature.trim());
 					boolean isHide = !StringUtil.isBlank(hideCRF) && YES.equalsIgnoreCase(hideCRF.trim());
+					boolean isEvaluatedCRF = !StringUtil.isBlank(evaluatedCRF) && YES.equalsIgnoreCase(evaluatedCRF.trim());
 					if (edcBean.getParentId() > 0) {
 						int dbDefaultVersionId = edcBean.getDefaultVersionId();
 						if (defaultVersionId != dbDefaultVersionId) {
@@ -408,16 +405,9 @@ public class UpdateSubStudyServlet extends Controller {
 							changed = true;
 							edcBean.setHideCrf(isHide);
 						}
-						if (!StringUtil.isBlank(selectedVersionIds)
-								&& !selectedVersionIds.equals(edcBean.getSelectedVersionIds())) {
+						if (!StringUtil.isBlank(selectedVersionIds) && !selectedVersionIds.equals(edcBean.getSelectedVersionIds())) {
 							changed = true;
-							String[] ids = selectedVersionIds.split(",");
-							ArrayList<Integer> idList = new ArrayList<Integer>();
-							for (String id : ids) {
-								idList.add(Integer.valueOf(id));
-							}
-							edcBean.setSelectedVersionIdList(idList);
-							edcBean.setSelectedVersionIds(selectedVersionIds);
+							setSelectedVersionList(edcBean, selectedVersionIds);
 						}
 						if (sdvId > 0 && sdvId != edcBean.getSourceDataVerification().getCode()) {
 							changed = true;
@@ -436,6 +426,10 @@ public class UpdateSubStudyServlet extends Controller {
 								edcBean.setEmailTo(emailCRFTo);
 							}
 						}
+						if (isEvaluatedCRF != edcBean.isEvaluatedCRF()) {
+							changed = true;
+							edcBean.setEvaluatedCRF(isEvaluatedCRF);
+						}
 						if (changed) {
 							edcBean.setUpdater(ub);
 							edcBean.setUpdatedDate(new Date());
@@ -443,50 +437,26 @@ public class UpdateSubStudyServlet extends Controller {
 							edcdao.update(edcBean);
 						}
 					} else {
-						// only if definition-crf has been modified, will it be
-						// saved for the site
+						// only if definition-crf has been modified, will it be saved for the site
 						int defaultId = defaultVersionId > 0 ? defaultVersionId : edcBean.getDefaultVersionId();
 						int dbDefaultVersionId = edcBean.getDefaultVersionId();
-						if (defaultId == dbDefaultVersionId) {
-							if (isRequired == edcBean.isRequiredCRF()) {
-								if (isDouble == edcBean.isDoubleEntry()) {
-									if (hasPassword == edcBean.isElectronicSignature()) {
-										if (isHide == edcBean.isHideCrf()) {
-											if (selectedVersionIdListSize > 0) {
-												if (selectedVersionIdListSize == edcBean.getVersions().size()) {
-													if (emailOnStep.equals(edcBean.getEmailStep())){
-														if (emailCRFTo.equals(edcBean.getEmailTo())){
-															if (sdvId > 0) {
-																if (sdvId != edcBean.getSourceDataVerification().getCode()) {
-																	changed = true;
-																}
-															}
-														} else {
-															changed = true;
-														}
-													} else {
-														changed = true;
-													}
-												} else {
-													changed = true;
-												}
-											}
-										} else {
+						if (defaultId == dbDefaultVersionId && isRequired == edcBean.isRequiredCRF() && isDouble == edcBean.isDoubleEntry()
+								&& hasPassword == edcBean.isElectronicSignature() && isHide == edcBean.isHideCrf()) {
+							if (selectedVersionIdListSize > 0) {
+								if (selectedVersionIdListSize == edcBean.getVersions().size() && emailOnStep.equals(edcBean.getEmailStep())
+										&& emailCRFTo.equals(edcBean.getEmailTo()) && isEvaluatedCRF == edcBean.isEvaluatedCRF()) {
+									if (sdvId > 0) {
+										if (sdvId != edcBean.getSourceDataVerification().getCode()) {
 											changed = true;
 										}
-									} else {
-										changed = true;
 									}
 								} else {
 									changed = true;
 								}
-							} else {
-								changed = true;
 							}
 						} else {
 							changed = true;
 						}
-
 						if (changed) {
 							CRFVersionDAO cvdao = getCRFVersionDAO();
 							CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultId);
@@ -497,22 +467,15 @@ public class UpdateSubStudyServlet extends Controller {
 							edcBean.setElectronicSignature(hasPassword);
 							edcBean.setHideCrf(isHide);
 							edcBean.setEmailStep(emailOnStep);
-
+							edcBean.setEvaluatedCRF(isEvaluatedCRF);
 							if (StringUtil.isBlank(emailOnStep)) {
 								edcBean.setEmailTo("");
 							} else {
 								edcBean.setEmailTo(emailCRFTo);
 							}
+							if (selectedVersionIdListSize > 0 && selectedVersionIdListSize != edcBean.getVersions().size()) {
+								setSelectedVersionList(edcBean, selectedVersionIds);
 
-							if (selectedVersionIdListSize > 0
-									&& selectedVersionIdListSize != edcBean.getVersions().size()) {
-								String[] ids = selectedVersionIds.split(",");
-								ArrayList<Integer> idList = new ArrayList<Integer>();
-								for (String id : ids) {
-									idList.add(Integer.valueOf(id));
-								}
-								edcBean.setSelectedVersionIdList(idList);
-								edcBean.setSelectedVersionIds(selectedVersionIds);
 							}
 							if (sdvId > 0 && sdvId != edcBean.getSourceDataVerification().getCode()) {
 								edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
@@ -531,8 +494,21 @@ public class UpdateSubStudyServlet extends Controller {
 		}
 	}
 
+	private void setSelectedVersionList(EventDefinitionCRFBean edcBean, String selectedVersionIds) {
+		String[] ids = selectedVersionIds.split(",");
+		ArrayList<Integer> idList = new ArrayList<Integer>();
+		for (String id : ids) {
+			idList.add(Integer.valueOf(id));
+		}
+		edcBean.setSelectedVersionIdList(idList);
+		edcBean.setSelectedVersionIds(selectedVersionIds);
+	}
+
 	/**
-	 * Inserts the new study into database
+	 * Saves study bean from session
+	 * 
+	 * @param request
+	 *            the incoming request
 	 */
 	public void submitStudy(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);

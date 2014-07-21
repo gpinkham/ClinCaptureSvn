@@ -21,6 +21,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -50,6 +51,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -57,25 +59,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author jxu
+ * The servlet for creating event definition of user's current active study
  * 
- *         Defines a new study event
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class DefineStudyEventServlet extends Controller {
 
-	/**
-	 * Checks whether the user has the correct privilege
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
@@ -83,35 +75,21 @@ public class DefineStudyEventServlet extends Controller {
 		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
 
 		if (currentStudy.getParentStudyId() > 0) {
-			addPageMessage(
-					respage.getString("SED_may_only_added_top_level")
-							+ respage.getString("please_contact_sysadmin_questions"), request);
-			throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST,
-					resexception.getString("not_top_study"), "1");
+			addPageMessage(respage.getString("SED_may_only_added_top_level") + respage.getString("please_contact_sysadmin_questions"), request);
+			throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST, resexception.getString("not_top_study"), "1");
 		}
 
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_persmission_add_SED_to_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST,
-				resexception.getString("not_study_director"), "1");
-
+		addPageMessage(respage.getString("no_have_persmission_add_SED_to_study") + respage.getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST, resexception.getString("not_study_director"), "1");
 	}
 
-	/**
-	 * Processes the 'define study event' request
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
 		HttpSession session = request.getSession();
 		StudyBean currentStudy = getCurrentStudy(request);
 		FormProcessor fpr = new FormProcessor(request);
@@ -141,8 +119,7 @@ public class DefineStudyEventServlet extends Controller {
 						if (nextAction != null) {
 							if (nextAction == 1) {
 								session.removeAttribute("definition");
-								addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"),
-										request);
+								addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"), request);
 								forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 							} else if (nextAction == 2) {
 								submitDefinition(request);
@@ -150,7 +127,6 @@ public class DefineStudyEventServlet extends Controller {
 								session.setAttribute("pageMessages", pageMessages);
 								forwardPage(Page.DEFINE_STUDY_EVENT1, request, response);
 							} else {
-								logger.info("actionName ==> 3");
 								submitDefinition(request);
 								StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
 								sed.setStudyId(currentStudy.getId());
@@ -159,11 +135,11 @@ public class DefineStudyEventServlet extends Controller {
 							}
 						}
 					} catch (NumberFormatException e) {
-						e.printStackTrace();
+						logger.error(e.getMessage());
 						addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"), request);
 						forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 					} catch (NullPointerException e) {
-						e.printStackTrace();
+						logger.error(e.getMessage());
 						addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"), request);
 						forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 					}
@@ -174,18 +150,18 @@ public class DefineStudyEventServlet extends Controller {
 						if (pageNumber == 2) {
 							String nextListPage = request.getParameter("next_list_page");
 							if (nextListPage != null && nextListPage.equalsIgnoreCase("true")) {
-								logger.trace("+++ step 1");
+								logger.trace("confirmDefinition1 step 1");
 								confirmDefinition1(request, response);
 							} else {
-								logger.trace("+++ step 2");
+								logger.trace("confirmDefinition2 step 2");
 								confirmDefinition2(request, response, false);
 							}
 						} else {
-							logger.trace("+++ step 3");
+							logger.trace("confirmDefinition1 step 3");
 							confirmDefinition1(request, response);
 						}
 					} else {
-						logger.trace("+++ step 4");
+						logger.trace("forwardPage step 4");
 						setOrGetDefinition(request);
 						forwardPage(Page.DEFINE_STUDY_EVENT1, request, response);
 					}
@@ -200,6 +176,7 @@ public class DefineStudyEventServlet extends Controller {
 	}
 
 	private void setOrGetDefinition(HttpServletRequest request) throws Exception {
+
 		StudyBean currentStudy = getCurrentStudy(request);
 		HttpSession session = request.getSession();
 
@@ -215,24 +192,17 @@ public class DefineStudyEventServlet extends Controller {
 		}
 	}
 
-	/**
-	 * Validates the first section of definition inputs
-	 * 
-	 * @throws Exception
-	 */
 	private void confirmDefinition1(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 		StudyBean currentStudy = getCurrentStudy(fp.getRequest());
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("type", Validator.NO_BLANKS);
-		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				2000);
-		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-		// Clinovo start #134 start
+		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+
 		String calendaredVisitType = fp.getString("type");
 		if ("calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
 			v.addValidation("maxDay", Validator.IS_REQUIRED);
@@ -290,11 +260,7 @@ public class DefineStudyEventServlet extends Controller {
 	}
 
 	private void prepareServletForStepTwo(FormProcessor fp, HttpServletResponse response, boolean checkForm) {
-		/*
-		 * The tmpCRFIdMap will hold all the selected CRFs in the session when the user is navigating through the list.
-		 * This has been done so that when the user moves to the next page of CRF list, the selection made in the
-		 * previous page doesn't get lost.
-		 */
+
 		Map tmpCRFIdMap = (HashMap) fp.getRequest().getSession().getAttribute("tmpCRFIdMap");
 		if (tmpCRFIdMap == null) {
 			tmpCRFIdMap = new HashMap();
@@ -312,8 +278,7 @@ public class DefineStudyEventServlet extends Controller {
 					logger.trace("found id: " + id + " name " + name + " selected " + selected);
 					tmpCRFIdMap.put(id, name);
 				} else {
-					// Removing the elements from session which has been
-					// deselected.
+					// Removing the elements from session which has been deselected.
 					if (tmpCRFIdMap.containsKey(id)) {
 						tmpCRFIdMap.remove(id);
 					}
@@ -325,9 +290,9 @@ public class DefineStudyEventServlet extends Controller {
 
 		EntityBeanTable table = fp.getEntityBeanTable();
 		ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
-		String[] columns = { resword.getString("CRF_name"), resword.getString("date_created"),
+		String[] columns = {resword.getString("CRF_name"), resword.getString("date_created"),
 				resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),
-				resword.getString("selected") };
+				resword.getString("selected")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(5);
 		StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) fp.getRequest().getSession()
@@ -363,7 +328,11 @@ public class DefineStudyEventServlet extends Controller {
 	/**
 	 * Validates the entire definition
 	 * 
-	 * @throws Exception
+	 * @param request
+	 *            the incoming request
+	 * @param response
+	 *            the response to redirect to
+	 * @throws <code>Exception</code> for all exceptions
 	 */
 	private void confirmWholeDefinition(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
@@ -389,6 +358,7 @@ public class DefineStudyEventServlet extends Controller {
 			String electronicSignature = fp.getString("electronicSignature" + i);
 			String emailCRFTo = fp.getString("mailTo" + i);
 			String emailOnStep = fp.getString("emailOnStep" + i);
+			String evaluatedCRF = fp.getString("evaluatedCRF" + i);
 
 			String hiddenCrf = fp.getString("hiddenCrf" + i);
 			// hideCRF is false by default in the bean
@@ -416,23 +386,25 @@ public class DefineStudyEventServlet extends Controller {
 			} else {
 				edcBean.setDecisionCondition(false);
 			}
-
 			if (!StringUtil.isBlank(electronicSignature) && "yes".equalsIgnoreCase(electronicSignature.trim())) {
 				edcBean.setElectronicSignature(true);
 			} else {
 				edcBean.setElectronicSignature(false);
 			}
-
 			if (!StringUtil.isBlank(emailCRFTo)) {
 				edcBean.setEmailTo(emailCRFTo);
 			} else {
 				edcBean.setEmailTo("");
 			}
-
 			if (!StringUtil.isBlank(emailOnStep)) {
 				edcBean.setEmailStep(emailOnStep);
 			} else {
 				edcBean.setEmailStep("");
+			}
+			if (!StringUtil.isBlank(evaluatedCRF) && "yes".equalsIgnoreCase(evaluatedCRF.trim())) {
+				edcBean.setEvaluatedCRF(true);
+			} else {
+				edcBean.setEvaluatedCRF(false);
 			}
 
 			String nullString = "";
@@ -453,32 +425,32 @@ public class DefineStudyEventServlet extends Controller {
 			eventDefinitionCRFs.add(edcBean);
 		}
 		request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
-		request.getSession().setAttribute("edCRFs", eventDefinitionCRFs);// not used on page
+		request.getSession().setAttribute("edCRFs", eventDefinitionCRFs);
 		forwardPage(Page.DEFINE_STUDY_EVENT_CONFIRM, request, response);
 
 	}
 
 	/**
-	 * Constructs study bean from request-first section
+	 * Constructs study event definition bean from request
 	 * 
-	 * @return StudyEventDefinitionBean
+	 * @param request
+	 *            the incoming request
+	 * @return <code>StudyEventDefinitionBean</code> bean that will be displayed on UX    
 	 */
 	private StudyEventDefinitionBean createStudyEventDefinition(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 		sed.setName(fp.getString("name"));
-		// YW <<
 		String temp = fp.getString("repeating");
 		if ("true".equalsIgnoreCase(temp) || "1".equals(temp)) {
 			sed.setRepeating(true);
 		} else if ("false".equalsIgnoreCase(temp) || "0".equals(temp)) {
 			sed.setRepeating(false);
 		}
-		// YW >>
+
 		sed.setCategory(fp.getString("category"));
 		sed.setDescription(fp.getString("description"));
 		sed.setType(fp.getString("type"));
-		// Clinovo ticket #134 start
 		sed.setMaxDay(fp.getInt("maxDay"));
 		sed.setMinDay(fp.getInt("minDay"));
 		sed.setScheduleDay(fp.getInt("schDay"));
@@ -495,19 +467,16 @@ public class DefineStudyEventServlet extends Controller {
 		} else {
 			sed.setReferenceVisit(false);
 		}
-		// end
-		return sed;
 
+		return sed;
 	}
 
-	private void confirmDefinition2(HttpServletRequest request, HttpServletResponse response, boolean isBack)
-			throws Exception {
+	private void confirmDefinition2(HttpServletRequest request, HttpServletResponse response, boolean isBack) throws Exception {
 
 		FormProcessor fp = new FormProcessor(request);
 		CRFVersionDAO vdao = getCRFVersionDAO();
 		ArrayList crfArray = new ArrayList();
 		Map tmpCRFIdMap = (HashMap) request.getSession().getAttribute("tmpCRFIdMap");
-		// trying to avoid NPE not sure why we would get it there ((tmpCRFIdMap.containsKey(id))), tbh
 		if (tmpCRFIdMap == null) {
 			tmpCRFIdMap = new HashMap();
 		}
@@ -524,7 +493,7 @@ public class DefineStudyEventServlet extends Controller {
 				CRFBean cb = new CRFBean();
 				cb.setId(id);
 				cb.setName(name);
-				// only find active verions
+				// only find active versions
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
 
@@ -552,7 +521,6 @@ public class DefineStudyEventServlet extends Controller {
 				cb.setId(id);
 				cb.setName(name);
 
-				// only find active verions
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
 
@@ -563,18 +531,17 @@ public class DefineStudyEventServlet extends Controller {
 		logger.trace("about to set tmpCRFIdMap " + tmpCRFIdMap.toString());
 		request.getSession().setAttribute("tmpCRFIdMap", tmpCRFIdMap);
 
-		if (crfArray.size() == 0 && !isBack) {// no crf selected
+		if (crfArray.size() == 0 && !isBack) {
 			addPageMessage(respage.getString("no_CRF_selected_for_definition_add_later"), request);
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 			sed.setCrfs(new ArrayList());
 			request.getSession().setAttribute("definition", sed);
 			forwardPage(Page.DEFINE_STUDY_EVENT_CONFIRM, request, response);
-
 		} else {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 
 			logger.info("setting crfs into defintion to review: " + crfArray.toString());
-			sed.setCrfs(crfArray);// crfs selected by user
+			sed.setCrfs(crfArray);
 
 			request.getSession().setAttribute("definition", sed);
 
@@ -590,11 +557,7 @@ public class DefineStudyEventServlet extends Controller {
 		}
 	}
 
-	/**
-	 * Inserts the new study into database NullPointer catch added by tbh 092007, mean to fix task #1642 in Mantis
-	 * 
-	 */
-	private void submitDefinition(HttpServletRequest request) throws NullPointerException {
+	private void submitDefinition(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 
@@ -616,7 +579,6 @@ public class DefineStudyEventServlet extends Controller {
 		}
 		sed.setOwner(ub);
 		sed.setStudyId(currentStudy.getId());
-		// above line added for insurance, tbh
 		sed.setCreatedDate(new Date());
 		sed.setStatus(Status.AVAILABLE);
 		StudyEventDefinitionBean sed1 = (StudyEventDefinitionBean) edao.create(sed);
@@ -640,7 +602,7 @@ public class DefineStudyEventServlet extends Controller {
 		request.getSession().removeAttribute("edCRFs");
 		request.getSession().removeAttribute("crfsWithVersion");
 		request.getSession().removeAttribute("tmpCRFIdMap");
-		request.getSession().removeAttribute("referenceVisitAlredyExist");
+		request.getSession().removeAttribute("referenceVisitAlreadyExist");
 		request.getSession().removeAttribute("maxDay");
 		request.getSession().removeAttribute("minDay");
 		request.getSession().removeAttribute("schDay");
@@ -658,7 +620,7 @@ public class DefineStudyEventServlet extends Controller {
 		for (StudyEventDefinitionBean studyEventDefinition : definitions) {
 			if (studyEventDefinition.getReferenceVisit()) {
 				logger.trace("Reference visit already exist");
-				request.getSession().setAttribute("referenceVisitAlredyExist", true);
+				request.getSession().setAttribute("referenceVisitAlreadyExist", true);
 				break;
 			}
 		}
@@ -684,5 +646,4 @@ public class DefineStudyEventServlet extends Controller {
 		UserAccountBean userBean = (UserAccountBean) uadao.findByUserName(userName);
 		return userBean.getId();
 	}
-
 }

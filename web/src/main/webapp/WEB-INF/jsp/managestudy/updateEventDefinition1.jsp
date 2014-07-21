@@ -226,7 +226,7 @@ $(document).ready(function() {
 						</c:otherwise>
 					</c:choose>
 					<c:choose>
-						<c:when test="${referenceVisitAlredyExist == 'true'}">
+						<c:when test="${referenceVisitAlreadyExist == 'true'}">
 							<span class="alert"><fmt:message key="reference_visit_already_exist" bundle="${resword}"/></span>
 						</c:when>
 					</c:choose>
@@ -500,6 +500,19 @@ $(document).ready(function() {
 					<span class="alert" style="display:none"><fmt:message key="enter_valid_email" bundle="${resnote}"/></span>
 				</td>
 			</tr>
+
+            <tr>
+                <td class="table_cell" colspan="4"><fmt:message key="evaluated_crf" bundle="${resword}"/>:
+                    <c:choose>
+                        <c:when test="${edc.evaluatedCRF == true}">
+                            <input type="checkbox" onchange="javascript:changeIcon();" checked name="evaluatedCRF<c:out value="${count}"/>" value="yes">
+                        </c:when>
+                        <c:otherwise>
+                            <input type="checkbox" onchange="javascript:changeIcon();" name="evaluatedCRF<c:out value="${count}"/>" value="yes">
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+            </tr>
 
 			<tr valign="top">
 				<td class="table_cell" colspan="4"><a href="<fmt:message key="nullValue" bundle="${resformat}"/>" target="def_win" onClick="openDefWindow('<fmt:message key="nullValue" bundle="${resformat}"/>'); return false;"><fmt:message key="null_values" bundle="${resword}"/></a>:<c:out value="${edc.nullValues}"/></td>

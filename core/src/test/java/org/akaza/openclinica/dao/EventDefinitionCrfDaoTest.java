@@ -80,4 +80,13 @@ public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
 		EventDefinitionCRFBean updatedEdc = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(id);
 		assertTrue(newDefaultVersion == updatedEdc.getDefaultVersionId());
 	}
+
+	@Test
+	public void testThatFindByPkReturnsEdcWithCorrectEvaluatedFlags(){
+		EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		assertEquals(true, edc.isEvaluatedCRF());
+
+		edc = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(5);
+		assertEquals(false, edc.isEvaluatedCRF());
+	}
 }
