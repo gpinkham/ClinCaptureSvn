@@ -17,18 +17,33 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * FindSubjectsFilter class.
+ */
 public class FindSubjectsFilter implements CriteriaCommand {
 
-	List<Filter> filters = new ArrayList<Filter>();
-	HashMap<String, String> columnMapping = new HashMap<String, String>();
+	public static final Logger LOGGER = LoggerFactory.getLogger(FindSubjectsFilter.class);
+
+	public static final int FOUR = 4;
+
+	private List<Filter> filters = new ArrayList<Filter>();
+	private HashMap<String, String> columnMapping = new HashMap<String, String>();
 	private StudyGroupClassDAO studyGroupClassDAO;
 
+	/**
+	 * FindSubjectsFilter constructor.
+	 * 
+	 * @param studyGroupClassDAO
+	 *            StudyGroupClassDAO
+	 */
 	public FindSubjectsFilter(StudyGroupClassDAO studyGroupClassDAO) {
 		columnMapping.put("studySubject.label", "ss.label");
 		columnMapping.put("studySubject.createdDate", "ss.date_created");
@@ -44,10 +59,25 @@ public class FindSubjectsFilter implements CriteriaCommand {
 		return studyGroupClassDAO;
 	}
 
+	/**
+	 * Method that adds a filter.
+	 * 
+	 * @param property
+	 *            String property
+	 * @param value
+	 *            Object value
+	 */
 	public void addFilter(String property, Object value) {
 		filters.add(new Filter(property, value));
 	}
 
+	/**
+	 * Method that executes all filters.
+	 * 
+	 * @param criteria
+	 *            String criteria
+	 * @return String sql string
+	 */
 	public String execute(String criteria) {
 		String theCriteria = "";
 		for (Filter filter : filters) {
@@ -63,7 +93,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
 			new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
 			result = true;
 		} catch (Exception e) {
-			//
+			LOGGER.error("Error has occurred.", e);
 		}
 		return result;
 	}
@@ -85,11 +115,18 @@ public class FindSubjectsFilter implements CriteriaCommand {
 
 			} else if (property.equals("studySubject.status")) {
 
-				theCriteria.append(" AND ").append(columnMapping.get(property)).append(" = ").append(value.toString());
+				theCriteria.append(" AND ").append(columnMapping.get(property));
+				if (value.toString().equals(String.valueOf(Status.DELETED.getId()))) {
+					theCriteria.append(" IN (").append(Status.DELETED.getId()).append(",")
+							.append(Status.AUTO_DELETED.getId()).append(")");
+				} else {
+					theCriteria.append(" = ").append(value.toString());
+				}
 
-			} else if (property.equals("studySubject.createdYear")) { 
+			} else if (property.equals("studySubject.createdYear")) {
 
-				theCriteria.append(" AND ").append("EXTRACT(YEAR FROM ss.date_created)").append(" = ").append(value.toString());
+				theCriteria.append(" AND ").append("EXTRACT(YEAR FROM ss.date_created)").append(" = ")
+						.append(value.toString());
 
 			} else if (property.startsWith("sed_")) {
 
@@ -122,51 +159,43 @@ public class FindSubjectsFilter implements CriteriaCommand {
 
 				if (subjectEventStatusId == SubjectEventStatus.NOT_SCHEDULED.getId()) {
 
-					theCriteria
-							.append(" AND ss.status_id NOT IN (").append(Status.DELETED.getId()).append(", ")
+					theCriteria.append(" AND ss.status_id NOT IN (").append(Status.DELETED.getId()).append(", ")
 							.append(Status.AUTO_DELETED.getId()).append(", ").append(Status.LOCKED.getId()).append(")")
 							.append(notScheduledFilter);
 
 				} else if (subjectEventStatusId == SubjectEventStatus.REMOVED.getId()) {
 
-					theCriteria
-							.append(" AND ((ss.status_id IN (").append(Status.DELETED.getId()).append(", ")
-							.append(Status.AUTO_DELETED.getId()).append(")")
-							.append(notScheduledFilter).append(")")
+					theCriteria.append(" AND ((ss.status_id IN (").append(Status.DELETED.getId()).append(", ")
+							.append(Status.AUTO_DELETED.getId()).append(")").append(notScheduledFilter).append(")")
 							.append(" OR ( se.study_event_definition_id = ").append(eventDefinitionId)
 							.append(" AND se.subject_event_status_id = ").append(subjectEventStatusId).append(" ))");
 
 				} else if (subjectEventStatusId == SubjectEventStatus.LOCKED.getId()) {
 
-					theCriteria
-							.append(" AND ((ss.status_id = ").append(Status.LOCKED.getId())
-							.append(notScheduledFilter).append(")")
-							.append(" OR ( se.study_event_definition_id = ").append(eventDefinitionId)
-							.append(" AND se.subject_event_status_id = ").append(subjectEventStatusId).append(" ))");
+					theCriteria.append(" AND ((ss.status_id = ").append(Status.LOCKED.getId())
+							.append(notScheduledFilter).append(")").append(" OR ( se.study_event_definition_id = ")
+							.append(eventDefinitionId).append(" AND se.subject_event_status_id = ")
+							.append(subjectEventStatusId).append(" ))");
 
 				} else {
 
-					theCriteria
-							.append(" AND ( se.study_event_definition_id = ").append(eventDefinitionId)
+					theCriteria.append(" AND ( se.study_event_definition_id = ").append(eventDefinitionId)
 							.append(" AND se.subject_event_status_id = ").append(subjectEventStatusId).append(" )");
 				}
 
 			} else if (property.startsWith("sgc_")) {
 
-				int study_group_class_id = Integer.parseInt(property.substring(4));
-				int group_id = Integer.parseInt(value.toString());
+				int studyGroupClassId = Integer.parseInt(property.substring(FOUR));
+				int groupId = Integer.parseInt(value.toString());
 
-				theCriteria.append(" AND ").append(group_id).append(" = ( SELECT DISTINCT sgm.study_group_id")
+				theCriteria.append(" AND ").append(groupId).append(" = ( SELECT DISTINCT sgm.study_group_id")
 						.append(" FROM subject_group_map sgm, study_group sg, study_group_class sgc, study s")
-						.append(" WHERE sgm.study_group_class_id = ").append(study_group_class_id)
+						.append(" WHERE sgm.study_group_class_id = ").append(studyGroupClassId)
 						.append(" AND sgm.study_subject_id = ss.study_subject_id")
 						.append(" AND sgm.study_group_id = sg.study_group_id")
 						.append(" AND (s.parent_study_id = sgc.study_id OR ss.study_id = sgc.study_id)")
 						.append(" AND sgm.study_group_class_id = sgc.study_group_class_id)");
-			}
-
-			else {
-
+			} else {
 				theCriteria.append(" AND UPPER(").append(columnMapping.get(property)).append(") like UPPER('%")
 						.append(value.toString()).append("%')");
 			}
@@ -174,6 +203,9 @@ public class FindSubjectsFilter implements CriteriaCommand {
 		return (criteria + theCriteria.toString());
 	}
 
+	/**
+	 * Filter sub class.
+	 */
 	private static class Filter {
 		private final String property;
 		private final Object value;

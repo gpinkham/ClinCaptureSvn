@@ -82,8 +82,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * ListEventsForSubjectTableFactory class.
+ */
 @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
+
+	public static final int TEN = 7;
+	public static final int THREE = 3;
+	public static final int EIGHT = 8;
+	public static final int SEVEN = 7;
 
 	private StudyEventDefinitionDAO studyEventDefinitionDao;
 	private DynamicEventDao dynamicEventDAO;
@@ -117,17 +125,24 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	private final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>();
 	private final HashMap<Integer, String> crfColumnImageIconPaths = new HashMap<Integer, String>();
 
+	/**
+	 * ListEventsForSubjectTableFactory constructor.
+	 * 
+	 * @param showMoreLink
+	 *            boolean
+	 */
 	public ListEventsForSubjectTableFactory(boolean showMoreLink) {
-		imageIconPaths.put(1, "images/icon_Scheduled.gif");
-		imageIconPaths.put(2, "images/icon_NotStarted.gif");
-		imageIconPaths.put(3, "images/icon_InitialDE.gif");
-		imageIconPaths.put(4, "images/icon_DEcomplete.gif");
-		imageIconPaths.put(5, "images/icon_Stopped.gif");
-		imageIconPaths.put(6, "images/icon_Skipped.gif");
-		imageIconPaths.put(7, "images/icon_Locked.gif");
-		imageIconPaths.put(8, "images/icon_Signed.gif");
-		imageIconPaths.put(9, "images/icon_DoubleCheck.gif");
-		imageIconPaths.put(10, "images/icon_Invalid.gif");
+		int index = 1;
+		imageIconPaths.put(index++, "images/icon_Scheduled.gif");
+		imageIconPaths.put(index++, "images/icon_NotStarted.gif");
+		imageIconPaths.put(index++, "images/icon_InitialDE.gif");
+		imageIconPaths.put(index++, "images/icon_DEcomplete.gif");
+		imageIconPaths.put(index++, "images/icon_Stopped.gif");
+		imageIconPaths.put(index++, "images/icon_Skipped.gif");
+		imageIconPaths.put(index++, "images/icon_Locked.gif");
+		imageIconPaths.put(index++, "images/icon_Signed.gif");
+		imageIconPaths.put(index++, "images/icon_DoubleCheck.gif");
+		imageIconPaths.put(index, "images/icon_Invalid.gif");
 
 		crfColumnImageIconPaths.put(Status.NOT_STARTED.getId(), "images/icon_NotStarted.gif");
 		crfColumnImageIconPaths.put(Status.DATA_ENTRY_STARTED.getId(), "images/icon_InitialDE.gif");
@@ -367,7 +382,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private int getColumnNamesMap(TableFacade tableFacade) {
-		int stratFrom = 3;
+		int stratFrom = THREE;
 		ArrayList<String> columnNamesList = new ArrayList<String>();
 		columnNamesList.add("studySubject.label");
 		columnNamesList.add("studySubject.status");
@@ -614,41 +629,93 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private class CharFilterMatcher implements FilterMatcher {
+		/**
+		 * Evaluate method.
+		 * 
+		 * @param itemValue
+		 *            Object itemValue
+		 * @param filterValue
+		 *            String filterValue
+		 * @return boolean
+		 */
 		public boolean evaluate(Object itemValue, String filterValue) {
 			String item = StringUtils.lowerCase(String.valueOf(itemValue));
 			String filter = StringUtils.lowerCase(String.valueOf(filterValue));
 			return StringUtils.contains(item, filter);
-
 		}
 	}
 
+	/**
+	 * StatusFilterMatcher sub class.
+	 */
 	public class StatusFilterMatcher implements FilterMatcher {
+		/**
+		 * Evaluate method.
+		 * 
+		 * @param itemValue
+		 *            Object itemValue
+		 * @param filterValue
+		 *            String filterValue
+		 * @return boolean
+		 */
 		public boolean evaluate(Object itemValue, String filterValue) {
-
 			String item = StringUtils.lowerCase(((Status) itemValue).getName());
 			String filter = StringUtils.lowerCase(filterValue);
-
 			return filter.equals(item);
 		}
 	}
 
+	/**
+	 * SubjectEventStatusFilterMatcher sub class.
+	 */
 	public class SubjectEventStatusFilterMatcher implements FilterMatcher {
+		/**
+		 * Evaluate method.
+		 * 
+		 * @param itemValue
+		 *            Object itemValue
+		 * @param filterValue
+		 *            String filterValue
+		 * @return boolean
+		 */
 		public boolean evaluate(Object itemValue, String filterValue) {
 			// No need to evaluate itemValue and filterValue.
 			return true;
 		}
 	}
 
+	/**
+	 * SubjectGroupFilterMatcher sub class.
+	 */
 	public class SubjectGroupFilterMatcher implements FilterMatcher {
-
+		/**
+		 * Evaluate method.
+		 * 
+		 * @param itemValue
+		 *            Object itemValue
+		 * @param filterValue
+		 *            String filterValue
+		 * @return boolean
+		 */
 		public boolean evaluate(Object itemValue, String filterValue) {
 			String itemSGName = studyGroupDAO.findByPK(Integer.valueOf(itemValue.toString())).getName();
 			return filterValue.equalsIgnoreCase(itemSGName);
 		}
 	}
 
+	/**
+	 * SubjectEventCRFStatusFilterMatcher sub class.
+	 */
 	public class SubjectEventCRFStatusFilterMatcher implements FilterMatcher {
-
+		/**
+		 * Evaluate method.
+		 * 
+		 * @param itemValue
+		 *            Object itemValue
+		 * @param filterValue
+		 *            String filterValue
+		 * @return boolean
+		 */
 		public boolean evaluate(Object itemValue, String filterValue) {
 			// No need to evaluate itemValue and filterValue.
 			return true;
@@ -719,8 +786,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private class StudyGroupClassCellEditor implements CellEditor {
-		StudyGroupClassBean studyGroupClass;
-		String groupName;
+		private StudyGroupClassBean studyGroupClass;
+		private String groupName;
 
 		public StudyGroupClassCellEditor(StudyGroupClassBean studyGroupClass) {
 			this.studyGroupClass = studyGroupClass;
@@ -738,12 +805,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 	private class EventStatusCellEditor implements CellEditor {
 
-		SubjectEventStatus subjectEventStatus;
-		StudyEventBean studyEvent;
-		StudySubjectBean studySubjectBean;
-		List<DisplayBean> events;
-		SubjectBean subject;
-		StudyEventDefinitionBean studyEventDefinition;
+		private SubjectEventStatus subjectEventStatus;
+		private StudyEventBean studyEvent;
+		private StudySubjectBean studySubjectBean;
+		private List<DisplayBean> events;
+		private SubjectBean subject;
+		private StudyEventDefinitionBean studyEventDefinition;
 
 		public Object getValue(Object item, String property, int rowcount) {
 
@@ -772,9 +839,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 						studyEventDefinition, studySubjectBean));
 
 				if (studySubjectBean.getStatus().isDeleted()) {
-					imageIconPath = imageIconPaths.get(10);
+					imageIconPath = imageIconPaths.get(TEN);
 				} else if (studySubjectBean.getStatus().isLocked()) {
-					imageIconPath = imageIconPaths.get(7);
+					imageIconPath = imageIconPaths.get(SEVEN);
 				} else {
 					imageIconPath = imageIconPaths.get(subjectEventStatus.getId());
 				}
@@ -789,8 +856,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private class EventStartDateCellEditor implements CellEditor {
-		Date eventStartDate;
-		List<DisplayBean> events;
+		private Date eventStartDate;
+		private List<DisplayBean> events;
 
 		public Object getValue(Object item, String property, int rowcount) {
 			events = (List<DisplayBean>) ((HashMap<Object, Object>) item).get("events");
@@ -808,12 +875,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 	private class EventCrfCellEditor implements CellEditor {
 
-		StudyEventBean studyEvent;
-		StudySubjectBean studySubjectBean;
-		List<DisplayBean> events;
-		SubjectBean subject;
-		EventCRFBean eventCrf;
-		EventDefinitionCRFBean eventDefintionCrf;
+		private StudyEventBean studyEvent;
+		private StudySubjectBean studySubjectBean;
+		private List<DisplayBean> events;
+		private SubjectBean subject;
+		private EventCRFBean eventCrf;
+		private EventDefinitionCRFBean eventDefintionCrf;
 
 		public Object getValue(Object item, String property, int rowcount) {
 			events = (List<DisplayBean>) ((HashMap<Object, Object>) item).get("events");
@@ -838,10 +905,17 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 					studyEvents.add(studyEvent);
 				}
 
-				url.append(eventDivBuilder(Integer.valueOf(rowcount + String.valueOf(i)), studyEvents, numberOfEvents,
-						selectedStudyEventDefinition, studySubjectBean,
-						(eventCrf == null ? null : String.valueOf(eventCrf.getId())),
-						String.valueOf(eventDefintionCrf.getId()), false));
+				EventDivBuilderWrapper eventDivBuilderWrapper = new EventDivBuilderWrapper();
+				eventDivBuilderWrapper.rowCount = Integer.valueOf(rowcount + String.valueOf(i));
+				eventDivBuilderWrapper.studyEvents = studyEvents;
+				eventDivBuilderWrapper.eventOccurrencesNumber = numberOfEvents;
+				eventDivBuilderWrapper.sed = selectedStudyEventDefinition;
+				eventDivBuilderWrapper.studySubject = studySubjectBean;
+				eventDivBuilderWrapper.eventCRFId = eventCrf == null ? null : String.valueOf(eventCrf.getId());
+				eventDivBuilderWrapper.eventDefintionCRFId = String.valueOf(eventDefintionCrf.getId());
+				eventDivBuilderWrapper.goingToReplaceHtmlContent = false;
+
+				url.append(eventDivBuilder(eventDivBuilderWrapper));
 
 				url.append("<img src='").append(crfColumnImageIconPaths.get(eventCRFStatusId)).append("' border='0'>");
 
@@ -859,7 +933,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			return ListStudySubjectTableFactory.getSubjectActionsColumnContent(item, currentUser, getCurrentRole(),
 					getStudyBean(), new DAOWrapper(getStudyDAO(), getStudyEventDAO(), getStudySubjectDAO(),
 							getEventCRFDAO(), getEventDefintionCRFDAO(), getStudyEventDefinitionDAO(),
-							getDiscrepancyNoteDAO()), resword, logger);
+							getDiscrepancyNoteDAO()), resword);
 		}
 	}
 
@@ -892,66 +966,177 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		}
 	}
 
+	/**
+	 * EventDivBuilder method.
+	 * 
+	 * @param rowCount
+	 *            Integer
+	 * @param studyEvents
+	 *            List<StudyEventBean>
+	 * @param eventOccurrencesNumber
+	 *            int
+	 * @param sed
+	 *            StudyEventDefinitionBean
+	 * @param studySubject
+	 *            StudySubjectBean
+	 * @return String
+	 */
 	public String eventDivBuilder(Integer rowCount, List<StudyEventBean> studyEvents, int eventOccurrencesNumber,
 			StudyEventDefinitionBean sed, StudySubjectBean studySubject) {
-		return eventDivBuilder(rowCount, studyEvents, eventOccurrencesNumber, sed, studySubject, null, null, false);
+		EventDivBuilderWrapper eventDivBuilderWrapper = new EventDivBuilderWrapper();
+		eventDivBuilderWrapper.rowCount = rowCount;
+		eventDivBuilderWrapper.studyEvents = studyEvents;
+		eventDivBuilderWrapper.eventOccurrencesNumber = eventOccurrencesNumber;
+		eventDivBuilderWrapper.sed = sed;
+		eventDivBuilderWrapper.studySubject = studySubject;
+		eventDivBuilderWrapper.eventCRFId = null;
+		eventDivBuilderWrapper.eventDefintionCRFId = null;
+		eventDivBuilderWrapper.goingToReplaceHtmlContent = false;
+		return eventDivBuilder(eventDivBuilderWrapper);
 	}
 
-	public String eventDivBuilder(Integer rowCount, List<StudyEventBean> studyEvents, int eventOccurrencesNumber,
-			StudyEventDefinitionBean sed, StudySubjectBean studySubject, String eventCRFId, String eventDefintionCRFId,
-			boolean goingToReplaceHtmlContent) {
-		String studySubjectLabel = SubjectLabelNormalizer.normalizeSubjectLabel(studySubject.getLabel());
+	/**
+	 * EventDivBuilderWrapper sub class.
+	 */
+	public static class EventDivBuilderWrapper {
+		public Integer getRowCount() {
+			return rowCount;
+		}
 
-		String divWidth = String.valueOf(POPUP_BASE_WIDTH + 8);
+		public void setRowCount(Integer rowCount) {
+			this.rowCount = rowCount;
+		}
+
+		public List<StudyEventBean> getStudyEvents() {
+			return studyEvents;
+		}
+
+		public void setStudyEvents(List<StudyEventBean> studyEvents) {
+			this.studyEvents = studyEvents;
+		}
+
+		public int getEventOccurrencesNumber() {
+			return eventOccurrencesNumber;
+		}
+
+		public void setEventOccurrencesNumber(int eventOccurrencesNumber) {
+			this.eventOccurrencesNumber = eventOccurrencesNumber;
+		}
+
+		public StudyEventDefinitionBean getSed() {
+			return sed;
+		}
+
+		public void setSed(StudyEventDefinitionBean sed) {
+			this.sed = sed;
+		}
+
+		public StudySubjectBean getStudySubject() {
+			return studySubject;
+		}
+
+		public void setStudySubject(StudySubjectBean studySubject) {
+			this.studySubject = studySubject;
+		}
+
+		public String getEventCRFId() {
+			return eventCRFId;
+		}
+
+		public void setEventCRFId(String eventCRFId) {
+			this.eventCRFId = eventCRFId;
+		}
+
+		public String getEventDefintionCRFId() {
+			return eventDefintionCRFId;
+		}
+
+		public void setEventDefintionCRFId(String eventDefintionCRFId) {
+			this.eventDefintionCRFId = eventDefintionCRFId;
+		}
+
+		public boolean isGoingToReplaceHtmlContent() {
+			return goingToReplaceHtmlContent;
+		}
+
+		public void setGoingToReplaceHtmlContent(boolean goingToReplaceHtmlContent) {
+			this.goingToReplaceHtmlContent = goingToReplaceHtmlContent;
+		}
+
+		private Integer rowCount;
+		private List<StudyEventBean> studyEvents;
+		private int eventOccurrencesNumber;
+		private StudyEventDefinitionBean sed;
+		private StudySubjectBean studySubject;
+		private String eventCRFId;
+		private String eventDefintionCRFId;
+		private boolean goingToReplaceHtmlContent;
+	}
+
+	/**
+	 * EventDivBuilder method.
+	 * 
+	 * @param eventDivBuilderWrapper
+	 *            EventDivBuilderWrapper
+	 * @return String
+	 */
+	public String eventDivBuilder(EventDivBuilderWrapper eventDivBuilderWrapper) {
+		String studySubjectLabel = SubjectLabelNormalizer.normalizeSubjectLabel(eventDivBuilderWrapper.studySubject
+				.getLabel());
+
+		String divWidth = String.valueOf(POPUP_BASE_WIDTH + EIGHT);
 
 		HtmlBuilder eventDiv = new HtmlBuilder();
 
-		if (goingToReplaceHtmlContent) {
+		if (eventDivBuilderWrapper.goingToReplaceHtmlContent) {
 			resword = ResourceBundleProvider.getWordsBundle();
 			resformat = ResourceBundleProvider.getFormatBundle();
 		} else {
 			// Event Div
 			eventDiv.div()
-					.id("Event_" + studySubjectLabel + "_"
-							+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_" + rowCount)
-					.styleClass("eventDivWrapper ViewSubjectsPopup").style("width:" + divWidth + "px;")
-					.rel("" + studySubject.getId()).close();
+					.id("Event_"
+							+ studySubjectLabel
+							+ "_"
+							+ (eventDivBuilderWrapper.eventDefintionCRFId == null ? eventDivBuilderWrapper.sed.getId()
+									+ "ev" : eventDivBuilderWrapper.eventDefintionCRFId) + "_"
+							+ eventDivBuilderWrapper.rowCount).styleClass("eventDivWrapper ViewSubjectsPopup")
+					.style("width:" + divWidth + "px;").rel("" + eventDivBuilderWrapper.studySubject.getId()).close();
 		}
 
 		eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").close();
 
-		singleEventDivBuilder(eventDiv, rowCount, studyEvents, eventOccurrencesNumber, sed, studySubject, eventCRFId,
-				eventDefintionCRFId);
+		singleEventDivBuilder(eventDiv, eventDivBuilderWrapper);
 
 		return eventDiv.toString();
 	}
 
-	private void singleEventDivBuilder(HtmlBuilder eventDiv, Integer rowCount, List<StudyEventBean> studyEvents,
-			int eventOccurrencesNumber, StudyEventDefinitionBean sed, StudySubjectBean studySubject, String eventCRFId,
-			String eventDefintionCRFId) {
+	private void singleEventDivBuilder(HtmlBuilder eventDiv, EventDivBuilderWrapper eventDivBuilderWrapper) {
 
 		String tableHeaderRowLeftStyleClass = "table_header_row_left";
-		String add_another_occurrence = resword.getString("add_another_occurrence");
-		String occurrence_x_of = resword.getString("ocurrence");
+		String addAnotherOccurrence = resword.getString("add_another_occurrence");
+		String occurrenceXOf = resword.getString("ocurrence");
 		String status = resword.getString("status");
 
-		SubjectEventStatus eventStatus = studyEvents.size() == 0 ? SubjectEventStatus.NOT_SCHEDULED : studyEvents
-				.get(0).getSubjectEventStatus();
+		SubjectEventStatus eventStatus = eventDivBuilderWrapper.studyEvents.size() == 0 ? SubjectEventStatus.NOT_SCHEDULED
+				: eventDivBuilderWrapper.studyEvents.get(0).getSubjectEventStatus();
 
-		String studyEventId = studyEvents.size() == 0 ? "" : String.valueOf(studyEvents.get(0).getId());
-		Status eventSysStatus = studySubject.getStatus();
-		String studySubjectLabel = SubjectLabelNormalizer.normalizeSubjectLabel(studySubject.getLabel());
+		String studyEventId = eventDivBuilderWrapper.studyEvents.size() == 0 ? "" : String
+				.valueOf(eventDivBuilderWrapper.studyEvents.get(0).getId());
+		Status eventSysStatus = eventDivBuilderWrapper.studySubject.getStatus();
+		String studySubjectLabel = SubjectLabelNormalizer.normalizeSubjectLabel(eventDivBuilderWrapper.studySubject
+				.getLabel());
 
-		if (sed.isRepeating()) {
+		if (eventDivBuilderWrapper.sed.isRepeating()) {
 
 			eventDiv.tr(0).valign("top").close();
 			eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass + " wrapper_ptl").colspan("2").close();
 			eventDiv.bold()
-					.append(occurrence_x_of)
-					.append(studyEvents.isEmpty() ? "#1 of 1" : "#" + studyEvents.get(0).getSampleOrdinal() + " of "
-							+ eventOccurrencesNumber).br();
-			if (studyEvents.size() > 0) {
-				eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
+					.append(occurrenceXOf)
+					.append(eventDivBuilderWrapper.studyEvents.isEmpty() ? "#1 of 1" : "#"
+							+ eventDivBuilderWrapper.studyEvents.get(0).getSampleOrdinal() + " of "
+							+ eventDivBuilderWrapper.eventOccurrencesNumber).br();
+			if (eventDivBuilderWrapper.studyEvents.size() > 0) {
+				eventDiv.append(formatDate(eventDivBuilderWrapper.studyEvents.get(0).getDateStarted())).br();
 
 			} else {
 				eventDiv.append(status + " : " + SubjectEventStatus.NOT_SCHEDULED.getName());
@@ -960,40 +1145,52 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			if (eventStatus != SubjectEventStatus.NOT_SCHEDULED && eventSysStatus != Status.DELETED
 					&& eventSysStatus != Status.AUTO_DELETED) {
 				eventDiv.tr(0).close().td(0).styleClass("table_cell_left").close();
-				eventDiv.ahref("CreateNewStudyEvent?studySubjectId=" + studySubject.getId() + "&studyEventDefinition="
-						+ sed.getId(), add_another_occurrence);
+				eventDiv.ahref("CreateNewStudyEvent?studySubjectId=" + eventDivBuilderWrapper.studySubject.getId()
+						+ "&studyEventDefinition=" + eventDivBuilderWrapper.sed.getId(), addAnotherOccurrence);
 				eventDiv.tdEnd().trEnd(0);
 			}
 
 		}
 
 		eventDiv.tr(0)
-				.id("Menu_on_" + studySubjectLabel + "_"
-						+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_" + rowCount)
-				.style("display: all").close();
+				.id("Menu_on_"
+						+ studySubjectLabel
+						+ "_"
+						+ (eventDivBuilderWrapper.eventDefintionCRFId == null ? eventDivBuilderWrapper.sed.getId()
+								+ "ev" : eventDivBuilderWrapper.eventDefintionCRFId) + "_"
+						+ eventDivBuilderWrapper.rowCount).style("display: all").close();
 		eventDiv.td(0).colspan("2").close();
 
 		if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED
 				|| eventSysStatus == Status.LOCKED) {
 
-			if (eventStatus == SubjectEventStatus.NOT_SCHEDULED && canScheduleStudySubject(studySubject)
+			if (eventStatus == SubjectEventStatus.NOT_SCHEDULED
+					&& canScheduleStudySubject(eventDivBuilderWrapper.studySubject)
 					&& currentRole.getRole() != Role.STUDY_MONITOR && studyBean.getStatus().isAvailable()) {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
-				String href1 = "PageToCreateNewStudyEvent?studySubjectId=" + studySubject.getId()
-						+ "&studyEventDefinition=" + sed.getId();
+				String href1 = "PageToCreateNewStudyEvent?studySubjectId="
+						+ eventDivBuilderWrapper.studySubject.getId() + "&studyEventDefinition="
+						+ eventDivBuilderWrapper.sed.getId();
 				eventDiv.div()
-						.id("eventScheduleWrapper_" + studySubjectLabel + "_"
-								+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_"
-								+ rowCount).rel(href1).style(POPUP_BASE_WIDTH_PX).close().divEnd();
+						.id("eventScheduleWrapper_"
+								+ studySubjectLabel
+								+ "_"
+								+ (eventDivBuilderWrapper.eventDefintionCRFId == null ? eventDivBuilderWrapper.sed
+										.getId() + "ev" : eventDivBuilderWrapper.eventDefintionCRFId) + "_"
+								+ eventDivBuilderWrapper.rowCount).rel(href1).style(POPUP_BASE_WIDTH_PX).close()
+						.divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			} else {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
 				eventDiv.div()
-						.id("crfListWrapper_" + studySubjectLabel + "_"
-								+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_"
-								+ rowCount).style(POPUP_BASE_WIDTH_PX).close().divEnd();
+						.id("crfListWrapper_"
+								+ studySubjectLabel
+								+ "_"
+								+ (eventDivBuilderWrapper.eventDefintionCRFId == null ? eventDivBuilderWrapper.sed
+										.getId() + "ev" : eventDivBuilderWrapper.eventDefintionCRFId) + "_"
+								+ eventDivBuilderWrapper.rowCount).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			}
 		}
@@ -1002,9 +1199,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			eventDiv.tr(0).valign("top").close();
 			eventDiv.td(0).styleClass("table_cell_left").close();
 			eventDiv.div()
-					.id("crfListWrapper_" + studySubjectLabel + "_"
-							+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_" + rowCount)
-					.style(POPUP_BASE_WIDTH_PX).close().divEnd();
+					.id("crfListWrapper_"
+							+ studySubjectLabel
+							+ "_"
+							+ (eventDivBuilderWrapper.eventDefintionCRFId == null ? eventDivBuilderWrapper.sed.getId()
+									+ "ev" : eventDivBuilderWrapper.eventDefintionCRFId) + "_"
+							+ eventDivBuilderWrapper.rowCount).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 			eventDiv.tdEnd().trEnd(0);
 		}
 
@@ -1012,9 +1212,11 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		eventDiv.divEnd();
 
 		if (eventStatus != SubjectEventStatus.NOT_SCHEDULED
-				|| (eventStatus == SubjectEventStatus.NOT_SCHEDULED && canScheduleStudySubject(studySubject)
+				|| (eventStatus == SubjectEventStatus.NOT_SCHEDULED
+						&& canScheduleStudySubject(eventDivBuilderWrapper.studySubject)
 						&& currentRole.getRole() != Role.STUDY_MONITOR && studyBean.getStatus().isAvailable())) {
-			iconLinkBuilder(eventDiv, studySubjectLabel, rowCount, sed, studyEventId, eventCRFId, eventDefintionCRFId);
+			iconLinkBuilder(eventDiv, studySubjectLabel, eventDivBuilderWrapper.rowCount, eventDivBuilderWrapper.sed,
+					studyEventId, eventDivBuilderWrapper.eventCRFId, eventDivBuilderWrapper.eventDefintionCRFId);
 		}
 
 	}
