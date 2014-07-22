@@ -17,77 +17,147 @@ package org.akaza.openclinica.util;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Contains unit tests for org.akaza.openclinica.util.StringValidator class.
+ * 
  * @author Frank
  * 
  */
 public class StringValidatorTest {
 
+	/**
+	 * Tests isValidURL method with valid url.
+	 */
 	@Test
 	public void testUrlValidatorWithValidUrl() {
 		assertTrue(StringValidator.isValidURL("http://www.clinovo.com"));
 	}
 
+	/**
+	 * Tests isValidURL method with invalid url.
+	 */
 	@Test
 	public void testUrlValidatorWithInvalidUrl() {
 		assertFalse(StringValidator.isValidURL("Invalid URL"));
 	}
 
+	/**
+	 * Tests isValidInteger method with valid positive integer.
+	 */
 	@Test
 	public void testIntegerValidatorWithValidPositiveInteger() {
 		assertTrue(StringValidator.isValidInteger("200"));
 	}
 
+	/**
+	 * Tests isValidInteger with valid negative integer.
+	 */
 	@Test
-	public void testIntegerValidatorWithInvalidNegativeInteger() {
+	public void testIntegerValidatorWithValidNegativeInteger() {
 		assertTrue(StringValidator.isValidInteger("-200"));
 	}
 
+	/**
+	 * Tests isValidInteger with non-integer.
+	 */
 	@Test
 	public void testIntegerValidatorWithNonInteger() {
 		assertFalse(StringValidator.isValidInteger("67.9"));
 	}
 
+	/**
+	 * Tests hasNumber method with valid text.
+	 */
 	@Test
 	public void testHasNumberWithValidText() {
 		assertTrue(StringValidator.hasNumber("Test has 1 number"));
 	}
 
+	/**
+	 * Tests hasNumber method with invalid text.
+	 */
 	@Test
 	public void testHasNumberWithInvalidText() {
 		assertFalse(StringValidator.hasNumber("Test has no number"));
 	}
 
+	/**
+	 * Tests isValidNumber method with positive floating point number.
+	 */
 	@Test
 	public void testNumberValidatorWithValidPositiveFloatingPointNumber() {
 		assertTrue(StringValidator.isValidNumber("200.90"));
 	}
 
+	/**
+	 * Tests isValidNumber with positive integer.
+	 */
 	@Test
 	public void testNumberValidatorWithValidPositiveInteger() {
 		assertTrue(StringValidator.isValidNumber("200"));
 	}
 
+	/**
+	 * Tests isValidNumber method with valid negative number.
+	 */
 	@Test
 	public void testNumberValidatorWithValidNegativeNumber() {
 		assertTrue(StringValidator.isValidNumber("-200.6"));
 	}
 
+	/**
+	 * Tests isValidNumber method with text.
+	 */
 	@Test
 	public void testNumberValidatorWithText() {
 		assertFalse(StringValidator.isValidNumber("Not Number"));
 	}
 
+	/**
+	 * Tests isValidDateYYYYMMDD method with valid date.
+	 */
 	@Test
 	public void testDateYYYYMMDDValidatorWithValidDate() {
 		assertTrue(StringValidator.isValidDateYYYYMMDD("2014-04-17"));
 	}
 
+	/**
+	 * Tests isValidDateYYYYMMDD method with invalid date.
+	 */
 	@Test
 	public void testDateYYYYMMDDValidatorWithInvalidDate() {
 		assertFalse(StringValidator.isValidDateYYYYMMDD("2014-67-17"));
+	}
+
+	/**
+	 * Tests the itemExitsInList method with input expecting true.
+	 */
+	@Test
+	public void testThatItemExitsInListReturnsTrue() {
+		List<String> stringList = new ArrayList<String>();
+		String testString = "my string";
+		stringList.add("String1");
+		stringList.add("String2");
+		stringList.add(testString);
+		assertTrue(StringValidator.itemExitsInList(testString, stringList));
+	}
+
+	/**
+	 * Tests the itemExitsInList method with input expecting false.
+	 */
+	@Test
+	public void testThatItemExistsInListReturnsFalse() {
+		List<String> stringList = new ArrayList<String>();
+		String testString = "my string";
+		stringList.add("String1");
+		stringList.add("String2");
+		stringList.add("String3");
+		assertFalse(StringValidator.itemExitsInList(testString, stringList));
 	}
 }

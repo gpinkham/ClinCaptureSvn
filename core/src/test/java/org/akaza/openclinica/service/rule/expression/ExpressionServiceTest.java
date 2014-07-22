@@ -13,15 +13,54 @@
 
 package org.akaza.openclinica.service.rule.expression;
 
-import junit.framework.TestCase;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.junit.Before;
+import org.junit.Test;
 
-public class ExpressionServiceTest extends TestCase {
+import java.util.List;
 
-	public void testStatement() {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * Contains unit tests for org.akaza.openclinica.service.rule.expression.ExpressionService class.
+ * 
+ * @author Frank
+ * 
+ */
+public class ExpressionServiceTest {
+
+	private ExpressionService expressionService;
+	private RuleSetBean ruleSet;
+
+	/**
+	 * Sets up objects to be used in tests.
+	 */
+	@Before
+	public void setUp() {
 		org.apache.commons.dbcp.BasicDataSource ds = new org.apache.commons.dbcp.BasicDataSource();
-		ExpressionService expressionService = new ExpressionService(ds);
+		expressionService = new ExpressionService(ds);
+		ruleSet = new RuleSetBean();
 
+		ExpressionBean ruleTarget = new ExpressionBean();
+		ruleTarget.setValue("SE_E2[936].F_CASECOMPLETION.IG_CASEC_UNGROUPED.I_CASEC_RDCSC90DFU");
+
+		ExpressionBean originalTarget = new ExpressionBean();
+		originalTarget.setValue("F_CASECOMPLETION.IG_CASEC_UNGROUPED.I_CASEC_RDCSC90DFU");
+		originalTarget.setTargetVersionOid("F_CASECOMPLETION_V1");
+		originalTarget.setTargetEventOid("SE_E2");
+
+		ruleSet.setOriginalTarget(originalTarget);
+		ruleSet.setTarget(ruleTarget);
+	}
+
+	/**
+	 * Tests that check syntax works fine.
+	 */
+	@Test
+	public void testThatCheckSyntaxWorksFine() {
 		// Syntax
 		assertEquals(false,
 				expressionService.checkSyntax("StudyEventName[ALL].FormName1.ItemGroupName[ALL].ItemName11."));
@@ -135,9 +174,43 @@ public class ExpressionServiceTest extends TestCase {
 
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		// MockContextFactory.revertSetAsInitial();
+	/**
+	 * Tests that prepareRuleExpression method doesn not return null.
+	 */
+	@Test
+	public void testThatPrepareRuleExpressionDoesNotReturnNull() {
+		String expression = "F_CASECOMPLETION.IG_CASEC_UNGROUPED.I_CASEC_RDCSC90DFU eq SE_E2.F_CONCOMITANTMEDICATION.IG_CONCO_GROUP.I_CONCO_SE023_TXT_DOSE";
+		assertNotNull(expressionService.prepareRuleExpression(expression, ruleSet));
+	}
+
+	/**
+	 * Tests that prepareRuleExpression method returns a list with at least one element.
+	 */
+	@Test
+	public void testThatPrepareRuleExpressionReturnsAtleastOne() {
+		String expression = "F_CASECOMPLETION.IG_CASEC_UNGROUPED.I_CASEC_RDCSC90DFU eq SE_E2.F_CONCOMITANTMEDICATION.IG_CONCO_GROUP.I_CONCO_SE023_TXT_DOSE";
+		List<String> expressions = expressionService.prepareRuleExpression(expression, ruleSet);
+		boolean atLeastOne = expressions.size() > 0;
+		assertTrue(atLeastOne);
+	}
+
+	/**
+	 * Tests that insertGroupOrdinal method works fine with a grouped item.
+	 */
+	@Test
+	public void testThatInsertGroupOrdinalWorksForGroupedItem() {
+		String expression = "SE_E2.F_CONCOMITANTMEDICATION.IG_CONCO_GROUP.I_CONCO_SE023_TXT_DOSE";
+		String newExpression = expressionService.insertGroupOrdinal(expression, 2);
+		assertEquals("SE_E2.F_CONCOMITANTMEDICATION.IG_CONCO_GROUP[2].I_CONCO_SE023_TXT_DOSE", newExpression);
+	}
+
+	/**
+	 * Tests that insertGroupOrdinal works fine with an ungrouped item.
+	 */
+	@Test
+	public void testThatInsertGroupOrdinalWorksForUngroupedItem() {
+		String expression = "F_CASECOMPLETION.IG_CASEC_UNGROUPED.I_CASEC_RDCSC90DFU";
+		String newExpression = expressionService.insertGroupOrdinal(expression, 2);
+		assertEquals("F_CASECOMPLETION.IG_CASEC_UNGROUPED.I_CASEC_RDCSC90DFU", newExpression);
 	}
 }

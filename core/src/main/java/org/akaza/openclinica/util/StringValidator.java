@@ -15,21 +15,27 @@
 
 package org.akaza.openclinica.util;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author Frank
+ * This class contains string utility methods.
  * 
+ * @author Frank
  */
-public class StringValidator {
+public final class StringValidator {
+
+	private StringValidator() {
+
+	}
 
 	/***
-	 * Checks if passed string is a valid URL
+	 * Checks if passed string is a valid URL.
 	 * 
 	 * @param url
-	 *            String
-	 * @return boolean
+	 *            to be validated
+	 * @return true if url is valid, false otherwise
 	 */
 	public static boolean isValidURL(String url) {
 
@@ -41,11 +47,11 @@ public class StringValidator {
 	}
 
 	/***
-	 * Checks if passed string is contains at least one number
+	 * Checks if passed String is contains at least one number.
 	 * 
 	 * @param text
-	 *            String
-	 * @return boolean
+	 *            String to be checked.
+	 * @return true if String contains at least one number, false otherwise.
 	 */
 	public static boolean hasNumber(String text) {
 
@@ -55,11 +61,11 @@ public class StringValidator {
 	}
 
 	/***
-	 * Checks if passed string is a valid integer (non floating-point) e.g 200, 1, 6
+	 * Checks if passed string is a valid integer (non floating-point) e.g 200, 1, 6.
 	 * 
 	 * @param integer
-	 *            String
-	 * @return boolean
+	 *            String to be checked
+	 * @return true if String is valid integer, false otherwise
 	 */
 	public static boolean isValidInteger(String integer) {
 
@@ -69,11 +75,11 @@ public class StringValidator {
 	}
 
 	/***
-	 * Checks if passed string is a valid number (integer or floating-point) e.g 200, 3.2, -56, -98.01
+	 * Checks if passed string is a valid number (integer or floating-point) e.g 200, 3.2, -56, -98.01.
 	 * 
 	 * @param number
-	 *            String
-	 * @return boolean
+	 *            String to be checked
+	 * @return true if string is valid number, false otherwise
 	 */
 	public static boolean isValidNumber(String number) {
 
@@ -83,16 +89,34 @@ public class StringValidator {
 	}
 
 	/***
-	 * Checks if passed string is a valid date in the format YYYY-MM-DD
+	 * Checks if passed string is a valid date in the format YYYY-MM-DD.
 	 * 
 	 * @param date
-	 *            String
-	 * @return boolean
+	 *            Date string to be checked
+	 * @return true if valid, false otherwise
 	 */
 	public static boolean isValidDateYYYYMMDD(String date) {
 
 		Pattern datePattern = Pattern.compile("((19|20)\\d\\d)(-)(0?[1-9]|1[012])(-)(0?[1-9]|[12][0-9]|3[01])");
 		Matcher matcher = datePattern.matcher(date);
 		return matcher.find();
+	}
+
+	/**
+	 * Checks if an String exits in a List of Strings.
+	 * 
+	 * @param item
+	 *            String to be searched for
+	 * @param items
+	 *            List of Strings to search from
+	 * @return true if String exists in List, false otherwise
+	 */
+	public static boolean itemExitsInList(String item, List<String> items) {
+		for (String it : items) {
+			if (it.equals(item)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
