@@ -1238,8 +1238,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			linksDivBuilderWrapper.studySubject = studySubject;
 			linksDivBuilderWrapper.currentEvent = studyEventBean;
 			linksDivBuilderWrapper.idAttribute = idAttribute;
-			linksDivBuilderWrapper.eventDiv = eventDiv;
-			linksDivBuilderWrapper.eventDiv = eventDiv;
 			linksDivBuilder(linksDivBuilderWrapper);
 
 			eventDiv.tableEnd(0);
