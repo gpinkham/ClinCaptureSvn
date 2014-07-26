@@ -193,7 +193,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 			ArrayList<StudyEventBean> evts = sedao.findAllByStudySubject(ssb);
 			for (StudyEventBean seb : evts) {
 				seb.setStudySubjectLabel(ssb.getLabel());
-				if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator())
+				if (!(currentRole.isSysAdmin() || currentRole.isStudyAdministrator())
 						&& seb.getSubjectEventStatus().isLocked()) {
 					seb.setEditable(false);
 				}

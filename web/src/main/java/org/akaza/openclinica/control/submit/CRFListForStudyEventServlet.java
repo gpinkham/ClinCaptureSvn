@@ -142,7 +142,7 @@ public class CRFListForStudyEventServlet extends Controller {
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
 		seb.setStudyEventDefinition(sedb);
-		if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator())
+		if (!(currentRole.isSysAdmin() || currentRole.isStudyAdministrator())
 				&& seb.getSubjectEventStatus().isLocked()) {
 			seb.setEditable(false);
 		}

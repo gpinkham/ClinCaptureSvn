@@ -332,7 +332,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 					getDataSource(), ub, currentRole, true);
 
 			for (DisplayStudyEventBean decb : displayEvents) {
-				if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator())
+				if (!(currentRole.isSysAdmin() || currentRole.isStudyAdministrator())
 						&& decb.getStudyEvent().getSubjectEventStatus().isLocked()) {
 					decb.getStudyEvent().setEditable(false);
 				}
