@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -22,7 +22,6 @@ import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory;
 import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobs;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
-import org.apache.commons.dbcp.BasicDataSource;
 import org.jmesa.facade.TableFacade;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
@@ -53,17 +52,16 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 /**
- * 
  * @author jnyayapathi Controller for listing all the scheduled jobs. Also an interface for canceling the jobs which are
  *         running.
  */
 @SuppressWarnings({ "unchecked" })
 @Controller("ScheduledJobController")
 public class ScheduledJobController {
-	public final static String SCHEDULED_TABLE_ATTRIBUTE = "scheduledTableAttribute";
-	@Autowired
-	private BasicDataSource dataSource;
-	private String SCHEDULER = "schedulerFactoryBean";
+
+	public static final String SCHEDULED_TABLE_ATTRIBUTE = "scheduledTableAttribute";
+
+	private static final String SCHEDULER = "schedulerFactoryBean";
 
 	@Autowired
 	private ScheduledJobTableFactory scheduledJobTableFactory;
@@ -72,9 +70,12 @@ public class ScheduledJobController {
 	@Autowired
 	private SDVUtil sdvUtil;
 
-	protected final static Logger logger = LoggerFactory
+	protected static final Logger LOGGER = LoggerFactory
 			.getLogger("org.akaza.openclinica.controller.ScheduledJobController");
 
+	/**
+	 * Default class constructor.
+	 */
 	public ScheduledJobController() {
 
 	}
@@ -95,12 +96,9 @@ public class ScheduledJobController {
 		ResourceBundleProvider.updateLocale(request.getLocale());
 		ModelMap gridMap = new ModelMap();
 		StdScheduler scheduler = getScheduler(request);
-		boolean showMoreLink = false;
-		if (request.getParameter("showMoreLink") != null) {
-			showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink").toString());
-		} else {
-			showMoreLink = true;
-		}
+		boolean showMoreLink = request.getParameter("showMoreLink") == null || Boolean
+				.parseBoolean(request.getParameter("showMoreLink"));
+
 		request.setAttribute("showMoreLink", showMoreLink + "");
 
 		request.setAttribute("imagePathPrefix", "../");
@@ -112,8 +110,7 @@ public class ScheduledJobController {
 
 		request.setAttribute("pageMessages", pageMessages);
 
-		List<JobExecutionContext> listCurrentJobs = new ArrayList<JobExecutionContext>();
-		listCurrentJobs = scheduler.getCurrentlyExecutingJobs();
+		List<JobExecutionContext> listCurrentJobs = scheduler.getCurrentlyExecutingJobs();
 		Iterator<JobExecutionContext> itCurrentJobs = listCurrentJobs.iterator();
 		List<String> currentJobList = new ArrayList<String>();
 		while (itCurrentJobs.hasNext()) {
@@ -121,9 +118,9 @@ public class ScheduledJobController {
 			currentJobList.add(temp.getTrigger().getKey().getName() + temp.getTrigger().getKey().getGroup());
 		}
 
-		Iterator<String> it = scheduler.getPausedTriggerGroups().iterator();
-		while (it.hasNext()) {
-			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(it.next()));
+		for (String group: scheduler.getPausedTriggerGroups()) {
+
+			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(group));
 			for (TriggerKey triggerKey : legacyTriggers) {
 				Trigger trigger = scheduler.getTrigger(triggerKey);
 				logMe("Paused Job Group" + trigger.getJobKey().getGroup());
@@ -133,20 +130,6 @@ public class ScheduledJobController {
 			}
 		}
 
-		// enumerate each job group
-		/*
-		 * for(String group: scheduler.getJobGroupNames()) { // enumerate each job in group
-		 * 
-		 * 
-		 * for(StdScheduler currentJob:listCurrentJobs) { currentJob.getJobNames(group); }
-		 * 
-		 * 
-		 * for(String jobName:scheduler.getJobNames(group)){
-		 * 
-		 * System.out.println("Found job identified by: " + jobName);
-		 * 
-		 * } }
-		 */
 		List<String> triggerGroups = scheduler.getTriggerGroupNames();
 		List<SimpleTriggerImpl> simpleTriggers = new ArrayList<SimpleTriggerImpl>();
 		for (String triggerGroup : triggerGroups) {
@@ -162,25 +145,15 @@ public class ScheduledJobController {
 		}
 
 		List<ScheduledJobs> jobsScheduled = new ArrayList<ScheduledJobs>();
-		/*
-		 * for(JobExecutionContext jec:listCurrentJobs) { ScheduledJobs jobs = new ScheduledJobs(); StringBuilder
-		 * schedulerStatus = new StringBuilder("");
-		 * 
-		 * schedulerStatus.append( "<center><input style='margin-right: 5px' type='checkbox' "
-		 * ).append("class='sdvCheck'") .append(" name='").append("sdvCheck_") .append
-		 * ((Integer)jec.getTrigger().getJobDataMap().get("dsId")).append( "' /></center>");
-		 * 
-		 * jobs.setCheckbox(schedulerStatus.toString()); jobs.setDatasetId((Integer
-		 * )jec.getTrigger().getJobDataMap().get("dsId")+""); jobs.setFireTime(jec.getFireTime()+"");
-		 * jobs.setScheduledFireTime(jec.getScheduledFireTime()+""); jobsScheduled.add(index, jobs); index++; }
-		 */
+
 		for (SimpleTriggerImpl st : simpleTriggers) {
 
 			ScheduledJobs jobs = new ScheduledJobs();
 
 			ExtractPropertyBean epBean = null;
-			if (st.getJobDataMap() != null)
+			if (st.getJobDataMap() != null) {
 				epBean = (ExtractPropertyBean) st.getJobDataMap().get(EP_BEAN);
+			}
 
 			if (epBean != null) {
 				StringBuilder checkbox = new StringBuilder("");
@@ -196,17 +169,18 @@ public class ScheduledJobController {
 						.append("this.form.theTriggerGroupName.value='").append(st.getGroup()).append("';")
 						.append("this.form.submit();").append("setAccessedObjected(this);");
 
-				actions.append("<td><input type=\"button\" class=\"button\" value=\"Cancel Job\" name=\"cancelJob\" ")
-						.append("onclick=\"").append(jsCodeString.toString()).append("\" />");
-				actions.append("<a href='#' data-cc-runningJobId='" + st.getName() + "' style='display: none;'></a>");
-				actions.append("</td></tr></table>");
+				actions.append("<td><input type=\"button\" class=\"button_medium\" value=\"Skip Next Run\" name=\"skipNextRun\" ")
+						.append("onclick=\"").append(jsCodeString.toString()).append("\" />")
+						.append("<a href='#' data-cc-runningJobId='").append(st.getName())
+						.append("' style='display: none;'></a>")
+						.append("</td></tr></table>");
 
 				jobs.setCheckbox(checkbox.toString());
-				// jobs.setDatasetId((Integer)st.getJobDataMap().get("dsId")+"");
 				jobs.setDatasetId(epBean.getDatasetName());
 				jobs.setFireTime(st.getStartTime() + "");
-				if (st.getNextFireTime() != null)
+				if (st.getNextFireTime() != null) {
 					jobs.setScheduledFireTime(st.getNextFireTime() + "");
+				}
 				jobs.setExportFileName(epBean.getExportFileName()[0]);
 				jobs.setAction(actions.toString());
 				jobs.setJobStatus(currentJobList.contains(st.getJobName() + st.getGroup()) ? "Currently Executing"
@@ -267,10 +241,8 @@ public class ScheduledJobController {
 			newTrigger.setGroup(triggerGroupName);
 			newTrigger.setJobName(theJobName);
 			newTrigger.setJobGroup(theJobGroupName);
-			// newTrigger.setNextFireTime(nextFireTime );
 			newTrigger.setMisfireInstruction(oldTrigger.getMisfireInstruction());
 			newTrigger.setJobDataMap(oldTrigger.getJobDataMap());
-			// newTrigger.setVolatility(false);
 			newTrigger.setRepeatCount(oldTrigger.getRepeatCount());
 			newTrigger.setRepeatInterval(oldTrigger.getRepeatInterval());
 			newTrigger
@@ -278,7 +250,7 @@ public class ScheduledJobController {
 			newTrigger.setStartTime(startTime);
 			newTrigger.setRepeatInterval(oldTrigger.getRepeatInterval());
 
-			scheduler.unscheduleJob(TriggerKey.triggerKey(triggerName, triggerGroupName));// these are the jobs which
+			scheduler.unscheduleJob(TriggerKey.triggerKey(triggerName, triggerGroupName)); // these are the jobs which
 																							// are from
 																							// extract data and
 																							// are not not required to
@@ -300,13 +272,10 @@ public class ScheduledJobController {
 				jobDetailBean.setName(newTrigger.getName());
 				jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
 				jobDetailBean.setJobDataMap(newTrigger.getJobDataMap());
-				jobDetailBean.setDurability(true); // need durability?
-				// jobDetailBean.setVolatility(false);
+				jobDetailBean.setDurability(true);
 
 				scheduler.deleteJob(jobDetailBean.getKey());
-				// scheduler.rescheduleJob(triggerName, triggerGroupName,
-				// newTrigger); // These are the jobs which come
-				// from export job and need to be rescheduled.
+
 				scheduler.scheduleJob(jobDetailBean, newTrigger);
 
 				messageFormat.applyPattern(resPageMessages.getString("job_has_been_rescheduled"));
@@ -324,25 +293,33 @@ public class ScheduledJobController {
 	}
 
 	private void logMe(String msg) {
-		// System.out.println(msg);
-		logger.info(msg);
+
+		LOGGER.info(msg);
 	}
 
 	private StdScheduler getScheduler(HttpServletRequest request) {
-		StdScheduler scheduler = (StdScheduler) SpringServletAccess.getApplicationContext(
-				request.getSession().getServletContext()).getBean(SCHEDULER);
-		return scheduler;
+
+		return (StdScheduler) SpringServletAccess
+				.getApplicationContext(request.getSession().getServletContext()).getBean(SCHEDULER);
 	}
 
 	private boolean mayProceed(HttpServletRequest request) {
+
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
 		Role r = currentRole.getRole();
 
 		return r != null && !Role.INVALID.equals(r);
 	}
 
+	/**
+	 * Common exception handler.
+	 *
+	 * @param ex an object, which represents the exception was thrown.
+	 * @return URL to redirect the user to.
+	 */
 	@ExceptionHandler(Exception.class)
 	public String handleException(Exception ex) {
+
 		ex.printStackTrace();
 		return "redirect:/MainMenu";
 	}
