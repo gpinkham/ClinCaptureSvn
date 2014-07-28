@@ -3,6 +3,8 @@ package org.akaza.openclinica.dao.managestudy;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.dao.submit.ListSubjectFilter;
+import org.akaza.openclinica.dao.submit.ListSubjectSort;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
 
@@ -10,6 +12,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import static org.mockito.Mockito.*;
 
 /**
  * StudySubjectDaoTest class that tests the StudySubjectDao's methods.
@@ -104,16 +108,25 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 	}
 
 	/**
-	 * Test that getWithFilterAndSort method returns correct collection's size.
+	 * Test that getWithFilterAndSort method returns correct subjects amount.
 	 */
 	@Test
-	public void checkThatGetWithFilterAndSortMethodReturnsTheCorrectCollectionsSize() {
-		final int startFrom = 0;
-		final int pageSize = 15;
-		StudyBean currentStudy = new StudyBean();
-		currentStudy.setId(1);
-		List<StudySubjectBean> list = studySubjectDAO.getWithFilterAndSort(currentStudy, new FindSubjectsFilter(
-				studyGroupClassDAO), new FindSubjectsSort(), startFrom, pageSize);
-		assertEquals(list.size(), 1);
+	public void testThatGetWithFilterAndSortReturnsCorrectAmountOfStudySubjects() {
+
+		CriteriaCommand mockFilter = mock(ListSubjectFilter.class);
+		when(mockFilter.execute("")).thenReturn("");
+
+		CriteriaCommand mockSort = mock(ListSubjectSort.class);
+		when(mockSort.execute("")).thenReturn("");
+
+		StudyBean study = new StudyBean();
+		study.setId(1);
+
+		List<StudySubjectBean> listOfSubjects =
+				studySubjectDAO.getWithFilterAndSort(study, mockFilter, mockSort, 0, 15);
+
+		int expectedSubjectsAmount = 1;
+
+		assertEquals(expectedSubjectsAmount, listOfSubjects.size());
 	}
 }

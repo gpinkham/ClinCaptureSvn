@@ -1146,44 +1146,47 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method that returns list of study subjects by currentStudy, FindSubjectsFilter, FindSubjectsSort, rowStart and
-	 * rowEnd.
-	 * 
-	 * @param currentStudy
-	 *            StudyBean
-	 * @param filter
-	 *            FindSubjectsFilter
-	 * @param sort
-	 *            FindSubjectsSort
-	 * @param rowStart
-	 *            rowStart
-	 * @param rowEnd
-	 *            rowEnd
-	 * @return Integer count of the study subjects
+	 * Returns a part of the list of the study subjects, that matches specified filters and sorting
+	 * (if there were specified some).
+	 *
+	 * @param currentStudy an instance of the <code>StudyBean</code> class, which represents the study/site, to search in.
+	 * @param filter       an instance of the <code>CriteriaCommand</code> interface, which is a specific filter class
+	 *                     for generating string representation of SQL filters, to be applied to the list of subjects.
+	 * @param sort         an instance of the <code>CriteriaCommand</code> interface, which is a specific sorting class
+	 *                     for generating string representation of SQL sorting, to be applied to the list of subjects.
+	 * @param rowStart     the start position of the part of the subject's list, to be returned.
+	 * @param rowEnd       the end position of the part of the subject's list, to be returned.
+	 * @return the list of instances of <code>StudySubjectBean</code> class, which match the SQL query;
+	 * if no records, matching the SQL query, were found, returns empty list.
 	 */
-	public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, FindSubjectsFilter filter,
-			FindSubjectsSort sort, int rowStart, int rowEnd) {
+	public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, CriteriaCommand filter,
+			CriteriaCommand sort, int rowStart, int rowEnd) {
+
 		ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
 		setTypesExpected();
-		String partialSql;
+
 		HashMap variables = new HashMap();
 		int index = 1;
 		variables.put(index++, currentStudy.getId());
 		variables.put(index, currentStudy.getId());
+
 		String sql = digester.getQuery("getWithFilterAndSort");
 		sql = sql + filter.execute("");
-		// Order by Clause for the defect id 0005480
 
-		partialSql = sort.execute("");
+		String partialSql = sort.execute("");
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
+
 			if (partialSql.equals("")) {
 				sql += " ORDER BY SS.label )x)where r between " + (rowStart + 1) + " and " + rowEnd;
 			} else {
 				sql += ")x)where r between " + (rowStart + 1) + " and " + rowEnd;
 			}
+
 			sql = sql + partialSql;
 		} else {
+
 			sql = sql + partialSql;
+
 			if (partialSql.equals("")) {
 				sql = sql + "  ORDER BY SS.label LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
 			} else {
@@ -1482,51 +1485,6 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		} else {
 			return null;
 		}
-	}
-
-	/**
-	 * Method that returns list of study subjects by currentStudy, ListEventsForSubjectFilter, ListEventsForSubjectSort,
-	 * rowStart and rowEnd.
-	 * 
-	 * @param currentStudy
-	 *            StudyBean
-	 * @param filter
-	 *            ListEventsForSubjectFilter
-	 * @param sort
-	 *            ListEventsForSubjectSort
-	 * @param rowStart
-	 *            rowStart
-	 * @param rowEnd
-	 *            rowEnd
-	 * @return Integer count of the study subjects
-	 */
-	public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, ListEventsForSubjectFilter filter,
-			ListEventsForSubjectSort sort, int rowStart, int rowEnd) {
-		ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
-		setTypesExpected();
-
-		HashMap variables = new HashMap();
-		int index = 1;
-		variables.put(index++, currentStudy.getId());
-		variables.put(index, currentStudy.getId());
-		String sql = digester.getQuery("getWithFilterAndSort");
-		sql = sql + filter.execute("");
-
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
-			sql += ")x) where r between " + (rowStart + 1) + " and " + rowEnd + " ";
-			sql = sql + sort.execute("");
-		} else {
-			sql = sql + sort.execute("");
-			sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
-		}
-
-		ArrayList rows = this.select(sql, variables);
-
-		for (Object row : rows) {
-			StudySubjectBean studySubjectBean = (StudySubjectBean) this.getEntityFromHashMap((HashMap) row);
-			studySubjects.add(studySubjectBean);
-		}
-		return studySubjects;
 	}
 
 	/**
