@@ -62,6 +62,7 @@ public abstract class ListStudySubjectServlet extends Controller {
 	/**
 	 * Class holder for internal purposes.
 	 */
+	@SuppressWarnings("unused")
 	private class ArrayListsHolder {
 
 		private ArrayList allDefs;
