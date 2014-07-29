@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 /**
  * StudySubjectDaoTest class that tests the StudySubjectDao's methods.
  */
+@SuppressWarnings("rawtypes")
 public class StudySubjectDaoTest extends DefaultAppContextTest {
 
 	/**
