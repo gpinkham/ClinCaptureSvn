@@ -21,24 +21,44 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * StudySubjectSDVFilter class.
+ */
 public class StudySubjectSDVFilter implements CriteriaCommand {
 
-	List<Filter> filters = new ArrayList<Filter>();
-	HashMap<String, String> columnMapping = new HashMap<String, String>();
+	private StudySubjectDAO studySubjectDAO;
+	private List<Filter> filters = new ArrayList<Filter>();
+	private HashMap<String, String> columnMapping = new HashMap<String, String>();
 
-	private String sdvStudySubjectFilter;
-
+	/**
+	 * StudySubjectSDVFilter constructor.
+	 */
 	public StudySubjectSDVFilter() {
 		columnMapping.put("sdvStatus", "");
 		columnMapping.put("studySubjectId", "mss.label");
 		columnMapping.put("siteId", "mst.unique_identifier");
-		sdvStudySubjectFilter = new StudySubjectDAO(null).getSdvStudySubjectFilter();
+		studySubjectDAO = new StudySubjectDAO(null);
 	}
 
+	/**
+	 * Method adds a filter.
+	 *
+	 * @param property
+	 *            String property
+	 * @param value
+	 *            Object value
+	 */
 	public void addFilter(String property, Object value) {
 		filters.add(new Filter(property, value));
 	}
 
+	/**
+	 * Method executes all filters.
+	 *
+	 * @param criteria
+	 *            String criteria
+	 * @return String
+	 */
 	public String execute(String criteria) {
 		String theCriteria = "";
 		for (Filter filter : filters) {
@@ -52,9 +72,9 @@ public class StudySubjectSDVFilter implements CriteriaCommand {
 		if (value != null) {
 			if (property.equals("sdvStatus")) {
 				if (value.equals("complete")) {
-					criteria += " AND " + sdvStudySubjectFilter + " ";
+					criteria += " AND mss.study_subject_id IN (" + studySubjectDAO.getQuery("sdvCompleteFilterForStudySubject") + ") ";
 				} else {
-					criteria += " AND NOT " + sdvStudySubjectFilter + " ";
+					criteria += " AND NOT mss.study_subject_id IN (" + studySubjectDAO.getQuery("sdvCompleteFilterForStudySubject") + ") ";
 				}
 			} else {
 				criteria = criteria + " and ";

@@ -3,6 +3,8 @@ package org.akaza.openclinica.dao.managestudy;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.dao.StudySubjectSDVFilter;
+import org.akaza.openclinica.dao.StudySubjectSDVSort;
 import org.akaza.openclinica.dao.submit.ListSubjectFilter;
 import org.akaza.openclinica.dao.submit.ListSubjectSort;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -10,6 +12,7 @@ import org.junit.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +22,71 @@ import static org.mockito.Mockito.*;
  * StudySubjectDaoTest class that tests the StudySubjectDao's methods.
  */
 public class StudySubjectDaoTest extends DefaultAppContextTest {
+
+	/**
+	 * Test that isStudySubjectReadyToBeSDVed returns correct value.
+	 * 
+	 * @throws OpenClinicaException
+	 *             the suctom OpenClinicaException
+	 */
+	@Test
+	public void testTthatisStudySubjectReadyToBeSDVedReturnsCorrectValue() throws OpenClinicaException {
+		StudyBean currentStudy = new StudyBean();
+		currentStudy.setId(1);
+		StudySubjectBean studySubject = new StudySubjectBean();
+		studySubject.setId(1);
+		boolean result = studySubjectDAO.isStudySubjectReadyToBeSDVed(currentStudy, studySubject);
+		assertEquals(result, false);
+	}
+
+	/**
+	 * Test that isStudySubjectSDVed returns correct value.
+	 * 
+	 * @throws OpenClinicaException
+	 *             the suctom OpenClinicaException
+	 */
+	@Test
+	public void testTthatIsStudySubjectSDVedReturnsCorrectValue() throws OpenClinicaException {
+		StudyBean currentStudy = new StudyBean();
+		currentStudy.setId(1);
+		StudySubjectBean studySubject = new StudySubjectBean();
+		studySubject.setId(1);
+		boolean result = studySubjectDAO.isStudySubjectSDVed(currentStudy, studySubject);
+		assertEquals(result, false);
+	}
+
+	/**
+	 * Test that method findAllByStudySDV returns the correct collection size.
+	 * 
+	 * @throws OpenClinicaException
+	 *             the suctom OpenClinicaException
+	 */
+	@Test
+	public void testThatMethodFindAllByStudySDVReturnsTheCorrectCollectionSize() throws OpenClinicaException {
+		StudyBean currentStudy = new StudyBean();
+		currentStudy.setId(1);
+		final int rowEnd = 15;
+		final int rowStart = 0;
+		StudySubjectSDVSort sort = new StudySubjectSDVSort();
+		StudySubjectSDVFilter filter = new StudySubjectSDVFilter();
+		ArrayList result = studySubjectDAO.findAllByStudySDV(currentStudy, filter, sort, rowStart, rowEnd);
+		assertEquals(result.size(), 0);
+	}
+
+	/**
+	 * Test that method countAllByStudySDV returns the correct value.
+	 * 
+	 * @throws OpenClinicaException
+	 *             the suctom OpenClinicaException
+	 */
+	@Test
+	public void testThatMethodCountAllByStudySDVReturnsTheCorrectValue() throws OpenClinicaException {
+		StudyBean currentStudy = new StudyBean();
+		currentStudy.setId(1);
+		StudySubjectSDVFilter filter = new StudySubjectSDVFilter();
+		int result = studySubjectDAO.countAllByStudySDV(currentStudy, filter);
+		assertEquals(result, 0);
+	}
 
 	/**
 	 * Test that the allowSDVSubject method return correct value.

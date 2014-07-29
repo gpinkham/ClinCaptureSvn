@@ -88,23 +88,13 @@
                     AND (ST.study_id=? or ST.parent_study_id=?)
         </sql>
     </query>
+
     <query>
         <name>findAllByStudySDV</name>
         <sql>
-            SELECT mss.*, mst.unique_identifier FROM study_subject mss, study mst
-            WHERE
-            mss.study_id = mst.study_id AND
-            (mst.study_id=? or mst.parent_study_id=?) 
-        </sql>
-    </query>
-
-    <query>
-        <name>countAllByStudySDV</name>
-        <sql>
-            SELECT COUNT( mss.study_subject_id) as count FROM study_subject mss, study mst
-            WHERE
-            mss.study_id = mst.study_id AND
-            (mst.study_id=? or mst.parent_study_id=?)
+            SELECT mss.study_subject_id
+            FROM study_subject mss
+            LEFT JOIN study s on s.study_id = mss.study_id
         </sql>
     </query>
 
@@ -352,45 +342,194 @@
         </sql>
     </query>
     <query>
-        <name>isStudySubjectSDVed</name>
+        <name>sdvCompleteFilterForStudySubject</name>
         <sql>
-            SELECT distinct mss.study_subject_id FROM study_subject mss WHERE mss.study_subject_id = ? AND
+            <![CDATA[
+            SELECT mss.study_subject_id
+
+            FROM study_subject mss
+
+            LEFT JOIN study s on s.study_id = mss.study_id
+
+            LEFT JOIN (select distinct de.study_event_definition_id, de.study_id, sgc.study_group_class_id, sgc.is_default from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id) de on (s.parent_study_id is null and de.study_id = s.study_id) or (not(s.parent_study_id is null) and de.study_id = s.parent_study_id)
+
+            LEFT JOIN (select distinct edc.event_definition_crf_id, edc.study_event_definition_id, edc.study_id from event_definition_crf edc, crf_version cv, crf c
+            where edc.status_id = 1 and edc.hide_crf = false and edc.source_data_verification_code in (1,2) and edc.crf_id = c.crf_id and c.status_id = 1 and (select count(distinct cv.crf_version_id) from crf_version cv where cv.crf_id = c.crf_id and cv.status_id = 1) > 0)
+            edc on ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id)))
+
+            LEFT JOIN (select distinct sed.study_event_definition_id, sed.study_id from study_event_definition sed
+
+            where sed.status_id = 1) sed on
+
+            sed.study_event_definition_id = edc.study_event_definition_id and
+
+            ((sed.study_event_definition_id not in (select distinct de.study_event_definition_id from dynamic_event de)) or
+
+            (sed.study_event_definition_id = de.study_event_definition_id and de.study_group_class_id = mss.dynamic_group_class_id) or
+
+            (sed.study_event_definition_id = de.study_event_definition_id and de.is_default = true))
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id, se.subject_event_status_id from study_event se, event_crf ec where se.status_id >= 1 and se.subject_event_status_id in (8,9) and ec.not_started = false and ec.sdv_status = true and ec.status_id = 2 and ec.study_event_id = se.study_event_id) sdv_se on sdv_se.study_event_definition_id = sed.study_event_definition_id and sdv_se.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id from study_event se where se.status_id >= 1 and se.subject_event_status_id in (1,7,10)) ignore_se on ignore_se.study_event_definition_id = sed.study_event_definition_id and ignore_se.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id, se.subject_event_status_id from study_event se, event_crf ec where se.status_id >= 1 and se.subject_event_status_id in (5,6) and  ec.not_started = false and ec.study_event_id = se.study_event_id) skipped_se on skipped_se.study_event_definition_id = sed.study_event_definition_id and skipped_se.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id from study_event se where se.status_id >= 1 and se.subject_event_status_id in (3,4)) other_se on other_se.study_event_definition_id = sed.study_event_definition_id and other_se.study_subject_id = mss.study_subject_id
+
+            group by mss.study_subject_id
+
+            having count(distinct sdv_se.study_event_id) > 0 and count(distinct sdv_se.study_event_id) + count(distinct ignore_se.study_event_id) <= count(distinct sed.study_event_definition_id) and count(distinct skipped_se.study_event_id) = 0 and count(distinct other_se.study_event_id) = 0
+            ]]>
         </sql>
     </query>
     <query>
-        <name>sdvStudySubjectFilter</name>
+        <name>sdvCompleteFilterForCertainStudySubject</name>
         <sql>
-            ((select count(se.study_event_id) from study_event se where se.status_id >= 1 and se.subject_event_status_id in (8,9) and (select count(distinct ec.event_crf_id) from event_crf ec where ec.not_started = false and ec.sdv_status = true and ec.status_id = 2 and ec.study_event_id = se.study_event_id) > 0 and se.study_subject_id = mss.study_subject_id and se.study_event_definition_id in
-            (SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s, event_definition_crf edc, crf_version cv, crf c WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and (edc.study_id = ? or edc.study_id = ?) and edc.study_event_definition_id = sed.study_event_definition_id and edc.status_id = 1 and edc.hide_crf = false and edc.source_data_verification_code in (1,2)  and edc.crf_id = c.crf_id and c.status_id = 1 and ((select count(distinct cv.crf_version_id) from crf_version cv where cv.crf_id = c.crf_id and cv.status_id = 1) > 0) and sed.study_event_definition_id in
-            ((select distinct study_event_definition_id from study_event_definition sed where sed.study_event_definition_id in ((SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and sed.study_event_definition_id not in (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id)) union (SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and sed.study_event_definition_id in (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id and sgc.is_default = true)))) union
-            (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = mss.dynamic_group_class_id)))) > 0
-            AND
-            (select count(se.study_event_id) from study_event se where se.status_id >= 1 and (se.subject_event_status_id in (1,7,8,9,10) or (se.subject_event_status_id in (5,6) and (select count(distinct ec.event_crf_id) from event_crf ec where ec.not_started = false and ec.study_event_id = se.study_event_id) = 0)) and se.study_subject_id = mss.study_subject_id and se.study_event_definition_id in
-            (SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s, event_definition_crf edc, crf_version cv, crf c WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and (edc.study_id = ? or edc.study_id = ?) and edc.study_event_definition_id = sed.study_event_definition_id and edc.status_id = 1 and edc.hide_crf = false and edc.source_data_verification_code in (1,2)  and edc.crf_id = c.crf_id and c.status_id = 1 and ((select count(distinct cv.crf_version_id) from crf_version cv where cv.crf_id = c.crf_id and cv.status_id = 1) > 0) and sed.study_event_definition_id in
-            ((select distinct study_event_definition_id from study_event_definition sed where sed.study_event_definition_id in ((SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and sed.study_event_definition_id not in (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id)) union (SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and sed.study_event_definition_id in (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id and sgc.is_default = true)))) union
-            (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = mss.dynamic_group_class_id))))
-            =
-            (SELECT count(distinct sed.study_event_definition_id) FROM study_event_definition sed, study s, event_definition_crf edc, crf_version cv, crf c WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and (edc.study_id = ? or edc.study_id = ?) and edc.study_event_definition_id = sed.study_event_definition_id and edc.status_id = 1 and edc.hide_crf = false and edc.source_data_verification_code in (1,2)  and edc.crf_id = c.crf_id and c.status_id = 1 and ((select count(distinct cv.crf_version_id) from crf_version cv where cv.crf_id = c.crf_id and cv.status_id = 1) > 0) and sed.study_event_definition_id in
-            ((select distinct study_event_definition_id from study_event_definition sed where sed.study_event_definition_id in ((SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and sed.study_event_definition_id not in (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id)) union (SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and sed.study_event_definition_id in (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id and sgc.is_default = true)))) union
-            (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = mss.dynamic_group_class_id))))
+            <![CDATA[
+            SELECT mss.study_subject_id
+
+            FROM study_subject mss
+
+            LEFT JOIN study s on s.study_id = mss.study_id
+
+            LEFT JOIN (select distinct de.study_event_definition_id, de.study_id, sgc.study_group_class_id, sgc.is_default from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id) de on (s.parent_study_id is null and de.study_id = s.study_id) or (not(s.parent_study_id is null) and de.study_id = s.parent_study_id)
+
+            LEFT JOIN (select distinct edc.event_definition_crf_id, edc.study_event_definition_id, edc.study_id from event_definition_crf edc, crf_version cv, crf c
+            where edc.status_id = 1 and edc.hide_crf = false and edc.source_data_verification_code in (1,2) and edc.crf_id = c.crf_id and c.status_id = 1 and (select count(distinct cv.crf_version_id) from crf_version cv where cv.crf_id = c.crf_id and cv.status_id = 1) > 0)
+            edc on ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id)))
+
+            LEFT JOIN (select distinct sed.study_event_definition_id, sed.study_id from study_event_definition sed
+
+            where sed.status_id = 1) sed on
+
+            sed.study_event_definition_id = edc.study_event_definition_id and
+
+            ((sed.study_event_definition_id not in (select distinct de.study_event_definition_id from dynamic_event de)) or
+
+            (sed.study_event_definition_id = de.study_event_definition_id and de.study_group_class_id = mss.dynamic_group_class_id) or
+
+            (sed.study_event_definition_id = de.study_event_definition_id and de.is_default = true))
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id, se.subject_event_status_id from study_event se, event_crf ec where se.status_id >= 1 and se.subject_event_status_id in (8,9) and ec.not_started = false and ec.sdv_status = true and ec.status_id = 2 and ec.study_event_id = se.study_event_id) sdv_se on sdv_se.study_event_definition_id = sed.study_event_definition_id and sdv_se.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id from study_event se where se.status_id >= 1 and se.subject_event_status_id in (1,7,10)) ignore_se on ignore_se.study_event_definition_id = sed.study_event_definition_id and ignore_se.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id, se.subject_event_status_id from study_event se, event_crf ec where se.status_id >= 1 and se.subject_event_status_id in (5,6) and  ec.not_started = false and ec.study_event_id = se.study_event_id) skipped_se on skipped_se.study_event_definition_id = sed.study_event_definition_id and skipped_se.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id from study_event se where se.status_id >= 1 and se.subject_event_status_id in (3,4)) other_se on other_se.study_event_definition_id = sed.study_event_definition_id and other_se.study_subject_id = mss.study_subject_id
+
+            where mss.study_subject_id = ?
+
+            group by mss.study_subject_id
+
+            having count(distinct sdv_se.study_event_id) > 0 and count(distinct sdv_se.study_event_id) + count(distinct ignore_se.study_event_id) <= count(distinct sed.study_event_definition_id) and count(distinct skipped_se.study_event_id) = 0 and count(distinct other_se.study_event_id) = 0
+            ]]>
+        </sql>
+    </query>
+    <query>
+        <name>withoutDns</name>
+        <sql>
+            LEFT JOIN (select distinct dn.discrepancy_note_id, dsm_map.subject_id
+            FROM subject s, discrepancy_note dn, dn_age_days dad, dn_subject_map dsm_map
+            WHERE s.subject_id = dsm_map.subject_id
+            AND dn.discrepancy_note_id = dsm_map.discrepancy_note_id
+            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
+            AND dn.discrepancy_note_id = dad.discrepancy_note_id
+            AND s.status_id not in (5, 7) and (dn.resolution_status_id = 1 or dn.resolution_status_id = 2 or dn.resolution_status_id = 3)) dn5 on dn5.subject_id = mss.subject_id
+
+            LEFT JOIN (select distinct dn.discrepancy_note_id, dss_map.study_subject_id
+            FROM study_subject ss, discrepancy_note dn, dn_age_days dad, dn_study_subject_map dss_map
+            WHERE ss.study_subject_id = dss_map.study_subject_id
+            AND dn.discrepancy_note_id = dss_map.discrepancy_note_id
+            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
+            AND dn.discrepancy_note_id = dad.discrepancy_note_id
+            AND ss.status_id not in (5, 7) and (dn.resolution_status_id = 1 or dn.resolution_status_id = 2 or dn.resolution_status_id = 3)) dn4 on dn4.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct dn.discrepancy_note_id, se.study_subject_id, se.study_event_definition_id
+            FROM study_event se, discrepancy_note dn, dn_age_days dad, dn_study_event_map dse_map
+            WHERE se.study_event_id = dse_map.study_event_id
+            AND dn.discrepancy_note_id = dse_map.discrepancy_note_id
+            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
+            AND dn.discrepancy_note_id = dad.discrepancy_note_id
+            AND se.status_id not in (5, 7) and (dn.resolution_status_id = 1 or dn.resolution_status_id = 2 or dn.resolution_status_id = 3)) dn3 on dn3.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct dn.discrepancy_note_id, ec.study_subject_id, se.study_event_definition_id
+            FROM event_crf ec, study_event se, discrepancy_note dn, dn_age_days dad, dn_event_crf_map dec_map
+            WHERE ec.event_crf_id = dec_map.event_crf_id
+            AND se.study_event_id = ec.study_event_id
+            AND dn.discrepancy_note_id = dec_map.discrepancy_note_id
+            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
+            AND dn.discrepancy_note_id = dad.discrepancy_note_id
+            AND ec.status_id not in (5, 7)
+            AND se.status_id not in (5, 7) and (dn.resolution_status_id = 1 or dn.resolution_status_id = 2 or dn.resolution_status_id = 3)) dn2 on dn2.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct dn.discrepancy_note_id, id.item_data_id, did_map.study_subject_id
+            FROM item_data id, event_crf ec, study_event se, discrepancy_note dn, dn_age_days dad, dn_item_data_map did_map
+            WHERE id.item_data_id = did_map.item_data_id
+            AND id.event_crf_id = ec.event_crf_id
+            AND ec.study_event_id = se.study_event_id
+            AND dn.discrepancy_note_id = did_map.discrepancy_note_id
+            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
+            AND dn.discrepancy_note_id = dad.discrepancy_note_id
+            AND id.status_id not in (5, 7)
+            AND ec.status_id not in (5, 7)
+            AND se.status_id not in (5, 7) and (dn.resolution_status_id = 1 or dn.resolution_status_id = 2 or dn.resolution_status_id = 3)) dn1 on dn1.study_subject_id = mss.study_subject_id
+        </sql>
+    </query>
+    <query>
+        <name>withoutDnsTail</name>
+        <sql>
+            <![CDATA[
+            group by mss.study_subject_id
+            having count(distinct dn1.discrepancy_note_id) = 0 and count(distinct dn2.discrepancy_note_id) = 0 and count(distinct dn3.discrepancy_note_id) = 0 and count(distinct dn4.discrepancy_note_id) = 0 and count(distinct dn5.discrepancy_note_id) = 0
+            ]]>
         </sql>
     </query>
     <query>
         <name>readyToBeSdvStudySubjectFilter</name>
         <sql>
-            ((select count(se.study_event_id) from study_event se where se.status_id = 1 and se.subject_event_status_id in (4,9) and se.study_subject_id = mss.study_subject_id and se.study_event_definition_id in
-            (SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s, event_definition_crf edc, crf_version cv, crf c WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and (edc.study_id = ? or edc.study_id = ?) and edc.study_event_definition_id = sed.study_event_definition_id and edc.status_id = 1 and edc.hide_crf = false and edc.source_data_verification_code in (1,2)  and edc.crf_id = c.crf_id and c.status_id = 1 and ((select count(distinct cv.crf_version_id) from crf_version cv where cv.crf_id = c.crf_id and cv.status_id = 1) > 0) and sed.study_event_definition_id in
-            ((select distinct study_event_definition_id from study_event_definition sed where sed.study_event_definition_id in ((SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and sed.study_event_definition_id not in (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id)) union (SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and sed.study_event_definition_id in (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id and sgc.is_default = true)))) union
-            (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = mss.dynamic_group_class_id)))) > 0
-            AND
-            (select count(se.study_event_id) from study_event se where se.status_id = 1 and se.subject_event_status_id in (4,9) and se.study_subject_id = mss.study_subject_id and se.study_event_definition_id in
-            (SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s, event_definition_crf edc, crf_version cv, crf c WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and (edc.study_id = ? or edc.study_id = ?) and edc.study_event_definition_id = sed.study_event_definition_id and edc.status_id = 1 and edc.hide_crf = false and edc.source_data_verification_code in (1,2)  and edc.crf_id = c.crf_id and c.status_id = 1 and ((select count(distinct cv.crf_version_id) from crf_version cv where cv.crf_id = c.crf_id and cv.status_id = 1) > 0) and sed.study_event_definition_id in
-            ((select distinct study_event_definition_id from study_event_definition sed where sed.study_event_definition_id in ((SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and sed.study_event_definition_id not in (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id)) union (SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and sed.study_event_definition_id in (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id and sgc.is_default = true)))) union
-            (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = mss.dynamic_group_class_id))))
-            =
-            (SELECT count(distinct sed.study_event_definition_id) FROM study_event_definition sed, study s, event_definition_crf edc, crf_version cv, crf c WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and (edc.study_id = ? or edc.study_id = ?) and edc.study_event_definition_id = sed.study_event_definition_id and edc.status_id = 1 and edc.hide_crf = false and edc.source_data_verification_code in (1,2)  and edc.crf_id = c.crf_id and c.status_id = 1 and ((select count(distinct cv.crf_version_id) from crf_version cv where cv.crf_id = c.crf_id and cv.status_id = 1) > 0) and sed.study_event_definition_id in
-            ((select distinct study_event_definition_id from study_event_definition sed where sed.study_event_definition_id in ((SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and sed.study_event_definition_id not in (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id)) union (SELECT distinct sed.study_event_definition_id FROM study_event_definition sed, study s WHERE sed.study_id = s.study_id and s.study_id = ? and sed.status_id = 1 and sed.study_event_definition_id in (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id and sgc.is_default = true)))) union
-            (select distinct study_event_definition_id from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and sgc.study_id = ? and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = mss.dynamic_group_class_id))))
+            <![CDATA[
+            SELECT mss.study_subject_id
+
+            FROM study_subject mss
+
+            LEFT JOIN study s on s.study_id = mss.study_id
+
+            LEFT JOIN (select distinct de.study_event_definition_id, de.study_id, sgc.study_group_class_id, sgc.is_default from study_group_class sgc, dynamic_event de where sgc.status_id = 1 and group_class_type_id = 4 and de.study_group_class_id = sgc.study_group_class_id) de on (s.parent_study_id is null and de.study_id = s.study_id) or (not(s.parent_study_id is null) and de.study_id = s.parent_study_id)
+
+            LEFT JOIN (select distinct edc.event_definition_crf_id, edc.study_event_definition_id, edc.study_id from event_definition_crf edc, crf_version cv, crf c
+            where edc.status_id = 1 and edc.hide_crf = false and edc.source_data_verification_code in (1,2) and edc.crf_id = c.crf_id and c.status_id = 1 and (select count(distinct cv.crf_version_id) from crf_version cv where cv.crf_id = c.crf_id and cv.status_id = 1) > 0)
+            edc on ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id)))
+
+            LEFT JOIN (select distinct sed.study_event_definition_id, sed.study_id from study_event_definition sed
+
+            where sed.status_id = 1) sed on
+
+            sed.study_event_definition_id = edc.study_event_definition_id and
+
+            ((sed.study_event_definition_id not in (select distinct de.study_event_definition_id from dynamic_event de)) or
+
+            (sed.study_event_definition_id = de.study_event_definition_id and de.study_group_class_id = mss.dynamic_group_class_id) or
+
+            (sed.study_event_definition_id = de.study_event_definition_id and de.is_default = true))
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id from study_event se where se.status_id >= 1 and se.subject_event_status_id in (4)) completed_se on completed_se.study_event_definition_id = sed.study_event_definition_id and completed_se.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id, se.subject_event_status_id from study_event se, event_crf ec where se.status_id >= 1 and se.subject_event_status_id in (8,9) and ec.not_started = false and ec.sdv_status = true and ec.status_id = 2 and ec.study_event_id = se.study_event_id) sdv_se on sdv_se.study_event_definition_id = sed.study_event_definition_id and sdv_se.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id from study_event se where se.status_id >= 1 and se.subject_event_status_id in (1,7,10)) ignore_se on ignore_se.study_event_definition_id = sed.study_event_definition_id and ignore_se.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id, se.subject_event_status_id from study_event se, event_crf ec where se.status_id >= 1 and se.subject_event_status_id in (5,6) and  ec.not_started = false and ec.study_event_id = se.study_event_id) skipped_se on skipped_se.study_event_definition_id = sed.study_event_definition_id and skipped_se.study_subject_id = mss.study_subject_id
+
+            LEFT JOIN (select distinct se.study_event_id, se.study_subject_id, se.study_event_definition_id from study_event se where se.status_id >= 1 and se.subject_event_status_id in (3)) other_se on other_se.study_event_definition_id = sed.study_event_definition_id and other_se.study_subject_id = mss.study_subject_id
+
+            where mss.study_subject_id = ?
+
+            group by mss.study_subject_id
+
+            having count(distinct completed_se.study_event_id) > 0 and count(distinct sdv_se.study_event_id) >= 0 and count(distinct sdv_se.study_event_id) + count(distinct ignore_se.study_event_id) <= count(distinct sed.study_event_definition_id) and count(distinct skipped_se.study_event_id) = 0 and count(distinct other_se.study_event_id) = 0
+            ]]>
         </sql>
     </query>
 </queries>
