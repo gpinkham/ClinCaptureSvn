@@ -13,21 +13,6 @@
 
 package org.akaza.openclinica.controller;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -47,6 +32,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
 /**
  * Implement the functionality for displaying a table of Event CRFs for Source Data Verification. This is an autowired,
  * multiaction Controller.
@@ -54,10 +50,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller("sdvController")
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class SDVController {
-	
-	public final static String SUBJECT_SDV_TABLE_ATTRIBUTE = "sdvTableAttribute";
-	@Autowired
-	private DataSource dataSource;
+
+	public static final String SUBJECT_SDV_TABLE_ATTRIBUTE = "sdvTableAttribute";
 
 	@Autowired
 	private SDVUtil sdvUtil;
@@ -65,12 +59,17 @@ public class SDVController {
 	@Autowired
 	private SubjectIdSDVFactory sdvFactory;
 
-	@Autowired
-	private SidebarInit sidebarInit;
-
-	public SDVController() {
-	}
-
+	/**
+	 * Method that handles requests to viewSubjectAggregate url.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param studyId
+	 *            study id
+	 * @return ModelMap
+	 */
 	@RequestMapping("/viewSubjectAggregate")
 	public ModelMap viewSubjectAggregateHandler(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("studyId") int studyId) {
@@ -85,16 +84,15 @@ public class SDVController {
 		ResourceBundleProvider.updateLocale(request.getLocale());
 		ModelMap gridMap = new ModelMap();
 		HttpSession session = request.getSession();
-		boolean showMoreLink = false;
+		boolean showMoreLink;
 		if (session.getAttribute("sSdvRestore") != null && session.getAttribute("sSdvRestore") == "false") {
 			session.setAttribute("sSdvRestore", "true");
 			showMoreLink = true;
 		} else if (request.getParameter("showMoreLink") != null) {
-			showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink").toString());
-		} else if (session.getAttribute("s_sdv_showMoreLink") != null) {
-			showMoreLink = Boolean.parseBoolean(session.getAttribute("s_sdv_showMoreLink") + "");
+			showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink"));
 		} else {
-			showMoreLink = true;
+			showMoreLink = session.getAttribute("s_sdv_showMoreLink") == null
+					|| Boolean.parseBoolean(session.getAttribute("s_sdv_showMoreLink") + "");
 		}
 		request.setAttribute("showMoreLink", showMoreLink + "");
 		session.setAttribute("s_sdv_showMoreLink", showMoreLink + "");
@@ -112,16 +110,27 @@ public class SDVController {
 
 		request.setAttribute("showBackButton", request.getParameter("sbb") != null);
 		request.setAttribute("pageMessages", pageMessages);
-		sdvFactory.showMoreLink = showMoreLink;
+		sdvFactory.setShowMoreLink(showMoreLink);
 		TableFacade facade = sdvFactory.createTable(request, response);
 		String sdvMatrix = facade.render();
 		gridMap.addAttribute(SUBJECT_SDV_TABLE_ATTRIBUTE, sdvMatrix);
 		return gridMap;
 	}
 
+	/**
+	 * Method that handles requests to viewAllSubjectSDV url.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param studySubjectId
+	 *            study subject id
+	 * @param studyId
+	 *            study id
+	 * @return ModelMap
+	 */
 	@RequestMapping("/viewAllSubjectSDV")
-	public ModelMap viewSubjectHandler(HttpServletRequest request, @RequestParam("studySubjectId") int studySubjectId,
-			@RequestParam("studyId") int studyId) {
+	public ModelMap viewAllSubjectSDVHandler(HttpServletRequest request,
+			@RequestParam("studySubjectId") int studySubjectId, @RequestParam("studyId") int studyId) {
 
 		ModelMap gridMap = new ModelMap();
 
@@ -141,8 +150,19 @@ public class SDVController {
 		return gridMap;
 	}
 
+	/**
+	 * Method that handles requests to viewAllSubjectSDVtmp url.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param studyId
+	 *            study id
+	 * @param response
+	 *            HttpServletResponse
+	 * @return ModelMap
+	 */
 	@RequestMapping("/viewAllSubjectSDVtmp")
-	public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId,
+	public ModelMap viewAllSubjectSDVTmpHandler(HttpServletRequest request, @RequestParam("studyId") int studyId,
 			HttpServletResponse response) {
 
 		if (!mayProceed(request)) {
@@ -165,17 +185,16 @@ public class SDVController {
 		// set up request attributes for sidebar
 		// Not necessary when using old page design...
 		// setUpSidebar(request);
-		boolean showMoreLink = false;
+		boolean showMoreLink;
 		if (session.getAttribute("tableFacadeRestore") != null && session.getAttribute("tableFacadeRestore") == "false") {
 			session.setAttribute("tableFacadeRestore", "true");
 			session.setAttribute("sSdvRestore", "false");
 			showMoreLink = true;
 		} else if (request.getParameter("showMoreLink") != null) {
-			showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink").toString());
-		} else if (session.getAttribute("sdv_showMoreLink") != null) {
-			showMoreLink = Boolean.parseBoolean(session.getAttribute("sdv_showMoreLink") + "");
+			showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink"));
 		} else {
-			showMoreLink = true;
+			showMoreLink = session.getAttribute("sdv_showMoreLink") == null
+					|| Boolean.parseBoolean(session.getAttribute("sdv_showMoreLink") + "");
 		}
 		request.setAttribute("showMoreLink", showMoreLink + "");
 		session.setAttribute("sdv_showMoreLink", showMoreLink + "");
@@ -206,9 +225,17 @@ public class SDVController {
 		return gridMap;
 	}
 
+	/**
+	 * Method that handles requests to viewAllSubjectSDVform url.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param studyId
+	 *            study id
+	 * @return ModelMap
+	 */
 	@RequestMapping("/viewAllSubjectSDVform")
-	public ModelMap viewAllSubjectFormHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("studyId") int studyId) {
+	public ModelMap viewAllSubjectFormHandler(HttpServletRequest request, @RequestParam("studyId") int studyId) {
 
 		ModelMap gridMap = new ModelMap();
 		String pattern = "MM/dd/yyyy";
@@ -216,10 +243,8 @@ public class SDVController {
 
 		// set up the parameters to take part in filtering
 		ServletRequestDataBinder dataBinder = new ServletRequestDataBinder(new SdvFilterDataBean());
-		dataBinder
-				.setAllowedFields(new String[] { "study_subject_id", "studyEventDefinition", "studyEventStatus",
-						"eventCRFStatus", "sdvRequirement", "eventcrfSDVStatus", "startUpdatedDate", "endDate",
-						"eventCRFName" });
+		dataBinder.setAllowedFields("study_subject_id", "studyEventDefinition", "studyEventStatus", "eventCRFStatus",
+				"sdvRequirement", "eventcrfSDVStatus", "startUpdatedDate", "endDate", "eventCRFName");
 
 		dataBinder.registerCustomEditor(java.util.Date.class, new CustomDateEditor(sdf, true));
 		dataBinder.bind(request);
@@ -241,10 +266,20 @@ public class SDVController {
 		return gridMap;
 	}
 
-	// method = RequestMethod.POST
+	/**
+	 * Method that handles requests to handleSDVPost url.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param redirection
+	 *            redirection
+	 * @return String
+	 */
 	@RequestMapping("/handleSDVPost")
 	public String sdvAllSubjectsFormHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("studyId") int studyId, @RequestParam("redirection") String redirection, ModelMap model) {
+			@RequestParam("redirection") String redirection) {
 
 		// The application is POSTing parameters with the name "sdvCheck_" plus the
 		// Event CRF id, so the parameter is sdvCheck_534.
@@ -253,7 +288,7 @@ public class SDVController {
 
 		Enumeration paramNames = request.getParameterNames();
 		Map<String, String> parameterMap = new HashMap<String, String>();
-		String tmpName = "";
+		String tmpName;
 		for (; paramNames.hasMoreElements();) {
 			tmpName = (String) paramNames.nextElement();
 			if (tmpName.contains(SDVUtil.CHECKBOX_NAME)) {
@@ -289,9 +324,22 @@ public class SDVController {
 
 	}
 
+	/**
+	 * Method that handles requests to handleSDVGet url.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param crfId
+	 *            crf id
+	 * @param redirection
+	 *            redirection
+	 * @return String
+	 */
 	@RequestMapping("/handleSDVGet")
 	public String sdvOneCRFFormHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("crfId") int crfId, @RequestParam("redirection") String redirection, ModelMap model) {
+			@RequestParam("crfId") int crfId, @RequestParam("redirection") String redirection) {
 
 		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(request.getLocale());
 
@@ -326,9 +374,22 @@ public class SDVController {
 
 	}
 
+	/**
+	 * Method that handles requests to handleSDVRemove url.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param crfId
+	 *            crf id
+	 * @param redirection
+	 *            redirection
+	 * @return String
+	 */
 	@RequestMapping("/handleSDVRemove")
 	public String changeSDVHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("crfId") int crfId, @RequestParam("redirection") String redirection, ModelMap model) {
+			@RequestParam("crfId") int crfId, @RequestParam("redirection") String redirection) {
 
 		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(request.getLocale());
 
@@ -354,10 +415,22 @@ public class SDVController {
 
 	}
 
+	/**
+	 * Method that handles requests to sdvStudySubject url.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param studySubjectId
+	 *            study subject id
+	 * @param redirection
+	 *            redirection
+	 * @return String
+	 */
 	@RequestMapping("/sdvStudySubject")
 	public String sdvStudySubjectHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("theStudySubjectId") int studySubjectId, @RequestParam("redirection") String redirection,
-			ModelMap model) {
+			@RequestParam("theStudySubjectId") int studySubjectId, @RequestParam("redirection") String redirection) {
 
 		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(request.getLocale());
 
@@ -380,10 +453,22 @@ public class SDVController {
 		return null;
 	}
 
+	/**
+	 * Method that handles requests to unSdvStudySubject url.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param studySubjectId
+	 *            study subject id
+	 * @param redirection
+	 *            redirection
+	 * @return String
+	 */
 	@RequestMapping("/unSdvStudySubject")
 	public String unSdvStudySubjectHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("theStudySubjectId") int studySubjectId, @RequestParam("redirection") String redirection,
-			ModelMap model) {
+			@RequestParam("theStudySubjectId") int studySubjectId, @RequestParam("redirection") String redirection) {
 
 		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(request.getLocale());
 
@@ -391,8 +476,8 @@ public class SDVController {
 		List<Integer> studySubjectIds = new ArrayList<Integer>();
 
 		studySubjectIds.add(studySubjectId);
-		boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(), true,
-				false);
+		boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(),
+				true, false);
 
 		if (updateCRFs) {
 			pageMessages.add(resPageMessages.getString("unset_event_crf_sdv"));
@@ -406,9 +491,20 @@ public class SDVController {
 
 	}
 
+	/**
+	 * Method that handles requests to sdvStudySubjects url.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param redirection
+	 *            redirection
+	 * @return String
+	 */
 	@RequestMapping("/sdvStudySubjects")
 	public String sdvStudySubjectsHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("studyId") int studyId, @RequestParam("redirection") String redirection, ModelMap model) {
+			@RequestParam("redirection") String redirection) {
 
 		// The application is POSTing parameters with the name "sdvCheck_" plus the
 		// Event CRF id, so the parameter is sdvCheck_534.
@@ -417,7 +513,7 @@ public class SDVController {
 
 		Enumeration paramNames = request.getParameterNames();
 		Map<String, String> parameterMap = new HashMap<String, String>();
-		String tmpName = "";
+		String tmpName;
 		for (; paramNames.hasMoreElements();) {
 			tmpName = (String) paramNames.nextElement();
 			if (tmpName.contains(SDVUtil.CHECKBOX_NAME)) {
@@ -436,7 +532,7 @@ public class SDVController {
 			sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
 
 		}
-		
+
 		List<Integer> studySubjectIds = sdvUtil.getListOfStudySubjectIds(parameterMap.keySet());
 		boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(),
 				isSdvWithOpenQueriesAllowed(request), true);
@@ -457,37 +553,30 @@ public class SDVController {
 
 	private boolean isSdvWithOpenQueriesAllowed(HttpServletRequest request) {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-		String allowSdvWithOpenQueries = currentStudy == null? "" : currentStudy.getStudyParameterConfig()
+		String allowSdvWithOpenQueries = currentStudy == null ? "" : currentStudy.getStudyParameterConfig()
 				.getAllowSdvWithOpenQueries();
 		return !"no".equals(allowSdvWithOpenQueries);
 	}
 
 	private UserAccountBean getCurrentUser(HttpServletRequest request) {
-		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
-		return ub;
-	}
-
-	public static void main(String[] args) throws ParseException {
-
-		String pattern = "MM/dd/yyyy";
-		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-
-		Date date = sdf.parse("01/01/2007");
-		System.out.println("date = " + date);
-
+		return (UserAccountBean) request.getSession().getAttribute("userBean");
 	}
 
 	private boolean mayProceed(HttpServletRequest request) {
 
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
 		Role r = currentRole.getRole();
-		if (Role.SYSTEM_ADMINISTRATOR.equals(r) || Role.STUDY_DIRECTOR.equals(r) || Role.STUDY_ADMINISTRATOR.equals(r)
-				|| Role.STUDY_MONITOR.equals(r)) {
-			return true;
-		}
-		return false;
+		return Role.SYSTEM_ADMINISTRATOR.equals(r) || Role.STUDY_DIRECTOR.equals(r)
+				|| Role.STUDY_ADMINISTRATOR.equals(r) || Role.STUDY_MONITOR.equals(r);
 	}
 
+	/**
+	 * Handles exceptions.
+	 * 
+	 * @param ex
+	 *            Exception
+	 * @return String
+	 */
 	@ExceptionHandler(Exception.class)
 	public String handleException(Exception ex) {
 		ex.printStackTrace();

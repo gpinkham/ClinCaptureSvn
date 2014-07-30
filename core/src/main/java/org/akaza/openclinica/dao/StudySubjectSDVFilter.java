@@ -36,7 +36,7 @@ public class StudySubjectSDVFilter implements CriteriaCommand {
 	public StudySubjectSDVFilter() {
 		columnMapping.put("sdvStatus", "");
 		columnMapping.put("studySubjectId", "mss.label");
-		columnMapping.put("siteId", "mst.unique_identifier");
+		columnMapping.put("siteId", "s.unique_identifier");
 		studySubjectDAO = new StudySubjectDAO(null);
 	}
 

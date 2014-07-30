@@ -31,7 +31,7 @@ public class StudySubjectSDVSort implements CriteriaCommand {
 		columnMapping.put("studySubject.secondaryLabel", "ss.secondary_label");
 		columnMapping.put("subject.charGender", "s.gender");
 		columnMapping.put("studySubjectId", "mss.label");
-		columnMapping.put("siteId", "mst.unique_identifier");
+		columnMapping.put("siteId", "s.unique_identifier");
 	}
 
 	public void addSort(String property, String order) {

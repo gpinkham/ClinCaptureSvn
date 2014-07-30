@@ -74,15 +74,20 @@ import java.util.ResourceBundle;
 @SuppressWarnings({ "unchecked" })
 public class SubjectIdSDVFactory extends AbstractTableFactory {
 
-	private DataSource dataSource;
+	private static final String ICON_FORCRFSTATUS_SUFFIX = ".gif'/>";
 
 	private int studyId;
-	private boolean showBackButton;
 	private String contextPath;
-	private final static String ICON_FORCRFSTATUS_SUFFIX = ".gif'/>";
-	public boolean showMoreLink;
+	private boolean showMoreLink;
+	private DataSource dataSource;
+	private boolean showBackButton;
 
-	public SubjectIdSDVFactory() {
+	public boolean isShowMoreLink() {
+		return showMoreLink;
+	}
+
+	public void setShowMoreLink(boolean showMoreLink) {
+		this.showMoreLink = showMoreLink;
 	}
 
 	public DataSource getDataSource() {
@@ -137,8 +142,12 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		sdvStatus.getFilterRenderer().setFilterEditor(new SdvStatusFilter());
 
 		// siteId-filter
-		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		List<String> studyIds = eventCRFDAO.getAvailableForSDVSiteNamesByStudyId(studyId);
+		StudyDAO studyDao = new StudyDAO(dataSource);
+		List<String> studyIds = new ArrayList<String>();
+		List<StudyBean> sites = (List<StudyBean>) studyDao.findAll(studyId);
+		for (StudyBean studyBean : sites) {
+			studyIds.add(studyBean.getIdentifier());
+		}
 		Collections.sort(studyIds);
 
 		HtmlColumn studyIdentifier = ((HtmlRow) row).getColumn("siteId");
@@ -225,8 +234,14 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		return studySubjectSDVSort;
 	}
 
-	/*
+	/**
 	 * Returns how many subjects exist in the study.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param studySubjectSDVFilter
+	 *            StudySubjectSDVFilter
+	 * @return int
 	 */
 	public int getTotalRowCount(StudyBean currentStudy, StudySubjectSDVFilter studySubjectSDVFilter) {
 		StudySubjectDAO studySubDAO = new StudySubjectDAO(dataSource);
@@ -393,14 +408,16 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 			// get number of completed event crfs
 			if (eventBean.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) {
 				numberOfCompletedEventCRFs++;
-				if (eventCRFIdWithRequiredSDVCodesList.contains(eventBean.getId()) && !eventBean.isSdvStatus())
+				if (eventCRFIdWithRequiredSDVCodesList.contains(eventBean.getId()) && !eventBean.isSdvStatus()) {
 					numberOfCompletedRequiredEventCRFs++;
+				}
 			}
 			// get number of completed event SDVd eventeventDefinitionCrfDAOs
 			if (eventBean.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE && eventBean.isSdvStatus()) {
 				numberOfSDVdEventCRFs++;
-				if (eventCRFIdWithRequiredSDVCodesList.contains(eventBean.getId()))
+				if (eventCRFIdWithRequiredSDVCodesList.contains(eventBean.getId())) {
 					numberOfSDVdRequiredEventCRFs++;
+				}
 			}
 			if (eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
 					|| eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED) {
