@@ -47,26 +47,25 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * <P>
  * ItemDataDAO.java, the equivalent to AnswerDAO in the original code base. Modified by ywang (12-07-2007) to convert
- * date_format string pattern of item value when item data type is date
+ * date_format string pattern of item value when item data type is date,
  * 
  * @author thickerson
- * 
- * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ItemDataDAO extends AuditableEntityDAO {
-
-	public Collection findMinMaxDates() {
-		return new ArrayList();
-	}
 
 	private void setQueryNames() {
 		getCurrentPKName = "getCurrentPK";
 		getNextPKName = "getNextPK";
 	}
 
+	/**
+	 * This constructor sets up the DataSource for DAO.
+	 * 
+	 * @param ds
+	 *            <code>DataSource</code> that will be assigned to DAO.
+	 */
 	public ItemDataDAO(DataSource ds) {
 		super(ds);
 		setQueryNames();
@@ -75,11 +74,27 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * This constructor sets up the DataSource and Connection for DAO.
+	 * 
+	 * @param ds
+	 *            <code>DataSource</code> that will be assigned to DAO.
+	 * @param con
+	 *            <code>Connection</code> that will be assigned to DAO.
+	 */
 	public ItemDataDAO(DataSource ds, Connection con) {
 		super(ds, con);
 		setQueryNames();
 	}
 
+	/**
+	 * This constructor sets up the Locale and DataSource.
+	 * 
+	 * @param ds
+	 *            <code>DataSource</code> that will be assigned to DAO.
+	 * @param locale
+	 *            <code>Locale</code> that will be assigned to DAO.
+	 */
 	public ItemDataDAO(DataSource ds, Locale locale) {
 		super(ds);
 		setQueryNames();
@@ -93,14 +108,31 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * This constructor sets up the DAODigister and DataSource.
+	 * 
+	 * @param ds
+	 *            <code>ItemDataDAO</code> that will be assigned to DAO.
+	 * @param digester
+	 *            <code>ItemDataDAO</code> that will be assigned to DAO.
+	 */
 	public ItemDataDAO(DataSource ds, DAODigester digester) {
 		super(ds);
 		this.digester = digester;
 		setQueryNames();
 	}
 
-	// This constructor sets up the Locale for JUnit tests; see the locale
-	// member variable in EntityDAO, and its initializeI18nStrings() method
+	/**
+	 * This constructor sets up the Locale for JUnit tests. See the locale member variable in EntityDAO, and its
+	 * initializeI18nStrings() method.
+	 * 
+	 * @param ds
+	 *            is <code>DataSource</code> that will be assigned to this DAO.
+	 * @param digester
+	 *            is <code>DAODigister</code> that will be assigned to this DAO.
+	 * @param locale
+	 *            is <code>Locale</code> that will be set to this DAO.
+	 */
 	public ItemDataDAO(DataSource ds, DAODigester digester, Locale locale) {
 
 		this(ds, digester);
@@ -112,27 +144,50 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		digesterName = SQLFactory.getInstance().DAO_ITEMDATA;
 	}
 
+	/**
+	 * This method is used to set expected types to compare rows in DB and field in <code>ItemDataBean</code> object.
+	 */
 	@Override
 	public void setTypesExpected() {
+
+		int index = 1;
+
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		this.setTypeExpected(2, TypeNames.INT);
-		this.setTypeExpected(3, TypeNames.INT);
-		this.setTypeExpected(4, TypeNames.INT);
-		this.setTypeExpected(5, TypeNames.STRING);
-		this.setTypeExpected(6, TypeNames.DATE);
-		this.setTypeExpected(7, TypeNames.DATE);
-		this.setTypeExpected(8, TypeNames.INT);// owner id
-		this.setTypeExpected(9, TypeNames.INT);// update id
-		this.setTypeExpected(10, TypeNames.INT);// ordinal
-		this.setTypeExpected(11, TypeNames.INT);// ordinal
+		this.setTypeExpected(index++, TypeNames.INT); // item data id
+		this.setTypeExpected(index++, TypeNames.INT); // item id
+		this.setTypeExpected(index++, TypeNames.INT); // event crf id
+		this.setTypeExpected(index++, TypeNames.INT); // status id
+		this.setTypeExpected(index++, TypeNames.STRING); // value
+		this.setTypeExpected(index++, TypeNames.DATE); // date created
+		this.setTypeExpected(index++, TypeNames.DATE); // date updated
+		this.setTypeExpected(index++, TypeNames.INT); // owner id
+		this.setTypeExpected(index++, TypeNames.INT); // update id
+		this.setTypeExpected(index++, TypeNames.INT); // ordinal
+		this.setTypeExpected(index, TypeNames.INT); // ordinal
 	}
 
+	/**
+	 * This method is used to update itemData in the database.
+	 * 
+	 * @param eb
+	 *            <code>ItemDataBean</code> that will be updated in the database.
+	 * @return updated item.
+	 */
 	public EntityBean update(EntityBean eb) {
 		return update(eb, null);
 	}
 
+	/**
+	 * This method is used to update itemData in the database.
+	 * 
+	 * @param eb
+	 *            <code>ItemDataBean</code> that will be updated in the database.
+	 * @param con
+	 *            <code>Connection</code> to the database. It can be null.
+	 * @return <code>ItemDataBean</code> that was updated.
+	 */
 	public EntityBean update(EntityBean eb, Connection con) {
+
 		ItemDataBean idb = (ItemDataBean) eb;
 
 		// Convert to oc_date_format_string pattern before
@@ -145,16 +200,17 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		}
 
 		idb.setActive(false);
+		int index = 1;
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(1, idb.getEventCRFId());
-		variables.put(2, idb.getItemId());
-		variables.put(3, idb.getStatus().getId());
-		variables.put(4, idb.getValue());
-		variables.put(5, idb.getUpdaterId());
-		variables.put(6, idb.getOrdinal());
-		variables.put(7, idb.getOldStatus().getId());
-		variables.put(8, idb.getId());
+		variables.put(index++, idb.getEventCRFId());
+		variables.put(index++, idb.getItemId());
+		variables.put(index++, idb.getStatus().getId());
+		variables.put(index++, idb.getValue());
+		variables.put(index++, idb.getUpdaterId());
+		variables.put(index++, idb.getOrdinal());
+		variables.put(index++, idb.getOldStatus().getId());
+		variables.put(index, idb.getId());
 		this.execute(digester.getQuery("update"), variables, con);
 		if (isQuerySuccessful()) {
 			idb.setActive(true);
@@ -164,10 +220,15 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * This will update item data value
+	 * This method id used to update only value for <code>ItemDataBean</code>. Date of update and updater will be
+	 * written to DB too.
 	 * 
+	 * @param eb
+	 *            <code>EntityBean</code> that will be updated.
+	 * @return idb updated <code>ItemDataBean</code>.
 	 */
 	public EntityBean updateValue(EntityBean eb) {
+
 		ItemDataBean idb = (ItemDataBean) eb;
 
 		// Convert to oc_date_format_string pattern before
@@ -180,12 +241,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		}
 
 		idb.setActive(false);
+		int index = 1;
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(1, idb.getStatus().getId());
-		variables.put(2, idb.getValue());
-		variables.put(3, idb.getUpdaterId());
-		variables.put(4, idb.getId());
+		variables.put(index++, idb.getStatus().getId());
+		variables.put(index++, idb.getValue());
+		variables.put(index++, idb.getUpdaterId());
+		variables.put(index, idb.getId());
 		this.execute(digester.getQuery("updateValue"), variables);
 
 		if (isQuerySuccessful()) {
@@ -195,6 +257,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		return idb;
 	}
 
+	/**
+	 * This method is used to update itemDataBeans with status Removed. Following rows will be updated by query: status,
+	 * value, update_id.
+	 * 
+	 * @param eb
+	 *            <code>ItemDataBean</code> that will be updated
+	 * @return updated <code>ItemDataBean</code>.
+	 */
 	public EntityBean updateValueForRemoved(EntityBean eb) {
 		ItemDataBean idb = (ItemDataBean) eb;
 
@@ -208,12 +278,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		}
 
 		idb.setActive(false);
+		int index = 1;
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(1, idb.getStatus().getId());
-		variables.put(2, idb.getValue());
-		variables.put(3, idb.getUpdaterId());
-		variables.put(4, idb.getId());
+		variables.put(index++, idb.getStatus().getId());
+		variables.put(index++, idb.getValue());
+		variables.put(index++, idb.getUpdaterId());
+		variables.put(index, idb.getId());
 		this.execute(digester.getQuery("updateValueForRemoved"), variables);
 
 		if (isQuerySuccessful()) {
@@ -224,14 +295,21 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * this will update item data status
+	 * This method will update only item data status.
+	 * 
+	 * @param eb
+	 *            <code>ItemDataBean</code> that will be updated.
+	 * @return updated <code>ItemDataBean</code>
 	 */
 	public EntityBean updateStatus(EntityBean eb) {
+
 		ItemDataBean idb = (ItemDataBean) eb;
 		idb.setActive(false);
+		int index = 1;
+
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(1, idb.getStatus().getId());
-		variables.put(2, idb.getId());
+		variables.put(index++, idb.getStatus().getId());
+		variables.put(index, idb.getId());
 		this.execute(digester.getQuery("updateStatus"), variables);
 
 		if (isQuerySuccessful()) {
@@ -242,27 +320,43 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * This will update item data value
+	 * This will update item data value, for dates in different formats.
 	 * 
+	 * @param eb
+	 *            <code>ItemDataBeean</code> that will be updated.
+	 * @param currentDfString
+	 *            - format of date (for example "yyyy-MM-dd").
+	 * @return updated <code>ItemDataBean</code>.
 	 */
-	public EntityBean updateValue(EntityBean eb, String current_df_string) {
-		return updateValue(eb, current_df_string, null);
+	public EntityBean updateValue(EntityBean eb, String currentDfString) {
+		return updateValue(eb, currentDfString, null);
 	}
 
-	public EntityBean updateValue(EntityBean eb, String current_df_string, Connection con) {
+	/**
+	 * This will update item data value, for dates in different formats.
+	 * 
+	 * @param eb
+	 *            <code>ItemDataBeean</code> that will be updated.
+	 * @param currentDfString
+	 *            - format of date (for example "yyyy-MM-dd").
+	 * @param con
+	 *            <code>Connection</code> that will be set to this DAO.
+	 * @return updated <code>ItemDataBean</code>.
+	 */
+	public EntityBean updateValue(EntityBean eb, String currentDfString, Connection con) {
 		ItemDataBean idb = (ItemDataBean) eb;
 
 		// Convert to oc_date_format_string pattern before
 		// inserting into database
-		idb.setValue(Utils.convertedItemDateValue(idb.getValue(), current_df_string, oc_df_string, locale));
+		idb.setValue(Utils.convertedItemDateValue(idb.getValue(), currentDfString, oc_df_string, locale));
 
 		idb.setActive(false);
-
+		int index = 1;
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(1, idb.getStatus().getId());
-		variables.put(2, idb.getValue());
-		variables.put(3, idb.getUpdaterId());
-		variables.put(4, idb.getId());
+		variables.put(index++, idb.getStatus().getId());
+		variables.put(index++, idb.getValue());
+		variables.put(index++, idb.getUpdaterId());
+		variables.put(index, idb.getId());
 		this.execute(digester.getQuery("updateValue"), variables, con);
 
 		if (isQuerySuccessful()) {
@@ -272,14 +366,22 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		return idb;
 	}
 
+	/**
+	 * This method will update only updater and update date for item data.
+	 * 
+	 * @param eb
+	 *            - <code>ItemDataBean</code> that will be updated.
+	 * @return updated <code>ItemDataBean</code>.
+	 */
 	public EntityBean updateUser(EntityBean eb) {
 		ItemDataBean idb = (ItemDataBean) eb;
 
 		idb.setActive(false);
+		int index = 1;
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(1, idb.getUpdaterId());
-		variables.put(2, idb.getId());
+		variables.put(index++, idb.getUpdaterId());
+		variables.put(index, idb.getId());
 		this.execute(digester.getQuery("updateUser"), variables);
 
 		if (isQuerySuccessful()) {
@@ -289,10 +391,26 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		return idb;
 	}
 
+	/**
+	 * This method used to create new item data.
+	 * 
+	 * @param eb
+	 *            <code>ItemDataBean</code> that will be written to the DB.
+	 * @return <code>ItemDataBean</code> that will be created.
+	 */
 	public EntityBean create(EntityBean eb) {
 		return create(eb, null);
 	}
 
+	/**
+	 * This method used to create new item data.
+	 * 
+	 * @param eb
+	 *            <code>ItemDataBean</code> that will be written to the DB.
+	 * @param con
+	 *            <code>Connection</code> connection that will be set for this DAO.
+	 * @return <code>ItemDataBean</code> that will be created.
+	 */
 	public EntityBean create(EntityBean eb, Connection con) {
 		ItemDataBean idb = (ItemDataBean) eb;
 		// Convert to oc_date_format_string pattern before
@@ -306,14 +424,15 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
 		int id = getNextPK();
-		variables.put(1, id);
-		variables.put(2, idb.getEventCRFId());
-		variables.put(3, idb.getItemId());
-		variables.put(4, idb.getStatus().getId());
-		variables.put(5, idb.getValue());
-		variables.put(6, idb.getOwnerId());
-		variables.put(7, idb.getOrdinal());
-		variables.put(8, idb.getStatus().getId());
+		int index = 1;
+		variables.put(index++, id);
+		variables.put(index++, idb.getEventCRFId());
+		variables.put(index++, idb.getItemId());
+		variables.put(index++, idb.getStatus().getId());
+		variables.put(index++, idb.getValue());
+		variables.put(index++, idb.getOwnerId());
+		variables.put(index++, idb.getOrdinal());
+		variables.put(index, idb.getStatus().getId());
 		this.execute(digester.getQuery("create"), variables, con);
 		if (isQuerySuccessful()) {
 			idb.setId(id);
@@ -322,6 +441,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		return idb;
 	}
 
+	/**
+	 * This method is used to create new item data already with information about date updated and updater.
+	 * 
+	 * @param eb
+	 *            <code>ItemDataBean</code> that will be inserted to the database.
+	 * @return inserted <code>ItemDataBean</code>.
+	 */
 	public EntityBean upsert(EntityBean eb) {
 		ItemDataBean idb = (ItemDataBean) eb;
 		// Convert to oc_date_format_string pattern before
@@ -335,14 +461,15 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
 		int id = getNextPK();
-		variables.put(1, id);
-		variables.put(2, idb.getEventCRFId());
-		variables.put(3, idb.getItemId());
-		variables.put(4, idb.getStatus().getId());
-		variables.put(5, idb.getValue());
-		variables.put(6, idb.getOwnerId());
-		variables.put(7, idb.getOrdinal());
-		variables.put(8, idb.getUpdaterId());
+		int index = 1;
+		variables.put(index++, id);
+		variables.put(index++, idb.getEventCRFId());
+		variables.put(index++, idb.getItemId());
+		variables.put(index++, idb.getStatus().getId());
+		variables.put(index++, idb.getValue());
+		variables.put(index++, idb.getOwnerId());
+		variables.put(index++, idb.getOrdinal());
+		variables.put(index, idb.getUpdaterId());
 		this.execute(digester.getQuery("upsert"), variables);
 
 		if (isQuerySuccessful()) {
@@ -353,7 +480,11 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Small check to make sure the type is a date, tbh
+	 * This method is used to check if item data type is a date.
+	 * 
+	 * @param itemId
+	 *            ID of <code>ItemBean</code> that will be checked.
+	 * @return Returns the dataType.
 	 */
 	public ItemDataType getDataType(int itemId) {
 		ItemDAO itemDAO = new ItemDAO(this.getDs());
@@ -361,6 +492,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		return itemBean.getDataType();
 	}
 
+	/**
+	 * This method is used to check if entered value match partial date pattern and update value according CC date
+	 * format.
+	 * 
+	 * @param pDate
+	 *            value that was entered in pDate format.
+	 * @return formated date.
+	 */
 	public String formatPDate(String pDate) {
 		String temp = "";
 		String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
@@ -387,6 +526,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		return temp;
 	}
 
+	/**
+	 * This method is used to update format of partial date.
+	 * 
+	 * @param pDate
+	 *            value that was entered for item.
+	 * @return formated date.
+	 */
 	public String reFormatPDate(String pDate) {
 		String temp = "";
 		String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
@@ -414,6 +560,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		return temp;
 	}
 
+	/**
+	 * This method is used to get values from HashMap and create <code>ItemDataBean</code>.
+	 * 
+	 * @param hm
+	 *            <code>HashMap</code> with values that will be written to <code>ItemDataBean</code>.
+	 * @return created <code>ItemDataBean</code>.
+	 */
 	public Object getEntityFromHashMap(HashMap hm) {
 		ItemDataBean eb = new ItemDataBean();
 		this.setEntityAuditInformation(eb, hm);
@@ -437,19 +590,36 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * This method is used to get all <code>ItemDataBean</code>s by Study ID, Item IDs and Item Group ID.
+	 * 
+	 * @param studyEventId
+	 *            ID of Study Event in which ItemData should be found.
+	 * @param itemOid
+	 *            ID of Item that should be found.
+	 * @param itemGroupOid
+	 *            and ID o Item Group in which this item should exist.
+	 * @return List of <code>ItemDataBean</code>s.
+	 */
 	public List<ItemDataBean> findByStudyEventAndOids(Integer studyEventId, String itemOid, String itemGroupOid) {
 		setTypesExpected();
 
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(1, studyEventId);
-		variables.put(2, itemOid);
-		variables.put(3, itemGroupOid);
-		variables.put(4, Status.DELETED.getId());
-		variables.put(5, Status.AUTO_DELETED.getId());
+		int index = 1;
+		variables.put(index++, studyEventId);
+		variables.put(index++, itemOid);
+		variables.put(index++, itemGroupOid);
+		variables.put(index++, Status.DELETED.getId());
+		variables.put(index, Status.AUTO_DELETED.getId());
 
 		return this.executeFindAllQuery("findByStudyEventAndOIDs", variables);
 	}
 
+	/**
+	 * This method is used to get all <code>ItemDataBeans</code> from database.
+	 * 
+	 * @return <code>Collection</code> of all ItemDataBeans.
+	 */
 	public Collection<ItemDataBean> findAll() {
 		setTypesExpected();
 
@@ -462,10 +632,28 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * This method is used to override appropriate method in AuditableEntityDAO.
+	 * 
+	 * @param strOrderByColumn
+	 *            <code>String</code>.
+	 * @param blnAscendingSort
+	 *            <code>boolean</code>.
+	 * @param strSearchPhrase
+	 *            <code>String</code>.
+	 * @return new <code>ArrayList</code>
+	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}
 
+	/**
+	 * This method is used to search item data by ID.
+	 * 
+	 * @param id
+	 *            <code>ItemDataBean</code> ID.
+	 * @return <code>ItemDataBean</code> that was found.
+	 */
 	public EntityBean findByPK(int id) {
 		ItemDataBean eb = new ItemDataBean();
 		this.setTypesExpected();
@@ -483,6 +671,47 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * This method returns list of <code>ItemDataBean</code>s that were created in the following year.
+	 * 
+	 * @param itemId
+	 *            <code>List</code> of IDs.
+	 * @param year
+	 *            <code>int</code> number of year in which items were created.
+	 * @return <code>List</code> of <code>ItemDataBean</code>s.
+	 */
+	public ItemDataBean findByPKAndYear(Integer itemId, int year) {
+
+		ItemDataBean ib = new ItemDataBean();
+		this.setTypesExpected();
+
+		if (itemId == null) {
+			itemId = 0;
+		}
+
+		int index = 1;
+		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+
+		variables.put(index++, itemId);
+		variables.put(index++, year);
+		variables.put(index, year);
+
+		String sql = digester.getQuery("findByPKAndYear");
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
+
+		if (it.hasNext()) {
+			ib = (ItemDataBean) this.getEntityFromHashMap((HashMap) it.next());
+		}
+		return ib;
+	}
+
+	/**
+	 * This method is used to remove item data from database.
+	 * 
+	 * @param itemDataId
+	 *            ID by which item data will be found.
+	 */
 	public void delete(int itemDataId) {
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
 		variables.put(1, itemDataId);
@@ -490,6 +719,12 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.execute(digester.getQuery("delete"), variables);
 	}
 
+	/**
+	 * This method is used to delete rows from item_data_map table, using itemDataId.
+	 * 
+	 * @param itemDataId
+	 *            ID that will be used to delete rows from item_data_map table.
+	 */
 	public void deleteDnMap(int itemDataId) {
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
 		variables.put(1, itemDataId);
@@ -497,55 +732,84 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.execute(digester.getQuery("deleteDn"), variables);
 	}
 
+	/**
+	 * This method is used to override appropriate method in AuditableEntityDAO.
+	 * 
+	 * @param objCurrentUser
+	 *            <code>Object</code>.
+	 * @param intActionType
+	 *            <code>int</code>.
+	 * @param strOrderByColumn
+	 *            <code>String</code>.
+	 * @param blnAscendingSort
+	 *            <code>boolean</code>.
+	 * @param strSearchPhrase
+	 *            <code>String</code>.
+	 * @return new <code>ArrayList</code>.
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}
 
+	/**
+	 * This method is used to override appropriate method in AuditableEntityDAO.
+	 * 
+	 * @param objCurrentUser
+	 *            <code>Object</code>.
+	 * @param intActionType
+	 *            <code>int</code>.
+	 * @return new <code>ArrayList</code>.
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
 		return new ArrayList();
 	}
 
+	/**
+	 * This method is used to find all ItemDataBeans by section ID and Event CRF ID.
+	 * 
+	 * @param sectionId
+	 *            ID of section where item should be found.
+	 * @param eventCRFId
+	 *            ID of event CRF where item should be found.
+	 * @return list of <code>ItemDataBean</code>s.
+	 */
 	public ArrayList<ItemDataBean> findAllBySectionIdAndEventCRFId(int sectionId, int eventCRFId) {
 		setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(1, sectionId);
-		variables.put(2, eventCRFId);
+		int index = 1;
+		variables.put(index++, sectionId);
+		variables.put(index, eventCRFId);
 
 		return this.executeFindAllQuery("findAllBySectionIdAndEventCRFId", variables);
 	}
 
+	/**
+	 * This method is used to find all active ItemDataBeans by section ID and Event CRF ID.
+	 * 
+	 * @param sectionId
+	 *            ID of section where item should be found.
+	 * @param eventCRFId
+	 *            ID of event CRF where item should be found.
+	 * @return ArrayList of <code>ItemDataBean</code>s.
+	 */
 	public ArrayList<ItemDataBean> findAllActiveBySectionIdAndEventCRFId(int sectionId, int eventCRFId) {
 		setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(1, sectionId);
-		variables.put(2, eventCRFId);
+		int index = 1;
+		variables.put(index++, sectionId);
+		variables.put(index, eventCRFId);
 
 		return this.executeFindAllQuery("findAllActiveBySectionIdAndEventCRFId", variables);
 	}
 
-	public boolean doesDataExistByEventCRFId(int eventCRFId) {
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-
-		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(1, eventCRFId);
-
-		ArrayList list = this.select(digester.getQuery("doesDataExistByEventCRFId"), variables);
-		Iterator it = list.iterator();
-		if (it.hasNext()) {
-			try {
-				HashMap hm = (HashMap) it.next();
-				Integer val = (Integer) hm.get("val");
-				return val == 1;
-			} catch (Exception e) {
-				//
-			}
-		}
-
-		return false;
-	}
-
+	/**
+	 * This method is used to search all item data for specific Event CRF.
+	 * 
+	 * @param eventCRFId
+	 *            by which item data will be searched.
+	 * @return List of <code>ItemDataBean</code>s.
+	 */
 	public ArrayList<ItemDataBean> findAllByEventCRFId(int eventCRFId) {
 		setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
@@ -554,52 +818,112 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		return this.executeFindAllQuery("findAllByEventCRFId", variables);
 	}
 
+	/**
+	 * This method is used to search all item data for specific Event CRF and Item with status != deleted.
+	 * 
+	 * @param eventCRFId
+	 *            by which item data will be searched.
+	 * @param itemId
+	 *            by which item data will be searched.
+	 * @return List of <code>ItemDataBean</code>s.
+	 */
 	public ArrayList<ItemDataBean> findAllByEventCRFIdAndItemId(int eventCRFId, int itemId) {
 		setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(1, eventCRFId);
-		variables.put(2, itemId);
+		int index = 1;
+		variables.put(index++, eventCRFId);
+		variables.put(index, itemId);
 
 		return this.executeFindAllQuery("findAllByEventCRFIdAndItemId", variables);
 	}
 
+	/**
+	 * This method is used to search all item data for specific Event CRF and Item with any status.
+	 * 
+	 * @param eventCRFId
+	 *            by which item data will be searched.
+	 * @param itemId
+	 *            by which item data will be searched.
+	 * @return List of <code>ItemDataBean</code>s.
+	 */
 	public ArrayList<ItemDataBean> findAllByEventCRFIdAndItemIdNoStatus(int eventCRFId, int itemId) {
 		setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(1, eventCRFId);
-		variables.put(2, itemId);
+		int index = 1;
+		variables.put(index++, eventCRFId);
+		variables.put(index, itemId);
 
 		return this.executeFindAllQuery("findAllByEventCRFIdAndItemIdNoStatus", variables);
 	}
 
+	/**
+	 * This method is used to search all items with parameter required = true for specific EventCRF for which data was
+	 * not entered.
+	 * 
+	 * @param eventCRFId
+	 *            by which item data will be searched.
+	 * @param crfVersionId
+	 *            by which item data will be searched.
+	 * @return List of <code>ItemDataBean</code>s.
+	 */
 	public ArrayList<ItemDataBean> findAllBlankRequiredByEventCRFId(int eventCRFId, int crfVersionId) {
 		setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(1, eventCRFId);
-		variables.put(2, crfVersionId);
+		int index = 1;
+		variables.put(index++, eventCRFId);
+		variables.put(index, crfVersionId);
 
 		return this.executeFindAllQuery("findAllBlankRequiredByEventCRFId", variables);
 	}
 
+	/**
+	 * This method is used to update status for all items in the specific EventCRF.
+	 * 
+	 * @param eventCRF
+	 *            <code>EvetnCRFBean</code> id from which will be used for search.
+	 * @param s
+	 *            <code>Status</code> that will be set to all item data rows.
+	 */
 	public void updateStatusByEventCRF(EventCRFBean eventCRF, Status s) {
 		updateStatusByEventCRF(eventCRF, s, null);
 	}
 
+	/**
+	 * This method is used to update status for all items in the specific EventCRF.
+	 * 
+	 * @param eventCRF
+	 *            <code>EvetnCRFBean</code> id from which will be used for search.
+	 * @param s
+	 *            <code>Status</code> that will be set to all item data rows.
+	 * @param con
+	 *            <code>Connection</code> that will be set to DAO.
+	 */
 	public void updateStatusByEventCRF(EventCRFBean eventCRF, Status s, Connection con) {
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(1, s.getId());
-		variables.put(2, eventCRF.getId());
+		int index = 1;
+		variables.put(index++, s.getId());
+		variables.put(index, eventCRF.getId());
 
 		String sql = digester.getQuery("updateStatusByEventCRF");
 
 		execute(sql, variables, con);
 	}
 
+	/**
+	 * This method is used to find all item data for specific item in a specific event.
+	 * 
+	 * @param itemId
+	 *            by which item data will be searched.
+	 * @param eventCRFId
+	 *            by which item data will be searched.
+	 * @return <code>ItemDataBean</code> that was found.
+	 */
 	public ItemDataBean findByItemIdAndEventCRFId(int itemId, int eventCRFId) {
 		setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, itemId);
-		variables.put(2, eventCRFId);
+		int index = 1;
+		variables.put(index++, itemId);
+		variables.put(index, eventCRFId);
 
 		EntityBean eb = this.executeFindByPKQuery("findByItemIdAndEventCRFId", variables);
 
@@ -610,22 +934,41 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * This method is used to find all item data for specific item in a specific event by ordinal.
+	 * 
+	 * @param itemId
+	 *            by which item data will be searched.
+	 * @param eventCRFId
+	 *            by which item data will be searched.
+	 * @param ordinal
+	 *            by which item will be found.
+	 * @return <code>ItemDataBean</code> that was found.
+	 */
 	public ItemDataBean findByItemIdAndEventCRFIdAndOrdinal(int itemId, int eventCRFId, int ordinal) {
 		setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, itemId);
-		variables.put(2, eventCRFId);
-		variables.put(3, ordinal);
+		int index = 1;
+		variables.put(index++, itemId);
+		variables.put(index++, eventCRFId);
+		variables.put(index, ordinal);
 
 		EntityBean eb = this.executeFindByPKQuery("findByItemIdAndEventCRFIdAndOrdinal", variables);
 
 		if (!eb.isActive()) {
-			return new ItemDataBean();// hmm, return null instead?
+			return new ItemDataBean();
 		} else {
 			return (ItemDataBean) eb;
 		}
 	}
 
+	/**
+	 * This function is used to find count of all required items in a specific Event CRFs.
+	 * 
+	 * @param ecb
+	 *            <code>EventCRFBean</code> in which items will be found.
+	 * @return list of <code>ItemDataBean</code>s.
+	 */
 	public int findAllRequiredByEventCRFId(EventCRFBean ecb) {
 		setTypesExpected();
 		int answer = 0;
@@ -642,8 +985,16 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Gets the maximum ordinal for item data in a given item group in a given section and event crf
+	 * Gets the maximum ordinal for item data in a given item group in a given section and event crf.
 	 * 
+	 * @param ecb
+	 *            <code>EventCRFBean</code> for which max ordinal will be found.
+	 * @param sb
+	 *            <code>SectionBean</code> for which max ordinal will be found.
+	 * @param igb
+	 *            <code>ItemGroupBean</code> for which max ordinal will be found.
+	 * 
+	 * @return maximal ordinal for group.
 	 */
 	public int getMaxOrdinalForGroup(EventCRFBean ecb, SectionBean sb, ItemGroupBean igb) {
 
@@ -651,9 +1002,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, ecb.getId());
-		variables.put(2, sb.getId());
-		variables.put(3, igb.getId());
+		int index = 1;
+		variables.put(index++, ecb.getId());
+		variables.put(index++, sb.getId());
+		variables.put(index, igb.getId());
 
 		ArrayList alist = this.select(digester.getQuery("getMaxOrdinalForGroup"), variables);
 		Iterator it = alist.iterator();
@@ -662,7 +1014,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 				HashMap hm = (HashMap) it.next();
 				return (Integer) hm.get("max_ord");
 			} catch (Exception e) {
-				//
+				logger.warn("An Exception was thrown while performing getMaxOrdinalForGroup........");
 			}
 		}
 
@@ -670,18 +1022,23 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Gets the maximum ordinal for item data in a given item group in a given section and event crf
+	 * Gets the maximum ordinal for item data in a given item group and event crf.
 	 * 
+	 * @param itemGroupOid
+	 *            OID of item group for which max ordinal will be calculated.
+	 * @param eventCrfId
+	 *            ID of <code>EventCRFBean</code>.
+	 * @return maximum ordinal for item data in a given item group and event crf
 	 */
-	public int getMaxOrdinalForGroupByGroupOID(String item_group_oid, int event_crf_id) {
+	public int getMaxOrdinalForGroupByGroupOID(String itemGroupOid, int eventCrfId) {
 
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.STRING);
 
 		HashMap variables = new HashMap(1);
-		variables.put(1, event_crf_id);
-		variables.put(2, item_group_oid);
+		variables.put(1, eventCrfId);
+		variables.put(2, itemGroupOid);
 
 		ArrayList alist = this.select(digester.getQuery("getMaxOrdinalForGroupByGroupOID"), variables);
 		Iterator it = alist.iterator();
@@ -690,21 +1047,31 @@ public class ItemDataDAO extends AuditableEntityDAO {
 				HashMap hm = (HashMap) it.next();
 				return (Integer) hm.get("max_ord");
 			} catch (Exception e) {
-				//
+				logger.warn("An Exception was thrown while performing getMaxOrdinalForGroupByGroupOID........");
 			}
 		}
 
 		return 0;
 	}
 
+	/**
+	 * Gets the maximum ordinal for item data in a given item bean and event crf.
+	 * 
+	 * @param ib
+	 *            OID of item for which max ordinal will be calculated.
+	 * @param ec
+	 *            <code>EventCRFBean</code>.
+	 * @return maximum ordinal for item data in a given item and event crf
+	 */
 	public int getMaxOrdinalForGroupByItemAndEventCrf(ItemBean ib, EventCRFBean ec) {
 
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, ib.getId());
-		variables.put(2, ec.getId());
+		int index = 1;
+		variables.put(index++, ib.getId());
+		variables.put(index, ec.getId());
 
 		ArrayList alist = this.select(digester.getQuery("getMaxOrdinalForGroupByItemAndEventCrf"), variables);
 		Iterator it = alist.iterator();
@@ -713,24 +1080,37 @@ public class ItemDataDAO extends AuditableEntityDAO {
 				HashMap hm = (HashMap) it.next();
 				return (Integer) hm.get("max_ord");
 			} catch (Exception e) {
-				//
+				logger.warn("An Exception was thrown while performing getMaxOrdinalForGroupByItemAndEventCrf........");
 			}
 		}
 
 		return 0;
 	}
 
-	public boolean isItemExists(int item_id, int ordinal_for_repeating_group_field, int event_crf_id) {
+	/**
+	 * Check if item data exist in the DB. !!!
+	 * 
+	 * @param itemId
+	 *            <code>int</code>.
+	 * @param ordinalForRepeatingGroupField
+	 *            <code>int</code>.
+	 * @param eventCrfId
+	 *            <code>int</code>.
+	 * @return <code>boolean</code>.
+	 */
+	public boolean isItemExists(int itemId, int ordinalForRepeatingGroupField, int eventCrfId) {
 
+		int index = 1;
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		this.setTypeExpected(2, TypeNames.INT);
-		this.setTypeExpected(3, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index, TypeNames.INT);
 
+		int varInd = 1;
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, item_id);
-		variables.put(2, ordinal_for_repeating_group_field);
-		variables.put(3, event_crf_id);
+		variables.put(varInd++, itemId);
+		variables.put(varInd++, ordinalForRepeatingGroupField);
+		variables.put(varInd, eventCrfId);
 
 		ArrayList alist = this.select(digester.getQuery("isItemExists"), variables);
 		Iterator it = alist.iterator();
@@ -738,6 +1118,15 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 	}
 
+	/**
+	 * This function is used get count of items in group.
+	 * 
+	 * @param itemId
+	 *            ID of item in this group.
+	 * @param eventcrfId
+	 *            <code>int</code> ID of CRF that should contain this group.
+	 * @return <code>int</code> size of group.
+	 */
 	public int getGroupSize(int itemId, int eventcrfId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
@@ -755,6 +1144,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Find item values by OID of item.
+	 * 
+	 * @param itoid
+	 *            - item OID.
+	 * @return list of values.
+	 */
 	public List<String> findValuesByItemOID(String itoid) {
 		List<String> vals = new ArrayList<String>();
 		this.unsetTypeExpected();
@@ -767,5 +1163,4 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		}
 		return vals;
 	}
-
 }

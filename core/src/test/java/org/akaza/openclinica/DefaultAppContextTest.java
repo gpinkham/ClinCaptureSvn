@@ -222,6 +222,10 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			max = (Integer) session.createSQLQuery("SELECT max(crf_id) from crf").uniqueResult();
 			session.createSQLQuery("ALTER SEQUENCE crf_crf_id_seq RESTART WITH " + (max + 1)).executeUpdate();
 
+			max = (Integer) session.createSQLQuery("SELECT max(item_data_id) from item_data").uniqueResult();
+			session.createSQLQuery("ALTER SEQUENCE item_data_item_data_id_seq RESTART WITH " + (max + 1))
+					.executeUpdate();
+
 		} else if (dbDriverClassName.contains(ORACLE)) {
 			Integer max = (Integer) session.createSQLQuery("SELECT max(discrepancy_note_id) from discrepancy_note")
 					.uniqueResult();
@@ -283,6 +287,12 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			session.createSQLQuery("DROP SEQUENCE crf_crf_id_seq").executeUpdate();
 			session.createSQLQuery(
 					"CREATE SEQUENCE crf_crf_id_seq START WITH " + (max + 1)
+							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(item_data_id) from item_data").uniqueResult();
+			session.createSQLQuery("DROP SEQUENCE item_data_item_data_id_seq").executeUpdate();
+			session.createSQLQuery(
+					"CREATE SEQUENCE item_data_item_data_id_seq START WITH " + (max + 1)
 							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
 		}
 

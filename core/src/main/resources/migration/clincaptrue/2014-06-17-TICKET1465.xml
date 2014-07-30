@@ -17,11 +17,4 @@
 		</insert>
 	</changeSet>
 
-	<changeSet author="denis" id="2014-06-17-TICKET1465-UPDATE-SEQENCE">
-		<alterSequence incrementBy="1" 
-			maxValue="90000"
-			minValue="1"
-			schemaName="public" 
-			sequenceName="widget_id_seq" />
-	</changeSet>
 </databaseChangeLog>

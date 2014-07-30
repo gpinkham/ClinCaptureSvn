@@ -77,18 +77,6 @@
                 </sql>
         </query>
         <query>
-                <name>findMinMaxDates</name>
-                <sql>select
-                        min(date_created) as min_date,
-                        max(date_created) as max_date
-                        from item_data</sql>
-        </query>
-
-        <query>
-            <name>doesDataExistByEventCRFId</name>
-            <sql>select count(item_data_id) as val from item_data where event_crf_id=? limit 1</sql>
-        </query>
-        <query>
                 <name>findAllByEventCRFId</name>
                 <sql>select * from item_data where event_crf_id=?</sql>
         </query>

@@ -476,7 +476,7 @@
     <item_form_metadata item_form_metadata_id="1" item_id="1" crf_version_id="1" header="" subheader="" parent_id="0"
                         parent_label="" column_number="1" page_number_label="1" question_number_label="1"
                         left_item_text="Start of Agent Administration Period" right_item_text="" section_id="1"
-                        response_set_id="1" regexp="" regexp_error_msg="" ordinal="1" required="false" default_value=""
+                        response_set_id="1" regexp="" regexp_error_msg="" ordinal="1" required="true" default_value=""
                         response_layout="" show_item="true" code_ref=""/>
     <item_form_metadata item_form_metadata_id="2" item_id="2" crf_version_id="1" header="" subheader="" parent_id="0"
                         parent_label="" column_number="2" page_number_label="1" question_number_label="2"

@@ -17,11 +17,12 @@ package com.clinovo.controller;
 
 import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
 import com.clinovo.bean.display.DisplayWidgetsRowWithName;
+import com.clinovo.dao.CodedItemDAO;
+import com.clinovo.model.CodedItem;
 import com.clinovo.model.Widget;
 import com.clinovo.model.WidgetsLayout;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
@@ -31,6 +32,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
 import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -45,6 +47,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -59,7 +62,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,13 +72,22 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+/**
+ * This controller was created to gather data from database and send it to widgets.
+ */
 @Controller
 @SuppressWarnings({ "unused", "rawtypes", "unchecked" })
 public class WidgetsLayoutController {
 
 	private static final int FILTER_START = 0;
-
 	private static final int FILTER_END = 99999;
+	private static final int NUMBER_OF_MONTHS = 11;
+
+	private static final int EC_DISPLAY_PER_SCREEN = 5;
+	private static final int ND_PER_CRF_DISPLAY_PER_SCREEN = 8;
+
+	private static final String STATUS_NOT_CODED = "Items to be Coded";
+	private static final String STATUS_CODED = "Coded Items";
 
 	@Autowired
 	private DataSource datasource;
@@ -90,8 +101,23 @@ public class WidgetsLayoutController {
 	@Autowired
 	private MessageSource messageSource;
 
+	@Autowired
+	private CodedItemDAO codedItemDAO;
+
+	/**
+	 * This method is used to display the widget on the Home page. It takes the data from the table "widget" and
+	 * "widgets_layout" processes it and sends back a list of widgets jsps that should be displayed and their order.
+	 * 
+	 * @param request
+	 *            is used to obtain data about current UserAccount and Study.
+	 * 
+	 * @return model ModelMap that contains list of jsps and their order.
+	 * 
+	 * @throws Exception
+	 *             if there is incorrect data in the database.
+	 */
 	@RequestMapping("/configureHomePage")
-	public ModelMap configureHomePageHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ModelMap configureHomePageHandler(HttpServletRequest request) throws Exception {
 		ModelMap model = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
@@ -125,6 +151,12 @@ public class WidgetsLayoutController {
 		return model;
 	}
 
+	/**
+	 * This method is used to save data after user updates his home page layout.
+	 * 
+	 * @param request
+	 *            is used to gather data about current UserAccount, Study and updates that user has made in his layout.
+	 */
 	@RequestMapping("/saveHomePage")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@ResponseBody
@@ -190,6 +222,18 @@ public class WidgetsLayoutController {
 		}
 	}
 
+	/**
+	 * This method is used to gather data from Database and send it to widget.
+	 * 
+	 * @param request
+	 *            is used to gather information about current user and study.
+	 * 
+	 * @param response
+	 *            is used to set correct locale and clear cache.
+	 * 
+	 * @throws IOException
+	 *             if data from request is incorrect or database contains corrupted data.
+	 */
 	@RequestMapping("/initNdsAssignedToMeWidget")
 	public void initNdsAssignedToMeWidget(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -227,6 +271,21 @@ public class WidgetsLayoutController {
 		response.getWriter().println(result);
 	}
 
+	/**
+	 * This method is used to gather data from Database and send it to widget.
+	 * 
+	 * @param request
+	 *            is used to gather information about current user and study.
+	 * @param model
+	 *            is used to return gathered from database data.
+	 * @param response
+	 *            is used to set correct locale and clear cache.
+	 * 
+	 * @throws IOException
+	 *             if data from request is incorrect or database contains corrupted data.
+	 * 
+	 * @return model - Model with gathered data.
+	 */
 	@RequestMapping("/initEventsCompletionWidget")
 	public String initEventsCompletionWidget(HttpServletRequest request, HttpServletResponse response, Model model)
 			throws IOException {
@@ -239,7 +298,7 @@ public class WidgetsLayoutController {
 		boolean hasPrevious;
 		boolean hasNext;
 		int displayFrom = Integer.parseInt(request.getParameter("lastElement"));
-		int maxDisplayNumber = 5;
+		int maxDisplayNumber = EC_DISPLAY_PER_SCREEN;
 		int studyId = Integer.parseInt(request.getParameter("studyId"));
 
 		if (action.equals("goBack")) {
@@ -293,7 +352,7 @@ public class WidgetsLayoutController {
 
 		hasPrevious = displayFrom != 0;
 
-		hasNext = displayFrom + 5 <= studyEventDefinitions.size();
+		hasNext = displayFrom + EC_DISPLAY_PER_SCREEN <= studyEventDefinitions.size();
 
 		model.addAttribute("eventCompletionRows", eventCompletionRows);
 		model.addAttribute("eventCompletionHasNext", hasNext);
@@ -303,6 +362,17 @@ public class WidgetsLayoutController {
 		return page;
 	}
 
+	/**
+	 * This method is used to gather data from Database and send it to widget.
+	 * 
+	 * @param request
+	 *            is used to gather information about current user and study.
+	 * @param response
+	 *            is used to set correct locale and clear cache.
+	 * 
+	 * @throws IOException
+	 *             if data from request is incorrect or database contains corrupted data.
+	 */
 	@RequestMapping("/getEventsCompletionLegendValues")
 	public void getEventsCompletionLegendValues(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
@@ -334,6 +404,21 @@ public class WidgetsLayoutController {
 		response.getWriter().println(listOfEventsWithStatuses);
 	}
 
+	/**
+	 * This method is used to gather data from Database and send it to widget.
+	 * 
+	 * @param request
+	 *            is used to gather information about current user and study.
+	 * @param model
+	 *            is used to return gathered from database data.
+	 * @param response
+	 *            is used to set correct locale and clear cache.
+	 * 
+	 * @throws IOException
+	 *             if data from request is incorrect or database contains corrupted data.
+	 * 
+	 * @return model Model with gathered data.
+	 */
 	@RequestMapping("/initSubjectStatusCount")
 	public String initSubjectStatusCountWidget(HttpServletRequest request, HttpServletResponse response, Model model)
 			throws IOException {
@@ -356,6 +441,21 @@ public class WidgetsLayoutController {
 		return "widgets/includes/subjectStatusCountChart";
 	}
 
+	/**
+	 * This method is used to gather data from Database and send it to widget.
+	 * 
+	 * @param request
+	 *            is used to gather information about current user and study.
+	 * @param model
+	 *            is used to return gathered from database data.
+	 * @param response
+	 *            is used to set correct locale and clear cache.
+	 * 
+	 * @throws IOException
+	 *             if data from request is incorrect or database contains corrupted data.
+	 * 
+	 * @return model Model with gathered data.
+	 */
 	@RequestMapping("/initStudyProgress")
 	public String initStudyProgressWidget(HttpServletRequest request, HttpServletResponse response, Model model)
 			throws IOException {
@@ -391,6 +491,21 @@ public class WidgetsLayoutController {
 		return "widgets/includes/studyProgressChart";
 	}
 
+	/**
+	 * This method is used to gather data from Database and send it to widget.
+	 * 
+	 * @param request
+	 *            is used to gather information about current user and study.
+	 * @param model
+	 *            is used to return gathered from database data.
+	 * @param response
+	 *            is used to set correct locale and clear cache.
+	 * 
+	 * @throws IOException
+	 *             if data from request is incorrect or database contains corrupted data.
+	 * 
+	 * @return model Model with gathered data.
+	 */
 	@RequestMapping("/initSdvProgressWidget")
 	public String initSdvProgressWidget(HttpServletRequest request, HttpServletResponse response, Model model)
 			throws IOException {
@@ -421,9 +536,9 @@ public class WidgetsLayoutController {
 		boolean sdvWithOpenQueries = sb.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes");
 		ArrayList<EventCRFBean> ecrfs = eCrfdao.getAvailableWithFilterAndSort(sb.getId(),
 				sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilterDone, sdvSortDone,
-				sdvWithOpenQueries, 0, 9999);
+				sdvWithOpenQueries, 0, FILTER_END);
 
-		List<Integer> countValues = new ArrayList<Integer>(Collections.nCopies(12, 0));
+		List<Integer> countValues = new ArrayList<Integer>(Collections.nCopies(NUMBER_OF_MONTHS + 1, 0));
 
 		int currentMonth = sdvCal.get(Calendar.MONTH);
 
@@ -436,7 +551,7 @@ public class WidgetsLayoutController {
 
 				int month = sdvCal.get(Calendar.MONTH);
 				int eStartMonth = (ecrfYear == sdvProgressYear) ? month : 0;
-				int eEndMonth = (sdvProgressYear != currentYear) ? 11 : currentMonth;
+				int eEndMonth = (sdvProgressYear != currentYear) ? NUMBER_OF_MONTHS : currentMonth;
 
 				for (int i = eStartMonth; i <= eEndMonth; i++) {
 
@@ -461,9 +576,9 @@ public class WidgetsLayoutController {
 		EventCRFSDVSort sdvSort = new EventCRFSDVSort();
 		ArrayList<EventCRFBean> availableForSDV = eCrfdao.getAvailableWithFilterAndSort(sb.getId(),
 				sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries,
-				0, 99999);
+				0, FILTER_END);
 
-		List<Integer> countAvailableCRFs = new ArrayList<Integer>(Collections.nCopies(12, 0));
+		List<Integer> countAvailableCRFs = new ArrayList<Integer>(Collections.nCopies(NUMBER_OF_MONTHS + 1, 0));
 
 		for (EventCRFBean avCRF : availableForSDV) {
 
@@ -476,7 +591,7 @@ public class WidgetsLayoutController {
 
 				int avMonth = avCal.get(Calendar.MONTH);
 				int startMonth = (avYear == sdvProgressYear) ? avMonth : 0;
-				int endMonth = (sdvProgressYear != currentYear) ? 11 : currentMonth;
+				int endMonth = (sdvProgressYear != currentYear) ? NUMBER_OF_MONTHS : currentMonth;
 
 				for (int i = startMonth; i <= endMonth; i++) {
 
@@ -495,6 +610,18 @@ public class WidgetsLayoutController {
 		return "widgets/includes/sdvProgressChart";
 	}
 
+	/**
+	 * This method is used to gather data from Database and send it to widget.
+	 * 
+	 * @param request
+	 *            is used to gather information about current user and study.
+	 * @param model
+	 *            is used to return gathered from database data.
+	 * @param response
+	 *            is used to set correct locale and clear cache.
+	 * 
+	 * @return model Model with gathered data.
+	 */
 	@RequestMapping("/initNdsPerCrfWidget")
 	public String initNdsPerCrfWidget(HttpServletRequest request, HttpServletResponse response, Model model) {
 
@@ -544,7 +671,7 @@ public class WidgetsLayoutController {
 				ResolutionStatus.NOT_APPLICABLE };
 
 		int start = Integer.parseInt(request.getParameter("start"));
-		int maxDispay = 8;
+		int maxDispay = ND_PER_CRF_DISPLAY_PER_SCREEN;
 		String action = request.getParameter("action");
 
 		if (action.equals("goForward")) {
@@ -587,6 +714,18 @@ public class WidgetsLayoutController {
 		return page;
 	}
 
+	/**
+	 * This method is used to gather data from Database and send it to widget.
+	 * 
+	 * @param request
+	 *            is used to gather information about current user and study.
+	 * @param model
+	 *            is used to return gathered from database data.
+	 * @param response
+	 *            is used to set correct locale and clear cache.
+	 * 
+	 * @return model Model with gathered data.
+	 */
 	@RequestMapping("/initEnrollmentProgressWidget")
 	public String initEnrollmentProgressWidget(HttpServletRequest request, HttpServletResponse response, Model model) {
 
@@ -619,12 +758,13 @@ public class WidgetsLayoutController {
 		FindSubjectsSort findSubjectsSort = new FindSubjectsSort();
 		FindSubjectsFilter findSubjectsFilter = new FindSubjectsFilter(studyGroupClassDAO);
 
-		List<StudySubjectBean> listOfSubjects = ssDao.getWithFilterAndSort(sb, findSubjectsFilter, findSubjectsSort, FILTER_START, FILTER_END);
+		List<StudySubjectBean> listOfSubjects = ssDao.getWithFilterAndSort(sb, findSubjectsFilter, findSubjectsSort,
+				FILTER_START, FILTER_END);
 
 		LinkedHashMap<String, LinkedHashMap<Status, Integer>> dataRows = new LinkedHashMap<String, LinkedHashMap<Status, Integer>>();
-		List<String> months = new ArrayList<String>();
+		ArrayList<String> months = getMonthsList(request);
 
-		for (int i = 1; i <= 12; i++) {
+		for (String month : months) {
 
 			LinkedHashMap<Status, Integer> blankStatuses = new LinkedHashMap<Status, Integer>();
 			blankStatuses.put(Status.LOCKED, 0);
@@ -632,8 +772,7 @@ public class WidgetsLayoutController {
 			blankStatuses.put(Status.SIGNED, 0);
 			blankStatuses.put(Status.AVAILABLE, 0);
 
-			dataRows.put(messageSource.getMessage("short.month." + i, null, request.getLocale()), blankStatuses);
-			months.add(messageSource.getMessage("short.month." + i, null, request.getLocale()));
+			dataRows.put(month, blankStatuses);
 		}
 
 		for (StudySubjectBean subject : listOfSubjects) {
@@ -656,15 +795,13 @@ public class WidgetsLayoutController {
 			int subjectUpdatedYear = subjectUpdatedCalendar.get(Calendar.YEAR);
 			int subjectUpdatedMonth = subjectUpdatedCalendar.get(Calendar.MONTH);
 			boolean wasSubjectAvailableAtLeastMonthInDisplayedYear = subjectCreatedYear <= displayedYear
-					&& (subject.getStatus() == Status.AVAILABLE || (subjectUpdatedYear >= displayedYear 
-					&& ((subjectUpdatedYear == subjectCreatedYear && subjectUpdatedMonth != subjectCreatedMonth) 
-							|| subjectUpdatedYear != subjectCreatedYear)));
+					&& (subject.getStatus() == Status.AVAILABLE || (subjectUpdatedYear >= displayedYear && ((subjectUpdatedYear == subjectCreatedYear && subjectUpdatedMonth != subjectCreatedMonth) || subjectUpdatedYear != subjectCreatedYear)));
 
 			// Add info about time when subjects were available
 			if (wasSubjectAvailableAtLeastMonthInDisplayedYear) {
 
 				int cStartMonth = subjectCreatedYear == displayedYear ? subjectCreatedMonth : 0;
-				int cEndMonth = displayedYear != currentYear ? 11 : currentMonth;
+				int cEndMonth = displayedYear != currentYear ? NUMBER_OF_MONTHS : currentMonth;
 
 				if (subject.getUpdatedDate() != newDate && subject.getStatus().getId() != Status.AVAILABLE.getId()
 						&& subjectUpdatedYear == displayedYear) {
@@ -688,7 +825,7 @@ public class WidgetsLayoutController {
 					&& subjectUpdatedYear <= displayedYear) {
 
 				int uStartMonth = subjectUpdatedYear == displayedYear ? subjectUpdatedMonth : 0;
-				int uEndMoth = displayedYear != currentYear ? 11 : currentMonth;
+				int uEndMoth = displayedYear != currentYear ? NUMBER_OF_MONTHS : currentMonth;
 
 				for (int j = uStartMonth; j <= uEndMoth; j++) {
 
@@ -713,6 +850,163 @@ public class WidgetsLayoutController {
 		model.addAttribute("epNextYearExists", nextYearDataExists);
 
 		return page;
+	}
+
+	/**
+	 * This method is used to gather data from Database and send it to widget.
+	 * 
+	 * @param request
+	 *            is used to gather information about current user and study.
+	 * @param model
+	 *            is used to return gathered from database data.
+	 * @param response
+	 *            is used to set correct locale and clear cache.
+	 * 
+	 * @return model - Model with gathered data.
+	 */
+	@RequestMapping("/initCodingProgressWidget")
+	public String initCodingProgressWidget(HttpServletRequest request, HttpServletResponse response, Model model) {
+
+		setRequestHeadersAndUpdateLocale(response, request);
+
+		String page = "widgets/includes/codingProgressChart";
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+
+		ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
+
+		// Set which year should be displayed.
+		int displayedYear = Integer.parseInt(request.getParameter("codingProgressYear"));
+		displayedYear = displayedYear == 0 ? Calendar.getInstance().get(Calendar.YEAR) : displayedYear;
+
+		List<CodedItem> codingItems = codedItemDAO.findAll();
+		ArrayList<Integer> itemsIds = new ArrayList<Integer>();
+
+		// Get list of IDs of item data for all Coded Items.
+		for (CodedItem item : codingItems) {
+			if (item.getCodedItemElements().size() > 0) {
+				itemsIds.add(item.getCodedItemElements().get(0).getItemDataId());
+			}
+		}
+
+		Calendar calendar = Calendar.getInstance();
+		int currentYear = calendar.get(Calendar.YEAR);
+		int currentMonth = calendar.get(Calendar.MONTH);
+		int previousYear = displayedYear - 1;
+
+		// Check - should "Next" or "Previous" buttons be displayed.
+		boolean previousYearDataExist = false;
+
+		for (Integer itemId : itemsIds) {
+			ItemDataBean item = itemDataDAO.findByPKAndYear(itemId, previousYear);
+			if (item.getItemId() != 0) {
+				previousYearDataExist = true;
+			}
+		}
+
+		boolean nextYearDataExist = displayedYear < currentYear;
+
+		LinkedHashMap<String, LinkedHashMap<String, Integer>> cpDataRows = new LinkedHashMap<String, LinkedHashMap<String, Integer>>();
+		ArrayList<String> months = getMonthsList(request);
+
+		// Create an empty data rows with months names.
+		for (String month : months) {
+
+			LinkedHashMap<String, Integer> blankStatuses = new LinkedHashMap<String, Integer>();
+			blankStatuses.put(STATUS_CODED, 0);
+			blankStatuses.put(STATUS_NOT_CODED, 0);
+
+			cpDataRows.put(month, blankStatuses);
+		}
+
+		// Add values to data rows.
+		for (CodedItem item : codingItems) {
+
+			if (item.getCodedItemElements().size() > 0) {
+
+				ItemDataBean codedItemData = (ItemDataBean) itemDataDAO.findByPK(item.getCodedItemElements().get(0)
+						.getItemDataId());
+
+				Date createdDate = codedItemData.getCreatedDate();
+				Date updatedDate = codedItemData.getUpdatedDate() != null ? codedItemData.getUpdatedDate()
+						: new Date(0);
+
+				Calendar createCalendar = Calendar.getInstance();
+				Calendar updateCalendar = Calendar.getInstance();
+				createCalendar.setTime(createdDate);
+				updateCalendar.setTime(updatedDate);
+
+				int createdYear = createCalendar.get(Calendar.YEAR);
+				int createdMonth = createCalendar.get(Calendar.MONTH);
+				int updatedYear = updateCalendar.get(Calendar.YEAR);
+				int updatedMonth = updateCalendar.get(Calendar.MONTH);
+
+				boolean itemWasNotCoded = (item.getStatus().equals("NOT_CODED")) && createdYear <= displayedYear;
+
+				if (itemWasNotCoded) {
+
+					int startMonth = createdYear == displayedYear ? createdMonth : 0;
+					int endMonth = currentYear == displayedYear ? currentMonth : NUMBER_OF_MONTHS;
+
+					for (int i = startMonth; i <= endMonth; i++) {
+
+						cpDataRows = getUpdateValueForMonth(cpDataRows, months.get(i), STATUS_NOT_CODED);
+					}
+				}
+
+				boolean itemWasCodedInThisYear = (item.getStatus().equals("CODED") && (updatedYear <= displayedYear));
+
+				if (itemWasCodedInThisYear) {
+
+					int startMonth = createdYear == displayedYear ? createdMonth : 0;
+					int endMonth = currentYear == displayedYear ? currentMonth : NUMBER_OF_MONTHS;
+
+					boolean itemWasUpdatedAtSameMonthWhenCreated = createdYear == updatedYear
+							&& createdMonth == updatedMonth;
+
+					if (itemWasUpdatedAtSameMonthWhenCreated) {
+
+						endMonth--;
+					}
+
+					for (int i = startMonth; i < endMonth; i++) {
+
+						cpDataRows = getUpdateValueForMonth(cpDataRows, months.get(i), STATUS_NOT_CODED);
+					}
+				}
+
+				boolean addItemToCodedBar = (item.getStatus().equals("CODED")) && createdYear <= displayedYear;
+
+				if (addItemToCodedBar) {
+
+					int startMonth = updatedYear == displayedYear ? updatedMonth : 0;
+					int endMonth = currentYear == displayedYear ? currentMonth : NUMBER_OF_MONTHS;
+
+					for (int i = startMonth; i <= endMonth; i++) {
+
+						cpDataRows = getUpdateValueForMonth(cpDataRows, months.get(i), STATUS_CODED);
+					}
+				}
+			}
+		}
+
+		// Set all attributes to model.
+		model.addAttribute("cpPreviousYearExists", previousYearDataExist);
+		model.addAttribute("cpNextYearExists", nextYearDataExist);
+		model.addAttribute("cpDataRows", cpDataRows);
+		model.addAttribute("cpYear", displayedYear);
+
+		return page;
+	}
+
+	private LinkedHashMap<String, LinkedHashMap<String, Integer>> getUpdateValueForMonth(
+			LinkedHashMap<String, LinkedHashMap<String, Integer>> dataRows, String month, String status) {
+
+		LinkedHashMap<String, Integer> updatedValues = dataRows.get(month);
+		int currentValue = updatedValues.get(status);
+		updatedValues.put(status, ++currentValue);
+		dataRows.put(month, updatedValues);
+
+		return dataRows;
 	}
 
 	private Integer getCountOfSubjects(StudyBean sb) {
@@ -743,6 +1037,18 @@ public class WidgetsLayoutController {
 		return studyEventDefinitions;
 	}
 
+	private ArrayList<String> getMonthsList(HttpServletRequest request) {
+
+		ArrayList<String> monthsList = new ArrayList<String>();
+
+		for (int i = 1; i <= NUMBER_OF_MONTHS + 1; i++) {
+
+			monthsList.add(messageSource.getMessage("short.month." + i, null, request.getLocale()));
+		}
+
+		return monthsList;
+	}
+
 	private void setRequestHeadersAndUpdateLocale(HttpServletResponse response, HttpServletRequest request) {
 
 		response.setHeader("Cache-Control", "no-cache");
@@ -753,6 +1059,10 @@ public class WidgetsLayoutController {
 		ResourceBundleProvider.updateLocale(request.getLocale());
 	}
 
+	/**
+	 * This class is designed to store information for Notes and Discrepancies per CRF widget, and display it on the
+	 * page.
+	 */
 	class NDsPerCRFDisplay {
 
 		private String crfName;
