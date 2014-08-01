@@ -10,11 +10,10 @@
 
 package org.akaza.openclinica.dao.rule;
 
-import java.util.List;
-
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -24,11 +23,13 @@ import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.junit.Test;
 
+import java.util.List;
+
 public class RuleSetDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testFindById() {
-		
+
 		RuleSetBean ruleSet = null;
 		ruleSet = ruleSetDao.findById(1);
 
@@ -55,7 +56,7 @@ public class RuleSetDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testSaveOrUpdate() {
-		
+
 		RuleBean persistantRuleBean = ruleDao.findById(1);
 		RuleSetBean ruleSetBean = createStubRuleSetBean(persistantRuleBean);
 		ruleSetBean = ruleSetDao.saveOrUpdate(ruleSetBean);
@@ -64,7 +65,7 @@ public class RuleSetDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testFindByCrfEmptyResultSet() {
-		
+
 		CRFBean crfBean = new CRFBean();
 		crfBean.setId(4);
 		StudyBean studyBean = new StudyBean();
@@ -79,7 +80,7 @@ public class RuleSetDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testFindByExpression() {
-		
+
 		RuleSetBean ruleSet = createStubRuleSetBean();
 		RuleSetBean persistentRuleSet = ruleSetDao.findByExpression(ruleSet);
 		assertNotNull("The returned ruleSet was null", persistentRuleSet);
@@ -88,7 +89,7 @@ public class RuleSetDaoTest extends DefaultAppContextTest {
 	}
 
 	private RuleSetBean createStubRuleSetBean(RuleBean ruleBean) {
-		
+
 		RuleSetBean ruleSet = new RuleSetBean();
 		ruleSet.setTarget(createExpression(Context.OC_RULES_V1,
 				"SE_ED2REPEA.F_CONC_V20.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_N"));
@@ -98,7 +99,7 @@ public class RuleSetDaoTest extends DefaultAppContextTest {
 	}
 
 	private RuleSetBean createStubRuleSetBean() {
-		
+
 		RuleSetBean ruleSet = new RuleSetBean();
 		ruleSet.setTarget(createExpression(Context.OC_RULES_V1,
 				"SE_ED2REPEA.F_CONC_V20.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_NAME"));
@@ -108,7 +109,7 @@ public class RuleSetDaoTest extends DefaultAppContextTest {
 	}
 
 	private RuleSetRuleBean createRuleSetRule(RuleSetBean ruleSet, RuleBean ruleBean) {
-		
+
 		RuleSetRuleBean ruleSetRule = new RuleSetRuleBean();
 		DiscrepancyNoteActionBean ruleAction = new DiscrepancyNoteActionBean();
 		ruleAction.setMessage("HELLO WORLD");
@@ -121,10 +122,22 @@ public class RuleSetDaoTest extends DefaultAppContextTest {
 	}
 
 	private ExpressionBean createExpression(Context context, String value) {
-		
+
 		ExpressionBean expression = new ExpressionBean();
 		expression.setContext(context);
 		expression.setValue(value);
 		return expression;
+	}
+
+	@Test
+	public void testThatFindByCrfIdAndCrfOidReturnsCorrectCollectionSize() {
+		CRFBean crfBean = (CRFBean) crfdao.findByPK(1);
+		assertEquals(ruleSetDao.findByCrfIdAndCrfOid(crfBean).size(), 4);
+	}
+
+	@Test
+	public void testThatFindByCrfVersionIdAndCrfVersionOidReturnsCorrectCollectionSize() {
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(1);
+		assertEquals(ruleSetDao.findByCrfVersionIdAndCrfVersionOid(crfVersionBean).size(), 1);
 	}
 }

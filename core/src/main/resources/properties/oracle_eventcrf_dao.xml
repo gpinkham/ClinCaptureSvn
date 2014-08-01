@@ -460,6 +460,39 @@
     </query>
 
     <query>
+        <name>findAllStartedByCrf</name>
+        <sql>
+            SELECT ec.*, ss.label, sed.name as sed_name, s.name as study_name
+            FROM study_subject ss, study_event_definition sed,
+            study s, study_event se, event_crf ec, crf_version cv
+            WHERE ec.crf_version_id=cv.crf_version_id
+            AND ec.crf_version_id in (select cv.crf_version_id from crf_version cv where cv.crf_id = ?)
+            AND ec.not_started = 0
+            AND ss.study_subject_id = ec.study_subject_id
+            AND se.study_event_definition_id = sed.study_event_definition_id
+            AND s.study_id = ss.study_id
+            AND ec.study_event_id = se.study_event_id
+            ORDER BY ec.event_crf_id ASC
+        </sql>
+    </query>
+    <query>
+        <name>findAllStartedByCrfVersion</name>
+        <sql>
+            SELECT ec.*, ss.label, sed.name as sed_name, s.name as study_name
+            FROM study_subject ss, study_event_definition sed,
+            study s, study_event se, event_crf ec, crf_version cv
+            WHERE ec.crf_version_id=cv.crf_version_id
+            AND ec.crf_version_id = ?
+            AND ec.not_started = 0
+            AND ss.study_subject_id = ec.study_subject_id
+            AND se.study_event_definition_id = sed.study_event_definition_id
+            AND s.study_id = ss.study_id
+            AND ec.study_event_id = se.study_event_id
+            ORDER BY ec.event_crf_id ASC
+        </sql>
+    </query>
+
+    <query>
         <name>findAllByStudyEventAndCrfOrCrfVersionOid</name>
         <sql>SELECT * FROM event_crf WHERE study_event_id=? AND crf_version_id in
             ( select crf_version.crf_version_id from crf_version left outer join crf on crf.crf_id=crf_version.crf_id

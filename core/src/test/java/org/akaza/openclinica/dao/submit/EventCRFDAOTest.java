@@ -43,14 +43,22 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 		int parentStudyId = 1;
 		EventCRFSDVFilter filter = new EventCRFSDVFilter(1);
 		EventCRFSDVSort sort = new EventCRFSDVSort();
-		boolean allowSdvWithOpenQueries = true;
 		int rowStart = 0;
 		int rowEnd = 15;
-		assertNotNull(eventCRFDAO.getAvailableWithFilterAndSort(studyId, parentStudyId, filter, sort,
-				allowSdvWithOpenQueries, rowStart, rowEnd));
-		assertEquals(
-				0,
-				eventCRFDAO.getAvailableWithFilterAndSort(studyId, parentStudyId, filter, sort,
-						allowSdvWithOpenQueries, rowStart, rowEnd).size());
+		assertNotNull(eventCRFDAO.getAvailableWithFilterAndSort(studyId, parentStudyId, filter, sort, true, rowStart,
+				rowEnd));
+		assertEquals(0,
+				eventCRFDAO.getAvailableWithFilterAndSort(studyId, parentStudyId, filter, sort, true, rowStart, rowEnd)
+						.size());
+	}
+
+	@Test
+	public void testFindAllStartedByCrfReturnsCorrectCollectionSize() {
+		assertEquals(eventCRFDAO.findAllStartedByCrf(1).size(), 2);
+	}
+
+	@Test
+	public void testFindAllStartedByCrfVersionReturnsCorrectCollectionSize() {
+		assertEquals(eventCRFDAO.findAllStartedByCrfVersion(1).size(), 2);
 	}
 }

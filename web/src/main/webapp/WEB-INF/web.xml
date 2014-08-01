@@ -960,11 +960,6 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>deleteCRFVersionServlet</servlet-name>
-        <display-name>DeleteCRFVersion</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>deleteEventCRFServlet</servlet-name>
         <display-name>DeleteEventCRF</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -1871,10 +1866,6 @@
     <servlet-mapping>
         <servlet-name>viewStudyEventsServlet</servlet-name>
         <url-pattern>/ViewStudyEvents</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>deleteCRFVersionServlet</servlet-name>
-        <url-pattern>/DeleteCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>deleteEventCRFServlet</servlet-name>

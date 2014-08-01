@@ -322,6 +322,64 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		return executeFindAllQuery("findAllByStudyEvent", variables);
 	}
 
+	/**
+	 * Find all started event crfs by crf id.
+	 * 
+	 * @param crfId
+	 *            crf id
+	 * @return List<EventCRFBean>
+	 */
+	public List<EventCRFBean> findAllStartedByCrf(int crfId) {
+		List<EventCRFBean> result = new ArrayList<EventCRFBean>();
+		this.setTypesExpected();
+
+		this.setTypeExpected(25, TypeNames.STRING);
+		this.setTypeExpected(26, TypeNames.STRING);
+
+		HashMap variables = new HashMap();
+		variables.put(1, crfId);
+
+		ArrayList alist = this.select(digester.getQuery("findAllStartedByCrf"), variables);
+
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
+			EventCRFBean eb = (EventCRFBean) this.getEntityFromHashMap(hm);
+			eb.setStudySubjectName((String) hm.get("label"));
+			eb.setEventName((String) hm.get("sed_name"));
+			result.add(eb);
+		}
+		return result;
+	}
+
+	/**
+	 * Find all started event crfs by crf version id.
+	 * 
+	 * @param crfVersionId
+	 *            crf version id
+	 * @return List<EventCRFBean>
+	 */
+	public List<EventCRFBean> findAllStartedByCrfVersion(int crfVersionId) {
+		List<EventCRFBean> result = new ArrayList<EventCRFBean>();
+		this.setTypesExpected();
+
+		this.setTypeExpected(25, TypeNames.STRING);
+		this.setTypeExpected(26, TypeNames.STRING);
+
+		HashMap variables = new HashMap();
+		variables.put(1, crfVersionId);
+
+		ArrayList alist = this.select(digester.getQuery("findAllStartedByCrfVersion"), variables);
+
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
+			EventCRFBean eb = (EventCRFBean) this.getEntityFromHashMap(hm);
+			eb.setStudySubjectName((String) hm.get("label"));
+			eb.setEventName((String) hm.get("sed_name"));
+			result.add(eb);
+		}
+		return result;
+	}
+
 	public ArrayList findAllStartedByStudyEvent(StudyEventBean studyEvent) {
 		HashMap variables = new HashMap();
 		variables.put(1, studyEvent.getId());
@@ -1103,11 +1161,11 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(1, eventCRFId);
 		this.execute(digester.getQuery("deleteEventCRFDNMap"), variables);
 	}
-	
+
 	public ArrayList<Integer> findAllIdsWithRequiredSDVCodesBySSubjectId(int studySujectId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
-		
+
 		HashMap variables = new HashMap();
 		variables.put(1, studySujectId);
 		variables.put(2, 1);
@@ -1119,7 +1177,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		ArrayList al = new ArrayList();
 		for (Object anAlist : alist) {
 			HashMap hm = (HashMap) anAlist;
-			al.add((Integer) hm.get("event_crf_id"));
+			al.add(hm.get("event_crf_id"));
 		}
 		return al;
 	}

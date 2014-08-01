@@ -1,22 +1,42 @@
 package org.akaza.openclinica.util;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+/**
+ * StudyEventDefinitionUtil class.
+ */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public final class StudyEventDefinitionUtil {
 
 	private StudyEventDefinitionUtil() {
 	}
 
+	/**
+	 * Method that returns list of StudyEventDefinitionBeans using incoming parameters.
+	 * 
+	 * @param study
+	 *            StudyBean
+	 * @param dedao
+	 *            DynamicEventDao
+	 * @param seddao
+	 *            StudyEventDefinitionDAO
+	 * @return List<StudyEventDefinitionBean>
+	 */
 	public static List<StudyEventDefinitionBean> getStudyEventDefinitionsForStudy(StudyBean study,
 			DynamicEventDao dedao, StudyEventDefinitionDAO seddao) {
 		List<StudyEventDefinitionBean> studyEventDefinitions;
@@ -30,6 +50,21 @@ public final class StudyEventDefinitionUtil {
 		return studyEventDefinitions;
 	}
 
+	/**
+	 * Method that returns list of StudyEventDefinitionBeans using incoming parameters.
+	 * 
+	 * @param studySubject
+	 *            StudySubjectBean
+	 * @param study
+	 *            StudyBean
+	 * @param dedao
+	 *            DynamicEventDao
+	 * @param sgcdao
+	 *            StudyGroupClassDAO
+	 * @param seddao
+	 *            StudyEventDefinitionDAO
+	 * @return List<StudyEventDefinitionBean>
+	 */
 	public static List<StudyEventDefinitionBean> getStudyEventDefinitionsForStudySubject(StudySubjectBean studySubject,
 			StudyBean study, DynamicEventDao dedao, StudyGroupClassDAO sgcdao, StudyEventDefinitionDAO seddao) {
 		StudyGroupClassBean subjDynGroup = new StudyGroupClassBean();
@@ -47,6 +82,21 @@ public final class StudyEventDefinitionUtil {
 		return studyEventDefinitions;
 	}
 
+	/**
+	 * Method that returns list of StudyEventDefinitionBeans using incoming parameters.
+	 * 
+	 * @param studySubject
+	 *            StudySubjectBean
+	 * @param study
+	 *            StudyBean
+	 * @param dedao
+	 *            DynamicEventDao
+	 * @param sgcdao
+	 *            StudyGroupClassDAO
+	 * @param seddao
+	 *            StudyEventDefinitionDAO
+	 * @return List<Integer>
+	 */
 	public static List<Integer> getStudyEventDefinitionIdsForStudySubject(StudySubjectBean studySubject,
 			StudyBean study, DynamicEventDao dedao, StudyGroupClassDAO sgcdao, StudyEventDefinitionDAO seddao) {
 		List<Integer> studyEventDefinitionIds = new ArrayList<Integer>();
@@ -56,5 +106,63 @@ public final class StudyEventDefinitionUtil {
 			studyEventDefinitionIds.add(studyEventDefinition.getId());
 		}
 		return studyEventDefinitionIds;
+	}
+
+	/**
+	 * Method returns list of study event definitions with statuses as in the event definition crfs.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param crfId
+	 *            crf id
+	 * @return List<StudyEventDefinitionBean>
+	 */
+	public static List<StudyEventDefinitionBean> studyEventDefinitionStatusUpdate(DataSource ds, int crfId) {
+		EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(ds);
+		StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(ds);
+
+		List<StudyEventDefinitionBean> studyEventDefinitionUpdated = new ArrayList<StudyEventDefinitionBean>();
+		List<EventDefinitionCRFBean> eventDefinitionCrfList = (List<EventDefinitionCRFBean>) eventDefinitionCrfDao
+				.findAllByCRF(crfId);
+
+		for (EventDefinitionCRFBean eventDefinitionCrfBean : eventDefinitionCrfList) {
+			StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) studyEventDefinitionDao
+					.findByPK(eventDefinitionCrfBean.getStudyEventDefinitionId());
+			studyEventDefinition.setStatus(eventDefinitionCrfBean.getStatus());
+			studyEventDefinitionUpdated.add(studyEventDefinition);
+		}
+
+		return studyEventDefinitionUpdated;
+	}
+
+	/**
+	 * Method returns list of study event definitions with at least one event definition crf with non deleted state.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param eventDefinitionCrfList
+	 *            Collection<EventDefinitionCRFBean>
+	 * @return List<StudyEventDefinitionBean>
+	 */
+	public static List<StudyEventDefinitionBean> studyEventDefinitionListFilter(DataSource ds,
+			Collection<EventDefinitionCRFBean> eventDefinitionCrfList) {
+		List<StudyEventDefinitionBean> studyEventDefinitionListFiltered = new ArrayList<StudyEventDefinitionBean>();
+		StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(ds);
+		UserAccountDAO userAccountDao = new UserAccountDAO(ds);
+
+		for (EventDefinitionCRFBean eventDefCrfBean : eventDefinitionCrfList) {
+
+			if (!eventDefCrfBean.getStatus().isDeleted()) {
+				StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) studyEventDefinitionDao
+						.findByPK(eventDefCrfBean.getStudyEventDefinitionId());
+				UserAccountBean userAccountBean = (UserAccountBean) userAccountDao.findByPK(studyEventDefinition
+						.getOwnerId());
+				studyEventDefinition.setOwner(userAccountBean);
+
+				studyEventDefinitionListFiltered.add(studyEventDefinition);
+			}
+		}
+
+		return studyEventDefinitionListFiltered;
 	}
 }

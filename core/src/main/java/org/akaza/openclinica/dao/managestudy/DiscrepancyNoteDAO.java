@@ -2269,6 +2269,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return result;
 	}
 
+	/**
+	 * Find all by crf id.
+	 * 
+	 * @param crfId
+	 *            crf id
+	 * @return ArrayList<DiscrepancyNoteBean>
+	 */
 	public ArrayList<DiscrepancyNoteBean> findAllByCRFId(int crfId) {
 
 		this.setTypesExpected();
@@ -2280,6 +2287,34 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		variables.put(1, crfId);
 
 		ArrayList<HashMap> rows = select(digester.getQuery("findAllByCRFId"), variables);
+		for (HashMap hm : rows) {
+			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
+			String studySubLabel = String.valueOf((hm).get("label"));
+			eb.getStudySub().setLabel(studySubLabel);
+			returnedNotelist.add(eb);
+		}
+
+		return returnedNotelist;
+	}
+
+	/**
+	 * Find all by crf version id.
+	 * 
+	 * @param crfVersionId
+	 *            crf version id
+	 * @return ArrayList<DiscrepancyNoteBean>
+	 */
+	public ArrayList<DiscrepancyNoteBean> findAllByCrfVersionId(int crfVersionId) {
+
+		this.setTypesExpected();
+		this.setTypeExpected(12, TypeNames.STRING);
+
+		ArrayList<DiscrepancyNoteBean> returnedNotelist = new ArrayList<DiscrepancyNoteBean>();
+
+		HashMap variables = new HashMap();
+		variables.put(1, crfVersionId);
+
+		ArrayList<HashMap> rows = select(digester.getQuery("findAllByCrfVersionId"), variables);
 		for (HashMap hm : rows) {
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			String studySubLabel = String.valueOf((hm).get("label"));

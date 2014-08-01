@@ -141,6 +141,28 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		return (ArrayList<RuleSetBean>) q.list();
 	}
 
+	@SuppressWarnings("unchecked")
+	public ArrayList<RuleSetBean> findByCrfIdAndCrfOid(CRFBean crfBean) {
+		String query = "select distinct rs.* from rule_set_rule rsr, rule_set rs, rule r, rule_expression re where rsr.rule_set_id = rs.id and rsr.rule_id = r.id and (rs.rule_expression_id = re.id or r.rule_expression_id = re.id)\n"
+				+ "and (rs.item_id in (select distinct(item_id) from item_form_metadata ifm, crf_version cv where ifm.crf_version_id = cv.crf_version_id and cv.crf_id = :crfId) or re.value like '%." + crfBean.getOid() + ".%' or re.target_version_oid in (select cv.oc_oid from crf_version cv where cv.crf_id = :crfId))";
+		// Using a sql query because we are referencing objects not managed by hibernate
+		org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
+		q.setInteger("crfId", crfBean.getId());
+		q.setInteger("crfId", crfBean.getId());
+		return (ArrayList<RuleSetBean>) q.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	public ArrayList<RuleSetBean> findByCrfVersionIdAndCrfVersionOid(CRFVersionBean crfVersionBean) {
+		String query = "select distinct rs.* from rule_set_rule rsr, rule_set rs, rule r, rule_expression re where rsr.rule_set_id = rs.id and rsr.rule_id = r.id and (rs.rule_expression_id = re.id or r.rule_expression_id = re.id)\n"
+				+ "and (rs.item_id in (select distinct(item_id) from item_form_metadata ifm where ifm.crf_version_id = :crfVersionId) or re.value like '%." + crfVersionBean.getOid() + ".%' or re.target_version_oid in (select cv.oc_oid from crf_version cv where cv.crf_version_id = :crfVersionId))";
+		// Using a sql query because we are referencing objects not managed by hibernate
+		org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
+		q.setInteger("crfVersionId", crfVersionBean.getId());
+		q.setInteger("crfVersionId", crfVersionBean.getId());
+		return (ArrayList<RuleSetBean>) q.list();
+	}
+
 	public RuleSetBean findByExpression(RuleSetBean ruleSet) {
 		String query = "from "
 				+ getDomainClassName()
