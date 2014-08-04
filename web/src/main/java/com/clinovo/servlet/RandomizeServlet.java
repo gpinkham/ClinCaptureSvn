@@ -21,7 +21,6 @@ import com.clinovo.model.Randomization;
 import com.clinovo.model.RandomizationResult;
 import com.clinovo.rule.ext.HttpTransportProtocol;
 import com.clinovo.util.RandomizationUtil;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -42,7 +41,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -51,7 +49,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 /**
- * End-point for all randomization calls
+ * End-point for all randomization calls.
  * 
  */
 @SuppressWarnings("serial")
@@ -101,7 +99,7 @@ public class RandomizeServlet extends Controller {
 
 			if (isCrfComplete(currentStudy, ub, crfId)) {
 
-				if (eligibility != null) {
+				if (!eligibility.equals("null")) {
 
 					// YES
 					if ("0".equals(eligibility)) {
@@ -145,8 +143,7 @@ public class RandomizeServlet extends Controller {
 		// Assign subject to group
 		String assignRandomizationResultTo = (String) request.getSession().getAttribute("assignRandomizationResultTo");
 
-		HashMap<String, ItemDataBean> itemsMap = RandomizationUtil
-				.getRandomizationItemData(request);
+		HashMap<String, ItemDataBean> itemsMap = RandomizationUtil.getRandomizationItemData(request);
 
 		// Save randomization result and update all statuses
 		RandomizationUtil.saveRandomizationResultToDatabase(result, itemsMap);
