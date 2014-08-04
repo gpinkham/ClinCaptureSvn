@@ -1288,9 +1288,11 @@ function setDataToLegend(displayType, selector, values, names) {
 		.find("div[class^=popup_legend_]")
 		.each(
 				function(index) {
-					var displayedValue = values[index] / percent % 1 === 0 ? values[index]
-					/ percent
-					: (values[index] / percent).toFixed(2);
+					var displayedValue = 0;
+					if (percent != 0){
+						displayedValue = values[index] / percent % 1 === 0 ? values[index]
+						/ percent : (values[index] / percent).toFixed(2);
+					}
 					$(this).html(displayedValue + "%");
 				});
 	}
