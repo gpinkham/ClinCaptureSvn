@@ -371,7 +371,7 @@ public class Page {
 	 * Page for listing seds
 	 */
 	public final static Page STUDY_EVENT_DEFINITION_LIST = new Page(
-			"/WEB-INF/jsp/managestudy/studyEventDefinitionList.jsp", "List all CRFs");
+			"/WEB-INF/jsp/managestudy/studyEventDefinitionList.jsp", "List all Event Definitions");
 
 	/**
 	 * Page for view all seds.

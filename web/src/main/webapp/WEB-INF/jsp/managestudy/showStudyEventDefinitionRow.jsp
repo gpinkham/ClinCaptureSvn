@@ -26,7 +26,7 @@
               <c:when test="${count==0}">
                   <c:choose>
                       <c:when test="${defSize>1}">
-                          <a href="#" onClick="changeDefinitionOrdinal({current: <c:out value="${nextRow.bean.id}"/>, previous: <c:out value="${currRow.bean.id}"/>, context: '${pageContext.request.contextPath}', servlet: 'changeDefinitionOrdinal'})">
+                          <a href="#" onClick="changeDefinitionOrdinal({current: <c:out value="${nextRow.bean.id}"/>, previous: <c:out value="${currRow.bean.id}"/>, context: '${pageContext.request.contextPath}', servlet: 'changeDefinitionOrdinal'}); setAccessedObjected(this);">
                               <img src="images/bt_sort_descending.gif" border="0"
                                    alt="<fmt:message key="move_down" bundle="${resword}"/>"
                                    title="<fmt:message key="move_down" bundle="${resword}"/>"/>
@@ -38,17 +38,17 @@
                   </c:choose>
               </c:when>
               <c:when test="${count==last}">
-                  <a href="#" onClick="changeDefinitionOrdinal({current: <c:out value="${currRow.bean.id}"/>, previous: <c:out value="${prevRow.bean.id}"/>, context: '${pageContext.request.contextPath}', servlet: 'changeDefinitionOrdinal'})">
+                  <a href="#" onClick="changeDefinitionOrdinal({current: <c:out value="${currRow.bean.id}"/>, previous: <c:out value="${prevRow.bean.id}"/>, context: '${pageContext.request.contextPath}', servlet: 'changeDefinitionOrdinal'}); setAccessedObjected(this);">
                       <img src="images/bt_sort_ascending.gif" alt="<fmt:message key="move_up" bundle="${resword}"/>"
                            title="<fmt:message key="move_up" bundle="${resword}"/>"
                            border="0"/>
                   </a>
               </c:when>
               <c:otherwise>
-                  <a href="#" onClick="changeDefinitionOrdinal({current: <c:out value="${currRow.bean.id}"/>, previous: <c:out value="${prevRow.bean.id}"/>, context: '${pageContext.request.contextPath}', servlet: 'changeDefinitionOrdinal'})">
+                  <a href="#" onClick="changeDefinitionOrdinal({current: <c:out value="${currRow.bean.id}"/>, previous: <c:out value="${prevRow.bean.id}"/>, context: '${pageContext.request.contextPath}', servlet: 'changeDefinitionOrdinal'}); setAccessedObjected(this);">
                       <img src="images/bt_sort_ascending.gif" alt="<fmt:message key="move_up" bundle="${resword}"/>" title="<fmt:message key="move_up" bundle="${resword}"/>" border="0"/>
                   </a>
-                  <a href="#" onClick="changeDefinitionOrdinal({previous: <c:out value="${currRow.bean.id}"/>, current: <c:out value="${nextRow.bean.id}"/>, context: '${pageContext.request.contextPath}', servlet: 'changeDefinitionOrdinal'})">
+                  <a href="#" onClick="changeDefinitionOrdinal({previous: <c:out value="${currRow.bean.id}"/>, current: <c:out value="${nextRow.bean.id}"/>, context: '${pageContext.request.contextPath}', servlet: 'changeDefinitionOrdinal'}); setAccessedObjected(this);">
                       <img src="images/bt_sort_descending.gif" alt="<fmt:message key="move_down" bundle="${resword}"/>"
                            title="<fmt:message key="move_down" bundle="${resword}"/>" border="0"/>
                   </a>
@@ -92,11 +92,13 @@
 
       <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
-		<tr>
+		<tr class="innerTable">
 		 <td>
 	      <a href="ViewEventDefinition?id=<c:out value="${currRow.bean.id}"/>"
 			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img 
+			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
+			data-cc-eventDefinitionId="${currRow.bean.id}"
+			onclick="setAccessedObjected(this);"><img 
 		    name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 		 </td>
      
@@ -108,12 +110,14 @@
         <c:if test="${!study.status.locked}">
         <td><a href="InitUpdateEventDefinition?id=<c:out value="${currRow.bean.id}"/>"
 			onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-			onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img 
+			onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
+			onclick="setAccessedObjected(this);"><img 
 			name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
 		  </td>
         <td><a href="RemoveEventDefinition?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
 			onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-			onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><img 
+			onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
+			onclick="setAccessedObjected(this);"><img 
 			name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
 		</td>
         </c:if>
@@ -124,7 +128,8 @@
 		</td>
          <td><a href="RestoreEventDefinition?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
 			onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
-			onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><img 
+			onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
+			onclick="setAccessedObjected(this);"><img 
 			name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
 		 </td> 
         

@@ -6,6 +6,13 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <jsp:include page="../include/managestudy-header.jsp"/>
+<script type="text/javascript" language="javascript">
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
+    
+</script>
 
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
@@ -155,7 +162,8 @@
 				<c:when test="${status.first}">
 					<c:choose>
 						<c:when test="${defSize>1}">
-							<a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${nextCrf.id}"/>&previous=<c:out value="${crf.id}"/>&id=<c:out value="${definition.id}"/>&currentOrdinal=<c:out value="${nextCrf.ordinal}"/>&previousOrdinal=<c:out value="${crf.ordinal}"/>">
+							<a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${nextCrf.id}"/>&previous=<c:out value="${crf.id}"/>&id=<c:out value="${definition.id}"/>&currentOrdinal=<c:out value="${nextCrf.ordinal}"/>&previousOrdinal=<c:out value="${crf.ordinal}"/>"
+								onclick="setAccessedObjected(this);">
 								<img src="images/bt_sort_descending.gif" border="0" alt="move down" title="move down"/>
 							</a>
 						</c:when>
@@ -165,15 +173,18 @@
 					</c:choose>
 				</c:when>
 				<c:when test="${status.last}">
-					<a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${crf.id}"/>&previous=<c:out value="${prevCrf.id}"/>&id=<c:out value="${definition.id}"/>&currentOrdinal=<c:out value="${crf.ordinal}"/>&previousOrdinal=<c:out value="${prevCrf.ordinal}"/>">
+					<a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${crf.id}"/>&previous=<c:out value="${prevCrf.id}"/>&id=<c:out value="${definition.id}"/>&currentOrdinal=<c:out value="${crf.ordinal}"/>&previousOrdinal=<c:out value="${prevCrf.ordinal}"/>"
+						onclick="setAccessedObjected(this);">
 						<img src="images/bt_sort_ascending.gif" alt="move up" title="move up" border="0"/>
 					</a>
 				</c:when>
 				<c:otherwise>
-					<a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${crf.id}"/>&previous=<c:out value="${prevCrf.id}"/>&id=<c:out value="${definition.id}"/>&currentOrdinal=<c:out value="${crf.ordinal}"/>&previousOrdinal=<c:out value="${prevCrf.ordinal}"/>">
+					<a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${crf.id}"/>&previous=<c:out value="${prevCrf.id}"/>&id=<c:out value="${definition.id}"/>&currentOrdinal=<c:out value="${crf.ordinal}"/>&previousOrdinal=<c:out value="${prevCrf.ordinal}"/>"
+						onclick="setAccessedObjected(this);">
 						<img src="images/bt_sort_ascending.gif" alt="move up" title="move up" border="0" />
 					</a>
-					<a href="ChangeDefinitionCRFOrdinal?previous=<c:out value="${crf.id}"/>&current=<c:out value="${nextCrf.id}"/>&id=<c:out value="${definition.id}"/>&previousOrdinal=<c:out value="${crf.ordinal}"/>&currentOrdinal=<c:out value="${nextCrf.ordinal}"/>">
+					<a href="ChangeDefinitionCRFOrdinal?previous=<c:out value="${crf.id}"/>&current=<c:out value="${nextCrf.id}"/>&id=<c:out value="${definition.id}"/>&previousOrdinal=<c:out value="${crf.ordinal}"/>&currentOrdinal=<c:out value="${nextCrf.ordinal}"/>"
+						onclick="setAccessedObjected(this);">
 						<img src="images/bt_sort_descending.gif" alt="move down" title="move up" border="0" />
 					</a>
 				</c:otherwise>
@@ -242,11 +253,13 @@
 
 			<td class="table_cell">
 				<table border="0" cellpadding="0" cellspacing="0">
-					<tr>
+					<tr class="innerTable">
 						<td>
 							<a href="ViewCRF?crfId=<c:out value="${crf.crfId}"/>"
 									onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-									onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');">
+									onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
+									data-cc-eventDefinitionCrfId="${crf.crfId}"
+									onclick="setAccessedObjected(this);">
 								<img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6">
 							</a>
 						</td>
@@ -275,5 +288,5 @@
 <c:import url="../include/workflow.jsp">
 	<c:param name="module" value="manage"/> 
 </c:import>
-
+<input id="accessAttributeName" type="hidden" value="data-cc-eventDefinitionCrfId">
 <jsp:include page="../include/footer.jsp"/>

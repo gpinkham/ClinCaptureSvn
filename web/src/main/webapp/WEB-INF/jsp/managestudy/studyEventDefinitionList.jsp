@@ -8,6 +8,13 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 <jsp:include page="../include/managestudy-header.jsp"/>
+<script type="text/javascript" language="javascript">
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
+    
+</script>
 
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
@@ -89,4 +96,5 @@
 		<input type="button" name="<fmt:message key="calendared_events" bundle="${resword}"/>" value="<fmt:message key="calendared_events" bundle="${resword}"/>" class="button_medium" onclick="javascript:openDocWindow('ShowCalendarFunc?id=<c:out value="${study.id}"/>')"/>
 	</td>
 </table>
+<input id="accessAttributeName" type="hidden" value="data-cc-eventDefinitionId">
 <jsp:include page="../include/footer.jsp"/>

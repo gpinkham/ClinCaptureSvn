@@ -5,6 +5,13 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <jsp:include page="../include/managestudy-header.jsp"/>
+<script type="text/javascript" language="javascript">
+    jQuery(window).load(function(){
+
+    	highlightLastAccessedObject();
+    });
+    
+</script>
 
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
@@ -162,7 +169,7 @@
    <td class="table_cell"><c:out value="${crf.status.name}"/></td> 
    <td class="table_cell">
      <table border="0" cellpadding="0" cellspacing="0">
-	  <tr>       
+	  <tr class="innerTable">       
         <td>
           <!-- <a href="ViewTableOfContent?crfVersionId=<c:out value="${crf.defaultVersionId}"/>&sedId=<c:out value="${definition.id}"/>"
 			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
@@ -174,7 +181,9 @@
               name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>-->
             <a href="ViewCRF?crfId=<c:out value="${crf.crfId}"/>"
                  onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                 onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
+                 onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
+				data-cc-eventDefinitionReadonlyCrfId="${crf.crfId}"
+				onclick="setAccessedObjected(this);"><img
                 name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 
         </td>
@@ -215,5 +224,5 @@
    <c:param name="module" value="manage"/> 
  </c:import>
  
-   
+<input id="accessAttributeName" type="hidden" value="data-cc-eventDefinitionReadonlyCrfId">
 <jsp:include page="../include/footer.jsp"/>
