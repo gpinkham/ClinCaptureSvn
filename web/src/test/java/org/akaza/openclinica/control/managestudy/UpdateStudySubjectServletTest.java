@@ -76,9 +76,9 @@ public class UpdateStudySubjectServletTest {
 
 		// first obtaining all the required Resource Bundle instances for tests,
 		// then stubbing all the static methods of the ResourceBundleProvider class
-		ResourceBundleProvider.updateLocale(Locale.getDefault());
-		ResourceBundle resWorkflow = ResourceBundleProvider.getWorkflowBundle(Locale.getDefault());
-		ResourceBundle resExceptions = ResourceBundleProvider.getExceptionsBundle(Locale.getDefault());
+		ResourceBundleProvider.updateLocale(locale);
+		ResourceBundle resWorkflow = ResourceBundleProvider.getWorkflowBundle(locale);
+		ResourceBundle resExceptions = ResourceBundleProvider.getExceptionsBundle(locale);
 		ResourceBundle resPage = ResourceBundleProvider.getPageMessagesBundle();
 		ResourceBundle resFormat = ResourceBundleProvider.getFormatBundle();
 		PowerMockito.mockStatic(ResourceBundleProvider.class);
