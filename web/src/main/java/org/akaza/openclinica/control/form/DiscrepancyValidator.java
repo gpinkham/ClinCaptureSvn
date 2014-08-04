@@ -41,10 +41,21 @@ import java.util.HashMap;
  * 
  * @author ssachs
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class DiscrepancyValidator extends Validator {
+
+	public static final int MAX_DESCRIPTION_LENGTH = 255;
+
 	private final FormDiscrepancyNotes notes;
 
+	/**
+	 * DiscrepancyValidator constructor.
+	 * 
+	 * @param validatorHelper
+	 *            ValidatorHelper
+	 * @param notes
+	 *            FormDiscrepancyNotes
+	 */
 	public DiscrepancyValidator(ValidatorHelper validatorHelper, FormDiscrepancyNotes notes) {
 		super(validatorHelper);
 		this.notes = notes;
@@ -64,6 +75,12 @@ public class DiscrepancyValidator extends Validator {
 		return super.validate(fieldName, v);
 	}
 
+	/**
+	 * Method that always executes last validation.
+	 * 
+	 * @param fieldName
+	 *            String
+	 */
 	public void alwaysExecuteLastValidation(String fieldName) {
 		ArrayList fieldValidations = getFieldValidations(fieldName);
 
