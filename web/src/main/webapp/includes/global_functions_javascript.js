@@ -1535,8 +1535,12 @@ function MM_findObjInParentWin(strParentWinImageName) { //v4.0
     return objImage;
 }
 
-function refreshPage() {
-    location.reload();
+function refreshSdvPage() {
+    if (window.opener && !window.opener.closed) {
+        window.opener.refreshSdvPage();
+    } else if (window.sdvPage) {
+        location.reload();
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -1548,10 +1552,8 @@ function refreshPage() {
 
 function setImageInParentWin(strParentWinImageName,strParentWinImageFullPath, resolutionStatusId) {
     var objImage;
+    window.refreshSdvPage();
     if (window.opener && !window.opener.closed) {
-        if (window.opener.opener && !window.opener.opener.closed && window.opener.opener.sdvPage) {
-            window.opener.opener.refreshPage();
-        }
         objImage = MM_findObjInParentWin(strParentWinImageName);
         if (objImage != null) {
             objImage.src = strParentWinImageFullPath;
