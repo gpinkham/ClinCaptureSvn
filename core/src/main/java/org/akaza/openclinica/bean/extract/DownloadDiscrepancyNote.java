@@ -1,12 +1,12 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -31,7 +31,7 @@ import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.ServletOutputStream;
-import java.awt.*;
+import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -42,26 +42,36 @@ import java.util.Map;
  * This class converts or serializes DiscrepancyNoteBeans to Strings or iText-related classes so that they can be
  * compiled into a file and downloaded to the user. This is a convenience class with a number of different methods for
  * serializing beans to Strings.
- * 
+ *
  * @author Bruce W. Perry
- * 
  */
 public class DownloadDiscrepancyNote implements DownLoadBean {
-	public static String CSV = "text/plain";
-	public static String PDF = "application/pdf";
-	public static Map<Integer, String> RESOLUTION_STATUS_MAP = new HashMap<Integer, String>();
+
+	public static final String CSV = "text/plain";
+	public static final String PDF = "application/pdf";
+
+	private static final int TABLE_PADDING_PDF = 4;
+	private static final int TABLE_SPACING_PDF = 4;
+
+	private static final int STUDY_IDENTIFIER_FONT_SIZE_PDF = 18;
+	private static final int PARENT_DN_SECTION_FONT_SIZE_PDF = 14;
+
+	public static final Map<Integer, String> RESOLUTION_STATUS_MAP = new HashMap<Integer, String>();
 	static {
-		RESOLUTION_STATUS_MAP.put(1, "New");
-		RESOLUTION_STATUS_MAP.put(2, "Updated");
-		RESOLUTION_STATUS_MAP.put(3, "Resolution Proposed");
-		RESOLUTION_STATUS_MAP.put(4, "Closed");
-		RESOLUTION_STATUS_MAP.put(5, "Not Applicable");
+
+		int index = 1;
+		RESOLUTION_STATUS_MAP.put(index++, "New");
+		RESOLUTION_STATUS_MAP.put(index++, "Updated");
+		RESOLUTION_STATUS_MAP.put(index++, "Resolution Proposed");
+		RESOLUTION_STATUS_MAP.put(index++, "Closed");
+		RESOLUTION_STATUS_MAP.put(index, "Not Applicable");
 	}
 
 	public DownloadDiscrepancyNote() {
 	}
 
 	public void downLoad(EntityBean bean, String format, OutputStream stream) {
+
 		if (bean == null || stream == null
 				|| !(bean instanceof org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean)) {
 			throw new IllegalStateException(
@@ -102,8 +112,9 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 		String singleBeanContent;
 
 		for (EntityBean discNoteBean : listOfBeans) {
-			if (!(discNoteBean instanceof DiscrepancyNoteBean))
+			if (!(discNoteBean instanceof DiscrepancyNoteBean)) {
 				return;
+			}
 
 			DiscrepancyNoteBean discNBean = (DiscrepancyNoteBean) discNoteBean;
 			singleBeanContent = serializeToString(discNBean, false, 0);
@@ -139,165 +150,121 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 	}
 
 	public int getContentLength(EntityBean bean, String format) {
+
 		return serializeToString(bean, false, 0).getBytes().length;
 	}
 
 	public int getThreadListContentLength(List<DiscrepancyNoteThread> threadBeans) {
+
 		int totalLength = 0;
 		int count = 0;
 		int threadCount = 1;
+
 		for (DiscrepancyNoteThread discrepancyNoteThread : threadBeans) {
+
 			for (DiscrepancyNoteBean discNoteBean : discrepancyNoteThread.getLinkedNoteList()) {
-				// DiscrepancyNoteBean discNoteBean = discrepancyNoteThread.getLinkedNoteList().getFirst();
+
 				++count;
 				// Only count the byte length of a CSV header row for the first DNote; we're only
 				// using response.setContentlength for CSV format, because apparently it is not
 				// necessary for PDF
-				totalLength += serializeToString(discNoteBean, (count == 1), 0).getBytes().length;
-				// each DN bean with have a column indicating the thread number for the
-				// note
-				totalLength += "\n".getBytes().length;
-
+				totalLength += serializeToString(discNoteBean, (count == 1), threadCount).getBytes().length;
 			}
-			totalLength += ("Thread number: " + threadCount).getBytes().length;
-			// increment threadCounter
+
 			threadCount++;
 		}
 		return totalLength;
 	}
 
 	public String serializeToString(EntityBean bean, boolean includeHeaderRow, int threadNumber) {
+
 		DiscrepancyNoteBean discNoteBean = (DiscrepancyNoteBean) bean;
 		StringBuilder writer = new StringBuilder("");
 		// If includeHeaderRow = true, the first row of the output consists of header names, only
 		// for CSV format
 		if (includeHeaderRow) {
-			writer.append("Study Subject ID");
-			writer.append(",");
-			writer.append("Subject Status");
-			writer.append(",");
-			writer.append("Study/Site OID");
-			writer.append(",");
+
+			writer.append("Study Subject ID").append(",");
+			writer.append("Subject Status").append(",");
+			writer.append("Study/Site OID").append(",");
 			// we're adding a thread number row
-			writer.append("Thread ID");
-			writer.append(",");
+			writer.append("Thread ID").append(",");
 
-			writer.append("Note ID");
-			writer.append(",");
+			writer.append("Note ID").append(",");
 
-			writer.append("Parent Note ID");
-			writer.append(",");
+			writer.append("Parent Note ID").append(",");
 
-			writer.append("Date Created");
-			writer.append(",");
-			writer.append("Date Update");
-			writer.append(",");
-			writer.append("Days Open");
-			writer.append(",");
-			writer.append("Days Since Updated");
-			writer.append(",");
+			writer.append("Date Created").append(",");
+			writer.append("Date Update").append(",");
+			writer.append("Days Open").append(",");
+			writer.append("Days Since Updated").append(",");
 
 			if (discNoteBean.getDisType() != null) {
-				writer.append("Discrepancy Type");
-				writer.append(",");
+				writer.append("Discrepancy Type").append(",");
 			}
-			writer.append("Resolution Status");
-			writer.append(",");
-			writer.append("Event Name");
-			writer.append(",");
-			writer.append("CRF Name");
-			writer.append(",");
-			writer.append("CRF Status");
-			writer.append(",");
-			writer.append("Entity name");
-			writer.append(",");
-			writer.append("Entity value");
-			writer.append(",");
-			writer.append("Description");
-			writer.append(",");
-			writer.append("Detailed Notes");
-			writer.append(",");
-			writer.append("Assigned User");
-			writer.append(",");
-			writer.append("Study Id");
-
-			writer.append("\n");
+			writer.append("Resolution Status").append(",");
+			writer.append("Event Name").append(",");
+			writer.append("CRF Name").append(",");
+			writer.append("CRF Status").append(",");
+			writer.append("Entity name").append(",");
+			writer.append("Entity value").append(",");
+			writer.append("Description").append(",");
+			writer.append("Detailed Notes").append(",");
+			writer.append("Assigned User").append(",");
+			writer.append("Study Id").append("\n");
 		}
 
 		// Fields with embedded commas must be
 		// delimited with double-quote characters.
-		writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getLabel()));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getLabel())).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getStatus().getName()));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getStatus().getName())).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getStudy().getOid()));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getStudy().getOid())).append(",");
 
-		writer.append(escapeQuotesInCSV(threadNumber + ""));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(threadNumber + "")).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getId() + ""));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getId() + "")).append(",");
 
-		writer.append(discNoteBean.getParentDnId() > 0 ? discNoteBean.getParentDnId() : "");
-		writer.append(",");
+		writer.append(discNoteBean.getParentDnId() > 0 ? discNoteBean.getParentDnId() : "").append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getCreatedDateString() + ""));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getCreatedDateString() + "")).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getUpdatedDateString() + ""));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getUpdatedDateString() + "")).append(",");
 
 		if (discNoteBean.getParentDnId() == 0) {
-			writer.append(escapeQuotesInCSV(discNoteBean.getAge() + ""));
-			writer.append(",");
+			writer.append(escapeQuotesInCSV(discNoteBean.getAge() + "")).append(",");
 
 			String daysSinceUpdated = escapeQuotesInCSV(discNoteBean.getDays() + "");
-			writer.append(daysSinceUpdated.equals("0") ? "" : daysSinceUpdated);
-			writer.append(",");
+			writer.append(daysSinceUpdated.equals("0") ? "" : daysSinceUpdated).append(",");
 		} else {
-			writer.append(",");
-			writer.append(",");
+			writer.append(",").append(",");
 		}
 
 		if (discNoteBean.getDisType() != null) {
-			writer.append(escapeQuotesInCSV(discNoteBean.getDisType().getName()));
-			writer.append(",");
+			writer.append(escapeQuotesInCSV(discNoteBean.getDisType().getName())).append(",");
 		}
 
-		writer.append(escapeQuotesInCSV(RESOLUTION_STATUS_MAP.get(discNoteBean.getResolutionStatusId()) + ""));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(RESOLUTION_STATUS_MAP.get(discNoteBean.getResolutionStatusId()) + "")).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getEventName()));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getEventName())).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getCrfName()));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getCrfName())).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getCrfStatus()));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getCrfStatus())).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getEntityName()));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getEntityName())).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getEntityValue()));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getEntityValue())).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getDescription() + ""));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getDescription() + "")).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getDetailedNotes() + ""));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getDetailedNotes() + "")).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getAssignedUser().getName()));
-		writer.append(",");
+		writer.append(escapeQuotesInCSV(discNoteBean.getAssignedUser().getName())).append(",");
 
-		writer.append(escapeQuotesInCSV(discNoteBean.getStudyId() + ""));
+		writer.append(escapeQuotesInCSV(discNoteBean.getStudyId() + "")).append("\n");
 
-		writer.append("\n");
-		// System.out.println(writer.toString());
 		return writer.toString();
 
 	}
@@ -354,8 +321,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 				HeaderFooter header = new HeaderFooter(new Phrase("Study Identifier: " + studyIdentifier + " pg."),
 						true);
 				header.setAlignment(Element.ALIGN_CENTER);
-				Paragraph para = new Paragraph("Study Identifier: " + studyIdentifier, new Font(Font.HELVETICA, 18,
-						Font.BOLD, new Color(0, 0, 0)));
+				Paragraph para = new Paragraph("Study Identifier: " + studyIdentifier, new Font(Font.HELVETICA,
+						STUDY_IDENTIFIER_FONT_SIZE_PDF, Font.BOLD, new Color(0, 0, 0)));
 				para.setAlignment(Element.ALIGN_CENTER);
 				pdfDoc.setHeader(header);
 				pdfDoc.add(para);
@@ -367,9 +334,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 						pdfDoc.newPage();
 					}
 					pdfDoc.add(this.createTableThreadHeader(discNoteThread));
-					// Just the parent of the thread? discNoteThread.getLinkedNoteList()
+
 					for (DiscrepancyNoteBean discNoteBean : discNoteThread.getLinkedNoteList()) {
-						// DiscrepancyNoteBean discNoteBean = discNoteThread.getLinkedNoteList().getFirst();
 						if (discNoteBean.getParentDnId() > 0) {
 							pdfDoc.add(this.createTableFromBean(discNoteBean));
 							pdfDoc.add(new Paragraph("\n"));
@@ -378,7 +344,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 					newPage = true;
 				}
 			}
-			// pdfDoc.add(new Paragraph(content));
+
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		}
@@ -401,7 +367,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 			for (DiscrepancyNoteThread dnThread : listOfThreadedBeans) {
 				threadCounter++;
 				for (DiscrepancyNoteBean discNoteBean : dnThread.getLinkedNoteList()) {
-					// DiscrepancyNoteBean discNoteBean = dnThread.getLinkedNoteList().getFirst();
+
 					++counter;
 
 					singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, threadCounter)
@@ -438,8 +404,9 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 
 	private String escapeQuotesInCSV(String csvValue) {
 
-		if (csvValue == null)
+		if (csvValue == null) {
 			return "";
+		}
 
 		if (csvValue.contains("\u2018")) {
 			csvValue = csvValue.replaceAll("\u2018", "'");
@@ -469,13 +436,14 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 	}
 
 	private Table createTableThreadHeader(DiscrepancyNoteThread discNoteThread) throws BadElementException {
+
 		Table table = new Table(2);
 		table.setTableFitsPage(true);
 		table.setCellsFitPage(true);
 		table.setBorderWidth(1);
 		table.setBorderColor(new java.awt.Color(0, 0, 0));
-		table.setPadding(4);
-		table.setSpacing(4);
+		table.setPadding(TABLE_PADDING_PDF);
+		table.setSpacing(TABLE_SPACING_PDF);
 
 		// Get information for the header; the resolution status, however, has to be the latest
 		// resolution status for the DN thread
@@ -495,8 +463,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 				}
 
 			}
-			Paragraph para = new Paragraph(content.toString(), new Font(Font.HELVETICA, 14, Font.BOLD, new Color(0, 0,
-					0)));
+			Paragraph para = new Paragraph(content.toString(), new Font(Font.HELVETICA, PARENT_DN_SECTION_FONT_SIZE_PDF,
+					Font.BOLD, new Color(0, 0, 0)));
 			Cell cell = new Cell(para);
 			cell.setHeader(true);
 			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
@@ -519,7 +487,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 			content.append(dnBean.getCrfName());
 
 			cell = new Cell(new Paragraph("CRF: " + dnBean.getCrfName() + "\n" + "Status: " + dnBean.getCrfStatus(),
-					new Font(Font.HELVETICA, 14, Font.BOLD, new Color(0, 0, 0))));
+					new Font(Font.HELVETICA, PARENT_DN_SECTION_FONT_SIZE_PDF, Font.BOLD, new Color(0, 0, 0))));
 
 			table.addCell(cell);
 
@@ -551,8 +519,9 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 	}
 
 	private Cell createCell(String propertyName, String propertyValue) throws BadElementException {
-		Paragraph para = new Paragraph(propertyName + ": " + propertyValue, new Font(Font.HELVETICA, 14, Font.BOLD,
-				new Color(0, 0, 0)));
+
+		Paragraph para = new Paragraph(propertyName + ": " + propertyValue, new Font(Font.HELVETICA,
+				PARENT_DN_SECTION_FONT_SIZE_PDF, Font.BOLD, new Color(0, 0, 0)));
 		return new Cell(para);
 	}
 
@@ -563,8 +532,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 		table.setCellsFitPage(true);
 		table.setBorderWidth(1);
 		table.setBorderColor(new java.awt.Color(0, 0, 0));
-		table.setPadding(4);
-		table.setSpacing(4);
+		table.setPadding(TABLE_PADDING_PDF);
+		table.setSpacing(TABLE_SPACING_PDF);
 		Cell cell = new Cell("Discrepancy note id: " + discBean.getId());
 		cell.setHeader(true);
 		cell.setColspan(2);
