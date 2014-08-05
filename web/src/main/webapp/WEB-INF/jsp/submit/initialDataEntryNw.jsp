@@ -52,6 +52,14 @@
         	formChanged = false;
    		});	
     </script>
+
+	<!-- Lock Strata and TrialID items if randomization result exists -->
+	<script type="text/javascript" language="JavaScript">
+		$(document).ready(function() {
+			checkRandomizationCRF();
+		});
+	</script>
+
     <!-- Added for the new Calender -->
 	<!-- *JSP* submit/initialDataEntryNw.jsp -->
         <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />

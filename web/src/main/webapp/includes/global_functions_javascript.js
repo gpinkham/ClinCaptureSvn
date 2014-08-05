@@ -2420,7 +2420,9 @@ function randomizeSubject() {
         }
     }
 
-   var strataLevels = [];
+	var strataLevels = [];
+	var strataItemIds = [];
+
     $.each($("div[id^=Rand_StrataData]").find(":selected"), function(index, element) {
 
         var strata = {
@@ -2430,6 +2432,9 @@ function randomizeSubject() {
             Level: $("input[eleid^='"+ $(this).parents("div").attr("id") +"']").attr($(this).text())
         };
 
+        var strataItemId = $(this).parents("select").attr("id").replace('input','');
+
+        strataItemIds.push(strataItemId);
         strataLevels.push(strata);
     });
 
@@ -2448,13 +2453,13 @@ function randomizeSubject() {
         } else {
 
             alertDialog({ message: $("input:hidden[name='requiredParam3Missing']").val(), height: 150, width: 500 });
-
+            $("input[type='submit']").removeAttr("disabled");
             return false;
         }
     } else {
 
         trialId = $("input[eleid='randomize']").attr("trialId");
-    }
+	}
 
 	var subject = $("input:hidden[name='subjectLabel']").val();
 
@@ -2462,7 +2467,7 @@ function randomizeSubject() {
 		&& (subject == "" || subject == undefined)) {
 
 		alert($("input[name=personIdMissing]").val());
-
+		$("input[type='submit']").removeAttr("disabled");
 		return false;
 	}
 
@@ -2479,6 +2484,7 @@ function randomizeSubject() {
             subject: subject,
             trialId: trialId,
             eligibility: eligibility,
+            strataItemIds: JSON.stringify(strataItemIds),
             strataLevel: JSON.stringify(strataLevels)
         },
 
@@ -2543,6 +2549,26 @@ function randomizeSubject() {
             }
         }
     });
+}
+
+/* =======================================================================
+ * Check if opened CRF is Randomization CRF, and disable strata and
+ * trialID items.
+ ========================================================================= */
+function checkRandomizationCRF() {
+
+	var dateSize = parseInt($("div[id=Rand_Date] input").size(),10);
+	var resultSize = parseInt($("div[id=Rand_Result] input").size(),10);
+
+	if (dateSize > 0 && resultSize > 0) {
+
+		var randResult = $("div#Rand_Result input").val();
+		var randDate = $("div#Rand_Date input").val();
+
+		if (randResult != "" && randDate != "") {
+			$("div[id^=Rand_StrataData] select option:not(:selected), div[id^=Rand_TrialIDs] select option:not(:selected)").remove();
+		}
+	}
 }
 
 function urlParam(name){

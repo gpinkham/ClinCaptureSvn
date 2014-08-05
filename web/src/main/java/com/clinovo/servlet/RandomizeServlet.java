@@ -147,6 +147,7 @@ public class RandomizeServlet extends Controller {
 
 		// Save randomization result and update all statuses
 		RandomizationUtil.saveRandomizationResultToDatabase(result, itemsMap);
+		RandomizationUtil.saveStratificationVariablesToDatabase(request);
 		RandomizationUtil.checkAndUpdateEventCRFAndStudyEventStatuses(itemsMap);
 
 		if (assignRandomizationResultTo.equals("dngroup")) {

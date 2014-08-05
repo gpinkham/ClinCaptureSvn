@@ -15,6 +15,7 @@
 package com.clinovo.util;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -38,6 +39,8 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +48,7 @@ import com.clinovo.exception.RandomizationException;
 import com.clinovo.model.RandomizationResult;
 
 /**
- * Utilities to help with randomization at the servlet layer -
+ * Utilities to help with randomization at the servlet layer.
  * 
  */
 public class RandomizationUtil {
@@ -61,10 +64,10 @@ public class RandomizationUtil {
 	private static EventCRFDAO eventCRFDAO;
 	private static StudyEventDAO studyEventDAO;
 
-	private final static Logger log = LoggerFactory.getLogger(RandomizationUtil.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RandomizationUtil.class);
 
 	/**
-	 * Ascertains whether the trial has been configured in both the crf and the properties
+	 * Ascertains whether the trial has been configured in both the crf and the properties.
 	 * 
 	 * @param configuredTrialId
 	 *            property file configured trial Id
@@ -75,15 +78,11 @@ public class RandomizationUtil {
 	 */
 	public static boolean isTrialIdDoubleConfigured(String configuredTrialId, String crfSpecifiedId) {
 
-		if (isConfiguredTrialIdValid(configuredTrialId) && isCRFSpecifiedTrialIdValid(crfSpecifiedId)) {
-			return true;
-		} else {
-			return false;
-		}
+		return isConfiguredTrialIdValid(configuredTrialId) && isCRFSpecifiedTrialIdValid(crfSpecifiedId);
 	}
 
 	/**
-	 * Checks If the property file configured trial Id configured is valid
+	 * Checks If the property file configured trial Id configured is valid.
 	 * 
 	 * @param trialId
 	 *            The trial id to check
@@ -96,7 +95,7 @@ public class RandomizationUtil {
 	}
 
 	/**
-	 * Checks If the crf configured trial Id configured is valid
+	 * Checks If the crf configured trial Id configured is valid.
 	 * 
 	 * @param trialId
 	 *            The trial id to check
@@ -109,7 +108,7 @@ public class RandomizationUtil {
 	}
 
 	/**
-	 * Assigns the returned randomization to a study group -
+	 * Assigns the returned randomization to a study group.
 	 * 
 	 * @param randomizationResult
 	 *            The randomization to assign to group.
@@ -151,7 +150,7 @@ public class RandomizationUtil {
 
 			} else {
 
-				log.error(studySubjectDAO.getFailureDetails().getMessage());
+				LOG.error(studySubjectDAO.getFailureDetails().getMessage());
 				throw new RandomizationException("Exception occurred during randomization");
 			}
 
@@ -163,12 +162,10 @@ public class RandomizationUtil {
 	}
 
 	/**
-	 * Add the returned randomization to a Study Subject ID
+	 * Add the returned randomization to a Study Subject ID.
 	 * 
 	 * @param randomizationResult
 	 *            The randomization to added to SSID.
-	 * 
-	 * @return 4 digits code that will be added to SSID.
 	 * 
 	 * @throws RandomizationException
 	 *             If generated SSID already exists in Study.
@@ -340,6 +337,73 @@ public class RandomizationUtil {
 	}
 
 	/**
+	 * Save stratification variables to the item_data table.
+	 * 
+	 * @param request
+	 *            <code>HttpServletRequest</code> from which all required data
+	 *            will be taken.
+	 * 
+	 * @throws RandomizationException
+	 *             If data was not saved successfully.
+	 * @throws JSONException
+	 *             if data from request is invalid.
+	 */
+	public static void saveStratificationVariablesToDatabase(
+			HttpServletRequest request) throws JSONException,
+			RandomizationException {
+
+		if (RandomizationUtil.itemDataDAO == null) {
+
+			RandomizationUtil.itemDataDAO = new ItemDataDAO(
+					sessionManager.getDataSource());
+		}
+
+		int eventCRFId = Integer.parseInt(request.getParameter("eventCrfId"));
+		String strataLevel = request.getParameter("strataLevel").equals("null") ? ""
+				: request.getParameter("strataLevel");
+		String strataItems = request.getParameter("strataItemIds").equals(
+				"null") ? "" : request.getParameter("strataItemIds");
+
+		JSONArray strataIds = new JSONArray(strataItems);
+		JSONArray array = new JSONArray(strataLevel);
+
+		if (array != null) {
+
+			if (array.length() != strataIds.length()) {
+				throw new RandomizationException(
+						"Error occured during the saving of the stratification variables.");
+			} else {
+				for (int i = 0; i < array.length(); i++) {
+
+					String strataField = Arrays.asList(
+							array.get(i).toString().split(",")).get(1);
+					String strataValue = Arrays
+							.asList(strataField.toString().split(":")).get(1)
+							.replace("\"", "").replace("}", "");
+					int itemId = Integer.parseInt(strataIds.get(i).toString());
+
+					ItemDataBean item = itemDataDAO.findByItemIdAndEventCRFId(
+							itemId, eventCRFId);
+
+					item.setValue(strataValue);
+
+					if (item.getEventCRFId() == 0) {
+						setAllFieldsForNewItem(item, itemId, request);
+
+						itemDataDAO.create(item);
+						checQuerySuccessfull(itemDataDAO);
+					} else {
+						setAllFieldsForUpdatedItem(item, request);
+
+						itemDataDAO.update(item);
+						checQuerySuccessfull(itemDataDAO);
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Get ItemDataBean for randomization result item and randomization date item.
 	 * 
 	 * @param request
@@ -357,9 +421,6 @@ public class RandomizationUtil {
 			RandomizationUtil.itemDataDAO = new ItemDataDAO(sessionManager.getDataSource());
 		}
 
-		UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute(
-				"userBean");
-
 		int eventCRFId = Integer.parseInt(request.getParameter("eventCrfId"));
 		int dateItemId = Integer.parseInt(request.getParameter("dateInputId"));
 		int resultItemId = Integer.parseInt(request
@@ -372,33 +433,15 @@ public class RandomizationUtil {
 
 		if (dateItem.getEventCRFId() == 0 || resultItem.getEventCRFId() == 0) {
 
-			dateItem.setCreatedDate(new Date());
-			dateItem.setStatus(Status.AVAILABLE);
-			dateItem.setOwner(userAccountBean);
-			dateItem.setItemId(dateItemId);
-			dateItem.setEventCRFId(eventCRFId);
-			dateItem.setOrdinal(1);
-
-			resultItem.setCreatedDate(new Date());
-			resultItem.setStatus(Status.AVAILABLE);
-			resultItem.setOwner(userAccountBean);
-			resultItem.setItemId(resultItemId);
-			resultItem.setEventCRFId(eventCRFId);
-			resultItem.setOrdinal(1);
+			setAllFieldsForNewItem(dateItem, dateItemId, request);
+			setAllFieldsForNewItem(resultItem, resultItemId, request);
 
 			setItemDataExist(false);
 
 		} else {
 
-			dateItem.setOldStatus(dateItem.getStatus());
-			dateItem.setUpdater(userAccountBean);
-			dateItem.setUpdatedDate(new Date());
-			dateItem.setStatus(Status.UNAVAILABLE);
-
-			resultItem.setOldStatus(resultItem.getStatus());
-			resultItem.setUpdater(userAccountBean);
-			resultItem.setUpdatedDate(new Date());
-			resultItem.setStatus(Status.UNAVAILABLE);
+			setAllFieldsForUpdatedItem(dateItem, request);
+			setAllFieldsForUpdatedItem(resultItem, request);
 
 			setItemDataExist(true);
 		}
@@ -409,6 +452,34 @@ public class RandomizationUtil {
 		itemsMap.put("resultItem", resultItem);
 
 		return itemsMap;
+	}
+
+	private static void setAllFieldsForUpdatedItem(ItemDataBean item,
+			HttpServletRequest request) {
+
+		UserAccountBean userAccountBean = (UserAccountBean) request
+				.getSession().getAttribute("userBean");
+
+		item.setOldStatus(item.getStatus());
+		item.setUpdater(userAccountBean);
+		item.setUpdatedDate(new Date());
+		item.setStatus(Status.UNAVAILABLE);
+	}
+
+	private static void setAllFieldsForNewItem(ItemDataBean item, Integer itemId,
+			HttpServletRequest request) {
+
+		UserAccountBean userAccountBean = (UserAccountBean) request
+				.getSession().getAttribute("userBean");
+
+		int eventCRFId = Integer.parseInt(request.getParameter("eventCrfId"));
+
+		item.setItemId(itemId);
+		item.setCreatedDate(new Date());
+		item.setStatus(Status.AVAILABLE);
+		item.setOwner(userAccountBean);
+		item.setEventCRFId(eventCRFId);
+		item.setOrdinal(1);
 	}
 
 	/**
@@ -429,7 +500,7 @@ public class RandomizationUtil {
 			return;
 		} else {
 
-			log.error(eDao.getFailureDetails().getMessage());
+			LOG.error(eDao.getFailureDetails().getMessage());
 			throw new RandomizationException(
 					"Exception occurred during randomization");
 		}
