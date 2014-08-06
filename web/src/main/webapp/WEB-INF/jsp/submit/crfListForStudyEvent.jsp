@@ -1,5 +1,5 @@
 <%@ page import="org.akaza.openclinica.bean.core.Role" %>
-<%@ page contentType="text/html; charset=UTF-8" %> 
+<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <jsp:useBean scope="session" id="userRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean" />
@@ -141,7 +141,7 @@
                		<a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=New">
                  		   <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
             	</c:when>
-            </c:choose>	
+            </c:choose>
         </td>
     </tr>
 
@@ -162,7 +162,7 @@
         <td class="table_header_row" style="white-space: nowrap;">
 
             <c:choose>
-                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and userRole.id ne 6 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${not(studyEvent.subjectEventStatus.id eq 7 and (userRole.id eq 4 or userRole.id eq 5 or userRole.id eq 6 or userRole.id eq 7)) and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and userRole.id ne 6 and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol1" value="false"/>
                     <a href="UpdateStudyEvent?event_id=${studyEvent.id}&ss_id=${studySubject.id}"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_event" bundle="${resword}"/>" title="<fmt:message key="edit_study_event" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -227,7 +227,7 @@
                		<a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_discrepancyNoteBean.resolutionStatus=New&listNotes_f_eventName=${studyEventName}&listNotes_f_studySubject.label=${studySubject.label}">
                  		   <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
             	</c:when>
-            </c:choose>	
+            </c:choose>
         </td>
     </tr>
     <c:choose>
@@ -237,7 +237,7 @@
         </tr>
     </c:when>
 
-    <c:otherwise> 
+    <c:otherwise>
     <tr>
         <td class="table_header_row_left" style="width: auto; min-width: 170px;"><fmt:message key="CRF_name" bundle="${resword}"/></td>
         <td class="table_header_row_left" style="width: auto;"><fmt:message key="version" bundle="${resword}"/></td>
@@ -255,7 +255,7 @@
                             <tr valign="top">
                                 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" />
                                     <c:if test="${dedc.edc.requiredCRF}"><span style="color: orange">*</span>
-                                    </c:if> 
+                                    </c:if>
                                     <c:if test="${(dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6)}">
                                         <img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/>
                                     </c:if>
@@ -290,7 +290,7 @@
                                             <c:set var="crfVersionInputId" value="crfVersionId${defaultVersionId}"/>
                                           </c:otherwise>
                                         </c:choose>
-										
+
                                         <c:choose>
                                             <c:when test="${versionCount<=1}">
                                                 <c:choose>
@@ -422,7 +422,7 @@
                										<a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=New&listNotes_f_crfName=${dedc.edc.crf.name}">
                  		   							<img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
             									</c:when>
-            								</c:choose>	
+            								</c:choose>
                                     </c:if>
                                 </td>
                             </tr>
@@ -642,7 +642,7 @@
                								<a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&listNotes_f_discrepancyNoteBean.resolutionStatus=New&listNotes_f_crfName=${dec.eventCRF.crf.name}&listNotes_f_eventName=${dec.eventCRF.name}">
                  		   					<img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
             							</c:when>
-            						</c:choose>	
+            						</c:choose>
                             	</c:if>
                             </td>
                         </tr>
