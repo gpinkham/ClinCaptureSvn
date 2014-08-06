@@ -86,8 +86,8 @@ public class WidgetsLayoutController {
 	private static final int EC_DISPLAY_PER_SCREEN = 5;
 	private static final int ND_PER_CRF_DISPLAY_PER_SCREEN = 8;
 
-	private static final String STATUS_NOT_CODED = "Items to be Coded";
-	private static final String STATUS_CODED = "Coded Items";
+	private static final String STATUS_NOT_CODED = "items to be coded";
+	private static final String STATUS_CODED = "coded items";
 
 	@Autowired
 	private DataSource datasource;
