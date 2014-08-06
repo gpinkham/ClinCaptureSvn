@@ -1,7 +1,11 @@
 package com.clinovo.controller;
 
+import java.util.ArrayList;
+
 import com.clinovo.BaseControllerTest;
 
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.junit.Before;
@@ -22,7 +26,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	private static final int SDV_PROG_ATTRIBUTES = 5;
 	private static final int NDS_PER_CRF_ATTRIBUTES = 4;
 	private static final int ENROLL_PROG_ATTRIBUTES = 4;
-	private static final int CODING_PROG_ATTRIBUTES = 4;
+	private static final int CODING_PROG_ATTRIBUTES = 5;
 
 	private StudyBean sb;
 	private UserAccountBean ub;
@@ -33,8 +37,15 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	@Before
 	public void prepear() {
 
+		ArrayList<StudyUserRoleBean> roles = new ArrayList<StudyUserRoleBean>();
+		StudyUserRoleBean adminRole = new StudyUserRoleBean();
+		adminRole.setRole(Role.SYSTEM_ADMINISTRATOR);
+		roles.add(adminRole);
 		ub = new UserAccountBean();
 		ub.setId(1);
+		ub.setRoles(roles);;
+		ub.setActiveStudyId(1);
+		ub.setName("root");
 
 		sb = new StudyBean();
 		sb.setId(1);
@@ -157,8 +168,9 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	@Test
 	public void testThatInitCodingProgressReturnsCode200() throws Exception {
 
-		this.mockMvc.perform(get(CODING_PROGRESS_WIDGET).param("codingProgressYear", "0").sessionAttr("study", sb)).andExpect(
-				status().isOk());
+		this.mockMvc.perform(
+				get(CODING_PROGRESS_WIDGET).param("codingProgressYear", "0").sessionAttr("study", sb)
+						.sessionAttr("userBean", ub)).andExpect(status().isOk());
 	}
 
 	/**
@@ -471,8 +483,8 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(CODING_PROGRESS_WIDGET).param("codingProgressYear", "0")
-						.sessionAttr("study", sb))
-				.andExpect(MockMvcResultMatchers.model().size(CODING_PROG_ATTRIBUTES));
+						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
+				MockMvcResultMatchers.model().size(CODING_PROG_ATTRIBUTES));
 	}
 
 	/**
@@ -486,9 +498,9 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(CODING_PROGRESS_WIDGET).param("codingProgressYear", "0")
-						.sessionAttr("study", sb)).andExpect(
+						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
 				MockMvcResultMatchers.model().attributeExists("cpYear", "cpDataRows", "cpPreviousYearExists",
-						"cpNextYearExists"));
+						"cpNextYearExists", "cpActivateLegend"));
 	}
 
 	/**
@@ -502,7 +514,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(CODING_PROGRESS_WIDGET).param("codingProgressYear", "0")
-						.sessionAttr("study", sb)).andExpect(
+						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/codingProgressChart"));
 	}
 }

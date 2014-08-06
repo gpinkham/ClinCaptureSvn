@@ -23,8 +23,10 @@ import com.clinovo.model.Widget;
 import com.clinovo.model.WidgetsLayout;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -62,6 +64,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -878,8 +881,14 @@ public class WidgetsLayoutController {
 		// Set which year should be displayed.
 		int displayedYear = Integer.parseInt(request.getParameter("codingProgressYear"));
 		displayedYear = displayedYear == 0 ? Calendar.getInstance().get(Calendar.YEAR) : displayedYear;
+		List<CodedItem> codingItems;
 
-		List<CodedItem> codingItems = codedItemDAO.findAll();
+		if (sb.isSite(sb.getParentStudyId())) {
+			codingItems = codedItemDAO.findByStudyAndSite(sb.getParentStudyId(), sb.getId());
+		} else {
+			codingItems = codedItemDAO.findByStudy(sb.getId());
+		}
+
 		ArrayList<Integer> itemsIds = new ArrayList<Integer>();
 
 		// Get list of IDs of item data for all Coded Items.
@@ -990,11 +999,25 @@ public class WidgetsLayoutController {
 			}
 		}
 
+		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
+		Role userRole = ub.getActiveStudyRole();
+		if (userRole == Role.INVALID && sb.getParentStudyId() > 0) {
+			userRole = ub.getRoleByStudy(sb.getParentStudyId()).getRole();
+		}
+		boolean activateLegend = false;
+
+		if (userRole == Role.SYSTEM_ADMINISTRATOR || userRole == Role.STUDY_ADMINISTRATOR
+				|| userRole == Role.STUDY_CODER) {
+
+			activateLegend = true;
+		}
+
 		// Set all attributes to model.
 		model.addAttribute("cpPreviousYearExists", previousYearDataExist);
 		model.addAttribute("cpNextYearExists", nextYearDataExist);
 		model.addAttribute("cpDataRows", cpDataRows);
 		model.addAttribute("cpYear", displayedYear);
+		model.addAttribute("cpActivateLegend", activateLegend);
 
 		return page;
 	}

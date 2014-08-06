@@ -1134,8 +1134,8 @@ function initCodingProgress(action) {
 			codingProgressChart.draw(data, options);
 
 			var element = document.getElementById('toolbar');
-			
-			if (!element) {
+			var activate = $("#cpActivateLegend").val();
+			if (!element && activate == "true") {
 
 				function selectHandler() {
 

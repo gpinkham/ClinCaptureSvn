@@ -31,5 +31,6 @@
 
 	<input type="text" value="${cpYear}" id="cpYear" />
 	<input type="text" class="currentColor" value="${newThemeColor}">
+	<input type="text" id="cpActivateLegend" value="${cpActivateLegend}">
 </form>
 <input type="hidden" value="${study.id}" id="cpStudyId">

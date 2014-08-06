@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis"
+		id="2014-08-01-TICKET1601-UPDATE-ACCESS-TO-CP-WIDGET">
+		<update tableName="widget">
+			<column name="have_access" value="1,2,4,6,7" />
+			<column name="display_as_default" value="1,2,4,6,7" />
+			<column name="site_metrics" value="TRUE" />
+			<where>id=13</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis"
+		id="2014-08-01-TICKET1601-UPDATE-ACCESS-TO-NDS-PER-CRF">
+		<update tableName="widget">
+			<column name="have_access" value="1,2,3,4,5,6" />
+			<column name="display_as_default" value="1,2,3,4,5,6" />
+			<where>id=10</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis"
+		id="2014-08-01-TICKET1601-REMOVE-NDS-PER-CRF-WIDGET-FROM-LAYOUT">
+		<delete tableName="widgets_layout">
+			<where>id=10</where>
+		</delete>
+	</changeSet>
+</databaseChangeLog>
