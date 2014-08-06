@@ -372,8 +372,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					if (studyEvents.size() < 1) {
 						subjectEventStatus = SubjectEventStatus.NOT_SCHEDULED;
 					} else {
+						int closestOrdinal = getNextOrdinal(studyEvents);
 						for (StudyEventBean studyEventBean : studyEvents) {
-							if (studyEventBean.getSampleOrdinal() == 1) {
+							if (studyEventBean.getSampleOrdinal() == closestOrdinal) {
 								subjectEventStatus = studyEventBean.getSubjectEventStatus();
 								break;
 							}
@@ -402,7 +403,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					subjectEventStatus = SubjectEventStatus.NOT_SCHEDULED;
 				} else {
 					for (StudyEventBean studyEventBean : studyEvents) {
-						if (studyEventBean.getSampleOrdinal() == 1) {
+						int closestOrdinal = getNextOrdinal(studyEvents);
+						if (studyEventBean.getSampleOrdinal() == closestOrdinal) {
 							subjectEventStatus = studyEventBean.getSubjectEventStatus();
 							break;
 						}
@@ -422,6 +424,17 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		// Do not forget to set the items back on the tableFacade.
 		tableFacade.setItems(theItems);
 
+	}
+
+	private int getNextOrdinal(List<StudyEventBean> studyEvents) {
+		int ordinal = 1;
+		for (StudyEventBean studyEventBean : studyEvents) {
+			if (studyEventBean.getSampleOrdinal() > 1) {
+				ordinal = studyEventBean.getSampleOrdinal();
+				break;
+			}
+		}
+		return ordinal;
 	}
 
 	private int getColumnNamesMap(TableFacade tableFacade) {
