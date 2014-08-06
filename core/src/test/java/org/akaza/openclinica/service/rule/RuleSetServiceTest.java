@@ -42,12 +42,13 @@ import java.util.Set;
 
 public class RuleSetServiceTest extends DefaultAppContextTest {
 
-	protected boolean runRulesOptimisation = true;
-	protected Set<Integer> skippedItemsIds;
-	protected ODMContainer container;
-	protected StudyBean studyBean;
-	protected InputStream stream;
-	protected UserAccountBean ub;
+	public static final int FOUR = 4;
+	public static final int THREE = 3;
+	private boolean runRulesOptimisation = true;
+	private Set<Integer> skippedItemsIds;
+	private ODMContainer container;
+	private StudyBean studyBean;
+	private UserAccountBean ub;
 
 	{
 		skippedItemsIds = new HashSet<Integer>();
@@ -70,7 +71,7 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 
 	private void parseFile(String fileName) throws Exception {
 		container = new ODMContainer();
-		stream = this.getClass().getClassLoader().getResourceAsStream("com/clinovo/" + fileName);
+		InputStream stream = this.getClass().getClassLoader().getResourceAsStream("com/clinovo/" + fileName);
 		JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		if (stream != null) {
@@ -104,7 +105,7 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 	public void testGetRuleSetsByCrfStudyAndStudyEventDefinition() {
 
 		List<RuleSetBean> ruleSets = getRuleSetsByCrfStudyAndStudyEventDefinition();
-		assertEquals("RuleSet size should be 4", 4, ruleSets.size());
+		assertEquals("RuleSet size should be 4", FOUR, ruleSets.size());
 		assertNotNull(ruleSets.get(0).getRuleSetRules());
 	}
 
@@ -112,10 +113,10 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 	public void testFilterByStatusEqualsAvailable() {
 
 		List<RuleSetBean> ruleSets = getRuleSetsByCrfStudyAndStudyEventDefinition();
-		assertEquals("RuleSet size should be 4", 4, ruleSets.size());
+		assertEquals("RuleSet size should be 4", FOUR, ruleSets.size());
 
 		ruleSets = ruleSetService.filterByStatusEqualsAvailable(ruleSets);
-		assertEquals("RuleSet size should be 3", 3, ruleSets.size());
+		assertEquals("RuleSet size should be 3", THREE, ruleSets.size());
 	}
 
 	@Test
@@ -164,5 +165,15 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 		ruleSetService.runRulesInImportData(runRulesOptimisation, getDataSource().getConnection(), containers,
 				skippedItemsIds, studyBean, ub, ExecutionMode.SAVE);
 		assertEquals(discrepancyNoteDAO.findAll().size(), total);
+	}
+
+	@Test
+	public void testThatPassedRuleSetWithNullExpressionsReturnsGracefully() {
+		RuleSetBean ruleSet = getRuleSetsByCrfStudyAndStudyEventDefinition().get(0);
+		ruleSet.setExpressions(null);
+		List<RuleSetBean> ruleSets = new ArrayList<RuleSetBean>();
+		ruleSets.add(ruleSet);
+		ruleSets = ruleSetService.filterRuleSetsByGroupOrdinal(ruleSets);
+		assertEquals(0, ruleSets.get(0).getExpressions().size());
 	}
 }

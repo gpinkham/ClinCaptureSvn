@@ -96,7 +96,6 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -1804,7 +1803,7 @@ public abstract class DataEntryServlet extends Controller {
 
 								request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
 								forwardPage(Page.setNewPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName()
-										+ "?eventId=" + ecb.getStudyEventId(), 
+										+ "?eventId=" + ecb.getStudyEventId(),
 										Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getTitle()), request, response);
 							} else {
 								// use clicked 'save'
@@ -1848,7 +1847,7 @@ public abstract class DataEntryServlet extends Controller {
 									}
 									// end
 									forwardPage(Page.setNewPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName()
-											+ "?eventId=" + ecb.getStudyEventId(), 
+											+ "?eventId=" + ecb.getStudyEventId(),
 											Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getTitle()), request, response);
 									return;
 
@@ -4520,7 +4519,6 @@ public abstract class DataEntryServlet extends Controller {
 			List<RuleSetBean> ruleSets, Boolean dryRun, Boolean shouldRunRules, MessageType mt, Phase phase,
 			EventCRFBean ecb, HttpServletRequest request) {
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
-		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		if (shouldRunRules) {
 			Container c = new Container();
 			try {
@@ -4533,8 +4531,8 @@ public abstract class DataEntryServlet extends Controller {
 				npe.printStackTrace();
 			}
 			logger.debug("running rules ... rule sets size is " + ruleSets.size());
-			return getRuleSetService(request).runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub,
-					c.variableAndValue, phase, ecb, request).getByMessageType(mt);
+			return getRuleSetService(request).runRulesInDataEntry(ruleSets, dryRun, ub, c.variableAndValue, phase, ecb,
+					request).getByMessageType(mt);
 		} else {
 			return new HashMap<String, ArrayList<String>>();
 		}

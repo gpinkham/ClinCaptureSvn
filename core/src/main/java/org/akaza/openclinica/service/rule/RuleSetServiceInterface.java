@@ -49,99 +49,352 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Contains ruleset service methods.
+ */
 public interface RuleSetServiceInterface {
 
+	/**
+	 * Saves RuleSetBean.
+	 * 
+	 * @param ruleSetBean
+	 *            rule to save
+	 * @return RuleSetBean after saving
+	 */
 	@Transactional
-	public abstract RuleSetBean saveRuleSet(RuleSetBean ruleSetBean);
+	RuleSetBean saveRuleSet(RuleSetBean ruleSetBean);
 
+	/**
+	 * Saves RuleSet in rulesContainer from import.
+	 * 
+	 * @param rulesContainer
+	 *            contains rules to be saved.
+	 */
 	@Transactional
-	public abstract void saveImportFromDesigner(RulesPostImportContainer rulesContainer);
+	void saveImportFromDesigner(RulesPostImportContainer rulesContainer);
 
+	/**
+	 * Saves imported RuleSets in rulesContainer.
+	 * 
+	 * @param rulesContainer
+	 *            contains imported rules.
+	 */
 	@Transactional
-	public abstract void saveImport(RulesPostImportContainer rulesContainer);
+	void saveImport(RulesPostImportContainer rulesContainer);
 
+	/**
+	 * Saves RuleSetRule.
+	 * 
+	 * @param ruleSetRule
+	 *            to be saved.
+	 */
 	@Transactional
-	public void saveImport(RuleSetRuleBean ruleSetRule);
+	void saveImport(RuleSetRuleBean ruleSetRule);
 
+	/**
+	 * Updates RuleSet.
+	 * 
+	 * @param ruleSetBean
+	 *            RuleSet to be updated
+	 * @param user
+	 *            updater
+	 * @param status
+	 *            status after update
+	 * @return returns updated RuleSet
+	 */
 	@Transactional
-	public abstract RuleSetBean updateRuleSet(RuleSetBean ruleSetBean, UserAccountBean user, Status status);
+	RuleSetBean updateRuleSet(RuleSetBean ruleSetBean, UserAccountBean user, Status status);
 
+	/**
+	 * Loads RuleSet with persistent rules.
+	 * 
+	 * @param ruleSetBean
+	 *            RuleSet to be loaded
+	 */
 	@Transactional
-	public abstract void loadRuleSetRuleWithPersistentRules(RuleSetBean ruleSetBean);
+	void loadRuleSetRuleWithPersistentRules(RuleSetBean ruleSetBean);
 
+	/**
+	 * Replaces RuleSetBean.
+	 * 
+	 * @param ruleSetBean
+	 *            RuleSetBean to be used.
+	 * @return updated RuleSetBean
+	 */
 	@Transactional
-	public abstract RuleSetBean replaceRuleSet(RuleSetBean ruleSetBean);
+	RuleSetBean replaceRuleSet(RuleSetBean ruleSetBean);
 
-	public abstract HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(
-			String crfId, ExecutionMode executionMode, StudyBean currentStudy, UserAccountBean ub);
+	/**
+	 * Runs all defined rules for crf.
+	 * 
+	 * @param crfId
+	 *            crf's id.
+	 * @param executionMode
+	 *            ExecutionMode: DRY_RUN or SAVE
+	 * @param currentStudy
+	 *            current study
+	 * @param ub
+	 *            current user
+	 * @return RuleBulkExecuteContainer.
+	 */
+	HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(String crfId,
+			ExecutionMode executionMode, StudyBean currentStudy, UserAccountBean ub);
 
-	public abstract HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(
+	/**
+	 * Runs all defined rules for crf version.
+	 * 
+	 * @param ruleSetRuleId
+	 *            id of RuleSet to execute
+	 * @param crfVersionId
+	 *            crf version id
+	 * @param executionMode
+	 *            ExecutionMode: DRY_RUN or SAVE
+	 * @param currentStudy
+	 *            current study
+	 * @param ub
+	 *            current user
+	 * @return RuleBulkExecuteContainer
+	 */
+	HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(
 			String ruleSetRuleId, String crfVersionId, ExecutionMode executionMode, StudyBean currentStudy,
 			UserAccountBean ub);
 
-	public abstract List<RuleSetBasedViewContainer> runRulesInBulk(List<RuleSetBean> ruleSets, Boolean dryRun,
-			StudyBean currentStudy, UserAccountBean ub);
-
-	public abstract MessageContainer runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun,
-			StudyBean currentStudy, UserAccountBean ub, HashMap<String, String> variableAndValue, Phase phase,
-			EventCRFBean ecb, HttpServletRequest request);
+	/**
+	 * Runs rules in bulk.
+	 * 
+	 * @param ruleSets
+	 *            RuleSetBeans
+	 * @param dryRun
+	 *            specifies if ExecutionMode is DRY_RUN
+	 * @param currentStudy
+	 *            current study.
+	 * @param ub
+	 *            current user
+	 * @return RuleSetBaseViewContainer list
+	 */
+	List<RuleSetBasedViewContainer> runRulesInBulk(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy,
+			UserAccountBean ub);
 
 	/**
-	 * @param containers
-	 * @param skippedItemIds
-	 * @param study
+	 * Runs rules in data entry.
+	 * 
+	 * @param ruleSets
+	 *            RuleSets containing rules to be run
+	 * @param dryRun
+	 *            specifies if ExecutionMode is DRY_RUN
 	 * @param ub
+	 *            current user
+	 * @param variableAndValue
+	 *            variable and value pairs
+	 * @param phase
+	 *            data entry phase
+	 * @param ecb
+	 *            EventCRFBean
+	 * @param request
+	 *            HttpServletRequest
+	 * @return MessageContainer
+	 */
+	MessageContainer runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, UserAccountBean ub,
+			HashMap<String, String> variableAndValue, Phase phase, EventCRFBean ecb, HttpServletRequest request);
+
+	/**
+	 * Runs rules in data import.
+	 * 
+	 * @param containers
+	 *            list of ImportDataRuleRunnerContainers
+	 * @param skippedItemIds
+	 *            ids of items to skip
+	 * @param study
+	 *            study being imported to
+	 * @param ub
+	 *            current user
 	 * @param executionMode
+	 *            ExecutionMode: DRY_RUN or SAVE
 	 * @return RuleActionBean summary with key as groupOrdinalPLusItemOid.
 	 */
-	public abstract HashMap<String, ArrayList<String>> runRulesInImportData(
+	HashMap<String, ArrayList<String>> runRulesInImportData(List<ImportDataRuleRunnerContainer> containers,
+			Set<Integer> skippedItemIds, StudyBean study, UserAccountBean ub, ExecutionMode executionMode);
+
+	/**
+	 * Runs rules in data import.
+	 * 
+	 * @param optimiseRuleValidator
+	 *            specifies whether rule validator should be optimized
+	 * @param connection
+	 *            Sql Connection to be used
+	 * @param containers
+	 *            list of ImportDataRuleRunnerContainers
+	 * @param study
+	 *            study to be imported to
+	 * @param ub
+	 *            current user
+	 * @param executionMode
+	 *            ExecutionMode: DRY_RUN or SAVE
+	 * @return RuleActionBean summary
+	 */
+	HashMap<String, ArrayList<String>> runRulesInImportData(Boolean optimiseRuleValidator, Connection connection,
+			List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub,
+			ExecutionMode executionMode);
+
+	/**
+	 * Runs rules in data import.
+	 * 
+	 * @param optimiseRuleValidator
+	 *            specifies whether rule validator should be optimized
+	 * @param connection
+	 *            Sql Connection to be used
+	 * @param containers
+	 *            list of ImportDataRuleRunnerContainers
+	 * @param skippedItemIds
+	 *            ids of skipped items
+	 * @param study
+	 *            study to be imported to
+	 * @param ub
+	 *            current user
+	 * @param executionMode
+	 *            ExecutionMode: DRY_RUN or SAVE
+	 * @return RuleActionBean summary
+	 */
+	HashMap<String, ArrayList<String>> runRulesInImportData(Boolean optimiseRuleValidator, Connection connection,
 			List<ImportDataRuleRunnerContainer> containers, Set<Integer> skippedItemIds, StudyBean study,
 			UserAccountBean ub, ExecutionMode executionMode);
 
-	public abstract HashMap<String, ArrayList<String>> runRulesInImportData(Boolean optimiseRuleValidator,
-			Connection connection, List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub,
-			ExecutionMode executionMode);
-
-	public abstract HashMap<String, ArrayList<String>> runRulesInImportData(Boolean optimiseRuleValidator,
-			Connection connection, List<ImportDataRuleRunnerContainer> containers, Set<Integer> skippedItemIds,
-			StudyBean study, UserAccountBean ub, ExecutionMode executionMode);
-
-	public abstract List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(StudyBean study,
-			StudyEventDefinitionBean sed, CRFVersionBean crfVersion);
-
-	/*
-	 * Used to Manage RuleSets ,Hence will return all RuleSets whether removed or not
+	/**
+	 * Gets RuleSets by CRF study and StudyEventDefinition.
+	 * 
+	 * @param study
+	 *            study to be used.
+	 * @param sed
+	 *            StudyEventDefinition to be used.
+	 * @param crfVersion
+	 *            CRFVersion to be used.
+	 * @return list of RuleSetBeans
 	 */
-	public abstract List<RuleSetBean> getRuleSetsByStudy(StudyBean study);
+	List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(StudyBean study, StudyEventDefinitionBean sed,
+			CRFVersionBean crfVersion);
 
-	@Transactional
-	public int getCountWithFilter(ViewRuleAssignmentFilter viewRuleAssignmentFilter);
+	/**
+	 * Gets all RuleSets of a study, both removed and available.
+	 * 
+	 * @param study
+	 *            study to be used.
+	 * @return list of RuleSetBeans
+	 */
+	List<RuleSetBean> getRuleSetsByStudy(StudyBean study);
 
+	/**
+	 * Gets count with filter.
+	 * 
+	 * @param viewRuleAssignmentFilter
+	 *            ViewRuleAssignmentFilter to be used.
+	 * @return count.
+	 */
 	@Transactional
-	public int getCountByStudy(StudyBean study);
+	int getCountWithFilter(ViewRuleAssignmentFilter viewRuleAssignmentFilter);
 
+	/**
+	 * Gets count by study.
+	 * 
+	 * @param study
+	 *            study to be used.
+	 * @return count
+	 */
 	@Transactional
-	public List<RuleSetRuleBean> getWithFilterAndSort(ViewRuleAssignmentFilter viewRuleAssignmentFilter,
+	int getCountByStudy(StudyBean study);
+
+	/**
+	 * Gets RuleSetRules with filter and sort.
+	 * 
+	 * @param viewRuleAssignmentFilter
+	 *            filter to be used.
+	 * @param viewRuleAssignmentSort
+	 *            sort to be used.
+	 * @param rowStart
+	 *            first row
+	 * @param rowEnd
+	 *            last row
+	 * @return list of RuleSetRules
+	 */
+	@Transactional
+	List<RuleSetRuleBean> getWithFilterAndSort(ViewRuleAssignmentFilter viewRuleAssignmentFilter,
 			ViewRuleAssignmentSort viewRuleAssignmentSort, int rowStart, int rowEnd);
 
-	// . TODO: why are we including study but not using it in query
-	public abstract RuleSetBean getRuleSetById(StudyBean study, String id);
+	/**
+	 * Gets RuleSet by id.
+	 * 
+	 * @param study
+	 *            study it belongs to.
+	 * @param id
+	 *            id of RuleSet
+	 * @return RuleSet
+	 */
+	RuleSetBean getRuleSetById(StudyBean study, String id);
 
+	/**
+	 * Gets RuleSetRule by id.
+	 * 
+	 * @param study
+	 *            study it belongs to
+	 * @param id
+	 *            id of RuleSetRule
+	 * @param ruleBean
+	 *            RuleSet it belongs to
+	 * @return RuleSetRule
+	 */
 	@Transactional
-	public abstract List<RuleSetRuleBean> getRuleSetById(StudyBean study, String id, RuleBean ruleBean);
+	List<RuleSetRuleBean> getRuleSetById(StudyBean study, String id, RuleBean ruleBean);
 
-	public abstract List<RuleSetBean> getRuleSetsByCrfAndStudy(CRFBean crfBean, StudyBean study);
+	/**
+	 * Gets RuleSets by CRF and Study.
+	 * 
+	 * @param crfBean
+	 *            CRF to be used.
+	 * @param study
+	 *            study to be used.
+	 * @return list of RuleSetBeans
+	 */
+	List<RuleSetBean> getRuleSetsByCrfAndStudy(CRFBean crfBean, StudyBean study);
 
+	/**
+	 * Filters by status available only for RuleSetRules.
+	 * 
+	 * @param ruleSets
+	 *            RuleSets to be filtered.
+	 * @return filter RuleSets
+	 */
 	@Transactional
-	public abstract List<RuleSetBean> filterByStatusEqualsAvailableOnlyRuleSetRules(List<RuleSetBean> ruleSets);
+	List<RuleSetBean> filterByStatusEqualsAvailableOnlyRuleSetRules(List<RuleSetBean> ruleSets);
 
+	/**
+	 * Filters by status available.
+	 * 
+	 * @param ruleSets
+	 *            RuleSets to filter
+	 * @return filtered RuleSets
+	 */
 	@Transactional
-	public abstract List<RuleSetBean> filterByStatusEqualsAvailable(List<RuleSetBean> ruleSets);
+	List<RuleSetBean> filterByStatusEqualsAvailable(List<RuleSetBean> ruleSets);
 
+	/**
+	 * Filters by rules.
+	 * 
+	 * @param ruleSet
+	 *            RuleSetContaining RuleSetRules to be filtered
+	 * @param ruleBeanId
+	 *            RuleSet id to filter
+	 * @return RuleSet with filter rules
+	 */
 	@Transactional
-	public abstract RuleSetBean filterByRules(RuleSetBean ruleSet, Integer ruleBeanId);
+	RuleSetBean filterByRules(RuleSetBean ruleSet, Integer ruleBeanId);
 
-	public RuleSetBean getObjects(RuleSetBean ruleSetBean);
+	/**
+	 * Initializes RuleSet properties.
+	 * 
+	 * @param ruleSetBean
+	 *            RuleSet to be initialized.
+	 * @return initialized RuleSet
+	 */
+	RuleSetBean getObjects(RuleSetBean ruleSetBean);
 
 	/**
 	 * Use in DataEntry Rule Execution Scenarios
@@ -153,118 +406,208 @@ public interface RuleSetServiceInterface {
 	 * to SE_TESTINGF[x].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[ALL].I_AGEN_DOSEDATE64 where x is the studyEventId.
 	 * 
 	 * @param ruleSets
+	 *            RuleSets to be filtered
 	 * @param studyEvent
+	 *            StudyEvent to be used.
 	 * @param crfVersion
-	 *            TODO
+	 *            CRFVersion to be used. TODO
 	 * @param studyEventDefinition
-	 *            TODO
-	 * @return
+	 *            StudyEventDefinition to be used. TODO
+	 * @return filtered RuleSetBeans
 	 */
 	@Transactional
-	public abstract List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets,
-			StudyEventBean studyEvent, CRFVersionBean crfVersion, StudyEventDefinitionBean studyEventDefinition);
+	List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, StudyEventBean studyEvent,
+			CRFVersionBean crfVersion, StudyEventDefinitionBean studyEventDefinition);
 
-	public abstract List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, String crfVersionId);
+	/**
+	 * Filters RuleSets by StudyEventOrdinal.
+	 * 
+	 * @param ruleSets
+	 *            RuleSets to be filtered.
+	 * @param crfVersionId
+	 *            Crf Version Id to be used
+	 * @return filtered RuleSetBeans
+	 */
+	List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, String crfVersionId);
 
 	/**
 	 * Iterate over ruleSet.getExpressions(). Given the following expression
 	 * SE_TESTINGF[studyEventId].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[X].I_AGEN_DOSEDATE64 X could be : ALL , "" , Number if
-	 * ALL or "" then iterate over all group ordinals if they exist and add. if Number just add the number
+	 * ALL or "" then iterate over all group ordinals if they exist and add. if Number just add the number.
 	 * 
 	 * @param ruleSets
+	 *            RuleSets to be used.
 	 * @param grouped
-	 * @return
+	 *            form properties to use.
+	 * @return list of solidified RuleSets
 	 */
 	@Transactional
-	public abstract List<RuleSetBean> solidifyGroupOrdinalsUsingFormProperties(List<RuleSetBean> ruleSets,
+	List<RuleSetBean> solidifyGroupOrdinalsUsingFormProperties(List<RuleSetBean> ruleSets,
 			HashMap<String, Integer> grouped);
 
+	/**
+	 * Filters RuleSets by section and group ordinal.
+	 * 
+	 * @param ruleSets
+	 *            RuleSets to filter
+	 * @param grouped
+	 *            properties to use
+	 * @return filtered RuleSets
+	 */
 	@Transactional
-	public abstract List<RuleSetBean> filterRuleSetsBySectionAndGroupOrdinal(List<RuleSetBean> ruleSets,
+	List<RuleSetBean> filterRuleSetsBySectionAndGroupOrdinal(List<RuleSetBean> ruleSets,
 			HashMap<String, Integer> grouped);
 
 	/**
 	 * Iterate over rulesets and remove those which are currently hidden.
 	 * 
-	 * @param allItems
+	 * @param ruleSets
+	 *            RuleSets to be used.
+	 * @param eventCrf
+	 *            EventCRF to be used.
+	 * @param crfVersion
+	 *            CRFVersion to be used.
+	 * @param itemBeansWithSCDShown
+	 *            Items with SCD shown
+	 * @return filtered RuleSets
 	 */
-	public abstract List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf,
+	List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf,
 			CRFVersionBean crfVersion, List<ItemBean> itemBeansWithSCDShown);
 
 	/**
 	 * Iterate over ruleSet.getExpressions(). Given the following expression
 	 * SE_TESTINGF[studyEventId].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[X].I_AGEN_DOSEDATE64 X could be : ALL , "" , Number
-	 * case 1 : if "" then iterate over itemDatas if they exist add. case 2 : if Number just add the number
+	 * case 1 : if "" then iterate over itemDatas if they exist add. case 2 : if Number just add the number.
 	 * 
 	 * @param ruleSets
-	 * @param grouped
-	 * @return
+	 *            RuleSets to be used.
+	 * @return filtered RuleSets
 	 */
-	public abstract List<RuleSetBean> filterRuleSetsByGroupOrdinal(List<RuleSetBean> ruleSets);
-
-	@Transactional
-	public abstract List<String> getGroupOrdinalPlusItemOids(List<RuleSetBean> ruleSets);
-
-	@Transactional
-	public abstract RuleSetBean replaceCrfOidInTargetExpression(RuleSetBean ruleSetBean, String replacementCrfOid);
-
-	public String getContextPath();
-
-	public void setContextPath(String contextPath);
-
-	public void setRequestURLMinusServletPath(String requestURLMinusServletPath);
-
-	public abstract String getRequestURLMinusServletPath();
+	List<RuleSetBean> filterRuleSetsByGroupOrdinal(List<RuleSetBean> ruleSets);
 
 	/**
-	 * @return the ruleSetDao
+	 * Gets group ordinal and item oids in a String list.
+	 * 
+	 * @param ruleSets
+	 *            RuleSets to use.
+	 * @return list of group ordinals plus item oids
 	 */
-	public abstract RuleSetDao getRuleSetDao();
+	@Transactional
+	List<String> getGroupOrdinalPlusItemOids(List<RuleSetBean> ruleSets);
 
 	/**
+	 * Replaces crf oid in target expression.
+	 * 
+	 * @param ruleSetBean
+	 *            RuleSet to use
+	 * @param replacementCrfOid
+	 *            new crf oid
+	 * @return RuleSet with replaced crf oid
+	 */
+	@Transactional
+	RuleSetBean replaceCrfOidInTargetExpression(RuleSetBean ruleSetBean, String replacementCrfOid);
+
+	/**
+	 * Gets context path.
+	 * 
+	 * @return context path
+	 */
+	String getContextPath();
+
+	/**
+	 * Sets context path.
+	 * 
+	 * @param contextPath
+	 *            context path to set.
+	 */
+	void setContextPath(String contextPath);
+
+	/**
+	 * Sets request url excluding servlet path.
+	 * 
+	 * @param requestURLMinusServletPath
+	 *            path to set.
+	 */
+	void setRequestURLMinusServletPath(String requestURLMinusServletPath);
+
+	/**
+	 * Gets request path excluding servlet path.
+	 * 
+	 * @return request path
+	 */
+	String getRequestURLMinusServletPath();
+
+	/**
+	 * Gets RuleSetDao.
+	 * 
+	 * @return the ruleSetDao.
+	 */
+	RuleSetDao getRuleSetDao();
+
+	/**
+	 * Sets RuleSetDao.
+	 * 
 	 * @param ruleSetDao
 	 *            the ruleSetDao to set
 	 */
-	public abstract void setRuleSetDao(RuleSetDao ruleSetDao);
+	void setRuleSetDao(RuleSetDao ruleSetDao);
 
 	/**
+	 * Sets RuleSetRuleDao.
+	 * 
 	 * @param ruleSetRuleDao
 	 *            the ruleSetRuleDao to set
 	 */
-	public abstract void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao);
+	void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao);
 
 	/**
 	 * @return the ruleSetRuleDao
 	 */
-	public abstract RuleSetRuleDao getRuleSetRuleDao();
+	RuleSetRuleDao getRuleSetRuleDao();
 
 	/**
 	 * @return the ruleDao
 	 */
-	public abstract RuleDao getRuleDao();
+	RuleDao getRuleDao();
 
 	/**
 	 * @param ruleDao
 	 *            the ruleDao to set
 	 */
-	public abstract void setRuleDao(RuleDao ruleDao);
+	void setRuleDao(RuleDao ruleDao);
 
-	public RuleSetAuditDao getRuleSetAuditDao();
+	/**
+	 * @return the RuleSetAuditDao
+	 */
+	RuleSetAuditDao getRuleSetAuditDao();
 
-	public void setRuleSetAuditDao(RuleSetAuditDao ruleSetAuditDao);
+	/**
+	 * @param ruleSetAuditDao
+	 *            to set
+	 */
+	void setRuleSetAuditDao(RuleSetAuditDao ruleSetAuditDao);
 
-	public JavaMailSenderImpl getMailSender();
+	/**
+	 * @return JavaMailSender
+	 */
+	JavaMailSenderImpl getMailSender();
 
-	public void setMailSender(JavaMailSenderImpl mailSender);
+	/**
+	 * @param mailSender
+	 *            to set
+	 */
+	void setMailSender(JavaMailSenderImpl mailSender);
 
 	/**
 	 * Return true if there is at least one rule should be run for a phase.
 	 * 
 	 * @param ruleSets
+	 *            to be used
 	 * @param phase
-	 * @return
+	 *            phase to check
+	 * @return true if yes, false if no
 	 */
 	@Transactional
-	public boolean shouldRunRulesForRuleSets(List<RuleSetBean> ruleSets, Phase phase);
+	boolean shouldRunRulesForRuleSets(List<RuleSetBean> ruleSets, Phase phase);
 
 }
