@@ -430,11 +430,12 @@ public class WidgetsLayoutController {
 
 		int availableSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.AVAILABLE);
 		int removedSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.DELETED);
+		int autoRemovedSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.AUTO_DELETED);
 		int lockedSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.LOCKED);
 		int signedSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.SIGNED);
 
 		model.addAttribute("countOfAvailableSubjects", availableSubjects);
-		model.addAttribute("countOfRemovedSubjects", removedSubjects);
+		model.addAttribute("countOfRemovedSubjects", removedSubjects + autoRemovedSubjects);
 		model.addAttribute("countOfLockedSubjects", lockedSubjects);
 		model.addAttribute("countOfSignedSubjects", signedSubjects);
 
