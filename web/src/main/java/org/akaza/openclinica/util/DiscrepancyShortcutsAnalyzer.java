@@ -1,9 +1,19 @@
+/*******************************************************************************
+ * CLINOVO RESERVES ALL RIGHTS TO THIS SOFTWARE, INCLUDING SOURCE AND DERIVED BINARY CODE. BY DOWNLOADING THIS SOFTWARE YOU AGREE TO THE FOLLOWING LICENSE:
+ *
+ * Subject to the terms and conditions of this Agreement including, Clinovo grants you a non-exclusive, non-transferable, non-sublicenseable limited license without license fees to reproduce and use internally the software complete and unmodified for the sole purpose of running Programs on one computer.
+ * This license does not allow for the commercial use of this software except by IRS approved non-profit organizations; educational entities not working in joint effort with for profit business.
+ * To use the license for other purposes, including for profit clinical trials, an additional paid license is required. Please contact our licensing department at http://www.clinovo.com/contact for pricing information.
+ *
+ * You may not modify, decompile, or reverse engineer the software.
+ * Clinovo disclaims any express or implied warranty of fitness for use.
+ * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
+ * THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. CLINOVO FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
+
+ * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
+ *******************************************************************************/
 package org.akaza.openclinica.util;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -14,6 +24,14 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Class for building and containing discrepancy notes analyzing objects that will be placed on data entry UX.
+ */
 public class DiscrepancyShortcutsAnalyzer {
 
 	public static final String DISCREPANCY_SHORTCUTS_ANALYZER = "discrepancyShortcutsAnalyzer";
@@ -27,6 +45,12 @@ public class DiscrepancyShortcutsAnalyzer {
 	public static final String SECTION_ID = "sectionId";
 	public static final String TAB_ID = "tabId";
 	public static final String DOMAIN_NAME = "domain_name";
+
+	public static final int RES_STATUS_OPEN = 1;
+	public static final int RES_STATUS_UPDATED = 2;
+	public static final int RES_STATUS_RESOLVED = 3;
+	public static final int RES_STATUS_CLOSED = 4;
+	public static final int RES_STATUS_NOT_APPLICABLE = 5;
 
 	private boolean hasNotes;
 
@@ -52,6 +76,9 @@ public class DiscrepancyShortcutsAnalyzer {
 		return totalNew;
 	}
 
+	/**
+	 * Increases total number of new notes.
+	 */
 	public void incTotalNew() {
 		totalNew++;
 	}
@@ -60,6 +87,9 @@ public class DiscrepancyShortcutsAnalyzer {
 		return totalUpdated;
 	}
 
+	/**
+	 * Increases total number of updated notes.
+	 */
 	public void incTotalUpdated() {
 		totalUpdated++;
 	}
@@ -68,6 +98,9 @@ public class DiscrepancyShortcutsAnalyzer {
 		return totalResolutionProposed;
 	}
 
+	/**
+	 * Increases total number of resolution proposed notes.
+	 */
 	public void incTotalResolutionProposed() {
 		totalResolutionProposed++;
 	}
@@ -76,6 +109,9 @@ public class DiscrepancyShortcutsAnalyzer {
 		return totalClosed;
 	}
 
+	/**
+	 * Increases total number of closed notes.
+	 */
 	public void incTotalClosed() {
 		totalClosed++;
 	}
@@ -84,6 +120,9 @@ public class DiscrepancyShortcutsAnalyzer {
 		return totalAnnotations;
 	}
 
+	/**
+	 * Increases total number of annotation notes.
+	 */
 	public void incTotalAnnotations() {
 		totalAnnotations++;
 	}
@@ -92,6 +131,9 @@ public class DiscrepancyShortcutsAnalyzer {
 		return sectionTotalNew;
 	}
 
+	/**
+	 * Increases number of total section notes.
+	 */
 	public void incSectionTotalNew() {
 		sectionTotalNew++;
 	}
@@ -100,6 +142,9 @@ public class DiscrepancyShortcutsAnalyzer {
 		return sectionTotalUpdated;
 	}
 
+	/**
+	 * Increases number of updated section notes.
+	 */
 	public void incSectionTotalUpdated() {
 		sectionTotalUpdated++;
 	}
@@ -108,6 +153,9 @@ public class DiscrepancyShortcutsAnalyzer {
 		return sectionTotalResolutionProposed;
 	}
 
+	/**
+	 * Increases number of resolution proposed section notes.
+	 */
 	public void incSectionTotalResolutionProposed() {
 		sectionTotalResolutionProposed++;
 	}
@@ -116,6 +164,9 @@ public class DiscrepancyShortcutsAnalyzer {
 		return sectionTotalClosed;
 	}
 
+	/**
+	 * Increases number of closed section notes.
+	 */
 	public void incSectionTotalClosed() {
 		sectionTotalClosed++;
 	}
@@ -124,6 +175,9 @@ public class DiscrepancyShortcutsAnalyzer {
 		return sectionTotalAnnotations;
 	}
 
+	/**
+	 * Increases number of annotation section notes.
+	 */
 	public void incSectionTotalAnnotations() {
 		sectionTotalAnnotations++;
 	}
@@ -176,6 +230,15 @@ public class DiscrepancyShortcutsAnalyzer {
 		this.hasNotes = hasNotes;
 	}
 
+	/**
+	 * Select section bean from the list by section id.
+	 * 
+	 * @param sections
+	 *            the list with eCRF sections.
+	 * @param sectionId
+	 *            the current section id.
+	 * @return the current section bean.
+	 */
 	public static int getTabNum(List<SectionBean> sections, int sectionId) {
 		int tabNum = 1;
 		if (sections != null && sections.size() > 0) {
@@ -206,38 +269,48 @@ public class DiscrepancyShortcutsAnalyzer {
 			currentSectionId = fp.getInt(SECTION_ID, true) == 0 ? (sections != null && sections.size() > 0 ? sections
 					.get(0).getId() : 0) : fp.getInt(SECTION_ID, true);
 		}
+
+		String cw = fp.getRequest().getParameter("cw");
+		String closeWindowParameter = cw != null ? "&cw=1" : "";
 		if (servletPath.equalsIgnoreCase("/ResolveDiscrepancy")
 				|| servletPath.equalsIgnoreCase("/ViewSectionDataEntry")
 				|| servletPath.equalsIgnoreCase("/ViewSectionDataEntryRESTUrlServlet")) {
-			link = currentSectionId == ifmbean.getSectionId() ? "" : fp.getRequest().getScheme() + "://" + fp.getRequest().getSession().getAttribute(DOMAIN_NAME) + fp.getRequest().getRequestURI()
-					.replaceAll(fp.getRequest().getServletPath(), "/ViewSectionDataEntry")
-					+ "?eventCRFId="
-					+ eventCrfBean.getId()
-					+ "&crfVersionId="
-					+ eventCrfBean.getCRFVersionId()
-					+ "&sectionId="
-					+ ifmbean.getSectionId()
-					+ "&tabId="
-					+ tabNum
-					+ "&studySubjectId="
-					+ eventCrfBean.getStudySubjectId()
-					+ "&eventDefinitionCRFId="
-					+ eventDefinitionCRFId
+			link = currentSectionId == ifmbean.getSectionId() ? "" : fp.getRequest().getScheme()
+					+ "://"
+					+ fp.getRequest().getSession().getAttribute(DOMAIN_NAME)
+					+ fp.getRequest().getRequestURI()
+							.replaceAll(fp.getRequest().getServletPath(), "/ViewSectionDataEntry") + "?eventCRFId="
+					+ eventCrfBean.getId() + closeWindowParameter + "&crfVersionId=" + eventCrfBean.getCRFVersionId()
+					+ "&sectionId=" + ifmbean.getSectionId() + "&tabId=" + tabNum + "&studySubjectId="
+					+ eventCrfBean.getStudySubjectId() + "&eventDefinitionCRFId=" + eventDefinitionCRFId
 					+ (fp.getString("exitTo", true).isEmpty() ? "" : "&exitTo=" + fp.getString("exitTo", true));
 		} else {
-			link = currentTabId == tabNum ? "" : fp.getRequest().getScheme() + "://" + fp.getRequest().getSession().getAttribute(DOMAIN_NAME) + fp.getRequest().getRequestURI()
-					.replaceAll(fp.getRequest().getServletPath(), servletPath)
-					+ "?eventCRFId="
-					+ eventCrfBean.getId()
-					+ "&sectionId="
-					+ ifmbean.getSectionId()
-					+ "&tabId="
-					+ tabNum
+			link = currentTabId == tabNum ? "" : fp.getRequest().getScheme() + "://"
+					+ fp.getRequest().getSession().getAttribute(DOMAIN_NAME)
+					+ fp.getRequest().getRequestURI().replaceAll(fp.getRequest().getServletPath(), servletPath)
+					+ "?eventCRFId=" + eventCrfBean.getId() + closeWindowParameter + "&sectionId="
+					+ ifmbean.getSectionId() + "&tabId=" + tabNum
 					+ (fp.getString("exitTo", true).isEmpty() ? "" : "&exitTo=" + fp.getString("exitTo", true));
 		}
 		return link;
 	}
 
+	/**
+	 * Generates discrepancy note urls for jumping between sections.
+	 * 
+	 * @param request
+	 *            the incoming request.
+	 * @param eventCrfBean
+	 *            the event crf bean for current crf.
+	 * @param ifmdao
+	 *            the item metadata bean for current crf.
+	 * @param eventDefinitionCRFId
+	 *            the event crf definition id.
+	 * @param sections
+	 *            the list of event crf sections.
+	 * @param noteThreads
+	 *            the list of discrepancy notes group.
+	 */
 	public static void prepareDnShortcutLinks(HttpServletRequest request, EventCRFBean eventCrfBean,
 			ItemFormMetadataDAO ifmdao, int eventDefinitionCRFId, List<SectionBean> sections,
 			List<DiscrepancyNoteThread> noteThreads) {
@@ -298,6 +371,16 @@ public class DiscrepancyShortcutsAnalyzer {
 		}
 	}
 
+	/**
+	 * Generates url anchors suffixes for current note threads.
+	 * 
+	 * @param request
+	 *            the incoming request.
+	 * @param dib
+	 *            the crf item that should be highlighted.
+	 * @param noteThreads
+	 *            the list of discrepancy notes threads.
+	 */
 	public static void prepareDnShortcutAnchors(HttpServletRequest request, DisplayItemBean dib,
 			List<DiscrepancyNoteThread> noteThreads) {
 		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = (DiscrepancyShortcutsAnalyzer) request
@@ -308,41 +391,38 @@ public class DiscrepancyShortcutsAnalyzer {
 				if (tempBean != null && tempBean.getEntityType().equalsIgnoreCase("itemData")
 						&& tempBean.getParentDnId() == 0) {
 					switch (tempBean.getResolutionStatusId()) {
-					case 1: {
+					case RES_STATUS_OPEN:
 						discrepancyShortcutsAnalyzer.incSectionTotalNew();
 						if (discrepancyShortcutsAnalyzer.getSectionTotalNew() == 1) {
 							dib.setFirstNewDn(true);
 						}
 						break;
-					}
-					case 2: {
+					case RES_STATUS_UPDATED:
 						discrepancyShortcutsAnalyzer.incSectionTotalUpdated();
 						if (discrepancyShortcutsAnalyzer.getSectionTotalUpdated() == 1) {
 							dib.setFirstUpdatedDn(true);
 						}
 						break;
-					}
-					case 3: {
+					case RES_STATUS_RESOLVED:
 						discrepancyShortcutsAnalyzer.incSectionTotalResolutionProposed();
 						if (discrepancyShortcutsAnalyzer.getSectionTotalResolutionProposed() == 1) {
 							dib.setFirstResolutionProposed(true);
 						}
 						break;
-					}
-					case 4: {
+					case RES_STATUS_CLOSED:
 						discrepancyShortcutsAnalyzer.incSectionTotalClosed();
 						if (discrepancyShortcutsAnalyzer.getSectionTotalClosed() == 1) {
 							dib.setFirstClosedDn(true);
+							break;
 						}
-						break;
-					}
-					case 5: {
+					case RES_STATUS_NOT_APPLICABLE:
 						discrepancyShortcutsAnalyzer.incSectionTotalAnnotations();
 						if (discrepancyShortcutsAnalyzer.getSectionTotalAnnotations() == 1) {
 							dib.setFirstAnnotation(true);
 						}
 						break;
-					}
+					default:
+						break;
 					}
 				}
 			}
