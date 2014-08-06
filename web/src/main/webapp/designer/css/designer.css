@@ -405,6 +405,11 @@ div {
 	max-height: 500px;
 }
 
+.ds-scrollable {
+  overflow-y: auto;
+  max-height: 150px;
+}
+
 td.group, td.ui-draggable {
   text-align: left;
 }
