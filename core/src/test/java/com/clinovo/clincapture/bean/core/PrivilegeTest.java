@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009-2013 Clinovo Inc.
+ * Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
  * 
@@ -10,19 +10,19 @@
 
 package com.clinovo.clincapture.bean.core;
 
+import org.akaza.openclinica.bean.core.Privilege;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import org.akaza.openclinica.bean.core.Privilege;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.junit.Before;
-import org.junit.Test;
 
 public class PrivilegeTest {
 
@@ -31,6 +31,10 @@ public class PrivilegeTest {
 	public static final String INVESTIGATOR_KEY = "investigator";
 	public static final String CLINICAL_RESEARCH_COORDINATOR_KEY = "clinical_research_coordinator";
 	public static final String STUDY_MONITOR_KEY = "study_monitor";
+	public static final int THREE = 3;
+	public static final int FOUR = 4;
+	public static final int FIVE = 5;
+	public static final int EIGHT = 8;
 
 	private Privilege privilege;
 	private ResourceBundle resterm;
@@ -59,7 +63,7 @@ public class PrivilegeTest {
 
 	@Test
 	public void testInvestigator() {
-		privilege = Privilege.get(3);
+		privilege = Privilege.get(THREE);
 		assertEquals(Privilege.INVESTIGATOR, privilege);
 		assertEquals(resterm.getString(INVESTIGATOR_KEY), privilege.getName());
 		assertNull(privilege.getDescription());
@@ -67,7 +71,7 @@ public class PrivilegeTest {
 
 	@Test
 	public void testResearchAssistant() {
-		privilege = Privilege.get(4);
+		privilege = Privilege.get(FOUR);
 		assertEquals(Privilege.CLINICAL_RESEARCH_COORDINATOR, privilege);
 		assertEquals(resterm.getString(CLINICAL_RESEARCH_COORDINATOR_KEY), privilege.getName());
 		assertNull(privilege.getDescription());
@@ -75,7 +79,7 @@ public class PrivilegeTest {
 
 	@Test
 	public void testMonitor() {
-		privilege = Privilege.get(5);
+		privilege = Privilege.get(FIVE);
 		assertEquals(Privilege.STUDY_MONITOR, privilege);
 		assertEquals(resterm.getString(STUDY_MONITOR_KEY), privilege.getName());
 		assertNull(privilege.getDescription());
@@ -86,7 +90,7 @@ public class PrivilegeTest {
 		assertNull(Privilege.get(-1));
 		assertNull(Privilege.get(0));
 		assertNotNull(Privilege.get(2));
-		assertNull(Privilege.get(7));
+		assertNull(Privilege.get(EIGHT));
 	}
 
 	@Test
@@ -94,6 +98,6 @@ public class PrivilegeTest {
 		assertFalse(Privilege.contains(-1));
 		assertFalse(Privilege.contains(0));
 		assertTrue(Privilege.contains(2));
-		assertFalse(Privilege.contains(7));
+		assertFalse(Privilege.contains(EIGHT));
 	}
 }

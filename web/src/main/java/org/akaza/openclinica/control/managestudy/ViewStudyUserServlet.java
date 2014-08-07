@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -36,26 +36,27 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@SuppressWarnings({ "serial" })
+/**
+ * Servlet for view user account page.
+ * 
+ */
+
 @Component
+@SuppressWarnings({ "serial" })
 public class ViewStudyUserServlet extends Controller {
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
 		}
-
 		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_USER_IN_STUDY_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -67,32 +68,27 @@ public class ViewStudyUserServlet extends Controller {
 		String name = request.getParameter("name");
 		String studyIdString = request.getParameter("studyId");
 
-		{
+		if (StringUtil.isBlank(name) || StringUtil.isBlank(studyIdString)) {
+			addPageMessage(respage.getString("please_choose_a_user_to_view"), request);
+			forwardPage(Page.LIST_USER_IN_STUDY_SERVLET, request, response);
+		} else {
+			int studyId = Integer.parseInt(studyIdString.trim());
+			UserAccountBean user = (UserAccountBean) udao.findByUserName(name);
 
-			if (StringUtil.isBlank(name) || StringUtil.isBlank(studyIdString)) {
-				addPageMessage(respage.getString("please_choose_a_user_to_view"), request);
-				forwardPage(Page.LIST_USER_IN_STUDY_SERVLET, request, response);
-			} else {
-				int studyId = Integer.parseInt(studyIdString.trim());
-				UserAccountBean user = (UserAccountBean) udao.findByUserName(name);
+			request.setAttribute("user", user);
 
-				request.setAttribute("user", user);
+			StudyUserRoleBean uRole = udao.findRoleByUserNameAndStudyId(name, studyId);
+			request.setAttribute("uRole", uRole);
 
-				StudyUserRoleBean uRole = udao.findRoleByUserNameAndStudyId(name, studyId);
-				request.setAttribute("uRole", uRole);
+			StudyDAO sdao = new StudyDAO(getDataSource());
+			StudyBean study = (StudyBean) sdao.findByPK(studyId);
+			request.setAttribute("uStudy", study);
+			request.setAttribute("roleMap", Role.ROLE_MAP);
 
-				StudyDAO sdao = new StudyDAO(getDataSource());
-				StudyBean study = (StudyBean) sdao.findByPK(studyId);
-				request.setAttribute("uStudy", study);
-				request.setAttribute("roleMap", Role.roleMap);
-				// To provide the view with the correct date format
-				// pattern, locale sensitive
-				String pattn = ResourceBundleProvider.getFormatBundle().getString("date_format_string");
-				request.setAttribute("dateFormatPattern", pattn);
-				request.setAttribute("action", "");
-				forwardPage(Page.VIEW_USER_IN_STUDY, request, response);
-
-			}
+			String pattn = ResourceBundleProvider.getFormatBundle().getString("date_format_string");
+			request.setAttribute("dateFormatPattern", pattn);
+			request.setAttribute("action", "");
+			forwardPage(Page.VIEW_USER_IN_STUDY, request, response);
 		}
 	}
 }

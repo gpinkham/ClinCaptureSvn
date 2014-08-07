@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -31,6 +31,10 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Servlet for user role action validation.
+ * 
+ */
 @SuppressWarnings({ "serial" })
 @Component
 public class SubmitDataServlet extends Controller {
@@ -40,13 +44,23 @@ public class SubmitDataServlet extends Controller {
 		forwardPage(Page.SUBMIT_DATA, request, response);
 	}
 
+	/**
+	 * Check if user have access for data review.
+	 * 
+	 * @param ub
+	 *            the user account bean.
+	 * @param currentRole
+	 *            the current study user role.
+	 * @return true if user have access for data review, false otherwise.
+	 */
 	public static boolean mayViewData(UserAccountBean ub, StudyUserRoleBean currentRole) {
 		if (currentRole != null) {
 			Role r = currentRole.getRole();
 			if (r != null
 					&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
 							|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
-							|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_MONITOR) || r.equals(Role.STUDY_CODER))) {
+							|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_MONITOR)
+							|| r.equals(Role.STUDY_CODER) || r.equals(Role.STUDY_EVALUATOR))) {
 				return true;
 			}
 		}
@@ -54,13 +68,21 @@ public class SubmitDataServlet extends Controller {
 		return false;
 	}
 
+	/**
+	 * Check if user have access for data entry.
+	 * 
+	 * @param ub
+	 *            the user account bean.
+	 * @param currentRole
+	 *            the current study user role.
+	 * @return true if user have access for data entry, false otherwise.
+	 */
 	public static boolean maySubmitData(UserAccountBean ub, StudyUserRoleBean currentRole) {
 		if (currentRole != null && ub != null) {
 			Role r = currentRole.getRole();
-			if (r != null
-					&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
-							|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR) || r
-								.equals(Role.CLINICAL_RESEARCH_COORDINATOR))) {
+			if (r != null && (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
+					|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
+					|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR))) {
 				return true;
 			}
 		}

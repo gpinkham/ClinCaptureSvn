@@ -51,13 +51,15 @@
 </c:forEach>
 <c:choose>
     <c:when test="${isStudyLevelUser}">
-        <c:set var="inclRoleCode1" value="2" />
-        <c:set var="inclRoleCode2" value="6" />
-        <c:set var="inclRoleCode3" value="7" />
+        <c:set var="inclRoleCode1" value="2"/>
+        <c:set var="inclRoleCode2" value="6"/>
+        <c:set var="inclRoleCode3" value="7"/>
+        <c:set var="inclRoleCode_eval" value="8"/>
     </c:when>
     <c:otherwise>
-        <c:set var="inclRoleCode1" value="4" />
-        <c:set var="inclRoleCode2" value="5" />
+        <c:set var="inclRoleCode1" value="4"/>
+        <c:set var="inclRoleCode2" value="5"/>
+        <c:set var="inclRoleCode_eval" value="8"/>
     </c:otherwise>
 </c:choose>
 
@@ -108,11 +110,12 @@
                                             </select>
                                         </c:when>
                                         <c:otherwise>
-                                            <select name="studyId" class="formfieldXL" onchange="changeFlag();">
+                                            <select name="studyId" class="formfieldXL" onchange="sendUrl();">
                                                 <c:forEach var="userStudy" items="${studies}" varStatus="status">
+                                                    <c:set var="selectedFlag" value="${selectedStudy.id == userStudy.id ? 'selected' : ''}"/>
                                                     <c:choose>
                                                         <c:when test="${isStudyLevelUser}">
-                                                            <option value="<c:out value="${userStudy.id}"/>"><c:out value="${userStudy.name}"/></option>
+                                                            <option value="<c:out value="${userStudy.id}"/>" ${selectedFlag}><c:out value="${userStudy.name}"/></option>
                                                         </c:when>
                                                         <c:otherwise>
                                                             <c:choose>
@@ -120,7 +123,7 @@
                                                                     <optgroup label="<c:out value="${userStudy.name}"/>" >
                                                                 </c:when>
                                                                 <c:otherwise>
-                                                                    <option value="<c:out value="${userStudy.id}"/>">&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${userStudy.name}"/></option>
+                                                                    <option value="<c:out value="${userStudy.id}"/>" ${selectedFlag}>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${userStudy.name}"/></option>
                                                                     <c:if test="${status.last || studies[status.index + 1].parentStudyId == 0}">
                                                                         </optgroup>
                                                                     </c:if>
@@ -142,7 +145,7 @@
                                         <select name="roleId" class="formfieldXL" onchange="javascript:'changeFlag();'">
                                             <c:if test="${not withoutRoles || selectedStudy ne null}">
                                                 <c:forEach var="currRole" items="${roles}">
-                                                    <c:if test="${currRole.key == inclRoleCode1 || currRole.key == inclRoleCode2 || currRole.key == inclRoleCode3}">
+                                                    <c:if test="${currRole.key == inclRoleCode1 || currRole.key == inclRoleCode2 || currRole.key == inclRoleCode3 || currRole.key == inclRoleCode_eval}">
                                                         <option value='<c:out value="${currRole.key}" />' <c:if test="${role1.id == currRole.key}">selected</c:if>><c:out value="${currRole.value}" /></option>
                                                     </c:if>
                                                 </c:forEach>

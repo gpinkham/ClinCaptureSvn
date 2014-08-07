@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -43,10 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Lists all the users in a study
- * 
- * @author jxu
- * 
+ * Lists all the users in a study.
  * 
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
@@ -54,6 +51,7 @@ import java.util.Map;
 public class ListStudyUserServlet extends RememberLastPage {
 
 	public static final String LIST_STUDY_USER = "listStudyUserUrl";
+	public static final int ACTION_COLUMN_NUM = 6;
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -111,14 +109,14 @@ public class ListStudyUserServlet extends RememberLastPage {
 				resword.getString("last_name"), resword.getString("role"), resword.getString("study_name"),
 				resword.getString("status"), resword.getString("actions") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(6);
+		table.hideColumnLink(ACTION_COLUMN_NUM);
 		table.setQuery("ListStudyUser", new HashMap());
 		table.setRows(allStudyUserRows);
 		table.computeDisplay();
 
 		request.setAttribute("table", table);
 		request.setAttribute("userRolesAvailableCountMap", userRolesAvailableCountMap);
-		request.setAttribute("roleMap", Role.roleMap);
+		request.setAttribute("roleMap", Role.ROLE_MAP);
 		request.setAttribute("study", currentStudy);
 		forwardPage(Page.LIST_USER_IN_STUDY, request, response);
 

@@ -46,7 +46,9 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.hibernate.SessionFactory;
@@ -56,6 +58,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * To avoid the constant loading of beans from the application context, which can take a lot of memory on the test, we
@@ -84,6 +87,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected DynamicEventDao dynamicEventDao;
 	protected StudyGroupClassDAO studyGroupClassDAO;
 	protected DiscrepancyNoteDAO discrepancyNoteDAO;
+	protected ItemGroupMetadataDAO itemGroupMetadataDAO;
 	protected EventDefinitionCRFDAO eventDefinitionCRFDAO;
 	protected StudyEventDefinitionDAO studyEventDefinitionDAO;
 	protected RulesPostImportContainerService postImportContainerService;
@@ -156,6 +160,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 
 	@Before
 	public void initializeDAOs() throws Exception {
+		Locale.setDefault(Locale.ENGLISH);
 
 		super.setUp();
 
@@ -176,6 +181,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		studySubjectDAO = new StudySubjectDAO(dataSource);
 		discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
 		studyGroupClassDAO = new StudyGroupClassDAO(dataSource);
+		itemGroupMetadataDAO = new ItemGroupMetadataDAO(dataSource);
 		eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 
@@ -192,6 +198,10 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 
 			max = (Integer) session.createSQLQuery("SELECT max(dynamic_event_id) from dynamic_event").uniqueResult();
 			session.createSQLQuery("ALTER SEQUENCE dynamic_event_dynamic_event_id_seq RESTART WITH " + (max + 1))
+					.executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(event_crf_id) from event_crf").uniqueResult();
+			session.createSQLQuery("ALTER SEQUENCE event_crf_event_crf_id_seq RESTART WITH " + (max + 1))
 					.executeUpdate();
 
 			max = (Integer) session.createSQLQuery("SELECT max(study_group_class_id) from study_group_class")
@@ -238,6 +248,12 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			session.createSQLQuery("DROP SEQUENCE dynamic_event_dynamic_event_id_seq").executeUpdate();
 			session.createSQLQuery(
 					"CREATE SEQUENCE dynamic_event_dynamic_event_id_seq START WITH " + (max + 1)
+							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(event_crf_id) from event_crf").uniqueResult();
+			session.createSQLQuery("DROP SEQUENCE event_crf_event_crf_id_seq").executeUpdate();
+			session.createSQLQuery(
+					"CREATE SEQUENCE event_crf_event_crf_id_seq START WITH " + (max + 1)
 							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
 
 			max = (Integer) session.createSQLQuery("SELECT max(study_group_class_id) from study_group_class")

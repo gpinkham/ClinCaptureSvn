@@ -1,12 +1,12 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.login;
 
+import com.clinovo.util.StudyParameterPriorityUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -50,31 +51,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Processes the request of changing current study
- * 
- * @author jxu
- * 
+ * Processes the request of changing current study.
+ *
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class ChangeStudyServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
-		//
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 
-		String action = request.getParameter("action");// action sent by user
+		String action = request.getParameter("action");
 		UserAccountDAO udao = getUserAccountDAO();
 		StudyDAO sdao = getStudyDAO();
 
 		ArrayList<StudyUserRoleBean> studies = udao.findStudyByUser(ub, (ArrayList) sdao.findAllNotRemoved());
-		request.setAttribute("roleMap", Role.roleMap);
+		request.setAttribute("roleMap", Role.ROLE_MAP);
 		if (request.getAttribute("label") != null) {
 			String label = (String) request.getAttribute("label");
 			if (label.length() > 0) {
@@ -85,7 +82,6 @@ public class ChangeStudyServlet extends Controller {
 		ArrayList validStudies = new ArrayList();
 		for (StudyUserRoleBean sr : studies) {
 			StudyBean study = (StudyBean) sdao.findByPK(sr.getStudyId());
-			// FIXME too many queries to the DB
 			if (study != null && study.getStatus().equals(Status.PENDING)) {
 				sr.setStatus(study.getStatus());
 			}
@@ -94,20 +90,16 @@ public class ChangeStudyServlet extends Controller {
 
 		if (StringUtil.isBlank(action)) {
 			request.setAttribute("studies", validStudies);
-
 			forwardPage(Page.CHANGE_STUDY, request, response);
 		} else {
-
 			if ("confirm".equalsIgnoreCase(action)) {
-				logger.info("confirm");
+				logger.info("confirm action");
 				confirmChangeStudy(request, response, studies);
-
 			} else if ("submit".equalsIgnoreCase(action)) {
-				logger.info("submit");
+				logger.info("submit action");
 				changeStudy(request, response);
 			}
 		}
-
 	}
 
 	private void confirmChangeStudy(HttpServletRequest request, HttpServletResponse response,
@@ -125,7 +117,7 @@ public class ChangeStudyServlet extends Controller {
 			forwardPage(Page.CHANGE_STUDY, request, response);
 		} else {
 			int studyId = fp.getInt("studyId");
-			logger.info("new study id:" + studyId);
+			logger.info("new study id: " + studyId);
 			for (StudyUserRoleBean studyWithRole : studies) {
 				if (studyWithRole.getStudyId() == studyId) {
 					if (studyWithRole.getParentStudyId() > 0) {
@@ -141,7 +133,6 @@ public class ChangeStudyServlet extends Controller {
 				}
 			}
 			addPageMessage(restext.getString("no_study_selected"), request);
-
 			forwardPage(Page.CHANGE_STUDY, request, response);
 		}
 	}
@@ -164,8 +155,7 @@ public class ChangeStudyServlet extends Controller {
 
 		ArrayList studyParameters = spvdao.findParamConfigByStudy(current);
 		current.setStudyParameters(studyParameters);
-		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
-				.getId();
+		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
 		StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
 		current.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
 		String idSetting = current.getStudyParameterConfig().getSubjectIdGeneration();
@@ -175,18 +165,14 @@ public class ChangeStudyServlet extends Controller {
 		}
 
 		StudyConfigService scs = getStudyConfigService();
-		if (current.getParentStudyId() <= 0) {// top study
+		if (current.getParentStudyId() <= 0) {
 			scs.setParametersForStudy(current);
 
 		} else {
-			// YW <<
 			if (current.getParentStudyId() > 0) {
 				current.setParentStudyName(sdao.findByPK(current.getParentStudyId()).getName());
-
 			}
-			// YW 06-12-2007>>
 			scs.setParametersForSite(current);
-
 		}
 		if (current.getStatus().equals(Status.DELETED) || current.getStatus().equals(Status.AUTO_DELETED)) {
 			request.getSession().removeAttribute("studyWithRole");
@@ -194,12 +180,15 @@ public class ChangeStudyServlet extends Controller {
 		} else {
 			request.getSession().setAttribute("study", current);
 			currentStudy = current;
-			// change user's active study id
 			UserAccountDAO udao = getUserAccountDAO();
 			ub.setActiveStudyId(current.getId());
 			ub.setUpdater(ub);
 			ub.setUpdatedDate(new java.util.Date());
 			udao.update(ub);
+
+			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled(EVALUATION_ENABLED, currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+			request.getSession().setAttribute(EVALUATION_ENABLED, isEvaluationEnabled);
 
 			currentRole = (StudyUserRoleBean) request.getSession().getAttribute("studyWithRole");
 			if (currentRole == null) {
@@ -211,15 +200,11 @@ public class ChangeStudyServlet extends Controller {
 			addPageMessage(restext.getString("current_study_changed_succesfully"), request);
 		}
 		ub.incNumVisitsToMainMenu();
-		// YW 2-18-2008, if study has been really changed <<
 		if (prevStudyId != studyId) {
 			request.getSession().removeAttribute("eventsForCreateDataset");
 			request.getSession().setAttribute("tableFacadeRestore", "false");
 		}
 		request.setAttribute("studyJustChanged", "yes");
-		// YW >>
-
-		// Integer assignedDiscrepancies = getDiscrepancyNoteDAO().countAllItemDataByStudyAndUser(currentStudy, ub);
 		Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(
 				" AND dn.assigned_user_id =" + ub.getId()
 						+ " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)",
@@ -242,10 +227,7 @@ public class ChangeStudyServlet extends Controller {
 			if (currentStudy.getParentStudyId() == 0) {
 				setupStudyStatisticsTable(request, response);
 			}
-
 		}
-
-		// forwardPage(Page.MENU);
 		response.sendRedirect("/" + getContextPath(request) + Page.MENU_SERVLET.getFileName());
 	}
 
@@ -285,7 +267,6 @@ public class ChangeStudyServlet extends Controller {
 		factory.setStudyDao(getStudyDAO());
 		String studySiteStatistics = factory.createTable(request, response).render();
 		request.setAttribute("studySiteStatistics", studySiteStatistics);
-
 	}
 
 	private void setupStudyStatisticsTable(HttpServletRequest request, HttpServletResponse response) {

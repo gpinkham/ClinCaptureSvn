@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -20,8 +20,10 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.StudyParameterPriorityUtil;
 import com.clinovo.util.ValidatorHelper;
 import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Role;
@@ -40,9 +42,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 /**
- * @author ssachs
+ * Servlet for study user role editing.
  * 
- *         Servlet for creating a user account.
  */
 @SuppressWarnings({ "rawtypes", "serial" })
 @Component
@@ -53,20 +54,27 @@ public class EditStudyUserRoleServlet extends Controller {
 	public static final String ARG_STUDY_ID = "studyId";
 	public static final String ARG_USER_NAME = "userName";
 
+	/**
+	 * Returns servlet URL path.
+	 * 
+	 * @param s
+	 *            the active user role.
+	 * @param user
+	 *            the active user account bean
+	 * @return <code>String</code> that contains servlet URL path.
+	 */
 	public static String getLink(StudyUserRoleBean s, UserAccountBean user) {
 		int studyId = s.getStudyId();
 		return PATH + "?" + ARG_STUDY_ID + "=" + studyId + "&" + ARG_USER_NAME + "=" + user.getName();
 	}
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 
+		UserAccountBean ub = getUserAccountBean(request);
 		if (!ub.isSysAdmin()) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study")
-							+ respage.getString("change_study_contact_sysadmin"), request);
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+					+ respage.getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
@@ -74,22 +82,18 @@ public class EditStudyUserRoleServlet extends Controller {
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
 		UserAccountBean ub = getUserAccountBean(request);
-
 		UserAccountDAO udao = getUserAccountDAO();
-
 		FormProcessor fp = new FormProcessor(request);
-
 		int studyId = fp.getInt(ARG_STUDY_ID);
 		String uName = fp.getString(ARG_USER_NAME);
 		StudyUserRoleBean studyUserRole = udao.findRoleByUserNameAndStudyId(uName, studyId);
-
 		StudyDAO sdao = getStudyDAO();
 		StudyBean sb = (StudyBean) sdao.findByPK(studyUserRole.getStudyId());
 		if (sb != null) {
 			studyUserRole.setStudyName(sb.getName());
 		}
-
 		if (!studyUserRole.isActive()) {
 			String message = respage.getString("the_user_has_no_role_in_study");
 			addPageMessage(message, request);
@@ -97,17 +101,14 @@ public class EditStudyUserRoleServlet extends Controller {
 		} else {
 			StudyBean study = (StudyBean) sdao.findByPK(studyUserRole.getStudyId());
 			request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
-			// send the user to the right place..
 			if (!fp.isSubmitted()) {
+				Map roleMap = roleMapValidator(study.getId());
 				request.setAttribute("userName", uName);
 				request.setAttribute("studyUserRole", studyUserRole);
-				request.setAttribute("roles", Role.roleMapWithDescriptions);
+				request.setAttribute("roles", roleMap);
 				request.setAttribute("chosenRoleId", studyUserRole.getRole().getId());
 				forwardPage(Page.EDIT_STUDY_USER_ROLE, request, response);
-			}
-
-			// process the form
-			else {
+			} else {
 				Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 				v.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
 				HashMap errors = v.validate();
@@ -138,11 +139,23 @@ public class EditStudyUserRoleServlet extends Controller {
 					request.setAttribute("userName", uName);
 					request.setAttribute("studyUserRole", studyUserRole);
 					request.setAttribute("chosenRoleId", fp.getInt(INPUT_ROLE));
-					request.setAttribute("roles", Role.roleMapWithDescriptions);
+					request.setAttribute("roles", roleMapValidator(studyId));
 					forwardPage(Page.EDIT_STUDY_USER_ROLE, request, response);
 				}
 			}
 		}
+	}
+
+	private Map roleMapValidator(int studyId) {
+		Map roleMap = Role.ROLE_MAP_WITH_DESCRIPTION;
+		StudyBean selectedStudyBean = (StudyBean) getStudyDAO().findByPK(studyId);
+		int currentStudyId = selectedStudyBean.getParentStudyId() > 0 ? selectedStudyBean.getParentStudyId() : selectedStudyBean.getId();
+		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation", currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+		if (!isEvaluationEnabled) {
+			Role.ROLE_MAP_WITH_DESCRIPTION.remove(Role.STUDY_EVALUATOR.getId());
+			roleMap = Role.ROLE_MAP_WITH_DESCRIPTION;
+		}
+		return roleMap;
 	}
 
 	@Override

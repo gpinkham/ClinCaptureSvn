@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -20,9 +20,14 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.StudyParameterPriorityUtil;
 import com.clinovo.util.ValidatorHelper;
 
-import org.akaza.openclinica.bean.core.*;
+import org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.TermType;
+import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -52,7 +57,6 @@ import java.util.Map;
 /**
  * Servlet for creating a user account.
  * 
- * @author ssachs
  */
 @SuppressWarnings({ "rawtypes", "serial" })
 @Component
@@ -71,23 +75,25 @@ public class CreateUserAccountServlet extends Controller {
 	public static final String INPUT_DISPLAY_PWD = "displayPwd";
 	public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
 	public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
+	public static final int USERNAME_LENGTH = 64;
+	public static final int NAMES_LENGTH = 50;
+	public static final int EMAIL_LENGTH = 120;
+	public static final int INPUT_INSTITUTION_LENGTH = 255;
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
-			throw new InsufficientPermissionException(Page.MENU,
-					resexception.getString("you_may_not_perform_administrative_functions"), "1");
+			throw new InsufficientPermissionException(Page.MENU, resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
 	}
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
-
 		FormProcessor fp = new FormProcessor(request);
 
 		StudyDAO sdao = getStudyDAO();
@@ -102,23 +108,12 @@ public class CreateUserAccountServlet extends Controller {
 		addEntityList("studies", finalList, respage.getString("a_user_cannot_be_created_no_study_as_active"),
 				Page.ADMIN_SYSTEM, request, response);
 
-		// for warning window for back button
 		String pageIsChanged = request.getParameter("pageIsChanged");
 		if (pageIsChanged != null) {
 			request.setAttribute("pageIsChanged", pageIsChanged);
 		}
 
-		StudyParameterValueDAO dao = new StudyParameterValueDAO(getDataSource());
-		StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(),
-				"allowCodingVerification");
-
-		Map roleMap;
-		if (allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
-			roleMap = Role.roleMapWithDescriptions;
-		} else {
-			Role.roleMapWithDescriptions.remove(7);
-			roleMap = Role.roleMapWithDescriptions;
-		}
+		Map roleMap = customiseUserRoleMap(sdao, currentStudy, fp.getInt(INPUT_STUDY));
 
 		ArrayList types = UserType.toArrayList();
 		types.remove(UserType.INVALID);
@@ -126,8 +121,7 @@ public class CreateUserAccountServlet extends Controller {
 		addEntityList("types", types, respage.getString("a_user_cannot_be_created_no_user_types_for"),
 				Page.ADMIN_SYSTEM, request, response);
 
-		Boolean changeRoles = request.getParameter("changeRoles") != null
-				&& Boolean.parseBoolean(request.getParameter("changeRoles"));
+		Boolean changeRoles = request.getParameter("changeRoles") != null && Boolean.parseBoolean(request.getParameter("changeRoles"));
 		int activeStudy = fp.getInt(INPUT_STUDY);
 		StudyBean study = (StudyBean) sdao.findByPK(activeStudy);
 		request.setAttribute("roles", roleMap);
@@ -135,11 +129,11 @@ public class CreateUserAccountServlet extends Controller {
 		request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
 
 		if (!fp.isSubmitted() || changeRoles) {
-			String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
+			String[] textFields = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
 					INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
 			fp.setCurrentStringValuesAsPreset(textFields);
 
-			String ddlbFields[] = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES };
+			String[] ddlbFields = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES };
 			fp.setCurrentIntValuesAsPreset(ddlbFields);
 
 			HashMap presetValues = fp.getPresetValues();
@@ -154,37 +148,7 @@ public class CreateUserAccountServlet extends Controller {
 
 			UserAccountDAO udao = new UserAccountDAO(getDataSource());
 			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
-
-			// username must not be blank,
-			// must be in the format specified by Validator.USERNAME,
-			// and must be unique
-			v.addValidation(INPUT_USERNAME, Validator.NO_BLANKS);
-			v.addValidation(INPUT_USERNAME, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
-			v.addValidation(INPUT_USERNAME, Validator.IS_A_USERNAME);
-
-			v.addValidation(INPUT_USERNAME, Validator.USERNAME_UNIQUE, udao);
-
-			v.addValidation(INPUT_FIRST_NAME, Validator.NO_BLANKS);
-			v.addValidation(INPUT_LAST_NAME, Validator.NO_BLANKS);
-			v.addValidation(INPUT_FIRST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 50);
-			v.addValidation(INPUT_LAST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 50);
-
-			v.addValidation(INPUT_EMAIL, Validator.NO_BLANKS);
-			v.addValidation(INPUT_EMAIL, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 120);
-			v.addValidation(INPUT_EMAIL, Validator.IS_A_EMAIL);
-
-			v.addValidation(INPUT_INSTITUTION, Validator.NO_BLANKS);
-			v.addValidation(INPUT_INSTITUTION, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-
-			v.addValidation(INPUT_STUDY, Validator.ENTITY_EXISTS, sdao);
-			v.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
-
-			HashMap errors = v.validate();
+			HashMap errors = validatePageValues(v, udao, sdao);
 
 			if (errors.isEmpty()) {
 				UserAccountBean createdUserAccountBean = new UserAccountBean();
@@ -257,24 +221,66 @@ public class CreateUserAccountServlet extends Controller {
 					forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 				}
 			} else {
-				String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
+				String[] textFields = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
 						INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
 				fp.setCurrentStringValuesAsPreset(textFields);
 
-				String ddlbFields[] = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES };
+				String[] ddlbFields = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES };
 				fp.setCurrentIntValuesAsPreset(ddlbFields);
 
 				HashMap presetValues = fp.getPresetValues();
 				setPresetValues(presetValues, request);
 
 				setInputMessages(errors, request);
-				addPageMessage(
-						respage.getString("there_were_some_errors_submission")
+				addPageMessage(respage.getString("there_were_some_errors_submission")
 								+ respage.getString("see_below_for_details"), request);
 
 				forwardPage(Page.CREATE_ACCOUNT, request, response);
 			}
 		}
+	}
+
+	private Map customiseUserRoleMap(StudyDAO sdao, StudyBean currentStudy, int selectedStudy) {
+
+		Map roleMap;
+		StudyParameterValueDAO dao = new StudyParameterValueDAO(getDataSource());
+		StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(), "allowCodingVerification");
+
+		if (allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
+			roleMap = Role.ROLE_MAP_WITH_DESCRIPTION;
+		} else {
+			Role.ROLE_MAP_WITH_DESCRIPTION.remove(Role.STUDY_CODER.getId());
+			roleMap = Role.ROLE_MAP_WITH_DESCRIPTION;
+		}
+
+		StudyBean selectedStudyBean = (StudyBean) sdao.findByPK(selectedStudy);
+		int parentStudyId = selectedStudyBean.getParentStudyId() > 0 ? selectedStudyBean.getParentStudyId() : selectedStudyBean.getId();
+		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation", parentStudyId, getSystemDAO(),  getStudyParameterValueDAO(), getStudyDAO());
+		if (!isEvaluationEnabled) {
+			Role.ROLE_MAP_WITH_DESCRIPTION.remove(Role.STUDY_EVALUATOR.getId());
+			roleMap = Role.ROLE_MAP_WITH_DESCRIPTION;
+		}
+		return roleMap;
+	}
+
+	private HashMap validatePageValues(Validator v, UserAccountDAO udao, StudyDAO sdao) {
+
+		v.addValidation(INPUT_USERNAME, Validator.NO_BLANKS);
+		v.addValidation(INPUT_USERNAME, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, USERNAME_LENGTH);
+		v.addValidation(INPUT_USERNAME, Validator.IS_A_USERNAME);
+		v.addValidation(INPUT_USERNAME, Validator.USERNAME_UNIQUE, udao);
+		v.addValidation(INPUT_FIRST_NAME, Validator.NO_BLANKS);
+		v.addValidation(INPUT_LAST_NAME, Validator.NO_BLANKS);
+		v.addValidation(INPUT_FIRST_NAME, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, NAMES_LENGTH);
+		v.addValidation(INPUT_LAST_NAME, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, NAMES_LENGTH);
+		v.addValidation(INPUT_EMAIL, Validator.NO_BLANKS);
+		v.addValidation(INPUT_EMAIL, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, EMAIL_LENGTH);
+		v.addValidation(INPUT_EMAIL, Validator.IS_A_EMAIL);
+		v.addValidation(INPUT_INSTITUTION, Validator.NO_BLANKS);
+		v.addValidation(INPUT_INSTITUTION, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INPUT_INSTITUTION_LENGTH);
+		v.addValidation(INPUT_STUDY, Validator.ENTITY_EXISTS, sdao);
+		v.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
+		return v.validate();
 	}
 
 	private UserAccountBean addActiveStudyRole(HttpServletRequest request, UserAccountBean createdUserAccountBean,

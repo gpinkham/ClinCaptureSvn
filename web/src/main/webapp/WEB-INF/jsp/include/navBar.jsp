@@ -199,6 +199,13 @@
                                                 </li>
                                                 <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             </c:when>
+                                            <c:when test="${userRole.studyEvaluator}">
+                                                <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                <c:if test="${evaluationEnabled eq true}">
+                                                    <li><a href="#"><fmt:message key="evaluate" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                </c:if>
+                                                <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            </c:when>
                                         </c:choose>
                                         <li id="nav_Tasks" style="position: relative; z-index: 3;">
                                             <a href="#" onmouseover="setNav('nav_Tasks');" id="nav_Tasks_link"><fmt:message key="nav_tasks" bundle="${resword}"/>
@@ -407,6 +414,20 @@
 	                	<div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
 	                </c:otherwise>
                 </c:choose>
+            </c:when>
+            <c:when test="${userRole.studyEvaluator}">
+                <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
+                <div class="taskLeftColumn">
+                    <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
+                </div>
+                <br clear="all">
+                <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
+                <c:if test="${evaluationEnabled eq true}">
+                    <div class="taskLeftColumn">
+                        <div class="taskLink"><a href="${urlPrefix}MainMenu"><fmt:message key="evaluated_crf" bundle="${resword}"/></a></div>
+                    </div>
+                </c:if>
+                <br clear="all">
             </c:when>
             <c:when test="${userRole.studyAdministrator}">
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>

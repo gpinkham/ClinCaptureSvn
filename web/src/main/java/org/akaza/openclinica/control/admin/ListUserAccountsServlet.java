@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -48,12 +48,17 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
 import org.springframework.stereotype.Component;
 
+/**
+ * Servlet for user account list table.
+ * 
+ */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class ListUserAccountsServlet extends RememberLastPage {
 
 	public static final String ARG_MESSAGE = "message";
 	public static final String SAVED_USER_LIST_URL = "savedUserListUrl";
+	public static final int ACTION_COLUMN_NUM = 5;
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -121,7 +126,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 				resword.getString("first_name"), resword.getString("last_name"), resword.getString("status"),
 				resword.getString("actions") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(5);
+		table.hideColumnLink(ACTION_COLUMN_NUM);
 		table.setQuery("ListUserAccounts", new HashMap());
 
 		table.setRows(allUserRows);
@@ -131,7 +136,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 
 		String message = fp.getString(ARG_MESSAGE, true);
 		request.setAttribute(ARG_MESSAGE, message);
-		request.setAttribute("roleMap", Role.roleMap);
+		request.setAttribute("roleMap", Role.ROLE_MAP);
 		request.setAttribute("userRolesRemovedCountMap", userRolesRemovedCountMap);
 		request.setAttribute("studyId", sb.getId());
 		request.setAttribute("parentStudyId", sb.getParentStudyId());
@@ -152,10 +157,12 @@ public class ListUserAccountsServlet extends RememberLastPage {
 	}
 
 	/**
-	 * For each user, for each study user role, set the study user role's studyName property.
+	 * For each user, for each study user role, set the study user role's
+	 * studyName property.
 	 * 
 	 * @param users
-	 *            The users to display in the table of users. Each element is a UserAccountBean.
+	 *            The users to display in the table of users. Each element is a
+	 *            UserAccountBean.
 	 */
 	private void setStudyNamesInStudyUserRoles(List<UserAccountBean> users) {
 		StudyDAO sdao = getStudyDAO();

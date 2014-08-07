@@ -1,12 +1,12 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -32,6 +32,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.StudyParameterPriorityUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -51,22 +52,18 @@ import org.akaza.openclinica.web.bean.UserAccountRow;
 import org.springframework.stereotype.Component;
 
 /**
- * Processes request to assign a user to a study
- * 
- * @author jxu
- * 
+ * Processes request to assign a user to a study.
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class AssignUserToStudyServlet extends Controller {
 
-	/**
-     *
-     */
+	private static final int ROLE_COL = 3;
+	private static final int SELECTED_COL = 4;
+	private static final int NOTES_COL = 5;
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -74,17 +71,15 @@ public class AssignUserToStudyServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
-
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		StudyBean currentStudy = getCurrentStudy(request);
 
+		StudyBean currentStudy = getCurrentStudy(request);
 		String action = request.getParameter("action");
 		ArrayList users = findUsers(request);
 		String nextListPage = request.getParameter("next_list_page");
@@ -97,11 +92,6 @@ public class AssignUserToStudyServlet extends Controller {
 				request.getSession().removeAttribute("tmpSelectedUsersMap");
 			}
 
-			/*
-			 * The tmpSelectedUsersMap will hold all the selected users in the session when the user is navigating
-			 * through the list. This has been done so that when the user moves to the next page of Users list, the
-			 * selection made in the previous page doesn't get lost.
-			 */
 			Map tmpSelectedUsersMap = (HashMap) request.getSession().getAttribute("tmpSelectedUsersMap");
 			if (tmpSelectedUsersMap == null) {
 				tmpSelectedUsersMap = new HashMap();
@@ -111,12 +101,9 @@ public class AssignUserToStudyServlet extends Controller {
 					int id = fp.getInt("id" + i);
 					int roleId = fp.getInt("activeStudyRoleId" + i);
 					String checked = fp.getString("selected" + i);
-					// logger.info("selected:" + checked);
 					if (!StringUtil.isBlank(checked) && "yes".equalsIgnoreCase(checked.trim())) {
 						tmpSelectedUsersMap.put(id, roleId);
 					} else {
-						// Removing the elements from session which has been
-						// deselected.
 						if (tmpSelectedUsersMap.containsKey(id)) {
 							tmpSelectedUsersMap.remove(id);
 						}
@@ -129,16 +116,15 @@ public class AssignUserToStudyServlet extends Controller {
 					resword.getString("last_name"), resword.getString("role"), resword.getString("selected"),
 					resword.getString("notes") };
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
-			table.hideColumnLink(3);
-			table.hideColumnLink(4);
-			table.hideColumnLink(5);
+			table.hideColumnLink(ROLE_COL);
+			table.hideColumnLink(SELECTED_COL);
+			table.hideColumnLink(NOTES_COL);
 			table.setQuery("AssignUserToStudy", new HashMap());
 			table.setRows(allRows);
 			table.computeDisplay();
 
 			StudyParameterValueDAO dao = new StudyParameterValueDAO(getDataSource());
-			StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(),
-					"allowCodingVerification");
+			StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(), "allowCodingVerification");
 
 			request.setAttribute("table", table);
 			ArrayList roles = Role.toArrayList();
@@ -154,10 +140,15 @@ public class AssignUserToStudyServlet extends Controller {
 				roles.remove(Role.CLINICAL_RESEARCH_COORDINATOR);
 			}
 
-			roles.remove(Role.STUDY_DIRECTOR); // clincapture does not user the STUDY_DIRECTOR role
-			roles.remove(Role.SYSTEM_ADMINISTRATOR); // admin is not a user role, only used
-			// for
-			// tomcat
+			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation", currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+			if (!isEvaluationEnabled) {
+				Role.ROLE_MAP_WITH_DESCRIPTION.remove(Role.STUDY_EVALUATOR.getId());
+				roles.remove(Role.STUDY_EVALUATOR);
+			}
+
+			roles.remove(Role.STUDY_DIRECTOR);
+			roles.remove(Role.SYSTEM_ADMINISTRATOR);
 			request.setAttribute("roles", roles);
 			forwardPage(Page.STUDY_USER_LIST, request, response);
 		} else {
@@ -191,18 +182,14 @@ public class AssignUserToStudyServlet extends Controller {
 				sub.setStudyId(currentStudy.getId());
 				sub.setStatus(Status.AVAILABLE);
 				sub.setOwner(ub);
-				if (udao.findStudyUserRole(user, sub).getName() != null
-						&& udao.findStudyUserRole(user, sub).getName().isEmpty()) {// create only when it doesn't exist in
-																				// database
+				if (udao.findStudyUserRole(user, sub).getName() != null && udao.findStudyUserRole(user, sub).getName().isEmpty()) {
 					udao.createStudyUserRole(user, sub);
 					getUserAccountService().setActiveStudyId(user, currentStudy.getId());
-				
 				} else {
 					break;
 				}
 				logger.info("one user added");
 				pageMass = pageMass + sendEmail(user, currentStudy, sub);
-
 			} else {
 				if (tmpSelectedUsersMap != null && tmpSelectedUsersMap.containsKey(id)) {
 					tmpSelectedUsersMap.remove(id);
@@ -211,8 +198,7 @@ public class AssignUserToStudyServlet extends Controller {
 		}
 
 		/* Assigning users which might have been selected during list navigation */
-		if (tmpSelectedUsersMap != null) {// try to fix the null pointer
-			// exception
+		if (tmpSelectedUsersMap != null) {
 			for (Object o : tmpSelectedUsersMap.keySet()) {
 				int id = (Integer) o;
 				int roleId = (Integer) tmpSelectedUsersMap.get(id);
@@ -231,9 +217,7 @@ public class AssignUserToStudyServlet extends Controller {
 					sub.setStatus(Status.AVAILABLE);
 					sub.setOwner(ub);
 					udao.createStudyUserRole(user, sub);
-					
 					getUserAccountService().setActiveStudyId(user, currentStudy.getId());
-					
 					logger.info("one user added");
 					pageMass = pageMass + sendEmail(user, currentStudy, sub);
 				}
@@ -253,11 +237,6 @@ public class AssignUserToStudyServlet extends Controller {
 
 	}
 
-	/**
-	 * Find all users in the system
-	 * 
-	 * @return currentStudy StudyBean
-	 */
 	private ArrayList findUsers(HttpServletRequest request) throws Exception {
 
 		UserAccountBean currentUser = getUserAccountBean(request);
@@ -281,12 +260,12 @@ public class AssignUserToStudyServlet extends Controller {
 			userListbyRoles = (ArrayList<UserAccountBean>) udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getName(),
 					Role.STUDY_MONITOR.getName());
 		}
-		
+
 		iterateUser = userListbyRoles.listIterator();
 		while (iterateUser.hasNext()) {
 			if (!getUserAccountService().doesUserHaveRoleInStydies(iterateUser.next(),
 					studyListCurrentUserHasAccessTo)) {
-				iterateUser.remove();				
+				iterateUser.remove();
 			}
 		}
 
@@ -335,7 +314,6 @@ public class AssignUserToStudyServlet extends Controller {
 
 				userAvailable.add(accountBean);
 			}
-
 		}
 
 		return (ArrayList<UserAccountBean>) userAvailable;

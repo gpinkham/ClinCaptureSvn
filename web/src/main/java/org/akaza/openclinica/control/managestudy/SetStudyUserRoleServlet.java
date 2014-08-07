@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.StudyParameterPriorityUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -41,20 +42,15 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * @author jxu
+ * Servlet for adding new role for user account.
  * 
- *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
- *         Code Templates
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class SetStudyUserRoleServlet extends Controller {
-	/**
-     *
-     */
+
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -113,7 +109,6 @@ public class SetStudyUserRoleServlet extends Controller {
 				} else if (studyBean.getParentStudyId() > 0) {
 					roles.remove(Role.STUDY_ADMINISTRATOR);
 					roles.remove(Role.STUDY_DIRECTOR);
-					// TODO: redo this fix
 					Role r = Role.CLINICAL_RESEARCH_COORDINATOR;
 					r.setDescription("Clinical_Research_Coordinator");
 					roles.remove(Role.CLINICAL_RESEARCH_COORDINATOR);
@@ -124,6 +119,14 @@ public class SetStudyUserRoleServlet extends Controller {
 
 					roles.add(ri);
 				}
+
+				int currentStudyId = studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean.getId();
+				boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation", currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+				if (!isEvaluationEnabled) {
+					Role.ROLE_MAP_WITH_DESCRIPTION.remove(Role.STUDY_EVALUATOR.getId());
+					roles.remove(Role.STUDY_EVALUATOR);
+				}
+
 				request.setAttribute("roles", roles);
 
 				forwardPage(Page.SET_USER_ROLE_IN_STUDY, request, response);
@@ -161,12 +164,12 @@ public class SetStudyUserRoleServlet extends Controller {
 	}
 
 	/**
-	 * Send email to the user, director and administrator
+	 * Send email to the user, director and administrator.
 	 * 
 	 * @param u
-	 *            UserAccountBean
+	 *            the user account bean.
 	 * @param sub
-	 *            StudyUserRoleBean
+	 *            the user account role.
 	 */
 	private String sendEmail(UserAccountBean u, StudyUserRoleBean sub) throws Exception {
 

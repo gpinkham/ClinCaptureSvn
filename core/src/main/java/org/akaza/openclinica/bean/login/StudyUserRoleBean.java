@@ -1,12 +1,12 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -25,53 +25,32 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 
 /**
- * @author thickerson
- */
-
-/**
- * @author ssachs
+ * Container for study user role.
  * 
- *         The superclass id field is the role id. The superclass name field is the role name.
  */
-
 public class StudyUserRoleBean extends AuditableEntityBean {
 
 	private static final long serialVersionUID = -758476275327298596L;
 
 	private Role role;
-
 	private int studyId;
-
-	// not in the database, and not guaranteed to correspond to studyId; studyId
-	// is authoritative
-	// this is only provided as a convenience
+	private int userAccountId = 0;
 	private String studyName = "";
-
-	// not in the database, and not guaranteed to correspond to studyId; studyId
-	// is authoritative
-	// this is only provided as a convenience
+	private String lastName = "";
+	private String firstName = "";
+	private String userName = "";
 	private int parentStudyId = 0;
-
-	private String lastName = ""; // not in the DB,not guaranteed to have a
-	// value
-
-	private String firstName = "";// not in the DB,not guaranteed to have a
-	// value
-
-	private String userName = ""; // name here is role.name, this is different
-	// from name,not guaranteed to have a value
-
-	// User role capabilities, use this instead the role name.
 	private boolean canMonitor;
 	private boolean canSubmitData;
 	private boolean canExtractData;
 	private boolean canManageStudy;
-	private boolean canCode = false;
+	private boolean canCode;
+	private boolean canEvaluate;
 
 
-	private int userAccountId = 0;
-
-
+	/**
+	 * Default study user role bean constructor.
+	 */
 	public StudyUserRoleBean() {
 		role = Role.INVALID;
 		studyId = 0;
@@ -79,36 +58,37 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		status = Status.AVAILABLE;
 	}
 
-	/**
-	 * @return Returns the role.
-	 */
 	public Role getRole() {
 		return role;
 	}
 
 	/**
+	 * Set new role for current study user role.
+	 * 
 	 * @param role
-	 *            The role to set.
+	 *            the new role for study user role bean.
 	 */
 	public void setRole(Role role) {
-		
+
 		this.role = role;
 		super.setId(role.getId());
 		super.setName(role.getCode());
-		
+
 		this.canSubmitData = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
 				|| this.role == Role.STUDY_DIRECTOR || this.role == Role.CLINICAL_RESEARCH_COORDINATOR
 				|| this.role == Role.INVESTIGATOR;
-		
+
 		this.canExtractData = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
 				|| this.role == Role.STUDY_DIRECTOR || this.role == Role.INVESTIGATOR;
-		
+
 		this.canManageStudy = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
 				|| this.role == Role.STUDY_DIRECTOR;
-		
+
 		this.canMonitor = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_MONITOR;
-		
+
 		this.canCode = this.role == Role.STUDY_CODER || this.role == Role.STUDY_ADMINISTRATOR;
+
+		this.canEvaluate = this.role == Role.STUDY_EVALUATOR || this.role == Role.STUDY_ADMINISTRATOR;
 	}
 
 	public int getUserAccountId() {
@@ -119,38 +99,29 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		this.userAccountId = userAccountId;
 	}
 
-	/**
-	 * @return Returns the roleName.
-	 */
 	public String getRoleName() {
 		return role.getName();
 	}
 
 	/**
+	 * Set new role for current user role bean using role name.
+	 * 
 	 * @param roleName
-	 *            The roleName to set.
+	 *            the role name.
 	 */
 	public void setRoleName(String roleName) {
 		Role role = Role.getByName(roleName);
 		setRole(role);
 	}
 
-	/**
-	 * @return Returns the studyId.
-	 */
 	public int getStudyId() {
 		return studyId;
 	}
 
-	/**
-	 * @param studyId
-	 *            The studyId to set.
-	 */
 	public void setStudyId(int studyId) {
 		this.studyId = studyId;
 	}
 
-	// this is different from the meaning of "name"
 	public String getUserName() {
 		return userName;
 	}
@@ -159,32 +130,18 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		this.userName = userName;
 	}
 
-	/**
-	 * @return Returns the studyName.
-	 */
 	public String getStudyName() {
 		return studyName;
 	}
 
-	/**
-	 * @param studyName
-	 *            The studyName to set.
-	 */
 	public void setStudyName(String studyName) {
 		this.studyName = studyName;
 	}
 
-	/**
-	 * @return Returns the parentStudyId.
-	 */
 	public int getParentStudyId() {
 		return parentStudyId;
 	}
 
-	/**
-	 * @param parentStudyId
-	 *            The parentStudyId to set.
-	 */
 	public void setParentStudyId(int parentStudyId) {
 		this.parentStudyId = parentStudyId;
 	}
@@ -197,7 +154,7 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		return "";
 	}
 
-    @Override
+	@Override
 	public int getId() {
 		if (role != null) {
 			return role.getId();
@@ -262,13 +219,13 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		return this.role == Role.STUDY_DIRECTOR;
 	}
 
-    public boolean isSysAdmin() {
-        return this.role == Role.SYSTEM_ADMINISTRATOR;
-    }
-    
-    public boolean isStudyCoder() {
-    	return this.role.equals(Role.STUDY_CODER);
-    }
+	public boolean isSysAdmin() {
+		return this.role == Role.SYSTEM_ADMINISTRATOR;
+	}
+
+	public boolean isStudyCoder() {
+		return this.role.equals(Role.STUDY_CODER);
+	}
 
 	public boolean isCanCode() {
 		return canCode;
@@ -277,9 +234,22 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	public void setCanCode(boolean canCode) {
 		this.canCode = canCode;
 	}
-	
+
+	public boolean isStudyEvaluator() {
+		return this.role.equals(Role.STUDY_EVALUATOR);
+	}
+
+	public boolean isCanEvaluate() {
+		return canEvaluate;
+	}
+
+	public void setCanEvaluate(boolean canEvaluate) {
+		this.canEvaluate = canEvaluate;
+	}
+
 	public boolean isStudyLevelRole() {
 		return this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
-				|| this.role == Role.STUDY_MONITOR || this.role == Role.STUDY_CODER;
+				|| this.role == Role.STUDY_MONITOR || this.role == Role.STUDY_CODER
+				|| this.role == Role.STUDY_EVALUATOR;
 	}
 }

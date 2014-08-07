@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.StudyParameterPriorityUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -38,16 +39,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
- * @author jxu
+ * Set user role servlet for adding roles for user account.
  * 
- *         Modified by ywang, 11-19-2007.
- * 
- *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
- *         Code Templates
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings({ "serial", "rawtypes" })
 @Component
 public class SetUserRoleServlet extends Controller {
 
@@ -63,7 +61,6 @@ public class SetUserRoleServlet extends Controller {
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_USER_ACCOUNTS_SERVLET, resexception.getString("not_admin"),
 				"1");
-
 	}
 
 	@Override
@@ -96,7 +93,7 @@ public class SetUserRoleServlet extends Controller {
 			Boolean changeRoles = request.getParameter("changeRoles") != null
 					&& Boolean.parseBoolean(request.getParameter("changeRoles"));
 			int studyId = fp.getInt("studyId");
-			request.setAttribute("roles", Role.roleMapWithDescriptions);
+			request.setAttribute("roles", Role.ROLE_MAP_WITH_DESCRIPTION);
 			request.setAttribute("studyId", studyId);
 
 			if ("confirm".equalsIgnoreCase(action) || changeRoles) {
@@ -135,6 +132,27 @@ public class SetUserRoleServlet extends Controller {
 						}
 					}
 				}
+
+				StudyBean selectedStudyBean = new StudyBean();
+				if (studyId > 0) {
+					selectedStudyBean = (StudyBean) sdao.findByPK(studyId);
+				} else {
+					if (finalStudyListNotHaveRole.size() > 0) {
+						selectedStudyBean = (StudyBean) sdao.findByPK(finalStudyListNotHaveRole.get(0).getId());
+					}
+				}
+				int currentStudyId = selectedStudyBean.getParentStudyId() > 0 ? selectedStudyBean.getParentStudyId()
+						: selectedStudyBean.getId();
+				boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
+						currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+				if (!isEvaluationEnabled) {
+					Role.ROLE_MAP_WITH_DESCRIPTION.remove(Role.STUDY_EVALUATOR.getId());
+					Map roleMap = Role.ROLE_MAP_WITH_DESCRIPTION;
+					request.setAttribute("roles", roleMap);
+				} else {
+					request.setAttribute("roles", Role.ROLE_MAP_WITH_DESCRIPTION);
+				}
+				request.setAttribute("selectedStudy", selectedStudyBean);
 
 				request.setAttribute("user", user);
 				request.setAttribute("withoutRoles", withoutRoles);

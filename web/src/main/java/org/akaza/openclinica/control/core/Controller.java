@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.control.core;
 
+import com.clinovo.util.StudyParameterPriorityUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -138,6 +139,7 @@ public abstract class Controller extends BaseController {
 	public static final String FORM_WITH_STATE_FLAG = "formWithStateFlag";
 	public static final String BOOSTRAP_DATE_FORMAT = "bootstrapDateFormat";
 	public static final String BOOTSTRAP_DATAPICKER_DATE_FORMAT = "bootstrap_datapicker_date_format";
+	public static final String EVALUATION_ENABLED = "evaluationEnabled";
 
 	protected void addPageMessage(String message, HttpServletRequest request) {
 		addPageMessage(message, request, logger);
@@ -412,6 +414,10 @@ public abstract class Controller extends BaseController {
 					currentStudy.setParentStudyName((sdao.findByPK(currentStudy.getParentStudyId())).getName());
 				}
 			}
+
+			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation", currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+			request.getSession().setAttribute(EVALUATION_ENABLED, isEvaluationEnabled);
 
 			if (this instanceof ListStudySubjectsServlet && currentStudy.getStatus() != Status.AVAILABLE) {
 				String startWith = BR;

@@ -44,10 +44,13 @@
     <c:when test="${isThisStudy}">
         <c:set var="inclRoleCode1" value="2" />
         <c:set var="inclRoleCode2" value="6" />
+        <c:set var="inclRoleCode3" value="7" />
+        <c:set var="inclRoleCode_evaluator" value="8" />
     </c:when>
     <c:otherwise>
         <c:set var="inclRoleCode1" value="4" />
         <c:set var="inclRoleCode2" value="5" />
+        <c:set var="inclRoleCode_evaluator" value="8" />
     </c:otherwise>
 </c:choose>
 
@@ -74,7 +77,7 @@
        <c:set var="role1" value="${uRole.role}"/>   
        <select name="roleId" class="formfieldXL" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
          <c:forEach var="userRole" items="${roles}">
-             <c:if test="${userRole.id == inclRoleCode1 || userRole.id == inclRoleCode2}">
+             <c:if test="${userRole.id == inclRoleCode1 || userRole.id == inclRoleCode2 || userRole.id == inclRoleCode3 || userRole.id == inclRoleCode_evaluator}">
                 <option value="<c:out value="${userRole.id}"/>" <c:if test="${role1.id == userRole.id}">selected</c:if>><c:out value="${userRole.description}"/>
              </c:if>
          </c:forEach>
