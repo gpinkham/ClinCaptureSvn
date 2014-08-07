@@ -27,6 +27,7 @@ import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
+import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
@@ -90,6 +91,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected EventDefinitionCRFDAO eventDefinitionCRFDAO;
 	protected StudyEventDefinitionDAO studyEventDefinitionDAO;
 	protected RulesPostImportContainerService postImportContainerService;
+	protected PasswordRequirementsDao requirementsDao;
 
 	// DAOS
 	@Autowired
@@ -183,6 +185,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		itemGroupMetadataDAO = new ItemGroupMetadataDAO(dataSource);
 		eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
+		requirementsDao = new PasswordRequirementsDao(configurationDao);
 
 		postImportContainerService = new RulesPostImportContainerService(dataSource);
 		postImportContainerService.setRuleDao(ruleDao);

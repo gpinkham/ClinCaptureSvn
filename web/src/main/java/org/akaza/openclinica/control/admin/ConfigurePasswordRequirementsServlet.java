@@ -20,12 +20,6 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
-
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -37,6 +31,10 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 
 /**
  * @author Leonel Gayard
@@ -74,7 +72,7 @@ public class ConfigurePasswordRequirementsServlet extends Controller {
 		} else {
 			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 			for (String key : passwordRequirementsDao.intConfigKeys()) {
-				v.addValidation(key, Validator.IS_AN_INTEGER);
+				v.addValidation(key, Validator.IS_A_POSITIVE_INTEGER);
 			}
 
 			HashMap<?, ?> errors = v.validate();

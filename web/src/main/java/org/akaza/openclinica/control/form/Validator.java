@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -21,7 +21,6 @@
 package org.akaza.openclinica.control.form;
 
 import com.clinovo.util.ValidatorHelper;
-
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -329,13 +328,12 @@ import java.util.regex.PatternSyntaxException;
  *      break;
  *  // ... (bottom of switch statement)
  * </code>
+ * </ul>
  * 
  * @author ssachs
  * 
  */
 
-// TODO: add ability to halt at a given validation
-// TODO: work on making this class extensible. this is probably best achieved by
 // subclassing the Validation class
 // and making it more beefy (ie adding a checkIfValidated() type method to that
 // class,
@@ -343,15 +341,34 @@ import java.util.regex.PatternSyntaxException;
 @SuppressWarnings({ "unchecked", "rawtypes", "unused" })
 public class Validator {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	Locale locale;
-	ResourceBundle restext, resexception, resword;
+	public static final int TWENTY_FOUR = 24;
+	public static final int NINE_NINE_NINE_NINE = 9999;
+	public static final int FOUR_THOUSAND = 4000;
+	public static final int TEN = 10;
+	public static final int TWENTY_SIX = 26;
+	public static final int THIRTY = 30;
+	public static final int THREE = 3;
+	public static final int SEVEN = 7;
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private Locale locale;
+	private ResourceBundle resexception, resword;
+	public static final int THOUSAND = 1000;
 
+	/**
+	 * getDateRegEx.
+	 * 
+	 * @return the regular expression object for localized dates
+	 */
 	public static ValidatorRegularExpression getDateRegEx() {
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
 		return new ValidatorRegularExpression(resformat.getString("date_format"), resformat.getString("date_regexp"));
 	}
 
+	/**
+	 * getDateTimeRegex.
+	 * 
+	 * @return regular expression with the localized date time regular expression
+	 */
 	public static ValidatorRegularExpression getDateTimeRegEx() {
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
 		return new ValidatorRegularExpression(resformat.getString("date_time_format"),
@@ -361,6 +378,11 @@ public class Validator {
 	public static final ValidatorRegularExpression EMAIL = new ValidatorRegularExpression(
 			"username@institution.domain", ".+@.+\\..*");
 
+	/**
+	 * getPhoneRegEx.
+	 * 
+	 * @return the validator regular expression object with a localized phone number.
+	 */
 	public static ValidatorRegularExpression getPhoneRegEx() {
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
 		return new ValidatorRegularExpression(resformat.getString("phone_format"), resformat.getString("phone_regexp"));
@@ -376,7 +398,7 @@ public class Validator {
 	public static final int IS_A_IMPORT_DATE = 44;
 	public static final int IS_A_IMPORT_PARTIAL_DATE = 45;
 	public static final int IS_DATE_TIME = 21;
-	public static final int CHECK_SAME = 5;// this is for matching passwords,
+	public static final int CHECK_SAME = 5; // this is for matching passwords,
 	// e.g.
 	public static final int IS_A_EMAIL = 6;
 	public static final int LENGTH_NUMERIC_COMPARISON = 7;
@@ -421,6 +443,7 @@ public class Validator {
 
 	public static final int NO_SEMI_COLONS_OR_COLONS = 43;
 
+	public static final int IS_A_POSITIVE_INTEGER = 46;
 	/**
 	 * The last field for which an addValidation method was invoked. This is used by setErrorMessage(String).
 	 */
@@ -434,13 +457,18 @@ public class Validator {
 
 	protected ResourceBundle resformat;
 
+	/**
+	 * Validator, the main creation class for the object.
+	 * 
+	 * @param validatorHelper
+	 *            which assists with the validation.
+	 */
 	public Validator(ValidatorHelper validatorHelper) {
 		validations = new HashMap();
 		errors = new HashMap();
 		this.validatorHelper = validatorHelper;
 		locale = validatorHelper.getLocale();
 		resformat = ResourceBundleProvider.getFormatBundle(locale);
-		restext = ResourceBundleProvider.getTextsBundle(locale);
 		resexception = ResourceBundleProvider.getExceptionsBundle(locale);
 		resword = ResourceBundleProvider.getWordsBundle(locale);
 		lastField = "";
@@ -457,27 +485,47 @@ public class Validator {
 		return fieldValidations;
 	}
 
-	// function used to squirrel away the validations until validate is called
+	/**
+	 * addValidation, function used to squirrel away the validations until validate is called.
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param v
+	 *            Validation
+	 */
 	public void addValidation(String fieldName, Validation v) {
 		ArrayList fieldValidations = getFieldValidations(fieldName);
 		fieldValidations.add(v);
 		validations.put(fieldName, fieldValidations);
 	}
 
-	/*
+	/**
 	 * use for: NO_BLANKS, IS_A_NUMBER, IS_A_DATE, IS_A_EMAIL, IS_AN_INTEGER, IS_A_PASSWORD, IS_A_USERNAME,
-	 * IS_A_PHONE_NUMBER, IS_DATE_TIME, NO_BLANKS_SET DATE_IN_PAST
+	 * IS_A_PHONE_NUMBER, IS_DATE_TIME, NO_BLANKS_SET DATE_IN_PAST.
+	 * 
+	 * @param fieldName
+	 *            , a string for the field name in the form.
+	 * @param type
+	 *            , an int for the type.
 	 */
 	public void addValidation(String fieldName, int type) {
 		Validation v = new Validation(type);
 		addValidation(fieldName, v);
 	}
 
-	/*
-	 * use for: IS_IN_RANGE
+	/**
+	 * use for: IS_IN_RANGE.
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param type
+	 *            int
+	 * @param start
+	 *            int
+	 * @param end
+	 *            int
 	 */
 	public void addValidation(String fieldName, int type, int start, int end) {
-		// TODO: assert type == is in range
 		// For finding out if a number is in a range
 
 		Validation v = new Validation(type);
@@ -487,12 +535,17 @@ public class Validator {
 		addValidation(fieldName, v);
 	}
 
-	/*
-	 * use for: CHECK_SAME, IS_A_FILE
+	/**
+	 * use for: CHECK_SAME, IS_A_FILE.
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param type
+	 *            int
+	 * @param dir
+	 *            String
 	 */
 	public void addValidation(String fieldName, int type, String dir) {
-		// TODO: assert type = IS_OF_FILE_TYPE or CHECK_SAME or
-		// DATE_IS_AFTER_OR_EQUAL
 
 		// for checking to see if there is a file present in the system or not
 		// also for IS_OF_FILE_TYPE - in this case dir is a file type
@@ -503,12 +556,19 @@ public class Validator {
 		addValidation(fieldName, v);
 	}
 
-	/*
-	 * use for: LENGHT_NUMERIC_COMPARISON, COMPARES_TO_STATIC_VALUE
+	/**
+	 * use for: LENGHT_NUMERIC_COMPARISON, COMPARES_TO_STATIC_VALUE.
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param type
+	 *            int
+	 * @param operator
+	 *            NumericComparisonOperator
+	 * @param compareTo
+	 *            int
 	 */
 	public void addValidation(String fieldName, int type, NumericComparisonOperator operator, int compareTo) {
-		// TODO: assert type = COMPARE_TO_STATIC_VALUE or
-		// LENGHT_NUMERIC_COMPARISON
 
 		Validation v = new Validation(type);
 		v.addArgument(operator);
@@ -517,8 +577,17 @@ public class Validator {
 		addValidation(fieldName, v);
 	}
 
-	/*
-	 * use for: ENTITY_EXISTS_IN_STUDY
+	/**
+	 * use for: ENTITY_EXISTS_IN_STUDY.
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param type
+	 *            int
+	 * @param dao
+	 *            AuditableEntityDAO
+	 * @param study
+	 *            StudyBean
 	 */
 	public void addValidation(String fieldName, int type, AuditableEntityDAO dao, StudyBean study) {
 		// for entity exists validation
@@ -529,8 +598,15 @@ public class Validator {
 		addValidation(fieldName, v);
 	}
 
-	/*
-	 * use for: ENTITY_EXISTS
+	/**
+	 * use for: ENTITY_EXISTS.
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param type
+	 *            int
+	 * @param edao
+	 *            EntityDAO
 	 */
 	public void addValidation(String fieldName, int type, EntityDAO edao) {
 		// for entity exists validation
@@ -540,13 +616,17 @@ public class Validator {
 		addValidation(fieldName, v);
 	}
 
-	// TODO: add is_of_file_type addValidation method
-
-	/*
-	 * use for: IS_IN_SET and IS_VALID_WIDTH_DECIMAL
+	/**
+	 * use for: IS_IN_SET and IS_VALID_WIDTH_DECIMAL.
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param type
+	 *            int
+	 * @param set
+	 *            ArrayList
 	 */
 	public void addValidation(String fieldName, int type, ArrayList set) {
-		// TODO: assert type == is_in_set
 
 		Validation v = new Validation(type);
 		v.addArgument(set);
@@ -554,8 +634,15 @@ public class Validator {
 		addValidation(fieldName, v);
 	}
 
-	/*
-	 * use for: IS_VALID_TERM
+	/**
+	 * use for: IS_VALID_TERM.
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param type
+	 *            int
+	 * @param termType
+	 *            TermType
 	 */
 	public void addValidation(String fieldName, int type, TermType termType) {
 		// assert type == is_valid_term
@@ -591,6 +678,8 @@ public class Validator {
 	 *            The type of validation. Should be MATCHES_INITIAL_DATA_ENTRY_VALUE.
 	 * @param idb
 	 *            The bean representing the value from initial data entry.
+	 * @param isMultiple
+	 *            flag to let us know if multiples will be required or not.
 	 */
 	public void addValidation(String fieldName, int type, ItemDataBean idb, boolean isMultiple) {
 		Validation v = new Validation(type);
@@ -605,8 +694,10 @@ public class Validator {
 		addValidation(fieldName, v);
 	}
 
-	/*
+	/**
 	 * Executes all of the validations which have been requested.
+	 * 
+	 * @return HashMap
 	 */
 	public HashMap validate() {
 		Set keys = validations.keySet();
@@ -632,9 +723,13 @@ public class Validator {
 		return errors;
 	}
 
-	/*
+	/**
 	 * Same as the validate() method, but does not validate against regex. This method is called ONLY FROM
-	 * ImportCRFDataService class
+	 * ImportCRFDataService class.
+	 * 
+	 * @param exceptionTxt
+	 *            String
+	 * @return HashMap
 	 */
 	public HashMap validate(String exceptionTxt) {
 		Set keys = validations.keySet();
@@ -662,8 +757,10 @@ public class Validator {
 		return errors;
 	}
 
-	/*
-	 * quick debug function to look inside the validations set
+	/**
+	 * quick debug function to look inside the validations set.
+	 * 
+	 * @return String
 	 */
 	public String getKeySet() {
 		String retMe = "";
@@ -678,6 +775,14 @@ public class Validator {
 		return retMe;
 	}
 
+	/**
+	 * addError, adds an error after a validation pass.
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param v
+	 *            Validation
+	 */
 	protected void addError(String fieldName, Validation v) {
 
 		locale = validatorHelper.getLocale();
@@ -747,10 +852,6 @@ public class Validator {
 			case IS_AN_INTEGER:
 				errorMessage = resexception.getString("input_not_integer");
 				break;
-			// case IS_A_FILE:
-			// break;
-			// case IS_OF_FILE_TYPE:
-			// break;
 			case IS_IN_SET:
 				errorMessage = resexception.getString("input_not_acceptable_option");
 				break;
@@ -830,11 +931,25 @@ public class Validator {
 			case NO_SEMI_COLONS_OR_COLONS:
 				errorMessage = resexception.getString("field_not_have_colons_or_semi");
 				break;
+
+			case IS_A_POSITIVE_INTEGER:
+				errorMessage = resexception.getString("field_not_a_positive_integer");
+				break;
+			default:
+				logger.error("reached default on " + fieldName + ", unknown validation type with id " + v.getType());
 			}
 		}
 		addError(fieldName, errorMessage);
 	}
 
+	/**
+	 * addError, without the device of the container.
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param errorMessage
+	 *            String
+	 */
 	protected void addError(String fieldName, String errorMessage) {
 		Validator.addError(errors, fieldName, errorMessage);
 	}
@@ -872,6 +987,15 @@ public class Validator {
 		existingErrors.put(fieldName, fieldErrors);
 	}
 
+	/**
+	 * validate, does what it says on the tin.
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param v
+	 *            Validation
+	 * @return hashmap of error messages.
+	 */
 	protected HashMap validate(String fieldName, Validation v) {
 		switch (v.getType()) {
 		case NO_BLANKS:
@@ -1103,8 +1227,9 @@ public class Validator {
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < messages.size(); i++) {
 				sb.append(messages.get(i));
-				if (i != messages.size() - 1)
+				if (i != messages.size() - 1) {
 					sb.append(" , ");
+				}
 				logger.debug(messages.get(i));
 			}
 			v.setErrorMessage(sb.toString());
@@ -1130,9 +1255,20 @@ public class Validator {
 			break;
 
 		case NO_SEMI_COLONS_OR_COLONS:
-			if (isColonSemiColon(fieldName))
+			if (isColonSemiColon(fieldName)) {
 				addError(fieldName, v);
+			}
 			break;
+
+		case IS_A_POSITIVE_INTEGER:
+			if (!isInteger(fieldName, true)) {
+				addError(fieldName, v);
+			}
+
+			break;
+		default:
+			logger.error("Reached default on field name " + fieldName + ", found unknonwn validation type with id "
+					+ v.getType());
 		}
 		return errors;
 	}
@@ -1278,7 +1414,7 @@ public class Validator {
 			 * Adding one day with the current server date to allow validation for date entered form a client in forward
 			 * timezone
 			 */
-			cal.add(Calendar.HOUR, 24);
+			cal.add(Calendar.HOUR, TWENTY_FOUR);
 			today = cal.getTime();
 			if (today.compareTo(d) >= 0) {
 				return true;
@@ -1295,9 +1431,10 @@ public class Validator {
 	 * @return <code>true</code> if the date's year has less than four digits; <code>false</code> otherwise.
 	 */
 	protected boolean isYearNotFourDigits(Date d) {
+
 		Calendar c = Calendar.getInstance();
 		c.setTime(d);
-		return !(c.get(Calendar.YEAR) < 1000 || c.get(Calendar.YEAR) > 9999);
+		return !(c.get(Calendar.YEAR) < THOUSAND || c.get(Calendar.YEAR) > NINE_NINE_NINE_NINE);
 	}
 
 	/**
@@ -1379,9 +1516,11 @@ public class Validator {
 		}
 	}
 
-	// TODO: entity exists method
-
 	protected boolean isInteger(String fieldName) {
+		return isInteger(fieldName, false);
+	}
+
+	protected boolean isInteger(String fieldName, boolean checkPositive) {
 		String fieldValue = getFieldValue(fieldName);
 
 		if (fieldValue == null) {
@@ -1397,8 +1536,7 @@ public class Validator {
 		} catch (Exception e) {
 			return false;
 		}
-
-		return true;
+		return !(checkPositive && Integer.parseInt(fieldValue) < 0);
 	}
 
 	protected boolean isInSet(String fieldName, ArrayList set) {
@@ -1617,7 +1755,7 @@ public class Validator {
 	}
 
 	protected boolean isSetBlank(String fieldName) {
-		String fieldValues[] = validatorHelper.getParameterValues(fieldName);
+		String[] fieldValues = validatorHelper.getParameterValues(fieldName);
 
 		return fieldValues == null || fieldValues.length == 0;
 
@@ -1633,7 +1771,7 @@ public class Validator {
 			values.put(rob.getValue(), Boolean.TRUE);
 		}
 
-		String fieldValues[];
+		String[] fieldValues;
 		if (multValues) {
 			fieldValues = validatorHelper.getParameterValues(fieldName);
 		} else {
@@ -1676,7 +1814,7 @@ public class Validator {
 			values.put(rob.getValue(), Boolean.TRUE);
 		}
 
-		String fieldValues[];
+		String[] fieldValues;
 		if (multValues) {
 			// fieldValues = request.getParameterValues(fieldName);
 			fieldValues = validatorHelper.getParameter(fieldName).split(",");
@@ -1744,7 +1882,7 @@ public class Validator {
 			// consider they match
 			return "".equals(oldValue);
 		}
-		System.out.println("value matches initial: found " + oldValue + " versus " + fieldValue);
+		logger.debug("value matches initial: found " + oldValue + " versus " + fieldValue);
 		return fieldValue.equals(oldValue);
 	}
 
@@ -1779,6 +1917,15 @@ public class Validator {
 		validations.put(lastField, fieldValidations);
 	}
 
+	/**
+	 * process crf validation function.
+	 * 
+	 * @param inputFunction
+	 *            String
+	 * @return Validation
+	 * @throws Exception
+	 *             an Exception
+	 */
 	public static Validation processCRFValidationFunction(String inputFunction) throws Exception {
 
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
@@ -1790,6 +1937,7 @@ public class Validator {
 
 		String fname;
 		ArrayList args;
+		int externalValue = THREE;
 
 		HashMap numArgsByFunction = new HashMap();
 		numArgsByFunction.put("range", 2);
@@ -1799,7 +1947,7 @@ public class Validator {
 		numArgsByFunction.put("lte", 1);
 		numArgsByFunction.put("ne", 1);
 		numArgsByFunction.put("eq", 1);
-		numArgsByFunction.put("getExternalValue", 3);
+		numArgsByFunction.put("getExternalValue", externalValue);
 
 		HashMap valTypeByFunction = new HashMap();
 		valTypeByFunction.put("range", Validator.IS_IN_RANGE);
@@ -1839,7 +1987,7 @@ public class Validator {
 
 			// if i > = 3, then we are dealing with arg2 or above
 			// this means we need to get rid of the preceding ,
-			if (i >= 3) {
+			if (i >= externalValue) {
 				arg = arg.substring(1);
 			}
 			arg = arg.trim();
@@ -1851,7 +1999,7 @@ public class Validator {
 				&& !fname.equalsIgnoreCase("ne") && !fname.equalsIgnoreCase("getexternalvalue")) {
 			throw new Exception(resexception.getString("validation_column_invalid_function"));
 		}
-		// test that the right number of arguments have been provdided; complain
+		// test that the right number of arguments have been provided; complain
 		// if not
 		Integer numProperArgsInFunction = (Integer) numArgsByFunction.get(fname);
 		if (args.size() != numProperArgsInFunction) {
@@ -1887,15 +2035,24 @@ public class Validator {
 		return v;
 	}
 
+	/**
+	 * process all the validation regexps.
+	 * 
+	 * @param inputRegex
+	 *            String
+	 * @return Validation
+	 * @throws Exception
+	 *             an Exception
+	 */
 	public static Validation processCRFValidationRegex(String inputRegex) throws Exception {
 
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
 
 		Validation v = new Validation(Validator.MATCHES_REGULAR_EXPRESSION);
-
+		int subString = SEVEN;
 		// inputRegex should be looking like "regexp:/expression/" if it goes
 		// this far
-		String finalRegexp = inputRegex.substring(7).trim();
+		String finalRegexp = inputRegex.substring(subString).trim();
 		finalRegexp = finalRegexp.substring(1, finalRegexp.length() - 1);
 		// YW >>
 
@@ -1907,6 +2064,12 @@ public class Validator {
 		return v;
 	}
 
+	/**
+	 * remove field validations.
+	 * 
+	 * @param fieldName
+	 *            String
+	 */
 	public void removeFieldValidations(String fieldName) {
 		if (validations.containsKey(fieldName)) {
 			validations.remove(fieldName);
@@ -1916,10 +2079,24 @@ public class Validator {
 	/**
 	 * Return error message of widthDecimal validation. If valid, no message returns.
 	 * 
+	 * @param widthDecimal
+	 *            String
+	 * @param dataType
+	 *            String
+	 * @param isCalculationItem
+	 *            boolean
+	 * @param locale
+	 *            Locale
+	 * 
+	 * @return a string with the decimal setting.
 	 * 
 	 */
 	public static StringBuffer validateWidthDecimalSetting(String widthDecimal, String dataType,
 			boolean isCalculationItem, Locale locale) {
+		int widthLimit = FOUR_THOUSAND;
+		int intLimit = TEN;
+		int realLimit = TWENTY_SIX;
+		int otherRealLimit = THIRTY;
 		StringBuffer message = new StringBuffer();
 		ResourceBundle resException = ResourceBundleProvider.getExceptionsBundle(locale);
 		if (Validator.validWidthDecimalPattern(widthDecimal, isCalculationItem)) {
@@ -1927,22 +2104,22 @@ public class Validator {
 			int decimal = Validator.parseDecimal(widthDecimal);
 			if (width > 0) {
 				if ("ST".equalsIgnoreCase(dataType)) {
-					if (width > 4000) {
+					if (width > widthLimit) {
 						message.append(" ").append(dataType).append(" ")
-								.append(resException.getString("datatype_maximum_width_is")).append(" ").append(4000)
-								.append(".");
+								.append(resException.getString("datatype_maximum_width_is")).append(" ")
+								.append(FOUR_THOUSAND).append(".");
 					}
 				} else if ("INT".equalsIgnoreCase(dataType)) {
-					if (width > 10) {
+					if (width > intLimit) {
 						message.append(" ").append(dataType).append(" ")
-								.append(resException.getString("datatype_maximum_width_is")).append(" ").append(10)
+								.append(resException.getString("datatype_maximum_width_is")).append(" ").append(TEN)
 								.append(".");
 					}
 				} else if ("REAL".equalsIgnoreCase(dataType)) {
-					if (width > 26) {
+					if (width > realLimit) {
 						message.append(" ").append(dataType).append(" ")
-								.append(resException.getString("datatype_maximum_width_is")).append(" ").append(26)
-								.append(".");
+								.append(resException.getString("datatype_maximum_width_is")).append(" ")
+								.append(TWENTY_SIX).append(".");
 					}
 				}
 			}
@@ -1957,7 +2134,7 @@ public class Validator {
 					if (width > 0 && decimal >= width) {
 						message.append(" ").append(resException.getString("decimal_cannot_larger_than_width"));
 					}
-					if (decimal > 30) {
+					if (decimal > otherRealLimit) {
 						message.append(" ").append(resException.getString("decimal_cannot_larger_than_30"));
 					}
 				}
@@ -1974,6 +2151,15 @@ public class Validator {
 		return message;
 	}
 
+	/**
+	 * generate a true or false base on the width of the decimal.
+	 * 
+	 * @param widthDecimal
+	 *            String
+	 * @param isCalculationItem
+	 *            boolean
+	 * @return boolean
+	 */
 	public static boolean validWidthDecimalPattern(String widthDecimal, boolean isCalculationItem) {
 		String pattern;
 		if (isCalculationItem) {
@@ -1985,6 +2171,13 @@ public class Validator {
 		return Pattern.matches(pattern, widthDecimal);
 	}
 
+	/**
+	 * generate parse width.
+	 * 
+	 * @param widthDecimal
+	 *            String
+	 * @return int
+	 */
 	public static int parseWidth(String widthDecimal) {
 		String w;
 		widthDecimal = widthDecimal.trim();
@@ -1999,6 +2192,13 @@ public class Validator {
 		return 0;
 	}
 
+	/**
+	 * generate parse decimal.
+	 * 
+	 * @param widthDecimal
+	 *            String
+	 * @return int
+	 */
 	public static int parseDecimal(String widthDecimal) {
 		String d = "";
 		widthDecimal = widthDecimal.trim();
