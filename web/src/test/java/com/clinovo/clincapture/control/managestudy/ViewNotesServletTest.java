@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ViewNotesServletTest extends DefaultAppContextTest {
 
 	public static final int FIVE = 5;
@@ -115,7 +116,7 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatViewNotesServletReturnsCorrectStatusesInSummaryMap() throws Exception {
-		viewNotesServlet.processRequest(request, response);
+		viewNotesServlet.processRequest(request, response);		
 		Map<String, Map<String, String>> customStat = (Map<String, Map<String, String>>) request
 				.getAttribute("summaryMap");
 		Map.Entry entry0 = Iterables.get(customStat.entrySet(), 0);

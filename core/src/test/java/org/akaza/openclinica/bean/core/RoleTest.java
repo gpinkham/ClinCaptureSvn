@@ -23,12 +23,13 @@ import java.util.ResourceBundle;
 
 import static org.junit.Assert.assertEquals;
 
+@SuppressWarnings({ "rawtypes" })
 public class RoleTest {
 
 	public static final int EIGHT = 8;
 	public static final int NINE = 9;
 	public static final int THREE = 3;
-	public static final int SIX = 6;
+	public static final int SIX = 6;	
 	private Map role = null;
 	private Map roleWithDescription = null;
 	private ResourceBundle resTerm = null;
