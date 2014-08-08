@@ -16,6 +16,10 @@
     </properties>
     
     <dependencies>
+        <dependency>
+            <groupId>org.apache.ws.commons.schema</groupId>
+            <artifactId>XmlSchema</artifactId>
+        </dependency>
     	<dependency>
             <groupId>com.clinovo.clincapture</groupId>
             <artifactId>core</artifactId>
