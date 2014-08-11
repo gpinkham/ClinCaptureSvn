@@ -1552,7 +1552,7 @@ function refreshSdvPage() {
 
 function setImageInParentWin(strParentWinImageName,strParentWinImageFullPath, resolutionStatusId) {
     var objImage;
-    window.refreshSdvPage();
+    refreshSdvPage();
     if (window.opener && !window.opener.closed) {
         objImage = MM_findObjInParentWin(strParentWinImageName);
         if (objImage != null) {
