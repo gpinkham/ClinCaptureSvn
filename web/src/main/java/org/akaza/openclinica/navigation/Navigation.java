@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -20,16 +20,19 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
 
+/**
+ * Navigation class.
+ */
 @SuppressWarnings({ "unchecked" })
-public class Navigation {
+public final class Navigation {
 
 	// "skip!"-set of pages, non pop-ups
 	private static Set<String> exclusionURLs = new HashSet<String>(Arrays.asList("/PageToCreateNewStudyEvent",
-			"/CRFListForStudyEvent", "/VerifyImportedCRFData", "/UpdateStudySubject", "/RemoveStudySubject", 
-			"/ResolveDiscrepancy", "/RestoreStudySubject", "/UpdateStudyEvent", "/RemoveStudyEvent", 
-			"/RestoreStudyEvent", "/DeleteEventCRF", "/RemoveEventCRF",	"/RestoreEventCRF", "/InitUpdateCRF",
-			"/InitUpdateSubStudy", "/UpdateSubStudy", "/DeleteStudyEvent", "/EditStudyUserRole", 
-			"/ViewSectionDataEntry", "/CreateSubjectGroupClass", "/SetStudyUserRole", "/UpdateProfile", 
+			"/CRFListForStudyEvent", "/VerifyImportedCRFData", "/UpdateStudySubject", "/RemoveStudySubject",
+			"/ResolveDiscrepancy", "/RestoreStudySubject", "/UpdateStudyEvent", "/RemoveStudyEvent",
+			"/RestoreStudyEvent", "/DeleteEventCRF", "/RemoveEventCRF", "/RestoreEventCRF", "/InitUpdateCRF",
+			"/InitUpdateSubStudy", "/UpdateSubStudy", "/DeleteStudyEvent", "/EditStudyUserRole",
+			"/ViewSectionDataEntry", "/CreateSubjectGroupClass", "/SetStudyUserRole", "/UpdateProfile",
 			"/SectionPreview", "/DefineStudyEvent", "/InitUpdateEventDefinition", "/UpdateEventDefinition",
 			"/RemoveEventDefinition", "/RemoveSubject", "/RemoveStudy", "/ViewUserAccount", "/EditUserAccount",
 			"/SetUserRole", "/ViewUserAccount", "/Configure", "/CreateUserAccount", "/UpdateJobImport",
@@ -40,24 +43,37 @@ public class Navigation {
 			"/CreateDataset", "/EditSelected", "/EditDataset", "/pages/managestudy/chooseCRFVersion",
 			"/pages/managestudy/confirmCRFVersionChange", "/pages/managestudy/changeCRFVersion", "/CreateCRFVersion",
 			"/RemoveCRF", "/RemoveCRFVersion", "/RestoreCRF", "/RestoreCRFVersion", "/DeleteCRFVersion",
-			"/LockCRFVersion", "/UnlockCRFVersion", "/CreateSubStudy", "/RemoveCRFFromDefinition", 
+			"/LockCRFVersion", "/UnlockCRFVersion", "/CreateSubStudy", "/RemoveCRFFromDefinition",
 			"/RestoreCRFFromDefinition", "/AddCRFToDefinition"));
 	// ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintAllEventCRF", "/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
 			"/ViewItemDetail", "/PrintCRF", "/PrintEventCRF", "/ViewRulesAssignment", "/SelectItems",
 			"/DownloadRuleSetXml", "/UpdateRuleSetRule", "/pages/handleSDVGet", "/DownloadVersionSpreadSheet",
-			"/PrintAllSiteEventCRF", "/DeleteUser", "/UnLockUser", "/DeleteStudyUserRole", "/PauseJob", 
-			"/CreateDiscrepancyNote", "/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile", 
+			"/PrintAllSiteEventCRF", "/DeleteUser", "/UnLockUser", "/DeleteStudyUserRole", "/PauseJob",
+			"/CreateDiscrepancyNote", "/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile",
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc", "/help",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
 			"/ChangeDefinitionCRFOrdinal", "/DoubleDataEntry", "/CreateOneDiscrepancyNote", "/MatchPassword",
-			"/pages/handleSDVPost", "/pages/handleSDVRemove", "/CompleteCrfDelete", "/pages/sdvStudySubjects", 
+			"/pages/handleSDVPost", "/pages/handleSDVRemove", "/CompleteCrfDelete", "/pages/sdvStudySubjects",
 			"/InitialDataEntry", "/AdministrativeEditing"));
-	// set of pages with special processing 
+	// set of pages with special processing
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects"));
 	private static String defaultShortURL = "/MainMenu";
 
+	private Navigation() {
+	}
+
+	/**
+	 * Removes a url from the visitedURLs.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param excludeUrl
+	 *            String
+	 * @throws Exception
+	 *             an Exception
+	 */
 	public static void removeUrl(HttpServletRequest request, String excludeUrl) throws Exception {
 		Stack<String> visitedURLs = (Stack<String>) request.getSession().getAttribute("visitedURLs");
 		if (visitedURLs != null) {
@@ -70,8 +86,11 @@ public class Navigation {
 		}
 	}
 
-	/*
+	/**
 	 * Here send/receive logic of visitedURLs-stack is accumulated. You can add transfer-logic here.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
 	 */
 	public static void addToNavigationStack(HttpServletRequest request) {
 		String urlPrefix = request.getContextPath();
@@ -83,6 +102,11 @@ public class Navigation {
 			Stack<String> visitedURLs = new Stack<String>();
 			if (request.getSession().getAttribute("visitedURLs") != null) {
 				visitedURLs = (Stack<String>) request.getSession().getAttribute("visitedURLs");
+			} else {
+				if (request.getRequestURL().toString().endsWith("/AccessFile")) {
+					request.getSession().setAttribute("redirectAfterLogin",
+							request.getRequestURL().toString().concat("?").concat(request.getQueryString()));
+				}
 			}
 			processRequestURL(visitedURLs, request);
 			request.getSession().setAttribute("visitedURLs", visitedURLs);
@@ -111,7 +135,7 @@ public class Navigation {
 				}
 				if (!exclusionURLs.contains(requestShortURI)) {
 					if (!specialURLs.contains(requestShortURI)) {
-						if (!visitedURLs.peek().split("\\?")[0].equals(requestShortURI)){
+						if (!visitedURLs.peek().split("\\?")[0].equals(requestShortURI)) {
 							visitedURLs.push(requestShortURL);
 						}
 					} else {
@@ -130,12 +154,12 @@ public class Navigation {
 			}
 		}
 	}
-	
+
 	private static void specialProcessingForURL(Stack<String> visitedURLs, String requestShortURL) {
 		String requestShortURI = requestShortURL.split("\\?")[0];
 		if ("/ListEventsForSubjects".equals(requestShortURI)) {
-			if (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects") ||
-					visitedURLs.peek().split("\\?")[0].equals("/ListStudySubjects")) {
+			if (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects")
+					|| visitedURLs.peek().split("\\?")[0].equals("/ListStudySubjects")) {
 				visitedURLs.pop();
 				visitedURLs.push(requestShortURL);
 			} else {

@@ -60,7 +60,6 @@
 
 	<bean id="successHandler"
 		class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
-        <property name="alwaysUseDefaultTargetUrl" value="true"/>
 		<property name="defaultTargetUrl" value="/MainMenu" /> <!-- which is the default value -->
 	</bean>
 

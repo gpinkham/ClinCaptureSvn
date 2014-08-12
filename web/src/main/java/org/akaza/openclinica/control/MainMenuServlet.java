@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -23,16 +23,6 @@ package org.akaza.openclinica.control;
 import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
 import com.clinovo.model.Widget;
 import com.clinovo.model.WidgetsLayout;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -52,6 +42,14 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 /**
  * 
  * The main controller servlet for all the work behind study sites for OpenClinica.
@@ -63,26 +61,39 @@ import org.springframework.stereotype.Component;
 @Component
 public class MainMenuServlet extends Controller {
 
+	public static final int EIGHT = 8;
+	public static final int SIXTY = 60;
+	public static final int THOUSAND = 1000;
+	public static final int TWENTY_FOUR = 24;
+
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		//
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		ub.incNumVisitsToMainMenu();
+
+		String redirectAfterLogin = (String) request.getSession().getAttribute("redirectAfterLogin");
+		if (redirectAfterLogin != null) {
+			request.getSession().removeAttribute("redirectAfterLogin");
+			request.setAttribute("redirectAfterLogin", redirectAfterLogin);
+		}
 
 		request.getSession().setAttribute(USER_BEAN_NAME, ub);
 		request.getSession().setAttribute("userRole", currentRole);
 		request.setAttribute("iconInfoShown", true);
 		request.setAttribute("closeInfoShowIcons", false);
 
-		if (ub == null || ub.getId() == 0) {// in case database connection is
+		if (ub.getId() == 0) {
+			// in case database connection is
 			// broken
 			forwardPage(Page.MENU, false, request, response);
 			return;
@@ -120,10 +131,11 @@ public class MainMenuServlet extends Controller {
 			Calendar cal = Calendar.getInstance();
 			// compute difference between current date and lastPwdChangeDate
 			long difference = Math.abs(cal.getTime().getTime() - lastPwdChangeDate.getTime());
-			long days = difference / (1000 * 60 * 60 * 24);
+			long days = difference / (THOUSAND * SIXTY * SIXTY * TWENTY_FOUR);
 			request.getSession().setAttribute("passwordExpired", "no");
 
-			if (pwdExpireDay != 0 && days >= pwdExpireDay) {// password expired, need to be changed
+			if (pwdExpireDay != 0 && days >= pwdExpireDay) {
+				// password expired, need to be changed
 				studies = (ArrayList) sdao.findAllByUser(ub.getName());
 				request.setAttribute("studies", studies);
 				request.getSession().setAttribute("userBean1", ub);
@@ -162,10 +174,12 @@ public class MainMenuServlet extends Controller {
 				}
 
 				Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(
-						" AND dn.assigned_user_id = " + ub.getId() + " AND dn.resolution_status_id IN (1,2,3)", currentStudy);
+						" AND dn.assigned_user_id = " + ub.getId() + " AND dn.resolution_status_id IN (1,2,3)",
+						currentStudy);
 				request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
 
-				int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+				int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId()
+						: currentStudy.getId();
 				StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 				StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
 				currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
@@ -194,7 +208,8 @@ public class MainMenuServlet extends Controller {
 
 					int studyId = sb.getId();
 					int userId = ub.getId();
-					List<WidgetsLayout> widgetsLayout = getWidgetsLayoutService().findAllByStudyIdAndUserId(studyId, userId);
+					List<WidgetsLayout> widgetsLayout = getWidgetsLayoutService().findAllByStudyIdAndUserId(studyId,
+							userId);
 					List<DisplayWidgetsLayoutBean> dispayWidgetsLayout = new ArrayList<DisplayWidgetsLayoutBean>();
 					int widgetsOrdinalCounter = 1;
 					int tcWidgetsOrdinalCounter = 1;
@@ -228,7 +243,9 @@ public class MainMenuServlet extends Controller {
 									currentWidgetsLayout.setOrdinal(0);
 								}
 
-								widgetsLayout.add(currentWidgetsLayout);
+								if (widgetsLayout != null) {
+									widgetsLayout.add(currentWidgetsLayout);
+								}
 								currentWidget.getWidgetsLayout().add(currentWidgetsLayout);
 
 							}
@@ -237,19 +254,21 @@ public class MainMenuServlet extends Controller {
 						}
 					}
 
-					for (WidgetsLayout currentLayout : widgetsLayout) {
+					if (widgetsLayout != null) {
+						for (WidgetsLayout currentLayout : widgetsLayout) {
 
-						Widget currentWidget = getWidgetService().findByChildsId(currentLayout.getId());
+							Widget currentWidget = getWidgetService().findByChildsId(currentLayout.getId());
 
-						String widgetName = currentWidget.getWidgetName().toLowerCase().replaceAll(" ", "_");
-						DisplayWidgetsLayoutBean currentDisplay = new DisplayWidgetsLayoutBean();
+							String widgetName = currentWidget.getWidgetName().toLowerCase().replaceAll(" ", "_");
+							DisplayWidgetsLayoutBean currentDisplay = new DisplayWidgetsLayoutBean();
 
-						currentDisplay.setWidgetName(widgetName + ".jsp");
-						currentDisplay.setOrdinal(currentLayout.getOrdinal());
-						currentDisplay.setWidgetId(currentWidget.getId());
-						currentDisplay.setTwoColumnWidget(currentWidget.isTwoColumnWidget());
+							currentDisplay.setWidgetName(widgetName + ".jsp");
+							currentDisplay.setOrdinal(currentLayout.getOrdinal());
+							currentDisplay.setWidgetId(currentWidget.getId());
+							currentDisplay.setTwoColumnWidget(currentWidget.isTwoColumnWidget());
 
-						dispayWidgetsLayout.add(currentDisplay);
+							dispayWidgetsLayout.add(currentDisplay);
+						}
 					}
 
 					boolean newWidgetMessageTrigger = true;
@@ -336,7 +355,8 @@ public class MainMenuServlet extends Controller {
 	private boolean widgetAddedToLayout(int widgetId, int userId, int studyId) {
 
 		boolean widgetAddedToLayout = true;
-		WidgetsLayout widgetsLayout = getWidgetsLayoutService()	.findByWidgetIdAndStudyIdAndUserId(widgetId, studyId, userId);
+		WidgetsLayout widgetsLayout = getWidgetsLayoutService().findByWidgetIdAndStudyIdAndUserId(widgetId, studyId,
+				userId);
 
 		if (widgetsLayout == null) {
 			widgetAddedToLayout = false;
@@ -436,7 +456,7 @@ public class MainMenuServlet extends Controller {
 		String findSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("findSubjectsHtml", findSubjectsHtml);
 	}
-	
+
 	private boolean browserSupportNewLayout(HttpServletRequest request) {
 
 		String userAgent = request.getHeader("User-Agent");
@@ -444,7 +464,7 @@ public class MainMenuServlet extends Controller {
 		if (userAgent.contains("MSIE")) { // Checking if Internet Explorer
 			String substring = userAgent.substring(userAgent.indexOf("MSIE")).split(";")[0];
 			float iExplorerVersion = Float.parseFloat(substring.split(" ")[1]);
-			if (iExplorerVersion < 8) {
+			if (iExplorerVersion < EIGHT) {
 				displayNewLayout = false;
 			}
 		}

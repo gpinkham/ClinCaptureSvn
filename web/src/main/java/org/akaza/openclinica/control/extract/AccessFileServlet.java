@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -20,16 +20,6 @@
  */
 package org.akaza.openclinica.control.extract;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -45,16 +35,39 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+/**
+ * AccessFileServlet class.
+ */
 @SuppressWarnings({ "serial" })
 @Component
 public class AccessFileServlet extends Controller {
 
-	public static String getLink(int fId) {
+	/**
+	 * Method builds link to download a file by file id.
+	 * 
+	 * @param fId
+	 *            file id
+	 * @return String
+	 */
+	public String getLink(int fId) {
 		return "AccessFile?fileId=" + fId;
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if (request.getSession().getAttribute("redirectAfterLogin") != null) {
+			response.sendRedirect(request.getContextPath() + Page.MENU_SERVLET.getFileName());
+			return;
+		}
 		FormProcessor fp = new FormProcessor(request);
 		int fileId = fp.getInt("fileId");
 		ArchivedDatasetFileDAO asdfdao = getArchivedDatasetFileDAO();
@@ -67,18 +80,20 @@ public class AccessFileServlet extends Controller {
 		if (parentId == 0) {
 			// Logged in at study level
 			StudyBean studyBean = (StudyBean) studyDao.findByPK(dsBean.getStudyId());
-			parentId = studyBean.getParentStudyId();// parent id of dataset created
+			parentId = studyBean.getParentStudyId();
+			// parent id of dataset created
 
 		}
 		// logic: is parentId of the dataset created not equal to currentstudy? or is current study
-		if ((parentId) != currentStudy.getId())
+		if ((parentId) != currentStudy.getId()) {
 			if (dsBean.getStudyId() != currentStudy.getId()) {
-				addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				addPageMessage(
+						respage.getString("no_have_correct_privilege_current_study")
 								+ respage.getString("change_study_contact_sysadmin"), request);
 				throw new InsufficientPermissionException(Page.MENU_SERVLET,
-						resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+						resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 			}
-
+		}
 		if (asdfBean.getFileReference().endsWith(".zip")) {
 			response.setHeader("Content-disposition", "attachment; filename=\"" + asdfBean.getName() + "\";");
 			response.setContentType("application/zip");
@@ -138,21 +153,26 @@ public class AccessFileServlet extends Controller {
 					try {
 						bis.close();
 					} catch (IOException ex) {
-						logger.error("Failed to close instance of BufferedInputStream in the AccessFileServlet.java: 141", ex);
+						logger.error(
+								"Failed to close instance of BufferedInputStream in the AccessFileServlet.java: 141",
+								ex);
 					}
 				}
 				if (is != null) {
 					try {
 						is.close();
 					} catch (IOException ex) {
-						logger.error("Failed to close instance of FileInputStream in the AccessFileServlet.java: 148", ex);
+						logger.error("Failed to close instance of FileInputStream in the AccessFileServlet.java: 148",
+								ex);
 					}
 				}
 				if (bos != null) {
 					try {
 						bos.close();
 					} catch (IOException ex) {
-						logger.error("Failed to close instance of BufferedOutputStream in the AccessFileServlet.java: 155", ex);
+						logger.error(
+								"Failed to close instance of BufferedOutputStream in the AccessFileServlet.java: 155",
+								ex);
 					}
 				}
 				if (sos != null) {
@@ -160,7 +180,9 @@ public class AccessFileServlet extends Controller {
 						sos.flush();
 						sos.close();
 					} catch (IOException ex) {
-						logger.error("Failed to close instance of ServletOutputStream in the AccessFileServlet.java: 163", ex);
+						logger.error(
+								"Failed to close instance of ServletOutputStream in the AccessFileServlet.java: 163",
+								ex);
 					}
 				}
 			}
@@ -176,15 +198,16 @@ public class AccessFileServlet extends Controller {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR) || currentRole.getRole().equals(Role.INVESTIGATOR) 
+		if (currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)
 				|| currentRole.getRole().equals(Role.STUDY_MONITOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 
