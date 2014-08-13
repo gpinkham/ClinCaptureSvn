@@ -3214,7 +3214,7 @@ function Pager(tableName, itemsPerPage) {
     this.init = function () {
 
         var tableBodies = document.getElementById(tableName).tBodies;
-        var records = (tableBodies.length - 1);
+        var records = tableBodies.length;
         this.pages = Math.ceil(records / itemsPerPage);
         this.inited = true;
 
