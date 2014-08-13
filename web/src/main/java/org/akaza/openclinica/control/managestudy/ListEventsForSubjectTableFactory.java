@@ -445,14 +445,13 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private ArrayList<StudyEventDefinitionBean> getStudyEventDefinitions() {
+
 		if (this.studyEventDefinitions == null) {
-			if (studyBean.getParentStudyId() > 0) {
-				StudyBean parentStudy = (StudyBean) getStudyDAO().findByPK(studyBean.getParentStudyId());
-				studyEventDefinitions = getStudyEventDefinitionDAO().findAllByStudy(parentStudy);
-			} else {
-				studyEventDefinitions = getStudyEventDefinitionDAO().findAllByStudy(studyBean);
-			}
+
+			int studyId = studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean.getId();
+			studyEventDefinitions = getStudyEventDefinitionDAO().findAllActiveByStudyId(studyId);
 		}
+
 		return this.studyEventDefinitions;
 	}
 
