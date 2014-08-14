@@ -1536,10 +1536,12 @@ function MM_findObjInParentWin(strParentWinImageName) { //v4.0
 }
 
 function refreshSdvPage() {
-    if (window.opener && !window.opener.closed) {
-        window.opener.refreshSdvPage();
-    } else if (window.sdvPage) {
-        location.reload();
+    try {
+        if (window.opener.opener && !window.opener.opener.closed && window.opener.opener.location.href.indexOf("viewAllSubjectSDVtmp") > 0) {
+            window.opener.opener.location.reload();
+        }
+    } catch (e) {
+        console.log(e.message)
     }
 }
 
@@ -1552,8 +1554,8 @@ function refreshSdvPage() {
 
 function setImageInParentWin(strParentWinImageName,strParentWinImageFullPath, resolutionStatusId) {
     var objImage;
-    refreshSdvPage();
     if (window.opener && !window.opener.closed) {
+        refreshSdvPage();
         objImage = MM_findObjInParentWin(strParentWinImageName);
         if (objImage != null) {
             objImage.src = strParentWinImageFullPath;
