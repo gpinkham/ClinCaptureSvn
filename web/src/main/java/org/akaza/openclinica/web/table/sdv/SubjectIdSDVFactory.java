@@ -366,7 +366,6 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 		EventDefinitionCRFDAO eventDefinitionCrfDAO = new EventDefinitionCRFDAO(dataSource);
-		StudyDAO studyDAO = new StudyDAO(dataSource);
 		CRFDAO crfDAO = new CRFDAO(dataSource);
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		StudyEventBean studyEventBean;
@@ -399,11 +398,13 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 				continue;
 			}
 			CRFBean crfBean = crfDAO.findByVersionId(eventBean.getCRFVersionId());
-			StudyBean subjectStudy = (StudyBean) studyDAO.findByPK(studySubject.getStudyId());
-			EventDefinitionCRFBean eventDefinitionCrf =
-					eventDefinitionCrfDAO.findByStudyEventDefinitionIdAndCRFId(subjectStudy,
-					studyEventBean.getStudyEventDefinitionId(), crfBean.getId());
-
+			EventDefinitionCRFBean eventDefinitionCrf = eventDefinitionCrfDAO
+					.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventBean.getStudyEventDefinitionId(),
+							crfBean.getId(), studySubject.getStudyId());
+			if (eventDefinitionCrf.getId() == 0) {
+				eventDefinitionCrf = eventDefinitionCrfDAO.findForStudyByStudyEventDefinitionIdAndCRFId(
+						studyEventBean.getStudyEventDefinitionId(), crfBean.getId());
+			}
 			// get number of completed event crfs
 			if (eventBean.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) {
 				numberOfCompletedEventCRFs++;

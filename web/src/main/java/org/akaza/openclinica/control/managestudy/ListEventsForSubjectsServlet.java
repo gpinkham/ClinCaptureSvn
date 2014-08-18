@@ -40,12 +40,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * <code>ListEventsForSubjectsServlet</code> class is a servlet, extends <code>RememberLastPage</code> class.
- * <p>
- * This class is meant to handle client requests for the Subject Matrix table view,
- * filtered on a specific study event definition.
- */
 @Component
 public class ListEventsForSubjectsServlet extends RememberLastPage {
 
@@ -126,7 +120,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		factory.setCurrentRole(currentRole);
 		factory.setCurrentUser(ub);
 		factory.setEventCRFDAO(getEventCRFDAO());
-		factory.setEventDefinitionCRFDAO(getEventDefinitionCRFDAO());
+		factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
 		factory.setCrfDAO(getCRFDAO());
 		factory.setCRFVersionDAO(getCRFVersionDAO());
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());

@@ -127,10 +127,9 @@ public class ResolveDiscrepancyServlet extends Controller {
 			ItemDataBean idb = (ItemDataBean) getItemDataDAO().findByPK(note.getEntityId());
 			EventCRFBean ecb = (EventCRFBean) getEventCRFDAO().findByPK(idb.getEventCRFId());
 			StudySubjectBean ssb = (StudySubjectBean) getStudySubjectDAO().findByPK(ecb.getStudySubjectId());
-			StudyBean subjectStudy = (StudyBean) getStudyDAO().findByPK(ssb.getStudyId());
 			CRFVersionBean crfvb = (CRFVersionBean) getCRFVersionDAO().findByPK(ecb.getCRFVersionId());
 			StudyEventBean seb = (StudyEventBean) getStudyEventDAO().findByPK(ecb.getStudyEventId());
-			EventDefinitionCRFBean edcb = getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFId(subjectStudy,
+			EventDefinitionCRFBean edcb = getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFId(
 					seb.getStudyEventDefinitionId(), crfvb.getCrfId());
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
 			dec.setEventDefinitionCRF(edcb);

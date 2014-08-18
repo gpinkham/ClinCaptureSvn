@@ -1032,7 +1032,7 @@ public class ImportCRFDataService {
 							} else {
 								EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(ds);
 								ArrayList<EventDefinitionCRFBean> requiredCrfs = (ArrayList<EventDefinitionCRFBean>) eventDefinitionCrfDao
-										.findAllByDefinition(studyEventDefintionBean.getId());
+										.findAllByEventDefinitionId(studyEventDefintionBean.getId());
 
 								for (EventDefinitionCRFBean def : requiredCrfs) {
 									int crfId = def.getCrfId();

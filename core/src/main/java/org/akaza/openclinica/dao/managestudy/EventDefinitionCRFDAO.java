@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
- *
+ * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -22,10 +22,12 @@ package org.akaza.openclinica.dao.managestudy;
 
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
@@ -39,592 +41,499 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
-/**
- * <code>EventDefinitionCRFDAO</code> class is a member of DAO layer, extends <code>AuditableEntityDAO</code> class.
- * <p/>
- * This class implements all the required data access logic for bean class <code>EventDefinitionCRFBean</code>.
- */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
 	private void setQueryNames() {
-
 		getCurrentPKName = "getCurrentPK";
 		getNextPKName = "getNextPK";
 		findAllByStudyName = "findAllByStudy";
 	}
 
-	/**
-	 * <code>EventDefinitionCRFDAO</code> class constructor.
-	 *
-	 * @param dataSource instance of <code>javax.sql.DataSource</code> class, which represents physical data source.
-	 */
-	public EventDefinitionCRFDAO(DataSource dataSource) {
-
-		super(dataSource);
+	public EventDefinitionCRFDAO(DataSource ds) {
+		super(ds);
 		setQueryNames();
 	}
 
-	/**
-	 * <code>EventDefinitionCRFDAO</code> class constructor.
-	 *
-	 * @param dataSource instance of <code>javax.sql.DataSource</code> class, which represents physical data source.
-	 * @param digester   instance of <code>DAODigester</code> class, which contains all of the named SQL queries,
-	 *                   which are specified for DAO class <code>EventDefinitionCRFDAO</code>.
-	 */
-	public EventDefinitionCRFDAO(DataSource dataSource, DAODigester digester) {
-
-		super(dataSource);
+	public EventDefinitionCRFDAO(DataSource ds, DAODigester digester) {
+		super(ds);
 		this.digester = digester;
 		setQueryNames();
 	}
 
 	@Override
 	protected void setDigesterName() {
-
 		digesterName = SQLFactory.getInstance().DAO_EVENTDEFINITIONCRF;
 	}
 
 	@Override
 	public void setTypesExpected() {
-
 		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+		this.setTypeExpected(2, TypeNames.INT);
+		this.setTypeExpected(3, TypeNames.INT);
+		this.setTypeExpected(4, TypeNames.INT);
+		this.setTypeExpected(5, TypeNames.BOOL);
 
-		int index = 1;
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.BOOL);
+		this.setTypeExpected(6, TypeNames.BOOL);
+		this.setTypeExpected(7, TypeNames.BOOL);
+		this.setTypeExpected(8, TypeNames.BOOL);
+		this.setTypeExpected(9, TypeNames.STRING);
+		this.setTypeExpected(10, TypeNames.INT);
 
-		this.setTypeExpected(index++, TypeNames.BOOL);
-		this.setTypeExpected(index++, TypeNames.BOOL);
-		this.setTypeExpected(index++, TypeNames.BOOL);
-		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.INT);
-
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.DATE);
-		this.setTypeExpected(index++, TypeNames.DATE);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.BOOL);
-
-		this.setTypeExpected(index++, TypeNames.BOOL);
-		this.setTypeExpected(index++, TypeNames.INT); // source_data_verification_id
-		this.setTypeExpected(index++, TypeNames.STRING); // selected_version_ids
-		this.setTypeExpected(index++, TypeNames.INT); // parent_id
-		this.setTypeExpected(index++, TypeNames.STRING); // email_step
-		this.setTypeExpected(index++, TypeNames.STRING); // email_to
-		this.setTypeExpected(index, TypeNames.BOOL); //evaluated_crf
-	}
-
-	public EventDefinitionCRFBean getEntityFromHashMap(HashMap record) {
-
-		EventDefinitionCRFBean eventDefinitionCRF = new EventDefinitionCRFBean();
-		super.setEntityAuditInformation(eventDefinitionCRF, record);
-
-		eventDefinitionCRF.setId((Integer) record.get("event_definition_crf_id"));
-		eventDefinitionCRF.setStudyEventDefinitionId((Integer) record.get("study_event_definition_id"));
-		eventDefinitionCRF.setStudyId((Integer) record.get("study_id"));
-		eventDefinitionCRF.setCrfId((Integer) record.get("crf_id"));
-		eventDefinitionCRF.setRequiredCRF((Boolean) record.get("required_crf"));
-		eventDefinitionCRF.setDoubleEntry((Boolean) record.get("double_entry"));
-		eventDefinitionCRF.setRequireAllTextFilled((Boolean) record.get("require_all_text_filled"));
-		eventDefinitionCRF.setDecisionCondition((Boolean) record.get("decision_conditions"));
-		eventDefinitionCRF.setNullValues((String) record.get("null_values"));
-		eventDefinitionCRF.setDefaultVersionId((Integer) record.get("default_version_id"));
-		eventDefinitionCRF.setOrdinal((Integer) record.get("ordinal"));
-		eventDefinitionCRF.setElectronicSignature((Boolean) record.get("electronic_signature"));
-		String crfName = (String) record.get("crf_name");
-		eventDefinitionCRF.setCrfName(crfName != null ? crfName : eventDefinitionCRF.getCrfName());
-		eventDefinitionCRF.setHideCrf(((Boolean) record.get("hide_crf")));
-		int sdvId = (Integer) record.get("source_data_verification_code");
-		eventDefinitionCRF.setSourceDataVerification(sdvId > 0 ? SourceDataVerification.getByCode(sdvId)
-				: SourceDataVerification.NOTREQUIRED);
-		String selectedVersionIds = (String) record.get("selected_version_ids");
-		eventDefinitionCRF.setSelectedVersionIds(selectedVersionIds != null ? selectedVersionIds : "");
-		int parentId = (Integer) record.get("parent_id");
-		eventDefinitionCRF.setParentId(parentId > 0 ? parentId : 0);
-		String emailTo = (String) record.get("email_to");
-		eventDefinitionCRF.setEmailTo(emailTo != null ? emailTo : "");
-		String emailStep = (String) record.get("email_step");
-		eventDefinitionCRF.setEmailStep(emailStep != null ? emailStep : "");
-		eventDefinitionCRF.setEvaluatedCRF(((Boolean) record.get("evaluated_crf")));
-		return eventDefinitionCRF;
-	}
-
-	public List<EventDefinitionCRFBean> findAll() {
-
-		this.setTypesExpected();
-
-		List<HashMap<String, Object>> recordsFromDB = this.select(digester.getQuery("findAll"));
-
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
-		}
-
-		return resultSetOfBeans;
+		this.setTypeExpected(11, TypeNames.INT);
+		this.setTypeExpected(12, TypeNames.INT);
+		this.setTypeExpected(13, TypeNames.DATE);
+		this.setTypeExpected(14, TypeNames.DATE);
+		this.setTypeExpected(15, TypeNames.INT);
+		this.setTypeExpected(16, TypeNames.INT);
+		this.setTypeExpected(17, TypeNames.BOOL);
+		// Issue 3212
+		this.setTypeExpected(18, TypeNames.BOOL);
+		this.setTypeExpected(19, TypeNames.INT); // source_data_verification_id
+		this.setTypeExpected(20, TypeNames.STRING); // selected_version_ids
+		this.setTypeExpected(21, TypeNames.INT); // parent_id
+		this.setTypeExpected(22, TypeNames.STRING); // email_step
+		this.setTypeExpected(23, TypeNames.STRING); // email_to
+		this.setTypeExpected(24, TypeNames.BOOL); //evaluated_crf
 	}
 
 	/**
-	 * Returns the list of all event definition CRF beans, which are bound to the specified study event definition id;
-	 * ordered by the <code>ordinal</code> property of <code>EventDefinitionCRFBean</code> class,
-	 * in <code>ASC</code> mode.
-	 *
-	 * @param definitionId study event definition id, to search on.
-	 * @return the list of instances of <code>EventDefinitionCRFBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
+	 * <p>
+	 * getEntityFromHashMap, the method that gets the object from the database query.
 	 */
-	public List<EventDefinitionCRFBean> findAllByDefinition(int definitionId) {
+	public Object getEntityFromHashMap(HashMap hm) {
+		EventDefinitionCRFBean eb = new EventDefinitionCRFBean();
+		super.setEntityAuditInformation(eb, hm);
+		// EVENT_DEFINITION_CRF_ID STUDY_EVENT_DEFINITION_ID STUDY_ID
+		// CRF_ID REQUIRED_CRF DOUBLE_ENTRY REQUIRE_ALL_TEXT_FILLED
+		// DECISION_CONDITIONS DEFAULT_VERSION_ID STATUS_ID OWNER_ID
+		// DATE_CREATED DATE_UPDATED UPDATE_ID
+		eb.setId(((Integer) hm.get("event_definition_crf_id")).intValue());
+		eb.setStudyEventDefinitionId(((Integer) hm.get("study_event_definition_id")).intValue());
+		eb.setStudyId(((Integer) hm.get("study_id")).intValue());
+		eb.setCrfId(((Integer) hm.get("crf_id")).intValue());
+		eb.setRequiredCRF(((Boolean) hm.get("required_crf")).booleanValue());
+		eb.setDoubleEntry(((Boolean) hm.get("double_entry")).booleanValue());
+		eb.setRequireAllTextFilled(((Boolean) hm.get("require_all_text_filled")).booleanValue());
+		eb.setDecisionCondition(((Boolean) hm.get("decision_conditions")).booleanValue());
+		eb.setNullValues((String) hm.get("null_values"));
+		eb.setDefaultVersionId(((Integer) hm.get("default_version_id")).intValue());
+		eb.setOrdinal(((Integer) hm.get("ordinal")).intValue());
+		eb.setElectronicSignature(((Boolean) hm.get("electronic_signature")).booleanValue());
+		String crfName = (String) hm.get("crf_name");
+		eb.setCrfName(crfName != null ? crfName : eb.getCrfName());
+		// issue 3212
+		eb.setHideCrf(((Boolean) hm.get("hide_crf")));
+		int sdvId = (Integer) hm.get("source_data_verification_code");
+		eb.setSourceDataVerification(SourceDataVerification.getByCode(sdvId > 0 ? sdvId : 3));
+		String selectedVersionIds = (String) hm.get("selected_version_ids");
+		eb.setSelectedVersionIds(selectedVersionIds != null ? selectedVersionIds : "");
+		int parentId = (Integer) hm.get("parent_id");
+		eb.setParentId(parentId > 0 ? parentId : 0);
+		String emailTo = (String) hm.get("email_to");
+		eb.setEmailTo(emailTo != null ? emailTo : "");
+		String emailStep = (String) hm.get("email_step");
+		eb.setEmailStep(emailStep != null ? emailStep : "");
+		eb.setEvaluatedCRF(((Boolean) hm.get("evaluated_crf")));
+		return eb;
+	}
 
+	public Collection findAll() {
 		this.setTypesExpected();
-
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		queryParameters.put(1, definitionId);
-
-		List<HashMap<String, Object>> recordsFromDB = this.select(digester.getQuery("findAllByDefinition"),
-				queryParameters);
-
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		ArrayList alist = this.select(digester.getQuery("findAll"));
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
 		}
+		return al;
+	}
 
-		return resultSetOfBeans;
+	public Collection findAllByDefinition(int definitionId) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(definitionId));
+
+		String sql = digester.getQuery("findAllByDefinition");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
+		}
+		return al;
 	}
 
 	/**
-	 * Returns the list of event definition CRF beans, which are assigned to a specific study event definition
-	 * in a specific study or site.
-	 * <p/>
-	 * If the <code>study</code> parameter represents a study, then this method returns the list of a study level
-	 * event definition CRF beans only (records for sites are excluded), which are assigned to a specific
-	 * study event definition.
-	 * If the <code>study</code> parameter represents a site, then this method returns the list of event definition
-	 * CRF beans, which are assigned to a specific study event definition in that site. That is, if a site has its own
-	 * event definition CRF record in the data base for a specific CRF form, assigned to a specific study event
-	 * definition, then this event definition CRF record of a site level will be added to the result list instead of
-	 * a study level record for the same CRF form; otherwise - to the result list will be added an event definition CRF
-	 * record of a study level.
-	 * <p/>
-	 * The result list is ordered by the <code>ordinal</code> property of the <code>EventDefinitionCRFBean</code> class,
-	 * in <code>ASC</code> mode.
-	 *
-	 * @param study        an instance of the <code>StudyBean</code> class, which represents the study, to search in.
-	 * @param definitionId study event definition id, to search on.
-	 * @return the list of instances of <code>EventDefinitionCRFBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
+	 * Find all EventDefinitionCRFBean for the StudyBean.
+	 * 
+	 * @param study
+	 * @param definitionId
+	 * @return
 	 */
-	public List<EventDefinitionCRFBean> findAllByDefinition(StudyBean study, int definitionId) {
-
+	public Collection findAllByDefinition(StudyBean study, int definitionId) {
 		return study.isSite(study.getParentStudyId()) ? findAllByDefinitionAndSiteIdAndParentStudyId(definitionId,
 				study.getId(), study.getParentStudyId()) : findAllParentsByDefinition(definitionId);
 	}
 
-	/**
-	 * Returns the list of ids of event definition CRF beans with status available, assigned to a specific study or site,
-	 * and for which data entry and source data verification are required.
-	 *
-	 * @param studyBean an instance of the <code>StudyBean</code> class, which represents the study/site, to search in.
-	 * @return the list of ids of event definition CRF records, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
-	 */
 	public List<Integer> getRequiredEventCRFDefIdsThatShouldBeSDVd(StudyBean studyBean) {
-
+		List<Integer> result = new ArrayList<Integer>();
 		unsetTypeExpected();
 		setTypeExpected(1, TypeNames.INT);
 		setTypeExpected(2, TypeNames.INT);
-
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		int index = 1;
-		queryParameters.put(index++, studyBean.getId());
-		queryParameters.put(index, studyBean.getParentStudyId());
-
-		List<HashMap<String, Object>> recordsFromDB = this
-				.select(digester.getQuery("requiredEventCRFDefIdsThatShouldBeSDVd"),
-						queryParameters);
-
-		List<Integer> resultIdList = new ArrayList<Integer>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultIdList.add((Integer) record.get("event_definition_crf_id"));
+		HashMap variables = new HashMap();
+		variables.put(1, studyBean.getId());
+		variables.put(2, studyBean.getParentStudyId());
+		String sql = digester.getQuery("requiredEventCRFDefIdsThatShouldBeSDVd");
+		ArrayList rows = this.select(sql, variables);
+		Iterator it = rows.iterator();
+		while (it.hasNext()) {
+			result.add((Integer) ((HashMap) it.next()).get("event_definition_crf_id"));
 		}
-
-		return resultIdList;
+		return result;
 	}
 
 	/**
-	 * Returns the list of a study level event definition CRF beans only (records for sites are excluded),
-	 * which are assigned to a specific study event definition;
-	 * ordered by the <code>ordinal</code> property of the <code>EventDefinitionCRFBean</code> class,
-	 * in <code>ASC</code> mode.
-	 *
-	 * @param definitionId study event definition id, to search on.
-	 * @return the list of instances of <code>EventDefinitionCRFBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
+	 * Find all EventDefinitionCRFBean which have no parent EventDefinitionCRFBean.
+	 * 
+	 * @param definitionId
+	 * @return
 	 */
-	public List<EventDefinitionCRFBean> findAllParentsByDefinition(int definitionId) {
-
+	public Collection findAllParentsByDefinition(int definitionId) {
 		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(definitionId));
 
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		queryParameters.put(1, definitionId);
-
-		List<HashMap<String, Object>> recordsFromDB = this.select(digester.getQuery("findAllParentsByDefinition"),
-				queryParameters);
-
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		String sql = digester.getQuery("findAllParentsByDefinition");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
 		}
-
-		return resultSetOfBeans;
+		return al;
 	}
-
+	
 	/**
-	 * Returns the list of a site level event definition CRF beans only (records for study are excluded),
-	 * which are assigned to a specific study event definition;
-	 * ordered by the <code>ordinal</code> property of the <code>EventDefinitionCRFBean</code> class,
-	 * in <code>ASC</code> mode.
-	 *
-	 * @param definitionId study event definition id, to search on.
-	 * @return the list of instances of <code>EventDefinitionCRFBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
+	 * Find all EventDefinitionCRFBean which have no parent EventDefinitionCRFBean.
+	 * 
+	 * @param definitionId
+	 * @return
 	 */
-	public List<EventDefinitionCRFBean> findAllChildrenByDefinition(int definitionId) {
-
+	public ArrayList<EventDefinitionCRFBean> findAllChildrenByDefinition(int definitionId) {
 		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(definitionId));
 
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		queryParameters.put(1, definitionId);
-
-		List<HashMap<String, Object>> recordsFromDB = this.select(digester.getQuery("findAllChildrenByDefinition"),
-				queryParameters);
-
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		String sql = digester.getQuery("findAllChildrenByDefinition");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList<EventDefinitionCRFBean> al = new ArrayList<EventDefinitionCRFBean>();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
 		}
-
-		return resultSetOfBeans;
+		return al;
 	}
 
 	/**
-	 * Returns the list of event definition CRF beans, which are assigned to a specific study event definition
-	 * for a specific site. That is, if a site has its own event definition CRF record in the data base for
-	 * a specific CRF form, assigned to a specific study event definition, then this event definition CRF record
-	 * of a site level will be added to the result list instead of a study level record for the same CRF form;
-	 * otherwise - to the result list will be added an event definition CRF record of a study level.
-	 * <p/>
-	 * The result list is ordered by the <code>ordinal</code> property of the <code>EventDefinitionCRFBean</code> class,
-	 * in <code>ASC</code> mode.
-	 *
-	 * @param definitionId  study event definition id, to search on.
-	 * @param siteId        site id, to search on.
-	 * @param parentStudyId study id, to search on.
-	 * @return the list of instances of <code>EventDefinitionCRFBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
+	 * Find all EventDefinitionCRFBean for the site
+	 * 
+	 * @param definitionId
+	 * @param siteId
+	 * @param parentStudyId
+	 * @return
 	 */
-	public List<EventDefinitionCRFBean> findAllByDefinitionAndSiteIdAndParentStudyId(int definitionId, int siteId,
-			int parentStudyId) {
-
+	public Collection findAllByDefinitionAndSiteIdAndParentStudyId(int definitionId, int siteId, int parentStudyId) {
 		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(definitionId));
+		variables.put(new Integer(2), new Integer(siteId));
+		variables.put(new Integer(3), new Integer(parentStudyId));
+		variables.put(new Integer(4), new Integer(definitionId));
+		variables.put(new Integer(5), new Integer(siteId));
 
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		int index = 1;
-		queryParameters.put(index++, definitionId);
-		queryParameters.put(index++, siteId);
-		queryParameters.put(index++, parentStudyId);
-		queryParameters.put(index++, definitionId);
-		queryParameters.put(index, siteId);
-
-		List<HashMap<String, Object>> recordsFromDB =
-				this.select(digester.getQuery("findAllByDefinitionAndSiteIdAndParentStudyId"), queryParameters);
-
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		String sql = digester.getQuery("findAllByDefinitionAndSiteIdAndParentStudyId");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
 		}
-
-		return resultSetOfBeans;
+		return al;
 	}
 
-	/**
-	 * Returns the list of event definition CRF beans, which have a specific CRF form assigned.
-	 *
-	 * @param crfId CRF form id, to search on.
-	 * @return the list of instances of <code>EventDefinitionCRFBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
-	 */
-	public List<EventDefinitionCRFBean> findAllByCRF(int crfId) {
-
+	public Collection findAllByCRF(int crfId) {
 		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(crfId));
 
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		queryParameters.put(1, crfId);
-
-		List<HashMap<String, Object>> recordsFromDB = this.select(digester.getQuery("findByCRFId"), queryParameters);
-
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		String sql = digester.getQuery("findByCRFId");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
 		}
-
-		return resultSetOfBeans;
+		return al;
 	}
 
-	public List<EventDefinitionCRFBean> findAll(String strOrderByColumn, boolean blnAscendingSort,
-			String strSearchPhrase) {
+	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
+		ArrayList al = new ArrayList();
 
-		return new ArrayList<EventDefinitionCRFBean>();
+		return al;
 	}
 
-	/**
-	 * Returns the event definition CRF bean, which matches a specific OID.
-	 *
-	 * @param oid the OID value, to search on.
-	 * @return the instance of the <code>EventDefinitionCRFBean</code> class, which matches given OID;
-	 * if such an event definition CRF record was not found, returns <code>null</code>.
-	 */
 	public EventDefinitionCRFBean findByOid(String oid) {
-
+		EventDefinitionCRFBean eb = null;
 		this.setTypesExpected();
 
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		queryParameters.put(1, oid);
+		HashMap variables = new HashMap();
+		variables.put(1, oid);
 
-		List<HashMap<String, Object>> recordsFromDB = this.select(digester.getQuery("findByOid"), queryParameters);
+		String sql = digester.getQuery("findByOid");
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
 
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		if (it.hasNext()) {
+			eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
 		}
-
-		return resultSetOfBeans.isEmpty() ? null : resultSetOfBeans.get(0);
+		return eb;
 	}
-
+	
 	public EntityBean findByPK(int id) {
-
+		EventDefinitionCRFBean eb = new EventDefinitionCRFBean();
 		this.setTypesExpected();
 
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		queryParameters.put(1, id);
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(id));
 
-		List<HashMap<String, Object>> recordsFromDB = this.select(digester.getQuery("findByPK"), queryParameters);
+		String sql = digester.getQuery("findByPK");
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
 
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		if (it.hasNext()) {
+			eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
 		}
 
-		return resultSetOfBeans.isEmpty() ? new EventDefinitionCRFBean() : resultSetOfBeans.get(0);
+		return eb;
 	}
 
+	/**
+	 * Creates a new studysubject
+	 */
 	@SuppressWarnings("deprecation")
-	public EntityBean create(EntityBean entityBean) {
-
-		EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) entityBean;
+	public EntityBean create(EntityBean eb) {
+		EventDefinitionCRFBean sb = (EventDefinitionCRFBean) eb;
 		HashMap nullVars = new HashMap();
-		HashMap queryParameters = new HashMap();
+		HashMap variables = new HashMap();
 		int id = getNextPK();
-
-		int index = 1;
-		queryParameters.put(index++, id);
-		queryParameters.put(index++, eventDefCRFBean.getStudyEventDefinitionId());
-		queryParameters.put(index++, eventDefCRFBean.getStudyId());
-		queryParameters.put(index++, eventDefCRFBean.getCrfId());
-		queryParameters.put(index++, eventDefCRFBean.isRequiredCRF());
-		queryParameters.put(index++, eventDefCRFBean.isDoubleEntry());
-		queryParameters.put(index++, eventDefCRFBean.isRequireAllTextFilled());
-		queryParameters.put(index++, eventDefCRFBean.isDecisionCondition());
-		queryParameters.put(index++, eventDefCRFBean.getNullValues());
-		queryParameters.put(index++, eventDefCRFBean.getDefaultVersionId());
-		queryParameters.put(index++, eventDefCRFBean.getStatus().getId());
-		queryParameters.put(index++, eventDefCRFBean.getOwnerId());
-		queryParameters.put(index++, eventDefCRFBean.getOrdinal());
-		queryParameters.put(index++, eventDefCRFBean.isElectronicSignature());
-		queryParameters.put(index++, eventDefCRFBean.isHideCrf());
-		queryParameters.put(index++, eventDefCRFBean.getSourceDataVerification().getCode());
-		queryParameters.put(index++, eventDefCRFBean.getSelectedVersionIds());
-
-		if (eventDefCRFBean.getParentId() == 0) {
-			nullVars.put(index, Types.INTEGER);
-			queryParameters.put(index, null);
+		// INSERT INTO EVENT_DEFINITION_CRF
+		// (EVENT_DEFINITION_CRF_ID,STUDY_EVENT_DEFINITION_ID,STUDY_ID,CRF_ID,
+		// REQUIRED_CRF,
+		// DOUBLE_ENTRY,REQUIRE_ALL_TEXT_FILLED,DECISION_CONDITIONS,
+		// NULL_VALUES,DEFAULT_VERSION_ID,STATUS_ID,OWNER_ID,DATE_CREATED,ordinal,
+		// ELECTRONIC_SIGNATURE,HIDE_CRF,SOURCE_DATA_VERIFICATION_ID,
+		// SELECTED_VERSION_IDS, PARENT_ID)
+		// VALUES (?,?,?,?,?,?,?,?,?,?,?,?,NOW(),?,?,?,?,?,?)
+		variables.put(new Integer(1), new Integer(id));
+		variables.put(new Integer(2), new Integer(sb.getStudyEventDefinitionId()));
+		variables.put(new Integer(3), new Integer(sb.getStudyId()));
+		variables.put(new Integer(4), new Integer(sb.getCrfId()));
+		variables.put(new Integer(5), new Boolean(sb.isRequiredCRF()));
+		variables.put(new Integer(6), new Boolean(sb.isDoubleEntry()));
+		variables.put(new Integer(7), new Boolean(sb.isRequireAllTextFilled()));
+		variables.put(new Integer(8), new Boolean(sb.isDecisionCondition()));
+		variables.put(new Integer(9), sb.getNullValues());
+		variables.put(new Integer(10), new Integer(sb.getDefaultVersionId()));
+		variables.put(new Integer(11), new Integer(sb.getStatus().getId()));
+		variables.put(new Integer(12), new Integer(sb.getOwnerId()));
+		variables.put(new Integer(13), new Integer(sb.getOrdinal()));
+		variables.put(new Integer(14), new Boolean(sb.isElectronicSignature()));
+		variables.put(new Integer(15), new Boolean(sb.isHideCrf()));
+		variables.put(new Integer(16), new Integer(sb.getSourceDataVerification().getCode()));
+		variables.put(new Integer(17), sb.getSelectedVersionIds());
+		if (sb.getParentId() == 0) {
+			nullVars.put(new Integer(18), new Integer(Types.INTEGER));
+			variables.put(new Integer(18), null);
 		} else {
-			queryParameters.put(index, eventDefCRFBean.getParentId());
+			variables.put(new Integer(18), new Integer(sb.getParentId()));
 		}
-		index++;
-
-		queryParameters.put(index++, eventDefCRFBean.getEmailStep());
-		queryParameters.put(index++, eventDefCRFBean.getEmailTo());
-		queryParameters.put(index, eventDefCRFBean.isEvaluatedCRF());
-
-		this.execute(digester.getQuery("create"), queryParameters, nullVars);
+		variables.put(new Integer(19), new String(sb.getEmailStep()));
+		variables.put(new Integer(20), new String(sb.getEmailTo()));
+		variables.put(new Integer(21), new Boolean(sb.isEvaluatedCRF()));
+		this.execute(digester.getQuery("create"), variables, nullVars);
 
 		if (isQuerySuccessful()) {
-			eventDefCRFBean.setId(id);
+			sb.setId(id);
 		}
 
-		return eventDefCRFBean;
+		return sb;
 	}
 
+	/**
+	 * Updates a Study event
+	 */
 	@SuppressWarnings("deprecation")
-	public EntityBean update(EntityBean entityBean) {
-
-		EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) entityBean;
+	public EntityBean update(EntityBean eb) {
+		EventDefinitionCRFBean sb = (EventDefinitionCRFBean) eb;
 		HashMap nullVars = new HashMap();
-		HashMap queryParameters = new HashMap();
-
-		int index = 1;
-		queryParameters.put(index++, eventDefCRFBean.getStudyEventDefinitionId());
-		queryParameters.put(index++, eventDefCRFBean.getStudyId());
-		queryParameters.put(index++, eventDefCRFBean.getCrfId());
-		queryParameters.put(index++, eventDefCRFBean.isRequiredCRF());
-		queryParameters.put(index++, eventDefCRFBean.isDoubleEntry());
-		queryParameters.put(index++, eventDefCRFBean.isRequireAllTextFilled());
-		queryParameters.put(index++, eventDefCRFBean.isDecisionCondition());
-		queryParameters.put(index++, eventDefCRFBean.getNullValues());
-		queryParameters.put(index++, eventDefCRFBean.getDefaultVersionId());
-		queryParameters.put(index++, eventDefCRFBean.getStatus().getId());
-		queryParameters.put(index++, new java.util.Date());    // DATE_Updated
-		queryParameters.put(index++, eventDefCRFBean.getUpdater().getId());
-		queryParameters.put(index++, eventDefCRFBean.getOrdinal());
-		queryParameters.put(index++, eventDefCRFBean.isElectronicSignature());
-		queryParameters.put(index++, eventDefCRFBean.isHideCrf());
-		queryParameters.put(index++, eventDefCRFBean.getSourceDataVerification().getCode());
-		queryParameters.put(index++, eventDefCRFBean.getSelectedVersionIds());
-
-		if (eventDefCRFBean.getParentId() == 0) {
-			nullVars.put(index, Types.INTEGER);
-			queryParameters.put(index, null);
+		HashMap variables = new HashMap();
+		// UPDATE EVENT_DEFINITION_CRF SET
+		// STUDY_EVENT_DEFINITION_ID=?,STUDY_ID=?,CRF_ID=?, REQUIRED_CRF=?,
+		// DOUBLE_ENTRY=?,REQUIRE_ALL_TEXT_FILLED=?,DECISION_CONDITIONS=?,
+		// NULL_VALUES=?,DEFAULT_VERSION_ID=?,STATUS_ID=?,DATE_UPDATED=?,UPDATE_ID=?,
+		// ordinal=?,ELECTRONIC_SIGNATURE=? HIDE_CRF=?,
+		// SOURCE_DATA_VERIFICATION_ID=?, Selected_version_ids=?, parent_id=?
+		// WHERE EVENT_DEFINITION_CRF_ID=?
+		variables.put(new Integer(1), new Integer(sb.getStudyEventDefinitionId()));
+		variables.put(new Integer(2), new Integer(sb.getStudyId()));
+		variables.put(new Integer(3), new Integer(sb.getCrfId()));
+		variables.put(new Integer(4), new Boolean(sb.isRequiredCRF()));
+		variables.put(new Integer(5), new Boolean(sb.isDoubleEntry()));
+		variables.put(new Integer(6), new Boolean(sb.isRequireAllTextFilled()));
+		variables.put(new Integer(7), new Boolean(sb.isDecisionCondition()));
+		variables.put(new Integer(8), sb.getNullValues());
+		variables.put(new Integer(9), new Integer(sb.getDefaultVersionId()));
+		variables.put(new Integer(10), new Integer(sb.getStatus().getId()));
+		variables.put(new Integer(11), new java.util.Date()); // DATE_Updated
+		variables.put(new Integer(12), new Integer(sb.getUpdater().getId()));
+		variables.put(new Integer(13), new Integer(sb.getOrdinal()));
+		variables.put(new Integer(14), new Boolean(sb.isElectronicSignature()));
+		variables.put(new Integer(15), new Boolean(sb.isHideCrf()));
+		variables.put(new Integer(16), new Integer(sb.getSourceDataVerification().getCode()));
+		variables.put(new Integer(17), sb.getSelectedVersionIds());
+		if (sb.getParentId() == 0) {
+			nullVars.put(new Integer(18), new Integer(Types.INTEGER));
+			variables.put(new Integer(18), null);
 		} else {
-			queryParameters.put(index, eventDefCRFBean.getParentId());
+			variables.put(new Integer(18), new Integer(sb.getParentId()));
 		}
-		index++;
+		variables.put(new Integer(19), new String(sb.getEmailStep()));
+		variables.put(new Integer(20), new String(sb.getEmailTo()));
+		variables.put(new Integer(21), new Boolean(sb.isEvaluatedCRF()));
+		variables.put(new Integer(22), new Integer(sb.getId()));
 
-		queryParameters.put(index++, eventDefCRFBean.getEmailStep());
-		queryParameters.put(index++, eventDefCRFBean.getEmailTo());
-		queryParameters.put(index++, eventDefCRFBean.isEvaluatedCRF());
-		queryParameters.put(index, eventDefCRFBean.getId());
+		String sql = digester.getQuery("update");
+		this.execute(sql, variables, nullVars);
 
-		this.execute(digester.getQuery("update"), queryParameters, nullVars);
-
-		return eventDefCRFBean;
+		return sb;
 	}
 
-	public List<EventDefinitionCRFBean> findAllByPermission(Object objCurrentUser, int intActionType,
-			String strOrderByColumn,
+	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
+		ArrayList al = new ArrayList();
 
-		return new ArrayList<EventDefinitionCRFBean>();
+		return al;
 	}
 
-	public List<EventDefinitionCRFBean> findAllByPermission(Object objCurrentUser, int intActionType) {
+	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
+		ArrayList al = new ArrayList();
 
-		return new ArrayList<EventDefinitionCRFBean>();
+		return al;
 	}
 
-	/**
-	 * Returns the list of all of the event definition CRF beans,
-	 * which have a specific CRF form version assigned as the default.
-	 *
-	 * @param versionId CRF form version id, to search on.
-	 * @return the list of instances of <code>EventDefinitionCRFBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
-	 */
-	public List<EventDefinitionCRFBean> findByDefaultVersion(int versionId) {
-
+	public ArrayList findByDefaultVersion(int versionId) {
 		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(versionId));
 
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		queryParameters.put(1, versionId);
-
-		List<HashMap<String, Object>> recordsFromDB = this.select(digester.getQuery("findByDefaultVersion"),
-				queryParameters);
-
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		String sql = digester.getQuery("findByDefaultVersion");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
 		}
+		return al;
+	}
 
-		return resultSetOfBeans;
+	public ArrayList findAllByEventDefinitionId(int eventDefinitionId) {
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(eventDefinitionId));
+
+		return executeFindAllQuery("findAllByEventDefinitionId", variables);
+	}
+
+	public ArrayList findAllByEventDefinitionIdAndOrdinal(int eventDefinitionId, int ordinal) {
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(eventDefinitionId));
+		variables.put(new Integer(2), new Integer(ordinal));
+
+		return executeFindAllQuery("findAllByEventDefinitionIdAndOrdinal", variables);
 	}
 
 	/**
-	 * Returns the list of the event definition CRF beans (both of study level and site level),
-	 * which are assigned to a specific study event definition and have a specific ordinal number
-	 * inside of that definition.
-	 *
-	 * @param eventDefinitionId the study event definition id, to search on.
-	 * @param ordinal           the ordinal number, to search on.
-	 * @return the list of instances of <code>EventDefinitionCRFBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
+	 * Find all EventDefinitionCRFBean for the StudyBean.
+	 * 
+	 * @param study
+	 * @param eventDefinitionId
+	 * @return
 	 */
-	public List<EventDefinitionCRFBean> findAllByEventDefinitionIdAndOrdinal(int eventDefinitionId, int ordinal) {
+	public Collection findAllByEventDefinitionId(StudyBean study, int eventDefinitionId) {
+		return study.isSite(study.getParentStudyId()) ? findAllByEventDefinitionIdAndSiteIdAndParentStudyId(
+				eventDefinitionId, study.getId(), study.getParentStudyId())
+				: findAllParentsByEventDefinitionId(eventDefinitionId);
+	}
 
-		HashMap queryParameters = new HashMap();
-		int index = 1;
-		queryParameters.put(index++, eventDefinitionId);
-		queryParameters.put(index, ordinal);
+	public Collection findAllParentsByEventDefinitionId(int definitionId) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(definitionId));
 
-		return (List<EventDefinitionCRFBean>) executeFindAllQuery("findAllByEventDefinitionIdAndOrdinal",
-				queryParameters);
+		String sql = digester.getQuery("findAllParentsByEventDefinitionId");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
+		}
+		return al;
+	}
+
+	public Collection findAllByEventDefinitionIdAndSiteIdAndParentStudyId(int definitionId, int siteId, int parentStudyId) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(definitionId));
+		variables.put(new Integer(2), new Integer(siteId));
+		variables.put(new Integer(3), new Integer(parentStudyId));
+		variables.put(new Integer(4), new Integer(definitionId));
+		variables.put(new Integer(5), new Integer(siteId));
+
+		String sql = digester.getQuery("findAllByEventDefinitionIdAndSiteIdAndParentStudyId");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
+		}
+		return al;
+	}
+
+	public ArrayList findAllActiveByEventDefinitionId(int eventDefinitionId) {
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(eventDefinitionId));
+
+		return executeFindAllQuery("findAllActiveByEventDefinitionId", variables);
 	}
 
 	/**
-	 * Returns the list of event definition CRF beans with status available only,
-	 * which are assigned to a specific study event definition;
-	 * ordered by the <code>ordinal</code> property of <code>EventDefinitionCRFBean</code> class,
-	 * in <code>ASC</code> mode.
-	 *
-	 * @param eventDefinitionId the study event definition id, to search on.
-	 * @return the list of instances of <code>EventDefinitionCRFBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
+	 * Find all active EventDefinitionCRFBean for the StudyBean and the study_event_definition_id
+	 * 
+	 * @param study
+	 * @param eventDefinitionId
+	 * @return
 	 */
-	public List<EventDefinitionCRFBean> findAllActiveByEventDefinitionId(int eventDefinitionId) {
-
-		HashMap queryParameters = new HashMap();
-		queryParameters.put(1, eventDefinitionId);
-
-		return (List<EventDefinitionCRFBean>) executeFindAllQuery("findAllActiveByEventDefinitionId", queryParameters);
-	}
-
-	/**
-	 * Returns the list of event definition CRF beans with status available only, which are assigned to a specific
-	 * study event definition in a specific study or site.
-	 * <p/>
-	 * If the <code>study</code> parameter represents a study, then this method returns the list of a study level
-	 * event definition CRF beans only (records for sites are excluded), which are assigned to a specific
-	 * study event definition.
-	 * If the <code>study</code> parameter represents a site, then this method returns the list of event definition
-	 * CRF beans, which are assigned to a specific study event definition in that site. That is, if a site has its own
-	 * event definition CRF record in the data base for a specific CRF form, assigned to a specific study event
-	 * definition, then this event definition CRF record of a site level will be added to the result list instead of
-	 * a study level record for the same CRF form; otherwise - to the result list will be added an event definition CRF
-	 * record of a study level.
-	 * <p/>
-	 * The result list is ordered by the <code>ordinal</code> property of the <code>EventDefinitionCRFBean</code> class,
-	 * in <code>ASC</code> mode.
-	 *
-	 * @param study             an instance of the <code>StudyBean</code> class, which represents the study, to search in.
-	 * @param eventDefinitionId the study event definition id, to search on.
-	 * @return the list of instances of <code>EventDefinitionCRFBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
-	 */
-	public List<EventDefinitionCRFBean> findAllActiveByEventDefinitionId(StudyBean study, int eventDefinitionId) {
-
+	public Collection findAllActiveByEventDefinitionId(StudyBean study, int eventDefinitionId) {
 		if (study.isSite(study.getParentStudyId())) {
 			return findAllActiveByEventDefinitionIdAndSiteIdAndParentStudyId(eventDefinitionId, study.getId(),
 					study.getParentStudyId());
@@ -633,128 +542,108 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		}
 	}
 
-	/**
-	 * Returns the list of a study level event definition CRF beans (records for sites are excluded),
-	 * with status available only, which are assigned to a specific study event definition;
-	 * ordered by the <code>ordinal</code> property of the <code>EventDefinitionCRFBean</code> class,
-	 * in <code>ASC</code> mode.
-	 *
-	 * @param definitionId the study event definition id, to search on.
-	 * @return the list of instances of <code>EventDefinitionCRFBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
-	 */
-	public List<EventDefinitionCRFBean> findAllActiveParentsByEventDefinitionId(int definitionId) {
-
+	public Collection findAllActiveParentsByEventDefinitionId(int definitionId) {
 		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(definitionId));
 
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		queryParameters.put(1, definitionId);
-
-		List<HashMap<String, Object>> recordsFromDB =
-				this.select(digester.getQuery("findAllActiveParentsByEventDefinitionId"), queryParameters);
-
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		String sql = digester.getQuery("findAllActiveParentsByEventDefinitionId");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
 		}
+		return al;
+	}
 
-		return resultSetOfBeans;
+	public Collection findAllActiveByEventDefinitionIdAndSiteIdAndParentStudyId(int definitionId, int siteId, int parentStudyId) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(definitionId));
+		variables.put(new Integer(2), new Integer(siteId));
+		variables.put(new Integer(3), new Integer(parentStudyId));
+		variables.put(new Integer(4), new Integer(definitionId));
+		variables.put(new Integer(5), new Integer(siteId));
+
+		String sql = digester.getQuery("findAllActiveByEventDefinitionIdAndSiteIdAndParentStudyId");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
+		}
+		return al;
+	}
+
+	public Collection findAllActiveNonHiddenByEventDefinitionIdAndStudy(int definitionId, StudyBean study) {
+		ArrayList al = new ArrayList();
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		if (study.getParentStudyId() > 0) {
+			variables.put(new Integer(1), new Integer(definitionId));
+			variables.put(new Integer(2), new Integer(study.getId()));
+			variables.put(new Integer(3), new Integer(definitionId));
+
+			String sql = digester.getQuery("findAllActiveNonHiddenByEventDefinitionIdAndSite");
+			ArrayList alist = this.select(sql, variables);
+			Iterator it = alist.iterator();
+			while (it.hasNext()) {
+				EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+				al.add(eb);
+			}
+		}
+		return al;
 	}
 
 	/**
-	 * Returns the list of event definition CRF beans with status available only,
-	 * which are assigned to a specific study event definition for a specific site.
-	 * That is, if a site has its own event definition CRF record in the data base for
-	 * a specific CRF form, assigned to a specific study event definition, then this event definition CRF record
-	 * of a site level will be added to the result list instead of a study level record for the same CRF form;
-	 * otherwise - to the result list will be added an event definition CRF record of a study level.
-	 * <p/>
-	 * The result list is ordered by the <code>ordinal</code> property of the <code>EventDefinitionCRFBean</code> class,
-	 * in <code>ASC</code> mode.
-	 *
-	 * @param definitionId  the study event definition id, to search on.
-	 * @param siteId        the site id, to search on.
-	 * @param parentStudyId the study id, to search on.
-	 * @return the list of instances of <code>EventDefinitionCRFBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
-	 */
-	private List<EventDefinitionCRFBean> findAllActiveByEventDefinitionIdAndSiteIdAndParentStudyId(int definitionId,
-			int siteId, int parentStudyId) {
-
-		this.setTypesExpected();
-
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		int index = 1;
-		queryParameters.put(index++, definitionId);
-		queryParameters.put(index++, siteId);
-		queryParameters.put(index++, parentStudyId);
-		queryParameters.put(index++, definitionId);
-		queryParameters.put(index, siteId);
-
-		List<HashMap<String, Object>> recordsFromDB =
-				this.select(digester.getQuery("findAllActiveByEventDefinitionIdAndSiteIdAndParentStudyId"),
-						queryParameters);
-
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
-		}
-
-		return resultSetOfBeans;
-	}
-
-	/**
-	 * Discovers if a specific CRF, which is determined by given CRF version id, is marked as data entry required
-	 * inside of a specific event definition CRF, which is determined by given study event bean.
-	 *
-	 * @param crfVersionId the CRF version id, to search on.
-	 * @param studyEvent   an instance of the <code>StudyEventBean</code> class, which represents the study event,
-	 *                     to search on.
-	 * @return <code>true</code> if the discovered CRF is marked as data entry required inside of
-	 * a specific event definition CRF, which is discovered by the given study event bean.; <code>false</code> otherwise.
+	 * isRequiredInDefinition, looks at a specific EventCRF and determines if it's required or not
+	 * 
+	 * @return boolean to tell us if it's required or not.
 	 */
 	public boolean isRequiredInDefinition(int crfVersionId, StudyEventBean studyEvent) {
-
 		StudyBean study = new StudyDAO(this.ds).findByStudySubjectId(studyEvent.getStudySubjectId());
 		int studyEventId = studyEvent.getId();
 
+		/*
+		 * select distinct event_definition_crf.study_id, event_definition_crf.required_crf,
+		 * event_definition_crf.parent_id from event_definition_crf, event_crf, crf_version, study_event where
+		 * crf_version.crf_version_id = 29 and crf_version.crf_version_id = event_crf.crf_version_id and
+		 * crf_version.crf_id = event_definition_crf.crf_id and event_definition_crf.study_event_definition_id =
+		 * study_event.study_event_definition_id and study_event.study_event_id = 91
+		 */
+
 		this.unsetTypeExpected();
-
-		int index = 1;
-		this.setTypeExpected(index++, TypeNames.BOOL);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index, TypeNames.INT);
-
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		index = 1;
-		queryParameters.put(index++, crfVersionId);
-		queryParameters.put(index, studyEventId);
+		this.setTypeExpected(1, TypeNames.BOOL);
+		this.setTypeExpected(2, TypeNames.INT);
+		this.setTypeExpected(3, TypeNames.INT);
+		HashMap variables = new HashMap();
+		variables.put(new Integer(2), new Integer(studyEventId));
+		variables.put(new Integer(1), new Integer(crfVersionId));
 
 		String sql = digester.getQuery("isRequiredInDefinition");
-		List<Map<String, Object>> recordsFromDB = this.select(sql, queryParameters);
 
-		Iterator<Map<String, Object>> iterator = recordsFromDB.iterator();
-		Boolean answer;
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
+		Boolean answer = false;
 		Boolean siteR = false;
 		Boolean studyR = false;
 		Boolean isExisted = false;
-
-		while (iterator.hasNext()) {
-
-			Map<String, Object> record = iterator.next();
-			Integer dbStudyId = (Integer) record.get("study_id");
-			Integer parentId = (Integer) record.get("parent_id");
+		while (it.hasNext()) {
+			HashMap hm = (HashMap) it.next();
+			Integer dbStudyId = (Integer) hm.get("study_id");
+			Integer parentId = (Integer) hm.get("parent_id");
 			if (dbStudyId == study.getId()) {
 				if (parentId != null && parentId > 0) {
-					siteR = (Boolean) record.get("required_crf");
+					siteR = (Boolean) hm.get("required_crf");
 					isExisted = true;
 				} else {
-					studyR = (Boolean) record.get("required_crf");
+					studyR = (Boolean) hm.get("required_crf");
 				}
 			} else if (dbStudyId == study.getParentStudyId()) {
-				studyR = (Boolean) record.get("required_crf");
+				studyR = (Boolean) hm.get("required_crf");
 			}
 		}
 		if (study.isSite(study.getParentStudyId()) && isExisted) {
@@ -765,27 +654,17 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
 		logger.info("We are returning " + answer.toString() + " for crfVersionId " + crfVersionId
 				+ " and studyEventId " + studyEventId);
-		return answer;
+		return answer.booleanValue();
 	}
 
 	/**
-	 * Searches for the event definition CRF bean by a specific study event and a specific CRF version.
-	 * <p/>
-	 * If the <code>study</code> parameter represents a study, then this method searches for
-	 * the event definition CRF bean of a study level, otherwise - searches for the event definition CRF bean of a site
-	 * level.
-	 *
-	 * @param study        an instance of the <code>StudyBean</code> class, which represents the study, to search in.
-	 * @param studyEventId the study event id, to search on.
-	 * @param crfVersionId the CRF version id, to search on.
-	 * @return the instance of the <code>EventDefinitionCRFBean</code> class, that matches the SQL query;
-	 * if such an event definition CRF record was not found, creates and returns an empty
-	 * instance of the <code>EventDefinitionCRFBean</code> class.
+	 * @param study
+	 * @param studyEventId
+	 * @param crfVersionId
+	 * @return
 	 */
-	public EventDefinitionCRFBean findByStudyEventIdAndCRFVersionId(StudyBean study, int studyEventId,
-			int crfVersionId) {
-
-		EventDefinitionCRFBean edc;
+	public EventDefinitionCRFBean findByStudyEventIdAndCRFVersionId(StudyBean study, int studyEventId, int crfVersionId) {
+		EventDefinitionCRFBean edc = new EventDefinitionCRFBean();
 
 		if (study.isSite(study.getParentStudyId())) {
 			edc = this.findByStudyEventIdAndCRFVersionIdAndSiteIdAndParentStudyId(studyEventId, crfVersionId,
@@ -797,163 +676,211 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Searches for the event definition CRF bean of a study level (records for sites are excluded),
-	 * by a specific study event and a specific CRF version.
-	 *
-	 * @param studyEventId the study event id, to search on.
-	 * @param crfVersionId the CRF version id, to search on.
-	 * @return the instance of the <code>EventDefinitionCRFBean</code> class, that matches the SQL query;
-	 * if such an event definition CRF record was not found, creates and returns an empty
-	 * instance of the <code>EventDefinitionCRFBean</code> class.
+	 * Find the EventDefinitionCRFBean of a study. So this EventDefinitionCRFBean has no parent.
+	 * 
+	 * @param studyEventId
+	 *            The requested study event id.
+	 * @param crfVersionId
+	 *            The requested CRF version id.
+	 * @return The event definition crf which defines the study event and crf version.
 	 */
 	public EventDefinitionCRFBean findForStudyByStudyEventIdAndCRFVersionId(int studyEventId, int crfVersionId) {
+		EventDefinitionCRFBean answer = new EventDefinitionCRFBean();
 
 		this.setTypesExpected();
+		this.setTypeExpected(22, TypeNames.STRING); // crfName
 
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		int index = 1;
-		queryParameters.put(index++, studyEventId);
-		queryParameters.put(index, crfVersionId);
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(studyEventId));
+		variables.put(new Integer(2), new Integer(crfVersionId));
 
-		List<HashMap<String, Object>> recordsFromDB =
-				this.select(digester.getQuery("findForStudyByStudyEventIdAndCRFVersionId"), queryParameters);
+		String sql = digester.getQuery("findForStudyByStudyEventIdAndCRFVersionId");
 
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
 
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		while (it.hasNext()) {
+			answer = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
 		}
 
-		return resultSetOfBeans.isEmpty() ? new EventDefinitionCRFBean() : resultSetOfBeans.get(0);
+		return answer;
 	}
 
-	/**
-	 * Searches for the event definition CRF bean of a site level, by a specific study event
-	 * and a specific CRF version.
-	 *
-	 * @param studyEventId  the study event id, to search on.
-	 * @param crfVersionId  the CRF version id, to search on.
-	 * @param siteId        the site id, to search on.
-	 * @param parentStudyId the study id, to search on.
-	 * @return the instance of the <code>EventDefinitionCRFBean</code> class, that matches the SQL query;
-	 * if such an event definition CRF record was not found, creates and returns an empty
-	 * instance of the <code>EventDefinitionCRFBean</code> class.
-	 */
-	private EventDefinitionCRFBean findByStudyEventIdAndCRFVersionIdAndSiteIdAndParentStudyId(int studyEventId,
+	public EventDefinitionCRFBean findByStudyEventIdAndCRFVersionIdAndSiteIdAndParentStudyId(int studyEventId,
 			int crfVersionId, int siteId, int parentStudyId) {
+		EventDefinitionCRFBean answer = new EventDefinitionCRFBean();
 
 		this.setTypesExpected();
+		this.setTypeExpected(22, TypeNames.STRING); // crfName
 
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		int index = 1;
-		queryParameters.put(index++, studyEventId);
-		queryParameters.put(index++, crfVersionId);
-		queryParameters.put(index++, siteId);
-		queryParameters.put(index++, parentStudyId);
-		queryParameters.put(index, siteId);
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(studyEventId));
+		variables.put(new Integer(2), new Integer(crfVersionId));
+		variables.put(new Integer(3), new Integer(siteId));
+		variables.put(new Integer(4), new Integer(parentStudyId));
+		variables.put(new Integer(5), new Integer(siteId));
 
-		List<HashMap<String, Object>> recordsFromDB =
-				this.select(digester.getQuery("findByStudyEventIdAndCRFVersionIdAndSiteIdAndParentStudyId"),
-						queryParameters);
+		String sql = digester.getQuery("findByStudyEventIdAndCRFVersionIdAndSiteIdAndParentStudyId");
 
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
 
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		while (it.hasNext()) {
+			answer = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
 		}
 
-		return resultSetOfBeans.isEmpty() ? new EventDefinitionCRFBean() : resultSetOfBeans.get(0);
+		return answer;
 	}
 
 	/**
-	 * Searches for the event definition CRF bean by a specific study event definition and a specific CRF.
-	 * <p/>
-	 * If the <code>study</code> parameter represents a study, then this method searches for
-	 * the event definition CRF bean of a study level, otherwise - searches for the event definition CRF bean of a site
-	 * level.
-	 *
-	 * @param study                  an instance of the <code>StudyBean</code> class, which represents the study,
-	 *                               to search in.
-	 * @param studyEventDefinitionId the study event definition id, to search on.
-	 * @param crfId                  the CRF id, to search on.
-	 * @return the instance of the <code>EventDefinitionCRFBean</code> class, that matches the SQL query;
-	 * if such an event definition CRF record was not found, creates and returns an empty
-	 * instance of the <code>EventDefinitionCRFBean</code> class.
+	 * @param studyEventDefinitionId
+	 *            The study event definition of the desired event definition crf.
+	 * @param crfId
+	 *            The CRF of the desired event definition crf.
+	 * @return The event definition crf for the specified study event definition and CRF.
+	 */
+	public EventDefinitionCRFBean findByStudyEventDefinitionIdAndCRFId(int studyEventDefinitionId, int crfId) {
+		EventDefinitionCRFBean answer = new EventDefinitionCRFBean();
+
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(studyEventDefinitionId));
+		variables.put(new Integer(2), new Integer(crfId));
+
+		String sql = digester.getQuery("findByStudyEventDefinitionIdAndCRFId");
+
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
+
+		while (it.hasNext()) {
+			answer = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		}
+
+		return answer;
+	}
+
+	public EventDefinitionCRFBean findByStudyEventDefinitionIdAndCRFIdAndStudyId(int studyEventDefinitionId, int crfId,
+			int studyId) {
+		EventDefinitionCRFBean answer = new EventDefinitionCRFBean();
+
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(studyEventDefinitionId));
+		variables.put(new Integer(2), new Integer(crfId));
+		variables.put(new Integer(3), new Integer(studyId));
+
+		String sql = digester.getQuery("findByStudyEventDefinitionIdAndCRFIdAndStudyId");
+
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
+
+		while (it.hasNext()) {
+			answer = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		}
+
+		return answer;
+	}
+
+	/**
+	 * Find EventDefinitionCRFBean for the StudyBean.
+	 * 
+	 * @param study
+	 * @param studyEventDefinitionId
+	 * @param crfId
+	 * @return
 	 */
 	public EventDefinitionCRFBean findByStudyEventDefinitionIdAndCRFId(StudyBean study, int studyEventDefinitionId,
 			int crfId) {
-
 		return study.isSite(study.getParentStudyId()) ? findByStudyEventDefinitionIdAndCRFIdAndSiteIdAndParentStudyId(
 				studyEventDefinitionId, crfId, study.getId(), study.getParentStudyId())
 				: findForStudyByStudyEventDefinitionIdAndCRFId(studyEventDefinitionId, crfId);
 	}
 
 	/**
-	 * Searches for the event definition CRF bean of a study level (records for sites are excluded),
-	 * by a specific study event definition and a specific CRF.
-	 *
-	 * @param studyEventDefinitionId the study event definition id, to search on.
-	 * @param crfId                  the CRF id, to search on.
-	 * @return the instance of the <code>EventDefinitionCRFBean</code> class, that matches the SQL query;
-	 * if such an event definition CRF record was not found, creates and returns an empty
-	 * instance of the <code>EventDefinitionCRFBean</code> class.
+	 * Find EventDefinitionCRFBean for a study. So this EventDefinitionCRFBean has no parent.
+	 * 
+	 * @param studyEventDefinitionId
+	 * @param crfId
+	 * @return
 	 */
 	public EventDefinitionCRFBean findForStudyByStudyEventDefinitionIdAndCRFId(int studyEventDefinitionId, int crfId) {
+		EventDefinitionCRFBean answer = new EventDefinitionCRFBean();
 
 		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(studyEventDefinitionId));
+		variables.put(new Integer(2), new Integer(crfId));
 
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		int index = 1;
-		queryParameters.put(index++, studyEventDefinitionId);
-		queryParameters.put(index, crfId);
+		String sql = digester.getQuery("findForStudyByStudyEventDefinitionIdAndCRFId");
 
-		List<HashMap<String, Object>> recordsFromDB =
-				this.select(digester.getQuery("findForStudyByStudyEventDefinitionIdAndCRFId"), queryParameters);
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
 
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		while (it.hasNext()) {
+			answer = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
 		}
 
-		return resultSetOfBeans.isEmpty() ? new EventDefinitionCRFBean() : resultSetOfBeans.get(0);
+		return answer;
 	}
 
-	/**
-	 * Searches for the event definition CRF bean of a site level, by a specific study event definition
-	 * and a specific CRF.
-	 *
-	 * @param studyEventDefId the study event definition id, to search on.
-	 * @param crfId           the CRF id, to search on.
-	 * @param siteId          the site id, to search on.
-	 * @param parentStudyId   the study id, to search on.
-	 * @return the instance of the <code>EventDefinitionCRFBean</code> class, that matches the SQL query;
-	 * if such an event definition CRF record was not found, creates and returns an empty
-	 * instance of the <code>EventDefinitionCRFBean</code> class.
-	 */
-	private EventDefinitionCRFBean findByStudyEventDefinitionIdAndCRFIdAndSiteIdAndParentStudyId(int studyEventDefId,
-			int crfId, int siteId, int parentStudyId) {
+	public EventDefinitionCRFBean findByStudyEventDefinitionIdAndCRFIdAndSiteIdAndParentStudyId(
+			int studyEventDefinitionId, int crfId, int siteId, int parentStudyId) {
+		EventDefinitionCRFBean answer = new EventDefinitionCRFBean();
 
 		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(studyEventDefinitionId));
+		variables.put(new Integer(2), new Integer(crfId));
+		variables.put(new Integer(3), new Integer(siteId));
+		variables.put(new Integer(4), new Integer(parentStudyId));
+		variables.put(new Integer(5), new Integer(siteId));
 
-		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
-		int index = 1;
-		queryParameters.put(index++, studyEventDefId);
-		queryParameters.put(index++, crfId);
-		queryParameters.put(index++, siteId);
-		queryParameters.put(index++, parentStudyId);
-		queryParameters.put(index, siteId);
+		String sql = digester.getQuery("findByStudyEventDefinitionIdAndCRFIdAndSiteIdAndParentStudyId");
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
 
-		List<HashMap<String, Object>> recordsFromDB =
-				this.select(digester.getQuery("findByStudyEventDefinitionIdAndCRFIdAndSiteIdAndParentStudyId"),
-						queryParameters);
-
-		List<EventDefinitionCRFBean> resultSetOfBeans = new ArrayList<EventDefinitionCRFBean>();
-
-		for (HashMap<String, Object> record : recordsFromDB) {
-			resultSetOfBeans.add(this.getEntityFromHashMap(record));
+		while (it.hasNext()) {
+			answer = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
 		}
 
-		return resultSetOfBeans.isEmpty() ? new EventDefinitionCRFBean() : resultSetOfBeans.get(0);
+		return answer;
+	}
+
+	public Set<String> findHiddenCrfIdsBySite(StudyBean study) {
+		Set<String> ids = new TreeSet<String>();
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+		this.setTypeExpected(2, TypeNames.INT);
+		this.setTypeExpected(3, TypeNames.STRING);
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(study.getId()));
+		String sql = digester.getQuery("findHiddenCrfIdAndNamesBySite");
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			HashMap hm = (HashMap) it.next();
+			ids.add(hm.get("study_event_definition_id") + "_" + hm.get("crf_id"));
+		}
+
+		return ids;
+	}
+
+	public Set<String> findHiddenCrfNamesBySite(StudyBean study) {
+		Set<String> names = new TreeSet<String>();
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+		this.setTypeExpected(2, TypeNames.INT);
+		this.setTypeExpected(3, TypeNames.STRING);
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(study.getId()));
+		String sql = digester.getQuery("findHiddenCrfIdAndNamesBySite");
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			HashMap hm = (HashMap) it.next();
+			names.add(hm.get("study_event_definition_id") + "_" + hm.get("name"));
+		}
+
+		return names;
 	}
 }

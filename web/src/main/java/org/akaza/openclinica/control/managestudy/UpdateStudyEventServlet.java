@@ -418,7 +418,7 @@ public class UpdateStudyEventServlet extends Controller {
 				ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
 				populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
 
-				ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, ub,
+				ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
 						currentRole, studyEvent.getSubjectEventStatus(), study);
 
 				request.setAttribute("studySubject", ssb);
@@ -587,7 +587,7 @@ public class UpdateStudyEventServlet extends Controller {
 				ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
 				populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
 
-				ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, ub,
+				ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
 						currentRole, studyEvent.getSubjectEventStatus(), study);
 
 				request.setAttribute("studySubject", ssb);

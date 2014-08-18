@@ -18,7 +18,6 @@ import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -35,7 +34,6 @@ import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -538,9 +536,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 					CRFVersionBean crfVersion = getExpressionService().getCRFVersionFromExpression(expression);
 					CRFBean crf = getExpressionService().getCRFFromExpression(expression);
 					int crfVersionId = 0;
-					StudyBean subjectStudy = new StudyDAO(ds).findByStudySubjectId(eventCrfBeanA.getStudySubjectId());
 					EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFDAO(ds)
-							.findByStudyEventDefinitionIdAndCRFId(subjectStudy, studyEventBeanB.getStudyEventDefinitionId(),
+							.findByStudyEventDefinitionIdAndCRFId(studyEventBeanB.getStudyEventDefinitionId(),
 									crf.getId());
 					if (eventDefinitionCRFBean.getId() != 0) {
 						crfVersionId = crfVersion != null ? crfVersion.getId() : eventDefinitionCRFBean

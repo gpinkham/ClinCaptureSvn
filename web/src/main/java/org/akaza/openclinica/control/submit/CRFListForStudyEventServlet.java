@@ -257,7 +257,7 @@ public class CRFListForStudyEventServlet extends Controller {
 		EnterDataForStudyEventServlet.populateUncompletedCRFsWithAnOwner(sm.getDataSource(),
 				uncompletedEventDefinitionCRFs);
 
-		ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, ub,
+		ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
 				currentRole, seb.getSubjectEventStatus(), study);
 
 		if (currentStudy.getParentStudyId() > 0) {

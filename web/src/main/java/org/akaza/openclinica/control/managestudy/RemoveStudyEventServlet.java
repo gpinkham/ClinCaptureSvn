@@ -115,7 +115,7 @@ public class RemoveStudyEventServlet extends Controller {
 
 				EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 				// find all crfs in the definition
-				ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllByDefinition(study, sed.getId());
+				ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllByEventDefinitionId(study, sed.getId());
 
 				EventCRFDAO ecdao = getEventCRFDAO();
 				ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);

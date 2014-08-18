@@ -1445,8 +1445,8 @@ public abstract class Controller extends BaseController {
 	 *            StudyBean
 	 * @return The list of DisplayEventCRFBeans for this study event.
 	 */
-	public ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, UserAccountBean ub,
-			StudyUserRoleBean currentRole, SubjectEventStatus status, StudyBean study) {
+	public ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs,
+			UserAccountBean ub, StudyUserRoleBean currentRole, SubjectEventStatus status, StudyBean study) {
 		ArrayList answer = new ArrayList();
 
 		StudyEventDAO sedao = getStudyEventDAO();
@@ -1517,8 +1517,7 @@ public abstract class Controller extends BaseController {
 	 *            SubjectEventStatus
 	 * @return The list of event definitions for which no event CRF exists.
 	 */
-	public ArrayList getUncompletedCRFs(List<EventDefinitionCRFBean> eventDefinitionCRFs, ArrayList eventCRFs,
-			SubjectEventStatus status) {
+	public ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs, SubjectEventStatus status) {
 		int i;
 		HashMap completed = new HashMap();
 		HashMap startedButIncompleted = new HashMap();
@@ -1536,7 +1535,7 @@ public abstract class Controller extends BaseController {
 		 */
 
 		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-			EventDefinitionCRFBean edcrf = eventDefinitionCRFs.get(i);
+			EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
 			completed.put(edcrf.getCrfId(), Boolean.FALSE);
 			startedButIncompleted.put(edcrf.getCrfId(), new EventCRFBean());
 		}
@@ -1558,7 +1557,7 @@ public abstract class Controller extends BaseController {
 		// TODO possible relation to 1689 here, tbh
 		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
 			DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
-			EventDefinitionCRFBean edcrf = eventDefinitionCRFs.get(i);
+			EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
 
 			dedc.setEdc(edcrf);
 			if (status.equals(SubjectEventStatus.LOCKED)) {
@@ -1602,14 +1601,14 @@ public abstract class Controller extends BaseController {
 
 			// find all active crfs in the definition
 			StudyBean study = (StudyBean) sdao.findByPK(studySubject.getStudyId());
-			List<EventDefinitionCRFBean> eventDefinitionCRFs = edcdao.findAllActiveByEventDefinitionId(study, sed.getId());
+			ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, sed.getId());
 			ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
 			// construct info needed on view study event page
 			DisplayStudyEventBean de = new DisplayStudyEventBean();
 			de.setStudyEvent(event);
-			de.setDisplayEventCRFs(getDisplayEventCRFs(ds, eventCRFs, ub, currentRole, event.getSubjectEventStatus(),
-					study));
+			de.setDisplayEventCRFs(getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub, currentRole,
+					event.getSubjectEventStatus(), study));
 			ArrayList al = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus());
 			EnterDataForStudyEventServlet.populateUncompletedCRFsWithCRFAndVersions(ds, logger, al);
 			de.setUncompletedCRFs(al);

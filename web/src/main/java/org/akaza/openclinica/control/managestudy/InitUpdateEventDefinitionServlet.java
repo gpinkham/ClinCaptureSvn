@@ -23,7 +23,6 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -163,7 +162,7 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 			EventDefinitionCRFDAO edao = getEventDefinitionCRFDAO();
 			ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllParentsByDefinition(defId);
 			//Get list of child EventDefinitionCRFs for cascading actions
-			List<EventDefinitionCRFBean> childEventDefCRFs = edao.findAllChildrenByDefinition(defId);
+			ArrayList<EventDefinitionCRFBean> childEventDefCRFs = edao.findAllChildrenByDefinition(defId);
 
 			CRFVersionDAO cvdao = getCRFVersionDAO();
 			CRFDAO cdao = getCRFDAO();
