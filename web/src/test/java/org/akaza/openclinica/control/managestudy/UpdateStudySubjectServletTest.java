@@ -22,7 +22,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -55,25 +54,21 @@ public class UpdateStudySubjectServletTest {
 	private MockServletContext mockedServletContext;
 	@Mock
 	private MockRequestDispatcher mockedRequestDispatcher;
-	private UpdateStudySubjectServlet spiedUpdateStudySubjectServlet;
-	private MockHttpServletResponse spiedResponse;
+
+	private UpdateStudySubjectServlet spiedUpdateStudySubjectServlet = Mockito.spy(new UpdateStudySubjectServlet());
+
+	private MockHttpServletResponse spiedResponse = Mockito.spy(new MockHttpServletResponse());
+
 	private MockHttpServletRequest request;
+
 	private StudySubjectBean subjectToUpdate;
+
 	private SimpleDateFormat dateFormat;
 
+	private static Locale locale = new Locale("en");
+
 	@Before
-	public void setUp() throws Exception {
-
-		MockitoAnnotations.initMocks(UpdateStudySubjectServletTest.class);
-		spiedUpdateStudySubjectServlet = Mockito.spy(new UpdateStudySubjectServlet());
-		spiedResponse = Mockito.spy(new MockHttpServletResponse());
-
-		Locale locale = new Locale("en");
-		request = new MockHttpServletRequest();
-		request.setPreferredLocales(Arrays.asList(locale));
-
-		subjectToUpdate = new StudySubjectBean();
-
+	public void beforeTestCaseRun() throws Exception {
 		// first obtaining all the required Resource Bundle instances for tests,
 		// then stubbing all the static methods of the ResourceBundleProvider class
 		ResourceBundleProvider.updateLocale(locale);
@@ -81,11 +76,17 @@ public class UpdateStudySubjectServletTest {
 		ResourceBundle resExceptions = ResourceBundleProvider.getExceptionsBundle(locale);
 		ResourceBundle resPage = ResourceBundleProvider.getPageMessagesBundle();
 		ResourceBundle resFormat = ResourceBundleProvider.getFormatBundle();
+
 		PowerMockito.mockStatic(ResourceBundleProvider.class);
 		PowerMockito.when(ResourceBundleProvider.getWorkflowBundle(Mockito.any(Locale.class))).thenReturn(resWorkflow);
 		PowerMockito.when(ResourceBundleProvider.getFormatBundle(Mockito.any(Locale.class))).thenReturn(resFormat);
 		PowerMockito.when(ResourceBundleProvider.getExceptionsBundle(Mockito.any(Locale.class))).thenReturn(
 				resExceptions);
+
+		request = new MockHttpServletRequest();
+		request.setPreferredLocales(Arrays.asList(locale));
+
+		subjectToUpdate = new StudySubjectBean();
 
 		dateFormat = new SimpleDateFormat(resFormat.getString("date_format_string"), locale);
 
@@ -106,13 +107,14 @@ public class UpdateStudySubjectServletTest {
 				mockedRequestDispatcher);
 
 		// setting up DAO mocks
+		StudySubjectBean emptySubjectBean = new StudySubjectBean();
 		Mockito.when(mockedStudySubjectDAO.findByPK(Mockito.any(Integer.class))).thenReturn(subjectToUpdate);
 		Mockito.when(
 				mockedStudySubjectDAO.findAnotherBySameLabel(Mockito.any(String.class), Mockito.any(Integer.class),
-						Mockito.any(Integer.class))).thenReturn(new StudySubjectBean());
+						Mockito.any(Integer.class))).thenReturn(emptySubjectBean);
 		Mockito.when(
 				mockedStudySubjectDAO.findAnotherBySameLabelInSites(Mockito.any(String.class),
-						Mockito.any(Integer.class), Mockito.any(Integer.class))).thenReturn(new StudySubjectBean());
+						Mockito.any(Integer.class), Mockito.any(Integer.class))).thenReturn(emptySubjectBean);
 		Mockito.when(
 				mockedDiscrepancyNoteDAO.findAllByEntityAndColumnAndStudy(Mockito.any(StudyBean.class),
 						Mockito.any(String.class), Mockito.any(Integer.class), Mockito.any(String.class))).thenReturn(

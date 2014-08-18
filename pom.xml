@@ -417,13 +417,13 @@
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-junit4</artifactId>
-                <version>1.5.1</version>
+                <version>1.5.4</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-api-mockito</artifactId>
-                <version>1.5.1</version>
+                <version>1.5.4</version>
                 <scope>test</scope>
             </dependency>
 	        <dependency>
@@ -693,7 +693,7 @@
 								<value>target/cobertura/cobertura.ser</value>
 							</property>
 						</systemProperties>
-						<argLine>-Xms1024m -Xmx1024m</argLine>
+						<argLine>-Xms512m -Xmx512m -XX:MaxPermSize=512m -XX:MaxHeapSize=512m -XX:+HeapDumpOnOutOfMemoryError</argLine>
 						<classpathDependencyExcludes>
 							<classpathDependencyExcludes>ch.qos.logback:logback-classic</classpathDependencyExcludes>
 						</classpathDependencyExcludes>
