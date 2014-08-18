@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-@SuppressWarnings("unchecked")
 public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
 
 	@Test

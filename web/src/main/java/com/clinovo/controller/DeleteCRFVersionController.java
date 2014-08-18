@@ -50,7 +50,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/deleteCRFVersion")
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "rawtypes" })
 public class DeleteCRFVersionController {
 
 	@Autowired
