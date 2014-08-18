@@ -46,6 +46,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -571,6 +572,8 @@ public abstract class DataEntryServlet extends Controller {
 		} else {
 			request.setAttribute("studyTitle", study.getName());
 		}
+
+		provideRandomizationStatisticsForSite(request);
 
 		logMe("Entering  Get the study then the parent study end  " + System.currentTimeMillis());
 		// Let us process the age
@@ -4908,5 +4911,29 @@ public abstract class DataEntryServlet extends Controller {
 		DataEntryService dataEntryService = (DataEntryService) SpringServletAccess.getApplicationContext(context)
 				.getBean("dataEntryService");
 		return dataEntryService;
+	}
+
+	private void provideRandomizationStatisticsForSite(HttpServletRequest request) {
+
+		StudyBean currentStudy = getCurrentStudy(request);
+
+		if (currentStudy.isSite()) {
+
+			int subjectsNumberAssignedToDynamicGroup;
+			Map<String, Integer> subjectsNumberAssignedToEachDynamicGroupMap = new HashMap<String, Integer>();
+
+			List<StudyGroupClassBean> activeDynamicGroupClasses =
+					getStudyGroupClassDAO().findAllActiveDynamicGroupClassesByStudyId(currentStudy.getParentStudyId());
+
+			for (StudyGroupClassBean dynamicGroupClass: activeDynamicGroupClasses) {
+
+				subjectsNumberAssignedToDynamicGroup =
+						getStudySubjectDAO().getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId(currentStudy.getId(),
+						dynamicGroupClass.getId());
+				subjectsNumberAssignedToEachDynamicGroupMap.put(dynamicGroupClass.getName(), subjectsNumberAssignedToDynamicGroup);
+			}
+
+			request.setAttribute("subjectsNumberAssignedToEachDynamicGroupMap", subjectsNumberAssignedToEachDynamicGroupMap);
+		}
 	}
 }

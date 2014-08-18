@@ -116,8 +116,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private String[] columnNames = new String[] {};
 	private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
 	private ArrayList<StudyEventDefinitionBean> studyEventDefinitionsFullList;
-	private ArrayList<StudyGroupClassBean> studyGroupClasses;
-	private ArrayList<StudyGroupClassBean> dynamicGroupClasses;
+	private List<StudyGroupClassBean> studyGroupClasses;
+	private List<StudyGroupClassBean> dynamicGroupClasses;
 	private StudyUserRoleBean currentRole;
 	private UserAccountBean currentUser;
 	private boolean showMoreLink;
@@ -542,31 +542,25 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		return this.studyEventDefinitions;
 	}
 
-	private ArrayList<StudyGroupClassBean> getStudyGroupClasses() {
+	private List<StudyGroupClassBean> getStudyGroupClasses() {
 		// need to filter here by dyanamic groups #done
 		if (this.studyGroupClasses == null) {
-			if (studyBean.getParentStudyId() > 0) {
-				StudyBean parentStudy = (StudyBean) getStudyDAO().findByPK(studyBean.getParentStudyId());
-				studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudy(parentStudy, true);
-			} else {
-				studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudy(studyBean, true);
-			}
+
+			int studyIdToSearchOn = studyBean.isSite() ? studyBean.getParentStudyId() : studyBean.getId();
+			studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudyId(studyIdToSearchOn, true);
 		}
 		return studyGroupClasses;
 	}
 
-	private ArrayList<StudyGroupClassBean> getDynamicGroupClasses() {
+	private List<StudyGroupClassBean> getDynamicGroupClasses() {
 		ArrayList<StudyEventDefinitionBean> studyEventDefinitionsList;
 		StudyGroupClassBean sgcb;
 		// need to filter by events that are not in dynamic groups #done
 		// and yet, at the same time, add them to the beginning of the list
 		if (dynamicGroupClasses == null) {
-			if (studyBean.getParentStudyId() > 0) {
-				dynamicGroupClasses = getStudyGroupClassDAO().findAllActiveDynamicGroupsByStudyId(
-						studyBean.getParentStudyId());
-			} else {
-				dynamicGroupClasses = getStudyGroupClassDAO().findAllActiveDynamicGroupsByStudyId(studyBean.getId());
-			}
+
+			int studyIdToSearchOn = studyBean.isSite() ? studyBean.getParentStudyId() : studyBean.getId();
+			dynamicGroupClasses = getStudyGroupClassDAO().findAllActiveDynamicGroupsByStudyId(studyIdToSearchOn);
 
 			ListIterator<StudyGroupClassBean> it = dynamicGroupClasses.listIterator();
 			while (it.hasNext()) {

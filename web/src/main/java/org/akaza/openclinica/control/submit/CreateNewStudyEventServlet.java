@@ -980,13 +980,11 @@ public class CreateNewStudyEventServlet extends Controller {
 			studyEventDefinitionIdToStudyEvent.put(studyEvent.getStudyEventDefinitionId(), studyEvent);
 		}
 
-		StudyGroupClassBean defaultStudyGroupClassBean = (StudyGroupClassBean) sgcdao
-				.findDefaultByStudyId(parentStudyId);
+		StudyGroupClassBean defaultStudyGroupClassBean = sgcdao.findDefaultByStudyId(parentStudyId);
 		boolean defaultStudyGroupClassBeanExist = !(defaultStudyGroupClassBean == null || defaultStudyGroupClassBean
 				.getId() == 0);
 
-		ArrayList<StudyGroupClassBean> allActiveDynGroupClasses = sgcdao
-				.findAllActiveDynamicGroupsByStudyId(parentStudyId);
+		List<StudyGroupClassBean> allActiveDynGroupClasses = sgcdao.findAllActiveDynamicGroupsByStudyId(parentStudyId);
 		Collections.sort(allActiveDynGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
 
 		// ordered eventDefs from dynGroups

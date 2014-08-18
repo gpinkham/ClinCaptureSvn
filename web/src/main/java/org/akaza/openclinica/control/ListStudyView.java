@@ -14,6 +14,7 @@
 package org.akaza.openclinica.control;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -29,12 +30,12 @@ public class ListStudyView extends DefaultView {
 
 	private final ResourceBundle resword;
 	private boolean showTitle = false;
-	private ArrayList<StudyGroupClassBean> studyGroupClasses;
-	private ArrayList<StudyGroupClassBean> dynamicGroupClasses;
+	private List<StudyGroupClassBean> studyGroupClasses;
+	private List<StudyGroupClassBean> dynamicGroupClasses;
 	private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
 	private int hideColumnsNumber;
 
-	public ListStudyView(Locale locale, HttpServletRequest request, ArrayList<StudyGroupClassBean> studyGroupClasses, ArrayList<StudyGroupClassBean> dynamicGroupClasses, ArrayList<StudyEventDefinitionBean> studyEventDefinitions, int hideColumnsNumber) {
+	public ListStudyView(Locale locale, HttpServletRequest request, List<StudyGroupClassBean> studyGroupClasses, List<StudyGroupClassBean> dynamicGroupClasses, ArrayList<StudyEventDefinitionBean> studyEventDefinitions, int hideColumnsNumber) {
 		this.studyGroupClasses = studyGroupClasses;
 		this.dynamicGroupClasses = dynamicGroupClasses;
 		this.studyEventDefinitions = studyEventDefinitions;

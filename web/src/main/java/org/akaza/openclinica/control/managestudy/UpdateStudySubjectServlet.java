@@ -42,7 +42,6 @@ import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.DataEntryServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -154,20 +153,12 @@ public class UpdateStudySubjectServlet extends Controller {
 
 			List<StudyGroupClassBean> classes;
 			List<StudyGroupClassBean> dynamicClasses;
-			StudyDAO stdao = getStudyDAO();
 			if (!"submit".equalsIgnoreCase(action)) {
 
-				int parentStudyId = currentStudy.getParentStudyId();
-				if (parentStudyId > 0) {
+				int studyIdToSearchOn = currentStudy.isSite() ? currentStudy.getParentStudyId() : currentStudy.getId();
+				classes = sgcdao.findAllActiveByStudyId(studyIdToSearchOn, true);
+				dynamicClasses = getDynamicGroupClassesByStudyId(studyIdToSearchOn);
 
-					StudyBean parentStudy = (StudyBean) stdao.findByPK(parentStudyId);
-					classes = (List<StudyGroupClassBean>) sgcdao.findAllActiveByStudy(parentStudy, true);
-					dynamicClasses = getDynamicGroupClassesByStudyId(request, parentStudyId);
-				} else {
-
-					classes = (List<StudyGroupClassBean>) sgcdao.findAllActiveByStudy(currentStudy, true);
-					dynamicClasses = getDynamicGroupClassesByStudyId(request, currentStudy.getId());
-				}
 				for (StudyGroupClassBean group : classes) {
 
 					ArrayList<StudyGroupBean> studyGroups = (ArrayList<StudyGroupBean>) sgdao

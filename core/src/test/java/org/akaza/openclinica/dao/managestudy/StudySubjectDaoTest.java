@@ -198,4 +198,30 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 
 		assertEquals(expectedSubjectsAmount, listOfSubjects.size());
 	}
+
+	@Test
+	public void testThatGetCountOfStudySubjectsByStudyIdAndDynamicGroupClassIdReturnsCorrectCount() {
+
+		int studyId = 1;
+		int dynamicGroupClassId = 4;
+		int actualCount;
+		int expectedCount = 1;
+
+		actualCount = studySubjectDAO.getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId(studyId, dynamicGroupClassId);
+
+		assertEquals(expectedCount, actualCount);
+	}
+
+	@Test
+	public void testThatGetCountOfStudySubjectsByStudyIdAndDynamicGroupClassIdReturnsZero() {
+
+		int studyId = 1;
+		int dynamicGroupClassId = 3;
+		int actualCount;
+		int expectedCount = 0;
+
+		actualCount = studySubjectDAO.getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId(studyId, dynamicGroupClassId);
+
+		assertEquals(expectedCount, actualCount);
+	}
 }

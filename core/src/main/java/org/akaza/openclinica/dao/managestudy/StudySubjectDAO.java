@@ -36,6 +36,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * StudySubjectDAO class. It performs the CRUD operations related to study subject items.
@@ -1827,5 +1828,31 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 			numericLabel = Integer.toString(greatestNum);
 		}
 		return siteId + "-" + numericLabel;
+	}
+
+	/**
+	 * Returns a number of study subjects (no matter what status subject has currently),
+	 * which were enrolled at a specific study/site and are randomized to a specific dynamic group class.
+	 *
+	 * @param studyId             the study/site id, to search on.
+	 * @param dynamicGroupClassId the dynamic group class id, to search on.
+	 * @return a number of study subjects, which match the SQL query.
+	 */
+	public int getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId(int studyId, int dynamicGroupClassId) {
+
+		this.unsetTypeExpected();
+		int index = 1;
+		this.setTypeExpected(index, TypeNames.INT); // counter
+
+		Map<Integer, Object> queryParameters = new HashMap<Integer, Object>();
+		index = 1;
+		queryParameters.put(index++, studyId);
+		queryParameters.put(index++, studyId);
+		queryParameters.put(index, dynamicGroupClassId);
+
+		List<HashMap<String, Object>> recordsFromDB =
+				this.select(digester.getQuery("getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId"), queryParameters);
+
+		return (Integer) recordsFromDB.get(0).get("count");
 	}
 }

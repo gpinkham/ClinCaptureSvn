@@ -54,7 +54,7 @@
 
     <study_subject study_subject_id="1" label="ssID1" secondary_label="" subject_id="1" study_id="1" status_id="1"
                    enrollment_date="2008-07-01" date_created="2008-07-02 00:00:00.0" owner_id="1" update_id="1"
-                   oc_oid="SS_SSID1" dynamic_group_class_id="0" randomization_date="2013-12-17" randomization_result="Surgery"/>
+                   oc_oid="SS_SSID1" dynamic_group_class_id="4" randomization_date="2013-12-17" randomization_result="Surgery"/>
 
     <study_event_definition study_event_definition_id="1" study_id="1" name="ED-1-NonRepeating" description=""
                             repeating="false" type="scheduled" category="" owner_id="1" status_id="1"

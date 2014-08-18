@@ -15,6 +15,7 @@ package org.akaza.openclinica.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
@@ -35,7 +36,7 @@ public final class StudyEventUtil {
 
 		ArrayList<StudyEventDefinitionBean> result = new ArrayList<StudyEventDefinitionBean>();
 
-		ArrayList<StudyGroupClassBean> allActiveDynGroupClasses = sgcdao.findAllActiveDynamicGroupsByStudyId(parentStudyId);
+		List<StudyGroupClassBean> allActiveDynGroupClasses = sgcdao.findAllActiveDynamicGroupsByStudyId(parentStudyId);
 		Collections.sort(allActiveDynGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
 
 		// ordered eventDefs from dynGroups

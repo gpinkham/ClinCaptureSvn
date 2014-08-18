@@ -27,16 +27,17 @@ import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItemType;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class ListStudySubjectTableToolbar extends DefaultToolbar {
 
 	private final ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
-	private final ArrayList<StudyGroupClassBean> studyGroupClasses;
+	private final List<StudyGroupClassBean> studyGroupClasses;
 	private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
 
 	public ListStudySubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions,
-			ArrayList<StudyGroupClassBean> studyGroupClasses, boolean addSubjectLinkShow, boolean showMoreLink) {
+			List<StudyGroupClassBean> studyGroupClasses, boolean addSubjectLinkShow, boolean showMoreLink) {
 		super();
 		this.studyEventDefinitions = studyEventDefinitions;
 		this.studyGroupClasses = studyGroupClasses;

@@ -920,12 +920,12 @@ public abstract class Controller extends BaseController {
 
 	}
 
-	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(HttpServletRequest request, int studyId) {
+	public List<StudyGroupClassBean> getDynamicGroupClassesByStudyId(int studyId) {
 
 		ListIterator it;
 		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
 		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
-		ArrayList<StudyGroupClassBean> dynamicGroupClasses = studyGroupClassDAO
+		List<StudyGroupClassBean> dynamicGroupClasses = studyGroupClassDAO
 				.findAllActiveDynamicGroupsByStudyId(studyId);
 		for (StudyGroupClassBean dynGroup : dynamicGroupClasses) {
 			dynGroup.setEventDefinitions(studyEventDefinitionDao.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup

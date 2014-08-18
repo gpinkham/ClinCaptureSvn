@@ -167,6 +167,13 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 	<input type="hidden" name="userEmail" value="${userBean.email}"/>
 	<input type="hidden" name="userPhone" value="${userBean.phone}"/>
 	<!-- /Interviewer information -->
+	<!-- Randomization statistics for current site.
+		This section provides info on number of study subjects in a site,
+		already assigned to each of active dynamic group classes-->
+	<c:forEach var="counter" items="${subjectsNumberAssignedToEachDynamicGroupMap}">
+		<input type="hidden" name="${counter.key}" value="${counter.value}"/>
+	</c:forEach>
+	<!-- /Randomization statistics for current site -->
 </c:if>
 <!-- Messages -->
 <input type="hidden" name="randDataEntryStepMessage" value='<fmt:message key="randomization_des_message" bundle="${restext}"/>'/>

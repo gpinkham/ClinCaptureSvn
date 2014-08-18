@@ -2,13 +2,15 @@
 <queries>
 	<query>
 		<name>findByPK</name>
-		<sql>SELECT * FROM study_group_class WHERE 
-		study_group_class_id = ?</sql>
+		<sql>SELECT * FROM study_group_class WHERE
+			study_group_class_id = ?
+		</sql>
 	</query>
 	<query>
 		<name>findByNameAndStudyId</name>
-		<sql>SELECT * FROM study_group_class WHERE 
-		name = ? AND study_id = ?</sql>
+		<sql>SELECT * FROM study_group_class WHERE
+			name = ? AND study_id = ?
+		</sql>
 	</query>
 	<query>
 		<name>findAll</name>
@@ -17,22 +19,22 @@
 	<query>
 		<name>findAllByStudy</name>
 		<sql>
-			SELECT sg.*, st.name as study_name, gct.name as type_name 
+			SELECT sg.*, st.name as study_name, gct.name as type_name
 			FROM study_group_class sg, study st, group_class_types gct
 			WHERE sg.group_class_type_id=gct.group_class_type_id
 			AND sg.study_id=st.study_id
 			AND (st.study_id=? or st.parent_study_id=?)
-		    ORDER BY sg.name asc
+			ORDER BY sg.name asc
 		</sql>
 	</query>
 	<query>
 		<name>findAllActiveByStudy</name>
 		<sql>
-			SELECT sg.*, st.name as study_name, gct.name as type_name 
+			SELECT sg.*, st.name as study_name, gct.name as type_name
 			FROM study_group_class sg, study st, group_class_types gct
 			WHERE sg.group_class_type_id=gct.group_class_type_id
 			AND sg.study_id=st.study_id
-				AND (st.study_id=? or st.parent_study_id=?)		
+			AND (st.study_id=? or st.parent_study_id=?)
 			AND sg.status_id=1
 			ORDER BY sg.name asc
 		</sql>
@@ -46,9 +48,11 @@
 		</sql>
 	</query>
 	<query>
-		<name>findAllDefault</name>
+		<name>findDefaultByStudyId</name>
 		<sql>
-			SELECT * FROM study_group_class WHERE is_default='true'
+			SELECT *
+			FROM study_group_class
+			WHERE study_id = ? AND is_default = 'true'
 		</sql>
 	</query>
 	<query>
@@ -63,9 +67,9 @@
 	<query>
 		<name>create</name>
 		<sql>
-			INSERT INTO study_group_class 
+			INSERT INTO study_group_class
 			(STUDY_GROUP_CLASS_ID, NAME, STUDY_ID, OWNER_ID, DATE_CREATED, GROUP_CLASS_TYPE_ID,
-				STATUS_ID, subject_assignment, is_default, dynamic_ordinal) 
+			STATUS_ID, subject_assignment, is_default, dynamic_ordinal)
 			VALUES (?,?,?,?,sysdate,?,?,?,?,?)
 		</sql>
 	</query>
@@ -73,24 +77,24 @@
 		<name>update</name>
 		<sql>
 			UPDATE study_group_class SET NAME=?,STUDY_ID=?, GROUP_CLASS_TYPE_ID=?,
-				STATUS_ID=?, DATE_UPDATED=?, UPDATE_ID=?, subject_assignment=?, is_default=?, dynamic_ordinal=?
+			STATUS_ID=?, DATE_UPDATED=?, UPDATE_ID=?, subject_assignment=?, is_default=?, dynamic_ordinal=?
 			WHERE STUDY_GROUP_CLASS_ID=?
-	    </sql>
+		</sql>
 	</query>
 	<query>
-        <name>getMaxDynamicOrdinalByStudyId</name>
-        <sql>
+		<name>getMaxDynamicOrdinalByStudyId</name>
+		<sql>
 			SELECT MAX(dynamic_ordinal) AS max_ord
-            FROM study_group_class 
+			FROM study_group_class
 			WHERE study_id=?
-        </sql>
-    </query>
+		</sql>
+	</query>
 	<query>
 		<name>updateDynamicOrdinal</name>
 		<sql>
 			UPDATE study_group_class SET dynamic_ordinal=?
 			WHERE study_id=? AND study_group_class_id=?
-	    </sql>
+		</sql>
 	</query>
 	<query>
 		<name>getCurrentPrimaryKey</name>
@@ -99,5 +103,13 @@
 	<query>
 		<name>getNextPK</name>
 		<sql>SELECT study_group_class_id_seq.nextval AS key from dual</sql>
+	</query>
+	<query>
+		<name>findAllActiveDynamicGroupClassesByStudyId</name>
+		<sql>
+			SELECT *
+			FROM study_group_class
+			WHERE study_id = ? AND group_class_type_id = 4 AND status_id = 1 AND is_default = 1
+		</sql>
 	</query>
 </queries>

@@ -168,8 +168,8 @@ public class AddNewSubjectServlet extends Controller {
 		StudySubjectDAO ssd = getStudySubjectDAO();
 		StudyDAO stdao = getStudyDAO();
 		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
-		ArrayList classes;
-		ArrayList dynamicClasses;
+		List<StudyGroupClassBean> classes;
+		List<StudyGroupClassBean> dynamicClasses;
 		int defaultDynGroupClassId = 0;
 		String defaultDynGroupClassName = "";
 		StudyInfoPanel panel = getStudyInfoPanel(request);
@@ -185,20 +185,15 @@ public class AddNewSubjectServlet extends Controller {
 		// Update study parameters of current study.
 		// "collectDob" and "genderRequired" are set as the same as the parent
 		// study
-		int parentStudyId = currentStudy.getParentStudyId();
-		if (parentStudyId <= 0) {
-			classes = sgcdao.findAllActiveByStudy(currentStudy, true);
-			dynamicClasses = getDynamicGroupClassesByStudyId(request, currentStudy.getId());
-		} else {
-			StudyBean parentStudy = (StudyBean) stdao.findByPK(parentStudyId);
-			classes = sgcdao.findAllActiveByStudy(parentStudy, true);
-			dynamicClasses = getDynamicGroupClassesByStudyId(request, parentStudyId);
-		}
+		int studyIdToSearchOn = currentStudy.isSite() ? currentStudy.getParentStudyId() : currentStudy.getId();
+		classes = sgcdao.findAllActiveByStudyId(studyIdToSearchOn, true);
+		dynamicClasses = getDynamicGroupClassesByStudyId(studyIdToSearchOn);
+
 
 		if (dynamicClasses.size() > 0) {
-			if (((StudyGroupClassBean) dynamicClasses.get(0)).isDefault()) {
-				defaultDynGroupClassId = ((StudyGroupClassBean) dynamicClasses.get(0)).getId();
-				defaultDynGroupClassName = ((StudyGroupClassBean) dynamicClasses.get(0)).getName();
+			if (dynamicClasses.get(0).isDefault()) {
+				defaultDynGroupClassId = dynamicClasses.get(0).getId();
+				defaultDynGroupClassName = dynamicClasses.get(0).getName();
 			}
 		}
 		fp.addPresetValue(DEFAULT_DYN_GROUP_CLASS_ID, defaultDynGroupClassId);
@@ -441,7 +436,7 @@ public class AddNewSubjectServlet extends Controller {
 
 			if (!classes.isEmpty()) {
 				for (int i = 0; i < classes.size(); i++) {
-					StudyGroupClassBean sgc = (StudyGroupClassBean) classes.get(i);
+					StudyGroupClassBean sgc = classes.get(i);
 					int groupId = fp.getInt("studyGroupId" + i);
 					String notes = fp.getString("notes" + i);
 
@@ -774,8 +769,8 @@ public class AddNewSubjectServlet extends Controller {
 				}
 				if (!classes.isEmpty() && studySubject.isActive()) {
 					SubjectGroupMapDAO sgmdao = getSubjectGroupMapDAO();
-					for (Object aClass : classes) {
-						StudyGroupClassBean group = (StudyGroupClassBean) aClass;
+					for (StudyGroupClassBean group : classes) {
+
 						group.getStudyGroupId();
 						group.getGroupNotes();
 						SubjectGroupMapBean map = new SubjectGroupMapBean();
@@ -957,7 +952,7 @@ public class AddNewSubjectServlet extends Controller {
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
 	}
 
-	protected void setUpBeans(ArrayList classes, HttpServletRequest request) throws Exception {
+	protected void setUpBeans(List<StudyGroupClassBean> classes, HttpServletRequest request) throws Exception {
 		StudyGroupDAO sgdao = getStudyGroupDAO();
 
 		SubjectDAO sdao = getSubjectDAO();
@@ -976,8 +971,8 @@ public class AddNewSubjectServlet extends Controller {
 		request.setAttribute(BEAN_FATHERS, dsFathers);
 		request.setAttribute(BEAN_MOTHERS, dsMothers);
 
-		for (Object aClass : classes) {
-			StudyGroupClassBean group = (StudyGroupClassBean) aClass;
+		for (StudyGroupClassBean group : classes) {
+
 			ArrayList studyGroups = sgdao.findAllByGroupClass(group);
 			group.setStudyGroups(studyGroups);
 		}

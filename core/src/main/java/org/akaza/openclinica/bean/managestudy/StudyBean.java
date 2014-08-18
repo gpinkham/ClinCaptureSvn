@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -25,25 +25,30 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.StringTokenizer;
 
-@SuppressWarnings({"rawtypes", "serial"})
+/**
+ * <code>StudyBean</code> class represents a study entity, extends <code>AuditableEntityBean</code> class.
+ */
+@SuppressWarnings({ "rawtypes", "serial" })
 public class StudyBean extends AuditableEntityBean {
+
 	private int parentStudyId = 0;
+
 	// The original reason to add this is being able to list on
 	// userbox.jsp the study name to which a site belong.
 	// This property doesn't exist in the database table <Study>, so it might
 	// not has value if it hasn't been assigned
 	private String parentStudyName = "";
-	
+
 	private String officialTitle = "";
 	private String identifier = "";
 	private String secondaryIdentifier = "";
-	private String summary = "";// need to be removed
+	private String summary = "";    // need to be removed
 
 	private Date datePlannedStart;
 	private Date datePlannedEnd;
 
 	// to designate genetic/non-genetic:
-	private StudyType type = StudyType.NONGENETIC;// default type
+	private StudyType type = StudyType.NONGENETIC;    // default type
 
 	/**
 	 * <code>true</code> if the study manages pedigrees, <code>false</code> otherwise Always equal to
@@ -91,8 +96,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param studyParameters
-	 *            The studyParameters to set.
+	 * @param studyParameters The studyParameters to set.
 	 */
 	public void setStudyParameters(ArrayList studyParameters) {
 		this.studyParameters = studyParameters;
@@ -106,8 +110,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param officialTitle
-	 *            The officialTitle to set.
+	 * @param officialTitle The officialTitle to set.
 	 */
 	public void setOfficialTitle(String officialTitle) {
 		this.officialTitle = officialTitle;
@@ -121,8 +124,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param resultsReference
-	 *            The resultsReference to set.
+	 * @param resultsReference The resultsReference to set.
 	 */
 	public void setResultsReference(boolean resultsReference) {
 		this.resultsReference = resultsReference;
@@ -148,30 +150,6 @@ public class StudyBean extends AuditableEntityBean {
 	private String selection = "";
 	private String timing = "";
 
-	public String getAbbreviatedName() {
-		String name = getName();
-		if (name.length() > 30) {
-			name = name.substring(0, 27) + "...";
-		}
-		return name;
-	}
-
-	public String getAbbreviatedParentStudyName() {
-		String parentStudyName = getParentStudyName();
-		if (parentStudyName.length() > 13) {
-			parentStudyName = parentStudyName.substring(0, 9) + "...";
-		}
-		return parentStudyName;
-	}
-
-	public String getAbbreviatedIdentifier() {
-		String identifier = getIdentifier();
-		if (identifier.length() > 20) {
-			identifier = identifier.substring(0, 16) + "...";
-		}
-		return identifier;
-	}
-
 	/**
 	 * @return Returns the ageMax.
 	 */
@@ -180,8 +158,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param ageMax
-	 *            The ageMax to set.
+	 * @param ageMax The ageMax to set.
 	 */
 	public void setAgeMax(String ageMax) {
 		this.ageMax = ageMax;
@@ -195,8 +172,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param ageMin
-	 *            The ageMin to set.
+	 * @param ageMin The ageMin to set.
 	 */
 	public void setAgeMin(String ageMin) {
 		this.ageMin = ageMin;
@@ -217,8 +193,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param allocation
-	 *            The allocation to set.
+	 * @param allocation The allocation to set.
 	 */
 	public void setAllocation(String allocation) {
 		this.allocation = allocation;
@@ -239,8 +214,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param assignment
-	 *            The assignment to set.
+	 * @param assignment The assignment to set.
 	 */
 	public void setAssignment(String assignment) {
 		this.assignment = assignment;
@@ -254,8 +228,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param collaborators
-	 *            The collaborators to set.
+	 * @param collaborators The collaborators to set.
 	 */
 	public void setCollaborators(String collaborators) {
 		this.collaborators = collaborators;
@@ -269,8 +242,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param conditions
-	 *            The conditions to set.
+	 * @param conditions The conditions to set.
 	 */
 	public void setConditions(String conditions) {
 		this.conditions = conditions;
@@ -291,8 +263,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param control
-	 *            The control to set.
+	 * @param control The control to set.
 	 */
 	public void setControl(String control) {
 		this.control = control;
@@ -306,8 +277,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param datePlannedEnd
-	 *            The datePlannedEnd to set.
+	 * @param datePlannedEnd The datePlannedEnd to set.
 	 */
 	public void setDatePlannedEnd(Date datePlannedEnd) {
 		this.datePlannedEnd = datePlannedEnd;
@@ -321,8 +291,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param datePlannedStart
-	 *            The datePlannedStart to set.
+	 * @param datePlannedStart The datePlannedStart to set.
 	 */
 	public void setDatePlannedStart(Date datePlannedStart) {
 		this.datePlannedStart = datePlannedStart;
@@ -343,8 +312,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param duration
-	 *            The duration to set.
+	 * @param duration The duration to set.
 	 */
 	public void setDuration(String duration) {
 		this.duration = duration;
@@ -358,8 +326,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param eligibility
-	 *            The eligibility to set.
+	 * @param eligibility The eligibility to set.
 	 */
 	public void setEligibility(String eligibility) {
 		this.eligibility = eligibility;
@@ -380,8 +347,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param endpoint
-	 *            The endpoint to set.
+	 * @param endpoint The endpoint to set.
 	 */
 	public void setEndpoint(String endpoint) {
 		this.endpoint = endpoint;
@@ -395,8 +361,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param expectedTotalEnrollment
-	 *            The expectedTotalEnrollment to set.
+	 * @param expectedTotalEnrollment The expectedTotalEnrollment to set.
 	 */
 	public void setExpectedTotalEnrollment(int expectedTotalEnrollment) {
 		this.expectedTotalEnrollment = expectedTotalEnrollment;
@@ -410,8 +375,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param facilityCity
-	 *            The facilityCity to set.
+	 * @param facilityCity The facilityCity to set.
 	 */
 	public void setFacilityCity(String facilityCity) {
 		this.facilityCity = facilityCity;
@@ -425,8 +389,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param facilityContactDegree
-	 *            The facilityContactDegree to set.
+	 * @param facilityContactDegree The facilityContactDegree to set.
 	 */
 	public void setFacilityContactDegree(String facilityContactDegree) {
 		this.facilityContactDegree = facilityContactDegree;
@@ -440,8 +403,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param facilityContactEmail
-	 *            The facilityContactEmail to set.
+	 * @param facilityContactEmail The facilityContactEmail to set.
 	 */
 	public void setFacilityContactEmail(String facilityContactEmail) {
 		this.facilityContactEmail = facilityContactEmail;
@@ -455,8 +417,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param facilityContactName
-	 *            The facilityContactName to set.
+	 * @param facilityContactName The facilityContactName to set.
 	 */
 	public void setFacilityContactName(String facilityContactName) {
 		this.facilityContactName = facilityContactName;
@@ -470,8 +431,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param facilityContactPhone
-	 *            The facilityContactPhone to set.
+	 * @param facilityContactPhone The facilityContactPhone to set.
 	 */
 	public void setFacilityContactPhone(String facilityContactPhone) {
 		this.facilityContactPhone = facilityContactPhone;
@@ -485,8 +445,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param facilityCountry
-	 *            The facilityCountry to set.
+	 * @param facilityCountry The facilityCountry to set.
 	 */
 	public void setFacilityCountry(String facilityCountry) {
 		this.facilityCountry = facilityCountry;
@@ -500,8 +459,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param facilityName
-	 *            The facilityName to set.
+	 * @param facilityName The facilityName to set.
 	 */
 	public void setFacilityName(String facilityName) {
 		this.facilityName = facilityName;
@@ -522,8 +480,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param facilityRecruitmentStatus
-	 *            The facilityRecruitmentStatus to set.
+	 * @param facilityRecruitmentStatus The facilityRecruitmentStatus to set.
 	 */
 	public void setFacilityRecruitmentStatus(String facilityRecruitmentStatus) {
 		this.facilityRecruitmentStatus = facilityRecruitmentStatus;
@@ -537,8 +494,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param facilityState
-	 *            The facilityState to set.
+	 * @param facilityState The facilityState to set.
 	 */
 	public void setFacilityState(String facilityState) {
 		this.facilityState = facilityState;
@@ -552,8 +508,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param facilityZip
-	 *            The facilityZip to set.
+	 * @param facilityZip The facilityZip to set.
 	 */
 	public void setFacilityZip(String facilityZip) {
 		this.facilityZip = facilityZip;
@@ -574,8 +529,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param gender
-	 *            The gender to set.
+	 * @param gender The gender to set.
 	 */
 	public void setGender(String gender) {
 		this.gender = gender;
@@ -589,8 +543,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param healthyVolunteerAccepted
-	 *            The healthyVolunteerAccepted to set.
+	 * @param healthyVolunteerAccepted The healthyVolunteerAccepted to set.
 	 */
 	public void setHealthyVolunteerAccepted(boolean healthyVolunteerAccepted) {
 		this.healthyVolunteerAccepted = healthyVolunteerAccepted;
@@ -604,7 +557,7 @@ public class StudyBean extends AuditableEntityBean {
 		StringBuffer sb = new StringBuffer();
 		String intervention, name;
 		while (st.hasMoreElements()) {
-			StringTokenizer inter = new StringTokenizer(st.nextToken().toString(), "/");
+			StringTokenizer inter = new StringTokenizer(st.nextToken(), "/");
 			intervention = inter.nextToken();
 			sb.append(ResourceBundleProvider.getResAdmin(intervention));
 			sb.append("/");
@@ -612,22 +565,22 @@ public class StudyBean extends AuditableEntityBean {
 			sb.append(name);
 			sb.append(",");
 		}
-		if (sb.length() != 0)
+		if (sb.length() != 0) {
 			sb.deleteCharAt(sb.lastIndexOf(","));
+		}
 		return sb.toString();
 	}
 
 	/**
 	 * @return Returns the interventions, using the keys of the intervention types, should be used when storing the
-	 *         Study in the database.
+	 * Study in the database.
 	 */
 	public String getInterventionsKey() {
 		return interventions;
 	}
 
 	/**
-	 * @param interventions
-	 *            The interventions to set.
+	 * @param interventions The interventions to set.
 	 */
 	public void setInterventions(String interventions) {
 		this.interventions = interventions;
@@ -641,8 +594,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param keywords
-	 *            The keywords to set.
+	 * @param keywords The keywords to set.
 	 */
 	public void setKeywords(String keywords) {
 		this.keywords = keywords;
@@ -663,8 +615,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param masking
-	 *            The masking to set.
+	 * @param masking The masking to set.
 	 */
 	public void setMasking(String masking) {
 		this.masking = masking;
@@ -678,8 +629,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param medlineIdentifier
-	 *            The medlineIdentifier to set.
+	 * @param medlineIdentifier The medlineIdentifier to set.
 	 */
 	public void setMedlineIdentifier(String medlineIdentifier) {
 		this.medlineIdentifier = medlineIdentifier;
@@ -697,8 +647,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param parentStudyId
-	 *            The parentStudyId to set.
+	 * @param parentStudyId The parentStudyId to set.
 	 */
 	public void setParentStudyId(int parentStudyId) {
 		this.parentStudyId = parentStudyId;
@@ -712,8 +661,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param parentStudyName
-	 *            String
+	 * @param parentStudyName String
 	 */
 	public void setParentStudyName(String parentStudyName) {
 		this.parentStudyName = parentStudyName;
@@ -734,8 +682,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param phase
-	 *            The phase to set.
+	 * @param phase The phase to set.
 	 */
 	public void setPhase(String phase) {
 		this.phase = phase;
@@ -749,8 +696,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param principalInvestigator
-	 *            The principalInvestigator to set.
+	 * @param principalInvestigator The principalInvestigator to set.
 	 */
 	public void setPrincipalInvestigator(String principalInvestigator) {
 		this.principalInvestigator = principalInvestigator;
@@ -764,8 +710,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param protocolDateVerification
-	 *            The protocolDateVerification to set.
+	 * @param protocolDateVerification The protocolDateVerification to set.
 	 */
 	public void setProtocolDateVerification(Date protocolDateVerification) {
 		this.protocolDateVerification = protocolDateVerification;
@@ -779,8 +724,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param protocolDescription
-	 *            The protocolDescription to set.
+	 * @param protocolDescription The protocolDescription to set.
 	 */
 	public void setProtocolDescription(String protocolDescription) {
 		this.protocolDescription = protocolDescription;
@@ -801,8 +745,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param purpose
-	 *            The purpose to set.
+	 * @param purpose The purpose to set.
 	 */
 	public void setPurpose(String purpose) {
 		this.purpose = purpose;
@@ -823,8 +766,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param selection
-	 *            The selection to set.
+	 * @param selection The selection to set.
 	 */
 	public void setSelection(String selection) {
 		this.selection = selection;
@@ -838,16 +780,15 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param sponsor
-	 *            The sponsor to set.
+	 * @param sponsor The sponsor to set.
 	 */
 	public void setSponsor(String sponsor) {
 		this.sponsor = sponsor;
 	}
 
 	/**
-	 * @deprecated
 	 * @return Returns the statusId.
+	 * @deprecated
 	 */
 	@Deprecated
 	public int getStatusId() {
@@ -855,9 +796,8 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
+	 * @param statusId The statusId to set.
 	 * @deprecated
-	 * @param statusId
-	 *            The statusId to set.
 	 */
 	@Deprecated
 	public void setStatusId(int statusId) {
@@ -880,8 +820,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param timing
-	 *            The timing to set.
+	 * @param timing The timing to set.
 	 */
 	public void setTiming(String timing) {
 		this.timing = timing;
@@ -902,8 +841,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param type
-	 *            The type to set.
+	 * @param type The type to set.
 	 */
 	public void setProtocolType(String type) {
 		this.protocolType = type;
@@ -917,8 +855,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param type
-	 *            The type to set. <B>Note that this should be of type managestudy.StudyType, not core.StudyType.</B>
+	 * @param type The type to set. <B>Note that this should be of type managestudy. StudyType, not core.StudyType.</B>
 	 */
 	public void setType(StudyType type) {
 		this.type = type;
@@ -929,8 +866,8 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @deprecated
 	 * @return Returns the typeId.
+	 * @deprecated
 	 */
 	@Deprecated
 	public int getTypeId() {
@@ -938,9 +875,8 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
+	 * @param typeId The typeId to set.
 	 * @deprecated
-	 * @param typeId
-	 *            The typeId to set.
 	 */
 	@Deprecated
 	public void setTypeId(int typeId) {
@@ -955,7 +891,14 @@ public class StudyBean extends AuditableEntityBean {
 		return genetic;
 	}
 
+	/**
+	 * Sets the type of a study.
+	 *
+	 * @param genetic if <code>true</code>, then a study will be assigned the type GENETIC;
+	 *                otherwise - will be assigned the type NON GENETIC.
+	 */
 	public void setGenetic(boolean genetic) {
+
 		this.genetic = genetic;
 
 		if (genetic) {
@@ -973,8 +916,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param url
-	 *            The uRL to set.
+	 * @param url The uRL to set.
 	 */
 	public void setUrl(String url) {
 		this.url = url;
@@ -988,8 +930,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param description
-	 *            The uRLDescription to set.
+	 * @param description The uRLDescription to set.
 	 */
 	public void setUrlDescription(String description) {
 		urlDescription = description;
@@ -1003,8 +944,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param identifier
-	 *            The identifier to set.
+	 * @param identifier The identifier to set.
 	 */
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
@@ -1018,8 +958,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param secondaryIdentifier
-	 *            The secondaryIdentifier to set.
+	 * @param secondaryIdentifier The secondaryIdentifier to set.
 	 */
 	public void setSecondaryIdentifier(String secondaryIdentifier) {
 		this.secondaryIdentifier = secondaryIdentifier;
@@ -1033,8 +972,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param summary
-	 *            The summary to set.
+	 * @param summary The summary to set.
 	 */
 	public void setSummary(String summary) {
 		this.summary = summary;
@@ -1048,8 +986,7 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param studyParameterConfig
-	 *            The studyParameterConfig to set.
+	 * @param studyParameterConfig The studyParameterConfig to set.
 	 */
 	public void setStudyParameterConfig(StudyParameterConfig studyParameterConfig) {
 		this.studyParameterConfig = studyParameterConfig;
@@ -1063,6 +1000,12 @@ public class StudyBean extends AuditableEntityBean {
 		this.oid = oid;
 	}
 
+	/**
+	 * Returns an <code>OidGenerator</code> property value, assigned to a study bean.
+	 *
+	 * @param ds a <code>DataSource</code> object, which represents the data source.
+	 * @return an <code>OidGenerator</code> property value, assigned to a study bean.
+	 */
 	public OidGenerator getOidGenerator(DataSource ds) {
 		if (oidGenerator != null) {
 			oidGenerator.setDataSource(ds);
@@ -1074,8 +1017,19 @@ public class StudyBean extends AuditableEntityBean {
 		this.oidGenerator = oidGenerator;
 	}
 
+	/**
+	 * Discovers if a specific study bean represents a site.
+	 *
+	 * @param parentStudyId a value of the <code>parentStudyId</code> property of the tested study bean.
+	 * @return <code>true</code> if the tested study bean represents a site; <code>false</code> otherwise.
+	 */
 	public boolean isSite(int parentStudyId) {
-		return parentStudyId > 0 ? true : false;
+		return parentStudyId > 0;
+	}
+
+	public boolean isSite() {
+
+		return this.parentStudyId > 0;
 	}
 
 	public boolean isShowUnlockEventsButton() {
@@ -1093,5 +1047,4 @@ public class StudyBean extends AuditableEntityBean {
 	public void setShowLockEventsButton(boolean showLockEventsButton) {
 		this.showLockEventsButton = showLockEventsButton;
 	}
-
 }
