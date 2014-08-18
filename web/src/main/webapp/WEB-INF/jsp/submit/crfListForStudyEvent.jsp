@@ -529,7 +529,7 @@
                                            onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                           ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="4"></a>
 
-                                        <c:if test="${userRole.id ne 4 and userRole.id ne 5 and (studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed') && (study.status.available)}">
+                                        <c:if test="${userRole.id ne 4 && userRole.id ne 5 and userRole.id ne 6 and (studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed') && (study.status.available)}">
                                             <c:set var="hideCol3" value="false"/>
                                             <c:set var="hideCol4" value="false"/>
                                             <c:set var="crfSpacersCount" value="4"/>
