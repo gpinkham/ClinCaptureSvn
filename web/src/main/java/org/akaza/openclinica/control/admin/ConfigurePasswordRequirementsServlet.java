@@ -82,6 +82,9 @@ public class ConfigurePasswordRequirementsServlet extends Controller {
 			if (minChars > 0 && maxChars > 0 && maxChars < minChars) {
 				Validator.addError(errors, "pwd.chars.min", resexception.getString("pwd_min_greater_than_max"));
 			}
+			if (passwordMustsGreaterThanMaxLength(fp)) {
+				Validator.addError(errors, "pwd.chars.max", resexception.getString("pwd_max_less_than_must_chars"));
+			}
 			if (errors.isEmpty()) {
 				passwordRequirementsDao.setHasLower(Boolean.valueOf(fp.getString("pwd.chars.case.lower")));
 				passwordRequirementsDao.setHasUpper(Boolean.valueOf(fp.getString("pwd.chars.case.upper")));
@@ -106,6 +109,28 @@ public class ConfigurePasswordRequirementsServlet extends Controller {
 				forwardPage(Page.CONFIGURATION_PASSWORD_REQUIREMENTS, request, response);
 			}
 		}
+	}
+
+	boolean passwordMustsGreaterThanMaxLength(FormProcessor fp) {
+		int maxChars = fp.getInt("pwd.chars.max");
+		int mustsCount = 0;
+		Boolean lowerCase = Boolean.valueOf(fp.getString("pwd.chars.case.lower"));
+		Boolean upperCase = Boolean.valueOf(fp.getString("pwd.chars.case.upper"));
+		Boolean digits = Boolean.valueOf(fp.getString("pwd.chars.digits"));
+		Boolean specials = Boolean.valueOf(fp.getString("pwd.chars.specials"));
+		if (lowerCase) {
+			mustsCount++;
+		}
+		if (upperCase) {
+			mustsCount++;
+		}
+		if (digits) {
+			mustsCount++;
+		}
+		if (specials) {
+			mustsCount++;
+		}
+		return maxChars > 0 && maxChars <= mustsCount;
 	}
 
 	private HashMap<String, Object> submittedValues(PasswordRequirementsDao passwordRequirementsDao, FormProcessor fp) {
