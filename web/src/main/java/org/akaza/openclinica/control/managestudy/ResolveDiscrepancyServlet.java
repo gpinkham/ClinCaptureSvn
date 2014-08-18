@@ -71,6 +71,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ResolveDiscrepancyServlet that handles request when user click on "view within record"-button on "Notes &
+ * Discrepancies"-page.
+ */
 @SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class ResolveDiscrepancyServlet extends Controller {
@@ -84,6 +88,15 @@ public class ResolveDiscrepancyServlet extends Controller {
 	public static final String SECTION_ID = "sectionId";
 	public static final String FIELD = "field";
 
+	/**
+	 * Returns Page for forwarding.
+	 * 
+	 * @param request
+	 *            The HttpServletRequest.
+	 * @param note
+	 *            The DiscrepancyNoteBean for what we are looking for page for forwarding.
+	 * @return A Page.
+	 */
 	public Page getPageForForwarding(HttpServletRequest request, DiscrepancyNoteBean note) {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -146,6 +159,21 @@ public class ResolveDiscrepancyServlet extends Controller {
 		return null;
 	}
 
+	/**
+	 * Get needed data from DB and save it to the request.
+	 * 
+	 * @param request
+	 *            The HttpServletRequest.
+	 * @param ds
+	 *            The DataSource.
+	 * @param currentStudy
+	 *            The StudyBean.
+	 * @param note
+	 *            The DiscrepancyNoteBean.
+	 * @param isCompleted
+	 *            The boolean.
+	 * @return A boolean.
+	 */
 	@SuppressWarnings("unchecked")
 	public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy,
 			DiscrepancyNoteBean note, boolean isCompleted) {
@@ -182,10 +210,8 @@ public class ResolveDiscrepancyServlet extends Controller {
 			request.setAttribute(UpdateStudyEventServlet.STUDY_SUBJECT_ID, String.valueOf(seb.getStudySubjectId()));
 			request.getSession().setAttribute(CreateDiscrepancyNoteServlet.SUBJECT_ID,
 					String.valueOf(seb.getStudySubjectId()));
-		}
-
-		// this is for item data
-		else if ("itemdata".equalsIgnoreCase(entityType)) {
+		} else if ("itemdata".equalsIgnoreCase(entityType)) {
+			// this is for item data
 			SectionDAO sdao = new SectionDAO(ds);
 			ItemDataDAO iddao = new ItemDataDAO(ds);
 			ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
@@ -212,13 +238,10 @@ public class ResolveDiscrepancyServlet extends Controller {
 			} else {
 				request.setAttribute(DataEntryServlet.INPUT_EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
 				request.setAttribute(DataEntryServlet.INPUT_SECTION_ID, String.valueOf(ifmb.getSectionId()));
-
 			}
-
 		}
 
 		return true;
-
 	}
 
 	@Override
@@ -326,7 +349,8 @@ public class ResolveDiscrepancyServlet extends Controller {
 				|| p.equals(Page.ADMIN_EDIT_SERVLET)) {
 			request.getSession().setAttribute(POP_UP_URL, request.getAttribute(POP_UP_URL));
 			response.sendRedirect(request.getContextPath() + p.getFileName()
-					+ (p.getFileName().contains("?") ? "&" : "?") + "eventCRFId=" + request.getAttribute(EVENT_CRF_ID));
+					+ (p.getFileName().contains("?") ? "&" : "?") + "eventCRFId=" + request.getAttribute(EVENT_CRF_ID)
+					+ "&sectionId=" + request.getAttribute(SECTION_ID) + "&tabId=" + request.getAttribute(TAB_ID));
 			return;
 		}
 
@@ -438,6 +462,5 @@ public class ResolveDiscrepancyServlet extends Controller {
 				}
 			}
 		}
-
 	}
 }
