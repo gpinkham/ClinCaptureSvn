@@ -22,6 +22,7 @@ import java.util.ResourceBundle;
 
 import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SubjectEventStatusUtilTest {
 
 	private ResourceBundle resword;
@@ -37,8 +38,7 @@ public class SubjectEventStatusUtilTest {
 	private List<EventDefinitionCRFBean> eventDefCrfs;
 
 	private int idCounter;
-
-	@SuppressWarnings("rawtypes")
+	
 	@Before
 	public void setUp() throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en"));

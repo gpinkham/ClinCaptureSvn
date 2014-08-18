@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author jxu
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({ "serial" })
 @Component
 public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 
