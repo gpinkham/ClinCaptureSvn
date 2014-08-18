@@ -187,7 +187,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 		// ArrayList displayEventCRFs = getDisplayEventCRFs(eventCRFs,
 		// eventDefinitionCRFs, seb.getSubjectEventStatus());
 
-		ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
+		ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, ub,
 				currentRole, seb.getSubjectEventStatus(), study);
 
 		// Issue 3212 BWP << hide certain CRFs at the site level

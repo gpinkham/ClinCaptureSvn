@@ -103,7 +103,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	private StudyDAO studyDAO;
 	private StudyGroupDAO studyGroupDAO;
 	private EventCRFDAO eventCRFDAO;
-	private EventDefinitionCRFDAO eventDefintionCRFDAO;
+	private EventDefinitionCRFDAO eventDefinitionCRFDAO;
 	private CRFDAO crfDAO;
 	private CRFVersionDAO crfVersionDAO;
 	private DiscrepancyNoteDAO discrepancyNoteDAO;
@@ -266,19 +266,20 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
 		for (StudySubjectBean studySubjectBean : items) {
+
+			StudyBean subjectStudy = (StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId());
 			HashMap<Object, Object> theItem = new HashMap<Object, Object>();
 			theItem.put("studySubject", studySubjectBean);
 			theItem.put("studySubject.label", studySubjectBean.getLabel());
 			theItem.put("studySubject.status", studySubjectBean.getStatus());
-			theItem.put("enrolledAt",
-					((StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId())).getIdentifier());
+			theItem.put("enrolledAt", subjectStudy.getIdentifier());
 
 			SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
 			theItem.put("subject", subjectBean);
 			theItem.put("subject.charGender", subjectBean.getGender());
 
 			theItem.put("isSignable", SignUtil.permitSign(studySubjectBean, new DAOWrapper(getStudyDAO(),
-					getStudyEventDAO(), getStudySubjectDAO(), getEventCRFDAO(), getEventDefintionCRFDAO(),
+					getStudyEventDAO(), getStudySubjectDAO(), getEventCRFDAO(), getEventDefinitionCRFDAO(),
 					getDiscrepancyNoteDAO())));
 
 			// study group classes
@@ -314,37 +315,43 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				d.getProps().put("event.status", SubjectEventStatus.NOT_SCHEDULED);
 				d.getProps().put("studySubject.createdDate", null);
 				for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
+
 					CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
+					EventDefinitionCRFBean eventDefCRFBean =
+							getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFId(subjectStudy,
+							selectedStudyEventDefinition.getId(), crf.getId());
 					d.getProps().put("crf_" + crf.getId(), getCRFStatusId(studySubjectBean, null, null, null, null));
 					d.getProps().put("crf_" + crf.getId() + "_eventCrf", null);
 					d.getProps().put("crf_" + crf.getId() + "_crf", crf);
-					d.getProps().put("crf_" + crf.getId() + "_eventDefinitionCrf",
-							getEventDefinitionCRFBean(selectedStudyEventDefinition.getId(), crf, studySubjectBean));
+					d.getProps().put("crf_" + crf.getId() + "_eventDefinitionCrf", eventDefCRFBean);
 					theItem.put("crf_" + crf.getId(), "");
 				}
 				events.add(d);
 			}
 			// study event size >0
 			for (StudyEventBean studyEventBean : eventsForStudySubjectAndEventDefinitions) {
+
 				DisplayBean d = new DisplayBean();
 				d.getProps().put("event", studyEventBean);
 				d.getProps().put("event.status", studyEventBean.getSubjectEventStatus());
 				d.getProps().put("studySubject.createdDate", studyEventBean.getDateStarted());
 				for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
+
 					CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
 					EventCRFBean eventCRFBean = crfAsKeyEventCrfAsValue.get(crf.getId() + "_" + studyEventBean.getId());
-					d.getProps().put(
-							"crf_" + crf.getId(),
+					EventDefinitionCRFBean eventDefCRFBean =
+							getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFId(subjectStudy,
+							selectedStudyEventDefinition.getId(), crf.getId());
+					d.getProps().put("crf_" + crf.getId(),
 							getCRFStatusId(studySubjectBean, studyEventBean, studyEventBean.getSubjectEventStatus(),
-									crf, eventCRFBean));
+							crf, eventCRFBean));
 					if (eventCRFBean != null) {
 						d.getProps().put("crf_" + crf.getId() + "_eventCrf", eventCRFBean);
 					} else {
 						d.getProps().put("crf_" + crf.getId() + "_eventCrf", null);
 					}
 					d.getProps().put("crf_" + crf.getId() + "_crf", crf);
-					d.getProps().put("crf_" + crf.getId() + "_eventDefinitionCrf",
-							getEventDefinitionCRFBean(selectedStudyEventDefinition.getId(), crf, studySubjectBean));
+					d.getProps().put("crf_" + crf.getId() + "_eventDefinitionCrf", eventDefCRFBean);
 
 					theItem.put("crf_" + crf.getId(), "");
 				}
@@ -367,18 +374,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		// Do not forget to set the items back on the tableFacade.
 		tableFacade.setItems(theItems);
 
-	}
-
-	private EventDefinitionCRFBean getEventDefinitionCRFBean(Integer studyEventDefinitionId, CRFBean crfBean,
-			StudySubjectBean studySubject) {
-		EventDefinitionCRFBean eventDefinitionCrf = getEventDefintionCRFDAO()
-				.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinitionId, crfBean.getId(),
-						studySubject.getStudyId());
-		if (eventDefinitionCrf.getId() == 0) {
-			eventDefinitionCrf = getEventDefintionCRFDAO().findForStudyByStudyEventDefinitionIdAndCRFId(
-					studyEventDefinitionId, crfBean.getId());
-		}
-		return eventDefinitionCrf;
 	}
 
 	private int getColumnNamesMap(TableFacade tableFacade) {
@@ -458,8 +453,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	private ArrayList<CRFBean> getCrfs(StudyEventDefinitionBean eventDefinition) {
 		if (this.crfBeans == null) {
 			crfBeans = new ArrayList<CRFBean>();
-			for (EventDefinitionCRFBean eventDefinitionCrf : (List<EventDefinitionCRFBean>) getEventDefintionCRFDAO()
-					.findAllActiveByEventDefinitionId(eventDefinition.getId())) {
+			for (EventDefinitionCRFBean eventDefinitionCrf
+					: getEventDefinitionCRFDAO().findAllActiveByEventDefinitionId(eventDefinition.getId())) {
 				CRFBean crfBean = (CRFBean) getCrfDAO().findByPK(eventDefinitionCrf.getCrfId());
 				if (eventDefinitionCrf.getParentId() == 0) {
 					crfBeans.add(crfBean);
@@ -577,12 +572,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		this.eventCRFDAO = eventCRFDAO;
 	}
 
-	public EventDefinitionCRFDAO getEventDefintionCRFDAO() {
-		return eventDefintionCRFDAO;
+	public EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
+		return eventDefinitionCRFDAO;
 	}
 
-	public void setEventDefintionCRFDAO(EventDefinitionCRFDAO eventDefintionCRFDAO) {
-		this.eventDefintionCRFDAO = eventDefintionCRFDAO;
+	public void setEventDefinitionCRFDAO(EventDefinitionCRFDAO eventDefinitionCRFDAO) {
+		this.eventDefinitionCRFDAO = eventDefinitionCRFDAO;
 	}
 
 	public CRFDAO getCrfDAO() {
@@ -931,7 +926,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		public Object getValue(Object item, String property, int rowcount) {
 			return ListStudySubjectTableFactory.getSubjectActionsColumnContent(item, currentUser, getCurrentRole(),
 					getStudyBean(), new DAOWrapper(getStudyDAO(), getStudyEventDAO(), getStudySubjectDAO(),
-							getEventCRFDAO(), getEventDefintionCRFDAO(), getStudyEventDefinitionDAO(),
+							getEventCRFDAO(), getEventDefinitionCRFDAO(), getStudyEventDefinitionDAO(),
 							getDiscrepancyNoteDAO()), resword);
 		}
 	}

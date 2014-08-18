@@ -22,6 +22,7 @@ package org.akaza.openclinica.control.submit;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -178,7 +179,8 @@ public class MarkEventCRFCompleteServlet extends Controller {
 
 				EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 				ArrayList allCRFs = ecdao.findAllByStudyEvent(seb);
-				ArrayList allEDCs = edcdao.findAllActiveByEventDefinitionId(seb.getStudyEventDefinitionId());
+				List<EventDefinitionCRFBean> allEDCs =
+						edcdao.findAllActiveByEventDefinitionId(seb.getStudyEventDefinitionId());
 				boolean eventCompleted = true;
 				for (int i = 0; i < allCRFs.size(); i++) {
 					EventCRFBean ec = (EventCRFBean) allCRFs.get(i);

@@ -20,7 +20,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -91,11 +91,11 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 			int defId, EventDefinitionCRFDAO dao) {
 		EventDefinitionCRFBean current = (EventDefinitionCRFBean) dao.findByPK(idCurrent);
 		EventDefinitionCRFBean previous = (EventDefinitionCRFBean) dao.findByPK(idPrevious);
-		ArrayList allEventDefCRFBeans = dao.findAllActiveByEventDefinitionId(current.getStudyEventDefinitionId());
+		List<EventDefinitionCRFBean> allEventDefCRFBeans =
+				dao.findAllActiveByEventDefinitionId(current.getStudyEventDefinitionId());
 
 		int maxOrder = 1;
-		for (Object tmpBean : allEventDefCRFBeans) {
-			EventDefinitionCRFBean edCRFBean = (EventDefinitionCRFBean) tmpBean;
+		for (EventDefinitionCRFBean edCRFBean : allEventDefCRFBeans) {
 			if (edCRFBean.getOrdinal() > maxOrder) {
 				maxOrder = edCRFBean.getOrdinal();
 			}
@@ -115,8 +115,8 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 				dao.update(previous);
 			}
 
-			ArrayList currOrdlist = dao.findAllByEventDefinitionIdAndOrdinal(defId, current.getOrdinal());
-			ArrayList prevOrdlist = dao.findAllByEventDefinitionIdAndOrdinal(defId, previous.getOrdinal());
+			List<EventDefinitionCRFBean> currOrdlist = dao.findAllByEventDefinitionIdAndOrdinal(defId, current.getOrdinal());
+			List<EventDefinitionCRFBean> prevOrdlist = dao.findAllByEventDefinitionIdAndOrdinal(defId, previous.getOrdinal());
 			if (currOrdlist.size() > 1 || prevOrdlist.size() > 1) {
 				fixDuplicates(defId, dao);
 			}
@@ -132,10 +132,10 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 	 *            EventDefinitionCRFDAO
 	 */
 	private void fixDuplicates(int definitionId, EventDefinitionCRFDAO dao) {
-		ArrayList list = dao.findAllByEventDefinitionId(definitionId);
+		List<EventDefinitionCRFBean> list = dao.findAllByDefinition(definitionId);
 		boolean incrementNextOrdinal = false;
 		for (int i = 0; i < list.size(); i++) {
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) list.get(i);
+			EventDefinitionCRFBean edc = list.get(i);
 			if (i == 0) {
 				if (edc.getOrdinal() != 0) {
 					edc.setOrdinal(i);

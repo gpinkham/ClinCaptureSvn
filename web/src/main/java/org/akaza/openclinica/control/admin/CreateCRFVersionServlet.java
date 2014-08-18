@@ -25,6 +25,7 @@ import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -194,7 +195,7 @@ public class CreateCRFVersionServlet extends Controller {
 							forwardPage(Page.CREATE_CRF_VERSION, request, response);
 							return;
 						} else {// owner,
-							ArrayList definitions = edao.findByDefaultVersion(version1.getId());
+							List<EventDefinitionCRFBean> definitions = edao.findByDefaultVersion(version1.getId());
 							if (!definitions.isEmpty()) {// used in
 								// definition
 								request.setAttribute("definitions", definitions);
