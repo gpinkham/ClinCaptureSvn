@@ -37,16 +37,24 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.service.EventService;
+import org.akaza.openclinica.service.EventServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+/**
+ * 
+ * This servlet handles delete study event operations.
+ *
+ */
 @SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class DeleteStudyEventServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -72,10 +80,10 @@ public class DeleteStudyEventServlet extends Controller {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 		FormProcessor fp = new FormProcessor(request);
-		int studyEventId = fp.getInt("id");// studyEventId
-		int studySubId = fp.getInt("studySubId");// studySubjectId
+		int studyEventId = fp.getInt("id"); // studyEventId
+		int studySubId = fp.getInt("studySubId"); // studySubjectId
 
-		if (request.getAttribute("deletedDurringUpdateStudyEvent")!=null){
+		if (request.getAttribute("deletedDurringUpdateStudyEvent") != null) {
 			studyEventId = fp.getInt("event_id", true);
 			studySubId = fp.getInt("id", true);
 		}
@@ -142,13 +150,28 @@ public class DeleteStudyEventServlet extends Controller {
 				}
 
 				sedao.deleteByPK(event.getId());
+				updateOrdinalsForEventOccurrences(event, sedao, studySub, sed);
 
-				if (request.getAttribute("deletedDurringUpdateStudyEvent")!=null){
+				if (request.getAttribute("deletedDurringUpdateStudyEvent") != null) {
 					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 				} else {
-					response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id="
-							+ studySubId);
+					response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName()
+							+ "?id=" + studySubId);
 				}
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void updateOrdinalsForEventOccurrences(StudyEventBean studyEvent, StudyEventDAO sedao,
+			StudySubjectBean studySub, StudyEventDefinitionBean sed) {
+		EventServiceInterface eventService = new EventService(getDataSource());
+		List<StudyEventBean> eventOccurrences = (List<StudyEventBean>) sedao
+				.findAllByDefinitionAndSubjectOrderByOrdinal(sed, studySub);
+		if (eventOccurrences != null) {
+			eventService.regenerateStudyEventOrdinals(eventOccurrences);
+			for (StudyEventBean event : eventOccurrences) {
+				sedao.update(event);
 			}
 		}
 	}

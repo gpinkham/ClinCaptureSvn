@@ -13,16 +13,55 @@
 
 package org.akaza.openclinica.service;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
-
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+
+/**
+ * 
+ * Provides Study Event services.
+ * 
+ */
 public interface EventServiceInterface {
 
-	public HashMap<String, String> scheduleEvent(UserAccountBean user, Date startDateTime, Date endDateTime,
-			String location, String studyUniqueId, String siteUniqueId, String eventDefinitionOID, String studySubjectId)
+	/**
+	 * Schedules an event for a subject.
+	 * 
+	 * @param user
+	 *            User sheduling event
+	 * @param startDateTime
+	 *            Start date and time of event
+	 * @param endDateTime
+	 *            End date and time of event
+	 * @param location
+	 *            Location of event
+	 * @param studyUniqueId
+	 *            Unique ID of Study
+	 * @param siteUniqueId
+	 *            Unique ID of site
+	 * @param eventDefinitionOID
+	 *            Event Definition OID
+	 * @param studySubjectId
+	 *            Id of Study Subject
+	 * @return Map with details of scheduled event including eventDefinitionOID, studyEventOrdinal and studySubjectOID
+	 * @throws OpenClinicaSystemException
+	 *             Thrown when event cannot be scheduled for study subject
+	 */
+	HashMap<String, String> scheduleEvent(UserAccountBean user, Date startDateTime, Date endDateTime, String location,
+			String studyUniqueId, String siteUniqueId, String eventDefinitionOID, String studySubjectId)
 			throws OpenClinicaSystemException;
+
+	/**
+	 * Regenerates Study Event ordinals. In case a Study Event has been deleted, this method should regenerate the
+	 * ordinals and eliminate any gaps in the numbering
+	 * 
+	 * @param studyEvents
+	 *            List of StudyEvents with the same StudyEventDefinitionId and StudySubjectId
+	 */
+	void regenerateStudyEventOrdinals(List<StudyEventBean> studyEvents);
 
 }

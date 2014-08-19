@@ -13,6 +13,12 @@
 
 package org.akaza.openclinica.service;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -28,27 +34,37 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
-import java.util.Date;
-import java.util.HashMap;
-
+/**
+ * 
+ * Provides Study Event services.
+ * 
+ */
 public class EventService implements EventServiceInterface {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private DataSource dataSource;
 
-	DataSource dataSource;
-
+	/**
+	 * 
+	 * @param dataSource
+	 *            DataSource to be used
+	 */
 	public EventService(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
+	/**
+	 * 
+	 * @param sessionManager
+	 *            SessionManager to be used
+	 */
 	public EventService(SessionManager sessionManager) {
 		this.dataSource = sessionManager.getDataSource();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public HashMap<String, String> scheduleEvent(UserAccountBean user, Date startDateTime, Date endDateTime,
 			String location, String studyUniqueId, String siteUniqueId, String eventDefinitionOID, String studySubjectId)
 			throws OpenClinicaSystemException {
@@ -91,6 +107,15 @@ public class EventService implements EventServiceInterface {
 
 	}
 
+	/**
+	 * Determines if StudyEventDefinition can be scheduled for study subject.
+	 * 
+	 * @param studyEventDefinition
+	 *            StudyEventDefinition to check
+	 * @param studySubject
+	 *            StudySubject to check
+	 * @return True if yes, false otherwise
+	 */
 	public boolean canSubjectScheduleAnEvent(StudyEventDefinitionBean studyEventDefinition,
 			StudySubjectBean studySubject) {
 		return studyEventDefinition.isRepeating()
@@ -152,6 +177,17 @@ public class EventService implements EventServiceInterface {
 	 */
 	public void setDatasource(DataSource dataSource) {
 		this.dataSource = dataSource;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void regenerateStudyEventOrdinals(List<StudyEventBean> studyEvents) {
+		int ordinal = 1;
+		for (StudyEventBean event : studyEvents) {
+			event.setSampleOrdinal(ordinal);
+			ordinal++;
+		}
 	}
 
 }

@@ -1,23 +1,10 @@
 package org.akaza.openclinica;
 
-import com.clinovo.dao.CodedItemDAO;
-import com.clinovo.dao.DictionaryDAO;
-import com.clinovo.dao.DiscrepancyDescriptionDAO;
-import com.clinovo.dao.StudySubjectIdDAO;
-import com.clinovo.dao.SystemDAO;
-import com.clinovo.dao.TermDAO;
-import com.clinovo.dao.WidgetDAO;
-import com.clinovo.dao.WidgetsLayoutDAO;
-import com.clinovo.service.CodedItemService;
-import com.clinovo.service.DataEntryService;
-import com.clinovo.service.DictionaryService;
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.service.ReportCRFService;
-import com.clinovo.service.StudySubjectIdService;
-import com.clinovo.service.SystemService;
-import com.clinovo.service.TermService;
-import com.clinovo.service.WidgetService;
-import com.clinovo.service.WidgetsLayoutService;
+import java.util.Date;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
@@ -49,6 +36,8 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.service.EventService;
+import org.akaza.openclinica.service.EventServiceInterface;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.hibernate.SessionFactory;
@@ -56,9 +45,24 @@ import org.hibernate.classic.Session;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.sql.DataSource;
-import java.util.Date;
-import java.util.Locale;
+import com.clinovo.dao.CodedItemDAO;
+import com.clinovo.dao.DictionaryDAO;
+import com.clinovo.dao.DiscrepancyDescriptionDAO;
+import com.clinovo.dao.StudySubjectIdDAO;
+import com.clinovo.dao.SystemDAO;
+import com.clinovo.dao.TermDAO;
+import com.clinovo.dao.WidgetDAO;
+import com.clinovo.dao.WidgetsLayoutDAO;
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DataEntryService;
+import com.clinovo.service.DictionaryService;
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.service.ReportCRFService;
+import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.service.SystemService;
+import com.clinovo.service.TermService;
+import com.clinovo.service.WidgetService;
+import com.clinovo.service.WidgetsLayoutService;
 
 /**
  * To avoid the constant loading of beans from the application context, which can take a lot of memory on the test, we
@@ -92,6 +96,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected StudyEventDefinitionDAO studyEventDefinitionDAO;
 	protected RulesPostImportContainerService postImportContainerService;
 	protected PasswordRequirementsDao requirementsDao;
+	protected EventServiceInterface eventService;
 
 	// DAOS
 	@Autowired
@@ -190,6 +195,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		postImportContainerService = new RulesPostImportContainerService(dataSource);
 		postImportContainerService.setRuleDao(ruleDao);
 		postImportContainerService.setRuleSetDao(ruleSetDao);
+		eventService = new EventService(dataSource);
 
 		Session session = sessionFactory.getCurrentSession();
 		if (dbDriverClassName.contains(POSTGRESQL)) {
