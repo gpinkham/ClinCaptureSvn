@@ -74,7 +74,6 @@ import org.akaza.openclinica.control.form.RuleValidator;
 import org.akaza.openclinica.control.form.ScoreItemValidator;
 import org.akaza.openclinica.control.form.Validation;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
@@ -104,6 +103,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.akaza.openclinica.logic.score.ScoreCalculator;
+import org.akaza.openclinica.navigation.HelpNavigationServlet;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.calendar.CalendarLogic;
@@ -400,11 +400,6 @@ public abstract class DataEntryServlet extends Controller {
 		prepareSessionNotesIfValidationsWillFail(request, hasGroup, isSubmitted, allNotes);
 		noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
-		String fromViewNotes = fp.getString("fromViewNotes");
-		if (fromViewNotes != null && "1".equals(fromViewNotes)) {
-			request.setAttribute("fromViewNotes", fromViewNotes);
-		}
-
 		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
 		Status s = ssb.getStatus();
@@ -421,10 +416,7 @@ public abstract class DataEntryServlet extends Controller {
 			newUploadedFiles = new HashMap<String, String>();
 		}
 		request.setAttribute("newUploadedFiles", newUploadedFiles);
-		if (!fp.getString("exitTo").equals("")) {
-			request.setAttribute("exitTo", fp.getString("exitTo"));
-		}
-
+		
 		if (!fp.getString(GO_EXIT).equals("")) {
 			request.getSession().removeAttribute(DN_ADDITIONAL_CR_PARAMS);
 			session.removeAttribute(GROUP_HAS_DATA);
@@ -447,24 +439,7 @@ public abstract class DataEntryServlet extends Controller {
 			}
 			session.removeAttribute("newUploadedFiles");
 			addPageMessage(respage.getString("exit_without_saving"), request);
-			if (fromViewNotes != null && "1".equals(fromViewNotes)) {
-				String viewNotesURL = (String) session.getAttribute("viewNotesURL");
-				if (viewNotesURL != null && viewNotesURL.length() > 0) {
-					response.sendRedirect(response.encodeRedirectURL(viewNotesURL));
-				}
-				return;
-			}
-			String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
-			String winLocation = (String) session.getAttribute(ViewNotesServlet.WIN_LOCATION);
-			if (!StringUtil.isBlank(fromResolvingNotes) && !StringUtil.isBlank(winLocation)) {
-				response.sendRedirect(response.encodeRedirectURL(winLocation));
-			} else {
-				if (!fp.getString("exitTo").equals("")) {
-					response.sendRedirect(response.encodeRedirectURL(fp.getString("exitTo")));
-				} else
-					response.sendRedirect(response.encodeRedirectURL("EnterDataForStudyEvent?eventId="
-							+ ecb.getStudyEventId()));
-			}
+			response.sendRedirect(HelpNavigationServlet.getSavedUrl(request)); 
 			return;
 		}
 
@@ -682,7 +657,7 @@ public abstract class DataEntryServlet extends Controller {
 			// attribute indicating that default values for items shouldn't be
 			// displayed
 			// in the application UI that will subsequently be displayed
-			// TODO: find a better, less random place for this
+			// find a better, less random place for this
 			// session.setAttribute(HAS_DATA_FLAG, true);
 
 			HashMap errors = new HashMap();
@@ -1805,11 +1780,9 @@ public abstract class DataEntryServlet extends Controller {
 								session.removeAttribute("to_create_crf");
 
 								request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
-								forwardPage(Page.setNewPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName()
-										+ "?eventId=" + ecb.getStudyEventId(),
-										Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getTitle()), request, response);
+								response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
 							} else {
-								// use clicked 'save'
+								// user clicked 'save'
 								addPageMessage(respage.getString("data_saved_continue_entering_edit_later"), request);
 								request.setAttribute(INPUT_EVENT_CRF, ecb);
 								request.setAttribute(INPUT_EVENT_CRF_ID, new Integer(ecb.getId()).toString());
@@ -1829,16 +1802,7 @@ public abstract class DataEntryServlet extends Controller {
 									session.removeAttribute("mayProcessUploading");
 
 									request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
-									if (fromViewNotes != null && "1".equals(fromViewNotes)) {
-										String viewNotesPageFileName = (String) session
-												.getAttribute("viewNotesPageFileName");
-										session.removeAttribute("viewNotesPageFileName");
-										session.removeAttribute("viewNotesURL");
-										if (viewNotesPageFileName != null && viewNotesPageFileName.length() > 0) {
-											forwardPage(Page.setNewPage(viewNotesPageFileName, "View Notes"), request,
-													response);
-										}
-									}
+									
 									// Clinovo Ticket #173 start
 									StdScheduler scheduler = getScheduler(request);
 									CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
@@ -1849,9 +1813,7 @@ public abstract class DataEntryServlet extends Controller {
 										}
 									}
 									// end
-									forwardPage(Page.setNewPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName()
-											+ "?eventId=" + ecb.getStudyEventId(),
-											Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getTitle()), request, response);
+									response.sendRedirect(HelpNavigationServlet.getSavedUrl(request)); 
 									return;
 
 								}

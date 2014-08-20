@@ -9,18 +9,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
-<jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
-<jsp:useBean scope='request' id='isAdminServlet' class='java.lang.String' />
-<jsp:useBean scope='request' id='exitTo' class='java.lang.String' />
-<jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
-<jsp:useBean scope="request" id="annotations" class="java.lang.String" />
-<jsp:useBean scope='request' id='pageMessages' class='java.util.ArrayList'/>
-<jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
-<jsp:useBean scope='request' id='markComplete' class='java.lang.String'/>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -30,7 +18,6 @@
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
     
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
-<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
     <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
     <link href="includes/jquery-ui.css" rel="stylesheet" type="text/css"/> 
     <script type="text/javascript" language="JavaScript">
@@ -65,10 +52,7 @@
 <c:if test='${popUpURL != ""}'>
     <script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script>
 </c:if>
-<%-- BWP:  onload=
-  "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});} TabsForwardByNum(<c:out value="${tabId}"/>);"
-  alert(self.screen.availWidth);
-margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
+
 <div id="centralContainer" style=
   "padding-left:3em; margin-top:1em;background-color: white; color:black;">
 
@@ -133,7 +117,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             </c:otherwise>
         </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
 		<h1><span class="first_level_header"><fmt:message key="subject_ID" bundle="${resword}"/>: <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
-<%--</div>--%>
 
 <form id="mainForm" name="crfForm" method="POST" action="DoubleDataEntry">
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
@@ -143,8 +126,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <input type="hidden" name="occurenceNumber" value="<c:out value="${studyEvent.sampleOrdinal}"/>" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
-<input type="hidden" name="exitTo" value="${exitTo}" />
-<input type="hidden" name="fromViewNotes" value="<c:out value="${fromViewNotes}"/>" />
 <input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
 <c:if test="${study.parentStudyId > 0}">
 	<!-- Site information -->
@@ -349,7 +330,7 @@ function DisplaySectionTabs()
 
     {
         sectionId = TabSectionId[TabID-1];
-        url = "DoubleDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID <c:if test="${exitTo ne null && !empty exitTo}"> + "&exitTo=${exitTo}"</c:if>;
+        url = "DoubleDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID;
         currTabID = <c:out value="${tabId}"/>;
 
         document.write('<td nowrap style="display:inline-block;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
@@ -438,23 +419,6 @@ function setParameterForDN(field, parameterName, value) {
   setParameterForDNWithPath(field, parameterName, value, '${pageContext.request.contextPath}');
 };
 </script>
-<%--
-<td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
-<td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0" style=
-  "margin-top:10px;margin-right:6px"/></a></td>
-<td>&nbsp;
-    <div class="formfieldM_BG_noMargin"><select class="formfieldM" name="sectionName" size="1" onchange="gotoLink();">
-        <c:set var="tabCount" value="1"/>
-        <option selected>-- <fmt:message key="select_to_jump" bundle="${resword}"/> --</option>
-        <c:forEach var="sec" items="${toc.sections}" >
-            <c:set var="tabUrl" value = "DoubleDataEntry?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tabId=${tabCount}&exitTo=${exitTo}"/>
-            <option value="<c:out value="${tabUrl}"/>"><c:out value="${sec.name}"/></option>
-            <c:set var="tabCount" value="${tabCount+1}"/>
-        </c:forEach>
-    </select>
-    </div>
-</td>
---%>
 </tr>
 </table>
 <%-- the below line is ABSOLUTELY NECESSARY FOR VALIDATION ON ANY PAGE --%>
@@ -640,13 +604,6 @@ function setParameterForDN(field, parameterName, value) {
                                         <td colspan="2">&nbsp;</td>
                                     </c:otherwise>
                                 </c:choose>
-
-                                    <%--
-                         <td><input type="submit" name="submittedResume" value="Save" class="button_medium" /></td>
-                         <td><input type="submit" name="submittedExit" value="Exit" class="button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" /></td>
-                         --%>
-
-                                    <%--<td valign="bottom"><img name="DataStatus_top" src="images/icon_UnchangedData.gif"></td>--%>
                             </tr>
                         </table>
                     </td>

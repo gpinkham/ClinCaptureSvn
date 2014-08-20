@@ -7,33 +7,6 @@
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 
-
-<jsp:useBean scope='session' id='studySubjectId'
-	class='java.lang.String' />
-
-<jsp:useBean scope='session' id='userBean'
-	class='org.akaza.openclinica.bean.login.UserAccountBean' />
-<jsp:useBean scope='session' id='study'
-	class='org.akaza.openclinica.bean.managestudy.StudyBean' />
-<jsp:useBean scope='session' id='userRole'
-	class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
-<jsp:useBean scope='request' id='isAdminServlet'
-	class='java.lang.String' />
-<jsp:useBean scope='request' id='crfListPage' class='java.lang.String' />
-<jsp:useBean scope='request' id='crfId' class='java.lang.String' />
-<jsp:useBean scope='request' id='eventId' class='java.lang.String' />
-<jsp:useBean scope='request' id='exitTo' class='java.lang.String' />
-<jsp:useBean scope="request" id="fromViewNotes" class="java.lang.String" />
-<jsp:useBean scope="session" id="viewNotesURL" class="java.lang.String" />
-
-<jsp:useBean scope="request" id="section"
-	class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
-
-<jsp:useBean scope="request" id="annotations" class="java.lang.String" />
-<jsp:useBean scope='request' id='pageMessages'
-	class='java.util.ArrayList' />
-<jsp:useBean scope='request' id='formMessages' class='java.util.HashMap' />
-
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow"
 	var="resworkflow" />
@@ -251,10 +224,7 @@
 					class="button" />
 			</c:when>
 			<c:otherwise>
-				<input type="button"
-					onclick="window.location.href='${viewSectionDataEntryReferer}';"
-					value="<fmt:message key="exit" bundle="${resword}"/>"
-					class="button" />
+			    <input type="button" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" value="<fmt:message key="exit" bundle="${resword}"/>" class="button" />
 			</c:otherwise>
 		</c:choose>
 

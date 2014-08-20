@@ -9,20 +9,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
- 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
-<jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
-<%--<jsp:useBean scope='request' id='isAdminServlet' class='java.lang.String' />--%>
-<jsp:useBean scope="request" id="section" class=
-  "org.akaza.openclinica.bean.submit.DisplaySectionBean" />
-<%--<jsp:useBean scope="request" id="annotations" class="java.lang.String" />--%>
-<jsp:useBean scope='request' id='pageMessages' class='java.util.ArrayList'/>
-<jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
-<jsp:useBean scope='request' id='exitTo' class='java.lang.String' />
-<jsp:useBean scope="request" id="fromViewNotes" class="java.lang.String"/>
-<jsp:useBean scope="session" id="viewNotesURL" class="java.lang.String"/>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -143,8 +129,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input id="hasPopUp" type="hidden" name="hasPopUp" value="${requestScope['hasPopUp']}" />
-<input type="hidden" name="exitTo" value="${exitTo}" />
-<input type="hidden" name="fromViewNotes" value="<c:out value="${fromViewNotes}"/>" />
 <input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
 <c:if test="${study.parentStudyId > 0}">
 	<!-- Site information -->
@@ -298,7 +282,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         while (TabID<=TabsNumber)
         {
             sectionId = TabSectionId[TabID-1];
-            url = "AdministrativeEditing?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID <c:if test="${exitTo ne null && !empty exitTo}"> + "&exitTo=${exitTo}"</c:if>;
+            url = "AdministrativeEditing?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID;
             currTabID = <c:out value="${tabId}"/>;
 
             document.write('<td nowrap style="display:inline-block;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
@@ -379,7 +363,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         <c:set var="tabCount" value="1"/>
         <option selected>-- <fmt:message key="select_to_jump" bundle="${resword}"/> --</option>
         <c:forEach var="sec" items="${toc.sections}" >
-            <c:set var="tabUrl" value = "AdministrativeEditing?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tabId=${tabCount}&exitTo=${exitTo}"/>
+            <c:set var="tabUrl" value = "AdministrativeEditing?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tabId=${tabCount}"/>
             <option value="<c:out value="${tabUrl}"/>"><c:out value="${sec.name}"/></option>
             <c:set var="tabCount" value="${tabCount+1}"/>
         </c:forEach>
@@ -413,7 +397,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         objImage = MM_findObj(strImageName);
         if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
         	confirmSubmit({
-        		message: '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>',
+        		message: '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>',
         		height: 150,
         		width: 500,
         		submit: submit
@@ -513,11 +497,8 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                                 <td>
                                   <input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
                                   "button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" />
-                                  <%-- <input type="button" id="seh" name="BTN_Exit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
-                                  "button_medium" onClick="javascript: return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');" />--%></td>
-                    
                                 </td>
-
+								
                                 <c:choose>
                                     <c:when test="${! empty formMessages}">
                                         <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif"></td>
@@ -550,22 +531,8 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                     <td align="right" valign="bottom">
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                    <%-- also not needed here, tbh 112007 --%>
-                                    <%--<c:choose>
-                                      <c:when test="${stage !='adminEdit' && section.lastSection}">
-                                        <td valign="bottom"><input type="checkbox" name="markComplete" value="Yes"
-                                                                   onclick="${markCRFMethodName}">
-                                        </td>
-                                        <td valign="bottom" nowrap>&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/> &nbsp;&nbsp;&nbsp;</td>
-                                      </c:when>
-                                      <c:otherwise>
-                                        <td colspan="2">&nbsp;</td>
-                                      </c:otherwise>
-                                    </c:choose>--%>
                                 <td><input type="submit" id="srm" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class="button_medium" onClick="disableSubmit('DataStatus_top'); this.form.submit();"/></td>
                                 <td><input type="submit" id="sem" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" /></td>
-
-                                    <%--<td valign="bottom"><img name="DataStatus_top" src="images/icon_UnchangedData.gif"></td>--%>
                             </tr>
                         </table>
                     </td>
@@ -1423,28 +1390,11 @@ table-->
         <td align="right" valign="bottom">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
-
-                    <%--<c:choose>
-                      <c:when test="${stage !='adminEdit' && section.lastSection}">
-                        <td valign="bottom">
-                          <input type="checkbox" name="markComplete" value="Yes"
-                                 onClick="${markCRFMethodName}">
-                        </td>
-                        <td valign="bottom" nowrap>&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/> &nbsp;&nbsp;&nbsp;</td>
-                      </c:when>
-                      <c:otherwise>
-                        <td colspan="2">&nbsp;</td>
-                      </c:otherwise>
-                    </c:choose>--%>
-
                     <td><input type="submit" id="srl" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                       "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
                     <td>
-                    <input type="hidden" name="fromResolvingNotes" value="${fromResolvingNotes}"/>
-                    <input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom', this);" />
-                    <%-- <input type="button" id="sel" name="BTN_Exit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
-                                  "button_medium" onClick="javascript: return checkGoBackEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');" />--%></td>
-                    
+						<input type="hidden" name="fromResolvingNotes" value="${fromResolvingNotes}"/>
+						<input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom', this);" />
                     </td>
                     <c:choose>
                         <c:when test="${! empty formMessages}">

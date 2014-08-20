@@ -9,18 +9,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
-<jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
-<jsp:useBean scope='request' id='isAdminServlet' class='java.lang.String' />
-<jsp:useBean scope='request' id='exitTo' class='java.lang.String' />
-<jsp:useBean scope="request" id="section" class=
-  "org.akaza.openclinica.bean.submit.DisplaySectionBean" />
-<jsp:useBean scope="request" id="annotations" class="java.lang.String" />
-<jsp:useBean scope='request' id='pageMessages' class='java.util.ArrayList'/>
-<jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
-<jsp:useBean scope='request' id='markComplete' class='java.lang.String'/>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -155,8 +143,6 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <input type="hidden" name="tabId" value="<c:out value="${tabId}"/>" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
-<input type="hidden" name="exitTo" value="${exitTo}" />
-<input type="hidden" name="fromViewNotes" value="<c:out value="${fromViewNotes}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="isFirstTimeOnSection" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
@@ -405,7 +391,7 @@ function DisplaySectionTabs()
 
     {
         sectionId = TabSectionId[TabID-1];
-        url = "InitialDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID <c:if test="${exitTo ne null && !empty exitTo}"> + "&exitTo=${exitTo}"</c:if>;
+        url = "InitialDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID;
         currTabID = <c:out value="${tabId}"/>;
 
         document.write('<td nowrap style="display:inline-block;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
@@ -506,7 +492,7 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
         <c:set var="tabCount" value="1"/>
         <option selected>-- <fmt:message key="select_to_jump" bundle="${resword}"/> --</option>
         <c:forEach var="sec" items="${toc.sections}" >
-            <c:set var="tabUrl" value = "InitialDataEntry?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tabId=${tabCount}&exitTo=${exitTo}"/>
+            <c:set var="tabUrl" value = "InitialDataEntry?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tabId=${tabCount}"/>
             <option value="<c:out value="${tabUrl}"/>"><c:out value="${sec.name}"/></option>
             <c:set var="tabCount" value="${tabCount+1}"/>
         </c:forEach>
@@ -642,8 +628,6 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
                                         <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="not_changed_data" bundle="${restext}"/>" src="images/icon_UnchangedData.gif"></td>
                                     </c:otherwise>
                                 </c:choose>
-
-
                             </tr>
                         </table>
                     </td>

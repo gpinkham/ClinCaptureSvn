@@ -82,8 +82,6 @@ public class ResolveDiscrepancyServlet extends Controller {
 	private static final String INPUT_NOTE_ID = "noteId";
 	private static final String EVENT_CRF_ID = "ecId";
 	private static final String STUDY_SUB_ID = "studySubjectId";
-	public static final String REFERER = "referer";
-	public static final String EXIT_TO = "exitTo";
 	public static final String TAB_ID = "tabId";
 	public static final String SECTION_ID = "sectionId";
 	public static final String FIELD = "field";
@@ -247,8 +245,6 @@ public class ResolveDiscrepancyServlet extends Controller {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
-
-		prepareExitTo(request);
 		FormProcessor fp = new FormProcessor(request);
 		int noteId = fp.getInt(INPUT_NOTE_ID);
 		String module = (String) request.getSession().getAttribute("module");
@@ -332,13 +328,6 @@ public class ResolveDiscrepancyServlet extends Controller {
 			throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET,
 					resexception.getString("the_discrepancy_note_triying_resolve_has_invalid_type"));
 		} else {
-			if (p.getFileName().contains("?")) {
-				if (!p.getFileName().contains("fromViewNotes=1")) {
-					p.setFileName(p.getFileName() + "&fromViewNotes=1");
-				}
-			} else {
-				p.setFileName(p.getFileName() + "?fromViewNotes=1");
-			}
 			String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean,
 					ResolutionStatus.CLOSED, true);
 			setPopUpURL(request, createNoteURL);
@@ -360,18 +349,6 @@ public class ResolveDiscrepancyServlet extends Controller {
 		}
 
 		forwardPage(p, request, response);
-	}
-
-	private void prepareExitTo(HttpServletRequest request) {
-		if (request.getHeader(REFERER) != null
-				&& request.getHeader(REFERER).contains(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET.getFileName())) {
-			request.setAttribute(
-					EXIT_TO,
-					request.getRequestURL()
-							.toString()
-							.replace(request.getServletPath(),
-									Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET.getFileName()));
-		}
 	}
 
 	@Override

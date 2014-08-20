@@ -44,7 +44,8 @@ public final class Navigation {
 			"/pages/managestudy/confirmCRFVersionChange", "/pages/managestudy/changeCRFVersion", "/CreateCRFVersion",
 			"/RemoveCRF", "/RemoveCRFVersion", "/RestoreCRF", "/RestoreCRFVersion", "/DeleteCRFVersion",
 			"/LockCRFVersion", "/UnlockCRFVersion", "/CreateSubStudy", "/RemoveCRFFromDefinition",
-			"/RestoreCRFFromDefinition", "/AddCRFToDefinition"));
+			"/RestoreCRFFromDefinition", "/AddCRFToDefinition",	"/InitialDataEntry", "/AdministrativeEditing", 
+			"/DoubleDataEntry"));
 	// ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintAllEventCRF", "/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
@@ -54,11 +55,11 @@ public final class Navigation {
 			"/CreateDiscrepancyNote", "/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile",
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc", "/help",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
-			"/ChangeDefinitionCRFOrdinal", "/DoubleDataEntry", "/CreateOneDiscrepancyNote", "/MatchPassword",
-			"/pages/handleSDVPost", "/pages/handleSDVRemove", "/CompleteCrfDelete", "/pages/sdvStudySubjects",
-			"/InitialDataEntry", "/AdministrativeEditing"));
+			"/ChangeDefinitionCRFOrdinal", "/CreateOneDiscrepancyNote", "/MatchPassword",
+			"/pages/handleSDVPost", "/pages/handleSDVRemove", "/CompleteCrfDelete", "/pages/sdvStudySubjects"));
 	// set of pages with special processing
-	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects"));
+	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
+			"/ListStudySubjects"));
 	private static String defaultShortURL = "/MainMenu";
 
 	private Navigation() {
@@ -116,7 +117,7 @@ public final class Navigation {
 		}
 	}
 
-	/*
+	/**
 	 * Here incoming request-URLs are (or aren't) added to visitedURLs-stack. You can add business-logic here.
 	 */
 	private static void processRequestURL(Stack<String> visitedURLs, HttpServletRequest request) {
@@ -163,6 +164,10 @@ public final class Navigation {
 				visitedURLs.pop();
 				visitedURLs.push(requestShortURL);
 			} else {
+				visitedURLs.push(requestShortURL);
+			}
+		} else if ("/ListStudySubjects".equals(requestShortURI)) {
+			if (!requestShortURL.contains("findSubjects_f_studySubject")) {
 				visitedURLs.push(requestShortURL);
 			}
 		} else {

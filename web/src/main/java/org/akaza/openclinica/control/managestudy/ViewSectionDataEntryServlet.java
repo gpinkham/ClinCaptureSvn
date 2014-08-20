@@ -79,7 +79,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * View a CRF version section data entry
+ * View a CRF version section data entry.
  * 
  * @author jxu
  */
@@ -92,11 +92,18 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 	public static final String VIEW_SECTION_DATA_ENTRY = "ViewSectionDataEntry";
 	public static final String RESOLVE_DISCREPANCY = "ResolveDiscrepancy";
 	public static final String JUST_CLOSE_WINDOW = "justCloseWindow";
-	public static String EVENT_CRF_ID = "eventCRFId";
-	public static String ENCLOSING_PAGE = "enclosingPage";
+	public static final String EVENT_CRF_ID = "eventCRFId";
+	public static final String ENCLOSING_PAGE = "enclosingPage";
 
 	/**
-	 * Checks whether the user has the correct privilege
+	 * Checks whether the user has the correct privilege.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @throws InsufficientPermissionException
+	 *             an InsufficientPermissionException
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -135,7 +142,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			}
 		}
 
-		SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat localDF = getLocalDf(request);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
 		SectionBean sb;
@@ -143,9 +150,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		boolean isSubmitted = false;
 		EventDefinitionCRFBean edcb;
 
-		if (!fp.getString("exitTo").equals("")) {
-			request.setAttribute("exitTo", fp.getString("exitTo"));
-		}
 		int crfVersionId = fp.getInt("crfVersionId", true);
 		int sectionId = fp.getInt("sectionId", true);
 		int eventCRFId = fp.getInt(EVENT_CRF_ID, true);
@@ -270,7 +274,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			Date tmpDate = displayBean.getEventCRF().getDateInterviewed();
 			String formattedInterviewerDate;
 			try {
-				formattedInterviewerDate = local_df.format(tmpDate);
+				formattedInterviewerDate = localDF.format(tmpDate);
 			} catch (Exception e) {
 				formattedInterviewerDate = "";
 			}
@@ -295,7 +299,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 				return;
 			}
-		} else if (crfVersionId > 0) {// for viewing blank CRF
+		} else if (crfVersionId > 0) {
+			// for viewing blank CRF
 			DisplayTableOfContentsBean displayBean = getDisplayBeanByCrfVersionId(crfVersionId);
 			request.setAttribute("toc", displayBean);
 			ArrayList sections = displayBean.getSections();
@@ -408,12 +413,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		dsb.setDisplayItemGroups(displayItemWithGroups);
 
 		super.populateNotesWithDBNoteCounts(discNotes, noteThreads, dsb, request);
-
-		if (fp.getString("fromViewNotes") != null && "1".equals(fp.getString("fromViewNotes"))) {
-			request.setAttribute("fromViewNotes", fp.getString("fromViewNotes"));
-		} else {
-			session.removeAttribute("viewNotesURL");
-		}
 
 		if ("saveNotes".equalsIgnoreCase(action)) {
 
@@ -569,10 +568,12 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 	}
 
 	/**
-	 * Current User may access a requested event CRF in the current user's studies
-	 *
+	 * Current User may access a requested event CRF in the current user's studies.
+	 * 
+	 * @param eventCrfNotes
+	 *            List<DiscrepancyNoteBean>
 	 * @param request
-	 *            TODO
+	 *            HttpServletRequest
 	 */
 
 	private void setAttributeForInterviewerDNotes(List<DiscrepancyNoteBean> eventCrfNotes, HttpServletRequest request) {

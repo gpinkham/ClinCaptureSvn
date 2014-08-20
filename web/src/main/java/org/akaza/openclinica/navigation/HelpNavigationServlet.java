@@ -21,7 +21,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@SuppressWarnings({"unchecked", "serial"})
+/**
+ * Help with navigation.
+ * 
+ * @author igor
+ */
+@SuppressWarnings({ "unchecked", "serial" })
 public class HelpNavigationServlet extends HttpServlet {
 
     @Override
@@ -35,6 +40,14 @@ public class HelpNavigationServlet extends HttpServlet {
     	pw.flush();
     }
     
+    /**
+	 * Returns first URL from stack of saved URLs.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @return String
+	 *            Saved URL from the stack
+	 */
     public static String getSavedUrl(HttpServletRequest request) {
     	Stack<String> visitedURLs = (Stack<String>) request.getSession().getAttribute("visitedURLs");
         String defaultUrl = "/MainMenu";
