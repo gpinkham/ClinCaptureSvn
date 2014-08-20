@@ -200,8 +200,9 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 	<!-- Randomization statistics for current site.
 		This section provides info on number of study subjects in a site,
 		already assigned to each of active dynamic group classes-->
-	<c:forEach var="counter" items="${subjectsNumberAssignedToEachDynamicGroupMap}">
-		<input type="hidden" name="${counter.key}" value="${counter.value}"/>
+	<c:forEach var="counter" items="${subjectsNumberAssignedToEachDynamicGroupMap}" varStatus="status">
+		<input type="hidden" id="dynamicGroupClass${status.index + 1}" group_class_name="${counter.key}"
+			   subjects_counter="${counter.value}"/>
 	</c:forEach>
 	<!-- /Randomization statistics for current site -->
 </c:if>
