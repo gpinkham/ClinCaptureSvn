@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
 
 	@Test
@@ -21,7 +22,7 @@ public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatFindAllReturnsCorrectNumber() {
+	public void testThatFindAllReturnsCorrectNumber() {		
 		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eventDefinitionCRFDAO
 				.findAll();
 		assertEquals(6, eventCRFs.size());
