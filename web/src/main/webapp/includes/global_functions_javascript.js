@@ -175,6 +175,22 @@ function datasetConfirmBack(message, formId, address, action) {
     return false;
 }
 
+function checkMetaDataVersionODMID(metaDataVersionODMID, messageToDisplay, formToSubmit, isCurrentScopeStudy) {
+
+	if (!metaDataVersionODMID && isCurrentScopeStudy) {
+
+		return confirmSubmit({
+			message : messageToDisplay,
+			height : 180,
+			width : 500,
+			form : formToSubmit
+		});
+	} else {
+
+		formToSubmit.submit();
+	}
+}
+
 function confirmBackSubmitForm(formId, address, action) {
 	$("#" + formId)[0].setAttribute("action", address);
     $("#" + formId + " input[name=action]").val(action);
