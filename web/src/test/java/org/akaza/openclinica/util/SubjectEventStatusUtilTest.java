@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
 
 import static org.junit.Assert.assertTrue;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes" })
 public class SubjectEventStatusUtilTest {
 
 	private ResourceBundle resword;

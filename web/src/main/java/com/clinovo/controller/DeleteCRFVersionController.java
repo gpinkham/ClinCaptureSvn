@@ -50,7 +50,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/deleteCRFVersion")
-@SuppressWarnings({ "rawtypes" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class DeleteCRFVersionController {
 
 	@Autowired
@@ -81,7 +81,7 @@ public class DeleteCRFVersionController {
 	 * @return String
 	 * @throws Exception
 	 *             an exception
-	 */
+	 */	
 	@RequestMapping(method = RequestMethod.GET)
 	public String mainGet(HttpServletRequest request, Model model, @RequestParam("crfVersionId") int crfVersionId)
 			throws Exception {

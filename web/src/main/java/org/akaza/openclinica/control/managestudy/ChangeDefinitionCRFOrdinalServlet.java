@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author jxu
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings({ "serial", "rawtypes" })
 @Component
 public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 
@@ -86,7 +86,7 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 	 *            int
 	 * @param dao
 	 *            EventDefinitionCRFDAO
-	 */
+	 */	
 	private void increase(HttpServletRequest request, int idCurrent, int idPrevious, int currOrdinal, int prevOrdinal,
 			int defId, EventDefinitionCRFDAO dao) {
 		EventDefinitionCRFBean current = (EventDefinitionCRFBean) dao.findByPK(idCurrent);

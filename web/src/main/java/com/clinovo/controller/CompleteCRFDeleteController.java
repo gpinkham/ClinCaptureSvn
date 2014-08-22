@@ -46,6 +46,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/completeCRFDelete")
+@SuppressWarnings("unchecked")
 public class CompleteCRFDeleteController {
 
 	@Autowired
