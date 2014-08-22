@@ -263,7 +263,7 @@ function resetTable(params) {
 	for (var chunk in alphaArr) {
 		var tr = alphaArr[chunk];
 		$(tr).find("td").toArray().map(function(x) {
-			if (!$(x).is(".ui-draggable")) {
+			if (!$(x).is(".ui-draggable, .item-datatype, .item-description")) {
 				createDraggable({
 					element: $(x)
 				});
@@ -1144,7 +1144,7 @@ function loadCRFVersionItems(params) {
 				target: ($("#dataSurface"), $("#secondDataSurface"))
 			});
 
-			var tdDescription = $("<td>");
+			var tdDescription = $("<td class='item-description'>");
 			if (item.description) {
 				if (item.description.length > 25) {
 					tdDescription.text(item.description.slice(0, 20) + "...");
@@ -1159,7 +1159,7 @@ function loadCRFVersionItems(params) {
 				}
 			}
 
-			var tdDataType = $("<td>");
+			var tdDataType = $("<td class='item-datatype'>");
 			tdDataType.text(mapItemType(item.type));
 			tr.append(tdName);
 			tr.append(tdDescription);
