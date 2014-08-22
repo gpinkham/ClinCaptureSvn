@@ -262,7 +262,6 @@ public class EditUserAccountServlet extends Controller {
 					request.getSession().setAttribute("reloadUserBean", true);
 					if (wasSysAdmin && !user.isSysAdmin()) {
 						forwardTo = Page.MENU_SERVLET;
-						Navigation.removeUrl(request, "/ListUserAccounts");
 						addPageMessage(respage.getString("you_may_not_perform_administrative_functions"), request);
 					}
 				}

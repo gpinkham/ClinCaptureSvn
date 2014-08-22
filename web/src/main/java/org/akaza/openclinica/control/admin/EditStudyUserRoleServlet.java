@@ -127,7 +127,6 @@ public class EditStudyUserRoleServlet extends Controller {
 								&& studyUserRole.getRole() != Role.STUDY_ADMINISTRATOR
 								&& studyUserRole.getRole() != Role.STUDY_DIRECTOR) {
 							forwardTo = Page.MENU_SERVLET;
-							Navigation.removeUrl(request, "/ListUserAccounts");
 							addPageMessage(respage.getString("you_may_not_perform_administrative_functions"), request);
 						}
 					}

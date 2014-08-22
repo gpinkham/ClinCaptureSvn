@@ -16,7 +16,6 @@ package org.akaza.openclinica.navigation;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
 
@@ -44,7 +43,7 @@ public final class Navigation {
 			"/pages/managestudy/confirmCRFVersionChange", "/pages/managestudy/changeCRFVersion", "/CreateCRFVersion",
 			"/RemoveCRF", "/RemoveCRFVersion", "/RestoreCRF", "/RestoreCRFVersion", "/DeleteCRFVersion",
 			"/LockCRFVersion", "/UnlockCRFVersion", "/CreateSubStudy", "/RemoveCRFFromDefinition",
-			"/RestoreCRFFromDefinition", "/AddCRFToDefinition",	"/InitialDataEntry", "/AdministrativeEditing", 
+			"/RestoreCRFFromDefinition", "/AddCRFToDefinition", "/InitialDataEntry", "/AdministrativeEditing",
 			"/DoubleDataEntry"));
 	// ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
@@ -55,36 +54,14 @@ public final class Navigation {
 			"/CreateDiscrepancyNote", "/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile",
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc", "/help",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
-			"/ChangeDefinitionCRFOrdinal", "/CreateOneDiscrepancyNote", "/MatchPassword",
-			"/pages/handleSDVPost", "/pages/handleSDVRemove", "/CompleteCrfDelete", "/pages/sdvStudySubjects"));
+			"/ChangeDefinitionCRFOrdinal", "/CreateOneDiscrepancyNote", "/MatchPassword", "/pages/handleSDVPost",
+			"/pages/handleSDVRemove", "/CompleteCrfDelete", "/pages/sdvStudySubjects"));
 	// set of pages with special processing
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
-			"/ListStudySubjects"));
+			"/ListStudySubjects", "/EnterDataForStudyEvent"));
 	private static String defaultShortURL = "/MainMenu";
 
 	private Navigation() {
-	}
-
-	/**
-	 * Removes a url from the visitedURLs.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param excludeUrl
-	 *            String
-	 * @throws Exception
-	 *             an Exception
-	 */
-	public static void removeUrl(HttpServletRequest request, String excludeUrl) throws Exception {
-		Stack<String> visitedURLs = (Stack<String>) request.getSession().getAttribute("visitedURLs");
-		if (visitedURLs != null) {
-			Iterator<String> iterator = visitedURLs.iterator();
-			while (iterator.hasNext()) {
-				if (iterator.next().toLowerCase().startsWith(excludeUrl.toLowerCase())) {
-					iterator.remove();
-				}
-			}
-		}
 	}
 
 	/**
@@ -135,12 +112,12 @@ public final class Navigation {
 					visitedURLs.pop();
 				}
 				if (!exclusionURLs.contains(requestShortURI)) {
-					if (!specialURLs.contains(requestShortURI)) {
-						if (!visitedURLs.peek().split("\\?")[0].equals(requestShortURI)) {
+					if (!visitedURLs.peek().split("\\?")[0].equals(requestShortURI)) {
+						if (!specialURLs.contains(requestShortURI)) {
 							visitedURLs.push(requestShortURL);
+						} else {
+							specialProcessingForURL(visitedURLs, requestShortURL);
 						}
-					} else {
-						specialProcessingForURL(visitedURLs, requestShortURL);
 					}
 				} else {
 					visitedURLs.push("skip!");
@@ -149,10 +126,16 @@ public final class Navigation {
 		} else {
 			if ((!exclusionURLs.contains(requestShortURI)) && (!exclusionPopUpURLs.contains(requestShortURI))
 					&& (!"XMLHttpRequest".equals(request.getHeader("X-Requested-With")))) {
-				visitedURLs.push(requestShortURL);
-			} else {
-				visitedURLs.push(defaultShortURL);
+				if (!specialURLs.contains(requestShortURI)) {
+					visitedURLs.push(requestShortURL);
+				} else {
+					specialProcessingForURL(visitedURLs, requestShortURL);
+				}
 			}
+		}
+
+		if (visitedURLs.isEmpty()) {
+			visitedURLs.push(defaultShortURL);
 		}
 	}
 
@@ -162,16 +145,28 @@ public final class Navigation {
 			if (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects")
 					|| visitedURLs.peek().split("\\?")[0].equals("/ListStudySubjects")) {
 				visitedURLs.pop();
-				visitedURLs.push(requestShortURL);
-			} else {
-				visitedURLs.push(requestShortURL);
 			}
-		} else if ("/ListStudySubjects".equals(requestShortURI)) {
-			if (!requestShortURL.contains("findSubjects_f_studySubject")) {
-				visitedURLs.push(requestShortURL);
-			}
-		} else {
-			visitedURLs.push(requestShortURL);
+
 		}
+
+		if ("/ListStudySubjects".equals(requestShortURI)) {
+			if (requestShortURL.contains("findSubjects_f_studySubject")) {
+				return;
+			} else {
+				if (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects")
+						|| visitedURLs.peek().split("\\?")[0].equals("/ListStudySubjects")) {
+					visitedURLs.pop();
+				}
+			}
+		}
+
+		if ("/EnterDataForStudyEvent".equals(requestShortURI)) {
+			if (requestShortURL.contains("openFirstCrf=true")) {
+				return;
+			}
+		}
+
+		visitedURLs.push(requestShortURL);
+
 	}
 }

@@ -151,7 +151,6 @@ public class SetStudyUserRoleServlet extends Controller {
 					if (!ub.isSysAdmin() && !ub.isTechAdmin() && sur.getRole() != Role.STUDY_ADMINISTRATOR
 							&& sur.getRole() != Role.STUDY_DIRECTOR) {
 						forwardTo = Page.MENU_SERVLET;
-						Navigation.removeUrl(request, "/ListStudyUser");
 						addPageMessage(
 								restext.getString("no_have_correct_privilege_current_study_to_manage_user_roles")
 										+ respage.getString("change_study_contact_sysadmin"), request);
