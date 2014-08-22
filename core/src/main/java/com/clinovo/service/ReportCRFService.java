@@ -18,26 +18,54 @@ package com.clinovo.service;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.core.SessionManager;
-
+/**
+ * 
+ * Provides report generation services.
+ * 
+ */
 public interface ReportCRFService {
-	public static final String CRF_REPORT_DIR = "crfReport";
+
+	String CRF_REPORT_DIR = "crfReport";
+
 	/**
 	 * Create PDF-report for CRF.
-	 * @param eventCRFId 
-	 * @param currentStudy 
+	 * 
+	 * @param eventCRFId
+	 *            EventDefinitionCRF Id to be used
 	 * @param locale
-	 * @param resword
-	 * @param urlPath
-	 * @param sysPath
-	 * @param dataPath
-	 * @param sm
+	 *            Locale to be used
 	 * @return path for file created
-	 * @throws Exception 
+	 * @throws Exception
+	 *             thrown in case of failure
 	 */
-	public String createPDFReport(int eventCRFId, StudyBean currentStudy, Locale locale, ResourceBundle resword, 
-			String urlPath, String sysPath, String dataPath, SessionManager sm) throws Exception;
-	
-	
+	String createPDFReport(int eventCRFId, Locale locale) throws Exception;
+
+	/**
+	 * 
+	 * @param urlPath
+	 *            UrlPath to set
+	 */
+	void setUrlPath(String urlPath);
+
+	/**
+	 * 
+	 * @param sysPath
+	 *            SysPath to set
+	 */
+	void setSysPath(String sysPath);
+
+	/**
+	 * 
+	 * @param dataPath
+	 *            DataPath to set
+	 */
+	void setDataPath(String dataPath);
+
+	/**
+	 * 
+	 * @param resword
+	 *            ResourceBundle to be set
+	 */
+	void setResword(ResourceBundle resword);
+
 }

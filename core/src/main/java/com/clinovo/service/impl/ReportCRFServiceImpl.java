@@ -15,26 +15,10 @@
 
 package com.clinovo.service.impl;
 
-import static net.sf.dynamicreports.report.builder.DynamicReports.cmp;
-import static net.sf.dynamicreports.report.builder.DynamicReports.col;
-import static net.sf.dynamicreports.report.builder.DynamicReports.report;
-import static net.sf.dynamicreports.report.builder.DynamicReports.type;
-import static net.sf.dynamicreports.report.builder.DynamicReports.grp;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javax.sql.DataSource;
-
+import com.clinovo.service.DataEntryService;
+import com.clinovo.service.ReportCRFService;
+import com.clinovo.util.DRTemplates;
+import com.clinovo.util.DRUtil;
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
 import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
@@ -43,7 +27,6 @@ import net.sf.dynamicreports.report.constant.HorizontalAlignment;
 import net.sf.dynamicreports.report.datasource.DRDataSource;
 import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.engine.JRDataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Utils;
@@ -57,7 +40,6 @@ import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -74,13 +56,32 @@ import org.akaza.openclinica.view.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.clinovo.service.DataEntryService;
-import com.clinovo.service.ReportCRFService;
-import com.clinovo.util.DRTemplates;
-import com.clinovo.util.DRUtil;
+import javax.sql.DataSource;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
+import static net.sf.dynamicreports.report.builder.DynamicReports.cmp;
+import static net.sf.dynamicreports.report.builder.DynamicReports.col;
+import static net.sf.dynamicreports.report.builder.DynamicReports.grp;
+import static net.sf.dynamicreports.report.builder.DynamicReports.report;
+import static net.sf.dynamicreports.report.builder.DynamicReports.type;
+
+/**
+ * 
+ * Provides report generation service.
+ * 
+ */
 @Service("reportCRFService")
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "unchecked" })
 public class ReportCRFServiceImpl implements ReportCRFService {
 	@Autowired
 	private DataSource dataSource;
@@ -88,21 +89,43 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 	private DataEntryService dataEntryService;
 	@Autowired
 	private StudyConfigService studyConfigService;
-	
+
 	private ResourceBundle resword;
-	
-	public String createPDFReport(int eventCRFId, StudyBean currentStudy, Locale locale, ResourceBundle resword, 
-			String urlPath, String sysPath, String dataPath, SessionManager sm) throws Exception {
-		return createReport(eventCRFId, currentStudy, locale, resword, urlPath, sysPath, dataPath, ".pdf", sm);
+	private String urlPath;
+	private String sysPath;
+	private String dataPath;
+
+	private static final int FIVE = 5;
+	private static final int FOUR = 4;
+	private static final int THREE = 3;
+	private static final int ONE_HUNDRED_TWO = 102;
+	private static final int ONE_HUNDRED_NINE = 109;
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String createPDFReport(int eventCRFId, Locale locale) throws Exception {
+		return createReport(eventCRFId, locale, ".pdf");
 	}
-	
-	public String createReport(int eventCRFId, StudyBean currentStudy, Locale locale, ResourceBundle resword, 
-			String urlPath, String sysPath, String dataPath, String fileExt, SessionManager sm) throws Exception {
+
+	/**
+	 * Create a report for CRF.
+	 * 
+	 * @param eventCRFId
+	 *            EventDefinitionCRF Id to be used
+	 * @param locale
+	 *            Locale to be used
+	 * @param fileExt
+	 *            File extension of report
+	 * @return String representing full path to report file
+	 * @throws Exception
+	 *             Thrown in case of failure
+	 */
+	private String createReport(int eventCRFId, Locale locale, String fileExt) throws Exception {
 		if (eventCRFId == 0) {
 			return "";
 		}
-		this.resword = resword;
-		
+
 		SectionDAO sdao = new SectionDAO(dataSource);
 		EventCRFDAO ecdao = new EventCRFDAO(dataSource);
 		CRFDAO crfdao = new CRFDAO(dataSource);
@@ -113,15 +136,13 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 		StudyDAO studydao = new StudyDAO(dataSource);
 		SubjectDAO subjdao = new SubjectDAO(dataSource);
 		ArrayList<SectionBean> allSectionBeans = new ArrayList<SectionBean>();
-		ArrayList<DisplaySectionBean> sectionBeans = new ArrayList();
-		SectionBean sb = new SectionBean();
+		ArrayList<DisplaySectionBean> sectionBeans;
 
 		EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
-		
+
 		// Get all the SectionBeans attached to this ECB
 		ArrayList<SectionBean> sects = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-		for (int i = 0; i < sects.size(); i++) {
-			sb = (SectionBean) sects.get(i);
+		for (SectionBean sb : sects) {
 			int sectId = sb.getId();
 			if (sectId > 0) {
 				allSectionBeans.add((SectionBean) sdao.findByPK(sectId));
@@ -136,7 +157,7 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 		se.setStudyEventDefinition(sed);
 		CRFBean cb = (CRFBean) crfdao.findByPK(crfVerBean.getCrfId());
 		StudyBean study = (StudyBean) studydao.findByPK(ssubj.getStudyId());
-		if (study.getParentStudyId() <= 0) {// top study
+		if (study.getParentStudyId() <= 0) { // top study
 			studyConfigService.setParametersForStudy(study);
 		} else {
 			studyConfigService.setParametersForSite(study);
@@ -153,28 +174,50 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 		return reportFilePath + fileExt;
 	}
 
-	public void generateReportFile(List<DisplaySectionBean> displaySectionBeans, Map<String, String> values, 
-			String titleText, String reportFilePath, String fileExt, String urlPath, String sysPath) throws IOException, DRException {
+	/**
+	 * 
+	 * @param displaySectionBeans
+	 *            List of DisplaySessionBeans to be used
+	 * @param values
+	 *            Map of values to be used
+	 * @param titleText
+	 *            Title text of report
+	 * @param reportFilePath
+	 *            Path to report file
+	 * @param fileExt
+	 *            Extension of report file
+	 * @param urlPath
+	 *            Path of URL
+	 * @param sysPath
+	 *            Path on system
+	 * @throws IOException
+	 *             Thrown in case of I/O failure
+	 * @throws DRException
+	 *             Thrown in case of DynamicReports failure
+	 */
+	private void generateReportFile(List<DisplaySectionBean> displaySectionBeans, Map<String, String> values,
+			String titleText, String reportFilePath, String fileExt, String urlPath, String sysPath)
+			throws IOException, DRException {
 		OutputStream out = new FileOutputStream(reportFilePath + fileExt);
 
 		JasperReportBuilder report = DynamicReports.report();
 		TextColumnBuilder<String> groupColumn = col.column("group", "group_column", type.stringType());
 		ColumnGroupBuilder itemGroup = grp.group(groupColumn).setStyle(DRTemplates.groupColumnConditionalStyle)
-				.addHeaderComponent(cmp.horizontalList().newRow().add(cmp.verticalGap(5)))
-				.addFooterComponent(cmp.horizontalList().newRow().add(cmp.verticalGap(5)));
-		
-		report.title(DRTemplates.getTitleComponent(titleText, DRTemplates.getDynamicReportsComponent(urlPath, sysPath)), cmp.subreport(createCRFHeaderTable(values)),
-				DRTemplates.getGapComponent()).pageFooter(DRTemplates.footerComponent);
-		report
-			.setColumnTitleStyle(DRTemplates.columnTitleStyle)
-			.highlightDetailEvenRows()
-			.columns(groupColumn,
-				col.column("Question", "left_item_text", type.stringType()),
-				col.column("Answer", "item_value", type.stringType()).setHorizontalAlignment(HorizontalAlignment.CENTER),
-				col.column("", "right_item_text", type.stringType()))
-			.setDataSource(createDataSource(displaySectionBeans))
-			.groupBy(itemGroup);
-		//report.show();
+				.addHeaderComponent(cmp.horizontalList().newRow().add(cmp.verticalGap(FIVE)))
+				.addFooterComponent(cmp.horizontalList().newRow().add(cmp.verticalGap(FIVE)));
+
+		report.title(
+				DRTemplates.getTitleComponent(titleText, DRTemplates.getDynamicReportsComponent(urlPath, sysPath)),
+				cmp.subreport(createCRFHeaderTable(values)), DRTemplates.getGapComponent()).pageFooter(
+				DRTemplates.footerComponent);
+		report.setColumnTitleStyle(DRTemplates.columnTitleStyle)
+				.highlightDetailEvenRows()
+				.columns(
+						groupColumn,
+						col.column("Question", "left_item_text", type.stringType()),
+						col.column("Answer", "item_value", type.stringType()).setHorizontalAlignment(
+								HorizontalAlignment.CENTER), col.column("", "right_item_text", type.stringType()))
+				.setDataSource(createDataSource(displaySectionBeans)).groupBy(itemGroup).setShowColumnTitle(false);
 		report.toPdf(out);
 
 		out.close();
@@ -182,14 +225,15 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 
 	private JasperReportBuilder createCRFHeaderTable(Map<String, String> values) {
 		JasperReportBuilder report = report();
-		report
-		.setColumnStyle(DRTemplates.getHeaderColumnStyle())
-		.columns(
-				col.column("", "column_1", type.stringType()),
-				col.column("", "column_2", type.stringType()).setHorizontalAlignment(HorizontalAlignment.CENTER),
-				col.column("", "column_3", type.stringType()),
-				col.column("", "column_4", type.stringType()).setHorizontalAlignment(HorizontalAlignment.CENTER))
-		.setDataSource(createDataSourceForHeader(values));
+		report.setColumnStyle(DRTemplates.getHeaderColumnStyle())
+				.columns(
+						col.column("", "column_1", type.stringType()),
+						col.column("", "column_2", type.stringType())
+								.setHorizontalAlignment(HorizontalAlignment.CENTER),
+						col.column("", "column_3", type.stringType()),
+						col.column("", "column_4", type.stringType())
+								.setHorizontalAlignment(HorizontalAlignment.CENTER))
+				.setDataSource(createDataSourceForHeader(values));
 
 		return report;
 	}
@@ -197,29 +241,29 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 	private JRDataSource createDataSourceForHeader(Map<String, String> values) {
 		DRDataSource dataSource = new DRDataSource("column_1", "column_2", "column_3", "column_4");
 		int size = values.size();
-		
-		int rem = size % 4;
-		int NumberOfSteps = size / 4 + (rem == 0? 0 : rem == 3? 2 : 1);
-		Iterator it = values.keySet().iterator();
-		
+
+		int rem = size % FOUR;
+		int numberOfSteps = size / FOUR + (rem == 0 ? 0 : rem == THREE ? 2 : 1);
+		Iterator<String> it = values.keySet().iterator();
+
 		List<String> leftColumn = new ArrayList<String>();
 		List<String> rightColumn = new ArrayList<String>();
 		for (int i = 0; it.hasNext(); i++) {
-			if (i < NumberOfSteps) {
-				leftColumn.add(values.get((String) it.next()));
-				leftColumn.add(it.hasNext()? values.get((String) it.next()) : "");
+			if (i < numberOfSteps) {
+				leftColumn.add(values.get(it.next()));
+				leftColumn.add(it.hasNext() ? values.get(it.next()) : "");
 			} else {
-				rightColumn.add(values.get((String) it.next()));
-				rightColumn.add(it.hasNext()? values.get((String) it.next()) : "");
+				rightColumn.add(values.get(it.next()));
+				rightColumn.add(it.hasNext() ? values.get(it.next()) : "");
 			}
 		}
-		
+
 		while (leftColumn.size() > rightColumn.size()) {
 			rightColumn.add("");
 		}
-		
-		for (int i = 0; i < leftColumn.size(); i = i+2) {
-			dataSource.add(leftColumn.get(i), leftColumn.get(i+1), rightColumn.get(i), rightColumn.get(i+1));
+
+		for (int i = 0; i < leftColumn.size(); i = i + 2) {
+			dataSource.add(leftColumn.get(i), leftColumn.get(i + 1), rightColumn.get(i), rightColumn.get(i + 1));
 		}
 
 		return dataSource;
@@ -238,34 +282,35 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 
 		values.put("study_subject_ID_label", studySubjectIDLabel);
 		values.put("study_subject_ID", ssubj.getLabel());
-		
-		String studyTitle = study.getName();
-		if (study.getParentStudyId() > 0) {
+
+		String studyTitle = study != null ? study.getName() : null;
+		if (study != null && study.getParentStudyId() > 0) {
 			// this is a site, find parent
 			StudyBean parentStudy = (StudyBean) studydao.findByPK(study.getParentStudyId());
 			studyTitle = parentStudy.getName() + " - " + study.getName();
 		}
 		values.put("study_site_label", resword.getString("study_site") + ":");
 		values.put("study_site", studyTitle);
-		
+
 		if (studyEvent != null) {
-			String event =  studyEvent.getStudyEventDefinition().getName() + " (" + sdf.format(studyEvent.getDateStarted()) + ")";
+			String event = studyEvent.getStudyEventDefinition().getName() + " ("
+					+ sdf.format(studyEvent.getDateStarted()) + ")";
 			values.put("event_label", resword.getString("event") + ":");
 			values.put("event", event);
 		}
-		
+
 		if (ecb != null && ecb.getDateInterviewed() != null) {
 			String interviewer = ecb.getInterviewerName() + " (" + sdf.format(ecb.getDateInterviewed()) + ")";
 			values.put("interviewer_label", resword.getString("interviewer") + ":");
 			values.put("interviewer", interviewer);
 		}
-		
+
 		if (study != null && "true".equals(study.getStudyParameterConfig().getPersonIdShownOnCRF())) {
-			String person_ID = subj.getUniqueIdentifier();
+			String personId = subj.getUniqueIdentifier();
 			values.put("person_ID_label", resword.getString("person_ID") + ":");
-			values.put("person_ID", person_ID);
+			values.put("person_ID", personId);
 		}
-		
+
 		if (study != null && "1".equals(study.getStudyParameterConfig().getCollectDob())) {
 			String age = Utils.getInstance().processAge(ssubj.getEnrollmentDate(), subj.getDateOfBirth());
 			if (!"N/A".equals(age)) {
@@ -275,17 +320,17 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 		}
 
 		if (subj != null && subj.getDateOfBirth() != null) {
-			String date_of_birth = sdf.format(subj.getDateOfBirth());
+			String dateOfBirth = sdf.format(subj.getDateOfBirth());
 			values.put("date_of_birth_label", resword.getString("date_of_birth") + ":");
-			values.put("date_of_birth", date_of_birth);
+			values.put("date_of_birth", dateOfBirth);
 		}
-		
-		if (study != null && "true".equals(study.getStudyParameterConfig().getGenderRequired()) 
-				&& (subj.getGender() == 102 || subj.getGender() == 109)) {
+
+		if (study != null && "true".equals(study.getStudyParameterConfig().getGenderRequired()) && subj != null
+				&& (subj.getGender() == ONE_HUNDRED_TWO || subj.getGender() == ONE_HUNDRED_NINE)) {
 			values.put("gender_label", study.getStudyParameterConfig().getGenderLabel() + ":");
-			values.put("gender", subj.getGender() == 102? resword.getString("F") : resword.getString("M"));
+			values.put("gender", subj.getGender() == ONE_HUNDRED_TWO ? resword.getString("F") : resword.getString("M"));
 		}
-		
+
 		return values;
 	}
 
@@ -294,7 +339,7 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 		for (DisplaySectionBean dsb : displaySectionBeans) {
 			String groupHeader = "";
 			for (DisplayItemBean dib : dsb.getItems()) {
-				String value = "";
+				String value;
 				if (!"".equals(dib.getMetadata().getHeader().trim())) {
 					groupHeader = DRUtil.getTextFromHeader(dib.getMetadata().getHeader());
 				}
@@ -303,17 +348,46 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 					value = dib.getMetadata().getResponseSet().getValue();
 				} else if (dib.getMetadata().getResponseSet().getResponseType() == ResponseType.RADIO) {
 					value = DRUtil.getValueFromRadio(dib);
-				} else if (dib.getMetadata().getResponseSet().getResponseType() == ResponseType.SELECT 
+				} else if (dib.getMetadata().getResponseSet().getResponseType() == ResponseType.SELECT
 						|| dib.getMetadata().getResponseSet().getResponseType() == ResponseType.SELECTMULTI) {
 					value = DRUtil.getValueFromSelect(dib);
 				} else {
 					continue;
 				}
-				
-				dataSource.add(groupHeader, DRUtil.getTextFromHTML(dib.getMetadata().getLeftItemText()).replaceAll("&nbsp", " "), 
-						value, DRUtil.getTextFromHTML(dib.getMetadata().getRightItemText()).replaceAll("&nbsp", " "));
+
+				dataSource.add(groupHeader,
+						DRUtil.getTextFromHTML(dib.getMetadata().getLeftItemText()).replaceAll("&nbsp", " "), value,
+						DRUtil.getTextFromHTML(dib.getMetadata().getRightItemText()).replaceAll("&nbsp", " "));
 			}
 		}
 		return dataSource;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setUrlPath(String urlPath) {
+		this.urlPath = urlPath;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setSysPath(String sysPath) {
+		this.sysPath = sysPath;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setDataPath(String dataPath) {
+		this.dataPath = dataPath;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setResword(ResourceBundle resword) {
+		this.resword = resword;
 	}
 }

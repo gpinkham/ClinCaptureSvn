@@ -1679,9 +1679,9 @@ public abstract class DataEntryServlet extends Controller {
 					}
 
 					// send email with CRF-report
-					if (markSuccessfully && "complete".equals(edcb.getEmailStep()))
-						sendEmailWithCRFReport(crfVersionBean, crfBean, ssb, edcb, ecb, currentStudy, locale, request);
-
+					if (markSuccessfully && "complete".equals(edcb.getEmailStep())) {
+						sendEmailWithCRFReport(crfVersionBean, crfBean, ssb, edcb, ecb, currentStudy, request);
+					}
 					// now write the event crf bean to the database
 					String annotations = fp.getString(INPUT_ANNOTATIONS);
 					setEventCRFAnnotations(annotations, request);
@@ -1842,15 +1842,22 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	private void sendEmailWithCRFReport(CRFVersionBean crfVersionBean, CRFBean crfBean, StudySubjectBean ssb,
-			EventDefinitionCRFBean edcb, EventCRFBean ecb, StudyBean currentStudy, Locale locale,
-			HttpServletRequest request) {
+			EventDefinitionCRFBean edcb, EventCRFBean ecb, StudyBean currentStudy, HttpServletRequest request) {
+		Locale locale = request.getLocale();
 		ReportCRFService reportCRFService = (ReportCRFService) SpringServletAccess.getApplicationContext(
 				getServletContext()).getBean("reportCRFService");
 		try {
-			String reportFilePath = reportCRFService.createPDFReport(ecb.getId(), currentStudy, locale, resword,
-					request.getRequestURL().toString().replaceAll(request.getServletPath(), ""), this
-							.getServletContext().getRealPath("/"), SQLInitServlet.getField("filePath")
-							+ ReportCRFService.CRF_REPORT_DIR + File.separator, getSessionManager(request));
+			String urlPath = request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
+			String sysPath = this.getServletContext().getRealPath("/");
+			String dataPath = SQLInitServlet.getField("filePath") + ReportCRFService.CRF_REPORT_DIR + File.separator;
+
+			reportCRFService.setUrlPath(urlPath);
+			reportCRFService.setSysPath(sysPath);
+			reportCRFService.setDataPath(dataPath);
+			reportCRFService.setResword(resword);
+
+			String reportFilePath = reportCRFService.createPDFReport(ecb.getId(), locale);
+
 			if (!StringUtil.isBlank(reportFilePath) && "complete".equals(edcb.getEmailStep())) {
 				StringBuilder body = new StringBuilder();
 				body.append(MessageFormat.format(respage.getString("crf_report_email_body"), "completed"));
@@ -4884,18 +4891,20 @@ public abstract class DataEntryServlet extends Controller {
 			int subjectsNumberAssignedToDynamicGroup;
 			Map<String, Integer> subjectsNumberAssignedToEachDynamicGroupMap = new HashMap<String, Integer>();
 
-			List<StudyGroupClassBean> activeDynamicGroupClasses =
-					getStudyGroupClassDAO().findAllActiveDynamicGroupClassesByStudyId(currentStudy.getParentStudyId());
+			List<StudyGroupClassBean> activeDynamicGroupClasses = getStudyGroupClassDAO()
+					.findAllActiveDynamicGroupClassesByStudyId(currentStudy.getParentStudyId());
 
-			for (StudyGroupClassBean dynamicGroupClass: activeDynamicGroupClasses) {
+			for (StudyGroupClassBean dynamicGroupClass : activeDynamicGroupClasses) {
 
-				subjectsNumberAssignedToDynamicGroup =
-						getStudySubjectDAO().getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId(currentStudy.getId(),
-						dynamicGroupClass.getId());
-				subjectsNumberAssignedToEachDynamicGroupMap.put(dynamicGroupClass.getName(), subjectsNumberAssignedToDynamicGroup);
+				subjectsNumberAssignedToDynamicGroup = getStudySubjectDAO()
+						.getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId(currentStudy.getId(),
+								dynamicGroupClass.getId());
+				subjectsNumberAssignedToEachDynamicGroupMap.put(dynamicGroupClass.getName(),
+						subjectsNumberAssignedToDynamicGroup);
 			}
 
-			request.setAttribute("subjectsNumberAssignedToEachDynamicGroupMap", subjectsNumberAssignedToEachDynamicGroupMap);
+			request.setAttribute("subjectsNumberAssignedToEachDynamicGroupMap",
+					subjectsNumberAssignedToEachDynamicGroupMap);
 		}
 	}
 }

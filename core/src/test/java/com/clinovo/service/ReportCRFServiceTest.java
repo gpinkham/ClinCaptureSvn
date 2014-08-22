@@ -15,40 +15,37 @@
 
 package com.clinovo.service;
 
+import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.akaza.openclinica.DefaultAppContextTest;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.core.SessionManager;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.junit.Test;
-import org.mockito.Mockito;
-
 public class ReportCRFServiceTest extends DefaultAppContextTest {
+
+	private int eventCRFId;
+	private Locale testLocale;
+
+	@Before
+	public void setUp() {
+		eventCRFId = 1;
+		testLocale = new Locale(locale);
+		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(testLocale);
+		reportCRFService.setUrlPath("");
+		reportCRFService.setSysPath("");
+		reportCRFService.setDataPath("");
+		reportCRFService.setResword(resword);
+	}
+
 	@Test
 	public void testCreatePDFReportReturnsNotNull() throws Exception {
-		StudyBean currentStudy = (StudyBean) studyDAO.findByPK(1);
-		int eventCRFId = 1;
-		SessionManager sm = Mockito.mock(SessionManager.class);
-		Mockito.when(sm.getDataSource()).thenReturn(dataSource);
-		String urlPath = "";
-		String sysPath = "";
-		String dataPath = "";
-		Locale testLocale = new Locale(locale);
-		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(testLocale);
-		assertNotNull(reportCRFService.createPDFReport(eventCRFId, currentStudy, testLocale, resword, urlPath, sysPath,
-				dataPath, sm));
+		assertNotNull(reportCRFService.createPDFReport(eventCRFId, testLocale));
 	}
 
 	@Test
 	public void testCreatePDFReportReturnsCorrectFileName() throws Exception {
-		SessionManager sm = Mockito.mock(SessionManager.class);
-		Mockito.when(sm.getDataSource()).thenReturn(dataSource);
-
-		Locale testLocale = new Locale(locale);
-		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(testLocale);
-		assertEquals("Agent_Administration_v2.0_ssID1.pdf", reportCRFService.createPDFReport(1,
-				(StudyBean) studyDAO.findByPK(1), testLocale, resword, "", "", "", sm));
+		assertEquals("Agent_Administration_v2.0_ssID1.pdf", reportCRFService.createPDFReport(1, testLocale));
 	}
 }
