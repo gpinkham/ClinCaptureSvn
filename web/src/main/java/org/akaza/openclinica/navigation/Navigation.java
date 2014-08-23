@@ -142,8 +142,8 @@ public final class Navigation {
 	private static void specialProcessingForURL(Stack<String> visitedURLs, String requestShortURL) {
 		String requestShortURI = requestShortURL.split("\\?")[0];
 		if ("/ListEventsForSubjects".equals(requestShortURI)) {
-			if (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects")
-					|| visitedURLs.peek().split("\\?")[0].equals("/ListStudySubjects")) {
+			if (!visitedURLs.isEmpty() && (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects")
+					|| visitedURLs.peek().split("\\?")[0].equals("/ListStudySubjects"))) {
 				visitedURLs.pop();
 			}
 
@@ -153,8 +153,8 @@ public final class Navigation {
 			if (requestShortURL.contains("findSubjects_f_studySubject")) {
 				return;
 			} else {
-				if (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects")
-						|| visitedURLs.peek().split("\\?")[0].equals("/ListStudySubjects")) {
+				if (!visitedURLs.isEmpty() && (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects")
+						|| visitedURLs.peek().split("\\?")[0].equals("/ListStudySubjects"))) {
 					visitedURLs.pop();
 				}
 			}
