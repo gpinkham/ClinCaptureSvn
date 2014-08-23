@@ -27,33 +27,56 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * SignUtil class.
+ */
+@SuppressWarnings("unchecked")
 public final class SignUtil {
 
 	private SignUtil() {
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Method that checks that study subject can be signed.
+	 * 
+	 * @param studySubjectBean
+	 *            StudySubjectBean
+	 * @param daoWrapper
+	 *            DAOWrapper
+	 * @return boolean
+	 */
 	public static boolean permitSign(StudySubjectBean studySubjectBean, DAOWrapper daoWrapper) {
 		boolean sign = !studySubjectBean.getStatus().isSigned();
 		if (sign) {
 			int signedEvents = 0;
 			ArrayList<StudyEventBean> studyEvents = daoWrapper.getSedao().findAllByStudySubject(studySubjectBean);
-			for (StudyEventBean studyEventBean : (ArrayList<StudyEventBean>) studyEvents) {
+			for (StudyEventBean studyEventBean : studyEvents) {
 				if (studyEventBean.getSubjectEventStatus() != SubjectEventStatus.SIGNED) {
 					StudyBean studyBean = (StudyBean) daoWrapper.getSdao().findByPK(studySubjectBean.getStudyId());
 					sign = permitSign(studyEventBean, studyBean, daoWrapper);
-					if (!sign)
+					if (!sign) {
 						break;
+					}
 				} else {
 					signedEvents++;
 				}
 			}
-			sign = signedEvents == studyEvents.size() ? false : sign;
+			sign = signedEvents != studyEvents.size() && sign;
 		}
 		return sign;
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Method that checks that study subject can be signed.
+	 * 
+	 * @param studyEventBean
+	 *            StudyEventBean
+	 * @param studyBean
+	 *            StudyBean
+	 * @param daoWrapper
+	 *            DAOWrapper
+	 * @return boolean
+	 */
 	public static boolean permitSign(StudyEventBean studyEventBean, StudyBean studyBean, DAOWrapper daoWrapper) {
 		boolean sign = daoWrapper.getDiscDao().doesNotHaveOutstandingDNs(studyEventBean);
 		if (sign) {
@@ -68,16 +91,19 @@ public final class SignUtil {
 				Collection<EventDefinitionCRFBean> eventDefCrfs = daoWrapper.getEdcdao().findAllByDefinition(studyBean,
 						studyEventBean.getStudyEventDefinitionId());
 				List<Integer> requiredCrfIds = new ArrayList<Integer>();
-				for (EventDefinitionCRFBean eventDefinitionCrf : (ArrayList<EventDefinitionCRFBean>) eventDefCrfs) {
-					if (eventDefinitionCrf.getStatus() != Status.AVAILABLE || !eventDefinitionCrf.isActive())
+				for (EventDefinitionCRFBean eventDefinitionCrf : eventDefCrfs) {
+					if (eventDefinitionCrf.getStatus() != Status.AVAILABLE || !eventDefinitionCrf.isActive()
+							|| eventDefinitionCrf.isHideCrf()) {
 						continue;
-					if (eventDefinitionCrf.isActive() && eventDefinitionCrf.isRequiredCRF()) {
+					}
+					if (eventDefinitionCrf.isRequiredCRF()) {
 						requiredCrfIds.add(eventDefinitionCrf.getId());
 					}
 				}
 				for (EventCRFBean eventCRFBean : eventCrfs) {
-					if (eventCRFBean.isNotStarted())
+					if (eventCRFBean.isNotStarted()) {
 						continue;
+					}
 					EventDefinitionCRFBean eventDefinitionCrf = daoWrapper.getEdcdao()
 							.findByStudyEventIdAndCRFVersionId(studyBean, studyEventBean.getId(),
 									eventCRFBean.getCRFVersionId());
@@ -95,7 +121,7 @@ public final class SignUtil {
 						break;
 					}
 				}
-				sign = sign ? requiredCrfIds.size() == 0 : sign;
+				sign = sign && requiredCrfIds.size() == 0;
 			} else {
 				sign = studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SIGNED;
 			}

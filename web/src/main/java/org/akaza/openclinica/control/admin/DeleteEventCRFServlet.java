@@ -20,10 +20,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.util.ArrayList;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.clinovo.model.CodedItem;
 import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -58,6 +54,10 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+
 @SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class DeleteEventCRFServlet extends Controller {
@@ -88,7 +88,7 @@ public class DeleteEventCRFServlet extends Controller {
 	}
 
 	private void smartForward(Page page, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+
 		response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
 	}
 
@@ -166,34 +166,34 @@ public class DeleteEventCRFServlet extends Controller {
 			} else {
 				logger.info("submit to delete the event CRF from event");
 
-                CodedItemService codedItemsService = getCodedItemService();
+				CodedItemService codedItemsService = getCodedItemService();
 
 				for (Object anItemData : itemData) {
 
-                    ItemDataBean item = (ItemDataBean) anItemData;
-                    CodedItem codedItem = codedItemsService.findCodedItem(item.getId());
+					ItemDataBean item = (ItemDataBean) anItemData;
+					CodedItem codedItem = codedItemsService.findCodedItem(item.getId());
 					ArrayList discrepancyList = dnDao.findExistingNotesForItemData(item.getId());
 
-                    iddao.deleteDnMap(item.getId());
+					iddao.deleteDnMap(item.getId());
 
-                    for (Object aDiscrepancyList : discrepancyList) {
+					for (Object aDiscrepancyList : discrepancyList) {
 						DiscrepancyNoteBean noteBean = (DiscrepancyNoteBean) aDiscrepancyList;
 						dnDao.deleteNotes(noteBean.getId());
 					}
 
-                    item.setUpdater(ub);
+					item.setUpdater(ub);
 					iddao.updateUser(item);
 					iddao.delete(item.getId());
 
-                    if(codedItem != null) {
-                        codedItemsService.deleteCodedItem(codedItem);
-                    }
+					if (codedItem != null) {
+						codedItemsService.deleteCodedItem(codedItem);
+					}
 				}
 				// delete event crf
 				ecdao.deleteEventCRFDNMap(eventCRF.getId());
 				ecdao.delete(eventCRF.getId());
 
-				SubjectEventStatusUtil.determineSubjectEventState(event, study, new DAOWrapper(sdao, sedao, subdao,
+				SubjectEventStatusUtil.determineSubjectEventState(event, new DAOWrapper(sdao, cvdao, sedao, subdao,
 						ecdao, edcdao, dnDao));
 				event = (StudyEventBean) sedao.update(event);
 

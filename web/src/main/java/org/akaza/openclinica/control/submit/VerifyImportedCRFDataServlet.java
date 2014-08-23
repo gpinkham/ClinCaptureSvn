@@ -20,20 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -74,6 +60,19 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system and what is not.
@@ -400,11 +399,9 @@ public class VerifyImportedCRFDataServlet extends Controller {
 				for (int studyEventId : studyEventIds) {
 					if (studyEventId > 0) {
 						StudyEventBean seb = (StudyEventBean) sedao.findByPK(studyEventId);
-						StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
-						StudyBean sb = (StudyBean) sdao.findByPK(ssb.getStudyId());
 
-						SubjectEventStatusUtil.determineSubjectEventState(seb, sb, new DAOWrapper(sdao, sedao, ssdao,
-								ecdao, edcdao, dndao));
+						SubjectEventStatusUtil.determineSubjectEventState(seb, new DAOWrapper(sdao, getCRFVersionDAO(),
+								sedao, ssdao, ecdao, edcdao, dndao));
 
 						sedao.update(seb, con);
 					}

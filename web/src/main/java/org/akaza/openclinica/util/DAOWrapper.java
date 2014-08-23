@@ -13,14 +13,24 @@
 
 package org.akaza.openclinica.util;
 
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 
 import javax.sql.DataSource;
 
+/**
+ * DAOWrapper class.
+ */
 public class DAOWrapper {
 
 	private StudyDAO sdao;
+	private CRFVersionDAO cvdao;
 	private StudyEventDAO sedao;
 	private StudySubjectDAO ssdao;
 	private EventCRFDAO ecdao;
@@ -28,6 +38,10 @@ public class DAOWrapper {
 	private DiscrepancyNoteDAO discDao;
 	private StudyEventDefinitionDAO seddao;
 
+	/**
+	 * DAOWrapper constructor.
+	 * @param ds DataSource
+	 */
 	public DAOWrapper(DataSource ds) {
 		this.sdao = new StudyDAO(ds);
 		this.sedao = new StudyEventDAO(ds);
@@ -37,9 +51,20 @@ public class DAOWrapper {
 		this.discDao = new DiscrepancyNoteDAO(ds);
 	}
 
-	public DAOWrapper(StudyDAO sdao, StudyEventDAO sedao, StudySubjectDAO ssdao, EventCRFDAO ecdao,
-			EventDefinitionCRFDAO edcdao, DiscrepancyNoteDAO discDao) {
+	/**
+	 * DAOWrapper constructor.
+	 * @param sdao StudyDAO
+	 * @param cvdao CRFVersionDAO
+	 * @param sedao StudyEventDAO
+	 * @param ssdao StudySubjectDAO
+	 * @param ecdao EventCRFDAO
+	 * @param edcdao EventDefinitionCRFDAO
+	 * @param discDao DiscrepancyNoteDAO
+	 */
+	public DAOWrapper(StudyDAO sdao, CRFVersionDAO cvdao, StudyEventDAO sedao, StudySubjectDAO ssdao,
+			EventCRFDAO ecdao, EventDefinitionCRFDAO edcdao, DiscrepancyNoteDAO discDao) {
 		this.sdao = sdao;
+		this.cvdao = cvdao;
 		this.sedao = sedao;
 		this.ssdao = ssdao;
 		this.ecdao = ecdao;
@@ -84,5 +109,9 @@ public class DAOWrapper {
 
 	public DiscrepancyNoteDAO getDiscDao() {
 		return discDao;
+	}
+
+	public CRFVersionDAO getCvdao() {
+		return cvdao;
 	}
 }

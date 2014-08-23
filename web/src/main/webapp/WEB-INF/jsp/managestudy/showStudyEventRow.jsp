@@ -398,7 +398,7 @@
 
         <td class="table_cell_border">
             <table border="0" cellpadding="0" cellspacing="0">
-                <tr valign="top" class="innerTable">
+                <tr valign="top" class="innerTable <c:if test='${dec.eventDefinitionCRF.hideCrf and study.parentStudyId > 0}'>hidden</c:if>">
                     <td>
                         <c:choose>
                             <c:when test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6}">

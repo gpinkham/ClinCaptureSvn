@@ -1361,7 +1361,7 @@ public abstract class DataEntryServlet extends Controller {
 
 				StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(studyEventBean
 						.getStudyEventDefinitionId());
-				SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, study, new DAOWrapper(studydao,
+				SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, new DAOWrapper(studydao, cvdao,
 						seDao, ssdao, ecdao, edcdao, dndao));
 				studyEventBean = (StudyEventBean) seDao.update(studyEventBean);
 
@@ -1835,7 +1835,7 @@ public abstract class DataEntryServlet extends Controller {
 					}
 				}
 
-				SubjectEventStatusUtil.determineSubjectEventStates(sedb, ssb, study, new DAOWrapper(studydao, seDao,
+				SubjectEventStatusUtil.determineSubjectEventStates(sedb, ssb, new DAOWrapper(studydao, cvdao, seDao,
 						ssdao, ecdao, edcdao, dndao));
 			}
 		}
@@ -3549,8 +3549,8 @@ public abstract class DataEntryServlet extends Controller {
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 		DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(getDataSource());
 		StudyBean study = (StudyBean) session.getAttribute("study");
-		SubjectEventStatusUtil.determineSubjectEventState(seb, study, new DAOWrapper(sdao, sedao, ssdao, ecdao, edcdao,
-				discDao));
+		SubjectEventStatusUtil.determineSubjectEventState(seb, new DAOWrapper(sdao, getCRFVersionDAO(), sedao, ssdao,
+				ecdao, edcdao, discDao));
 		seb = (StudyEventBean) sedao.update(seb);
 
 		// Clinovo calendar func

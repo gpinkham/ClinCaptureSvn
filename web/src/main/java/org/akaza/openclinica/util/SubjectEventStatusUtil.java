@@ -33,36 +33,68 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-// be careful when you change the logic of this class (talk with Marc or Sergey) !
+/**
+ * SubjectEventStatusUtil class.
+ */
 @SuppressWarnings({ "unchecked" })
 public final class SubjectEventStatusUtil {
 
-	final static HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>();
+	private static HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>();
 
 	static {
-		imageIconPaths.put(1, "images/icon_Scheduled.gif");
-		imageIconPaths.put(2, "images/icon_NotStarted.gif");
-		imageIconPaths.put(3, "images/icon_InitialDE.gif");
-		imageIconPaths.put(4, "images/icon_DEcomplete.gif");
-		imageIconPaths.put(5, "images/icon_Stopped.gif");
-		imageIconPaths.put(6, "images/icon_Skipped.gif");
-		imageIconPaths.put(7, "images/icon_Locked.gif");
-		imageIconPaths.put(8, "images/icon_Signed.gif");
-		imageIconPaths.put(9, "images/icon_DoubleCheck.gif");
-		imageIconPaths.put(10, "images/icon_Invalid.gif");
+		int index = 1;
+		imageIconPaths.put(index++, "images/icon_Scheduled.gif");
+		imageIconPaths.put(index++, "images/icon_NotStarted.gif");
+		imageIconPaths.put(index++, "images/icon_InitialDE.gif");
+		imageIconPaths.put(index++, "images/icon_DEcomplete.gif");
+		imageIconPaths.put(index++, "images/icon_Stopped.gif");
+		imageIconPaths.put(index++, "images/icon_Skipped.gif");
+		imageIconPaths.put(index++, "images/icon_Locked.gif");
+		imageIconPaths.put(index++, "images/icon_Signed.gif");
+		imageIconPaths.put(index++, "images/icon_DoubleCheck.gif");
+		imageIconPaths.put(index, "images/icon_Invalid.gif");
 	}
 
 	private SubjectEventStatusUtil() {
 	}
 
+	public static HashMap<Integer, String> getImageIconPaths() {
+		return imageIconPaths;
+	}
+
+	/**
+	 * Method returns an icon for SubjectEventStatus.
+	 * 
+	 * @param status
+	 *            SubjectEventStatus
+	 * @return String
+	 */
 	public static String getSESIconUrl(SubjectEventStatus status) {
 		String iconUrl = imageIconPaths.get(status.getId());
 		return iconUrl == null ? "" : iconUrl;
 	}
 
+	/**
+	 * Method determines an icon for study event on the subject matrix.
+	 * 
+	 * @param url
+	 *            StringBuilder
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param studySubjectBean
+	 *            StudySubjectBean
+	 * @param studyEvents
+	 *            List<StudyEventBean>
+	 * @param subjectEventStatus
+	 *            SubjectEventStatus
+	 * @param resword
+	 *            ResourceBundle
+	 * @param permissionForDynamic
+	 *            boolean
+	 */
 	public static void determineSubjectEventIconOnTheSubjectMatrix(StringBuilder url, StudyBean currentStudy,
 			StudySubjectBean studySubjectBean, List<StudyEventBean> studyEvents, SubjectEventStatus subjectEventStatus,
-			ResourceBundle resword, boolean permission_for_dynamic) {
+			ResourceBundle resword, boolean permissionForDynamic) {
 		if (studyEvents.size() <= 1) {
 			if (studySubjectBean.getStatus().isLocked() && subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
 				String txt = resword.getString("locked");
@@ -84,7 +116,7 @@ public final class SubjectEventStatusUtil {
 						.append(txt)
 						.append("' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative;'>");
 			} else {
-				if (!subjectEventStatus.isNotScheduled() || permission_for_dynamic) {
+				if (!subjectEventStatus.isNotScheduled() || permissionForDynamic) {
 					url.append("<img src='")
 							.append(imageIconPaths.get(subjectEventStatus.getId()))
 							.append("' border='0' style='position: relative;' title=\"")
@@ -100,18 +132,19 @@ public final class SubjectEventStatusUtil {
 				}
 			}
 		} else {
+			int index = 0;
 			SubjectEventStatus status = null;
 			Map<SubjectEventStatus, Integer> scoreMap = new HashMap<SubjectEventStatus, Integer>();
-			scoreMap.put(SubjectEventStatus.INVALID, 0);
-			scoreMap.put(SubjectEventStatus.SCHEDULED, 1);
-			scoreMap.put(SubjectEventStatus.DATA_ENTRY_STARTED, 2);
-			scoreMap.put(SubjectEventStatus.COMPLETED, 3);
-			scoreMap.put(SubjectEventStatus.SOURCE_DATA_VERIFIED, 4);
-			scoreMap.put(SubjectEventStatus.SIGNED, 5);
-			scoreMap.put(SubjectEventStatus.REMOVED, 6);
-			scoreMap.put(SubjectEventStatus.STOPPED, 7);
-			scoreMap.put(SubjectEventStatus.SKIPPED, 8);
-			scoreMap.put(SubjectEventStatus.LOCKED, 9);
+			scoreMap.put(SubjectEventStatus.INVALID, index++);
+			scoreMap.put(SubjectEventStatus.SCHEDULED, index++);
+			scoreMap.put(SubjectEventStatus.DATA_ENTRY_STARTED, index++);
+			scoreMap.put(SubjectEventStatus.COMPLETED, index++);
+			scoreMap.put(SubjectEventStatus.SOURCE_DATA_VERIFIED, index++);
+			scoreMap.put(SubjectEventStatus.SIGNED, index++);
+			scoreMap.put(SubjectEventStatus.REMOVED, index++);
+			scoreMap.put(SubjectEventStatus.STOPPED, index++);
+			scoreMap.put(SubjectEventStatus.SKIPPED, index++);
+			scoreMap.put(SubjectEventStatus.LOCKED, index);
 			for (StudyEventBean studyEventBean : studyEvents) {
 				Integer statusScore = scoreMap.get(status);
 				Integer studyEventBeanScore = scoreMap.get(studyEventBean.getSubjectEventStatus());
@@ -126,6 +159,14 @@ public final class SubjectEventStatusUtil {
 		}
 	}
 
+	/**
+	 * Method prepares the possible subject event statuses that we can set for study event.
+	 * 
+	 * @param events
+	 *            List<EventCRFBean>
+	 * @param statuses
+	 *            List<SubjectEventStatus>
+	 */
 	public static void preparePossibleSubjectEventStates(List<EventCRFBean> events, List<SubjectEventStatus> statuses) {
 		// TODO + add the checking of rights
 		int countOfSDVd = 0;
@@ -151,34 +192,81 @@ public final class SubjectEventStatusUtil {
 		}
 	}
 
-	public static void determineSubjectEventState(StudyEventBean studyEventBean, StudyBean studyBean,
-			List<EventCRFBean> eventCRFs, DAOWrapper daoWrapper) {
-		analyzeSubjectEventState(studyEventBean, studyBean, eventCRFs, daoWrapper, null);
+	/**
+	 * Method that determines the subject event state for study event by incoming parameters.
+	 * 
+	 * @param studyEventBean
+	 *            StudyEventBean
+	 * @param eventCRFs
+	 *            List<EventCRFBean>
+	 * @param daoWrapper
+	 *            DAOWrapper
+	 */
+	public static void determineSubjectEventState(StudyEventBean studyEventBean, List<EventCRFBean> eventCRFs,
+			DAOWrapper daoWrapper) {
+		analyzeSubjectEventState(studyEventBean, eventCRFs, daoWrapper, null);
 		daoWrapper.getSedao().update(studyEventBean);
 	}
 
-	public static void determineSubjectEventState(StudyEventBean studyEventBean, StudyBean studyBean,
-			DAOWrapper daoWrapper) {
+	/**
+	 * Method that determines the subject event state for study event by incoming parameters.
+	 * 
+	 * @param studyEventBean
+	 *            StudyEventBean
+	 * @param daoWrapper
+	 *            DAOWrapper
+	 */
+	public static void determineSubjectEventState(StudyEventBean studyEventBean, DAOWrapper daoWrapper) {
 		ArrayList<EventCRFBean> eventCRFs = daoWrapper.getEcdao().findAllByStudyEvent(studyEventBean);
-		analyzeSubjectEventState(studyEventBean, studyBean, eventCRFs, daoWrapper, null);
+		analyzeSubjectEventState(studyEventBean, eventCRFs, daoWrapper, null);
 	}
 
-	public static void determineSubjectEventState(StudyEventBean studyEventBean, StudyBean studyBean,
-			DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
+	/**
+	 * Method that determines the subject event state for study event by incoming parameters.
+	 * 
+	 * @param studyEventBean
+	 *            StudyEventBean
+	 * @param daoWrapper
+	 *            DAOWrapper
+	 * @param signStateRestorer
+	 *            SignStateRestorer
+	 */
+	public static void determineSubjectEventState(StudyEventBean studyEventBean, DAOWrapper daoWrapper,
+			SignStateRestorer signStateRestorer) {
 		ArrayList<EventCRFBean> eventCRFs = daoWrapper.getEcdao().findAllByStudyEvent(studyEventBean);
-		analyzeSubjectEventState(studyEventBean, studyBean, eventCRFs, daoWrapper, signStateRestorer);
+		analyzeSubjectEventState(studyEventBean, eventCRFs, daoWrapper, signStateRestorer);
 	}
 
+	/**
+	 * Method that determines the subject event states for study events by incoming parameters.
+	 * 
+	 * @param sed
+	 *            StudyEventDefinitionBean
+	 * @param ss
+	 *            StudySubjectBean
+	 * @param daoWrapper
+	 *            DAOWrapper
+	 */
 	public static void determineSubjectEventStates(StudyEventDefinitionBean sed, StudySubjectBean ss,
-			StudyBean studyBean, DAOWrapper daoWrapper) {
+			DAOWrapper daoWrapper) {
 		List<StudyEventBean> studyEvents = daoWrapper.getSedao().findAllByDefinitionAndSubject(sed, ss);
-		determineSubjectEventStates(studyEvents, studyBean, daoWrapper, null);
+		determineSubjectEventStates(studyEvents, daoWrapper, null);
 	}
 
-	public static void determineSubjectEventStates(List<StudyEventBean> studyEvents, StudyBean studyBean,
-			DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
+	/**
+	 * Method that determines the subject event states for study events by incoming parameters.
+	 * 
+	 * @param studyEvents
+	 *            List<StudyEventBean>
+	 * @param daoWrapper
+	 *            DAOWrapper
+	 * @param signStateRestorer
+	 *            SignStateRestorer
+	 */
+	public static void determineSubjectEventStates(List<StudyEventBean> studyEvents, DAOWrapper daoWrapper,
+			SignStateRestorer signStateRestorer) {
 		for (StudyEventBean studyEventBean : studyEvents) {
-			determineSubjectEventState(studyEventBean, studyBean, daoWrapper, signStateRestorer);
+			determineSubjectEventState(studyEventBean, daoWrapper, signStateRestorer);
 			daoWrapper.getSedao().update(studyEventBean);
 		}
 	}
@@ -186,7 +274,7 @@ public final class SubjectEventStatusUtil {
 	private static enum State {
 		DES(1), DEC(2), SDV(3), DENS(4);
 
-		int id;
+		private int id;
 
 		public int getId() {
 			return id;
@@ -222,11 +310,10 @@ public final class SubjectEventStatusUtil {
 	private static void setSubjectEventState(StudyEventBean studyEventBean, StudyBean studyBean, DAOWrapper daoWrapper,
 			State state) {
 		switch (state) {
-		case DES: {
+		case DES:
 			studyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
 			break;
-		}
-		case DEC: {
+		case DEC:
 			SubjectEventStatus status = SubjectEventStatus.COMPLETED;
 			if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SIGNED) {
 				status = SignUtil.permitSign(studyEventBean, studyBean, daoWrapper) ? SubjectEventStatus.SIGNED
@@ -234,25 +321,23 @@ public final class SubjectEventStatusUtil {
 			}
 			studyEventBean.setSubjectEventStatus(status);
 			break;
-		}
-		case SDV: {
-			SubjectEventStatus status = SubjectEventStatus.SOURCE_DATA_VERIFIED;
+		case SDV:
+			status = SubjectEventStatus.SOURCE_DATA_VERIFIED;
 			if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SIGNED) {
 				status = SignUtil.permitSign(studyEventBean, studyBean, daoWrapper) ? SubjectEventStatus.SIGNED
 						: status;
 			}
 			studyEventBean.setSubjectEventStatus(status);
 			break;
-		}
-		case DENS: {
+		case DENS:
 			studyEventBean.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 			break;
-		}
+		default:
 		}
 	}
 
-	private static void analyzeSubjectEventState(StudyEventBean studyEventBean, StudyBean studyBean,
-			List<EventCRFBean> eventCRFs, DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
+	private static void analyzeSubjectEventState(StudyEventBean studyEventBean, List<EventCRFBean> eventCRFs,
+			DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
 		State state = State.DENS;
 		boolean hasStarted = false;
 		boolean justScheduled = true;
@@ -260,14 +345,26 @@ public final class SubjectEventStatusUtil {
 		List<Integer> requiredCrfIds = new ArrayList<Integer>();
 		SubjectEventStatus savedPrevSubjectEventStatus = studyEventBean.getPrevSubjectEventStatus();
 		SubjectEventStatus savedCurrentSubjectEventStatus = studyEventBean.getSubjectEventStatus();
+		StudySubjectBean studySubjectBean = (StudySubjectBean) daoWrapper.getSsdao().findByPK(
+				studyEventBean.getStudySubjectId());
+		StudyBean studySubjectStudyBean = (StudyBean) daoWrapper.getSdao().findByPK(studySubjectBean.getStudyId());
 		List<EventDefinitionCRFBean> eventDefCrfs = (List<EventDefinitionCRFBean>) daoWrapper.getEdcdao()
-				.findAllByDefinition(studyBean, studyEventBean.getStudyEventDefinitionId());
+				.findAllActiveByEventDefinitionId(studySubjectStudyBean, studyEventBean.getStudyEventDefinitionId());
+		List<Integer> crfsToProcess = new ArrayList<Integer>();
+		for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefCrfs) {
+			if (eventDefinitionCRFBean.getStatus() == Status.AVAILABLE && eventDefinitionCRFBean.isActive()
+					&& !eventDefinitionCRFBean.isHideCrf()) {
+				crfsToProcess.add(eventDefinitionCRFBean.getCrfId());
+			}
+		}
 		Map<Integer, SignedData> preSignedData = SignStateRestorer.initPreSignedData(savedCurrentSubjectEventStatus,
 				signStateRestorer);
 		Map<Integer, SignedData> postSignedData = SignStateRestorer.initPostSignedData(eventDefCrfs);
 		for (EventDefinitionCRFBean eventDefinitionCrf : eventDefCrfs) {
-			if (eventDefinitionCrf.getStatus() != Status.AVAILABLE || !eventDefinitionCrf.isActive())
+			if (eventDefinitionCrf.getStatus() != Status.AVAILABLE || !eventDefinitionCrf.isActive()
+					|| eventDefinitionCrf.isHideCrf() || !crfsToProcess.contains(eventDefinitionCrf.getCrfId())) {
 				continue;
+			}
 			if (eventDefinitionCrf.isRequiredCRF()) {
 				requiredCrfIds.add(eventDefinitionCrf.getId());
 			}
@@ -280,11 +377,13 @@ public final class SubjectEventStatusUtil {
 		boolean hasRequiredCRFs = requiredCrfIds.size() > 0;
 		boolean hasSDVedCRFs = false;
 		for (EventCRFBean eventCRFBean : eventCRFs) {
-			if (eventCRFBean.isNotStarted())
+			int crfId = daoWrapper.getCvdao().getCRFIdFromCRFVersionId(eventCRFBean.getCRFVersionId());
+			if (eventCRFBean.isNotStarted() || !crfsToProcess.contains(crfId)) {
 				continue;
+			}
 			justScheduled = false;
 			EventDefinitionCRFBean eventDefinitionCrf = daoWrapper.getEdcdao().findByStudyEventIdAndCRFVersionId(
-					studyBean, studyEventBean.getId(), eventCRFBean.getCRFVersionId());
+					studySubjectStudyBean, studyEventBean.getId(), eventCRFBean.getCRFVersionId());
 			SignStateRestorer.prepareSignedData(eventCRFBean, eventDefinitionCrf, preSignedData);
 			SignStateRestorer.prepareSignedData(eventCRFBean, eventDefinitionCrf, postSignedData);
 			State eventCRFState = getState(eventCRFBean);
@@ -316,7 +415,7 @@ public final class SubjectEventStatusUtil {
 				state = State.SDV;
 			}
 		}
-		setSubjectEventState(studyEventBean, studyBean, daoWrapper, state);
+		setSubjectEventState(studyEventBean, studySubjectStudyBean, daoWrapper, state);
 		if (!studyEventBean.getSubjectEventStatus().equals(savedCurrentSubjectEventStatus)
 				|| (studyEventBean.getPrevSubjectEventStatus().equals(SubjectEventStatus.SIGNED) && studyEventBean
 						.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED))) {
@@ -328,6 +427,14 @@ public final class SubjectEventStatusUtil {
 		}
 	}
 
+	/**
+	 * Method fills the double data owner for event crfs.
+	 * 
+	 * @param eventCRFs
+	 *            ArrayList<EventCRFBean>
+	 * @param sm
+	 *            SessionManager
+	 */
 	public static void fillDoubleDataOwner(ArrayList<EventCRFBean> eventCRFs, SessionManager sm) {
 		// validatorId field was used for another purpose in the past, but now it is used for DoubleDataEntry
 		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());

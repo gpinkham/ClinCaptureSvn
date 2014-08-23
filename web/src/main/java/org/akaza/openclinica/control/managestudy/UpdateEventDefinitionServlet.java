@@ -21,16 +21,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -68,12 +58,21 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 @SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 @Component
 public class UpdateEventDefinitionServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -81,7 +80,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition") + "<br>"
+		addPageMessage(
+				respage.getString("no_have_permission_to_update_study_event_definition") + "<br>"
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
@@ -102,7 +102,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 			} else if ("addCrfs".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute(
+						"definition");
 				saveEventDefinitionToSession(sed, fp);
 				saveEventDefinitionCRFsToSession(fp);
 				response.sendRedirect(request.getContextPath() + "/AddCRFToDefinition");
@@ -122,9 +123,12 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 		v.addValidation("name", Validator.NO_BLANKS);
-		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+				2000);
+		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
 
 		String calendaredVisitType = fp.getString("type");
 		if ("calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
@@ -213,7 +217,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 		ArrayList edcs = (ArrayList) request.getSession().getAttribute("eventDefinitionCRFs");
 		ArrayList childEdcs = (ArrayList) request.getSession().getAttribute("childEventDefCRFs");
 
-		SignStateRestorer signStateRestorer = (SignStateRestorer) request.getSession().getAttribute("signStateRestorer");
+		SignStateRestorer signStateRestorer = (SignStateRestorer) request.getSession()
+				.getAttribute("signStateRestorer");
 
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 		logger.info("Definition bean to be updated:" + sed.getName() + sed.getCategory());
@@ -225,7 +230,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(getDataSource());
 		EventDefinitionCRFDAO eventDefinitionCrfDAO = new EventDefinitionCRFDAO(getDataSource());
-		DAOWrapper daoWrapper = new DAOWrapper(sdao, sedao, studySubjectDAO, eventCRFDAO, eventDefinitionCrfDAO, dndao);
+		DAOWrapper daoWrapper = new DAOWrapper(sdao, getCRFVersionDAO(), sedao, studySubjectDAO, eventCRFDAO,
+				eventDefinitionCrfDAO, dndao);
 
 		StudyBean study = (StudyBean) sdao.findByPK(sed.getStudyId());
 
@@ -266,7 +272,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 		ArrayList<StudyEventBean> studyEventList = (ArrayList<StudyEventBean>) sedao
 				.findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved(study, sed.getId());
-		SubjectEventStatusUtil.determineSubjectEventStates(studyEventList, study, daoWrapper, signStateRestorer);
+		SubjectEventStatusUtil.determineSubjectEventStates(studyEventList, daoWrapper, signStateRestorer);
 
 		clearSession(request.getSession());
 
@@ -274,8 +280,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 		forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 	}
 
-	private void updateChildEdcs(HttpServletRequest request, ArrayList childEdcs, UserAccountBean ub, EventDefinitionCRFDAO cdao,
-			StudyBean currentStudy, StudyEventDefinitionBean sed) {
+	private void updateChildEdcs(HttpServletRequest request, ArrayList childEdcs, UserAccountBean ub,
+			EventDefinitionCRFDAO cdao, StudyBean currentStudy, StudyEventDefinitionBean sed) {
 		for (Object childEdc1 : childEdcs) {
 			EventDefinitionCRFBean childEdc = (EventDefinitionCRFBean) childEdc1;
 			if (childEdc.getId() > 0) {
@@ -293,7 +299,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 		}
 	}
 
-	public void removeAllEventsItems(StudyBean currentStudy, UserAccountBean ub, EventDefinitionCRFBean edc, StudyEventDefinitionBean sed) {
+	public void removeAllEventsItems(StudyBean currentStudy, UserAccountBean ub, EventDefinitionCRFBean edc,
+			StudyEventDefinitionBean sed) {
 		StudyEventDAO seDao = new StudyEventDAO(getDataSource());
 		EventCRFDAO ecrfDao = new EventCRFDAO(getDataSource());
 		ItemDataDAO iddao = new ItemDataDAO(getDataSource());

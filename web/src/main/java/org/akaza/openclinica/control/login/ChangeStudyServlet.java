@@ -59,7 +59,8 @@ import java.util.HashMap;
 public class ChangeStudyServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 	}
 
 	@Override
@@ -155,7 +156,8 @@ public class ChangeStudyServlet extends Controller {
 
 		ArrayList studyParameters = spvdao.findParamConfigByStudy(current);
 		current.setStudyParameters(studyParameters);
-		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
+				.getId();
 		StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
 		current.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
 		String idSetting = current.getStudyParameterConfig().getSubjectIdGeneration();
@@ -186,8 +188,10 @@ public class ChangeStudyServlet extends Controller {
 			ub.setUpdatedDate(new java.util.Date());
 			udao.update(ub);
 
-			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
-			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled(EVALUATION_ENABLED, currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
+					.getId();
+			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled(EVALUATION_ENABLED,
+					currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
 			request.getSession().setAttribute(EVALUATION_ENABLED, isEvaluationEnabled);
 
 			currentRole = (StudyUserRoleBean) request.getSession().getAttribute("studyWithRole");
@@ -292,6 +296,7 @@ public class ChangeStudyServlet extends Controller {
 		factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
 		factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
 		factory.setStudyDAO(getStudyDAO());
+		factory.setCrfVersionDAO(getCRFVersionDAO());
 		factory.setCurrentRole(currentRole);
 		factory.setCurrentUser(ub);
 		factory.setEventCRFDAO(getEventCRFDAO());

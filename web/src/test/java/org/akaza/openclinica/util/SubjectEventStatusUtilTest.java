@@ -8,12 +8,16 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +28,8 @@ import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings({ "rawtypes" })
 public class SubjectEventStatusUtilTest {
+	
+	private int idCounter = 1;
 
 	private ResourceBundle resword;
 
@@ -37,34 +43,54 @@ public class SubjectEventStatusUtilTest {
 
 	private List<EventDefinitionCRFBean> eventDefCrfs;
 
-	private int idCounter;
-	
 	@Before
 	public void setUp() throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en"));
 		resword = ResourceBundleProvider.getFormatBundle();
 		studyBean = new StudyBean();
+		studyBean.setId(1);
+		StudySubjectBean studySubjectBean = new StudySubjectBean();
+		studySubjectBean.setStudyId(1);
 		studyEventBean = new StudyEventBean();
 		studyEventBean.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+		studyEventBean.setStudySubjectId(1);
+		studyEventBean.setStudyEventDefinitionId(1);
 		daoWrapper = Mockito.mock(DAOWrapper.class);
-		EventCRFDAO eventCRFDAO = Mockito.mock(EventCRFDAO.class);
+		StudyDAO studyDao = Mockito.mock(StudyDAO.class);
+		CRFVersionDAO crfVersionDao = Mockito.mock(CRFVersionDAO.class);
+		EventCRFDAO eventCRFDao = Mockito.mock(EventCRFDAO.class);
+		StudySubjectDAO studySubjectDao = Mockito.mock(StudySubjectDAO.class);
 		EventDefinitionCRFDAO eventDefinitionCRFDAO = Mockito.mock(EventDefinitionCRFDAO.class);
-		Mockito.when(daoWrapper.getEcdao()).thenReturn(eventCRFDAO);
+		Mockito.when(daoWrapper.getCvdao()).thenReturn(crfVersionDao);
+		Mockito.when(daoWrapper.getSdao()).thenReturn(studyDao);
+		Mockito.when(daoWrapper.getEcdao()).thenReturn(eventCRFDao);
+		Mockito.when(daoWrapper.getSsdao()).thenReturn(studySubjectDao);
 		Mockito.when(daoWrapper.getEdcdao()).thenReturn(eventDefinitionCRFDAO);
 		eventCrfList = new ArrayList<EventCRFBean>();
 		eventDefCrfs = new ArrayList<EventDefinitionCRFBean>();
+		PowerMockito.whenNew(CRFVersionDAO.class).withAnyArguments().thenReturn(crfVersionDao);
+		Mockito.when(daoWrapper.getSdao().findByPK(1)).thenReturn(studyBean);
+		Mockito.when(daoWrapper.getSsdao().findByPK(1)).thenReturn(studySubjectBean);
 		Mockito.when(daoWrapper.getEcdao().findAllByStudyEvent(studyEventBean)).thenReturn((ArrayList) eventCrfList);
 		Mockito.when(daoWrapper.getEdcdao().findAllByDefinition(studyBean, studyEventBean.getStudyEventDefinitionId()))
 				.thenReturn((ArrayList) eventDefCrfs);
 	}
 
 	private EventDefinitionCRFBean getEventDefinitionCRFBean(Status status, boolean required, SourceDataVerification sdv) {
+		return getEventDefinitionCRFBean(status, required, false, sdv);
+	}
+
+	private EventDefinitionCRFBean getEventDefinitionCRFBean(Status status, boolean required, boolean hideCrf,
+			SourceDataVerification sdv) {
 		EventDefinitionCRFBean edcb = new EventDefinitionCRFBean();
+		edcb.setActive(true);
 		edcb.setId(idCounter);
 		edcb.setStatus(status);
+		edcb.setHideCrf(hideCrf);
+		edcb.setCrfId(idCounter);
 		edcb.setRequiredCRF(required);
+		edcb.setStudyEventDefinitionId(1);
 		edcb.setSourceDataVerification(sdv);
-		edcb.setActive(true);
 		return edcb;
 	}
 
@@ -72,6 +98,7 @@ public class SubjectEventStatusUtilTest {
 		EventCRFBean ecb = new EventCRFBean();
 		ecb.setActive(true);
 		ecb.setStatus(status);
+		ecb.setStudyEventId(1);
 		ecb.setSdvStatus(sdvStatus);
 		ecb.setCRFVersionId(idCounter);
 		ecb.setNotStarted(notStarted);
@@ -80,11 +107,18 @@ public class SubjectEventStatusUtilTest {
 
 	private void prepareEventCRFBeanAndEventDefinitionCRFBean(EventCRFBean eventCRFBean,
 			EventDefinitionCRFBean eventDefinitionCRFBean) {
+		Mockito.when(daoWrapper.getCvdao().getCRFIdFromCRFVersionId(idCounter)).thenReturn(idCounter);
 		idCounter++;
 		eventCrfList.add(eventCRFBean);
 		eventDefCrfs.add(eventDefinitionCRFBean);
 		Mockito.when(
 				daoWrapper.getEdcdao().findByStudyEventIdAndCRFVersionId(studyBean, studyEventBean.getId(),
+						eventCRFBean.getCRFVersionId())).thenReturn(eventDefinitionCRFBean);
+		Mockito.when(
+				daoWrapper.getEdcdao().findAllActiveByEventDefinitionId(studyBean,
+						eventDefinitionCRFBean.getStudyEventDefinitionId())).thenReturn(eventDefCrfs);
+		Mockito.when(
+				daoWrapper.getEdcdao().findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(),
 						eventCRFBean.getCRFVersionId())).thenReturn(eventDefinitionCRFBean);
 	}
 
@@ -105,7 +139,7 @@ public class SubjectEventStatusUtilTest {
 		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
 				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
 		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.imageIconPaths.get(SubjectEventStatus.SCHEDULED.getId())));
+				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.SCHEDULED.getId())));
 	}
 
 	@Test
@@ -119,7 +153,7 @@ public class SubjectEventStatusUtilTest {
 		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
 				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
 		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.imageIconPaths.get(SubjectEventStatus.DATA_ENTRY_STARTED.getId())));
+				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.DATA_ENTRY_STARTED.getId())));
 	}
 
 	@Test
@@ -133,7 +167,7 @@ public class SubjectEventStatusUtilTest {
 		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
 				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
 		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.imageIconPaths.get(SubjectEventStatus.COMPLETED.getId())));
+				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.COMPLETED.getId())));
 	}
 
 	@Test
@@ -147,7 +181,7 @@ public class SubjectEventStatusUtilTest {
 		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
 				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
 		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.imageIconPaths.get(SubjectEventStatus.SOURCE_DATA_VERIFIED.getId())));
+				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.SOURCE_DATA_VERIFIED.getId())));
 	}
 
 	@Test
@@ -160,8 +194,8 @@ public class SubjectEventStatusUtilTest {
 		StringBuilder url = new StringBuilder();
 		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
 				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
-		assertTrue(url.toString()
-				.contains(SubjectEventStatusUtil.imageIconPaths.get(SubjectEventStatus.SIGNED.getId())));
+		assertTrue(url.toString().contains(
+				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.SIGNED.getId())));
 	}
 
 	@Test
@@ -174,8 +208,8 @@ public class SubjectEventStatusUtilTest {
 		StringBuilder url = new StringBuilder();
 		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
 				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
-		assertTrue(url.toString()
-				.contains(SubjectEventStatusUtil.imageIconPaths.get(SubjectEventStatus.LOCKED.getId())));
+		assertTrue(url.toString().contains(
+				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.LOCKED.getId())));
 	}
 
 	@Test
@@ -189,7 +223,7 @@ public class SubjectEventStatusUtilTest {
 		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
 				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
 		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.imageIconPaths.get(SubjectEventStatus.REMOVED.getId())));
+				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.REMOVED.getId())));
 	}
 
 	@Test
@@ -203,7 +237,7 @@ public class SubjectEventStatusUtilTest {
 		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
 				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
 		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.imageIconPaths.get(SubjectEventStatus.SKIPPED.getId())));
+				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.SKIPPED.getId())));
 	}
 
 	@Test
@@ -217,7 +251,7 @@ public class SubjectEventStatusUtilTest {
 		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
 				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
 		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.imageIconPaths.get(SubjectEventStatus.STOPPED.getId())));
+				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.STOPPED.getId())));
 	}
 
 	@Test
@@ -228,7 +262,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, true, SourceDataVerification.AllREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, false),
 				getEventDefinitionCRFBean(Status.AVAILABLE, true, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED));
 	}
 
@@ -240,7 +274,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, true, SourceDataVerification.AllREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, false),
 				getEventDefinitionCRFBean(Status.AVAILABLE, true, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED));
 	}
 
@@ -252,7 +286,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.AllREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, false),
 				getEventDefinitionCRFBean(Status.AVAILABLE, true, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED));
 	}
 
@@ -264,7 +298,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.AVAILABLE, true, false),
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED));
 	}
 
@@ -276,7 +310,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, false),
 				getEventDefinitionCRFBean(Status.AVAILABLE, true, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED));
 	}
 
@@ -288,7 +322,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, false),
 				getEventDefinitionCRFBean(Status.AVAILABLE, true, SourceDataVerification.AllREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED));
 	}
 
@@ -300,7 +334,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, false),
 				getEventDefinitionCRFBean(Status.AVAILABLE, true, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED));
 	}
 
@@ -312,7 +346,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.AVAILABLE, false, false),
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED));
 	}
 
@@ -324,7 +358,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.AllREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, true),
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.AllREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED));
 	}
 
@@ -336,7 +370,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.AllREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, true),
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.AllREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED));
 	}
 
@@ -348,7 +382,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.AllREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, true),
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.AllREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED));
 	}
 
@@ -360,7 +394,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.SIGNED, false, true),
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED));
 	}
 
@@ -372,7 +406,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, true),
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED));
 	}
 
@@ -384,7 +418,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, true),
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED));
 	}
 
@@ -396,7 +430,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, true),
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED));
 	}
 
@@ -408,7 +442,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, true, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, true),
 				getEventDefinitionCRFBean(Status.AVAILABLE, true, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED));
 	}
 
@@ -420,7 +454,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, true),
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED));
 	}
 
@@ -432,7 +466,7 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, false),
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.PARTIALREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED));
 	}
 
@@ -444,7 +478,21 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
 		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, false),
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.PARTIALREQUIRED));
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
+		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED));
+	}
+
+	@Test
+	public void testCase20ThatChecksThatStudyEventBeanStatusIsDES() {
+		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.AVAILABLE, false, false),
+				getEventDefinitionCRFBean(Status.AVAILABLE, true, SourceDataVerification.NOTREQUIRED));
+		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, true),
+				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
+		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, true),
+				getEventDefinitionCRFBean(Status.AVAILABLE, false, SourceDataVerification.NOTREQUIRED));
+		prepareEventCRFBeanAndEventDefinitionCRFBean(getEventCRFBean(Status.UNAVAILABLE, false, true),
+				getEventDefinitionCRFBean(Status.AVAILABLE, false, true, SourceDataVerification.NOTREQUIRED));
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED));
 	}
 }

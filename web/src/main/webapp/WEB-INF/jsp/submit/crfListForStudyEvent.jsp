@@ -501,6 +501,7 @@
                             </td>
 
                             <td class="table_cell_left" style="vertical-align: middle;">
+                                <div class="<c:if test='${dec.eventDefinitionCRF.hideCrf and study.parentStudyId > 0}'>hidden</c:if>">
                                 <c:set var="actionQuery" value="" />
                                 <c:if test="${(study.status.available) && dec.continueInitialDataEntryPermitted}">
                                   <c:set var="actionQuery" value="InitialDataEntry?eventCRFId=${dec.eventCRF.id}" />
@@ -644,6 +645,7 @@
             							</c:when>
             						</c:choose>
                             	</c:if>
+                                </div>
                             </td>
                         </tr>
                         <c:set var="rowCount" value="${rowCount + 1}" />

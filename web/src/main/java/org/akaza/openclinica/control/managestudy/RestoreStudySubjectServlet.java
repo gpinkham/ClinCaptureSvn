@@ -56,16 +56,16 @@ import java.util.Date;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class RestoreStudySubjectServlet extends Controller {
-	
+
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
 
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_locked"), request, response);
 		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_frozen"), request, response);
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
@@ -73,8 +73,9 @@ public class RestoreStudySubjectServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -83,8 +84,8 @@ public class RestoreStudySubjectServlet extends Controller {
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        UserAccountBean currentUser = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		UserAccountBean currentUser = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String studySubIdString = request.getParameter("id");
 		String subIdString = request.getParameter("subjectId");
@@ -116,13 +117,14 @@ public class RestoreStudySubjectServlet extends Controller {
 
 			// find study events
 			StudyEventDAO sedao = getStudyEventDAO();
-			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, getDataSource(),
-					currentUser, currentRole, false);
+			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub,
+					getDataSource(), currentUser, currentRole, false);
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (studySub.getStatus().equals(Status.AVAILABLE)) {
-					addPageMessage(respage.getString("this_subject_is_already_available_for_study") + " "
-							+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					addPageMessage(
+							respage.getString("this_subject_is_already_available_for_study") + " "
+									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
 					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 					return;
 				}
@@ -141,33 +143,39 @@ public class RestoreStudySubjectServlet extends Controller {
 				studySub.setUpdatedDate(new Date());
 				subdao.update(studySub);
 
-				EventCRFDAO ecdao =  getEventCRFDAO();
+				EventCRFDAO ecdao = getEventCRFDAO();
 
 				// restore all study events
-                for (DisplayStudyEventBean dispEvent : displayEvents) {
+				for (DisplayStudyEventBean dispEvent : displayEvents) {
 
-                    StudyEventBean event = dispEvent.getStudyEvent();
-                    if (event.getStatus().equals(Status.AUTO_DELETED)) {
-                        event.setStatus(Status.AVAILABLE);
-                        event.setUpdater(currentUser);
-                        event.setUpdatedDate(new Date());
-                        sedao.update(event);
+					StudyEventBean event = dispEvent.getStudyEvent();
+					if (event.getStatus().equals(Status.AUTO_DELETED)) {
+						event.setStatus(Status.AVAILABLE);
+						event.setUpdater(currentUser);
+						event.setUpdatedDate(new Date());
+						sedao.update(event);
 
 						ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
 						getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
 
-						SubjectEventStatusUtil.determineSubjectEventState(event, study, eventCRFs, new DAOWrapper(studydao,
-								sedao, subdao, ecdao, edcdao, discDao));
-                    }
-                }
+						SubjectEventStatusUtil.determineSubjectEventState(event, eventCRFs, new DAOWrapper(studydao,
+								getCRFVersionDAO(), sedao, subdao, ecdao, edcdao, discDao));
+					}
+				}
 
-				String emailBody = new StringBuilder("").append(respage.getString("the_subject")).append(" ").append(studySub.getLabel()).append(" ")
-						.append((study.isSite(study.getParentStudyId()) ? respage.getString("has_been_restored_to_the_site") : respage.getString("has_been_restored_to_the_study")))
-						.append(" ").append(study.getName()).append(".").toString();
+				String emailBody = new StringBuilder("")
+						.append(respage.getString("the_subject"))
+						.append(" ")
+						.append(studySub.getLabel())
+						.append(" ")
+						.append((study.isSite(study.getParentStudyId()) ? respage
+								.getString("has_been_restored_to_the_site") : respage
+								.getString("has_been_restored_to_the_study"))).append(" ").append(study.getName())
+						.append(".").toString();
 
 				addPageMessage(emailBody, request);
-				
+
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			}
 		}

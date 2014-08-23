@@ -22,7 +22,6 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
@@ -34,6 +33,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.util.DAOWrapper;
@@ -56,8 +56,10 @@ import java.util.Date;
 @Component
 public class RestoreSubjectServlet extends Controller {
 	/**
-	 * @param request  HttpServletRequest
-	 * @param response HttpServletResponse
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -72,8 +74,9 @@ public class RestoreSubjectServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
@@ -127,6 +130,7 @@ public class RestoreSubjectServlet extends Controller {
 				}
 
 				EventCRFDAO ecdao = getEventCRFDAO();
+				CRFVersionDAO cvdao = getCRFVersionDAO();
 				StudySubjectDAO subdao = getStudySubjectDAO();
 				EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 				DiscrepancyNoteDAO discDao = getDiscrepancyNoteDAO();
@@ -143,15 +147,14 @@ public class RestoreSubjectServlet extends Controller {
 
 						getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
 
-						StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(event.getStudySubjectId());
-						StudyBean study = (StudyBean) studydao.findByPK(studySub.getStudyId());
-						SubjectEventStatusUtil.determineSubjectEventState(event, study, eventCRFs, new DAOWrapper(
-								studydao, sedao, subdao, ecdao, edcdao, discDao));
+						SubjectEventStatusUtil.determineSubjectEventState(event, eventCRFs, new DAOWrapper(studydao,
+								cvdao, sedao, subdao, ecdao, edcdao, discDao));
 					}
 				}
 
 				String emailBody = new StringBuilder("").append(respage.getString("the_subject"))
-						.append(subject.getName()).append(" ").append(respage.getString("has_been_restored_succesfully")).toString();
+						.append(subject.getName()).append(" ")
+						.append(respage.getString("has_been_restored_succesfully")).toString();
 
 				addPageMessage(emailBody, request);
 

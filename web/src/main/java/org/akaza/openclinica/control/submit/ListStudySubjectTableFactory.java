@@ -334,8 +334,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					studySubjectBean);
 			HashMap<Integer, List<StudyEventBean>> allStudyEventsForStudySubjectBySedId = new HashMap<Integer, List<StudyEventBean>>();
 			theItem.put("isSignable", SignUtil.permitSign(studySubjectBean, new DAOWrapper(getStudyDAO(),
-					getStudyEventDAO(), getStudySubjectDAO(), getEventCRFDAO(), getEventDefintionCRFDAO(),
-					getDiscrepancyNoteDAO())));
+					getCrfVersionDAO(), getStudyEventDAO(), getStudySubjectDAO(), getEventCRFDAO(),
+					getEventDefintionCRFDAO(), getDiscrepancyNoteDAO())));
 
 			for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
 				if (allStudyEventsForStudySubjectBySedId.get(studyEventBean.getStudyEventDefinitionId()) == null) {

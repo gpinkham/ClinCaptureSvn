@@ -79,7 +79,7 @@ import java.util.Map;
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class SignStudySubjectServlet extends Controller {
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -109,11 +109,17 @@ public class SignStudySubjectServlet extends Controller {
 
 	/**
 	 * Gets display study events for study subject.
-	 * @param study study to use
-	 * @param studySub study subject to use
-	 * @param ds DataSource to use
-	 * @param ub current user
-	 * @param currentRole current user's role in study
+	 * 
+	 * @param study
+	 *            study to use
+	 * @param studySub
+	 *            study subject to use
+	 * @param ds
+	 *            DataSource to use
+	 * @param ub
+	 *            current user
+	 * @param currentRole
+	 *            current user's role in study
 	 * @return list of display study events
 	 */
 	public static ArrayList getDisplayStudyEventsForStudySubject(StudyBean study, StudySubjectBean studySub,
@@ -158,9 +164,13 @@ public class SignStudySubjectServlet extends Controller {
 
 	/**
 	 * Signs subject events.
-	 * @param studySub study subject to be used
-	 * @param ds DataSource to be used
-	 * @param ub current user
+	 * 
+	 * @param studySub
+	 *            study subject to be used
+	 * @param ds
+	 *            DataSource to be used
+	 * @param ub
+	 *            current user
 	 * @return true if signing was successful; false otherwise
 	 */
 	public static boolean signSubjectEvents(StudySubjectBean studySub, DataSource ds, UserAccountBean ub) {
@@ -197,9 +207,9 @@ public class SignStudySubjectServlet extends Controller {
 		final int five = 5;
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
-		SubjectDAO sdao = new SubjectDAO(getDataSource());		
+		SubjectDAO sdao = new SubjectDAO(getDataSource());
 		FormProcessor fp = new FormProcessor(request);
-		String action = fp.getString("action"); 
+		String action = fp.getString("action");
 		int studySubId = fp.getInt("id", true); // studySubjectId
 		String module = fp.getString(MODULE);
 		request.setAttribute(MODULE, module);
@@ -209,7 +219,8 @@ public class SignStudySubjectServlet extends Controller {
 			return;
 		}
 		StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
-		if (!SignUtil.permitSign(studySub, new DAOWrapper(studyDao, sedao, subdao, ecdao, edcdao, dndao))) {
+		if (!SignUtil.permitSign(studySub, new DAOWrapper(studyDao, getCRFVersionDAO(), sedao, subdao, ecdao, edcdao,
+				dndao))) {
 			addPageMessage(respage.getString("subject_event_cannot_signed"), request);
 			// for navigation purpose (to avoid double url in stack)
 			request.getSession().setAttribute("skipURL", "true");
@@ -217,13 +228,12 @@ public class SignStudySubjectServlet extends Controller {
 			return;
 		}
 		if (action.equalsIgnoreCase("confirm")) {
-			Page forwardPage = authenticateUser(request, response, ub, subdao, studySubId,
-					studySub);
+			Page forwardPage = authenticateUser(request, response, ub, subdao, studySubId, studySub);
 			if (forwardPage != null) {
 				forwardPage(forwardPage, request, response);
 			}
 		}
-		request.setAttribute("studySub", studySub);		
+		request.setAttribute("studySub", studySub);
 		int studyId = studySub.getStudyId();
 		int subjectId = studySub.getSubjectId();
 		SubjectBean subject = (SubjectBean) sdao.findByPK(subjectId);
@@ -321,8 +331,7 @@ public class SignStudySubjectServlet extends Controller {
 		forwardPage(Page.SIGN_STUDY_SUBJECT, request, response);
 	}
 
-	Page authenticateUser(HttpServletRequest request,
-			HttpServletResponse response, UserAccountBean ub,
+	Page authenticateUser(HttpServletRequest request, HttpServletResponse response, UserAccountBean ub,
 			StudySubjectDAO subdao, int studySubId, StudySubjectBean studySub) {
 		String username = request.getParameter("j_user");
 		String password = request.getParameter("j_pass");
@@ -351,12 +360,19 @@ public class SignStudySubjectServlet extends Controller {
 	/**
 	 * Each of the event CRFs with its corresponding CRFBean. Then generates a list of DisplayEventCRFBeans, one for
 	 * each event CRF.
-	 * @param study current study
-	 * @param ds DataSource to be used.
-	 * @param eventCRFs the list of event CRFs for this study event.
-	 * @param ub current user
-	 * @param currentRole user's role in current study
-	 * @param status the subject event status
+	 * 
+	 * @param study
+	 *            current study
+	 * @param ds
+	 *            DataSource to be used.
+	 * @param eventCRFs
+	 *            the list of event CRFs for this study event.
+	 * @param ub
+	 *            current user
+	 * @param currentRole
+	 *            user's role in current study
+	 * @param status
+	 *            the subject event status
 	 * @return The list of DisplayEventCRFBeans for this study event.
 	 */
 	public static ArrayList getDisplayEventCRFs(StudyBean study, DataSource ds, ArrayList<EventCRFBean> eventCRFs,
@@ -420,14 +436,14 @@ public class SignStudySubjectServlet extends Controller {
 	 * Finds all the event definitions for which no event CRF exists - which is the list of event definitions with
 	 * uncompleted event CRFs.
 	 * 
-	 * @param ds 
-	 * 		      DataSource to be used.
+	 * @param ds
+	 *            DataSource to be used.
 	 * @param eventDefinitionCRFs
 	 *            All of the event definition CRFs for this study event.
 	 * @param eventCRFs
 	 *            All of the event CRFs for this study event.
 	 * @param status
-	 *  		  subject event status
+	 *            subject event status
 	 * @return The list of event definitions for which no event CRF exists.
 	 */
 	public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs,
@@ -491,8 +507,11 @@ public class SignStudySubjectServlet extends Controller {
 
 	/**
 	 * Populates uncompleted crfs with crf and versions.
-	 * @param ds DataSource to be used.
-	 * @param uncompletedEventDefinitionCRFs list of uncompleted CRFs
+	 * 
+	 * @param ds
+	 *            DataSource to be used.
+	 * @param uncompletedEventDefinitionCRFs
+	 *            list of uncompleted CRFs
 	 */
 	public static void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, ArrayList uncompletedEventDefinitionCRFs) {
 		CRFDAO cdao = new CRFDAO(ds);
@@ -523,8 +542,11 @@ public class SignStudySubjectServlet extends Controller {
 
 	/**
 	 * Deteremines whether current user has access to this page.
-	 * @param request HttpServletRequest to be used.
-	 * @throws InsufficientPermissionException thrown if users is not permitted to access page.
+	 * 
+	 * @param request
+	 *            HttpServletRequest to be used.
+	 * @throws InsufficientPermissionException
+	 *             thrown if users is not permitted to access page.
 	 */
 	public void mayAccess(HttpServletRequest request) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);

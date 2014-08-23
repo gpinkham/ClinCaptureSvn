@@ -445,6 +445,7 @@ public class MainMenuServlet extends Controller {
 		factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
 		factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
 		factory.setStudyDAO(getStudyDAO());
+		factory.setCrfVersionDAO(getCRFVersionDAO());
 		factory.setCurrentRole(currentRole);
 		factory.setCurrentUser(ub);
 		factory.setEventCRFDAO(getEventCRFDAO());

@@ -15,30 +15,6 @@ package org.akaza.openclinica.web.job;
 
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.util.ValidatorHelper;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.sql.Connection;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.sql.DataSource;
-import javax.xml.bind.JAXBContext;
-import javax.xml.transform.sax.SAXSource;
-
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -70,6 +46,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -101,6 +78,28 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
+
+import javax.sql.DataSource;
+import javax.xml.bind.JAXBContext;
+import javax.xml.transform.sax.SAXSource;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Connection;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * Import Spring Job, a job running asynchronously on the Tomcat server using Spring and Quartz.
@@ -146,6 +145,7 @@ public class ImportSpringJob extends QuartzJobBean {
 
 	private StudyDAO sdao;
 	private EventCRFDAO ecdao;
+	private CRFVersionDAO cvdao;
 	private StudyEventDAO sedao;
 	private StudySubjectDAO ssdao;
 	private ItemDataDAO itemDataDao;
@@ -208,6 +208,7 @@ public class ImportSpringJob extends QuartzJobBean {
 
 			sdao = new StudyDAO(dataSource);
 			ecdao = new EventCRFDAO(dataSource);
+			cvdao = new CRFVersionDAO(dataSource);
 			sedao = new StudyEventDAO(dataSource);
 			ssdao = new StudySubjectDAO(dataSource);
 			itemDataDao = new ItemDataDAO(dataSource);
@@ -418,8 +419,10 @@ public class ImportSpringJob extends QuartzJobBean {
 			SAXSource saxSource = new SAXSource(namespaceFilter, inputSource);
 			try {
 				odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
-				logger.debug("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
-				logger.debug("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
+				logger.debug("Found crf data container for study oid: "
+						+ odmContainer.getCrfDataPostImportContainer().getStudyOID());
+				logger.debug("found length of subject list: "
+						+ odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
 			} catch (Exception me1) {
 
 				MessageFormat mf = new MessageFormat("");
@@ -698,11 +701,9 @@ public class ImportSpringJob extends QuartzJobBean {
 				for (int studyEventId : studyEventIds) {
 					if (studyEventId > 0) {
 						StudyEventBean seb = (StudyEventBean) sedao.findByPK(studyEventId);
-						StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
-						StudyBean sb = (StudyBean) sdao.findByPK(ssb.getStudyId());
 
-						SubjectEventStatusUtil.determineSubjectEventState(seb, sb, new DAOWrapper(sdao, sedao, ssdao,
-								ecdao, edcdao, dndao));
+						SubjectEventStatusUtil.determineSubjectEventState(seb, new DAOWrapper(sdao, cvdao, sedao,
+								ssdao, ecdao, edcdao, dndao));
 
 						seb.setUpdatedDate(new Date());
 						seb.setUpdater(ub);

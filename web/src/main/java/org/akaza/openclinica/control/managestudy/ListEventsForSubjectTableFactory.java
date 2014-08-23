@@ -278,8 +278,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			theItem.put("subject.charGender", subjectBean.getGender());
 
 			theItem.put("isSignable", SignUtil.permitSign(studySubjectBean, new DAOWrapper(getStudyDAO(),
-					getStudyEventDAO(), getStudySubjectDAO(), getEventCRFDAO(), getEventDefintionCRFDAO(),
-					getDiscrepancyNoteDAO())));
+					getCRFVersionDAO(), getStudyEventDAO(), getStudySubjectDAO(), getEventCRFDAO(),
+					getEventDefintionCRFDAO(), getDiscrepancyNoteDAO())));
 
 			// study group classes
 			SubjectGroupMapBean subjectGroupMapBean;

@@ -20,12 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.util.Date;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -38,6 +32,11 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Servlet for creating subject matrix page.
@@ -53,7 +52,8 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -62,13 +62,17 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		}
 
 		if (currentRole != null
-				&& (currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
-				|| currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.INVESTIGATOR)
-				|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || currentRole.getRole().equals(Role.STUDY_MONITOR))) {
+				&& (currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR)
+						|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
+						|| currentRole.getRole().equals(Role.STUDY_DIRECTOR)
+						|| currentRole.getRole().equals(Role.INVESTIGATOR)
+						|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || currentRole.getRole()
+						.equals(Role.STUDY_MONITOR))) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
@@ -145,6 +149,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
 		factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
 		factory.setStudyDAO(getStudyDAO());
+		factory.setCrfVersionDAO(getCRFVersionDAO());
 		factory.setCurrentRole(currentRole);
 		factory.setCurrentUser(ub);
 		factory.setEventCRFDAO(getEventCRFDAO());
@@ -179,14 +184,17 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		FormProcessor fp = new FormProcessor(request);
 		showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
 		String savedUrl = (String) request.getSession().getAttribute(SAVED_LAST_VISITED_PAGE_URL);
-		savedUrl = savedUrl != null ? savedUrl.replaceAll(".*" + request.getContextPath() + "/ListStudySubjects", "") : null;
+		savedUrl = savedUrl != null ? savedUrl.replaceAll(".*" + request.getContextPath() + "/ListStudySubjects", "")
+				: null;
 		return request.getMethod().equalsIgnoreCase("POST") && savedUrl != null ? savedUrl : "?module="
 				+ fp.getString("module")
 				+ "&maxRows=15&showMoreLink="
 				+ showMoreLink
-				+ "&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_=" + getPageSize(request) + "&findSubjects_s_0_studySubject.createdDate=desc"
-				+ (fp.getString("navBar").equalsIgnoreCase("yes") ? ("&findSubjects_f_studySubject.label="
-				+ fp .getString("findSubjects_f_studySubject.label")) : "");
+				+ "&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_="
+				+ getPageSize(request)
+				+ "&findSubjects_s_0_studySubject.createdDate=desc"
+				+ (fp.getString("navBar").equalsIgnoreCase("yes") ? ("&findSubjects_f_studySubject.label=" + fp
+						.getString("findSubjects_f_studySubject.label")) : "");
 	}
 
 	@Override
@@ -197,7 +205,8 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	@Override
 	protected void saveUrl(String key, String value, HttpServletRequest request) {
 		if (value != null) {
-			String pageSize = value.contains("findSubjects_mr_") ? value.replaceFirst(".*&findSubjects_mr_=(\\d{2,}).*", "$1") : "15";
+			String pageSize = value.contains("findSubjects_mr_") ? value.replaceFirst(
+					".*&findSubjects_mr_=(\\d{2,}).*", "$1") : "15";
 			request.getSession().setAttribute(SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX, pageSize);
 			request.getSession().setAttribute(key, value);
 		}
@@ -212,8 +221,8 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 
 		String savedUrl = (String) request.getSession().getAttribute(key);
 
-		return savedUrl == null ? savedUrl : savedUrl.replaceFirst(
-				"&findSubjects_mr_=\\d{2,}&", "&findSubjects_mr_=" + getPageSize(request) + "&");
+		return savedUrl == null ? savedUrl : savedUrl.replaceFirst("&findSubjects_mr_=\\d{2,}&", "&findSubjects_mr_="
+				+ getPageSize(request) + "&");
 	}
 
 	/**

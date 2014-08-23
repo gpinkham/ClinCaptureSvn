@@ -206,8 +206,8 @@ public class SDVUtil {
 
 		Limit limit = tableFacade.getLimit();
 		int pageNum = 0;
-		int maxRows = 0; 
-		//Store pageNum and maxRows if they already exist in limit
+		int maxRows = 0;
+		// Store pageNum and maxRows if they already exist in limit
 		if (limit.getRowSelect() != null) {
 			pageNum = limit.getRowSelect().getPage();
 			maxRows = limit.getRowSelect().getMaxRows();
@@ -218,15 +218,15 @@ public class SDVUtil {
 				.getAllowSdvWithOpenQueries()) ? false : true;
 		int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, currentStudy.getParentStudyId(),
 				allowSdvWithOpenQueries);
-		//If maxRows was previously set, we need to set it again in the tableFacade before we 
-		//setTotalRows
+		// If maxRows was previously set, we need to set it again in the tableFacade before we
+		// setTotalRows
 		if (maxRows > 0) {
 			tableFacade.setMaxRows(maxRows);
 		}
 		tableFacade.setTotalRows(totalRows);
-		//If pageNum was previously set, it might have been lost during the setTotalRows operation
-		//so we need to set it back
-		if (pageNum > 0) {			
+		// If pageNum was previously set, it might have been lost during the setTotalRows operation
+		// so we need to set it back
+		if (pageNum > 0) {
 			limit.getRowSelect().setPage(pageNum);
 		}
 
@@ -860,7 +860,8 @@ public class SDVUtil {
 						.append(ICON_FORSVN_SUFFIX).append("onclick=\"")
 						.append("this.form.method='GET'; this.form.action='").append(request.getContextPath())
 						.append("/pages/handleSDVGet").append("';").append("this.form.crfId.value='")
-						.append(crfBean.getId()).append("';").append("this.form.submit(); setAccessedObjected(this);").append("\" />");
+						.append(crfBean.getId()).append("';").append("this.form.submit(); setAccessedObjected(this);")
+						.append("\" />");
 			}
 
 			tempSDVBean.setSdvStatusActions(actions.toString());
@@ -875,13 +876,12 @@ public class SDVUtil {
 			int eventDefinitionCRFId, int crfVersionId) {
 
 		HtmlBuilder html = new HtmlBuilder();
-		html.a().onclick(
-				"openDocWindow('" + request.getContextPath()
-						+ "/ViewSectionDataEntry?cw=1&eventDefinitionCRFId=&eventCRFId=" + eventDefinitionCRFId
-						+ "&tabId=1&studySubjectId=" + studySubjectId + "'); setAccessedObjected(this);")
-				.append(" data-cc-sdvCrfId='")
-				.append(eventDefinitionCRFId)
-				.append("'");
+		html.a()
+				.onclick(
+						"openDocWindow('" + request.getContextPath()
+								+ "/ViewSectionDataEntry?cw=1&eventDefinitionCRFId=&eventCRFId=" + eventDefinitionCRFId
+								+ "&tabId=1&studySubjectId=" + studySubjectId + "'); setAccessedObjected(this);")
+				.append(" data-cc-sdvCrfId='").append(eventDefinitionCRFId).append("'");
 		html.href("#").close();
 
 		/*
@@ -1008,8 +1008,8 @@ public class SDVUtil {
 
 	}
 
-	public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, int userId, boolean isSdvWithOpenQueriesAllowed,
-			boolean setVerification) {
+	public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, int userId,
+			boolean isSdvWithOpenQueriesAllowed, boolean setVerification) {
 
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
@@ -1017,13 +1017,14 @@ public class SDVUtil {
 		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		StudyDAO studyDAO = new StudyDAO(dataSource);
-		DAOWrapper daoWrapper = new DAOWrapper(studyDAO, studyEventDAO, studySubjectDAO, eventCRFDAO,
+		CRFVersionDAO cvdao = new CRFVersionDAO(dataSource);
+		DAOWrapper daoWrapper = new DAOWrapper(studyDAO, cvdao, studyEventDAO, studySubjectDAO, eventCRFDAO,
 				eventDefinitionCrfDAO, dndao);
 
 		if (studySubjectIds == null || studySubjectIds.isEmpty()) {
 			return true;
 		}
-		
+
 		List<Integer> exceptedEventCrfIdForSubjectList = new ArrayList<Integer>();
 		for (Integer studySubjectId : studySubjectIds) {
 			if (!isSdvWithOpenQueriesAllowed) {
@@ -1035,7 +1036,7 @@ public class SDVUtil {
 			for (EventCRFBean eventCRFBean : eventCrfs) {
 				if (!isSdvWithOpenQueriesAllowed && exceptedEventCrfIdForSubjectList.contains(eventCRFBean.getId()))
 					continue;
-				
+
 				try {
 					eventCRFDAO.setSDVStatus(setVerification, userId, eventCRFBean.getId());
 				} catch (Exception exc) {
@@ -1047,7 +1048,7 @@ public class SDVUtil {
 			studySubjectDAO.update(studySubject);
 
 			List<StudyEventBean> studyEvents = studyEventDAO.findAllByStudySubject(studySubject);
-			SubjectEventStatusUtil.determineSubjectEventStates(studyEvents, studyBean, daoWrapper, null);
+			SubjectEventStatusUtil.determineSubjectEventStates(studyEvents, daoWrapper, null);
 		}
 
 		return true;
@@ -1067,8 +1068,9 @@ public class SDVUtil {
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
 		StudyDAO studyDAO = new StudyDAO(dataSource);
+		CRFVersionDAO cvdao = new CRFVersionDAO(dataSource);
 		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
-		DAOWrapper daoWrapper = new DAOWrapper(studyDAO, studyEventDAO, studySubjectDAO, eventCRFDAO,
+		DAOWrapper daoWrapper = new DAOWrapper(studyDAO, cvdao, studyEventDAO, studySubjectDAO, eventCRFDAO,
 				eventDefinitionCRFDAO, dndao);
 
 		for (Integer eventCrfId : eventCRFIds) {
@@ -1078,10 +1080,9 @@ public class SDVUtil {
 				EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(eventCrfId);
 				StudyEventBean se = (StudyEventBean) studyEventDAO.findByPK(ec.getStudyEventId());
 				StudySubjectBean ss = (StudySubjectBean) studySubjectDAO.findByPK(se.getStudySubjectId());
-				StudyBean studyBean = (StudyBean) studyDAO.findByPK(ss.getStudyId());
 				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(se
 						.getStudyEventDefinitionId());
-				SubjectEventStatusUtil.determineSubjectEventStates(sed, ss, studyBean, daoWrapper);
+				SubjectEventStatusUtil.determineSubjectEventStates(sed, ss, daoWrapper);
 			} catch (Exception exc) {
 				System.out.println(exc.getMessage());
 				return false;

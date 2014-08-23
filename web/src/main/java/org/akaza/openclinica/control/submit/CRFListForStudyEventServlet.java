@@ -64,7 +64,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * copy of the EnterDataForStudyEventServlet
+ * copy of the EnterDataForStudyEventServlet.
  * 
  * @author ssachs
  */
@@ -92,15 +92,15 @@ public class CRFListForStudyEventServlet extends Controller {
 	// The study event has an existing discrepancy note related to its location
 	// property; this
 	// value will be saved as a request attribute
-	public final static String HAS_LOCATION_NOTE = "hasLocationNote";
+	public static final String HAS_LOCATION_NOTE = "hasLocationNote";
 	// The study event has an existing discrepancy note related to its start
 	// date property; this
 	// value will be saved as a request attribute
-	public final static String HAS_START_DATE_NOTE = "hasStartDateNote";
+	public static final String HAS_START_DATE_NOTE = "hasStartDateNote";
 	// The study event has an existing discrepancy note related to its end date
 	// property; this
 	// value will be saved as a request attribute
-	public final static String HAS_END_DATE_NOTE = "hasEndDateNote";
+	public static final String HAS_END_DATE_NOTE = "hasEndDateNote";
 
 	public static final String SHOW_SIGN_BUTTON = "showSignButton";
 
@@ -142,8 +142,7 @@ public class CRFListForStudyEventServlet extends Controller {
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
 		seb.setStudyEventDefinition(sedb);
-		if (!(currentRole.isSysAdmin() || currentRole.isStudyAdministrator())
-				&& seb.getSubjectEventStatus().isLocked()) {
+		if (!(currentRole.isSysAdmin() || currentRole.isStudyAdministrator()) && seb.getSubjectEventStatus().isLocked()) {
 			seb.setEditable(false);
 		}
 		return seb;
@@ -340,8 +339,8 @@ public class CRFListForStudyEventServlet extends Controller {
 
 		request.setAttribute("crfNDsMap", notedMap);
 
-		request.setAttribute("eventName", seb != null && seb.getStudyEventDefinition() != null ? seb
-				.getStudyEventDefinition().getDescription() : "");
+		request.setAttribute("eventName", seb.getStudyEventDefinition() != null ? seb.getStudyEventDefinition()
+				.getDescription() : "");
 
 		// this is for generating side info panel
 		request.setAttribute("beans", new ArrayList());
@@ -408,9 +407,11 @@ public class CRFListForStudyEventServlet extends Controller {
 			EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
 			int crfId = cvdao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
 			ArrayList idata = iddao.findAllByEventCRFId(ecrf.getId());
-			if (!idata.isEmpty()) {// this crf has data already
+			if (!idata.isEmpty()) {
+				// this crf has data already
 				completed.put(crfId, Boolean.TRUE);
-			} else {// event crf got created, but no data entered
+			} else {
+				// event crf got created, but no data entered
 				startedButIncompleted.put(crfId, ecrf);
 			}
 		}
