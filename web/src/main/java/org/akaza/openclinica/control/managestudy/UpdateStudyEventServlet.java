@@ -182,8 +182,8 @@ public class UpdateStudyEventServlet extends Controller {
 		if (studySubjectId > 0) {
 			ssub = (StudySubjectBean) ssdao.findByPK(studySubjectId);
 			request.setAttribute("studySubject", ssub);
-			request.setAttribute("id", studySubjectId + "");// for the workflow box, so it can link back to view study
-															// subject
+			request.setAttribute("id", studySubjectId + "");
+			// for the workflow box, so it can link back to view study subject
 		}
 
 		Status s = ssub.getStatus();
@@ -245,14 +245,12 @@ public class UpdateStudyEventServlet extends Controller {
 		// may not be populated, only entered crfs seem to ping the list
 		for (Object getAllECRF : getAllECRFs) {
 			EventDefinitionCRFBean ecrfBean = (EventDefinitionCRFBean) getAllECRF;
-
-			//
 			logger.info("found number of existing ecrfs: " + getECRFs.size());
 			if (getECRFs.size() == 0) {
 				statuses.remove(SubjectEventStatus.COMPLETED);
 				statuses.remove(SubjectEventStatus.LOCKED);
 
-			}// otherwise...
+			}
 			for (Object getECRF : getECRFs) {
 				EventCRFBean existingBean = (EventCRFBean) getECRF;
 				logger.info("***** found: " + existingBean.getCRFVersionId() + " " + existingBean.getCrf().getId()
@@ -309,22 +307,8 @@ public class UpdateStudyEventServlet extends Controller {
 				studyEvent.setSubjectEventStatus(ses);
 			}
 
-			ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
 			if (ses.equals(SubjectEventStatus.SKIPPED) || ses.equals(SubjectEventStatus.STOPPED)) {
 				studyEvent.setStatus(Status.UNAVAILABLE);
-				for (EventCRFBean ecb : eventCRFs) {
-					ecb.setOldStatus(ecb.getStatus());
-					ecb.setStatus(Status.UNAVAILABLE);
-					ecb.setUpdater(ub);
-					ecb.setUpdatedDate(new Date());
-					ecdao.update(ecb);
-				}
-			} else {
-				for (EventCRFBean ecb : eventCRFs) {
-					ecb.setUpdater(ub);
-					ecb.setUpdatedDate(new Date());
-					ecdao.update(ecb);
-				}
 			}
 
 			String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
@@ -368,7 +352,7 @@ public class UpdateStudyEventServlet extends Controller {
 
 			if (!errors.isEmpty()) {
 				setInputMessages(errors, request);
-				String prefixes[] = { INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX };
+				String[] prefixes = { INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX };
 				fp.setCurrentDateTimeValuesAsPreset(prefixes);
 				setPresetValues(fp.getPresetValues(), request);
 
@@ -408,7 +392,7 @@ public class UpdateStudyEventServlet extends Controller {
 				ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
 
 				ecdao = new EventCRFDAO(getDataSource());
-				eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
+				ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
 				SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
 
 				study = (StudyBean) sdao.findByPK(ssb.getStudyId());
@@ -524,8 +508,8 @@ public class UpdateStudyEventServlet extends Controller {
 
 				redirectToStudySubjectView(request, response, studySubjectId);
 			}
-		} else if (action.equalsIgnoreCase("confirm")) {// confirming the signed
-			// status
+		} else if (action.equalsIgnoreCase("confirm")) {
+			// confirming the signed status
 			String username = request.getParameter("j_user");
 			String password = request.getParameter("j_pass");
 			SecurityManager securityManager = getSecurityManager();
@@ -634,8 +618,8 @@ public class UpdateStudyEventServlet extends Controller {
 				presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
 			}
 
-			SimpleDateFormat local_df = getLocalDf(request);
-			String dateValue = local_df.format(studyEvent.getDateStarted());
+			SimpleDateFormat localDf = getLocalDf(request);
+			String dateValue = localDf.format(studyEvent.getDateStarted());
 			presetValues.put(INPUT_STARTDATE_PREFIX + "Date", dateValue);
 
 			presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", -1);
@@ -661,7 +645,7 @@ public class UpdateStudyEventServlet extends Controller {
 						break;
 					}
 				}
-				presetValues.put(INPUT_ENDDATE_PREFIX + "Date", local_df.format(studyEvent.getDateEnded()));
+				presetValues.put(INPUT_ENDDATE_PREFIX + "Date", localDf.format(studyEvent.getDateEnded()));
 			}
 
 			setPresetValues(presetValues, request);
@@ -706,9 +690,11 @@ public class UpdateStudyEventServlet extends Controller {
 			EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
 			int crfId = cvdao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
 			ArrayList idata = iddao.findAllByEventCRFId(ecrf.getId());
-			if (!idata.isEmpty()) {// this crf has data already
+			if (!idata.isEmpty()) {
+				// this crf has data already
 				completed.put(crfId, Boolean.TRUE);
-			} else {// event crf got created, but no data entered
+			} else {
+				// event crf got created, but no data entered
 				startedButIncompleted.put(crfId, ecrf);
 			}
 		}
