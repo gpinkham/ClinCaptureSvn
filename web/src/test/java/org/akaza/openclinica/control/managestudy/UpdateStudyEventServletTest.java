@@ -1,9 +1,19 @@
 package org.akaza.openclinica.control.managestudy;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -23,6 +33,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.SignUtil;
+import org.akaza.openclinica.util.StudyEventDefinitionUtil;
 import org.akaza.openclinica.view.Page;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,17 +49,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import static org.junit.Assert.assertFalse;
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ Status.class, ResourceBundleProvider.class, UpdateStudyEventServlet.class, FormProcessor.class,
-		StudySubjectDAO.class, SignUtil.class, DAOWrapper.class, StudyEventDefinitionDAO.class, EventCRFDAO.class })
+		StudySubjectDAO.class, SignUtil.class, DAOWrapper.class, StudyEventDefinitionDAO.class, EventCRFDAO.class,
+		StudyEventDefinitionUtil.class })
 public class UpdateStudyEventServletTest {
 
 	@Mock
@@ -101,6 +105,9 @@ public class UpdateStudyEventServletTest {
 	private StudyParameterConfig studyParameterConfig;
 
 	private String currentStudyLocked;
+	private List<Integer> studyEventDefinitionIds;
+	private List<StudyEventBean> studyEvents;
+	private StudySubjectBean studySubjectToUpdate;
 
 	@Before
 	public void setUp() throws Exception {
@@ -113,6 +120,7 @@ public class UpdateStudyEventServletTest {
 		PowerMockito.mockStatic(Status.class);
 		PowerMockito.mockStatic(SignUtil.class);
 		PowerMockito.mockStatic(ResourceBundleProvider.class);
+		PowerMockito.mockStatic(StudyEventDefinitionUtil.class);
 		PowerMockito.when(ResourceBundleProvider.getTermsBundle()).thenReturn(resterm);
 		PowerMockito.doCallRealMethod().when(updateStudyEventServlet).processRequest(request, response);
 		PowerMockito.doReturn(userAccountBean).when(updateStudyEventServlet).getUserAccountBean(request);
@@ -136,6 +144,37 @@ public class UpdateStudyEventServletTest {
 		PowerMockito.whenNew(EventCRFDAO.class).withAnyArguments().thenReturn(eventCRFDAO);
 		PowerMockito.whenNew(DAOWrapper.class).withAnyArguments().thenReturn(daoWrapper);
 		PowerMockito.when(SignUtil.permitSign(studyEventBean, studyBean, daoWrapper)).thenReturn(true);
+		initStudyEventLists();
+		studySubjectToUpdate = new StudySubjectBean();
+		PowerMockito
+				.doCallRealMethod()
+				.when(updateStudyEventServlet)
+				.updateStudySubjectStatus(studyEventDefinitionIds, studySubjectDAO, studySubjectToUpdate,
+						studyEventDAO, studyEventBean, studyBean, userAccountBean);
+		PowerMockito.doReturn(studySubjectBean).when(studySubjectDAO).update(studySubjectToUpdate);
+		PowerMockito.when(studyEventDAO.findAllByStudySubject(Mockito.any(StudySubjectBean.class))).thenReturn(
+				(ArrayList<StudyEventBean>) studyEvents);
+	}
+
+	private void initStudyEventLists() {
+		int index = 1;
+		int id = 0;
+		studyEventDefinitionIds = new ArrayList<Integer>();
+		studyEventDefinitionIds.add(index++);
+		studyEventDefinitionIds.add(index++);
+		studyEventDefinitionIds.add(index++);
+
+		index = 1;
+		studyEvents = new ArrayList<StudyEventBean>();
+		addStudyEventToList(id++, index++);
+		addStudyEventToList(id++, index++);
+		addStudyEventToList(id++, index++);
+	}
+
+	private void addStudyEventToList(int listIndex, int id) {
+		studyEvents.add(new StudyEventBean());
+		studyEvents.get(listIndex).setId(id);
+		studyEvents.get(listIndex).setStudyEventDefinitionId(id);
 	}
 
 	@Test
@@ -163,10 +202,33 @@ public class UpdateStudyEventServletTest {
 		PowerMockito.doReturn(1).when(studyEventBean).getStudyEventDefinitionId();
 		PowerMockito.when(
 				eventDefinitionCRFDAO.findAllByDefinition(studyBean, studyEventBean.getStudyEventDefinitionId()))
-				.thenReturn(new ArrayList());
+				.thenReturn(new ArrayList<EventDefinitionCRFBean>());
 		PowerMockito.doNothing().when(updateStudyEventServlet)
 				.checkStudyLocked(Page.MENU_SERVLET, currentStudyLocked, request, response);
 		updateStudyEventServlet.processRequest(request, response);
 		assertFalse(eventCRFBean.getStatus().equals(Status.UNAVAILABLE));
+	}
+
+	@Test
+	public void testThatUpdateStudySubjectStatusLocksStudySubject() throws Exception {
+		studyEvents.get(0).setSubjectEventStatus(SubjectEventStatus.LOCKED);
+		studyEvents.get(1).setSubjectEventStatus(SubjectEventStatus.LOCKED);
+		studyEvents.get(2).setSubjectEventStatus(SubjectEventStatus.LOCKED);
+		studySubjectToUpdate.setId(1);
+		studySubjectToUpdate.setStatus(Status.AVAILABLE);
+		updateStudyEventServlet.updateStudySubjectStatus(studyEventDefinitionIds, studySubjectDAO,
+				studySubjectToUpdate, studyEventDAO, studyEventBean, studyBean, userAccountBean);
+		assertEquals(Status.LOCKED, studySubjectToUpdate.getStatus());
+	}
+
+	@Test
+	public void testThatUpdateStudySubjectStatusUnlocksStudySubject() throws Exception {
+		studyEvents.get(0).setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+		studyEvents.get(1).setSubjectEventStatus(SubjectEventStatus.LOCKED);
+		studyEvents.get(2).setSubjectEventStatus(SubjectEventStatus.LOCKED);
+		studySubjectToUpdate.setStatus(Status.LOCKED);
+		updateStudyEventServlet.updateStudySubjectStatus(studyEventDefinitionIds, studySubjectDAO,
+				studySubjectToUpdate, studyEventDAO, studyEventBean, studyBean, userAccountBean);
+		assertEquals(Status.AVAILABLE, studySubjectToUpdate.getStatus());
 	}
 }

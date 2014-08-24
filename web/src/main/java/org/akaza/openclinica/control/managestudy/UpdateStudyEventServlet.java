@@ -20,7 +20,20 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.ValidatorHelper;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
@@ -71,18 +84,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.quartz.impl.StdScheduler;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * @author jxu
@@ -461,23 +463,11 @@ public class UpdateStudyEventServlet extends Controller {
 				if (ses == SubjectEventStatus.UNLOCK) {
 					ssub.setStatus(Status.AVAILABLE);
 					ssdao.update(ssub);
-				} else if (ses == SubjectEventStatus.LOCKED) {
-					int count = 0;
+				} else {
 					List<Integer> studyEventDefinitionIds = StudyEventDefinitionUtil
 							.getStudyEventDefinitionIdsForStudySubject(ssub, studyBean, getDynamicEventDao(),
 									getStudyGroupClassDAO(), seddao);
-					List<StudyEventBean> studyEventList = sedao.findAllByStudySubject(ssub);
-					for (StudyEventBean studyEventBean : studyEventList) {
-						studyEventDefinitionIds.remove((Integer) studyEventBean.getStudyEventDefinitionId());
-						if (studyEventBean.getId() != studyEvent.getId()
-								&& studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
-							count++;
-						}
-					}
-					if (count == studyEventList.size() - 1 && studyEventDefinitionIds.size() == 0) {
-						ssub.setStatus(Status.LOCKED);
-						ssdao.update(ssub);
-					}
+					updateStudySubjectStatus(studyEventDefinitionIds, ssdao, ssub, sedao, studyEvent, studyBean, ub);
 				}
 
 				if (studyEvent.getSubjectEventStatus().isCompleted()) {
@@ -519,6 +509,8 @@ public class UpdateStudyEventServlet extends Controller {
 				seb.setUpdater(ub);
 				seb.setUpdatedDate(new Date());
 				sedao.update(seb);
+				// set Study Subject's status to available
+				ssub.setStatus(Status.AVAILABLE);
 
 				// If all the StudyEvents become signed we will make the
 				// StudySubject signed as well
@@ -534,9 +526,9 @@ public class UpdateStudyEventServlet extends Controller {
 				if (allSigned) {
 					logger.info("Signing StudySubject [" + ssub.getSubjectId() + "]");
 					ssub.setStatus(Status.SIGNED);
-					ssub.setUpdater(ub);
-					ssdao.update(ssub);
 				}
+				ssub.setUpdater(ub);
+				ssdao.update(ssub);
 
 				// save discrepancy notes into DB
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
@@ -659,6 +651,25 @@ public class UpdateStudyEventServlet extends Controller {
 			forwardPage(Page.UPDATE_STUDY_EVENT, request, response);
 		}
 
+	}
+
+	void updateStudySubjectStatus(List<Integer> studyEventDefinitionIds, StudySubjectDAO ssdao, StudySubjectBean ssub,
+			StudyEventDAO sedao, StudyEventBean studyEvent, StudyBean studyBean, UserAccountBean ub) {
+		int count = 0;
+		List<StudyEventBean> studyEventList = sedao.findAllByStudySubject(ssub);
+		for (StudyEventBean studyEventBean : studyEventList) {
+			studyEventDefinitionIds.remove((Integer) studyEventBean.getStudyEventDefinitionId());
+			if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
+				count++;
+			}
+		}
+		if (count == studyEventList.size() && studyEventDefinitionIds.size() == 0) {
+			ssub.setStatus(Status.LOCKED);
+		} else {
+			ssub.setStatus(Status.AVAILABLE);
+		}
+		ssub.setUpdater(ub);
+		ssdao.update(ssub);
 	}
 
 	private ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs) {
