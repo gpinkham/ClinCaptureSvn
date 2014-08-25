@@ -23,6 +23,8 @@ package org.akaza.openclinica.bean.submit;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.core.form.StringUtil;
 
+import com.clinovo.util.DRUtil;
+
 @SuppressWarnings({"rawtypes", "serial"})
 public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	//
@@ -704,5 +706,19 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	
 	public void setCodeRef(String codeRef) {
 		this.codeRef = codeRef;
+	}
+		
+	/**
+	 * @return Returns text without break spaces from the leftItemText.
+	 */
+	public String getTextFromLeftItemText() {
+		return DRUtil.getTextFromHTML(this.leftItemText.replaceAll("&nbsp;", ""));
+	}
+
+	/**
+	 * @return Returns text without break spaces from the rightItemText.
+	 */
+	public String getTextFromRightItemText(String leftItemText) {
+		return DRUtil.getTextFromHTML(this.rightItemText.replaceAll("&nbsp;", ""));
 	}
 }

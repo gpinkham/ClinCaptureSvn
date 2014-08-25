@@ -627,4 +627,19 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		}
 		return al;
 	}
+
+	public List<StudyEventDefinitionBean> findAllActiveByStudyIdAndCRFId(int crfId, int studyId) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, studyId);
+		variables.put(2, crfId);
+		ArrayList alist = this.select(digester.getQuery("findAllActiveByStudyIdAndCRFId"), variables);
+		ArrayList<StudyEventDefinitionBean> al = new ArrayList<StudyEventDefinitionBean>();
+		for (Object anAlist : alist) {
+			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			al.add(eb);
+		}
+		
+		return al;
+	}
 }

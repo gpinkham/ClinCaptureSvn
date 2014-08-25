@@ -191,17 +191,22 @@
 			</td>
 		  </c:if>
           <c:if test="${userBean.sysAdmin}">
-            <td><a href="pages/deleteCRFVersion?crfVersionId=<c:out value="${version.id}"/>"
+            <td><a href="DeleteCRFVersion?action=confirm&verId=<c:out value="${version.id}"/>"
                    onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
                    onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"
                    onclick="setAccessedObjectWithRowspans(this)"><img
               name="bt_Delete1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
             </td>
           </c:if>
+			<td>
+				<a href="ViewSectionDataEntry?crfId=<c:out value="${currRow.bean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&annotated=1"
+					onclick="setAccessedObjectWithRowspans(this)">
+					<img name="bt_Annotate" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="annotate_crf" bundle="${resword}"/>" align="left" hspace="6">
+				</a>
+			</td>
         </tr>
       </table>
     </td>
   </tr>
 </c:forEach>
 <tr><td class="table_divider" colspan="9">&nbsp;</td></tr>
-  

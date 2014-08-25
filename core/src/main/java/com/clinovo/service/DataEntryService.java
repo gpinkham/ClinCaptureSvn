@@ -16,20 +16,17 @@ package com.clinovo.service;
 
 import java.util.ArrayList;
 
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.view.Page;
 
 public interface DataEntryService {
 
 	public DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems, boolean isSubmitted, Page servletPage,
-			StudyBean study, EventCRFBean ecb, SectionBean sb, EventDefinitionCRFBean edcb, int eventDefinitionCRFId,
-			SessionManager sm) throws Exception;
+			StudyBean study, EventCRFBean ecb, SectionBean sb) throws Exception;
 
 	public boolean shouldLoadDBValues(DisplayItemBean dib, Page servletPage);
 	

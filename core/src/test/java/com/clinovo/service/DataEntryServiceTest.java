@@ -15,18 +15,15 @@ package com.clinovo.service;
 
 import java.util.ArrayList;
 import org.akaza.openclinica.DefaultAppContextTest;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SuppressWarnings("unchecked")
 public class DataEntryServiceTest extends DefaultAppContextTest {
@@ -73,12 +70,8 @@ public class DataEntryServiceTest extends DefaultAppContextTest {
 		ib.setId(1);
 		items.add(ib);
 		sb.setItems(items);
-		EventDefinitionCRFBean edcb = new EventDefinitionCRFBean();
-		int eventDefinitionCRFId = 1;
-		SessionManager sm = Mockito.mock(SessionManager.class);
-		Mockito.when(sm.getDataSource()).thenReturn(dataSource);
 		DisplaySectionBean dsb = dataEntryService.getDisplayBean(hasGroup, includeUngroupedItems, isSubmitted, servletPage,
-				study, ecb, sb, edcb, eventDefinitionCRFId, sm);
+				study, ecb, sb);
 		assertNotNull(dsb);
 	}
 }

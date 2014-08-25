@@ -36,7 +36,6 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -64,20 +63,16 @@ public class DataEntryServiceImpl implements DataEntryService {
 	@Autowired private DynamicsMetadataService dynamicsMetadataService;
 	
 	public DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems,
-			boolean isSubmitted, Page servletPage, StudyBean study, EventCRFBean ecb, SectionBean sb,
-			EventDefinitionCRFBean edcb, int eventDefinitionCRFId, SessionManager sm) throws Exception {
+			boolean isSubmitted, Page servletPage, StudyBean study, EventCRFBean ecb, SectionBean sb) throws Exception {
 		DisplaySectionBean section = new DisplaySectionBean();
 		
 		// Find out whether there are ungrouped items in this section
 		boolean hasUngroupedItems = false;
-
-		if (eventDefinitionCRFId <= 0 || edcb == null) { 
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
-			EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(),
-					ecb.getCRFVersionId());
-			eventDefinitionCRFId = eventDefinitionCRFId <= 0? edcBean.getId(): eventDefinitionCRFId;
-			edcb = edcb == null? edcBean : edcb;
-		}
+		
+		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
+		EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), ecb.getCRFVersionId());
+		int eventDefinitionCRFId = edcb.getId();
+		
 		logger.trace("eventDefinitionCRFId " + eventDefinitionCRFId);
 		// Use this class to find out whether there are ungrouped items in this
 		// section
@@ -89,10 +84,10 @@ public class DataEntryServiceImpl implements DataEntryService {
 				// Null values: this method adds null values to the
 				// displayitembeans
 				newDisplayBean = formBeanUtil.createDisplaySectionBWithFormGroups(sb.getId(), ecb.getCRFVersionId(),
-						sm.getDataSource(), eventDefinitionCRFId, ecb, dynamicsMetadataService);
+						dataSource, eventDefinitionCRFId, ecb, dynamicsMetadataService);
 			} else {
 				newDisplayBean = formBeanUtil.createDisplaySectionWithItemGroups(study, sb.getId(), ecb,
-						ecb.getStudyEventId(), sm, eventDefinitionCRFId, dynamicsMetadataService);
+						ecb.getStudyEventId(), dataSource, eventDefinitionCRFId, dynamicsMetadataService);
 			}
 			itemGroups = newDisplayBean.getDisplayFormGroups();
 			logger.trace("found item group size: " + itemGroups.size() + " and to string: " + itemGroups.toString());

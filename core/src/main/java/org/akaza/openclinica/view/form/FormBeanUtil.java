@@ -27,7 +27,6 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -1170,19 +1169,19 @@ public class FormBeanUtil {
 	 *            The CRF version ID associated with the Items.
 	 * @param studyEventId
 	 *            The Study Event ID associated with the CRF Version ID.
-	 * @param sm
-	 *            A SessionManager, from which DataSources are acquired for the DAO objects.
+	 * @param datasource
+	 *            A DataSource, that are acquired for the DAO objects.
 	 * @return A DisplaySectionBean.
 	 */
 	public DisplaySectionBean createDisplaySectionWithItemGroups(StudyBean study, int sectionId,
-			EventCRFBean eventCrfBean, int studyEventId, SessionManager sm, int eventDefinitionCRFId,
+			EventCRFBean eventCrfBean, int studyEventId, DataSource dataSource, int eventDefinitionCRFId,
 			DynamicsMetadataService dynamicsMetadataService) {
 
 		DisplaySectionBean dBean = new DisplaySectionBean();
-		ItemGroupDAO formGroupDAO = new ItemGroupDAO(sm.getDataSource());
-		ItemGroupMetadataDAO igMetaDAO = new ItemGroupMetadataDAO(sm.getDataSource());
-		ItemDAO itemDao = new ItemDAO(sm.getDataSource());
-		ItemFormMetadataDAO metaDao = new ItemFormMetadataDAO(sm.getDataSource());
+		ItemGroupDAO formGroupDAO = new ItemGroupDAO(dataSource);
+		ItemGroupMetadataDAO igMetaDAO = new ItemGroupMetadataDAO(dataSource);
+		ItemDAO itemDao = new ItemDAO(dataSource);
+		ItemFormMetadataDAO metaDao = new ItemFormMetadataDAO(dataSource);
 
 		List<ItemGroupBean> arrList = formGroupDAO.findLegitGroupBySectionId(sectionId);
 		// all items associated with the section, including those not in a group
@@ -1203,7 +1202,7 @@ public class FormBeanUtil {
 		List<String> nullValuesList = new ArrayList<String>();
 		boolean itemsHaveChecksRadios = itemsIncludeChecksRadiosSelects(allMetas);
 		if (eventDefinitionCRFId <= 0) {
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
 			EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(study, studyEventId,
 					eventCrfBean.getCRFVersionId());
 			eventDefinitionCRFId = edcBean.getId();
@@ -1213,7 +1212,7 @@ public class FormBeanUtil {
 		// if the id is zero, horizontal result sets do not display null values
 		if (itemsHaveChecksRadios && eventDefinitionCRFId > 0) {
 			// method returns null values as a List<String>
-			nullValuesList = this.getNullValuesByEventCRFDefId(eventDefinitionCRFId, sm.getDataSource());
+			nullValuesList = this.getNullValuesByEventCRFDefId(eventDefinitionCRFId, dataSource);
 		}
 		// Get the items associated with each group
 		List<ItemBean> itBeans;
@@ -1234,7 +1233,7 @@ public class FormBeanUtil {
 			}
 			// include arrayList parameter until I determine difference in
 			// classes
-			displayItems = getDisplayBeansFromItems(itBeans, sm.getDataSource(), eventCrfBean, sectionId,
+			displayItems = getDisplayBeansFromItems(itBeans, dataSource, eventCrfBean, sectionId,
 					nullValuesList, dynamicsMetadataService);
 			displayItemGBean = this.createDisplayFormGroup(displayItems, itemGroup);
 			displayFormBeans.add(displayItemGBean);

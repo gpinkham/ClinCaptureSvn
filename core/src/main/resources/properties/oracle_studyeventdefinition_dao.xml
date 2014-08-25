@@ -191,4 +191,14 @@
 			SELECT distinct name, repeating FROM study_event_definition WHERE study_id=?
 		</sql>
 	</query>
+	<query>
+		<name>findAllActiveByStudyIdAndCRFId</name>
+		<sql>
+			SELECT sed.*
+			FROM study_event_definition sed, event_definition_crf edc
+			WHERE sed.status_id = 1 AND sed.study_id = ?
+			AND edc.study_event_definition_id = sed.study_event_definition_id
+			AND edc.crf_id = ?
+		</sql>
+	</query>
 </queries>

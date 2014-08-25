@@ -47,7 +47,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.DataEntryServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -87,11 +86,8 @@ import java.util.Set;
 @Component
 public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
-	public static final String VIEW_SECTION_DATA_ENTRY_REFERER = "viewSectionDataEntryReferer";
-	public static final String REFERER = "referer";
 	public static final String VIEW_SECTION_DATA_ENTRY = "ViewSectionDataEntry";
 	public static final String RESOLVE_DISCREPANCY = "ResolveDiscrepancy";
-	public static final String JUST_CLOSE_WINDOW = "justCloseWindow";
 	public static final String EVENT_CRF_ID = "eventCRFId";
 	public static final String ENCLOSING_PAGE = "enclosingPage";
 
@@ -132,15 +128,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		FormProcessor fp = new FormProcessor(request);
 		request.setAttribute("expandCrfInfo", false);
-		String cw = request.getParameter("cw");
-		if (cw != null) {
-			request.setAttribute(JUST_CLOSE_WINDOW, true);
-		} else {
-			String referer = request.getHeader(REFERER);
-			if (referer != null && !referer.contains(VIEW_SECTION_DATA_ENTRY) && !referer.contains(RESOLVE_DISCREPANCY)) {
-				request.getSession().setAttribute(VIEW_SECTION_DATA_ENTRY_REFERER, referer);
-			}
-		}
 
 		SimpleDateFormat localDF = getLocalDf(request);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
@@ -156,12 +143,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		int studySubjectId = fp.getInt("studySubjectId", true);
 		String action = fp.getString("action");
 		HttpSession session = request.getSession();
-		String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
-		if (StringUtil.isBlank(fromResolvingNotes)) {
-			session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
-			session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
-		}
-
+		
 		request.setAttribute("eventId", fp.getString("eventId"));
 		request.setAttribute("studySubjectId", studySubjectId + "");
 		request.setAttribute("crfListPage", fp.getString("crfListPage"));
@@ -179,8 +161,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		StudyDAO studydao = getStudyDAO();
 		int eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
-		EventDefinitionCRFDAO eventCrfDao = getEventDefinitionCRFDAO();
-		edcb = (EventDefinitionCRFBean) eventCrfDao.findByPK(eventDefinitionCRFId);
+		EventDefinitionCRFDAO eventDefCrfDao = getEventDefinitionCRFDAO();
+		edcb = (EventDefinitionCRFBean) eventDefCrfDao.findByPK(eventDefinitionCRFId);
 
 		if (edcb.getId() > 0) {
 			Set<Integer> studyIds = new HashSet<Integer>();
@@ -210,15 +192,17 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		// for a particular event
 		session.removeAttribute("presetValues");
 
-		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-		SectionDAO sdao = new SectionDAO(getDataSource());
-		String age = "";
 		if (sectionId == 0 && crfVersionId == 0 && eventCRFId == 0) {
 			addPageMessage(respage.getString("please_choose_a_CRF_to_view"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			return;
 		}
+		
+		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
+		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+		SectionDAO sdao = new SectionDAO(getDataSource());
+		String age = "";
+		
 		if (studySubjectId > 0) {
 			StudySubjectDAO ssdao = getStudySubjectDAO();
 			StudySubjectBean sub = (StudySubjectBean) ssdao.findByPK(studySubjectId);
@@ -247,7 +231,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 				studySubjectId = event.getStudySubjectId();
 				request.setAttribute("studySubjectId", studySubjectId + "");
-
 			}
 			// Get the status/number of item discrepancy notes
 			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
@@ -320,7 +303,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				}
 				return;
 			}
-
 		}
 
 		sb = (SectionBean) sdao.findByPK(sectionId);
@@ -335,7 +317,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			} else {
 				request.setAttribute("studyTitle", currentStudy.getName());
 			}
-
+			
 		} else {
 			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
@@ -422,7 +404,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 			for (int i = 0; i < dsb.getDisplayItemGroups().size(); i++) {
 				DisplayItemWithGroupBean diwb = dsb.getDisplayItemGroups().get(i);
-
 				if (diwb.isInGroup()) {
 					List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
 					logger.info("dgbs size: " + dgbs.size());
@@ -436,7 +417,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 							logger.info("item data id:" + displayItem.getData().getId());
 							AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, displayItem.getData()
 									.getId(), "itemData", currentStudy);
-
 						}
 					}
 
@@ -464,7 +444,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			request.setAttribute(BEAN_ANNOTATIONS, ecb.getAnnotations());
 			request.setAttribute("sec", sb);
 			request.setAttribute("EventCRFBean", ecb);
-
+			
 			int tabNum;
 			if ("".equalsIgnoreCase(fp.getString("tabId", true))) {
 				tabNum = 1;
@@ -472,9 +452,18 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				tabNum = fp.getInt("tabId", true);
 			}
 			request.setAttribute("tabId", Integer.toString(tabNum));
-
-			// Signal interviewer.jsp that the containing page is
-			// viewSectionData,
+			
+			if (fp.getBoolean("annotated")) {
+				StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
+				CRFVersionDAO crfVerDao = getCRFVersionDAO();
+				CRFVersionBean crfVerBean = (CRFVersionBean) crfVerDao.findByPK(crfVersionId);
+				request.setAttribute("crfVerFormOID", crfVerBean.getOid());
+				request.setAttribute("studyEventDefs", seddao.findAllActiveByStudyIdAndCRFId(currentStudy.getId(), crfId));
+				
+				forwardPage(Page.VIEW_ANNOTATED_SECTION_DATA_ENTRY, request, response);
+				return;
+			}
+			// Signal interviewer.jsp that the containing page is viewSectionData,
 			// for the purpose of suppressing discrepancy note icons for the
 			// interview date and name fields
 			request.setAttribute(ENCLOSING_PAGE, "viewSectionData");

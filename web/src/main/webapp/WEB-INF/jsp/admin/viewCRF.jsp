@@ -63,9 +63,6 @@
 </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
-
 <h1>
 	<span class="first_level_header">
 		<fmt:message key="view_CRF_details" bundle="${resword}"/>
@@ -73,7 +70,6 @@
 </h1>
 <div style="width: 600px">
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
         <div class="tablebox_center">
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr valign="top"><td class="table_header_column_top"><fmt:message key="name" bundle="${resword}"/>:</td><td class="table_cell">
@@ -88,7 +84,6 @@
             </table>
         </div>
     </div></div></div></div></div></div></div></div>
-
 </div>
 <br>
 <c:choose>
@@ -102,7 +97,6 @@
 <fmt:message key="versions" bundle="${resword}"/></span>
 <div style="width: 100%">
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
         <div class="tablebox_center">
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr valign="top">
@@ -141,14 +135,20 @@
                                             name="bt_Metadata" src="images/bt_Metadata.gif" border="0" alt="Metadata" title="Metadata" align="left" hspace="6"></a>
 
                                 </td>
+								<td>
+									<a href="ViewSectionDataEntry?crfId=<c:out value="${currRow.bean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&annotated=1"
+											onclick="setAccessedObjectWithRowspans(this)">
+										<img name="bt_Annotate" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="annotate_crf" bundle="${resword}"/>" align="left" hspace="6">
+									</a>
+								</td>
                             </tr>
                         </table>
-                        </c:forEach>
-
+					</td>
+				</tr>
+                </c:forEach>
             </table>
         </div>
     </div></div></div></div></div></div></div></div>
-
 </div>
 <br/>
 <span class="table_title_Admin"><fmt:message key="studies_using_crf" bundle="${resword}"/></span>
@@ -159,7 +159,7 @@
         ${studiesTableHTML}
     </form>
 </div>
- <br/>
+<br/>
 
 <span class="table_title_Admin"><fmt:message key="associated_event_definitions" bundle="${resword}"/></span></span>
 <div style="width: 100%">
@@ -201,7 +201,7 @@
 
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+					class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" name="<fmt:message key="view_crf_rules" bundle="${resword}"/>" value="<fmt:message key="view_crf_rules" bundle="${resword}"/>" class="button_long" onClick="window.location.href='ViewRuleAssignment?ruleAssignments_f_crfName=<c:out value="${crfName}"/>'"/>
 <input type="button" name="<fmt:message key="run_crf_rules" bundle="${resword}"/>" value="<fmt:message key="run_crf_rules" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRule?crfId=<c:out value="${crf.id}"/>&action=dryRun'"/>
 

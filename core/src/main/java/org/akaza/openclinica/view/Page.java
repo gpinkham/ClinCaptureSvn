@@ -713,6 +713,9 @@ public class Page {
 			"View Table Of Contents Servlet");
 	public final static Page VIEW_SECTION_DATA_ENTRY = new Page("/WEB-INF/jsp/managestudy/viewSectionDataEntry.jsp",
 			"View Section Data Entry");
+	public final static Page VIEW_ANNOTATED_SECTION_DATA_ENTRY = new Page("/WEB-INF/jsp/managestudy/viewAnnotatedSectionDataEntry.jsp",
+			"View Section Data Entry");
+	
 	public final static Page VIEW_SECTION_DATA_PREVIEW = new Page(
 			"/WEB-INF/jsp/managestudy/viewSectionDataPreview.jsp", "View Section Data Preview");
 	// YW 07-23-2007 << for preview in the issue000937

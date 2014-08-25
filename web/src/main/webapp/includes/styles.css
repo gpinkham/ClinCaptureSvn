@@ -198,7 +198,6 @@ td .aka_revised {
 
 .aka_ques_block {
     width: 2em;
-    float:left;
     text-align:left
 }
 
@@ -2715,4 +2714,100 @@ td.borderHighlightBottom{
 
 #ruleAssignments > thead > tr.filter > td:last-child {
     white-space: nowrap;
+}
+
+.hidden_cell{
+	padding: 0px;
+	border: 0px;
+}
+
+.hidden_cell_with_padding{
+	padding-bottom: 1px;
+	border: 0px;
+}
+
+.single_select_cell, .single_select_cell_last{
+	padding-left: 5px;
+	padding-right: 5px;
+	border-style: solid;
+	border-left-width: 1px;
+	border-right-width: 1px;
+	border-top-width: 0px;
+	border-bottom-width: 0px;
+	vertical-align: top;
+}
+
+.single_select_cell_first{
+	border-left-width: 0px;
+	border-right-width: 0px;
+	border-top-width: 0px;
+	border-bottom-width: 0px;
+	padding-bottom: 1px;
+}
+
+.single_select_cell_last{
+	border-top-width: 0px;
+	border-bottom-width: 1px;
+}
+
+.annotated_item{
+	opacity: 0.7;
+	filter: alpha(opacity=40);
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+div.annotation_text{
+	position: absolute; 
+	visibility: hidden;
+	z-index: 100;
+}
+
+span.annotation_text{ 
+	font-family: Arial;
+	font-weight: bold;
+	font-size: 110%;
+	color: red; 
+}
+
+td.annotated_itemOID{
+	padding-top: 5px;
+	padding-bottom: 5px;
+	horizontal-align: center;
+}
+
+span.annotated_itemOID{
+	font-family: Arial;
+	font-weight: bold;
+	font-size: 110%;
+	color: #00B050; 
+	background:#ffffcc;
+}
+
+td.annotated_groupOID{
+	padding-top: 3px;
+	padding-bottom: 3px;
+	padding-left: 2px;
+}
+
+span.annotated_groupOID{
+	font-family: Arial;
+	font-weight: bold;
+	font-size: 110%;
+	color: #ffab29; 
+	background:#ffffcc;
+}
+
+td.annotated_crfOID{
+	padding-top: 3px;
+	padding-bottom: 5px;
+}
+
+span.annotated_crfOID, span.annotated_eventOID{
+	font-family: Arial;
+	font-weight: bold;
+	font-size: 110%;
+	color: red; 
+	background:#ffffcc;
 }

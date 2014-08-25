@@ -3130,15 +3130,12 @@ public abstract class DataEntryServlet extends Controller {
 	protected DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems,
 			HttpServletRequest request, boolean isSubmitted) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
-		int eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
 		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
-		SessionManager sm = getSessionManager(request);
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
-		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
 
 		return getDataEntryService(getServletContext()).getDisplayBean(hasGroup, includeUngroupedItems, isSubmitted,
-				getServletPage(request), study, ecb, sb, edcb, eventDefinitionCRFId, sm);
+				getServletPage(request), study, ecb, sb);
 	}
 
 	/**
