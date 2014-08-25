@@ -84,7 +84,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 @Endpoint
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public class StudySubjectEndpoint {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -242,14 +242,19 @@ public class StudySubjectEndpoint {
 			studySubjectType.setEnrollmentDate(getXMLGregorianCalendarDate(studySubjectBean.getEnrollmentDate()));
 			SubjectBean subjectBean = (SubjectBean) getSubjectDao().findByPK(studySubjectBean.getSubjectId());
 			subjectType.setUniqueIdentifier(subjectBean.getUniqueIdentifier());
-			subjectType.setGender(GenderType.fromValue(String.valueOf(subjectBean.getGender())));
-			subjectType.setDateOfBirth(getXMLGregorianCalendarDate(subjectBean.getDateOfBirth()));
+			String genderStr = String.valueOf(subjectBean.getGender());
+			if (!"".equals(genderStr.trim())) {
+				subjectType.setGender(GenderType.fromValue(genderStr));
+			}
+			if (subjectBean.getDateOfBirth() != null) {
+				subjectType.setDateOfBirth(getXMLGregorianCalendarDate(subjectBean.getDateOfBirth()));
+			}
+			
 			studySubjectType.setSubject(subjectType);
-			// studySubjectType.setStudyRef(studyRef);
+			
 			logger.debug(studySubjectBean.getLabel());
 			studySubjectType.setEvents(getEvents(studySubjectBean));
 			studySubjectsType.getStudySubject().add(studySubjectType);
-
 		}
 		return response;
 	}

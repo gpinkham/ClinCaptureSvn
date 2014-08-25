@@ -57,7 +57,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
  * @author thickerson, daniel
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public class DataImportService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
