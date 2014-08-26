@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="aram" id="2014-08-25-TICKET1673" dbms="postgresql" runOnChange="true">
+		<comment>Recalculates CRFs ordinal inside of study event definitions</comment>
+		<sql splitStatements="false">
+			CREATE OR REPLACE FUNCTION recalculate_crf_ordinal() RETURNS void AS
+			'DECLARE
+				studyEventDef study_event_definition;
+				eventDefCRFParent event_definition_crf;
+				newOrdinal integer;
+			BEGIN
+				FOR studyEventDef IN (SELECT * FROM study_event_definition) LOOP
+
+					newOrdinal := 1;
+
+					FOR eventDefCRFParent IN (SELECT * FROM event_definition_crf
+												WHERE study_event_definition_id = studyEventDef.study_event_definition_id
+												AND parent_id IS NULL ORDER BY ordinal ASC) LOOP
+
+						UPDATE event_definition_crf SET ordinal = newOrdinal
+						WHERE event_definition_crf_id IN (SELECT event_definition_crf_id
+															FROM event_definition_crf
+															WHERE event_definition_crf_id = eventDefCRFParent.event_definition_crf_id
+															OR parent_id = eventDefCRFParent.event_definition_crf_id);
+					newOrdinal := newOrdinal + 1;
+					END LOOP;
+
+				END LOOP;
+			END;'
+			LANGUAGE plpgsql;
+
+			SELECT recalculate_crf_ordinal();
+			DROP FUNCTION recalculate_crf_ordinal();
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

@@ -48,7 +48,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Processes request to add new CRFs info study event definition
+ * Processes request to add new CRFs info study event definition.
  * 
  * @author jxu
  */
@@ -56,13 +56,17 @@ import java.util.Map;
 @Component
 public class AddCRFToDefinitionServlet extends Controller {
 
+	public static final int FIVE = 5;
+
 	/**
-	 * Checks whether the user has the correct privilege
+	 * Checks whether the user has the correct privilege.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
 	 * @param response
 	 *            HttpServletResponse
+	 * @throws InsufficientPermissionException
+	 *             the InsufficientPermissionException
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -200,7 +204,8 @@ public class AddCRFToDefinitionServlet extends Controller {
 		}
 		request.getSession().removeAttribute("tmpCRFIdMap");
 
-		if (crfArray.size() == 0) {// no crf seleted
+		if (crfArray.size() == 0) {
+			// no crf seleted
 			addPageMessage(respage.getString("no_new_CRF_added"), request);
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 			sed.setCrfs(new ArrayList());
@@ -221,14 +226,12 @@ public class AddCRFToDefinitionServlet extends Controller {
 				edcBean.setStudyEventDefinitionId(sed.getId());
 				edcBean.setStudyId(ub.getActiveStudyId());
 				edcBean.setSourceDataVerification(SourceDataVerification.NOTREQUIRED);
-				ordinalForNewCRF = ordinalForNewCRF + 1;
-				edcBean.setOrdinal(ordinalForNewCRF);
+				edcBean.setOrdinal(++ordinalForNewCRF);
 				edcBean.setVersions(crf.getVersions());
 
 				CRFVersionBean defaultVersion1 = (CRFVersionBean) vdao.findByPK(edcBean.getDefaultVersionId());
 				edcBean.setDefaultVersionName(defaultVersion1.getName());
 
-				ordinalForNewCRF++;
 				edcs.add(edcBean);
 			}
 			request.getSession().setAttribute("eventDefinitionCRFs", edcs);
@@ -246,7 +249,7 @@ public class AddCRFToDefinitionServlet extends Controller {
 				resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),
 				resword.getString("selected") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(5);
+		table.hideColumnLink(FIVE);
 		HashMap args = new HashMap();
 		args.put("actionName", "next");
 		table.setQuery("AddCRFToDefinition", args);

@@ -142,19 +142,7 @@
 			<td valign="top" class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>
 		</tr>
 
-		<c:set var="prevCrf" value=""/>
-		<c:set var="count" value="0"/>
-		<c:set var="last" value="${defSize-1}"/>
-
 		<c:forEach var ="crf" items="${eventDefinitionCRFs}" varStatus="status">
-		<c:choose>
-			<c:when test="${count == last}">
-				<c:set var="nextCrf" value="${eventDefinitionCRFs[count]}"/>
-			</c:when>
-			<c:otherwise>
-				<c:set var="nextCrf" value="${eventDefinitionCRFs[count+1]}"/>
-			</c:otherwise>
-		</c:choose>
 
 		<tr valign="top">
 			<td class="table_cell_left">
@@ -162,8 +150,7 @@
 				<c:when test="${status.first}">
 					<c:choose>
 						<c:when test="${defSize>1}">
-							<a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${nextCrf.id}"/>&previous=<c:out value="${crf.id}"/>&id=<c:out value="${definition.id}"/>&currentOrdinal=<c:out value="${nextCrf.ordinal}"/>&previousOrdinal=<c:out value="${crf.ordinal}"/>"
-								onclick="setAccessedObjected(this);">
+							<a href="ChangeDefinitionCRFOrdinal?eventCRFDefId=<c:out value="${crf.id}"/>&action=moveDown" onclick="setAccessedObjected(this);">
 								<img src="images/bt_sort_descending.gif" border="0" alt="move down" title="move down"/>
 							</a>
 						</c:when>
@@ -173,19 +160,16 @@
 					</c:choose>
 				</c:when>
 				<c:when test="${status.last}">
-					<a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${crf.id}"/>&previous=<c:out value="${prevCrf.id}"/>&id=<c:out value="${definition.id}"/>&currentOrdinal=<c:out value="${crf.ordinal}"/>&previousOrdinal=<c:out value="${prevCrf.ordinal}"/>"
-						onclick="setAccessedObjected(this);">
+					<a href="ChangeDefinitionCRFOrdinal?eventCRFDefId=<c:out value="${crf.id}"/>&action=moveUp" onclick="setAccessedObjected(this);">
 						<img src="images/bt_sort_ascending.gif" alt="move up" title="move up" border="0"/>
 					</a>
 				</c:when>
 				<c:otherwise>
-					<a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${crf.id}"/>&previous=<c:out value="${prevCrf.id}"/>&id=<c:out value="${definition.id}"/>&currentOrdinal=<c:out value="${crf.ordinal}"/>&previousOrdinal=<c:out value="${prevCrf.ordinal}"/>"
-						onclick="setAccessedObjected(this);">
+					<a href="ChangeDefinitionCRFOrdinal?eventCRFDefId=<c:out value="${crf.id}"/>&action=moveUp" onclick="setAccessedObjected(this);">
 						<img src="images/bt_sort_ascending.gif" alt="move up" title="move up" border="0" />
 					</a>
-					<a href="ChangeDefinitionCRFOrdinal?previous=<c:out value="${crf.id}"/>&current=<c:out value="${nextCrf.id}"/>&id=<c:out value="${definition.id}"/>&previousOrdinal=<c:out value="${crf.ordinal}"/>&currentOrdinal=<c:out value="${nextCrf.ordinal}"/>"
-						onclick="setAccessedObjected(this);">
-						<img src="images/bt_sort_descending.gif" alt="move down" title="move up" border="0" />
+					<a href="ChangeDefinitionCRFOrdinal?eventCRFDefId=<c:out value="${crf.id}"/>&action=moveDown" onclick="setAccessedObjected(this);">
+						<img src="images/bt_sort_descending.gif" alt="move down" title="move down" border="0" />
 					</a>
 				</c:otherwise>
 			</c:choose>
@@ -268,8 +252,6 @@
 			</td>
 		</tr>
 
-		<c:set var="prevCrf" value="${crf}"/>
-		<c:set var="count" value="${count+1}"/>
 		</c:forEach>
 
 	</table>
