@@ -191,7 +191,7 @@
 			</td>
 		  </c:if>
           <c:if test="${userBean.sysAdmin}">
-            <td><a href="DeleteCRFVersion?action=confirm&verId=<c:out value="${version.id}"/>"
+            <td><a href="pages/deleteCRFVersion?crfVersionId=<c:out value="${version.id}"/>"
                    onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
                    onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"
                    onclick="setAccessedObjectWithRowspans(this)"><img
