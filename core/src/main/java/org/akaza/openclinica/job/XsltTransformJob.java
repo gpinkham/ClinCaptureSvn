@@ -288,11 +288,6 @@ public class XsltTransformJob extends QuartzJobBean {
 					throw new Exception(messageSource.getMessage("sasDataset.exception.folder", new Object[] {
 							sasJobDir, nextFireTime }, locale));
 				}
-				if (!new File(sasJobDirFile.getAbsolutePath() + File.separator + "ready.txt").exists()) {
-					logger.info("Job: " + (jobName != null ? jobName : datasetBean.getName())
-							+ ". The next fire time is: " + nextFireTime);
-					return;
-				}
 
 				sasErrors = sasErrors.concat("\n\n").concat(messageSource.getMessage("sas.errors", null, locale))
 						.concat("\n\n");
@@ -301,14 +296,16 @@ public class XsltTransformJob extends QuartzJobBean {
 					sasSideHasErrors = true;
 					unscheduleSASJob = true;
 					sasErrors = sasErrors.concat(readFileContent(errorsFile, "\n")).concat("\n");
+					if (!sasExtractJob) {
+						sasExceptionMessage = messageSource.getMessage("sas.failed.checkEmail", null, locale);
+					}
+					throw new Exception(messageSource.getMessage("sas.failed", null, locale));
 				}
 
-				sasWarnings = sasWarnings.concat("<br/>")
-						.concat(messageSource.getMessage("sas.warnings", null, locale)).concat("<br/><br/>");
-				File warningsFile = new File(sasJobDirFile.getAbsolutePath() + File.separator + "warnings.txt");
-				if (warningsFile.exists()) {
-					sasSideHasWarnings = true;
-					sasWarnings = sasWarnings.concat(readFileContent(warningsFile, "<br/>")).concat("<br/>");
+				if (!new File(sasJobDirFile.getAbsolutePath() + File.separator + "ready.txt").exists()) {
+					logger.info("Job: " + (jobName != null ? jobName : datasetBean.getName())
+							+ ". The next fire time is: " + nextFireTime);
+					return;
 				}
 
 				String[] myFiles = sasJobDirFile.list(new FilenameFilter() {
@@ -320,20 +317,18 @@ public class XsltTransformJob extends QuartzJobBean {
 					throw new Exception(messageSource.getMessage("sasDataset.exception.zip",
 							new Object[] { nextFireTime }, locale));
 				}
+
+				sasWarnings = sasWarnings.concat("<br/>")
+						.concat(messageSource.getMessage("sas.warnings", null, locale)).concat("<br/><br/>");
+				File warningsFile = new File(sasJobDirFile.getAbsolutePath() + File.separator + "warnings.txt");
+				if (warningsFile.exists()) {
+					sasSideHasWarnings = true;
+					sasWarnings = sasWarnings.concat(readFileContent(warningsFile, "<br/>")).concat("<br/>");
+				}
+
 				File sasDirArchivedFile = new File(sasJobDirFile.getAbsolutePath() + File.separator + myFiles[0]);
 				File sasOdmDirArchivedFile = new File(sasOdmOutputPath + File.separator + sasDirArchivedFile.getName());
 				FileCopyUtils.copy(sasDirArchivedFile, sasOdmDirArchivedFile);
-				deleteDirectory(sasJobDirFile);
-
-				XsltTransformJob.DeleteOldObject deleteOldObject = (XsltTransformJob.DeleteOldObject) dataMap
-						.get(SAS_DELETE_OLD_OBJECT);
-
-				if (deleteOldObject.deleteOld) {
-					deleteIntermFiles(deleteOldObject.intermediateFiles, deleteOldObject.endFile,
-							deleteOldObject.dontDelFiles);
-					deleteIntermFiles(deleteOldObject.markForDelete, deleteOldObject.endFile,
-							deleteOldObject.dontDelFiles);
-				}
 
 				double done = setFormat(((double) (System.currentTimeMillis() - start)) / ONE_THOUSAND);
 				logger.trace("--> job completed in " + done + " ms");
@@ -345,13 +340,6 @@ public class XsltTransformJob extends QuartzJobBean {
 					subject = "Job Ran: " + jobName;
 				} else {
 					subject = "Job Ran: " + datasetBean.getName();
-				}
-
-				if (sasSideHasErrors) {
-					if (!sasExtractJob) {
-						sasExceptionMessage = messageSource.getMessage("sas.failed.checkEmail", null, locale);
-					}
-					throw new Exception(messageSource.getMessage("sas.failed", null, locale));
 				}
 
 				if (sasSideHasWarnings) {
@@ -378,6 +366,16 @@ public class XsltTransformJob extends QuartzJobBean {
 
 				unscheduleSASJob = true;
 				context.getJobDetail().getJobDataMap().remove("failMessage");
+
+				XsltTransformJob.DeleteOldObject deleteOldObject = (XsltTransformJob.DeleteOldObject) dataMap
+						.get(SAS_DELETE_OLD_OBJECT);
+
+				if (deleteOldObject.deleteOld) {
+					deleteIntermFiles(deleteOldObject.intermediateFiles, deleteOldObject.endFile,
+							deleteOldObject.dontDelFiles);
+					deleteIntermFiles(deleteOldObject.markForDelete, deleteOldObject.endFile,
+							deleteOldObject.dontDelFiles);
+				}
 			} else {
 
 				// generate file directory for file service
@@ -836,10 +834,12 @@ public class XsltTransformJob extends QuartzJobBean {
 								.get(SAS_EXTRACT_REPEAT_COUNT));
 						((SimpleTriggerImpl) context.getTrigger()).setRepeatInterval((Long) dataMap
 								.get(SAS_EXTRACT_REPEAT_INTERVAL));
+						context.getScheduler().rescheduleJob(context.getTrigger().getKey(), context.getTrigger());
 					}
 				} catch (Exception e) {
 					logger.error("Error has occurred.", e);
 				}
+				deleteDirectory(new File((String) dataMap.get(SAS_JOB_DIR)));
 			}
 		}
 	}
