@@ -62,6 +62,9 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 				"strataLevel",
 				"[{\"StratificationID\":1,\"Level\":\"2\"},{\"StratificationID\":2,\"Level\":\"1\"}]");
 		request.setParameter("strataItemIds", "[1,2]");
+		request.setParameter("trialIdItemId", "1");
+		request.setParameter("trialId", "12");
+		request.setParameter("trialIdItemValue", "2");
 
 		Mockito.when(
 				mockedItemDataDAO.findByItemIdAndEventCRFId(Mockito.anyInt(),
@@ -233,6 +236,23 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 		RandomizationUtil.saveStratificationVariablesToDatabase(request);
 		Mockito.verify(mockedItemDataDAO).update(
 				Mockito.any(ItemDataBean.class));
+	}
+
+	@Test
+	public void testThatSaveTrialIDItemToDatabaseRunsCorretly()
+			throws RandomizationException {
+
+		RandomizationUtil.saveTrialIDItemToDatabase(request);
+		Mockito.verify(mockedItemDataDAO).create(
+				Mockito.any(ItemDataBean.class));
+	}
+
+	@Test(expected = RandomizationException.class)
+	public void testThatSaveTrialIDItemToDatabaseThrowsExceptionIfItemIdIsIncorrect()
+			throws RandomizationException {
+
+		request.setParameter("trialIdItemId", "string");
+		RandomizationUtil.saveTrialIDItemToDatabase(request);
 	}
 
 	private RandomizationResult createRandomizationResult() {

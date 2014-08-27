@@ -404,6 +404,56 @@ public class RandomizationUtil {
 	}
 
 	/**
+	 * Save value of Rand_TrialIDs item to the database if exists.
+	 * 
+	 * @param request
+	 *            <code>HttpServletRequest</code> from which all required data
+	 *            will be taken.
+	 * 
+	 * @throws RandomizationException
+	 *             If data was not saved successfully.
+	 */
+	public static void saveTrialIDItemToDatabase(HttpServletRequest request)
+			throws RandomizationException {
+
+		if (RandomizationUtil.itemDataDAO == null) {
+
+			RandomizationUtil.itemDataDAO = new ItemDataDAO(
+					sessionManager.getDataSource());
+		}
+
+		int eventCRFId = Integer.parseInt(request.getParameter("eventCrfId"));
+
+		if (trialIdItemExists(request)) {
+
+			try {
+				int itemId = 0;
+				itemId = Integer.parseInt(request.getParameter("trialIdItemId"));
+
+				String trialIdItemValue = request.getParameter("trialIdItemValue");
+				ItemDataBean item = itemDataDAO.findByItemIdAndEventCRFId(itemId, eventCRFId);
+
+				item.setValue(trialIdItemValue);
+
+				if (item.getEventCRFId() == 0) {
+					setAllFieldsForNewItem(item, itemId, request);
+
+					itemDataDAO.create(item);
+					checQuerySuccessfull(itemDataDAO);
+				} else {
+					setAllFieldsForUpdatedItem(item, request);
+
+					itemDataDAO.update(item);
+					checQuerySuccessfull(itemDataDAO);
+				}
+			} catch (Exception e) {
+				throw new RandomizationException(
+						"An error occurred during the saving of the Rand_TrialIDs variable. Please contact your system administrator.");
+			}
+		}
+	}
+
+	/**
 	 * Get ItemDataBean for randomization result item and randomization date item.
 	 * 
 	 * @param request
@@ -504,6 +554,12 @@ public class RandomizationUtil {
 			throw new RandomizationException(
 					"Exception occurred during randomization");
 		}
+	}
+
+	private static boolean trialIdItemExists(HttpServletRequest request) {
+
+		String trialId = request.getParameter("trialId");
+		return isCRFSpecifiedTrialIdValid(trialId);
 	}
 
 	public static void setStudyGroupDAO(StudyGroupClassDAO studyGroupDAO) {

@@ -2457,6 +2457,8 @@ function randomizeSubject() {
     });
 
     var trialId = null;
+    var trialIdItemId = null;
+    var trialIdItemValue = null;
 
     // Check if the trial Id is defined
     if($("#Rand_TrialIDs :select").size() > 0) {
@@ -2466,6 +2468,8 @@ function randomizeSubject() {
 
             var opt3 = $("#Rand_TrialIDs :select").find(":selected").text();
 
+            trialIdItemId = $("#Rand_TrialIDs").find("select").attr("id").replace('input','');
+            trialIdItemValue = $("#Rand_TrialIDs").find("select").val();
             trialId = $("input:hidden[eleid='requiredParam3']").attr(opt3);
 
         } else {
@@ -2501,6 +2505,8 @@ function randomizeSubject() {
             resultInputId: resultInputId,
             subject: subject,
             trialId: trialId,
+            trialIdItemId: trialIdItemId,
+            trialIdItemValue: trialIdItemValue,
             eligibility: eligibility,
             strataItemIds: JSON.stringify(strataItemIds),
             strataLevel: JSON.stringify(strataLevels)
