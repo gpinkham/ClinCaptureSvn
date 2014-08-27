@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="Denis" id="2014-08-19-TICKET1509">
+		<comment>Insert data about randomization into study_subject table for already randomized subjects</comment>
+		<sql>
+			UPDATE study_subject 
+			SET randomization_result = (SELECT value 
+				FROM item_data 
+				WHERE event_crf_id IN (SELECT event_crf_id 
+					FROM event_crf
+					WHERE event_crf.study_subject_id = study_subject.study_subject_id)
+				AND item_id IN (SELECT item_id 
+					FROM item 
+					WHERE name = 'Rand_Result') 
+				AND value IS NOT NULL 
+				ORDER BY event_crf_id DESC
+				LIMIT 1) 
+			WHERE randomization_result IS NULL;
+
+			UPDATE study_subject 
+			SET randomization_date = (SELECT date_created 
+				FROM item_data 
+				WHERE event_crf_id IN (SELECT event_crf_id 
+					FROM event_crf
+					WHERE event_crf.study_subject_id = study_subject.study_subject_id)
+				AND item_id IN (SELECT item_id 
+					FROM item 
+					WHERE name = 'Rand_Date')
+				AND value IS NOT NULL
+				AND date_updated IS NULL 
+				ORDER BY event_crf_id DESC 
+				LIMIT 1 )
+			WHERE randomization_date IS NULL;
+
+			UPDATE study_subject 
+			SET randomization_date = (SELECT date_updated 
+				FROM item_data 
+				WHERE event_crf_id IN (SELECT event_crf_id 
+					FROM event_crf
+					WHERE event_crf.study_subject_id = study_subject.study_subject_id)
+				AND item_id IN (SELECT item_id 
+					FROM item 
+					WHERE name = 'Rand_Date')
+				AND value IS NOT NULL
+				AND date_updated IS NOT NULL 
+				ORDER BY event_crf_id DESC 
+				LIMIT 1 )
+			WHERE randomization_date IS NULL;
+		</sql>
+	</changeSet>
+</databaseChangeLog>

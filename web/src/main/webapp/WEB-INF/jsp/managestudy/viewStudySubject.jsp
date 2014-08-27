@@ -299,14 +299,10 @@
 							</td>
 							<td class="table_cell_br"><b><fmt:message key="randomization_date" bundle="${resword}"/></b></td>
 							<td class="table_cell_br">
-								${studySub.randomizationDate}
+								<fmt:formatDate value="${studySub.randomizationDate}" pattern="${dteFormat}" />
 							</td>
 						</tr>
 						</c:if>
-
-						<tr>
-							<td class="table_divider" colspan="4">&nbsp;</td>
-						</tr>
 
 					<tr>
 						<td class="table_cell_br_colored"><b><fmt:message key="study_name" bundle="${resword}"/></b></td>
