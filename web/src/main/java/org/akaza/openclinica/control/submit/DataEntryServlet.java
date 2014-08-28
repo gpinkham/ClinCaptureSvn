@@ -2072,14 +2072,9 @@ public abstract class DataEntryServlet extends Controller {
 	protected void setReasonForChangeError(HashMap errors, ItemDataBean idb, String formName, String error,
 			HttpServletRequest request) {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-		HttpSession session = request.getSession();
-		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session
-				.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-		HashMap fieldNotes = fdn.getFieldNotes();
 		Set<String> setOfItemNamesWithRFCErrors = request.getAttribute("setOfItemNamesWithRFCErrors") == null ? new TreeSet<String>()
 				: (TreeSet<String>) request.getAttribute("setOfItemNamesWithRFCErrors");
-		int existingNotes = dndao.findNumExistingNotesForItem(idb.getId());
-		if (existingNotes > 0) {
+		if (getNumberOfNotesForField(idb.getId(), formName, dndao, request) > 0) {
 
 			logger.debug("has a note in db " + formName);
 
@@ -2087,7 +2082,7 @@ public abstract class DataEntryServlet extends Controller {
 			 * Having existing notes is not enough to let it pass through after changing data. There has to be a
 			 * DiscrepancyNote for the latest changed data
 			 */
-			HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) session
+			HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) request.getSession()
 					.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
 			if ((noteSubmitted == null || noteSubmitted.get(formName) == null || !(Boolean) noteSubmitted.get(formName))
 					&& (noteSubmitted == null || noteSubmitted.get(idb.getId()) == null || !(Boolean) noteSubmitted
@@ -2104,6 +2099,19 @@ public abstract class DataEntryServlet extends Controller {
 		request.setAttribute("setOfItemNamesWithRFCErrors", setOfItemNamesWithRFCErrors);
 	}
 
+	private static int getNumberOfNotesForField(int itemDataBeanId, String formName, DiscrepancyNoteDAO dndao, 
+			HttpServletRequest request) {
+		int existingNotes = dndao.findNumExistingNotesForItem(itemDataBeanId);
+		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession()
+				.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+		
+		if (existingNotes <= 0 && fdn != null) {
+			existingNotes = fdn.getNotes(formName).size();
+		}
+		
+		return existingNotes;
+	}
+	
 	/**
 	 * Get the input beans - the EventCRFBean and the SectionBean. For both beans, look first in the request attributes
 	 * to see if the bean has been stored there. If not, look in the parameters for the bean id, and then retrieve the
