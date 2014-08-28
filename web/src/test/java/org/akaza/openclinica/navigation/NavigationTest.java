@@ -40,12 +40,19 @@ public class NavigationTest {
 	}
 	
 	@Test
-	public void testThatURLsFromexclusionPopUpURLsAreBiengProcessedCorrectly() {
+	public void testThatURLsFromexclusionPopUpURLsAreBiengProcessedCorrectly1() {
 		configureRequest("UploadFile");
 		Navigation.addToNavigationStack(request);
 		assertEquals(1, visitedURLs.size());
 		assertTrue(visitedURLs.get(0).equals("/MainMenu"));
-		
+	}
+	
+	@Test
+	public void testThatURLsFromexclusionPopUpURLsAreBiengProcessedCorrectly2() {
+		configureRequest("DownloadAttachedFile");
+		Navigation.addToNavigationStack(request);
+		assertEquals(1, visitedURLs.size());
+		assertTrue(visitedURLs.get(0).equals("/MainMenu"));	
 	}
 	
 	private void configureRequest(String url) {
