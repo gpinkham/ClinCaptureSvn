@@ -125,6 +125,7 @@ public class XsltTransformJob extends QuartzJobBean {
 	public static final int FOUR = 4;
 	public static final int THREE = 3;
 	public static final int TWO = 2;
+	public static final int MILLISECONDS_IN_DAY = 86400000;
 	private OpenClinicaMailSender mailSender;
 	private DataSource dataSource;
 	private AuditEventDAO auditEventDAO;
@@ -164,8 +165,19 @@ public class XsltTransformJob extends QuartzJobBean {
 		return content;
 	}
 
+	private boolean reportAboutException(JobExecutionContext context, String exceptionKey) {
+		Date exceptionDate = (Date) context.getJobDetail().getJobDataMap().get(exceptionKey);
+		boolean reportAboutException = exceptionDate == null
+				|| Math.abs(exceptionDate.getTime() - System.currentTimeMillis()) > MILLISECONDS_IN_DAY;
+		if (reportAboutException) {
+			context.getJobDetail().getJobDataMap().put(exceptionKey, new Date());
+		}
+		return reportAboutException;
+	}
+
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+		boolean reportAboutException = true;
 		Locale locale = new Locale("en-US");
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
@@ -262,8 +274,10 @@ public class XsltTransformJob extends QuartzJobBean {
 				String jobType = (String) dataMap.get(JOB_TYPE);
 				sasExtractJob = jobType != null && jobType.equals(EXPORT_JOB);
 				if (sasDir == null || sasDir.trim().isEmpty()) {
+					reportAboutException = reportAboutException(context, "sasDirException");
 					throw new Exception(messageSource.getMessage("sasDataset.exception.sasExtractFolder", null, locale));
 				} else if (!sasDirFile.exists()) {
+					reportAboutException = reportAboutException(context, "latestSasDirException");
 					throw new Exception(messageSource.getMessage("sasDataset.exception.sasFolder",
 							new Object[] { sasDir }, locale));
 				}
@@ -279,14 +293,11 @@ public class XsltTransformJob extends QuartzJobBean {
 				}
 				emailBuffer = (StringBuffer) dataMap.get(SAS_EMAIL_BUFFER);
 				String sasOdmOutputPath = (String) dataMap.get(SAS_ODM_OUTPUT_PATH);
-				String nextFireTime = simpleDateFormat.format(context.getTrigger().getNextFireTime());
-				if (!sasDirFile.exists()) {
-					throw new Exception(messageSource.getMessage("sasDataset.exception.folder", new Object[] { sasDir,
-							nextFireTime }, locale));
-				}
+				String nextFireTimeStr = simpleDateFormat.format(context.getTrigger().getNextFireTime());
 				if (!sasJobDirFile.exists()) {
+					reportAboutException = reportAboutException(context, "latestSasJobDirException");
 					throw new Exception(messageSource.getMessage("sasDataset.exception.folder", new Object[] {
-							sasJobDir, nextFireTime }, locale));
+							sasJobDir, nextFireTimeStr }, locale));
 				}
 
 				sasErrors = sasErrors.concat("\n\n").concat(messageSource.getMessage("sas.errors", null, locale))
@@ -304,7 +315,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
 				if (!new File(sasJobDirFile.getAbsolutePath() + File.separator + "ready.txt").exists()) {
 					logger.info("Job: " + (jobName != null ? jobName : datasetBean.getName())
-							+ ". The next fire time is: " + nextFireTime);
+							+ ". The next fire time is: " + nextFireTimeStr);
 					return;
 				}
 
@@ -314,8 +325,9 @@ public class XsltTransformJob extends QuartzJobBean {
 					}
 				});
 				if (myFiles.length != 1) {
+					unscheduleSASJob = true;
 					throw new Exception(messageSource.getMessage("sasDataset.exception.zip",
-							new Object[] { nextFireTime }, locale));
+							new Object[] { nextFireTimeStr }, locale));
 				}
 
 				sasWarnings = sasWarnings.concat("<br/>")
@@ -768,10 +780,12 @@ public class XsltTransformJob extends QuartzJobBean {
 			logger.error("Error has occurred.", e);
 			exceptions = true;
 		} catch (Exception ee) {
-			sendErrorEmail(ee.getMessage(), sasSideHasErrors ? sasErrors.replaceAll("\n", "<br/>") : null, context,
-					alertEmail);
-			postErrorMessage(!sasExtractJob && sasSideHasErrors ? sasExceptionMessage : ee.getMessage(),
-					sasSideHasErrors && sasExtractJob ? sasErrors.replaceAll("\n", "<br/>") : null, context);
+			if (reportAboutException) {
+				sendErrorEmail(ee.getMessage(), sasSideHasErrors ? sasErrors.replaceAll("\n", "<br/>") : null, context,
+						alertEmail);
+				postErrorMessage(!sasExtractJob && sasSideHasErrors ? sasExceptionMessage : ee.getMessage(),
+						sasSideHasErrors && sasExtractJob ? sasErrors.replaceAll("\n", "<br/>") : null, context);
+			}
 			ee.printStackTrace();
 			logger.error("Error has occurred.".concat(sasSideHasErrors ? sasErrors : ""), ee);
 			exceptions = true;
