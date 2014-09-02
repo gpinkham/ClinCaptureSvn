@@ -36,6 +36,10 @@
          date_created="2008-07-02" oc_oid="F_CONC" source_study_id="1" auto_layout="false" />
     <crf crf_id="3" status_id="1" name="Medical coding eCRF" description="Test" owner_id="1"
          date_created="2014-05-05" oc_oid="F_MEDICAL" source_study_id="1" auto_layout="false" />
+    <crf crf_id="4" status_id="1" name="Test CRF" description="Test" owner_id="1"
+         date_created="2014-05-05" oc_oid="F_TESTCRF" source_study_id="1" auto_layout="false" />
+    <crf crf_id="5" status_id="1" name="Another CRF" description="Test" owner_id="1"
+         date_created="2014-05-05" oc_oid="F_ANOTHERCRF" source_study_id="1" auto_layout="false" />
 
     <crf_version crf_version_id="1" crf_id="1" name="v2.0" description="Cal&apos;s Test v1; new template"
                  revision_notes="rev agoodwin 10.16.2007" status_id="1" date_created="2008-07-02" owner_id="1"
@@ -48,6 +52,15 @@
     <crf_version crf_version_id="4" crf_id="3" name="v1.0" description="Medical coding first version"
                  revision_notes="demo ecrf" status_id="1" date_created="2014-05-05" owner_id="1"
                  oc_oid="F_MEDICAL_V1"/>
+    <crf_version crf_version_id="5" crf_id="4" name="v1.0" description="Test CRF"
+                 revision_notes="test ecrf" status_id="1" date_created="2014-05-05" owner_id="1"
+                 oc_oid="F_TESTCRF_V1"/>
+    <crf_version crf_version_id="6" crf_id="4" name="v2.0" description="Test CRF"
+                 revision_notes="test ecrf" status_id="1" date_created="2014-05-05" owner_id="1"
+                 oc_oid="F_TESTCRF_V2"/>
+    <crf_version crf_version_id="7" crf_id="5" name="v1.0" description="Another CRF"
+                 revision_notes="test ecrf" status_id="1" date_created="2014-05-05" owner_id="1"
+                 oc_oid="F_ANOTHERCRF_V1"/>
 
     <subject subject_id="1" status_id="1" date_of_birth="2008-07-01" gender="m" unique_identifier="pID1"
              date_created="2008-07-02" owner_id="1" update_id="1" dob_collected="true"/>
@@ -180,6 +193,14 @@
     <event_definition_crf event_definition_crf_id="6" study_event_definition_id="3" study_id="1" crf_id="3"
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="2" status_id="1" owner_id="1"
+                          date_created="2014-05-05" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="false"/>
+    <event_definition_crf event_definition_crf_id="7" study_event_definition_id="9" study_id="1" crf_id="4"
+                          required_crf="true" double_entry="false" require_all_text_filled="false"
+                          decision_conditions="false" null_values="" default_version_id="5" status_id="1" owner_id="1"
+                          date_created="2014-05-05" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="false"/>
+    <event_definition_crf event_definition_crf_id="8" study_event_definition_id="9" study_id="1" crf_id="5"
+                          required_crf="true" double_entry="false" require_all_text_filled="false"
+                          decision_conditions="false" null_values="" default_version_id="7" status_id="1" owner_id="1"
                           date_created="2014-05-05" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="false"/>
 
     <item item_id="1" name="periodStart" description="Start of Agent Administration Period" units="" phi_status="false"

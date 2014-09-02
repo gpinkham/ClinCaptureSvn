@@ -123,6 +123,10 @@
 		<name>deleteItemGroupMetaByVersion</name>
 		<sql>delete from item_group_metadata where crf_version_id=</sql>
 	</query>
+    <query>
+        <name>deleteEventCrfByVersion</name>
+        <sql>delete from event_crf where crf_version_id=</sql>
+    </query>
 	<query>
 		<name>getCRFIdFromCRFVersionId</name>
 		<sql>SELECT crf_id FROM crf_version WHERE crf_version_id=?</sql>

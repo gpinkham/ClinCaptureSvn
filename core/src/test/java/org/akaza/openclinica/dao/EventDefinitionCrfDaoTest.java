@@ -25,7 +25,7 @@ public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
 	public void testThatFindAllReturnsCorrectNumber() {		
 		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eventDefinitionCRFDAO
 				.findAll();
-		assertEquals(6, eventCRFs.size());
+		assertEquals(8, eventCRFs.size());
 	}
 
 	@Test

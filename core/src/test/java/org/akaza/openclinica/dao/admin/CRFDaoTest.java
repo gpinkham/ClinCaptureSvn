@@ -117,7 +117,7 @@ public class CRFDaoTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindAllByStudyReturnsAllExistingCRFs() throws OpenClinicaException {
 		int studyId = 1;
-		assertEquals(3, crfdao.findAllByStudy(studyId).size());
+		assertEquals(5, crfdao.findAllByStudy(studyId).size());
 	}
 
 	@Test
@@ -138,17 +138,17 @@ public class CRFDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testGetAllCRFNamesFromStudyReturnCorrectSize() throws OpenClinicaException {
-		assertEquals(3, crfdao.getAllCRFNamesFromStudy(1).size());
+		assertEquals(5, crfdao.getAllCRFNamesFromStudy(1).size());
 	}
 
 	@Test
 	public void testThatFindAllActiveByDefinitionsForCurrentStudyReturnsCorrectSize() throws Exception {
-		assertEquals(3, crfdao.findAllActiveByDefinitionsForCurrentStudy(1).size());
+		assertEquals(5, crfdao.findAllActiveByDefinitionsForCurrentStudy(1).size());
 	}
 
 	@Test
 	public void testThatFindAllActiveCrfsReturnsCorrectSize() throws OpenClinicaException {
-		assertEquals(3, crfdao.findAllActiveCrfs().size());
+		assertEquals(5, crfdao.findAllActiveCrfs().size());
 	}
 
 	@Test

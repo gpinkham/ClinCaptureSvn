@@ -157,11 +157,13 @@ public class DeleteCRFVersionController {
 
 		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(crfVersionId);
 		CRFBean crfBean = (CRFBean) crfDao.findByPK(crfVersionBean.getCrfId());
+		int crfVersionQuantity = crfVersionDao.findAllActiveByCRF(crfBean.getId()).size();
 
 		List<RuleSetBean> ruleSetBeanList = ruleSetListFilter(crfVersionId);
 		List<EventCRFBean> eventCrfBeanList = eventCrfDAO.findAllStartedByCrfVersion(crfVersionId);
-		List<StudyEventDefinitionBean> eventDefinitionListAvailable = StudyEventDefinitionUtil
-				.studyEventDefinitionListFilter(dataSource, eventDefinitionCrfDao.findAllByCRF(crfBean.getId()));
+		List<StudyEventDefinitionBean> eventDefinitionListAvailable = crfVersionQuantity > 1 ? new ArrayList<StudyEventDefinitionBean>()
+				: StudyEventDefinitionUtil.studyEventDefinitionListFilter(dataSource,
+						eventDefinitionCrfDao.findAllByCRF(crfBean.getId()));
 		List<DiscrepancyNoteBean> crfDiscrepancyNotes = discrepancyNoteDao.findAllByCRFId(crfBean.getId());
 
 		if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0 || eventDefinitionListAvailable.size() > 0

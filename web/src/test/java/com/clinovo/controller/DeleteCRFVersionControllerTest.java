@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Locale;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,7 +54,7 @@ public class DeleteCRFVersionControllerTest extends BaseControllerTest {
 	@Test
 	public void testThatDeleteCRFVersionConfirmReturnsCode302() throws Exception {
 
-		this.mockMvc.perform(post(DELETE_CRF_VERSION).param("crfVersionId", "1").param("confirm", "confirm"))
+		this.mockMvc.perform(post(DELETE_CRF_VERSION).param("crfVersionId", "2").param("confirm", "confirm"))
 				.andExpect(status().isFound());
 	}
 
@@ -62,5 +64,24 @@ public class DeleteCRFVersionControllerTest extends BaseControllerTest {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(DELETE_CRF_VERSION).param("crfVersionId", "1").param("confirm", "confirm"))
 				.andExpect(MockMvcResultMatchers.view().name("redirect:/ListCRF"));
+
+	}
+
+	@Test
+	public void testThatDeleteCRFVersionConfirmDoesNotAllowToDeleteCrfVersion() throws Exception {
+		this.mockMvc.perform(post(DELETE_CRF_VERSION).param("crfVersionId", "7").param("confirm", "confirm"))
+				.andExpect(
+						MockMvcResultMatchers.request().sessionAttribute(
+								"controllerMessage",
+								messageSource
+										.getMessage("this_crf_version_has_associated_data", null, new Locale("en"))));
+	}
+
+	@Test
+	public void testThatDeleteCRFVersionConfirmAllowToDeleteCrfVersion() throws Exception {
+		this.mockMvc.perform(post(DELETE_CRF_VERSION).param("crfVersionId", "5").param("confirm", "confirm"))
+				.andExpect(
+						MockMvcResultMatchers.request().sessionAttribute("controllerMessage",
+								messageSource.getMessage("the_crf_version_has_been_removed", null, new Locale("en"))));
 	}
 }
