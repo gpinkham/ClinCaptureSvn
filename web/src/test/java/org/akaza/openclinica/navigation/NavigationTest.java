@@ -26,42 +26,66 @@ public class NavigationTest {
 
 	@Test
 	public void testThatNavigationUtilSetsRedirectAfterLoginAttributeInTheSession() {
-		configureRequest("AccessFile", "fid=123");
+		configureRequestURLAndQuery("AccessFile", "fid=123");
 		Navigation.addToNavigationStack(request);
 		assertTrue(session.getAttribute("redirectAfterLogin") != null);
 	}
 	
 	@Test
 	public void testThatURLsFromSpecialURLsAreBiengProcessedCorrectly() {
-		configureRequest("EnterDataForStudyEvent");
+		configureRequestURLWithoutQuery("EnterDataForStudyEvent");
 		Navigation.addToNavigationStack(request);
 		assertEquals(1, visitedURLs.size());
 		assertTrue(visitedURLs.get(0).equals("/MainMenu"));
 	}
 	
 	@Test
-	public void testThatURLsFromexclusionPopUpURLsAreBiengProcessedCorrectly1() {
-		configureRequest("UploadFile");
+	public void testThatURLsFromExclusionPopUpURLsAreBiengProcessedCorrectly1() {
+		configureRequestURLWithoutQuery("UploadFile");
 		Navigation.addToNavigationStack(request);
 		assertEquals(1, visitedURLs.size());
 		assertTrue(visitedURLs.get(0).equals("/MainMenu"));
 	}
 	
 	@Test
-	public void testThatURLsFromexclusionPopUpURLsAreBiengProcessedCorrectly2() {
-		configureRequest("DownloadAttachedFile");
+	public void testThatURLsFromExclusionPopUpURLsAreBiengProcessedCorrectly2() {
+		configureRequestURLWithoutQuery("DownloadAttachedFile");
 		Navigation.addToNavigationStack(request);
 		assertEquals(1, visitedURLs.size());
 		assertTrue(visitedURLs.get(0).equals("/MainMenu"));	
 	}
 	
-	private void configureRequest(String url) {
-		visitedURLs = new Stack<String>();
-		session.setAttribute("visitedURLs", visitedURLs);
-		configureRequest(url, "eventId=5&openFirstCrf=true");
+	@Test
+	public void testThatURLsFromSpecialURLsAreBiengProcessedCorrectly1() {
+
+		configureRequestURLWithQuery("ViewSectionDataEntry", "cw=1&abc=2");
+		Navigation.addToNavigationStack(request);
+		assertEquals(1, visitedURLs.size());
+		assertTrue(visitedURLs.get(0).equals("/MainMenu"));	
 	}
 	
-	private void configureRequest(String url, String query) {
+	@Test
+	public void testThatURLsFromSpecialURLsAreBiengProcessedCorrectly2() {
+
+		configureRequestURLWithQuery("ViewSectionDataEntry", "abc=2");
+		Navigation.addToNavigationStack(request);
+		assertEquals(1, visitedURLs.size());
+		assertTrue(visitedURLs.get(0).equals("skip!"));	
+	}
+	
+	private void configureRequestURLWithQuery(String url, String query) {
+		visitedURLs = new Stack<String>();
+		session.setAttribute("visitedURLs", visitedURLs);
+		configureRequestURLAndQuery(url, query);
+	}
+	
+	private void configureRequestURLWithoutQuery(String url) {
+		visitedURLs = new Stack<String>();
+		session.setAttribute("visitedURLs", visitedURLs);
+		configureRequestURLAndQuery(url, "eventId=5&openFirstCrf=true");
+	}
+	
+	private void configureRequestURLAndQuery(String url, String query) {
 		Mockito.when(request.getQueryString()).thenReturn(query);
 		Mockito.when(request.getContextPath()).thenReturn("/clincapture");
 		Mockito.when(request.getRequestURI()).thenReturn("/clincapture/" + url);

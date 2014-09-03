@@ -31,7 +31,7 @@ public final class Navigation {
 			"/ResolveDiscrepancy", "/RestoreStudySubject", "/UpdateStudyEvent", "/RemoveStudyEvent",
 			"/RestoreStudyEvent", "/DeleteEventCRF", "/RemoveEventCRF", "/RestoreEventCRF", "/InitUpdateCRF",
 			"/InitUpdateSubStudy", "/UpdateSubStudy", "/DeleteStudyEvent", "/EditStudyUserRole",
-			"/ViewSectionDataEntry", "/CreateSubjectGroupClass", "/SetStudyUserRole", "/UpdateProfile",
+			"/CreateSubjectGroupClass", "/SetStudyUserRole", "/UpdateProfile", "/DoubleDataEntry",
 			"/SectionPreview", "/DefineStudyEvent", "/InitUpdateEventDefinition", "/UpdateEventDefinition",
 			"/RemoveEventDefinition", "/RemoveSubject", "/RemoveStudy", "/ViewUserAccount", "/EditUserAccount",
 			"/SetUserRole", "/ViewUserAccount", "/Configure", "/CreateUserAccount", "/UpdateJobImport",
@@ -43,8 +43,7 @@ public final class Navigation {
 			"/pages/managestudy/confirmCRFVersionChange", "/pages/managestudy/changeCRFVersion", "/CreateCRFVersion",
 			"/RemoveCRF", "/RemoveCRFVersion", "/RestoreCRF", "/RestoreCRFVersion", "/DeleteCRFVersion",
 			"/LockCRFVersion", "/UnlockCRFVersion", "/CreateSubStudy", "/RemoveCRFFromDefinition",
-			"/RestoreCRFFromDefinition", "/AddCRFToDefinition", "/InitialDataEntry", "/AdministrativeEditing",
-			"/DoubleDataEntry"));
+			"/RestoreCRFFromDefinition", "/AddCRFToDefinition", "/InitialDataEntry", "/AdministrativeEditing"));
 	// ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintAllEventCRF", "/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
@@ -59,7 +58,7 @@ public final class Navigation {
 			"/DownloadAttachedFile"));
 	// set of pages with special processing
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
-			"/ListStudySubjects", "/EnterDataForStudyEvent"));
+			"/ListStudySubjects", "/EnterDataForStudyEvent", "/ViewSectionDataEntry"));
 	private static String defaultShortURL = "/MainMenu";
 
 	private Navigation() {
@@ -147,7 +146,6 @@ public final class Navigation {
 					|| visitedURLs.peek().split("\\?")[0].equals("/ListStudySubjects"))) {
 				visitedURLs.pop();
 			}
-
 		}
 
 		if ("/ListStudySubjects".equals(requestShortURI)) {
@@ -167,7 +165,16 @@ public final class Navigation {
 			}
 		}
 
+		if ("/ViewSectionDataEntry".equals(requestShortURI)) {
+			if (requestShortURL.contains("cw=1")) {
+				// popup on SDV-page
+				return;
+			} else {
+				visitedURLs.push("skip!");
+				return;
+			}
+		}
+		
 		visitedURLs.push(requestShortURL);
-
 	}
 }

@@ -1032,7 +1032,6 @@ public class SDVUtil {
 			}
 			ArrayList<EventCRFBean> eventCrfs = eventCRFDAO.getEventCRFsByStudySubjectCompleteOrLocked(studySubjectId);
 			StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);			
-			StudyBean studyBean = (StudyBean) studyDAO.findByPK(studySubject.getStudyId());
 			for (EventCRFBean eventCRFBean : eventCrfs) {
 				if (!isSdvWithOpenQueriesAllowed && exceptedEventCrfIdForSubjectList.contains(eventCRFBean.getId()))
 					continue;

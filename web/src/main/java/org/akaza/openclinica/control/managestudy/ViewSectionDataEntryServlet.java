@@ -90,6 +90,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 	public static final String RESOLVE_DISCREPANCY = "ResolveDiscrepancy";
 	public static final String EVENT_CRF_ID = "eventCRFId";
 	public static final String ENCLOSING_PAGE = "enclosingPage";
+	public static final String JUST_CLOSE_WINDOW = "justCloseWindow";
 
 	/**
 	 * Checks whether the user has the correct privilege.
@@ -129,6 +130,10 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		FormProcessor fp = new FormProcessor(request);
 		request.setAttribute("expandCrfInfo", false);
 
+		if (request.getParameter("cw") != null) {
+			request.setAttribute(JUST_CLOSE_WINDOW, true);
+		}
+		
 		SimpleDateFormat localDF = getLocalDf(request);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
