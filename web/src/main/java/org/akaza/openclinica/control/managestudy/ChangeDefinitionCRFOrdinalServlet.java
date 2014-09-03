@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 /**
  * Processes request to change CRF ordinals in a study event definition.
  */
-@SuppressWarnings({ "serial", "rawtypes", "unchecked" })
+@SuppressWarnings({ "serial", "unchecked" })
 @Component
 public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 

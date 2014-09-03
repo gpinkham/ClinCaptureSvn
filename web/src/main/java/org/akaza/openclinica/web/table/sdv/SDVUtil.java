@@ -92,7 +92,7 @@ import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
  * A utility class that implements the details of the Source Data Verification (SDV) Jmesa tables.
  */
 @Component
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({ "unchecked" , "unused" })
 public class SDVUtil {
 
 	private final static String VIEW_ICON_FORSUBJECT_PREFIX = "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudySubject?id=";
@@ -1031,7 +1031,7 @@ public class SDVUtil {
 				exceptedEventCrfIdForSubjectList = dndao.findAllEvCRFIdsWithUnclosedDNsByStSubId(studySubjectId);
 			}
 			ArrayList<EventCRFBean> eventCrfs = eventCRFDAO.getEventCRFsByStudySubjectCompleteOrLocked(studySubjectId);
-			StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
+			StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);			
 			StudyBean studyBean = (StudyBean) studyDAO.findByPK(studySubject.getStudyId());
 			for (EventCRFBean eventCRFBean : eventCrfs) {
 				if (!isSdvWithOpenQueriesAllowed && exceptedEventCrfIdForSubjectList.contains(eventCRFBean.getId()))
