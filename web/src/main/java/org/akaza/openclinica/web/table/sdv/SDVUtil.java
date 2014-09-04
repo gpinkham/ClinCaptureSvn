@@ -92,7 +92,7 @@ import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
  * A utility class that implements the details of the Source Data Verification (SDV) Jmesa tables.
  */
 @Component
-@SuppressWarnings({ "unchecked" , "unused" })
+@SuppressWarnings({ "unchecked" })
 public class SDVUtil {
 
 	private final static String VIEW_ICON_FORSUBJECT_PREFIX = "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudySubject?id=";
