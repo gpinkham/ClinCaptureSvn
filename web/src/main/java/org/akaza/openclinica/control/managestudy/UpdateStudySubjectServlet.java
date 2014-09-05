@@ -39,7 +39,6 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
-import org.akaza.openclinica.control.submit.DataEntryServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -129,8 +128,8 @@ public class UpdateStudySubjectServlet extends Controller {
 			ArrayList<DiscrepancyNoteBean> dbNotes = (ArrayList<DiscrepancyNoteBean>) dndao
 					.findAllByEntityAndColumnAndStudy(currentStudy, "studySub", studySubId, "enrollment_date");
 			request.setAttribute(HAS_NOTES, dbNotes != null && dbNotes.size() > 0);
-			request.setAttribute(ENROLLMENT_NOTE_STATUS, ResolutionStatus.get(DataEntryServlet
-					.getDiscrepancyNoteResolutionStatus(dndao, studySubId, dbNotes)));
+			request.setAttribute(ENROLLMENT_NOTE_STATUS,
+					ResolutionStatus.get(getDiscrepancyNoteResolutionStatus(request, dndao, studySubId, dbNotes)));
 
 			String action = fp.getString("action", true);
 			if (StringUtil.isBlank(action)) {

@@ -388,8 +388,8 @@ public abstract class DataEntryServlet extends Controller {
 		eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
 
 		// Filter out coder notes
-		allNotes = extractCoderNotes(allNotes, request);
-		eventCrfNotes = extractCoderNotes(eventCrfNotes, request);
+		allNotes = filterNotesByUserRole(allNotes, request);
+		eventCrfNotes = filterNotesByUserRole(eventCrfNotes, request);
 
 		if (!eventCrfNotes.isEmpty()) {
 			allNotes.addAll(eventCrfNotes);
@@ -416,7 +416,7 @@ public abstract class DataEntryServlet extends Controller {
 			newUploadedFiles = new HashMap<String, String>();
 		}
 		request.setAttribute("newUploadedFiles", newUploadedFiles);
-		
+
 		if (!fp.getString(GO_EXIT).equals("")) {
 			request.getSession().removeAttribute(DN_ADDITIONAL_CR_PARAMS);
 			session.removeAttribute(GROUP_HAS_DATA);
@@ -439,7 +439,7 @@ public abstract class DataEntryServlet extends Controller {
 			}
 			session.removeAttribute("newUploadedFiles");
 			addPageMessage(respage.getString("exit_without_saving"), request);
-			response.sendRedirect(HelpNavigationServlet.getSavedUrl(request)); 
+			response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
 			return;
 		}
 
@@ -1802,7 +1802,7 @@ public abstract class DataEntryServlet extends Controller {
 									session.removeAttribute("mayProcessUploading");
 
 									request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
-									
+
 									// Clinovo Ticket #173 start
 									StdScheduler scheduler = getScheduler(request);
 									CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
@@ -1813,7 +1813,7 @@ public abstract class DataEntryServlet extends Controller {
 										}
 									}
 									// end
-									response.sendRedirect(HelpNavigationServlet.getSavedUrl(request)); 
+									response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
 									return;
 
 								}
@@ -2082,8 +2082,8 @@ public abstract class DataEntryServlet extends Controller {
 			 * Having existing notes is not enough to let it pass through after changing data. There has to be a
 			 * DiscrepancyNote for the latest changed data
 			 */
-			HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) request.getSession()
-					.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
+			HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) request.getSession().getAttribute(
+					DataEntryServlet.NOTE_SUBMITTED);
 			if ((noteSubmitted == null || noteSubmitted.get(formName) == null || !(Boolean) noteSubmitted.get(formName))
 					&& (noteSubmitted == null || noteSubmitted.get(idb.getId()) == null || !(Boolean) noteSubmitted
 							.get(idb.getId()))) {
@@ -2099,19 +2099,19 @@ public abstract class DataEntryServlet extends Controller {
 		request.setAttribute("setOfItemNamesWithRFCErrors", setOfItemNamesWithRFCErrors);
 	}
 
-	private static int getNumberOfNotesForField(int itemDataBeanId, String formName, DiscrepancyNoteDAO dndao, 
+	private static int getNumberOfNotesForField(int itemDataBeanId, String formName, DiscrepancyNoteDAO dndao,
 			HttpServletRequest request) {
 		int existingNotes = dndao.findNumExistingNotesForItem(itemDataBeanId);
-		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession()
-				.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-		
+		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
+				AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+
 		if (existingNotes <= 0 && fdn != null) {
 			existingNotes = fdn.getNotes(formName).size();
 		}
-		
+
 		return existingNotes;
 	}
-	
+
 	/**
 	 * Get the input beans - the EventCRFBean and the SectionBean. For both beans, look first in the request attributes
 	 * to see if the bean has been stored there. If not, look in the parameters for the bean id, and then retrieve the
@@ -3207,7 +3207,7 @@ public abstract class DataEntryServlet extends Controller {
 		List<DiscrepancyNoteBean> existingNameNotes = new ArrayList();
 		List<DiscrepancyNoteBean> existingIntrvDateNotes = new ArrayList();
 
-		ecNotes = extractCoderNotes(ecNotes, request);
+		ecNotes = filterNotesByUserRole(ecNotes, request);
 
 		for (int i = 0; i < ecNotes.size(); i++) {
 			DiscrepancyNoteBean dn = ecNotes.get(i);
@@ -3271,7 +3271,7 @@ public abstract class DataEntryServlet extends Controller {
 
 						List dbNotes = dndao.findExistingNotesForItemData(itemDataId);
 
-						dbNotes = extractCoderNotes(dbNotes, request);
+						dbNotes = filterNotesByUserRole(dbNotes, request);
 
 						ArrayList notes = new ArrayList(discNotes.getNotes(inputName));
 						notes.addAll(dbNotes);
@@ -3279,7 +3279,7 @@ public abstract class DataEntryServlet extends Controller {
 								true);
 						discNotes.setNumExistingFieldNotes(inputName, dbNotes.size());
 						dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
-						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, itemDataId,
+						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(request, dndao, itemDataId,
 								discNotes.getNotes(inputName)));
 						dib = setTotals(dib, itemDataId, notes, ecb.getId(), request);
 						DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
@@ -3302,12 +3302,12 @@ public abstract class DataEntryServlet extends Controller {
 				List dbNotes = dndao.findExistingNotesForItemData(itemDataId);
 				ArrayList notes = new ArrayList(discNotes.getNotes(inputFieldName));
 
-				dbNotes = extractCoderNotes(dbNotes, request);
+				dbNotes = filterNotesByUserRole(dbNotes, request);
 
 				notes.addAll(dbNotes);
 				discNotes.setNumExistingFieldNotes(inputFieldName, dbNotes.size());
 				dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
-				dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, itemDataId,
+				dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(request, dndao, itemDataId,
 						discNotes.getNotes(inputFieldName)));
 				dib = setTotals(dib, itemDataId, discNotes.getNotes(inputFieldName), ecb.getId(), request);
 				noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
@@ -3325,14 +3325,14 @@ public abstract class DataEntryServlet extends Controller {
 					List dbChildNotes = dndao.findExistingNotesForItemData(childItemId);
 					List childNotes = new ArrayList(discNotes.getNotes(inputFieldName));
 
-					dbChildNotes = extractCoderNotes(dbChildNotes, request);
+					dbChildNotes = filterNotesByUserRole(dbChildNotes, request);
 
 					childNotes.addAll(dbNotes);
 					noteThreads = dNoteUtil
 							.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
 					discNotes.setNumExistingFieldNotes(childInputFieldName, dbChildNotes.size());
 					child.setNumDiscrepancyNotes(dbChildNotes.size() + childNotes.size());
-					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, childItemDataId,
+					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(request, dndao, childItemDataId,
 							discNotes.getNotes(childInputFieldName)));
 					child = setTotals(child, childItemDataId, discNotes.getNotes(childInputFieldName), ecb.getId(),
 							request);
@@ -3355,7 +3355,7 @@ public abstract class DataEntryServlet extends Controller {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		List<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesToolTips(ecb);
 
-		ecNotes = extractCoderNotes(ecNotes, request);
+		ecNotes = filterNotesByUserRole(ecNotes, request);
 
 		ArrayList<DiscrepancyNoteBean> nameNotes = new ArrayList();
 		ArrayList<DiscrepancyNoteBean> dateNotes = new ArrayList();
@@ -3391,7 +3391,7 @@ public abstract class DataEntryServlet extends Controller {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		List<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForToolTip(itemDataId);
 
-		existingNotes = extractCoderNotes(existingNotes, request);
+		existingNotes = filterNotesByUserRole(existingNotes, request);
 
 		dib.setDiscrepancyNotes(existingNotes);
 
@@ -4647,51 +4647,6 @@ public abstract class DataEntryServlet extends Controller {
 		}
 		request.setAttribute("manualRows", new Integer(manualRows));
 		return errors;
-	}
-
-	/* Determining the resolution status that will be shown in color flag for an item. */
-	public static int getDiscrepancyNoteResolutionStatus(DiscrepancyNoteDAO dndao, int itemDataId, ArrayList formNotes) {
-		int resolutionStatus = 0;
-		boolean hasOtherThread = false;
-
-		ArrayList existingNotes = dndao.findExistingNotesForItemData(itemDataId);
-		for (Object obj : existingNotes) {
-			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
-			/*
-			 * We would only take the resolution status of the parent note of any note thread. If there are more than
-			 * one note thread, the thread with the worst resolution status will be taken.
-			 */
-			if (note.getParentDnId() == 0) {
-				if (hasOtherThread) {
-					if (resolutionStatus > note.getResolutionStatusId()) {
-						resolutionStatus = note.getResolutionStatusId();
-					}
-				} else {
-					resolutionStatus = note.getResolutionStatusId();
-				}
-				hasOtherThread = true;
-			}
-		}
-
-		if (formNotes == null || formNotes.isEmpty()) {
-			return resolutionStatus;
-		}
-
-		for (Object obj : formNotes) {
-			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
-			if (note.getParentDnId() == 0) {
-				if (hasOtherThread) {
-					if (resolutionStatus > note.getResolutionStatusId()) {
-						resolutionStatus = note.getResolutionStatusId();
-					}
-				} else {
-					resolutionStatus = note.getResolutionStatusId();
-				}
-				hasOtherThread = true;
-			}
-		}
-
-		return resolutionStatus;
 	}
 
 	/*

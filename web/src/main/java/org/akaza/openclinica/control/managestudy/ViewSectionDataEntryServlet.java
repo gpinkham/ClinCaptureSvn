@@ -133,7 +133,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		if (request.getParameter("cw") != null) {
 			request.setAttribute(JUST_CLOSE_WINDOW, true);
 		}
-		
+
 		SimpleDateFormat localDF = getLocalDf(request);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
@@ -148,7 +148,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		int studySubjectId = fp.getInt("studySubjectId", true);
 		String action = fp.getString("action");
 		HttpSession session = request.getSession();
-		
+
 		request.setAttribute("eventId", fp.getString("eventId"));
 		request.setAttribute("studySubjectId", studySubjectId + "");
 		request.setAttribute("crfListPage", fp.getString("crfListPage"));
@@ -181,7 +181,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				addPageMessage(
 						respage.getString("no_have_correct_privilege_current_study") + " "
 								+ respage.getString("change_study_contact_sysadmin"), request);
-				throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
+				throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"),
+						"1");
 			}
 		}
 
@@ -202,12 +203,12 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			return;
 		}
-		
+
 		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		SectionDAO sdao = new SectionDAO(getDataSource());
 		String age = "";
-		
+
 		if (studySubjectId > 0) {
 			StudySubjectDAO ssdao = getStudySubjectDAO();
 			StudySubjectBean sub = (StudySubjectBean) ssdao.findByPK(studySubjectId);
@@ -240,7 +241,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			// Get the status/number of item discrepancy notes
 			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 			allNotes = dndao.findAllTopNotesByEventCRF(eventCRFId);
-			allNotes = extractCoderNotes(allNotes, request);
+			allNotes = filterNotesByUserRole(allNotes, request);
 
 			// add interviewer.jsp related notes to this Collection
 			eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
@@ -322,7 +323,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			} else {
 				request.setAttribute("studyTitle", currentStudy.getName());
 			}
-			
+
 		} else {
 			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
@@ -343,7 +344,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				StudyEventDAO sedao = getStudyEventDAO();
 				StudyEventBean se = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 				StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se
+						.getStudyEventDefinitionId());
 				se.setStudyEventDefinition(sed);
 				request.setAttribute("studyEvent", se);
 
@@ -430,13 +432,15 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 					// TODO work on this line
 
 					String inputName = getInputName(dib);
-					AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), "ItemData", currentStudy);
+					AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), "ItemData",
+							currentStudy);
 
 					ArrayList childItems = dib.getChildren();
 					for (Object childItem : childItems) {
 						DisplayItemBean child = (DisplayItemBean) childItem;
 						inputName = getInputName(child);
-						AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), "ItemData", currentStudy);
+						AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(),
+								"ItemData", currentStudy);
 					}
 				}
 			}
@@ -449,7 +453,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			request.setAttribute(BEAN_ANNOTATIONS, ecb.getAnnotations());
 			request.setAttribute("sec", sb);
 			request.setAttribute("EventCRFBean", ecb);
-			
+
 			int tabNum;
 			if ("".equalsIgnoreCase(fp.getString("tabId", true))) {
 				tabNum = 1;
@@ -457,14 +461,15 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				tabNum = fp.getInt("tabId", true);
 			}
 			request.setAttribute("tabId", Integer.toString(tabNum));
-			
+
 			if (fp.getBoolean("annotated")) {
 				StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 				CRFVersionDAO crfVerDao = getCRFVersionDAO();
 				CRFVersionBean crfVerBean = (CRFVersionBean) crfVerDao.findByPK(crfVersionId);
 				request.setAttribute("crfVerFormOID", crfVerBean.getOid());
-				request.setAttribute("studyEventDefs", seddao.findAllActiveByStudyIdAndCRFId(currentStudy.getId(), crfId));
-				
+				request.setAttribute("studyEventDefs",
+						seddao.findAllActiveByStudyIdAndCRFId(currentStudy.getId(), crfId));
+
 				forwardPage(Page.VIEW_ANNOTATED_SECTION_DATA_ENTRY, request, response);
 				return;
 			}

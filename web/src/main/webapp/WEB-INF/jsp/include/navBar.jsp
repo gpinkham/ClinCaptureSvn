@@ -202,7 +202,7 @@
                                             <c:when test="${userRole.studyEvaluator}">
                                                 <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <c:if test="${evaluationEnabled eq true}">
-                                                    <li><a href="#"><fmt:message key="evaluate" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <li><a href="${urlPrefix}pages/crfEvaluation"><fmt:message key="evaluate" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 </c:if>
                                                 <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             </c:when>
@@ -424,7 +424,7 @@
                 <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
                 <c:if test="${evaluationEnabled eq true}">
                     <div class="taskLeftColumn">
-                        <div class="taskLink"><a href="${urlPrefix}MainMenu"><fmt:message key="evaluated_crf" bundle="${resword}"/></a></div>
+                        <div class="taskLink"><a href="${urlPrefix}pages/crfEvaluation"><fmt:message key="evaluated_crf" bundle="${resword}"/></a></div>
                     </div>
                 </c:if>
                 <br clear="all">

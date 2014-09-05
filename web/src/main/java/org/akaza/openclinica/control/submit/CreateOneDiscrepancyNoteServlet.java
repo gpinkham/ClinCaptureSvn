@@ -329,10 +329,10 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 	private void sendUpdatedDN(StudyBean currentStudy, int entityId, DiscrepancyNoteBean dn, DiscrepancyNoteDAO dndao,
 			HttpServletRequest request) {
 		// we should send fake dn with correct resolution status to change flag color for the field
-		ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumnAndStudy(currentStudy, dn.getEntityType(), dn.getEntityId(),
-				dn.getColumn());
+		ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumnAndStudy(currentStudy, dn.getEntityType(),
+				dn.getEntityId(), dn.getColumn());
 		DiscrepancyNoteBean dnDuplicate = new DiscrepancyNoteBean(dn);
-		dnDuplicate.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));
+		dnDuplicate.setResolutionStatusId(getDiscrepancyNoteResolutionStatus(request, dndao, entityId, notes));
 		request.setAttribute(UPDATED_DISCREPANCY_NOTE, dnDuplicate);
 	}
 

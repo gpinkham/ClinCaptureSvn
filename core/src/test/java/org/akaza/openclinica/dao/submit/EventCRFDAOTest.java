@@ -13,12 +13,18 @@
 
 package org.akaza.openclinica.dao.submit;
 
+import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
+import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
 import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
+
+import java.util.HashMap;
 
 public class EventCRFDAOTest extends DefaultAppContextTest {
 
@@ -60,5 +66,22 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testFindAllStartedByCrfVersionReturnsCorrectCollectionSize() {
 		assertEquals(eventCRFDAO.findAllStartedByCrfVersion(1).size(), 2);
+	}
+
+	@Test
+	public void testThatCountOfAllEventCrfsForEvaluationReturnsCorrectValue() {
+		CRFEvaluationFilter filter = new CRFEvaluationFilter(new HashMap<Object, Status>());
+		StudyBean currentStudy = new StudyBean();
+		currentStudy.setId(1);
+		assertEquals(eventCRFDAO.countOfAllEventCrfsForEvaluation(filter, currentStudy), 4);
+	}
+
+	@Test
+	public void testThatFindAllEventCrfsForEvaluationReturnsCorrectCollectionSize() {
+		CRFEvaluationFilter filter = new CRFEvaluationFilter(new HashMap<Object, Status>());
+		CRFEvaluationSort sort = new CRFEvaluationSort();
+		StudyBean currentStudy = new StudyBean();
+		currentStudy.setId(1);
+		assertEquals(eventCRFDAO.findAllEventCrfsForEvaluation(currentStudy, filter, sort, 0, 15).size(), 4);
 	}
 }

@@ -21,8 +21,12 @@
 
 package org.akaza.openclinica.dao.submit;
 
+import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
+import com.clinovo.jmesa.evaluation.CRFEvaluationItem;
+import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -1180,5 +1184,118 @@ public class EventCRFDAO extends AuditableEntityDAO {
 			al.add(hm.get("event_crf_id"));
 		}
 		return al;
+	}
+
+	public int countOfAllEventCrfsForEvaluation(CRFEvaluationFilter filter, StudyBean currentStudy) {
+		int index = 1;
+		int result = 0;
+		this.unsetTypeExpected();
+		this.setTypeExpected(index, TypeNames.INT);
+
+		HashMap variables = new HashMap();
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
+		String sql = digester.getQuery("countOfAllEventCrfsForEvaluation");
+		sql = sql.concat(filter.execute(""));
+
+		ArrayList rows = this.select(sql, variables);
+		Iterator it = rows.iterator();
+
+		if (it.hasNext()) {
+			result = (Integer) ((HashMap) it.next()).get("total");
+		}
+
+		return result;
+	}
+
+	public List<CRFEvaluationItem> findAllEventCrfsForEvaluation(StudyBean currentStudy, CRFEvaluationFilter filter,
+			CRFEvaluationSort sort, int rowStart, int rowEnd) {
+		List<CRFEvaluationItem> result = new ArrayList<CRFEvaluationItem>();
+
+		int index = 1;
+		this.unsetTypeExpected();
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.BOOL);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index, TypeNames.DATE);
+
+		index = 1;
+		HashMap variables = new HashMap();
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
+
+		String sql = digester.getQuery("findAllEventCrfsForEvaluation");
+		sql = sql.concat(filter.execute(""));
+
+		String partialSql = sort.execute("");
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
+			if (partialSql.equals("")) {
+				sql = sql.concat(" ORDER BY ec.date_created )x)where r between ")
+						.concat(Integer.toString(rowStart + 1)).concat(" and ").concat(Integer.toString(rowEnd));
+			} else {
+				sql = sql.concat(")x)where r between ").concat(Integer.toString(rowStart + 1)).concat(" and ")
+						.concat(Integer.toString(rowEnd)).concat(" ").concat(partialSql);
+			}
+		} else {
+			sql = sql.concat(partialSql);
+			if (partialSql.equals("")) {
+				sql = sql.concat(" ORDER BY ec.date_created LIMIT ").concat(Integer.toString(rowEnd - rowStart))
+						.concat(" OFFSET ").concat(Integer.toString(rowStart));
+			} else {
+				sql = sql.concat(" LIMIT ").concat(Integer.toString(rowEnd - rowStart)).concat(" OFFSET ")
+						.concat(Integer.toString(rowStart));
+			}
+		}
+
+		ArrayList alist = this.select(sql, variables);
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
+			CRFEvaluationItem crfEvaluationItem = new CRFEvaluationItem();
+			crfEvaluationItem.setEventCrfId((Integer) hm.get("event_crf_id"));
+			crfEvaluationItem.setEventDefinitionCrfId((Integer) hm.get("event_definition_crf_id"));
+			crfEvaluationItem.setStudyEventId((Integer) hm.get("study_event_id"));
+			crfEvaluationItem.setStudyEventDefinitionId((Integer) hm.get("study_event_definition_id"));
+			crfEvaluationItem.setStudySubjectId((Integer) hm.get("study_subject_id"));
+			crfEvaluationItem.setStudyId((Integer) hm.get("study_id"));
+			crfEvaluationItem.setCrfVersionId((Integer) hm.get("crf_version_id"));
+			crfEvaluationItem.setCrfId((Integer) hm.get("crf_id"));
+			crfEvaluationItem.setCrfName((String) hm.get("crf_name"));
+			crfEvaluationItem.setStudyEventName((String) hm.get("study_event_name"));
+			crfEvaluationItem.setStudySubjectLabel((String) hm.get("study_subject_label"));
+			crfEvaluationItem.setStatus(Status.get((Integer) hm.get("status_id")));
+			crfEvaluationItem
+					.setSubjectEventStatus(SubjectEventStatus.get((Integer) hm.get("subject_event_status_id")));
+			crfEvaluationItem.setSdv((Boolean) hm.get("sdv_status"));
+			crfEvaluationItem.setValidatorId((Integer) hm.get("validator_id"));
+			crfEvaluationItem.setOwnerId((Integer) hm.get("owner_id"));
+			crfEvaluationItem.setUpdaterId((Integer) hm.get("updater_id"));
+			crfEvaluationItem.setDateValidate((Date) hm.get("date_validate"));
+			crfEvaluationItem.setDateCompleted((Date) hm.get("date_completed"));
+			crfEvaluationItem.setDateValidateCompleted((Date) hm.get("date_validate_completed"));
+			crfEvaluationItem.setDateCreated((Date) hm.get("date_created"));
+			crfEvaluationItem.setDateUpdated((Date) hm.get("date_updated"));
+
+			result.add(crfEvaluationItem);
+		}
+
+		return result;
 	}
 }

@@ -435,6 +435,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 
 		List<DiscrepancyNoteBean> notes = (List<DiscrepancyNoteBean>) dndao.findAllByEntityAndColumnAndStudy(
 				currentStudy, name, entityId, column);
+		notes = filterNotesByUserRole(notes, request);
 
 		if (notes.size() > 0) {
 			manageStatuses(request, field);
@@ -623,8 +624,8 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		fixStatusUpdatedDate(noteTree);
 		request.setAttribute(DIS_NOTES, noteTree);
 
-		ArrayList<StudyUserRoleBean> userAccounts = DiscrepancyNoteUtil.generateUserAccounts(
-				ssub.getId(), currentStudy, udao, new StudyDAO(getDataSource()));
+		ArrayList<StudyUserRoleBean> userAccounts = DiscrepancyNoteUtil.generateUserAccounts(ssub.getId(),
+				currentStudy, udao, new StudyDAO(getDataSource()));
 
 		request.setAttribute(USER_ACCOUNTS, userAccounts);
 		request.setAttribute(VIEW_DN_LINK, this.getPageServletFileName(request));
@@ -815,7 +816,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			request.setAttribute(RES_STATUSES2, resStatuses2);
 		}
 	}
-	
+
 	private void prepareRepeatingInfo(String name, int entityId, HttpServletRequest request) {
 		Map<String, String> repeatingInfoMap = DiscrepancyNoteUtil.prepareRepeatingInfoMap(name, entityId,
 				getItemDataDAO(), getEventCRFDAO(), getStudyEventDAO(), getItemGroupMetadataDAO(),

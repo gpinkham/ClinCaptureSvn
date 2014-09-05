@@ -108,14 +108,16 @@ public class ViewNotesServlet extends RememberLastPage {
 			}
 		}
 
-		boolean showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
+		boolean showMoreLink = fp.getString("showMoreLink").equals("")
+				|| Boolean.parseBoolean(fp.getString("showMoreLink"));
 
 		int oneSubjectId = fp.getInt("id");
 		request.getSession().setAttribute("subjectId", oneSubjectId);
 
 		int discNoteTypeId;
 		try {
-			DiscrepancyNoteType discNoteType = DiscrepancyNoteType.getByName(request.getParameter(DISCREPANCY_NOTE_TYPE_PARAM));
+			DiscrepancyNoteType discNoteType = DiscrepancyNoteType.getByName(request
+					.getParameter(DISCREPANCY_NOTE_TYPE_PARAM));
 			discNoteTypeId = discNoteType.getId();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -131,7 +133,8 @@ public class ViewNotesServlet extends RememberLastPage {
 
 		int resolutionStatusId;
 		try {
-			ResolutionStatus resolutionStatus = ResolutionStatus.getByName(request.getParameter(DISCREPANCY_NOTE_STATUS_PARAM));
+			ResolutionStatus resolutionStatus = ResolutionStatus.getByName(request
+					.getParameter(DISCREPANCY_NOTE_STATUS_PARAM));
 			resolutionStatusId = resolutionStatus.getId();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -143,9 +146,13 @@ public class ViewNotesServlet extends RememberLastPage {
 			request.getSession().removeAttribute(NOTES_TABLE);
 		}
 
-		request.getSession().setAttribute(WIN_LOCATION, "ViewNotes?viewForOne=" + viewForOne + "&id=" + oneSubjectId + "&module=" + module + " &removeSession=1");
+		request.getSession().setAttribute(
+				WIN_LOCATION,
+				"ViewNotes?viewForOne=" + viewForOne + "&id=" + oneSubjectId + "&module=" + module
+						+ " &removeSession=1");
 
-		boolean hasAResolutionStatus = resolutionStatusId >= DN_STATUS_NEW && resolutionStatusId <= DN_STATUS_NOT_APPLICABLE;
+		boolean hasAResolutionStatus = resolutionStatusId >= DN_STATUS_NEW
+				&& resolutionStatusId <= DN_STATUS_NOT_APPLICABLE;
 		Set<Integer> resolutionStatusIds = (HashSet) request.getSession().getAttribute(RESOLUTION_STATUS);
 		if (!hasAResolutionStatus && resolutionStatusIds != null) {
 			request.getSession().removeAttribute(RESOLUTION_STATUS);
@@ -234,7 +241,8 @@ public class ViewNotesServlet extends RememberLastPage {
 	}
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -242,8 +250,9 @@ public class ViewNotesServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_permission_to_view_discrepancies")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_permission_to_view_discrepancies")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_study_director_or_study_cordinator"), "1");
 	}
@@ -264,13 +273,5 @@ public class ViewNotesServlet extends RememberLastPage {
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&listNotes_")
 				|| request.getQueryString().contains("&print=yes");
-	}
-
-	private boolean isEvaluator(UserAccountBean loggedInUser, HttpServletRequest request) {
-
-		if (getCurrentStudy(request).isSite(getCurrentStudy(request).getParentStudyId())) {
-			return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("evaluator");
-		}
-		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("evaluator");
 	}
 }

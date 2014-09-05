@@ -4330,6 +4330,7 @@ function clearLastAccessedObjects(){
     localStorage.removeItem("data-cc-eventDefinitionId");
     localStorage.removeItem("data-cc-eventDefinitionCrfId");
     localStorage.removeItem("data-cc-eventDefinitionReadonlyCrfId");
+    localStorage.removeItem("data-cc-crfEvaluationId");
 }
 
 function removeHighlightFromCellDescendants(td){

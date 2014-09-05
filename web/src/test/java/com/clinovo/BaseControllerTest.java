@@ -1,6 +1,7 @@
 package com.clinovo;
 
 import org.akaza.openclinica.AbstractContextSentiveTest;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
@@ -14,6 +15,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.Locale;
 
 /**
  * BaseControllerTest class.
@@ -42,20 +45,24 @@ public class BaseControllerTest extends AbstractContextSentiveTest {
 	public static final String ENROLLMENT_PROGRESS_WIDGET = "/initEnrollmentProgressWidget";
 	public static final String CODING_PROGRESS_WIDGET = "/initCodingProgressWidget";
 	public static final String DELETE_CRF_VERSION = "/deleteCRFVersion";
+	public static final String CRF_EVALUATION = "/crfEvaluation";
+
+	public static final Locale LOCALE = new Locale("en");
 
 	@Autowired
 	protected WebApplicationContext wac;
-	
+
 	@Autowired
 	protected MessageSource messageSource;
 
 	@Before
 	public void setup() throws Exception {
-		
 		super.setUp();
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-		
+
 		SecurityContextHolder.getContext().setAuthentication(
 				new UsernamePasswordAuthenticationToken("BB", "is dreaming about halle berry"));
+
+		ResourceBundleProvider.updateLocale(LOCALE);
 	}
 }

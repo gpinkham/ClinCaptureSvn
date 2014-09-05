@@ -31,19 +31,19 @@ public final class Navigation {
 			"/ResolveDiscrepancy", "/RestoreStudySubject", "/UpdateStudyEvent", "/RemoveStudyEvent",
 			"/RestoreStudyEvent", "/DeleteEventCRF", "/RemoveEventCRF", "/RestoreEventCRF", "/InitUpdateCRF",
 			"/InitUpdateSubStudy", "/UpdateSubStudy", "/DeleteStudyEvent", "/EditStudyUserRole",
-			"/CreateSubjectGroupClass", "/SetStudyUserRole", "/UpdateProfile", "/DoubleDataEntry",
-			"/SectionPreview", "/DefineStudyEvent", "/InitUpdateEventDefinition", "/UpdateEventDefinition",
-			"/RemoveEventDefinition", "/RemoveSubject", "/RemoveStudy", "/ViewUserAccount", "/EditUserAccount",
-			"/SetUserRole", "/ViewUserAccount", "/Configure", "/CreateUserAccount", "/UpdateJobImport",
-			"/CreateJobExport", "/CreateJobImport", "/UpdateProfile", "/RemoveDataset", "/LockStudySubject",
-			"/pages/extract", "/CreateNewStudyEvent", "/UpdateSubject", "/UpdateSubjectGroupClass",
-			"/ViewSubjectGroupClass", "/RemoveSubjectGroupClass", "/RestoreSubjectGroupClass", "/UpdateJobExport",
-			"/EditDataset", "/RemoveSite", "/RestoreSite", "/extract", "/ViewSelected", "/SelectItems",
-			"/CreateDataset", "/EditSelected", "/EditDataset", "/pages/managestudy/chooseCRFVersion",
-			"/pages/managestudy/confirmCRFVersionChange", "/pages/managestudy/changeCRFVersion", "/CreateCRFVersion",
-			"/RemoveCRF", "/RemoveCRFVersion", "/RestoreCRF", "/RestoreCRFVersion", "/DeleteCRFVersion",
-			"/LockCRFVersion", "/UnlockCRFVersion", "/CreateSubStudy", "/RemoveCRFFromDefinition",
-			"/RestoreCRFFromDefinition", "/AddCRFToDefinition", "/InitialDataEntry", "/AdministrativeEditing"));
+			"/CreateSubjectGroupClass", "/SetStudyUserRole", "/UpdateProfile", "/DoubleDataEntry", "/SectionPreview",
+			"/DefineStudyEvent", "/InitUpdateEventDefinition", "/UpdateEventDefinition", "/RemoveEventDefinition",
+			"/RemoveSubject", "/RemoveStudy", "/ViewUserAccount", "/EditUserAccount", "/SetUserRole",
+			"/ViewUserAccount", "/Configure", "/CreateUserAccount", "/UpdateJobImport", "/CreateJobExport",
+			"/CreateJobImport", "/UpdateProfile", "/RemoveDataset", "/LockStudySubject", "/pages/extract",
+			"/CreateNewStudyEvent", "/UpdateSubject", "/UpdateSubjectGroupClass", "/ViewSubjectGroupClass",
+			"/RemoveSubjectGroupClass", "/RestoreSubjectGroupClass", "/UpdateJobExport", "/EditDataset", "/RemoveSite",
+			"/RestoreSite", "/extract", "/ViewSelected", "/SelectItems", "/CreateDataset", "/EditSelected",
+			"/EditDataset", "/pages/managestudy/chooseCRFVersion", "/pages/managestudy/confirmCRFVersionChange",
+			"/pages/managestudy/changeCRFVersion", "/CreateCRFVersion", "/RemoveCRF", "/RemoveCRFVersion",
+			"/RestoreCRF", "/RestoreCRFVersion", "/DeleteCRFVersion", "/LockCRFVersion", "/UnlockCRFVersion",
+			"/CreateSubStudy", "/RemoveCRFFromDefinition", "/RestoreCRFFromDefinition", "/AddCRFToDefinition",
+			"/InitialDataEntry", "/AdministrativeEditing"));
 	// ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintAllEventCRF", "/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
@@ -58,7 +58,7 @@ public final class Navigation {
 			"/DownloadAttachedFile"));
 	// set of pages with special processing
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
-			"/ListStudySubjects", "/EnterDataForStudyEvent", "/ViewSectionDataEntry"));
+			"/ListStudySubjects", "/EnterDataForStudyEvent", "/ViewSectionDataEntry", "/pages/crfEvaluation"));
 	private static String defaultShortURL = "/MainMenu";
 
 	private Navigation() {
@@ -142,8 +142,9 @@ public final class Navigation {
 	private static void specialProcessingForURL(Stack<String> visitedURLs, String requestShortURL) {
 		String requestShortURI = requestShortURL.split("\\?")[0];
 		if ("/ListEventsForSubjects".equals(requestShortURI)) {
-			if (!visitedURLs.isEmpty() && (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects")
-					|| visitedURLs.peek().split("\\?")[0].equals("/ListStudySubjects"))) {
+			if (!visitedURLs.isEmpty()
+					&& (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects") || visitedURLs.peek()
+							.split("\\?")[0].equals("/ListStudySubjects"))) {
 				visitedURLs.pop();
 			}
 		}
@@ -152,8 +153,9 @@ public final class Navigation {
 			if (requestShortURL.contains("findSubjects_f_studySubject")) {
 				return;
 			} else {
-				if (!visitedURLs.isEmpty() && (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects")
-						|| visitedURLs.peek().split("\\?")[0].equals("/ListStudySubjects"))) {
+				if (!visitedURLs.isEmpty()
+						&& (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects") || visitedURLs.peek()
+								.split("\\?")[0].equals("/ListStudySubjects"))) {
 					visitedURLs.pop();
 				}
 			}
@@ -174,7 +176,12 @@ public final class Navigation {
 				return;
 			}
 		}
-		
+
+		if ("/pages/crfEvaluation".equals(requestShortURI)) {
+			visitedURLs.push(requestShortURI);
+			return;
+		}
+
 		visitedURLs.push(requestShortURL);
 	}
 }

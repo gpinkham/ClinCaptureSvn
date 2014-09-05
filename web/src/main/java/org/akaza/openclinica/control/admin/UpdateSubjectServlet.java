@@ -28,14 +28,12 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
-
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
-import org.akaza.openclinica.control.submit.DataEntryServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -121,23 +119,23 @@ public class UpdateSubjectServlet extends Controller {
 			DiscrepancyNoteBean discrepancyNoteBean = new DiscrepancyNoteBean();
 			ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumnAndStudy(currentStudy, "subject", subjectId,
 					"unique_identifier");
-			discrepancyNoteBean.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao,
-					subjectId, notes));
+			discrepancyNoteBean.setResolutionStatusId(getDiscrepancyNoteResolutionStatus(request, dndao, subjectId,
+					notes));
 			request.setAttribute(HAS_UNIQUE_ID_NOTE, notes.size() > 0 ? "yes" : "");
 			request.setAttribute(UNIQUE_ID_NOTE, discrepancyNoteBean);
 
 			discrepancyNoteBean = new DiscrepancyNoteBean();
 			notes = (ArrayList) dndao.findAllByEntityAndColumnAndStudy(currentStudy, "subject", subjectId, "gender");
-			discrepancyNoteBean.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao,
-					subjectId, notes));
+			discrepancyNoteBean.setResolutionStatusId(getDiscrepancyNoteResolutionStatus(request, dndao, subjectId,
+					notes));
 			request.setAttribute(HAS_GENDER_NOTE, notes.size() > 0 ? "yes" : "");
 			request.setAttribute(GENDER_NOTE, discrepancyNoteBean);
 
 			discrepancyNoteBean = new DiscrepancyNoteBean();
 			notes = (ArrayList) dndao.findAllByEntityAndColumnAndStudy(currentStudy, "subject", subjectId,
 					"date_of_birth");
-			discrepancyNoteBean.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao,
-					subjectId, notes));
+			discrepancyNoteBean.setResolutionStatusId(getDiscrepancyNoteResolutionStatus(request, dndao, subjectId,
+					notes));
 			request.setAttribute(HAS_DOB_NOTE, notes.size() > 0 ? "yes" : "");
 			request.setAttribute(DOB_NOTE, discrepancyNoteBean);
 
@@ -287,7 +285,7 @@ public class UpdateSubjectServlet extends Controller {
 	 * Processes 'confirm' request, validate the subject object
 	 * 
 	 * @throws Exception
-	 */	
+	 */
 	private void confirm(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		SubjectBean subject = (SubjectBean) request.getSession().getAttribute("subjectToUpdate");
 		FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(

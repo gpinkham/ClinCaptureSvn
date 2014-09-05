@@ -15,6 +15,7 @@
 
 package com.clinovo.interceptor;
 
+import com.clinovo.controller.Redirection;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -29,8 +30,13 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * SetUpSessionInterceptor that able to manage controller requests.
+ */
 public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 
+	public static final String PREV_URL = "_PrevUrl";
+	public static final String FIRST_URL_PARAMETER = "?";
 	public static final String INCLUDE_REPORTING = "includeReporting";
 
 	@Override
@@ -52,8 +58,28 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 			request.setAttribute(INCLUDE_REPORTING, !SQLInitServlet.getField("pentaho.url").trim().equals(""));
 			if (!ok) {
 				response.sendRedirect(request.getContextPath() + "/MainMenu");
+			} else {
+				ok = checkForRedirection(request, response, handler);
 			}
 		}
 		return ok;
+	}
+
+	private boolean checkForRedirection(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
+		boolean result = true;
+		if (handler instanceof Redirection) {
+			String queryString = request.getQueryString();
+			String key = handler.getClass().getName().concat(PREV_URL);
+			String prevQueryString = (String) request.getSession().getAttribute(key);
+			if (prevQueryString != null && queryString == null) {
+				response.sendRedirect(request.getContextPath().concat(((Redirection) handler).getUrl())
+						.concat(FIRST_URL_PARAMETER).concat(prevQueryString));
+				result = false;
+			} else {
+				request.getSession().setAttribute(key, queryString);
+			}
+		}
+		return result;
 	}
 }

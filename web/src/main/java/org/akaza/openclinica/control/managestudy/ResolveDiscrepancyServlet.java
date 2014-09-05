@@ -361,8 +361,8 @@ public class ResolveDiscrepancyServlet extends Controller {
 			request.getSession().removeAttribute("module");
 		}
 
-		if (currentRole.getRole().equals(Role.STUDY_CODER) || currentRole.getRole().equals(Role.INVESTIGATOR)
-				|| currentRole.getRole().equals(Role.STUDY_MONITOR)
+		if (currentRole.getRole().equals(Role.STUDY_EVALUATOR) || currentRole.getRole().equals(Role.STUDY_CODER)
+				|| currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.STUDY_MONITOR)
 				|| currentRole.getRole().equals(Role.STUDY_DIRECTOR)
 				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR)

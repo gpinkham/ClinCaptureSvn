@@ -37,7 +37,6 @@ import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
-import org.akaza.openclinica.control.submit.DataEntryServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
@@ -456,14 +455,14 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 		}
 	}
 
-	private void setRequestAttributesForNotes(StudyBean currentStudy, HttpServletRequest request, DiscrepancyNoteDAO discrepancyNoteDAO,
-			List<DiscrepancyNoteBean> discBeans) {
+	private void setRequestAttributesForNotes(StudyBean currentStudy, HttpServletRequest request,
+			DiscrepancyNoteDAO discrepancyNoteDAO, List<DiscrepancyNoteBean> discBeans) {
 		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
-			ArrayList notes = (ArrayList) discrepancyNoteDAO.findAllByEntityAndColumnAndStudy(currentStudy, 
+			ArrayList notes = (ArrayList) discrepancyNoteDAO.findAllByEntityAndColumnAndStudy(currentStudy,
 					discrepancyNoteBean.getEntityType(), discrepancyNoteBean.getEntityId(),
 					discrepancyNoteBean.getColumn());
-			discrepancyNoteBean.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(
-					discrepancyNoteDAO, discrepancyNoteBean.getEntityId(), notes));
+			discrepancyNoteBean.setResolutionStatusId(getDiscrepancyNoteResolutionStatus(request, discrepancyNoteDAO,
+					discrepancyNoteBean.getEntityId(), notes));
 			if ("unique_identifier".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
 				request.setAttribute(HAS_UNIQUE_ID_NOTE, "yes");
 				request.setAttribute(UNIQUE_ID_NOTE, discrepancyNoteBean);

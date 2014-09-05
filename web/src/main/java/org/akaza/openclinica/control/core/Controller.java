@@ -53,6 +53,7 @@ import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -415,8 +416,10 @@ public abstract class Controller extends BaseController {
 				}
 			}
 
-			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
-			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation", currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
+					.getId();
+			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
+					currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
 			request.getSession().setAttribute(EVALUATION_ENABLED, isEvaluationEnabled);
 
 			if (this instanceof ListStudySubjectsServlet && currentStudy.getStatus() != Status.AVAILABLE) {
@@ -925,8 +928,7 @@ public abstract class Controller extends BaseController {
 		ListIterator it;
 		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
 		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
-		List<StudyGroupClassBean> dynamicGroupClasses = studyGroupClassDAO
-				.findAllActiveDynamicGroupsByStudyId(studyId);
+		List<StudyGroupClassBean> dynamicGroupClasses = studyGroupClassDAO.findAllActiveDynamicGroupsByStudyId(studyId);
 		for (StudyGroupClassBean dynGroup : dynamicGroupClasses) {
 			dynGroup.setEventDefinitions(studyEventDefinitionDao.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup
 					.getId()));
@@ -1622,7 +1624,7 @@ public abstract class Controller extends BaseController {
 		return displayEvents;
 	}
 
-	protected List<DiscrepancyNoteBean> extractCoderNotes(List<DiscrepancyNoteBean> notes, HttpServletRequest request) {
+	private List<DiscrepancyNoteBean> extractCoderNotes(List<DiscrepancyNoteBean> notes, HttpServletRequest request) {
 
 		if (isCoder(getUserAccountBean(request), request)) {
 
@@ -1647,16 +1649,106 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
-	protected boolean isCoder(UserAccountBean loggedInUser, HttpServletRequest request) {
+	private List<DiscrepancyNoteBean> extractEvaluatorNotes(List<DiscrepancyNoteBean> notes, HttpServletRequest request) {
 
+		if (isEvaluator(getUserAccountBean(request), request)) {
+
+			List<DiscrepancyNoteBean> filteredDiscrepancyNotes = new ArrayList<DiscrepancyNoteBean>();
+
+			for (DiscrepancyNoteBean discrepancyNote : notes) {
+
+				UserAccountBean owner = (UserAccountBean) getUserAccountDAO().findByPK(discrepancyNote.getOwnerId());
+				UserAccountBean assignedUser = (UserAccountBean) getUserAccountDAO().findByPK(
+						discrepancyNote.getAssignedUserId());
+
+				if (isEvaluator(assignedUser, request) || isEvaluator(owner, request)) {
+
+					filteredDiscrepancyNotes.add(discrepancyNote);
+				}
+			}
+
+			return filteredDiscrepancyNotes;
+
+		} else {
+			return notes;
+		}
+	}
+
+	protected List<DiscrepancyNoteBean> filterNotesByUserRole(List<DiscrepancyNoteBean> notes,
+			HttpServletRequest request) {
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+		if (currentRole.getRole().equals(Role.STUDY_CODER)) {
+			notes = extractCoderNotes(notes, request);
+		} else if (currentRole.getRole().equals(Role.STUDY_EVALUATOR)) {
+			notes = extractEvaluatorNotes(notes, request);
+		}
+		return notes;
+	}
+
+	protected boolean isEvaluator(UserAccountBean loggedInUser, HttpServletRequest request) {
 		// site
 		if (getCurrentStudy(request).isSite(getCurrentStudy(request).getParentStudyId())) {
+			return loggedInUser.getRoleByStudy(getCurrentStudy(request).getParentStudyId()).getName()
+					.equalsIgnoreCase("evaluator");
+		}
+		// Otherwise, study
+		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("evaluator");
+	}
 
+	protected boolean isCoder(UserAccountBean loggedInUser, HttpServletRequest request) {
+		// site
+		if (getCurrentStudy(request).isSite(getCurrentStudy(request).getParentStudyId())) {
 			return loggedInUser.getRoleByStudy(getCurrentStudy(request).getParentStudyId()).getName()
 					.equalsIgnoreCase("study coder");
 		}
-
 		// Otherwise, study
 		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("study coder");
+	}
+
+	/* Determining the resolution status that will be shown in color flag for an item. */
+	protected int getDiscrepancyNoteResolutionStatus(HttpServletRequest request, DiscrepancyNoteDAO dndao,
+			int itemDataId, ArrayList formNotes) {
+		int resolutionStatus = 0;
+		boolean hasOtherThread = false;
+
+		List<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForItemData(itemDataId);
+		existingNotes = filterNotesByUserRole(existingNotes, request);
+		for (Object obj : existingNotes) {
+			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
+			/*
+			 * We would only take the resolution status of the parent note of any note thread. If there are more than
+			 * one note thread, the thread with the worst resolution status will be taken.
+			 */
+			if (note.getParentDnId() == 0) {
+				if (hasOtherThread) {
+					if (resolutionStatus > note.getResolutionStatusId()) {
+						resolutionStatus = note.getResolutionStatusId();
+					}
+				} else {
+					resolutionStatus = note.getResolutionStatusId();
+				}
+				hasOtherThread = true;
+			}
+		}
+
+		if (formNotes == null || formNotes.isEmpty()) {
+			return resolutionStatus;
+		}
+
+		for (Object obj : filterNotesByUserRole(formNotes, request)) {
+			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
+			if (note.getParentDnId() == 0) {
+				if (hasOtherThread) {
+					if (resolutionStatus > note.getResolutionStatusId()) {
+						resolutionStatus = note.getResolutionStatusId();
+					}
+				} else {
+					resolutionStatus = note.getResolutionStatusId();
+				}
+				hasOtherThread = true;
+			}
+		}
+
+		return resolutionStatus;
 	}
 }
