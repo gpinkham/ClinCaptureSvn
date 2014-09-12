@@ -173,7 +173,7 @@
 			<span class="filler">filler</span>
 		</div>
 	</div>
-	<a onclick="javascript:toolbarToogle(this)" href="#" class="show_hide_link"><div id="show_hide">Hide</div></a>
+	<a onclick="javascript:toolbarToggle(this)" href="#" class="show_hide_link"><div id="show_hide">Hide</div></a>
 </div>
 
 </c:if>

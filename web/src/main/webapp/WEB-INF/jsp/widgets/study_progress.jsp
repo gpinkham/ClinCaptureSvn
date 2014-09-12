@@ -6,9 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 <script>
-$(document).ready(function($) {
-	setTimeout(function() { initStudyProgress(); }, 700);
-});
+	<c:import url="../../includes/js/widgets/w_study_progress.js" />
 </script>
 
 <div class="study_progress" align="center">

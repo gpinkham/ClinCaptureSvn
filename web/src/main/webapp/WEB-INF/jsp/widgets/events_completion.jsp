@@ -6,11 +6,9 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 <script>
-$(document).ready(function($) {
-	setTimeout(function() { getEventsCompletionLegendValues(); }, 300);
-	setTimeout(function() { initEventsCompletionWidget("init"); }, 700);
-});
+	<c:import url="../../includes/js/widgets/w_events_completion.js" />
 </script>
+
 <div class="events_completion" align="center">
 	<h2><fmt:message key="events_completion_widget_header" bundle="${resword}"/></h2>
 	<div id="events_completion_container">

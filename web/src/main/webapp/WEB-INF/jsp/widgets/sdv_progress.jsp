@@ -7,9 +7,7 @@
 
 <!-- Function that runs ajax request, and returns widgets chart -->
 <script>
-$(document).ready(function($) {
-	setTimeout(function() { initSdvProgress("init"); }, 700);
-});
+	<c:import url="../../includes/js/widgets/w_sdv_progress.js" />
 </script>
 
 <div class="sdv_progress" align="center">

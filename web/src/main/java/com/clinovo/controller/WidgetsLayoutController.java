@@ -108,21 +108,23 @@ public class WidgetsLayoutController {
 	private CodedItemDAO codedItemDAO;
 
 	/**
-	 * This method is used to display the widget on the Home page. It takes the data from the table "widget" and
-	 * "widgets_layout" processes it and sends back a list of widgets jsps that should be displayed and their order.
+	 * This method is used to display the widget on the Home page. It takes the
+	 * data from the table "widget" and "widgets_layout" processes it and sends
+	 * back a list of widgets jsps that should be displayed and their order.
 	 * 
 	 * @param request
 	 *            is used to obtain data about current UserAccount and Study.
-	 * 
+	 * @param response
+	 *            is used to remove caching.
 	 * @return model ModelMap that contains list of jsps and their order.
 	 * 
 	 * @throws Exception
 	 *             if there is incorrect data in the database.
 	 */
 	@RequestMapping("/configureHomePage")
-	public ModelMap configureHomePageHandler(HttpServletRequest request) throws Exception {
+	public ModelMap configureHomePageHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelMap model = new ModelMap();
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		setRequestHeadersAndUpdateLocale(response, request);
 
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
@@ -939,7 +941,6 @@ public class WidgetsLayoutController {
 				Date createdDate = codedItemData.getCreatedDate();
 				Date updatedDate = codedItemData.getUpdatedDate() != null ? codedItemData.getUpdatedDate()
 						: new Date(0);
-
 				Calendar createCalendar = Calendar.getInstance();
 				Calendar updateCalendar = Calendar.getInstance();
 				createCalendar.setTime(createdDate);
@@ -949,7 +950,6 @@ public class WidgetsLayoutController {
 				int createdMonth = createCalendar.get(Calendar.MONTH);
 				int updatedYear = updateCalendar.get(Calendar.YEAR);
 				int updatedMonth = updateCalendar.get(Calendar.MONTH);
-
 				boolean itemWasNotCoded = (item.getStatus().equals("NOT_CODED")) && createdYear <= displayedYear;
 
 				if (itemWasNotCoded) {

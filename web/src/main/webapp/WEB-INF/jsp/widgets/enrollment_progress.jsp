@@ -7,9 +7,7 @@
 
 <!-- Function that runs ajax request, and returns widgets chart -->
 <script>
-$(document).ready(function($) {
-	setTimeout(function() { initEnrollmentProgress("init"); }, 700);
-});
+	<c:import url="../../includes/js/widgets/w_enrollment_progress.js" />
 </script>
 
 <div class="enrollment_progress" align="center">

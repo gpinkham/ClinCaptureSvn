@@ -7,9 +7,7 @@
 
 <!-- Function that runs ajax request, and returns widgets chart -->
 <script>
-$(document).ready(function($) {
-	setTimeout(function() { initNdsPerCrf("init"); }, 700);
-});
+	<c:import url="../../includes/js/widgets/w_nds_per_crf.js" />
 </script>
 
 <div class="nds_per_crf" align="center">

@@ -6,10 +6,9 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 <script>
-$(document).ready(function($) {
-	setTimeout(function() { initNdsAssignedToMeWidget(); }, 400);
-});
+	<c:import url="../../includes/js/widgets/w_nds_assigned_to_me.js" />
 </script>
+
 <div class="dns_assigned_to_me" align="center">
 	<h2><fmt:message key="nds_assigned_to_me_widget_header" bundle="${resword}"/></h2>
 	<div class="chart_wrapper" align="left">

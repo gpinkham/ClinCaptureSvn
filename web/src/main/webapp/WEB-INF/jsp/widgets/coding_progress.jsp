@@ -5,13 +5,11 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
-
 <!-- Function that runs ajax request, and returns widgets chart -->
 <script>
-$(document).ready(function($) {
-	setTimeout(function() { initCodingProgress("init"); }, 700);
-});
+	<c:import url="../../includes/js/widgets/w_coding_progress.js" />
 </script>
+
 <div class="coding_progress" align="center">
 	<h2><fmt:message key="coding_progress_widget_header" bundle="${resword}"/></h2> 
 	

@@ -6,9 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 <script>
-$(document).ready(function($) {
-	setTimeout(function() { initSubjectStatusCount(); }, 700);
-});
+	<c:import url="../../includes/js/widgets/w_subject_status_count.js" />
 </script>
 
 <div class="subject_status_count" align="center">
