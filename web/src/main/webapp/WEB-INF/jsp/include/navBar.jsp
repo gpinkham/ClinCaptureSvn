@@ -6,75 +6,75 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <script language="JavaScript">
-        function reportBug() {
-            var bugtrack = "https://www.openclinica.com/ClinCapture/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
-            var user= "<c:out value="${userBean.name}"/>";
-            bugtrack = bugtrack + user+ "&url=" + window.location.href;
-            openDocWindow(bugtrack);
-        }
-        
-        function confirmCancel(pageName){
-        	
-        	confirmSubmit({
-        		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
-        		height: 150,
-        		width: 500,
-        		pageName: pageName
-        	});
-        }
-        
-        function confirmCancelAction( pageName, contextPath){
-        	
-        	var tform = document.forms["fr_cancel_button"];
-        	tform.action=contextPath+"/"+pageName;
-        	confirmSubmit({
-        		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
-        		height: 150,
-        		width: 500,
-        		form: tform
-        	});
-        }
-        
-        function confirmExit(pageName){
-        	
-        	confirmSubmit({
-        		message: '<fmt:message key="sure_to_exit" bundle="${resword}"/>',
-        		height: 150,
-        		width: 500,
-        		pageName: pageName
-        	});
-        }
-        
-        function goBack(){
-        	
-        	confirmSubmit({
-        		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
-        		height: 150,
-        		width: 500,
-        		goBack: true
-        	});
-        }
-        function lockedCRFAlert(userName){
+    function reportBug() {
+        var bugtrack = "https://www.openclinica.com/ClinCapture/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
+        var user= "<c:out value="${userBean.name}"/>";
+        bugtrack = bugtrack + user+ "&url=" + window.location.href;
+        openDocWindow(bugtrack);
+    }
 
-            alertDialog({
-        		message: message,
-        		height: 150,
-        		width: 500
-        	});
-            return false;
-        }
-        
-        function confirmExitAction( pageName, contextPath){
-        	
-        	var tform = document.forms["fr_cancel_button"];
-        	tform.action=contextPath+"/"+pageName;
-        	confirmSubmit({
-        		message: '<fmt:message key="sure_to_exit" bundle="${resword}"/>',
-        		height: 150,
-        		width: 500,
-        		form: tform
-        	});
-        }
+    function confirmCancel(pageName){
+
+        confirmSubmit({
+            message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
+            height: 150,
+            width: 500,
+            pageName: pageName
+        });
+    }
+
+    function confirmCancelAction( pageName, contextPath){
+
+        var tform = document.forms["fr_cancel_button"];
+        tform.action=contextPath+"/"+pageName;
+        confirmSubmit({
+            message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
+            height: 150,
+            width: 500,
+            form: tform
+        });
+    }
+
+    function confirmExit(pageName){
+
+        confirmSubmit({
+            message: '<fmt:message key="sure_to_exit" bundle="${resword}"/>',
+            height: 150,
+            width: 500,
+            pageName: pageName
+        });
+    }
+
+    function goBack(){
+
+        confirmSubmit({
+            message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
+            height: 150,
+            width: 500,
+            goBack: true
+        });
+    }
+    function lockedCRFAlert(userName){
+
+        alertDialog({
+            message: message,
+            height: 150,
+            width: 500
+        });
+        return false;
+    }
+
+    function confirmExitAction( pageName, contextPath){
+
+        var tform = document.forms["fr_cancel_button"];
+        tform.action=contextPath+"/"+pageName;
+        confirmSubmit({
+            message: '<fmt:message key="sure_to_exit" bundle="${resword}"/>',
+            height: 150,
+            width: 500,
+            form: tform
+        });
+    }
 </script>
 
 <jsp:useBean scope='session' id='tableFacadeRestore' class='java.lang.String' />
@@ -145,16 +145,17 @@
                                     <td><b>
                                         <ul>
                                             <c:choose>
+
                                                 <c:when test="${userRole.sysAdmin || userBean.techAdmin}">
                                                     <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                     <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-
                                                     <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
                                                         <li><a name="codedItems" href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                     </c:if>
                                                     <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                     <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 </c:when>
+
                                                 <c:when test="${userRole.studyAdministrator}">
                                                     <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                     <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
@@ -164,29 +165,7 @@
                                                     <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                     <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 </c:when>
-                                                <c:when test="${userRole.clinicalResearchCoordinator}">
-                                                    <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                    <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                    <c:if test="${study.status.available}">
-                                                        <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                    </c:if>
-                                                    <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                </c:when>
-                                                <c:when test="${userRole.investigator}">
-                                                    <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                    <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                    <c:if test="${study.status.available}">
-                                                        <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                    </c:if>
-                                                    <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                </c:when>
-                                                <c:when test="${userRole.studyCoder}">
-                                                    <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                    <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
-                                                        <li><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                    </c:if>
-                                                    <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                </c:when>
+
                                                 <c:when test="${userRole.monitor }">
                                                     <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                     <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
@@ -197,27 +176,47 @@
                                                     </li>
                                                     <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 </c:when>
-                                                <c:when test="${userRole.studyEvaluator}">
+
+                                                <c:when test="${userRole.clinicalResearchCoordinator}">
                                                     <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                    <c:if test="${evaluationEnabled eq true}">
-                                                        <li><a href="#"><fmt:message key="evaluate" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <c:if test="${study.status.available}">
+                                                        <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                     </c:if>
                                                     <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 </c:when>
+
+                                                <c:when test="${userRole.investigator}">
+                                                    <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <c:if test="${study.status.available}">
+                                                        <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    </c:if>
+                                                    <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                </c:when>
+
+                                                <c:when test="${userRole.studyCoder}">
+                                                    <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
+                                                        <li><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    </c:if>
+                                                    <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                </c:when>
+
+                                                <c:when test="${userRole.studyEvaluator}">
+                                                    <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <c:if test="${evaluationEnabled eq true}">
+                                                        <li><a href="${urlPrefix}pages/crfEvaluation"><fmt:message key="evaluate" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    </c:if>
+                                                    <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                </c:when>
+
                                             </c:choose>
+
                                             <li id="nav_Tasks" style="position: relative; z-index: 3;">
                                                 <a href="#" onmouseover="setNav('nav_Tasks');" id="nav_Tasks_link"><fmt:message key="nav_tasks" bundle="${resword}"/>
                                                     <img src="${urlPrefix}images/bt_Tasks_pulldown.gif" alt="Tasks" border="0"/></a>
                                             </li>
-                                                    <li><a href="${urlPrefix}pages/crfEvaluation"><fmt:message key="evaluate" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                </c:if>
-                                                <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            </c:when>
-                                        </c:choose>
-                                        <li id="nav_Tasks" style="position: relative; z-index: 3;">
-                                            <a href="#" onmouseover="setNav('nav_Tasks');" id="nav_Tasks_link"><fmt:message key="nav_tasks" bundle="${resword}"/>
-                                                <img src="${urlPrefix}images/bt_Tasks_pulldown.gif" alt="Tasks" border="0"/></a>
-                                        </li>
                                         </ul></b>
                                     </td>
                                     <td align="right" style="font-weight: normal;">
@@ -265,46 +264,6 @@
                 <c:import url="/WEB-INF/jsp/include/navBarExtractData.jsp"/>
                 <c:import url="/WEB-INF/jsp/include/navBarStudySetup.jsp"/>
                 <c:import url="/WEB-INF/jsp/include/navBarAdministration.jsp"/>
-                <br clear="all">
-            </c:when>
-
-            <c:when test="${userRole.studyMonitor}">
-                <c:import url="/WEB-INF/jsp/include/navBarMonitorAndManageData.jsp"/>
-                <c:import url="/WEB-INF/jsp/include/navBarExtractData.jsp"/>
-                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarStudySetup.jsp"/></c:if>
-                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarAdministration.jsp"/></c:if>
-                <br clear="all">
-            </c:when>
-
-            <c:when test="${userRole.clinicalResearchCoordinator}">
-                <c:import url="/WEB-INF/jsp/include/navBarSubmitData.jsp"/>
-                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarMonitorAndManageData.jsp"/></c:if>
-                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarStudySetup.jsp"/></c:if>
-                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarAdministration.jsp"/></c:if>
-                <br clear="all">
-            </c:when>
-
-            <c:when test="${userRole.investigator}">
-                <c:import url="/WEB-INF/jsp/include/navBarSubmitData.jsp"/>
-                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarMonitorAndManageData.jsp"/></c:if>
-                <c:import url="/WEB-INF/jsp/include/navBarExtractData.jsp"/>
-                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarStudySetup.jsp"/></c:if>
-                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarAdministration.jsp"/></c:if>
-                <br clear="all">
-            </c:when>
-
-            <c:when test="${userRole.studyCoder}">
-                <c:import url="/WEB-INF/jsp/include/navBarMonitorAndManageData.jsp"/>
-            </c:when>
-
-            <c:when test="${userRole.studyEvaluator}">
-                <c:import url="/WEB-INF/jsp/include/navBarSubmitData.jsp"/>
-                <c:import url="/WEB-INF/jsp/include/navBarMonitorAndManageData.jsp"/>
-                <br clear="all">
-                        <div class="taskLink"><a href="${urlPrefix}pages/crfEvaluation"><fmt:message key="evaluated_crf" bundle="${resword}"/></a></div>
-                    </div>
-                </c:if>
-                <br clear="all">
             </c:when>
 
             <c:when test="${userRole.studyAdministrator}">
@@ -313,13 +272,36 @@
                 <c:import url="/WEB-INF/jsp/include/navBarExtractData.jsp"/>
                 <c:import url="/WEB-INF/jsp/include/navBarStudySetup.jsp"/>
                 <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarAdministration.jsp"/></c:if>
-                <br clear="all">
+            </c:when>
+
+            <c:when test="${userRole.studyMonitor}">
+                <c:import url="/WEB-INF/jsp/include/navBarMonitorAndManageData.jsp"/>
+                <c:import url="/WEB-INF/jsp/include/navBarExtractData.jsp"/>
+                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarAdministration.jsp"/></c:if>
+            </c:when>
+
+            <c:when test="${userRole.clinicalResearchCoordinator}">
+                <c:import url="/WEB-INF/jsp/include/navBarSubmitData.jsp"/>
+                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarAdministration.jsp"/></c:if>
+            </c:when>
+
+            <c:when test="${userRole.investigator}">
+                <c:import url="/WEB-INF/jsp/include/navBarSubmitData.jsp"/>
+                <c:import url="/WEB-INF/jsp/include/navBarExtractData.jsp"/>
+                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarAdministration.jsp"/></c:if>
+            </c:when>
+
+            <c:when test="${userRole.studyCoder}">
+                <c:import url="/WEB-INF/jsp/include/navBarMonitorAndManageData.jsp"/>
+            </c:when>
+
+            <c:when test="${userRole.studyEvaluator}">
+                <c:import url="/WEB-INF/jsp/include/navBarMonitorAndManageData.jsp"/>
             </c:when>
 
         </c:choose>
 
         <c:import url="/WEB-INF/jsp/include/navBarOther.jsp"/>
 
-        <div></div>
     </div>
 </div>
