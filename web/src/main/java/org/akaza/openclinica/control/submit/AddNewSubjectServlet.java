@@ -71,27 +71,25 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+// import javax.servlet.http.*;
+
 /**
- * Enroll a new subject into system.
+ * Enroll a new subject into system
  * 
  * @author ssachs
  * @version CVS: $Id: AddNewSubjectServlet.java,v 1.15 2005/07/05 17:20:43 jxu Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial", "deprecation" })
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class AddNewSubjectServlet extends Controller {
 
 	public static final String OPEN_FIRST_CRF = "openFirstCrf";
 	public static final String TRUE = "true";
-	public static final int INT_255 = 255;
-	public static final int INT_30 = 30;
-	public static final int INT_1000 = 1000;
-
-	private Logger logger = LoggerFactory.getLogger(getClass().getName());
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private final Object simpleLockObj = new Object();
 
-	public static final String INPUT_UNIQUE_IDENTIFIER = "uniqueIdentifier";
+	public static final String INPUT_UNIQUE_IDENTIFIER = "uniqueIdentifier";// global
 
 	public static final String INPUT_DOB = "dob";
 
@@ -143,26 +141,26 @@ public class AddNewSubjectServlet extends Controller {
 	public static final String D_WARNING = "dWarning";
 	public static final String Y_WARNING = "yWarning";
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		if (!currentRole.getRole().equals(Role.INVESTIGATOR)
-				&& !currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
+		if (!currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
 				&& !currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR)) {
 			addPageMessage(restext.getString("no_have_correct_privilege_to_add_subject"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					restext.getString("no_have_correct_privilege_to_add_subject"), "1");
 		}
 
-		String dob = "";
-		String yob = "";
-		String gender = "";
+		String DOB = "";
+		String YOB = "";
+		String GENDER = "";
 		boolean needUpdate = false;
 		SubjectBean updateSubject = null;
-		SimpleDateFormat localDf = getLocalDf(request);
+		SimpleDateFormat local_df = getLocalDf(request);
 
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
 		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
@@ -180,7 +178,7 @@ public class AddNewSubjectServlet extends Controller {
 		FormDiscrepancyNotes discNotes;
 
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-		// TODO l10n for dates? Note that in some places we hard-code the yob by
+		// TODO l10n for dates? Note that in some places we hard-code the YOB by
 		// using "01/01/"+yob,
 		// not exactly supporting i18n...tbh
 
@@ -190,6 +188,7 @@ public class AddNewSubjectServlet extends Controller {
 		int studyIdToSearchOn = currentStudy.isSite() ? currentStudy.getParentStudyId() : currentStudy.getId();
 		classes = sgcdao.findAllActiveByStudyId(studyIdToSearchOn, true);
 		dynamicClasses = getDynamicGroupClassesByStudyId(studyIdToSearchOn);
+
 
 		if (dynamicClasses.size() > 0) {
 			if (dynamicClasses.get(0).isDefault()) {
@@ -210,7 +209,7 @@ public class AddNewSubjectServlet extends Controller {
 				request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
 
 				Date today = new Date(System.currentTimeMillis());
-				String todayFormatted = localDf.format(today);
+				String todayFormatted = local_df.format(today);
 				fp.addPresetValue(INPUT_ENROLLMENT_DATE, todayFormatted);
 
 				String idSetting;
@@ -238,9 +237,9 @@ public class AddNewSubjectServlet extends Controller {
 			// could be used to compare against
 			// values in database <subject> table for "add existing subject"
 			if (!fp.getBoolean(EXISTING_SUB_SHOWN)) {
-				dob = fp.getString(INPUT_DOB);
-				yob = fp.getString(INPUT_YOB);
-				gender = fp.getString(INPUT_GENDER);
+				DOB = fp.getString(INPUT_DOB);
+				YOB = fp.getString(INPUT_YOB);
+				GENDER = fp.getString(INPUT_GENDER);
 			}
 
 			discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(FORM_DISCREPANCY_NOTES_NAME);
@@ -255,18 +254,18 @@ public class AddNewSubjectServlet extends Controller {
 			String subIdSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
 			if (!subIdSetting.equalsIgnoreCase("auto non-editable") && !subIdSetting.equalsIgnoreCase("auto editable")) {
 				v.addValidation(INPUT_LABEL, Validator.LENGTH_NUMERIC_COMPARISON,
-						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_30);
+						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
 			}
 
 			if (currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("required")) {
 				v.addValidation(INPUT_UNIQUE_IDENTIFIER, Validator.NO_BLANKS);
 			}
 			v.addValidation(INPUT_UNIQUE_IDENTIFIER, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_255);
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
 			if (!StringUtil.isBlank(fp.getString(INPUT_SECONDARY_LABEL))) {
 				v.addValidation(INPUT_SECONDARY_LABEL, Validator.LENGTH_NUMERIC_COMPARISON,
-						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_30);
+						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
 			}
 
 			String dobSetting = currentStudy.getStudyParameterConfig().getCollectDob();
@@ -277,12 +276,11 @@ public class AddNewSubjectServlet extends Controller {
 					v.alwaysExecuteLastValidation(INPUT_DOB);
 				}
 				v.addValidation(INPUT_DOB, Validator.DATE_IN_PAST);
-			} else if (dobSetting.equals("2")) {
-				// year of birth
+			} else if (dobSetting.equals("2")) {// year of birth
 				v.addValidation(INPUT_YOB, Validator.IS_AN_INTEGER);
 				v.alwaysExecuteLastValidation(INPUT_YOB);
 				v.addValidation(INPUT_YOB, Validator.COMPARES_TO_STATIC_VALUE,
-						NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO, INT_1000);
+						NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO, 1000);
 
 				// get today's year
 				Date today = new Date();
@@ -291,8 +289,8 @@ public class AddNewSubjectServlet extends Controller {
 				int currentYear = c.get(Calendar.YEAR);
 				v.addValidation(INPUT_YOB, Validator.COMPARES_TO_STATIC_VALUE,
 						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, currentYear);
-			} else { // dob not used, added
-				logger.info("should read this only if dob not used");
+			} else { // DOB not used, added
+				logger.info("should read this only if DOB not used");
 			}
 
 			ArrayList acceptableGenders = new ArrayList();
@@ -331,8 +329,7 @@ public class AddNewSubjectServlet extends Controller {
 			HashMap errors = v.validate();
 
 			SubjectDAO sdao = getSubjectDAO();
-			String uniqueIdentifier = fp.getString(INPUT_UNIQUE_IDENTIFIER);
-			// global Id
+			String uniqueIdentifier = fp.getString(INPUT_UNIQUE_IDENTIFIER);// global Id
 			SubjectBean subjectWithSameId = new SubjectBean();
 			boolean showExistingRecord = false;
 			if (!uniqueIdentifier.equals("")) {
@@ -399,7 +396,7 @@ public class AddNewSubjectServlet extends Controller {
 						showExistingRecord = true;
 					}
 				}
-			}
+			}// end of the block if(!uniqueIdentifier.equals(""))
 
 			boolean insertWithParents = fp.getInt(INPUT_MOTHER) > 0 || fp.getInt(INPUT_FATHER) > 0;
 
@@ -447,7 +444,7 @@ public class AddNewSubjectServlet extends Controller {
 						Validator.addError(errors, "studyGroupId" + i,
 								resexception.getString("group_class_is_required"));
 					}
-					if (notes.trim().length() > INT_255) {
+					if (notes.trim().length() > 255) {
 						Validator.addError(errors, "notes" + i, resexception.getString("notes_cannot_longer_255"));
 					}
 					sgc.setStudyGroupId(groupId);
@@ -476,7 +473,7 @@ public class AddNewSubjectServlet extends Controller {
 				fp.addPresetValue(SELECTED_DYN_GROUP_CLASS_ID, request.getParameter("dynamicGroupClassId"));
 
 				if (currentStudy.isGenetic()) {
-					String[] intFields = { INPUT_GROUP, INPUT_FATHER, INPUT_MOTHER };
+					String intFields[] = { INPUT_GROUP, INPUT_FATHER, INPUT_MOTHER };
 					fp.setCurrentIntValuesAsPreset(intFields);
 				}
 				fp.addPresetValue(EDIT_DOB, fp.getString(EDIT_DOB));
@@ -520,7 +517,7 @@ public class AddNewSubjectServlet extends Controller {
 					if (subject.getDateOfBirth() != null) {
 						cal.setTime(subject.getDateOfBirth());
 						year = cal.get(Calendar.YEAR);
-						fp.addPresetValue(INPUT_DOB, localDf.format(subject.getDateOfBirth()));
+						fp.addPresetValue(INPUT_DOB, local_df.format(subject.getDateOfBirth()));
 					} else {
 						fp.addPresetValue(INPUT_DOB, "");
 					}
@@ -557,12 +554,12 @@ public class AddNewSubjectServlet extends Controller {
 					if (currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
 						if (String.valueOf(subjectWithSameId.getGender()).equals(" ")) {
 							fp.addPresetValue(G_WARNING, "emptytrue");
-							fp.addPresetValue(INPUT_GENDER, gender);
+							fp.addPresetValue(INPUT_GENDER, GENDER);
 							needUpdate = true;
 							updateSubject = subjectWithSameId;
-							updateSubject.setGender(gender.toCharArray()[0]);
+							updateSubject.setGender(GENDER.toCharArray()[0]);
 							warningCount++;
-						} else if (!String.valueOf(subjectWithSameId.getGender()).equals(gender)) {
+						} else if (!String.valueOf(subjectWithSameId.getGender()).equals(GENDER)) {
 							fp.addPresetValue(G_WARNING, "true");
 							warningCount++;
 						} else {
@@ -572,7 +569,7 @@ public class AddNewSubjectServlet extends Controller {
 						fp.addPresetValue(G_WARNING, "false");
 					}
 
-					// Current study required dob
+					// Current study required DOB
 					if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
 						// date-of-birth in subject table is not completed
 						if (!subjectWithSameId.isDobCollected()) {
@@ -581,14 +578,14 @@ public class AddNewSubjectServlet extends Controller {
 							updateSubject.setDobCollected(true);
 
 							if (subjectWithSameId.getDateOfBirth() == null) {
-								fp.addPresetValue(INPUT_DOB, dob);
-								updateSubject.setDateOfBirth(new Date(dob));
+								fp.addPresetValue(INPUT_DOB, DOB);
+								updateSubject.setDateOfBirth(new Date(DOB));
 							} else {
 								String y = String.valueOf(subjectWithSameId.getDateOfBirth()).split("\\-")[0];
-								String[] d = dob.split("\\/");
+								String[] d = DOB.split("\\/");
 								// if year-of-birth in subject table
 								if (!y.equals("0001")) {
-									// if year-of-birth is different from dob's
+									// if year-of-birth is different from DOB's
 									// year, use year-of-birth
 									if (!y.equals(d[2])) {
 										fp.addPresetValue(D_WARNING, "dobYearWrong");
@@ -596,42 +593,59 @@ public class AddNewSubjectServlet extends Controller {
 										updateSubject.setDateOfBirth(sdf.parse(d[0] + "/" + d[1] + "/" + y));
 									} else {
 										fp.addPresetValue(D_WARNING, "dobUsed");
-										fp.addPresetValue(INPUT_DOB, dob);
-										updateSubject.setDateOfBirth(sdf.parse(dob));
+										fp.addPresetValue(INPUT_DOB, DOB);
+										updateSubject.setDateOfBirth(sdf.parse(DOB));
 									}
-								} else {
+								}
+								// date-of-birth is not required in subject
+								// table
+								else {
 									fp.addPresetValue(D_WARNING, "emptyD");
-									fp.addPresetValue(INPUT_DOB, dob);
-									updateSubject.setDateOfBirth(sdf.parse(dob));
+									fp.addPresetValue(INPUT_DOB, DOB);
+									updateSubject.setDateOfBirth(sdf.parse(DOB));
 								}
 							}
 							warningCount++;
-						} else if (!localDf.format(subjectWithSameId.getDateOfBirth()).equals(dob)) {
+						}
+						// date-of-birth in subject table but doesn't match DOB
+						else if (!local_df.format(subjectWithSameId.getDateOfBirth()).equals(DOB)) {
 							fp.addPresetValue(D_WARNING, "currentDOBWrong");
 							warningCount++;
-						} else {
+						}
+						// date-of-birth in subject table matchs DOB
+						else {
 							fp.addPresetValue(D_WARNING, "false");
 						}
-					} else if (currentStudy.getStudyParameterConfig().getCollectDob().equals("2")) {
+					}
+					// current Study require YOB
+					else if (currentStudy.getStudyParameterConfig().getCollectDob().equals("2")) {
 						String y = String.valueOf(subjectWithSameId.getDateOfBirth()).split("\\-")[0];
 						// year of date-of-birth in subject table is avaible
 						if (!y.equals("0001")) {
-							// year in subject table doesn't match yob,
-							if (!y.equals(yob)) {
+							// year in subject table doesn't match YOB,
+							if (!y.equals(YOB)) {
 								fp.addPresetValue(Y_WARNING, "yobWrong");
 								warningCount++;
-							} else {
+							}
+							// year in subject table matches YOB
+							else {
 								fp.addPresetValue(Y_WARNING, "false");
 							}
-						} else {
+						}
+						// year of date-of-birth in the subject talbe is not
+						// availbe, YOB is used
+						else {
 							needUpdate = true;
 							updateSubject = subjectWithSameId;
 							fp.addPresetValue(Y_WARNING, "yearEmpty");
-							fp.addPresetValue(INPUT_YOB, yob);
-							updateSubject.setDateOfBirth(sdf.parse("01/01/" + yob));
+							fp.addPresetValue(INPUT_YOB, YOB);
+							updateSubject.setDateOfBirth(sdf.parse("01/01/" + YOB));
 							warningCount++;
 						}
-					} else {
+					}
+					// current study require no DOB, there is no need to check
+					// date-of-birth in the subject table
+					else {
 						fp.addPresetValue(Y_WARNING, "false");
 					}
 
@@ -672,13 +686,13 @@ public class AddNewSubjectServlet extends Controller {
 						// added the "2" to make sure that 'not used' is kept to
 						// null, tbh 102007
 						subject.setDobCollected(false);
-						int intYob = fp.getInt(INPUT_YOB);
-						Date fakeDate = new Date("01/01/" + intYob);
+						int yob = fp.getInt(INPUT_YOB);
+						Date fakeDate = new Date("01/01/" + yob);
 
-						String dobString = localDf.format(fakeDate);
+						String dobString = local_df.format(fakeDate);
 
 						try {
-							Date fakeDOB = localDf.parse(dobString);
+							Date fakeDOB = local_df.parse(dobString);
 							subject.setDateOfBirth(fakeDOB);
 						} catch (ParseException pe) {
 							subject.setDateOfBirth(new Date());
@@ -817,7 +831,7 @@ public class AddNewSubjectServlet extends Controller {
 					setUpBeans(classes, request);
 					request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
 					Date today = new Date(System.currentTimeMillis());
-					String todayFormatted = localDf.format(today);
+					String todayFormatted = local_df.format(today);
 					fp.addPresetValue(INPUT_ENROLLMENT_DATE, todayFormatted);
 
 					String idSetting;
@@ -869,8 +883,8 @@ public class AddNewSubjectServlet extends Controller {
 					}
 					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 				}
-			}
-		}
+			}// end of no error (errors.isEmpty())
+		}// end of fp.isSubmitted()
 	}
 
 	protected StudyEventBean createStudyEvent(FormProcessor fp, StudySubjectBean s) {
@@ -967,23 +981,12 @@ public class AddNewSubjectServlet extends Controller {
 	}
 
 	/**
-	 * Save the discrepancy notes of each field into session in the form.
+	 * Save the discrepancy notes of each field into session in the form
 	 * 
-	 * @param field
-	 *            String
-	 * @param notes
-	 *            FormDiscrepancyNotes
-	 * @param dndao
-	 *            DiscrepancyNoteDAO
-	 * @param entityId
-	 *            int
-	 * @param entityType
-	 *            String
-	 * @param sb
-	 *            StudyBean
 	 */
 	public static void saveFieldNotes(String field, FormDiscrepancyNotes notes, DiscrepancyNoteDAO dndao, int entityId,
 			String entityType, StudyBean sb) {
+
 		if (notes == null || dndao == null || sb == null) {
 			return;
 		}
@@ -1031,16 +1034,7 @@ public class AddNewSubjectServlet extends Controller {
 	}
 
 	/**
-	 * Find study subject id for each subject, and construct displaySubjectBean.
-	 *
-	 * @param displayArray
-	 *            ArrayList
-	 * @param subjects
-	 *            ArrayList
-	 * @param ssdao
-	 *            StudySubjectDAO
-	 * @param stdao
-	 *            StudyDAO
+	 * Find study subject id for each subject, and construct displaySubjectBean
 	 */
 	public static void displaySubjects(ArrayList displayArray, ArrayList subjects, StudySubjectDAO ssdao, StudyDAO stdao) {
 

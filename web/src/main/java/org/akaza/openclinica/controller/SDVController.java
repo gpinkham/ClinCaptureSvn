@@ -563,11 +563,11 @@ public class SDVController {
 	}
 
 	private boolean mayProceed(HttpServletRequest request) {
-		UserAccountBean ub = getCurrentUser(request);
+
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
 		Role r = currentRole.getRole();
 		return Role.SYSTEM_ADMINISTRATOR.equals(r) || Role.STUDY_DIRECTOR.equals(r)
-				|| Role.STUDY_ADMINISTRATOR.equals(r) || Role.STUDY_MONITOR.equals(r) || ub.isSysAdmin();
+				|| Role.STUDY_ADMINISTRATOR.equals(r) || Role.STUDY_MONITOR.equals(r);
 	}
 
 	/**

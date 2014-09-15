@@ -47,6 +47,7 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	private boolean canCode;
 	private boolean canEvaluate;
 
+
 	/**
 	 * Default study user role bean constructor.
 	 */
@@ -220,10 +221,6 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
 	public boolean isSysAdmin() {
 		return this.role == Role.SYSTEM_ADMINISTRATOR;
-	}
-
-	public boolean isStudyMonitor() {
-		return this.role.equals(Role.STUDY_MONITOR);
 	}
 
 	public boolean isStudyCoder() {
