@@ -20,12 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -39,8 +33,18 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyRow;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * ListSiteServlet class.
+ */
 @Component
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class ListSiteServlet extends RememberLastPage {
 
 	public static final String SAVED_LIST_SITES_URL = "savedListSitesUrl";
@@ -51,6 +55,8 @@ public class ListSiteServlet extends RememberLastPage {
 	 *            HttpServletRequest
 	 * @param response
 	 *            HttpServletResponse
+	 * @throws InsufficientPermissionException
+	 *             the InsufficientPermissionException
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -69,18 +75,19 @@ public class ListSiteServlet extends RememberLastPage {
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_study_director"), "1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
 	/**
-	 * Finds all the studies, processes the request
+	 * Finds all the studies, processes the request.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
 	 * @param response
 	 *            HttpServletResponse
+	 * @throws Exception
+	 *             an Exception
 	 */
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -88,60 +95,59 @@ public class ListSiteServlet extends RememberLastPage {
 			return;
 		}
 
+		StudyDAO studyDao = getStudyDAO();
 		FormProcessor fp = new FormProcessor(request);
-		StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean studyBean = getCurrentStudy(request);
 
-		if (currentStudy.getParentStudyId() > 0) {
-			addPageMessage(respage.getString("no_sites_available_study_is_a_site"), request);
-			forwardPage(Page.MENU_SERVLET, request, response);
-		} else {
-
-			StudyDAO sdao = getStudyDAO();
-			ArrayList studies = (ArrayList) sdao.findAllByParent(currentStudy.getId());
-
-			Map<Integer, Map<String, Integer>> infoMap = sdao.analyzeEvents(studies);
-			for (Object studyObj : studies) {
-				StudyBean sb = ((StudyBean) studyObj);
-				Map<String, Integer> map = infoMap.get(sb.getId());
-				int countEvents = map.get("countEvents");
-				if (countEvents > 0) {
-					int countLockedEvents = map.get("countLockedEvents");
-					if (countEvents == countLockedEvents) {
-						sb.setShowUnlockEventsButton(true);
-					} else {
-						sb.setShowLockEventsButton(true);
-					}
-				}
-			}
-
-			EntityBeanTable table = fp.getEntityBeanTable();
-			ArrayList allStudyRows = StudyRow.generateRowsFromBeans(studies);
-
-			String[] columns = { resword.getString("name"), resword.getString("unique_identifier"),
-					resword.getString("OID"), resword.getString("principal_investigator"),
-					resword.getString("facility_name"), resword.getString("date_created"), resword.getString("status"),
-					resword.getString("actions") };
-			table.setColumns(new ArrayList(Arrays.asList(columns)));
-			table.hideColumnLink(2);
-			table.hideColumnLink(7);
-			table.setQuery("ListSite", new HashMap());
-			// if (!currentStudy.getStatus().isLocked()) {
-			// table.addLink(resword.getString("create_a_new_site"),
-			// "CreateSubStudy");
-			// }
-
-			table.setRows(allStudyRows);
-			table.computeDisplay();
-
-			request.setAttribute("table", table);
-			if (request.getParameter("read") != null && request.getParameter("read").equals("true")) {
-				request.setAttribute("readOnly", true);
-			}
-			addNewSiteNotificationMessage(request);
-			request.getSession().setAttribute("fromListSite", "yes");
-			forwardPage(Page.SITE_LIST, request, response);
+		if (studyBean.getParentStudyId() > 0) {
+			studyBean = (StudyBean) studyDao.findByPK(studyBean.getParentStudyId());
 		}
 
+		ArrayList studies = (ArrayList) studyDao.findAllByParent(studyBean.getId());
+
+		Map<Integer, Map<String, Integer>> infoMap = studyDao.analyzeEvents(studies);
+		for (Object studyObj : studies) {
+			StudyBean sb = ((StudyBean) studyObj);
+			Map<String, Integer> map = infoMap.get(sb.getId());
+			int countEvents = map.get("countEvents");
+			if (countEvents > 0) {
+				int countLockedEvents = map.get("countLockedEvents");
+				if (countEvents == countLockedEvents) {
+					sb.setShowUnlockEventsButton(true);
+				} else {
+					sb.setShowLockEventsButton(true);
+				}
+			}
+		}
+
+		EntityBeanTable table = fp.getEntityBeanTable();
+		ArrayList allStudyRows = StudyRow.generateRowsFromBeans(studies);
+
+		final int two = 2;
+		final int seven = 7;
+		String[] columns = { resword.getString("name"), resword.getString("unique_identifier"),
+				resword.getString("OID"), resword.getString("principal_investigator"),
+				resword.getString("facility_name"), resword.getString("date_created"), resword.getString("status"),
+				resword.getString("actions") };
+		table.setColumns(new ArrayList(Arrays.asList(columns)));
+		table.hideColumnLink(two);
+		table.hideColumnLink(seven);
+		table.setQuery("ListSite", new HashMap());
+		// if (!studyBean.getStatus().isLocked()) {
+		// table.addLink(resword.getString("create_a_new_site"),
+		// "CreateSubStudy");
+		// }
+
+		table.setRows(allStudyRows);
+		table.computeDisplay();
+
+		request.setAttribute("table", table);
+		if (request.getParameter("read") != null && request.getParameter("read").equals("true")) {
+			request.setAttribute("readOnly", true);
+		}
+		addNewSiteNotificationMessage(request);
+		request.getSession().setAttribute("fromListSite", "yes");
+		forwardPage(Page.SITE_LIST, request, response);
 	}
 
 	@Override
