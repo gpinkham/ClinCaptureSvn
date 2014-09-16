@@ -30,7 +30,7 @@ function initSubjectStatusCount() {
 					function selectHandler() {
 						var selectedItem = subjectStatusChart.getSelection()[0];
 							if (selectedItem) {
-							var statusName = widgetStringTrim(data.getValue(selectedItem.row, 0)
+							var statusName = trim(data.getValue(selectedItem.row, 0)
 									.toString().split('-')[1]).toLowerCase();
 							window.location.href = "ListStudySubjects?module=admin&maxRows=15&showMoreLink=false&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_=15&findSubjects_f_studySubject.status="
 									+ statusName;
