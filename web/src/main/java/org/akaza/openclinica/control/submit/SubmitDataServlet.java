@@ -80,9 +80,10 @@ public class SubmitDataServlet extends Controller {
 	public static boolean maySubmitData(UserAccountBean ub, StudyUserRoleBean currentRole) {
 		if (currentRole != null && ub != null) {
 			Role r = currentRole.getRole();
-			if (r != null && (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
-					|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
-					|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR))) {
+			if (r != null
+					&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
+							|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
+							|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_EVALUATOR))) {
 				return true;
 			}
 		}
@@ -91,9 +92,10 @@ public class SubmitDataServlet extends Controller {
 	}
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String exceptionName = resexception.getString("no_permission_to_submit_data");
 		String noAccessMessage = respage.getString("may_not_enter_data_for_this_study")
