@@ -75,7 +75,9 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -285,15 +287,17 @@ public class XsltTransformJob extends QuartzJobBean {
 			if (sasDatasetJob && sasJobDir != null) {
 				int sasTimer = (Integer) dataMap.get(SAS_TIMER);
 				File sasJobDirFile = new File(sasJobDir);
-				if (((SimpleTriggerImpl) context.getTrigger()).getTimesTriggered() == sasTimer * MINUTES_IN_HOUR + 1) {
-					deleteDirectory(sasJobDirFile);
+				Date nextFireTime = context.getTrigger().getNextFireTime();
+				if (((SimpleTriggerImpl) context.getTrigger()).getTimesTriggered() == sasTimer * MINUTES_IN_HOUR + 1
+						|| nextFireTime == null) {
+					unscheduleSASJob = true;
 					throw new Exception(messageSource.getMessage("sasDataset.exception.failed", new Object[] {
 							jobName != null ? jobName : datasetBean.getName(), sasTimer, sasTimer > 1 ? "s" : "" },
 							locale));
 				}
 				emailBuffer = (StringBuffer) dataMap.get(SAS_EMAIL_BUFFER);
 				String sasOdmOutputPath = (String) dataMap.get(SAS_ODM_OUTPUT_PATH);
-				String nextFireTimeStr = simpleDateFormat.format(context.getTrigger().getNextFireTime());
+				String nextFireTimeStr = simpleDateFormat.format(nextFireTime);
 				if (!sasJobDirFile.exists()) {
 					reportAboutException = reportAboutException(context, "latestSasJobDirException");
 					throw new Exception(messageSource.getMessage("sasDataset.exception.folder", new Object[] {
@@ -672,6 +676,8 @@ public class XsltTransformJob extends QuartzJobBean {
 							dataMap.put(SAS_EXTRACT_REPEAT_INTERVAL,
 									((SimpleTriggerImpl) context.getTrigger()).getRepeatInterval());
 						}
+						((SimpleTriggerImpl) context.getTrigger())
+								.setMisfireInstruction(SimpleTriggerImpl.MISFIRE_INSTRUCTION_FIRE_NOW);
 						((SimpleTriggerImpl) context.getTrigger()).setJobDataMap(dataMap);
 						((SimpleTriggerImpl) context.getTrigger()).setRepeatInterval(MILLISECONDS_IN_MINUTE);
 						((SimpleTriggerImpl) context.getTrigger()).setRepeatCount(sasTimer * MINUTES_IN_HOUR);
@@ -786,7 +792,6 @@ public class XsltTransformJob extends QuartzJobBean {
 				postErrorMessage(!sasExtractJob && sasSideHasErrors ? sasExceptionMessage : ee.getMessage(),
 						sasSideHasErrors && sasExtractJob ? sasErrors.replaceAll("\n", "<br/>") : null, context);
 			}
-			ee.printStackTrace();
 			logger.error("Error has occurred.".concat(sasSideHasErrors ? sasErrors : ""), ee);
 			exceptions = true;
 
@@ -838,22 +843,44 @@ public class XsltTransformJob extends QuartzJobBean {
 			}
 			resetArchiveDataset(datasetBean);
 			if (unscheduleSASJob) {
+				deleteDirectory(new File((String) dataMap.remove(SAS_JOB_DIR)));
 				try {
 					if (!sasExtractJob) {
 						context.getScheduler().unscheduleJob(context.getTrigger().getKey());
 					} else {
-						((SimpleTriggerImpl) context.getTrigger()).setStartTime((Date) dataMap
-								.get(SAS_EXTRACT_JOB_NEXT_FIRE_TIME));
+						((SimpleTriggerImpl) context.getTrigger())
+								.setMisfireInstruction(SimpleTriggerImpl.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
 						((SimpleTriggerImpl) context.getTrigger()).setRepeatCount((Integer) dataMap
 								.get(SAS_EXTRACT_REPEAT_COUNT));
 						((SimpleTriggerImpl) context.getTrigger()).setRepeatInterval((Long) dataMap
 								.get(SAS_EXTRACT_REPEAT_INTERVAL));
+						Calendar calendar = GregorianCalendar.getInstance();
+						calendar.setTime((Date) dataMap.get(SAS_EXTRACT_JOB_NEXT_FIRE_TIME));
+						int prevHour = calendar.get(Calendar.HOUR_OF_DAY);
+						int prevMinute = calendar.get(Calendar.MINUTE);
+						Date currentDate = new Date(System.currentTimeMillis());
+						calendar.setTime(currentDate);
+						calendar.set(Calendar.HOUR_OF_DAY, prevHour);
+						calendar.set(Calendar.MINUTE, prevMinute);
+						Date newDate = calendar.getTime();
+						if (newDate.compareTo(currentDate) <= 0) {
+							String periodToRun = (String) dataMap.get("periodToRun");
+							if (periodToRun.equalsIgnoreCase("monthly")) {
+								calendar.add(Calendar.MONTH, 1);
+							} else if (periodToRun.equalsIgnoreCase("weekly")) {
+								calendar.add(Calendar.WEEK_OF_MONTH, 1);
+							} else {
+								calendar.add(Calendar.DAY_OF_MONTH, 1);
+							}
+							newDate = calendar.getTime();
+						}
+						((SimpleTriggerImpl) context.getTrigger()).setStartTime(newDate);
+						((SimpleTriggerImpl) context.getTrigger()).setJobDataMap(dataMap);
 						context.getScheduler().rescheduleJob(context.getTrigger().getKey(), context.getTrigger());
 					}
 				} catch (Exception e) {
 					logger.error("Error has occurred.", e);
 				}
-				deleteDirectory(new File((String) dataMap.get(SAS_JOB_DIR)));
 			}
 		}
 	}
@@ -917,7 +944,7 @@ public class XsltTransformJob extends QuartzJobBean {
 	/**
 	 * To go through all the existing archived datasets and delete off the records whose file references do not exist
 	 * any more.
-	 * 
+	 *
 	 * @param datasetBean
 	 *            DatasetBean
 	 */
@@ -1030,7 +1057,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
 	/**
 	 * Utility method, might be useful in the future to convert to kilobytes.
-	 * 
+	 *
 	 * @param bytes
 	 *            long
 	 * @return float
@@ -1053,7 +1080,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
 	/**
 	 * Stub to get the list of all old files.
-	 * 
+	 *
 	 * @param outputPath
 	 *            String
 	 * @param postProcLoc
