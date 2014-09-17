@@ -3,6 +3,7 @@ package com.clinovo.controller;
 import com.clinovo.model.CRFEvaluationTableFactory;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
@@ -22,7 +23,6 @@ import javax.sql.DataSource;
 @Controller
 public class CRFEvaluationController extends Redirection {
 
-	public static final String STUDY = "study";
 	public static final String SHOW_MORE_LINK = "showMoreLink";
 	public static final String CRF_EVALUATION_TABLE = "crfEvaluationTable";
 	public static final String PAGE_CRF_EVALUATION = "/pages/crfEvaluation";
@@ -50,8 +50,14 @@ public class CRFEvaluationController extends Redirection {
 	@RequestMapping("/crfEvaluation")
 	public String crfEvaluation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String page = EVALUATION_CRF_EVALUATION;
-		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(STUDY);
+
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(BaseController.STUDY);
 		StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession().getAttribute(BaseController.USER_ROLE);
+		UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute(
+				BaseController.USER_BEAN_NAME);
+
+		BaseController.removeLockedCRF(userAccountBean.getId());
+
 		if (userRole.getRole() == Role.SYSTEM_ADMINISTRATOR || userRole.getRole() == Role.STUDY_EVALUATOR) {
 			request.setAttribute(
 					CRF_EVALUATION_TABLE,

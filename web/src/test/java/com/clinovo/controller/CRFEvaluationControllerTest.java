@@ -59,4 +59,19 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(
 				MockMvcResultMatchers.view().name("redirect:/MainMenu?message=system_no_permission"));
 	}
+
+	@Test
+	public void testAllCrfsThatWereLockedByCurrentUserWillBeUnlockedForHim() throws Exception {
+		int ecbId = 1;
+		final int anotherUserId = 2;
+		BaseController.lockThisEventCRF(ecbId++, userBean.getId());
+		BaseController.lockThisEventCRF(ecbId, anotherUserId);
+		assertEquals(BaseController.getUnavailableCRFList().size(), 2);
+		userRole.setRole(Role.STUDY_EVALUATOR);
+		this.mockMvc.perform(
+				get(CRF_EVALUATION).locale(LOCALE).sessionAttr(BaseController.STUDY, currentStudy)
+						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
+						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(status().isOk());
+		assertEquals(BaseController.getUnavailableCRFList().size(), 1);
+	}
 }
