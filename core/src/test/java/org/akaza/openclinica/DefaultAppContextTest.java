@@ -1,11 +1,25 @@
 package org.akaza.openclinica;
 
-import java.util.Date;
-import java.util.Locale;
-
-import javax.sql.DataSource;
-
+import com.clinovo.dao.CodedItemDAO;
+import com.clinovo.dao.DictionaryDAO;
+import com.clinovo.dao.DiscrepancyDescriptionDAO;
+import com.clinovo.dao.StudySubjectIdDAO;
+import com.clinovo.dao.SystemDAO;
+import com.clinovo.dao.TermDAO;
+import com.clinovo.dao.WidgetDAO;
+import com.clinovo.dao.WidgetsLayoutDAO;
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DataEntryService;
+import com.clinovo.service.DictionaryService;
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.service.ReportCRFService;
+import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.service.SystemService;
+import com.clinovo.service.TermService;
+import com.clinovo.service.WidgetService;
+import com.clinovo.service.WidgetsLayoutService;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -45,24 +59,9 @@ import org.hibernate.classic.Session;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.clinovo.dao.CodedItemDAO;
-import com.clinovo.dao.DictionaryDAO;
-import com.clinovo.dao.DiscrepancyDescriptionDAO;
-import com.clinovo.dao.StudySubjectIdDAO;
-import com.clinovo.dao.SystemDAO;
-import com.clinovo.dao.TermDAO;
-import com.clinovo.dao.WidgetDAO;
-import com.clinovo.dao.WidgetsLayoutDAO;
-import com.clinovo.service.CodedItemService;
-import com.clinovo.service.DataEntryService;
-import com.clinovo.service.DictionaryService;
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.service.ReportCRFService;
-import com.clinovo.service.StudySubjectIdService;
-import com.clinovo.service.SystemService;
-import com.clinovo.service.TermService;
-import com.clinovo.service.WidgetService;
-import com.clinovo.service.WidgetsLayoutService;
+import javax.sql.DataSource;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * To avoid the constant loading of beans from the application context, which can take a lot of memory on the test, we
@@ -75,6 +74,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	public static final String ORACLE = "oracle";
 	protected DataSource dataSource = getDataSource();
 
+	protected AuditDAO auditDao;
 	protected ItemDAO idao;
 	protected CRFDAO crfdao;
 	protected EventCRFDAO eventCRFDAO;
@@ -171,6 +171,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		super.setUp();
 
 		// DAO that require data source
+		auditDao = new AuditDAO(dataSource);
 		idao = new ItemDAO(dataSource);
 		crfdao = new CRFDAO(dataSource);
 		eventCRFDAO = new EventCRFDAO(dataSource);

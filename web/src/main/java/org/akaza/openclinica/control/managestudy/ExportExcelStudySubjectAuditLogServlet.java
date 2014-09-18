@@ -8,14 +8,6 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import jxl.CellView;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
@@ -27,17 +19,16 @@ import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import org.akaza.openclinica.bean.admin.AuditBean;
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -46,33 +37,46 @@ import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-/**
- * @author jsampson
- * @author akung
- */
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
-@SuppressWarnings("serial")
+/**
+ * ExportExcelStudySubjectAuditLogServlet class.
+ */
+@SuppressWarnings({ "serial", "unchecked", "rawtypes" })
 @Component
 public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 
+	public static final int SIX = 6;
+	public static final int EIGHT = 8;
+	public static final int AUDIT_EVENT_TYPE_3 = 3;
+	public static final int AUDIT_EVENT_TYPE_32 = 32;
+	public static final int AUDIT_EVENT_TYPE_12 = 12;
+
 	/**
-	 * Checks whether the user has the right permission to proceed function
-	 * 
+	 * Checks whether the user has the right permission to proceed function.
+	 *
 	 * @param request
 	 *            HttpServletRequest
 	 * @param response
 	 *            HttpServletResponse
+	 * @throws InsufficientPermissionException
+	 *             the InsufficientPermissionException
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -96,7 +100,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -106,14 +109,13 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 		AuditDAO adao = getAuditDAO();
 
 		StudyEventDAO sedao = getStudyEventDAO();
-		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		EventCRFDAO ecdao = getEventCRFDAO();
 		StudyDAO studydao = getStudyDAO();
 		CRFDAO cdao = getCRFDAO();
 		CRFVersionDAO cvdao = getCRFVersionDAO();
 		StudySubjectBean studySubject = null;
 
-		ArrayList events = null;
+		List<StudyEventBean> events = null;
 		ArrayList studySubjectAudits = new ArrayList();
 		ArrayList eventCRFAudits = new ArrayList();
 		ArrayList studyEventAudits = new ArrayList();
@@ -160,28 +162,25 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 			// integer values.
 			for (Object studySubjectAuditEvent : studySubjectAuditEvents) {
 				AuditBean auditBean = (AuditBean) studySubjectAuditEvent;
-				if (auditBean.getAuditEventTypeId() == 3) {
+				if (auditBean.getAuditEventTypeId() == AUDIT_EVENT_TYPE_3) {
 					auditBean.setOldValue(Status.get(Integer.parseInt(auditBean.getOldValue())).getName());
 					auditBean.setNewValue(Status.get(Integer.parseInt(auditBean.getNewValue())).getName());
 				}
 			}
 			// Global subject value changed
 			studySubjectAudits.addAll(adao.findSubjectAuditEvents(subject.getId()));
-			
+
 			studySubjectAudits.addAll(studySubjectAuditEvents);
 
 			studySubjectAudits.addAll(adao.findStudySubjectGroupAssignmentAuditEvents(studySubject.getId()));
 
 			// Get the list of events
 			events = sedao.findAllByStudySubject(studySubject);
-			for (Object event : events) {
-				// Link study event definitions
-				StudyEventBean studyEvent = (StudyEventBean) event;
-				studyEvent.setStudyEventDefinition((StudyEventDefinitionBean) seddao.findByPK(studyEvent
-						.getStudyEventDefinitionId()));
-
+			addDeletedStudyEvents(studySubject, events);
+			for (StudyEventBean studyEvent : events) {
 				// Link event CRFs
 				studyEvent.setEventCRFs(ecdao.findAllByStudyEvent(studyEvent));
+				addDeletedEventCrfs(studySubject, studyEvent);
 
 				// Find deleted Event CRFs
 				List deletedEventCRFs = adao.findDeletedEventCRFsFromAuditEvent(studyEvent.getId());
@@ -197,26 +196,23 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 				for (Object eventCRF1 : eventCRFs) {
 					// Link CRF and CRF Versions
 					EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
-					eventCRF.setCrfVersion((CRFVersionBean) cvdao.findByPK(eventCRF.getCRFVersionId()));
-					eventCRF.setCrf(cdao.findByVersionId(eventCRF.getCRFVersionId()));
+					CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(eventCRF.getCRFVersionId());
+					if (crfVersionBean.getId() > 0) {
+						eventCRF.setCrfVersion(crfVersionBean);
+					}
+					CRFBean crfBean = cdao.findByVersionId(eventCRF.getCRFVersionId());
+					if (crfBean.getId() > 0) {
+						eventCRF.setCrf(crfBean);
+					}
 					// Get the event crf audits
 					eventCRFAudits.addAll(adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId()));
 					logger.info("eventCRFAudits size [" + eventCRFAudits.size() + "] eventCRF id [" + eventCRF.getId()
 							+ "]");
 				}
 			}
-			ItemDataDAO itemDataDao = getItemDataDAO();
-			for (Object o : eventCRFAudits) {
-				AuditBean ab = (AuditBean) o;
-				if (ab.getAuditTable().equalsIgnoreCase("item_data")) {
-					ItemDataBean idBean = (ItemDataBean) itemDataDao.findByPK(ab.getEntityId());
-					ab.setOrdinal(idBean.getOrdinal());
-				}
-			}
-
 		}
 
-		WritableFont headerFormat = new WritableFont(WritableFont.ARIAL, 8, WritableFont.BOLD, false,
+		WritableFont headerFormat = new WritableFont(WritableFont.ARIAL, EIGHT, WritableFont.BOLD, false,
 				UnderlineStyle.NO_UNDERLINE, Colour.VIOLET2);
 		WritableCellFormat cellFormat = new WritableCellFormat();
 		cellFormat.setFont(headerFormat);
@@ -267,8 +263,9 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 
 		for (Object studySubjectAudit : studySubjectAudits) {
 			AuditBean audit = (AuditBean) studySubjectAudit;
-			excelRow = new String[] { ResourceBundleProvider.getAuditEventsBundle().getString(audit.getAuditEventTypeName()), 
-					dateTimeFormat(audit.getAuditDate()), audit.getUserName(), audit.getEntityName(), 
+			excelRow = new String[] {
+					ResourceBundleProvider.getAuditEventsBundle().getString(audit.getAuditEventTypeName()),
+					dateTimeFormat(audit.getAuditDate()), audit.getUserName(), audit.getEntityName(),
 					audit.getOldValue(), audit.getNewValue() };
 			for (int i = 0; i < excelRow.length; i++) {
 				Label label = new Label(i, row, excelRow[i]);
@@ -389,56 +386,68 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 					if (studyEvent.getEntityId() == event.getId()) {
 						String getOld = studyEvent.getOldValue();
 						String oldValue;
-						if (getOld.equals("0"))
-							oldValue = ResourceBundleProvider.getResWord("invalid_");
-						else if (getOld.equals("1"))
-							oldValue = ResourceBundleProvider.getResWord("scheduled_");
-						else if (getOld.equals("2"))
-							oldValue = ResourceBundleProvider.getResWord("not_scheduled");
-						else if (getOld.equals("3"))
-							oldValue = ResourceBundleProvider.getResWord("data_entry_started_");
-						else if (getOld.equals("4"))
-							oldValue = ResourceBundleProvider.getResWord("completed_");
-						else if (getOld.equals("5"))
-							oldValue = ResourceBundleProvider.getResWord("stopped_");
-						else if (getOld.equals("6"))
-							oldValue = ResourceBundleProvider.getResWord("skipped_");
-						else if (getOld.equals("7"))
-							oldValue = ResourceBundleProvider.getResWord("locked");
-						else if (getOld.equals("8"))
-							oldValue = ResourceBundleProvider.getResWord("signed");
-						else
+						if (getOld.equals("0")) {
+							oldValue = ResourceBundleProvider.getResTerm("invalid");
+						} else if (getOld.equals("1")) {
+							oldValue = ResourceBundleProvider.getResTerm("scheduled");
+						} else if (getOld.equals("2")) {
+							oldValue = ResourceBundleProvider.getResTerm("not_scheduled");
+						} else if (getOld.equals("3")) {
+							oldValue = ResourceBundleProvider.getResTerm("data_entry_started");
+						} else if (getOld.equals("4")) {
+							oldValue = ResourceBundleProvider.getResTerm("completed");
+						} else if (getOld.equals("5")) {
+							oldValue = ResourceBundleProvider.getResTerm("stopped");
+						} else if (getOld.equals("6")) {
+							oldValue = ResourceBundleProvider.getResTerm("skipped");
+						} else if (getOld.equals("7")) {
+							oldValue = ResourceBundleProvider.getResTerm("locked");
+						} else if (getOld.equals("8")) {
+							oldValue = ResourceBundleProvider.getResTerm("signed");
+						} else if (getOld.equals("9")) {
+							oldValue = ResourceBundleProvider.getResTerm("source_data_verified");
+						} else if (getOld.equals("10")) {
+							oldValue = ResourceBundleProvider.getResTerm("deleted");
+						} else {
 							oldValue = studyEvent.getOldValue();
+						}
 
 						String getNew = studyEvent.getNewValue();
 						String newValue;
-						if (getNew.equals("0"))
-							newValue = ResourceBundleProvider.getResWord("invalid_");
-						else if (getNew.equals("1"))
-							newValue = ResourceBundleProvider.getResWord("scheduled_");
-						else if (getNew.equals("2"))
-							newValue = ResourceBundleProvider.getResWord("not_scheduled");
-						else if (getNew.equals("3"))
-							newValue = ResourceBundleProvider.getResWord("data_entry_started_");
-						else if (getNew.equals("4"))
-							newValue = ResourceBundleProvider.getResWord("completed_");
-						else if (getNew.equals("5"))
-							newValue = ResourceBundleProvider.getResWord("removed_");
-						else if (getNew.equals("6"))
-							newValue = ResourceBundleProvider.getResWord("skipped_");
-						else if (getNew.equals("7"))
-							newValue = ResourceBundleProvider.getResWord("locked");
-						else if (getNew.equals("8"))
-							newValue = ResourceBundleProvider.getResWord("signed");
-						else if (getNew.equals("9"))
-							newValue = ResourceBundleProvider.getResWord("frozen_");
-						else
+						if (getNew.equals("0")) {
+							newValue = ResourceBundleProvider.getResTerm("invalid");
+						} else if (getNew.equals("1")) {
+							newValue = ResourceBundleProvider.getResTerm("scheduled");
+						} else if (getNew.equals("2")) {
+							newValue = ResourceBundleProvider.getResTerm("not_scheduled");
+						} else if (getNew.equals("3")) {
+							newValue = ResourceBundleProvider.getResTerm("data_entry_started");
+						} else if (getNew.equals("4")) {
+							newValue = ResourceBundleProvider.getResTerm("completed");
+						} else if (getNew.equals("5")) {
+							newValue = ResourceBundleProvider.getResTerm("removed");
+						} else if (getNew.equals("6")) {
+							newValue = ResourceBundleProvider.getResTerm("skipped");
+						} else if (getNew.equals("7")) {
+							newValue = ResourceBundleProvider.getResTerm("locked");
+						} else if (getNew.equals("8")) {
+							newValue = ResourceBundleProvider.getResTerm("signed");
+						} else if (getNew.equals("9")) {
+							newValue = ResourceBundleProvider.getResTerm("source_data_verified");
+						} else if (getNew.equals("10")) {
+							newValue = ResourceBundleProvider.getResTerm("deleted");
+						} else {
 							newValue = studyEvent.getNewValue();
+						}
 
-						excelRow = new String[] { ResourceBundleProvider.getAuditEventsBundle().getString(studyEvent.getAuditEventTypeName()),
-								dateTimeFormat(studyEvent.getAuditDate()), studyEvent.getUserName(),
-								studyEvent.getEntityName() + (event.getStudyEventDefinition().isRepeating()? 
-										"(" + studyEvent.getOrdinal() + ")" : ""), oldValue, newValue };
+						excelRow = new String[] {
+								ResourceBundleProvider.getAuditEventsBundle().getString(
+										studyEvent.getAuditEventTypeName()),
+								dateTimeFormat(studyEvent.getAuditDate()),
+								studyEvent.getUserName(),
+								studyEvent.getEntityName()
+										+ (event.getStudyEventDefinition().isRepeating() ? "("
+												+ studyEvent.getOrdinal() + ")" : ""), oldValue, newValue };
 						for (int i = 0; i < excelRow.length; i++) {
 							label = new Label(i, row, excelRow[i]);
 							excelSheet.addCell(label);
@@ -482,65 +491,71 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 						if (eventCrfAudit.getEventCRFId() == eventCrf.getId()) {
 							String oldValue = "";
 							String newValue = "";
-							if (eventCrfAudit.getAuditEventTypeId() == 12
+							if (eventCrfAudit.getAuditEventTypeId() == AUDIT_EVENT_TYPE_12
 									|| eventCrfAudit.getEntityName().equals("Status")) {
 								String getOld = eventCrfAudit.getOldValue();
-								if (getOld.equals("0"))
+								if (getOld.equals("0")) {
 									oldValue = ResourceBundleProvider.getResWord("invalid_");
-								else if (getOld.equals("1"))
+								} else if (getOld.equals("1")) {
 									oldValue = ResourceBundleProvider.getResWord("available_");
-								else if (getOld.equals("2"))
+								} else if (getOld.equals("2")) {
 									oldValue = ResourceBundleProvider.getResWord("completed");
-								else if (getOld.equals("3"))
+								} else if (getOld.equals("3")) {
 									oldValue = ResourceBundleProvider.getResWord("private");
-								else if (getOld.equals("4"))
+								} else if (getOld.equals("4")) {
 									oldValue = ResourceBundleProvider.getResWord("pending");
-								else if (getOld.equals("5"))
+								} else if (getOld.equals("5")) {
 									oldValue = ResourceBundleProvider.getResWord("removed_");
-								else if (getOld.equals("6"))
+								} else if (getOld.equals("6")) {
 									oldValue = ResourceBundleProvider.getResWord("locked");
-								else if (getOld.equals("7"))
+								} else if (getOld.equals("7")) {
 									oldValue = ResourceBundleProvider.getResWord("auto_removed");
-							} else if (eventCrfAudit.getAuditEventTypeId() == 32) {
+								}
+							} else if (eventCrfAudit.getAuditEventTypeId() == AUDIT_EVENT_TYPE_32) {
 								String getOld = eventCrfAudit.getOldValue();
-								if (getOld.equals("0"))
+								if (getOld.equals("0")) {
 									oldValue = ResourceBundleProvider.getResWord("FALSE");
-								else if (getOld.equals("1"))
+								} else if (getOld.equals("1")) {
 									oldValue = ResourceBundleProvider.getResWord("TRUE");
+								}
 							} else {
 								oldValue = eventCrfAudit.getOldValue();
 							}
 
-							if (eventCrfAudit.getAuditEventTypeId() == 12
+							if (eventCrfAudit.getAuditEventTypeId() == AUDIT_EVENT_TYPE_12
 									|| eventCrfAudit.getEntityName().equals("Status")) {
 								String getNew = eventCrfAudit.getNewValue();
-								if (getNew.equals("0"))
+								if (getNew.equals("0")) {
 									newValue = ResourceBundleProvider.getResWord("invalid_");
-								else if (getNew.equals("1"))
+								} else if (getNew.equals("1")) {
 									newValue = ResourceBundleProvider.getResWord("available_");
-								else if (getNew.equals("2"))
+								} else if (getNew.equals("2")) {
 									newValue = ResourceBundleProvider.getResWord("completed");
-								else if (getNew.equals("3"))
+								} else if (getNew.equals("3")) {
 									newValue = ResourceBundleProvider.getResWord("private");
-								else if (getNew.equals("4"))
+								} else if (getNew.equals("4")) {
 									newValue = ResourceBundleProvider.getResWord("pending");
-								else if (getNew.equals("5"))
+								} else if (getNew.equals("5")) {
 									newValue = ResourceBundleProvider.getResWord("removed_");
-								else if (getNew.equals("6"))
+								} else if (getNew.equals("6")) {
 									newValue = ResourceBundleProvider.getResWord("locked");
-								else if (getNew.equals("7"))
+								} else if (getNew.equals("7")) {
 									newValue = ResourceBundleProvider.getResWord("auto_removed");
-							} else if (eventCrfAudit.getAuditEventTypeId() == 32) {
+								}
+							} else if (eventCrfAudit.getAuditEventTypeId() == AUDIT_EVENT_TYPE_32) {
 								String getNew = eventCrfAudit.getNewValue();
-								if (getNew.equals("0"))
+								if (getNew.equals("0")) {
 									newValue = ResourceBundleProvider.getResWord("FALSE");
-								else if (getNew.equals("1"))
+								} else if (getNew.equals("1")) {
 									newValue = ResourceBundleProvider.getResWord("TRUE");
+								}
 							} else {
 								newValue = eventCrfAudit.getNewValue();
 							}
 
-							excelRow = new String[] { ResourceBundleProvider.getAuditEventsBundle().getString(eventCrfAudit.getAuditEventTypeName()),
+							excelRow = new String[] {
+									ResourceBundleProvider.getAuditEventsBundle().getString(
+											eventCrfAudit.getAuditEventTypeName()),
 									dateTimeFormat(eventCrfAudit.getAuditDate()), eventCrfAudit.getUserName(),
 									eventCrfAudit.getEntityName() + "(" + eventCrfAudit.getOrdinal() + ")", oldValue,
 									newValue };
@@ -601,7 +616,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 	}
 
 	private void autoSizeColumns(WritableSheet sheet) {
-		for (int x = 0; x < 6; x++) {
+		for (int x = 0; x < SIX; x++) {
 			CellView cell = sheet.getColumnView(x);
 			cell.setAutosize(true);
 			sheet.setColumnView(x, cell);

@@ -14,6 +14,7 @@
 package org.akaza.openclinica.control.core;
 
 import com.clinovo.util.StudyParameterPriorityUtil;
+import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -48,6 +49,7 @@ import org.akaza.openclinica.control.submit.ListStudySubjectsServlet;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -114,6 +116,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -1750,5 +1753,72 @@ public abstract class Controller extends BaseController {
 		}
 
 		return resolutionStatus;
+	}
+
+	protected void addDeletedStudyEvents(StudySubjectBean studySubjectBean, List<StudyEventBean> studyEvents) {
+		AuditDAO auditDao = getAuditDAO();
+		UserAccountDAO userAccountDao = getUserAccountDAO();
+		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
+		for (AuditBean auditBean : auditDao.findDeletedStudyEvents(studySubjectBean.getId())) {
+			StudyEventBean studyEventBean = new StudyEventBean();
+			studyEventBean.setId(auditBean.getEntityId());
+			studyEventBean.setDateStarted(auditBean.getDateStart());
+			studyEventBean.setLocation(auditBean.getLocation());
+			studyEventBean.setStudySubjectId(auditBean.getStudySubjectId());
+			studyEventBean.setStudyEventDefinitionId(auditBean.getStudyEventDefinitionId());
+			studyEventBean.setSampleOrdinal(auditBean.getStudyEventSampleOrdinal());
+			studyEventBean.setStatus(Status.get(Integer.parseInt(auditBean.getNewValue())));
+			studyEventBean.setOwner((UserAccountBean) userAccountDao.findByPK(auditBean.getUserId()));
+			studyEventBean.setUpdater(studyEventBean.getOwner());
+			studyEvents.add(studyEventBean);
+		}
+		for (StudyEventBean studyEventBean : studyEvents) {
+			StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDao
+					.findByPK(studyEventBean.getStudyEventDefinitionId());
+			studyEventBean.setStudyEventDefinitionOrdinal(studyEventDefinitionBean.getOrdinal());
+			studyEventBean.setStudyEventDefinition(studyEventDefinitionBean);
+		}
+		Collections.sort(studyEvents, new Comparator<StudyEventBean>() {
+			public int compare(StudyEventBean se1, StudyEventBean se2) {
+				int result = new Integer(se1.getStudyEventDefinitionOrdinal()).compareTo(se2
+						.getStudyEventDefinitionOrdinal());
+				if (result == 0) {
+					result = new Integer(se1.getSampleOrdinal()).compareTo(se2.getSampleOrdinal());
+					if (result == 0) {
+						result = new Integer(se1.getId()).compareTo(se2.getId());
+					}
+				}
+				return result;
+			}
+		});
+	}
+
+	protected void addDeletedEventCrfs(StudySubjectBean studySubjectBean, StudyEventBean studyEventBean) {
+		AuditDAO auditDao = getAuditDAO();
+		UserAccountDAO userAccountDao = getUserAccountDAO();
+		for (AuditBean auditBean : auditDao.findDeletedEventCrfs(studySubjectBean.getId(), studyEventBean.getId())) {
+			CRFBean crfBean = new CRFBean();
+			crfBean.setName(auditBean.getCrfName());
+			CRFVersionBean crfVersionBean = new CRFVersionBean();
+			crfVersionBean.setName(auditBean.getCrfVersion());
+			EventCRFBean eventCRFBean = new EventCRFBean();
+			eventCRFBean.setCrfVersion(crfVersionBean);
+			eventCRFBean.setCrf(crfBean);
+			eventCRFBean.setId(auditBean.getEntityId());
+			eventCRFBean.setInterviewerName(auditBean.getInterviewerName());
+			eventCRFBean.setDateInterviewed(auditBean.getDateInterviewed());
+			eventCRFBean.setStudySubjectId(auditBean.getStudySubjectId());
+			eventCRFBean.setCRFVersionId(auditBean.getCrfVersionId());
+			eventCRFBean.setStudyEventId(auditBean.getStudyEventId());
+			eventCRFBean.setStatus(Status.get(Integer.parseInt(auditBean.getNewValue())));
+			eventCRFBean.setOwner((UserAccountBean) userAccountDao.findByPK(auditBean.getUserId()));
+			eventCRFBean.setUpdater(eventCRFBean.getOwner());
+			studyEventBean.getEventCRFs().add(eventCRFBean);
+		}
+		Collections.sort(studyEventBean.getEventCRFs(), new Comparator<EventCRFBean>() {
+			public int compare(EventCRFBean ec1, EventCRFBean ec2) {
+				return new Integer(ec1.getId()).compareTo(ec2.getId());
+			}
+		});
 	}
 }

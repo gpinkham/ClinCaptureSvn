@@ -20,16 +20,20 @@
  */
 package org.akaza.openclinica.bean.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.util.SignedData;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * StudyEventBean class.
+ */
 @SuppressWarnings({ "rawtypes", "serial" })
 public class StudyEventBean extends AuditableEntityBean {
 	// STUDY_EVENT_ID STUDY_EVENT_DEFINITION_ID SUBJECT_ID
@@ -55,7 +59,8 @@ public class StudyEventBean extends AuditableEntityBean {
 	// not in database
 	private StudyEventDefinitionBean studyEventDefinition = new StudyEventDefinitionBean();
 
-	private ArrayList eventCRFs = new ArrayList();// not in DB
+	// not in DB
+	private ArrayList eventCRFs = new ArrayList();
 
 	private DataEntryStage stage;
 
@@ -63,7 +68,8 @@ public class StudyEventBean extends AuditableEntityBean {
 
 	private String studySubjectLabel;
 
-	private boolean scheduledDatePast = false;// not in DB
+	// not in DB
+	private boolean scheduledDatePast = false;
 
 	private int repeatingNum = 1;
 
@@ -74,6 +80,8 @@ public class StudyEventBean extends AuditableEntityBean {
 
 	private boolean startTimeFlag = false;
 	private boolean endTimeFlag = false;
+
+	private int studyEventDefinitionOrdinal;
 
 	private Map<Integer, SignedData> signedData = new HashMap<Integer, SignedData>();
 
@@ -199,11 +207,20 @@ public class StudyEventBean extends AuditableEntityBean {
 		this.subjectEventStatus = subjectEventStatus;
 	}
 
+	/**
+	 * StudyEventBean constructor.
+	 */
 	public StudyEventBean() {
 		stage = DataEntryStage.UNCOMPLETED;
 		subjectEventStatus = SubjectEventStatus.SCHEDULED;
 	}
 
+	/**
+	 * StudyEventBean constructor.
+	 * 
+	 * @param obj
+	 *            StudyEventBean
+	 */
 	public StudyEventBean(StudyEventBean obj) {
 		this.id = obj.getId();
 		this.stage = obj.getStage();
@@ -352,13 +369,9 @@ public class StudyEventBean extends AuditableEntityBean {
 
 		if (s.equals(Status.AVAILABLE)) {
 			stage = DataEntryStage.UNCOMPLETED;
-		}
-
-		else if (s.equals(Status.PENDING)) {
+		} else if (s.equals(Status.PENDING)) {
 			stage = DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE;
-		}
-
-		else if (s.equals(Status.UNAVAILABLE)) {
+		} else if (s.equals(Status.UNAVAILABLE)) {
 			stage = DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE;
 		}
 	}
@@ -408,5 +421,13 @@ public class StudyEventBean extends AuditableEntityBean {
 
 	public void setPrevSubjectEventStatus(SubjectEventStatus prevSubjectEventStatus) {
 		this.prevSubjectEventStatus = prevSubjectEventStatus;
+	}
+
+	public int getStudyEventDefinitionOrdinal() {
+		return studyEventDefinitionOrdinal;
+	}
+
+	public void setStudyEventDefinitionOrdinal(int studyEventDefinitionOrdinal) {
+		this.studyEventDefinitionOrdinal = studyEventDefinitionOrdinal;
 	}
 }

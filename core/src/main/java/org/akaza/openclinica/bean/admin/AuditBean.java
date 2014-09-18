@@ -15,8 +15,12 @@ package org.akaza.openclinica.bean.admin;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
+/**
+ * AuditBean class.
+ */
 @SuppressWarnings("serial")
 public class AuditBean extends EntityBean {
 
@@ -36,9 +40,21 @@ public class AuditBean extends EntityBean {
 
 	private int itemDataTypeId;
 	private int ordinal;
-	
+
 	private int itemId;
 	private String itemDescription;
+
+	private String crfName;
+	private String crfVersion;
+	private Timestamp dateStart;
+	private String location;
+	private Date dateInterviewed;
+	private String interviewerName;
+	private int studyEventSampleOrdinal;
+	private int eventDefinitionCrfId;
+	private int studyEventDefinitionId;
+	private int studySubjectId;
+	private int crfVersionId;
 
 	public int getItemDataTypeId() {
 		return this.itemDataTypeId;
@@ -162,32 +178,39 @@ public class AuditBean extends EntityBean {
 
 	@Override
 	public int hashCode() {
-		final int PRIME = 31;
+		final int prime = 31;
 		int result = 1;
-		result = PRIME * result + (auditTable == null ? 0 : auditTable.hashCode());
-		result = PRIME * result + userId;
-		result = PRIME * result + id;
+		result = prime * result + (auditTable == null ? 0 : auditTable.hashCode());
+		result = prime * result + userId;
+		result = prime * result + id;
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		final AuditBean other = (AuditBean) obj;
 		if (auditTable == null) {
-			if (other.auditTable != null)
+			if (other.auditTable != null) {
 				return false;
-		} else if (!auditTable.equals(other.auditTable))
+			}
+		} else if (!auditTable.equals(other.auditTable)) {
 			return false;
-		if (userId != other.userId)
+		}
+		if (userId != other.userId) {
 			return false;
-		if (id != other.id)
+		}
+		if (id != other.id) {
 			return false;
+		}
 		return true;
 	}
 
@@ -207,4 +230,91 @@ public class AuditBean extends EntityBean {
 		this.itemDescription = itemDescription;
 	}
 
+	public int getStudyEventSampleOrdinal() {
+		return studyEventSampleOrdinal;
+	}
+
+	public void setStudyEventSampleOrdinal(int studyEventSampleOrdinal) {
+		this.studyEventSampleOrdinal = studyEventSampleOrdinal;
+	}
+
+	public int getEventDefinitionCrfId() {
+		return eventDefinitionCrfId;
+	}
+
+	public void setEventDefinitionCrfId(int eventDefinitionCrfId) {
+		this.eventDefinitionCrfId = eventDefinitionCrfId;
+	}
+
+	public int getStudyEventDefinitionId() {
+		return studyEventDefinitionId;
+	}
+
+	public void setStudyEventDefinitionId(int studyEventDefinitionId) {
+		this.studyEventDefinitionId = studyEventDefinitionId;
+	}
+
+	public int getStudySubjectId() {
+		return studySubjectId;
+	}
+
+	public void setStudySubjectId(int studySubjectId) {
+		this.studySubjectId = studySubjectId;
+	}
+
+	public int getCrfVersionId() {
+		return crfVersionId;
+	}
+
+	public void setCrfVersionId(int crfVersionId) {
+		this.crfVersionId = crfVersionId;
+	}
+
+	public String getInterviewerName() {
+		return interviewerName;
+	}
+
+	public void setInterviewerName(String interviewerName) {
+		this.interviewerName = interviewerName;
+	}
+
+	public Date getDateInterviewed() {
+		return dateInterviewed;
+	}
+
+	public void setDateInterviewed(Date dateInterviewed) {
+		this.dateInterviewed = dateInterviewed;
+	}
+
+	public Timestamp getDateStart() {
+		return dateStart;
+	}
+
+	public void setDateStart(Timestamp dateStart) {
+		this.dateStart = dateStart;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getCrfName() {
+		return crfName;
+	}
+
+	public void setCrfName(String crfName) {
+		this.crfName = crfName;
+	}
+
+	public String getCrfVersion() {
+		return crfVersion;
+	}
+
+	public void setCrfVersion(String crfVersion) {
+		this.crfVersion = crfVersion;
+	}
 }

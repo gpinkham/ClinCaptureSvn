@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="skirpichenok" id="2014-09-14-TICKET1735-01" dbms="postgresql">
+        <comment>Insert a new record into the audit_log_event_type table</comment>
+        <insert tableName="audit_log_event_type">
+            <column name="audit_log_event_type_id" valueNumeric="54"/>
+            <column name="name" value="event_crf_deleted"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2014-09-14-TICKET1735-02" dbms="postgresql">
+        <comment>Add new columns to the audit_log_event table</comment>
+        <addColumn tableName="audit_log_event">
+            <column name="ordinal" type="INT"/>
+        </addColumn>
+        <addColumn tableName="audit_log_event">
+            <column name="name" type="VARCHAR(255)"/>
+        </addColumn>
+        <addColumn tableName="audit_log_event">
+            <column name="version" type="VARCHAR(255)"/>
+        </addColumn>
+        <addColumn tableName="audit_log_event">
+            <column name="date_interviewed" type="DATE"/>
+        </addColumn>
+        <addColumn tableName="audit_log_event">
+            <column name="interviewer_name" type="VARCHAR(255)"/>
+        </addColumn>
+        <addColumn tableName="audit_log_event">
+            <column name="event_definition_crf_id" type="INT"/>
+        </addColumn>
+        <addColumn tableName="audit_log_event">
+            <column name="location" type="VARCHAR(2000)"/>
+        </addColumn>
+        <addColumn tableName="audit_log_event">
+            <column name="date_start" type="timestamp with time zone"/>
+        </addColumn>
+        <addColumn tableName="audit_log_event">
+            <column name="study_event_definition_id" type="INT"/>
+        </addColumn>
+        <addColumn tableName="audit_log_event">
+            <column name="study_subject_id" type="INT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2014-09-14-TICKET1735-03" dbms="postgresql">
+        <sql splitStatements="false">
+            CREATE TRIGGER event_crf_delete
+            AFTER DELETE
+            ON event_crf
+            FOR EACH ROW
+            EXECUTE PROCEDURE event_crf_trigger();
+        </sql>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2014-09-14-TICKET1735-04" dbms="postgresql">
+        <sql splitStatements="false">
+            CREATE TRIGGER study_event_delete
+            AFTER DELETE
+            ON study_event
+            FOR EACH ROW
+            EXECUTE PROCEDURE study_event_trigger();
+        </sql>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2014-09-14-TICKET1735-05" dbms="postgresql">
+        <comment>update event_crf_trigger and study_event_trigger</comment>
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION item_data_initial_trigger() RETURNS "trigger"
+            AS 'DECLARE
+            pk INTEGER;
+            entity_name_value TEXT;
+            std_evnt_id INTEGER;
+            crf_version_id INTEGER;
+            BEGIN
+            IF (TG_OP = ''INSERT'' and length(NEW.value)>0) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            SELECT INTO entity_name_value item.name FROM item WHERE item.item_id = NEW.item_id;
+            SELECT INTO std_evnt_id ec.study_event_id FROM event_crf ec WHERE ec.event_crf_id = NEW.event_crf_id;
+            SELECT INTO crf_version_id ec.crf_version_id FROM event_crf ec WHERE ec.event_crf_id = NEW.event_crf_id;
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, reason_for_change, new_value, event_crf_id, study_event_id, event_crf_version_id, ordinal)
+            VALUES (pk, ''1'', now(), NEW.owner_id, ''item_data'', NEW.item_data_id, entity_name_value, ''initial value'', NEW.value, NEW.event_crf_id, std_evnt_id, crf_version_id, NEW.ordinal);
+            RETURN NULL;
+            END IF;
+            RETURN NULL;
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION repeating_item_data_trigger()
+            RETURNS "trigger" AS
+            'DECLARE
+            pk INTEGER;
+            entity_name_value TEXT;
+            std_evnt_id INTEGER;
+            crf_version_id INTEGER;
+            validator_id INTEGER;
+            event_crf_status_id INTEGER;
+            BEGIN
+            IF (TG_OP = ''INSERT'') THEN
+            /*---------------*/
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            SELECT INTO entity_name_value item.name FROM item WHERE item.item_id = NEW.item_id;
+            SELECT INTO std_evnt_id ec.study_event_id FROM event_crf ec WHERE ec.event_crf_id = NEW.event_crf_id;
+            SELECT INTO crf_version_id ec.crf_version_id FROM event_crf ec WHERE ec.event_crf_id = NEW.event_crf_id;
+            SELECT INTO validator_id ec.validator_id FROM event_crf ec WHERE ec.event_crf_id = NEW.event_crf_id;
+            SELECT INTO event_crf_status_id ec.status_id FROM event_crf ec WHERE ec.event_crf_id = NEW.event_crf_id;
+
+            IF (NEW.status_id = ''2'' AND NEW.ordinal <![CDATA[>]]> 1 AND validator_id <![CDATA[>]]> 0 AND event_crf_status_id  = ''4'') THEN  /*DDE*/
+
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, new_value, event_crf_id, study_event_id, event_crf_version_id, ordinal)
+            VALUES (pk, ''30'', now(), NEW.owner_id, ''item_data'', NEW.item_data_id, entity_name_value, NEW.value, NEW.event_crf_id, std_evnt_id, crf_version_id, NEW.ordinal);
+            ELSE
+            IF(NEW.status_id =''2'' AND NEW.ordinal <![CDATA[>]]> 1  AND event_crf_status_id  = ''2'') THEN /*ADE*/
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, new_value, event_crf_id, study_event_id, event_crf_version_id, ordinal)
+            VALUES (pk, ''30'', now(), NEW.owner_id, ''item_data'', NEW.item_data_id, entity_name_value, NEW.value, NEW.event_crf_id, std_evnt_id, crf_version_id, NEW.ordinal);
+            END IF;
+            END IF;
+            RETURN NULL;  /*return values ignored for ''after'' triggers*/
+
+            END IF;
+            RETURN NULL;  /*return values ignored for ''after'' triggers*/
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION item_data_trigger() RETURNS "trigger"
+            AS 'DECLARE
+            pk INTEGER;
+            entity_name_value TEXT;
+            std_evnt_id INTEGER;
+            crf_version_id INTEGER;
+            coded_item_id INTEGER;
+
+            BEGIN
+            IF (TG_OP = ''DELETE'') THEN
+            /*---------------*/
+            /*Item data deleted (by deleting an event crf)*/
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            SELECT INTO entity_name_value item.name FROM item WHERE item.item_id = OLD.item_id;
+            SELECT INTO std_evnt_id ec.study_event_id FROM event_crf ec WHERE ec.event_crf_id = OLD.event_crf_id;
+            SELECT INTO crf_version_id ec.crf_version_id FROM event_crf ec WHERE ec.event_crf_id = OLD.event_crf_id;
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, event_crf_id, study_event_id, event_crf_version_id, ordinal)
+            VALUES (pk, ''13'', now(), OLD.update_id, ''item_data'', OLD.item_data_id, entity_name_value, OLD.value, OLD.event_crf_id, std_evnt_id, crf_version_id, OLD.ordinal);
+            RETURN NULL; --return values ignored for ''after'' triggers
+
+            ELSIF (TG_OP = ''UPDATE'') THEN
+
+            IF(OLD.status_id <![CDATA[<>]]> NEW.status_id) THEN
+            /*---------------*/
+            /*Item data status changed (by removing an event crf)*/
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            SELECT INTO entity_name_value item.name FROM item WHERE item.item_id = NEW.item_id;
+            SELECT INTO coded_item_id coded_item_element.coded_item_id FROM coded_item_element WHERE coded_item_element.item_data_id = NEW.item_data_id;
+            IF (coded_item_id > 0) THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''53'', now(), NEW.update_id, ''item_data'', NEW.item_data_id, entity_name_value, OLD.value, NEW.value, NEW.event_crf_id);
+            ELSE
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''12'', now(), NEW.update_id, ''item_data'', NEW.item_data_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
+            END IF;
+            /*---------------*/
+            END IF;
+
+            IF(OLD.value <![CDATA[<>]]> NEW.value) THEN
+            /*---------------*/
+            /*Item data updated*/
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            SELECT INTO entity_name_value item.name FROM item WHERE item.item_id = NEW.item_id;
+            SELECT INTO coded_item_id coded_item_element.coded_item_id FROM coded_item_element WHERE coded_item_element.item_data_id = NEW.item_data_id;
+            IF (coded_item_id > 0) THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''53'', now(), NEW.update_id, ''item_data'', NEW.item_data_id, entity_name_value, OLD.value, NEW.value, NEW.event_crf_id);
+            ELSE
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''1'', now(), NEW.update_id, ''item_data'', NEW.item_data_id, entity_name_value, OLD.value, NEW.value, NEW.event_crf_id);
+            END IF;
+            DELETE FROM rule_action_run_log where item_data_id = NEW.item_data_id;
+            /*---------------*/
+            END IF;
+            RETURN NULL;  /*return values ignored for ''after'' triggers*/
+            END IF;
+            RETURN NULL;  /*return values ignored for ''after'' triggers*/
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION event_crf_trigger() RETURNS "trigger"
+            AS 'DECLARE
+            pk INTEGER;
+            entity_name_value TEXT;
+            crfName TEXT;
+            crfVersion TEXT;
+            sId INTEGER;
+            crfId INTEGER;
+            edcId INTEGER;
+            sedId INTEGER;
+            BEGIN
+            IF (TG_OP = ''DELETE'') THEN
+            IF (OLD.not_started = false) THEN
+            SELECT INTO sId ss.study_id FROM study_subject ss WHERE ss.study_subject_id = OLD.study_subject_id;
+            SELECT INTO crfId cv.crf_id FROM crf_version cv WHERE cv.crf_version_id = OLD.crf_version_id;
+            SELECT INTO sedId se.study_event_definition_id FROM study_event se WHERE se.study_event_id = OLD.study_event_id;
+            SELECT INTO edcId edc.event_definition_crf_id FROM event_definition_crf edc, study s WHERE s.study_id = sId AND edc.study_event_definition_id = sedId AND edc.crf_id = crfId AND ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id)));
+            SELECT INTO crfName c.name FROM crf_version cv, crf c WHERE c.crf_id = cv.crf_id AND cv.crf_version_id = OLD.crf_version_id;
+            SELECT INTO crfVersion cv.name FROM crf_version cv WHERE cv.crf_version_id = OLD.crf_version_id;
+            INSERT INTO audit_log_event(audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id, study_event_id, event_crf_version_id, date_interviewed, interviewer_name, event_definition_crf_id, study_event_definition_id, study_subject_id, name, version)
+            VALUES (''54'', now(), OLD.update_id, ''event_crf'', OLD.event_crf_id, ''Status'', OLD.status_id, 5, OLD.event_crf_id, OLD.study_event_id, OLD.crf_version_id, OLD.date_interviewed, OLD.interviewer_name, edcId, sedId, OLD.study_subject_id, crfName, crfVersion);
+            END IF;
+            RETURN NULL;
+            ELSIF (TG_OP = ''UPDATE'') THEN
+            IF(OLD.status_id <![CDATA[<>]]> NEW.status_id) THEN
+            /*---------------*/
+            /*Event CRF status changed*/
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            SELECT INTO entity_name_value ''Status'';
+            IF(OLD.status_id = ''1'' AND NEW.status_id = ''2'') THEN
+            IF (NEW.electronic_signature_status) THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''14'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
+            ELSE
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''8'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
+            END IF;
+            ELSIF (OLD.status_id = ''1'' AND NEW.status_id = ''4'') THEN
+            IF (NEW.electronic_signature_status) THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''15'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
+            ELSE
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''10'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
+            END IF;
+            ELSIF (OLD.status_id = ''4'' AND NEW.status_id = ''2'') THEN
+            IF (NEW.electronic_signature_status) THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''16'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
+            ELSE
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''11'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
+            END IF;
+            END IF;
+            /*---------------*/
+            END IF;
+
+            IF(OLD.date_interviewed <![CDATA[<>]]> NEW.date_interviewed) THEN
+            /*---------------*/
+            /*Event CRF date interviewed*/
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            SELECT INTO entity_name_value ''Date interviewed'';
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''9'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.date_interviewed, NEW.date_interviewed, NEW.event_crf_id);
+            /*---------------*/
+            END IF;
+
+            IF((OLD.interviewer_name <![CDATA[<>]]> NEW.interviewer_name) AND (OLD.interviewer_name <![CDATA[<>]]> '''')) THEN
+            /*---------------*/
+            /*Event CRF interviewer name*/
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            SELECT INTO entity_name_value ''Interviewer Name'';
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''9'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.interviewer_name, NEW.interviewer_name, NEW.event_crf_id);
+            /*---------------*/
+            END IF;
+
+            IF(OLD.sdv_status <![CDATA[<>]]> NEW.sdv_status) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            SELECT INTO entity_name_value ''EventCRF SDV Status'';
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (pk, ''32'', now(), NEW.sdv_update_id, ''event_crf'', NEW.event_crf_id, entity_name_value,
+            (select case when OLD.sdv_status is true then TRUE else FALSE end),
+            (select case when NEW.sdv_status is true then TRUE else FALSE end), NEW.event_crf_id);
+            /*---------------*/
+            END IF;
+            RETURN NULL;  /*return values ignored for ''after'' triggers*/
+            END IF;
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION study_event_trigger()
+            RETURNS trigger AS
+            'DECLARE
+            pk INTEGER;
+            BEGIN
+            IF (TG_OP = ''DELETE'') THEN
+            INSERT INTO audit_log_event(audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, study_event_id, ordinal, location, date_start, study_event_definition_id, study_subject_id)
+            VALUES (''51'', now(), OLD.update_id, ''study_event'', OLD.study_event_id, ''Status'', OLD.status_id, 10, OLD.study_event_id, OLD.sample_ordinal, OLD.location, OLD.date_start, OLD.study_event_definition_id, OLD.study_subject_id);
+            RETURN NULL;
+            ELSIF (TG_OP = ''INSERT'') THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            IF(NEW.subject_event_status_id = ''1'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''17'', now(), NEW.owner_id, ''study_event'', NEW.study_event_id, ''Status'',''0'', NEW.subject_event_status_id);
+            END IF;
+            END IF;
+
+            IF (TG_OP = ''UPDATE'') THEN
+            IF(OLD.subject_event_status_id <![CDATA[<>]]> NEW.subject_event_status_id) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            IF(NEW.subject_event_status_id = ''1'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''17'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            ELSIF(NEW.subject_event_status_id = ''3'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''18'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            ELSIF(NEW.subject_event_status_id = ''4'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''19'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            ELSIF(NEW.subject_event_status_id = ''5'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''20'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            ELSIF(NEW.subject_event_status_id = ''6'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''21'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            ELSIF(NEW.subject_event_status_id = ''7'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''22'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            ELSIF(NEW.subject_event_status_id = ''8'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''31'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            ELSIF(NEW.subject_event_status_id = ''9'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''50'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            ELSIF(NEW.subject_event_status_id = ''10'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''51'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            END IF;
+            END IF;
+            IF(OLD.status_id <![CDATA[<>]]> NEW.status_id) THEN
+            IF(NEW.status_id = ''5'' or NEW.status_id = ''1'') THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''23'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.status_id, NEW.status_id);
+            END IF;
+            END IF;
+            IF(OLD.date_start <![CDATA[<>]]> NEW.date_start) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''24'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Start date'', OLD.date_start, NEW.date_start);
+            END IF;
+            IF(OLD.date_end <![CDATA[<>]]> NEW.date_end) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''25'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''End date'', OLD.date_end, NEW.date_end);
+            END IF;
+            IF(OLD.location <![CDATA[<>]]> NEW.location) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''26'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Location'', OLD.location, NEW.location);
+            END IF;
+            RETURN NULL;  /*return values ignored for ''after'' triggers*/
+            END IF;
+            RETURN NULL;
+            END;
+            'LANGUAGE plpgsql;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

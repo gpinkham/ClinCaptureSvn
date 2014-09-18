@@ -20,16 +20,6 @@
  */
 package org.akaza.openclinica.dao.admin;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -39,6 +29,16 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
+
+import javax.sql.DataSource;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class AuditDAO extends EntityDAO {
@@ -210,43 +210,6 @@ public class AuditDAO extends EntityDAO {
 		variables.put(1, eventCRFId);
 
 		String sql = digester.getQuery("findEventCRFAuditEvents");
-		ArrayList alist = this.select(sql, variables);
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			AuditBean eb = (AuditBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
-
-	}
-
-	public Collection findEventCRFAuditEventsWithItemDataType(int eventCRFId) {
-		this.setTypesExpectedWithItemDataType();
-
-		HashMap variables = new HashMap();
-		variables.put(1, eventCRFId);
-
-		String sql = digester.getQuery("findEventCRFAuditEventsWithItemDataTypeAndItemData");
-		ArrayList alist = this.select(sql, variables);
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			AuditBean eb = (AuditBean) this.getEntityFromHashMapWithItemDataTypeAndItemData((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
-
-	}
-
-	/**
-	 * Find audit log events type for an Study Event
-	 */
-	public Collection findStudyEventAuditEvents(int studyEventId) {
-		this.setTypesExpected();
-
-		HashMap variables = new HashMap();
-		variables.put(1, studyEventId);
-
-		String sql = digester.getQuery("findStudyEventAuditEvents");
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
 		for (Object anAlist : alist) {
@@ -472,4 +435,153 @@ public class AuditDAO extends EntityDAO {
 		}
 	}
 
+	/**
+	 * Method that returns the list of the audit events by studyEventId.
+	 * 
+	 * @param studyEventId
+	 *            int
+	 * @return List<AuditBean>
+	 */
+	public Collection findStudyEventAuditEvents(int studyEventId) {
+		this.setTypesExpected();
+
+		this.setTypeExpected(14, TypeNames.TIMESTAMP); // date_start
+		this.setTypeExpected(15, TypeNames.STRING); // location
+		this.setTypeExpected(16, TypeNames.INT); // ordinal
+		this.setTypeExpected(17, TypeNames.INT); // event_definition_crf_id
+		this.setTypeExpected(18, TypeNames.INT); // study_event_definition_id
+		this.setTypeExpected(19, TypeNames.INT); // study_subject_id
+
+		HashMap variables = new HashMap();
+		variables.put(1, studyEventId);
+
+		String sql = digester.getQuery("findStudyEventAuditEvents");
+		List<HashMap> aList = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		for (HashMap anAList : aList) {
+			AuditBean eb = (AuditBean) this.getEntityFromHashMap(anAList);
+			if (eb.getAuditEventTypeId() == 51) {
+				eb.setDateStart((Timestamp) anAList.get("date_start"));
+				eb.setLocation((String) anAList.get("location"));
+				eb.setEventDefinitionCrfId((Integer) anAList.get("event_definition_crf_id"));
+				eb.setStudyEventSampleOrdinal((Integer) anAList.get("ordinal"));
+				eb.setStudyEventDefinitionId((Integer) anAList.get("study_event_definition_id"));
+				eb.setStudySubjectId((Integer) anAList.get("study_subject_id"));
+			}
+			al.add(eb);
+		}
+		return al;
+	}
+
+	/**
+	 * Method that finds the deleted study events.
+	 * 
+	 * @param studySubjectId
+	 *            int
+	 * @return List<AuditBean>
+	 */
+	public List<AuditBean> findDeletedStudyEvents(int studySubjectId) {
+		this.setTypesExpected();
+
+		this.setTypeExpected(14, TypeNames.TIMESTAMP); // date_start
+		this.setTypeExpected(15, TypeNames.STRING); // location
+		this.setTypeExpected(16, TypeNames.INT); // ordinal
+		this.setTypeExpected(17, TypeNames.INT); // event_definition_crf_id
+		this.setTypeExpected(18, TypeNames.INT); // study_event_definition_id
+		this.setTypeExpected(19, TypeNames.INT); // study_subject_id
+
+		HashMap variables = new HashMap();
+		variables.put(1, studySubjectId);
+
+		String sql = digester.getQuery("findDeletedStudyEvents");
+		List<HashMap> aList = this.select(sql, variables);
+		List<AuditBean> al = new ArrayList<AuditBean>();
+		for (HashMap anAList : aList) {
+			AuditBean eb = (AuditBean) this.getEntityFromHashMap(anAList);
+			eb.setDateStart((Timestamp) anAList.get("date_start"));
+			eb.setLocation((String) anAList.get("location"));
+			eb.setEventDefinitionCrfId((Integer) anAList.get("event_definition_crf_id"));
+			eb.setStudyEventSampleOrdinal((Integer) anAList.get("ordinal"));
+			eb.setStudyEventDefinitionId((Integer) anAList.get("study_event_definition_id"));
+			eb.setStudySubjectId((Integer) anAList.get("study_subject_id"));
+			al.add(eb);
+		}
+		return al;
+	}
+
+	/**
+	 * Method that finds the deleted event crfs.
+	 * 
+	 * @param studySubjectId
+	 *            int
+	 * @param studyEventId
+	 *            int
+	 * @return List<AuditBean>
+	 */
+	public List<AuditBean> findDeletedEventCrfs(int studySubjectId, int studyEventId) {
+		this.setTypesExpected();
+
+		this.setTypeExpected(14, TypeNames.STRING); // crf name
+		this.setTypeExpected(15, TypeNames.STRING); // crf version
+		this.setTypeExpected(16, TypeNames.DATE); // date_interviewed
+		this.setTypeExpected(17, TypeNames.STRING); // interviewer_name
+		this.setTypeExpected(18, TypeNames.INT); // event_crf_version_id
+		this.setTypeExpected(19, TypeNames.INT); // study_event_id
+		this.setTypeExpected(20, TypeNames.INT); // event_definition_crf_id
+		this.setTypeExpected(21, TypeNames.INT); // study_event_definition_id
+		this.setTypeExpected(22, TypeNames.INT); // study_subject_id
+
+		HashMap variables = new HashMap();
+		variables.put(1, studySubjectId);
+		variables.put(2, studyEventId);
+
+		String sql = digester.getQuery("findDeletedEventCrfs");
+		List<HashMap> aList = this.select(sql, variables);
+		List<AuditBean> al = new ArrayList<AuditBean>();
+		for (HashMap anAList : aList) {
+			AuditBean eb = (AuditBean) this.getEntityFromHashMap(anAList);
+			eb.setCrfName((String) anAList.get("name"));
+			eb.setCrfVersion((String) anAList.get("version"));
+			eb.setDateInterviewed((Date) anAList.get("date_interviewed"));
+			eb.setInterviewerName((String) anAList.get("interviewer_name"));
+			eb.setCrfVersionId((Integer) anAList.get("event_crf_version_id"));
+			eb.setEventDefinitionCrfId((Integer) anAList.get("event_definition_crf_id"));
+			eb.setStudyEventId((Integer) anAList.get("study_event_id"));
+			eb.setStudyEventDefinitionId((Integer) anAList.get("study_event_definition_id"));
+			eb.setStudySubjectId((Integer) anAList.get("study_subject_id"));
+			al.add(eb);
+		}
+		return al;
+	}
+
+	/**
+	 * Method that finds event CRF audit events with item data type.
+	 * 
+	 * @param eventCRFId
+	 *            int
+	 * @return List<AuditBean>
+	 */
+	public List<AuditBean> findEventCRFAuditEventsWithItemDataType(int eventCRFId) {
+		List<AuditBean> result = new ArrayList();
+
+		this.setTypesExpectedWithItemDataType();
+		// item data ordinal
+		this.setTypeExpected(17, TypeNames.INT);
+
+		HashMap variables = new HashMap();
+		variables.put(1, eventCRFId);
+
+		String sql = digester.getQuery("findEventCRFAuditEventsWithItemDataTypeAndItemData");
+		List<HashMap> aList = this.select(sql, variables);
+		for (HashMap hm : aList) {
+			AuditBean eb = (AuditBean) this.getEntityFromHashMap(hm);
+			eb.setItemDataTypeId((Integer) hm.get("item_data_type_id"));
+			eb.setItemId((Integer) hm.get("item_id"));
+			eb.setItemDescription((String) hm.get("description"));
+			eb.setOrdinal((Integer) hm.get("ordinal"));
+			result.add(eb);
+		}
+		return result;
+
+	}
 }

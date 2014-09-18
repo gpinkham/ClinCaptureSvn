@@ -22,17 +22,16 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.admin.AuditBean;
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -41,12 +40,10 @@ import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -58,12 +55,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * ViewStudySubjectAuditLogServlet class.
+ */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class ViewStudySubjectAuditLogServlet extends Controller {
 
+	public static final int AUDIT_EVENT_TYPE_3 = 3;
+
 	/**
-	 * Checks whether the user has the right permission to proceed function
+	 * Checks whether the user has the right permission to proceed function.
+	 *
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @throws InsufficientPermissionException
+	 *             the InsufficientPermissionException
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -98,7 +107,6 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 
 		StudyEventDAO sedao = getStudyEventDAO();
-		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		EventCRFDAO ecdao = getEventCRFDAO();
 		StudyDAO studydao = getStudyDAO();
 		CRFDAO cdao = getCRFDAO();
@@ -111,7 +119,7 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 		ArrayList allDeletedEventCRFs = new ArrayList();
 		String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
 
-		int studySubId = fp.getInt("id", true);// studySubjectId
+		int studySubId = fp.getInt("id", true);
 		request.setAttribute("id", studySubId);
 
 		if (studySubId == 0) {
@@ -158,7 +166,7 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 			// integer values.
 			for (Object studySubjectAuditEvent : studySubjectAuditEvents) {
 				AuditBean auditBean = (AuditBean) studySubjectAuditEvent;
-				if (auditBean.getAuditEventTypeId() == 3) {
+				if (auditBean.getAuditEventTypeId() == AUDIT_EVENT_TYPE_3) {
 					auditBean.setOldValue(Status.get(Integer.parseInt(auditBean.getOldValue())).getName());
 					auditBean.setNewValue(Status.get(Integer.parseInt(auditBean.getNewValue())).getName());
 				}
@@ -171,15 +179,12 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 			request.setAttribute("studySubjectAudits", studySubjectAudits);
 
 			// Get the list of events
-			ArrayList events = sedao.findAllByStudySubject(studySubject);
-			for (Object event : events) {
-				// Link study event definitions
-				StudyEventBean studyEvent = (StudyEventBean) event;
-				studyEvent.setStudyEventDefinition((StudyEventDefinitionBean) seddao.findByPK(studyEvent
-						.getStudyEventDefinitionId()));
-
+			List<StudyEventBean> events = sedao.findAllByStudySubject(studySubject);
+			addDeletedStudyEvents(studySubject, events);
+			for (StudyEventBean studyEvent : events) {
 				// Link event CRFs
 				studyEvent.setEventCRFs(ecdao.findAllByStudyEvent(studyEvent));
+				addDeletedEventCrfs(studySubject, studyEvent);
 
 				// Find deleted Event CRFs
 				List deletedEventCRFs = adao.findDeletedEventCRFsFromAuditEvent(studyEvent.getId());
@@ -195,22 +200,21 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 				for (Object eventCRF1 : eventCRFs) {
 					// Link CRF and CRF Versions
 					EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
-					eventCRF.setCrfVersion((CRFVersionBean) cvdao.findByPK(eventCRF.getCRFVersionId()));
-					eventCRF.setCrf(cdao.findByVersionId(eventCRF.getCRFVersionId()));
+					CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(eventCRF.getCRFVersionId());
+					if (crfVersionBean.getId() > 0) {
+						eventCRF.setCrfVersion(crfVersionBean);
+					}
+					CRFBean crfBean = cdao.findByVersionId(eventCRF.getCRFVersionId());
+					if (crfBean.getId() > 0) {
+						eventCRF.setCrf(crfBean);
+					}
 					// Get the event crf audits
 					eventCRFAudits.addAll(adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId()));
 					logger.info("eventCRFAudits size [" + eventCRFAudits.size() + "] eventCRF id [" + eventCRF.getId()
 							+ "]");
 				}
 			}
-			ItemDataDAO itemDataDao = new ItemDataDAO(getDataSource());
-			for (Object o : eventCRFAudits) {
-				AuditBean ab = (AuditBean) o;
-				if (ab.getAuditTable().equalsIgnoreCase("item_data")) {
-					ItemDataBean idBean = (ItemDataBean) itemDataDao.findByPK(ab.getEntityId());
-					ab.setOrdinal(idBean.getOrdinal());
-				}
-			}
+
 			request.setAttribute("events", events);
 			request.setAttribute("eventCRFAudits", eventCRFAudits);
 			request.setAttribute("studyEventAudits", studyEventAudits);

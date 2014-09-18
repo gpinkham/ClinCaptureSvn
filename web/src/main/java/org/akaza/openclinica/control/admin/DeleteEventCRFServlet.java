@@ -58,20 +58,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
+/**
+ * DeleteEventCRFServlet class.
+ */
 @SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class DeleteEventCRFServlet extends Controller {
 
-	public static String STUDY_SUB_ID = "ssId";
-	public static String EVENT_CRF_ID = "ecId";
+	public static final String STUDY_SUB_ID = "ssId";
+	public static final String EVENT_CRF_ID = "ecId";
 
-	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -189,8 +185,11 @@ public class DeleteEventCRFServlet extends Controller {
 						codedItemsService.deleteCodedItem(codedItem);
 					}
 				}
-				// delete event crf
 				ecdao.deleteEventCRFDNMap(eventCRF.getId());
+				// update user id before deleting
+				eventCRF.setUpdater(ub);
+				ecdao.update(eventCRF);
+				// delete
 				ecdao.delete(eventCRF.getId());
 
 				SubjectEventStatusUtil.determineSubjectEventState(event, new DAOWrapper(sdao, cvdao, sedao, subdao,

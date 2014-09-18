@@ -96,7 +96,7 @@
 	</query>
 	<query>
 		<name>findAllByEventCRFId</name>
-		<sql>select * from item_data where event_crf_id=?</sql>
+		<sql>select * from item_data where event_crf_id=? order by ordinal, item_data_id</sql>
 	</query>
 	<query>
 		<name>findAllByEventCRFIdAndItemId</name>

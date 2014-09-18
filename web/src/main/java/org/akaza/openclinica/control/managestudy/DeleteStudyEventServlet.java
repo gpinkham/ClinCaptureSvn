@@ -13,12 +13,6 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -42,6 +36,11 @@ import org.akaza.openclinica.service.EventServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -149,7 +148,12 @@ public class DeleteStudyEventServlet extends Controller {
 					dndao.deleteNotes(dnId);
 				}
 
+				// update user id before deleting
+				event.setUpdater(ub);
+				sedao.update(event);
+				// delete
 				sedao.deleteByPK(event.getId());
+
 				updateOrdinalsForEventOccurrences(event, sedao, studySub, sed);
 
 				if (request.getAttribute("deletedDurringUpdateStudyEvent") != null) {

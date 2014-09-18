@@ -49,7 +49,8 @@
         <sql>
             SELECT  ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
             ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
-            ale.new_value, ale.event_crf_id, ua.user_name, alet.name
+            ale.new_value, ale.event_crf_id, ua.user_name, alet.name,
+            ale.date_start, ale.location, ale.ordinal, ale.event_definition_crf_id, ale.study_event_definition_id, ale.study_subject_id
             FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
             JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
             WHERE ale.audit_log_event_type_id IN (17,18,19,20,21,22,23,24,25,26,31,35,50,51) AND ale.entity_id=? ORDER BY audit_date;
@@ -84,10 +85,10 @@
     	<sql>
     	SELECT ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
         	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
-        	ale.new_value, ale.event_crf_id, ale.user_name, ale.name, item.item_data_type_id, item.item_id, item.description
+        	ale.new_value, ale.event_crf_id, ale.user_name, ale.name, item.item_data_type_id, item.item_id, item.description, ale.ordinal
 		FROM (SELECT  ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
         	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
-        	ale.new_value, ale.event_crf_id, ua.user_name, alet.name
+        	ale.new_value, ale.event_crf_id, ua.user_name, alet.name, ale.ordinal
 			FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
      		JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
 			WHERE ale.audit_log_event_type_id IN (1,8,9,10,11,12,13,14,15,16,30,32,33,52,53) AND ale.event_crf_id=?
@@ -133,6 +134,32 @@
         <sql>
             INSERT INTO audit_log_event(audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
             VALUES (?,NOW(),?,?,?,?,?,?,?)
+        </sql>
+    </query>
+    <query>
+        <name>findDeletedStudyEvents</name>
+        <sql>
+            SELECT  ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
+            ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
+            ale.new_value, ale.event_crf_id, ua.user_name, alet.name,
+            ale.date_start, ale.location, ale.ordinal, ale.event_definition_crf_id, ale.study_event_definition_id, ale.study_subject_id
+            FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
+            JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
+            WHERE ale.audit_table='study_event' AND ale.audit_log_event_type_id IN (51) AND ale.study_subject_id=?
+            ORDER BY ale.audit_date;
+        </sql>
+    </query>
+    <query>
+        <name>findDeletedEventCrfs</name>
+        <sql>
+            SELECT  ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
+            ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
+            ale.new_value, ale.event_crf_id, ua.user_name, alet.name,
+            ale.name, ale.version, ale.date_interviewed, ale.interviewer_name, ale.event_crf_version_id, ale.study_event_id, ale.event_definition_crf_id, ale.study_event_definition_id, ale.study_subject_id
+            FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
+            JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
+            WHERE ale.audit_table='event_crf' AND ale.audit_log_event_type_id IN (54) AND ale.study_subject_id=? AND ale.study_event_id=?
+            ORDER BY ale.audit_date;
         </sql>
     </query>
 </queries>
