@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -47,7 +47,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Assigns a study subject to another study
+ * Assigns a study subject to another study.
  * 
  * @author jxu
  * 
@@ -56,8 +56,14 @@ import java.util.Date;
 @Component
 public class ReassignStudySubjectServlet extends Controller {
 	/**
-     *
-     */
+	 * Permits access to reassigning subject.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @throws InsufficientPermissionException                  
+	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -81,14 +87,24 @@ public class ReassignStudySubjectServlet extends Controller {
 
 	}
 
+	/**
+	 * Process user's request for reassigning subject to another site.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @throws Exception
+	 * 				Exception
+	 */
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 
 		String action = request.getParameter("action");
-		StudyDAO sdao = new StudyDAO(getDataSource());
-		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
-		SubjectDAO subdao = new SubjectDAO(getDataSource());
+		StudyDAO sdao = getStudyDAO();
+		StudySubjectDAO ssdao = getStudySubjectDAO();
+		SubjectDAO subdao = getSubjectDAO();
 		FormProcessor fp = new FormProcessor(request);
 
 		int studySubId = fp.getInt("id");
@@ -128,7 +144,10 @@ public class ReassignStudySubjectServlet extends Controller {
 					forwardPage(Page.REASSIGN_STUDY_SUBJECT_CONFIRM, request, response);
 				} else if ("back".equalsIgnoreCase(action)) {
 					request.setAttribute("displayStudy", displayStudy);
-					studySub.setStudyId(studyId);
+					if (studySub.getStudyId() != studyId) {
+						studySub.setStudyId(studyId);
+						request.setAttribute("isDataChanged", true);
+					}
 					request.setAttribute("studySub", studySub);
 					forwardPage(Page.REASSIGN_STUDY_SUBJECT, request, response);
 				} else {
@@ -143,7 +162,9 @@ public class ReassignStudySubjectServlet extends Controller {
 		ArrayList studies;
 		DisplayStudyBean displayStudy = new DisplayStudyBean();
 		StudyBean study = (StudyBean) sdao.findByPK(studySub.getStudyId());
-		if (study.getParentStudyId() > 0) {// current in site
+		displayStudy.setStatus(study.getStatus());
+		if (study.getParentStudyId() > 0) {
+			// current in site
 			studies = (ArrayList) sdao.findAllByParent(study.getParentStudyId());
 			StudyBean parent = (StudyBean) sdao.findByPK(study.getParentStudyId());
 			displayStudy.setParent(parent);
