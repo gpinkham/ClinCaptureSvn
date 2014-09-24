@@ -121,6 +121,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <%--</div>--%> 
 
 <form id="mainForm" name="crfForm" method="POST" action="AdministrativeEditing">
+<c:if test="${justCloseWindow}"><input type="hidden" name="cw" value="1" /></c:if>
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
@@ -282,7 +283,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         while (TabID<=TabsNumber)
         {
             sectionId = TabSectionId[TabID-1];
-            url = "AdministrativeEditing?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID;
+            url = "AdministrativeEditing?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID + "${justCloseWindow ? '&cw=1' : ''}";
             currTabID = <c:out value="${tabId}"/>;
 
             document.write('<td nowrap style="display:inline-block;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
@@ -495,8 +496,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                                 <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                                   "button_medium" onClick="disableSubmit('DataStatus_top'); this.form.submit();"/></td>
                                 <td>
-                                  <input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
-                                  "button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" />
+                                    <input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" />
                                 </td>
 								
                                 <c:choose>
@@ -532,7 +532,9 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td><input type="submit" id="srm" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class="button_medium" onClick="disableSubmit('DataStatus_top'); this.form.submit();"/></td>
-                                <td><input type="submit" id="sem" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" /></td>
+                                <td>
+                                    <input type="submit" id="sem" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" />
+                                </td>
                             </tr>
                         </table>
                     </td>
@@ -1394,7 +1396,7 @@ table-->
                       "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
                     <td>
 						<input type="hidden" name="fromResolvingNotes" value="${fromResolvingNotes}"/>
-						<input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom', this);" />
+                        <input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom', this);" />
                     </td>
                     <c:choose>
                         <c:when test="${! empty formMessages}">

@@ -49,7 +49,8 @@ import java.util.Date;
 public class SetStudyUserRoleServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -119,10 +120,11 @@ public class SetStudyUserRoleServlet extends Controller {
 					roles.add(ri);
 				}
 
-				int currentStudyId = studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean.getId();
-				boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation", currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+				int currentStudyId = studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean
+						.getId();
+				boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
+						currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
 				if (!isEvaluationEnabled) {
-					Role.ROLE_MAP_WITH_DESCRIPTION.remove(Role.STUDY_EVALUATOR.getId());
 					roles.remove(Role.STUDY_EVALUATOR);
 				}
 

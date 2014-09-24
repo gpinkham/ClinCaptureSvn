@@ -41,8 +41,17 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 	}
 
 	@Test
+	public void testThatForStudyAdministratorRoleCRFEvaluationControllerReturnsCode200() throws Exception {
+		userRole.setRole(Role.STUDY_ADMINISTRATOR);
+		this.mockMvc.perform(
+				get(CRF_EVALUATION).locale(LOCALE).sessionAttr(BaseController.STUDY, currentStudy)
+						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
+						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(status().isOk());
+	}
+
+	@Test
 	public void testThatForEvaluatorRoleCRFEvaluationControllerReturnsCode200() throws Exception {
-		userRole.setRole(Role.SYSTEM_ADMINISTRATOR);
+		userRole.setRole(Role.STUDY_EVALUATOR);
 		this.mockMvc.perform(
 				get(CRF_EVALUATION).locale(LOCALE).sessionAttr(BaseController.STUDY, currentStudy)
 						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
@@ -57,7 +66,8 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 						.sessionAttr(BaseController.STUDY, currentStudy)
 						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
 						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(
-				MockMvcResultMatchers.view().name("redirect:/MainMenu?message=system_no_permission"));
+				MockMvcResultMatchers.view().name("redirect:/MainMenu"));
+
 	}
 
 	@Test

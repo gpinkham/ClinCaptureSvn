@@ -138,17 +138,29 @@ public abstract class Controller extends BaseController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
+	public static final String CW = "cw";
 	public static final String CC_DATE_FORMAT = "ccDateFormat";
+	public static final String JUST_CLOSE_WINDOW = "justCloseWindow";
+	public static final String EVALUATION_ENABLED = "evaluationEnabled";
 	public static final String DATE_FORMAT_STRING = "date_format_string";
 	public static final String FORM_WITH_STATE_FLAG = "formWithStateFlag";
 	public static final String BOOSTRAP_DATE_FORMAT = "bootstrapDateFormat";
 	public static final String BOOTSTRAP_DATAPICKER_DATE_FORMAT = "bootstrap_datapicker_date_format";
-	public static final String EVALUATION_ENABLED = "evaluationEnabled";
 
 	protected void addPageMessage(String message, HttpServletRequest request) {
 		addPageMessage(message, request, logger);
 	}
 
+	/**
+	 * Method that adds a message to the request.
+	 * 
+	 * @param message
+	 *            String
+	 * @param request
+	 *            HttpServletRequest
+	 * @param aLogger
+	 *            Logger
+	 */
 	public static void addPageMessage(String message, HttpServletRequest request, Logger aLogger) {
 		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
 
@@ -163,10 +175,33 @@ public abstract class Controller extends BaseController {
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
 	}
 
-	protected void storePageMessages(HttpServletRequest request) {
+	/**
+	 * Method that moves messages from request to the session.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 */
+	public static void storePageMessages(HttpServletRequest request) {
 		Map storedAttributes = new HashMap();
 		storedAttributes.put(PAGE_MESSAGE, request.getAttribute(PAGE_MESSAGE));
 		request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
+	}
+
+	/**
+	 * Method that restores messages from the session.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 */
+	public static void restorePageMessages(HttpServletRequest request) {
+		Map storedAttributes = (Map) request.getSession().getAttribute(STORED_ATTRIBUTES);
+		if (storedAttributes != null) {
+			request.getSession().removeAttribute(STORED_ATTRIBUTES);
+			ArrayList pageMessages = (ArrayList) storedAttributes.get(PAGE_MESSAGE);
+			if (pageMessages != null) {
+				request.setAttribute(PAGE_MESSAGE, pageMessages);
+			}
+		}
 	}
 
 	protected void setToPanel(String title, String info, HttpServletRequest request) {
@@ -220,6 +255,14 @@ public abstract class Controller extends BaseController {
 
 	public static final String USER_BEAN_NAME = "userBean";
 
+	/**
+	 * Method that checks password timeout.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	public void passwdTimeOut(HttpServletRequest request, HttpServletResponse response) {
 		UserAccountBean ub = getUserAccountBean(request);
 		Date lastChangeDate = ub.getPasswdTimestamp();
@@ -340,6 +383,12 @@ public abstract class Controller extends BaseController {
 		if (session.getAttribute(SUPPORT_URL) == null) {
 			session.setAttribute(SUPPORT_URL, SQLInitServlet.getSupportURL());
 		}
+
+		if (request.getParameter(CW) != null) {
+			request.setAttribute(JUST_CLOSE_WINDOW, true);
+		}
+
+		restorePageMessages(request);
 
 		StudyBean currentStudy = getUpdatedStudy(request);
 		UserAccountBean ub = getUserAccountBean(request);

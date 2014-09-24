@@ -22,10 +22,6 @@ package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.StudyParameterPriorityUtil;
 import com.clinovo.util.ValidatorHelper;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.TermType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -40,11 +36,17 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Servlet for study user role editing.
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 @Component
 public class EditStudyUserRoleServlet extends Controller {
 
@@ -68,12 +70,14 @@ public class EditStudyUserRoleServlet extends Controller {
 	}
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 
 		UserAccountBean ub = getUserAccountBean(request);
 		if (!ub.isSysAdmin()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-					+ respage.getString("change_study_contact_sysadmin"), request);
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study")
+							+ respage.getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
@@ -145,13 +149,14 @@ public class EditStudyUserRoleServlet extends Controller {
 	}
 
 	private Map roleMapValidator(int studyId) {
-		Map roleMap = Role.ROLE_MAP_WITH_DESCRIPTION;
+		Map<Object, Object> roleMap = new LinkedHashMap<Object, Object>(Role.ROLE_MAP_WITH_DESCRIPTION);
 		StudyBean selectedStudyBean = (StudyBean) getStudyDAO().findByPK(studyId);
-		int currentStudyId = selectedStudyBean.getParentStudyId() > 0 ? selectedStudyBean.getParentStudyId() : selectedStudyBean.getId();
-		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation", currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+		int currentStudyId = selectedStudyBean.getParentStudyId() > 0 ? selectedStudyBean.getParentStudyId()
+				: selectedStudyBean.getId();
+		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
+				currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
 		if (!isEvaluationEnabled) {
-			Role.ROLE_MAP_WITH_DESCRIPTION.remove(Role.STUDY_EVALUATOR.getId());
-			roleMap = Role.ROLE_MAP_WITH_DESCRIPTION;
+			roleMap.remove(Role.STUDY_EVALUATOR.getId());
 		}
 		return roleMap;
 	}

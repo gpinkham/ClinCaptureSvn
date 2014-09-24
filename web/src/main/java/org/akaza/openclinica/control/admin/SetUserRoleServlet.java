@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ import java.util.Map;
  * Set user role servlet for adding roles for user account.
  * 
  */
-@SuppressWarnings({ "serial", "rawtypes" })
+@SuppressWarnings({ "serial", "unchecked" })
 @Component
 public class SetUserRoleServlet extends Controller {
 
@@ -93,8 +94,9 @@ public class SetUserRoleServlet extends Controller {
 			Boolean changeRoles = request.getParameter("changeRoles") != null
 					&& Boolean.parseBoolean(request.getParameter("changeRoles"));
 			int studyId = fp.getInt("studyId");
-			request.setAttribute("roles", Role.ROLE_MAP_WITH_DESCRIPTION);
 			request.setAttribute("studyId", studyId);
+			Map<Object, Object> roleMap = new LinkedHashMap<Object, Object>(Role.ROLE_MAP_WITH_DESCRIPTION);
+			request.setAttribute("roles", roleMap);
 
 			if ("confirm".equalsIgnoreCase(action) || changeRoles) {
 
@@ -146,11 +148,10 @@ public class SetUserRoleServlet extends Controller {
 				boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
 						currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
 				if (!isEvaluationEnabled) {
-					Role.ROLE_MAP_WITH_DESCRIPTION.remove(Role.STUDY_EVALUATOR.getId());
-					Map roleMap = Role.ROLE_MAP_WITH_DESCRIPTION;
+					roleMap.remove(Role.STUDY_EVALUATOR.getId());
 					request.setAttribute("roles", roleMap);
 				} else {
-					request.setAttribute("roles", Role.ROLE_MAP_WITH_DESCRIPTION);
+					request.setAttribute("roles", roleMap);
 				}
 				request.setAttribute("selectedStudy", selectedStudyBean);
 
@@ -180,7 +181,7 @@ public class SetUserRoleServlet extends Controller {
 				sur.setStatus(Status.AVAILABLE);
 				sur.setOwner(currentUser);
 				sur.setCreatedDate(new Date());
-
+				StringBuilder sb = new StringBuilder("");
 				if (studyId > 0) {
 					udao.createStudyUserRole(user, sur);
 
@@ -192,10 +193,9 @@ public class SetUserRoleServlet extends Controller {
 						request.getSession().setAttribute("reloadUserBean", true);
 					}
 					addPageMessage(
-							new StringBuilder("").append(user.getFirstName()).append(" ").append(user.getLastName())
-									.append(" (").append(resword.getString("username")).append(": ")
-									.append(user.getName()).append(") ")
-									.append(respage.getString("has_been_granted_the_role")).append(" \"")
+							sb.append(user.getFirstName()).append(" ").append(user.getLastName()).append(" (")
+									.append(resword.getString("username")).append(": ").append(user.getName())
+									.append(") ").append(respage.getString("has_been_granted_the_role")).append(" \"")
 									.append(sur.getRole().getDescription()).append("\" ")
 									.append(respage.getString("in_the_study_site")).append(" ")
 									.append(userStudy.getName()).append(".").toString(), request);

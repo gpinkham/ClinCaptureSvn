@@ -29,7 +29,7 @@ public class RoleTest {
 	public static final int EIGHT = 8;
 	public static final int NINE = 9;
 	public static final int THREE = 3;
-	public static final int SIX = 6;	
+	public static final int SIX = 6;
 	private Map role = null;
 	private Map roleWithDescription = null;
 	private ResourceBundle resTerm = null;
@@ -57,7 +57,7 @@ public class RoleTest {
 		Role.prepareRoleMapWithDescriptions(resTerm);
 		assertEquals("Study Monitor", roleWithDescription.get(Role.STUDY_MONITOR.getId()));
 		assertEquals("Study Administrator", roleWithDescription.get(Role.STUDY_ADMINISTRATOR.getId()));
-		assertEquals("Evaluator", roleWithDescription.get(Role.STUDY_EVALUATOR.getId()));
+		assertEquals("Study Evaluator", roleWithDescription.get(Role.STUDY_EVALUATOR.getId()));
 	}
 
 	@Test

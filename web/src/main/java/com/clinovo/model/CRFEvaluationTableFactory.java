@@ -175,23 +175,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 				.concat("' src='../images/icon_");
 	}
 
-	private String getCRFStatusIconPath(CRFEvaluationItem crfEvaluationItem, String contextPath) {
-		String additionalAttr = " data-cc-crfEvaluationId=\"".concat(
-				Integer.toString(crfEvaluationItem.getEventCrfId())).concat("\">");
-
-		HtmlBuilder html = new HtmlBuilder()
-				.a()
-				.href("#")
-				.onclick(
-						"setAccessedObjected(this); location.href = '".concat(contextPath)
-								.concat("/ViewSectionDataEntry?eventDefinitionCRFId=")
-								.concat(Integer.toString(crfEvaluationItem.getEventDefinitionCrfId()))
-								.concat("&eventCRFId=").concat(Integer.toString(crfEvaluationItem.getEventCrfId()))
-								.concat("&tabId=1&eventId=")
-								.concat(Integer.toString(crfEvaluationItem.getStudyEventId()))
-								.concat("&studySubjectId=")
-								.concat(Integer.toString(crfEvaluationItem.getStudySubjectId())).concat("';"));
-
+	private String getCRFStatusIconPath(CRFEvaluationItem crfEvaluationItem) {
 		DataEntryStage stage = crfEvaluationItem.getStage();
 
 		int statusId = stage.getId();
@@ -217,8 +201,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 			title = SubjectEventStatus.SOURCE_DATA_VERIFIED.getNormalizedName();
 		}
 
-		StringBuilder builder = new StringBuilder(html.toString()).append(additionalAttr).append(
-				getIconForCrfStatusPrefix(title));
+		StringBuilder builder = new StringBuilder().append(getIconForCrfStatusPrefix(title));
 
 		if (statusId > ZERO && statusId < TEN) {
 			builder.append(CRF_STATUS_ICONS.get(statusId));
@@ -226,14 +209,14 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 			builder.append(CRF_STATUS_ICONS.get(ZERO));
 		}
 
-		builder.append(ICON_FORCRFSTATUS_SUFFIX).append("</a> <input type=\"hidden\" statusId=\"").append(statusId)
+		builder.append(ICON_FORCRFSTATUS_SUFFIX).append("<br/><input type=\"hidden\" statusId=\"").append(statusId)
 				.append("\" />");
 		return builder.toString();
 	}
 
 	private class CRFStatusCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowCount) {
-			return getCRFStatusIconPath((CRFEvaluationItem) ((HashMap) item).get(OBJECT), contextPath);
+			return getCRFStatusIconPath((CRFEvaluationItem) ((HashMap) item).get(OBJECT));
 		}
 	}
 
@@ -250,14 +233,14 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 					.a()
 					.href("#")
 					.onclick(
-							"setAccessedObjected(this); location.href = '".concat(contextPath)
+							"setAccessedObjected(this); openDocWindow('".concat(contextPath)
 									.concat("/ViewSectionDataEntry?eventDefinitionCRFId=")
 									.concat(Integer.toString(crfEvaluationItem.getEventDefinitionCrfId()))
 									.concat("&eventCRFId=").concat(Integer.toString(crfEvaluationItem.getEventCrfId()))
 									.concat("&tabId=1&eventId=")
 									.concat(Integer.toString(crfEvaluationItem.getStudyEventId()))
 									.concat("&studySubjectId=")
-									.concat(Integer.toString(crfEvaluationItem.getStudySubjectId())).concat("';"));
+									.concat(Integer.toString(crfEvaluationItem.getStudySubjectId())).concat("&cw=1');"));
 
 			String printMessage = messageSource.getMessage(PRINT, null, locale);
 			String viewMessage = messageSource.getMessage(VIEW_DATA, null, locale);
@@ -276,8 +259,8 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 			String aLink = "<a href=\"#\" onclick=\"setAccessedObjected(this); checkCRFLocked('"
 					.concat(Integer.toString(crfEvaluationItem.getEventCrfId())).concat("', '../")
 					.concat(dataEntryPage).concat("?eventCRFId=")
-					.concat(Integer.toString(crfEvaluationItem.getEventCrfId())).concat("');\"").concat(additionalAttr)
-					.concat(">");
+					.concat(Integer.toString(crfEvaluationItem.getEventCrfId())).concat("&cw=1');\"")
+					.concat(additionalAttr).concat(">");
 
 			if (userBean.getId() == crfEvaluationItem.getOwnerId()
 					&& crfEvaluationItem.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
@@ -394,7 +377,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 			h.put(CRF_NAME, crfEvaluationItem.getCrfName());
 			h.put(STUDY_SUBJECT_ID, crfEvaluationItem.getStudySubjectLabel());
 			h.put(EVENT_NAME, crfEvaluationItem.getStudyEventName());
-			h.put(CRF_STATUS, getCRFStatusIconPath(crfEvaluationItem, tableFacade.getWebContext().getContextPath()));
+			h.put(CRF_STATUS, getCRFStatusIconPath(crfEvaluationItem));
 			crfEvaluationItemsResult.add(h);
 		}
 

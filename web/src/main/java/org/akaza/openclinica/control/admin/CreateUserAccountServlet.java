@@ -22,7 +22,6 @@ package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.StudyParameterPriorityUtil;
 import com.clinovo.util.ValidatorHelper;
-
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -48,9 +47,9 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +57,7 @@ import java.util.Map;
  * Servlet for creating a user account.
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 @Component
 public class CreateUserAccountServlet extends Controller {
 
@@ -81,30 +80,31 @@ public class CreateUserAccountServlet extends Controller {
 	public static final int INPUT_INSTITUTION_LENGTH = 255;
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
-			throw new InsufficientPermissionException(Page.MENU, resexception.getString("you_may_not_perform_administrative_functions"), "1");
+			throw new InsufficientPermissionException(Page.MENU,
+					resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
 	}
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 		FormProcessor fp = new FormProcessor(request);
 
 		StudyDAO sdao = getStudyDAO();
 		List<StudyBean> all = sdao.findAllActiveStudiesWhereUserHasRole(ub.getName());
-		
+
 		List<StudyBean> finalList = new ArrayList<StudyBean>();
 		for (StudyBean sb : all) {
 			finalList.add(sb);
 			finalList.addAll(sdao.findAllByParentAndActive(sb.getId()));
 		}
-		
+
 		addEntityList("studies", finalList, respage.getString("a_user_cannot_be_created_no_study_as_active"),
 				Page.ADMIN_SYSTEM, request, response);
 
@@ -121,7 +121,8 @@ public class CreateUserAccountServlet extends Controller {
 		addEntityList("types", types, respage.getString("a_user_cannot_be_created_no_user_types_for"),
 				Page.ADMIN_SYSTEM, request, response);
 
-		Boolean changeRoles = request.getParameter("changeRoles") != null && Boolean.parseBoolean(request.getParameter("changeRoles"));
+		Boolean changeRoles = request.getParameter("changeRoles") != null
+				&& Boolean.parseBoolean(request.getParameter("changeRoles"));
 		int activeStudy = fp.getInt(INPUT_STUDY);
 		StudyBean study = (StudyBean) sdao.findByPK(activeStudy);
 		request.setAttribute("roles", roleMap);
@@ -232,7 +233,8 @@ public class CreateUserAccountServlet extends Controller {
 				setPresetValues(presetValues, request);
 
 				setInputMessages(errors, request);
-				addPageMessage(respage.getString("there_were_some_errors_submission")
+				addPageMessage(
+						respage.getString("there_were_some_errors_submission")
 								+ respage.getString("see_below_for_details"), request);
 
 				forwardPage(Page.CREATE_ACCOUNT, request, response);
@@ -241,24 +243,22 @@ public class CreateUserAccountServlet extends Controller {
 	}
 
 	private Map customiseUserRoleMap(StudyDAO sdao, StudyBean currentStudy, int selectedStudy) {
-
-		Map roleMap;
+		Map<Object, Object> roleMap = new LinkedHashMap<Object, Object>(Role.ROLE_MAP_WITH_DESCRIPTION);
 		StudyParameterValueDAO dao = new StudyParameterValueDAO(getDataSource());
-		StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(), "allowCodingVerification");
+		StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(),
+				"allowCodingVerification");
 
-		if (allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
-			roleMap = Role.ROLE_MAP_WITH_DESCRIPTION;
-		} else {
-			Role.ROLE_MAP_WITH_DESCRIPTION.remove(Role.STUDY_CODER.getId());
-			roleMap = Role.ROLE_MAP_WITH_DESCRIPTION;
+		if (!allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
+			roleMap.remove(Role.STUDY_CODER.getId());
 		}
 
 		StudyBean selectedStudyBean = (StudyBean) sdao.findByPK(selectedStudy);
-		int parentStudyId = selectedStudyBean.getParentStudyId() > 0 ? selectedStudyBean.getParentStudyId() : selectedStudyBean.getId();
-		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation", parentStudyId, getSystemDAO(),  getStudyParameterValueDAO(), getStudyDAO());
+		int parentStudyId = selectedStudyBean.getParentStudyId() > 0 ? selectedStudyBean.getParentStudyId()
+				: selectedStudyBean.getId();
+		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
+				parentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
 		if (!isEvaluationEnabled) {
-			Role.ROLE_MAP_WITH_DESCRIPTION.remove(Role.STUDY_EVALUATOR.getId());
-			roleMap = Role.ROLE_MAP_WITH_DESCRIPTION;
+			roleMap.remove(Role.STUDY_EVALUATOR.getId());
 		}
 		return roleMap;
 	}
@@ -266,18 +266,23 @@ public class CreateUserAccountServlet extends Controller {
 	private HashMap validatePageValues(Validator v, UserAccountDAO udao, StudyDAO sdao) {
 
 		v.addValidation(INPUT_USERNAME, Validator.NO_BLANKS);
-		v.addValidation(INPUT_USERNAME, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, USERNAME_LENGTH);
+		v.addValidation(INPUT_USERNAME, Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, USERNAME_LENGTH);
 		v.addValidation(INPUT_USERNAME, Validator.IS_A_USERNAME);
 		v.addValidation(INPUT_USERNAME, Validator.USERNAME_UNIQUE, udao);
 		v.addValidation(INPUT_FIRST_NAME, Validator.NO_BLANKS);
 		v.addValidation(INPUT_LAST_NAME, Validator.NO_BLANKS);
-		v.addValidation(INPUT_FIRST_NAME, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, NAMES_LENGTH);
-		v.addValidation(INPUT_LAST_NAME, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, NAMES_LENGTH);
+		v.addValidation(INPUT_FIRST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, NAMES_LENGTH);
+		v.addValidation(INPUT_LAST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, NAMES_LENGTH);
 		v.addValidation(INPUT_EMAIL, Validator.NO_BLANKS);
-		v.addValidation(INPUT_EMAIL, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, EMAIL_LENGTH);
+		v.addValidation(INPUT_EMAIL, Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, EMAIL_LENGTH);
 		v.addValidation(INPUT_EMAIL, Validator.IS_A_EMAIL);
 		v.addValidation(INPUT_INSTITUTION, Validator.NO_BLANKS);
-		v.addValidation(INPUT_INSTITUTION, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INPUT_INSTITUTION_LENGTH);
+		v.addValidation(INPUT_INSTITUTION, Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INPUT_INSTITUTION_LENGTH);
 		v.addValidation(INPUT_STUDY, Validator.ENTITY_EXISTS, sdao);
 		v.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
 		return v.validate();
@@ -302,8 +307,9 @@ public class CreateUserAccountServlet extends Controller {
 
 	private void sendNewAccountEmail(HttpServletRequest request, UserAccountBean createdUserAccountBean,
 			String password, String studyName) throws Exception {
+		StringBuilder sb = new StringBuilder("");
 		logger.info("Sending account creation notification to " + createdUserAccountBean.getName());
-		String body = new StringBuilder("").append("<html><body>").append(resword.getString("dear")).append(" ")
+		String body = sb.append("<html><body>").append(resword.getString("dear")).append(" ")
 				.append(createdUserAccountBean.getFirstName()).append(" ").append(createdUserAccountBean.getLastName())
 				.append(",<br><br>").append(restext.getString("a_new_user_account_has_been_created_for_you"))
 				.append("<br><br>").append(resword.getString("user_name")).append(": ")

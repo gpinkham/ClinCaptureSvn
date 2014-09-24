@@ -33,7 +33,7 @@
     function checkCRFLocked(ecId, url){
         jQuery.post("../CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
             if(data == 'true'){
-                window.location = url;
+                openDocWindow(url);
             }else{
                 alertDialog({ message:data, height: 150, width: 500 });
             }

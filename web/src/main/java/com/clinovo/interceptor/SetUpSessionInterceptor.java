@@ -20,6 +20,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.StudyInfoPanel;
@@ -43,6 +44,7 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		boolean ok = true;
 		if (SecurityContextHolder.getContext().getAuthentication() != null) {
+			Controller.restorePageMessages(request);
 			Navigation.addToNavigationStack(request);
 			StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession()
 					.getAttribute(BaseController.USER_ROLE);

@@ -119,6 +119,7 @@
 		<h1><span class="first_level_header"><fmt:message key="subject_ID" bundle="${resword}"/>: <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
 
 <form id="mainForm" name="crfForm" method="POST" action="DoubleDataEntry">
+<c:if test="${justCloseWindow}"><input type="hidden" name="cw" value="1" /></c:if>
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
@@ -330,7 +331,7 @@ function DisplaySectionTabs()
 
     {
         sectionId = TabSectionId[TabID-1];
-        url = "DoubleDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID;
+        url = "DoubleDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID + "${justCloseWindow ? '&cw=1' : ''}";
         currTabID = <c:out value="${tabId}"/>;
 
         document.write('<td nowrap style="display:inline-block;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
@@ -548,8 +549,9 @@ function setParameterForDN(field, parameterName, value) {
 
                                 <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                                   "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
-                                <td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
-                                  "button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" /></td>
+                                <td>
+                                    <input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" />
+                                </td>
 
                                 <c:choose>
                                     <c:when test="${! empty formMessages}">
@@ -1540,7 +1542,9 @@ table-->
                     </c:choose>
                     <td><input type="submit" id="srl" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                       "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
-                    <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom', this);" /></td>
+                    <td>
+                        <input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom', this);" />
+                    </td>
 
                     <c:choose>
                         <c:when test="${! empty formMessages}">

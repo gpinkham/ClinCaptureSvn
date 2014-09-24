@@ -59,7 +59,6 @@
     <c:otherwise>
         <c:set var="inclRoleCode1" value="4"/>
         <c:set var="inclRoleCode2" value="5"/>
-        <c:set var="inclRoleCode_eval" value="8"/>
     </c:otherwise>
 </c:choose>
 

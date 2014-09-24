@@ -417,6 +417,8 @@ public abstract class DataEntryServlet extends Controller {
 		}
 		request.setAttribute("newUploadedFiles", newUploadedFiles);
 
+		boolean autoCloseDataEntryPage = request.getParameter(CW) != null;
+
 		if (!fp.getString(GO_EXIT).equals("")) {
 			request.getSession().removeAttribute(DN_ADDITIONAL_CR_PARAMS);
 			session.removeAttribute(GROUP_HAS_DATA);
@@ -439,7 +441,12 @@ public abstract class DataEntryServlet extends Controller {
 			}
 			session.removeAttribute("newUploadedFiles");
 			addPageMessage(respage.getString("exit_without_saving"), request);
-			response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+			storePageMessages(request);
+			if (autoCloseDataEntryPage) {
+				forwardPage(Page.AUTO_CLOSE_PAGE, request, response);
+			} else {
+				response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+			}
 			return;
 		}
 
@@ -472,7 +479,8 @@ public abstract class DataEntryServlet extends Controller {
 		StudyEventDAO seDao = new StudyEventDAO(getDataSource());
 		EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
-		request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);// JN:Putting the event_def_crf_bean in the request attribute.
+		// JN:Putting the event_def_crf_bean in the request attribute.
+		request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);
 
 		StudyEventBean studyEventBean = (StudyEventBean) seDao.findByPK(ecb.getStudyEventId());
 		edcBean.setId(eventDefinitionCRFId);
@@ -1736,7 +1744,12 @@ public abstract class DataEntryServlet extends Controller {
 						logger.debug("try to remove to_create_crf");
 						session.removeAttribute("to_create_crf");
 
-						forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
+						if (autoCloseDataEntryPage) {
+							storePageMessages(request);
+							forwardPage(Page.AUTO_CLOSE_PAGE, request, response);
+						} else {
+							forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
+						}
 					} else {
 						boolean forwardingSucceeded = false;
 
@@ -1780,7 +1793,13 @@ public abstract class DataEntryServlet extends Controller {
 								session.removeAttribute("to_create_crf");
 
 								request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
-								response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+
+								storePageMessages(request);
+								if (autoCloseDataEntryPage) {
+									forwardPage(Page.AUTO_CLOSE_PAGE, request, response);
+								} else {
+									response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+								}
 							} else {
 								// user clicked 'save'
 								addPageMessage(respage.getString("data_saved_continue_entering_edit_later"), request);
@@ -1813,9 +1832,14 @@ public abstract class DataEntryServlet extends Controller {
 										}
 									}
 									// end
-									response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
-									return;
 
+									storePageMessages(request);
+									if (autoCloseDataEntryPage) {
+										forwardPage(Page.AUTO_CLOSE_PAGE, request, response);
+									} else {
+										response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+									}
+									return;
 								}
 
 								int tabNum = 0;
@@ -1829,7 +1853,6 @@ public abstract class DataEntryServlet extends Controller {
 								}
 
 								forwardPage(getServletPage(request), request, response);
-
 							}
 						}
 					}

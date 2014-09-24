@@ -20,18 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.clinovo.util.StudyParameterPriorityUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -51,6 +39,17 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Processes request to assign a user to a study.
  */
@@ -63,7 +62,8 @@ public class AssignUserToStudyServlet extends Controller {
 	private static final int NOTES_COL = 5;
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -71,8 +71,9 @@ public class AssignUserToStudyServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 	}
 
@@ -124,7 +125,10 @@ public class AssignUserToStudyServlet extends Controller {
 			table.computeDisplay();
 
 			StudyParameterValueDAO dao = new StudyParameterValueDAO(getDataSource());
-			StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(), "allowCodingVerification");
+			StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(),
+					"allowCodingVerification");
+			StudyParameterValueBean allowEvaluation = dao.findByHandleAndStudy(currentStudy.getId(),
+					"allowCrfEvaluation");
 
 			request.setAttribute("table", table);
 			ArrayList roles = Role.toArrayList();
@@ -132,18 +136,23 @@ public class AssignUserToStudyServlet extends Controller {
 				roles.remove(Role.STUDY_ADMINISTRATOR);
 				roles.remove(Role.STUDY_MONITOR);
 				roles.remove(Role.STUDY_CODER);
+				roles.remove(Role.STUDY_EVALUATOR);
 			} else {
 				if (!allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
 					roles.remove(Role.STUDY_CODER);
+				}
+				if (!allowEvaluation.getValue().equalsIgnoreCase("yes")) {
+					roles.remove(Role.STUDY_EVALUATOR);
 				}
 				roles.remove(Role.INVESTIGATOR);
 				roles.remove(Role.CLINICAL_RESEARCH_COORDINATOR);
 			}
 
-			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
-			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation", currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
+					.getId();
+			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
+					currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
 			if (!isEvaluationEnabled) {
-				Role.ROLE_MAP_WITH_DESCRIPTION.remove(Role.STUDY_EVALUATOR.getId());
 				roles.remove(Role.STUDY_EVALUATOR);
 			}
 
@@ -182,7 +191,8 @@ public class AssignUserToStudyServlet extends Controller {
 				sub.setStudyId(currentStudy.getId());
 				sub.setStatus(Status.AVAILABLE);
 				sub.setOwner(ub);
-				if (udao.findStudyUserRole(user, sub).getName() != null && udao.findStudyUserRole(user, sub).getName().isEmpty()) {
+				if (udao.findStudyUserRole(user, sub).getName() != null
+						&& udao.findStudyUserRole(user, sub).getName().isEmpty()) {
 					udao.createStudyUserRole(user, sub);
 					getUserAccountService().setActiveStudyId(user, currentStudy.getId());
 				} else {
@@ -250,7 +260,8 @@ public class AssignUserToStudyServlet extends Controller {
 		String notes;
 		boolean hasRoleInCurrentStudy;
 		boolean hasRoleWithStatusRemovedInCurrentStudy;
-		List<StudyBean> studyListCurrentUserHasAccessTo = sdao.findAllActiveStudiesWhereUserHasRole(currentUser.getName());
+		List<StudyBean> studyListCurrentUserHasAccessTo = sdao.findAllActiveStudiesWhereUserHasRole(currentUser
+				.getName());
 		ListIterator<UserAccountBean> iterateUser;
 
 		if (currentStudy.getParentStudyId() > 0) {
@@ -263,8 +274,7 @@ public class AssignUserToStudyServlet extends Controller {
 
 		iterateUser = userListbyRoles.listIterator();
 		while (iterateUser.hasNext()) {
-			if (!getUserAccountService().doesUserHaveRoleInStydies(iterateUser.next(),
-					studyListCurrentUserHasAccessTo)) {
+			if (!getUserAccountService().doesUserHaveRoleInStydies(iterateUser.next(), studyListCurrentUserHasAccessTo)) {
 				iterateUser.remove();
 			}
 		}
@@ -279,7 +289,7 @@ public class AssignUserToStudyServlet extends Controller {
 			hasRoleWithStatusRemovedInCurrentStudy = false;
 			notes = "";
 			for (StudyUserRoleBean roleBean : accountBean.getRoles()) {
-
+				StringBuilder sb = new StringBuilder("");
 				if (currentStudy.getId() == roleBean.getStudyId() && roleBean.getStatus().equals(Status.DELETED)) {
 					hasRoleWithStatusRemovedInCurrentStudy = true;
 					break;
@@ -288,13 +298,13 @@ public class AssignUserToStudyServlet extends Controller {
 				} else if (currentStudy.getParentStudyId() > 0 && !roleBean.getStatus().equals(Status.DELETED)) {
 					site = (StudyBean) sdao.findByPK(roleBean.getStudyId());
 					study = (StudyBean) sdao.findByPK(site.getParentStudyId());
-					notes = new StringBuilder("").append(notes).append(roleBean.getRole().getDescription())
+					notes = sb.append(notes).append(roleBean.getRole().getDescription())
 							.append(respage.getString("in_site")).append(": ").append(site.getName()).append(",")
 							.append(respage.getString("in_the_study")).append(": ").append(study.getName())
 							.append("; ").toString();
 				} else if (currentStudy.getParentStudyId() == 0 && !roleBean.getStatus().equals(Status.DELETED)) {
 					study = (StudyBean) sdao.findByPK(roleBean.getStudyId());
-					notes = new StringBuilder("").append(notes).append(roleBean.getRole().getDescription())
+					notes = sb.append(notes).append(roleBean.getRole().getDescription())
 							.append(respage.getString("in_the_study")).append(": ").append(study.getName())
 							.append("; ").toString();
 				}
@@ -321,16 +331,16 @@ public class AssignUserToStudyServlet extends Controller {
 
 	private String sendEmail(UserAccountBean u, StudyBean currentStudy, StudyUserRoleBean sub) throws Exception {
 		logger.info("Sending email...");
-
+		StringBuilder sb = new StringBuilder("");
 		if (currentStudy.getParentStudyId() > 0) {
-			return new StringBuilder("").append(u.getFirstName()).append(" ").append(u.getLastName()).append("(")
+			return sb.append(u.getFirstName()).append(" ").append(u.getLastName()).append("(")
 					.append(resword.getString("username")).append(": ").append(u.getName()).append(") ")
 					.append(respage.getString("has_been_assigned_to_the_site")).append(currentStudy.getName())
 					.append(" under the Study ").append(currentStudy.getParentStudyName()).append(" ")
 					.append(resword.getString("as")).append(" \"").append(sub.getRole().getDescription())
 					.append("\". ").toString();
 		} else {
-			return new StringBuilder("").append(u.getFirstName()).append(" ").append(u.getLastName()).append("(")
+			return sb.append(u.getFirstName()).append(" ").append(u.getLastName()).append("(")
 					.append(resword.getString("username")).append(": ").append(u.getName()).append(") ")
 					.append(respage.getString("has_been_assigned_to_the_study")).append(currentStudy.getName())
 					.append(" ").append(resword.getString("as")).append(" \"").append(sub.getRole().getDescription())
