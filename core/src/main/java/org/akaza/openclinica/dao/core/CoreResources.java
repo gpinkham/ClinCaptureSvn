@@ -44,13 +44,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 @Component
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class CoreResources implements ResourceLoaderAware {
 
 	protected final static Logger logger = LoggerFactory.getLogger(CoreResources.class);
+
+	public static final Set<String> CALENDAR_LANGS = new HashSet<String>();
 
 	public static final String UTF_8 = "utf-8";
 
@@ -192,6 +196,21 @@ public class CoreResources implements ResourceLoaderAware {
 		}
 	}
 
+	private void fillCalendarLangs() {
+		try {
+			Resource resource = new DefaultResourceLoader().getResource("..".concat(File.separator).concat("..")
+					.concat(File.separator).concat("includes").concat(File.separator).concat("new_cal")
+					.concat(File.separator).concat("lang"));
+			if (resource.exists()) {
+				for (String fileName : resource.getFile().list()) {
+					CALENDAR_LANGS.add(fileName.replaceAll(".*-", "").replaceAll("\\..*", ""));
+				}
+			}
+		} catch (Exception ex) {
+			logger.error("Error has occurred.", ex);
+		}
+	}
+
 	private void checkLogo() {
 		try {
 			File logoFile = new File(new DefaultResourceLoader()
@@ -211,6 +230,7 @@ public class CoreResources implements ResourceLoaderAware {
 		try {
 			setODM_MAPPING_DIR();
 			if (dataInfo != null) {
+				fillCalendarLangs();
 				loadSystemProperties();
 				if (extractInfo != null) {
 					copyBaseToDest(resourceLoader);

@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator" %>
 <%@ taglib uri="com.akazaresearch.viewtags" prefix="view" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -17,10 +18,7 @@
     <script type="text/javascript" language="javascript" src="../includes/Tabs.js"></script>
     <!-- Added for the new Calender -->
 
-    <link rel="stylesheet" type="text/css" media="all" href="../includes/new_cal/skins/aqua/theme.css" title="Aqua" />
-    <script type="text/javascript" src="../includes/new_cal/calendar.js"></script>
-    <script type="text/javascript" src="../includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
-    <script type="text/javascript" src="../includes/new_cal/calendar-setup.js"></script>
+    <ui:calendar/>
     <!-- End -->
     <link rel="stylesheet" href="../includes/styles_updated.css" type="text/css">
     <link rel="stylesheet" href="../includes/proto_styles.css" type="text/css">

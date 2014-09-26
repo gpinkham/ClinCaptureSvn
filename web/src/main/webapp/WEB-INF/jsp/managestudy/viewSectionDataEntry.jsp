@@ -3,93 +3,63 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm"%>
-
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow"
-	var="resworkflow" />
+<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow" />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext" />
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format"
-	var="resformat" />
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat" />
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+    <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
-<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+    <title>ClinCapture <fmt:message key="view_data_entry" bundle="${resword}" /></title>
+    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
-<title>ClinCapture <fmt:message key="view_data_entry"
-		bundle="${resword}" /></title>
-<link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-<link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
-<meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/print.css" type="text/css" media="print">
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/jmesa/jquery-1.3.2.min.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/global_functions_javascript.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/Tabs.js"></script>
+    <script type="text/javascript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/repetition-model/repetition-model.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/prototype.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/scriptaculous.js?load=effects"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/effects.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/jmesa/jquery-ui.min.js"></script>
+    <!-- Added for the new Calender -->
 
-<link rel="stylesheet"
-	href="<c:out value="${contextPath}" />/includes/styles.css"
-	type="text/css" media="screen">
-	<link rel="stylesheet"
-		href="<c:out value="${contextPath}" />/includes/print.css"
-		type="text/css" media="print">
-        <script type="text/JavaScript" language="JavaScript"
-            src="<c:out value="${contextPath}" />/includes/jmesa/jquery-1.3.2.min.js"></script>
-		<script type="text/JavaScript" language="JavaScript"
-			src="<c:out value="${contextPath}" />/includes/global_functions_javascript.js"></script>
-		<script type="text/JavaScript" language="JavaScript"
-			src="<c:out value="${contextPath}" />/includes/Tabs.js"></script>
-		<script type="text/javascript" language="JavaScript"
-			src="<c:out value="${contextPath}" />/includes/repetition-model/repetition-model.js"></script>
-		<script type="text/JavaScript" language="JavaScript"
-			src="<c:out value="${contextPath}" />/includes/prototype.js"></script>
-		<script type="text/JavaScript" language="JavaScript"
-			src="<c:out value="${contextPath}" />/includes/scriptaculous.js?load=effects"></script>
-		<script type="text/JavaScript" language="JavaScript"
-			src="<c:out value="${contextPath}" />/includes/effects.js"></script>
-		<script type="text/JavaScript" language="JavaScript" 
-			src="<c:out value="${contextPath}" />/includes/jmesa/jquery-ui.min.js"></script>
-		<!-- Added for the new Calender -->
-
-		<link rel="stylesheet" type="text/css" media="all"
-			href="<c:out value="${contextPath}" />/includes/new_cal/skins/aqua/theme.css"
-			title="Aqua" />
-		<script type="text/javascript"
-			src="<c:out value="${contextPath}" />/includes/new_cal/calendar.js"></script>
-		<script type="text/javascript"
-			src="<c:out value="${contextPath}" />/includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
-		<script type="text/javascript"
-			src="<c:out value="${contextPath}" />/includes/new_cal/calendar-setup.js"></script>
-        <!-- End -->
-        <c:set var="color" scope="session" value="${newThemeColor}"/>
-	    <c:if test="${(color == 'violet') || (color == 'green')}">
-		<script>
-	          document.write( '<style class="hideStuff" ' +
-              'type="text/css">body {display:none;}<\/style>');
-	    </script>
-		</c:if>
+    <ui:calendar/>
+    <!-- End -->
+    <c:set var="color" scope="session" value="${newThemeColor}"/>
+    <c:if test="${(color == 'violet') || (color == 'green')}">
+        <script>
+            document.write( '<style class="hideStuff" ' +
+                    'type="text/css">body {display:none;}<\/style>');
+        </script>
+    </c:if>
 </head>
 <body class="aka_bodywidth"
-	onload="<c:if test='${popUpURL != ""}'>
-            openDNoteWindow('<c:out value="${popUpURL}" />');
+	onload="<c:if test='${popUpURL != ""}'>            openDNoteWindow('<c:out value="${popUpURL}" />');
 	        </c:if>">
 	
-<script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script>
-<script language="JavaScript" type="text/javascript">
+<script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script><script language="JavaScript" type="text/javascript">
 		jQuery(document).ready(function() {
             jQuery("table > tbody  tr").attr("repeat", "0");
-            jQuery("table > tbody  button").attr("disabled", "true");
-            jQuery("table > tbody  input").attr("disabled", "disabled");
+            jQuery("table > tbody  button").attr("disabled", "true");            jQuery("table > tbody  input").attr("disabled", "disabled");
             jQuery("table > tbody a").removeAttr("onmouseover");
             jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
-            jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
-            jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
+            jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");            jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
 		});
 </script>
-
 <c:set var="prevItemHolderId" value="0"/>
 
-	<div id="centralContainer"
-		style="padding-left: 3em; margin-top: 1em; background-color: white; color: black;">
+	<div id="centralContainer"		style="padding-left: 3em; margin-top: 1em; background-color: white; color: black;">
 
 
 

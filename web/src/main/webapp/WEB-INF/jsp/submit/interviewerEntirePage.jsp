@@ -1,17 +1,19 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<head><title>ClinCapture interview</title>
+<head>
+    <title>ClinCapture interview</title>
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
-   <%-- <fmt:message key="view_data_entry" bundle="${resword}"/>--%>
+    <%-- <fmt:message key="view_data_entry" bundle="${resword}"/>--%>
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
-<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
+    <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
     <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
@@ -23,34 +25,24 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
     <!-- Added for the new Calender -->
 
-    <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
-    <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
-    <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
-    <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
+    <ui:calendar/>
     <!-- End -->
     <!-- *JSP* submit/interviewerEntirePage.jsp -->
-
 </head>
 <body class="aka_bodywidth" onload="<c:if test='${popUpURL != ""}'>
 		openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>">
-
 <div id="centralContainer" style=
   "padding-left:3em; margin-top:1em; background-color: white; color:black;">
-
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
-
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<c:set var="interviewer" value="${toc.eventCRF.interviewerName}" />
-<c:set var="interviewDate" value="${toc.eventCRF.dateInterviewed}" />
+<c:set var="interviewer" value="${toc.eventCRF.interviewerName}" /><c:set var="interviewDate" value="${toc.eventCRF.dateInterviewed}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
 <%--<c:set var="inputVal" value="input${itemId}" />--%>
-
 <c:set var="hasNameNote" value="${param.hasNameNote}"/>
 <c:set var="hasDateNote" value="${param.hasDateNote}"/>
-
 <c:forEach var="presetValue" items="${presetValues}">
     <c:if test='${presetValue.key == "interviewer"}'>
         <c:set var="interviewer" value="${presetValue.value}" />

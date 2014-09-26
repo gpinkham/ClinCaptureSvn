@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm"%>
-
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 
@@ -16,56 +16,45 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+    <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
-<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+    <title>ClinCapture <fmt:message key="view_data_entry" bundle="${resword}" /></title>
+    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
-<title>ClinCapture <fmt:message key="view_data_entry" bundle="${resword}" /></title>
-<link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-<link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
-<meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <link rel="stylesheet" href="${contextPath}/includes/styles.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="${contextPath}/includes/print.css" type="text/css" media="print">
+    <script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery-1.3.2.min.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/global_functions_javascript.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/Tabs.js"></script>
+    <script type="text/javascript" language="JavaScript" src="${contextPath}/includes/repetition-model/repetition-model.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/prototype.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/scriptaculous.js?load=effects"></script>
+    <script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/effects.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery-ui.min.js"></script>
+    <!-- Added for the new Calender -->
 
-<link rel="stylesheet" href="${contextPath}/includes/styles.css" type="text/css" media="screen">
-<link rel="stylesheet" href="${contextPath}/includes/print.css" type="text/css" media="print">
-<script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery-1.3.2.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/global_functions_javascript.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/Tabs.js"></script>
-<script type="text/javascript" language="JavaScript" src="${contextPath}/includes/repetition-model/repetition-model.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/prototype.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/scriptaculous.js?load=effects"></script>
-<script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/effects.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery-ui.min.js"></script>
-		<!-- Added for the new Calender -->
-
-<link rel="stylesheet" type="text/css" media="all" href="${contextPath}/includes/new_cal/skins/aqua/theme.css" title="Aqua" />
-<script type="text/javascript" src="${contextPath}/includes/new_cal/calendar.js"></script>
-<script type="text/javascript" src="${contextPath}/includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
-<script type="text/javascript" src="${contextPath}/includes/new_cal/calendar-setup.js"></script>
-<script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script>
-       
+    <ui:calendar/>
+    <script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script>
 </head>
 <body class="aka_bodywidth">
-	
-<script language="JavaScript" type="text/javascript">
+	<script language="JavaScript" type="text/javascript">
 	function disableElements() {
 		jQuery("table > tbody  tr").attr("repeat", "0");
-		jQuery("table > tbody  button").attr("disabled", "true");
-		jQuery("table > tbody  input").attr("disabled", "disabled");
+		jQuery("table > tbody  button").attr("disabled", "true");		jQuery("table > tbody  input").attr("disabled", "disabled");
 		jQuery("table > tbody a").removeAttr("onmouseover");
 		jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
-		jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
-		jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
+		jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");		jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
 	}	
 		
-	function calcCenterOfElement(element){
-		var center = {
+	function calcCenterOfElement(element){		var center = {
 			x: element.offset().left + element.width()/2, 
 			y: element.offset().top + element.height()/2
-		}
-		return center;
+		}		return center;
 	}
 
-	function calcOffset(target, bullet){
-		var offset = {
+	function calcOffset(target, bullet){		var offset = {
 			delta_x: target.x - bullet.x, 
 			delta_y: target.y - bullet.y
 		}

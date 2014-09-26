@@ -4,6 +4,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -31,31 +32,22 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
      <!-- Added for the new Calender -->
 
-    <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
-    <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
-    <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
-    <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
+    <ui:calendar/>
     <!-- End -->
     <!-- *JSP* submit/doubleDataEntry.jsp -->
-    <script type="text/javascript" language="JavaScript" src="includes/repetition-model/repetition-model.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
+    <script type="text/javascript" language="JavaScript" src="includes/repetition-model/repetition-model.js"></script>    <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
-
     <c:set var="color" scope="session" value="${newThemeColor}"/>
 	<c:if test="${(color == 'violet') || (color == 'green')}">
-        <style class="hideStuff" type="text/css">body {display:none;}</style>
-	</c:if>
+        <style class="hideStuff" type="text/css">body {display:none;}</style>	</c:if>
 
 </head>
-<body class="aka_bodywidth" onload="document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';" onunload="javascript:clsWin();">
-<c:if test='${popUpURL != ""}'>
+<body class="aka_bodywidth" onload="document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';" onunload="javascript:clsWin();"><c:if test='${popUpURL != ""}'>
     <script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script>
 </c:if>
-
 <div id="centralContainer" style=
   "padding-left:3em; margin-top:1em;background-color: white; color:black;">
-
 
 <%-- set button text depending on whether or not the user is confirming values --%>
 <c:choose>

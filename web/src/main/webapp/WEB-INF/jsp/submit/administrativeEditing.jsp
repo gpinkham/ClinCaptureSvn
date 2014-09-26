@@ -4,6 +4,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -12,13 +13,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head><title>ClinCapture <fmt:message key="administrative_editing" bundle="${resword}"/></title>
+<head>
+    <title>ClinCapture <fmt:message key="administrative_editing" bundle="${resword}"/></title>
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
-    
+
     <link rel="stylesheet" href="includes/styles.css" type="text/css">
-<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
+    <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
     <link href="includes/jquery-ui.css" rel="stylesheet" type="text/css"/>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui.min.js"></script>
@@ -31,39 +33,30 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
     <!-- Added for the new Calender -->
 
-    <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
-    <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
-    <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
-    <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
+    <ui:calendar/>
     <!-- End -->
     <!-- *JSP* submit/administrativeEditing.jsp -->
     <c:set var="color" scope="session" value="${newThemeColor}"/>
-	<c:if test="${(color == 'violet') ||(color == 'green')}">
+    <c:if test="${(color == 'violet') ||(color == 'green')}">
         <style class="hideStuff" type="text/css">body {display:none;}</style>
-	</c:if>
+    </c:if>
 </head>
 <body class="aka_bodywidth" onload="" onunload="javascript:clsWin();">
-<c:if test='${popUpURL != ""}'>
-    <script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script>
+<c:if test='${popUpURL != ""}'>    <script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script>
 </c:if>
 <%-- BWP:
- onload=
-  "document.getElementById('centralContainer').style.display='none'; new Effect.Appear('centralContainer', {duration:1});<jsp:include page="../include/showPopUp2.jsp"/>"
+ onload=  "document.getElementById('centralContainer').style.display='none'; new Effect.Appear('centralContainer', {duration:1});<jsp:include page="../include/showPopUp2.jsp"/>"
   TabsForwardByNum(<c:out value="${tabId}"/>); alert(self.screen.availWidth);
 margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
-
 <c:set var="markCRFMethodName" value="displayMessageFromCheckbox(this, undefined)"/>
 
-<div id="centralContainer" style=
-  "padding-left:3em; margin-top:10px;background-color: white; color:black;">
+<div id="centralContainer" style=  "padding-left:3em; margin-top:10px;background-color: white; color:black;">
 
 
-<%-- set button text depending on whether or not the user is confirming values --%>
-<c:choose>
+<%-- set button text depending on whether or not the user is confirming values --%><c:choose>
     <c:when test="${section.checkInputs}">
         <c:set var="buttonAction"><fmt:message key="save" bundle="${resword}"/></c:set>
-        <c:set var="checkInputsValue" value="1" />
-    </c:when>
+        <c:set var="checkInputsValue" value="1" />    </c:when>
     <c:otherwise>
         <c:set var="buttonAction" value="Confirm values" />
         <c:set var="checkInputsValue" value="0" /> 
