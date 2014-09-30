@@ -1,10 +1,10 @@
 /*******************************************************************************
  * CLINOVO RESERVES ALL RIGHTS TO THIS SOFTWARE, INCLUDING SOURCE AND DERIVED BINARY CODE. BY DOWNLOADING THIS SOFTWARE YOU AGREE TO THE FOLLOWING LICENSE:
- * 
+ *
  * Subject to the terms and conditions of this Agreement including, Clinovo grants you a non-exclusive, non-transferable, non-sublicenseable limited license without license fees to reproduce and use internally the software complete and unmodified for the sole purpose of running Programs on one computer. 
  * This license does not allow for the commercial use of this software except by IRS approved non-profit organizations; educational entities not working in joint effort with for profit business.
  * To use the license for other purposes, including for profit clinical trials, an additional paid license is required. Please contact our licensing department at http://www.clinovo.com/contact for pricing information.
- * 
+ *
  * You may not modify, decompile, or reverse engineer the software.
  * Clinovo disclaims any express or implied warranty of fitness for use. 
  * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
@@ -16,6 +16,7 @@
 package com.clinovo.controller;
 
 import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
+import com.clinovo.bean.display.DisplayWidgetsRowWithExtraField;
 import com.clinovo.bean.display.DisplayWidgetsRowWithName;
 import com.clinovo.dao.CodedItemDAO;
 import com.clinovo.model.CodedItem;
@@ -44,6 +45,7 @@ import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsSort;
 import org.akaza.openclinica.dao.managestudy.ListEventsForSubjectFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -66,6 +68,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -85,9 +88,11 @@ public class WidgetsLayoutController {
 	private static final int FILTER_START = 0;
 	private static final int FILTER_END = 99999;
 	private static final int NUMBER_OF_MONTHS = 11;
+	private static final int PERCENTS = 100;
 
 	private static final int EC_DISPLAY_PER_SCREEN = 5;
 	private static final int ND_PER_CRF_DISPLAY_PER_SCREEN = 8;
+	private static final int ESPS_DISPLAY_PER_SCREEN = 5;
 
 	private static final String STATUS_NOT_CODED = "items to be coded";
 	private static final String STATUS_CODED = "coded items";
@@ -111,13 +116,13 @@ public class WidgetsLayoutController {
 	 * This method is used to display the widget on the Home page. It takes the
 	 * data from the table "widget" and "widgets_layout" processes it and sends
 	 * back a list of widgets jsps that should be displayed and their order.
-	 * 
+	 *
 	 * @param request
 	 *            is used to obtain data about current UserAccount and Study.
 	 * @param response
 	 *            is used to remove caching.
 	 * @return model ModelMap that contains list of jsps and their order.
-	 * 
+	 *
 	 * @throws Exception
 	 *             if there is incorrect data in the database.
 	 */
@@ -158,7 +163,7 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to save data after user updates his home page layout.
-	 * 
+	 *
 	 * @param request
 	 *            is used to gather data about current UserAccount, Study and updates that user has made in his layout.
 	 */
@@ -229,13 +234,13 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 * 
+	 *
 	 * @param request
 	 *            is used to gather information about current user and study.
-	 * 
+	 *
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 * 
+	 *
 	 * @throws IOException
 	 *             if data from request is incorrect or database contains corrupted data.
 	 */
@@ -278,17 +283,17 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 * 
+	 *
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 * 
+	 *
 	 * @throws IOException
 	 *             if data from request is incorrect or database contains corrupted data.
-	 * 
+	 *
 	 * @return model - Model with gathered data.
 	 */
 	@RequestMapping("/initEventsCompletionWidget")
@@ -369,12 +374,12 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 * 
+	 *
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 * 
+	 *
 	 * @throws IOException
 	 *             if data from request is incorrect or database contains corrupted data.
 	 */
@@ -411,17 +416,17 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 * 
+	 *
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 * 
+	 *
 	 * @throws IOException
 	 *             if data from request is incorrect or database contains corrupted data.
-	 * 
+	 *
 	 * @return model Model with gathered data.
 	 */
 	@RequestMapping("/initSubjectStatusCount")
@@ -449,17 +454,17 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 * 
+	 *
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 * 
+	 *
 	 * @throws IOException
 	 *             if data from request is incorrect or database contains corrupted data.
-	 * 
+	 *
 	 * @return model Model with gathered data.
 	 */
 	@RequestMapping("/initStudyProgress")
@@ -499,17 +504,17 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 * 
+	 *
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 * 
+	 *
 	 * @throws IOException
 	 *             if data from request is incorrect or database contains corrupted data.
-	 * 
+	 *
 	 * @return model Model with gathered data.
 	 */
 	@RequestMapping("/initSdvProgressWidget")
@@ -618,14 +623,14 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 * 
+	 *
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 * 
+	 *
 	 * @return model Model with gathered data.
 	 */
 	@RequestMapping("/initNdsPerCrfWidget")
@@ -722,14 +727,14 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 * 
+	 *
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 * 
+	 *
 	 * @return model Model with gathered data.
 	 */
 	@RequestMapping("/initEnrollmentProgressWidget")
@@ -860,14 +865,14 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 * 
+	 *
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 * 
+	 *
 	 * @return model - Model with gathered data.
 	 */
 	@RequestMapping("/initCodingProgressWidget")
@@ -1022,14 +1027,142 @@ public class WidgetsLayoutController {
 		return page;
 	}
 
+	/**
+	 * This method is used to gather data from Database and send it to widget.
+	 *
+	 * @param request
+	 *            is used to gather information about current user and study.
+	 * @param model
+	 *            is used to return gathered from database data.
+	 * @param response
+	 *            is used to set correct locale and clear cache.
+	 *
+	 * @return model - Model with gathered data.
+	 */
+	@RequestMapping("/initEnrollStatusPerSiteWidget")
+	public String initEnrollStatusPerSiteWidget(HttpServletRequest request, HttpServletResponse response, Model model) {
+
+		String page = "widgets/includes/enrollStatusPerSiteChart";
+		StudyDAO studyDAO = new StudyDAO(datasource);
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+		String action = request.getParameter("action");
+		int currentDisplay = Integer.parseInt(request.getParameter("epPerSiteDisplay"));
+		if (action.equals("goBack")) {
+			currentDisplay -= ESPS_DISPLAY_PER_SCREEN;
+		} else if (action.equals("goForward")) {
+			currentDisplay += ESPS_DISPLAY_PER_SCREEN;
+		}
+		ArrayList<Integer> listOfSitesIds = (ArrayList<Integer>) studyDAO.findAllSiteIdsByStudy(sb);
+		Status[] listOfStatuses = { Status.LOCKED, Status.DELETED, Status.AUTO_DELETED, Status.SIGNED, Status.AVAILABLE };
+		ArrayList<DisplayWidgetsRowWithExtraField> dataRows = new ArrayList<DisplayWidgetsRowWithExtraField>();
+		listOfSitesIds.remove(listOfSitesIds.indexOf(sb.getId()));
+		ArrayList<StudyBean> listOfSites = new ArrayList<StudyBean>();
+
+		for (int index : listOfSitesIds) {
+			StudyBean currentSite = (StudyBean) studyDAO.findByPK(index);
+			listOfSites.add(currentSite);
+		}
+		listOfSites = sortSitesByPercentOfExpectedEnrollment(listOfSites);
+		int listSize = listOfSites.size();
+
+		for (int i = currentDisplay; i < currentDisplay + ESPS_DISPLAY_PER_SCREEN && i < listSize; i++) {
+			StudyBean site = listOfSites.get(i);
+			DisplayWidgetsRowWithExtraField currentRow = new DisplayWidgetsRowWithExtraField();
+			currentRow.setRowName(site.getName());
+			currentRow.setName(site.getIdentifier());
+			LinkedHashMap<String, Integer> values = new LinkedHashMap<String, Integer>();
+
+			for (Status status : listOfStatuses) {
+				if (status == Status.AUTO_DELETED) {
+					int countOfDeletedSubjects = values.get(Status.DELETED.getName());
+					int countOfAutoRemovedSubject = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(site, status);
+					values.put(Status.DELETED.getName(), countOfAutoRemovedSubject + countOfDeletedSubjects);
+				} else {
+					int countOfSubjectWithStatus = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(site, status);
+					values.put(status.getName(), countOfSubjectWithStatus);
+				}
+			}
+			currentRow.setRowValues(values);
+			String percentOfExpectedEnrollment = getPercentOfEnrollmentForSite(site);
+			currentRow.setExtraField(percentOfExpectedEnrollment);
+			dataRows.add(currentRow);
+		}
+
+		boolean nextButtonEnabled = currentDisplay + ESPS_DISPLAY_PER_SCREEN < listSize;
+		boolean prevButtonEnabled = currentDisplay > 0;
+		model.addAttribute("espsDataRows", dataRows);
+		model.addAttribute("espsDisplay", currentDisplay);
+		model.addAttribute("espsPreviousPageExists", prevButtonEnabled);
+		model.addAttribute("espsNextPageExists", nextButtonEnabled);
+		return page;
+	}
+
+	/**
+	 * This method is used to gather data from Database and send it to widget.
+	 *
+	 * @param request
+	 *            is used to gather information about current user and study.
+	 * @param response
+	 *            is used to set correct locale and clear cache.
+	 * @throws IOException
+	 *             if data from request is incorrect or database contains corrupted data.
+	 */
+	@RequestMapping("/getEnrollStatusPerSiteLegendValues")
+	public void getEnrollStatusPerSiteLegendValues(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
+
+		setRequestHeadersAndUpdateLocale(response, request);
+
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+
+		int availableSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.AVAILABLE);
+		int removedSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.DELETED);
+		int autoRemovedSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.AUTO_DELETED);
+		int lockedSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.LOCKED);
+		int signedSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.SIGNED);
+
+		List<Integer> listOfEventsWithStatuses = new ArrayList<Integer>();
+
+		listOfEventsWithStatuses.add(availableSubjects);
+		listOfEventsWithStatuses.add(removedSubjects + autoRemovedSubjects);
+		listOfEventsWithStatuses.add(signedSubjects);
+		listOfEventsWithStatuses.add(lockedSubjects);
+
+		response.getWriter().println(listOfEventsWithStatuses);
+	}
+
+	private ArrayList<StudyBean> sortSitesByPercentOfExpectedEnrollment(ArrayList<StudyBean> listOfSites) {
+		Collections.sort(listOfSites, new Comparator<StudyBean>() {
+			public int compare(final StudyBean site1, final StudyBean site2) {
+				int compareResult;
+				StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
+				float site1ExpectedTotalEnrollment = site1.getExpectedTotalEnrollment();
+				float site2ExpectedTotalEnrollment = site2.getExpectedTotalEnrollment();
+				float subjectOnSite1 = studySubjectDAO.getCountofStudySubjects(site1);
+				float subjectOnSite2 = studySubjectDAO.getCountofStudySubjects(site2);
+				float site1PercentOfExpected = subjectOnSite1 / site1ExpectedTotalEnrollment * PERCENTS;
+				float site2PercentOfExpected = subjectOnSite2 / site2ExpectedTotalEnrollment * PERCENTS;
+				if (site1PercentOfExpected < site2PercentOfExpected) {
+					compareResult = 1;
+				} else if (site1PercentOfExpected > site2PercentOfExpected) {
+					compareResult = -1;
+				} else {
+					compareResult = site1.getName().compareTo(site2.getName());
+				}
+				return compareResult;
+			}
+		});
+		return listOfSites;
+	}
+
 	private LinkedHashMap<String, LinkedHashMap<String, Integer>> getUpdateValueForMonth(
 			LinkedHashMap<String, LinkedHashMap<String, Integer>> dataRows, String month, String status) {
-
 		LinkedHashMap<String, Integer> updatedValues = dataRows.get(month);
 		int currentValue = updatedValues.get(status);
 		updatedValues.put(status, ++currentValue);
 		dataRows.put(month, updatedValues);
-
 		return dataRows;
 	}
 
@@ -1037,13 +1170,11 @@ public class WidgetsLayoutController {
 
 		int countOfSubjects;
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
-
 		if (sb.isSite(sb.getParentStudyId())) {
 			countOfSubjects = studySubjectDAO.getCountofStudySubjectsAtStudyOrSite(sb);
 		} else {
 			countOfSubjects = studySubjectDAO.getCountofStudySubjectsAtStudy(sb);
 		}
-
 		return countOfSubjects;
 	}
 
@@ -1051,25 +1182,20 @@ public class WidgetsLayoutController {
 
 		List<StudyEventDefinitionBean> studyEventDefinitions;
 		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(datasource);
-
 		if (sb.isSite(sb.getParentStudyId())) {
 			studyEventDefinitions = studyEventDefinitionDAO.findAllActiveByParentStudyId(sb.getParentStudyId());
 		} else {
 			studyEventDefinitions = studyEventDefinitionDAO.findAllActiveByStudyId(sb.getId());
 		}
-
 		return studyEventDefinitions;
 	}
 
 	private ArrayList<String> getMonthsList(HttpServletRequest request) {
 
 		ArrayList<String> monthsList = new ArrayList<String>();
-
 		for (int i = 1; i <= NUMBER_OF_MONTHS + 1; i++) {
-
 			monthsList.add(messageSource.getMessage("short.month." + i, null, request.getLocale()));
 		}
-
 		return monthsList;
 	}
 
@@ -1079,8 +1205,21 @@ public class WidgetsLayoutController {
 		response.setHeader("Pragma", "no-cache");
 		response.setDateHeader("Expires", -1);
 		response.setHeader("Cache-Control", "no-store");
-
 		ResourceBundleProvider.updateLocale(request.getLocale());
+	}
+
+	private String getPercentOfEnrollmentForSite(StudyBean site) {
+
+		DecimalFormat df = new DecimalFormat();
+		df.setMaximumFractionDigits(2);
+		float result = 0;
+		if (site.isSite()) {
+			StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
+			float expectedTotalEnrollment = site.getExpectedTotalEnrollment();
+			float subjectOnSite = studySubjectDAO.getCountofStudySubjects(site);
+			result = subjectOnSite / expectedTotalEnrollment * PERCENTS;
+		}
+		return df.format(result);
 	}
 
 	/**

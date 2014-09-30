@@ -27,6 +27,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	private static final int NDS_PER_CRF_ATTRIBUTES = 4;
 	private static final int ENROLL_PROG_ATTRIBUTES = 4;
 	private static final int CODING_PROG_ATTRIBUTES = 5;
+	private static final int ENROLL_STAT_PER_SITE_ATTRIBUTES = 4;
 
 	private StudyBean sb;
 	private UserAccountBean ub;
@@ -171,6 +172,22 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 		this.mockMvc.perform(
 				get(CODING_PROGRESS_WIDGET).param("codingProgressYear", "0").sessionAttr("study", sb)
 						.sessionAttr("userBean", ub)).andExpect(status().isOk());
+	}
+	
+	 
+	@Test
+	public void testThatInitEnrollStatusPerSiteReturnsCode200() throws Exception {
+
+		this.mockMvc.perform(
+				get(ENROLL_STATUS_PER_SITE).param("epPerSiteDisplay", "0").param("action", "init")
+						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(status().isOk());
+	}
+	
+	@Test
+	public void testThatGetESPSLegendValuesReturnsCode200() throws Exception {
+
+		this.mockMvc.perform(get(ESPS_LEGEND).param("userId", "1").sessionAttr("study", sb)).andExpect(
+				status().isOk());
 	}
 
 	/**
@@ -516,5 +533,33 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 				MockMvcRequestBuilders.post(CODING_PROGRESS_WIDGET).param("codingProgressYear", "0")
 						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/codingProgressChart"));
+	}
+
+	@Test
+	public void testThatInitEnrollStatusPerSiteReturnsCorrectNumberOfAttributes() throws Exception {
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(ENROLL_STATUS_PER_SITE).param("epPerSiteDisplay", "0")
+						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
+				MockMvcResultMatchers.model().size(ENROLL_STAT_PER_SITE_ATTRIBUTES));
+	}
+
+	@Test
+	public void testThatInitEnrollStatusPerSiteReturnsModelWithAllAttributes() throws Exception {
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(ENROLL_STATUS_PER_SITE).param("epPerSiteDisplay", "0")
+						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
+				MockMvcResultMatchers.model().attributeExists("espsDisplay", "espsDataRows", "espsPreviousPageExists",
+						"espsNextPageExists"));
+	}
+
+	@Test
+	public void testThatInitEnrollStatusPerSiteReturnsCorrectUrl() throws Exception {
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(ENROLL_STATUS_PER_SITE).param("epPerSiteDisplay", "0")
+						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
+				MockMvcResultMatchers.view().name("widgets/includes/enrollStatusPerSiteChart"));
 	}
 }

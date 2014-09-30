@@ -100,9 +100,11 @@ table.widgets_container td {
 	display: none;
 }
 
-.widget .bar_name {
+.widget .bar_name, .widget .bar_name a,.widget .bar_name a:hover {
 	text-align: center;
 	padding-top: 5px;
+	font-style: normal;
+	color: #4D4D4D;
 }
 
 .configure .widget:hover .remove,.configure .widget_big:hover .remove {
@@ -157,6 +159,15 @@ form#actionForSave input {
 	border-left: 1px solid gray;
 	padding: 10px 0px;
 	margin-top: 20px;
+}
+
+.widget #enrollment_status_per_site_container .chart_wrapper {
+	width: 310px;
+}
+
+.widget #enrollment_status_per_site_container table.captions {
+	width: 400px;
+	margin-left: -5px;
 }
 
 .widget .stacked_bar {
@@ -318,12 +329,24 @@ form#actionForSave input {
 	display: none;
 }
 
+.widget div.right_text {
+    margin-top: -17px;
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 10px;
+}
+
+.widget .hint {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 10px;
+    font-style: italic;
+    color: gray;
+}
 /* DNs assigned to me */
 .dns_assigned_to_me .new {
 	background-color: red;
 }
 
-.dns_assigned_to_me table.signs {
+.dns_assigned_to_me table.signs,.enrollment_status_per_site table.signs {
 	width: 260px;
 	margin-left: 60px;
 }
@@ -350,39 +373,46 @@ form#actionForSave input {
 	background-color: #ecf8ff;
 }
 
-.events_completion .scheduled {
+.widget .scheduled {
 	background-color: #12d2ff;
 }
 
-.events_completion .data_entry_started {
+.widget .data_entry_started {
 	background-color: #ffc700;
 }
 
-.events_completion .completed {
+.widget .completed {
 	background-color: #9439c4;
 }
 
-.events_completion .signed {
+.widget .signed {
 	background-color: #029f32;
 }
 
-.events_completion  .locked {
+.widget  .locked {
 	background-color: #868686;
 }
 
-.events_completion .skipped {
+.widget .skipped {
 	background-color: #ff6301;
 }
 
-.events_completion .stopped {
+.widget .stopped {
 	background-color: #ff0000;
 }
 
-.events_completion  .sdved,.events_completion .source_data_verified {
+.widget  .sdved,.widget .source_data_verified {
 	background-color: #8ac819;
 }
 
-.events_completion  .stacked_bar,.events_completion .not_scheduled {
+.widget  .stacked_bar,.widget .not_scheduled {
 	background-color: #ecf8ff;
 }
-/*/ Events Completion */
+
+.widget .removed {
+	background-color: #ff0000;
+}
+
+.widget .available {
+	background-color: #12d2ff;
+}

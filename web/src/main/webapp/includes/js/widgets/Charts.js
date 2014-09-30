@@ -398,6 +398,22 @@ function setStacksLengths(selector, values, captionLimit) {
 }
 
 /**
+ * This function if used to get size of row in the small horizontal bars widget.
+ *
+ * @param <String> selector by which stack should be found by jQuery search engine (for example "#events_completion_container .stacked_bar .stack").
+ * @param <Integer> total - value of the row.
+ * @param <Integer> captionLimit - length of whole row.
+ * @return length of the row in pixels.
+ */
+function getRowLength(selector, total, captionLimit) {
+
+	var barWidth = parseInt($(selector).parent().parent().width());
+	var unitSize = barWidth / captionLimit;
+	var rowWidth = parseInt(total, 10) * unitSize;
+	return rowWidth;
+}
+
+/**
 * On "View All Events in study" page user should enter two dates for filter
 * 
 * @returns <Array<Date, Date>>[0] - start date for filter (current date - 10 years)
@@ -654,4 +670,40 @@ function getNodeAttributes(node, regexp) {
 function capitalizeFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 };
+
+
+/**
+ * This method is used to find maximum length of row.
+ *
+ * @param rows - an array of objects, from which values will be taken.
+ */
+function getMaxRowLengths(rows) {
+	var max = 0;
+	rows.each(function(entry) {
+		var total = 0;
+		var stacks = $(this).find("li");
+		stacks.each(function(index) {
+			var currentValue = $(this).find(".hidden").html();
+			if (currentValue < 0)
+				currentValue = 0;
+			if (currentValue)
+				total += parseInt(currentValue);
+		});
+		max = total > max ? total : max;
+	});
+	return max;
+}
+
+/**
+ * This function is used to move such elements as 'Expected total enrollment'
+ * to the right of row in the horizontal bar widgets.
+ *
+ * @param selector - jQ selector of the element which should be moved.
+ * @param length - length in px, on which element will be moved to the right.
+ */
+function moveElementsToTheRight(selector,length) {
+
+	var offset = parseInt(length, 10) + 2;
+	$(selector).css("padding-left", offset + "px");
+}
 /* /Supporting functions */
