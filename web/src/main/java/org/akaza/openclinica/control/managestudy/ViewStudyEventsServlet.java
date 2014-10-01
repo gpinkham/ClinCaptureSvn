@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +45,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -477,6 +479,12 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 				.format(fp.getDate(INPUT_STARTDATE));
 		String endDate = request.getParameter(INPUT_ENDDATE) == null ? localDf.format(defaultEndDate) : localDf
 				.format(fp.getDate(INPUT_ENDDATE));
+		try {
+			startDate = URLEncoder.encode(startDate, "UTF-8");
+			endDate = URLEncoder.encode(endDate, "UTF-8");
+		} catch (Exception ex) {
+			logger.error("Error has occurred.", ex);
+		}
 		String eblFiltered = fp.getString("ebl_filtered");
 		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
 		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
@@ -489,7 +497,11 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 				.append((!eblSortAscending.isEmpty() ? eblSortAscending : "1")).append("&ebl_filtered=")
 				.append((!eblFiltered.isEmpty() ? eblFiltered : "0")).append("&ebl_filterKeyword=")
 				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1");
-		if (request.getParameter("refreshPage") != null) {
+		Locale locale = (Locale) request.getSession().getAttribute("viewStudyEventsServletPreviousLocale");
+		boolean localeChanged = locale != null
+				&& !request.getLocale().getLanguage().equalsIgnoreCase(locale.getLanguage());
+		request.getSession().setAttribute("viewStudyEventsServletPreviousLocale", request.getLocale());
+		if (request.getParameter("refreshPage") != null || localeChanged) {
 			saveUrl(getUrlKey(request), request.getRequestURL() + sb.toString(), request);
 		}
 		return sb.toString();
