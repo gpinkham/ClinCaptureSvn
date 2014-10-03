@@ -346,9 +346,19 @@ form#actionForSave input {
 	background-color: red;
 }
 
-.dns_assigned_to_me table.signs,.enrollment_status_per_site table.signs {
+.dns_assigned_to_me table.signs {
 	width: 260px;
 	margin-left: 60px;
+}
+
+.enrollment_status_per_site table.signs {
+	width: 260px;
+	margin: 28px 90px;
+}
+
+.enrollment_status_per_site .bar_name {
+	padding-top: 6px;
+	padding-bottom: 1px;
 }
 
 .dns_assigned_to_me .updated {

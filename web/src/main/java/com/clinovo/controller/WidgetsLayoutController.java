@@ -1211,7 +1211,7 @@ public class WidgetsLayoutController {
 	private String getPercentOfEnrollmentForSite(StudyBean site) {
 
 		DecimalFormat df = new DecimalFormat();
-		df.setMaximumFractionDigits(2);
+		df.setMaximumFractionDigits(0);
 		float result = 0;
 		if (site.isSite()) {
 			StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
