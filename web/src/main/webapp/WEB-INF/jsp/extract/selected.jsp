@@ -222,15 +222,15 @@
 <table class="table_horizontal" width="100%">
 	<tr>
 		<td style="width:130px">
-			<fmt:message key="CRF_version" bundle="${resword}" />
+			<fmt:message key="CRF_version" bundle="${resword}"/>
 		</td>
 
 		<td style="width:130px">
-			<fmt:message key="interviewer_name" bundle="${resword}" />
+			<fmt:message key="interviewer_name" bundle="${resword}"/>
 		</td>
 
 		<td>
-			<fmt:message key="interview_date" bundle="${resword}" />
+			<fmt:message key="interview_date" bundle="${resword}"/>
 		</td>
 
 		<td>
@@ -301,19 +301,19 @@
 		<td></td>
 
 		<td>
-			<fmt:message key="subject_group_name" bundle="${resword}" />
+			<fmt:message key="subject_group_name" bundle="${resword}"/>
 		</td>
 
 		<td>
-			<fmt:message key="subject_group_type" bundle="${resword}" />
+			<fmt:message key="subject_group_type" bundle="${resword}"/>
 		</td>
 
 		<td>
-			<fmt:message key="status" bundle="${resword}" />
+			<fmt:message key="status" bundle="${resword}"/>
 		</td>
 
 		<td>
-			<fmt:message key="subject_assignment" bundle="${resword}" />
+			<fmt:message key="subject_assignment" bundle="${resword}"/>
 		</td>
 	</tr>
 
@@ -322,28 +322,28 @@
 			<c:choose>
 				<c:when test="${sgclass.selected}">
 					<td>
-						<input type=checkbox checked name="groupSelected<c:out value=" ${sgclass.id} "/>" value="yes">
+						<input type=checkbox checked name="groupSelected<c:out value="${sgclass.id}"/>" value="yes">
 				</c:when>
 				<c:otherwise>
 					<td>
-						<input type=checkbox name="groupSelected<c:out value=" ${sgclass.id} "/>" value="yes">
+						<input type=checkbox name="groupSelected<c:out value="${sgclass.id}"/>" value="yes">
 				</c:otherwise>
 			</c:choose>
 
 			<td>
-				<c:out value="${sgclass.name}" />
+				<c:out value="${sgclass.name}"/>
 			</td>
 
 			<td>
-				<c:out value="${sgclass.groupClassTypeName}" />
+				<c:out value="${sgclass.groupClassTypeName}"/>
 			</td>
 
 			<td>
-				<c:out value="${sgclass.status.name}" />
+				<c:out value="${sgclass.status.name}"/>
 			</td>
 
 			<td>
-				<c:out value="${sgclass.subjectAssignment}" />
+				<c:out value="${sgclass.subjectAssignment}"/>
 			</td>
 		</tr>
 	</c:forEach>
@@ -396,23 +396,23 @@
 			<td>
 				<c:choose>
 					<c:when test="${item.selected}">
-						<input type="checkbox" checked name="itemSelected<c:out value=" ${count} "/>" value="yes">
+						<input type="checkbox" checked name="itemSelected<c:out value="${count}"/>" value="yes">
 					</c:when>
 					<c:otherwise>
-						<input type="checkbox" name="itemSelected<c:out value=" ${count} "/>" value="yes">
+						<input type="checkbox" name="itemSelected<c:out value="${count}"/>" value="yes">
 					</c:otherwise>
 				</c:choose>
 			</td>
-			<td><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value=" ${item.id} "/>&itemName=<c:out value="${item.name} "/>')"><c:out value="${item.name}"/></a>
+			<td><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>&itemName=<c:out value="${item.name}"/>')"><c:out value="${item.name}"/></a>
 			</td>
 			<td>
-				<c:out value="${item.description}" />&nbsp;</td>
+				<c:out value="${item.description}"/>&nbsp;</td>
 			<td>
-				<input type="hidden" name="itemDefName<c:out value=" ${count} "/>" value="<c:out value=" ${item.defName} "/>">
-				<c:out value="${item.defName}" />&nbsp;</td>
+				<input type="hidden" name="itemDefName<c:out value="${count}"/>" value="<c:out value="${item.defName}"/>">
+				<c:out value="${item.defName}"/>&nbsp;</td>
 			<td>
-				<input type="hidden" name="itemCrfName<c:out value=" ${count} "/>" value="<c:out value=" ${item.crfName} "/>">
-				<c:out value="${item.crfName}" />&nbsp;</td>
+				<input type="hidden" name="itemCrfName<c:out value="${count}"/>" value="<c:out value="${item.crfName}"/>">
+				<c:out value="${item.crfName}"/>&nbsp;</td>
 			<td>
 				<c:choose>
 					<c:when test="${fn:length(item.itemMetas) eq 0}">${item.itemMeta.crfVersionName}</c:when>
@@ -420,9 +420,9 @@
 						<c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
 							<c:choose>
 								<c:when test="${status.last}">
-									<c:out value="${meta.crfVersionName}" /></c:when>
+									<c:out value="${meta.crfVersionName}"/></c:when>
 								<c:otherwise>
-									<c:out value="${meta.crfVersionName}" />,
+									<c:out value="${meta.crfVersionName}"/>,
 									<br>
 								</c:otherwise>
 							</c:choose>
@@ -430,9 +430,9 @@
 				</c:choose>
 			</td>
 			<td>
-				<c:out value="${item.dataType.name}" />&nbsp;</td>
+				<c:out value="${item.dataType.name}"/>&nbsp;</td>
 			<td>
-				<c:out value="${item.units}" />&nbsp;</td>
+				<c:out value="${item.units}"/>&nbsp;</td>
 			<td>
 				<c:choose>
 					<c:when test="${fn:length(item.itemMetas) eq 0}">${item.itemMeta.responseSet.label}</c:when>
@@ -440,9 +440,9 @@
 						<c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
 							<c:choose>
 								<c:when test="${status.last}">
-									<c:out value="${meta.responseSet.label}" /></c:when>
+									<c:out value="${meta.responseSet.label}"/></c:when>
 								<c:otherwise>
-									<c:out value="${meta.responseSet.label}" />,
+									<c:out value="${meta.responseSet.label}"/>,
 									<br>
 								</c:otherwise>
 							</c:choose>
