@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -1222,6 +1222,27 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 									openQueries.put(itemName, upSql);
 								}
 							} else {
+								String upSql = "";
+								if (dbName.equals("oracle")) {
+									upSql = "UPDATE ITEM SET DESCRIPTION='"
+											+ stripQuotes(descLabel)
+											+ "',"
+											+ "PHI_STATUS="
+											+ (phiBoolean ? 1 : 0)
+											+ " WHERE exists (SELECT versioning_map.item_id from versioning_map, crf_version where"
+											+ " versioning_map.crf_version_id = crf_version.crf_version_id"
+											+ " AND crf_version.crf_id= " + crfId
+											+ " AND item.item_id = versioning_map.item_id)" + " AND item.name='"
+											+ stripQuotes(itemName) + "'";
+								} else {
+									upSql = "UPDATE ITEM SET DESCRIPTION='" + stripQuotes(descLabel) + "',"
+											+ "PHI_STATUS=" + phiBoolean + " FROM versioning_map, crf_version"
+											+ " WHERE item.name='" + stripQuotes(itemName)
+											+ "' AND item.item_id = versioning_map.item_id AND"
+											+ " versioning_map.crf_version_id = crf_version.crf_version_id"
+											+ " AND crf_version.crf_id = " + crfId;
+								}
+								openQueries.put(itemName, upSql);
 								ownerId = oldItem.getOwner().getId();
 							}
 						}

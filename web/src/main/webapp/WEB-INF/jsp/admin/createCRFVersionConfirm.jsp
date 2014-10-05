@@ -68,7 +68,7 @@
  <c:if test="${!empty warnings}">
   <p><fmt:message key="warnings" bundle="${resword}"/>:<p>
   <c:forEach var="warning" items="${warnings}">
-    <span class="alert"><c:out value="${warning}"/></span><br/>
+    <p><span class="alert"><c:out value="${warning}"/></span></p>
   </c:forEach>
  </c:if>
   <%-- Move to alerts
