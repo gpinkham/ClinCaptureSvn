@@ -31,3 +31,5 @@
 	<input type="text" class="currentColor" value="${newThemeColor}">
 </form>
 <input type="hidden" value="${study.id}" id="sdvWStudyId">
+
+<script>applyThemeForChart();</script>

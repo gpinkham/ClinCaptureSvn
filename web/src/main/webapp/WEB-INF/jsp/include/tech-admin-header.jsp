@@ -29,10 +29,10 @@
 
     <ui:calendar/>
     <!-- End -->
+    <ui:theme/>
 
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
-</head>
+    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" /></head>
 <body class="main_BG" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0"
 	<jsp:include page="../include/showPopUp.jsp"/>
 >

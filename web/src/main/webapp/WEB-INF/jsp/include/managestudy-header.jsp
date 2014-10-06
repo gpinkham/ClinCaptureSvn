@@ -47,13 +47,7 @@
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
 
-    <c:set var="color" scope="session" value="${newThemeColor}"/>
-    <c:if test="${(color == 'violet') || (color == 'green')}">
-        <script>
-            document.write( '<style class="hideStuff" ' +
-                    'type="text/css">body {display:none;}<\/style>');
-        </script>
-    </c:if>
+    <ui:theme/>
 </head>
 <body style="width:1024px;" class="main_BG"
 

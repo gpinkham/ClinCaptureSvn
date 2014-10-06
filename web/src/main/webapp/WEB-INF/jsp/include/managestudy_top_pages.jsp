@@ -37,6 +37,7 @@
     <!-- Added for the new Calender -->
 
     <ui:calendar/>
+    <ui:theme/>
     <!-- End -->
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />

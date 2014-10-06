@@ -35,6 +35,7 @@
 
     <ui:calendar/>
     <!-- End -->
+    <ui:theme/>
 
     <script type="text/JavaScript" language="JavaScript" src="../../includes/prototype.js"></script>
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />

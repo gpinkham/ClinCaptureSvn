@@ -1,59 +1,52 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/> 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <html>
 <head>
-<link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-<link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
-<link rel="stylesheet" href="includes/styles.css" type="text/css">
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
-<style type="text/css">
+    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="stylesheet" href="includes/styles.css" type="text/css">
+    <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+    <style type="text/css">
 
-.popup_BG { background-image: url(images/main_BG.gif);
-	background-repeat: repeat-x;
-	background-position: top;
-	background-color: #FFFFFF;
-	}
+        .popup_BG { background-image: url(images/main_BG.gif);
+            background-repeat: repeat-x;
+            background-position: top;
+            background-color: #FFFFFF;
+        }
 
 
-</style>
-
+    </style>
+    <ui:theme/>
 </head>
 <body class="popup_BG">
- <jsp:include page="../include/alertbox.jsp"/>
- <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
+ <jsp:include page="../include/alertbox.jsp"/> <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
  <tr valign="top">
 	<td background="images/popup_BG.gif" ><img src="images/popup_OC.gif"></td>	
-  </tr>
- <tr valign="top"> 
+  </tr> <tr valign="top"> 
  <td>
      <h1>
-	     <span class="first_level_header">
-	    	 <fmt:message key="item_meta_global_att" bundle="${resword}"/>
+	     <span class="first_level_header">	    	 <fmt:message key="item_meta_global_att" bundle="${resword}"/>
 	     </span>
      <h1>
-<table>
-<tr><td> 	 
+<table><tr><td> 	 
 <div>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
 <div class="textbox_center" align="center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">  
-  <tr valign="top" ><td class="table_header_column"><fmt:message key="CRF_name" bundle="${resword}"/>:</td><td class="table_header_column">  
-  <c:out value="${crf.name}"/>
+  <tr valign="top" ><td class="table_header_column"><fmt:message key="CRF_name" bundle="${resword}"/>:</td><td class="table_header_column">    <c:out value="${crf.name}"/>
    </td></tr>
   <tr valign="top" ><td class="table_header_column"><fmt:message key="item_name" bundle="${resword}"/>:</td><td class="table_header_column">
-  <c:out value="${item.name}"/>
-   </td></tr>
+  <c:out value="${item.name}"/>   </td></tr>
   <tr valign="top" ><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_header_column">
   <c:out value="${item.oid}"/>
-   </td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="description" bundle="${resword}"/>:</td><td class="table_header_column">
+   </td></tr>  <tr valign="top"><td class="table_header_column"><fmt:message key="description" bundle="${resword}"/>:</td><td class="table_header_column">
   <c:out value="${item.description}"/>&nbsp;
   </td></tr> 
   <tr valign="top"><td class="table_header_column"><fmt:message key="data_type" bundle="${resword}"/>:</td><td class="table_header_column">

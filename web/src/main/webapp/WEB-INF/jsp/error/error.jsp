@@ -15,45 +15,29 @@
 
 <jsp:include page="../include/sideAlert.jsp"/>
 
-<c:set var="color" scope="session" value="${newThemeColor}"/>
-<c:if test="${(color == 'violet') || (color == 'green')}">
-    <script>
-        document.write('<style class="hideStuff" ' + 'type="text/css">body {display:none;}<\/style>');
-    </script>
-</c:if>
-
 <tr id="sidebar_Instructions_open" style="display: none">
     <td class="sidebar_tab">
-
         <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img
                 src="${pageContext.request.contextPath}/images/sidebar_collapse.gif" border="0" align="right"
                 hspace="10"></a>
-
         <b><fmt:message key="instructions" bundle="${restext}"/></b>
 
         <div class="sidebar_tab_content">
-
             <fmt:message key="study_module_instruction" bundle="${restext}"/>
 
         </div>
-
     </td>
 
-</tr>
-<tr id="sidebar_Instructions_closed">
+</tr><tr id="sidebar_Instructions_closed">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img
-                src="${pageContext.request.contextPath}/images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img                src="${pageContext.request.contextPath}/images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 
         <b><fmt:message key="instructions" bundle="${restext}"/></b>
-
     </td>
 </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
-
 <div>
     <span class="first_level_header"><fmt:message key="error.controllerErrorMsg" bundle="${exceptions}"/></span>
 </div>
-
 <jsp:include page="../include/footer.jsp"/>

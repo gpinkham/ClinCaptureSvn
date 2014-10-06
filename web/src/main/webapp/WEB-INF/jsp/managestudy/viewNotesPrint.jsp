@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -10,14 +11,15 @@
 
 <html>
 <head>
-<title><fmt:message key="print_discrepancy_notes" bundle="${resword}"/></title>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-  <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui.min.js"></script>
-  <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
-<link rel="stylesheet" href="includes/styles.css" type="text/css">
-<link rel="stylesheet" href="includes/jquery-ui.css"  type="text/css"/>  
+    <title><fmt:message key="print_discrepancy_notes" bundle="${resword}"/></title>
+    <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui.min.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+    <link rel="stylesheet" href="includes/styles.css" type="text/css">
+    <link rel="stylesheet" href="includes/jquery-ui.css"  type="text/css"/>
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <ui:theme/>
 </head>
 <body onload="javascript:alertDialog({ message: '<fmt:message key="alert_to_print" bundle="${restext}"/>', height: 150, width: 400 })">
 

@@ -34,6 +34,8 @@
 
     <ui:calendar/>
     <!-- End -->
+    <ui:theme/>
+
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
 </head>

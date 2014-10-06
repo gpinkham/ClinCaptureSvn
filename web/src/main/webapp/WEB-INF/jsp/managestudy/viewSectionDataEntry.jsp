@@ -36,47 +36,32 @@
 
     <ui:calendar/>
     <!-- End -->
-    <c:set var="color" scope="session" value="${newThemeColor}"/>
-    <c:if test="${(color == 'violet') || (color == 'green')}">
-        <script>
-            document.write( '<style class="hideStuff" ' +
-                    'type="text/css">body {display:none;}<\/style>');
-        </script>
-    </c:if>
+    <ui:theme/>
 </head>
 <body class="aka_bodywidth"
-	onload="<c:if test='${popUpURL != ""}'>            openDNoteWindow('<c:out value="${popUpURL}" />');
-	        </c:if>">
+	onload="<c:if test='${popUpURL != ""}'>            openDNoteWindow('<c:out value="${popUpURL}" />');	        </c:if>">
 	
 <script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script><script language="JavaScript" type="text/javascript">
-		jQuery(document).ready(function() {
-            jQuery("table > tbody  tr").attr("repeat", "0");
+		jQuery(document).ready(function() {            jQuery("table > tbody  tr").attr("repeat", "0");
             jQuery("table > tbody  button").attr("disabled", "true");            jQuery("table > tbody  input").attr("disabled", "disabled");
             jQuery("table > tbody a").removeAttr("onmouseover");
-            jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
-            jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");            jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
+            jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");            jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");            jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
 		});
 </script>
 <c:set var="prevItemHolderId" value="0"/>
-
 	<div id="centralContainer"		style="padding-left: 3em; margin-top: 1em; background-color: white; color: black;">
 
 
-
-		<table width="75%">
-			<tr>
+		<table width="75%">			<tr>
 				<td>
 					<h1>
-						<span class="first_level_header"> <b> <c:out
-									value="${toc.crf.name}" /> <c:out
+						<span class="first_level_header"> <b> <c:out									value="${toc.crf.name}" /> <c:out
 									value="${toc.crfVersion.name}" /> 
 									<c:choose>
-									<c:when test="${eventCRF.stage.initialDE and !eventCRF.notStarted}">
-										<img src="images/icon_InitialDE.gif"
+									<c:when test="${eventCRF.stage.initialDE and !eventCRF.notStarted}">										<img src="images/icon_InitialDE.gif"
 											alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>"
 											title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
-									</c:when>
-									<c:when test="${eventCRF.stage.initialDE_Complete}">
+									</c:when>									<c:when test="${eventCRF.stage.initialDE_Complete}">
 										<img src="images/icon_InitialDEcomplete.gif"
 											alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>"
 											title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">

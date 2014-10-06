@@ -33,3 +33,5 @@
 	<input type="text" class="currentColor" value="${newThemeColor}">
 </form>
 <input type="hidden" value="${study.id}" id="epStudyId">
+
+<script>applyThemeForChart();</script>

@@ -12,3 +12,5 @@
 	<input type="text" id="ssc_removed" value="${countOfRemovedSubjects}" />
 	<input type="text" id="ssc_locked" value="${countOfLockedSubjects}" />
 </form>
+
+<script>applyThemeForChart();</script>

@@ -11,3 +11,5 @@
 		<input id="sp_${fn:replace(eventStatus.key, ' ', '_')}_count" value="${eventStatus.value}"/>
 	</c:forEach>
 </form>
+
+<script>applyThemeForChart();</script>

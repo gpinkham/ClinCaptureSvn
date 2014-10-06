@@ -31,3 +31,5 @@
 		</tr>
 	</table>
 </div>
+
+<script>applyThemeForChart();</script>

@@ -42,11 +42,6 @@
 
 </script>
 
-<c:set var="color" scope="session" value="${newThemeColor}" />
-<c:if test="${(color == 'violet') || (color == 'green')}">
-    <style class="hideStuff" type="text/css">body {display:none;}</style>
-</c:if>
-
 <tr id="sidebar_Instructions_open">
     <td class="sidebar_tab">
         <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">

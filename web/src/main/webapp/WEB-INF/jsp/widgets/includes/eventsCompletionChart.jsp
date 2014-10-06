@@ -25,3 +25,5 @@
 	<input type="text" id="ec_has_previous" value="${eventCompletionHasPrevious}" />
 	<input type="text" id="ec_last_element" value="${eventCompletionLastElement}" />
 </form>
+
+<script>applyThemeForChart();</script>

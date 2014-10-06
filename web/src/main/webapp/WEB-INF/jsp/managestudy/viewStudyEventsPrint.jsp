@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -10,11 +11,12 @@
 
 <html>
 <head>
-<title><fmt:message key="openclinica_print_study_events" bundle="${resword}"/></title>
-<link rel="stylesheet" href="includes/styles.css" type="text/css">
+    <title><fmt:message key="openclinica_print_study_events" bundle="${resword}"/></title>
+    <link rel="stylesheet" href="includes/styles.css" type="text/css">
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+    <ui:theme/>
 </head>
 <body onload="javascript:alert('<fmt:message key="alert_to_print" bundle="${restext}"/>')">
 

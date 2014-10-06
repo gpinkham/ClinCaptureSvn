@@ -2,47 +2,45 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm"%>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format"
-	var="resformat" />
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat" />
 <c:set var="dteFormat">
 	<fmt:message key="date_format_string" bundle="${resformat}" />
 </c:set>
 
 <html>
 <head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=8" />
-<script type="text/JavaScript" language="JavaScript"
-    src="includes/jmesa/jquery-1.3.2.min.js"></script>
-<script type="text/JavaScript" language="JavaScript"
-	src="includes/global_functions_javascript.js"></script>
-<script type="text/javascript" language="JavaScript"
-	src="includes/repetition-model/repetition-model.js"></script>
-<link rel="stylesheet" href="includes/styles.css" type="text/css">
-<link rel="stylesheet" href="includes/print_crf.css" type="text/css">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+    <script type="text/javascript" language="JavaScript" src="includes/repetition-model/repetition-model.js"></script>
+    <link rel="stylesheet" href="includes/styles.css" type="text/css">
+    <link rel="stylesheet" href="includes/print_crf.css" type="text/css">
 
-<style>
-.infotab {
-	border-top: 1px #CCCCCC solid;
-	border-left: 1px #CCCCCC solid
-}
+    <style>
+        .infotab {
+            border-top: 1px #CCCCCC solid;
+            border-left: 1px #CCCCCC solid
+        }
 
-.infotab tr td {
-	border-right: 1px #000000 solid;
-	border-bottom: 1px #000000 solid;
-	padding: 2px 4px 2px 4px
-}
+        .infotab tr td {
+            border-right: 1px #000000 solid;
+            border-bottom: 1px #000000 solid;
+            padding: 2px 4px 2px 4px
+        }
 
-.infotab tr td h1 {
-	color: #000000
-}
+        .infotab tr td h1 {
+            color: #000000
+        }
 
-thead {
-	display: table-header-group;
-}
-</style>
+        thead {
+            display: table-header-group;
+        }
+    </style>
+    <ui:theme/>
 </head>
 <c:set var="eventName" value="true" scope="request" />
 <c:set var="InternetE" value="${isInternetExplorer}" scope="request" />

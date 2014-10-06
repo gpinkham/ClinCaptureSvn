@@ -36,46 +36,34 @@
     <ui:calendar/>
     <!-- End -->
     <!-- *JSP* submit/administrativeEditing.jsp -->
-    <c:set var="color" scope="session" value="${newThemeColor}"/>
-    <c:if test="${(color == 'violet') ||(color == 'green')}">
-        <style class="hideStuff" type="text/css">body {display:none;}</style>
-    </c:if>
+    <ui:theme/>
 </head>
 <body class="aka_bodywidth" onload="" onunload="javascript:clsWin();">
-<c:if test='${popUpURL != ""}'>    <script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script>
-</c:if>
+<c:if test='${popUpURL != ""}'>    <script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script></c:if>
 <%-- BWP:
  onload=  "document.getElementById('centralContainer').style.display='none'; new Effect.Appear('centralContainer', {duration:1});<jsp:include page="../include/showPopUp2.jsp"/>"
-  TabsForwardByNum(<c:out value="${tabId}"/>); alert(self.screen.availWidth);
-margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
+  TabsForwardByNum(<c:out value="${tabId}"/>); alert(self.screen.availWidth);margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <c:set var="markCRFMethodName" value="displayMessageFromCheckbox(this, undefined)"/>
 
 <div id="centralContainer" style=  "padding-left:3em; margin-top:10px;background-color: white; color:black;">
 
-
 <%-- set button text depending on whether or not the user is confirming values --%><c:choose>
-    <c:when test="${section.checkInputs}">
-        <c:set var="buttonAction"><fmt:message key="save" bundle="${resword}"/></c:set>
+    <c:when test="${section.checkInputs}">        <c:set var="buttonAction"><fmt:message key="save" bundle="${resword}"/></c:set>
         <c:set var="checkInputsValue" value="1" />    </c:when>
     <c:otherwise>
-        <c:set var="buttonAction" value="Confirm values" />
-        <c:set var="checkInputsValue" value="0" /> 
+        <c:set var="buttonAction" value="Confirm values" />        <c:set var="checkInputsValue" value="0" /> 
     </c:otherwise>
 </c:choose>
-<table width="75%"><tr><td>
-<h1>
+<table width="75%"><tr><td><h1>
 	<span class="first_level_header"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
          <c:choose>
-            <c:when test="${eventCRF.stage.initialDE and !eventCRF.notStarted}">
-                <img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>"
+            <c:when test="${eventCRF.stage.initialDE and !eventCRF.notStarted}">                <img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>"
                      title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
             </c:when>
-            <c:when
-              test="${eventCRF.stage.initialDE_Complete}">
+            <c:when              test="${eventCRF.stage.initialDE_Complete}">
                 <img src="images/icon_InitialDEcomplete.gif"
                      alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>"
-                     title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
-            </c:when>
+                     title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">            </c:when>
             <c:when test="${eventCRF.stage.doubleDE}">
                 <img src="images/icon_DDE.gif" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>"
                      title="<fmt:message key="double_data_entry" bundle="${resword}"/>">

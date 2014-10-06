@@ -40,10 +40,10 @@
 
     <ui:calendar/>
     <!-- End -->
+    <ui:theme/>
 
     <script language="JavaScript">
-        var StatusBoxValue = 1;
-    </script>
+        var StatusBoxValue = 1;    </script>
 
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />

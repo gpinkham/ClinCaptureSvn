@@ -5,52 +5,47 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <html>
-<head><title>Print CRF</title>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=8" />
-  <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-  <script type="text/JavaScript" language="JavaScript" src=
-    "includes/global_functions_javascript.js"></script>
-  <script type="text/javascript"  language="JavaScript" src=
-    "includes/repetition-model/repetition-model.js"></script>
-  <link rel="stylesheet" href="includes/styles.css" type="text/css">
-  <link rel="stylesheet" href="includes/print_crf.css" type="text/css">
+<head>
+    <title>Print CRF</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src=
+            "includes/global_functions_javascript.js"></script>
+    <script type="text/javascript"  language="JavaScript" src=
+            "includes/repetition-model/repetition-model.js"></script>
+    <link rel="stylesheet" href="includes/styles.css" type="text/css">
+    <link rel="stylesheet" href="includes/print_crf.css" type="text/css">
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <ui:theme/>
 </head>
 <!-- Clinovo ticket #134 start -->
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script><script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
 <script type="text/JavaScript">
 $(document).ready(function() {
-$('.tableDiv').find('span').each(function() {
-    var $this = $(this);
+$('.tableDiv').find('span').each(function() {    var $this = $(this);
 	var t = $this.text();
     $this.html(t.replace('&lt;','<').replace('&gt;', '>'));
-});
-$('.toplevel').find('.aka_headerBackground.aka_padding_large.aka_cellBorders.aka_font_general').each(function() {
+});$('.toplevel').find('.aka_headerBackground.aka_padding_large.aka_cellBorders.aka_font_general').each(function() {
     var $this = $(this);
 	var t = $this.text();
-    $this.html(t.replace('&lt;','<').replace('&gt;', '>'));
-});
+    $this.html(t.replace('&lt;','<').replace('&gt;', '>'));});
 //Dynamic cell formating
 $('.tableDiv').find('.aka_text_block_shared').css('height','100%').css('float','left').css('display','table');
 $(".aka_form_table").attr('class', 'tableDiv');
-
 //Block all inputs and textarea on print page
 var elsarea = document.getElementsByTagName ('textarea');
-for ( var i = 0; i < elsarea.length ; i ++ ) {
-	elsarea[i].setAttribute('disabled', 'true'); 
+for ( var i = 0; i < elsarea.length ; i ++ ) {	elsarea[i].setAttribute('disabled', 'true'); 
 }
 var els = document.getElementsByTagName ('input');
-for ( var i = 0; i < els.length ; i ++ ) {
- if ( els[i].type == 'text' || els[i].type == 'radio' || els[i].type == 'checkbox') els[i].setAttribute('disabled', 'true'); 
+for ( var i = 0; i < els.length ; i ++ ) { if ( els[i].type == 'text' || els[i].type == 'radio' || els[i].type == 'checkbox') els[i].setAttribute('disabled', 'true'); 
 }
  });
-</script>
-<!-- end -->
+</script><!-- end -->
 <jsp:useBean scope="request" id="crfVersionBean" class="org.akaza.openclinica.bean.submit.CRFVersionBean" />
 <jsp:useBean scope="request" id="crfBean" class="org.akaza.openclinica.bean.admin.CRFBean" />
 <jsp:useBean scope="session" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />

@@ -1,0 +1,17 @@
+.widget h2, .widget_big h2 {
+	background-color:#2C6CAF;
+}
+
+.toolbar_wrapper h2 {
+	background-color:#2C6CAF;
+}
+
+.ui-sortable-placeholder, .ui-placeholder-big {
+	border-color: #2C6CAF!important;
+}
+
+#show_hide {
+	background-color:#2C6CAF;
+}
+
+

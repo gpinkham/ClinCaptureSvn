@@ -17,7 +17,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<c:set var="contextPath" value="${pageContext.request.contextPath}" />
-	<c:set var="color" scope="session" value="${newThemeColor}"/>
 	
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=8" />
@@ -50,6 +49,7 @@
 
     <ui:calendar/>
 	<!-- End -->
+    <ui:theme/>
 
     <script language="JavaScript">
         function reportBug() {
@@ -72,25 +72,7 @@
         function initmb(){var ab='absolute';var n='none';var obody=document.getElementsByTagName('body')[0];var frag=document.createDocumentFragment();var obol=document.createElement('div');obol.setAttribute('id','ol');obol.style.display=n;obol.style.position=ab;obol.style.top=0;obol.style.left=0;obol.style.zIndex=998;obol.style.width='100%';frag.appendChild(obol);var obbx=document.createElement('div');obbx.setAttribute('id','mbox');obbx.style.display=n;obbx.style.position=ab;obbx.style.zIndex=999;var obl=document.createElement('span');obbx.appendChild(obl);var obbxd=document.createElement('div');obbxd.setAttribute('id','mbd');obl.appendChild(obbxd);frag.insertBefore(obbx,obol.nextSibling);obody.insertBefore(frag,obody.firstChild);
             window.onscroll = scrollFix; window.onresize = sizeFix;
         }
-    </script>	
-	
-	<c:if test="${(color == 'violet') || (color == 'green')}">
-		<script>
-			document.write( '<style class="hideStuff" ' +
-				  'type="text/css">body {display:none;}<\/style>');
-		</script>
-	</c:if>
-	<c:choose>
-		<c:when test="${(color == 'violet')}">
-			<link rel="stylesheet" href="<c:out value="${pageContext.request.contextPath}" />/includes/css/charts_violet.css" type="text/css"/>
-		</c:when>
-		<c:when test="${(color == 'green')}">
-			<link rel="stylesheet" href="<c:out value="${pageContext.request.contextPath}" />/includes/css/charts_green.css" type="text/css"/>
-		</c:when>
-		<c:otherwise>
-			<link rel="stylesheet" href="<c:out value="${pageContext.request.contextPath}" />/includes/css/charts_blue.css" type="text/css"/>
-		</c:otherwise>
-	</c:choose>
+    </script>
 </head>
 
 <body class="main_BG" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0"

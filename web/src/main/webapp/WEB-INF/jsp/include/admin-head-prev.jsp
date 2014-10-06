@@ -39,6 +39,7 @@
 
     <ui:calendar/>
     <!-- End -->
+    <ui:theme/>
 </head>
 <%-- style="width:1152px;" I removed this include because you cannot have both
      "onLoad" tests: <jsp:include page="../include/showPopUp.jsp"/> reduce file size--%>

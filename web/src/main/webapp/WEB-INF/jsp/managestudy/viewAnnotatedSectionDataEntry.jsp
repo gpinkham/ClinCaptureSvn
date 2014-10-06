@@ -36,38 +36,31 @@
     <!-- Added for the new Calender -->
 
     <ui:calendar/>
+    <ui:theme/>
     <script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script>
 </head>
-<body class="aka_bodywidth">
-	<script language="JavaScript" type="text/javascript">
+<body class="aka_bodywidth">	<script language="JavaScript" type="text/javascript">
 	function disableElements() {
 		jQuery("table > tbody  tr").attr("repeat", "0");
-		jQuery("table > tbody  button").attr("disabled", "true");		jQuery("table > tbody  input").attr("disabled", "disabled");
-		jQuery("table > tbody a").removeAttr("onmouseover");
+		jQuery("table > tbody  button").attr("disabled", "true");		jQuery("table > tbody  input").attr("disabled", "disabled");		jQuery("table > tbody a").removeAttr("onmouseover");
 		jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
 		jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");		jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
-	}	
-		
+	}			
 	function calcCenterOfElement(element){		var center = {
 			x: element.offset().left + element.width()/2, 
-			y: element.offset().top + element.height()/2
-		}		return center;
+			y: element.offset().top + element.height()/2		}		return center;
 	}
 
-	function calcOffset(target, bullet){		var offset = {
-			delta_x: target.x - bullet.x, 
+	function calcOffset(target, bullet){		var offset = {			delta_x: target.x - bullet.x, 
 			delta_y: target.y - bullet.y
 		}
-		return offset;
-	}
+		return offset;	}
 	
 	function annotateAllRadioButtons(){
-		$('input[id*=input][type=radio]').each(annotateElement);
-		return;
+		$('input[id*=input][type=radio]').each(annotateElement);		return;
 	}
 	
-	function annotateAllCheckBoxes(){
-		$('input[id*=input][type=checkbox]').each(annotateElement);	
+	function annotateAllCheckBoxes(){		$('input[id*=input][type=checkbox]').each(annotateElement);	
 		return;
 	}
 	

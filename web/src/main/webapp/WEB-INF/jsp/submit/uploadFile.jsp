@@ -6,6 +6,7 @@ response.setDateHeader ("Expires", 0);
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <jsp:useBean scope='session' id='pageMessage' class='java.lang.String'/>
 <jsp:useBean scope='session' id='mayProcessUploading' class='java.lang.String'/>
 <jsp:useBean scope='request' id='fileItemId' class='java.lang.String'/>
@@ -50,36 +51,29 @@ response.setDateHeader ("Expires", 0);
 			window.close();
 		}
 	</script>
+     <ui:theme/>
  </head>
 
-
 <body>
-<!-- *JSP* submit/uploadFile.jsp -->
-<div style="float: left; padding-left: 15px;">
+<!-- *JSP* submit/uploadFile.jsp --><div style="float: left; padding-left: 15px;">
 	<h1>
 		<span class="first_level_header">
-			<fmt:message key="file_upload" bundle="${resword}"/>
-		</span>
+			<fmt:message key="file_upload" bundle="${resword}"/>		</span>
 	</h1>
 </div>
-<div style="float: right; padding-right: 20px;">
-	<a href="#" onclick="javascript:window.close();">
+<div style="float: right; padding-right: 20px;">	<a href="#" onclick="javascript:window.close();">
 		<img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox">
 	</a>
-</div>
-<div style="clear:both;"></div> 
+</div><div style="clear:both;"></div> 
 <div class="alert" style="padding-left: 15px;">
 <c:forEach var="message" items="${pageMessages}">
- <c:out value="${message}" escapeXml="false"/>
-</c:forEach>
+ <c:out value="${message}" escapeXml="false"/></c:forEach>
 </div> 
 <div id="divWithData" style="padding-left: 15px; padding-right: 15px;">
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-	<div class="uploadFileBoxText">
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">	<div class="uploadFileBoxText">
 		<form name="uploadForm" action="UploadFile" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="itemId" value="${fileItemId}">
-			<input type="hidden" name="inputName" value="${inputName}">
-			<c:choose>
+			<input type="hidden" name="inputName" value="${inputName}">			<c:choose>
 				<c:when test="${mayProcessUploading=='true'}">
 					<c:choose>
 						<c:when test="${uploadFileStatus=='successed'}">

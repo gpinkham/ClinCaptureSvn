@@ -38,45 +38,33 @@
     <script type="text/javascript" language="JavaScript" src="includes/repetition-model/repetition-model.js"></script>    <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
-    <c:set var="color" scope="session" value="${newThemeColor}"/>
-	<c:if test="${(color == 'violet') || (color == 'green')}">
-        <style class="hideStuff" type="text/css">body {display:none;}</style>	</c:if>
-
+    <ui:theme/>
 </head>
 <body class="aka_bodywidth" onload="document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';" onunload="javascript:clsWin();"><c:if test='${popUpURL != ""}'>
-    <script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script>
-</c:if>
+    <script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script></c:if>
 <div id="centralContainer" style=
   "padding-left:3em; margin-top:1em;background-color: white; color:black;">
-
 <%-- set button text depending on whether or not the user is confirming values --%>
 <c:choose>
-    <c:when test="${section.checkInputs}">
-        <c:set var="buttonAction"><fmt:message key="save" bundle="${resword}"/></c:set>
+    <c:when test="${section.checkInputs}">        <c:set var="buttonAction"><fmt:message key="save" bundle="${resword}"/></c:set>
         <c:set var="checkInputsValue" value="1" />
     </c:when>
-    <c:otherwise>
-        <c:set var="buttonAction" value="Confirm values" />
+    <c:otherwise>        <c:set var="buttonAction" value="Confirm values" />
         <c:set var="checkInputsValue" value="0" />
     </c:otherwise>
 </c:choose>
-
 <table width="75%"><tr><td>
 <h1><span class="first_level_header"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
-         <c:choose>
-            <c:when test="${eventCRF.stage.initialDE}">
+         <c:choose>            <c:when test="${eventCRF.stage.initialDE}">
                 <img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>"
                      title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
-            </c:when>
-            <c:when
+            </c:when>            <c:when
               test="${eventCRF.stage.initialDE_Complete}">
                 <img src="images/icon_InitialDEcomplete.gif"
-                     alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>"
-                     title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
+                     alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>"                     title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
             </c:when>
             <c:when test="${eventCRF.stage.doubleDE}">
-                <img src="images/icon_DDE.gif" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>"
-                     title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
+                <img src="images/icon_DDE.gif" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>"                     title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
             </c:when>
             <c:when test="${eventCRF.stage.doubleDE_Complete}">
                 <c:choose>

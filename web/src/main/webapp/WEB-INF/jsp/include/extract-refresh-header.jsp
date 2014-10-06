@@ -55,10 +55,7 @@
 
     <ui:calendar/>
     <!-- End -->
-    <c:set var="color" scope="session" value="${newThemeColor}"/>
-    <c:if test="${(color == 'violet') || (color == 'green')}">
-        <style class="hideStuff" type="text/css">body {display:none;}</style>
-    </c:if>
+    <ui:theme/>
 </head>
 
 <body onload="javascript:sendToPage()" class="background" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0">

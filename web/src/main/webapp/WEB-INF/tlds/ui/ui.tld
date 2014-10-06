@@ -14,4 +14,10 @@
         <bodycontent>empty</bodycontent>
     </tag>
 
+    <tag>
+        <name>theme</name>
+        <tagclass>com.clinovo.tag.ThemeTag</tagclass>
+        <bodycontent>empty</bodycontent>
+    </tag>
+
 </taglib>

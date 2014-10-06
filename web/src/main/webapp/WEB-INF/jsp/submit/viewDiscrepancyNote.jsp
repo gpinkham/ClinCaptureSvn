@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
- 
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
@@ -83,37 +83,29 @@
 
         .table_cell_left { padding-left: 8px; padding-right: 8px; }
     </style>
-
+    <ui:theme/>
 </head>
 
-<body class="popup_BG" style="margin: 0px 12px 0px 12px;" 
-	onload="window.scrollTo(0,'<c:out value="${y}"/>');javascript:setStatusWithId('<c:out value="${typeID0}"/>','0','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');refreshSource('<c:out value="${refresh}"/>', '/ViewNotes?');">
+<body class="popup_BG" style="margin: 0px 12px 0px 12px;" 	onload="window.scrollTo(0,'<c:out value="${y}"/>');javascript:setStatusWithId('<c:out value="${typeID0}"/>','0','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');refreshSource('<c:out value="${refresh}"/>', '/ViewNotes?');">
 
 <c:if test="${updatedDiscrepancyNote ne null}">
-  <script type="text/javascript" language="javascript">
-			setImageInParentWin('flag_<c:out value="${updatedDiscrepancyNote.field}"/>', '${contextPath}<c:out value="${updatedDiscrepancyNote.resStatus.iconFilePath}"/>', '${updatedDiscrepancyNote.resStatus.id}');
+  <script type="text/javascript" language="javascript">			setImageInParentWin('flag_<c:out value="${updatedDiscrepancyNote.field}"/>', '${contextPath}<c:out value="${updatedDiscrepancyNote.resStatus.iconFilePath}"/>', '${updatedDiscrepancyNote.resStatus.id}');
   </script>
 </c:if>
-
 <!-- Alert Box -->
 <!-- *JSP* submit/viewDiscrepancyNote.jsp -->
 <!-- These DIVs define shaded box borders -->
-
 <%-- <jsp:include page="../include/alertbox.jsp"/> --%>
 
 <!-- End Alert Box -->
-
 <div style="float: left;">
 	<h1>
-		<span class="first_level_header">
-			<c:out value="${entityName}"/><c:if test="${itemDataOrdinal ne null}">(#${itemDataOrdinal})</c:if>: <fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
+		<span class="first_level_header">			<c:out value="${entityName}"/><c:if test="${itemDataOrdinal ne null}">(#${itemDataOrdinal})</c:if>: <fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
 		</span>
 	</h1>
-</div>
-<div style="float: right;"><p>
+</div><div style="float: right;"><p>
 </p></div>
 <br clear="all">
-
 
 <!-- Entity box -->
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;">

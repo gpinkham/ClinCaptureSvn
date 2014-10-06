@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -15,8 +16,8 @@
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
 <title><fmt:message key="openclinica" bundle="${resword}"/>- <fmt:message key="add_discrepancy_note" bundle="${resword}"/></title>
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+<link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
+<link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
 <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css">
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
@@ -37,9 +38,11 @@
 	}
 </style>
 
+<ui:theme/>
+
 <script language="JavaScript">
 function leftnavExpand(strLeftNavRowElementName){
- 
+
     var objLeftNavRowElement;
 
     objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
@@ -108,17 +111,17 @@ function setResStatus(resStatusId, destinationUserId) {
 		objtr1.disabled = true;
 	}
 }
-		
+
 function setElements(typeId,user1,user2,filter1,nw,ud,rs,cl,na,isRFC) {
 	setStatus(typeId,filter1,nw,ud,rs,cl,na);
 	if(typeId == 3) {//query
 		showElement(user1);
-		showElement(user2);	
+		showElement(user2);
 		showElement('input');
 		switchOnElement('inputDescription');
 		hideElement('select');
 		switchOffElement('selectDescription');
-		
+
 	} else {
 		hideElement(user1);
 		hideElement(user2);
@@ -150,7 +153,7 @@ function sendFormDataViaAjax() {
 				$("div#ajax-loader").hide();
 				$("div#divWithData").show();
 			};
-			
+
 			if (data.indexOf('Save Done') > -1) {
 				showDiv();
 				changeDNFlagIconInParentWindow();
@@ -162,12 +165,12 @@ function sendFormDataViaAjax() {
 			} else if (data.indexOf('Error in data') > -1) {
 				showDiv();
 			} else {
-				alert('No response from server');
+				alertDialog({ message: "No response from server", height: 150, width: 500 });
 			}
         }
     });
 }
-	
+
 function displayMessageInBox(showOkButton, showCancelButton, headerOfMessageBox, message, notShowAgainMessage, themeColor){
     if ($("#confirmation").length == 0) {
 		$("body").append(
@@ -189,37 +192,42 @@ function displayMessageInBox(showOkButton, showCancelButton, headerOfMessageBox,
 				window.close();
 				}
 			});
-			
+
         $("#confirmation #ignoreBoxMSG").unbind("change").bind("change", function() {
 			setCookie("ignoreBoxMSG31", $(this).attr("checked") ? "yes" : "no", 1000);
         });
-			
+
 		if (themeColor == 'violet') {
 			$('input.button_medium').css('background-image', 'url(images/violet/button_medium_BG.gif)');
 			$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
 		}
-			
+
 		if (themeColor == 'green') {
 			$('input.button_medium').css('background-image', 'url(images/green/button_medium_BG.gif)');
 			$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
 		}
-	
+
+		if (themeColor == 'darkBlue') {
+			$('input.button_medium').css('background-image', 'url(images/darkBlue/button_medium_BG.gif)');
+			$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#2C6CAF');
+		}
+
 		if (getCookie("ignoreBoxMSG31") == "yes") {
 			clickOkInMessageBox();
 		} else {
 			$("#confirmation #ignoreBoxMSG").attr('checked', false);
 			$("#confirmation").dialog("open");
         }
-    } 
+    }
 }
- 
+
 function clickOkInMessageBox(){
     $('#confirmation').dialog('close');
 	window.close();
 }
- 
+
 function showMessageForDN(){
-    displayMessageInBox(true, false, '<fmt:message key="this_note_is_associated_with_data" bundle="${respage}"/>', '${popupMessage}', '<fmt:message key="do_not_show_this_message_anymore" bundle="${respage}"/>', '${newThemeColor}'); 
+    displayMessageInBox(true, false, '<fmt:message key="this_note_is_associated_with_data" bundle="${respage}"/>', '${popupMessage}', '<fmt:message key="do_not_show_this_message_anymore" bundle="${respage}"/>', '${newThemeColor}');
 }
 
 $(document).ready(function() {
@@ -231,39 +239,31 @@ $(document).ready(function() {
 	});
 })
 
-</script> 
+</script>
 </head>
 <body style="margin: 0px 12px 0px 12px;" onload="javascript:setStatus('<c:out value="${discrepancyNote.discrepancyNoteTypeId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
-<%-- needs to run at first to possibly gray out the drop down, tbh 02/2010--%>
-<!-- *JSP* submit/addDiscrepancyNote.jsp -->
+<%-- needs to run at first to possibly gray out the drop down, tbh 02/2010--%><!-- *JSP* submit/addDiscrepancyNote.jsp -->
 <div style="float: left;">
 	<h1>
-		<span class="first_level_header">
-			<c:out value="${entityName}"/>: <fmt:message key="add_discrepancy_note" bundle="${resword}"/>
+		<span class="first_level_header">			<c:out value="${entityName}"/>: <fmt:message key="add_discrepancy_note" bundle="${resword}"/>
 		</span>
 	</h1>
-</div>
-<div style="float: right;">
+</div><div style="float: right;">
 	<a href="#" onclick="javascript:window.close();">
 		<img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox">
-	</a>
-</div>
+	</a></div>
 <div style="clear:both;"></div> 
 <div class="alert">
-<c:forEach var="message" items="${pageMessages}">
- <c:out value="${message}" escapeXml="false"/>
+<c:forEach var="message" items="${pageMessages}"> <c:out value="${message}" escapeXml="false"/>
 </c:forEach>
 </div>         
-<form id="noteForm" method="POST" action="CreateDiscrepancyNote">
-<jsp:include page="../include/showSubmitted.jsp" />
+<form id="noteForm" method="POST" action="CreateDiscrepancyNote"><jsp:include page="../include/showSubmitted.jsp" />
 <input type="hidden" name="name" value="<c:out value="${discrepancyNote.entityType}"/>">
 <input type="hidden" name="column" value="<c:out value="${discrepancyNote.column}"/>">
-<input type="hidden" name="itemId" value="<c:out value="${discrepancyNote.itemId}"/>">
-<input type="hidden" name="parentId" value="<c:out value="${discrepancyNote.parentDnId}"/>">
+<input type="hidden" name="itemId" value="<c:out value="${discrepancyNote.itemId}"/>"><input type="hidden" name="parentId" value="<c:out value="${discrepancyNote.parentDnId}"/>">
 <input type="hidden" name="id" value="<c:out value="${discrepancyNote.entityId}"/>">
 <input type="hidden" name="subjectId" value="<c:out value="${param.subjectId}"/>">
-<input type="hidden" name="field" value="<c:out value="${discrepancyNote.field}"/>">
-<input type="hidden" name="writeToDB" value="<c:out value="${writeToDB}" />">
+<input type="hidden" name="field" value="<c:out value="${discrepancyNote.field}"/>"><input type="hidden" name="writeToDB" value="<c:out value="${writeToDB}" />">
 <input type="hidden" name="monitor" value="<c:out value="${monitor}" />">
 <input type="hidden" name="new" value="<c:out value="${new}" />">
 <input type="hidden" name="enterData" value="<c:out value="${enterData}" />">

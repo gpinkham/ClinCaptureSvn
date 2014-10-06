@@ -34,3 +34,5 @@
 	<input type="text" id="cpActivateLegend" value="${cpActivateLegend}">
 </form>
 <input type="hidden" value="${study.id}" id="cpStudyId">
+
+<script>applyThemeForChart();</script>

@@ -41,13 +41,7 @@
 
     <ui:calendar/>
     <!-- End -->
-    <c:set var="color" scope="session" value="${newThemeColor}"/>
-    <c:if test="${(color == 'violet') || (color == 'green')}">
-        <script>
-            document.write( '<style class="hideStuff" ' +
-                    'type="text/css">body {display:none;}<\/style>');
-        </script>
-    </c:if>
+    <ui:theme/>
 </head>
  <%-- style="width:1152px;" I removed this include because you cannot have both
  	"onLoad" tests: <jsp:include page="../include/showPopUp.jsp"/> reduce file size--%>

@@ -4000,10 +4000,8 @@ function confirmDialog(params){
 }
 
 function openDialog(params) {
-	
-	var themeColorCode = $("#themeColorCode").val();
 	$(".ui-dialog-titlebar-close", $(params.dialogDiv).parent()).hide();
-    $('.ui-dialog-titlebar').css('border', '1px Solid ' + themeColorCode);
+    $('.ui-dialog-titlebar').css('border', '1px Solid ' + theme.mainColor);
     $('.ui-widget-content').css('border', '0');
     
     if($.browser.msie){
@@ -4031,30 +4029,13 @@ function setButtonAttributes(buttonValue){
 }
 
 function setDialogTheme(params) {
-	
-	var themeColorCode = $("#themeColorCode").val();
-	
-	//Violet Color Theme
-    if (themeColorCode == '#AA62C6' || themeColorCode == '#aa62c6') {
-    	
-    	if(params.cancelButtonValue)
-    		$('.ui-dialog-buttonpane').find('button:contains("' + params.cancelButtonValue + '")').css('background-image', 'url(' + params.imagesFolderPath + 'violet/button_medium_BG.gif)');
-    	if(params.okButtonValue)
-    		$('.ui-dialog-buttonpane').find('button:contains("' + params.okButtonValue + '")').css('background-image', 'url(' + params.imagesFolderPath + 'violet/button_medium_BG.gif)');
-    	
-        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
+    if (theme.name != 'blue') {
+        if (params.cancelButtonValue)
+            $('.ui-dialog-buttonpane').find('button:contains("' + params.cancelButtonValue + '")').css('background-image', 'url(' + params.imagesFolderPath + theme.name + '/button_medium_BG.gif)');
+        if (params.okButtonValue)
+            $('.ui-dialog-buttonpane').find('button:contains("' + params.okButtonValue + '")').css('background-image', 'url(' + params.imagesFolderPath + theme.name + '/button_medium_BG.gif)');
     }
-    
-    //Green Color Theme
-    if (themeColorCode == '#75b894' || themeColorCode == '#75B894') {
-    	
-    	if(params.cancelButtonValue)
-    		$('.ui-dialog-buttonpane').find('button:contains("' + params.cancelButtonValue + '")').css('background-image', 'url(' + params.imagesFolderPath + 'green/button_medium_BG.gif)');
-    	if(params.okButtonValue)
-    		$('.ui-dialog-buttonpane').find('button:contains("' + params.okButtonValue + '")').css('background-image', 'url(' + params.imagesFolderPath + 'green/button_medium_BG.gif)');
-    	
-        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
-    }
+    $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', theme.mainColor);
 }
 
 function confirmMarkAsComplete(params){
