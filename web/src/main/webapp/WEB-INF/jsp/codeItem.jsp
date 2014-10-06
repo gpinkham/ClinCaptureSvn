@@ -35,6 +35,9 @@
                     <c:if test="${(color == 'green')}">
                         <c:set var="hyperlinkColor" value="#75b894"/>
                     </c:if>
+                    <c:if test="${(color == 'darkBlue')}">
+                        <c:set var="hyperlinkColor" value="#2c6caf"/>
+                    </c:if>
                     <td>
                         <c:set var="objectHttpPath" value="${(fn:replace(obj.httpPath, '/MDR/', '/MEDDRA/'))}"/>
                         <a target="_blank" style="color:<c:out value="${hyperlinkColor}"/>"
@@ -72,6 +75,10 @@
                         <c:if test="${(color == 'green')}">
                             <c:set var="codeButtonColor" value="../images/green/button_BG.gif"/>
                         </c:if>
+                        <c:if test="${(color == 'darkBlue')}">
+                            <c:set var="codeButtonColor" value="../images/darkBlue/button_BG.gif"/>
+                        </c:if>
+
                         <c:choose>
                             <c:when test="${autoCoded}">
                                 <td colspan="2"></td>

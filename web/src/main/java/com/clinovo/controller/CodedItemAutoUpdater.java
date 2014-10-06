@@ -40,6 +40,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+
+/**
+ * Encapsulates functionality required to build coding result.
+ */
 @Controller
 public class CodedItemAutoUpdater {
 
@@ -54,16 +58,22 @@ public class CodedItemAutoUpdater {
 
     private String themeColor;
 
-	private final static String BIOONTOLOGY_URL = "http://bioportal.bioontology.org";
-	private final static String BIOONTOLOGY_WS_URL = "http://data.bioontology.org";
+	private final String bioontologyUrlDefault = "http://bioportal.bioontology.org";
+	private final String bioontologyWsUrl = "http://data.bioontology.org";
 
-    @RequestMapping(value = "/checkCodedItemsStatus")
+	/**
+	 * Method checks coding results for coded items with in process status.
+	 *
+	 * @param request The incoming request.
+	 * @param response The response to redirect to.
+	 * @throws IOException If an error occur during the returning of results.
+	 */
+	@RequestMapping(value = "/checkCodedItemsStatus")
     public void checkCodedItemsStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         String codedItemIdList = request.getParameter("arr");
         List<String> codedItemIdListString = new ArrayList<String>(Arrays.asList(codedItemIdList.split(",")));
         List<Integer> codedItemIdListInt = convertStringListToIntList(codedItemIdListString);
-
         themeColor = (String) request.getSession().getAttribute("newThemeColor");
         String showContext = request.getParameter("showContext");
         themeColor = themeColor == null ? "blue" : themeColor;
@@ -77,22 +87,15 @@ public class CodedItemAutoUpdater {
     private List<String> buildResponseBox(List<Integer> codedItemIdListInt, String showContext) throws MalformedURLException {
 
         List<String> codedItemToAppend = new ArrayList<String>();
-
         for (int codedItemId : codedItemIdListInt) {
-
             CodedItem codedItem = codedItemService.findCodedItem(codedItemId);
-
             if (codedItem.isCoded()) {
-
                 ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
                 ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
                 Term term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(), codedItem.getDictionary());
-
                 if (term != null) {
-
                     codedItemToAppend.add(contextBoxBuilder(codedItem, term.getLocalAlias(), term.getPreferredName(), showContext));
                 } else {
-
                     codedItemToAppend.add(contextBoxBuilder(codedItem, "", "", showContext));
                 }
             }
@@ -101,71 +104,60 @@ public class CodedItemAutoUpdater {
         return codedItemToAppend;
     }
 
-    private String contextBoxBuilder(CodedItem codedItem, String alise, String prefTerm, String showContext) throws MalformedURLException {
+	private String contextBoxBuilder(CodedItem codedItem, String alise, String prefTerm, String showContext) throws MalformedURLException {
 
-        String termToAppend = "";
-        String prefToAppend = "";
-        String displayStyle = "display:none;";
+		String termToAppend = "";
+		String prefToAppend = "";
+		String displayStyle = "display:none;";
 		String httpPathDisplay = codedItem.getDictionary().equals("WHOD") ? "display:none;" : "";
+		if (!alise.isEmpty() && !prefTerm.isEmpty()) {
+			termToAppend = alise;
+			prefToAppend = prefTerm;
+		}
+		if (showContext.equals("true")) {
+			displayStyle = "";
+		}
 
-        if(!alise.isEmpty() && !prefTerm.isEmpty()) {
+		HtmlBuilder builder = new HtmlBuilder();
+		builder.table(1).id("tablepaging").styleClass("itemsTable")
+				.append(" idToAppend=\"" + codedItem.getItemId() + "\" ")
+				.style(displayStyle)
+				.append(" termToAppend=\"" + termToAppend + "\" ")
+				.append(" prefToAppend=\"" + prefToAppend + "\" ")
+				.close()
+				.tr(1).style(httpPathDisplay).close()
+				.td(1).close().append(ResourceBundleProvider.getResWord("http") + ": ").tdEnd()
+				.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href(normalizeUrl(codedItem.getHttpPath(), codedItem.getDictionary())
+				+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid=" + codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
+				.td(2).width("360px").colspan("2").close().tdEnd()
+				.td(2).close().tdEnd().trEnd(1);
 
-            termToAppend = alise;
-            prefToAppend = prefTerm;
-        }
+		for (CodedItemElement codedItemElement : codedItemElementsFilter(codedItem).getCodedItemElements()) {
+			builder.tr(1).close().td(1).style("white-space: nowrap;").close().append(" " + ResourceBundleProvider.getResWord(codedItemElement.getItemName().toLowerCase()) + ": ").tdEnd()
+					.td(2).close().append(codedItemElement.getItemCode()).tdEnd().tdEnd()
+					.td(2).width("360px").colspan("2").close().tdEnd()
+					.td(2).close().tdEnd().trEnd(1).trEnd(1);
+		}
+		builder.tableEnd(1);
+		builder.append("separatorMark");
 
-        if(showContext.equals("true")) {
-
-            displayStyle = "";
-        }
-
-        HtmlBuilder builder = new HtmlBuilder();
-            builder.table(1).id("tablepaging").styleClass("itemsTable")
-                    .append(" idToAppend=\"" + codedItem.getItemId() + "\" ")
-                    .style(displayStyle)
-                    .append(" termToAppend=\"" + termToAppend + "\" ")
-                    .append(" prefToAppend=\"" + prefToAppend + "\" ")
-                    .close()
-                    .tr(1).style(httpPathDisplay).close()
-                    .td(1).close().append(ResourceBundleProvider.getResWord("http") + ": ").tdEnd()
-					.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href(normalizeUrl(codedItem.getHttpPath(), codedItem.getDictionary())
-					+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid=" + codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
-					.td(3).width("360px").colspan("2").close().tdEnd()
-                    .td(4).close().tdEnd().trEnd(1);
-
-            for (CodedItemElement codedItemElement : codedItemElementsFilter(codedItem).getCodedItemElements()) {
-
-                builder.tr(1).close().td(1).style("white-space: nowrap;").close().append(" " + ResourceBundleProvider.getResWord(codedItemElement.getItemName().toLowerCase()) + ": ").tdEnd()
-                        .td(2).close().append(codedItemElement.getItemCode()).tdEnd().tdEnd()
-                        .td(3).width("360px").colspan("2").close().tdEnd()
-                        .td(4).close().tdEnd().trEnd(1).trEnd(1);
-
-            }
-
-            builder.tableEnd(1);
-            builder.append("separatorMark");
-
-        return builder.toString();
-    }
+		return builder.toString();
+	}
 
 	private String normalizeUrl(String bioontologyUrl, String dictionary) throws MalformedURLException {
-
-		if (bioontologyUrl.equals(BIOONTOLOGY_WS_URL) || "MEDDRA".equals(dictionary)) {
-			return BIOONTOLOGY_URL;
+		if (bioontologyUrl.equals(bioontologyWsUrl) || "MEDDRA".equals(dictionary)) {
+			return bioontologyUrlDefault;
 		} else {
 			URL url = new URL(bioontologyUrl);
 			return url.getProtocol() + "://" + url.getHost();
 		}
 	}
 
-    private CodedItem codedItemElementsFilter(CodedItem codedItem) {
+	private CodedItem codedItemElementsFilter(CodedItem codedItem) {
 
-        CodedItem codedItemWithFilterFields = new CodedItem();
-
+		CodedItem codedItemWithFilterFields = new CodedItem();
 		for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
-
 			for (CodedItemElement codedItemIteration : codedItem.getCodedItemElements()) {
-
 				if ((codedItemElement.getItemName() + "C").equals(codedItemIteration.getItemName())) {
 					if (!codedItemElement.getItemCode().isEmpty()) {
 						codedItemWithFilterFields.addCodedItemElements(codedItemElement);
@@ -173,7 +165,6 @@ public class CodedItemAutoUpdater {
 					}
 				} else if (codedItemElement.getItemName().equals("CMP") || codedItemElement.getItemName().equals("CNTR")
 						|| codedItemElement.getItemName().equals("MPNC")) {
-
 					if (!codedItemElement.getItemCode().isEmpty()) {
 						codedItemWithFilterFields.addCodedItemElements(codedItemElement);
 						break;
@@ -181,45 +172,34 @@ public class CodedItemAutoUpdater {
 				}
 			}
 		}
+		Collections.sort(codedItemWithFilterFields.getCodedItemElements(), new CodedElementSortById());
+		return codedItemWithFilterFields;
+	}
 
-        Collections.sort(codedItemWithFilterFields.getCodedItemElements(), new codedElementSortById());
+	private class CodedElementSortById implements Comparator<Object> {
+		public int compare(Object o1, Object o2) {
+			CodedItemElement p1 = (CodedItemElement) o1;
+			CodedItemElement p2 = (CodedItemElement) o2;
+			return p1.getId() - p2.getId();
+		}
+	}
 
-        return codedItemWithFilterFields;
-    }
+	private List<Integer> convertStringListToIntList(List<String> codedItemIdListString) {
+		List<Integer> intList = new ArrayList<Integer>();
+		for (String s : codedItemIdListString) {
+			intList.add(Integer.valueOf(s));
+		}
+		return intList;
+	}
 
-    private class codedElementSortById implements Comparator<Object> {
-
-        public int compare(Object o1, Object o2) {
-            CodedItemElement p1 = (CodedItemElement) o1;
-            CodedItemElement p2 = (CodedItemElement) o2;
-            return p1.getId() - p2.getId();
-        }
-    }
-
-    private List<Integer> convertStringListToIntList(List<String> codedItemIdListString) {
-
-        List<Integer> intList = new ArrayList<Integer>();
-
-        for (String s : codedItemIdListString) {
-
-            intList.add(Integer.valueOf(s));
-        }
-
-        return intList;
-    }
-
-    public String getThemeColor() {
-
-        if (themeColor.equalsIgnoreCase("violet")) {
-
-            return "#aa62c6";
-
-        } else if (themeColor.equalsIgnoreCase("green")) {
-
-            return "#75b894";
-        }
-
-        return "#729fcf";
-    }
-
+	private String getThemeColor() {
+		if (themeColor.equalsIgnoreCase("violet")) {
+			return "#aa62c6";
+		} else if (themeColor.equalsIgnoreCase("green")) {
+			return "#75b894";
+		} else if (themeColor.equalsIgnoreCase("darkBlue")) {
+			return "#2c6caf";
+		}
+		return "#729fcf";
+	}
 }

@@ -2880,9 +2880,10 @@ uncodeCodeItem = function(item) {
             var color = $('*').find('a').css('color').toLowerCase();
             if (color == 'rgb(170, 98, 198)' || color == '#aa62c6') {
                 codeItemButtonSrc = "../images/violet/code_violet.png";
-            }
-            if (color == 'rgb(117, 184, 148)' || color == '#75b894') {
+            } else if (color == 'rgb(117, 184, 148)' || color == '#75b894') {
                 codeItemButtonSrc = "../images/green/code_green.png";
+            } else if (color == 'rgb(44, 108, 175)' || color == '#2c6caf') {
+                codeItemButtonSrc = "../images/darkBlue/code_darkBlue.png";
             }
 
             $(item).parents().find("div[id=" + $(item).attr("itemid") + "]").siblings("input").attr('disabled', false);

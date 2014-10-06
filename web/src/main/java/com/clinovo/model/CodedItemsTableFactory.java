@@ -16,16 +16,27 @@ package com.clinovo.model;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.*;
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -34,7 +45,11 @@ import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -54,13 +69,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Encapsulates all the functionality required to create tables for coded items depending on the handler called in the controller.
- *
  */
 @SuppressWarnings("rawtypes")
 public class CodedItemsTableFactory extends AbstractTableFactory {
 
-	private final static String BIOONTOLOGY_URL = "http://bioportal.bioontology.org";
-	private final static String BIOONTOLOGY_WS_URL = "http://data.bioontology.org";
+	private final String bioontologyUrlDefault = "http://bioportal.bioontology.org";
+	private final String bioontologyUrlWs = "http://data.bioontology.org";
 
 	private int studyId = -1;
 	private StudyDAO studyDAO;
@@ -81,13 +95,19 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private final String medicalCodingContextNeeded;
     private final String showMoreLink;
     private final String showContext;
-
-    public CodedItemsTableFactory(String medicalCodingContextNeeded, String showMoreLink, String showContext) {
-
-        this.medicalCodingContextNeeded = medicalCodingContextNeeded;
-        this.showMoreLink = showMoreLink;
-        this.showContext = showContext;
-    }
+	
+	/**
+	 * CodedItemsTableFactory constructor.
+	 *
+	 * @param medicalCodingContextNeeded the coding context parameter value.
+	 * @param showMoreLink the show more flag value.
+	 * @param showContext the show table context flag parameter value.
+	 */
+	public CodedItemsTableFactory(String medicalCodingContextNeeded, String showMoreLink, String showContext) {
+		this.medicalCodingContextNeeded = medicalCodingContextNeeded;
+		this.showMoreLink = showMoreLink;
+		this.showContext = showContext;
+	}
 
     @Override
     protected String getTableName() {
@@ -95,28 +115,27 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     }
 
     @Override
-    protected void configureColumns(TableFacade tableFacade, Locale locale) {
+	protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
-        tableFacade.setColumnProperties("itemDataValue", "dictionary", "status", "subjectName", "eventName", "crfName", "codedColumn", "actionColumn");
-        
-        Row row = tableFacade.getTable().getRow();
-        
-        configureColumn(row.getColumn("itemDataValue"), "Verbatim Term", new ItemDataValueCellEditor(), null);
-        configureColumn(row.getColumn("dictionary"), "Dictionary", new DictionaryCellEditor(), new DictionaryDroplistFilterEditor());
-        configureColumn(row.getColumn("status"), "Status", new StatusCellEditor(), new StatusDroplistFilterEditor());
-        configureColumn(row.getColumn("subjectName"), "Study Subject ID", new SubjectCellEditor(), null, true, true);
-        configureColumn(row.getColumn("eventName"), "Study Event", new EventCellEditor(), null, true, true);
-        configureColumn(row.getColumn("crfName"), "CRF", new CrfCellEditor(), null, true, true);
-        configureColumn(row.getColumn("codedColumn"), "Medical Codes", new CodedCellEditor(), null, false, false);
-        configureColumn(row.getColumn("actionColumn"), "Actions", new ActionCellEditor(), new DefaultActionsEditor(
-                locale), true, false);
-    }
+		tableFacade.setColumnProperties("itemDataValue", "dictionary", "status", "subjectName", "eventName", "crfName", "codedColumn", "actionColumn");
+
+		Row row = tableFacade.getTable().getRow();
+
+		configureColumn(row.getColumn("itemDataValue"), "Verbatim Term", new ItemDataValueCellEditor(), null);
+		configureColumn(row.getColumn("dictionary"), "Dictionary", new DictionaryCellEditor(), new DictionaryDroplistFilterEditor());
+		configureColumn(row.getColumn("status"), "Status", new StatusCellEditor(), new StatusDroplistFilterEditor());
+		configureColumn(row.getColumn("subjectName"), "Study Subject ID", new SubjectCellEditor(), null, true, true);
+		configureColumn(row.getColumn("eventName"), "Study Event", new EventCellEditor(), null, true, true);
+		configureColumn(row.getColumn("crfName"), "CRF", new CrfCellEditor(), null, true, true);
+		configureColumn(row.getColumn("codedColumn"), "Medical Codes", new CodedCellEditor(), null, false, false);
+		configureColumn(row.getColumn("actionColumn"), "Actions", new ActionCellEditor(), new DefaultActionsEditor(
+				locale), true, false);
+	}
 
     @Override
     public void setDataAndLimitVariables(TableFacade tableFacade) {
 
         Limit limit = tableFacade.getLimit();
-
         if (!limit.isComplete()) {
             tableFacade.setTotalRows(codedItems.size());
         }
@@ -124,50 +143,38 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         Collection<HashMap<Object, Object>> codedItemsResult = new ArrayList<HashMap<Object, Object>>();
         
         for (CodedItem codedItem : codedItems) {
-        	
             HashMap<Object, Object> h = new HashMap<Object, Object>();
             h.put("codedItem", codedItem);
             h.put("codedItem.itemId", codedItem.getItemId());
             h.put("itemDataValue", getItemDataValue(codedItem.getItemId()));
-            h.put("subjectName", getSubjectBean(codedItem.getSubjectId()).getLabel());
-            h.put("eventName", getStudyEventDefinitionBean(codedItem.getEventCrfId(), codedItem.getCrfVersionId()).getName());
+			h.put("subjectName", getSubjectBean(codedItem.getSubjectId()).getLabel());
+			h.put("eventName", getStudyEventDefinitionBean(codedItem.getEventCrfId(), codedItem.getCrfVersionId()).getName());
             h.put("status", getCodedItemStatus(codedItem));
             h.put("crfName", getCrfName(codedItem.getCrfVersionId()));
             h.put("dictionary", getCorrectDictionaryName(codedItem.getDictionary()));
-
             codedItemsResult.add(h);
         }
 
         tableFacade.setItems(codedItemsResult);
     }
 
-    private String getCodedItemStatus(CodedItem codedItem) {
-
-        if (codedItem.getStatus().equals("NOT_CODED")) {
-
-            return "Not Coded";
-            
-        } else if (codedItem.getStatus().equals("CODED")) {
-
-            return "Coded";
-            
-        } else if (codedItem.getStatus().equals("CODE_NOT_FOUND")) {
-        	
-        	return "Code not Found";
-        }
-
-      return "Unknown";
-    }
+	private String getCodedItemStatus(CodedItem codedItem) {
+		if (codedItem.getStatus().equals("NOT_CODED")) {
+			return "Not Coded";
+		} else if (codedItem.getStatus().equals("CODED")) {
+			return "Coded";
+		} else if (codedItem.getStatus().equals("CODE_NOT_FOUND")) {
+			return "Code not Found";
+		}
+		return "Unknown";
+	}
 
 	@SuppressWarnings("unchecked")
     private class ItemDataValueCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
-
             HtmlBuilder builder = new HtmlBuilder();
             String itemDataValue = (String) ((HashMap<Object, Object>) item).get("itemDataValue");
-
             if (!itemDataValue.isEmpty()) {
-
                 builder.div().name("itemDataValue").close().append(itemDataValue).divEnd()
                        .div().style("width:160px").close().divEnd();
             }
@@ -178,106 +185,80 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
     @SuppressWarnings("unchecked")
     private class DictionaryCellEditor implements CellEditor {
-    	
-        public Object getValue(Object item, String property, int rowcount) {
 
-            HtmlBuilder builder = new HtmlBuilder();
+		public Object getValue(Object item, String property, int rowcount) {
+			HtmlBuilder builder = new HtmlBuilder();
+			CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
+			builder.div().name("termDictionary").close().append(getCorrectDictionaryName(codedItem.getDictionary())).divEnd()
+					.div().style("width:160px").close().divEnd();
+			return builder.toString();
+		}
+	}
 
-            CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
+	private String getCorrectDictionaryName(String codedItemDictionary) {
+		if (codedItemDictionary.equalsIgnoreCase("ICD_9CM")) {
+			return "ICD 9CM";
+		} else if (codedItemDictionary.equalsIgnoreCase("ICD_10")) {
+			return "ICD 10";
+		} else if (codedItemDictionary.equalsIgnoreCase("MEDDRA")) {
+			return "MedDRA";
+		} else if (codedItemDictionary.equalsIgnoreCase("WHOD")) {
+			return "WHOD";
+		}
+		return "Dictionary Not Found";
+	}
 
-            builder.div().name("termDictionary").close().append(getCorrectDictionaryName(codedItem.getDictionary())).divEnd()
-                   .div().style("width:160px").close().divEnd();
-
-            return builder.toString();
-        }
-    }
-
-    private String getCorrectDictionaryName(String codedItemDictionary) {
-
-        if(codedItemDictionary.equalsIgnoreCase("ICD_9CM")) {
-
-            return "ICD 9CM";
-        } else if(codedItemDictionary.equalsIgnoreCase("ICD_10")) {
-
-            return "ICD 10";
-        } else if (codedItemDictionary.equalsIgnoreCase("MEDDRA")) {
-
-            return "MedDRA";
-        } else if (codedItemDictionary.equalsIgnoreCase("WHOD")) {
-
-            return "WHOD";
-        }
-        return "Dictionary Not Found";
-    }
-    
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
     private class CodedCellEditor implements CellEditor {
     	
         public Object getValue(Object item, String property, int rowcount) {
-
             HtmlBuilder builder = new HtmlBuilder();
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
-
             if (codedItem != null) {
-                
 				if (isLoggedInUserMonitor()) {
-
                    builder.append(codedItem.getPreferredTerm()).div().style("width:250px").close().divEnd();
-
 					return builder.toString();
-
 				} else if (codedItem.getStatus().equals("CODED")) {
-
-                    builder.append("Search: ").input().style("border:1px solid #a6a6a6; margin-bottom: 2px; color:#4D4D4D").disabled().type("text").value(codedItem.getPreferredTerm()).close();
+                    builder.append(ResourceBundleProvider.getResWord("search") + ": ").input().style("border:1px solid #a6a6a6; margin-bottom: 2px; color:#4D4D4D").disabled().type("text").value(codedItem.getPreferredTerm()).close();
                 } else {
-
-                    builder.append("Search: ").input().style("border:1px solid #a6a6a6 ;margin-bottom: 2px; color:#4D4D4D").type("text").value(codedItem.getPreferredTerm()).close();
+                    builder.append(ResourceBundleProvider.getResWord("search") + ": ").input().style("border:1px solid #a6a6a6; margin-bottom: 2px; color:#4D4D4D").type("text").value(codedItem.getPreferredTerm()).close();
                 }
 
 				String codedItemContextBox = null;
 				try {
 					codedItemContextBox = contextBoxBuilder(codedItem);
 				} catch (MalformedURLException e) {
-					e.printStackTrace();
+					logger.error(e.getMessage());
 				}
 
 				builder.div().id(String.valueOf(codedItem.getItemId())).close().append(" " + codedItemContextBox + " ").divEnd();
-
-                builder.div().style("width:420px").close().divEnd();
-            }
+				builder.div().style("width:420px").close().divEnd();
+			}
 
             return builder.toString();
         }
 
         private String contextBoxBuilder(CodedItem codedItem) throws MalformedURLException {
-
             HtmlBuilder builder = new HtmlBuilder();
-
-            String showContextValue = "none";
-
-            if(showContext.equals("true")) {
-
-                showContextValue = "";
-            }
-
+			String showContextValue = "none";
+			if (showContext.equals("true")) {
+				showContextValue = "";
+			}
             if (codedItem.isCoded()) {
-
-                builder.table(1).id("tablepaging").styleClass("itemsTable").style("display:" + showContextValue + ";").close()
-                        .tr(1).style(codedItem.getDictionary().equals("WHOD") ? "display:none;" : "").close()
-                        .td(1).close().append(ResourceBundleProvider.getResWord("http") + ": ").tdEnd()
+				builder.table(1).id("tablepaging").styleClass("itemsTable").style("display:" + showContextValue + ";").close()
+						.tr(1).style(codedItem.getDictionary().equals("WHOD") ? "display:none;" : "").close()
+						.td(1).close().append(ResourceBundleProvider.getResWord("http") + ": ").tdEnd()
 						.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href(normalizeUrl(codedItem.getHttpPath(), codedItem.getDictionary())
 						+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid=" + codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
-						.td(3).width("360px").colspan("2").close().tdEnd()
-                        .td(4).close().tdEnd().trEnd(1);
+						.td(2).width("360px").colspan("2").close().tdEnd()
+						.td(2).close().tdEnd().trEnd(1);
 
-
-                for (CodedItemElement codedItemElement : codedItemElementsFilter(codedItem).getCodedItemElements()) {
-
-                    builder.tr(1).style("white-space: nowrap;").close().td(1).close().append(" " + ResourceBundleProvider.getResWord(codedItemElement.getItemName().toLowerCase()) + ": ").tdEnd()
-                            .td(2).close().append(codedItemElement.getItemCode()).tdEnd().tdEnd()
-                            .td(3).width("360px").colspan("2").close().tdEnd()
-                            .td(4).close().tdEnd().trEnd(1).trEnd(1);
-                }
+				for (CodedItemElement codedItemElement : codedItemElementsFilter(codedItem).getCodedItemElements()) {
+					builder.tr(1).style("white-space: nowrap;").close().td(1).close().append(" " + ResourceBundleProvider.getResWord(codedItemElement.getItemName().toLowerCase()) + ": ").tdEnd()
+							.td(2).close().append(codedItemElement.getItemCode()).tdEnd().tdEnd()
+							.td(2).width("360px").colspan("2").close().tdEnd()
+							.td(2).close().tdEnd().trEnd(1).trEnd(1);
+				}
 
                 builder.tableEnd(1);
             }
@@ -286,9 +267,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         }
 
 		private String normalizeUrl(String bioontologyUrl, String dictionary) throws MalformedURLException {
-
-			if (bioontologyUrl.equals(BIOONTOLOGY_WS_URL) || "MEDDRA".equals(dictionary)) {
-				return BIOONTOLOGY_URL;
+			if (bioontologyUrl.equals(bioontologyUrlWs) || "MEDDRA".equals(dictionary)) {
+				return bioontologyUrlDefault;
 			} else {
 				URL url = new URL(bioontologyUrl);
 				return url.getProtocol() + "://" + url.getHost();
@@ -297,12 +277,9 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
         private CodedItem codedItemElementsFilter(CodedItem codedItem) {
 
-            CodedItem codedItemWithFilterFields = new CodedItem();
-
-            for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
-
-                for (CodedItemElement codedItemIteration : codedItem.getCodedItemElements()) {
-
+			CodedItem codedItemWithFilterFields = new CodedItem();
+			for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
+				for (CodedItemElement codedItemIteration : codedItem.getCodedItemElements()) {
 					if ((codedItemElement.getItemName() + "C").equals(codedItemIteration.getItemName())) {
 						if (!codedItemElement.getItemCode().isEmpty()) {
 							codedItemWithFilterFields.addCodedItemElements(codedItemElement);
@@ -315,16 +292,15 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 							break;
 						}
 					}
-                }
-            }
+				}
+			}
 
-            Collections.sort(codedItemWithFilterFields.getCodedItemElements(), new codedElementSortById());
+            Collections.sort(codedItemWithFilterFields.getCodedItemElements(), new CodedElementSortById());
 
             return codedItemWithFilterFields;
         }
 
-        private class codedElementSortById implements Comparator {
-
+        private class CodedElementSortById implements Comparator {
             public int compare(Object o1, Object o2) {
                 CodedItemElement p1 = (CodedItemElement) o1;
                 CodedItemElement p2 = (CodedItemElement) o2;
@@ -346,11 +322,9 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             HtmlBuilder builder = new HtmlBuilder();
 
             if (codedItem != null) {
-
                 String codeItemIcon = codeItemIconBuilder(codedItem);
                 String uncodeItemIcon = uncodeItemIconBuilder(codedItem);
                 String goToCrfIcon = goToCrfIconBuilder(eventCRFBean, eventDefCRFBean, codedItem.getItemId());
-
                 builder.append(codeItemIcon).nbsp().nbsp()
                         .append(uncodeItemIcon).nbsp().nbsp()
                         .append(goToCrfIcon);
@@ -362,54 +336,40 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         }
 
         private String codeItemIconBuilder(CodedItem codedItem) {
-
             String codedItemButtonColor = codedItem.isCoded() ? "code_confirm.png" : "code_blue.png";
             HtmlBuilder builder = new HtmlBuilder();
-
             if (isLoggedInUserMonitor()) {
-
                 builder.a().append("itemId=\"" + codedItem.getItemId() + "\"").close();
-
             } else {
-
                 String disabled = (codedItem.getStatus().equals("CODED")) ? " block='true' " : " block='false' ";
-
+            	
                 builder.a().onclick("codeItem(this)").append(disabled).name("Code").append("itemId=\"" + codedItem.getItemId() + "\"")
                 .append("data-cc-mcItemId=\"" + codedItem.getItemId() + "\"").close();
             }
-
             builder.img().style("float:left; height:17px").border("0").title(ResourceBundleProvider.getResWord("code"))
                     .alt(ResourceBundleProvider.getResWord("code")).src("../images/" + codedItemButtonColor + "").close().aEnd();
-
             return builder.toString();
         }
 
         private String uncodeItemIconBuilder(CodedItem codedItem) {
 
             HtmlBuilder builder = new HtmlBuilder();
-
             builder.a().onclick("showMedicalCodingUncodeAlertBox(this)").name("unCode")
                     .append("itemId=\"" + codedItem.getItemId() + "\"");
-
             Term codedItemTerm = getCodedItemTerm(codedItem);
-
-            if(!codedItemTerm.getHttpPath().isEmpty()) {
-
+			if (!codedItemTerm.getHttpPath().isEmpty()) {
                 builder.append("term=\"" + codedItemTerm.getLocalAlias().toLowerCase() + "\" ")
                        .append("pref=\"" + codedItemTerm.getPreferredName().toLowerCase() + "\" ");
-            } else {
+			} else {
+				builder.append("term=\"\" ");
+				builder.append("pref=\"\" ");
+			}
 
-                builder.append("term=\"\" ");
-                builder.append("pref=\"\" ");
-            }
-
-            if (codedItem.isCoded()) {
-
-                builder.close();
-            } else {
-
-                builder.style("visibility:hidden").close();
-            }
+			if (codedItem.isCoded()) {
+				builder.close();
+			} else {
+				builder.style("visibility:hidden").close();
+			}
 
             builder.img().style("height:17px").border("0").title(ResourceBundleProvider.getResWord("deleteAlias"))
                     .alt(ResourceBundleProvider.getResWord("deleteAlias")).src("../images/bt_Delete.gif").name("codeBtn").close().aEnd();
@@ -417,71 +377,56 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             return builder.toString();
         }
 
-        private String goToCrfIconBuilder(EventCRFBean eventCRFBean, EventDefinitionCRFBean eventDefCRFBean, int itemId) {
+		private String goToCrfIconBuilder(EventCRFBean eventCRFBean, EventDefinitionCRFBean eventDefCRFBean, int itemId) {
+			HtmlBuilder builder = new HtmlBuilder();
+			builder.a().name("goToEcrf").append("itemId=\"" + itemId + "\"").append(" onmouseup=\"javascript:setImage('Complete','../images/" + getEventCrfStatusIcon(eventCRFBean) + "');\"")
+					.href("../ViewSectionDataEntry?eventCRFId=" + eventCRFBean.getId()
+							+ "&eventDefinitionCRFId=" + eventDefCRFBean.getId()
+							+ "&tabId=1&eventId=" + eventCRFBean.getStudyEventId() + "&amp;viewFull=yes")
+					.onclick("setAccessedObjected(this)").close()
+					.img().border("0").title(ResourceBundleProvider.getResWord("openCrf")).alt(ResourceBundleProvider.getResWord("openCrf"))
+					.style("height:17px").src("../images/" + getEventCrfStatusIcon(eventCRFBean) + "").close().aEnd();
 
-            HtmlBuilder builder = new HtmlBuilder();
+			return builder.toString();
+		}
 
-            builder.a().name("goToEcrf").append("itemId=\"" + itemId + "\"").append(" onmouseup=\"javascript:setImage('Complete','../images/"+ getEventCrfStatusIcon(eventCRFBean) + "');\"")
-                    .href("../ViewSectionDataEntry?eventCRFId=" + eventCRFBean.getId()
-                            + "&eventDefinitionCRFId=" + eventDefCRFBean.getId()
-                            + "&tabId=1&eventId=" + eventCRFBean.getStudyEventId() + "&amp;viewFull=yes")
-                            .onclick("setAccessedObjected(this)").close()
-                    .img().border("0").title(ResourceBundleProvider.getResWord("openCrf")).alt(ResourceBundleProvider.getResWord("openCrf"))
-                    .style("height:17px").src("../images/"+ getEventCrfStatusIcon(eventCRFBean) + "").close().aEnd();
+		private String getEventCrfStatusIcon(EventCRFBean eventCRFBean) {
 
-            return builder.toString();
-        }
-
-        private String getEventCrfStatusIcon(EventCRFBean eventCRFBean) {
-
-            StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCRFBean.getStudyEventId());
+			StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCRFBean.getStudyEventId());
 			CRFVersionBean crfVersion = (CRFVersionBean) crfVersionDAO.findByPK(eventCRFBean.getCRFVersionId());
-            String goToEcrfIcon = "";
-
-            if (studyEventBean.getSubjectEventStatus().isLocked() || studyEventBean.getSubjectEventStatus().isStopped() || studyEventBean.getSubjectEventStatus().isSkipped() || !crfVersion.getStatus().equals(Status.AVAILABLE)) {
-
-                goToEcrfIcon = "icon_Locked_long.gif";
-            } else  if (eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
-
-                goToEcrfIcon = "icon_InitialDE_long.gif";
-            } else if (eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) ) {
-
-                goToEcrfIcon = "icon_InitialDEcomplete.gif";
-            } else if(eventCRFBean.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-
-                goToEcrfIcon = "icon_DDE.gif";
-            } else if(eventCRFBean.getStage().isDoubleDE_Complete()) {
-
-                if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
-
-                    goToEcrfIcon = "icon_Signed_long.gif";
-                } else if (eventCRFBean.isSdvStatus()) {
-
-                    goToEcrfIcon = "icon_DoubleCheck_long.gif";
-                } else {
-
-                    goToEcrfIcon = "icon_DEcomplete_long.gif";
-                }
-            }
-
-            return goToEcrfIcon;
-        }
-    }
+			String goToEcrfIcon = "";
+			if (studyEventBean.getSubjectEventStatus().isLocked() || studyEventBean.getSubjectEventStatus().isStopped()
+					|| studyEventBean.getSubjectEventStatus().isSkipped() || !crfVersion.getStatus().equals(Status.AVAILABLE)) {
+				goToEcrfIcon = "icon_Locked_long.gif";
+			} else if (eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
+				goToEcrfIcon = "icon_InitialDE_long.gif";
+			} else if (eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
+				goToEcrfIcon = "icon_InitialDEcomplete.gif";
+			} else if (eventCRFBean.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+				goToEcrfIcon = "icon_DDE.gif";
+			} else if (eventCRFBean.getStage().isDoubleDE_Complete()) {
+				if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
+					goToEcrfIcon = "icon_Signed_long.gif";
+				} else if (eventCRFBean.isSdvStatus()) {
+					goToEcrfIcon = "icon_DoubleCheck_long.gif";
+				} else {
+					goToEcrfIcon = "icon_DEcomplete_long.gif";
+				}
+			}
+			return goToEcrfIcon;
+		}
+	}
 
     private Term getCodedItemTerm(CodedItem codedItem) {
 
         ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
         ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
-
         for (Term term : terms) {
-
             if (data.getValue().equalsIgnoreCase(term.getLocalAlias())
                     && term.getExternalDictionaryName().equals(codedItem.getDictionary())) {
-
                 return term;
             }
         }
-
         return new Term();
     }
 
@@ -489,10 +434,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private class StatusCellEditor implements CellEditor {
     	
         public Object getValue(Object item, String property, int cowcount) {
-
             String codedItemStatus = (String) ((HashMap<Object, Object>) item).get("status");
             HtmlBuilder builder = new HtmlBuilder();
-
             if (!codedItemStatus.isEmpty()) {
                 builder.div().name("itemStatus").close()
                 .append(codedItemStatus).divEnd().div().style("width:100px").close().divEnd();
@@ -504,10 +447,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     @SuppressWarnings("unchecked")
     private class SubjectCellEditor implements CellEditor {
         public Object getValue(Object item, String property, int cowcount) {
-
             HtmlBuilder builder = new HtmlBuilder();
             String subjectLabel = (String) ((HashMap<Object, Object>) item).get("subjectName");
-
             if (!subjectLabel.isEmpty()) {
                 builder.div().name("subjectId").close()
                         .append(subjectLabel).divEnd().div().style("width:100px").close().divEnd();
@@ -520,16 +461,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     @SuppressWarnings("unchecked")
     private class EventCellEditor implements CellEditor {
         public Object getValue(Object item, String property, int cowcount) {
-
             HtmlBuilder builder = new HtmlBuilder();
             String eventName = (String) ((HashMap<Object, Object>) item).get("eventName");
-
-            if (!eventName.isEmpty()) {
-
-                builder.div().name("eventName").close()
-                        .append(eventName).divEnd().div().style("width:100px").close().divEnd();
-            }
-
+			if (!eventName.isEmpty()) {
+				builder.div().name("eventName").close()
+						.append(eventName).divEnd().div().style("width:100px").close().divEnd();
+			}
             return builder.toString();
         }
     }
@@ -537,15 +474,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     @SuppressWarnings("unchecked")
     private class CrfCellEditor implements CellEditor {
         public Object getValue(Object item, String property, int cowcount) {
-
             String crfName = (String) ((HashMap<Object, Object>) item).get("crfName");
             HtmlBuilder builder = new HtmlBuilder();
-
-            if (!crfName.isEmpty()) {
-
-                builder.div().name("crfName").close()
-                        .append(crfName).divEnd().div().style("width:120px").close().divEnd();
-            }
+			if (!crfName.isEmpty()) {
+				builder.div().name("crfName").close()
+						.append(crfName).divEnd().div().style("width:120px").close().divEnd();
+			}
 
             return builder.toString();
         }
@@ -556,7 +490,6 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         protected List<Option> getOptions() {
         	
         	StudyParameterValueBean mcApprovalNeeded = new StudyParameterValueDAO(datasource).findByHandleAndStudy(studyId, "medicalCodingApprovalNeeded");
-        	
             List<Option> options = new ArrayList<Option>();
             options.add(new Option("All", "All"));
             options.add(new Option("Not Coded", "Not Coded"));
@@ -618,14 +551,11 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 	public void setDataSource(DataSource datasource) {
 		this.datasource = datasource;
 	}
-	
-	public boolean isLoggedInUserMonitor() {
 
+	private boolean isLoggedInUserMonitor() {
 		UserAccountDAO userDAO = new UserAccountDAO(datasource);
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
 		UserAccountBean loggedInUser = (UserAccountBean) userDAO.findByUserName(authentication.getName());
-
 		return loggedInUser.getRoleByStudy(studyId).getName().equalsIgnoreCase("study monitor");
 	}
 	
@@ -639,85 +569,71 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
     public void setStudyEventDAO(StudyEventDAO studyEventDAO) { this.studyEventDAO = studyEventDAO; }
 
-    private StudySubjectBean getSubjectBean(int subjectId) {
-    	
-        return  (StudySubjectBean) studySubjectDAO.findByPK(subjectId);
-    }
+	private StudySubjectBean getSubjectBean(int subjectId) {
+		return (StudySubjectBean) studySubjectDAO.findByPK(subjectId);
+	}
 
-    private StudyEventDefinitionBean getStudyEventDefinitionBean(int eventCrfId, int crfVersionId) {
-    	
-        EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(eventCrfId);
-        StudyBean studyBean = (StudyBean) studyDAO.findByStudySubjectId(eventCRFBean.getStudySubjectId());
-        EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) eventDefCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(), crfVersionId);
-        
-        return studyEventDefDao.findByEventDefinitionCRFId(eventDefCRFBean.getId());
-    }
+	private StudyEventDefinitionBean getStudyEventDefinitionBean(int eventCrfId, int crfVersionId) {
+		EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(eventCrfId);
+		StudyBean studyBean = (StudyBean) studyDAO.findByStudySubjectId(eventCRFBean.getStudySubjectId());
+		EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) eventDefCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(), crfVersionId);
+		return studyEventDefDao.findByEventDefinitionCRFId(eventDefCRFBean.getId());
+	}
 
     private String getItemDataValue(int itemId) {
         ItemDataBean itemDataBean = (ItemDataBean) itemDataDAO.findByPK(itemId);
         return itemDataBean.getValue();
     }
 
-    private String getCrfName(int eventCrfVersionId) {
-            CRFBean crfBean = crfDAO.findByVersionId(eventCrfVersionId);
-           return crfBean.getName();
-    }
+	private String getCrfName(int eventCrfVersionId) {
+		CRFBean crfBean = crfDAO.findByVersionId(eventCrfVersionId);
+		return crfBean.getName();
+	}
 
     @Override
-    public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
+	public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
 
-        boolean showMore = false;
-        boolean showCodedItemsContext = false;
-        boolean contextNeeded = false;
+		boolean showMore = false;
+		boolean showCodedItemsContext = false;
+		boolean contextNeeded = false;
+		if (showMoreLink.equalsIgnoreCase("true")) {
+			showMore = true;
+		}
+		if (showContext.equalsIgnoreCase("true")) {
+			showCodedItemsContext = true;
+		}
+		if (medicalCodingContextNeeded.equalsIgnoreCase("yes")) {
+			contextNeeded = true;
+		}
+		CodedItemsTableToolbar toolbar = new CodedItemsTableToolbar(showMore, contextNeeded, showCodedItemsContext);
+		tableFacade.setToolbar(toolbar);
+	}
 
-        if (showMoreLink.equalsIgnoreCase("true")) {
-            showMore = true;
-        }
+	@Override
+	public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {
+		super.configureTableFacade(response, tableFacade);
+		tableFacade.addFilterMatcher(new MatcherKey(String.class, "status"), new StatusFilterMatcher());
+	}
 
-        if (showContext.equalsIgnoreCase("true")) {
-            showCodedItemsContext = true;
-        }
+	private class StatusFilterMatcher implements FilterMatcher {
+		public boolean evaluate(Object itemValue, String filterValue) {
+			String item = StringUtils.lowerCase(String.valueOf(itemValue));
+			String filter = StringUtils.lowerCase(String.valueOf(filterValue));
+			if (filter.equals(item) || filter.equals("all")) {
+				return true;
+			}
+			return false;
+		}
+	}
 
-        if (medicalCodingContextNeeded.equalsIgnoreCase("yes")) {
-            contextNeeded = true;
-        }
-
-        CodedItemsTableToolbar toolbar = new CodedItemsTableToolbar(showMore, contextNeeded, showCodedItemsContext);
-        tableFacade.setToolbar(toolbar);
-    }
-
-    @Override
-    public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {
-
-        super.configureTableFacade(response, tableFacade);
-
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "status"), new StatusFilterMatcher());
-    }
-
-    public class StatusFilterMatcher implements FilterMatcher {
-        public boolean evaluate(Object itemValue, String filterValue) {
-
-            String item = StringUtils.lowerCase(String.valueOf(itemValue));
-            String filter = StringUtils.lowerCase(String.valueOf(filterValue));
-
-            if (filter.equals(item) || filter.equals("all")) {
-                return true;
-            }
-            return false;
-        }
-    }
-
-    public String getThemeColor() {
-
-        if (themeColor.equalsIgnoreCase("violet")) {
-
-            return "#aa62c6";
-
-        } else if (themeColor.equalsIgnoreCase("green")) {
-
-            return "#75b894";
-        }
-
-        return "#729fcf";
-    }
+	private String getThemeColor() {
+		if (themeColor.equalsIgnoreCase("violet")) {
+			return "#aa62c6";
+		} else if (themeColor.equalsIgnoreCase("green")) {
+			return "#75b894";
+		} else if (themeColor.equalsIgnoreCase("darkBlue")) {
+			return "#2c6caf";
+		}
+		return "#729fcf";
+	}
 }
