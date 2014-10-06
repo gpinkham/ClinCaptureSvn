@@ -10,6 +10,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="showDDEColumn" value="false"/>
+<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <script type="text/javascript" language="javascript">
     function checkCRFLocked(ecId, url){
@@ -202,11 +203,55 @@
                     <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
                 </c:otherwise>
             </c:choose>
-
             <c:choose>
                 <c:when test="${showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and userRole.id eq 4 and not study.status.locked and not study.status.pending}">
                     <c:set var="hideCol6" value="false"/>
-                    <a href="UpdateStudyEvent?action=submit&event_id=${studyEvent.id}&ss_id=${studySubject.id}&changeDate=&startDate=20-Jan-2012&startHour=-1&startMinute=-1&startHalf=&endDate=&endHour=-1&endMinute=-1&endHalf=&statusId=8&Submit=Submit+Changes"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign" bundle="${resword}"/>" title="<fmt:message key="sign" bundle="${resword}"/>" hspace="4"/></a>
+                    <c:set var="signUrl" value="UpdateStudyEvent?action=submit&event_id=${studyEvent.id}&ss_id=${studySubject.id}&changeDate=&startDate="/>
+	                    <c:if test="${study.studyParameterConfig.startDateTimeRequired != 'not_used'}">
+                            <fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}" var="dateStart"/>
+                            <c:set var="signUrl" value="${signUrl}${dateStart}" />
+	                     </c:if>
+                    <c:choose>
+                        <c:when test="${study.studyParameterConfig.useStartTime == 'yes' && study.studyParameterConfig.startDateTimeRequired != 'not_used'}">
+                            <c:set var="signUrl" value="${signUrl}&startHour=" />
+                            <fmt:formatDate value="${studyEvent.dateStarted}" pattern="hh" var="startHour"/>
+                            <c:set var="signUrl" value="${signUrl}${startHour}"/>
+                            <c:set var="signUrl" value="${signUrl}&startMinute="/>
+                            <fmt:formatDate value="${studyEvent.dateStarted}" pattern="mm" var="startMinutes"/>
+                            <c:set var="signUrl" value="${signUrl}${startMinutes}" />
+                            <c:set var="signUrl" value="${signUrl}&startHalf=" />
+                            <fmt:formatDate value="${studyEvent.dateStarted}" pattern="a" var="startHalf"/>
+                            <c:set var="signUrl" value="${signUrl}${startHalf}" />
+                        </c:when>
+                        <c:otherwise>
+                            <c:set var="signUrl" value="${signUrl}&startHour=-1&startMinute=-1&startHalf="/>
+                        </c:otherwise>
+                    </c:choose>
+                    <c:set var="signUrl" value="${signUrl}&endDate=" />
+		                <c:if test="${study.studyParameterConfig.endDateTimeRequired != 'not_used'}">
+                           <fmt:formatDate value="${studyEvent.dateEnded}" pattern="${dteFormat}" var="dateEnd"/>
+                            <c:set var="signUrl" value="${signUrl}${dateEnd}" />
+	                     </c:if>
+                    <c:choose>
+                        <c:when test="${study.studyParameterConfig.useEndTime == 'yes' && study.studyParameterConfig.endDateTimeRequired != 'not_used'}}">
+                            <c:set var="signUrl" value="${signUrl}&endHour=" />
+                            <fmt:formatDate value="${studyEvent.dateEnded}" pattern="hh" var="endHour"/>
+                            <c:set var="signUrl" value="${signUrl}${endHour}"/>
+                            <c:set var="signUrl" value="${signUrl}&endMinute=" />
+                            <fmt:formatDate value="${studyEvent.dateEnded}" pattern="mm" var="endMinutes"/>
+                            <c:set var="signUrl" value="${signUrl}${endMinutes}"/>
+                            <c:set var="signUrl" value="${signUrl}&endHalf=" />
+                            <fmt:formatDate value="${studyEvent.dateEnded}" pattern="a" var="endHalf"/>
+                            <c:set var="signUrl" value="${signUrl}${endHalf}"/>
+                        </c:when>
+                        <c:otherwise>
+                            <c:set var="signUrl" value="${signUrl}&endHour=-1&endMinute=-1&endHalf="/>
+                        </c:otherwise>
+                    </c:choose>
+                    <c:set var="signUrl" value="${signUrl}&statusId=8&Submit=Submit+Changes"/>
+                    <a href="${signUrl}">
+                    <img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign" bundle="${resword}"/>" title="<fmt:message key="sign" bundle="${resword}"/>" hspace="4"/>
+                    </a>
                 </c:when>
                 <c:otherwise>
                     <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>

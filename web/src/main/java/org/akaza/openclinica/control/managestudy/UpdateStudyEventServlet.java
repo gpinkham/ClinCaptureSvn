@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -87,30 +87,21 @@ import org.springframework.stereotype.Component;
 import com.clinovo.util.ValidatorHelper;
 
 /**
- * @author jxu
- * 
- *         Performs updating study event action
+ * Performs updating study event action.
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class UpdateStudyEventServlet extends Controller {
-
+	
 	private static final long serialVersionUID = -6029524999558420563L;
-
+	
 	public static final String EVENT_ID = "event_id";
-
 	public static final String STUDY_SUBJECT_ID = "ss_id";
-
 	public static final String EVENT_BEAN = "studyEvent";
-
 	public static final String EVENT_DEFINITION_BEAN = "eventDefinition";
-
 	public static final String SUBJECT_EVENT_STATUS_ID = "statusId";
-
 	public static final String INPUT_STARTDATE_PREFIX = "start";
-
 	public static final String INPUT_ENDDATE_PREFIX = "end";
-
 	public static final String INPUT_LOCATION = "location";
 
 	@Override
@@ -185,7 +176,6 @@ public class UpdateStudyEventServlet extends Controller {
 			ssub = (StudySubjectBean) ssdao.findByPK(studySubjectId);
 			request.setAttribute("studySubject", ssub);
 			request.setAttribute("id", studySubjectId + "");
-			// for the workflow box, so it can link back to view study subject
 		}
 
 		Status s = ssub.getStatus();
@@ -255,17 +245,16 @@ public class UpdateStudyEventServlet extends Controller {
 			}
 			for (Object getECRF : getECRFs) {
 				EventCRFBean existingBean = (EventCRFBean) getECRF;
-				logger.info("***** found: " + existingBean.getCRFVersionId() + " " + existingBean.getCrf().getId()
+				logger.info("Found: " + existingBean.getCRFVersionId() + " " + existingBean.getCrf().getId()
 						+ " " + existingBean.getCrfVersion().getName() + " " + existingBean.getStatus().getName() + " "
 						+ existingBean.getStage().getName());
 
-				logger.info("***** comparing above to ecrfBean.DefaultVersionID: " + ecrfBean.getDefaultVersionId());
+				logger.info("Comparing above to ecrfBean.DefaultVersionID: " + ecrfBean.getDefaultVersionId());
 
 				if (!existingBean.getStatus().equals(Status.UNAVAILABLE)
 						&& edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent)) {
 
-					logger.info("found that " + existingBean.getCrfVersion().getName() + " is required...");
-					// that is, it's not completed but required to complete
+					logger.info("Found that " + existingBean.getCrfVersion().getName() + " is required...");
 					statuses.remove(SubjectEventStatus.COMPLETED);
 					statuses.remove(SubjectEventStatus.LOCKED);
 				}
@@ -353,6 +342,10 @@ public class UpdateStudyEventServlet extends Controller {
 			}
 
 			if (!errors.isEmpty()) {
+				StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
+				List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil.getAllNotesforSubjectAndEvent(
+						studySubjectBean, currentStudy, sm);
+				EnterDataForStudyEventServlet.setRequestAttributesForNotes(allNotesforSubjectAndEvent, studyEvent, sm, request);
 				setInputMessages(errors, request);
 				String[] prefixes = { INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX };
 				fp.setCurrentDateTimeValuesAsPreset(prefixes);
@@ -455,7 +448,7 @@ public class UpdateStudyEventServlet extends Controller {
 
 				studyEvent.setLocation(fp.getString(INPUT_LOCATION));
 
-				logger.info("update study event...");
+				logger.info("Update study event");
 				studyEvent.setUpdater(ub);
 				studyEvent.setUpdatedDate(new Date());
 				sedao.update(studyEvent);
@@ -549,7 +542,6 @@ public class UpdateStudyEventServlet extends Controller {
 			} else {
 				request.setAttribute(STUDY_SUBJECT_ID, Integer.toString(studySubjectId));
 				request.setAttribute("studyEvent", seb);
-				// -------------------
 				ssdao = new StudySubjectDAO(getDataSource());
 				ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
 
@@ -570,14 +562,12 @@ public class UpdateStudyEventServlet extends Controller {
 				request.setAttribute("uncompletedEventDefinitionCRFs", uncompletedEventDefinitionCRFs);
 				request.setAttribute("displayEventCRFs", displayEventCRFs);
 
-				// ------------------
 				request.setAttribute("studyEvent", session.getAttribute("eventSigned"));
 				addPageMessage(restext.getString("password_match"), request);
 				forwardPage(Page.UPDATE_STUDY_EVENT_SIGNED, request, response);
 			}
 		} else {
-			logger.info("no action, go to update page");
-
+			logger.info("No action, go to update page");
 			StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
 			List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil.getAllNotesforSubjectAndEvent(
 					studySubjectBean, currentStudy, sm);
