@@ -82,7 +82,7 @@ public class ConfigurePasswordRequirementsServlet extends Controller {
 			if (minChars > 0 && maxChars > 0 && maxChars < minChars) {
 				Validator.addError(errors, "pwd.chars.min", resexception.getString("pwd_min_greater_than_max"));
 			}
-			if (passwordMustsGreaterThanMinLength(fp)) {
+			if (minChars > 0 && passwordMustsGreaterThanMinLength(fp)) {
 				Validator.addError(errors, "pwd.chars.min", resexception.getString("pwd_min_less_than_must_chars"));
 			}
 			if (passwordMustsGreaterThanMaxLength(fp)) {
