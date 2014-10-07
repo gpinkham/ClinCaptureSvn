@@ -198,7 +198,7 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
 	}
 
 	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "rule_id", nullable = false)
+	@JoinColumn(name = "rule_id")
 	public RuleBean getRuleBean() {
 		return ruleBean;
 	}

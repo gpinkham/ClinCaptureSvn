@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -25,6 +25,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.domain.Status;
+import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleAuditBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -36,7 +37,12 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
+
+/**
+ * UpdateRuleSetRuleServlet, the class which handles the business case for updating or deleting a rule.
+ */
 @Component
 public class UpdateRuleSetRuleServlet extends Controller {
 
@@ -76,6 +82,7 @@ public class UpdateRuleSetRuleServlet extends Controller {
 		String ruleSetRuleId = request.getParameter(RULESETRULE_ID);
 		String source = request.getParameter("source");
 		String action = request.getParameter(ACTION);
+
 		if (ruleSetRuleId != null) {
 			RuleSetRuleBean ruleSetRule = getRuleSetRuleDao().findById(Integer.valueOf(ruleSetRuleId));
 			performAction(action, ruleSetRule, ub);
@@ -126,11 +133,20 @@ public class UpdateRuleSetRuleServlet extends Controller {
 
 	private void deleteRule(RuleSetRuleBean ruleSetRule) {
 		RuleSetBean ruleSet = ruleSetRule.getRuleSetBean();
+		RuleBean rule = ruleSetRule.getRuleBean();
+		List<RuleSetRuleBean> duplicatedRuleSetRules = getRuleSetRuleDao().findByRuleSetBeanAndRuleBean(ruleSet, rule);
 		getRuleDao().getSessionFactory().getCurrentSession().clear();
 		Session session = getRuleDao().getSessionFactory().getCurrentSession();
 		Transaction transaction = session.beginTransaction();
-		session.delete(ruleSetRule);
-		if (ruleSet.getRuleSetRuleSize() <= 1) {
+		for (int i = 0; i < duplicatedRuleSetRules.size(); i++) {
+			RuleSetRuleBean currentRuleSetRule = duplicatedRuleSetRules.get(i);
+			if (i != 0) {
+				currentRuleSetRule.setRuleBean(null);
+			}
+			session.delete(currentRuleSetRule);
+		}
+		if (ruleSet.getRuleSetRuleSize() <= duplicatedRuleSetRules.size()) {
+			ruleSet.getRuleSetRules().clear();
 			session.delete(ruleSet);
 		}
 		transaction.commit();
