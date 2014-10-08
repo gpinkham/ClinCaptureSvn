@@ -998,7 +998,7 @@ function displayMessageFromCheckbox(checkboxObject, dde){
 
         if ($("#confirmation").length == 0) {
             $("body").append(
-                "<div id=\"confirmation\" style=\"display: none;\" title=\"Mark CRF Complete\">" +
+                "<div id=\"confirmation\" title=\"Mark CRF Complete\">" +
                     (dde == undefined ? "<div style=\"clear: both; text-align: justify;\">Marking this CRF complete will finalize data entry. You will be allowed to edit the data later but this data entry stage is completed. If Double Data Entry is required, you or another user may need to complete this CRF again before it is verified as complete. Are you sure you want to mark this CRF complete?</div>"
                                       : "<div style=\"clear: both; text-align: justify;\">Marking this CRF complete will prepare it for Double Data Entry, where another user will enter data and then be able to finally complete this CRF.</div>") +
                     "<div style=\"clear: both; padding: 6px;\"><input type=\"checkbox\" id=\"ignoreMarkCRFCompleteMSG\"/> Do not show this message anymore.</div>" +
@@ -1040,15 +1040,10 @@ function displayMessageFromCheckbox(checkboxObject, dde){
         }
     }
 
-	
-	var color = $('*').find('a').css('color');
-	if (color == 'rgb(170, 98, 198)' || color == '#AA62C6' || color == '#aa62c6') {
-		$('input.button_medium').css('background-image', 'url(images/violet/button_medium_BG.gif)');
-		$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
-	}
-	if (color == 'rgb(117, 184, 148)' || color == '#75b894' || color == '#75B894') {
-		$('input.button_medium').css('background-image', 'url(images/green/button_medium_BG.gif)');
-		$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
+    if (theme.name != 'blue') {
+		$('input.button_medium').css('background-image', 'url(images/' + theme.name + '/button_medium_BG.gif)');
+        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', theme.mainColor);
+        $('.ui-dialog-titlebar').css('border', '1px Solid ' + theme.mainColor);
 	}
 }
 
