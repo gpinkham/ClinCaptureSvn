@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -38,7 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * the data access object for instruments in the database.
+ * The data access object for instruments in the database.
  * 
  * @author thickerson
  * 
@@ -53,11 +53,25 @@ public class CRFDAO extends AuditableEntityDAO {
 		digesterName = SQLFactory.getInstance().DAO_CRF;
 	}
 
+	/**
+	 * CRFDAO constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 */
 	public CRFDAO(DataSource ds) {
 		super(ds);
 		setQueryNames();
 	}
 
+	/**
+	 * CRFDAO constructor.
+	 *
+	 * @param ds
+	 *            DataSource
+	 * @param digester
+	 *            DAODigester
+	 */
 	public CRFDAO(DataSource ds, DAODigester digester) {
 		super(ds);
 		setQueryNames();
@@ -73,56 +87,73 @@ public class CRFDAO extends AuditableEntityDAO {
 		getNextPKName = "getNextPK";
 	}
 
+	/**
+	 * Method that sets expected types.
+	 */
 	@Override
 	public void setTypesExpected() {
+		int index = 1;
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		this.setTypeExpected(2, TypeNames.INT);
-		this.setTypeExpected(3, TypeNames.STRING);// name
-		this.setTypeExpected(4, TypeNames.STRING);// description
-		this.setTypeExpected(5, TypeNames.INT);// owner id
-		this.setTypeExpected(6, TypeNames.DATE);// created
-		this.setTypeExpected(7, TypeNames.DATE);// updated
-		this.setTypeExpected(8, TypeNames.INT);// update id
-		this.setTypeExpected(9, TypeNames.STRING);// oc_oid
-		this.setTypeExpected(10, TypeNames.INT);// study_id
-
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.INT);
 		// set type for auto_layout property
 		if (getDBType().equals("oracle")) {
-			this.setTypeExpected(11, TypeNames.INT);
+			this.setTypeExpected(index, TypeNames.INT);
 		} else {
-			this.setTypeExpected(11, TypeNames.BOOL);
+			this.setTypeExpected(index, TypeNames.BOOL);
 		}
 	}
 
+	/**
+	 * Method that updates EntityBean in the DB.
+	 * 
+	 * @param eb
+	 *            EntityBean
+	 * @return EntityBean
+	 */
 	public EntityBean update(EntityBean eb) {
+		int index = 1;
 		CRFBean cb = (CRFBean) eb;
 		HashMap variables = new HashMap();
-		variables.put(1, cb.getStatus().getId());
-		variables.put(2, cb.getName());
-		variables.put(3, cb.getDescription());
-		variables.put(4, cb.getUpdater().getId());
-		variables.put(5, cb.getId());
+		variables.put(index++, cb.getStatus().getId());
+		variables.put(index++, cb.getName());
+		variables.put(index++, cb.getDescription());
+		variables.put(index++, cb.getUpdater().getId());
+		variables.put(index, cb.getId());
 		this.execute(digester.getQuery("update"), variables);
 		return eb;
 	}
 
+	/**
+	 * Method that creates EntityBean in the DB.
+	 * 
+	 * @param eb
+	 *            EntityBean
+	 * @return EntityBean
+	 */
 	public EntityBean create(EntityBean eb) {
+		int index = 1;
 		CRFBean cb = (CRFBean) eb;
 		HashMap variables = new HashMap();
-		variables.put(1, cb.getStatus().getId());
-		variables.put(2, cb.getName());
-		variables.put(3, cb.getDescription());
-		variables.put(4, cb.getOwner().getId());
-		variables.put(5, getValidOid(cb, cb.getName()));
-
+		variables.put(index++, cb.getStatus().getId());
+		variables.put(index++, cb.getName());
+		variables.put(index++, cb.getDescription());
+		variables.put(index++, cb.getOwner().getId());
+		variables.put(index++, getValidOid(cb, cb.getName()));
 		// set auto_layout property
 		if (getDBType().equals("oracle")) {
-			variables.put(6, 1);
+			variables.put(index, 1);
 		} else {
-			variables.put(6, Boolean.TRUE);
+			variables.put(index, Boolean.TRUE);
 		}
-
 		this.executeWithPK(digester.getQuery("create"), variables, null);
 		if (isQuerySuccessful()) {
 			cb.setId(getLatestPK());
@@ -130,6 +161,13 @@ public class CRFDAO extends AuditableEntityDAO {
 		return cb;
 	}
 
+	/**
+	 * Method builds CRFBean from HashMap data.
+	 * 
+	 * @param hm
+	 *            HashMap
+	 * @return CRFBean
+	 */
 	public Object getEntityFromHashMap(HashMap hm) {
 		CRFBean eb = new CRFBean();
 		this.setEntityAuditInformation(eb, hm);
@@ -138,7 +176,6 @@ public class CRFDAO extends AuditableEntityDAO {
 		eb.setDescription((String) hm.get("description"));
 		eb.setOid((String) hm.get("oc_oid"));
 		eb.setStudyId((Integer) hm.get("source_study_id"));
-
 		// get auto_layout property
 		if (getDBType().equals("oracle")) {
 			eb.setAutoLayout(((Integer) hm.get("auto_layout")) == 1);
@@ -149,19 +186,25 @@ public class CRFDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * Method that returns all crfs.
+	 * 
+	 * @return Collection
+	 */
 	public Collection findAll() {
-
 		return findAllByLimit(false);
 	}
 
+	/**
+	 * Method returns count of active crfs.
+	 * 
+	 * @return Integer
+	 */
 	public Integer getCountofActiveCRFs() {
 		setTypesExpected();
-
 		String sql = digester.getQuery("getCountofCRFs");
-
 		ArrayList rows = this.select(sql);
 		Iterator it = rows.iterator();
-
 		if (it.hasNext()) {
 			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
@@ -169,21 +212,33 @@ public class CRFDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that finds crfs by studyId.
+	 * 
+	 * @param studyId
+	 *            int
+	 * @return Collection
+	 */
 	public Collection findAllByStudy(int studyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(1, studyId);
 		ArrayList alist = this.select(digester.getQuery("findAllByStudy"), variables);
 		ArrayList al = new ArrayList();
-
 		for (Object anAlist : alist) {
 			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
-
 	}
 
+	/**
+	 * Method that finds crfs using limit flag.
+	 * 
+	 * @param hasLimit
+	 *            boolean
+	 * @return Collection
+	 */
 	public Collection findAllByLimit(boolean hasLimit) {
 		this.setTypesExpected();
 		ArrayList alist;
@@ -200,6 +255,11 @@ public class CRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Method that finds all active crfs.
+	 * 
+	 * @return List<CRFBean>
+	 */
 	public List<CRFBean> findAllActiveCrfs() {
 		List result = new ArrayList<CRFBean>();
 		this.setTypesExpected();
@@ -210,6 +270,13 @@ public class CRFDAO extends AuditableEntityDAO {
 		return result;
 	}
 
+	/**
+	 * Method that returns crfs by status.
+	 * 
+	 * @param status
+	 *            Status
+	 * @return List<CRFBean>
+	 */
 	public Collection findAllByStatus(Status status) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
@@ -224,6 +291,13 @@ public class CRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Method that returns all active crfs by StudyEventDefinitionBean.
+	 *
+	 * @param definition
+	 *            StudyEventDefinitionBean
+	 * @return Collection
+	 */
 	public Collection findAllActiveByDefinition(StudyEventDefinitionBean definition) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
@@ -238,6 +312,13 @@ public class CRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Method that returns all active crfs by definitions in the certain studyId.
+	 *
+	 * @param studyId
+	 *            int
+	 * @return Collection
+	 */
 	public Collection findAllActiveByDefinitions(int studyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
@@ -253,6 +334,13 @@ public class CRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Method that returns all active crfs by definitions in the current study.
+	 *
+	 * @param studyId
+	 *            int
+	 * @return Collection
+	 */
 	public Collection findAllActiveByDefinitionsForCurrentStudy(int studyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
@@ -267,10 +355,28 @@ public class CRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Method that finds all crfs.
+	 * 
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
+	 * @return Collection
+	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}
 
+	/**
+	 * Method that finds crf by id.
+	 * 
+	 * @param id
+	 *            int
+	 * @return EntityBean
+	 */
 	public EntityBean findByPK(int id) {
 		CRFBean eb = new CRFBean();
 		this.setTypesExpected();
@@ -287,6 +393,13 @@ public class CRFDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * Method that finds crf by item oid.
+	 * 
+	 * @param itemOid
+	 *            String
+	 * @return CRFBean
+	 */
 	public CRFBean findByItemOid(String itemOid) {
 		CRFBean eb = new CRFBean();
 		this.setTypesExpected();
@@ -303,6 +416,13 @@ public class CRFDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * Method that finds crf by name.
+	 *
+	 * @param name
+	 *            String
+	 * @return CRFBean
+	 */
 	public EntityBean findByName(String name) {
 		CRFBean eb = new CRFBean();
 		this.setTypesExpected();
@@ -320,6 +440,15 @@ public class CRFDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * Method that finds crf by name that does not have the certain id.
+	 *
+	 * @param crfId
+	 *            int
+	 * @param name
+	 *            String
+	 * @return CRFBean
+	 */
 	public EntityBean findAnotherByName(String name, int crfId) {
 		CRFBean eb = new CRFBean();
 		this.setTypesExpected();
@@ -338,15 +467,46 @@ public class CRFDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * Method that finds crf by permissions.
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
+	 * @return Collection
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}
 
+	/**
+	 * Method that finds crf by permissions.
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @return Collection
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
 		return new ArrayList();
 	}
 
+	/**
+	 * Method that find crf by crfVersionId.
+	 * 
+	 * @param crfVersionId
+	 *            int
+	 * @return CRFBean
+	 */
 	public CRFBean findByVersionId(int crfVersionId) {
 		CRFBean answer = new CRFBean();
 
@@ -367,6 +527,15 @@ public class CRFDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns next crf oid by crf bean and crfName.
+	 * 
+	 * @param crfBean
+	 *            CRFBean
+	 * @param crfName
+	 *            String
+	 * @return String
+	 */
 	private String getOid(CRFBean crfBean, String crfName) {
 
 		String oid;
@@ -378,6 +547,15 @@ public class CRFDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method returns valid crf oid by crf bean and crfName.
+	 * 
+	 * @param crfBean
+	 *            CRFBean
+	 * @param crfName
+	 *            String
+	 * @return String
+	 */
 	public String getValidOid(CRFBean crfBean, String crfName) {
 
 		String oid = getOid(crfBean, crfName);
@@ -389,6 +567,13 @@ public class CRFDAO extends AuditableEntityDAO {
 		return oid;
 	}
 
+	/**
+	 * Method that returns list of crfs by oid.
+	 * 
+	 * @param oid
+	 *            String
+	 * @return ArrayList<CRFBean>
+	 */
 	public ArrayList<CRFBean> findAllByOid(String oid) {
 		HashMap<Integer, String> variables = new HashMap<Integer, String>();
 		variables.put(1, oid);
@@ -396,6 +581,13 @@ public class CRFDAO extends AuditableEntityDAO {
 		return executeFindAllQuery("findByOID", variables);
 	}
 
+	/**
+	 * Method that returns crf by oid.
+	 * 
+	 * @param oid
+	 *            String
+	 * @return CRFBean
+	 */
 	public CRFBean findByOid(String oid) {
 		this.unsetTypeExpected();
 		setTypesExpected();
@@ -414,6 +606,13 @@ public class CRFDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method that returns list of crf names by studyId.
+	 * 
+	 * @param studyId
+	 *            int
+	 * @return List<String>
+	 */
 	public List<String> getAllCRFNamesFromStudy(int studyId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.STRING);
@@ -429,19 +628,45 @@ public class CRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Method that deletes crf by crfId.
+	 * 
+	 * @param crfId
+	 *            int
+	 */
 	public void deleteCrfById(int crfId) {
+		int index = 1;
 		String sql = digester.getQuery("deleteCrfByCrfId");
 		HashMap variables = new HashMap();
-		variables.put(1, crfId);
-		variables.put(2, crfId);
-		variables.put(3, crfId);
-		variables.put(4, crfId);
-		variables.put(5, crfId);
-		variables.put(6, crfId);
-		variables.put(7, crfId);
-		variables.put(8, crfId);
-		variables.put(9, crfId);
-		variables.put(10, crfId);
+		variables.put(index++, crfId);
+		variables.put(index++, crfId);
+		variables.put(index++, crfId);
+		variables.put(index++, crfId);
+		variables.put(index++, crfId);
+		variables.put(index++, crfId);
+		variables.put(index++, crfId);
+		variables.put(index++, crfId);
+		variables.put(index++, crfId);
+		variables.put(index, crfId);
 		this.execute(sql, variables);
+	}
+
+	/**
+	 * Method that returns crfs that are available for evaluation.
+	 * 
+	 * @param currentStudyId
+	 *            int
+	 * @return CRFBean list
+	 */
+	public List<CRFBean> findAllEvaluableCrfs(int currentStudyId) {
+		List result = new ArrayList<CRFBean>();
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, currentStudyId);
+		ArrayList objList = select(digester.getQuery("findAllEvaluableCrfs"), variables);
+		for (Object object : objList) {
+			result.add(getEntityFromHashMap((HashMap) object));
+		}
+		return result;
 	}
 }

@@ -3,6 +3,7 @@ package com.clinovo.model;
 import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
 import com.clinovo.jmesa.evaluation.CRFEvaluationItem;
 import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -12,8 +13,8 @@ import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.web.table.filter.CRFFilter;
 import org.akaza.openclinica.web.table.filter.StudyEventTableRowFilter;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -156,7 +157,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 		Row row = tableFacade.getTable().getRow();
 
 		configureColumn(row.getColumn(CRF_NAME), messageSource.getMessage(CRF_EVALUATION_TABLE_CRF_NAME, null, locale),
-				null, new CRFFilter(dataSource, currentStudy), true, true);
+				null, new EvaluableCRFsFilter(), true, true);
 		configureColumn(row.getColumn(STUDY_SUBJECT_ID),
 				messageSource.getMessage(CRF_EVALUATION_TABLE_STUDY_SUBJECT_ID, null, locale), null, null, true, true);
 		configureColumn(row.getColumn(EVENT_NAME),
@@ -168,6 +169,17 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn(ACTION_COLUMN),
 				messageSource.getMessage(CRF_EVALUATION_TABLE_ACTION_COLUMN, null, locale), new ActionsCellEditor(),
 				new DefaultActionsEditor(locale), true, false);
+	}
+
+	private class EvaluableCRFsFilter extends DroplistFilterEditor {
+		@Override
+		protected List<Option> getOptions() {
+			List<Option> options = new ArrayList<Option>();
+			for (CRFBean crf : new CRFDAO(dataSource).findAllEvaluableCrfs(currentStudy.getId())) {
+				options.add(new Option(crf.getName(), crf.getName()));
+			}
+			return options;
+		}
 	}
 
 	private String getIconForCrfStatusPrefix(String title) {

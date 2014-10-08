@@ -186,4 +186,15 @@
             DELETE FROM crf WHERE crf_id = ?;
         </sql>
     </query>
+    <query>
+        <name>findAllEvaluableCrfs</name>
+        <sql>
+            select distinct c.* from event_definition_crf edc
+            left join study s ON s.study_id = ?
+            left join crf c ON c.status_id = 1 and (select count(distinct cv.crf_version_id) from crf_version cv where cv.crf_id = c.crf_id and cv.status_id = 1) > 0 and c.crf_id = edc.crf_id
+            where edc.evaluated_crf = true and edc.status_id = 1 and edc.hide_crf = false
+            and ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id)))
+            order by c.name
+        </sql>
+    </query>
 </queries>

@@ -353,4 +353,9 @@ public class CRFDaoTest extends DefaultAppContextTest {
 		crfBean = (CRFBean) crfdao.create(crfBean);
 		assertTrue(crfBean.isActive());
 	}
+
+	@Test
+	public void testThatFindAllEvaluableCrfsReturnsCorrectCollectionSize() {
+		assertTrue(crfdao.findAllEvaluableCrfs(1).size() == 2);
+	}
 }
