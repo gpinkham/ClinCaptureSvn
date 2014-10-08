@@ -17,7 +17,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <c:set var="contextPath" value="${pageContext.request.contextPath}" />
-
     <title>ClinCapture <fmt:message key="view_data_entry" bundle="${resword}" /></title>
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
@@ -33,56 +32,68 @@
     <script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/scriptaculous.js?load=effects"></script>
     <script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/effects.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery-ui.min.js"></script>
-    <!-- Added for the new Calender -->
-
     <ui:calendar/>
     <ui:theme/>
     <script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script>
 </head>
-<body class="aka_bodywidth">	<script language="JavaScript" type="text/javascript">
-	function disableElements() {
-		jQuery("table > tbody  tr").attr("repeat", "0");
-		jQuery("table > tbody  button").attr("disabled", "true");		jQuery("table > tbody  input").attr("disabled", "disabled");		jQuery("table > tbody a").removeAttr("onmouseover");
-		jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
-		jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");		jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
-	}			
-	function calcCenterOfElement(element){		var center = {
-			x: element.offset().left + element.width()/2, 
-			y: element.offset().top + element.height()/2		}		return center;
-	}
+<body class="aka_bodywidth">
+<script language="JavaScript" type="text/javascript">
 
-	function calcOffset(target, bullet){		var offset = {			delta_x: target.x - bullet.x, 
-			delta_y: target.y - bullet.y
-		}
-		return offset;	}
-	
-	function annotateAllRadioButtons(){
-		$('input[id*=input][type=radio]').each(annotateElement);		return;
-	}
-	
-	function annotateAllCheckBoxes(){		$('input[id*=input][type=checkbox]').each(annotateElement);	
-		return;
-	}
-	
-	function annotateElement(i, element){
-		var aDivId = 'a_div_' + element.id;
-		//var annotationTextDiv = $('div[id=' + aDivId + ']');
-		var annotationTextDiv = $(element).prev();
-		var offset = calcOffset(calcCenterOfElement($(element)), calcCenterOfElement(annotationTextDiv));
-		annotationTextDiv.css({
-			'left': annotationTextDiv.offset().left + offset.delta_x + 'px', 
-			'top': annotationTextDiv.offset().top + offset.delta_y + 'px',
-			'display': '',
-			'visibility': 'visible'
-		});
-		return;
-	}
-	
-	$(window).load(function() {
-		annotateAllRadioButtons();
-		annotateAllCheckBoxes();
-		disableElements();
-	})
+    function disableElements() {
+        jQuery("table > tbody  tr").attr("repeat", "0");
+        jQuery("table > tbody  button").attr("disabled", "true");
+        jQuery("table > tbody  input").attr("disabled", "disabled");
+        jQuery("table > tbody a").removeAttr("onmouseover");
+        jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
+        jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
+        jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
+    }
+
+    function calcCenterOfElement(element) {
+        var center = {
+            x: element.offset().left + element.width() / 2,
+            y: element.offset().top + element.height() / 2
+        }
+        return center;
+    }
+
+    function calcOffset(target, bullet) {
+        var offset = {
+            delta_x: target.x - bullet.x,
+            delta_y: target.y - bullet.y
+        }
+        return offset;
+    }
+
+    function annotateAllRadioButtons() {
+        $('input[id*=input][type=radio]').each(annotateElement);
+        return;
+    }
+
+    function annotateAllCheckBoxes() {
+        $('input[id*=input][type=checkbox]').each(annotateElement);
+        return;
+    }
+
+    function annotateElement(i, element) {
+        var aDivId = 'a_div_' + element.id;
+        var annotationTextDiv = $(element).prev();
+        var offset = calcOffset(calcCenterOfElement($(element)), calcCenterOfElement(annotationTextDiv));
+        annotationTextDiv.css({
+            'left': annotationTextDiv.offset().left + offset.delta_x + 'px',
+            'top': annotationTextDiv.offset().top + offset.delta_y + 'px',
+            'display': '',
+            'visibility': 'visible'
+        });
+        return;
+    }
+
+    $(window).load(function () {
+        deleteHideStuff();
+        annotateAllRadioButtons();
+        annotateAllCheckBoxes();
+        disableElements();
+    })
 </script>
 
 <c:set var="prevItemHolderId" value="0"/>
@@ -809,7 +820,7 @@
 </table> <!-- End Table Contents -->
 
 </div>
-	
+
 </body>
 <jsp:include page="../include/changeTheme.jsp" />
 </html>
