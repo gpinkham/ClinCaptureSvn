@@ -21,7 +21,6 @@
 <form:hidden path="${paramPath}.group.orderId"/>
 <form:hidden path="${paramPath}.group.parentId"/>
 <form:hidden path="${paramPath}.group.version"/>
-<form:hidden path="${paramPath}.group.isStudySpecific"/>
 <form:hidden id="state_group_id_${grp.group.id}" path="${paramPath}.opened"/>
 
 <div class="group"><img id="img_group_id_${grp.group.id}"

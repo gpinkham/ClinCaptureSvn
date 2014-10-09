@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="Frank" id="2014-09-10-TICKET1722-DELETE-FROM-SYSTEM">
+		<comment>Delete medical coding properties allowCodingVerification, medicalCodingApprovalNeeded and medicalCodingContextNeeded from system</comment>
+		<delete tableName="system">
+			<where>name = 'allowCodingVerification'</where>
+		</delete>
+		<delete tableName="system">
+			<where>name = 'medicalCodingApprovalNeeded'</where>
+		</delete>
+		<delete tableName="system">
+			<where>name = 'medicalCodingContextNeeded'</where>
+		</delete>
+	</changeSet>
+	<changeSet author="Frank" id="2014-09-10-TICKET1722-UPDATE-SYSTEM">
+		<comment>Update order_id values for medical coding system properties</comment>
+		<update tableName="system">
+			<column name="order_id" value="1" />
+			<where>name = 'defaultBioontologyURL'</where>
+		</update>
+		<update tableName="system">
+			<column name="order_id" value="2" />
+			<where>name = 'medicalCodingApiKey'</where>
+		</update>
+		<update tableName="system">
+			<column name="order_id" value="3" />
+			<where>name = 'autoCodeDictionaryName'</where>
+		</update>
+	</changeSet>
+	<changeSet author="Frank"
+		id="2014-09-10-TICKET1722-DROP-SYSTEM-GROUP-COL">
+		<comment>drop column is_study_specific as it is no longer used</comment>
+		<dropColumn columnName="is_study_specific" tableName="system_group" />
+	</changeSet>
+</databaseChangeLog>

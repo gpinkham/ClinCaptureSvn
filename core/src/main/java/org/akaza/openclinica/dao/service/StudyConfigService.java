@@ -194,17 +194,11 @@ public class StudyConfigService {
 		        spc.setAutoCreateSubjectDuringImport(value);
 		    } else if (handle.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
 		        spc.setReplaceExisitingDataDuringImport(value);
-			} else if (handle.equalsIgnoreCase("allowCodingVerification")) {
-				spc.setAllowCodingVerification(value);
 			} else if (handle.equalsIgnoreCase("defaultBioontologyURL")) {
 				spc.setDefaultBioontologyURL(value);
 			} else if (handle.equalsIgnoreCase("autoCodeDictionaryName")) {
 				spc.setAutoCodeDictionaryName(value);
-			} else if (handle.equalsIgnoreCase("medicalCodingApprovalNeeded")) {
-				spc.setMedicalCodingApprovalNeeded(value);
-			} else if (handle.equalsIgnoreCase("medicalCodingContextNeeded")) {
-		        spc.setMedicalCodingContextNeeded(value);
-		    } else if (handle.equalsIgnoreCase("medicalCodingApiKey")) {
+			} else if (handle.equalsIgnoreCase("medicalCodingApiKey")) {
 		        spc.setMedicalCodingApiKey(value);
 		    } else if (handle.equalsIgnoreCase("assignRandomizationResultTo")) {
 		    	spc.setAssignRandomizationResultTo(value);

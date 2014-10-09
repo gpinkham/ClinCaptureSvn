@@ -26,7 +26,6 @@ public class SystemGroupHolder implements Serializable {
 
 	private SystemGroup group;
 	private boolean opened;
-	private boolean isStudySpecific;
 
 	private List<SystemGroupHolder> subGroups = new ArrayList<SystemGroupHolder>();
 
@@ -69,20 +68,5 @@ public class SystemGroupHolder implements Serializable {
 
 	public void setSystemProperties(List<com.clinovo.model.System> systemProperties) {
 		this.systemProperties = systemProperties;
-	}
-
-	/**
-	 * @return the isStudySpecific
-	 */
-	public boolean getIsStudySpecific() {
-		return isStudySpecific;
-	}
-
-	/**
-	 * @param isStudySpecific
-	 *            the isStudySpecific to set
-	 */
-	public void setIsStudySpecific(boolean isStudySpecific) {
-		this.isStudySpecific = isStudySpecific;
 	}
 }
