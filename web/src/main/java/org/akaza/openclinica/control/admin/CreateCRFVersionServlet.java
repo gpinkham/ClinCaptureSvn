@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -69,7 +69,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Create a new CRF version by uploading excel file.
- * 
+ *
  * @author jxu, ywang
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
@@ -95,7 +95,8 @@ public class CreateCRFVersionServlet extends Controller {
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
+				"1");
 	}
 
 	/**
@@ -103,16 +104,28 @@ public class CreateCRFVersionServlet extends Controller {
 	 */
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		FormProcessor fp = new FormProcessor(request);
 		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.reset();
 		panel.setStudyInfoShown(true);
 		String action = request.getParameter("action");
+
+		if ("autoupload".equalsIgnoreCase(action)) {
+			CRFVersionBean crfVersionBean = new CRFVersionBean();
+			crfVersionBean.setCrfId(fp.getInt("crfId"));
+			request.getSession().setAttribute("version", crfVersionBean);
+			request.setAttribute("crfAutoUploadMode", true);
+		}
 		CRFVersionBean version = (CRFVersionBean) request.getSession().getAttribute("version");
 		HashMap errors = getErrorsHolder(request);
 		if (StringUtil.isBlank(action)) {
 			logger.info("action is blank");
 			request.setAttribute("version", version);
 			forwardPage(Page.CREATE_CRF_VERSION, request, response);
+		} else if ("autoupload".equalsIgnoreCase(action)) {
+			if (confirm(request, response, version, errors)) {
+				confirmSql(request, response, version);
+			}
 		} else if ("confirm".equalsIgnoreCase(action)) {
 			confirm(request, response, version, errors);
 		} else if ("confirmsql".equalsIgnoreCase(action)) {
@@ -262,11 +275,12 @@ public class CreateCRFVersionServlet extends Controller {
 		}
 	}
 
-	private void confirm(HttpServletRequest request, HttpServletResponse response, CRFVersionBean version,
+	private boolean confirm(HttpServletRequest request, HttpServletResponse response, CRFVersionBean version,
 			HashMap errors) {
 		final int versionNameLength = 255;
 		FormProcessor fp = new FormProcessor(request);
 
+		String action = request.getParameter("action");
 		UserAccountBean ub = getUserAccountBean(request);
 
 		CRFDAO cdao = getCRFDAO();
@@ -278,10 +292,12 @@ public class CreateCRFVersionServlet extends Controller {
 			logger.info("The filePath in datainfo.properties is invalid " + dir);
 			addPageMessage(resword.getString("the_filepath_you_defined"), request);
 			forwardPage(Page.CREATE_CRF_VERSION, request, response);
-			return;
+			return false;
 		}
+		// All the uploaded files will be saved in filePath/crf/original/
 		String theDir = dir + "crf" + File.separator + "original" + File.separator;
 		if (!(new File(theDir)).isDirectory()) {
+			// noinspection ResultOfMethodCallIgnored
 			(new File(theDir)).mkdirs();
 			logger.info("Made the directory " + theDir);
 		}
@@ -292,18 +308,19 @@ public class CreateCRFVersionServlet extends Controller {
 			Validator.addError(errors, "excel_file", crfException.getMessage());
 			request.setAttribute("formMessages", errors);
 			forwardPage(Page.CREATE_CRF_VERSION, request, response);
-			return;
+			return false;
 		} catch (Exception e) {
-			//
 			logger.warn("*** Found exception during file upload***");
 			e.printStackTrace();
 		}
 		request.getSession().setAttribute("tempFileName", tempFile);
+		// At this point, if there are errors, they point to no file
+		// provided and/or not xls format
 		if (errors.isEmpty()) {
 			NewCRFBean newCRFBean = (NewCRFBean) request.getSession().getAttribute("nib");
 			if (newCRFBean == null) {
 				forwardPage(Page.CREATE_CRF_VERSION, request, response);
-				return;
+				return false;
 			}
 			String versionName = newCRFBean.getVersionName();
 			if (versionName.length() > versionNameLength) {
@@ -321,7 +338,7 @@ public class CreateCRFVersionServlet extends Controller {
 			logger.info("has validation errors ");
 			request.setAttribute("formMessages", errors);
 			forwardPage(Page.CREATE_CRF_VERSION, request, response);
-			return;
+			return false;
 		} else {
 			CRFBean crf = (CRFBean) cdao.findByPK(version.getCrfId());
 			ArrayList versions = (ArrayList) vdao.findAllByCRF(crf.getId());
@@ -331,23 +348,24 @@ public class CreateCRFVersionServlet extends Controller {
 					logger.info("Version already exists; owner or not:" + ub.getId() + "," + version1.getOwnerId());
 					if (ub.getId() != version1.getOwnerId()) {
 						addPageMessage(respage.getString("CRF_version_try_upload_exists_database")
-								+ version1.getOwner().getName() + respage.getString("please_contact_owner_to_delete"),
+										+ version1.getOwner().getName() + respage
+										.getString("please_contact_owner_to_delete"),
 								request);
 						forwardPage(Page.CREATE_CRF_VERSION, request, response);
-						return;
+						return false;
 					} else {
 						ArrayList definitions = edao.findByDefaultVersion(version1.getId());
 						if (!definitions.isEmpty()) {
 							request.setAttribute("definitions", definitions);
 							forwardPage(Page.REMOVE_CRF_VERSION_DEF, request, response);
-							return;
+							return false;
 						} else {
 							int previousVersionId = version1.getId();
 							version.setId(previousVersionId);
 							request.getSession().setAttribute("version", version);
 							request.getSession().setAttribute("previousVersionId", previousVersionId);
 							forwardPage(Page.REMOVE_CRF_VERSION_CONFIRM, request, response);
-							return;
+							return false;
 						}
 					}
 				}
@@ -356,27 +374,28 @@ public class CreateCRFVersionServlet extends Controller {
 			List excelErr = (ArrayList) request.getSession().getAttribute("excelErrors");
 			logger.info("excelErr.isEmpty()=" + excelErr.isEmpty());
 			if (excelErr.isEmpty()) {
-				addPageMessage(resword.getString("congratulations_your_spreadsheet_no_errors"), request);
-				forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PREVIEW, request, response);
+				if (!action.equals("autoupload")) {
+					addPageMessage(resword.getString("congratulations_your_spreadsheet_no_errors"), request);
+					forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PREVIEW, request, response);
+					return true;
+				}
 			} else {
 				logger.info("OpenClinicaException thrown, forwarding to CREATE_CRF_VERSION_CONFIRM.");
 				forwardPage(Page.CREATE_CRF_VERSION_CONFIRM, request, response);
+				return false;
 			}
 		}
+		return true;
 	}
 
 	/**
 	 * Uploads the excel version file.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param theDir
-	 *            String
-	 * @param version
-	 *            CRFVersionBean
+	 *
+	 * @param request HttpServletRequest
+	 * @param theDir  String
+	 * @param version CRFVersionBean
 	 * @return temp file name
-	 * @throws Exception
-	 *             in case of failure
+	 * @throws Exception in case of failure
 	 */
 	public String uploadFile(HttpServletRequest request, String theDir, CRFVersionBean version) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
@@ -486,13 +505,13 @@ public class CreateCRFVersionServlet extends Controller {
 							if (isOwner) {
 								warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
 										+ resexception.getString("in_your_spreadsheet_already_exists")
-										+ ib.getDataType().getName() + ") " + resword.getString("and_or") 
+										+ ib.getDataType().getName() + ") " + resword.getString("and_or")
 										+ " UNITS("
 										+ ib.getUnits() + ").");
 							} else {
 								warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
 										+ resexception.getString("in_your_spreadsheet_already_exists")
-										+ ib.getDataType().getName() + ") " + resword.getString("and_or") 
+										+ ib.getDataType().getName() + ") " + resword.getString("and_or")
 										+ " UNITS("
 										+ ib.getUnits() + ").");
 							}
@@ -542,11 +561,9 @@ public class CreateCRFVersionServlet extends Controller {
 
 	/**
 	 * Checks whether the version can be deleted.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param previousVersionId
-	 *            int
+	 *
+	 * @param request           HttpServletRequest
+	 * @param previousVersionId int
 	 * @return boolean
 	 */
 	private boolean canDeleteVersion(HttpServletRequest request, int previousVersionId) {
@@ -588,11 +605,9 @@ public class CreateCRFVersionServlet extends Controller {
 	/**
 	 * Checks whether the item with same name has the same other fields: units, phi_status if no, they are two different
 	 * items, cannot have the same same.
-	 * 
-	 * @param items
-	 *            items from excel
-	 * @param version
-	 *            crf version bean
+	 *
+	 * @param items   items from excel
+	 * @param version crf version bean
 	 * @return the items found
 	 */
 	public List<ItemBean> isItemSame(HashMap<String, ItemBean> items, CRFVersionBean version) {
@@ -650,17 +665,15 @@ public class CreateCRFVersionServlet extends Controller {
 	/**
 	 * When the version is added, for each non-new item OpenClinica should check the RESPONSE_OPTIONS_TEXT, and
 	 * RESPONSE_VALUES used for the item in other versions of the CRF.
-	 * 
+	 * <p/>
 	 * For a given RESPONSE_VALUES code, the associated RESPONSE_OPTIONS_TEXT string is different than in a previous
 	 * version
-	 * 
+	 * <p/>
 	 * For a given RESPONSE_OPTIONS_TEXT string, the associated RESPONSE_VALUES code is different than in a previous
 	 * version
-	 * 
-	 * @param oldRes
-	 *            ResponseSetBean
-	 * @param newRes
-	 *            ResponseSetBean
+	 *
+	 * @param oldRes ResponseSetBean
+	 * @param newRes ResponseSetBean
 	 * @return The original option
 	 */
 	@SuppressWarnings("unused")
@@ -680,16 +693,10 @@ public class CreateCRFVersionServlet extends Controller {
 				for (int j = i; j < newOptions.size(); j++) { // from
 					// spreadsheet
 					ResponseOptionBean rob1 = (ResponseOptionBean) newOptions.get(j);
-
-					// Fix the problem of cannot recognize the same responses
 					String text1 = restoreQuotes(rob1.getText());
-
 					String value1 = restoreQuotes(rob1.getValue());
 
 					if (StringUtil.isBlank(text1) && StringUtil.isBlank(value1)) {
-						// this response label appears in the spreadsheet
-						// multiple times, so
-						// ignore the checking for the repeated ones
 						break;
 					}
 					if (text1.equalsIgnoreCase(text) && !value1.equals(value)) {
@@ -709,13 +716,10 @@ public class CreateCRFVersionServlet extends Controller {
 
 	/**
 	 * Copy one file to another.
-	 * 
-	 * @param src
-	 *            File
-	 * @param dst
-	 *            File
-	 * @throws IOException
-	 *             in case of IO errors
+	 *
+	 * @param src File
+	 * @param dst File
+	 * @throws IOException in case of IO errors
 	 */
 	public void copy(File src, File dst) throws IOException {
 		final int maxSize = 1024;
@@ -736,9 +740,8 @@ public class CreateCRFVersionServlet extends Controller {
 	 * restoreQuotes, utility function meant to replace double quotes in strings with single quote. Don''t -> Don't, for
 	 * example. If the option text has single quote, it is changed to double quotes for SQL compatibility, so we will
 	 * change it back before the comparison
-	 * 
-	 * @param subj
-	 *            the subject line
+	 *
+	 * @param subj the subject line
 	 * @return A string with all the quotes escaped.
 	 */
 	public String restoreQuotes(String subj) {

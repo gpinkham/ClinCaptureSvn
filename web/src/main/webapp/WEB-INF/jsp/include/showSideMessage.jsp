@@ -9,6 +9,14 @@
 <jsp:useBean scope='request' id='pageMessages' class='java.util.ArrayList'/>
 <%--<jsp:useBean scope='request' id='message' class='java.lang.String'/>--%>
 
+<c:if test="${crfAutoUploadMode && !empty pageMessages}">
+<!-- <import-error>
+<c:forEach var="message" items="${pageMessages}">
+    ${message}<br/>
+</c:forEach>
+</import-error> -->
+</c:if>
+
 <c:if test="${!empty pageMessages}">
 <div class="alert">    
 <c:forEach var="message" items="${pageMessages}">

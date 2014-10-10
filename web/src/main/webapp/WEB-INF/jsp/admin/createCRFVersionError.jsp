@@ -63,6 +63,13 @@
 
 </div></div></div></div></div></div></div></div>
 <br/>
+<c:if test="${!empty excelErrors}">
+<!-- <import-error>
+<c:forEach var="error" items="${excelErrors}">
+    ${error}<br/>
+</c:forEach>
+</import-error> -->
+</c:if>
 <c:forEach var="error" items="${excelErrors}">
 <span class="alert"><c:out value="${error}"/></span><br/><hr/>
 </c:forEach>

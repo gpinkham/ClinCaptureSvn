@@ -14,6 +14,12 @@
 </c:otherwise>
 </c:choose>
 
+<!--
+<crf-id>${crfId}</crf-id>
+-->
+<!--
+<crf-version-id>${crfVersionId}</crf-version-id>
+-->
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>

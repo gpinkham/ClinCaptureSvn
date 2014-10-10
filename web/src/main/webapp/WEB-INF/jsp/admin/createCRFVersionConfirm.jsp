@@ -128,6 +128,13 @@
 <br>
 <fmt:message key="there_were_several_invalid_fields" bundle="${restext}"/> 
 <br>
+<c:if test="${!empty excelErrors}">
+<!-- <import-error>
+<c:forEach var="error" items="${excelErrors}">
+    ${error}<br/>
+</c:forEach>
+</import-error> -->
+</c:if>
 <c:forEach var="error" items="${excelErrors}">
 <span class="alert"><c:out value="${error}"/><br></span>
 </c:forEach>
