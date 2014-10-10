@@ -69,7 +69,8 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%><d
         <c:set var="checkInputsValue" value="0" />    </c:otherwise></c:choose>
 
 <table width="75%"><tr><td>
-<h1><span class="first_level_header"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />         <c:choose>
+<span class="first_level_header"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
+    <c:choose>
             <c:when test="${eventCRF.stage.initialDE and !eventCRF.notStarted}">
                 <img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>"
                      title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">            </c:when>
@@ -109,15 +110,19 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%><d
             <c:otherwise>
                 <img src="images/icon_NotStarted.gif" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
             </c:otherwise>
-        </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
-		<h1><span class="first_level_header"><fmt:message key="subject_ID" bundle="${resword}"/>: <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
-<%--the tabId default value is set in DataEntryServlet.getInputBeans()--%>
-
-
+       </c:choose></b>  &nbsp;&nbsp;</span></td>
+    </tr>
+    <tr>
+        <td>
+        <span class="first_level_header">
+            <fmt:message key="subject_ID" bundle="${resword}"/>: <c:out value="${studySubject.label}"/>&nbsp;&nbsp;
+        </span>
+        </td>
+    </tr>
+</table>
 
 <!--InitialDataEntry  inputs-->
-<form id="mainForm" name="crfForm" method="post" action="InitialDataEntry">
-<c:if test="${justCloseWindow}"><input type="hidden" name="cw" value="1" /></c:if>
+<form id="mainForm" name="crfForm" method="post" action="InitialDataEntry"><c:if test="${justCloseWindow}"><input type="hidden" name="cw" value="1" /></c:if>
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
 <input type="hidden" name="crfVersionId" value="<c:out value="${section.eventCRF.CRFVersionId}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />

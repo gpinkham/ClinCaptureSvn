@@ -54,7 +54,7 @@
     </c:otherwise>
 </c:choose>
 <table width="75%"><tr><td>
-<h1><span class="first_level_header"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
+<span class="first_level_header"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
          <c:choose>            <c:when test="${eventCRF.stage.initialDE}">
                 <img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>"
                      title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
@@ -95,12 +95,19 @@
             <c:otherwise>
                 <img src="images/icon_NotStarted.gif" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
             </c:otherwise>
-        </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
-		<h1><span class="first_level_header"><fmt:message key="subject_ID" bundle="${resword}"/>: <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
+         </c:choose></b>&nbsp;&nbsp;</span></td>
+    </tr>
+    <tr>
+        <td>
+            <span class="first_level_header">
+                <fmt:message key="subject_ID" bundle="${resword}"/>: <c:out value="${studySubject.label}"/>&nbsp;&nbsp;
+            </span>
+        </td>
+    </tr>
+</table>
 
 <form id="mainForm" name="crfForm" method="POST" action="DoubleDataEntry">
-<c:if test="${justCloseWindow}"><input type="hidden" name="cw" value="1" /></c:if>
-<input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
+<c:if test="${justCloseWindow}"><input type="hidden" name="cw" value="1" /></c:if><input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
 <input type="hidden" name="tabId" value="<c:out value="${tabId}"/>" />

@@ -2811,3 +2811,12 @@ span.annotated_crfOID, span.annotated_eventOID{
 	color: red; 
 	background:#ffffcc;
 }
+
+.header_crf_cell {
+    border: 1px solid #c5c5c5;
+    border-spacing: 10px;
+    border-collapse: separate;
+    padding: 1px;
+    padding-left: 5px;
+    color: #789EC5;
+}

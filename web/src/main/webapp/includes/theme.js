@@ -95,6 +95,7 @@ var applyCommonStylesForTheme = function(theme) {
 
     $('input.navSearch:text').css('background-color', theme.navSearchColor);
     $('.table_cell_noborder').css('color', theme.mainColor);
+    $('.header_crf_cell').css('color', theme.mainColor);
     $('.table_cell_top').css('color', theme.mainColor);
     $('.table_cell_br_colored').css('color', theme.mainColor);
     $('.table_header_column_top').css('color', theme.mainColor);
