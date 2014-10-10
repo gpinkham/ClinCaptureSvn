@@ -43,6 +43,7 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 		RandomizationUtil.setStudySubjectDAO(studySubjectDAO);
 		RandomizationUtil.setItemDataDAO(itemDataDAO);
 		RandomizationUtil.setSubjectDAO(subjectDAO);
+		RandomizationUtil.setStudyParameterValueDAO(studyParameterValueDAO);
 
 		SessionManager manager = Mockito.mock(SessionManager.class);
 		Mockito.when(manager.getDataSource()).thenReturn(null);
@@ -50,25 +51,22 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 		RandomizationUtil.setSessionManager(manager);
 		RandomizationUtil randomizationUtil = new RandomizationUtil();
 
-		Whitebox.setInternalState(randomizationUtil, "itemDataDAO",
-				mockedItemDataDAO);
+		Whitebox.setInternalState(randomizationUtil, "itemDataDAO", mockedItemDataDAO);
 
 		request = new MockHttpServletRequest();
 		request.getSession().setAttribute("userBean", createUserAccountBean());
 		request.setParameter("eventCrfId", "1");
 		request.setParameter("dateInputId", "1");
 		request.setParameter("resultInputId", "1");
-		request.setParameter(
-				"strataLevel",
+		request.setParameter("strataLevel",
 				"[{\"StratificationID\":1,\"Level\":\"2\"},{\"StratificationID\":2,\"Level\":\"1\"}]");
 		request.setParameter("strataItemIds", "[1,2]");
 		request.setParameter("trialIdItemId", "1");
 		request.setParameter("trialId", "12");
 		request.setParameter("trialIdItemValue", "2");
 
-		Mockito.when(
-				mockedItemDataDAO.findByItemIdAndEventCRFId(Mockito.anyInt(),
-						Mockito.anyInt())).thenReturn(new ItemDataBean());
+		Mockito.when(mockedItemDataDAO.findByItemIdAndEventCRFId(Mockito.anyInt(), Mockito.anyInt())).thenReturn(
+				new ItemDataBean());
 
 		Mockito.when(mockedItemDataDAO.isQuerySuccessful()).thenReturn(true);
 	}
@@ -100,8 +98,7 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 	@Test
 	public void testThatIsConfiguredTrialIdValidReturnsTrueIfIdIsSpecified() {
 
-		assertTrue(RandomizationUtil
-				.isConfiguredTrialIdValid("some-configured-id"));
+		assertTrue(RandomizationUtil.isConfiguredTrialIdValid("some-configured-id"));
 	}
 
 	@Test
@@ -123,89 +120,85 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 	}
 
 	@Test
+	public void testThatGetRandomizationTrialIdByStudyWorksForStudy() {
+		assertEquals("1223", RandomizationUtil.getRandomizationTrialIdByStudy((StudyBean) studyDAO.findByPK(1)));
+	}
+
+	@Test
+	public void testThatGetRandomizationTrialIdByStudyWorksForSite() {
+		StudyBean site = new StudyBean();
+		site.setParentStudyId(1);
+		assertEquals("1223", RandomizationUtil.getRandomizationTrialIdByStudy(site));
+	}
+
+	@Test
 	public void testThatIsTrialDoubleConfiguredReturnsTrueIfTrialIdIsSpecifiedInBothPlaces() {
 
-		assertTrue(RandomizationUtil.isTrialIdDoubleConfigured(
-				"some-configured-trial-id", "some-crf-id"));
+		assertTrue(RandomizationUtil.isTrialIdDoubleConfigured("some-configured-trial-id", "some-crf-id"));
 	}
 
 	@Test
 	public void testThatIsTrialDoubleConfiguredReturnsFalseIfTrialIdIsOnlyConfiguredInPropertiesFileForUndefined() {
 
-		assertFalse(RandomizationUtil.isTrialIdDoubleConfigured(
-				"some-configured-id", "undefined"));
+		assertFalse(RandomizationUtil.isTrialIdDoubleConfigured("some-configured-id", "undefined"));
 	}
 
 	@Test
 	public void testThatIsTrialDoubleConfiguredReturnsFalseIfTrialIdIsOnlyConfiguredInPropertiesFileForNull() {
 
-		assertFalse(RandomizationUtil.isTrialIdDoubleConfigured(
-				"some-configured-id", "null"));
+		assertFalse(RandomizationUtil.isTrialIdDoubleConfigured("some-configured-id", "null"));
 	}
 
 	@Test
 	public void testThatIsTrialDoubleConfiguredReturnsFalseIfTrialIdIsOnlyConfiguredInPropertiesFileForEmptyString() {
 
-		assertFalse(RandomizationUtil.isTrialIdDoubleConfigured(
-				"some-configured-id", ""));
+		assertFalse(RandomizationUtil.isTrialIdDoubleConfigured("some-configured-id", ""));
 	}
 
 	@Test
 	public void testThatIsTrialDoubleConfiguredReturnsFalseIfTrialIdIsOnlyConfiguredInCRFForUndefined() {
 
-		assertFalse(RandomizationUtil.isTrialIdDoubleConfigured("0",
-				"some-crf-id"));
+		assertFalse(RandomizationUtil.isTrialIdDoubleConfigured("0", "some-crf-id"));
 	}
 
 	public void testThatIsTrialDoubleConfiguredReturnsFalseIfTrialIdIsOnlyConfiguredInCRFForNull() {
 
-		assertFalse(RandomizationUtil.isTrialIdDoubleConfigured(null,
-				"some-crf-id"));
+		assertFalse(RandomizationUtil.isTrialIdDoubleConfigured(null, "some-crf-id"));
 	}
 
 	@Test
 	public void testThatIsTrialDoubleConfiguredReturnsFalseIfTrialIdIsOnlyConfiguredInCRFForEmptyString() {
 
-		assertFalse(RandomizationUtil.isTrialIdDoubleConfigured("",
-				"some-crf-id"));
+		assertFalse(RandomizationUtil.isTrialIdDoubleConfigured("", "some-crf-id"));
 	}
 
 	@Test
-	public void testThatAssignSubjectToGroupDoesNotReturnNull()
-			throws RandomizationException {
+	public void testThatAssignSubjectToGroupDoesNotReturnNull() throws RandomizationException {
 
-		assertNotNull(RandomizationUtil
-				.assignSubjectToGroup(createRandomizationResult()));
+		assertNotNull(RandomizationUtil.assignSubjectToGroup(createRandomizationResult()));
 	}
 
 	@Test
-	public void testThatAssignSubjectToGroupReturnsTheAssignedGroup()
-			throws RandomizationException {
+	public void testThatAssignSubjectToGroupReturnsTheAssignedGroup() throws RandomizationException {
 
-		assertEquals(
-				"Should return assigned group, having the same name as the rando result",
-				"test-group",
-				RandomizationUtil.assignSubjectToGroup(
-						createRandomizationResult()).getName());
+		assertEquals("Should return assigned group, having the same name as the rando result", "test-group",
+				RandomizationUtil.assignSubjectToGroup(createRandomizationResult()).getName());
 
 	}
 
 	@Test(expected = RandomizationException.class)
-	public void testThatRandomizationExceptionIsThrownWhenNoMatchingGroupIsFound()
-			throws RandomizationException {
+	public void testThatRandomizationExceptionIsThrownWhenNoMatchingGroupIsFound() throws RandomizationException {
 
 		RandomizationUtil.setStudyGroupDAO(createStudyGroupDAOMock(null));
 		RandomizationUtil.assignSubjectToGroup(createRandomizationResult());
 	}
 
 	@Test(expected = RandomizationException.class)
-	public void testThatFailedQueryRaisesException()
-			throws RandomizationException {
+	public void testThatFailedQueryRaisesException() throws RandomizationException {
 
 		StudySubjectDAO dao = createStudySubjectDAOMock();
 		Mockito.when(dao.isQuerySuccessful()).thenReturn(Boolean.FALSE);
-		Mockito.when(dao.getFailureDetails()).thenReturn(
-				new SQLException("some-failure-message-from-the-db"));
+		Mockito.when(dao.getFailureDetails()).thenReturn(new SQLException("some-failure-message-from-the-db"));
 
 		RandomizationUtil.setStudySubjectDAO(dao);
 		RandomizationUtil.assignSubjectToGroup(createRandomizationResult());
@@ -214,42 +207,36 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 	@Test
 	public void testThatGetRandomizationItemDataReturnsValidObjects() {
 
-		HashMap<String, ItemDataBean> listOfItems = RandomizationUtil
-				.getRandomizationItemData(request);
+		HashMap<String, ItemDataBean> listOfItems = RandomizationUtil.getRandomizationItemData(request);
 		assertEquals(2, listOfItems.size());
 	}
 
 	@Test
 	public void testThatGetRandomizationItemDataReturnsValidSetOfItems() {
 
-		HashMap<String, ItemDataBean> listOfItems = RandomizationUtil
-				.getRandomizationItemData(request);
+		HashMap<String, ItemDataBean> listOfItems = RandomizationUtil.getRandomizationItemData(request);
 
 		assertNotNull(listOfItems.get("resultItem"));
 		assertNotNull(listOfItems.get("dateItem"));
 	}
 
 	@Test
-	public void testThatSaveStratificationVariablesToDatabaseRunsCorrectly()
-			throws JSONException, RandomizationException {
+	public void testThatSaveStratificationVariablesToDatabaseRunsCorrectly() throws JSONException,
+			RandomizationException {
 
 		RandomizationUtil.saveStratificationVariablesToDatabase(request);
-		Mockito.verify(mockedItemDataDAO).update(
-				Mockito.any(ItemDataBean.class));
+		Mockito.verify(mockedItemDataDAO).update(Mockito.any(ItemDataBean.class));
 	}
 
 	@Test
-	public void testThatSaveTrialIDItemToDatabaseRunsCorretly()
-			throws RandomizationException {
+	public void testThatSaveTrialIDItemToDatabaseRunsCorretly() throws RandomizationException {
 
 		RandomizationUtil.saveTrialIDItemToDatabase(request);
-		Mockito.verify(mockedItemDataDAO).create(
-				Mockito.any(ItemDataBean.class));
+		Mockito.verify(mockedItemDataDAO).create(Mockito.any(ItemDataBean.class));
 	}
 
 	@Test(expected = RandomizationException.class)
-	public void testThatSaveTrialIDItemToDatabaseThrowsExceptionIfItemIdIsIncorrect()
-			throws RandomizationException {
+	public void testThatSaveTrialIDItemToDatabaseThrowsExceptionIfItemIdIsIncorrect() throws RandomizationException {
 
 		request.setParameter("trialIdItemId", "string");
 		RandomizationUtil.saveTrialIDItemToDatabase(request);
@@ -270,9 +257,8 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 
 		StudyGroupClassDAO dao = Mockito.mock(StudyGroupClassDAO.class);
 
-		Mockito.when(
-				dao.findByNameAndStudyId(Mockito.anyString(), Mockito.anyInt()))
-				.thenReturn((StudyGroupClassBean) result);
+		Mockito.when(dao.findByNameAndStudyId(Mockito.anyString(), Mockito.anyInt())).thenReturn(
+				(StudyGroupClassBean) result);
 
 		return dao;
 	}
@@ -285,11 +271,8 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 		StudySubjectDAO dao = Mockito.mock(StudySubjectDAO.class);
 
 		Mockito.when(dao.isQuerySuccessful()).thenReturn(Boolean.TRUE);
-		Mockito.when(dao.update(Mockito.any(EntityBean.class))).thenReturn(
-				new StudyGroupClassBean());
-		Mockito.when(
-				dao.findByLabelAndStudy(Mockito.anyString(),
-						Mockito.any(StudyBean.class))).thenReturn(subject);
+		Mockito.when(dao.update(Mockito.any(EntityBean.class))).thenReturn(new StudyGroupClassBean());
+		Mockito.when(dao.findByLabelAndStudy(Mockito.anyString(), Mockito.any(StudyBean.class))).thenReturn(subject);
 
 		return dao;
 	}
@@ -302,11 +285,8 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 		SubjectDAO dao = Mockito.mock(SubjectDAO.class);
 
 		Mockito.when(dao.isQuerySuccessful()).thenReturn(Boolean.TRUE);
-		Mockito.when(dao.update(Mockito.any(EntityBean.class))).thenReturn(
-				new StudyGroupClassBean());
-		Mockito.when(
-				dao.findByUniqueIdentifierAndStudy(Mockito.anyString(),
-						Mockito.anyInt())).thenReturn(subject);
+		Mockito.when(dao.update(Mockito.any(EntityBean.class))).thenReturn(new StudyGroupClassBean());
+		Mockito.when(dao.findByUniqueIdentifierAndStudy(Mockito.anyString(), Mockito.anyInt())).thenReturn(subject);
 
 		return dao;
 	}

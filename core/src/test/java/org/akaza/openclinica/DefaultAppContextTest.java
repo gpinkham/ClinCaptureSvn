@@ -43,6 +43,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -97,6 +98,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected RulesPostImportContainerService postImportContainerService;
 	protected PasswordRequirementsDao requirementsDao;
 	protected EventServiceInterface eventService;
+	protected StudyParameterValueDAO studyParameterValueDAO;
 
 	// DAOS
 	@Autowired
@@ -192,6 +194,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 		requirementsDao = new PasswordRequirementsDao(configurationDao);
+		studyParameterValueDAO = new StudyParameterValueDAO(dataSource);
 
 		postImportContainerService = new RulesPostImportContainerService(dataSource);
 		postImportContainerService.setRuleDao(ruleDao);

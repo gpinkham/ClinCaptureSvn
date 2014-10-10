@@ -133,12 +133,12 @@ public class RandomizeServlet extends Controller {
 	private void randomize(HttpServletRequest request, PrintWriter writer) throws Exception {
 		StudyBean currentStudy = getCurrentStudy(request);
 
-		RandomizationResult result = initiateRandomizationCall(request);
-		result.setStudyId(String.valueOf(getStudyId(currentStudy, getStudyDAO())));
-
 		// Set expected context
 		RandomizationUtil.setSessionManager(getSessionManager(request));
 		RandomizationUtil.setCurrentStudy(currentStudy);
+
+		RandomizationResult result = initiateRandomizationCall(request);
+		result.setStudyId(String.valueOf(getStudyId(currentStudy, getStudyDAO())));
 
 		// Assign subject to group
 		String assignRandomizationResultTo = (String) request.getSession().getAttribute("assignRandomizationResultTo");
@@ -182,17 +182,17 @@ public class RandomizeServlet extends Controller {
 		// Get Trial Id configured in the CRF
 		String crfConfiguredTrialId = request.getParameter("trialId");
 
-		// Get TrialId configured in datainfo.properties
-		String configuredTrialId = CoreResources.getField("randomizationTrialId");
+		// Get TrialId configured in study parameters
+		String configuredTrialId = RandomizationUtil.getRandomizationTrialIdByStudy(currentStudy);
 
-		// Check if the datainfo.properties trial config is "empty or zero"
+		// Check if the study params trial config is "empty or zero"
 		if (RandomizationUtil.isConfiguredTrialIdValid(configuredTrialId)) {
 
 			// Trial Id should be configured in one place
 			if (RandomizationUtil.isTrialIdDoubleConfigured(configuredTrialId, crfConfiguredTrialId)) {
 
 				throw new RandomizationException(
-						"Trial ID must be specified either on the server or the CRF but not both.");
+						"Trial ID must be specified either in the study parameters or the CRF but not both.");
 
 			} else {
 
