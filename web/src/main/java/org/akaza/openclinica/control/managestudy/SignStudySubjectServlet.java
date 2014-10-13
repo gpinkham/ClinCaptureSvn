@@ -416,12 +416,8 @@ public class SignStudySubjectServlet extends Controller {
 			}
 			// TODO need to refactor since this is similar to other code, tbh
 			if (edc != null) {
-				// System.out.println("edc is not null, need to set flags");
 				DisplayEventCRFBean dec = new DisplayEventCRFBean();
-				dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
-				if (dec.isLocked()) {
-					System.out.println("*** found a locked DEC: " + edc.getCrfName());
-				}
+				dec.setFlags(ecb, ub, currentRole, edc);
 				ArrayList idata = iddao.findAllByEventCRFId(ecb.getId());
 				if (!idata.isEmpty()) {
 					answer.add(dec);

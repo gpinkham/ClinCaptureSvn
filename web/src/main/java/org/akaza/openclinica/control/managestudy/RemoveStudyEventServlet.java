@@ -74,7 +74,8 @@ public class RemoveStudyEventServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
@@ -84,8 +85,10 @@ public class RemoveStudyEventServlet extends Controller {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		FormProcessor fp = new FormProcessor(request);
-		int studyEventId = fp.getInt("id");// studyEventId
-		int studySubId = fp.getInt("studySubId");// studySubjectId
+		// studyEventId
+		int studyEventId = fp.getInt("id");
+		// studySubjectId
+		int studySubId = fp.getInt("studySubId");
 		UserAccountBean currentUser = getUserAccountBean(request);
 
 		StudyEventDAO sedao = getStudyEventDAO();
@@ -140,10 +143,15 @@ public class RemoveStudyEventServlet extends Controller {
 
 				getEventCRFService().removeEventCRFsByStudyEvent(event, currentUser);
 
-				String emailBody = new StringBuilder("").append(respage.getString("the_event")).append(" ")
-						.append(event.getStudyEventDefinition().getName()).append(" ")
-						.append(respage.getString("has_been_removed_from_the_subject_record_for")).append(" ")
-						.append(studySub.getLabel()).append(" ")
+				String emailBody = new StringBuilder("")
+						.append(respage.getString("the_event"))
+						.append(" ")
+						.append(event.getStudyEventDefinition().getName())
+						.append(" ")
+						.append(respage.getString("has_been_removed_from_the_subject_record_for"))
+						.append(" ")
+						.append(studySub.getLabel())
+						.append(" ")
 						.append(study.isSite(study.getParentStudyId()) ? respage.getString("in_the_site") : respage
 								.getString("in_the_study")).append(" ").append(study.getName()).append(".").toString();
 
@@ -211,7 +219,7 @@ public class RemoveStudyEventServlet extends Controller {
 					studyEventDefinitionId));
 
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
-			dec.setFlags(ecb, getUserAccountBean(request), getCurrentRole(request), edc.isDoubleEntry());
+			dec.setFlags(ecb, getUserAccountBean(request), getCurrentRole(request), edc);
 			answer.add(dec);
 		}
 

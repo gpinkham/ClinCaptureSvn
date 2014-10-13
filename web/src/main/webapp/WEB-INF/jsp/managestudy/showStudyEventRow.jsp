@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -259,14 +260,7 @@
                         <td>
                             <c:choose>
                                 <c:when test="${!dedc.status.locked && currRow.bean.studyEvent.subjectEventStatus.name != 'locked' && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6}">
-                                    <a href="#" onclick="setAccessedObjected(this); checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>', document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>);"
-                                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                                        <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0"
-                                             alt="<fmt:message key="enter_data" bundle="${resword}"/>"
-                                             title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right"
-                                             hspace="6">
-                                    </a>
+                                    <ui:dataEntryLink object="${dedc}" rowCount="${rowCount}" actionQueryTail="${currRow.bean.studyEvent.id}${dedc.edc.crf.id}" onClickFunction="setAccessedObjected(this); checkCRFLockedInitial"  imgAlign="right" imgHSpace="6"/>
                                 </c:when>
                                 <c:otherwise>
                                     <img src="images/bt_Transparent.gif" border="0" hspace="6">
@@ -344,8 +338,9 @@
                          title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
                 </c:when>
                 <c:when test="${dec.stage.doubleDE}">
-                    <img src="images/icon_DDE.gif" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>"
-                         title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
+                    <c:set var="ddeTitleCode" value="double_data_entry"/>
+                    <c:if test="${dec.eventDefinitionCRF.evaluatedCRF && !dec.eventDefinitionCRF.doubleEntry}"><c:set var="ddeTitleCode" value="evaluation"/></c:if>
+                    <img src="images/icon_DDE.gif" alt="<fmt:message key="${ddeTitleCode}" bundle="${resword}"/>" title="<fmt:message key="${ddeTitleCode}" bundle="${resword}"/>">
                 </c:when>
                 <c:when test="${dec.stage.doubleDE_Complete}">
                     <c:choose>
@@ -402,48 +397,7 @@
                     <td>
                         <c:choose>
                             <c:when test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6}">
-                                <c:if test="${dec.continueInitialDataEntryPermitted}">
-                                    <a href="#"
-                                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                                       onclick="setAccessedObjected(this); checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', 'InitialDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}');">
-                                        <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0"
-                                             alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>"
-                                             title="<fmt:message key="continue_entering_data" bundle="${resword}"/>"
-                                             align="left" hspace="6">
-                                    </a>
-                                </c:if>
-                                <c:if test="${dec.startDoubleDataEntryPermitted}">
-                                    <a href="#"
-                                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                                       onclick="setAccessedObjected(this); checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', 'DoubleDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}');">
-                                        <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0"
-                                             alt="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>"
-                                             title="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>"
-                                             align="left" hspace="6"></a>
-                                </c:if>
-                                <c:if test="${dec.continueDoubleDataEntryPermitted}">
-                                    <a href="#"
-                                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                                       onclick="setAccessedObjected(this); checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', 'DoubleDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}');">
-                                        <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0"
-                                             alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>"
-                                             title="<fmt:message key="continue_entering_data" bundle="${resword}"/>"
-                                             align="left" hspace="6"></a>
-                                </c:if>
-                                <c:if test="${(dec.performAdministrativeEditingPermitted) &&(study.status.available)}">
-                                    <a href="#"
-                                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                                       onclick="setAccessedObjected(this); checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', 'AdministrativeEditing?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}');">
-                                        <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0"
-                                             alt="<fmt:message key="administrative_editing" bundle="${resword}"/>"
-                                             title="<fmt:message key="administrative_editing" bundle="${resword}"/>"
-                                             align="left" hspace="6">
-                                    </a>
-                                </c:if>
+                                <ui:dataEntryLink object="${dec}" actionQueryTail="?eventCRFId=${dec.eventCRF.id}&exitTo=ViewStudySubject?id=${studySub.id}" imgAlign="left" imgHSpace="6" onClickFunction="setAccessedObjected(this); checkCRFLocked"/>
                                 <%-- locked status here --%>
                                 <c:if test="${dec.locked || dec.eventCRF.status.locked || dec.stage.locked || currRow.bean.studyEvent.subjectEventStatus.locked}">
                                     <img name="itemForSpace" src="images/bt_EnterData.gif" border="0"

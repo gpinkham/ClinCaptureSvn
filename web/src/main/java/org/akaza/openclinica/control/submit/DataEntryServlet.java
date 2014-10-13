@@ -3498,7 +3498,7 @@ public abstract class DataEntryServlet extends Controller {
 
 		if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
 
-			if (!edcb.isDoubleEntry()) {
+			if (!(edcb.isDoubleEntry() || edcb.isEvaluatedCRF())) {
 				addPageMessage(respage.getString("not_mark_CRF_complete2"), request);
 				return false;
 			}
@@ -3511,13 +3511,13 @@ public abstract class DataEntryServlet extends Controller {
 
 		Status newStatus = ecb.getStatus();
 		boolean ide = true;
-		if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry()) {
+		if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && (edcb.isDoubleEntry() || edcb.isEvaluatedCRF())) {
 			newStatus = Status.PENDING;
 			ecb.setUpdaterId(ub.getId());
 			ecb.setUpdater(ub);
 			ecb.setUpdatedDate(new Date());
 			ecb.setDateCompleted(new Date());
-		} else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && !edcb.isDoubleEntry()) {
+		} else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && !(edcb.isDoubleEntry() || edcb.isEvaluatedCRF())) {
 			newStatus = Status.UNAVAILABLE;
 			ecb.setUpdaterId(ub.getId());
 			ecb.setUpdater(ub);
@@ -3525,7 +3525,8 @@ public abstract class DataEntryServlet extends Controller {
 			ecb.setDateCompleted(new Date());
 			ecb.setDateValidateCompleted(new Date());
 
-		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) && edcb.isDoubleEntry()) {
+		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
+				&& (edcb.isDoubleEntry() || edcb.isEvaluatedCRF())) {
 			newStatus = Status.UNAVAILABLE;
 			ecb.setUpdaterId(ub.getId());
 			ecb.setUpdater(ub);

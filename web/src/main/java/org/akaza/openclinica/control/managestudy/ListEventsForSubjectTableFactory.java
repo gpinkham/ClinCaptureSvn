@@ -92,6 +92,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	public static final int THREE = 3;
 	public static final int EIGHT = 8;
 	public static final int SEVEN = 7;
+	public static final int FIFTY = 50;
 
 	private StudyEventDefinitionDAO studyEventDefinitionDao;
 	private DynamicEventDao dynamicEventDAO;
@@ -120,14 +121,14 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	private StudyEventDefinitionBean selectedStudyEventDefinition;
 
 	private static final int POPUP_BASE_WIDTH = 600;
-	private static final String POPUP_BASE_WIDTH_PX = "width: " + POPUP_BASE_WIDTH + "px";
+	private static final String POPUP_BASE_WIDTH_PX = "width: " + (POPUP_BASE_WIDTH + FIFTY) + "px";
 
 	private final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>();
 	private final HashMap<Integer, String> crfColumnImageIconPaths = new HashMap<Integer, String>();
 
 	/**
 	 * ListEventsForSubjectTableFactory constructor.
-	 * 
+	 *
 	 * @param showMoreLink
 	 *            boolean
 	 */
@@ -630,7 +631,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	private class CharFilterMatcher implements FilterMatcher {
 		/**
 		 * Evaluate method.
-		 * 
+		 *
 		 * @param itemValue
 		 *            Object itemValue
 		 * @param filterValue
@@ -650,7 +651,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	public class StatusFilterMatcher implements FilterMatcher {
 		/**
 		 * Evaluate method.
-		 * 
+		 *
 		 * @param itemValue
 		 *            Object itemValue
 		 * @param filterValue
@@ -670,7 +671,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	public class SubjectEventStatusFilterMatcher implements FilterMatcher {
 		/**
 		 * Evaluate method.
-		 * 
+		 *
 		 * @param itemValue
 		 *            Object itemValue
 		 * @param filterValue
@@ -689,7 +690,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	public class SubjectGroupFilterMatcher implements FilterMatcher {
 		/**
 		 * Evaluate method.
-		 * 
+		 *
 		 * @param itemValue
 		 *            Object itemValue
 		 * @param filterValue
@@ -708,7 +709,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	public class SubjectEventCRFStatusFilterMatcher implements FilterMatcher {
 		/**
 		 * Evaluate method.
-		 * 
+		 *
 		 * @param itemValue
 		 *            Object itemValue
 		 * @param filterValue
@@ -967,7 +968,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 	/**
 	 * EventDivBuilder method.
-	 * 
+	 *
 	 * @param rowCount
 	 *            Integer
 	 * @param studyEvents
@@ -1074,7 +1075,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 	/**
 	 * EventDivBuilder method.
-	 * 
+	 *
 	 * @param eventDivBuilderWrapper
 	 *            EventDivBuilderWrapper
 	 * @return String
@@ -1083,7 +1084,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		String studySubjectLabel = SubjectLabelNormalizer.normalizeSubjectLabel(eventDivBuilderWrapper.studySubject
 				.getLabel());
 
-		String divWidth = String.valueOf(POPUP_BASE_WIDTH + EIGHT);
+		String divWidth = String.valueOf(POPUP_BASE_WIDTH + FIFTY + EIGHT);
 
 		HtmlBuilder eventDiv = new HtmlBuilder();
 

@@ -17,6 +17,7 @@ import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
 import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
@@ -73,7 +74,7 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 		CRFEvaluationFilter filter = new CRFEvaluationFilter(new HashMap<Object, Status>());
 		StudyBean currentStudy = new StudyBean();
 		currentStudy.setId(1);
-		assertEquals(eventCRFDAO.countOfAllEventCrfsForEvaluation(filter, currentStudy), 4);
+		assertEquals(eventCRFDAO.countOfAllEventCrfsForEvaluation(filter, currentStudy), 0);
 	}
 
 	@Test
@@ -82,6 +83,30 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 		CRFEvaluationSort sort = new CRFEvaluationSort();
 		StudyBean currentStudy = new StudyBean();
 		currentStudy.setId(1);
-		assertEquals(eventCRFDAO.findAllEventCrfsForEvaluation(currentStudy, filter, sort, 0, 15).size(), 4);
+		assertEquals(eventCRFDAO.findAllEventCrfsForEvaluation(currentStudy, filter, sort, 0, 15).size(), 0);
+	}
+
+	@Test
+	public void testThatUpdateSavesTheOwnerId() {
+		UserAccountBean root = (UserAccountBean) userAccountDAO.findByPK(1);
+		UserAccountBean newOwner = new UserAccountBean();
+		newOwner.setEmail("test@gmail.com");
+		newOwner.setName("test_user");
+		newOwner.setActiveStudyId(1);
+		newOwner.setEnabled(true);
+		newOwner.setAccountNonLocked(true);
+		newOwner.setFirstName("user");
+		newOwner.setLastName("user");
+		newOwner.setPhone("123123123123");
+		newOwner.setOwner(root);
+		newOwner.setUpdater(root);
+		newOwner = (UserAccountBean) userAccountDAO.create(newOwner);
+		EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(1);
+		eventCRFBean.setOwner(newOwner);
+		eventCRFBean = (EventCRFBean) eventCRFDAO.update(eventCRFBean);
+		assertEquals(eventCRFBean.getOwnerId(), newOwner.getId());
+		eventCRFBean.setOwner(root);
+		eventCRFDAO.update(eventCRFBean);
+		userAccountDAO.execute("delete from user_account where user_id = ".concat(Integer.toString(newOwner.getId())));
 	}
 }

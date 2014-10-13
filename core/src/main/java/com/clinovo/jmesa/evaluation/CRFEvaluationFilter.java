@@ -76,9 +76,7 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 		if (value != null) {
 			if (property.equals(CRF_STATUS)) {
 				Status status = optionsMap.get(value);
-				if (status.equals(Status.AUTO_DELETED) || status.equals(Status.DELETED)) {
-					theCriteria.append(" AND ").append(columnMapping.get(property)).append(" in (5,7) ");
-				} else if (status.equals(Status.LOCKED)) {
+				if (status.equals(Status.LOCKED)) {
 					theCriteria.append(" AND (").append(columnMapping.get(property))
 							.append(" in (6) or se.subject_event_status_id in (5,6,7)) ");
 				} else if (status.equals(Status.SIGNED)) {
@@ -96,31 +94,25 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 							.append(" and se.subject_event_status_id != 8) ");
 				} else if (status.equals(Status.DATA_ENTRY_STARTED)) {
 					theCriteria.append(" AND (").append(columnMapping.get(property))
-							.append(" in (1,4) and se.subject_event_status_id in (1,3,4,8,9)) ");
+							.append(" in (4) and se.subject_event_status_id in (1,3,4,8,9)) ");
 				}
 			} else {
-				theCriteria.append(" AND UPPER(").append(columnMapping.get(property)).append(") like UPPER('%")
-						.append(value.toString()).append("%')");
+				theCriteria.append(" AND UPPER(").append(columnMapping.get(property)).append(") like UPPER('%")						.append(value.toString()).append("%')");
 			}
 		}
-		return criteria.concat(theCriteria.toString());
-	}
+		return criteria.concat(theCriteria.toString());	}
 
 	private class Filter {
-		private final String property;
-		private final Object value;
+		private final String property;		private final Object value;
 
 		public Filter(String property, Object value) {
-			this.property = property;
-			this.value = value;
+			this.property = property;			this.value = value;
 		}
 
-		public String getProperty() {
-			return property;
+		public String getProperty() {			return property;
 		}
 
-		public Object getValue() {
-			return value;
+		public Object getValue() {			return value;
 		}
 	}
 }

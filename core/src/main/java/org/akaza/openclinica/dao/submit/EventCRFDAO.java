@@ -193,7 +193,8 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		}
 		variables.put(19, ecb.getSdvUpdateId());
 		variables.put(20, ecb.isNotStarted());
-		variables.put(21, ecb.getId());
+		variables.put(21, ecb.getOwnerId());
+		variables.put(22, ecb.getId());
 		this.execute(digester.getQuery("update"), variables, nullVars, con);
 		if (isQuerySuccessful()) {
 			ecb.setActive(true);

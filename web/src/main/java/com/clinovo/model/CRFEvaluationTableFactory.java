@@ -64,6 +64,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	public static final String VIEW_DATA = "view_data";
 	public static final String EVENT_NAME = "eventName";
 	public static final String CRF_STATUS = "crfStatus";
+	public static final String EVALUATION = "evaluation";
 	public static final String ACTION_COLUMN = "actionColumn";
 	public static final String IDE_COMPLETED = "ideCompleted";
 	public static final String STUDY_SUBJECT_ID = "studySubjectId";
@@ -74,10 +75,10 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	public static final String BT_TRANSPARENT_GIF = "bt_Transparent.gif";
 	public static final String DATA_ENTRY_STARTED = "data_entry_started";
 	public static final String CRF_EVALUATION_TABLE = "crfEvaluationTable";
+	public static final String BEGIN_CRF_EVALUATION = "begin_crf_evaluation";
 	public static final String SOURCE_DATA_VERIFIED = "source_data_verified";
 	public static final String ADMINISTRATIVE_EDITING = "AdministrativeEditing";
 	public static final String CONTINUE_ENTERING_DATA = "continue_entering_data";
-	public static final String BEGIN_DOUBLE_DATA_ENTRY = "begin_double_data_entry";
 	public static final String CRF_EVALUATION_TABLE_CRF_NAME = "crfEvaluationTable.crfName";
 	public static final String CRF_EVALUATION_TABLE_EVENT_NAME = "crfEvaluationTable.eventName";
 	public static final String CRF_EVALUATION_TABLE_CRF_STATUS = "crfEvaluationTable.crfStatus";
@@ -196,6 +197,9 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 		if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
 			title = messageSource.getMessage(IDE_COMPLETED, null, locale);
 		}
+		if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+			title = messageSource.getMessage(EVALUATION, null, locale);
+		}
 
 		if (crfEvaluationItem.getSubjectEventStatus() == SubjectEventStatus.REMOVED) {
 			title = SubjectEventStatus.REMOVED.getNormalizedName();
@@ -258,8 +262,8 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 			String viewMessage = messageSource.getMessage(VIEW_DATA, null, locale);
 			String enterDataMessage = crfEvaluationItem.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) ? DataEntryStage.ADMINISTRATIVE_EDITING
 					.getNormalizedName() : (crfEvaluationItem.getStage().equals(
-					DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) ? messageSource.getMessage(BEGIN_DOUBLE_DATA_ENTRY,
-					null, locale) : messageSource.getMessage(CONTINUE_ENTERING_DATA, null, locale));
+					DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) ? messageSource.getMessage(BEGIN_CRF_EVALUATION, null,
+					locale) : messageSource.getMessage(CONTINUE_ENTERING_DATA, null, locale));
 
 			String dataEntryPage = crfEvaluationItem.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
 					|| crfEvaluationItem.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY) ? DOUBLE_DATA_ENTRY
@@ -361,7 +365,6 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 		optionsMap.put(messageSource.getMessage(SOURCE_DATA_VERIFIED, null, locale).toLowerCase(),
 				Status.SOURCE_DATA_VERIFIED);
 		optionsMap.put(messageSource.getMessage(LOCKED, null, locale).toLowerCase(), Status.LOCKED);
-		optionsMap.put(messageSource.getMessage(REMOVED, null, locale).toLowerCase(), Status.DELETED);
 		optionsMap.put(messageSource.getMessage(SIGNED, null, locale).toLowerCase(), Status.SIGNED);
 
 		currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute(BaseController.STUDY);

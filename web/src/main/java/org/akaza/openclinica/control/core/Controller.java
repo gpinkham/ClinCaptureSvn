@@ -1545,7 +1545,7 @@ public abstract class Controller extends BaseController {
 			if (edc != null) {
 				DisplayEventCRFBean dec = new DisplayEventCRFBean();
 				dec.setEventDefinitionCRF(edc);
-				dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
+				dec.setFlags(ecb, ub, currentRole, edc);
 
 				ArrayList idata = iddao.findAllByEventCRFId(ecb.getId());
 				if (!idata.isEmpty()) {

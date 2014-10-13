@@ -20,14 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -55,6 +47,13 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * @author jxu
  * 
@@ -65,7 +64,8 @@ import org.springframework.stereotype.Component;
 public class RestoreStudyEventServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
 		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
 
@@ -73,8 +73,9 @@ public class RestoreStudyEventServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
@@ -82,8 +83,10 @@ public class RestoreStudyEventServlet extends Controller {
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
-		int studyEventId = fp.getInt("id");// studyEventId
-		int studySubId = fp.getInt("studySubId");// studySubjectId
+		// studyEventId
+		int studyEventId = fp.getInt("id");
+		// studySubjectId
+		int studySubId = fp.getInt("studySubId");
 		UserAccountBean currentUser = getUserAccountBean(request);
 
 		StudyEventDAO sedao = getStudyEventDAO();
@@ -101,9 +104,11 @@ public class RestoreStudyEventServlet extends Controller {
 			// subject has been removed
 			Status s = studySub.getStatus();
 			if (s.isDeleted()) {
-				addPageMessage(new StringBuilder("").append(resword.getString("study_event"))
-						.append(resterm.getString("could_not_be")).append(resterm.getString("restored"))
-						.append(".").append(respage.getString("study_subject_has_been_deleted")).toString(), request);
+				addPageMessage(
+						new StringBuilder("").append(resword.getString("study_event"))
+								.append(resterm.getString("could_not_be")).append(resterm.getString("restored"))
+								.append(".").append(respage.getString("study_subject_has_been_deleted")).toString(),
+						request);
 				request.setAttribute("id", Integer.toString(studySubId));
 				forwardToViewStudySubjectPage(request, response);
 			}
@@ -114,7 +119,8 @@ public class RestoreStudyEventServlet extends Controller {
 			request.setAttribute("studySub", studySub);
 
 			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
+					.findByPK(event.getStudyEventDefinitionId());
 			event.setStudyEventDefinition(sed);
 
 			StudyDAO studydao = getStudyDAO();
@@ -123,8 +129,11 @@ public class RestoreStudyEventServlet extends Controller {
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (event.getStatus().equals(Status.AVAILABLE)) {
-					addPageMessage(new StringBuilder("").append(respage.getString("this_event_is_already_available_for_study"))
-							.append(" ").append(respage.getString("please_contact_sysadmin_for_more_information")).toString(), request);
+					addPageMessage(
+							new StringBuilder("")
+									.append(respage.getString("this_event_is_already_available_for_study")).append(" ")
+									.append(respage.getString("please_contact_sysadmin_for_more_information"))
+									.toString(), request);
 					request.setAttribute("id", Integer.toString(studySubId));
 					forwardToViewStudySubjectPage(request, response);
 					return;
@@ -161,7 +170,7 @@ public class RestoreStudyEventServlet extends Controller {
 
 				getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
 
-				for (EventCRFBean eventCRF: eventCRFs) {
+				for (EventCRFBean eventCRF : eventCRFs) {
 					hasStarted = !hasStarted ? !eventCRF.isNotStarted() : hasStarted;
 				}
 
@@ -182,7 +191,8 @@ public class RestoreStudyEventServlet extends Controller {
 		}
 	}
 
-	private void forwardToViewStudySubjectPage(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	private void forwardToViewStudySubjectPage(HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 		storePageMessages(request);
 		String id = (String) request.getAttribute("id");
 		String savedUrl = (String) request.getSession().getAttribute(
@@ -190,7 +200,8 @@ public class RestoreStudyEventServlet extends Controller {
 		if (savedUrl != null && savedUrl.contains("id=" + id)) {
 			response.sendRedirect(savedUrl);
 		} else {
-			response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id=" + id);
+			response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id="
+					+ id);
 		}
 	}
 
@@ -236,7 +247,7 @@ public class RestoreStudyEventServlet extends Controller {
 					studyEventDefinitionId));
 
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
-			dec.setFlags(ecb, getUserAccountBean(request), getCurrentRole(request), edc.isDoubleEntry());
+			dec.setFlags(ecb, getUserAccountBean(request), getCurrentRole(request), edc);
 			answer.add(dec);
 		}
 

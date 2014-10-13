@@ -2,6 +2,8 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+
 <jsp:useBean scope="session" id="userRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean" />
 <jsp:useBean scope='request' id='eventId' class='java.lang.String'/>
 <c:set var="eventId" value="${eventId}"/>
@@ -433,11 +435,8 @@
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         </c:when>
                                         <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && (study.status.available) && !studyEvent.status.deleted && userRole.role.id ne 6}">
-                                                <c:set var="hideCol1" value="false"/>
-                                                    <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>',document.startForm${studyEvent.id}${dedc.edc.crf.id});"
-                                                   onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
-                                                   onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');">
-                                                   <img name="bt_EnterData<c:out value="${rowCount}"/>" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="4"></a>
+                                            <c:set var="hideCol1" value="false"/>
+                                            <ui:dataEntryLink object="${dedc}" rowCount="${rowCount}" actionQueryTail="${studyEvent.id}${dedc.edc.crf.id}" onClickFunction="checkCRFLockedInitial"/>
                                         </c:when>
                                         <c:otherwise>
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
@@ -515,7 +514,9 @@
                                         <img src="images/icon_InitialDEcomplete.gif" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
                                     </c:when>
                                     <c:when test="${dec.stage.doubleDE}">
-                                        <img src="images/icon_DDE.gif" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>" title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
+                                        <c:set var="ddeTitleCode" value="double_data_entry"/>
+                                        <c:if test="${dec.eventDefinitionCRF.evaluatedCRF && !dec.eventDefinitionCRF.doubleEntry}"><c:set var="ddeTitleCode" value="evaluation"/></c:if>
+                                        <img src="images/icon_DDE.gif" alt="<fmt:message key="${ddeTitleCode}" bundle="${resword}"/>" title="<fmt:message key="${ddeTitleCode}" bundle="${resword}"/>">
                                     </c:when>
                                     <c:when test="${dec.stage.doubleDE_Complete}">
                                         <c:choose>
@@ -547,26 +548,12 @@
 
                             <td class="table_cell_left" style="vertical-align: middle;">
                                 <div class="<c:if test='${dec.eventDefinitionCRF.hideCrf and study.parentStudyId > 0}'>hidden</c:if>">
-                                <c:set var="actionQuery" value="" />
-                                <c:if test="${(study.status.available) && dec.continueInitialDataEntryPermitted}">
-                                  <c:set var="actionQuery" value="InitialDataEntry?eventCRFId=${dec.eventCRF.id}" />
-                                </c:if>
 
-                                <c:if test="${(study.status.available) && dec.startDoubleDataEntryPermitted}">
-                                  <c:set var="actionQuery" value="DoubleDataEntry?eventCRFId=${dec.eventCRF.id}" />
-                                </c:if>
-
-                                <c:if test="${(study.status.available) && dec.continueDoubleDataEntryPermitted}">
-                                  <c:set var="actionQuery" value="DoubleDataEntry?eventCRFId=${dec.eventCRF.id}" />
-                                </c:if>
-
-                                <c:if test="${(study.status.available || study.status.frozen) && dec.performAdministrativeEditingPermitted}">
-                                  <c:set var="actionQuery" value="AdministrativeEditing?eventCRFId=${dec.eventCRF.id}" />
-                                </c:if>
+                                <c:set var="allowDataEntry" value="${(study.status.available && dec.continueInitialDataEntryPermitted) || (study.status.available && (dec.startDoubleDataEntryPermitted || dec.continueDoubleDataEntryPermitted)) || ((study.status.available || study.status.frozen) && dec.performAdministrativeEditingPermitted)}" />
 
                                 <c:set var="crfSpacersCount" value="0"/>
                                 <c:choose>
-                                    <c:when test='${actionQuery == "" && dec.stage.name == "invalid" }'>
+                                    <c:when test='${!allowDataEntry && dec.stage.name == "invalid" }'>
                                         <c:set var="hideCol2" value="false"/>
                                         <c:set var="crfSpacersCount" value="5"/>
                                         <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
@@ -590,7 +577,7 @@
                                         </c:if>
                                     </c:when>
 
-                                    <c:when test='${actionQuery == ""}'>
+                                    <c:when test='${!allowDataEntry}'>
                                         <c:set var="hideCol2" value="false"/>
                                         <c:set var="crfSpacersCount" value="5"/>
                                         <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
@@ -603,43 +590,9 @@
                                     <c:otherwise>
                                         <c:set var="enterDataWasInserted" value="false"/>
                                         <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && userRole.role.id ne 6}">
-                                            <c:if test="${dec.continueInitialDataEntryPermitted}">
-                                                <c:set var="hideCol1" value="false"/>
-                                                <c:set var="enterDataWasInserted" value="true"/>
-                                                <a href="#"
-                                                onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                                onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                                                onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
-                                                <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="4"></a>
-                                            </c:if>
-                                            <c:if test="${dec.startDoubleDataEntryPermitted}">
-                                                <c:set var="hideCol1" value="false"/>
-                                                <c:set var="enterDataWasInserted" value="true"/>
-                                                <a href="#"
-                                                onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                                onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                                                onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
-                                                <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" title="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" align="left" hspace="4"></a>
-                                            </c:if>
-                                            <c:if test="${dec.continueDoubleDataEntryPermitted}">
-                                                <c:set var="hideCol1" value="false"/>
-                                                <c:set var="enterDataWasInserted" value="true"/>
-                                                <a href="#"
-                                                onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                                onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                                                onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
-                                                <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="4"></a>
-                                            </c:if>
-                                            <c:if test="${dec.performAdministrativeEditingPermitted}">
-                                                <c:set var="hideCol1" value="false"/>
-                                                <c:set var="enterDataWasInserted" value="true"/>
-                                                <a href="#"
-                                                onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                                onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                                                onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
-                                                <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="4">
-                                                </a>
-                                            </c:if>
+                                            <c:set var="hideCol1" value="false"/>
+                                            <c:set var="enterDataWasInserted" value="true"/>
+                                            <ui:dataEntryLink object="${dec}" actionQueryTail="?eventCRFId=${dec.eventCRF.id}"/>
                                         </c:if>
 
                                         <c:if test="${enterDataWasInserted eq 'false'}">

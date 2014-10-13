@@ -57,7 +57,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Processes request of 'restore an event CRF from a event'
+ * Processes request of 'restore an event CRF from a event.
  * 
  * @author jxu
  * 
@@ -77,7 +77,8 @@ public class RestoreEventCRFServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
@@ -90,8 +91,10 @@ public class RestoreEventCRFServlet extends Controller {
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		FormProcessor fp = new FormProcessor(request);
-		int eventCRFId = fp.getInt("id");// eventCRFId
-		int studySubId = fp.getInt("studySubId");// studySubjectId
+		// eventCRFId
+		int eventCRFId = fp.getInt("id");
+		// studySubjectId
+		int studySubId = fp.getInt("studySubId");
 		checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"), request,
 				response);
 		StudyEventDAO sedao = getStudyEventDAO();
@@ -110,9 +113,11 @@ public class RestoreEventCRFServlet extends Controller {
 			// YW 11-07-2007, an event CRF could not be restored if its study
 			// subject has been removed
 			if (studySub.getStatus().isDeleted()) {
-				addPageMessage(new StringBuilder("").append(resword.getString("event_CRF")).append(resterm.getString("could_not_be"))
-						.append(resterm.getString("restored")).append(".").append(respage.getString("study_subject_has_been_deleted"))
-						.toString(), request);
+				addPageMessage(
+						new StringBuilder("").append(resword.getString("event_CRF"))
+								.append(resterm.getString("could_not_be")).append(resterm.getString("restored"))
+								.append(".").append(respage.getString("study_subject_has_been_deleted")).toString(),
+						request);
 				request.setAttribute("id", Integer.toString(studySubId));
 				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 			}
@@ -150,7 +155,7 @@ public class RestoreEventCRFServlet extends Controller {
 
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
 			dec.setEventCRF(eventCRF);
-			dec.setFlags(eventCRF, currentUser, currentRole, edc.isDoubleEntry());
+			dec.setFlags(eventCRF, currentUser, currentRole, edc);
 
 			// find all item data
 			ItemDataDAO iddao = getItemDataDAO();
@@ -162,7 +167,8 @@ public class RestoreEventCRFServlet extends Controller {
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (!eventCRF.getStatus().isDeleted()) {
-					addPageMessage(respage.getString("this_event_CRF_avilable_for_study") + " "
+					addPageMessage(
+							respage.getString("this_event_CRF_avilable_for_study") + " "
 									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
 					request.setAttribute("id", Integer.toString(studySubId));
 					forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
@@ -186,9 +192,9 @@ public class RestoreEventCRFServlet extends Controller {
 				event.setUpdatedDate(new Date());
 				sedao.update(event);
 
-				String emailBody = new StringBuilder("").append(respage.getString("the_event_CRF")).append(cb.getName())
-						.append(" ").append(respage.getString("has_been_restored_to_the_event")).append(" ")
-						.append(event.getStudyEventDefinition().getName()).append(".").toString();
+				String emailBody = new StringBuilder("").append(respage.getString("the_event_CRF"))
+						.append(cb.getName()).append(" ").append(respage.getString("has_been_restored_to_the_event"))
+						.append(" ").append(event.getStudyEventDefinition().getName()).append(".").toString();
 
 				addPageMessage(emailBody, request);
 				sendEmail(emailBody, request);
@@ -209,7 +215,7 @@ public class RestoreEventCRFServlet extends Controller {
 	}
 
 	/**
-	 * Send email to director and administrator
+	 * Send email to director and administrator.
 	 * 
 	 * @param emailBody
 	 *            String

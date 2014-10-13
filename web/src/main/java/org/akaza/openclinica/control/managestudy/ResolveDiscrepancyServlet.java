@@ -131,7 +131,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 					seb.getStudyEventDefinitionId(), crfvb.getCrfId());
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
 			dec.setEventDefinitionCRF(edcb);
-			dec.setFlags(ecb, ub, currentRole, edcb.isDoubleEntry());
+			dec.setFlags(ecb, ub, currentRole, edcb);
 			request.setAttribute(EVENT_CRF_ID, Integer.toString(ecb.getId()));
 			if (!ssb.getStatus().equals(Status.LOCKED)
 					&& currentStudy.getStatus().equals(Status.AVAILABLE)

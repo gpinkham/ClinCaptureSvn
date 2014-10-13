@@ -54,7 +54,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
 /**
- * Removes an Event CRF
+ * Removes an Event CRF.
  * 
  * @author jxu
  * 
@@ -62,9 +62,7 @@ import java.util.ArrayList;
 @SuppressWarnings({ "serial" })
 @Component
 public class RemoveEventCRFServlet extends Controller {
-	/**
-     * 
-     */
+
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -79,7 +77,8 @@ public class RemoveEventCRFServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
@@ -92,8 +91,10 @@ public class RemoveEventCRFServlet extends Controller {
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		FormProcessor fp = new FormProcessor(request);
-		int eventCRFId = fp.getInt("id");// eventCRFId
-		int studySubId = fp.getInt("studySubId");// studySubjectId
+		// eventCRFId
+		int eventCRFId = fp.getInt("id");
+		// studySubjectId
+		int studySubId = fp.getInt("studySubId");
 		checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"), request,
 				response);
 		StudyEventDAO sedao = getStudyEventDAO();
@@ -142,7 +143,7 @@ public class RemoveEventCRFServlet extends Controller {
 
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
 			dec.setEventCRF(eventCRF);
-			dec.setFlags(eventCRF, currentUser, currentRole, edc.isDoubleEntry());
+			dec.setFlags(eventCRF, currentUser, currentRole, edc);
 
 			// find all item data
 			ItemDataDAO iddao = getItemDataDAO();
@@ -154,8 +155,9 @@ public class RemoveEventCRFServlet extends Controller {
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (eventCRF.getStatus().isDeleted()) {
-					addPageMessage(respage.getString("this_event_CRF_is_removed_for_this_study") + " "
-							+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					addPageMessage(
+							respage.getString("this_event_CRF_is_removed_for_this_study") + " "
+									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
 					request.setAttribute("id", Integer.toString(studySubId));
 					forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 					return;
@@ -182,7 +184,7 @@ public class RemoveEventCRFServlet extends Controller {
 	}
 
 	/**
-	 * Send email to director and administrator
+	 * Send email to director and administrator.
 	 * 
 	 * @param emailBody
 	 *            String

@@ -42,22 +42,29 @@ import java.util.Date;
 @SuppressWarnings("rawtypes")
 public class DisplayEventCRFBean implements Comparable {
 
-	protected final static Logger logger = LoggerFactory.getLogger(DisplayEventCRFBean.class.getName());
+	protected static final Logger LOGGER = LoggerFactory.getLogger(DisplayEventCRFBean.class.getName());
 
-	private EventDefinitionCRFBean eventDefinitionCRF;
-	private EventCRFBean eventCRF;
+	public static final int TWELVE = 12;
+
 	private DataEntryStage stage;
-	private boolean startInitialDataEntryPermitted = false;
-	private boolean continueInitialDataEntryPermitted = false;
-	private boolean startDoubleDataEntryPermitted = false;
-	private boolean continueDoubleDataEntryPermitted = false;
-	private boolean performAdministrativeEditingPermitted = false;
+	private EventCRFBean eventCRF;
+	private EventDefinitionCRFBean eventDefinitionCRF;
+
 	private boolean locked = false;
+	private boolean startDoubleDataEntryPermitted = false;
+	private boolean startInitialDataEntryPermitted = false;
+	private boolean continueDoubleDataEntryPermitted = false;
+	private boolean continueInitialDataEntryPermitted = false;
+	private boolean performAdministrativeEditingPermitted = false;
+
 	/**
 	 * Does the user have to wait twelve hours before starting double data entry?
 	 */
 	private boolean twelveHourWaitRequired = false;
 
+	/**
+	 * DisplayEventCRFBean constructor.
+	 */
 	public DisplayEventCRFBean() {
 		eventDefinitionCRF = new EventDefinitionCRFBean();
 		eventCRF = new EventCRFBean();
@@ -145,12 +152,25 @@ public class DisplayEventCRFBean implements Comparable {
 		return twelveHourWaitRequired;
 	}
 
+	/**
+	 * Method that sets flags.
+	 * 
+	 * @param eventCRF
+	 *            EventCRFBean
+	 * @param user
+	 *            UserAccountBean
+	 * @param surb
+	 *            StudyUserRoleBean
+	 * @param eventDefinitionCRF
+	 *            EventDefinitionCRFBean
+	 */
 	public void setFlags(EventCRFBean eventCRF, UserAccountBean user, StudyUserRoleBean surb,
-			boolean doubleDataEntryPermitted) {
+			EventDefinitionCRFBean eventDefinitionCRF) {
 		this.eventCRF = eventCRF;
+		this.eventDefinitionCRF = eventDefinitionCRF;
+		boolean crfEvaluationOrDDEPermitted = eventDefinitionCRF.isDoubleEntry() || eventDefinitionCRF.isEvaluatedCRF();
 		stage = eventCRF.getStage();
 		Role r = surb.getRole();
-		boolean isSuper = isSuper(user, r);
 		boolean isEditor = isEditor(user, r);
 
 		if (stage.equals(DataEntryStage.LOCKED)) {
@@ -158,15 +178,14 @@ public class DisplayEventCRFBean implements Comparable {
 			return;
 		}
 
-		if (stage.equals(DataEntryStage.UNCOMPLETED)) {
+		if (stage.equals(DataEntryStage.UNCOMPLETED) || eventCRF.isNotStarted()) {
 			startInitialDataEntryPermitted = true;
 		} else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
 			continueInitialDataEntryPermitted = true;
 		} else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
-			if (doubleDataEntryPermitted) {
+			if (crfEvaluationOrDDEPermitted) {
 				if (eventCRF.getOwner().equals(user)) {
-					if (eventCRF.isNotStarted()
-							&& (initialDataEntryCompletedMoreThanTwelveHoursAgo(eventCRF) || isSuper)) {
+					if (initialDataEntryCompletedMoreThanTwelveHoursAgo(eventCRF)) {
 						startDoubleDataEntryPermitted = true;
 					} else {
 						startDoubleDataEntryPermitted = false;
@@ -180,17 +199,23 @@ public class DisplayEventCRFBean implements Comparable {
 					performAdministrativeEditingPermitted = true;
 				}
 			}
-		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY) && doubleDataEntryPermitted) {
-			if (eventCRF.getValidatorId() == user.getId() || isSuper) {
+		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY) && crfEvaluationOrDDEPermitted) {
+			if (eventCRF.getValidatorId() == user.getId()) {
 				continueDoubleDataEntryPermitted = true;
 			}
 		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)) {
 			if (isEditor) {
 				performAdministrativeEditingPermitted = true;
 			}
-		} // else if (stage.equals(DataEntryStage.INVALID)) {
-			// }
-			//
+		}
+		if (eventDefinitionCRF.isEvaluatedCRF()
+				&& !eventDefinitionCRF.isDoubleEntry()
+				&& (startDoubleDataEntryPermitted || continueDoubleDataEntryPermitted)
+				&& (surb.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || surb.getRole().equals(
+						Role.INVESTIGATOR))) {
+			startDoubleDataEntryPermitted = false;
+			continueDoubleDataEntryPermitted = false;
+		}
 	}
 
 	/**
@@ -206,23 +231,39 @@ public class DisplayEventCRFBean implements Comparable {
 				|| studyRole.equals(Role.STUDY_ADMINISTRATOR);
 	}
 
+	/**
+	 * Method checks that user with role is able to do data entry.
+	 * 
+	 * @param user
+	 *            UserAccountBean
+	 * @param studyRole
+	 *            Role
+	 * @return boolean
+	 */
 	public static boolean isEditor(UserAccountBean user, Role studyRole) {
 		return isSuper(user, studyRole) || studyRole.equals(Role.INVESTIGATOR)
 				|| studyRole.equals(Role.CLINICAL_RESEARCH_COORDINATOR);
 	}
 
+	/**
+	 * Method checks that data entry was completed more than 12 hours ago.
+	 *
+	 * @param eventCRF
+	 *            EventCRFBean
+	 * @return boolean
+	 */
 	public static boolean initialDataEntryCompletedMoreThanTwelveHoursAgo(EventCRFBean eventCRF) {
 		Date ideCompleted = eventCRF.getDateCompleted();
-		logger.info("id: " + eventCRF.getId() + "; idec: " + ideCompleted);
+		LOGGER.info("id: " + eventCRF.getId() + "; idec: " + ideCompleted);
 		Date now = new Date();
-		logger.info("now: " + now);
+		LOGGER.info("now: " + now);
 		Calendar c = Calendar.getInstance();
 		c.setTime(ideCompleted);
-		c.add(Calendar.HOUR, 12);
+		c.add(Calendar.HOUR, TWELVE);
 
 		Date twelveHoursAfterIDECompleted = c.getTime();
-		logger.info("aft12: " + twelveHoursAfterIDECompleted);
-		logger.info("returning: " + (now.getTime() > twelveHoursAfterIDECompleted.getTime()));
+		LOGGER.info("aft12: " + twelveHoursAfterIDECompleted);
+		LOGGER.info("returning: " + (now.getTime() > twelveHoursAfterIDECompleted.getTime()));
 		return now.getTime() > twelveHoursAfterIDECompleted.getTime();
 
 		// long twelveHoursInMilliSeconds = 12 * 60 * 60 * 1000;
@@ -246,10 +287,12 @@ public class DisplayEventCRFBean implements Comparable {
 		// return created.after(nowMinusTwelve);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Method to compare DisplayEventCRFBean objects.
 	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 * @param o
+	 *            Object
+	 * @return int
 	 */
 	public int compareTo(Object o) {
 		if (o == null || !o.getClass().equals(this.getClass())) {

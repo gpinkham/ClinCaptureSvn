@@ -146,7 +146,7 @@ public class DeleteEventCRFServlet extends Controller {
 
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
 			dec.setEventCRF(eventCRF);
-			dec.setFlags(eventCRF, ub, currentRole, edc.isDoubleEntry());
+			dec.setFlags(eventCRF, ub, currentRole, edc);
 
 			// find all item data
 			ItemDataDAO iddao = getItemDataDAO();

@@ -3766,6 +3766,14 @@ $(document).ready(function() {
 			$(this).attr('previousValue', 'checked');
 		}
 	});
+    $("input[name^=evaluatedCRF][type=checkbox]").mouseup(function() {
+        var postfix = $(this).attr("name").toString().replace('evaluatedCRF', '');
+        $("input[name=doubleEntry" + postfix + "]").attr("checked", false);
+    })
+    $("input[name^=doubleEntry][type=checkbox]").mouseup(function() {
+        var postfix = $(this).attr("name").toString().replace('doubleEntry', '');
+        $("input[name=evaluatedCRF" + postfix + "]").attr("checked", false);
+    })
 });
 
 
@@ -4435,5 +4443,3 @@ function changeDefinitionOrdinal(params) {
         }
     });
 }
-
-
