@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -12,16 +12,6 @@
  ******************************************************************************/
 
 package org.akaza.openclinica.controller;
-
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.odm.AdminDataReportBean;
@@ -58,7 +48,7 @@ import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
@@ -91,14 +81,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 @Controller
 @RequestMapping(value = "/rule")
 public class RuleController {
 
-    @Autowired
-    private RuleDao ruleDao;
-    @Autowired
-    private RuleSetDao ruleSetDao;
+	@Autowired
+	private RuleDao ruleDao;
+	@Autowired
+	private RuleSetDao ruleSetDao;
 	@Autowired
 	private BasicDataSource dataSource;
 	private RuleSetRuleDao ruleSetRuleDao;
@@ -291,9 +290,9 @@ public class RuleController {
 	}
 
 	@RequestMapping(value = "/studies/{study}/connect", method = RequestMethod.POST)
-	public @ResponseBody
-	org.openclinica.ns.response.v31.Response create(@RequestBody org.openclinica.ns.response.v31.Response responeType,
-			Model model, HttpSession session, @PathVariable("study") String studyOid) throws Exception {
+	public @ResponseBody org.openclinica.ns.response.v31.Response create(
+			@RequestBody org.openclinica.ns.response.v31.Response responeType, Model model, HttpSession session,
+			@PathVariable("study") String studyOid) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		StudyDAO studyDao = new StudyDAO(dataSource);
 		StudyBean currentStudy = studyDao.findByOid(studyOid);
@@ -311,9 +310,8 @@ public class RuleController {
 	}
 
 	@RequestMapping(value = "/studies/{study}/validateRule", method = RequestMethod.POST)
-	public @ResponseBody
-	Response create(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model, HttpSession session,
-			@PathVariable("study") String studyOid) throws Exception {
+	public @ResponseBody Response create(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model,
+			HttpSession session, @PathVariable("study") String studyOid) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		RulesPostImportContainer rpic = mapRulesToRulesPostImportContainer(rules);
 		StudyDAO studyDao = new StudyDAO(dataSource);
@@ -322,7 +320,8 @@ public class RuleController {
 		UserAccountBean userAccount = getUserAccount();
 		mayProceed(userAccount, currentStudy);
 
-        RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(currentStudy, userAccount);
+		RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(
+				currentStudy, userAccount);
 		rpic = rulesPostImportContainerService.validateRuleDefs(rpic);
 		rpic = rulesPostImportContainerService.validateRuleSetDefs(rpic);
 		Response response = new Response();
@@ -350,10 +349,9 @@ public class RuleController {
 
 	@SuppressWarnings("unused")
 	@RequestMapping(value = "/studies/{study}/validateAndSaveRule", method = RequestMethod.POST)
-	public @ResponseBody
-	Response validateAndSave(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model, HttpSession session,
-			@PathVariable("study") String studyOid, @RequestParam("ignoreDuplicates") Boolean ignoreDuplicates)
-			throws Exception {
+	public @ResponseBody Response validateAndSave(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model,
+			HttpSession session, @PathVariable("study") String studyOid,
+			@RequestParam("ignoreDuplicates") Boolean ignoreDuplicates) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		RulesPostImportContainer rpic = mapRulesToRulesPostImportContainer(rules);
 		StudyDAO studyDao = new StudyDAO(dataSource);
@@ -362,7 +360,8 @@ public class RuleController {
 		UserAccountBean userAccount = getUserAccount();
 		mayProceed(userAccount, currentStudy);
 
-        RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(currentStudy, userAccount);
+		RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(
+				currentStudy, userAccount);
 		rpic = rulesPostImportContainerService.validateRuleDefs(rpic);
 		rpic = rulesPostImportContainerService.validateRuleSetDefs(rpic);
 		Response response = new Response();
@@ -398,8 +397,7 @@ public class RuleController {
 	}
 
 	@RequestMapping(value = "/studies/{study}/validateAndTestRule", method = RequestMethod.POST)
-	public @ResponseBody
-	org.openclinica.ns.rules_test.v31.RulesTest create(
+	public @ResponseBody org.openclinica.ns.rules_test.v31.RulesTest create(
 			@RequestBody org.openclinica.ns.rules_test.v31.RulesTest ruleTest, Model model, HttpSession session,
 			@PathVariable("study") String studyOid) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
@@ -410,7 +408,8 @@ public class RuleController {
 		UserAccountBean userAccount = getUserAccount();
 		mayProceed(userAccount, currentStudy);
 
-        RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(currentStudy, userAccount);
+		RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(
+				currentStudy, userAccount);
 		rpic = rulesPostImportContainerService.validateRuleDefs(rpic);
 		rpic = rulesPostImportContainerService.validateRuleSetDefs(rpic);
 		Response response = new Response();

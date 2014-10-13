@@ -11,7 +11,7 @@
 		<property name="changeLog" value="classpath:migration/master.xml" />
 	</bean>
 
-	<bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource">
+	<bean id="dataSource" class="org.apache.tomcat.dbcp.dbcp.BasicDataSource">
 		<property name="driverClassName" value="s[driver]" />
 		<property name="maxActive" value="50" />
 		<property name="maxIdle" value="2" />
@@ -26,8 +26,6 @@
 		<property name="url" value="s[url]" />
 		<property name="username" value="s[username]" />
 		<property name="password" value="s[password]" />
-		<property name="bigStringTryClob" value="true" />
-
 	</bean>
 
 </beans>

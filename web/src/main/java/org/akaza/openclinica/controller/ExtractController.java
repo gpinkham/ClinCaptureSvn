@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -13,14 +13,6 @@
 
 package org.akaza.openclinica.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -31,7 +23,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.ExtractUtils;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.quartz.SchedulerException;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
@@ -43,6 +35,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 // import org.akaza.openclinica.control.extract.StdScheduler;
 
@@ -78,7 +77,7 @@ public class ExtractController {
 	 *            , http request
 	 * @return model map, but more importantly, creates a quartz job which runs right away and generates all output
 	 *         there
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelMap processSubmit(HttpServletRequest request, HttpServletResponse response,
@@ -205,7 +204,7 @@ public class ExtractController {
 			request.getSession().setAttribute("groupName", ExtractController.TRIGGER_GROUP_NAME);
 
 		request.getSession().setAttribute("datasetId", new Integer(dsBean.getId()));
-		
+
 		request.getSession().setAttribute("exportStatus", "ongoing");
 		response.sendRedirect(request.getContextPath() + "/ViewDatasets");
 		return map;

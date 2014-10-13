@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -13,18 +13,24 @@
 
 package org.akaza.openclinica.control;
 
-import java.util.Map;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
+import ch.qos.logback.classic.LoggerContext;
+import net.sf.ehcache.CacheManager;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.OpenClinicaVersionDAO;
 import org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
 import org.akaza.openclinica.domain.OpenClinicaVersionBean;
 import org.akaza.openclinica.service.usageStats.LogUsageStatsService;
 import org.quartz.impl.StdScheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.util.Enumeration;
+import java.util.Map;
 
 /**
  * ServletContextListener used as a controller for throwing an error when reading up the properties
@@ -33,7 +39,8 @@ import org.quartz.impl.StdScheduler;
  * 
  */
 public class OCServletContextListener implements ServletContextListener {
-	private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass().getName());
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 	UsageStatsServiceDAO usageStatsServiceDAO;
 	OpenClinicaVersionDAO openClinicaVersionDAO;
@@ -45,17 +52,36 @@ public class OCServletContextListener implements ServletContextListener {
 		logger.debug("CCServletContextListener -> contextDestroyed");
 		// FIXME probably the place where we need to close everything
 
-		// Save the OpenClinica stop time into database
 		ServletContext context = event.getServletContext();
-		// do not wait for jobs to finish when shutting down - make this into datainfo.properties?
-		getScheduler(context).shutdown(false);
+
+		// Save the OpenClinica stop time into database
 		getUsageStatsServiceDAO(context).saveOCStopTimeToDB();
 
+		// do not wait for jobs to finish when shutting down - make this into datainfo.properties?
+		getScheduler(context).shutdown(true);
+
+		CacheManager.getInstance().shutdown();
+
+		Enumeration<Driver> drivers = DriverManager.getDrivers();
+		while (drivers.hasMoreElements()) {
+			Driver driver = drivers.nextElement();
+			try {
+				DriverManager.deregisterDriver(driver);
+			} catch (Exception ex) {
+				logger.error("Error has occurred.", ex);
+			}
+		}
+
+		if (LoggerFactory.getILoggerFactory() instanceof LoggerContext) {
+			LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+			loggerContext.stop();
+		}
 	}
 
 	public void contextInitialized(ServletContextEvent event) {
 		logger.debug("CCServletContextListener -> contextInitialized");
 		ServletContext context = event.getServletContext();
+
 		// Save OpenClinica version to database
 		getOpenClinicaVersionDAO(context).saveOCVersionToDB(CoreResources.getField(ClinCaptureVersion));
 

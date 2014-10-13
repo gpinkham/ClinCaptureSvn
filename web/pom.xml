@@ -145,8 +145,8 @@
 			<artifactId>cglib-nodep</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>joda-time</groupId>
@@ -173,10 +173,10 @@
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>dbcp</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>
@@ -290,10 +290,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springmodules</groupId>
-			<artifactId>spring-modules-validation</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 		</dependency>
@@ -405,6 +401,17 @@
                     <groupId>net.sourceforge.cobertura</groupId>
                     <artifactId>cobertura</artifactId>
                     <version>${cobertura.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.tomcat</groupId>
+                    <artifactId>dbcp</artifactId>
+                    <version>${tomcat-dbcp.version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <version>${postgresql.version}</version>
                 </dependency>
             </dependencies>
             <build>

@@ -114,8 +114,8 @@
 			<artifactId>cglib-nodep</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>joda-time</groupId>
@@ -148,10 +148,10 @@
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>dbcp</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>

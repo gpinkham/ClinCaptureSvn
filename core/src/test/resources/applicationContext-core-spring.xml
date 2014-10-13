@@ -33,13 +33,8 @@
 
 	</bean>
 
-    <bean id="validator" class="org.springmodules.validation.bean.BeanValidator">
-        <property name="configurationLoader">
-            <bean class="org.springmodules.validation.bean.conf.loader.annotation.AnnotationBeanValidationConfigurationLoader"/>
-        </property>
-        <property name="errorCodeConverter">
-            <bean class="com.clinovo.util.ValidationErrorCodeConverter"/>
-        </property>
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="validationMessageSource" ref="messageSource"/>
     </bean>
 
 </beans>

@@ -15,7 +15,6 @@
 		<dependency>
 			<groupId>net.sourceforge.dynamicreports</groupId>
 			<artifactId>dynamicreports-core</artifactId>
-			<version>3.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -184,18 +183,18 @@
 			<artifactId>itext</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>dbcp</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>
@@ -336,10 +335,6 @@
 			<artifactId>json</artifactId>
 			<version>20090211</version>
 		</dependency>
-        <dependency>
-            <groupId>org.springmodules</groupId>
-            <artifactId>spring-modules-validation</artifactId>
-        </dependency>
 	</dependencies>
 
 	<build>

@@ -13,14 +13,8 @@
 
 package org.akaza.openclinica;
 
-import java.io.InputStream;
-import java.util.Locale;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.dbunit.DataSourceBasedDBTestCase;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
@@ -34,15 +28,19 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import javax.sql.DataSource;
+import java.io.InputStream;
+import java.util.Locale;
+import java.util.Properties;
+
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
 @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
-@ContextConfiguration(locations = { 
-		"classpath*:applicationContext-core-spring.xml",
+@ContextConfiguration(locations = { "classpath*:applicationContext-core-spring.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
-        "classpath*:org/akaza/openclinica/applicationContext-core-scheduler.xml",
+		"classpath*:org/akaza/openclinica/applicationContext-core-scheduler.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-security.xml" })
@@ -75,7 +73,7 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 
 	@Override
 	protected IDataSet getDataSet() throws Exception {
-		
+
 		InputStream resource = AbstractContextSentiveTest.class.getResourceAsStream(getTestDataFilePath());
 		FlatXmlDataSet flatXmlDataSet = new FlatXmlDataSet(resource);
 		return flatXmlDataSet;

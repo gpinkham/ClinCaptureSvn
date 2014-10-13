@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -18,9 +18,9 @@ import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
-import org.akaza.openclinica.core.ExtendedBasicDataSource;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ResourceLoaderAware;
@@ -121,7 +121,7 @@ public class CoreResources implements ResourceLoaderAware {
 
 	private void loadSystemProperties() throws Exception {
 		Connection connection = null;
-		ExtendedBasicDataSource dataSource = null;
+		BasicDataSource dataSource = null;
 		try {
 
 			String path = resourceLoader.getResource("/").exists() ? resourceLoader.getResource("/").getURI().getPath()
@@ -149,7 +149,7 @@ public class CoreResources implements ResourceLoaderAware {
 
 			setDatabaseProperties(dbType);
 			// setup dataSource
-			dataSource = new ExtendedBasicDataSource();
+			dataSource = new BasicDataSource();
 			dataSource.setUrl(dataInfo.getProperty("url"));
 			dataSource.setUsername(dataInfo.getProperty("username"));
 			dataSource.setPassword(dataInfo.getProperty("password"));
@@ -164,7 +164,6 @@ public class CoreResources implements ResourceLoaderAware {
 			dataSource.setTestOnReturn(true);
 			dataSource.setTimeBetweenEvictionRunsMillis(300000);
 			dataSource.setMinEvictableIdleTimeMillis(600000);
-			dataSource.setBigStringTryClob("true");
 			connection = dataSource.getConnection();
 
 			SpringLiquibase liquibase = new SpringLiquibase();
@@ -419,12 +418,12 @@ public class CoreResources implements ResourceLoaderAware {
 	private void copyImportRulesFiles() throws IOException {
 		ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[3];
 		String[] fileNames = { "rules.xsd", "rules_template.xml", "rules_template_with_notes.xml" };
-		listSrcFiles[0] = (ByteArrayInputStream) resourceLoader.getResource(
-				"classpath:properties" + File.separator + fileNames[0]).getInputStream();
-		listSrcFiles[1] = (ByteArrayInputStream) resourceLoader.getResource(
-				"classpath:properties" + File.separator + fileNames[1]).getInputStream();
-		listSrcFiles[2] = (ByteArrayInputStream) resourceLoader.getResource(
-				"classpath:properties" + File.separator + fileNames[2]).getInputStream();
+		listSrcFiles[0] = new ByteArrayInputStream(resourceLoader
+				.getResource("classpath:properties" + File.separator + fileNames[0]).getURL().getFile().getBytes());
+		listSrcFiles[1] = new ByteArrayInputStream(resourceLoader
+				.getResource("classpath:properties" + File.separator + fileNames[1]).getURL().getFile().getBytes());
+		listSrcFiles[2] = new ByteArrayInputStream(resourceLoader
+				.getResource("classpath:properties" + File.separator + fileNames[2]).getURL().getFile().getBytes());
 		File dest = new File(getField("filePath") + "rules");
 		if (!dest.exists()) {
 			if (!dest.mkdirs()) {
@@ -502,8 +501,9 @@ public class CoreResources implements ResourceLoaderAware {
 		ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
 		String[] fileNames = { "cd_odm_mapping.xml" };
 		try {
-			listSrcFiles[0] = (ByteArrayInputStream) resourceLoader.getResource(
-					"classpath:properties" + File.separator + "cd_odm_mapping.xml").getInputStream();
+			listSrcFiles[0] = new ByteArrayInputStream(resourceLoader
+					.getResource("classpath:properties" + File.separator + "cd_odm_mapping.xml").getURL().getFile()
+					.getBytes());
 
 		} catch (IOException ioe) {
 			OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to read source files");

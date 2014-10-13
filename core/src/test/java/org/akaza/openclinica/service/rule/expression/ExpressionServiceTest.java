@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009-2013 Clinovo Inc.
+ * Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -15,6 +15,7 @@ package org.akaza.openclinica.service.rule.expression;
 
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,7 +41,7 @@ public class ExpressionServiceTest {
 	 */
 	@Before
 	public void setUp() {
-		org.apache.commons.dbcp.BasicDataSource ds = new org.apache.commons.dbcp.BasicDataSource();
+		BasicDataSource ds = new BasicDataSource();
 		expressionService = new ExpressionService(ds);
 		ruleSet = new RuleSetBean();
 
