@@ -1817,7 +1817,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		greatestNum += 1;
 
 		final int ten = 10;
-		final int oneHundred = 100;
+		final int oneHundred = 10;
 
 		String numericLabel;
 		if (greatestNum < ten) {
