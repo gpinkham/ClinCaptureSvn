@@ -60,6 +60,7 @@ public final class Navigation {
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
 			"/ListStudySubjects", "/EnterDataForStudyEvent", "/ViewSectionDataEntry", "/pages/crfEvaluation"));
 	private static String defaultShortURL = "/MainMenu";
+	private static Set<String> queryParameterRequiredURLs = new HashSet(Arrays.asList("/ViewStudySubject"));
 
 	private Navigation() {
 	}
@@ -118,6 +119,8 @@ public final class Navigation {
 						} else {
 							specialProcessingForURL(visitedURLs, requestShortURL);
 						}
+					} else if (queryParameterRequiredURLs.contains(requestShortURI)) {
+						specialProcessingForURL(visitedURLs, requestShortURL);
 					}
 				} else {
 					visitedURLs.push("skip!");
@@ -179,6 +182,13 @@ public final class Navigation {
 
 		if ("/pages/crfEvaluation".equals(requestShortURI)) {
 			visitedURLs.push(requestShortURI);
+			return;
+		}
+
+		if ("/ViewStudySubject".equals(requestShortURI)) {
+			if (!visitedURLs.peek().equals(requestShortURL)) {
+				visitedURLs.push(requestShortURL);
+			}
 			return;
 		}
 

@@ -32,7 +32,7 @@ public class NavigationTest {
 	}
 
 	@Test
-	public void testThatURLsFromSpecialURLsAreBiengProcessedCorrectly() {
+	public void testThatURLsFromSpecialURLsAreBeingProcessedCorrectly() {
 		configureRequestURLWithoutQuery("EnterDataForStudyEvent");
 		Navigation.addToNavigationStack(request);
 		assertEquals(1, visitedURLs.size());
@@ -40,7 +40,7 @@ public class NavigationTest {
 	}
 
 	@Test
-	public void testThatURLsFromExclusionPopUpURLsAreBiengProcessedCorrectly1() {
+	public void testThatURLsFromExclusionPopUpURLsAreBeingProcessedCorrectly1() {
 		configureRequestURLWithoutQuery("UploadFile");
 		Navigation.addToNavigationStack(request);
 		assertEquals(1, visitedURLs.size());
@@ -48,7 +48,7 @@ public class NavigationTest {
 	}
 
 	@Test
-	public void testThatURLsFromExclusionPopUpURLsAreBiengProcessedCorrectly2() {
+	public void testThatURLsFromExclusionPopUpURLsAreBeingProcessedCorrectly2() {
 		configureRequestURLWithoutQuery("DownloadAttachedFile");
 		Navigation.addToNavigationStack(request);
 		assertEquals(1, visitedURLs.size());
@@ -77,12 +77,22 @@ public class NavigationTest {
 	}
 
 	@Test
-	public void testThatURLsFromSpecialURLsAreBiengProcessedCorrectly2() {
+	public void testThatURLsFromSpecialURLsAreBeingProcessedCorrectly2() {
 
 		configureRequestURLWithQuery("ViewSectionDataEntry", "abc=2");
 		Navigation.addToNavigationStack(request);
 		assertEquals(1, visitedURLs.size());
 		assertTrue(visitedURLs.get(0).equals("skip!"));
+	}
+
+	@Test
+	public void testThatURLsFromQueryParameterRequiredAreBeingProcessedCorrectly() {
+		visitedURLs = new Stack<String>();
+		visitedURLs.push("/ViewStudySubject?s=1");
+		session.setAttribute("visitedURLs", visitedURLs);
+		configureRequestURLAndQuery("ViewStudySubject", "s=2");
+		Navigation.addToNavigationStack(request);
+		assertEquals("/ViewStudySubject?s=2", visitedURLs.peek());
 	}
 
 	private void configureRequestURLWithQuery(String url, String query) {
