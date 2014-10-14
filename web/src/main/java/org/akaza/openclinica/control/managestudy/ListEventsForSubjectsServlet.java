@@ -83,7 +83,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
 		// set up auto study subject id
 		if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-			String nextLabel = getStudySubjectDAO().findNextLabel(currentStudy.getIdentifier());
+			String nextLabel = getStudySubjectDAO().findNextLabel(currentStudy);
 			request.setAttribute("label", nextLabel);
 		}
 

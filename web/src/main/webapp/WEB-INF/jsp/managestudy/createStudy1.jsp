@@ -46,12 +46,12 @@
 
     cancelButton=document.getElementById('cancel');
     if ( cancelButton != null) {
-    	confirmDialog({ 
+    	confirmDialog({
     		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
     		height: 150,
     		width: 500,
     		redirectLink: 'ListStudy'
-    		});      
+    		});
      	return false;
    	}
     return true;
@@ -193,9 +193,9 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td>
-		<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
-					value="<fmt:message key="back" bundle="${resword}"/>" 
-					class="button_medium" 
+		<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage"
+					value="<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
 					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 	</td>
 	<td>
@@ -209,7 +209,7 @@
 		   </script>
 		 </c:if>
 	</td>
-</tr> 
+</tr>
 
 </table>
 

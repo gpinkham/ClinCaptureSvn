@@ -7,6 +7,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.admin" var="resadmin"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.exceptions" var="reserrors"/>
 
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
@@ -70,68 +71,8 @@
 <jsp:useBean scope='request' id='sitesToView' class='java.util.ArrayList'/>
 
 <script language="JavaScript">
-	function leftnavExpand(strLeftNavRowElementName){
-		var objLeftNavRowElement;
-		var objExCl;
-        objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
-		if (objLeftNavRowElement != null) {
-			if (objLeftNavRowElement.style) { 
-				objLeftNavRowElement = objLeftNavRowElement.style; 
-			}
-			objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
-		}
-		objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
-		if (objExCl != null) {
-            var newThemeColor = "${newThemeColor}";
-            newThemeColor = newThemeColor == "green" || newThemeColor == "violet" ? ("/" + newThemeColor) : "";
-			if(objLeftNavRowElement.display == "none"){
-				objExCl.src = "images" + newThemeColor + "/bt_Expand.gif";
-			}else{
-				objExCl.src = "images" + newThemeColor + "/bt_Collapse.gif";
-			}
-		}
-	}
-	
-	function leftnavExpandExt(strLeftNavRowElementName){
-		$("div[id="+strLeftNavRowElementName+"]").each(function() {
-			leftnavExpand(strLeftNavRowElementName+'_3');
-			leftnavExpand(strLeftNavRowElementName+'_4');
-		});
-	}
-	
-	function showMoreFields(index, name) {
-		switch (name) {
-			case 'RFC':
-				var rowId = 'dnRFCDescriptionRow';
-				break;
-			case 'updateDescriptions':
-				var rowId = 'dnUpdateDescriptionRow';
-				break;
-			case 'closeDescriptions':
-				var rowId = 'dnCloseDescriptionRow';
-				break;
-			}
-		for (var j=index+1; (j<26)&&(j<(index+3)); j++){
-			$("tr#"+rowId+"_a"+j).show();
-			$("tr#"+rowId+"_b"+j).show();
-			$("tr#"+rowId+"_c"+j).show();
-		}
-	}	
-	
-	$(document).ready(function() { 
-		var sections = new Array('3', '4', '5', '6', '6_1', '6_2', '6_3', '7');
-		for (var j=0; j < sections.length; j++){
-			if ($("div#section" + sections[j] + " span.alert").text() != '') {
-				leftnavExpand("section" + sections[j]);
-			}	
-		}
-		
-		$("input[data-cc-action][checked]").each(function(){
-			hideUnhideStudyParamRow(this);
-		});
-	})	
-
- </script>
+	<c:import url="../../../includes/js/pages/update_study.js" />
+</script>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 
@@ -156,13 +97,13 @@
 	</c:if>
 </c:forEach>
 
-<br><br>
+<br>
 
 <c:set var="genderShow" value="${true}"/>
 <fmt:message key="gender" bundle="${resword}" var="genderLabel"/>
 <c:if test="${study ne null}">
-    <c:set var="genderShow" value="${!(study.studyParameterConfig.genderRequired == 'false')}"/>
-    <c:set var="genderLabel" value="${study.studyParameterConfig.genderLabel}"/>
+	<c:set var="genderShow" value="${!(study.studyParameterConfig.genderRequired == 'false')}"/>
+	<c:set var="genderLabel" value="${study.studyParameterConfig.genderLabel}"/>
 </c:if>
 
 <br>
@@ -170,573 +111,544 @@
 <input type=hidden name="action" value="submit">
 <input type=hidden name="studyId" value="<c:out value="${studyId}"/>">
 <a href="javascript:leftnavExpand('section1');">
-    <img id="excl_section1" src="images/bt_Collapse.gif" border="0"> <span class="table_title_Admin">
+	<img id="excl_section1" src="images/bt_Collapse.gif" border="0"> <span class="table_title_Admin">
     <fmt:message key="study_description_status" bundle="${resword}"/>  </span></a>
 <div id="section1" style="">
 <div style="width: 660px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-	<div class="textbox_center">
-		<table border="0" cellpadding="0" cellspacing="0" width="450">
-			<tr valign="top">
-				<td class="formlabel">
-					<a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;">
-						<b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:
-					</a>
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="uniqueProId" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.identifier}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td>
-				<td width="10%">
-					*
-				</td>
-			</tr>
+<div class="textbox_center">
+<table border="0" cellpadding="0" cellspacing="0" width="450">
+<tr valign="top">
+	<td class="formlabel">
+		<a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;">
+			<b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:
+		</a>
+	</td>
+	<td>
+		<input type="text" name="uniqueProId" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.identifier}"/>" class="formfieldXL bw2 h15">
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td>
+	<td width="10%">
+		*
+	</td>
+</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<b><fmt:message key="brief_title" bundle="${resword}"/></b>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="name" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.name}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include>
-				</td>
-				<td>
-					*
-				</td>
-			</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<b><fmt:message key="brief_title" bundle="${resword}"/></b>:
+	</td>
+	<td>
+		<input type="text" name="name" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.name}"/>" class="formfieldXL h15 bw2">
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include>
+	</td>
+	<td>
+		*
+	</td>
+</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<b><fmt:message key="official_title" bundle="${resword}"/></b>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="officialTitle" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.officialTitle}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="officialTitle"/></jsp:include>
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<b><fmt:message key="official_title" bundle="${resword}"/></b>:
+	</td>
+	<td>
+		<input type="text" name="officialTitle" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.officialTitle}"/>" class="formfieldXL h15 bw2">
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="officialTitle"/></jsp:include>
+	</td>
+	<td>
+		&nbsp;
+	</td>
+</tr>
 
+<c:choose>
+	<c:when test="${studyToView.parentStudyId == 0}">
+		<c:set var="key" value="study_system_status"/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="key" value="site_system_status"/>
+	</c:otherwise>
+</c:choose>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="${key}" bundle="${resword}"/>:
+	</td>
+	<td>
+		<c:set var="dis" value="${parentStudy.name!='' && !parentStudy.status.available}"/>
+		<c:set var="status1" value="${studyToView.status.id}"/>
+		<select class="formfieldXL bw1 h20 w250" name="statusId" disabled="true">
+			<c:forEach var="status" items="${statuses}">
+			<c:choose>
+			<c:when test="${status1 == status.id}">
+			<option value="<c:out value="${status.id}"/>" selected><c:out value="${status.name}"/>
+				</c:when>
+				<c:otherwise>
+			<option value="<c:out value="${status.id}"/>"><c:out value="${status.name}"/>
+				</c:otherwise>
+				</c:choose>
+				</c:forEach>
+		</select>
+		<input type=hidden name="status" value="${status1}">
+	</td>
+	<td>
+		*
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<a href="http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds'); return false;"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b>:</a>
+		<br>
+		(<fmt:message key="separate_by_commas" bundle="${resword}"/>)
+	</td>
+	<td>
+		<textarea class="formtextareaXL4 bw1 maxw250" name="secondProId" onchange="javascript:changeIcon()" rows="4" cols="50"><c:out value="${studyToView.secondaryIdentifier}"/></textarea>
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondProId"/></jsp:include>
+	</td>
+	<td>&nbsp;</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="principal_investigator" bundle="${resword}"/>:
+	</td>
+	<td>
+		<input type="text" name="prinInvestigator" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.principalInvestigator}"/>" class="formfieldXL h15 bw2">
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="prinInvestigator"/></jsp:include>
+	</td>
+	<td>*</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<a href="http://prsinfo.clinicaltrials.gov/definitions.html#BriefSummary" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#BriefSummary'); return false;">
+			<fmt:message key="brief_summary" bundle="${resword}"/>:
+		</a>
+	</td>
+	<td>
+		<textarea class="formtextareaXL4 bw1 maxw250" name="description" onchange="javascript:changeIcon()" rows="4" cols="50"><c:out value="${studyToView.summary}"/></textarea>
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
+	</td>
+	<td>
+		*
+	</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="detailed_description" bundle="${resword}"/>:
+	</td>
+	<td>
+		<textarea class="formtextareaXL4 bw1 maxw250" name="protocolDescription" onchange="javascript:changeIcon()" rows="4" cols="50"><c:out value="${studyToView.protocolDescription}"/></textarea>
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="protocolDescription"/></jsp:include>
+	</td>
+	<td>
+		&nbsp;
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="sponsor" bundle="${resword}"/>:
+	</td>
+	<td>
+		<input type="text" name="sponsor" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.sponsor}"/>" class="formfieldXL h15 bw2">
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="sponsor"/></jsp:include>
+	</td>
+	<td>
+		*
+	</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="collaborators" bundle="${resword}"/>:
+		<br>
+		(<fmt:message key="separate_by_commas" bundle="${resword}"/>)
+	</td>
+	<td>
+		<textarea class="formtextareaXL4 bw1 maxw250" name="collaborators" onchange="javascript:changeIcon()" rows="4" cols="50"><c:out value="${studyToView.collaborators}"/></textarea>
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="collaborators"/></jsp:include>
+	</td>
+	<td>
+		&nbsp;
+	</td>
+</tr>
+
+<!-- section B-->
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="study_phase" bundle="${resword}"/>:
+	</td>
+	<td>
+		<c:set var="phase1" value="${studyToView.phase}"/>
+		<select name="phase" class="formfieldXL h20 bw1 w250" onchange="javascript:changeIcon()">
+			<c:forEach var="phase" items="${studyPhaseMap}">
+			<c:set var="phasekey">
+				<fmt:message key="${phase.key}" bundle="${resadmin}"/>
+			</c:set>
+			<c:choose>
+			<c:when test="${phase1 == phasekey}">
+			<option value="<c:out value="${phase.key}"/>" selected><c:out value="${phase.value}"/>
+				</c:when>
+				<c:otherwise>
+			<option value="<c:out value="${phase.key}"/>"><c:out value="${phase.value}"/>
+				</c:otherwise>
+				</c:choose>
+				</c:forEach>
+		</select>
+	</td>
+	<td>
+		*
+	</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="protocol_type" bundle="${resword}"/>:
+	</td>
+	<td class="pb10">
+		<c:set var="type1" value="observational"/>
 		<c:choose>
-			<c:when test="${studyToView.parentStudyId == 0}">
-				<c:set var="key" value="study_system_status"/>
+			<c:when test="${studyToView.protocolTypeKey == type1}">
+				<input type="radio" onchange="javascript:changeIcon()" checked name="protocolType" value="observational" disabled><fmt:message key="observational" bundle="${resword}"/>
 			</c:when>
 			<c:otherwise>
-				<c:set var="key" value="site_system_status"/>
+				<input type="radio" onchange="javascript:changeIcon()" checked name="protocolType" value="interventional" disabled><fmt:message key="interventional" bundle="${resword}"/>
 			</c:otherwise>
 		</c:choose>
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="${key}" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<c:set var="dis" value="${parentStudy.name!='' && !parentStudy.status.available}"/>
-						<c:set var="status1" value="${studyToView.status.id}"/>
-						<select class="formfieldXL" name="statusId" disabled="true">
-						<c:forEach var="status" items="${statuses}">
-							<c:choose>
-								<c:when test="${status1 == status.id}">
-									<option value="<c:out value="${status.id}"/>" selected><c:out value="${status.name}"/>
-								</c:when>
-								<c:otherwise>
-									<option value="<c:out value="${status.id}"/>"><c:out value="${status.name}"/>
-								</c:otherwise>
-							</c:choose>
-						</c:forEach>
-						</select>
-						<input type=hidden name="status" value="${status1}">
-					</div>
-				</td>
-				<td>
-					*
-				</td>
-			</tr>
-			<tr valign="top">
-				<td class="formlabel">
-					<a href="http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds'); return false;"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b>:</a>
-					<br>
-					(<fmt:message key="separate_by_commas" bundle="${resword}"/>)
-				</td>
-				<td> 
-					<div class="formtextareaXL4_BG">
-						<textarea class="formtextareaXL4" name="secondProId" onchange="javascript:changeIcon()" rows="4" cols="50"><c:out value="${studyToView.secondaryIdentifier}"/></textarea>
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondProId"/></jsp:include>
-				</td>
-				<td>&nbsp;</td>
-			</tr>
+	</td>
+	<td>&nbsp;</td>
+</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="principal_investigator" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="prinInvestigator" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.principalInvestigator}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="prinInvestigator"/></jsp:include></td><td>*</td></tr>
+<tr valign="top">
+	<td class="formlabel">
+		<a href="http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate'); return false;"><fmt:message key="protocol_verification" bundle="${resword}"/>:</a>
+	</td>
+	<td>
+		<input type="text" name="protocolDateVerification" onchange="javascript:changeIcon()" value="<c:out value="${protocolDateVerification}"/>" class="formfieldXL bw2 h15" id="protocolDateVerificationField">
+		<br>
+		<jsp:include page="../showMessage.jsp">
+			<jsp:param name="key" value="protocolDateVerification"/>
+		</jsp:include>
+	</td>
+	<td>
+		<A HREF="#" >
+			<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="protocolDateVerificationTrigger"/>
+			<script type="text/javascript">
+				Calendar.setup({inputField  : "protocolDateVerificationField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "protocolDateVerificationTrigger" });
+			</script>
+		</a>
+	</td>
+</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<a href="http://prsinfo.clinicaltrials.gov/definitions.html#BriefSummary" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#BriefSummary'); return false;">
-						<fmt:message key="brief_summary" bundle="${resword}"/>:
-					</a>
-				</td>
-				<td>
-					<div class="formtextareaXL4_BG">
-						<textarea class="formtextareaXL4" name="description" onchange="javascript:changeIcon()" rows="4" cols="50"><c:out value="${studyToView.summary}"/></textarea>
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
-				</td>
-				<td>
-					*
-				</td>
-			</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="study_start_date" bundle="${resword}"/>:
+	</td>
+	<td>
+		<input type="text" name="startDate" onchange="javascript:changeIcon()" value="<c:out value="${startDate}" />" class="formfieldXL  bw2 h15" id="startDateField">
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDate"/></jsp:include>
+	</td>
+	<td>
+		<A HREF="#" >
+			<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="startDateTrigger"/>
+			<script type="text/javascript">
+				Calendar.setup({inputField  : "startDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "startDateTrigger" });
+			</script>
+		</a>
+		*
+	</td>
+</tr>
 
-            <tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="detailed_description" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formtextareaXL4_BG">
-						<textarea class="formtextareaXL4" name="protocolDescription" onchange="javascript:changeIcon()" rows="4" cols="50"><c:out value="${studyToView.protocolDescription}"/></textarea>
-					</div>
-				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="protocolDescription"/></jsp:include>
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="sponsor" bundle="${resword}"/>:
-				</td>
-				<td> 
-					<div class="formfieldXL_BG">
-						<input type="text" name="sponsor" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.sponsor}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="sponsor"/></jsp:include>
-				</td>
-				<td>
-					*
-				</td>
-			</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="study_completion_date" bundle="${resword}"/>:
+	</td>
+	<td>
+		<input type="text" name="endDate" onchange="javascript:changeIcon()" value="<c:out value="${endDate}" />" class="formfieldXL h15 bw2" id="endDateField">
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="endDate"/></jsp:include>
+	</td>
+	<td>
+		<A HREF="#">
+			<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="endDateTrigger"/>
+			<script type="text/javascript">
+				Calendar.setup({inputField  : "endDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "endDateTrigger" });
+			</script>
+		</a>
+	</td>
+</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="collaborators" bundle="${resword}"/>:
-					<br>
-					(<fmt:message key="separate_by_commas" bundle="${resword}"/>)
-				</td>
-				<td>
-					<div class="formtextareaXL4_BG">
-						<textarea class="formtextareaXL4" name="collaborators" onchange="javascript:changeIcon()" rows="4" cols="50"><c:out value="${studyToView.collaborators}"/></textarea>
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="collaborators"/></jsp:include>
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
+<!-- From Update Page 3 -->
 
-            <!-- section B-->
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="study_phase" bundle="${resword}"/>:
-				</td>
-				<td>
-					<c:set var="phase1" value="${studyToView.phase}"/>
-					<div class="formfieldXL_BG">
-						<select name="phase" class="formfieldXL" onchange="javascript:changeIcon()">
-						<c:forEach var="phase" items="${studyPhaseMap}">
-							<c:set var="phasekey">
-								<fmt:message key="${phase.key}" bundle="${resadmin}"/>
-							</c:set>
-							<c:choose>
-								<c:when test="${phase1 == phasekey}">
-									<option value="<c:out value="${phase.key}"/>" selected><c:out value="${phase.value}"/>
-								</c:when>
-								<c:otherwise>
-									<option value="<c:out value="${phase.key}"/>"><c:out value="${phase.value}"/>
-								</c:otherwise>
-							</c:choose>
-						</c:forEach>
-						</select>
-					</div>
-				</td>
-				<td>
-					*
-				</td>
-			</tr>
-
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="protocol_type" bundle="${resword}"/>:
-				</td>
-				<td>
-					<c:set var="type1" value="observational"/>
-					<c:choose>
-						<c:when test="${studyToView.protocolTypeKey == type1}">
-							<input type="radio" onchange="javascript:changeIcon()" checked name="protocolType" value="observational" disabled><fmt:message key="observational" bundle="${resword}"/>
-						</c:when>
-						<c:otherwise>
-							<input type="radio" onchange="javascript:changeIcon()" checked name="protocolType" value="interventional" disabled><fmt:message key="interventional" bundle="${resword}"/>
-						</c:otherwise>
+<c:if test='${isInterventional==1}'>
+	<tr valign="top">
+		<td class="formlabel">
+			<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntPurpose" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntPurpose'); return false;">
+				<fmt:message key="purpose" bundle="${resword}"/></a>:
+		</td>
+		<td>
+			<c:set var="purpose1" value="${studyToView.purpose}"/>
+			<select name="purpose" class="formfieldXL bw1 h20 w250" onchange="javascript:changeIcon()">
+				<c:forEach var="purpose" items="${interPurposeMap}">
+				<c:set var="purposekey">
+					<fmt:message key="${purpose.key}" bundle="${resadmin}"/>
+				</c:set>
+				<c:choose>
+				<c:when test="${purpose1 == purposekey}">
+				<option value="<c:out value="${purpose.key}"/>" selected><c:out value="${purpose.value}"/>
+					</c:when>
+					<c:otherwise>
+				<option value="<c:out value="${purposekey}"/>"><c:out value="${purpose.value}"/>
+					</c:otherwise>
 					</c:choose>
-				</td>
-				<td>&nbsp;</td>
-			</tr>
-
-			<tr valign="top">
-				<td class="formlabel">
-					<a href="http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate'); return false;"><fmt:message key="protocol_verification" bundle="${resword}"/>:</a>
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="protocolDateVerification" onchange="javascript:changeIcon()" value="<c:out value="${protocolDateVerification}"/>" class="formfieldM" id="protocolDateVerificationField">
-					</div>
-					<jsp:include page="../showMessage.jsp">
-						<jsp:param name="key" value="protocolDateVerification"/>
-					</jsp:include>
-				</td>
-				<td>
-					<A HREF="#" >
-						<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="protocolDateVerificationTrigger"/>
-						<script type="text/javascript">
-							Calendar.setup({inputField  : "protocolDateVerificationField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "protocolDateVerificationTrigger" });
-						</script>
-					</a>
-				</td>
-			</tr>
-
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="study_start_date" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="startDate" onchange="javascript:changeIcon()" value="<c:out value="${startDate}" />" class="formfieldXL" id="startDateField">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDate"/></jsp:include>
-				</td>
-				<td>
-					<A HREF="#" >
-						<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="startDateTrigger"/>
-						<script type="text/javascript">
-							Calendar.setup({inputField  : "startDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "startDateTrigger" });
-						</script>
-					</a>
-					*
-				</td>
-			</tr>
-
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="study_completion_date" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="endDate" onchange="javascript:changeIcon()" value="<c:out value="${endDate}" />" class="formfieldXL" id="endDateField">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="endDate"/></jsp:include>
-				</td>
-				<td>
-					<A HREF="#">
-						<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="endDateTrigger"/>
-						<script type="text/javascript">
-							Calendar.setup({inputField  : "endDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "endDateTrigger" });
-						</script>
-					</a>
-				</td>
-			</tr>
-
-             <!-- From Update Page 3 -->
-
-          <c:if test='${isInterventional==1}'>
-			<tr valign="top">
-				<td class="formlabel">
-					<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntPurpose" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntPurpose'); return false;">
-						<fmt:message key="purpose" bundle="${resword}"/></a>:
-				</td>
-				<td>
-					<c:set var="purpose1" value="${studyToView.purpose}"/>
-					<div class="formfieldXL_BG">
-						<select name="purpose" class="formfieldXL" onchange="javascript:changeIcon()">
-						<c:forEach var="purpose" items="${interPurposeMap}">
-							<c:set var="purposekey">
-								<fmt:message key="${purpose.key}" bundle="${resadmin}"/>
-							</c:set>
-							<c:choose>
-								<c:when test="${purpose1 == purposekey}">
-									<option value="<c:out value="${purpose.key}"/>" selected><c:out value="${purpose.value}"/>
-								</c:when>
-								<c:otherwise>
-									<option value="<c:out value="${purposekey}"/>"><c:out value="${purpose.value}"/>
-								</c:otherwise>
-							</c:choose>
-						</c:forEach>
-						</select>
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="purpose"/></jsp:include>
-				</td>
-			</tr>
-			<tr valign="top">
-				<td class="formlabel">
-					<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntAllocation" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntAllocation'); return false;">
-						<fmt:message key="allocation" bundle="${resword}"/></a>:
-				</td>
-				<td>
-					<c:set var="allocation1" value="${studyToView.allocation}"/>
-					<div class="formfieldXL_BG">
-						<select name="allocation" class="formfieldXL" onchange="javascript:changeIcon()">
-							<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-							<c:forEach var="allocation" items="${allocationMap}">
-								<c:set var="allocationkey">
-									<fmt:message key="${allocation.key}" bundle="${resadmin}"/>
-								</c:set>
-								<c:choose>
-									<c:when test="${allocation1 == allocationkey}">
-										<option value="<c:out value="${allocation.key}"/>" selected><c:out value="${allocation.value}"/>
-									</c:when>
-									<c:otherwise>
-										<option value="<c:out value="${allocation.key}"/>"><c:out value="${allocation.value}"/>
-									</c:otherwise>
-								</c:choose>
-							</c:forEach>
-						</select>
-					</div>
-				</td>
-			</tr>
-
-			<tr valign="top">
-				<td class="formlabel">
-				<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntMasking" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntMasking'); return false;">
-					<fmt:message key="masking" bundle="${resword}"/></a>:
-				</td>
-				<td>
-					<c:set var="masking1" value="${studyToView.masking}"/>
-					<div class="formfieldXL_BG">
-						<select name="masking" class="formfieldXL" onchange="javascript:changeIcon()">
-							<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-							<c:forEach var="masking" items="${maskingMap}">
-								<c:set var="maskingkey">
-									<fmt:message key="${masking.key}" bundle="${resadmin}"/>
-								</c:set>
-								<c:choose>
-									<c:when test="${masking1 == maskingkey}">
-										<option value="<c:out value="${masking.key}"/>" selected><c:out value="${masking.value}"/>
-									</c:when>
-									<c:otherwise>
-										<option value="<c:out value="${masking.key}"/>"><c:out value="${masking.value}"/>
-									</c:otherwise>
-								</c:choose>
-							</c:forEach>
-						</select>
-					</div>
-				</td>
-			</tr>
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="control" bundle="${resword}"/>:
-				</td>
-				<td>
-					<c:set var="control1" value="${studyToView.control}"/>
-					<div class="formfieldXL_BG">
-						<select name="control" class="formfieldXL" onchange="javascript:changeIcon()">
-							<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-							<c:forEach var="control" items="${controlMap}">
-								<c:set var="controlkey">
-									<fmt:message key="${control.key}" bundle="${resadmin}"/>
-								</c:set>
-								<c:choose>
-									<c:when test="${control1 == controlkey}">
-										<option value="<c:out value="${control.key}"/>" selected><c:out value="${control.value}"/>
-									</c:when>
-									<c:otherwise>
-										<option value="<c:out value="${control.key}"/>"><c:out value="${control.value}"/>
-									</c:otherwise>
-								</c:choose>
-							</c:forEach>
-						</select>
-					</div>
-				</td>
-			</tr>
-			<tr valign="top">
-				<td class="formlabel">
-					<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntDesign" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntDesign'); return false;">
-						<fmt:message key="intervention_model" bundle="${resword}"/></a>:
-				</td>
-				<td>
-					<%-- was assignment, tbh --%>
-					<c:set var="assignment1" value="${studyToView.assignment}"/>
-					<div class="formfieldXL_BG">
-						<select name="assignment" class="formfieldXL" onchange="javascript:changeIcon()">
-							<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-							<c:forEach var="assignment" items="${assignmentMap}">
-								<c:set var="assignmentkey">
-									<fmt:message key="${assignment.key}" bundle="${resadmin}"/>
-								</c:set>
-								<c:choose>
-									<c:when test="${assignment1 == assignmentkey}">
-										<option value="<c:out value="${assignment.key}"/>" selected><c:out value="${assignment.value}"/>
-									</c:when>
-									<c:otherwise>
-										<option value="<c:out value="${assignment.key}"/>"><c:out value="${assignment.value}"/>
-									</c:otherwise>
-								</c:choose>
-							</c:forEach>
-						</select>
-					</div>
-				</td>
-			</tr>
-			<tr valign="top">
-				<td class="formlabel">
-					<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntEndpoints" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntEndpoints'); return false;">
-						<fmt:message key="study_classification" bundle="${resword}"/></a>:</td><td>
-				<%-- was endpoint, tbh --%>
-					<c:set var="endpoint1" value="${studyToView.endpoint}"/>
-					<div class="formfieldXL_BG">
-						<select name="endpoint" class="formfieldXL" onchange="javascript:changeIcon()">
-							<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-							<c:forEach var="endpoint" items="${endpointMap}">
-								<c:set var="endpointkey">
-									<fmt:message key="${endpoint.key}" bundle="${resadmin}"/>
-								</c:set>
-								<c:choose>
-									<c:when test="${endpoint1 == endpointkey}">
-										<option value="<c:out value="${endpoint.key}"/>" selected><c:out value="${endpoint.value}"/>
-									</c:when>
-									<c:otherwise>
-										<option value="<c:out value="${endpoint.key}"/>"><c:out value="${endpoint.value}"/>
-									</c:otherwise>
-								</c:choose>
-							</c:forEach>
-						</select>
-					</div>
-				</td>
-			</tr>
-		</c:if>
-		<c:if test="${isInterventional==0}">
-             <!-- End From Update Page 3 -->
-             <!-- condition for isInterventional should be applied -->
-             <!-- From Update Page 4 -->
-			<tr valign="bottom">
-				<td class="formlabel">
-					<fmt:message key="purpose" bundle="${resword}"/>:
-				</td>
-				<td>
-					<c:set var="purpose1" value="${studyToView.purpose}"/>
-					<div class="formfieldXL_BG">
-						<select name="purpose" class="formfieldXL" onchange="javascript:changeIcon()">
-							<c:forEach var="purpose" items="${obserPurposeMap}">
-								<c:set var="purposekey">
-									<fmt:message key="${purpose.key}" bundle="${resadmin}"/>
-								</c:set>
-								<c:choose>
-									<c:when test="${purpose1 == purposekey}">
-										<option value="<c:out value="${purpose.key}"/>" selected><c:out value="${purpose.value}"/>
-									</c:when>
-									<c:otherwise>
-										<option value="<c:out value="${purpose.key}"/>"><c:out value="${purpose.value}"/>
-									</c:otherwise>
-								</c:choose>
-							</c:forEach>
-						</select>
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="purpose"/></jsp:include>
-				</td>
-				<td valign="top">
-					*
-				</td>
-			</tr>
-
-			<tr valign="bottom">
-				<td class="formlabel">
-					<fmt:message key="duration" bundle="${resword}"/>:
-				</td>
-				<td>
-					<c:set var="longitudinal">
-						<fmt:message key="longitudinal" bundle="${resadmin}"/>
-					</c:set>
-					<c:choose>
-						<c:when test="${studyToView.duration ==longitudinal}">
-							<input type="radio" onchange="javascript:changeIcon()" checked name="duration" value="longitudinal"><fmt:message key="longitudinal" bundle="${resword}"/>:
-							<input type="radio" onchange="javascript:changeIcon()" name="duration" value="cross-sectional"><fmt:message key="cross_sectional" bundle="${resword}"/>:
-						</c:when>
-						<c:otherwise>
-							<input type="radio" onchange="javascript:changeIcon()" name="duration" value="longitudinal"><fmt:message key="longitudinal" bundle="${resword}"/>:
-							<input type="radio" onchange="javascript:changeIcon()" checked name="duration" value="cross-sectional"><fmt:message key="cross_sectional" bundle="${resword}"/>:
-						</c:otherwise>
+					</c:forEach>
+			</select>
+			<br>
+			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="purpose"/></jsp:include>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="formlabel">
+			<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntAllocation" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntAllocation'); return false;">
+				<fmt:message key="allocation" bundle="${resword}"/></a>:
+		</td>
+		<td>
+			<c:set var="allocation1" value="${studyToView.allocation}"/>
+			<select name="allocation" class="formfieldXL w250 h20 bw1" onchange="javascript:changeIcon()">
+				<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
+				<c:forEach var="allocation" items="${allocationMap}">
+				<c:set var="allocationkey">
+					<fmt:message key="${allocation.key}" bundle="${resadmin}"/>
+				</c:set>
+				<c:choose>
+				<c:when test="${allocation1 == allocationkey}">
+				<option value="<c:out value="${allocation.key}"/>" selected><c:out value="${allocation.value}"/>
+					</c:when>
+					<c:otherwise>
+				<option value="<c:out value="${allocation.key}"/>"><c:out value="${allocation.value}"/>
+					</c:otherwise>
 					</c:choose>
-				</td>
-				<td>&nbsp;</td>
-			</tr>
+					</c:forEach>
+			</select>
+		</td>
+	</tr>
 
-			<tr valign="bottom">
-				<td class="formlabel">
-					<a href="http://prsinfo.clinicaltrials.gov/definitions.html#EligibilitySamplingMethod" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#EligibilitySamplingMethod'); return false;">
-						<fmt:message key="selection" bundle="${resword}"/></a>
-				</td>
-				<td>
-				<c:set var="selection1" value="${studyToView.selection}"/>
-					<div class="formfieldXL_BG">
-						<select name="selection" class="formfieldXL" onchange="javascript:changeIcon()">
-						<c:forEach var="selection" items="${selectionMap}">
-							<c:set var="selectionkey">
-								<fmt:message key="${selection.key}" bundle="${resadmin}"/>
-							</c:set>
-							<c:choose>
-								<c:when test="${selection1 == selectionkey}">
-									<option value="<c:out value="${selection.key}"/>" selected><c:out value="${selection.value}"/>
-								</c:when>
-								<c:otherwise>
-									<option value="<c:out value="${selection.key}"/>"><c:out value="${selection.value}"/>
-								</c:otherwise>
-							</c:choose>
-						</c:forEach>
-						</select>
-					</div>
-				</td>
-				<td>&nbsp;</td>
-			</tr>
+	<tr valign="top">
+		<td class="formlabel">
+			<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntMasking" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntMasking'); return false;">
+				<fmt:message key="masking" bundle="${resword}"/></a>:
+		</td>
+		<td>
+			<c:set var="masking1" value="${studyToView.masking}"/>
+			<select name="masking" class="formfieldXL w250 h20 bw1" onchange="javascript:changeIcon()">
+				<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
+				<c:forEach var="masking" items="${maskingMap}">
+				<c:set var="maskingkey">
+					<fmt:message key="${masking.key}" bundle="${resadmin}"/>
+				</c:set>
+				<c:choose>
+				<c:when test="${masking1 == maskingkey}">
+				<option value="<c:out value="${masking.key}"/>" selected><c:out value="${masking.value}"/>
+					</c:when>
+					<c:otherwise>
+				<option value="<c:out value="${masking.key}"/>"><c:out value="${masking.value}"/>
+					</c:otherwise>
+					</c:choose>
+					</c:forEach>
+			</select>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="formlabel">
+			<fmt:message key="control" bundle="${resword}"/>:
+		</td>
+		<td>
+			<c:set var="control1" value="${studyToView.control}"/>
+			<select name="control" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
+				<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
+				<c:forEach var="control" items="${controlMap}">
+				<c:set var="controlkey">
+					<fmt:message key="${control.key}" bundle="${resadmin}"/>
+				</c:set>
+				<c:choose>
+				<c:when test="${control1 == controlkey}">
+				<option value="<c:out value="${control.key}"/>" selected><c:out value="${control.value}"/>
+					</c:when>
+					<c:otherwise>
+				<option value="<c:out value="${control.key}"/>"><c:out value="${control.value}"/>
+					</c:otherwise>
+					</c:choose>
+					</c:forEach>
+			</select>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="formlabel">
+			<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntDesign" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntDesign'); return false;">
+				<fmt:message key="intervention_model" bundle="${resword}"/></a>:
+		</td>
+		<td>
+				<%-- was assignment, tbh --%>
+			<c:set var="assignment1" value="${studyToView.assignment}"/>
+			<select name="assignment" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
+				<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
+				<c:forEach var="assignment" items="${assignmentMap}">
+				<c:set var="assignmentkey">
+					<fmt:message key="${assignment.key}" bundle="${resadmin}"/>
+				</c:set>
+				<c:choose>
+				<c:when test="${assignment1 == assignmentkey}">
+				<option value="<c:out value="${assignment.key}"/>" selected><c:out value="${assignment.value}"/>
+					</c:when>
+					<c:otherwise>
+				<option value="<c:out value="${assignment.key}"/>"><c:out value="${assignment.value}"/>
+					</c:otherwise>
+					</c:choose>
+					</c:forEach>
+			</select>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="formlabel">
+			<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntEndpoints" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntEndpoints'); return false;">
+				<fmt:message key="study_classification" bundle="${resword}"/></a>:</td><td>
+			<%-- was endpoint, tbh --%>
+		<c:set var="endpoint1" value="${studyToView.endpoint}"/>
+		<select name="endpoint" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
+			<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
+			<c:forEach var="endpoint" items="${endpointMap}">
+			<c:set var="endpointkey">
+				<fmt:message key="${endpoint.key}" bundle="${resadmin}"/>
+			</c:set>
+			<c:choose>
+			<c:when test="${endpoint1 == endpointkey}">
+			<option value="<c:out value="${endpoint.key}"/>" selected><c:out value="${endpoint.value}"/>
+				</c:when>
+				<c:otherwise>
+			<option value="<c:out value="${endpoint.key}"/>"><c:out value="${endpoint.value}"/>
+				</c:otherwise>
+				</c:choose>
+				</c:forEach>
+		</select>
+	</td>
+	</tr>
+</c:if>
+<!-- End From Update Page 3 -->
 
-			<tr valign="bottom">
-				<td class="formlabel">
-					<fmt:message key="timing" bundle="${resword}"/>
-				</td>
-				<td>
-					<c:set var="timing1" value="${studyToView.timing}"/>
-					<div class="formfieldXL_BG">
-						<select name="timing" class="formfieldXL" onchange="javascript:changeIcon()">
-							<c:forEach var="timing" items="${timingMap}">
-								<c:set var="timingkey">
-									<fmt:message key="${timing.key}" bundle="${resadmin}"/>
-								</c:set>
-								<c:choose>
-									<c:when test="${timing1 == timingkey}">
-										<option value="<c:out value="${timing.key}"/>" selected><c:out value="${timing.value}"/>
-									</c:when>
-									<c:otherwise>
-										<option value="<c:out value="${timing.key}"/>"><c:out value="${timing.value}"/>
-									</c:otherwise>
-								</c:choose>
-							</c:forEach>
-						</select>
-					</div>
-				</td>
-				<td>&nbsp;</td>
-			</tr>
-          <!-- End of the condition -->
-            <!-- End From Update Page 4 -->
-		</c:if>
-	</table>
+<!-- condition for isInterventional should be applied -->
+<!-- From Update Page 4 -->
+<c:if test="${isInterventional==0}">
+	<tr valign="bottom">
+		<td class="formlabel">
+			<fmt:message key="purpose" bundle="${resword}"/>:
+		</td>
+		<td>
+			<c:set var="purpose1" value="${studyToView.purpose}"/>
+			<select name="purpose" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
+				<c:forEach var="purpose" items="${obserPurposeMap}">
+				<c:set var="purposekey">
+					<fmt:message key="${purpose.key}" bundle="${resadmin}"/>
+				</c:set>
+				<c:choose>
+				<c:when test="${purpose1 == purposekey}">
+				<option value="<c:out value="${purpose.key}"/>" selected><c:out value="${purpose.value}"/>
+					</c:when>
+					<c:otherwise>
+				<option value="<c:out value="${purpose.key}"/>"><c:out value="${purpose.value}"/>
+					</c:otherwise>
+					</c:choose>
+					</c:forEach>
+			</select>
+			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="purpose"/></jsp:include>
+		</td>
+		<td valign="top">
+			*
+		</td>
+	</tr>
+
+	<tr valign="bottom">
+		<td class="formlabel">
+			<fmt:message key="duration" bundle="${resword}"/>:
+		</td>
+		<td class="pb10">
+			<c:set var="longitudinal">
+				<fmt:message key="longitudinal" bundle="${resadmin}"/>
+			</c:set>
+			<c:choose>
+				<c:when test="${studyToView.duration ==longitudinal}">
+					<input type="radio" onchange="javascript:changeIcon()" checked name="duration" value="longitudinal"><fmt:message key="longitudinal" bundle="${resword}"/>:
+					<input type="radio" onchange="javascript:changeIcon()" name="duration" value="cross-sectional"><fmt:message key="cross_sectional" bundle="${resword}"/>:
+				</c:when>
+				<c:otherwise>
+					<input type="radio" onchange="javascript:changeIcon()" name="duration" value="longitudinal"><fmt:message key="longitudinal" bundle="${resword}"/>:
+					<input type="radio" onchange="javascript:changeIcon()" checked name="duration" value="cross-sectional"><fmt:message key="cross_sectional" bundle="${resword}"/>:
+				</c:otherwise>
+			</c:choose>
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+
+	<tr valign="bottom">
+		<td class="formlabel">
+			<a href="http://prsinfo.clinicaltrials.gov/definitions.html#EligibilitySamplingMethod" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#EligibilitySamplingMethod'); return false;">
+				<fmt:message key="selection" bundle="${resword}"/></a>
+		</td>
+		<td>
+			<c:set var="selection1" value="${studyToView.selection}"/>
+			<select name="selection" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
+				<c:forEach var="selection" items="${selectionMap}">
+				<c:set var="selectionkey">
+					<fmt:message key="${selection.key}" bundle="${resadmin}"/>
+				</c:set>
+				<c:choose>
+				<c:when test="${selection1 == selectionkey}">
+				<option value="<c:out value="${selection.key}"/>" selected><c:out value="${selection.value}"/>
+					</c:when>
+					<c:otherwise>
+				<option value="<c:out value="${selection.key}"/>"><c:out value="${selection.value}"/>
+					</c:otherwise>
+					</c:choose>
+					</c:forEach>
+			</select>
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+
+	<tr valign="bottom">
+		<td class="formlabel">
+			<fmt:message key="timing" bundle="${resword}"/>
+		</td>
+		<td>
+			<c:set var="timing1" value="${studyToView.timing}"/>
+			<select name="timing" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
+				<c:forEach var="timing" items="${timingMap}">
+				<c:set var="timingkey">
+					<fmt:message key="${timing.key}" bundle="${resadmin}"/>
+				</c:set>
+				<c:choose>
+				<c:when test="${timing1 == timingkey}">
+				<option value="<c:out value="${timing.key}"/>" selected><c:out value="${timing.value}"/>
+					</c:when>
+					<c:otherwise>
+				<option value="<c:out value="${timing.key}"/>"><c:out value="${timing.value}"/>
+					</c:otherwise>
+					</c:choose>
+					</c:forEach>
+			</select>
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+	<!-- End of the condition -->
+	<!-- End From Update Page 4 -->
+</c:if>
+</table>
 </div>
 </div></div></div></div></div></div></div></div>
 </div>
@@ -746,7 +658,7 @@
 <br>
 
 <div style="font-family: Tahoma, Arial, Helvetica, Sans-Serif;font-size:17px;">
-    <fmt:message key="expand_each_section" bundle="${restext}"/>
+	<fmt:message key="expand_each_section" bundle="${restext}"/>
 </div>
 <br>
 
@@ -754,145 +666,134 @@
 	<img id="excl_section3" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
          <fmt:message key="conditions_and_eligibility" bundle="${resword}"/></span></a>
 <div id="section3" style="display:none ">
-<div style="width: 660px">
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-	<div class="textbox_center">
-		<table border="0" cellpadding="0">
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="conditions" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="conditions" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.conditions}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="conditions"/></jsp:include>
-				</td>
-			</tr>
+	<div style="width: 660px">
+		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+			<div class="textbox_center">
+				<table border="0" cellpadding="0">
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="conditions" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="conditions" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.conditions}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="conditions"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="keywords" bundle="${resword}"/>:
-					<br>
-					(<fmt:message key="separate_by_commas" bundle="${resword}"/>)
-				</td>
-				<td>
-					<div class="formtextareaXL4_BG">
-						<textarea name="keywords" onchange="javascript:changeIcon()" rows="4" cols="50"  class="formtextareaXL4"><c:out value="${studyToView.keywords}"/></textarea>
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="keywords"/></jsp:include>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="keywords" bundle="${resword}"/>:
+							<br>
+							(<fmt:message key="separate_by_commas" bundle="${resword}"/>)
+						</td>
+						<td>
+							<textarea name="keywords" onchange="javascript:changeIcon()" rows="4" cols="50"  class="formtextareaXL4 bw1 maxw250"><c:out value="${studyToView.keywords}"/></textarea>
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="keywords"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="eligibility_criteria" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formtextareaXL4_BG">
-						<textarea name="eligibility" onchange="javascript:changeIcon()" rows="4" cols="50" class="formtextareaXL4"><c:out value="${studyToView.eligibility}"/></textarea>
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="eligibility"/></jsp:include>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="eligibility_criteria" bundle="${resword}"/>:
+						</td>
+						<td>
+							<textarea name="eligibility" onchange="javascript:changeIcon()" rows="4" cols="50" class="formtextareaXL4 bw1 maxw250"><c:out value="${studyToView.eligibility}"/></textarea>
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="eligibility"/></jsp:include>
+						</td>
+					</tr>
 
-		<c:if test="${genderShow}">
-			<tr valign="top">
-				<td class="formlabel">${genderLabel}:</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<select name="gender" class="formfieldXL" onchange="javascript:changeIcon()">
-						<c:set var="female">
-							<fmt:message key="female" bundle="${resword}"/>
-						</c:set>
-						<c:set var="male">
-							<fmt:message key="male" bundle="${resword}"/>
-						</c:set>
-						<c:choose>
-							<c:when test="${studyToView.gender == female}">
-								<option value="both"><fmt:message key="both" bundle="${resword}"/></option>
-								<option value="male"><fmt:message key="male" bundle="${resword}"/></option>
-								<option value="female" selected><fmt:message key="female" bundle="${resword}"/></option>
-							</c:when>
-							<c:when test="${studyToView.gender == male}">
-								<option value="both"><fmt:message key="both" bundle="${resword}"/></option>
-								<option value="male" selected><fmt:message key="male" bundle="${resword}"/></option>
-								<option value="female"><fmt:message key="female" bundle="${resword}"/></option>
-							</c:when>
-							<c:otherwise>
-								<option value="both" selected><c:out value="${studyToView.gender}"/></option>
-								<option value="male"><fmt:message key="male" bundle="${resword}"/></option>
-								<option value="female"><fmt:message key="female" bundle="${resword}"/></option>
-							</c:otherwise>
-						</c:choose>
-						</select>
-					</div>
-				</td>
-			</tr>
-		</c:if>
+					<c:if test="${genderShow}">
+						<tr valign="top">
+							<td class="formlabel">${genderLabel}:</td>
+							<td>
+								<select name="gender" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
+									<c:set var="female">
+										<fmt:message key="female" bundle="${resword}"/>
+									</c:set>
+									<c:set var="male">
+										<fmt:message key="male" bundle="${resword}"/>
+									</c:set>
+									<c:choose>
+										<c:when test="${studyToView.gender == female}">
+											<option value="both"><fmt:message key="both" bundle="${resword}"/></option>
+											<option value="male"><fmt:message key="male" bundle="${resword}"/></option>
+											<option value="female" selected><fmt:message key="female" bundle="${resword}"/></option>
+										</c:when>
+										<c:when test="${studyToView.gender == male}">
+											<option value="both"><fmt:message key="both" bundle="${resword}"/></option>
+											<option value="male" selected><fmt:message key="male" bundle="${resword}"/></option>
+											<option value="female"><fmt:message key="female" bundle="${resword}"/></option>
+										</c:when>
+										<c:otherwise>
+											<option value="both" selected><c:out value="${studyToView.gender}"/></option>
+											<option value="male"><fmt:message key="male" bundle="${resword}"/></option>
+											<option value="female"><fmt:message key="female" bundle="${resword}"/></option>
+										</c:otherwise>
+									</c:choose>
+								</select>
+							</td>
+						</tr>
+					</c:if>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="minimum_age" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="ageMin" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.ageMin}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="ageMin"/></jsp:include>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="minimum_age" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="ageMin" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.ageMin}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="ageMin"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="maximum_age" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="ageMax" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.ageMax}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="ageMax"/></jsp:include>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="maximum_age" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="ageMax" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.ageMax}"/>" class="formfieldXL bw2 h15">
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="ageMax"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="healthy_volunteers_accepted" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<select name="healthyVolunteerAccepted" class="formfieldXL" onchange="javascript:changeIcon()">
-							<c:choose>
-								<c:when test="${studyToView.healthyVolunteerAccepted == true}">
-									<option value="1" selected><fmt:message key="yes" bundle="${resword}"/></option>
-									<option value="0"><fmt:message key="no" bundle="${resword}"/></option>
-								</c:when>
-								<c:otherwise>
-									<option value="1"><fmt:message key="yes" bundle="${resword}"/></option>
-									<option value="0" selected><fmt:message key="no" bundle="${resword}"/></option>
-								</c:otherwise>
-							</c:choose>
-						</select>
-					</div>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="healthy_volunteers_accepted" bundle="${resword}"/>:
+						</td>
+						<td>
+							<select name="healthyVolunteerAccepted" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
+								<c:choose>
+									<c:when test="${studyToView.healthyVolunteerAccepted == true}">
+										<option value="1" selected><fmt:message key="yes" bundle="${resword}"/></option>
+										<option value="0"><fmt:message key="no" bundle="${resword}"/></option>
+									</c:when>
+									<c:otherwise>
+										<option value="1"><fmt:message key="yes" bundle="${resword}"/></option>
+										<option value="0" selected><fmt:message key="no" bundle="${resword}"/></option>
+									</c:otherwise>
+								</c:choose>
+							</select>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="expected_total_enrollment" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="expectedTotalEnrollment" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.expectedTotalEnrollment}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="expectedTotalEnrollment"/></jsp:include>
-				</td>
-				<td>*</td>
-			</tr>
-		</table>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="expected_total_enrollment" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="expectedTotalEnrollment" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.expectedTotalEnrollment}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="expectedTotalEnrollment"/></jsp:include>
+						</td>
+						<td>*</td>
+					</tr>
+				</table>
+			</div>
+		</div></div></div></div></div></div></div></div>
 	</div>
-</div></div></div></div></div></div></div></div>
-</div>
 </div>
 <br>
 
@@ -901,201 +802,187 @@
     <span class="table_title_Admin">
         <fmt:message key="facility_information" bundle="${resword}"/></span></a>
 <div id="section4" style="display:none ">
-<div style="width: 660px">
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-    <div class="textbox_center">
-		<table border="0" cellpadding="5">
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="facility_name" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="facName" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityName}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facName"/></jsp:include>
-				</td>
-			</tr>
+	<div style="width: 660px">
+		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+			<div class="textbox_center">
+				<table border="0" cellpadding="5">
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="facility_name" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="facName" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityName}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facName"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="facility_city" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="facCity" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityCity}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facCity"/></jsp:include>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="facility_city" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="facCity" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityCity}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facCity"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="facility_state_province" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="facState" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityState}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facState"/></jsp:include>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="facility_state_province" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="facState" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityState}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facState"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="postal_code" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="facZip" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityZip}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facZip"/></jsp:include>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="postal_code" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="facZip" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityZip}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facZip"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="facility_country" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="facCountry" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityCountry}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facCountry"/></jsp:include>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="facility_country" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="facCountry" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityCountry}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facCountry"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="facility_contact_name" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="facConName" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityContactName}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConName"/></jsp:include>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="facility_contact_name" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="facConName" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityContactName}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConName"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="facility_contact_degree" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="facConDegree" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityContactDegree}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConDegree"/></jsp:include>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="facility_contact_degree" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="facConDegree" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityContactDegree}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConDegree"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="facility_contact_phone" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="facConPhone" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityContactPhone}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConPhone"/></jsp:include>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="facility_contact_phone" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="facConPhone" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityContactPhone}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConPhone"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="facility_contact_email" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="facConEmail" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityContactEmail}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConEmail"/></jsp:include>
-				</td>
-			</tr>
-		</table>
-    </div>
-</div></div></div></div></div></div></div></div>
-</div>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="facility_contact_email" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="facConEmail" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityContactEmail}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConEmail"/></jsp:include>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div></div></div></div></div></div></div></div>
+	</div>
 </div>
 <br>
 
 <a href="javascript:leftnavExpand('section5');">
- 	<img id="excl_section5" src="images/bt_Expand.gif" border="0"> 
+	<img id="excl_section5" src="images/bt_Expand.gif" border="0">
 	<span class="table_title_Admin">
            <fmt:message key="related_infomation" bundle="${resword}"/>
 	</span>
 </a>
 <div id="section5" style="display:none ">
-<div style="width: 660px">
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-	<div class="textbox_center">
-		<table border="0" cellpadding="0">
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="MEDLINE_identifier" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="medlineIdentifier" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.medlineIdentifier}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="medlineIdentifier"/></jsp:include>
-				</td>
-			</tr>
+	<div style="width: 660px">
+		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+			<div class="textbox_center">
+				<table border="0" cellpadding="0">
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="MEDLINE_identifier" bundle="${resword}"/>:
+						</td>
+						<td>
+							<input type="text" name="medlineIdentifier" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.medlineIdentifier}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="medlineIdentifier"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="results_reference" bundle="${resword}"/>:
-				</td>
-				<td>
-					<div class="formfieldS_BG">
-						<select name="resultsReference" class="formfieldS" onchange="javascript:changeIcon()">
-						<c:choose>
-							<c:when test="${studyToView.resultsReference == true}">
-								<option value="1" selected><fmt:message key="yes" bundle="${resword}"/></option>
-								<option value="0"><fmt:message key="no" bundle="${resword}"/></option>
-							</c:when>
-							<c:otherwise>
-								<option value="1"><fmt:message key="yes" bundle="${resword}"/></option>
-								<option value="0" selected><fmt:message key="no" bundle="${resword}"/></option>
-							</c:otherwise>
-						</c:choose>
-						</select>
-					</div>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="results_reference" bundle="${resword}"/>:
+						</td>
+						<td>
+							<select name="resultsReference" class="formfieldS bw1 h20" onchange="javascript:changeIcon()">
+								<c:choose>
+									<c:when test="${studyToView.resultsReference == true}">
+										<option value="1" selected><fmt:message key="yes" bundle="${resword}"/></option>
+										<option value="0"><fmt:message key="no" bundle="${resword}"/></option>
+									</c:when>
+									<c:otherwise>
+										<option value="1"><fmt:message key="yes" bundle="${resword}"/></option>
+										<option value="0" selected><fmt:message key="no" bundle="${resword}"/></option>
+									</c:otherwise>
+								</c:choose>
+							</select>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="URL_reference" bundle="${resword}"/>
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="url" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.url}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="url"/></jsp:include>
-				</td>
-			</tr>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="URL_reference" bundle="${resword}"/>
+						</td>
+						<td>
+							<input type="text" name="url" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.url}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="url"/></jsp:include>
+						</td>
+					</tr>
 
-			<tr valign="top">
-				<td class="formlabel">
-					<fmt:message key="URL_description" bundle="${resword}"/>
-				</td>
-				<td>
-					<div class="formfieldXL_BG">
-						<input type="text" name="urlDescription" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.urlDescription}"/>" class="formfieldXL">
-					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="urlDescription"/></jsp:include>
-				</td>
-			</tr>
-		</table>
-    </div>
-</div></div></div></div></div></div></div></div>
-</div>
+					<tr valign="top">
+						<td class="formlabel">
+							<fmt:message key="URL_description" bundle="${resword}"/>
+						</td>
+						<td>
+							<input type="text" name="urlDescription" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.urlDescription}"/>" class="formfieldXL bw2 h15">
+							<br>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="urlDescription"/></jsp:include>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div></div></div></div></div></div></div></div>
+	</div>
 </div>
 
 <br>
 <a href="javascript:leftnavExpand('section6');">
- 	<img id="excl_section6" src="images/bt_Expand.gif" border="0"> 
+	<img id="excl_section6" src="images/bt_Expand.gif" border="0">
 	<span class="table_title_Admin">
            <fmt:message key="notes_and_discrepancies_descriptions" bundle="${resword}"/>
 	</span>
@@ -1103,278 +990,240 @@
 <br>
 <div id="section6" style="display:none">
 
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<a href="javascript:leftnavExpand('section6_1');">
-		<img id="excl_section6_1" src="images/bt_Expand.gif" border="0"> 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="javascript:leftnavExpand('section6_1');">
+	<img id="excl_section6_1" src="images/bt_Expand.gif" border="0">
 		<span class="table_title_Admin">
 			<fmt:message key="update_discrepancies_descriptions" bundle="${resword}"/>
 		</span>
-	</a>
-	<br>
-	
-	<div id="section6_1" name="" style="display:none" name="update_descriptions">
+</a>
+<br>
 
-		<div style="width: 660px">
+<div id="section6_1" name="" style="display:none" name="update_descriptions">
+
+	<div style="width: 660px">
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-		<div class="textbox_center">
-			<table border="0" cellpadding="0">
-				<tr valign="top"><td class="formlabel"><fmt:message key="reason_for_update_descriptions" bundle="${resword}"/></td>
-					<td>
-						<table>
-							<c:set var="count" value="0"/>
-							<c:forEach var="term" items="${dDescriptionsMap['dnUpdateDescriptions']}">
-								<tr>
-									<td> 
-										<div class="formfieldXL_BG">
-											<input type="text" name="updateName${count}" onchange="javascript:changeIcon()" value="${term.name}" class="formfieldXL">
-										</div>
-									</td>
-								</tr>	
-								<tr>
-									<td>
-										<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateName${count}"/></jsp:include></p>
-										<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateDescriptionError${count}"/></jsp:include></p>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<fmt:message key="visibility" bundle="${resword}"/>:
-										<c:choose>
-											<c:when test="${term.visibilityLevel == 'Site'}">
-												<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" checked value="2"><fmt:message key="site_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" value="0"><fmt:message key="both" bundle="${resword}"/>
-											</c:when>
-											<c:when test="${term.visibilityLevel == 'Study'}">
-												<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" checked value="1"><fmt:message key="study_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" value="0"><fmt:message key="both" bundle="${resword}"/>
-											</c:when>
-											<c:otherwise>
-												<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
-											</c:otherwise>
-										</c:choose>
-										<input type=hidden name="updateDescriptionId${count}" value="${term.id}">
-										<c:set var="count" value="${count+1}"/>
-										<br></br>
-									</td>
-								</tr>	
-							</c:forEach>	
-							<c:choose>
-								<c:when test="${count < 3}">
-									<c:set var="delta" value="${2-count}"/>
-								</c:when>
-								<c:when test="${count > 21}">
-									<c:set var="delta" value="${24-count}"/>
-								</c:when>
-								<c:otherwise>
-									<c:set var="delta" value="1"/>
-								</c:otherwise>
-							</c:choose>
-							<c:forEach begin="${count}" end="${count+delta}">
-								<tr id="dnUpdateDescriptionRow_a${count}">
-									<td>
-										<div class="formfieldXL_BG">
-											<input type="text" name="updateName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'updateDescriptions');" value="" class="formfieldXL">
-										</div>
-									</td>
-								</tr>	
-								<tr id="dnUpdateDescriptionRow_b${count}">
-									<td>
-										<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateName${count}"/></jsp:include></p>
-										<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateDescriptionError${count}"/></jsp:include></p>
-									</td>
-								</tr>
-								<tr id="dnUpdateDescriptionRow_c${count}">
-									<td>		
-										<fmt:message key="visibility" bundle="${resword}"/>:
-										<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
-										<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
-										<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
-										<br></br>
-									</td>
-								</tr>	
-								<c:set var="count" value="${count+1}"/>
-							</c:forEach>
-							<c:if test="${count <= 24}">
-								<c:forEach begin="${count}" end="24">
-									<tr style="display: none" id="dnUpdateDescriptionRow_a${count}">
+			<div class="textbox_center">
+				<table border="0" cellpadding="0">
+					<tr valign="top"><td class="formlabel"><fmt:message key="reason_for_update_descriptions" bundle="${resword}"/></td>
+						<td>
+							<table>
+								<c:set var="count" value="0"/>
+								<c:forEach var="term" items="${dDescriptionsMap['dnUpdateDescriptions']}">
+									<tr>
 										<td>
-											<div class="formfieldXL_BG">
-												<input type="text" name="updateName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'updateDescriptions');" value="" class="formfieldXL">
-											</div>
+											<input type="text" name="updateName${count}" onchange="javascript:changeIcon()" value="${term.name}" class="formfieldXL bw2 h15">
 										</td>
-									</tr>	
-									<tr style="display: none" id="dnUpdateDescriptionRow_b${count}">
+									</tr>
+									<tr>
 										<td>
 											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateName${count}"/></jsp:include></p>
 											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateDescriptionError${count}"/></jsp:include></p>
 										</td>
 									</tr>
-									<tr style="display: none" id="dnUpdateDescriptionRow_c${count}">
-										<td>		
-											<fmt:message key="visibility" bundle="${resword}"/>: 
+									<tr>
+										<td>
+											<fmt:message key="visibility" bundle="${resword}"/>:
+
+											<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" ${term.visibilityLevel == 'Site' ? 'checked' : ''} value="2"><fmt:message key="site_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" ${term.visibilityLevel == 'Study' ? 'checked' : ''} value="1"><fmt:message key="study_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" ${term.visibilityLevel == 'Study and Site' ? 'checked' : ''} value="0"><fmt:message key="both" bundle="${resword}"/>
+											<input type=hidden name="updateDescriptionId${count}" value="${term.id}">
+											<c:set var="count" value="${count+1}"/>
+											<br></br>
+										</td>
+									</tr>
+								</c:forEach>
+								<c:choose>
+									<c:when test="${count < 3}">
+										<c:set var="delta" value="${2-count}"/>
+									</c:when>
+									<c:when test="${count > 21}">
+										<c:set var="delta" value="${24-count}"/>
+									</c:when>
+									<c:otherwise>
+										<c:set var="delta" value="1"/>
+									</c:otherwise>
+								</c:choose>
+								<c:forEach begin="${count}" end="${count+delta}">
+									<tr id="dnUpdateDescriptionRow_a${count}">
+										<td>
+											<input type="text" name="updateName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'updateDescriptions');" value="" class="formfieldXL bw2 h15">
+										</td>
+									</tr>
+									<tr id="dnUpdateDescriptionRow_b${count}">
+										<td>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateName${count}"/></jsp:include></p>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateDescriptionError${count}"/></jsp:include></p>
+										</td>
+									</tr>
+									<tr id="dnUpdateDescriptionRow_c${count}">
+										<td>
+											<fmt:message key="visibility" bundle="${resword}"/>:
 											<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
 											<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
 											<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
 											<br></br>
 										</td>
-									</tr>	
+									</tr>
 									<c:set var="count" value="${count+1}"/>
-								</c:forEach>   
-							</c:if> 
-						</table>
-					</td>
-				</tr>
-			</table>
-		</div></div></div></div></div></div></div></div></div>
-		</div>
+								</c:forEach>
+								<c:if test="${count <= 24}">
+									<c:forEach begin="${count}" end="24">
+										<tr style="display: none" id="dnUpdateDescriptionRow_a${count}">
+											<td>
+												<input type="text" name="updateName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'updateDescriptions');" value="" class="formfieldXL bw2 h15">
+											</td>
+										</tr>
+										<tr style="display: none" id="dnUpdateDescriptionRow_b${count}">
+											<td>
+												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateName${count}"/></jsp:include></p>
+												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateDescriptionError${count}"/></jsp:include></p>
+											</td>
+										</tr>
+										<tr style="display: none" id="dnUpdateDescriptionRow_c${count}">
+											<td>
+												<fmt:message key="visibility" bundle="${resword}"/>:
+												<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
+												<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
+												<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
+												<br></br>
+											</td>
+										</tr>
+										<c:set var="count" value="${count+1}"/>
+									</c:forEach>
+								</c:if>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</div></div></div></div></div></div></div></div></div>
 	</div>
+</div>
 
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<a href="javascript:leftnavExpand('section6_2');">
-		<img id="excl_section6_2" src="images/bt_Expand.gif" border="0"> 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="javascript:leftnavExpand('section6_2');">
+	<img id="excl_section6_2" src="images/bt_Expand.gif" border="0">
 		<span class="table_title_Admin">
 			<fmt:message key="close_discrepancies_descriptions" bundle="${resword}"/>
 		</span>
-	</a>
-	<br>
+</a>
+<br>
 
-	<div id="section6_2" style="display:none" name="close_descriptions">
+<div id="section6_2" style="display:none" name="close_descriptions">
 
-		<div style="width: 660px">
+	<div style="width: 660px">
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-		<div class="textbox_center">
-			<table border="0" cellpadding="0">
-				<tr valign="top"><td class="formlabel"><fmt:message key="reason_for_close_descriptions" bundle="${resword}"/></td>
-					<td>
-						<table>
-							<c:set var="count" value="0"/>
-							<c:forEach var="term" items="${dDescriptionsMap['dnCloseDescriptions']}">
-								<tr>
-									<td>
-										<div class="formfieldXL_BG">
-											<input type="text" name="closeName${count}" onchange="javascript:changeIcon()" value="${term.name}" class="formfieldXL">
-										</div>
-									</td> 
-								</tr>	
-								<tr>
-									<td>
-										<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeName${count}"/></jsp:include></p>
-										<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeDescriptionError${count}"/></jsp:include></p>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<fmt:message key="visibility" bundle="${resword}"/>:
-										<c:choose>
-											<c:when test="${term.visibilityLevel == 'Site'}">
-												<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" checked value="2"><fmt:message key="site_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" value="0"><fmt:message key="both" bundle="${resword}"/>
-											</c:when>
-											<c:when test="${term.visibilityLevel == 'Study'}">
-												<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" checked value="1"><fmt:message key="study_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" value="0"><fmt:message key="both" bundle="${resword}"/>
-											</c:when>
-											<c:otherwise>
-												<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
-											</c:otherwise>
-										</c:choose>
-										<input type=hidden name="closeDescriptionId${count}" value="${term.id}">
-										<c:set var="count" value="${count+1}"/>
-										<br></br>
-									</td>
-								</tr>	
-							</c:forEach>	
-							<c:choose>
-								<c:when test="${count < 3}">
-									<c:set var="delta" value="${2-count}"/>
-								</c:when>
-								<c:when test="${count > 21}">
-									<c:set var="delta" value="${24-count}"/>
-								</c:when>
-								<c:otherwise>
-									<c:set var="delta" value="1"/>
-								</c:otherwise>
-							</c:choose>
-							<c:forEach begin="${count}" end="${count+delta}">
-								<tr id="dnCloseDescriptionRow_a${count}">
-									<td>
-										<div class="formfieldXL_BG">
-											<input type="text" name="closeName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'closeDescriptions');" value="" class="formfieldXL">
-										</div>
-									</td>
-								</tr>	
-								<tr id="dnCloseDescriptionRow_b${count}">
-									<td>
-										<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeName${count}"/></jsp:include></p>
-										<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeDescriptionError${count}"/></jsp:include></p>											</td>
-									</td>
-								</tr>
-								<tr id="dnCloseDescriptionRow_c${count}">
-									<td>		
-										<fmt:message key="visibility" bundle="${resword}"/>:
-										<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
-										<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
-										<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
-										<br></br>
-									</td>
-								</tr>	
-								<c:set var="count" value="${count+1}"/>
-							</c:forEach>
-							<c:if test="${count <= 24}">
-								<c:forEach begin="${count}" end="24">
-									<tr style="display: none" id="dnCloseDescriptionRow_a${count}">
+			<div class="textbox_center">
+				<table border="0" cellpadding="0">
+					<tr valign="top"><td class="formlabel"><fmt:message key="reason_for_close_descriptions" bundle="${resword}"/></td>
+						<td>
+							<table>
+								<c:set var="count" value="0"/>
+								<c:forEach var="term" items="${dDescriptionsMap['dnCloseDescriptions']}">
+									<tr>
 										<td>
-											<div class="formfieldXL_BG">
-												<input type="text" name="closeName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'closeDescriptions');" value="" class="formfieldXL">
-											</div>
-										</td>
-									</tr>	
-									<tr style="display: none" id="dnCloseDescriptionRow_b${count}">
-										<td>
-											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeName${count}"/></jsp:include></p>
-											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeDescriptionError${count}"/></jsp:include></p>												</td>
+											<input type="text" name="closeName${count}" onchange="javascript:changeIcon()" value="${term.name}" class="formfieldXL bw2 h15">
 										</td>
 									</tr>
-									<tr style="display: none" id="dnCloseDescriptionRow_c${count}">
-										<td>		
-											<fmt:message key="visibility" bundle="${resword}"/>: 
+									<tr>
+										<td>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeName${count}"/></jsp:include></p>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeDescriptionError${count}"/></jsp:include></p>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<fmt:message key="visibility" bundle="${resword}"/>:
+											<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" ${term.visibilityLevel == 'Site' ? 'checked' : ''} value="2"><fmt:message key="site_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" ${term.visibilityLevel == 'Study' ? 'checked' : ''} value="1"><fmt:message key="study_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" ${term.visibilityLevel == 'Study and Site' ? 'checked' : ''} value="0"><fmt:message key="both" bundle="${resword}"/>
+
+											<input type=hidden name="closeDescriptionId${count}" value="${term.id}">
+											<c:set var="count" value="${count+1}"/>
+											<br></br>
+										</td>
+									</tr>
+								</c:forEach>
+								<c:choose>
+									<c:when test="${count < 3}">
+										<c:set var="delta" value="${2-count}"/>
+									</c:when>
+									<c:when test="${count > 21}">
+										<c:set var="delta" value="${24-count}"/>
+									</c:when>
+									<c:otherwise>
+										<c:set var="delta" value="1"/>
+									</c:otherwise>
+								</c:choose>
+								<c:forEach begin="${count}" end="${count+delta}">
+									<tr id="dnCloseDescriptionRow_a${count}">
+										<td>
+											<input type="text" name="closeName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'closeDescriptions');" value="" class="formfieldXL bw2 h15">
+										</td>
+									</tr>
+									<tr id="dnCloseDescriptionRow_b${count}">
+										<td>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeName${count}"/></jsp:include></p>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeDescriptionError${count}"/></jsp:include></p>											</td>
+										</td>
+									</tr>
+									<tr id="dnCloseDescriptionRow_c${count}">
+										<td>
+											<fmt:message key="visibility" bundle="${resword}"/>:
 											<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
 											<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
 											<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
 											<br></br>
 										</td>
-									</tr>	
+									</tr>
 									<c:set var="count" value="${count+1}"/>
-								</c:forEach>   
-							</c:if> 
-						</table>
-					</td>
-				</tr>
-			</table>
-		</div></div></div></div></div></div></div></div></div>
-		</div>
+								</c:forEach>
+								<c:if test="${count <= 24}">
+									<c:forEach begin="${count}" end="24">
+										<tr style="display: none" id="dnCloseDescriptionRow_a${count}">
+											<td>
+												<input type="text" name="closeName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'closeDescriptions');" value="" class="formfieldXL bw2 h15">
+											</td>
+										</tr>
+										<tr style="display: none" id="dnCloseDescriptionRow_b${count}">
+											<td>
+												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeName${count}"/></jsp:include></p>
+												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeDescriptionError${count}"/></jsp:include></p>												</td>
+											</td>
+										</tr>
+										<tr style="display: none" id="dnCloseDescriptionRow_c${count}">
+											<td>
+												<fmt:message key="visibility" bundle="${resword}"/>:
+												<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
+												<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
+												<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
+												<br></br>
+											</td>
+										</tr>
+										<c:set var="count" value="${count+1}"/>
+									</c:forEach>
+								</c:if>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</div></div></div></div></div></div></div></div></div>
 	</div>
-	
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<a href="javascript:leftnavExpand('section6_3');">
-		<img id="excl_section6_3" src="images/bt_Expand.gif" border="0"> 
+</div>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="javascript:leftnavExpand('section6_3');">
+	<img id="excl_section6_3" src="images/bt_Expand.gif" border="0">
 		<span class="table_title_Admin">
            <fmt:message key="reason_for_change_descriptions" bundle="${resword}"/>
 		</span>
-	</a>
+</a>
 
-		<div id="section6_3" style="display:none" name="reasons_for_change_desciptions">
+<div id="section6_3" style="display:none" name="reasons_for_change_desciptions">
 
-			<div style="width: 660px">
-			<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+	<div style="width: 660px">
+		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 			<div class="textbox_center">
 				<table border="0" cellpadding="0">
 					<tr valign="top"><td class="formlabel"><fmt:message key="reason_for_change_descriptions" bundle="${resword}"/></td>
@@ -1384,11 +1233,9 @@
 								<c:forEach var="term" items="${dDescriptionsMap['dnRFCDescriptions']}">
 									<tr>
 										<td>
-											<div class="formfieldXL_BG">
-												<input type="text" name="dnRFCName${count}" onchange="javascript:changeIcon()" value="${term.name}" class="formfieldXL">
-											</div>
+											<input type="text" name="dnRFCName${count}" onchange="javascript:changeIcon()" value="${term.name}" class="formfieldXL bw2 h15">
 										</td>
-									</tr>	
+									</tr>
 									<tr>
 										<td>
 											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRFCName${count}"/></jsp:include></p>
@@ -1398,29 +1245,17 @@
 									<tr>
 										<td>
 											<fmt:message key="visibility" bundle="${resword}"/>:
-											<c:choose>
-												<c:when test="${term.visibilityLevel == 'Site'}">
-													<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" checked value="2"><fmt:message key="site_level" bundle="${resword}"/>
-													<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
-													<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" value="0"><fmt:message key="both" bundle="${resword}"/>
-												</c:when>
-												<c:when test="${term.visibilityLevel == 'Study'}">
-													<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
-													<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" checked value="1"><fmt:message key="study_level" bundle="${resword}"/>
-													<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" value="0"><fmt:message key="both" bundle="${resword}"/>
-												</c:when>
-												<c:otherwise>
-													<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
-													<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
-													<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
-												</c:otherwise>
-											</c:choose>
+
+											<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" ${term.visibilityLevel == 'Site'} value="2"><fmt:message key="site_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" ${term.visibilityLevel == 'Study'} value="1"><fmt:message key="study_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}"  ${term.visibilityLevel == 'Study and Site'}value="0"><fmt:message key="both" bundle="${resword}"/>
+
 											<input type=hidden name="dnRFCDescriptionId${count}" value="${term.id}">
 											<c:set var="count" value="${count+1}"/>
 											<br></br>
 										</td>
-									</tr>	
-								</c:forEach>	
+									</tr>
+								</c:forEach>
 								<c:choose>
 									<c:when test="${count < 3}">
 										<c:set var="delta" value="${2-count}"/>
@@ -1435,11 +1270,9 @@
 								<c:forEach begin="${count}" end="${count+delta}">
 									<tr id="dnRFCDescriptionRow_a${count}">
 										<td>
-											<div class="formfieldXL_BG">
-												<input type="text" name="dnRFCName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'RFC');" value="" class="formfieldXL">
-											</div>
+											<input type="text" name="dnRFCName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'RFC');" value="" class="formfieldXL bw2 h15">
 										</td>
-									</tr>	
+									</tr>
 									<tr id="dnRFCDescriptionRow_b${count}">
 										<td>
 											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRFCName${count}"/></jsp:include></p>
@@ -1447,25 +1280,23 @@
 										</td>
 									</tr>
 									<tr id="dnRFCDescriptionRow_c${count}">
-										<td>		
+										<td>
 											<fmt:message key="visibility" bundle="${resword}"/>:
 											<input type="radio" onchange="javascript:changeIcon();" name="dnRFCVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
 											<input type="radio" onchange="javascript:changeIcon();" name="dnRFCVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
 											<input type="radio" onchange="javascript:changeIcon();" name="dnRFCVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
 											<br></br>
 										</td>
-									</tr>	
+									</tr>
 									<c:set var="count" value="${count+1}"/>
 								</c:forEach>
 								<c:if test="${count <= 24}">
 									<c:forEach begin="${count}" end="24">
 										<tr style="display: none" id="dnRFCDescriptionRow_a${count}">
 											<td>
-												<div class="formfieldXL_BG">
-													<input type="text" name="dnRFCName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'RFC');" value="" class="formfieldXL">
-												</div>
+												<input type="text" name="dnRFCName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'RFC');" value="" class="formfieldXL bw2 h15">
 											</td>
-										</tr>	
+										</tr>
 										<tr style="display: none" id="dnRFCDescriptionRow_b${count}">
 											<td>
 												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRFCName${count}"/></jsp:include></p>
@@ -1473,25 +1304,25 @@
 											</td>
 										</tr>
 										<tr style="display: none" id="dnRFCDescriptionRow_c${count}">
-											<td>		
-												<fmt:message key="visibility" bundle="${resword}"/>: 
+											<td>
+												<fmt:message key="visibility" bundle="${resword}"/>:
 												<input type="radio" onchange="javascript:changeIcon();" name="dnRFCVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
 												<input type="radio" onchange="javascript:changeIcon();" name="dnRFCVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
 												<input type="radio" onchange="javascript:changeIcon();" name="dnRFCVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
 												<br></br>
 											</td>
-										</tr>	
+										</tr>
 										<c:set var="count" value="${count+1}"/>
-									</c:forEach>   
-								</c:if> 
+									</c:forEach>
+								</c:if>
 							</table>
 						</td>
 					</tr>
 				</table>
 			</div></div></div></div></div></div></div></div></div>
-			</div>
-		</div>
 	</div>
+</div>
+</div>
 <!-- end of section f -->
 
 <a href="javascript:leftnavExpand('section7');">
@@ -1501,690 +1332,772 @@
 <div style="width: 660px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="textbox_center">
-	<table border="0" cellpadding="4" cellspacing="0" id="study_param_config">
-		<tr valign="top" style="width: 100%;">
-			<td class="formlabel" style="text-align: left;">
-				<fmt:message key="studyParameters" bundle="${resword}"/>:
-			</td>
-			<td style="text-align: left;">
-				&nbsp;
-			</td>
-		</tr>
-		<tr valign="top">
-			<td class="formlabel"><fmt:message key="allow_discrepancy_management" bundle="${resword}"/></td>
-			<td>
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.discrepancyManagement == 'true' ? "checked" : ""} 
-					name="discrepancyManagement" value="true"><fmt:message key="yes" bundle="${resword}"/>
-					
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.discrepancyManagement == 'false' ? "checked" : ""} 
-					name="discrepancyManagement" value="false"><fmt:message key="no" bundle="${resword}"/>			
-			</td>
-		</tr>
-		<tr valign="top">
-			<td class="formlabel">
-				<fmt:message key="forced_reason_for_change" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.adminForcedReasonForChange == 'true' ? "checked" : ""} 
-					name="adminForcedReasonForChange" value="true"><fmt:message key="yes" bundle="${resword}"/>
-					
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.adminForcedReasonForChange == 'false' ? "checked" : ""} 
-					name="adminForcedReasonForChange" value="false"><fmt:message key="no" bundle="${resword}"/>
-			</td>
-		</tr>
-		<tr valign="top">
-		    <td class="formlabel">
-		      <fmt:message key="allowSdvWithOpenQueries" bundle="${resword}"/>
-		    </td>
-		    <td>
-		    	<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'yes' ? "checked" : ""} 
-					name="allowSdvWithOpenQueries" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-					
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'yes' ? "" : "checked"} 
-					name="allowSdvWithOpenQueries" value="no"><fmt:message key="no" bundle="${resword}"/>
-		    </td>
-	  	</tr>
-	  	<tr>
-			<td>&nbsp;</td>
-		</tr>
-		<tr valign="top" style="border: 1px solid black;width: 100%;">
-			<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
-				<fmt:message key="subjectParameters" bundle="${resword}"/>:
-			</td>
-			<td style=" border-top: 1px solid black; text-align: left;">
-				&nbsp;
-			</td>
-		</tr>
-		<tr valign="top">
-			<td class="formlabel">
-				<fmt:message key="how_to_generate_the_study_subject_ID" bundle="${resword}"/>:
-			</td>
-			<td>
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.subjectIdGeneration == 'manual' ? "checked" : ""} 
-					name="subjectIdGeneration" value="manual"><fmt:message key="manual_entry" bundle="${resword}"/>
-				
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.subjectIdGeneration == 'auto editable' ? "checked" : ""}
-					name="subjectIdGeneration" value="auto editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
-				
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.subjectIdGeneration == 'auto non-editable' ? "checked" : ""}
-					name="subjectIdGeneration" value="auto non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>			
-			</td>
-		</tr>
-		<tr valign="top">
-		<td class="formlabel">
-			<fmt:message key="studySubjectIdLabel" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="text" name="studySubjectIdLabel" onchange="javascript:changeIcon()" value="${studyToView.studyParameterConfig.studySubjectIdLabel}" maxlength="255" size="35">
-				<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studySubjectIdLabel"/></jsp:include>
-			</td>
-		</tr>
-		<tr valign="top">
-			<td class="formlabel">
-				<fmt:message key="secondaryIDRequired" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="radio" name="secondaryIdRequired" 
-					${studyToView.studyParameterConfig.secondaryIdRequired == 'yes' ? "checked" : ""}
-					value="yes" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="secondaryId">
-					<fmt:message key="required" bundle="${resword}"/>
-					
-				<input type="radio" name="secondaryIdRequired" 
-					${studyToView.studyParameterConfig.secondaryIdRequired == 'no' ? "checked" : ""}
-					value="no" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="secondaryId">
-					<fmt:message key="optional" bundle="${resword}"/>
-				<input type="radio" name="secondaryIdRequired" 
-					${studyToView.studyParameterConfig.secondaryIdRequired == 'not_used' ? "checked" : ""}
-					value="not_used" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="secondaryId"">
-					<fmt:message key="not_used" bundle="${resword}"/>
-			</td>
-		</tr>
-		<tr id="secondaryIdRow" valign="top" class="secondaryId">
-			<td class="formlabel">
-				<fmt:message key="secondaryIdLabel" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="text" name="secondaryIdLabel" onchange="javascript:changeIcon()" value="${studyToView.studyParameterConfig.secondaryIdLabel}" maxlength="255" size="35">
-				<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryIdLabel"/></jsp:include>
-			</td>
-		</tr>
-		<tr id="secondaryViewableRow" valign="top" class="secondaryId">
-			<td class="formlabel"><fmt:message key="secondary_label_viewable" bundle="${resword}"/></td>
-			<td>
-				<input type="radio" onchange="javascript:changeIcon()"
-					${studyToView.studyParameterConfig.secondaryLabelViewable== 'true' ? "checked" : ""}
-					name="secondaryLabelViewable" value="true"><fmt:message key="yes" bundle="${resword}"/>
-					
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.secondaryLabelViewable== 'false' ? "checked" : ""}
-					name="secondaryLabelViewable" value="false"><fmt:message key="no" bundle="${resword}"/>
-			</td>
-		</tr>
-		<tr valign="top">
-			<td class="formlabel">
-				<fmt:message key="dateOfEnrollmentForStudyRequired" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="radio" name="dateOfEnrollmentForStudyRequired" 
-					${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'yes' ? "checked" : ""}
-					value="yes" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="dateOfEnrollment">
-					<fmt:message key="required" bundle="${resword}"/>
-				<input type="radio" name="dateOfEnrollmentForStudyRequired" 
-					${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'no' ? "checked" : ""}
-					value="no" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="dateOfEnrollment">
-					<fmt:message key="optional" bundle="${resword}"/>
-				<input type="radio" name="dateOfEnrollmentForStudyRequired" 
-					${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'not_used' ? "checked" : ""}
-					value="not_used" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="dateOfEnrollment">
-					<fmt:message key="not_used" bundle="${resword}"/>
-			</td>
-		</tr>
-		<tr valign="top" class="dateOfEnrollment">
-			<td class="formlabel">
-				<fmt:message key="dateOfEnrollmentForStudyLabel" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="text" name="dateOfEnrollmentForStudyLabel" onchange="javascript:changeIcon()" value="${studyToView.studyParameterConfig.dateOfEnrollmentForStudyLabel}" maxlength="255" size="35">
-				<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dateOfEnrollmentForStudyLabel"/></jsp:include>
-			</td>
-		</tr>
-		<tr valign="top">
-			<td class="formlabel">
-				<fmt:message key="gender_required2" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="radio" name="genderRequired" 
-					${studyToView.studyParameterConfig.genderRequired == 'true' ? "checked" : ""}
-					value="true" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="gender">
-					<fmt:message key="yes" bundle="${resword}"/>
-				<input type="radio" name="genderRequired" 
-					${studyToView.studyParameterConfig.genderRequired == 'false' ? "checked" : ""}
-					value="false" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="gender">
-					<fmt:message key="no" bundle="${resword}"/>
-			</td>
-		</tr>
-		<tr valign="top" class="gender">
-			<td class="formlabel">
-				<fmt:message key="genderLabel" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="text" name="genderLabel" onchange="javascript:changeIcon()" value="${studyToView.studyParameterConfig.genderLabel}" maxlength="255" size="35">
-				<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="genderLabel"/></jsp:include>
-			</td>
-		</tr>
-		<tr valign="top">
-			<td class="formlabel"><fmt:message key="collect_subject_date_of_birth" bundle="${resword}"/></td>
-			<td>
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.collectDob == '1' ? "checked" : ""}
-					name="collectDob" value="1"><fmt:message key="yes" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.collectDob == '2' ? "checked" : ""}
-					name="collectDob" value="2"><fmt:message key="only_year_of_birth" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.collectDob == '3' ? "checked" : ""}
-					name="collectDob" value="3"><fmt:message key="not_used" bundle="${resword}"/>
-			</td>
-		</tr>
-		<tr valign="top">
-			<td class="formlabel">
-				<fmt:message key="subject_person_ID_required" bundle="${resword}"/>
-			</td>
-			<td>
-				<c:set var="not_used" value="not used"/>
-				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="personId" 
-					${studyToView.studyParameterConfig.subjectPersonIdRequired == 'required' ? "checked" : ""}
-					name="subjectPersonIdRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="personId" 
-					${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional' ? "checked" : ""}
-					name="subjectPersonIdRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="personId" 
-					${studyToView.studyParameterConfig.subjectPersonIdRequired == 'copyFromSSID' ? "checked" : ""}
-					name="subjectPersonIdRequired" value="copyFromSSID"><fmt:message key="copy_from_ssid" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="personId" 
-					${studyToView.studyParameterConfig.subjectPersonIdRequired == not_used ? "checked" : ""}
-					name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
-			</td>
-		</tr>
+<table border="0" cellpadding="4" cellspacing="0" id="study_param_config">
+<tr valign="top" style="width: 100%;">
+	<td class="formlabel" style="text-align: left;">
+		<fmt:message key="studyParameters" bundle="${resword}"/>:
+	</td>
+	<td style="text-align: left;">
+		&nbsp;
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel"><fmt:message key="allow_discrepancy_management" bundle="${resword}"/></td>
+	<td>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.discrepancyManagement == 'true' ? "checked" : ""}
+		       name="discrepancyManagement" value="true"><fmt:message key="yes" bundle="${resword}"/>
 
-		<tr valign="top" class="personId">
-			<td class="formlabel">
-				<fmt:message key="show_person_id_on_crf_header" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="radio" onchange="javascript:changeIcon()"
-					${studyToView.studyParameterConfig.personIdShownOnCRF == 'true' ? "checked" : ""}
-					name="personIdShownOnCRF" value="true"><fmt:message key="yes" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon()" 
-					${studyToView.studyParameterConfig.personIdShownOnCRF == 'false' ? "checked" : ""}
-					name="personIdShownOnCRF" value="false"><fmt:message key="no" bundle="${resword}"/>
-			</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-		</tr>
-		<tr valign="top" style="border: 1px solid black;width: 100%;">
-			<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
-				<fmt:message key="eventParameters" bundle="${resword}"/>:
-			</td>
-			<td style=" border-top: 1px solid black; text-align: left;">
-				&nbsp;
-			</td>
-		</tr>
-		<tr valign="top">
-			<td class="formlabel">
-				<fmt:message key="event_location_required" bundle="${resword}"/>
-			</td>
-			<td>
-	            <input type="radio" onchange="javascript:changeIcon()" 
-	            	${studyToView.studyParameterConfig.eventLocationRequired== 'required' ? "checked" : ""} 
-	            	name="eventLocationRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
-	            <input type="radio" onchange="javascript:changeIcon()" 
-	            	${studyToView.studyParameterConfig.eventLocationRequired== 'optional' ? "checked" : ""} 
-	            	name="eventLocationRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
-	            <input type="radio" onchange="javascript:changeIcon()" 
-	            	${studyToView.studyParameterConfig.eventLocationRequired== 'not_used' ? "checked" : ""} 
-	            	name="eventLocationRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
-			</td>
-		</tr>	
-		<tr valign="top">
-			<td class="formlabel">
-				<fmt:message key="startDateTimeRequired" bundle="${resword}"/>
-			</td>
-			<td>
-				<input class="some-class" type="radio" name="startDateTimeRequired" value="yes" 
-					${studyToView.studyParameterConfig.startDateTimeRequired == 'yes' ? "checked" : ""}
-					onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="startDate">
-					<fmt:message key="required" bundle="${resword}"/>
-				<input type="radio" name="startDateTimeRequired" value="no" 
-					${studyToView.studyParameterConfig.startDateTimeRequired == 'no' ? "checked" : ""}
-					onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="startDate">
-					<fmt:message key="optional" bundle="${resword}"/>
-				<input type="radio" name="startDateTimeRequired" value="not_used" 
-					${studyToView.studyParameterConfig.startDateTimeRequired == 'not_used' ? "checked" : ""}
-					onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="startDate">
-					<fmt:message key="not_used" bundle="${resword}"/>
-			</td>
-		</tr>
-		<tr valign="top" class="startDate">
-			<td class="formlabel">
-				<fmt:message key="useStartTime" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="radio" checked name="useStartTime" value="yes" 
-					${studyToView.studyParameterConfig.useStartTime == 'yes' ? "checked" : ""}
-					onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-				<input type="radio" name="useStartTime" value="no" 
-					${studyToView.studyParameterConfig.useStartTime == 'no' ? "checked" : ""}
-					onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
-			</td>
-		</tr>
-		<tr valign="top" class="startDate">
-			<td class="formlabel">
-				<fmt:message key="startDateTimeLabel" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="text" name="startDateTimeLabel" onchange="javascript:changeIcon()" value="${studyToView.studyParameterConfig.startDateTimeLabel}" maxlength="255" size="35">
-				<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDateTimeLabel"/></jsp:include>
-			</td>
-		</tr>
-		<tr valign="top">
-			<td class="formlabel">
-				<fmt:message key="endDateTimeRequired" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="radio" checked name="endDateTimeRequired" value="yes" 
-					${studyToView.studyParameterConfig.endDateTimeRequired == 'yes' ? "checked" : ""}
-					onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="stopDate">
-					<fmt:message key="required" bundle="${resword}"/>
-					
-				<input type="radio" name="endDateTimeRequired" value="no" 
-					${studyToView.studyParameterConfig.endDateTimeRequired == 'no' ? "checked" : ""}
-					onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="stopDate">
-					<fmt:message key="optional" bundle="${resword}"/>
-					
-				<input type="radio" name="endDateTimeRequired" value="not_used" 
-					${studyToView.studyParameterConfig.endDateTimeRequired == 'not_used' ? "checked" : ""}
-					onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="stopDate">
-					<fmt:message key="not_used" bundle="${resword}"/>
-			</td>
-		</tr>
-		<tr valign="top" class="stopDate">
-			<td class="formlabel">
-				<fmt:message key="useEndTime" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="radio" checked name="useEndTime" value="yes" 
-					${studyToView.studyParameterConfig.useEndTime == 'yes' ? "checked" : ""}
-					onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-					
-				<input type="radio" name="useEndTime" value="no" 
-					${studyToView.studyParameterConfig.useEndTime == 'no' ? "checked" : ""}
-					onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
-			</td>
-		</tr>
-		<tr valign="top" class="stopDate">
-			<td class="formlabel">
-				<fmt:message key="endDateTimeLabel" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="text" name="endDateTimeLabel" onchange="javascript:changeIcon()" value="${studyToView.studyParameterConfig.endDateTimeLabel}" maxlength="255" size="35">
-				<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="endDateTimeLabel"/></jsp:include>
-			</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-		</tr>
-			<tr valign="top" style="border: 1px solid black;width: 100%;">
-			<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
-				<fmt:message key="dataEntryParameters" bundle="${resword}"/>:
-			</td><td style=" border-top: 1px solid black; text-align: left;">&nbsp;</td>
-		</tr>		
-		<tr valign="top">
-			<td class="formlabel">
-				<fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewer" 
-					${studyToView.studyParameterConfig.interviewerNameRequired == 'yes' ? "checked" : ""} 
-					name="interviewerNameRequired" value="yes"> 
-				<fmt:message key="yes" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewer" 
-					${studyToView.studyParameterConfig.interviewerNameRequired != 'yes' ? "checked" : ""}
-					name="interviewerNameRequired" value="no">
-					<fmt:message key="no" bundle="${resword}"/>
-			</td>
-		</tr>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.discrepancyManagement == 'false' ? "checked" : ""}
+		       name="discrepancyManagement" value="false"><fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="forced_reason_for_change" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.adminForcedReasonForChange == 'true' ? "checked" : ""}
+		       name="adminForcedReasonForChange" value="true"><fmt:message key="yes" bundle="${resword}"/>
 
-		<tr valign="top" class="interviewer">
-			<td class="formlabel">
-				<fmt:message key="interviewer_name_default_as_blank" bundle="${resword}"/>
-			</td>
-			<td>
-			<c:choose>
-				<c:when test="${studyToView.studyParameterConfig.interviewerNameDefault== 'blank'}">
-					<input type="radio" onchange="javascript:changeIcon()" checked name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
-					<input type="radio" onchange="javascript:changeIcon()" name="interviewerNameDefault" value="pre-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
-				</c:when>
-				<c:otherwise>
-					<input type="radio" onchange="javascript:changeIcon()" name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
-					<input type="radio" onchange="javascript:changeIcon()" checked name="interviewerNameDefault" value="re-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
-				</c:otherwise>
-			</c:choose>
-			</td>
-		</tr>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.adminForcedReasonForChange == 'false' ? "checked" : ""}
+		       name="adminForcedReasonForChange" value="false"><fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="allowSdvWithOpenQueries" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'yes' ? "checked" : ""}
+		       name="allowSdvWithOpenQueries" value="yes"><fmt:message key="yes" bundle="${resword}"/>
 
-		<tr valign="top" class="interviewer">
-			<td class="formlabel">
-				<fmt:message key="interviewer_name_editable" bundle="${resword}"/>
-			</td>
-			<td>
-			<c:choose>
-				<c:when test="${studyToView.studyParameterConfig.interviewerNameEditable== 'true'}">
-					<input type="radio" onchange="javascript:changeIcon()" checked name="interviewerNameEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
-					<input type="radio" onchange="javascript:changeIcon()" name="interviewerNameEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
-				</c:when>
-				<c:otherwise>
-					<input type="radio" onchange="javascript:changeIcon()" name="interviewerNameEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
-					<input type="radio" onchange="javascript:changeIcon()" checked name="interviewerNameEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
-				</c:otherwise>
-			</c:choose>
-			</td>
-		</tr>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'yes' ? "" : "checked"}
+		       name="allowSdvWithOpenQueries" value="no"><fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
+<tr>
+	<td>&nbsp;</td>
+</tr>
+<tr valign="top" style="border: 1px solid black;width: 100%;">
+	<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
+		<fmt:message key="subjectParameters" bundle="${resword}"/>:
+	</td>
+	<td style=" border-top: 1px solid black; text-align: left;">
+		&nbsp;
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="how_to_generate_the_study_subject_ID" bundle="${resword}"/>:
+	</td>
+	<td>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.subjectIdGeneration == 'manual' ? "checked" : ""}
+		       name="subjectIdGeneration" value="manual" onclick="hideUnhideStudyParamRow(this);"
+		       data-cc-action="hide" data-row-class="autoGeneratedFormat">
+		<fmt:message key="manual_entry" bundle="${resword}"/>
 
-		<tr valign="top">
-			<td class="formlabel">
-				<fmt:message key="interviewer_date_required" bundle="${resword}"/>
-			</td>
-			<td>
-				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewDate" 
-					${studyToView.studyParameterConfig.interviewDateRequired == 'yes' ? "checked" : ""} 
-					name="interviewDateRequired" value="yes"> 
-				<fmt:message key="yes" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewDate" 
-					${studyToView.studyParameterConfig.interviewDateRequired != 'yes' ? "checked" : ""}
-					name="interviewDateRequired" value="no">
-					<fmt:message key="no" bundle="${resword}"/>
-			</td>
-		</tr>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.subjectIdGeneration == 'auto editable' ? "checked" : ""}
+		       name="subjectIdGeneration" value="auto editable" onclick="hideUnhideStudyParamRow(this);"
+		       data-cc-action="show" data-row-class="autoGeneratedFormat">
+		<fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
 
-		<tr valign="top" class="interviewDate">
-			<td class="formlabel">
-				<fmt:message key="interviewer_date_default_as_blank" bundle="${resword}"/>
-			</td>
-			<td>
-			<c:choose>
-				<c:when test="${studyToView.studyParameterConfig.interviewDateDefault== 'blank'}">
-					<input type="radio" onchange="javascript:changeIcon()" checked name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
-					<input type="radio" onchange="javascript:changeIcon()" name="interviewDateDefault" value="pre-populated">
-					<fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
-				</c:when>
-				<c:otherwise>
-					<input type="radio" onchange="javascript:changeIcon()" name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
-					<input type="radio" onchange="javascript:changeIcon()" checked name="interviewDateDefault" value="re-populated"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
-				</c:otherwise>
-			</c:choose>
-			</td>
-		</tr>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.subjectIdGeneration == 'auto non-editable' ? "checked" : ""}
+		       name="subjectIdGeneration" value="auto non-editable" onclick="hideUnhideStudyParamRow(this);"
+		       data-cc-action="show" data-row-class="autoGeneratedFormat">
+		<fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
+	</td>
+</tr>
 
-		<tr valign="top" class="interviewDate">
-			<td class="formlabel">
-				<fmt:message key="interviewer_date_editable" bundle="${resword}"/>
-			</td>
-			<td>
-				<c:choose>
-					<c:when test="${studyToView.studyParameterConfig.interviewDateEditable== 'true'}">
-						<input type="radio" onchange="javascript:changeIcon()" checked name="interviewDateEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
-						<input type="radio" onchange="javascript:changeIcon()" name="interviewDateEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
-					</c:when>
-					<c:otherwise>
-						<input type="radio" onchange="javascript:changeIcon()" name="interviewDateEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
-						<input type="radio" onchange="javascript:changeIcon()" checked name="interviewDateEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
-					</c:otherwise>
-				</c:choose>
-			</td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td> 
-		</tr> 
-	 	<tr valign="top" style="border: 1px solid black;width: 100%;"> 
-			<td class="formlabel" style="border-top: 1px solid black;text-align: left;"> 
-				<fmt:message key="randomization_parameters" bundle="${resword}"/>: 
-			</td> 
-			<td style=" border-top: 1px solid black; text-align: left;"> 
-				&nbsp; 
-			</td> 
-		</tr> 
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="studySubjectIdLabel" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="text" name="studySubjectIdLabel" onchange="javascript:changeIcon()" value="${studyToView.studyParameterConfig.studySubjectIdLabel}" maxlength="255" size="35">
+		<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studySubjectIdLabel"/></jsp:include>
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="secondaryIDRequired" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" name="secondaryIdRequired"
+		${studyToView.studyParameterConfig.secondaryIdRequired == 'yes' ? "checked" : ""}
+		       value="yes" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="secondaryId">
+		<fmt:message key="required" bundle="${resword}"/>
 
-		<tr valign="top"> 
-			<td class="formlabel"> 
-				<fmt:message key="assign_randomization_parameters_to" bundle="${resword}"/>: 
-			</td> 
-			<td> 
-				<input type="radio" name="assignRandomizationResultTo" ${studyToView.studyParameterConfig.assignRandomizationResultTo == 'dngroup' ? "checked" : ""} value="dngroup" onchange="javascript:changeIcon()">
-				<fmt:message key="systemProperty.assignRandomizationResultTo.dngroup.radioLabel" bundle="${resword}"/> 
-				
-				<input type="radio" name="assignRandomizationResultTo" ${studyToView.studyParameterConfig.assignRandomizationResultTo == 'ssid' ? "checked" : ""} value="ssid" onchange="javascript:changeIcon()">
-				<fmt:message key="systemProperty.assignRandomizationResultTo.ssid.radioLabel" bundle="${resword}"/> 
-				
-				<input type="radio" name="assignRandomizationResultTo" ${studyToView.studyParameterConfig.assignRandomizationResultTo == 'none' ? "checked" : ""} value="none" onchange="javascript:changeIcon()">
-				<fmt:message key="systemProperty.assignRandomizationResultTo.none.radioLabel" bundle="${resword}"/>
-			</td> 
-		</tr>
-		<tr valign="top"> 
-			<td class="formlabel"> 
-				<fmt:message key="systemProperty.randomizationTrialId.label" bundle="${resword}"/>: 
-			</td> 
-			<td> 
-				<input type="text" name="randomizationTrialId" value="${studyToView.studyParameterConfig.randomizationTrialId}" maxlength="255" size="35">
-			</td> 
-		</tr> 	 	
-		<tr> 
-			<td>&nbsp;</td> 
-		</tr> 
-		<tr valign="top" style="border: 1px solid black;width: 100%;"> 
-			<td class="formlabel" style="border-top: 1px solid black;text-align: left;"> 
-				<fmt:message key="dataImport" bundle="${resword}"/>: 
-			</td>
-			<td style=" border-top: 1px solid black; text-align: left;">&nbsp;</td> 
-		</tr> 
-	 	 
-		<tr valign="top"> 
-			<td class="formlabel"> 
-				<fmt:message key="markImportedCRFAsCompleted" bundle="${resword}"/> 
-			</td> 
-			<td> 
-				<c:choose> 
-					<c:when test="${studyToView.studyParameterConfig.markImportedCRFAsCompleted == 'yes'}"> 
-						<input type="radio" checked name="markImportedCRFAsCompleted" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/> 
-						<input type="radio" name="markImportedCRFAsCompleted" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/> 
-					</c:when> 
-					<c:otherwise> 
-						<input type="radio" name="markImportedCRFAsCompleted" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/> 
-						<input type="radio" checked name="markImportedCRFAsCompleted" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/> 
-					</c:otherwise> 
-				</c:choose> 
-			</td> 
-		</tr> 
-	 	 
-		<tr valign="top"> 
-			<td class="formlabel"> 
-				<fmt:message key="autoScheduleEventDuringImport" bundle="${resword}"/> 
-			</td> 
-			<td> 
-				<c:choose> 
-					<c:when test="${studyToView.studyParameterConfig.autoScheduleEventDuringImport == 'yes'}"> 
-						<input type="radio" checked name="autoScheduleEventDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/> 
-						<input type="radio" name="autoScheduleEventDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/> 
-					</c:when> 
-					<c:otherwise> 
-						<input type="radio" name="autoScheduleEventDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/> 
-						<input type="radio" checked name="autoScheduleEventDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/> 
-					</c:otherwise> 
-				</c:choose> 
-			</td> 
-		</tr> 
- 
-		<tr valign="top"> 
-			<td class="formlabel"> 
-				<fmt:message key="autoCreateSubjectDuringImport" bundle="${resword}"/> 
-			</td> 
-			<td> 
-				<c:choose> 
-					<c:when test="${studyToView.studyParameterConfig.autoCreateSubjectDuringImport == 'yes'}"> 
-						<input type="radio" checked name="autoCreateSubjectDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/> 
-						<input type="radio" name="autoCreateSubjectDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/> 
-					</c:when> 
-					<c:otherwise> 
-						<input type="radio" name="autoCreateSubjectDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/> 
-						<input type="radio" checked name="autoCreateSubjectDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/> 
-					</c:otherwise> 
-				</c:choose> 
-			</td> 
-		</tr> 
-	 	 
-		<tr valign="top"> 
-			<td class="formlabel"> 
-				<fmt:message key="replaceExisitingDataDuringImport" bundle="${resword}"/> 
-			</td> 
-			<td> 
-				<c:choose> 
-					<c:when test="${studyToView.studyParameterConfig.replaceExisitingDataDuringImport == 'yes'}"> 
-						<input type="radio" checked name="replaceExisitingDataDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/> 
-						<input type="radio" name="replaceExisitingDataDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/> 
-					</c:when> 
-					<c:otherwise> 
-						<input type="radio" name="replaceExisitingDataDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/> 
-						<input type="radio" checked name="replaceExisitingDataDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/> 
-					</c:otherwise> 
-				</c:choose> 
-			</td> 
-		</tr> 
-		 	 
-		<tr> 
-			<td>&nbsp;</td> 
-		</tr> 
-		<tr valign="top" style="border: 1px solid black;width: 100%;"> 
-			<td class="formlabel" style="border-top: 1px solid black;text-align: left;"> 
-				<fmt:message key="medical_coding" bundle="${resword}"/>: 
-			</td> 
-			<td style=" border-top: 1px solid black; text-align: left;"> 
-				&nbsp; 
-			</td> 
-		</tr> 
+		<input type="radio" name="secondaryIdRequired"
+		${studyToView.studyParameterConfig.secondaryIdRequired == 'no' ? "checked" : ""}
+		       value="no" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="secondaryId">
+		<fmt:message key="optional" bundle="${resword}"/>
+		<input type="radio" name="secondaryIdRequired"
+		${studyToView.studyParameterConfig.secondaryIdRequired == 'not_used' ? "checked" : ""}
+		       value="not_used" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="secondaryId"">
+		<fmt:message key="not_used" bundle="${resword}"/>
+	</td>
+</tr>
+<tr id="secondaryIdRow" valign="top" class="secondaryId">
+	<td class="formlabel">
+		<fmt:message key="secondaryIdLabel" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="text" name="secondaryIdLabel" onchange="javascript:changeIcon()" value="${studyToView.studyParameterConfig.secondaryIdLabel}" maxlength="255" size="35">
+		<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryIdLabel"/></jsp:include>
+	</td>
+</tr>
+<tr id="secondaryViewableRow" valign="top" class="secondaryId">
+	<td class="formlabel"><fmt:message key="secondary_label_viewable" bundle="${resword}"/></td>
+	<td>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.secondaryLabelViewable== 'true' ? "checked" : ""}
+		       name="secondaryLabelViewable" value="true"><fmt:message key="yes" bundle="${resword}"/>
 
-		<tr valign="top"> 
-			<td class="formlabel"> 
-				<fmt:message key="allowCodingVerification" bundle="${resword}"/> 
-			</td> 
-			<td> 
-				<input type="radio" name="allowCodingVerification" ${studyToView.studyParameterConfig.allowCodingVerification == 'yes' ? "checked" : ""} value="yes" onchange="javascript:changeIcon()" 
-							onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="medicalCoding">
-				<fmt:message key="yes" bundle="${resword}"/> 
-				<input type="radio" name="allowCodingVerification" ${studyToView.studyParameterConfig.allowCodingVerification == 'no' ? "checked" : ""} value="no" onchange="javascript:changeIcon()" 
-					onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="medicalCoding">
-				<fmt:message key="no" bundle="${resword}"/> 
-			</td> 
-		</tr>
-		<tr valign="top" class="medicalCoding"> 
-			<td class="formlabel"> 
-				<fmt:message key="medicalCodingApprovalNeeded" bundle="${resword}"/> 
-			</td> 
-			<td> 
-				<c:choose> 
-					<c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == 'yes'}"> 
-						<input type="radio" disabled="disabled" name="medicalCodingApprovalNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/> 
-						<input type="radio" disabled="disabled" checked name="medicalCodingApprovalNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/> 
-					</c:when> 
-					<c:otherwise> 
-						<input type="radio" disabled="disabled" name="medicalCodingApprovalNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/> 
-						<input type="radio" disabled="disabled" checked name="medicalCodingApprovalNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/> 
-					</c:otherwise> 
-				</c:choose> 
-			</td> 
-		</tr>  	 
-		<tr valign="top" class="medicalCoding"> 
-			<td class="formlabel"> 
-				<fmt:message key="medicalCodingContextNeeded" bundle="${resword}"/> 
-			</td> 
-			<td> 
-				<c:choose> 
-					<c:when test="${studyToView.studyParameterConfig.medicalCodingContextNeeded == 'yes'}"> 
-						<input type="radio" checked name="medicalCodingContextNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/> 
-						<input type="radio" name="medicalCodingContextNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/> 
-					</c:when> 
-					<c:otherwise> 
-						<input type="radio" name="medicalCodingContextNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/> 
-						<input type="radio" checked name="medicalCodingContextNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/> 
-					</c:otherwise> 
-				</c:choose> 
-			</td> 
-		</tr> 
-		<tr valign="top" class="medicalCoding"> 
-			<td class="formlabel"> 
-				<fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>: 
-			</td> 
-			<td> 
-				<input type="text" name="autoCodeDictionaryName" value="${studyToView.studyParameterConfig.autoCodeDictionaryName}" maxlength="255" size="35"> 
-				<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="autoCodeDictionaryName"/></jsp:include> 
-			</td> 
-		</tr>
-        <tr valign="top" style="border: 1px solid black;width: 100%;">
-            <td class="formlabel" style="border-top: 1px solid black;text-align: left;">
-                <fmt:message key="systemProperty.crf_evaluation.name" bundle="${resword}"/>:
-            </td>
-            <td style=" border-top: 1px solid black; text-align: left;">
-                &nbsp;
-            </td>
-        </tr>
-        <tr valign="top">
-            <td class="formlabel">
-                <fmt:message key="systemProperty.allowCrfEvaluation.label" bundle="${resword}"/>?
-            </td>
-            <td>
-                <c:choose>
-                    <c:when test="${studyToView.studyParameterConfig.allowCrfEvaluation == 'yes'}">
-                        <input type="radio" checked name="allowCrfEvaluation" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-                        <input type="radio" name="allowCrfEvaluation" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
-                    </c:when>
-                    <c:otherwise>
-                        <input type="radio" name="allowCrfEvaluation" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-                        <input type="radio" checked name="allowCrfEvaluation" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
-                    </c:otherwise>
-                </c:choose>
-            </td>
-        </tr>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.secondaryLabelViewable== 'false' ? "checked" : ""}
+		       name="secondaryLabelViewable" value="false"><fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="dateOfEnrollmentForStudyRequired" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" name="dateOfEnrollmentForStudyRequired"
+		${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'yes' ? "checked" : ""}
+		       value="yes" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="dateOfEnrollment">
+		<fmt:message key="required" bundle="${resword}"/>
+		<input type="radio" name="dateOfEnrollmentForStudyRequired"
+		${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'no' ? "checked" : ""}
+		       value="no" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="dateOfEnrollment">
+		<fmt:message key="optional" bundle="${resword}"/>
+		<input type="radio" name="dateOfEnrollmentForStudyRequired"
+		${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'not_used' ? "checked" : ""}
+		       value="not_used" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="dateOfEnrollment">
+		<fmt:message key="not_used" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top" class="dateOfEnrollment">
+	<td class="formlabel">
+		<fmt:message key="dateOfEnrollmentForStudyLabel" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="text" name="dateOfEnrollmentForStudyLabel" onchange="javascript:changeIcon()" value="${studyToView.studyParameterConfig.dateOfEnrollmentForStudyLabel}" maxlength="255" size="35">
+		<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dateOfEnrollmentForStudyLabel"/></jsp:include>
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="gender_required2" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" name="genderRequired"
+		${studyToView.studyParameterConfig.genderRequired == 'true' ? "checked" : ""}
+		       value="true" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="gender">
+		<fmt:message key="yes" bundle="${resword}"/>
+		<input type="radio" name="genderRequired"
+		${studyToView.studyParameterConfig.genderRequired == 'false' ? "checked" : ""}
+		       value="false" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="gender">
+		<fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top" class="gender">
+	<td class="formlabel">
+		<fmt:message key="genderLabel" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="text" name="genderLabel" onchange="javascript:changeIcon()" value="${studyToView.studyParameterConfig.genderLabel}" maxlength="255" size="35">
+		<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="genderLabel"/></jsp:include>
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel"><fmt:message key="collect_subject_date_of_birth" bundle="${resword}"/></td>
+	<td>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.collectDob == '1' ? "checked" : ""}
+		       name="collectDob" value="1"><fmt:message key="yes" bundle="${resword}"/>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.collectDob == '2' ? "checked" : ""}
+		       name="collectDob" value="2"><fmt:message key="only_year_of_birth" bundle="${resword}"/>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.collectDob == '3' ? "checked" : ""}
+		       name="collectDob" value="3"><fmt:message key="not_used" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="subject_person_ID_required" bundle="${resword}"/>
+	</td>
+	<td>
+		<c:set var="not_used" value="not used"/>
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="personId"
+		${studyToView.studyParameterConfig.subjectPersonIdRequired == 'required' ? "checked" : ""}
+		       name="subjectPersonIdRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="personId"
+		${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional' ? "checked" : ""}
+		       name="subjectPersonIdRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="personId"
+		${studyToView.studyParameterConfig.subjectPersonIdRequired == 'copyFromSSID' ? "checked" : ""}
+		       name="subjectPersonIdRequired" value="copyFromSSID"><fmt:message key="copy_from_ssid" bundle="${resword}"/>
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="personId"
+		${studyToView.studyParameterConfig.subjectPersonIdRequired == not_used ? "checked" : ""}
+		       name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
+	</td>
+</tr>
 
-        <tr valign="top">
-            <td class="formlabel">
-                <fmt:message key="systemProperty.evaluateWithContext.label" bundle="${resword}"/>?
-            </td>
-            <td>
-                <c:choose>
-                    <c:when test="${studyToView.studyParameterConfig.evaluateWithContext == 'yes'}">
-                        <input type="radio" checked name="evaluateWithContext" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-                        <input type="radio" name="evaluateWithContext" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
-                    </c:when>
-                    <c:otherwise>
-                        <input type="radio" name="evaluateWithContext" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-                        <input type="radio" checked name="evaluateWithContext" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
-                    </c:otherwise>
-                </c:choose>
-            </td>
-        </tr>
-        <tr>
-			<td>&nbsp;</td> 
-		</tr>	
-	</table>
+<tr valign="top" class="personId">
+	<td class="formlabel">
+		<fmt:message key="show_person_id_on_crf_header" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.personIdShownOnCRF == 'true' ? "checked" : ""}
+		       name="personIdShownOnCRF" value="true"><fmt:message key="yes" bundle="${resword}"/>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.personIdShownOnCRF == 'false' ? "checked" : ""}
+		       name="personIdShownOnCRF" value="false"><fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
+
+<tr class="autoGeneratedFormat">
+	<td>&nbsp;</td>
+</tr>
+<tr valign="top" style="border: 1px solid black;width: 100%;" class="autoGeneratedFormat">
+	<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
+		<fmt:message key="auto_generated_section_header" bundle="${resword}"/>:
+	</td>
+	<td style=" border-top: 1px solid black; text-align: left;">
+		&nbsp;
+	</td>
+</tr>
+
+<tr valign="top" class="autoGeneratedFormat">
+	<td class="formlabel"><fmt:message key="auto_generated_prefix" bundle="${resword}"/>:</td>
+	<td>
+		<select class="formfieldXS single_select_property" onchange="javascript:changeIcon(); updateGeneratedSubjectId();" style="width: 80px;" id="generatedIdPrefix">
+			<option value="0" ${studyToView.studyParameterConfig.autoGeneratedPrefix == '' ? 'selected' : ''}>
+				<fmt:message bundle="${resword}" key="none"/>
+			</option>
+			<option value="1" ${studyToView.studyParameterConfig.autoGeneratedPrefix == 'SiteID' ? 'selected' : ''}>
+				<fmt:message bundle="${resword}" key="site_id"/>
+			</option>
+			<option value="2" ${studyToView.studyParameterConfig.autoGeneratedPrefix != '' and studyToView.studyParameterConfig.autoGeneratedPrefix != 'SiteID' ? 'selected' : ''}>
+				<fmt:message bundle="${resword}" key="custom"/>
+			</option>
+		</select>
+		<input type="text" value="${studyToView.studyParameterConfig.autoGeneratedPrefix}" name="autoGeneratedPrefix" onchange="javascript:changeIcon(); updateGeneratedSubjectId();" maxlength="25"/>
+		<br>
+		<span id="autoGeneratedPrefixMessage" class="alert"><fmt:message bundle="${reserrors}" key="auto_generated_subject_id_prefix_message"/><span>
+	</td>
+</tr>
+
+<tr valign="top" class="autoGeneratedFormat">
+	<td class="formlabel"><fmt:message key="auto_generated_separator" bundle="${resword}"/>:</td>
+	<td>
+		<select class="formfieldXS single_select_property" onchange="javascript:changeIcon(); updateGeneratedSubjectId();" style="width: 80px;" id="generatedIdSeparator">
+			<option value="0" ${studyToView.studyParameterConfig.autoGeneratedSeparator == '' ? 'selected' : ''}>
+				<fmt:message bundle="${resword}" key="none"/>
+			</option>
+			<option value="1" ${studyToView.studyParameterConfig.autoGeneratedSeparator != '' ? 'selected' : ''}>
+				<fmt:message bundle="${resword}" key="custom"/>
+			</option>
+		</select>
+		<input type="text" value="${studyToView.studyParameterConfig.autoGeneratedSeparator}" name="autoGeneratedSeparator" onchange="javascript:changeIcon(); updateGeneratedSubjectId();" maxlength="2" style="width: 20px"/>
+		<br>
+		<span id="autoGeneratedSeparatorMessage" class="alert"><fmt:message bundle="${reserrors}" key="auto_generated_subject_id_separator_message"/><span>
+	</td>
+</tr>
+
+<tr valign="top" class="autoGeneratedFormat">
+	<td class="formlabel"><fmt:message key="auto_generated_suffix" bundle="${resword}"/>:</td>
+	<td>
+		<select class="formfieldXS single_select_property" name="autoGeneratedSuffix" onchange="javascript:changeIcon(); updateGeneratedSubjectId();">
+			<option value="3" ${studyToView.studyParameterConfig.autoGeneratedSuffix == '3' ? 'selected' : ''}> 3 </option>
+			<option value="4" ${studyToView.studyParameterConfig.autoGeneratedSuffix == '4' ? 'selected' : ''}> 4 </option>
+			<option value="5" ${studyToView.studyParameterConfig.autoGeneratedSuffix == '5' ? 'selected' : ''}> 5 </option>
+			<option value="6" ${studyToView.studyParameterConfig.autoGeneratedSuffix == '6' ? 'selected' : ''}> 6 </option>
+		</select>
+	</td>
+</tr>
+
+<script>
+	$(window).load(function() {
+		updateGeneratedSubjectId();
+	});
+</script>
+
+<tr valign="top" class="autoGeneratedFormat">
+	<td class="formlabel"><fmt:message key="subject_ID" bundle="${resword}"/>:</td>
+	<td>
+		<span id="generated_id"></span>
+	</td>
+</tr>
+
+<tr>
+	<td>&nbsp;</td>
+</tr>
+<tr valign="top" style="border: 1px solid black;width: 100%;">
+	<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
+		<fmt:message key="eventParameters" bundle="${resword}"/>:
+	</td>
+	<td style=" border-top: 1px solid black; text-align: left;">
+		&nbsp;
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="event_location_required" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.eventLocationRequired== 'required' ? "checked" : ""}
+		       name="eventLocationRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.eventLocationRequired== 'optional' ? "checked" : ""}
+		       name="eventLocationRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.eventLocationRequired== 'not_used' ? "checked" : ""}
+		       name="eventLocationRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="startDateTimeRequired" bundle="${resword}"/>
+	</td>
+	<td>
+		<input class="some-class" type="radio" name="startDateTimeRequired" value="yes"
+		${studyToView.studyParameterConfig.startDateTimeRequired == 'yes' ? "checked" : ""}
+		       onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="startDate">
+		<fmt:message key="required" bundle="${resword}"/>
+		<input type="radio" name="startDateTimeRequired" value="no"
+		${studyToView.studyParameterConfig.startDateTimeRequired == 'no' ? "checked" : ""}
+		       onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="startDate">
+		<fmt:message key="optional" bundle="${resword}"/>
+		<input type="radio" name="startDateTimeRequired" value="not_used"
+		${studyToView.studyParameterConfig.startDateTimeRequired == 'not_used' ? "checked" : ""}
+		       onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="startDate">
+		<fmt:message key="not_used" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top" class="startDate">
+	<td class="formlabel">
+		<fmt:message key="useStartTime" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" checked name="useStartTime" value="yes"
+		${studyToView.studyParameterConfig.useStartTime == 'yes' ? "checked" : ""}
+		       onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+		<input type="radio" name="useStartTime" value="no"
+		${studyToView.studyParameterConfig.useStartTime == 'no' ? "checked" : ""}
+		       onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top" class="startDate">
+	<td class="formlabel">
+		<fmt:message key="startDateTimeLabel" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="text" name="startDateTimeLabel" onchange="javascript:changeIcon()" value="${studyToView.studyParameterConfig.startDateTimeLabel}" maxlength="255" size="35">
+		<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDateTimeLabel"/></jsp:include>
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="endDateTimeRequired" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" checked name="endDateTimeRequired" value="yes"
+		${studyToView.studyParameterConfig.endDateTimeRequired == 'yes' ? "checked" : ""}
+		       onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="stopDate">
+		<fmt:message key="required" bundle="${resword}"/>
+
+		<input type="radio" name="endDateTimeRequired" value="no"
+		${studyToView.studyParameterConfig.endDateTimeRequired == 'no' ? "checked" : ""}
+		       onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="stopDate">
+		<fmt:message key="optional" bundle="${resword}"/>
+
+		<input type="radio" name="endDateTimeRequired" value="not_used"
+		${studyToView.studyParameterConfig.endDateTimeRequired == 'not_used' ? "checked" : ""}
+		       onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="stopDate">
+		<fmt:message key="not_used" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top" class="stopDate">
+	<td class="formlabel">
+		<fmt:message key="useEndTime" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" checked name="useEndTime" value="yes"
+		${studyToView.studyParameterConfig.useEndTime == 'yes' ? "checked" : ""}
+		       onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+
+		<input type="radio" name="useEndTime" value="no"
+		${studyToView.studyParameterConfig.useEndTime == 'no' ? "checked" : ""}
+		       onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top" class="stopDate">
+	<td class="formlabel">
+		<fmt:message key="endDateTimeLabel" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="text" name="endDateTimeLabel" onchange="javascript:changeIcon()" value="${studyToView.studyParameterConfig.endDateTimeLabel}" maxlength="255" size="35">
+		<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="endDateTimeLabel"/></jsp:include>
+	</td>
+</tr>
+<tr>
+	<td>&nbsp;</td>
+</tr>
+<tr valign="top" style="border: 1px solid black;width: 100%;">
+	<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
+		<fmt:message key="dataEntryParameters" bundle="${resword}"/>:
+	</td><td style=" border-top: 1px solid black; text-align: left;">&nbsp;</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewer"
+		${studyToView.studyParameterConfig.interviewerNameRequired == 'yes' ? "checked" : ""}
+		       name="interviewerNameRequired" value="yes">
+		<fmt:message key="yes" bundle="${resword}"/>
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewer"
+		${studyToView.studyParameterConfig.interviewerNameRequired != 'yes' ? "checked" : ""}
+		       name="interviewerNameRequired" value="no">
+		<fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
+
+<tr valign="top" class="interviewer">
+	<td class="formlabel">
+		<fmt:message key="interviewer_name_default_as_blank" bundle="${resword}"/>
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${studyToView.studyParameterConfig.interviewerNameDefault== 'blank'}">
+				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" name="interviewerNameDefault" value="pre-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" onchange="javascript:changeIcon()" name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewerNameDefault" value="re-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+
+<tr valign="top" class="interviewer">
+	<td class="formlabel">
+		<fmt:message key="interviewer_name_editable" bundle="${resword}"/>
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${studyToView.studyParameterConfig.interviewerNameEditable== 'true'}">
+				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewerNameEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" name="interviewerNameEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" onchange="javascript:changeIcon()" name="interviewerNameEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewerNameEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="interviewer_date_required" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewDate"
+		${studyToView.studyParameterConfig.interviewDateRequired == 'yes' ? "checked" : ""}
+		       name="interviewDateRequired" value="yes">
+		<fmt:message key="yes" bundle="${resword}"/>
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewDate"
+		${studyToView.studyParameterConfig.interviewDateRequired != 'yes' ? "checked" : ""}
+		       name="interviewDateRequired" value="no">
+		<fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
+
+<tr valign="top" class="interviewDate">
+	<td class="formlabel">
+		<fmt:message key="interviewer_date_default_as_blank" bundle="${resword}"/>
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${studyToView.studyParameterConfig.interviewDateDefault== 'blank'}">
+				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" name="interviewDateDefault" value="pre-populated">
+				<fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" onchange="javascript:changeIcon()" name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewDateDefault" value="re-populated"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+
+<tr valign="top" class="interviewDate">
+	<td class="formlabel">
+		<fmt:message key="interviewer_date_editable" bundle="${resword}"/>
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${studyToView.studyParameterConfig.interviewDateEditable== 'true'}">
+				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewDateEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" name="interviewDateEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" onchange="javascript:changeIcon()" name="interviewDateEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewDateEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+<tr>
+	<td>&nbsp;</td>
+</tr>
+<tr valign="top" style="border: 1px solid black;width: 100%;">
+	<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
+		<fmt:message key="randomization_parameters" bundle="${resword}"/>:
+	</td>
+	<td style=" border-top: 1px solid black; text-align: left;">
+		&nbsp;
+	</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="assign_randomization_parameters_to" bundle="${resword}"/>:
+	</td>
+	<td>
+		<input type="radio" name="assignRandomizationResultTo" ${studyToView.studyParameterConfig.assignRandomizationResultTo == 'dngroup' ? "checked" : ""} value="dngroup" onchange="javascript:changeIcon()">
+		<fmt:message key="systemProperty.assignRandomizationResultTo.dngroup.radioLabel" bundle="${resword}"/>
+
+		<input type="radio" name="assignRandomizationResultTo" ${studyToView.studyParameterConfig.assignRandomizationResultTo == 'ssid' ? "checked" : ""} value="ssid" onchange="javascript:changeIcon()">
+		<fmt:message key="systemProperty.assignRandomizationResultTo.ssid.radioLabel" bundle="${resword}"/>
+
+		<input type="radio" name="assignRandomizationResultTo" ${studyToView.studyParameterConfig.assignRandomizationResultTo == 'none' ? "checked" : ""} value="none" onchange="javascript:changeIcon()">
+		<fmt:message key="systemProperty.assignRandomizationResultTo.none.radioLabel" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="systemProperty.randomizationTrialId.label" bundle="${resword}"/>:
+	</td>
+	<td>
+		<input type="text" name="randomizationTrialId" value="${studyToView.studyParameterConfig.randomizationTrialId}" maxlength="255" size="35">
+	</td>
+</tr>
+<tr>
+	<td>&nbsp;</td>
+</tr>
+<tr valign="top" style="border: 1px solid black;width: 100%;">
+	<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
+		<fmt:message key="dataImport" bundle="${resword}"/>:
+	</td>
+	<td style=" border-top: 1px solid black; text-align: left;">&nbsp;</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="markImportedCRFAsCompleted" bundle="${resword}"/>
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${studyToView.studyParameterConfig.markImportedCRFAsCompleted == 'yes'}">
+				<input type="radio" checked name="markImportedCRFAsCompleted" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" name="markImportedCRFAsCompleted" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" name="markImportedCRFAsCompleted" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" checked name="markImportedCRFAsCompleted" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="autoScheduleEventDuringImport" bundle="${resword}"/>
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${studyToView.studyParameterConfig.autoScheduleEventDuringImport == 'yes'}">
+				<input type="radio" checked name="autoScheduleEventDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" name="autoScheduleEventDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" name="autoScheduleEventDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" checked name="autoScheduleEventDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="autoCreateSubjectDuringImport" bundle="${resword}"/>
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${studyToView.studyParameterConfig.autoCreateSubjectDuringImport == 'yes'}">
+				<input type="radio" checked name="autoCreateSubjectDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" name="autoCreateSubjectDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" name="autoCreateSubjectDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" checked name="autoCreateSubjectDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="replaceExisitingDataDuringImport" bundle="${resword}"/>
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${studyToView.studyParameterConfig.replaceExisitingDataDuringImport == 'yes'}">
+				<input type="radio" checked name="replaceExisitingDataDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" name="replaceExisitingDataDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" name="replaceExisitingDataDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" checked name="replaceExisitingDataDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+
+<tr>
+	<td>&nbsp;</td>
+</tr>
+<tr valign="top" style="border: 1px solid black;width: 100%;">
+	<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
+		<fmt:message key="medical_coding" bundle="${resword}"/>:
+	</td>
+	<td style=" border-top: 1px solid black; text-align: left;">
+		&nbsp;
+	</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="allowCodingVerification" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" name="allowCodingVerification" ${studyToView.studyParameterConfig.allowCodingVerification == 'yes' ? "checked" : ""} value="yes" onchange="javascript:changeIcon()"
+		       onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="medicalCoding">
+		<fmt:message key="yes" bundle="${resword}"/>
+		<input type="radio" name="allowCodingVerification" ${studyToView.studyParameterConfig.allowCodingVerification == 'no' ? "checked" : ""} value="no" onchange="javascript:changeIcon()"
+		       onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="medicalCoding">
+		<fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top" class="medicalCoding">
+	<td class="formlabel">
+		<fmt:message key="medicalCodingApprovalNeeded" bundle="${resword}"/>
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == 'yes'}">
+				<input type="radio" disabled="disabled" name="medicalCodingApprovalNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" disabled="disabled" checked name="medicalCodingApprovalNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" disabled="disabled" name="medicalCodingApprovalNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" disabled="disabled" checked name="medicalCodingApprovalNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+<tr valign="top" class="medicalCoding">
+	<td class="formlabel">
+		<fmt:message key="medicalCodingContextNeeded" bundle="${resword}"/>
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${studyToView.studyParameterConfig.medicalCodingContextNeeded == 'yes'}">
+				<input type="radio" checked name="medicalCodingContextNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" name="medicalCodingContextNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" name="medicalCodingContextNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" checked name="medicalCodingContextNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+<tr valign="top" class="medicalCoding">
+	<td class="formlabel">
+		<fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>:
+	</td>
+	<td>
+		<input type="text" name="autoCodeDictionaryName" value="${studyToView.studyParameterConfig.autoCodeDictionaryName}" maxlength="255" size="35">
+		<br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="autoCodeDictionaryName"/></jsp:include>
+	</td>
+</tr>
+<tr valign="top" style="border: 1px solid black;width: 100%;">
+	<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
+		<fmt:message key="systemProperty.crf_evaluation.name" bundle="${resword}"/>:
+	</td>
+	<td style=" border-top: 1px solid black; text-align: left;">
+		&nbsp;
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="systemProperty.allowCrfEvaluation.label" bundle="${resword}"/>?
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${studyToView.studyParameterConfig.allowCrfEvaluation == 'yes'}">
+				<input type="radio" checked name="allowCrfEvaluation" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" name="allowCrfEvaluation" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" name="allowCrfEvaluation" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" checked name="allowCrfEvaluation" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="systemProperty.evaluateWithContext.label" bundle="${resword}"/>?
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${studyToView.studyParameterConfig.evaluateWithContext == 'yes'}">
+				<input type="radio" checked name="evaluateWithContext" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" name="evaluateWithContext" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" name="evaluateWithContext" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+				<input type="radio" checked name="evaluateWithContext" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+<tr>
+	<td>&nbsp;</td>
+</tr>
+</table>
 </div>
 </div></div></div></div></div></div></div></div>
 
@@ -2192,31 +2105,25 @@
 </div>
 <br>
 <table border="0" cellpadding="0" cellspacing="0">
-<tr>
-<td>
-
-<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
-					value="<fmt:message key="back" bundle="${resword}"/>" 
-					class="button_medium" 
-					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
-
-</td>
-<td>
- <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
-</td>
-<td>
- <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
-</td>
-</tr>
+	<tr>
+		<td>
+			<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage"
+			       value="<fmt:message key="back" bundle="${resword}"/>"
+			       class="button_medium"
+			       onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
+		</td>
+		<td>
+			<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
+		</td>
+		<td>
+			<img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
+		</td>
+	</tr>
 </table>
-
 </form>
 
-<br>
-<br>
-
-<br>
- <c:import url="../include/workflow.jsp">
-  <c:param name="module" value="admin"/>
- </c:import>
+<br><br><br>
+<c:import url="../include/workflow.jsp">
+	<c:param name="module" value="admin"/>
+</c:import>
 <jsp:include page="../include/footer.jsp"/>

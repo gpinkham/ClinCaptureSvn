@@ -221,7 +221,7 @@ public class AddNewSubjectServlet extends Controller {
 				// available ID (label) for now
 				if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
 
-					String nextLabel = ssd.findNextLabel(currentStudy.getIdentifier());
+					String nextLabel = ssd.findNextLabel(currentStudy);
 					fp.addPresetValue(INPUT_LABEL, nextLabel);
 
 				}
@@ -826,7 +826,7 @@ public class AddNewSubjectServlet extends Controller {
 					logger.info("subject id setting :" + idSetting);
 					// set up auto study subject id
 					if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-						String nextLabel = ssd.findNextLabel(currentStudy.getIdentifier());
+						String nextLabel = ssd.findNextLabel(currentStudy);
 						fp.addPresetValue(INPUT_LABEL, nextLabel);
 					}
 

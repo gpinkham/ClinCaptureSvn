@@ -1223,6 +1223,15 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     margin-right: 10px;
 }
 
+select.single_select_property {
+    height: 20px;
+    border: 1px solid gray;
+    margin: 1px;
+    padding: 1px;
+    font-size: 11px;
+    font-family: Tahoma;
+}
+
 .formlabel { text-align: right;
     vertical-align: top;
     padding-left: 6px;
@@ -2812,6 +2821,33 @@ span.annotated_crfOID, span.annotated_eventOID{
 	background:#ffffcc;
 }
 
+.w250 {
+	width: 250px;
+}
+
+.bw1 {
+	border-width: 1px;
+}
+
+.bw2 {
+	border-width: 2px;
+}
+
+.pb10 {
+	padding-bottom:10px;
+}
+
+.h15 {
+	height:15px;
+}
+
+.h20 {
+	height:20px;
+}
+
+.maxw250 {
+	max-width: 250px;
+}
 .header_crf_cell {
     border: 1px solid #c5c5c5;
     border-spacing: 10px;

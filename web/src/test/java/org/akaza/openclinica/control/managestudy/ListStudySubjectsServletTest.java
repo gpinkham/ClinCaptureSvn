@@ -134,19 +134,27 @@ public class ListStudySubjectsServletTest {
 		request.getSession().setAttribute("study", currentStudy);
 		request.getSession().setAttribute("userRole", currentRole);
 
-		Mockito.when(studySubjectDAO.getWithFilterAndSort(Mockito.any(StudyBean.class), Mockito.any(FindSubjectsFilter.class),
-				Mockito.any(FindSubjectsSort.class), Mockito.anyInt(), Mockito.anyInt()))
+		Mockito.when(studySubjectDAO
+				.getWithFilterAndSort(Mockito.any(StudyBean.class), Mockito.any(FindSubjectsFilter.class),
+						Mockito.any(FindSubjectsSort.class), Mockito.anyInt(), Mockito.anyInt()))
 				.thenReturn((ArrayList) studySubjectBeanList);
-		Mockito.when(studySubjectDAO.getCountWithFilter(Mockito.any(FindSubjectsFilter.class), Mockito.any(StudyBean.class))).thenReturn(15);
-		Mockito.when(studySubjectDAO.findNextLabel(Mockito.any(String.class))).thenReturn("study_parameter");
+		Mockito.when(
+				studySubjectDAO.getCountWithFilter(Mockito.any(FindSubjectsFilter.class), Mockito.any(StudyBean.class)))
+				.thenReturn(15);
+		Mockito.when(studySubjectDAO.findNextLabel(Mockito.any(StudyBean.class))).thenReturn("study_parameter");
 
 		Mockito.when(studyDAO.findByPK(Mockito.anyInt())).thenReturn(currentStudy);
 		Mockito.when(subjectDAO.findByPK(Mockito.anyInt())).thenReturn(subjectBean);
-		Mockito.when(studyEventDAO.findAllByStudySubject(Mockito.any(StudySubjectBean.class))).thenReturn((ArrayList) studyEventBeanList);
-		Mockito.when(studyEventDAO.findAllByStudySubject(Mockito.any(StudySubjectBean.class))).thenReturn((ArrayList) studyEventBeanList);
-		Mockito.when(studyEventDefinitionDAO.findAllActiveByParentStudyId(Mockito.anyInt(), Mockito.any(ArrayList.class))).thenReturn((ArrayList) studyEventDefinitionBeanList);
+		Mockito.when(studyEventDAO.findAllByStudySubject(Mockito.any(StudySubjectBean.class)))
+				.thenReturn((ArrayList) studyEventBeanList);
+		Mockito.when(studyEventDAO.findAllByStudySubject(Mockito.any(StudySubjectBean.class)))
+				.thenReturn((ArrayList) studyEventBeanList);
+		Mockito.when(
+				studyEventDefinitionDAO.findAllActiveByParentStudyId(Mockito.anyInt(), Mockito.any(ArrayList.class)))
+				.thenReturn((ArrayList) studyEventDefinitionBeanList);
 		Mockito.when(studyEventDefinitionDAO.findByPK(Mockito.anyInt())).thenReturn(studyEventDefinitionBean);
-		Mockito.when(dynamicEventDao.findAllDefIdsInActiveDynGroupsByStudyId(Mockito.anyInt())).thenReturn(new ArrayList<StudyEventDefinitionBean>());
+		Mockito.when(dynamicEventDao.findAllDefIdsInActiveDynGroupsByStudyId(Mockito.anyInt()))
+				.thenReturn(new ArrayList<StudyEventDefinitionBean>());
 		Mockito.when(servletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(requestDispatcher);
 
 		Mockito.doReturn(servletContext).when(listStudySubjectsServlet).getServletContext();
@@ -177,7 +185,8 @@ public class ListStudySubjectsServletTest {
 	}
 
 	@Test
-	public void testThatListStudySubjectServletGrantAccessToStudyAdministrator() throws InsufficientPermissionException {
+	public void testThatListStudySubjectServletGrantAccessToStudyAdministrator()
+			throws InsufficientPermissionException {
 		listStudySubjectsServlet.mayProceed(request, response);
 		Assert.assertNull(request.getAttribute("pageMessages"));
 	}
@@ -233,11 +242,10 @@ public class ListStudySubjectsServletTest {
 
 	@Test
 	public void testThatListStudySubjectServletReturnsSubjectMatrixTableWithSdvIcon() throws Exception {
-		Mockito.when(studySubjectDAO.allowSDVSubject(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(true);
+		Mockito.when(studySubjectDAO.allowSDVSubject(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt()))
+				.thenReturn(true);
 		listStudySubjectsServlet.processRequest(request, response);
 		String htmlCode = (String) request.getAttribute("findSubjectsHtml");
 		Assert.assertEquals(true, htmlCode.contains("icon_DoubleCheck_Action"));
 	}
 }
-
-
