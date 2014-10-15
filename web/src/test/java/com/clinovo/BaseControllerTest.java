@@ -48,6 +48,7 @@ public class BaseControllerTest extends AbstractContextSentiveTest {
 	public static final String DELETE_CRF_VERSION = "/deleteCRFVersion";
 	public static final String CRF_EVALUATION = "/crfEvaluation";
 	public static final String ESPS_LEGEND = "/getEnrollStatusPerSiteLegendValues";
+	public static final String EVALUATION_PROGRESS_WIDGET = "/initEvaluationProgressWidget";
 
 	public static final Locale LOCALE = new Locale("en");
 

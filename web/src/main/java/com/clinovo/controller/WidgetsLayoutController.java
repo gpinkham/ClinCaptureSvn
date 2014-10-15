@@ -19,6 +19,9 @@ import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
 import com.clinovo.bean.display.DisplayWidgetsRowWithExtraField;
 import com.clinovo.bean.display.DisplayWidgetsRowWithName;
 import com.clinovo.dao.CodedItemDAO;
+import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
+import com.clinovo.jmesa.evaluation.CRFEvaluationItem;
+import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.Widget;
 import com.clinovo.model.WidgetsLayout;
@@ -96,6 +99,8 @@ public class WidgetsLayoutController {
 
 	private static final String STATUS_NOT_CODED = "items to be coded";
 	private static final String STATUS_CODED = "coded items";
+	private static final String STATUS_EVALUATED = "evaluated crfs";
+	private static final String STATUS_NOT_EVALUATED = "crfs to be evaluated";
 
 	@Autowired
 	private DataSource datasource;
@@ -1132,6 +1137,99 @@ public class WidgetsLayoutController {
 
 		response.getWriter().println(listOfEventsWithStatuses);
 	}
+
+	/**
+	 * This method is used to gather data from Database and send it to widget.
+	 *
+	 * @param request  is used to gather information about current user and study.
+	 * @param model    is used to return gathered from database data.
+	 * @param response is used to set correct locale and clear cache.
+	 * @return model - Model with gathered data.
+	 */
+	@RequestMapping("/initEvaluationProgressWidget")
+	public String initEvaluationProgressWidget(HttpServletRequest request, HttpServletResponse response, Model model) {
+
+		EventCRFDAO eventCRFDAO = new EventCRFDAO(datasource);
+		setRequestHeadersAndUpdateLocale(response, request);
+		String page = "widgets/includes/evaluationProgressChart";
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
+		int displayedYear = Integer.parseInt(request.getParameter("evaluationProgressYear"));
+		displayedYear = displayedYear == 0 ? Calendar.getInstance().get(Calendar.YEAR) : displayedYear;
+
+		Calendar calendar = Calendar.getInstance();
+		int currentYear = calendar.get(Calendar.YEAR);
+		int currentMonth = calendar.get(Calendar.MONTH);
+		int previousYear = displayedYear - 1;
+
+		LinkedHashMap<String, LinkedHashMap<String, Integer>> dataRows = new LinkedHashMap<String, LinkedHashMap<String, Integer>>();
+		ArrayList<String> months = getMonthsList(request);
+		// Create an empty data rows with months names.
+		for (String month : months) {
+			LinkedHashMap<String, Integer> blankStatuses = new LinkedHashMap<String, Integer>();
+			blankStatuses.put(STATUS_EVALUATED, 0);
+			blankStatuses.put(STATUS_NOT_EVALUATED, 0);
+			dataRows.put(month, blankStatuses);
+		}
+		CRFEvaluationFilter filter = new CRFEvaluationFilter(null);
+		CRFEvaluationSort sort = new CRFEvaluationSort();
+		List<CRFEvaluationItem> evaluationItems = eventCRFDAO
+				.findAllEventCrfsForEvaluation(sb, filter, sort, FILTER_START, FILTER_END);
+
+		for (CRFEvaluationItem item : evaluationItems) {
+			Calendar availableCalendar = Calendar.getInstance();
+			availableCalendar.setTime(item.getDateCompleted());
+			int availableYear = availableCalendar.get(Calendar.YEAR);
+			int availableMonth = availableCalendar.get(Calendar.MONTH);
+			boolean itemWasEvaluated = item.getDateValidateCompleted() != null && availableYear <= displayedYear;
+			boolean itemNotEvaluated = item.getDateValidateCompleted() == null && availableYear <= displayedYear;
+			//Check if CRF was not evaluated yet.
+			if (itemNotEvaluated) {
+				int startMonth = availableYear == displayedYear ? availableMonth : 0;
+				int endMonth = displayedYear == currentYear ? currentMonth : NUMBER_OF_MONTHS;
+				for (int i = startMonth; i <= endMonth; i++) {
+					dataRows = getUpdateValueForMonth(dataRows, months.get(i), STATUS_NOT_EVALUATED);
+				}
+			}
+			if (itemWasEvaluated) {
+				Calendar evaluatedCalendar = Calendar.getInstance();
+				evaluatedCalendar.setTime(item.getDateValidateCompleted());
+				int evaluatedYear = evaluatedCalendar.get(Calendar.YEAR);
+				int evaluatedMonth = evaluatedCalendar.get(Calendar.MONTH);
+				boolean wasAvailableMonthOrMore = (evaluatedYear == availableYear && evaluatedMonth > availableMonth)
+						|| evaluatedYear > availableYear;
+				//Check if CRF was already evaluated, but it was available some time to.
+				if (wasAvailableMonthOrMore) {
+					int startMonth = availableYear == displayedYear ? availableMonth : 0;
+					int endMonth = evaluatedYear == displayedYear ? evaluatedMonth - 1 : NUMBER_OF_MONTHS;
+					for (int i = startMonth; i <= endMonth; i++) {
+						dataRows = getUpdateValueForMonth(dataRows, months.get(i), STATUS_NOT_EVALUATED);
+					}
+				}
+				boolean wasEvaluatedInThisYear = evaluatedYear <= displayedYear;
+				// Check if CRF should be displayed in the already evaluated column.
+				if (wasEvaluatedInThisYear) {
+					int startMonth = displayedYear == evaluatedYear ? evaluatedMonth : 0;
+					int endMonth = displayedYear == currentYear ? currentMonth : NUMBER_OF_MONTHS;
+					for (int i = startMonth; i <= endMonth; i++) {
+						dataRows = getUpdateValueForMonth(dataRows, months.get(i), STATUS_EVALUATED);
+					}
+				}
+			}
+		}
+		filter.addFilter("crfCompletedYear", previousYear);
+		boolean evalProgNextYearExists = currentYear > displayedYear;
+		boolean evalProgPreviousYearExists = eventCRFDAO.countOfAllEventCrfsForEvaluation(filter, sb) != 0;
+		boolean evaluationProgressActivateLegend = sb.getStudyParameterConfig().getAllowCrfEvaluation().equals("yes");
+		model.addAttribute("evalProgNextYearExists", evalProgNextYearExists);
+		model.addAttribute("evalProgPreviousYearExists", evalProgPreviousYearExists);
+		model.addAttribute("evaluationProgressYear", displayedYear);
+		model.addAttribute("evaluationProgressActivateLegend", evaluationProgressActivateLegend);
+		model.addAttribute("evaluationProgressDataRows", dataRows);
+
+		return page;
+	}
+
 
 	private ArrayList<StudyBean> sortSitesByPercentOfExpectedEnrollment(ArrayList<StudyBean> listOfSites) {
 		Collections.sort(listOfSites, new Comparator<StudyBean>() {

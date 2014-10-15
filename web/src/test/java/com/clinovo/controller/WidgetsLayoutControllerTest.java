@@ -28,6 +28,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	private static final int ENROLL_PROG_ATTRIBUTES = 4;
 	private static final int CODING_PROG_ATTRIBUTES = 5;
 	private static final int ENROLL_STAT_PER_SITE_ATTRIBUTES = 4;
+	private static final int EVALUATION_PROG_ATTRIBUTES = 5;
 
 	private StudyBean sb;
 	private UserAccountBean ub;
@@ -44,7 +45,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 		roles.add(adminRole);
 		ub = new UserAccountBean();
 		ub.setId(1);
-		ub.setRoles(roles);;
+		ub.setRoles(roles);
 		ub.setActiveStudyId(1);
 		ub.setName("root");
 
@@ -158,6 +159,14 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 		this.mockMvc.perform(
 				get(NDS_PER_CRF_WIDGET).param("start", "0").param("action", "init").sessionAttr("study", sb))
 				.andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatInitEvaluationProgressReturnsCode200() throws Exception {
+
+		this.mockMvc.perform(
+				get(EVALUATION_PROGRESS_WIDGET).param("evaluationProgressYear", "0").sessionAttr("userBean", ub)
+						.sessionAttr("study", sb)).andExpect(status().isOk());
 	}
 
 	/**
@@ -533,6 +542,34 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 				MockMvcRequestBuilders.post(CODING_PROGRESS_WIDGET).param("codingProgressYear", "0")
 						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/codingProgressChart"));
+	}
+
+	@Test
+	public void testThatInitEvaluationProgressReturnsCorrectNumberOfAttributes() throws Exception {
+
+		this.mockMvc.perform(
+				get(EVALUATION_PROGRESS_WIDGET).param("evaluationProgressYear", "0").sessionAttr("userBean", ub)
+						.sessionAttr("study", sb)).andExpect(
+				MockMvcResultMatchers.model().size(EVALUATION_PROG_ATTRIBUTES));
+	}
+
+	@Test
+	public void testThatInitEvaluationProgressReturnsModelWithAllAttributes() throws Exception {
+
+		this.mockMvc.perform(
+				get(EVALUATION_PROGRESS_WIDGET).param("evaluationProgressYear", "0").sessionAttr("userBean", ub)
+						.sessionAttr("study", sb)).andExpect(
+				MockMvcResultMatchers.model().attributeExists("evaluationProgressYear", "evaluationProgressDataRows",
+						"evalProgPreviousYearExists", "evalProgNextYearExists", "evaluationProgressActivateLegend"));
+	}
+
+	@Test
+	public void testThatInitEvaluationProgressReturnsCorrectUrl() throws Exception {
+
+		this.mockMvc.perform(
+				get(EVALUATION_PROGRESS_WIDGET).param("evaluationProgressYear", "0").sessionAttr("userBean", ub)
+						.sessionAttr("study", sb)).andExpect(
+				MockMvcResultMatchers.view().name("widgets/includes/evaluationProgressChart"));
 	}
 
 	@Test

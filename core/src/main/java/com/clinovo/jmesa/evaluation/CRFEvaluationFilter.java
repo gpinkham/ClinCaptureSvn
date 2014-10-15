@@ -19,11 +19,13 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 	public static final String EVENT_NAME = "eventName";
 	public static final String CRF_STATUS = "crfStatus";
 	public static final String STUDY_SUBJECT_ID = "studySubjectId";
+	public static final String EC_COMPLETE_YEAR = "crfCompletedYear";
 
 	public static final String C_NAME = "c.name";
 	public static final String SS_LABEL = "ss.label";
 	public static final String SED_NAME = "sed.name";
 	public static final String EC_STATUS_ID = "ec.status_id";
+	public static final String EC_C_DATE = "ec.date_completed";
 
 	private Map<Object, Status> optionsMap;
 	private List<Filter> filters = new ArrayList<Filter>();
@@ -31,9 +33,8 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 
 	/**
 	 * CRFEvaluationFilter constructor.
-	 * 
-	 * @param optionsMap
-	 *            Map<String, Status>
+	 *
+	 * @param optionsMap Map<String, Status>
 	 */
 	public CRFEvaluationFilter(Map<Object, Status> optionsMap) {
 		this.optionsMap = optionsMap;
@@ -41,15 +42,14 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 		columnMapping.put(EVENT_NAME, SED_NAME);
 		columnMapping.put(CRF_STATUS, EC_STATUS_ID);
 		columnMapping.put(STUDY_SUBJECT_ID, SS_LABEL);
+		columnMapping.put(EC_COMPLETE_YEAR, EC_C_DATE);
 	}
 
 	/**
 	 * Method that adds a filter.
 	 *
-	 * @param property
-	 *            String property
-	 * @param value
-	 *            Object value
+	 * @param property String property
+	 * @param value    Object value
 	 */
 	public void addFilter(String property, Object value) {
 		filters.add(new Filter(property, value));
@@ -58,8 +58,7 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 	/**
 	 * Method that executes all filters.
 	 *
-	 * @param criteria
-	 *            String criteria
+	 * @param criteria String criteria
 	 * @return String sql string
 	 */
 	public String execute(String criteria) {
@@ -96,23 +95,31 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 					theCriteria.append(" AND (").append(columnMapping.get(property))
 							.append(" in (4) and se.subject_event_status_id in (1,3,4,8,9)) ");
 				}
+			} else if (property.equals(EC_COMPLETE_YEAR)) {
+				theCriteria.append(" AND EXTRACT(YEAR FROM " + EC_C_DATE + ") = " + value.toString());
 			} else {
-				theCriteria.append(" AND UPPER(").append(columnMapping.get(property)).append(") like UPPER('%")						.append(value.toString()).append("%')");
+				theCriteria.append(" AND UPPER(").append(columnMapping.get(property)).append(") like UPPER('%")
+						.append(value.toString()).append("%')");
 			}
 		}
-		return criteria.concat(theCriteria.toString());	}
+		return criteria.concat(theCriteria.toString());
+	}
 
 	private class Filter {
-		private final String property;		private final Object value;
+		private final String property;
+		private final Object value;
 
 		public Filter(String property, Object value) {
-			this.property = property;			this.value = value;
+			this.property = property;
+			this.value = value;
 		}
 
-		public String getProperty() {			return property;
+		public String getProperty() {
+			return property;
 		}
 
-		public Object getValue() {			return value;
+		public Object getValue() {
+			return value;
 		}
 	}
 }

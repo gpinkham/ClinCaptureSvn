@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2014-09-02-TICKET1535-CREATE-EVALUATION-PROGRESS-WIDGET">
+		<comment>Create "CRF Evaluation Progress" widget</comment>
+		<insert tableName="widget">
+			<column name="id" value="15" />
+			<column name="version" value="0" />
+			<column name="widget_name" value="CRF Evaluation Progress" />
+			<column name="have_access" value="1,2,8" />
+			<column name="display_as_default" value="1,2,8" />
+			<column name="study_metrics" value="TRUE" />
+			<column name="site_metrics" value="TRUE" />
+			<column name="two_column_widget" value="TRUE" />
+		</insert>
+	</changeSet>
+
+</databaseChangeLog>
