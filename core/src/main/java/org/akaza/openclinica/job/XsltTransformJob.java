@@ -639,7 +639,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
 					File odmFile = new File(outputPath + File.separator + archivedFilename);
 
-					// odm was generate - starting the sas dataset job
+					// odm was generate - starting the SAS transport file job
 					if (sasDatasetJob) {
 						File sasJobDirFile = new File(sasDirFile.getAbsolutePath() + File.separator
 								+ CoreResources.getField("remoteIp") + "_"
