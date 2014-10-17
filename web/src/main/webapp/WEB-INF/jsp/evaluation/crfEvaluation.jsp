@@ -16,6 +16,7 @@
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jspfunctions.js'/>"></script>
 
 <jsp:include page="../include/sideAlert.jsp" />
+<link rel="stylesheet" href="/includes/styles.css" type="text/css">
 <link rel="stylesheet" href="<c:url value='/includes/jmesa/jmesa.css'/>" type="text/css">
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jmesa.js'/>"></script>
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.jmesa.js'/>"></script>
@@ -74,14 +75,20 @@
 	</span>
 </h1>
 
+${summaryTable}
+<br>
 <form action="${pageContext.request.contextPath}/pages/crfEvaluation" style="clear:left; float:left;">
     ${crfEvaluationTable}
 </form>
 
-<br><input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+<br>
+
+<div style="clear:left; float:left">
+    <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
            value="<fmt:message key="back" bundle="${resword}"/>"
            class="button_medium"
-           onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+           onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/>
+</div>
 
 <input id="accessAttributeName" type="hidden" value="data-cc-crfEvaluationId">
 

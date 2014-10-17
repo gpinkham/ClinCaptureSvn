@@ -58,7 +58,6 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	public static final String LOCKED = "locked";
 	public static final String SIGNED = "signed";
 	public static final String OBJECT = "object";
-	public static final String REMOVED = "removed";
 	public static final String CRF_NAME = "crfName";
 	public static final String COMPLETED = "completed";
 	public static final String VIEW_DATA = "view_data";
@@ -72,6 +71,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	public static final String DOUBLE_DATA_ENTRY = "DoubleDataEntry";
 	public static final String BT_ENTER_DATA_GIF = "bt_EnterData.gif";
 	public static final String INITIAL_DATA_ENTRY = "InitialDataEntry";
+	public static final String EVALUATION_STATUS = "evaluation_status";
 	public static final String BT_TRANSPARENT_GIF = "bt_Transparent.gif";
 	public static final String DATA_ENTRY_STARTED = "data_entry_started";
 	public static final String CRF_EVALUATION_TABLE = "crfEvaluationTable";
@@ -153,7 +153,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	protected void configureColumns(TableFacade tableFacade, Locale locale) {
 		contextPath = tableFacade.getWebContext().getContextPath();
 
-		tableFacade.setColumnProperties(CRF_NAME, STUDY_SUBJECT_ID, EVENT_NAME, CRF_STATUS, ACTION_COLUMN);
+		tableFacade.setColumnProperties(CRF_NAME, STUDY_SUBJECT_ID, EVENT_NAME, CRF_STATUS, EVALUATION_STATUS, ACTION_COLUMN);
 
 		Row row = tableFacade.getTable().getRow();
 
@@ -167,6 +167,9 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn(CRF_STATUS),
 				messageSource.getMessage(CRF_EVALUATION_TABLE_CRF_STATUS, null, locale), new CRFStatusCellEditor(),
 				new CrfStatusFilter(), true, false);
+		configureColumn(row.getColumn(EVALUATION_STATUS),
+				messageSource.getMessage(EVALUATION_STATUS, null, locale), new EvaluationStatusCellEditor(),
+				new EvaluationStatusFilter(), true, false);
 		configureColumn(row.getColumn(ACTION_COLUMN),
 				messageSource.getMessage(CRF_EVALUATION_TABLE_ACTION_COLUMN, null, locale), new ActionsCellEditor(),
 				new DefaultActionsEditor(locale), true, false);
@@ -326,6 +329,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, STUDY_SUBJECT_ID), new DefaultFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, EVENT_NAME), new DefaultFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, CRF_STATUS), new DefaultFilterMatcher());
+		tableFacade.addFilterMatcher(new MatcherKey(String.class, EVALUATION_STATUS), new DefaultFilterMatcher());
 	}
 
 	private class DefaultFilterMatcher implements FilterMatcher {
@@ -393,9 +397,72 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 			h.put(STUDY_SUBJECT_ID, crfEvaluationItem.getStudySubjectLabel());
 			h.put(EVENT_NAME, crfEvaluationItem.getStudyEventName());
 			h.put(CRF_STATUS, getCRFStatusIconPath(crfEvaluationItem));
+			h.put(EVALUATION_STATUS, crfEvaluationItem.getDateValidateCompleted() != null
+					? messageSource.getMessage("evaluation_completed", null, locale)
+					: messageSource.getMessage("ready_for_evaluation", null, locale));
 			crfEvaluationItemsResult.add(h);
 		}
 
 		tableFacade.setItems(crfEvaluationItemsResult);
+
+		HtmlBuilder htmlBuilder = createSummaryTable();
+		tableFacade.getWebContext().setRequestAttribute("summaryTable", htmlBuilder.toString());
+	}
+
+	private HtmlBuilder createSummaryTable() {
+		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
+		int totalRows = eventCRFDAO.countOfAllEventCrfsForEvaluation(new CRFEvaluationFilter(optionsMap), currentStudy);
+		List<CRFEvaluationItem> crfEvaluationItems = eventCRFDAO.findAllEventCrfsForEvaluation(currentStudy, new CRFEvaluationFilter(optionsMap), new CRFEvaluationSort(), 0, totalRows);
+		int evaluationCompleted = 0;
+
+		for (CRFEvaluationItem item : crfEvaluationItems) {
+			if (item.getDateValidateCompleted() != null) {
+				evaluationCompleted++;
+			}
+		}
+		int evaluationReadyNumber = totalRows - evaluationCompleted;
+
+		HtmlBuilder summaryTable = new HtmlBuilder();
+		summaryTable.a().id("sumBoxParent").href("javascript:void(0)").onclick("showSummaryBox('sumBox',document.getElementById('sumBoxParent'),'"
+				+ messageSource.getMessage("show_summary_statistics", null, locale) + "','"
+				+ messageSource.getMessage("hide_summary_statistics", null, locale) + "')").close()
+				.img().name("ExpandGroup1").src("../images/bt_Collapse.gif").border("0").close()
+				.append(" ").append(messageSource.getMessage("hide_summary_statistics", null, locale)).aEnd().divEnd().br()
+				.div().id("sumBox").style("clear:left;float:left").close()
+				.table(1).styleClass("summaryTable").width("600px").cellspacing("0").close()
+				.tr(1).close().td(1).close().nbsp().tdEnd()
+				.td(2).align("center").close().append(messageSource.getMessage("ready_for_evaluation", null, locale)).tdEnd()
+				.td(2).align("center").close().append(messageSource.getMessage("evaluation_completed", null, locale)).tdEnd()
+				.td(2).align("center").width("100px").close().append(messageSource.getMessage("total", null, locale)).tdEnd().trEnd(1)
+				.tr(2).close().td(1).align("center").close().append(messageSource.getMessage("evaluated_crf", null, locale)).tdEnd()
+				.td(2).align("center").close().a().href("javascript:$.jmesa.addFilterToLimit('" + getTableName() + "', '" + EVALUATION_STATUS + "', '"
+						+ messageSource.getMessage("ready_for_evaluation", null, locale) + "'); $.jmesa.onInvokeAction('"
+						+ getTableName() + "', 'filter');").close().append(evaluationReadyNumber).aEnd().tdEnd()
+				.td(1).align("center").close().a().href("javascript:$.jmesa.addFilterToLimit('" + getTableName() + "', '" + EVALUATION_STATUS + "', '"
+						+ messageSource.getMessage("evaluation_completed", null, locale) +  "'); $.jmesa.onInvokeAction('"
+						+ getTableName() + "', 'filter');").close().append(evaluationCompleted).aEnd().tdEnd()
+				.td(1).align("center").close().a().href("javascript:$.jmesa.addFilterToLimit('" + getTableName() + "', '" + EVALUATION_STATUS
+						+ "', ''); $.jmesa.onInvokeAction('" + getTableName() + "', 'filter');").close().append(totalRows).aEnd().tdEnd().trEnd(2)
+				.tableEnd(1).divEnd();
+		return summaryTable;
+	}
+
+	private class EvaluationStatusCellEditor implements CellEditor {
+		public Object getValue(Object item, String property, int rowCount) {
+			CRFEvaluationItem crfEvaluationItem = (CRFEvaluationItem) ((HashMap) item).get(OBJECT);
+			return crfEvaluationItem.getDateValidateCompleted() != null
+					? messageSource.getMessage("evaluation_completed", null, locale)
+					: messageSource.getMessage("ready_for_evaluation", null, locale);
+		}
+	}
+
+	private class EvaluationStatusFilter extends DroplistFilterEditor {
+		@Override
+		protected List<Option> getOptions() {
+			List<Option> optionList = new ArrayList<Option>();
+			optionList.add(new Option(messageSource.getMessage("ready_for_evaluation", null, locale), messageSource.getMessage("ready_for_evaluation", null, locale)));
+			optionList.add(new Option(messageSource.getMessage("evaluation_completed", null, locale), messageSource.getMessage("evaluation_completed", null, locale)));
+			return optionList;
+		}
 	}
 }

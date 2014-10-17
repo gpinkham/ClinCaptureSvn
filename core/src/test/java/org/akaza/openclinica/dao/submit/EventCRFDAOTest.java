@@ -74,7 +74,7 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 		CRFEvaluationFilter filter = new CRFEvaluationFilter(new HashMap<Object, Status>());
 		StudyBean currentStudy = new StudyBean();
 		currentStudy.setId(1);
-		assertEquals(eventCRFDAO.countOfAllEventCrfsForEvaluation(filter, currentStudy), 0);
+		assertEquals(1, eventCRFDAO.countOfAllEventCrfsForEvaluation(filter, currentStudy));
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 		CRFEvaluationSort sort = new CRFEvaluationSort();
 		StudyBean currentStudy = new StudyBean();
 		currentStudy.setId(1);
-		assertEquals(eventCRFDAO.findAllEventCrfsForEvaluation(currentStudy, filter, sort, 0, 15).size(), 0);
+		assertEquals(1, eventCRFDAO.findAllEventCrfsForEvaluation(currentStudy, filter, sort, 0, 15).size());
 	}
 
 	@Test

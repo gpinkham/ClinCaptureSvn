@@ -20,12 +20,17 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 	public static final String CRF_STATUS = "crfStatus";
 	public static final String STUDY_SUBJECT_ID = "studySubjectId";
 	public static final String EC_COMPLETE_YEAR = "crfCompletedYear";
+	public static final String EVALUATION_STATUS = "evaluation_status";
+
+	public static final String READY_FOR_EVALUATION = "Ready for Evaluation";
+	public static final String EVALUATION_COMPLETED = "Evaluation Completed";
 
 	public static final String C_NAME = "c.name";
 	public static final String SS_LABEL = "ss.label";
 	public static final String SED_NAME = "sed.name";
 	public static final String EC_STATUS_ID = "ec.status_id";
 	public static final String EC_C_DATE = "ec.date_completed";
+	public static final String EC_DATE_VALIDATE_COMPLETED = "ec.date_validate_completed";
 
 	private Map<Object, Status> optionsMap;
 	private List<Filter> filters = new ArrayList<Filter>();
@@ -97,6 +102,14 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 				}
 			} else if (property.equals(EC_COMPLETE_YEAR)) {
 				theCriteria.append(" AND EXTRACT(YEAR FROM " + EC_C_DATE + ") = " + value.toString());
+			} else if (property.equals(EVALUATION_STATUS)) {
+				if (value.equals(READY_FOR_EVALUATION)) {
+					theCriteria.append(" AND (").append(EC_DATE_VALIDATE_COMPLETED)
+							.append(" IS NULL) ");
+				} else if (value.equals(EVALUATION_COMPLETED)) {
+					theCriteria.append(" AND NOT(").append(EC_DATE_VALIDATE_COMPLETED)
+							.append(" IS NULL) ");
+				}
 			} else {
 				theCriteria.append(" AND UPPER(").append(columnMapping.get(property)).append(") like UPPER('%")
 						.append(value.toString()).append("%')");

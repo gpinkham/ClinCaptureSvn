@@ -135,10 +135,10 @@
                  reference_visit_id="0"/>
 
     <event_crf event_crf_id="1" study_event_id="1" crf_version_id="1" date_interviewed="2001-12-12"
-               interviewer_name="Krikor" completion_status_id="1" status_id="1" annotations="" validator_id="0"
+               interviewer_name="Krikor" completion_status_id="1" status_id="2" annotations="" validator_id="0"
                validator_annotations="" validate_string="" owner_id="1" date_created="2008-07-02" study_subject_id="1"
                date_updated="2008-07-02" update_id="1" electronic_signature_status="false" sdv_status="false"
-               old_status_id="1" sdv_update_id="0" not_started="false"/>
+               old_status_id="1" sdv_update_id="0" not_started="false" date_completed="2014-10-17"/>
     <event_crf event_crf_id="2" study_event_id="2" crf_version_id="2" date_interviewed="2008-07-29"
                interviewer_name="Krikor" completion_status_id="1" status_id="1" annotations="" validator_id="0"
                validator_annotations="" validate_string="" owner_id="1" date_created="2008-07-02" study_subject_id="1"
