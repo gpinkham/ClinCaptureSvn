@@ -59,8 +59,8 @@ public final class Navigation {
 	// set of pages with special processing
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
 			"/ListStudySubjects", "/EnterDataForStudyEvent", "/ViewSectionDataEntry", "/pages/crfEvaluation"));
-	private static String defaultShortURL = "/MainMenu";
-	private static Set<String> queryParameterRequiredURLs = new HashSet(Arrays.asList("/ViewStudySubject"));
+	private static String defaultShortURL = "/MainMenu";	
+	private static Set<String> queryParameterRequiredURLs = new HashSet<String>(Arrays.asList("/ViewStudySubject"));
 
 	private Navigation() {
 	}

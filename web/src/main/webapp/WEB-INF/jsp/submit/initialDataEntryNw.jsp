@@ -1682,5 +1682,12 @@ table-->
   "position:absolute;visibility:hidden;background-color:white"></div>
 </div>
 <jsp:include page="../include/changeTheme.jsp"/>
+<script>
+    window.onbeforeunload = function(){
+        if (window.opener) {
+            window.opener.location.reload(true);
+        }
+    }
+</script>
 </body>
 </html>

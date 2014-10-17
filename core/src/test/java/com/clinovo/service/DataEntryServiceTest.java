@@ -13,17 +13,21 @@
 
 package com.clinovo.service;
 
-import java.util.ArrayList;
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 @SuppressWarnings("unchecked")
 public class DataEntryServiceTest extends DefaultAppContextTest {
@@ -35,43 +39,70 @@ public class DataEntryServiceTest extends DefaultAppContextTest {
 		StudyBean study = (StudyBean) studyDAO.findByPK(1);
 		assertNotNull(dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study, Page.INITIAL_DATA_ENTRY_SERVLET));
 	}
-	
+
 	@Test
 	public void testGetAllDisplayBeansReturnsResult() throws Exception {
 		ArrayList<SectionBean> allSectionBeans = sectionDAO.findAllByCRFVersionId(1);
 		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		StudyBean study = (StudyBean) studyDAO.findByPK(1);
-		assertEquals(3, (dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study, Page.INITIAL_DATA_ENTRY_SERVLET).size()));
+		assertEquals(3, (dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study,
+				Page.INITIAL_DATA_ENTRY_SERVLET).size()));
 	}
-	
+
 	@Test
 	public void testShouldLoadDBValuesReturnsNotNull() {
 		DisplayItemBean dib = new DisplayItemBean();
 		assertNotNull(dataEntryService.shouldLoadDBValues(dib, Page.INITIAL_DATA_ENTRY_SERVLET));
 	}
-	
+
 	@Test
 	public void testShouldLoadDBValuesReturnsTrue() {
 		DisplayItemBean dib = new DisplayItemBean();
 		assertTrue(dataEntryService.shouldLoadDBValues(dib, Page.INITIAL_DATA_ENTRY_SERVLET));
 	}
-	
+
+	@Test
+	public void testShouldLoadDBValuesReturnsTrueForEvaluableCrfInDDEMode() {
+		DisplayItemBean dib = new DisplayItemBean();
+		EventDefinitionCRFBean edcb = new EventDefinitionCRFBean();
+		edcb.setEvaluatedCRF(true);
+		dib.setEventDefinitionCRF(edcb);
+		assertTrue(dataEntryService.shouldLoadDBValues(dib, Page.DOUBLE_DATA_ENTRY_SERVLET));
+	}
+
+	@Test
+	public void testShouldLoadDBValuesReturnsTrueForDDE() {
+		DisplayItemBean dib = new DisplayItemBean();
+		ItemDataBean idb = new ItemDataBean();
+		dib.setData(idb);
+		assertTrue(dataEntryService.shouldLoadDBValues(dib, Page.DOUBLE_DATA_ENTRY_SERVLET));
+	}
+
+	@Test
+	public void testShouldLoadDBValuesReturnsFalseForDDE() {
+		DisplayItemBean dib = new DisplayItemBean();
+		ItemDataBean idb = new ItemDataBean();
+		idb.setStatus(Status.PENDING);
+		dib.setData(idb);
+		assertFalse(dataEntryService.shouldLoadDBValues(dib, Page.DOUBLE_DATA_ENTRY_SERVLET));
+	}
+
 	@Test
 	public void testGetDisplayBeanReturnsNotNull() throws Exception {
 		boolean hasGroup = false;
-		boolean includeUngroupedItems = true; 
+		boolean includeUngroupedItems = true;
 		boolean isSubmitted = false;
 		Page servletPage = Page.INITIAL_DATA_ENTRY_SERVLET;
 		StudyBean study = (StudyBean) studyDAO.findByPK(1);
 		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
-		SectionBean sb = new SectionBean(); 
+		SectionBean sb = new SectionBean();
 		ArrayList<ItemBean> items = new ArrayList<ItemBean>();
 		ItemBean ib = new ItemBean();
 		ib.setId(1);
 		items.add(ib);
 		sb.setItems(items);
-		DisplaySectionBean dsb = dataEntryService.getDisplayBean(hasGroup, includeUngroupedItems, isSubmitted, servletPage,
-				study, ecb, sb);
+		DisplaySectionBean dsb = dataEntryService.getDisplayBean(hasGroup, includeUngroupedItems, isSubmitted,
+				servletPage, study, ecb, sb);
 		assertNotNull(dsb);
 	}
 }

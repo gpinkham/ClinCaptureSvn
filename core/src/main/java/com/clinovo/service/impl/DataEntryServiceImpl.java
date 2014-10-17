@@ -14,14 +14,7 @@
  *******************************************************************************/
 package com.clinovo.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.sql.DataSource;
-
+import com.clinovo.service.DataEntryService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -52,27 +45,35 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.clinovo.service.DataEntryService;
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 @Service("dataEntryService")
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class DataEntryServiceImpl implements DataEntryService {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	@Autowired private DataSource dataSource;
-	@Autowired private DynamicsMetadataService dynamicsMetadataService;
-	
-	public DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems,
-			boolean isSubmitted, Page servletPage, StudyBean study, EventCRFBean ecb, SectionBean sb) throws Exception {
+	@Autowired
+	private DataSource dataSource;
+	@Autowired
+	private DynamicsMetadataService dynamicsMetadataService;
+
+	public DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems, boolean isSubmitted,
+			Page servletPage, StudyBean study, EventCRFBean ecb, SectionBean sb) throws Exception {
 		DisplaySectionBean section = new DisplaySectionBean();
-		
+
 		// Find out whether there are ungrouped items in this section
 		boolean hasUngroupedItems = false;
-		
+
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
-		EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), ecb.getCRFVersionId());
+		EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(),
+				ecb.getCRFVersionId());
 		int eventDefinitionCRFId = edcb.getId();
-		
+
 		logger.trace("eventDefinitionCRFId " + eventDefinitionCRFId);
 		// Use this class to find out whether there are ungrouped items in this
 		// section
@@ -130,7 +131,7 @@ public class DataEntryServiceImpl implements DataEntryService {
 		// get all the parent display item beans not in group
 		logger.debug("Entering getParentDisplayItems::: Thread is? " + Thread.currentThread());
 		ArrayList displayItems = getParentDisplayItems(hasGroup, sb, edcb, idao, ifmdao, iddao, ecb, hasUngroupedItems,
-				 Page.isDDEServletPage(servletPage));
+				Page.isDDEServletPage(servletPage));
 		logger.debug("Entering getParentDisplayItems::: Done and Thread is? " + Thread.currentThread());
 
 		logger.debug("just ran get parent display, has group " + hasGroup + " has ungrouped " + hasUngroupedItems);
@@ -165,9 +166,18 @@ public class DataEntryServiceImpl implements DataEntryService {
 
 		return section;
 	}
-	
+
+	/**
+	 * Method that checks that DB data should be displayed.
+	 * 
+	 * @param dib
+	 *            DisplayItemBean
+	 * @param servletPage
+	 *            Page
+	 * @return boolean
+	 */
 	public boolean shouldLoadDBValues(DisplayItemBean dib, Page servletPage) {
-		if (Page.ADMIN_EDIT_SERVLET.equals(servletPage)){
+		if (Page.ADMIN_EDIT_SERVLET.equals(servletPage)) {
 			if (dib.getData().getStatus() == null) {
 				return true;
 			}
@@ -175,35 +185,18 @@ public class DataEntryServiceImpl implements DataEntryService {
 				return false;
 			}
 		}
-		
-		if (Page.DOUBLE_DATA_ENTRY_SERVLET.equals(servletPage)){
-			// my understanding-jxu:
-			// if the status is pending, should not load the db value
-			// if the status is UNAVAILABLE,load DB value
-			// interesting bug here: some fields load, some don't
-			// remove a session value here:
-			// int keyId = ecb.getId();
-			// session.removeAttribute(COUNT_VALIDATE+keyId);
-			// logger.info("^^^removed count_validate here");
-			// wonky place to do it, but no other place at the moment, tbh
+
+		if (Page.DOUBLE_DATA_ENTRY_SERVLET.equals(servletPage)) {
+			if (dib.getEventDefinitionCRF().isEvaluatedCRF()) {
+				return true;
+			}
 			if (dib.getData().getStatus() == null || dib.getData().getStatus().equals(Status.UNAVAILABLE)) {
 				return true;
 			}
-			/*
-			 * if (!dib.getData().getStatus().equals(Status.UNAVAILABLE)) { logger.info("status don't match.."); return
-			 * false; //return true; }
-			 */
-
-			// how about this instead:
-			// if it's pending, return false
-			// otherwise return true?
 			if (dib.getData().getStatus().equals(Status.PENDING)) {
-				// logger.info("status was pending...");
 				return false;
-				// return true;
 			}
 		}
-		
 		return true;
 	}
 
@@ -308,20 +301,20 @@ public class DataEntryServiceImpl implements DataEntryService {
 
 		return answer;
 	}
-	
+
 	/**
 	 * Get the DisplayItemBean objects corresponding to the items which are children of the specified parent.
 	 * 
 	 * @param parent
 	 *            The item whose children are to be retrieved.
-	 * @param isDDEPage 
-	 * @param shouldLoadDBValues 
+	 * @param isDDEPage
+	 * @param shouldLoadDBValues
 	 * 
 	 * @return An array of DisplayItemBean objects corresponding to the items which are children of parent, and are
 	 *         sorted by column number (ascending), then ordinal (ascending).
 	 */
-	private ArrayList getChildrenDisplayItems(DisplayItemBean parent, EventDefinitionCRFBean edcb,
-			EventCRFBean ecb, Page servletPage) {
+	private ArrayList getChildrenDisplayItems(DisplayItemBean parent, EventDefinitionCRFBean edcb, EventCRFBean ecb,
+			Page servletPage) {
 		boolean isDDEPage = Page.isDDEServletPage(servletPage);
 		ArrayList answer = new ArrayList();
 		int parentId = parent.getItem().getId();
@@ -370,7 +363,7 @@ public class DataEntryServiceImpl implements DataEntryService {
 
 		return answer;
 	}
-	
+
 	/**
 	 * Retrieve the DisplaySectionBean which will be used to display the Event CRF Section on the JSP, and also is used
 	 * to controll processRequest.
@@ -378,7 +371,8 @@ public class DataEntryServiceImpl implements DataEntryService {
 	 * @param request
 	 *            TODO
 	 */
-	public ArrayList getAllDisplayBeans(ArrayList<SectionBean> allSectionBeans, EventCRFBean ecb, StudyBean study, Page servletPage) throws Exception {
+	public ArrayList getAllDisplayBeans(ArrayList<SectionBean> allSectionBeans, EventCRFBean ecb, StudyBean study,
+			Page servletPage) throws Exception {
 		ArrayList<DisplaySectionBean> sections = new ArrayList<DisplaySectionBean>();
 		SectionDAO sdao = new SectionDAO(dataSource);
 		ItemDataDAO iddao = new ItemDataDAO(dataSource);
@@ -417,7 +411,8 @@ public class DataEntryServiceImpl implements DataEntryService {
 			iddao = new ItemDataDAO(dataSource);
 
 			// get all the display item beans
-			ArrayList displayItems = getParentDisplayItems(false, sb, edcb, idao, ifmdao, iddao, ecb, false, Page.isDDEServletPage(servletPage));
+			ArrayList displayItems = getParentDisplayItems(false, sb, edcb, idao, ifmdao, iddao, ecb, false,
+					Page.isDDEServletPage(servletPage));
 
 			logger.debug("222 just ran get parent display, has group " + " FALSE has ungrouped FALSE");
 			// now sort them by ordinal
@@ -439,7 +434,7 @@ public class DataEntryServiceImpl implements DataEntryService {
 			section.setItems(displayItems);
 			sections.add(section);
 		}
-		
+
 		return sections;
 	}
 }
