@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -195,7 +195,7 @@ public class StudyConfigService {
 		
 		com.clinovo.model.System systemProp = spvdao.findSystemPropertyByName(handle);
 		String value;
-		if(systemProp != null) {
+		if (systemProp != null) {
 			value = systemProp.getValue();
 			if (handle.equalsIgnoreCase("markImportedCRFAsCompleted")) {
 				spc.setMarkImportedCRFAsCompleted(value);
@@ -211,11 +211,7 @@ public class StudyConfigService {
 				spc.setAutoCodeDictionaryName(value);
 			} else if (handle.equalsIgnoreCase("medicalCodingApiKey")) {
 		        spc.setMedicalCodingApiKey(value);
-		    } else if (handle.equalsIgnoreCase("assignRandomizationResultTo")) {
-		    	spc.setAssignRandomizationResultTo(value);
-		    } else if (handle.equalsIgnoreCase("randomizationTrialId")) {
-		    	spc.setRandomizationTrialId(value);
-			} else if (handle.equalsIgnoreCase("allowCrfEvaluation")) {
+		    } else if (handle.equalsIgnoreCase("allowCrfEvaluation")) {
 				spc.setAllowCrfEvaluation(value);
 			} else if (handle.equalsIgnoreCase("evaluateWithContext")) {
 				spc.setEvaluateWithContext(value);

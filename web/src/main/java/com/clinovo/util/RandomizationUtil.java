@@ -28,7 +28,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
@@ -37,7 +36,6 @@ import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -65,7 +63,6 @@ public class RandomizationUtil {
 	private static ItemDataDAO itemDataDAO;
 	private static EventCRFDAO eventCRFDAO;
 	private static StudyEventDAO studyEventDAO;
-	private static StudyParameterValueDAO studyParameterValueDAO;
 
 	private static final Logger LOG = LoggerFactory.getLogger(RandomizationUtil.class);
 
@@ -524,27 +521,6 @@ public class RandomizationUtil {
 		}
 	}
 
-	/**
-	 * Gets randomization trialId configured for the study.
-	 * 
-	 * @param study
-	 *            Study to check
-	 * @return study's randomization trialId or empty string if trialId is not set
-	 */
-	public static String getRandomizationTrialIdByStudy(StudyBean study) {
-		if (RandomizationUtil.studyParameterValueDAO == null) {
-			RandomizationUtil.studyParameterValueDAO = new StudyParameterValueDAO(sessionManager.getDataSource());
-		}
-		int studyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
-		StudyParameterValueBean studyParameter = RandomizationUtil.studyParameterValueDAO.findByHandleAndStudy(studyId,
-				"randomizationTrialId");
-		if (studyParameter != null && studyParameter.getValue() != null) {
-			return studyParameter.getValue();
-		} else {
-			return "";
-		}
-	}
-
 	private static boolean trialIdItemExists(HttpServletRequest request) {
 
 		String trialId = request.getParameter("trialId");
@@ -584,9 +560,5 @@ public class RandomizationUtil {
 	public static void setItemDataExist(boolean itemDataExist) {
 
 		RandomizationUtil.itemDataExist = itemDataExist;
-	}
-
-	public static void setStudyParameterValueDAO(StudyParameterValueDAO studyParameterValueDAO) {
-		RandomizationUtil.studyParameterValueDAO = studyParameterValueDAO;
 	}
 }

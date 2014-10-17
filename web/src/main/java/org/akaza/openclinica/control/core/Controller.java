@@ -366,8 +366,6 @@ public abstract class Controller extends BaseController {
 		reloadUserBean(session, getUserAccountDAO());
 		String newThemeColor = CoreResources.getField("themeColor");
 		session.setAttribute("newThemeColor", newThemeColor);
-		String assignRandomizationResultTo = CoreResources.getField("assignRandomizationResultTo");
-		session.setAttribute("assignRandomizationResultTo", assignRandomizationResultTo);
 		String randomizationEnviroment = CoreResources.getField("randomizationEnviroment");
 		session.setAttribute("randomizationEnviroment", randomizationEnviroment);
 		ApplicationContext applicationContext = SpringServletAccess.getApplicationContext(getServletContext());

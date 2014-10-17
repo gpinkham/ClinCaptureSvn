@@ -43,7 +43,6 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 		RandomizationUtil.setStudySubjectDAO(studySubjectDAO);
 		RandomizationUtil.setItemDataDAO(itemDataDAO);
 		RandomizationUtil.setSubjectDAO(subjectDAO);
-		RandomizationUtil.setStudyParameterValueDAO(studyParameterValueDAO);
 
 		SessionManager manager = Mockito.mock(SessionManager.class);
 		Mockito.when(manager.getDataSource()).thenReturn(null);
@@ -117,18 +116,6 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 	public void testThatIsConfiguredTrialIdValidReturnsForNull() {
 
 		assertFalse(RandomizationUtil.isConfiguredTrialIdValid(null));
-	}
-
-	@Test
-	public void testThatGetRandomizationTrialIdByStudyWorksForStudy() {
-		assertEquals("1223", RandomizationUtil.getRandomizationTrialIdByStudy((StudyBean) studyDAO.findByPK(1)));
-	}
-
-	@Test
-	public void testThatGetRandomizationTrialIdByStudyWorksForSite() {
-		StudyBean site = new StudyBean();
-		site.setParentStudyId(1);
-		assertEquals("1223", RandomizationUtil.getRandomizationTrialIdByStudy(site));
 	}
 
 	@Test

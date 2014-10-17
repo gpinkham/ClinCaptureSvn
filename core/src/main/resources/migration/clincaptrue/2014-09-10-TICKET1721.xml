@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="Frank"
+		id="2014-09-10-TICKET1721-UPDATE-STUDY-PARAMETER-VALUE">
+		<comment>Update unset study-level rando trialIds before deleting system level trialId</comment>
+		<sql>
+			UPDATE study_parameter_value SET value = (SELECT value FROM
+			system WHERE name = 'randomizationTrialId')
+			WHERE parameter =
+			'randomizationTrialId'
+			AND (value IS NULL OR value = '' OR value='blank')
+		</sql>
+	</changeSet>
+	<changeSet author="Frank" id="2014-09-10-TICKET1721-DELETE-SYSTEM">
+		<comment>Delete randomization trial id and assignment result from system</comment>
+		<delete tableName="system">
+			<where>name = 'randomizationTrialId'</where>
+		</delete>
+		<delete tableName="system">
+			<where>name = 'assignRandomizationResultTo'</where>
+		</delete>
+	</changeSet>
+	<changeSet author="Frank" id="2014-09-10-TICKET1721-UPDATE-SYSTEM">
+		<comment>Update order_id values for randomizationEnviroment for consistency</comment>
+		<update tableName="system">
+			<column name="order_id" value="5" />
+			<where>name = 'randomizationEnviroment'</where>
+		</update>
+	</changeSet>
+</databaseChangeLog>
+

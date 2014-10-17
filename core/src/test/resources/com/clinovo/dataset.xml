@@ -1003,6 +1003,4 @@
 	<widgets_layout id="1" user_id="1" study_id="1" widget_id="1" ordinal="0" version="0"/>
 	<widgets_layout id="2" user_id="1" study_id="1" widget_id="2" ordinal="1" version="0"/>
 	<widgets_layout id="3" user_id="1" study_id="1" widget_id="3" ordinal="2" version="0"/>
-	
-	<study_parameter_value study_parameter_value_id="15" study_id="1" value="1223" parameter="randomizationTrialId"/>
 </dataset>

@@ -141,7 +141,7 @@ public class RandomizeServlet extends Controller {
 		result.setStudyId(String.valueOf(getStudyId(currentStudy, getStudyDAO())));
 
 		// Assign subject to group
-		String assignRandomizationResultTo = (String) request.getSession().getAttribute("assignRandomizationResultTo");
+		String assignRandomizationResultTo = currentStudy.getStudyParameterConfig().getAssignRandomizationResultTo();
 
 		HashMap<String, ItemDataBean> itemsMap = RandomizationUtil.getRandomizationItemData(request);
 
@@ -183,7 +183,7 @@ public class RandomizeServlet extends Controller {
 		String crfConfiguredTrialId = request.getParameter("trialId");
 
 		// Get TrialId configured in study parameters
-		String configuredTrialId = RandomizationUtil.getRandomizationTrialIdByStudy(currentStudy);
+		String configuredTrialId = currentStudy.getStudyParameterConfig().getRandomizationTrialId();
 
 		// Check if the study params trial config is "empty or zero"
 		if (RandomizationUtil.isConfiguredTrialIdValid(configuredTrialId)) {
