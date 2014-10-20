@@ -4549,13 +4549,15 @@ public abstract class DataEntryServlet extends Controller {
 	private RuleSetServiceInterface getRuleSetService(HttpServletRequest request) {
 
 		RuleSetServiceInterface ruleSetService = null;
-
+		String requestUrl =
+				request.getScheme() + "://" + request.getSession().getAttribute(DOMAIN_NAME) + request.getRequestURI()
+						.toString().replaceAll(request.getServletPath(), "");
 		ruleSetService = ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
 				.getApplicationContext(getServletContext()).getBean("ruleSetService");
 		ruleSetService.setContextPath(getContextPath(request));
 		ruleSetService.setMailSender((JavaMailSenderImpl) SpringServletAccess
 				.getApplicationContext(getServletContext()).getBean("mailSender"));
-		ruleSetService.setRequestURLMinusServletPath(getRequestURLMinusServletPath(request));
+		ruleSetService.setRequestURLMinusServletPath(requestUrl);
 		return ruleSetService;
 	}
 

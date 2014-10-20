@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -38,29 +38,32 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@SuppressWarnings({"serial"})
+/**
+ * This class used to run rules set.
+ */
+@SuppressWarnings({ "serial" })
 @Component
 public class RunRuleSetServlet extends Controller {
 
-	private static String RULESET_ID = "ruleSetId";
-	private static String RULE_ID = "ruleId";
-	private static String RULESET = "ruleSet";
-	private static String RULESET_RESULT = "ruleSetResult";
+	private static final String RULESET_ID = "ruleSetId";
+	private static final String RULE_ID = "ruleId";
+	private static final String RULESET = "ruleSet";
+	private static final String RULESET_RESULT = "ruleSetResult";
 
 	/**
-     *
-     * @param request
-     * @param response
-     */
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole()
+				.equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -73,9 +76,9 @@ public class RunRuleSetServlet extends Controller {
 	@SuppressWarnings("unused")
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
-        StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		String ruleSetId = request.getParameter(RULESET_ID);
 		String ruleId = request.getParameter(RULE_ID);
@@ -86,7 +89,8 @@ public class RunRuleSetServlet extends Controller {
 			List<RuleSetBean> ruleSets = new ArrayList<RuleSetBean>();
 			ruleSets.add(ruleSetBean);
 			if (dryRun != null && dryRun.equals("no")) {
-				List<RuleSetBasedViewContainer> resultOfRunningRules = getRuleSetService().runRulesInBulk(ruleSets, false, currentStudy, ub);
+				List<RuleSetBasedViewContainer> resultOfRunningRules = getRuleSetService()
+						.runRulesInBulk(ruleSets, false, currentStudy, ub);
 				addPageMessage(respage.getString("actions_successfully_taken"), request);
 				forwardPage(Page.LIST_RULE_SETS_SERVLET, request, response);
 
@@ -124,7 +128,7 @@ public class RunRuleSetServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
 			return Controller.ADMIN_SERVLET_CODE;
 		} else {
@@ -134,11 +138,13 @@ public class RunRuleSetServlet extends Controller {
 
 	@SuppressWarnings("unused")
 	private RuleSetService getRuleSetService(HttpServletRequest request) {
-        RuleSetService ruleSetService = getRuleSetService();
+		String requestUrl =
+				request.getScheme() + "://" + request.getSession().getAttribute(DOMAIN_NAME) + request.getRequestURI()
+						.replaceAll(request.getServletPath(), "");
+		RuleSetService ruleSetService = getRuleSetService();
 		ruleSetService.setContextPath(getContextPath(request));
 		ruleSetService.setMailSender(getMailSender());
-		ruleSetService.setRequestURLMinusServletPath(getRequestURLMinusServletPath(request));
+		ruleSetService.setRequestURLMinusServletPath(requestUrl);
 		return ruleSetService;
 	}
-
 }
