@@ -39,6 +39,7 @@ import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.service.EventService;
 import org.akaza.openclinica.service.EventServiceInterface;
+import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.hibernate.SessionFactory;
@@ -99,6 +100,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected RulesPostImportContainerService postImportContainerService;
 	protected PasswordRequirementsDao requirementsDao;
 	protected EventServiceInterface eventService;
+	protected DiscrepancyNoteService discrepancyNoteService;
 
 	// DAOS
 	@Autowired
@@ -194,6 +196,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 		requirementsDao = new PasswordRequirementsDao(configurationDao);
+		discrepancyNoteService = new DiscrepancyNoteService(dataSource);
 
 		postImportContainerService = new RulesPostImportContainerService(dataSource);
 		postImportContainerService.setRuleDao(ruleDao);

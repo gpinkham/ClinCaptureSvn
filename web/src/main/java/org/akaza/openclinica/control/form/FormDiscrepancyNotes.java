@@ -10,33 +10,43 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
-/*
- * OpenClinica is distributed under the
- * GNU Lesser General Public License (GNU LGPL).
-
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
- */
 package org.akaza.openclinica.control.form;
 
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-@SuppressWarnings({"rawtypes","unchecked"})
+/**
+ * 
+ * Provides for DiscrepancyNotes in CRF forms.
+ * 
+ */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class FormDiscrepancyNotes {
 	private HashMap fieldNotes;
 	private HashMap numExistingFieldNotes;
 	private HashMap idNotes;
 
+	/**
+	 * Initializes FormDiscrepancyNotes object.
+	 */
 	public FormDiscrepancyNotes() {
 		fieldNotes = new HashMap();
 		numExistingFieldNotes = new HashMap();
 		idNotes = new HashMap();
 	}
 
+	/**
+	 * Add DN to this FormDiscrepancyNotes.
+	 * 
+	 * @param field
+	 *            Field name to map DN
+	 * @param note
+	 *            DN to add
+	 */
 	public void addNote(String field, DiscrepancyNoteBean note) {
 		ArrayList notes;
 		if (fieldNotes.containsKey(field)) {
@@ -50,10 +60,12 @@ public class FormDiscrepancyNotes {
 	}
 
 	/**
-	 * want to map entity Id with field names So we know if an entity has discrepancy note giving entity id
+	 * Want to map entity Id with field names So we know if an entity has discrepancy note giving entity id.
 	 * 
 	 * @param entityId
+	 *            EntityId
 	 * @param field
+	 *            Field name
 	 */
 	public void addIdNote(int entityId, String field) {
 		ArrayList notes;
@@ -69,6 +81,13 @@ public class FormDiscrepancyNotes {
 		idNotes.put(new Integer(entityId), notes);
 	}
 
+	/**
+	 * Check if FormDiscrepancyNotes has DN for specified field.
+	 * 
+	 * @param field
+	 *            Field to check
+	 * @return true if yes, false otherwise
+	 */
 	public boolean hasNote(String field) {
 		ArrayList notes;
 		if (fieldNotes.containsKey(field)) {
@@ -78,6 +97,13 @@ public class FormDiscrepancyNotes {
 		return false;
 	}
 
+	/**
+	 * Get notes associated with field.
+	 * 
+	 * @param field
+	 *            Field to check
+	 * @return List of associated notes
+	 */
 	public ArrayList getNotes(String field) {
 		ArrayList notes;
 		if (fieldNotes.containsKey(field)) {
@@ -88,10 +114,25 @@ public class FormDiscrepancyNotes {
 		return notes;
 	}
 
+	/**
+	 * Sets number of existing field notes.
+	 * 
+	 * @param field
+	 *            Field to set for
+	 * @param num
+	 *            Number to set
+	 */
 	public void setNumExistingFieldNotes(String field, int num) {
 		numExistingFieldNotes.put(field, new Integer(num));
 	}
 
+	/**
+	 * Gets number of existing field notes for field.
+	 * 
+	 * @param field
+	 *            Field to check for
+	 * @return Number of existing field notes
+	 */
 	public int getNumExistingFieldNotes(String field) {
 		if (numExistingFieldNotes.containsKey(field)) {
 			Integer numInt = (Integer) numExistingFieldNotes.get(field);
@@ -145,5 +186,34 @@ public class FormDiscrepancyNotes {
 	 */
 	public void setIdNotes(HashMap idNotes) {
 		this.idNotes = idNotes;
+	}
+
+	/**
+	 * Adds list of RFC DiscrepancyNotes to FormDiscrepancyNote object.
+	 * 
+	 * @param notes
+	 *            list of RFCs
+	 */
+	public void addAutoRFCs(List<DiscrepancyNoteBean> notes) {
+		for (DiscrepancyNoteBean note : notes) {
+			if (this.hasNote(note.getField())) {
+				if (!this.fieldHasRFC(note.getField())) {
+					this.addNote(note.getField(), note);
+				}
+			} else {
+				this.addNote(note.getField(), note);
+			}
+		}
+	}
+
+	private boolean fieldHasRFC(String field) {
+		ArrayList exitingNotes = this.getNotes(field);
+		for (Object note : exitingNotes) {
+			DiscrepancyNoteBean existingNote = (DiscrepancyNoteBean) note;
+			if (existingNote.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

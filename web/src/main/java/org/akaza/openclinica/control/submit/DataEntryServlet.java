@@ -20,11 +20,28 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.model.CodedItemElement;
-import com.clinovo.service.DataEntryService;
-import com.clinovo.service.ReportCRFService;
-import com.clinovo.util.ValidatorHelper;
+import java.io.File;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -112,6 +129,7 @@ import org.akaza.openclinica.service.crfdata.InstantOnChangeService;
 import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
 import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
 import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrParcel;
+import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
@@ -125,26 +143,11 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.impl.StdScheduler;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.CodedItemElement;
+import com.clinovo.service.DataEntryService;
+import com.clinovo.service.ReportCRFService;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * @author ssachs
@@ -1376,6 +1379,17 @@ public abstract class DataEntryServlet extends Controller {
 				// save discrepancy notes into DB
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session
 						.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+
+				if ((stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || stage
+						.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) && edcb.isEvaluatedCRF()) {
+					String noteDescription = resword.getString("crf_eval_rfc_description");
+					String detailedDescription = resword.getString("crf_eval_rfc_detailed_description");
+					List<DiscrepancyNoteBean> dbns = new DiscrepancyNoteService(getDataSource())
+							.generateRFCsForChangedFields(changedItemsList, changedItemNamesList, oldItemdata,
+									ub, noteDescription, detailedDescription);
+					fdn.addAutoRFCs(dbns);
+				}
+
 				dndao = new DiscrepancyNoteDAO(getDataSource());
 
 				AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEWER, fdn, dndao, ecb.getId(), "EventCRF",
