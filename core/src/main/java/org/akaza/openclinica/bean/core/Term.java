@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -35,13 +35,24 @@ import java.util.ResourceBundle;
 @SuppressWarnings({ "serial", "rawtypes", "unchecked" })
 public class Term extends EntityBean {
 
-	ResourceBundle resterm;
-	protected String description;
+	private ResourceBundle resterm;
+	private String description;
 
+	/**
+	 * Term constructor.
+	 */
 	public Term() {
 		super();
 	}
 
+	/**
+	 * Term constructor.
+	 * 
+	 * @param id
+	 *            int
+	 * @param name
+	 *            String
+	 */
 	public Term(int id, String name) {
 		setId(id);
 		setName(name);
@@ -49,6 +60,16 @@ public class Term extends EntityBean {
 
 	}
 
+	/**
+	 * Term constructor.
+	 * 
+	 * @param id
+	 *            int
+	 * @param name
+	 *            String
+	 * @param description
+	 *            String
+	 */
 	public Term(int id, String name, String description) {
 		setId(id);
 		setName(name);
@@ -75,6 +96,13 @@ public class Term extends EntityBean {
 		this.description = description;
 	}
 
+	/**
+	 * Method that compares term objects.
+	 * 
+	 * @param t
+	 *            Term
+	 * @return boolean
+	 */
 	public boolean equals(Term t) {
 		return (t != null) && (this.id == t.id);
 	}
@@ -84,6 +112,15 @@ public class Term extends EntityBean {
 		return id;
 	}
 
+	/**
+	 * Method that checks that term id is present in the list.
+	 * 
+	 * @param id
+	 *            int
+	 * @param list
+	 *            List
+	 * @return boolean
+	 */
 	public static boolean contains(int id, List list) {
 		Term t = new Term(id, "");
 
@@ -95,6 +132,15 @@ public class Term extends EntityBean {
 		return false;
 	}
 
+	/**
+	 * Method that returns term by id from the list.
+	 * 
+	 * @param id
+	 *            int
+	 * @param list
+	 *            List
+	 * @return Term
+	 */
 	public static Term get(int id, List list) {
 		Term t = new Term(id, "");
 
@@ -118,19 +164,30 @@ public class Term extends EntityBean {
 	}
 
 	public String getNormalizedName() {
-		String name = getName();
-		if (name != null) {
-			List<String> wordList = Arrays.asList(name.split("\\s"));
+		return normalizeString(getName());
+	}
+
+	/**
+	 * Method makes first symbol in upper case for each word in the passed string.
+	 * 
+	 * @param value
+	 *            String
+	 * @return String
+	 */
+	public static String normalizeString(String value) {
+		if (value != null) {
+			List<String> wordList = Arrays.asList(value.split("\\s"));
 			StringBuilder builder = new StringBuilder();
 			for (String word : wordList) {
-				if (wordList.indexOf(word) > 0)
+				if (wordList.indexOf(word) > 0) {
 					builder.append(" ");
+				}
 				builder.append(word.isEmpty() ? " " : (Character.toString(word.charAt(0)).toUpperCase() + word
 						.substring(1)));
 			}
-			return builder.toString();
-		} else
-			return null;
+			value = builder.toString();
+		}
+		return value;
 	}
 
 	public String getCode() {

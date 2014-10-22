@@ -39,7 +39,8 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 	/**
 	 * CRFEvaluationFilter constructor.
 	 *
-	 * @param optionsMap Map<String, Status>
+	 * @param optionsMap
+	 *            Map<String, Status>
 	 */
 	public CRFEvaluationFilter(Map<Object, Status> optionsMap) {
 		this.optionsMap = optionsMap;
@@ -53,8 +54,10 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 	/**
 	 * Method that adds a filter.
 	 *
-	 * @param property String property
-	 * @param value    Object value
+	 * @param property
+	 *            String property
+	 * @param value
+	 *            Object value
 	 */
 	public void addFilter(String property, Object value) {
 		filters.add(new Filter(property, value));
@@ -63,7 +66,8 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 	/**
 	 * Method that executes all filters.
 	 *
-	 * @param criteria String criteria
+	 * @param criteria
+	 *            String criteria
 	 * @return String sql string
 	 */
 	public String execute(String criteria) {
@@ -80,7 +84,10 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 		if (value != null) {
 			if (property.equals(CRF_STATUS)) {
 				Status status = optionsMap.get(value);
-				if (status.equals(Status.LOCKED)) {
+				if (status.equals(Status.DELETED)) {
+					theCriteria.append(" AND (").append(columnMapping.get(property))
+							.append(" in (5,7) or se.subject_event_status_id in (10)) ");
+				} else if (status.equals(Status.LOCKED)) {
 					theCriteria.append(" AND (").append(columnMapping.get(property))
 							.append(" in (6) or se.subject_event_status_id in (5,6,7)) ");
 				} else if (status.equals(Status.SIGNED)) {
@@ -98,17 +105,18 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 							.append(" and se.subject_event_status_id != 8) ");
 				} else if (status.equals(Status.DATA_ENTRY_STARTED)) {
 					theCriteria.append(" AND (").append(columnMapping.get(property))
-							.append(" in (4) and se.subject_event_status_id in (1,3,4,8,9)) ");
+							.append(" in (4) and ec.validator_id = 0 and se.subject_event_status_id in (1,3,4,8,9)) ");
+				} else if (status.equals(Status.DOUBLE_DATA_ENTRY)) {
+					theCriteria.append(" AND (").append(columnMapping.get(property))
+							.append(" in (4) and ec.validator_id != 0 and se.subject_event_status_id in (1,3,4,8,9)) ");
 				}
 			} else if (property.equals(EC_COMPLETE_YEAR)) {
-				theCriteria.append(" AND EXTRACT(YEAR FROM " + EC_C_DATE + ") = " + value.toString());
+				theCriteria.append(" AND EXTRACT(YEAR FROM ").append(EC_C_DATE).append(") = ").append(value.toString());
 			} else if (property.equals(EVALUATION_STATUS)) {
 				if (value.equals(READY_FOR_EVALUATION)) {
-					theCriteria.append(" AND (").append(EC_DATE_VALIDATE_COMPLETED)
-							.append(" IS NULL) ");
+					theCriteria.append(" AND (").append(EC_DATE_VALIDATE_COMPLETED).append(" IS NULL) ");
 				} else if (value.equals(EVALUATION_COMPLETED)) {
-					theCriteria.append(" AND NOT(").append(EC_DATE_VALIDATE_COMPLETED)
-							.append(" IS NULL) ");
+					theCriteria.append(" AND NOT(").append(EC_DATE_VALIDATE_COMPLETED).append(" IS NULL) ");
 				}
 			} else {
 				theCriteria.append(" AND UPPER(").append(columnMapping.get(property)).append(") like UPPER('%")

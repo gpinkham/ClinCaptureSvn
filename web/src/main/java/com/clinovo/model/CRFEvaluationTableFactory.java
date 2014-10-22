@@ -35,6 +35,7 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -58,6 +59,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	public static final String LOCKED = "locked";
 	public static final String SIGNED = "signed";
 	public static final String OBJECT = "object";
+	public static final String REMOVED = "removed";
 	public static final String CRF_NAME = "crfName";
 	public static final String COMPLETED = "completed";
 	public static final String VIEW_DATA = "view_data";
@@ -79,6 +81,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	public static final String SOURCE_DATA_VERIFIED = "source_data_verified";
 	public static final String ADMINISTRATIVE_EDITING = "AdministrativeEditing";
 	public static final String CONTINUE_ENTERING_DATA = "continue_entering_data";
+	public static final String DOUBLE_DATA_ENTRY_STARTED = "double_data_entry_start";
 	public static final String CRF_EVALUATION_TABLE_CRF_NAME = "crfEvaluationTable.crfName";
 	public static final String CRF_EVALUATION_TABLE_EVENT_NAME = "crfEvaluationTable.eventName";
 	public static final String CRF_EVALUATION_TABLE_CRF_STATUS = "crfEvaluationTable.crfStatus";
@@ -122,7 +125,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	private boolean evaluateWithContext;
 	private MessageSource messageSource;
 
-	private Map<Object, Status> optionsMap = new HashMap<Object, Status>();
+	private Map<Object, Status> optionsMap = new LinkedHashMap<Object, Status>();
 
 	/**
 	 * CRFEvaluationTableFactory constructor.
@@ -153,7 +156,8 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	protected void configureColumns(TableFacade tableFacade, Locale locale) {
 		contextPath = tableFacade.getWebContext().getContextPath();
 
-		tableFacade.setColumnProperties(CRF_NAME, STUDY_SUBJECT_ID, EVENT_NAME, CRF_STATUS, EVALUATION_STATUS, ACTION_COLUMN);
+		tableFacade.setColumnProperties(CRF_NAME, STUDY_SUBJECT_ID, EVENT_NAME, CRF_STATUS, EVALUATION_STATUS,
+				ACTION_COLUMN);
 
 		Row row = tableFacade.getTable().getRow();
 
@@ -167,9 +171,8 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn(CRF_STATUS),
 				messageSource.getMessage(CRF_EVALUATION_TABLE_CRF_STATUS, null, locale), new CRFStatusCellEditor(),
 				new CrfStatusFilter(), true, false);
-		configureColumn(row.getColumn(EVALUATION_STATUS),
-				messageSource.getMessage(EVALUATION_STATUS, null, locale), new EvaluationStatusCellEditor(),
-				new EvaluationStatusFilter(), true, false);
+		configureColumn(row.getColumn(EVALUATION_STATUS), messageSource.getMessage(EVALUATION_STATUS, null, locale),
+				new EvaluationStatusCellEditor(), new EvaluationStatusFilter(), true, false);
 		configureColumn(row.getColumn(ACTION_COLUMN),
 				messageSource.getMessage(CRF_EVALUATION_TABLE_ACTION_COLUMN, null, locale), new ActionsCellEditor(),
 				new DefaultActionsEditor(locale), true, false);
@@ -249,10 +252,8 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 					Integer.toString(crfEvaluationItem.getEventCrfId())).concat("\"");
 
 			HtmlBuilder html = new HtmlBuilder()
-					.a()
-					.href("#")
-					.onclick(
-							"setAccessedObjected(this); openDocWindow('".concat(contextPath)
+					.a().href("#")
+					.onclick("setAccessedObjected(this); openDocWindow('".concat(contextPath)
 									.concat("/ViewSectionDataEntry?eventDefinitionCRFId=")
 									.concat(Integer.toString(crfEvaluationItem.getEventDefinitionCrfId()))
 									.concat("&eventCRFId=").concat(Integer.toString(crfEvaluationItem.getEventCrfId()))
@@ -281,8 +282,12 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 					.concat(Integer.toString(crfEvaluationItem.getEventCrfId())).concat("&cw=1');\"")
 					.concat(additionalAttr).concat(">");
 
-			if (userBean.getId() == crfEvaluationItem.getOwnerId()
-					&& crfEvaluationItem.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
+			if (crfEvaluationItem.getSubjectEventStatus().equals(SubjectEventStatus.REMOVED)
+					|| crfEvaluationItem.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)
+					|| crfEvaluationItem.getSubjectEventStatus().equals(SubjectEventStatus.STOPPED)
+					|| crfEvaluationItem.getSubjectEventStatus().equals(SubjectEventStatus.SKIPPED)
+					|| (userBean.getId() == crfEvaluationItem.getOwnerId() && crfEvaluationItem.getStage().equals(
+							DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE))) {
 				aLink = "";
 				enterDataMessage = "";
 				enterDataImg = BT_TRANSPARENT_GIF;
@@ -363,13 +368,20 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 		Limit limit = tableFacade.getLimit();
 		CRFEvaluationFilter crfEvaluationFilter = getCRFEvaluationFilter(limit);
 
-		optionsMap.put(messageSource.getMessage(DATA_ENTRY_STARTED, null, locale).toLowerCase(),
-				Status.DATA_ENTRY_STARTED);
-		optionsMap.put(messageSource.getMessage(COMPLETED, null, locale).toLowerCase(), Status.COMPLETED);
-		optionsMap.put(messageSource.getMessage(SOURCE_DATA_VERIFIED, null, locale).toLowerCase(),
-				Status.SOURCE_DATA_VERIFIED);
-		optionsMap.put(messageSource.getMessage(LOCKED, null, locale).toLowerCase(), Status.LOCKED);
-		optionsMap.put(messageSource.getMessage(SIGNED, null, locale).toLowerCase(), Status.SIGNED);
+		optionsMap.put(messageSource.getMessage(IDE_COMPLETED, null, locale), Status.DATA_ENTRY_STARTED);
+		optionsMap.put(messageSource.getMessage(DOUBLE_DATA_ENTRY_STARTED, null, locale), Status.DOUBLE_DATA_ENTRY);
+		optionsMap.put(messageSource.getMessage(COMPLETED, null, locale), Status.COMPLETED);
+		optionsMap.put(org.akaza.openclinica.bean.core.Term.normalizeString(messageSource.getMessage(
+				SOURCE_DATA_VERIFIED, null, locale)), Status.SOURCE_DATA_VERIFIED);
+		optionsMap.put(
+				org.akaza.openclinica.bean.core.Term.normalizeString(messageSource.getMessage(SIGNED, null, locale)),
+				Status.SIGNED);
+		optionsMap.put(
+				org.akaza.openclinica.bean.core.Term.normalizeString(messageSource.getMessage(REMOVED, null, locale)),
+				Status.DELETED);
+		optionsMap.put(
+				org.akaza.openclinica.bean.core.Term.normalizeString(messageSource.getMessage(LOCKED, null, locale)),
+				Status.LOCKED);
 
 		currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute(BaseController.STUDY);
 		userBean = (UserAccountBean) tableFacade.getWebContext().getSessionAttribute(BaseController.USER_BEAN_NAME);
@@ -397,9 +409,10 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 			h.put(STUDY_SUBJECT_ID, crfEvaluationItem.getStudySubjectLabel());
 			h.put(EVENT_NAME, crfEvaluationItem.getStudyEventName());
 			h.put(CRF_STATUS, getCRFStatusIconPath(crfEvaluationItem));
-			h.put(EVALUATION_STATUS, crfEvaluationItem.getDateValidateCompleted() != null
-					? messageSource.getMessage("evaluation_completed", null, locale)
-					: messageSource.getMessage("ready_for_evaluation", null, locale));
+			h.put(EVALUATION_STATUS,
+					crfEvaluationItem.getDateValidateCompleted() != null ? messageSource.getMessage(
+							"evaluation_completed", null, locale) : messageSource.getMessage("ready_for_evaluation",
+							null, locale));
 			crfEvaluationItemsResult.add(h);
 		}
 
@@ -412,7 +425,8 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	private HtmlBuilder createSummaryTable() {
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		int totalRows = eventCRFDAO.countOfAllEventCrfsForEvaluation(new CRFEvaluationFilter(optionsMap), currentStudy);
-		List<CRFEvaluationItem> crfEvaluationItems = eventCRFDAO.findAllEventCrfsForEvaluation(currentStudy, new CRFEvaluationFilter(optionsMap), new CRFEvaluationSort(), 0, totalRows);
+		List<CRFEvaluationItem> crfEvaluationItems = eventCRFDAO.findAllEventCrfsForEvaluation(currentStudy,
+				new CRFEvaluationFilter(optionsMap), new CRFEvaluationSort(), 0, totalRows);
 		int evaluationCompleted = 0;
 
 		for (CRFEvaluationItem item : crfEvaluationItems) {
@@ -436,13 +450,13 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 				.td(2).align("center").width("100px").close().append(messageSource.getMessage("total", null, locale)).tdEnd().trEnd(1)
 				.tr(2).close().td(1).align("center").close().append(messageSource.getMessage("evaluated_crf", null, locale)).tdEnd()
 				.td(2).align("center").close().a().href("javascript:$.jmesa.addFilterToLimit('" + getTableName() + "', '" + EVALUATION_STATUS + "', '"
-						+ messageSource.getMessage("ready_for_evaluation", null, locale) + "'); $.jmesa.onInvokeAction('"
-						+ getTableName() + "', 'filter');").close().append(evaluationReadyNumber).aEnd().tdEnd()
+				+ messageSource.getMessage("ready_for_evaluation", null, locale) + "'); $.jmesa.onInvokeAction('"
+				+ getTableName() + "', 'filter');").close().append(evaluationReadyNumber).aEnd().tdEnd()
 				.td(1).align("center").close().a().href("javascript:$.jmesa.addFilterToLimit('" + getTableName() + "', '" + EVALUATION_STATUS + "', '"
-						+ messageSource.getMessage("evaluation_completed", null, locale) +  "'); $.jmesa.onInvokeAction('"
-						+ getTableName() + "', 'filter');").close().append(evaluationCompleted).aEnd().tdEnd()
+				+ messageSource.getMessage("evaluation_completed", null, locale) +  "'); $.jmesa.onInvokeAction('"
+				+ getTableName() + "', 'filter');").close().append(evaluationCompleted).aEnd().tdEnd()
 				.td(1).align("center").close().a().href("javascript:$.jmesa.addFilterToLimit('" + getTableName() + "', '" + EVALUATION_STATUS
-						+ "', ''); $.jmesa.onInvokeAction('" + getTableName() + "', 'filter');").close().append(totalRows).aEnd().tdEnd().trEnd(2)
+				+ "', ''); $.jmesa.onInvokeAction('" + getTableName() + "', 'filter');").close().append(totalRows).aEnd().tdEnd().trEnd(2)
 				.tableEnd(1).divEnd();
 		return summaryTable;
 	}
@@ -450,9 +464,9 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	private class EvaluationStatusCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowCount) {
 			CRFEvaluationItem crfEvaluationItem = (CRFEvaluationItem) ((HashMap) item).get(OBJECT);
-			return crfEvaluationItem.getDateValidateCompleted() != null
-					? messageSource.getMessage("evaluation_completed", null, locale)
-					: messageSource.getMessage("ready_for_evaluation", null, locale);
+			return crfEvaluationItem.getDateValidateCompleted() != null ? messageSource.getMessage(
+					"evaluation_completed", null, locale) : messageSource.getMessage("ready_for_evaluation", null,
+					locale);
 		}
 	}
 
@@ -460,8 +474,10 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 		@Override
 		protected List<Option> getOptions() {
 			List<Option> optionList = new ArrayList<Option>();
-			optionList.add(new Option(messageSource.getMessage("ready_for_evaluation", null, locale), messageSource.getMessage("ready_for_evaluation", null, locale)));
-			optionList.add(new Option(messageSource.getMessage("evaluation_completed", null, locale), messageSource.getMessage("evaluation_completed", null, locale)));
+			optionList.add(new Option(messageSource.getMessage("ready_for_evaluation", null, locale), messageSource
+					.getMessage("ready_for_evaluation", null, locale)));
+			optionList.add(new Option(messageSource.getMessage("evaluation_completed", null, locale), messageSource
+					.getMessage("evaluation_completed", null, locale)));
 			return optionList;
 		}
 	}

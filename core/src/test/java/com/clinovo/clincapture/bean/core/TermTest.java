@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009-2013 Clinovo Inc.
+ * Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
  * 
@@ -9,8 +9,6 @@
  ******************************************************************************/
 
 package com.clinovo.clincapture.bean.core;
-
-import static org.junit.Assert.*;
 
 import org.akaza.openclinica.bean.core.Term;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -22,15 +20,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * User: Pavel Date: 12.10.12
- */
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class TermTest {
 
 	private Term term;
 
-	private final static String TERM_BUNDLE_KEY = "delete";
-	private final static String TERM_BUNDLE_VALUE = "delete";
+	public static final String TERM_BUNDLE_KEY = "delete";
+	public static final String TERM_BUNDLE_VALUE = "delete";
+	public static final String NORMALIZED_TERM_BUNDLE_KEY = "Delete";
 
 	private final static List<Term> termList = Arrays.asList(new Term(1, ""), new Term(2, ""), new Term(3, ""),
 			new Term(4, ""), new Term(6, ""), new Term(7, ""));
@@ -69,7 +70,7 @@ public class TermTest {
 	}
 
 	@Test
-	public void testContaines() {
+	public void testContains() {
 		assertTrue(Term.contains(1, termList));
 		assertTrue(Term.contains(7, termList));
 		assertFalse(Term.contains(-1, termList));
@@ -92,4 +93,13 @@ public class TermTest {
 		assertTrue((new Term(10, TERM_BUNDLE_KEY, TERM_BUNDLE_KEY)).equals(new Term(10, "", "")));
 	}
 
+	@Test
+	public void testThatGetNormalizedNameReturnsCorrectValue() {
+		assertEquals(new Term(10, TERM_BUNDLE_KEY, TERM_BUNDLE_KEY).getNormalizedName(), NORMALIZED_TERM_BUNDLE_KEY);
+	}
+
+	@Test
+	public void testThatNormalizeStringReturnsCorrectValue() {
+		assertEquals(Term.normalizeString(TERM_BUNDLE_KEY), NORMALIZED_TERM_BUNDLE_KEY);
+	}
 }
