@@ -1627,7 +1627,7 @@ Date.parseDate = function(str, fmt) {
 		    case "%b":
 		    case "%B":
 			for (j = 0; j < 12; ++j) {
-				if (Calendar._MN[j].substr(0, a[i].length).toLowerCase() == a[i].toLowerCase()) { m = j; break; }
+				if (Calendar._MN[j].substr(0, a[i].length).toLowerCase() == a[i].toLowerCase() || Calendar._SMN[j].substr(0, a[i].length).toLowerCase() == a[i].toLowerCase()) { m = j; break; }
 			}
 			break;
 

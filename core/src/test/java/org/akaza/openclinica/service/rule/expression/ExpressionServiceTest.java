@@ -13,17 +13,19 @@
 
 package org.akaza.openclinica.service.rule.expression;
 
+import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.core.ItemDataType;
+import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.util.Locale;
 
 /**
  * Contains unit tests for org.akaza.openclinica.service.rule.expression.ExpressionService class.
@@ -31,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  * @author Frank
  * 
  */
-public class ExpressionServiceTest {
+public class ExpressionServiceTest extends DefaultAppContextTest {
 
 	private ExpressionService expressionService;
 	private RuleSetBean ruleSet;
@@ -213,5 +215,25 @@ public class ExpressionServiceTest {
 		String expression = "F_CASECOMPLETION.IG_CASEC_UNGROUPED.I_CASEC_RDCSC90DFU";
 		String newExpression = expressionService.insertGroupOrdinal(expression, 2);
 		assertEquals("F_CASECOMPLETION.IG_CASEC_UNGROUPED.I_CASEC_RDCSC90DFU", newExpression);
+	}
+
+	/**
+	 * Tests that ifValueIsDate works fine for all locales.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testThatIfValueIsDateMethodWorksFineForAllLocales() throws Exception {
+		for (String isoLang : Locale.getISOLanguages()) {
+			Locale locale = new Locale(isoLang);
+			String systemDate = "2014-10-17";
+			ItemBean itemBean = new ItemBean();
+			itemBean.setDataType(ItemDataType.DATE);
+			ResourceBundleProvider.updateLocale(locale);
+			String dateFormatString = ResourceBundleProvider.getFormatBundle().getString("date_format_string");
+			String localizedDate = new SimpleDateFormat(dateFormatString, locale).format(new SimpleDateFormat(
+					"yyyy-MM-dd").parse(systemDate));
+			assertEquals(expressionService.ifValueIsDate(itemBean, localizedDate), systemDate);
+		}
 	}
 }
