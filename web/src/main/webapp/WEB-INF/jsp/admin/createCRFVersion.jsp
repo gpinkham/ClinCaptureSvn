@@ -64,12 +64,12 @@
 
 <jsp:useBean scope='session' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='request' id='crfName' class='java.lang.String'/>
+<jsp:useBean scope='session' id='crfName' class='java.lang.String'/>
 
 <h1>
 	<span class="first_level_header">
 		 <c:choose>
-		     <c:when test="${empty crfName}">
+		     <c:when test="${empty crfName || empty param.crfId}">
 		         <fmt:message key="create_a_new_CRF_case_report_form" bundle="${resworkflow}"/>
 		     </c:when>
 		     <c:otherwise>

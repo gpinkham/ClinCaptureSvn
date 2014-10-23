@@ -1,4 +1,4 @@
-    <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="java.util.*" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -19,7 +19,7 @@
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
-<!-- then instructions-->
+
 <tr id="sidebar_Instructions_open" style="display: none">
 		<td class="sidebar_tab">
 
@@ -35,7 +35,7 @@
 		</td>
 
 	</tr>
-<%-- remove display?  style="display: all"--%>
+
   <tr id="sidebar_Instructions_closed">
 		<td class="sidebar_tab">
 
@@ -54,10 +54,6 @@
 <jsp:useBean scope='session' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 <jsp:useBean scope='session' id='crfName' class='java.lang.String'/>
 
-
-<%-- <h1><span class="title_manage"><fmt:message key="preview_CRF" bundle="${resword}"/></span></h1> --%>
-
-
 <c:choose>
 <c:when test="${empty excelErrors}">
  <h1>
@@ -71,30 +67,25 @@
     <p><span class="alert"><c:out value="${warning}"/></span></p>
   </c:forEach>
  </c:if>
-  <%-- Move to alerts
-<br/><fmt:message key="congratulations_your_spreadsheet" bundle="${resword}"/>
-<br/><b><form action=
-  "ViewSectionDataEntry?crfVersionId=<c:out value=
-"${version.crfId}"/>&tabId=1" method="post">  --%>
 
 <p>
 <table border="0">
 <tr>
-  <%-- ViewSectionDataEntry?crfVersionId=<c:out value=
-"${version.crfId}"/>&tabId=1
-<form action="javascript:void(0)"><a href="SectionPreview?tabId=1"  target="_blank"><input type="submit" name="submit" value=
-   "Preview CRF" class="button_medium"></a></form>--%>
 
 <td>
 <input type="button" name="BTN_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
-					onClick="javascript: history.go(-1);" />
+                    <c:choose>
+                        <c:when test="${param.crfId == 0}">
+                            onClick="javascript: window.location.href = 'CreateCRFVersion';"/>
+                        </c:when>
+                    <c:otherwise>
+                            onClick="javascript: window.location.href = 'InitCreateCRFVersion?crfId=${version.crfId}&name=${crfName}';" />
+                    </c:otherwise>
+                    </c:choose>
 </td>  
-  <td><b><form action="CreateCRFVersion?action=confirmsql&crfId=<c:out value=
-"${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post">
-    <%-- The user shouldn't save the new or revised CRF by clicking the button more than once, so the
-    button is disabled after it's clicked. --%>   
+  <td><b><form action="CreateCRFVersion?action=confirmsql&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post">
  <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></form></b> </td>
    </tr>
   </table>
@@ -108,12 +99,18 @@
  <input type="button" name="BTN_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
-					onClick="javascript: history.go(-1);" />
+                    <c:choose>
+                        <c:when test="${param.crfId == 0}">
+                            onClick="javascript: window.location.href = 'CreateCRFVersion';"/>
+                        </c:when>
+                        <c:otherwise>
+                            onClick="javascript: window.location.href = 'InitCreateCRFVersion?crfId=${version.crfId}&name=${crfName}';" />
+                        </c:otherwise>
+                    </c:choose>
 </td>  
 <td><b><form action="CreateCRFVersion?action=confirmsql&crfId=<c:out value=
 "${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post">
-    <%-- The user shouldn't save the new or revised CRF by clicking the button more than once, so the
-    button is disabled after it's clicked. --%>
+
  <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></form></b> </td>
   </tr>
   </table>
@@ -145,7 +142,15 @@
 <input type="button" name="BTN_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
-					onClick="javascript: history.go(-1);" />
+                    <c:choose>
+                        <c:when test="${param.crfId == 0}">
+                            onClick="javascript: window.location.href = 'CreateCRFVersion';" />
+                        </c:when>
+                        <c:otherwise>
+                            onClick="javascript: window.location.href = 'InitCreateCRFVersion?crfId=${version.crfId}&name=${crfName}';" />
+                        </c:otherwise>
+                    </c:choose>
+
 <br></br>
 <%=htmlTable%>
 

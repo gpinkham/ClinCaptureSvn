@@ -34,7 +34,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 /**
- * Prepares to creat a new CRF Version
+ * Prepares to create a new CRF Version.
  * 
  * @author jxu
  */
@@ -47,6 +47,7 @@ public class InitCreateCRFVersionServlet extends Controller {
 	 *            HttpServletRequest
 	 * @param response
 	 *            HttpServletResponse
+	 * @throws InsufficientPermissionException the exception.
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -97,7 +98,7 @@ public class InitCreateCRFVersionServlet extends Controller {
 			CRFVersionBean version = new CRFVersionBean();
 			version.setCrfId(crfId);
 			request.getSession().setAttribute("version", version);
-			request.setAttribute("crfName", name);
+			request.getSession().setAttribute("crfName", name);
 			request.setAttribute("CrfId", crfId);
 			forwardPage(Page.CREATE_CRF_VERSION, request, response);
 		}

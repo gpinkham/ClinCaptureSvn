@@ -234,6 +234,7 @@ public class CreateCRFVersionServlet extends Controller {
 
 				request.setAttribute("crfVersionId", cfvID);
 				request.getSession().removeAttribute("version");
+				request.getSession().removeAttribute("crfName");
 				request.getSession().removeAttribute("eventsForVersion");
 				request.getSession().removeAttribute("itemsHaveData");
 				request.getSession().removeAttribute("nib");
