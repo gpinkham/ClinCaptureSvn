@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2014-10-08-TICKET1773-ORACLE" dbms="oracle">
+		<comment>Delete rule_fk if exists.</comment>
+		<sql splitStatements="false">
+			create or replace Procedure delete_constraint_if_exists (t_name varchar, c_name varchar)
+			returns void AS
+			'
+			BEGIN
+			if exists (select constraint_name
+			from information_schema.constraint_column_usage
+			where table_name = t_name  and constraint_name = c_name) then
+			alter table rule_set_rule drop constraint rule_fk;
+			end if;
+			END;'
+			EXECUTE delete_constraint_if_exists('rule','rule_fk');
+			DROP Procedure delete_constraint_if_exists;
+		</sql>
+	</changeSet>
+</databaseChangeLog>
+
+
