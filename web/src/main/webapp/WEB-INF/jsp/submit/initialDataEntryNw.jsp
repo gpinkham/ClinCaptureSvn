@@ -135,6 +135,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%><d
 <input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
 <input type="hidden" name="occurenceNumber" value="<c:out value="${studyEvent.sampleOrdinal}"/>" />
 <!-- For randomization -->
+<input type="hidden" name="studySubjectId" value="${studySubject.id}">
 <input type="hidden" name="crfId" value="<c:out value="${section.crf.id}"/>" />
 <input type="hidden" name="assignRandomizationResultTo" value="${study.studyParameterConfig.assignRandomizationResultTo}"/>
 <input type="hidden" name="randomizationMessage" value="<fmt:message key="randomization_successful_message" bundle="${restext}"/>"/>

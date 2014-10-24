@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +17,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import com.clinovo.context.impl.JSONSubmissionContext;
 import com.clinovo.exception.RandomizationException;
 import com.clinovo.rule.ext.HttpTransportProtocol;
+
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ RandomizeServlet.class, HttpTransportProtocol.class })
@@ -36,7 +41,8 @@ public class RandomizeServletTest {
 		request = new MockHttpServletRequest();
 		randomizeServlet = PowerMockito.mock(RandomizeServlet.class);
 		jsonSubmissionContext = PowerMockito.mock(JSONSubmissionContext.class);
-		httpTransportProtocol = PowerMockito.mock(HttpTransportProtocol.class);		
+		httpTransportProtocol = PowerMockito.mock(HttpTransportProtocol.class);
+
 		study = new StudyBean();
 		study.setId(1);
 		study.setStudyParameterConfig(new StudyParameterConfig());
@@ -46,7 +52,13 @@ public class RandomizeServletTest {
 						PowerMockito.method(RandomizeServlet.class, "initiateRandomizationCall",
 								HttpServletRequest.class)).withArguments(request).thenCallRealMethod();
 		PowerMockito.whenNew(JSONSubmissionContext.class).withNoArguments().thenReturn(jsonSubmissionContext);
-		PowerMockito.whenNew(HttpTransportProtocol.class).withNoArguments().thenReturn(httpTransportProtocol);	
+		PowerMockito.whenNew(HttpTransportProtocol.class).withNoArguments().thenReturn(httpTransportProtocol);
+
+		Locale locale = new Locale("en");
+		request.setPreferredLocales(Arrays.asList(locale));
+		ResourceBundleProvider.updateLocale(locale);
+		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
+		org.mockito.internal.util.reflection.Whitebox.setInternalState(randomizeServlet, "resexception", resexception);
 	}
 
 	@Test(expected = RandomizationException.class)

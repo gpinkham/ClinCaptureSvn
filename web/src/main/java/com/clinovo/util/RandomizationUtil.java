@@ -203,8 +203,8 @@ public class RandomizationUtil {
 			RandomizationUtil.itemDataDAO = new ItemDataDAO(sessionManager.getDataSource());
 		}
 
-		ItemDataBean dateItem = (ItemDataBean) itemsMap.get("dateItem");
-		ItemDataBean resultItem = (ItemDataBean) itemsMap.get("resultItem");
+		ItemDataBean dateItem = itemsMap.get("dateItem");
+		ItemDataBean resultItem = itemsMap.get("resultItem");
 
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 
@@ -404,8 +404,7 @@ public class RandomizationUtil {
 		if (trialIdItemExists(request)) {
 
 			try {
-				int itemId = 0;
-				itemId = Integer.parseInt(request.getParameter("trialIdItemId"));
+				int itemId = Integer.parseInt(request.getParameter("trialIdItemId"));
 
 				String trialIdItemValue = request.getParameter("trialIdItemValue");
 				ItemDataBean item = itemDataDAO.findByItemIdAndEventCRFId(itemId, eventCRFId);
@@ -436,7 +435,7 @@ public class RandomizationUtil {
 	 * @param request
 	 *            The HttpServletRequest from which all information about items will be extracted.
 	 * 
-	 * @return HashMap<String, ItemDataBean> with information about randomization items.
+	 * @return HashMap with information about randomization items.
 	 */
 	public static HashMap<String, ItemDataBean> getRandomizationItemData(HttpServletRequest request) {
 
@@ -519,6 +518,27 @@ public class RandomizationUtil {
 			LOG.error(eDao.getFailureDetails().getMessage());
 			throw new RandomizationException("Exception occurred during randomization");
 		}
+	}
+
+	/**
+	 * Get StudySubjectBean to check if it can be randomized with current properties.
+	 *
+	 * @param request The HttpServletRequest from which all information about subject will be extracted.
+	 * @return StudySubjectBean
+	 */
+	public static StudySubjectBean getStudySubjectBean(HttpServletRequest request) {
+		if (RandomizationUtil.studySubjectDAO == null) {
+			RandomizationUtil.studySubjectDAO = new StudySubjectDAO(sessionManager.getDataSource());
+		}
+		if (RandomizationUtil.subjectDAO == null) {
+			RandomizationUtil.subjectDAO = new SubjectDAO(sessionManager.getDataSource());
+		}
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+		int subjectId = Integer.parseInt(request.getParameter("subjectId"));
+		StudySubjectBean studySubject = studySubjectDAO.findBySubjectIdAndStudy(subjectId, sb);
+		SubjectBean subject = (SubjectBean) subjectDAO.findByPK(studySubject.getSubjectId());
+		studySubject.setUniqueIdentifier(subject.getUniqueIdentifier());
+		return studySubject;
 	}
 
 	private static boolean trialIdItemExists(HttpServletRequest request) {

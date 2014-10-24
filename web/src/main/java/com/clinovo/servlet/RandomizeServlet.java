@@ -25,6 +25,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -70,10 +71,8 @@ public class RandomizeServlet extends Controller {
 		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.getRole().equals(Role.INVESTIGATOR)
 				|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)) {
-
 			return;
 		}
-
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
@@ -86,65 +85,71 @@ public class RandomizeServlet extends Controller {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		log.info("Processing randomize request");
 
+		// Set expected context
+		RandomizationUtil.setSessionManager(getSessionManager(request));
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
+		StudySubjectBean subject = RandomizationUtil.getStudySubjectBean(request);
 
 		PrintWriter writer = response.getWriter();
 
 		try {
-
 			String crfId = request.getParameter("crf");
-
 			String eligibility = request.getParameter("eligibility");
 
-			if (isCrfComplete(currentStudy, ub, crfId)) {
-
-				if (!eligibility.equals("null")) {
-
-					// YES
-					if ("0".equals(eligibility)) {
-
+			if (isSubjectConfiguredValid(subject, request)) {
+				if (isCrfComplete(currentStudy, ub, crfId)) {
+					if (!eligibility.equals("null")) {
+						// YES
+						if ("0".equals(eligibility)) {
+							randomize(request, writer);
+						} else if ("1".equals(eligibility)) {
+							throw new RandomizationException(
+									resexception.getString("subject_has_not_completed_ie_criteria"));
+						}
+					} else {
 						randomize(request, writer);
-
-					} else if ("1".equals(eligibility)) {
-
-						throw new RandomizationException(
-								"The subject has not completed the IE criteria. Complete IE criteria before randomizing the subject");
 					}
 				} else {
-
-					randomize(request, writer);
+					throw new RandomizationException(
+							resexception.getString("crf_is_not_complete"));
 				}
-
 			} else {
-
 				throw new RandomizationException(
-						"The crf is not complete. Please make sure you have executed all rules before attempting to randomize the subject");
+						resexception.getString("subject_label_and_id_not_equals"));
 			}
-
 		} catch (Exception ex) {
-
 			log.error("Randomization Error: {0}", ex.getMessage());
 			writer.write("Exception: " + ex.getMessage());
 			writer.flush();
 		}
 	}
 
+	private boolean isSubjectConfiguredValid(StudySubjectBean subject, HttpServletRequest request) {
+
+		boolean result = true;
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+		String assignRandomizationResultTo = sb.getStudyParameterConfig().getAssignRandomizationResultTo();
+		if (assignRandomizationResultTo.equals("ssid")) {
+			String subjectUniqueIdentifier = subject.getUniqueIdentifier();
+			String subjectLabel = subject.getLabel();
+			result = subjectLabel.equals(subjectUniqueIdentifier);
+		}
+		return result;
+	}
+
 	private void randomize(HttpServletRequest request, PrintWriter writer) throws Exception {
-		StudyBean currentStudy = getCurrentStudy(request);
 
 		// Set expected context
-		RandomizationUtil.setSessionManager(getSessionManager(request));
+		StudyBean currentStudy = getCurrentStudy(request);
 		RandomizationUtil.setCurrentStudy(currentStudy);
 
 		RandomizationResult result = initiateRandomizationCall(request);
 		result.setStudyId(String.valueOf(getStudyId(currentStudy, getStudyDAO())));
-
 		// Assign subject to group
 		String assignRandomizationResultTo = currentStudy.getStudyParameterConfig().getAssignRandomizationResultTo();
 
 		HashMap<String, ItemDataBean> itemsMap = RandomizationUtil.getRandomizationItemData(request);
-
 		// Save randomization result and update all statuses
 		RandomizationUtil.saveRandomizationResultToDatabase(result, itemsMap);
 		RandomizationUtil.saveStratificationVariablesToDatabase(request);
@@ -152,16 +157,12 @@ public class RandomizeServlet extends Controller {
 		RandomizationUtil.checkAndUpdateEventCRFAndStudyEventStatuses(itemsMap);
 
 		if (assignRandomizationResultTo.equals("dngroup")) {
-
 			RandomizationUtil.assignSubjectToGroup(result);
 		} else if (assignRandomizationResultTo.equals("ssid")) {
-
 			RandomizationUtil.addRandomizationResultToSSID(result);
 		} else {
-
 			log.info("Subject" + result.getPatientId() + "was randomized successfully");
 		}
-
 		JSONObject randomizationResult = new JSONObject();
 
 		DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
@@ -175,40 +176,28 @@ public class RandomizeServlet extends Controller {
 	}
 
 	private RandomizationResult initiateRandomizationCall(HttpServletRequest request) throws Exception {
+
 		StudyBean currentStudy = getCurrentStudy(request);
-
 		String trialId;
-
 		// Get Trial Id configured in the CRF
 		String crfConfiguredTrialId = request.getParameter("trialId");
-
 		// Get TrialId configured in study parameters
 		String configuredTrialId = currentStudy.getStudyParameterConfig().getRandomizationTrialId();
-
 		// Check if the study params trial config is "empty or zero"
 		if (RandomizationUtil.isConfiguredTrialIdValid(configuredTrialId)) {
-
 			// Trial Id should be configured in one place
 			if (RandomizationUtil.isTrialIdDoubleConfigured(configuredTrialId, crfConfiguredTrialId)) {
-
 				throw new RandomizationException(
-						"Trial ID must be specified either in the study parameters or the CRF but not both.");
-
+						resexception.getString("trial_id_not_configured_correctly"));
 			} else {
-
 				trialId = configuredTrialId;
 			}
-
 		} else if (RandomizationUtil.isCRFSpecifiedTrialIdValid(crfConfiguredTrialId)) {
-
 			trialId = crfConfiguredTrialId;
-
 		} else {
-
-			// Valid Trial Id must be specified at least in one place (CRF or datainfo.properties)
-			throw new RandomizationException("Specify a valid Trial Id to proceed.");
+			// Valid Trial Id must be specified at least in one place (CRF or Study properties)
+			throw new RandomizationException(resexception.getString("specify_valid_trial_id"));
 		}
-
 		String strataLevel = request.getParameter("strataLevel").equals("null") ? "" : request
 				.getParameter("strataLevel");
 
@@ -217,18 +206,15 @@ public class RandomizeServlet extends Controller {
 		String randomizationEnviroment = (String) request.getSession().getAttribute("randomizationEnviroment");
 
 		Randomization randomization = new Randomization();
-
 		// username and password
 		randomization.setUsername(CoreResources.getField("randomizationusername"));
 		randomization.setPassword(CoreResources.getField("randomizationpassword"));
-
 		// Rando details
 		randomization.setSiteId(siteId);
 		randomization.setTrialId(trialId);
 		randomization.setPatientId(patientId);
 		randomization.setStratificationLevel(strataLevel);
 		randomization.setTestOnly(Boolean.toString(randomizationEnviroment.equals("test")));
-
 		// Https details
 		randomization.setRandomizationUrl(CoreResources.getField("randomizationUrl"));
 		randomization.setAuthenticationUrl(CoreResources.getField("randomizationAuthenticationUrl"));
@@ -245,7 +231,6 @@ public class RandomizeServlet extends Controller {
 	private boolean isCrfComplete(StudyBean currentStudy, UserAccountBean ub, String crfId) {
 
 		log.info("Asserting the status of crf with id: {0} ", crfId);
-
 		// Run rules on the CRF
 		HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> result = getRuleSetService()
 				.runRulesInBulk(crfId, ExecutionMode.DRY_RUN, currentStudy, ub);
@@ -256,12 +241,9 @@ public class RandomizeServlet extends Controller {
 	protected String getSite(StudyBean currentStudy) throws RandomizationException {
 
 		if (currentStudy.isSite(currentStudy.getId())) {
-
 			return currentStudy.getIdentifier();
-
 		} else {
-
-			throw new RandomizationException("Randomization can only be performed on a site.");
+			throw new RandomizationException(resexception.getString("randomization_can_be_performer_only_at_site"));
 		}
 	}
 
@@ -270,13 +252,10 @@ public class RandomizeServlet extends Controller {
 		StudyBean study;
 
 		if (currentStudy.getParentStudyId() > 0) {
-
 			study = (StudyBean) studyDAO.findByPK(currentStudy.getParentStudyId());
 		} else {
-
 			study = currentStudy;
 		}
-
 		return study.getId();
 	}
 }

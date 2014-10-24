@@ -3,6 +3,8 @@ package com.clinovo.util;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+import com.clinovo.model.Randomization;
+import com.clinovo.servlet.RandomizeServlet;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -38,6 +40,9 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 		SubjectDAO subjectDAO = createSubjectDAOMock();
 		StudyGroupClassDAO studyGroupDAO = createStudyGroupDAOMock(createSubjectGroup());
 		mockedItemDataDAO = Mockito.mock(ItemDataDAO.class);
+		StudyBean studyBean = new StudyBean();
+		studyBean.setId(1);
+		studyBean.getStudyParameterConfig().setAssignRandomizationResultTo("ssid");
 
 		RandomizationUtil.setStudyGroupDAO(studyGroupDAO);
 		RandomizationUtil.setStudySubjectDAO(studySubjectDAO);
@@ -63,6 +68,7 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 		request.setParameter("trialIdItemId", "1");
 		request.setParameter("trialId", "12");
 		request.setParameter("trialIdItemValue", "2");
+		request.getSession().setAttribute("study", studyBean);
 
 		Mockito.when(mockedItemDataDAO.findByItemIdAndEventCRFId(Mockito.anyInt(), Mockito.anyInt())).thenReturn(
 				new ItemDataBean());
@@ -229,6 +235,14 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 		RandomizationUtil.saveTrialIDItemToDatabase(request);
 	}
 
+	@Test
+	public void testThatGetStudySubjectBeanReturnsCorrectResult() {
+
+		request.setParameter("subjectId", "1");
+		StudySubjectBean subject =  RandomizationUtil.getStudySubjectBean(request);
+		assertEquals("some-subject-label", subject.getName());
+	}
+
 	private RandomizationResult createRandomizationResult() {
 
 		RandomizationResult result = new RandomizationResult();
@@ -260,7 +274,7 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 		Mockito.when(dao.isQuerySuccessful()).thenReturn(Boolean.TRUE);
 		Mockito.when(dao.update(Mockito.any(EntityBean.class))).thenReturn(new StudyGroupClassBean());
 		Mockito.when(dao.findByLabelAndStudy(Mockito.anyString(), Mockito.any(StudyBean.class))).thenReturn(subject);
-
+		Mockito.when(dao.findBySubjectIdAndStudy(Mockito.anyInt(),Mockito.any(StudyBean.class))).thenReturn(subject);
 		return dao;
 	}
 
@@ -274,6 +288,7 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 		Mockito.when(dao.isQuerySuccessful()).thenReturn(Boolean.TRUE);
 		Mockito.when(dao.update(Mockito.any(EntityBean.class))).thenReturn(new StudyGroupClassBean());
 		Mockito.when(dao.findByUniqueIdentifierAndStudy(Mockito.anyString(), Mockito.anyInt())).thenReturn(subject);
+		Mockito.when(dao.findByPK(Mockito.anyInt())).thenReturn(subject);
 
 		return dao;
 	}

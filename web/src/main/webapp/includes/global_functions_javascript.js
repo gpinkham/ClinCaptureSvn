@@ -2406,99 +2406,76 @@ $(function() {
 function randomizeSubject() {
 
 	disableRandomizeCRFButtons(true);
-
 	var crf = $("input:hidden[name='crfId']").val();
 	var eventCrfId = $("input:hidden[name='eventCRFId']").val();
 	var dateInputId = $("#Rand_Date").find(":input").attr("id").replace('input','');
 	var resultInputId = $("#Rand_Result").find(":input").attr("id").replace('input','');
 	var eligibility = null;
-
 	// Check if the data entry step is IDE
 	if($("form[id=mainForm]").attr("action") !== "InitialDataEntry") {
- 
-		alertDialog({ message: $("input:hidden[name='randDataEntryStepMessage']").val(), height: 150, width: 500 });
+ 		alertDialog({ message: $("input:hidden[name='randDataEntryStepMessage']").val(), height: 150, width: 500 });
 		$("input[type='submit']").removeAttr("disabled");
-		
 		return false;
 	}
-
 	// Check if the subject eligibility is defined
 	if($("#Rand_Eligibility :radio").size() > 0) {
-
         // Check if selection has been done
         if($("input[type=radio]:checked", "#Rand_Eligibility").length > 0) {
-            
             eligibility = $("input[type=radio]:checked", "#Rand_Eligibility").val();
-
         }
     }
-
 	var strataLevels = [];
 	var strataItemIds = [];
 
     $.each($("div[id^=Rand_StrataData]").find(":selected"), function(index, element) {
-
         var strata = {
-
             // ordering
             StratificationID: index + 1,
             Level: $("input[eleid^='"+ $(this).parents("div").attr("id") +"']").attr($(this).text())
         };
-
         var strataItemId = $(this).parents("select").attr("id").replace('input','');
-
         strataItemIds.push(strataItemId);
         strataLevels.push(strata);
     });
-
     var trialId = null;
     var trialIdItemId = null;
     var trialIdItemValue = null;
-
     // Check if the trial Id is defined
     if($("#Rand_TrialIDs :select").size() > 0) {
-
         // Check if selection has been done
         if($("#Rand_TrialIDs :select").find(":selected") !== undefined) {
-
             var opt3 = $("#Rand_TrialIDs :select").find(":selected").text();
-
             trialIdItemId = $("#Rand_TrialIDs").find("select").attr("id").replace('input','');
             trialIdItemValue = $("#Rand_TrialIDs").find("select").val();
             trialId = $("input:hidden[eleid='requiredParam3']").attr(opt3);
-
         } else {
-
             alertDialog({ message: $("input:hidden[name='requiredParam3Missing']").val(), height: 150, width: 500 });
             $("input[type='submit']").removeAttr("disabled");
             return false;
         }
     } else {
-
         trialId = $("input[eleid='randomize']").attr("trialId");
 	}
-
 	var subject = $("input:hidden[name='subjectLabel']").val();
 
 	if ($("input:hidden[name='assignRandomizationResultTo']").val() == "ssid"
 		&& (subject == "" || subject == undefined)) {
-
 		alert($("input[name=personIdMissing]").val());
 		$("input[type='submit']").removeAttr("disabled");
 		return false;
 	}
+	var subjectId = $("input[name='studySubjectId']").val();
 
     $.ajax({
-
         type:"POST",
         url: "randomize",
         data: {
-
             crf: crf,
             eventCrfId: eventCrfId,
             dateInputId: dateInputId,
             resultInputId: resultInputId,
             subject: subject,
+	        subjectId: subjectId,
             trialId: trialId,
             trialIdItemId: trialIdItemId,
             trialIdItemValue: trialIdItemValue,
@@ -2506,63 +2483,40 @@ function randomizeSubject() {
             strataItemIds: JSON.stringify(strataItemIds),
             strataLevel: JSON.stringify(strataLevels)
         },
-
         success: function(data) {
-            
             if(data.match(/UnknownHostException/)) {
-
                 disableRandomizeCRFButtons(false);
                 alertDialog({ message: "The randomization service is not available. Consult your system administrator", height: 150, width: 500 });
-
             } else if(data.match(/Invalid Site/)) {
-
                 disableRandomizeCRFButtons(false);
                 alertDialog({ message: "The Site Id configured is invalid. Please contact your system administrator", height: 150, width: 500 });
-
             } else if(data.match(/Invalid Trial/)) {
-
                 disableRandomizeCRFButtons(false);
                 alertDialog({ message: "The Trial Id configured is invalid. Please contact your system administrator", height: 150, width: 500 });
-
             } else if(data.match(/Invalid Strata/)) {
-
                 disableRandomizeCRFButtons(false);
                 alertDialog({ message: "The Stratification level missing. Please contact your system administrator", height: 150, width: 500 });
-
             } else if(data.match(/^\</)) {
-
                 disableRandomizeCRFButtons(false);
                 alertDialog({ message: "An error occurred during the randomization call. Please contact your system administrator", height: 150, width: 500 });
-
             } else if(data.match(/Site is not auth/)) {
-
                 disableRandomizeCRFButtons(false);
                 alertDialog({ message: "The Site configured is not authorized to randomize subjects . Please contact your system administrator", height: 150, width: 500 });
-
             } else if(data.match(/Exception/)) {
-
                 disableRandomizeCRFButtons(false);
                 var exceptionPattern = new RegExp("^.*:(.*)");
                 alertDialog({ message: exceptionPattern.exec(data)[1], height: 150, width: 500 });
-
             } else {
-
                 var result = JSON.parse(data);
-
                 var dateInput = $("#Rand_Date").find(":input");
                 var resultInput = $("#Rand_Result").find(":input");
-
                 $(dateInput).attr("readonly", "");
                 $(resultInput).attr("readonly", "");
-
                 $(dateInput).val(result.date).change();
                 $(resultInput).val(result.result).change();
-
                 $(dateInput).attr("readonly", "readonly");
                 $(resultInput).attr("readonly", "readonly");
-
                 $("input[type='submit']").removeAttr("disabled");
-
                 var errorMessage = $("input[name=randomizationMessage]").val();
                 alertDialog({ message: errorMessage, height: 150, width: 500 });
             }
