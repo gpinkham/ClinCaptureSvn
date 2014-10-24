@@ -344,7 +344,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	}
 
 	private CRFEvaluationFilter getCRFEvaluationFilter(Limit limit) {
-		CRFEvaluationFilter crfEvaluationFilter = new CRFEvaluationFilter(optionsMap);
+		CRFEvaluationFilter crfEvaluationFilter = new CRFEvaluationFilter(optionsMap, messageSource, locale);
 		FilterSet filterSet = limit.getFilterSet();
 		Collection<Filter> filters = filterSet.getFilters();
 		for (Filter filter : filters) {
@@ -424,9 +424,9 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 
 	private HtmlBuilder createSummaryTable() {
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		int totalRows = eventCRFDAO.countOfAllEventCrfsForEvaluation(new CRFEvaluationFilter(optionsMap), currentStudy);
+		int totalRows = eventCRFDAO.countOfAllEventCrfsForEvaluation(new CRFEvaluationFilter(optionsMap, messageSource, locale), currentStudy);
 		List<CRFEvaluationItem> crfEvaluationItems = eventCRFDAO.findAllEventCrfsForEvaluation(currentStudy,
-				new CRFEvaluationFilter(optionsMap), new CRFEvaluationSort(), 0, totalRows);
+				new CRFEvaluationFilter(optionsMap, messageSource, locale), new CRFEvaluationSort(), 0, totalRows);
 		int evaluationCompleted = 0;
 
 		for (CRFEvaluationItem item : crfEvaluationItems) {

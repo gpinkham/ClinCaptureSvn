@@ -46,6 +46,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 
 import com.clinovo.dao.CodedItemDAO;
 import com.clinovo.dao.DictionaryDAO;
@@ -167,6 +168,8 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected ReportCRFService reportCRFService;
 	@Autowired
 	private SessionFactory sessionFactory;
+	@Autowired
+	protected MessageSource messageSource;
 
 	@Before
 	public void initializeDAOs() throws Exception {

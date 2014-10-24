@@ -15,6 +15,7 @@ package org.akaza.openclinica.dao.submit;
 
 import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
 import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -26,6 +27,7 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 public class EventCRFDAOTest extends DefaultAppContextTest {
 
@@ -71,7 +73,8 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatCountOfAllEventCrfsForEvaluationReturnsCorrectValue() {
-		CRFEvaluationFilter filter = new CRFEvaluationFilter(new HashMap<Object, Status>());
+		CRFEvaluationFilter filter = new CRFEvaluationFilter(new HashMap<Object, Status>(), messageSource,
+				Locale.ENGLISH);
 		StudyBean currentStudy = new StudyBean();
 		currentStudy.setId(1);
 		assertEquals(1, eventCRFDAO.countOfAllEventCrfsForEvaluation(filter, currentStudy));
@@ -79,7 +82,8 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatFindAllEventCrfsForEvaluationReturnsCorrectCollectionSize() {
-		CRFEvaluationFilter filter = new CRFEvaluationFilter(new HashMap<Object, Status>());
+		CRFEvaluationFilter filter = new CRFEvaluationFilter(new HashMap<Object, Status>(), messageSource,
+				Locale.ENGLISH);
 		CRFEvaluationSort sort = new CRFEvaluationSort();
 		StudyBean currentStudy = new StudyBean();
 		currentStudy.setId(1);

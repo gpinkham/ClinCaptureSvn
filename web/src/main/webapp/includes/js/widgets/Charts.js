@@ -658,7 +658,7 @@ function getNodeAttributes(node, regexp) {
 	$.each(node.get(0).attributes, function(index, attr) {
 		if (regexp.test(attr.nodeName)) {
 			var key = attr.nodeName.match(regexp)[1];
-			attributes[key] = attr.nodeValue;
+			attributes[key] = attr.value;
 		}
 	});
 	return attributes;

@@ -1,14 +1,16 @@
 package com.clinovo.jmesa.evaluation;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 import org.apache.commons.lang.StringEscapeUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.springframework.context.MessageSource;
 
 /**
  * CRFEvaluationFilter class.
@@ -22,9 +24,6 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 	public static final String EC_COMPLETE_YEAR = "crfCompletedYear";
 	public static final String EVALUATION_STATUS = "evaluation_status";
 
-	public static final String READY_FOR_EVALUATION = "Ready for Evaluation";
-	public static final String EVALUATION_COMPLETED = "Evaluation Completed";
-
 	public static final String C_NAME = "c.name";
 	public static final String SS_LABEL = "ss.label";
 	public static final String SED_NAME = "sed.name";
@@ -33,27 +32,35 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 	public static final String EC_DATE_VALIDATE_COMPLETED = "ec.date_validate_completed";
 
 	private Map<Object, Status> optionsMap;
+	private MessageSource messageSource;
+	private Locale locale;
 	private List<Filter> filters = new ArrayList<Filter>();
 	private HashMap<String, String> columnMapping = new HashMap<String, String>();
 
 	/**
 	 * CRFEvaluationFilter constructor.
-	 *
+	 * 
 	 * @param optionsMap
 	 *            Map<String, Status>
+	 * @param messageSource
+	 *            MessageSource
+	 * @param locale
+	 *            Locale
 	 */
-	public CRFEvaluationFilter(Map<Object, Status> optionsMap) {
+	public CRFEvaluationFilter(Map<Object, Status> optionsMap, MessageSource messageSource, Locale locale) {
 		this.optionsMap = optionsMap;
 		columnMapping.put(CRF_NAME, C_NAME);
 		columnMapping.put(EVENT_NAME, SED_NAME);
 		columnMapping.put(CRF_STATUS, EC_STATUS_ID);
 		columnMapping.put(STUDY_SUBJECT_ID, SS_LABEL);
 		columnMapping.put(EC_COMPLETE_YEAR, EC_C_DATE);
+		this.messageSource = messageSource;
+		this.locale = locale;
 	}
 
 	/**
 	 * Method that adds a filter.
-	 *
+	 * 
 	 * @param property
 	 *            String property
 	 * @param value
@@ -65,7 +72,7 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 
 	/**
 	 * Method that executes all filters.
-	 *
+	 * 
 	 * @param criteria
 	 *            String criteria
 	 * @return String sql string
@@ -113,9 +120,9 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 			} else if (property.equals(EC_COMPLETE_YEAR)) {
 				theCriteria.append(" AND EXTRACT(YEAR FROM ").append(EC_C_DATE).append(") = ").append(value.toString());
 			} else if (property.equals(EVALUATION_STATUS)) {
-				if (value.equals(READY_FOR_EVALUATION)) {
+				if (value.equals(messageSource.getMessage("ready_for_evaluation", null, locale))) {
 					theCriteria.append(" AND (").append(EC_DATE_VALIDATE_COMPLETED).append(" IS NULL) ");
-				} else if (value.equals(EVALUATION_COMPLETED)) {
+				} else if (value.equals(messageSource.getMessage("evaluation_completed", null, locale))) {
 					theCriteria.append(" AND NOT(").append(EC_DATE_VALIDATE_COMPLETED).append(" IS NULL) ");
 				}
 			} else {

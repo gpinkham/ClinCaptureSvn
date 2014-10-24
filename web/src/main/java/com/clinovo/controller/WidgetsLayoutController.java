@@ -15,18 +15,21 @@
 
 package com.clinovo.controller;
 
-import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
-import com.clinovo.bean.display.DisplayWidgetsRowWithExtraField;
-import com.clinovo.bean.display.DisplayWidgetsRowWithName;
-import com.clinovo.dao.CodedItemDAO;
-import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
-import com.clinovo.jmesa.evaluation.CRFEvaluationItem;
-import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
-import com.clinovo.model.CodedItem;
-import com.clinovo.model.Widget;
-import com.clinovo.model.WidgetsLayout;
-import com.clinovo.service.WidgetService;
-import com.clinovo.service.WidgetsLayoutService;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -66,20 +69,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
+import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
+import com.clinovo.bean.display.DisplayWidgetsRowWithExtraField;
+import com.clinovo.bean.display.DisplayWidgetsRowWithName;
+import com.clinovo.dao.CodedItemDAO;
+import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
+import com.clinovo.jmesa.evaluation.CRFEvaluationItem;
+import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.Widget;
+import com.clinovo.model.WidgetsLayout;
+import com.clinovo.service.WidgetService;
+import com.clinovo.service.WidgetsLayoutService;
 
 /**
  * This controller was created to gather data from database and send it to widgets.
@@ -99,8 +100,6 @@ public class WidgetsLayoutController {
 
 	private static final String STATUS_NOT_CODED = "items to be coded";
 	private static final String STATUS_CODED = "coded items";
-	private static final String STATUS_EVALUATED = "evaluated crfs";
-	private static final String STATUS_NOT_EVALUATED = "crfs to be evaluated";
 
 	@Autowired
 	private DataSource datasource;
@@ -118,16 +117,15 @@ public class WidgetsLayoutController {
 	private CodedItemDAO codedItemDAO;
 
 	/**
-	 * This method is used to display the widget on the Home page. It takes the
-	 * data from the table "widget" and "widgets_layout" processes it and sends
-	 * back a list of widgets jsps that should be displayed and their order.
-	 *
+	 * This method is used to display the widget on the Home page. It takes the data from the table "widget" and
+	 * "widgets_layout" processes it and sends back a list of widgets jsps that should be displayed and their order.
+	 * 
 	 * @param request
 	 *            is used to obtain data about current UserAccount and Study.
 	 * @param response
 	 *            is used to remove caching.
 	 * @return model ModelMap that contains list of jsps and their order.
-	 *
+	 * 
 	 * @throws Exception
 	 *             if there is incorrect data in the database.
 	 */
@@ -168,7 +166,7 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to save data after user updates his home page layout.
-	 *
+	 * 
 	 * @param request
 	 *            is used to gather data about current UserAccount, Study and updates that user has made in his layout.
 	 */
@@ -239,13 +237,13 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 *
+	 * 
 	 * @param request
 	 *            is used to gather information about current user and study.
-	 *
+	 * 
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 *
+	 * 
 	 * @throws IOException
 	 *             if data from request is incorrect or database contains corrupted data.
 	 */
@@ -288,17 +286,17 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 *
+	 * 
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 *
+	 * 
 	 * @throws IOException
 	 *             if data from request is incorrect or database contains corrupted data.
-	 *
+	 * 
 	 * @return model - Model with gathered data.
 	 */
 	@RequestMapping("/initEventsCompletionWidget")
@@ -379,12 +377,12 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 *
+	 * 
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 *
+	 * 
 	 * @throws IOException
 	 *             if data from request is incorrect or database contains corrupted data.
 	 */
@@ -421,17 +419,17 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 *
+	 * 
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 *
+	 * 
 	 * @throws IOException
 	 *             if data from request is incorrect or database contains corrupted data.
-	 *
+	 * 
 	 * @return model Model with gathered data.
 	 */
 	@RequestMapping("/initSubjectStatusCount")
@@ -459,17 +457,17 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 *
+	 * 
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 *
+	 * 
 	 * @throws IOException
 	 *             if data from request is incorrect or database contains corrupted data.
-	 *
+	 * 
 	 * @return model Model with gathered data.
 	 */
 	@RequestMapping("/initStudyProgress")
@@ -509,17 +507,17 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 *
+	 * 
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 *
+	 * 
 	 * @throws IOException
 	 *             if data from request is incorrect or database contains corrupted data.
-	 *
+	 * 
 	 * @return model Model with gathered data.
 	 */
 	@RequestMapping("/initSdvProgressWidget")
@@ -628,14 +626,14 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 *
+	 * 
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 *
+	 * 
 	 * @return model Model with gathered data.
 	 */
 	@RequestMapping("/initNdsPerCrfWidget")
@@ -732,14 +730,14 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 *
+	 * 
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 *
+	 * 
 	 * @return model Model with gathered data.
 	 */
 	@RequestMapping("/initEnrollmentProgressWidget")
@@ -870,14 +868,14 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 *
+	 * 
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 *
+	 * 
 	 * @return model - Model with gathered data.
 	 */
 	@RequestMapping("/initCodingProgressWidget")
@@ -1034,14 +1032,14 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 *
+	 * 
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 *
+	 * 
 	 * @return model - Model with gathered data.
 	 */
 	@RequestMapping("/initEnrollStatusPerSiteWidget")
@@ -1105,7 +1103,7 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 *
+	 * 
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param response
@@ -1140,10 +1138,13 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 *
-	 * @param request  is used to gather information about current user and study.
-	 * @param model    is used to return gathered from database data.
-	 * @param response is used to set correct locale and clear cache.
+	 * 
+	 * @param request
+	 *            is used to gather information about current user and study.
+	 * @param model
+	 *            is used to return gathered from database data.
+	 * @param response
+	 *            is used to set correct locale and clear cache.
 	 * @return model - Model with gathered data.
 	 */
 	@RequestMapping("/initEvaluationProgressWidget")
@@ -1151,6 +1152,7 @@ public class WidgetsLayoutController {
 
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(datasource);
 		setRequestHeadersAndUpdateLocale(response, request);
+		Locale locale = request.getLocale();
 		String page = "widgets/includes/evaluationProgressChart";
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -1167,14 +1169,14 @@ public class WidgetsLayoutController {
 		// Create an empty data rows with months names.
 		for (String month : months) {
 			LinkedHashMap<String, Integer> blankStatuses = new LinkedHashMap<String, Integer>();
-			blankStatuses.put(STATUS_EVALUATED, 0);
-			blankStatuses.put(STATUS_NOT_EVALUATED, 0);
+			blankStatuses.put(messageSource.getMessage("evaluation_completed", null, locale), 0);
+			blankStatuses.put(messageSource.getMessage("ready_for_evaluation", null, locale), 0);
 			dataRows.put(month, blankStatuses);
 		}
-		CRFEvaluationFilter filter = new CRFEvaluationFilter(null);
+		CRFEvaluationFilter filter = new CRFEvaluationFilter(null, messageSource, request.getLocale());
 		CRFEvaluationSort sort = new CRFEvaluationSort();
-		List<CRFEvaluationItem> evaluationItems = eventCRFDAO
-				.findAllEventCrfsForEvaluation(sb, filter, sort, FILTER_START, FILTER_END);
+		List<CRFEvaluationItem> evaluationItems = eventCRFDAO.findAllEventCrfsForEvaluation(sb, filter, sort,
+				FILTER_START, FILTER_END);
 
 		for (CRFEvaluationItem item : evaluationItems) {
 			Calendar availableCalendar = Calendar.getInstance();
@@ -1183,12 +1185,12 @@ public class WidgetsLayoutController {
 			int availableMonth = availableCalendar.get(Calendar.MONTH);
 			boolean itemWasEvaluated = item.getDateValidateCompleted() != null && availableYear <= displayedYear;
 			boolean itemNotEvaluated = item.getDateValidateCompleted() == null && availableYear <= displayedYear;
-			//Check if CRF was not evaluated yet.
+			// Check if CRF was not evaluated yet.
 			if (itemNotEvaluated) {
 				int startMonth = availableYear == displayedYear ? availableMonth : 0;
 				int endMonth = displayedYear == currentYear ? currentMonth : NUMBER_OF_MONTHS;
 				for (int i = startMonth; i <= endMonth; i++) {
-					dataRows = getUpdateValueForMonth(dataRows, months.get(i), STATUS_NOT_EVALUATED);
+					dataRows = getUpdateValueForMonth(dataRows, months.get(i), messageSource.getMessage("ready_for_evaluation", null, locale));
 				}
 			}
 			if (itemWasEvaluated) {
@@ -1198,12 +1200,12 @@ public class WidgetsLayoutController {
 				int evaluatedMonth = evaluatedCalendar.get(Calendar.MONTH);
 				boolean wasAvailableMonthOrMore = (evaluatedYear == availableYear && evaluatedMonth > availableMonth)
 						|| evaluatedYear > availableYear;
-				//Check if CRF was already evaluated, but it was available some time to.
+				// Check if CRF was already evaluated, but it was available some time to.
 				if (wasAvailableMonthOrMore) {
 					int startMonth = availableYear == displayedYear ? availableMonth : 0;
 					int endMonth = evaluatedYear == displayedYear ? evaluatedMonth - 1 : NUMBER_OF_MONTHS;
 					for (int i = startMonth; i <= endMonth; i++) {
-						dataRows = getUpdateValueForMonth(dataRows, months.get(i), STATUS_NOT_EVALUATED);
+						dataRows = getUpdateValueForMonth(dataRows, months.get(i), messageSource.getMessage("ready_for_evaluation", null, locale));
 					}
 				}
 				boolean wasEvaluatedInThisYear = evaluatedYear <= displayedYear;
@@ -1212,7 +1214,7 @@ public class WidgetsLayoutController {
 					int startMonth = displayedYear == evaluatedYear ? evaluatedMonth : 0;
 					int endMonth = displayedYear == currentYear ? currentMonth : NUMBER_OF_MONTHS;
 					for (int i = startMonth; i <= endMonth; i++) {
-						dataRows = getUpdateValueForMonth(dataRows, months.get(i), STATUS_EVALUATED);
+						dataRows = getUpdateValueForMonth(dataRows, months.get(i), messageSource.getMessage("evaluation_completed", null, locale));
 					}
 				}
 			}
@@ -1229,7 +1231,6 @@ public class WidgetsLayoutController {
 
 		return page;
 	}
-
 
 	private ArrayList<StudyBean> sortSitesByPercentOfExpectedEnrollment(ArrayList<StudyBean> listOfSites) {
 		Collections.sort(listOfSites, new Comparator<StudyBean>() {

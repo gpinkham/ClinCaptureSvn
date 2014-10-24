@@ -45,8 +45,11 @@ function initEvaluationProgress(action) {
 					var currentYear = new Date().getFullYear();
 					var currentMonth = new Date().getMonth();
 					if (selectedItem && selectedItem.row == currentMonth && currentYear == displayedYear) {
-						var redirectPrefix = "pages/crfEvaluation";
-						window.location.href = redirectPrefix ;
+						var arr = getEvaluationStatuses();
+						var statusNumber = (selectedItem.column % 2 == 0 ? selectedItem.column - 2 : selectedItem.column - 1) / 2;
+						var currentStatus = arr[statusNumber].replace(/ /g, "+");
+						var redirectPrefix= "pages/crfEvaluation?maxRows=15&showMoreLink=false&crfEvaluationTable_tr_=true&crfEvaluationTable_p_=1&crfEvaluationTable_mr_=15&crfEvaluationTable_f_evaluation_status=";
+						window.location.href = redirectPrefix + currentStatus ;
 					} else
 						evaluationProgressChart.setSelection([]);
 				}
@@ -67,12 +70,12 @@ function getEvaluationProgressWidgetData() {
 	var regexp = /^stat\-(.+)$/;
 	var i;
 	// Set the order of statuses in chart
-	var arr = ["evaluated_crfs", "crfs_to_be_evaluated"];
+	var arr = getEvaluationStatuses();
 	var data = new google.visualization.DataTable();
 	var arrLength = arr.length;
 	data.addColumn('string', 'Month');
 	for (i = 0; i < arrLength; i++) {
-		data.addColumn('number', capitalizeFirstLetter(arr[i]).replace(/_/g," ").replace(/(crf)|(Crf)/g,"CRF"));
+		data.addColumn('number', arr[i]);
 		data.addColumn({
 			type : 'number',
 			role : 'annotation'
@@ -84,10 +87,18 @@ function getEvaluationProgressWidgetData() {
 		var row = [];
 		row.push(currentMonth);
 		for (i = 0; i < arrLength; i++) {
-			row.push(parseInt(currentValues[arr[i]]));
-			row.push(parseInt(currentValues[arr[i]]));
+			row.push(parseInt(currentValues[arr[i].replace(/ /g, "_").toLowerCase()]));
+			row.push(parseInt(currentValues[arr[i].replace(/ /g, "_").toLowerCase()]));
 		}
 		data.addRow(row);
 	});
 	return data;
+}
+
+/**
+ * Gets an array of evaluation statuses
+ */
+function getEvaluationStatuses() {
+	var evalStatusList = $("#evaluationStatusList").val();
+	return evalStatusList.split(";");
 }
