@@ -415,7 +415,7 @@
                 <td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
                 <td class="table_cell ddeColumn">
 					<c:choose>
-						<c:when test="${!dec.eventDefinitionCRF.doubleEntry}">
+						<c:when test="${!dec.eventDefinitionCRF.doubleEntry && !dec.eventDefinitionCRF.evaluatedCRF}">
 							n/a
 						</c:when>
 						<c:otherwise>
