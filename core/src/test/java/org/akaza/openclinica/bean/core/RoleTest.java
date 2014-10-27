@@ -83,4 +83,9 @@ public class RoleTest {
 		Role role = Role.max(Role.STUDY_ADMINISTRATOR, Role.STUDY_EVALUATOR);
 		assertEquals(Role.STUDY_ADMINISTRATOR, role);
 	}
+
+	@Test
+	public void testThatSystemAdminRoleGetsCorrectly() {
+		assertEquals(Role.SYSTEM_ADMINISTRATOR, Role.getByName("system administrator"));
+	}
 }

@@ -127,7 +127,8 @@ public final class Role extends Term {
 	public static Role getByName(String name) {
 		for (Object object : MEMBERS_LIST) {
 			Role temp = (Role) object;
-			if (temp.getName().equals(name) || temp.name.equals(name)) {
+			String tempName = name.replace(" ", "_");
+			if (temp.name.equals(name) || temp.name.equals(tempName)) {
 				return temp;
 			}
 		}
