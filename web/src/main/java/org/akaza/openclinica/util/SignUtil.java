@@ -107,6 +107,10 @@ public final class SignUtil {
 					EventDefinitionCRFBean eventDefinitionCrf = daoWrapper.getEdcdao()
 							.findByStudyEventIdAndCRFVersionId(studyBean, studyEventBean.getId(),
 									eventCRFBean.getCRFVersionId());
+					if (eventDefinitionCrf.getStatus() != Status.AVAILABLE || !eventDefinitionCrf.isActive()
+							|| eventDefinitionCrf.isHideCrf()) {
+						continue;
+					}
 					requiredCrfIds.remove((Integer) eventDefinitionCrf.getId());
 
 					if (!(eventCRFBean.getStatus() == Status.UNAVAILABLE && eventCRFBean.getStage().equals(
