@@ -139,8 +139,10 @@ public class ResolveDiscrepancyServlet extends Controller {
 					&& (ub.getActiveStudyRole().equals(Role.SYSTEM_ADMINISTRATOR)
 							|| ub.getActiveStudyRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
 							|| ub.getActiveStudyRole().equals(Role.INVESTIGATOR)
-							|| ub.getActiveStudyRole().equals(Role.STUDY_MONITOR) || ub.getActiveStudyRole().equals(
-							Role.STUDY_ADMINISTRATOR))) {
+							|| ub.getActiveStudyRole().equals(Role.STUDY_MONITOR)
+							|| ub.getActiveStudyRole().equals(Role.STUDY_ADMINISTRATOR))
+							|| ub.getActiveStudyRole().equals(Role.STUDY_EVALUATOR)
+					) {
 				if (dec.isContinueInitialDataEntryPermitted()) {
 					return Page.INITIAL_DATA_ENTRY_SERVLET;
 				} else if (dec.isStartDoubleDataEntryPermitted()) {

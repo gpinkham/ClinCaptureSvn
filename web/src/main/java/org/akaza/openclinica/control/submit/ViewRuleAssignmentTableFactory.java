@@ -150,7 +150,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 				new ActionSummaryCellEditor(false), null, true, false);
 
 		// Configure the drop-down for the study event control
-		CRFFilter crfFileter = new CRFFilter(dataSource, currentStudy);
+		CRFFilter crfFileter = new CRFFilter(dataSource, currentStudy, getCurrentUser());
 
 		HtmlColumn crfNameColumn = ((HtmlRow) row).getColumn(2);
 		crfNameColumn.getFilterRenderer().setFilterEditor(crfFileter);

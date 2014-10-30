@@ -11,6 +11,8 @@
 package com.clinovo.clincapture.dao.managestudy;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -459,6 +461,21 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 	public void testThatFindAllByCRFIdContainsSubjectLabel() {
 
 		assertEquals("ssID1", discrepancyNoteDAO.findAllByCRFId(1).get(0).getStudySub().getLabel());
+	}
+
+	@Test
+	public void testThatCountNotesStatisticForEvaluationCrfContainsCorrectValues() {
+		List<DiscrepancyNoteStatisticBean> statisticBean = discrepancyNoteDAO.countNotesStatisticForEvaluationCrf(study);
+		Collections.sort(statisticBean, new Comparator<DiscrepancyNoteStatisticBean>() {
+			public int compare(DiscrepancyNoteStatisticBean o1, DiscrepancyNoteStatisticBean o2) {
+				if (o1.getResolutionStatusId() == o2.getResolutionStatusId()) {
+					return 0;
+				}
+				return o1.getResolutionStatusId() < o2.getResolutionStatusId() ? -1 : 1;
+			}
+		});
+		assertEquals(1, statisticBean.get(0).getResolutionStatusId());
+		assertEquals(4, statisticBean.get(1).getResolutionStatusId());
 	}
 
 }

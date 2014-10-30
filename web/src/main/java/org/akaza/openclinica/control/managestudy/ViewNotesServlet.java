@@ -113,7 +113,6 @@ public class ViewNotesServlet extends RememberLastPage {
 
 		int oneSubjectId = fp.getInt("id");
 		request.getSession().setAttribute("subjectId", oneSubjectId);
-
 		int discNoteTypeId;
 		try {
 			DiscrepancyNoteType discNoteType = DiscrepancyNoteType.getByName(request
@@ -124,13 +123,11 @@ public class ViewNotesServlet extends RememberLastPage {
 			discNoteTypeId = ALL;
 		}
 		request.setAttribute(DISCREPANCY_NOTE_TYPE, discNoteTypeId);
-
 		boolean removeSession = fp.getBoolean("removeSession");
 		request.getSession().setAttribute("module", module);
 		String viewForOne = fp.getString("viewForOne");
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		dndao.setFetchMapping(true);
-
 		int resolutionStatusId;
 		try {
 			ResolutionStatus resolutionStatus = ResolutionStatus.getByName(request
@@ -145,9 +142,7 @@ public class ViewNotesServlet extends RememberLastPage {
 			request.getSession().removeAttribute(WIN_LOCATION);
 			request.getSession().removeAttribute(NOTES_TABLE);
 		}
-
-		request.getSession().setAttribute(
-				WIN_LOCATION,
+		request.getSession().setAttribute(WIN_LOCATION,
 				"ViewNotes?viewForOne=" + viewForOne + "&id=" + oneSubjectId + "&module=" + module
 						+ " &removeSession=1");
 
@@ -209,22 +204,21 @@ public class ViewNotesServlet extends RememberLastPage {
 		}
 
 		String viewNotesHtml = tf.render();
-
 		request.setAttribute("viewNotesHtml", viewNotesHtml);
 		String viewNotesURL = this.getPageURL(request);
 		request.getSession().setAttribute("viewNotesURL", viewNotesURL);
 		String viewNotesPageFileName = this.getPageServletFileName(request);
 		request.getSession().setAttribute("viewNotesPageFileName", viewNotesPageFileName);
 
-		List<DiscrepancyNoteStatisticBean> statisticBeans = dndao.countNotesStatistic(currentStudy);
-
+		List<DiscrepancyNoteStatisticBean> statisticBeans;
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		UserAccountBean loggedInUser = (UserAccountBean) uadao.findByUserName(authentication.getName());
-
 		if (isCoder(loggedInUser, request)) {
 			statisticBeans = factory.getCoderFilteredNotesStatistics();
 		} else if (isEvaluator(loggedInUser, request)) {
-			statisticBeans = factory.getEvaluatorFilteredNotesStatistics();
+			statisticBeans = dndao.countNotesStatisticForEvaluationCrf(currentStudy);
+		} else {
+			statisticBeans = dndao.countNotesStatistic(currentStudy);
 		}
 
 		Map<String, String> customTotalMap = ListNotesTableFactory.getNotesTypesStatistics(statisticBeans);

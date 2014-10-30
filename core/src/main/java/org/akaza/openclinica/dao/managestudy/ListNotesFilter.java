@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * Custom discrepancy notes table filter.
+ */
 public class ListNotesFilter implements CriteriaCommand {
 
 	List<Filter> filters = new ArrayList<Filter>();
@@ -56,6 +59,7 @@ public class ListNotesFilter implements CriteriaCommand {
 		additionalColumnMapping.put("eventName", "dns.event_name");
 		additionalColumnMapping.put("entityName", "dns.item_name");
 		additionalColumnMapping.put("entityValue", "dns.item_value");
+		additionalColumnMapping.put("evaluationCrf", "evaluationCrf");
 
 		additionalStudyEventColumnMapping.put("eventId", "se.study_event_id");
 	}
@@ -251,8 +255,17 @@ public class ListNotesFilter implements CriteriaCommand {
 					itemDataOrdinal = RegexpUtil.parseGroup(value, "(\\(#\\d*\\))", 1).replaceAll("\\(#|\\)", "");
 					value = RegexpUtil.parseGroup(value, "(\\w*)(\\(#\\d*\\))", 1);
 				}
-				builder.append(" and ").append(additionalColumnMapping.get(property)).append(" like '%").append(value)
-						.append("%' ");
+
+				if (property.equalsIgnoreCase("evaluationCrf")) {
+					builder.append(" and dns.crf_name in (select name from crf where crf.crf_id in (select crf_id from event_definition_crf where event_definition_crf.evaluated_crf = '");
+					if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
+						builder.append(value.equals("true") ? "1" : "0").append("')) ");
+					} else {
+						builder.append(value).append("')) ");
+					}
+				} else {
+					builder.append(" and ").append(additionalColumnMapping.get(property)).append(" like '%").append(value).append("%' ");
+				}
 				if (itemDataOrdinal != null) {
 					builder.append(" and ").append("dns.item_data_ordinal").append(" = ").append(itemDataOrdinal)
 							.append(" ");

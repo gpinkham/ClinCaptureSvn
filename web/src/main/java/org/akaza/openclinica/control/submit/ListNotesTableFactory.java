@@ -1,13 +1,13 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
- * You should have received a copy of the Lesser GNU General Public License along with this program.  
+ *
+ * You should have received a copy of the Lesser GNU General Public License along with this program.
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
@@ -92,7 +92,7 @@ import java.util.ResourceBundle;
 /**
  * Encapsulates all the functionality required to create table for notes and
  * discrepancy servlet.
- * 
+ *
  */
 @SuppressWarnings({ "unchecked", "unused" })
 public class ListNotesTableFactory extends AbstractTableFactory {
@@ -106,7 +106,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	public static final String NEW_AND_UPDATED_VALUE = "21";
 	public static final String NOT_CLOSED_VALUE = "321";
 	public static final String STUDY_CODER = "study coder";
-	public static final String STUDY_EVALUATOR = "evaluator";
+	public static final String STUDY_EVALUATOR = "study evaluator";
 
 	private AuditUserLoginDao auditUserLoginDao;
 	private StudySubjectDAO studySubjectDao;
@@ -147,7 +147,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	/**
 	 * ListNotesTableFactory constructor.
-	 * 
+	 *
 	 * @param showMoreLink
 	 *            the boolean parameter for show more columns table hyperlink
 	 */
@@ -190,7 +190,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn(eventName), resword.getString("event_name"), null,
 				new StudyEventTableRowFilter(dataSource, currentStudy), true, false);
 		configureColumn(row.getColumn(crfName), resword.getString("CRF"), null,
-				new CRFFilter(dataSource, currentStudy), true, false);
+				new CRFFilter(dataSource, currentStudy, getCurrentUserAccount()), true, false);
 		configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, false, false);
 		configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), null, null, true, false);
 		configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, false);
@@ -258,8 +258,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		resword = ResourceBundleProvider.getWordsBundle(getLocale());
 		resformat = ResourceBundleProvider.getFormatBundle(getLocale());
 
+
 		Limit limit = tableFacade.getLimit();
 		ListNotesFilter listNotesFilter = getListNoteFilter(limit);
+		if (checkUserRole(Role.getByName("study_evaluator").getName(), getCurrentUserAccount())) {
+			listNotesFilter.addFilter("evaluationCrf", "true");
+		}
 		ListNotesSort listNotesSort = getListSubjectSort(limit);
 		DiscrepancyNoteDAO discrepancyNoteDAO = getDiscrepancyNoteDao();
 		Integer dnCount = discrepancyNoteDAO.countViewNotesWithFilter(getCurrentStudy(), listNotesFilter);
@@ -270,15 +274,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		int count = rowSelect.getRowEnd() - rowSelect.getRowStart();
 		List<DiscrepancyNoteBean> customItems = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(getCurrentStudy(), listNotesFilter, listNotesSort, offset, count);
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-		UserAccountBean loggedInUser = (UserAccountBean) userAccountDao.findByUserName(authentication.getName());
-
-		if (checkUserRole(Role.getByName("study_coder").getName(), loggedInUser)) {
+        if (checkUserRole(Role.getByName("study_coder").getName(), getCurrentUserAccount())) {
 			customItems = extractNotesByRole(STUDY_CODER);
-			tableFacade.setTotalRows(customItems.size());
-		} else if (checkUserRole(Role.getByName("study_evaluator").getName(), loggedInUser)) {
-			customItems = extractNotesByRole(STUDY_EVALUATOR);
 			tableFacade.setTotalRows(customItems.size());
 		}
 
@@ -335,7 +332,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	}
 
-
 	private boolean checkUserRole(String userRole, UserAccountBean loggedInUser) {
 		if (userRole.equalsIgnoreCase(STUDY_CODER)) {
 			if (getCurrentStudy().isSite(getCurrentStudy().getParentStudyId())) {
@@ -364,7 +360,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	/**
 	 * Returns list with additional information about discrepancy notes
 	 * depending on discrepancy notes type.
-	 * 
+	 *
 	 * @param customItems
 	 *            the list of different discrepancy notes
 	 * @return list with discrepancy notes with additional information
@@ -570,7 +566,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	 * A very custom way to filter the items. The AuditUserLoginFilter acts as a
 	 * command for the Hibernate criteria object. Take the Limit information and
 	 * filter the rows.
-	 * 
+	 *
 	 * @param limit
 	 *            The Limit to use.
 	 * @return list with filtered notes.
@@ -606,7 +602,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	 * A very custom way to sort the items. The AuditUserLoginSort acts as a
 	 * command for the Hibernate criteria object. Take the Limit information and
 	 * sort the rows.
-	 * 
+	 *
 	 * @param limit
 	 *            The Limit to use.
 	 */
@@ -634,7 +630,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	/**
 	 * Returns map of <code>DiscrepancyNoteStatisticBean</code> total statuses
 	 * that will be placed on the UX.
-	 * 
+	 *
 	 * @param statisticBeans
 	 *            the list of beans what should be analysed.
 	 * @return the map with total number of statuses.
@@ -675,7 +671,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	/**
 	 * Returns map of <code>DiscrepancyNoteStatisticBean</code> numbers of
 	 * different statuses that will be placed on the UX.
-	 * 
+	 *
 	 * @param statisticBeans
 	 *            the list of beans what should be analysed.
 	 * @return the map with statuses per .
@@ -1131,7 +1127,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	 * Filters the notes and discrepancies statics and returns only those issues
 	 * by a user with the coder role. It is assumed that the logged in user is
 	 * the coder user.
-	 * 
+	 *
 	 * @return List of ND statics for logged in user with coder role.
 	 */
 	public List<DiscrepancyNoteStatisticBean> getCoderFilteredNotesStatistics() {
@@ -1146,26 +1142,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			}
 		}
 
-		return dnStatics;
-	}
-
-	/**
-	 * Filters the notes and discrepancies statics and returns only those issues
-	 * by a user with the evaluator role.
-	 * 
-	 * @return List of ND statics for logged in user with evaluator role.
-	 */
-	public List<DiscrepancyNoteStatisticBean> getEvaluatorFilteredNotesStatistics() {
-
-		List<DiscrepancyNoteStatisticBean> dnStatics = new ArrayList<DiscrepancyNoteStatisticBean>();
-		List<DiscrepancyNoteBean> evaluatorNotes = extractNotesByRole(STUDY_EVALUATOR);
-		Map<String, Integer> noteTypes = extractFilteredNoteTypes(evaluatorNotes);
-		for (DiscrepancyNoteBean discrepancyNote : evaluatorNotes) {
-			DiscrepancyNoteStatisticBean stat = createDiscrepancyStatistic(discrepancyNote, noteTypes);
-			if (!added(stat, dnStatics)) {
-				dnStatics.add(stat);
-			}
-		}
 		return dnStatics;
 	}
 
@@ -1200,5 +1176,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		statisticBean.setResolutionStatusId(note.getResolutionStatusId());
 		statisticBean.setDiscrepancyNotesCount(noteTypes.get(note.getResStatus().getName()));
 		return statisticBean;
+	}
+
+	private UserAccountBean getCurrentUserAccount() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		return (UserAccountBean) userAccountDao.findByUserName(authentication.getName());
 	}
 }

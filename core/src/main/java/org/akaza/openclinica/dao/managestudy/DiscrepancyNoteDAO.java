@@ -2324,4 +2324,60 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		return returnedNotelist;
 	}
+
+	/**
+	 * Select discrepancy notes counter for eCRFs marked as evaluation required.
+	 *
+	 * @param currentStudy the current study bean.
+	 * @return the list with discrepancy note statistic beans.
+	 */
+	public List<DiscrepancyNoteStatisticBean> countNotesStatisticForEvaluationCrf(StudyBean currentStudy) {
+
+		setStatisticTypesExpected();
+		Map variables = new HashMap();
+		int index = 1;
+		variables.put(index++, currentStudy.getId());
+		variables.put(index++, currentStudy.getId());
+		variables.put(index++, currentStudy.getId());
+		variables.put(index, currentStudy.getId());
+
+		StringBuilder sql = new StringBuilder(
+				"SELECT sum(count), discrepancy_note_type_id, resolution_status_id FROM (");
+		sql.append(digester.getQuery("countAllEventCrfDNByStudyForStat"));
+		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+			sql.append(" and ec.event_crf_id not in ( ")
+					.append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
+		}
+		sql.append(" and ec.crf_version_id in (select crf_version_id from crf_version where crf_id in (select crf_id from event_definition_crf where event_definition_crf.evaluated_crf = ");
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
+			sql.append("'1')) ");
+		} else {
+			sql.append("'true')) ");
+		}
+		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
+		sql.append(UNION_OP);
+		sql.append(digester.getQuery("countAllItemDataDNByStudyForStat"));
+		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+			sql.append(" and ec.event_crf_id not in ( ")
+					.append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
+		}
+		sql.append(" and ec.crf_version_id in (select crf_version_id from crf_version where crf_id in (select crf_id from event_definition_crf where event_definition_crf.evaluated_crf = ");
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
+			sql.append("'1')) ");
+		} else {
+			sql.append("'true')) ");
+		}
+		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
+		sql.append(") types GROUP BY discrepancy_note_type_id, resolution_status_id");
+
+		ArrayList rows = select(sql.toString(), variables);
+		Iterator it = rows.iterator();
+		List<DiscrepancyNoteStatisticBean> notesStat = new ArrayList<DiscrepancyNoteStatisticBean>();
+		while (it.hasNext()) {
+			notesStat.add(getStatisticEntityFromHashMap((Map) it.next()));
+		}
+		return notesStat;
+	}
 }

@@ -1699,38 +1699,11 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
-	private List<DiscrepancyNoteBean> extractEvaluatorNotes(List<DiscrepancyNoteBean> notes, HttpServletRequest request) {
-
-		if (isEvaluator(getUserAccountBean(request), request)) {
-
-			List<DiscrepancyNoteBean> filteredDiscrepancyNotes = new ArrayList<DiscrepancyNoteBean>();
-
-			for (DiscrepancyNoteBean discrepancyNote : notes) {
-
-				UserAccountBean owner = (UserAccountBean) getUserAccountDAO().findByPK(discrepancyNote.getOwnerId());
-				UserAccountBean assignedUser = (UserAccountBean) getUserAccountDAO().findByPK(
-						discrepancyNote.getAssignedUserId());
-
-				if (isEvaluator(assignedUser, request) || isEvaluator(owner, request)) {
-
-					filteredDiscrepancyNotes.add(discrepancyNote);
-				}
-			}
-
-			return filteredDiscrepancyNotes;
-
-		} else {
-			return notes;
-		}
-	}
-
 	protected List<DiscrepancyNoteBean> filterNotesByUserRole(List<DiscrepancyNoteBean> notes,
 			HttpServletRequest request) {
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 		if (currentRole.getRole().equals(Role.STUDY_CODER)) {
 			notes = extractCoderNotes(notes, request);
-		} else if (currentRole.getRole().equals(Role.STUDY_EVALUATOR)) {
-			notes = extractEvaluatorNotes(notes, request);
 		}
 		return notes;
 	}
@@ -1739,10 +1712,10 @@ public abstract class Controller extends BaseController {
 		// site
 		if (getCurrentStudy(request).isSite(getCurrentStudy(request).getParentStudyId())) {
 			return loggedInUser.getRoleByStudy(getCurrentStudy(request).getParentStudyId()).getName()
-					.equalsIgnoreCase("evaluator");
+					.equalsIgnoreCase("study evaluator");
 		}
 		// Otherwise, study
-		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("evaluator");
+		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("study evaluator");
 	}
 
 	protected boolean isCoder(UserAccountBean loggedInUser, HttpServletRequest request) {
