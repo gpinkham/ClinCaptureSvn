@@ -1,8 +1,11 @@
 package com.clinovo.jmesa.evaluation;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +39,9 @@ public class CRFEvaluationItem {
 	private Date dateValidateCompleted;
 	private Date dateCreated;
 	private Date dateUpdated;
+	private CRFBean crfBean;
+	private CRFVersionBean crfVersionBean;
+	private DisplayEventCRFBean displayEventCRFBean;
 
 	public Date getDateValidate() {
 		return dateValidate;
@@ -234,5 +240,29 @@ public class CRFEvaluationItem {
 
 	public void setSdv(boolean sdv) {
 		this.sdv = sdv;
+	}
+
+	public DisplayEventCRFBean getDisplayEventCRFBean() {
+		return displayEventCRFBean;
+	}
+
+	public void setDisplayEventCRFBean(DisplayEventCRFBean displayEventCRFBean) {
+		this.displayEventCRFBean = displayEventCRFBean;
+	}
+
+	public CRFVersionBean getCrfVersionBean() {
+		return crfVersionBean;
+	}
+
+	public void setCrfVersionBean(CRFVersionBean crfVersionBean) {
+		this.crfVersionBean = crfVersionBean;
+	}
+
+	public CRFBean getCrfBean() {
+		return crfBean;
+	}
+
+	public void setCrfBean(CRFBean crfBean) {
+		this.crfBean = crfBean;
 	}
 }

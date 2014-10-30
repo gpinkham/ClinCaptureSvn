@@ -1,16 +1,16 @@
 package com.clinovo.jmesa.evaluation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.context.MessageSource;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * CRFEvaluationFilter class.
@@ -92,30 +92,44 @@ public class CRFEvaluationFilter implements CriteriaCommand {
 			if (property.equals(CRF_STATUS)) {
 				Status status = optionsMap.get(value);
 				if (status.equals(Status.DELETED)) {
-					theCriteria.append(" AND (").append(columnMapping.get(property))
-							.append(" in (5,7) or se.subject_event_status_id in (10)) ");
+					theCriteria
+							.append(" AND ((")
+							.append(columnMapping.get(property))
+							.append(" in (5,7) or se.subject_event_status_id in (10)) and not(c.status_id in (5,6,7)) and not(cv.status_id in (5,6,7))) ");
 				} else if (status.equals(Status.LOCKED)) {
-					theCriteria.append(" AND (").append(columnMapping.get(property))
-							.append(" in (6) or se.subject_event_status_id in (5,6,7)) ");
+					theCriteria
+							.append(" AND (")
+							.append(columnMapping.get(property))
+							.append(" in (6) or se.subject_event_status_id in (5,6,7) or c.status_id in (5,6,7) or cv.status_id in (5,6,7)) ");
 				} else if (status.equals(Status.SIGNED)) {
-					theCriteria.append(" AND (").append(columnMapping.get(property))
-							.append(" = 2 and se.subject_event_status_id = 8) ");
+					theCriteria
+							.append(" AND (")
+							.append(columnMapping.get(property))
+							.append(" = 2 and se.subject_event_status_id = 8 and not(c.status_id in (5,6,7)) and not(cv.status_id in (5,6,7))) ");
 				} else if (status.equals(Status.SOURCE_DATA_VERIFIED)) {
-					theCriteria.append(" AND (").append(columnMapping.get(property))
+					theCriteria
+							.append(" AND (")
+							.append(columnMapping.get(property))
 							.append(" = 2 and ec.sdv_status = ")
 							.append(CoreResources.getDBType().equalsIgnoreCase("oracle") ? "1" : "true")
-							.append(" and se.subject_event_status_id != 8) ");
+							.append(" and not(se.subject_event_status_id in (5,6,7,8)) and not(c.status_id in (5,6,7)) and not(cv.status_id in (5,6,7))) ");
 				} else if (status.equals(Status.COMPLETED)) {
-					theCriteria.append(" AND (").append(columnMapping.get(property))
+					theCriteria
+							.append(" AND (")
+							.append(columnMapping.get(property))
 							.append(" = 2 and ec.sdv_status = ")
 							.append(CoreResources.getDBType().equalsIgnoreCase("oracle") ? "0" : "false")
-							.append(" and se.subject_event_status_id != 8) ");
-				} else if (status.equals(Status.DATA_ENTRY_STARTED)) {
-					theCriteria.append(" AND (").append(columnMapping.get(property))
-							.append(" in (4) and ec.validator_id = 0 and se.subject_event_status_id in (1,3,4,8,9)) ");
+							.append(" and not(se.subject_event_status_id in (5,6,7,8)) and not(c.status_id in (5,6,7)) and not(cv.status_id in (5,6,7))) ");
+				} else if (status.equals(Status.INITIAL_DATA_ENTRY_COMPLETED)) {
+					theCriteria
+							.append(" AND (")
+							.append(columnMapping.get(property))
+							.append(" in (4) and ec.validator_id = 0 and se.subject_event_status_id in (1,3,4,8,9) and not(c.status_id in (5,6,7)) and not(cv.status_id in (5,6,7))) ");
 				} else if (status.equals(Status.DOUBLE_DATA_ENTRY)) {
-					theCriteria.append(" AND (").append(columnMapping.get(property))
-							.append(" in (4) and ec.validator_id != 0 and se.subject_event_status_id in (1,3,4,8,9)) ");
+					theCriteria
+							.append(" AND (")
+							.append(columnMapping.get(property))
+							.append(" in (4) and ec.validator_id != 0 and se.subject_event_status_id in (1,3,4,8,9) and not(c.status_id in (5,6,7)) and not(cv.status_id in (5,6,7))) ");
 				}
 			} else if (property.equals(EC_COMPLETE_YEAR)) {
 				theCriteria.append(" AND EXTRACT(YEAR FROM ").append(EC_C_DATE).append(") = ").append(value.toString());

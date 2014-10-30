@@ -695,16 +695,69 @@
     <query>
         <name>countOfAllEventCrfsForEvaluation</name>
         <sql>
-            select count(distinct ec.event_crf_id) as total from event_crf ec, event_definition_crf edc, study_event se, study_event_definition sed, study_subject ss, study s, crf_version cv, crf c where c.crf_id = cv.crf_id and cv.crf_version_id = ec.crf_version_id and ec.study_event_id = se.study_event_id and se.study_subject_id = ss.study_subject_id and s.study_id = ss.study_id
-            and ec.not_started = false and ec.status_id >= 2 and c.status_id = 1 and cv.status_id = 1 and edc.status_id = 1 and sed.status_id = 1 and sed.study_event_definition_id = se.study_event_definition_id and se.study_event_definition_id = edc.study_event_definition_id and edc.crf_id = cv.crf_id and edc.double_entry = false and edc.evaluated_crf = true and edc.hide_crf = false and ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id)))
+            select count(distinct ec.event_crf_id) as total
+            from event_crf ec, event_definition_crf edc, study_event se, study_event_definition sed, study_subject ss, study s, crf_version cv, crf c
+            where c.crf_id = cv.crf_id
+            and cv.crf_version_id = ec.crf_version_id
+            and ec.study_event_id = se.study_event_id
+            and se.study_subject_id = ss.study_subject_id
+            and s.study_id = ss.study_id
+            and ec.not_started = false
+            and ec.status_id >= 2
+            and not(ec.date_completed is null)
+            and sed.status_id = 1
+            and sed.study_event_definition_id = se.study_event_definition_id
+            and se.study_event_definition_id = edc.study_event_definition_id
+            and edc.crf_id = cv.crf_id
+            and edc.double_entry = false
+            and edc.evaluated_crf = true
+            and edc.hide_crf = false
+            and ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id)))
             and (s.study_id = ? or s.parent_study_id = ?)
         </sql>
     </query>
     <query>
         <name>findAllEventCrfsForEvaluation</name>
         <sql>
-            select ec.event_crf_id as event_crf_id, edc.event_definition_crf_id as event_definition_crf_id, se.study_event_id as study_event_id, sed.study_event_definition_id as study_event_definition_id, ss.study_subject_id as study_subject_id, ss.study_id as study_id, cv.crf_version_id as crf_version_id, c.crf_id as crf_id, c.name as crf_name, sed.name as study_event_name, ss.label as study_subject_label, ec.status_id as status_id, ec.sdv_status as sdv_status, se.subject_event_status_id as subject_event_status_id, ec.validator_id as validator_id, ec.owner_id as owner_id, ec.update_id as updater_id, ec.date_validate as date_validate, ec.date_completed as date_completed, ec.date_validate_completed as date_validate_completed, ec.date_created as date_created, ec.date_updated as date_updated from event_crf ec, event_definition_crf edc, study_event se, study_event_definition sed, study_subject ss, study s, crf_version cv, crf c where c.crf_id = cv.crf_id and cv.crf_version_id = ec.crf_version_id and ec.study_event_id = se.study_event_id and se.study_subject_id = ss.study_subject_id and s.study_id = ss.study_id
-            and ec.not_started = false and ec.status_id >= 2 and c.status_id = 1 and cv.status_id = 1 and edc.status_id = 1 and sed.status_id = 1 and sed.study_event_definition_id = se.study_event_definition_id and se.study_event_definition_id = edc.study_event_definition_id and edc.crf_id = cv.crf_id and edc.double_entry = false and edc.evaluated_crf = true and edc.hide_crf = false and ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id)))
+            select ec.event_crf_id as event_crf_id,
+            edc.event_definition_crf_id as event_definition_crf_id,
+            se.study_event_id as study_event_id,
+            sed.study_event_definition_id as study_event_definition_id,
+            ss.study_subject_id as study_subject_id,
+            ss.study_id as study_id,
+            cv.crf_version_id as crf_version_id,
+            c.crf_id as crf_id,
+            c.name as crf_name,
+            sed.name as study_event_name,
+            ss.label as study_subject_label,
+            ec.status_id as status_id,
+            ec.sdv_status as sdv_status,
+            se.subject_event_status_id as subject_event_status_id,
+            ec.validator_id as validator_id,
+            ec.owner_id as owner_id,
+            ec.update_id as updater_id,
+            ec.date_validate as date_validate,
+            ec.date_completed as date_completed,
+            ec.date_validate_completed as date_validate_completed,
+            ec.date_created as date_created,
+            ec.date_updated as date_updated
+            from event_crf ec, event_definition_crf edc, study_event se, study_event_definition sed, study_subject ss, study s, crf_version cv, crf c
+            where c.crf_id = cv.crf_id
+            and cv.crf_version_id = ec.crf_version_id
+            and ec.study_event_id = se.study_event_id
+            and se.study_subject_id = ss.study_subject_id
+            and s.study_id = ss.study_id
+            and ec.not_started = false
+            and ec.status_id >= 2
+            and not(ec.date_completed is null)
+            and sed.status_id = 1
+            and sed.study_event_definition_id = se.study_event_definition_id
+            and se.study_event_definition_id = edc.study_event_definition_id
+            and edc.crf_id = cv.crf_id
+            and edc.double_entry = false
+            and edc.evaluated_crf = true
+            and edc.hide_crf = false
+            and ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id)))
             and (s.study_id = ? or s.parent_study_id = ?)
         </sql>
     </query>

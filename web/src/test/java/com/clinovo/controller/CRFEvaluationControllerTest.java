@@ -2,6 +2,7 @@ package com.clinovo.controller;
 
 import com.clinovo.BaseControllerTest;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -24,6 +25,7 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 	public void setUp() {
 		currentStudy = new StudyBean();
 		currentStudy.setId(1);
+		currentStudy.setStatus(Status.AVAILABLE);
 
 		userRole = new StudyUserRoleBean();
 

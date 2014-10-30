@@ -663,6 +663,7 @@ public class CRFDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(1, currentStudyId);
+		variables.put(2, currentStudyId);
 		ArrayList objList = select(digester.getQuery("findAllEvaluableCrfs"), variables);
 		for (Object object : objList) {
 			result.add(getEntityFromHashMap((HashMap) object));

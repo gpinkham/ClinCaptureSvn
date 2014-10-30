@@ -189,10 +189,12 @@
     <query>
         <name>findAllEvaluableCrfs</name>
         <sql>
-            SELECT DISTINCT c.* FROM event_definition_crf edc 
-			LEFT JOIN study s ON s.study_id = ?
-			LEFT JOIN crf c ON c.status_id = 1 AND (SELECT count(DISTINCT cv.crf_version_id) FROM crf_version cv WHERE cv.crf_id = c.crf_id AND cv.status_id = 1) > 0 AND c.crf_id = edc.crf_id 
-			WHERE edc.evaluated_crf = TRUE AND edc.status_id = 1 AND edc.hide_crf = FALSE 
+            SELECT DISTINCT c.* FROM event_definition_crf edc
+            JOIN study s ON (s.study_id = ? OR s.parent_study_id = ?)
+            JOIN crf c ON c.crf_id = edc.crf_id
+            JOIN crf_version cv ON cv.crf_id = edc.crf_id
+            JOIN study_subject ss ON ss.study_id = s.study_id AND ((c.status_id = 1 AND cv.status_id = 1 AND edc.status_id = 1) OR (SELECT count(DISTINCT ec.event_crf_id) FROM event_crf ec WHERE ec.study_subject_id = ss.study_subject_id AND ec.crf_version_id = cv.crf_version_id AND ec.not_started = false) > 0)
+			WHERE edc.evaluated_crf = TRUE AND edc.hide_crf = FALSE
 			AND (	
 				s.parent_study_id IS NULL 
 				AND (
