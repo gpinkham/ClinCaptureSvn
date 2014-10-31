@@ -385,16 +385,7 @@ $(document).ready(function() {
 			        </c:choose>
 			    </td>
 
-			    <td class="table_cell"><fmt:message key="double_data_entry" bundle="${resword}"/>:
-			        <c:choose>
-			            <c:when test="${edc.doubleEntry == true}">
-			                <input type="checkbox" onchange="javascript:changeIcon();" checked onclick="if(!this.checked){return confirmDialog({ message:'<fmt:message key="check_disable_dde" bundle="${resword}"/>', checkbox: this, height: 280, width: 550 });}" name="doubleEntry<c:out value="${count}"/>" value="yes">
-			            </c:when>
-			            <c:otherwise>
-			                <input type="checkbox" onchange="javascript:changeIcon();" name="doubleEntry<c:out value="${count}"/>" value="yes">
-			            </c:otherwise>
-			        </c:choose>
-			    </td>
+			    <td class="table_cell">&nbsp;</td>
 
 			    <td class="table_cell"><fmt:message key="password_required" bundle="${resword}"/>:
 			        <c:choose>
@@ -455,9 +446,31 @@ $(document).ready(function() {
 			</tr>
 
 			<tr valign="top">
-				<td class="table_cell" colspan="2">
+				<td class="table_cell" colspan="4">
+                    <fmt:message key="data_entry_quality" bundle="${resword}"/>:
+                    <c:set var="deQualityDE" value=""/>
+                    <c:set var="deQualityEvaluatedCRF" value=""/>
+                    <c:choose>
+                        <c:when test="${edc.doubleEntry == true}">
+                            <c:set var="deQualityDE" value="checked"/>
+                        </c:when>
+                        <c:when test="${edc.evaluatedCRF == true}">
+                            <c:set var="deQualityEvaluatedCRF" value="checked"/>
+                        </c:when>
+                    </c:choose>
 
-					<fmt:message key="send_email_on" bundle="${resword}"/>: 
+                    <input type="radio" name="deQuality${count}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="dde" class="email_field_trigger uncheckable_radio" ${deQualityDE}/>
+                    <fmt:message key="double_data_entry" bundle="${resword}"/>
+
+                    <input type="radio" name="deQuality${count}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="evaluation" class="email_field_trigger uncheckable_radio" ${deQualityEvaluatedCRF}/>
+                    <fmt:message key="crf_data_evaluation" bundle="${resword}"/>
+                </td>
+            </tr>
+
+            <tr valign="top">
+                <td class="table_cell" colspan="2">
+
+					<fmt:message key="send_email_when" bundle="${resword}"/>:
 					<c:choose>
 						<c:when test="${edc.emailStep eq 'complete'}">
 							<c:set var="emailStepComplete" value="checked"/>
@@ -468,7 +481,7 @@ $(document).ready(function() {
 					</c:choose>
 
 					<input type="radio" name="emailOnStep<c:out value="${count}"/>" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="complete" class="email_field_trigger uncheckable_radio" ${emailStepComplete}/>
-					<fmt:message key="complete" bundle="${resterms}"/>
+					<fmt:message key="completed" bundle="${resword}"/>
 
 					<c:choose>
 						<c:when test="${edc.emailStep eq 'sign'}">
@@ -480,7 +493,7 @@ $(document).ready(function() {
 					</c:choose>
 					
 					<input type="radio" name="emailOnStep<c:out value="${count}"/>" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="sign" class="email_field_trigger uncheckable_radio" ${emailStepSign}/>
-					<fmt:message key="sign" bundle="${resterms}"/>
+					<fmt:message key="Signed" bundle="${resword}"/>
 				</td>
 
 				<td class="table_cell" colspan="2">
@@ -502,16 +515,7 @@ $(document).ready(function() {
 			</tr>
 
             <tr>
-                <td class="table_cell" colspan="4"><fmt:message key="evaluated_crf" bundle="${resword}"/>:
-                    <c:choose>
-                        <c:when test="${edc.evaluatedCRF == true}">
-                            <input type="checkbox" onchange="javascript:changeIcon();" checked name="evaluatedCRF<c:out value="${count}"/>" value="yes">
-                        </c:when>
-                        <c:otherwise>
-                            <input type="checkbox" onchange="javascript:changeIcon();" name="evaluatedCRF<c:out value="${count}"/>" value="yes">
-                        </c:otherwise>
-                    </c:choose>
-                </td>
+                <td class="table_cell" colspan="4">&nbsp;</td>
             </tr>
 
 			<tr valign="top">

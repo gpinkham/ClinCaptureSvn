@@ -3708,26 +3708,21 @@ function chooseHomePageVersion(){
 * To make radiobutton uncheckable, you should add class "uncheckable_radio" to it
 ========================================================================================== */
 $(document).ready(function() {
-	$("input[type='radio'].uncheckable_radio").click(function() {
-		var previousValue = $(this).attr('previousValue');
-		var name = $(this).attr('name');
+    $("input[type='radio'].uncheckable_radio").each(function() {
+        $(this).attr('previousValue', $(this).attr('checked') == true ? 'checked' : '');
+        $(this).click(function() {
+            var previousValue = $(this).attr('previousValue');
+            var name = $(this).attr('name');
 
-		if (previousValue == 'checked') {
-			$(this).removeAttr('checked');
-			$(this).attr('previousValue', false);
-		} else {
-			$("input[name=" + name + "]:radio").attr('previousValue', false);
-			$(this).attr('previousValue', 'checked');
-		}
-	});
-    $("input[name^=evaluatedCRF][type=checkbox]").mouseup(function() {
-        var postfix = $(this).attr("name").toString().replace('evaluatedCRF', '');
-        $("input[name=doubleEntry" + postfix + "]").attr("checked", false);
-    })
-    $("input[name^=doubleEntry][type=checkbox]").mouseup(function() {
-        var postfix = $(this).attr("name").toString().replace('doubleEntry', '');
-        $("input[name=evaluatedCRF" + postfix + "]").attr("checked", false);
-    })
+            if (previousValue == 'checked') {
+                $(this).removeAttr('checked');
+                $(this).attr('previousValue', false);
+            } else {
+                $("input[name=" + name + "]:radio").attr('previousValue', false);
+                $(this).attr('previousValue', 'checked');
+            }
+        });
+    });
 });
 
 

@@ -672,16 +672,7 @@
 				</c:choose>
 			</td>
 
-			<td class="table_cell"><fmt:message key="double_data_entry" bundle="${resword}"/>:
-				<c:choose>
-					<c:when test="${edc.doubleEntry == true}">
-						<input type="checkbox" checked name="doubleEntry<c:out value="${num}"/>" value="yes" disabled>
-					</c:when>
-					<c:otherwise>
-						<input type="checkbox" name="doubleEntry<c:out value="${num}"/>" value="yes" disabled>
-					</c:otherwise>
-				</c:choose>
-			</td>
+			<td class="table_cell">&nbsp;</td>
 
 			<td class="table_cell"><fmt:message key="password_required" bundle="${resword}"/>:
 				<c:choose>
@@ -695,7 +686,7 @@
 			</td>
 
 			<td class="table_cell"><fmt:message key="default_version" bundle="${resword}"/>:
-				<select name="defaultVersionId<c:out value="${num}"/>" id="dv<c:out value="${num}"/>" onclick="updateVersionSelection('<c:out value="${selectedIds}"/>',document.getElementById('dv<c:out value="${num}"/>').selectedIndex, '<c:out value="${num}"/>')">
+				<select name="defaultVersionId<c:out value="${num}"/>" id="dv<c:out value="${num}"/>" onclick="updateVersionSelection('<c:out value="${selectedIds}"/>',document.getElementById('dv<c:out value="${num}"/>').selectedIndex, '<c:out value="${num}"/>')" disabled>
 					<c:forEach var="version" items="${edc.versions}">
 						<c:choose>
 							<c:when test="${edc.defaultVersionId == version.id}">
@@ -753,7 +744,7 @@
 			</td>
 
 			<td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
-				<select name="sdvOption<c:out value="${num}"/>">
+				<select name="sdvOption<c:out value="${num}"/>" disabled>
 					<c:set var="index" value="1"/>
 					<c:forEach var="sdv" items="${sdvOptions}">
 						<c:choose>
@@ -770,10 +761,32 @@
 			</td>
 		</tr>
 
+        <tr valign="top">
+            <td class="table_cell" colspan="4">
+                <fmt:message key="data_entry_quality" bundle="${resword}"/>:
+                <c:set var="deQualityDE" value=""/>
+                <c:set var="deQualityEvaluatedCRF" value=""/>
+                <c:choose>
+                    <c:when test="${edc.doubleEntry == true}">
+                        <c:set var="deQualityDE" value="checked"/>
+                    </c:when>
+                    <c:when test="${edc.evaluatedCRF == true}">
+                        <c:set var="deQualityEvaluatedCRF" value="checked"/>
+                    </c:when>
+                </c:choose>
+
+                <input type="radio" name="deQuality${num}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="dde" class="email_field_trigger uncheckable_radio" ${deQualityDE} disabled/>
+                <fmt:message key="double_data_entry" bundle="${resword}"/>
+
+                <input type="radio" name="deQuality${num}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="evaluation" class="email_field_trigger uncheckable_radio" ${deQualityEvaluatedCRF} disabled/>
+                <fmt:message key="crf_data_evaluation" bundle="${resword}"/>
+            </td>
+        </tr>
+
 		<tr valign="top">
 			<td class="table_cell" colspan="2">
 				
-				<fmt:message key="send_email_on" bundle="${resword}"/>: 
+				<fmt:message key="send_email_when" bundle="${resword}"/>:
 				<c:choose>
 					<c:when test="${edc.emailStep eq 'complete'}">
 						<c:set var="emailStepComplete" value="checked"/>
@@ -816,18 +829,6 @@
 				<span class="alert" style="display:none"><fmt:message key="enter_valid_email" bundle="${resnotes}"/></span>
 			</td>
 		</tr>
-        <tr>
-            <td class="table_cell" colspan="4"><fmt:message key="evaluated_crf" bundle="${resword}"/>:
-                <c:choose>
-                    <c:when test="${!edc.evaluatedCRF}">
-                        <input type="checkbox" disabled name="evaluatedCRF<c:out value="${num}"/>" value="yes">
-                    </c:when>
-                    <c:otherwise>
-                        <input checked="checked" disabled type="checkbox" name="evaluatedCRF<c:out value="${num}"/>" value="yes">
-                    </c:otherwise>
-                </c:choose>
-            </td>
-        </tr>
 		<c:set var="count" value="${count+1}"/>
 		</c:if>
 

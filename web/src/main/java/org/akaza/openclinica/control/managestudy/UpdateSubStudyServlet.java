@@ -21,17 +21,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -56,6 +45,15 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 @Component
 public class UpdateSubStudyServlet extends Controller {
@@ -68,9 +66,12 @@ public class UpdateSubStudyServlet extends Controller {
 	public static final String DEFINITIONS = "definitions";
 	public static final String PARENT_NAME = "parentName";
 	public static final String SDV_OPTIONS = "sdvOptions";
+	public static final String DDE = "dde";
+	public static final String EVALUATION = "evaluation";
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
@@ -80,8 +81,9 @@ public class UpdateSubStudyServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.STUDY_LIST, resexception.getString("not_study_director"), "1");
 	}
 
@@ -141,7 +143,8 @@ public class UpdateSubStudyServlet extends Controller {
 	 *            the parent study bean for parent study status validation
 	 * @throws <code>Exception</code> for all exceptions
 	 */
-	private void confirmStudy(HttpServletRequest request, HttpServletResponse response, HashMap errors, StudyBean parentStudy) throws Exception {
+	private void confirmStudy(HttpServletRequest request, HttpServletResponse response, HashMap errors,
+			StudyBean parentStudy) throws Exception {
 
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
@@ -161,16 +164,26 @@ public class UpdateSubStudyServlet extends Controller {
 		if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
 			v.addValidation("facConEmail", Validator.IS_A_EMAIL);
 		}
-		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 20);
-		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
-		v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
-		v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 20);
+		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+				64);
+		v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
+		v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
 		errors.putAll(v.validate());
 
@@ -323,9 +336,10 @@ public class UpdateSubStudyServlet extends Controller {
 
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
 		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));
-        study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
+		study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
-		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
+		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
+				fp.getString("replaceExisitingDataDuringImport"));
 		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
 		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
 
@@ -348,7 +362,8 @@ public class UpdateSubStudyServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		HttpSession httpSession = request.getSession();
 		FormProcessor fp = new FormProcessor(request);
-		ArrayList<StudyEventDefinitionBean> seds = (ArrayList<StudyEventDefinitionBean>) httpSession.getAttribute(DEFINITIONS);
+		ArrayList<StudyEventDefinitionBean> seds = (ArrayList<StudyEventDefinitionBean>) httpSession
+				.getAttribute(DEFINITIONS);
 		for (StudyEventDefinitionBean sed : seds) {
 			EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 			ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
@@ -358,13 +373,12 @@ public class UpdateSubStudyServlet extends Controller {
 					String order = start + "-" + edcBean.getId();
 					int defaultVersionId = fp.getInt("defaultVersionId" + order);
 					String requiredCRF = fp.getString("requiredCRF" + order);
-					String doubleEntry = fp.getString("doubleEntry" + order);
+					String deQuality = fp.getString("deQuality" + order);
 					String emailCRFTo = fp.getString("mailTo" + order);
 					String emailOnStep = fp.getString("emailOnStep" + order);
 					String electronicSignature = fp.getString("electronicSignature" + order);
 					String hideCRF = fp.getString("hideCRF" + order);
 					int sdvId = fp.getInt("sdvOption" + order);
-					String evaluatedCRF = fp.getString("evaluatedCRF" + order);
 					ArrayList<String> selectedVersionIdList = fp.getStringArray("versionSelection" + order);
 					int selectedVersionIdListSize = selectedVersionIdList.size();
 					String selectedVersionIds = "";
@@ -376,10 +390,12 @@ public class UpdateSubStudyServlet extends Controller {
 					}
 					boolean changed = false;
 					boolean isRequired = !StringUtil.isBlank(requiredCRF) && YES.equalsIgnoreCase(requiredCRF.trim());
-					boolean isDouble = !StringUtil.isBlank(doubleEntry) && YES.equalsIgnoreCase(doubleEntry.trim());
-					boolean hasPassword = !StringUtil.isBlank(electronicSignature) && YES.equalsIgnoreCase(electronicSignature.trim());
+					boolean isDouble = !StringUtil.isBlank(deQuality) && DDE.equalsIgnoreCase(deQuality.trim());
+					boolean hasPassword = !StringUtil.isBlank(electronicSignature)
+							&& YES.equalsIgnoreCase(electronicSignature.trim());
 					boolean isHide = !StringUtil.isBlank(hideCRF) && YES.equalsIgnoreCase(hideCRF.trim());
-					boolean isEvaluatedCRF = !StringUtil.isBlank(evaluatedCRF) && YES.equalsIgnoreCase(evaluatedCRF.trim());
+					boolean isEvaluatedCRF = !StringUtil.isBlank(deQuality)
+							&& EVALUATION.equalsIgnoreCase(deQuality.trim());
 					if (edcBean.getParentId() > 0) {
 						int dbDefaultVersionId = edcBean.getDefaultVersionId();
 						if (defaultVersionId != dbDefaultVersionId) {
@@ -405,7 +421,8 @@ public class UpdateSubStudyServlet extends Controller {
 							changed = true;
 							edcBean.setHideCrf(isHide);
 						}
-						if (!StringUtil.isBlank(selectedVersionIds) && !selectedVersionIds.equals(edcBean.getSelectedVersionIds())) {
+						if (!StringUtil.isBlank(selectedVersionIds)
+								&& !selectedVersionIds.equals(edcBean.getSelectedVersionIds())) {
 							changed = true;
 							setSelectedVersionList(edcBean, selectedVersionIds);
 						}
@@ -440,11 +457,14 @@ public class UpdateSubStudyServlet extends Controller {
 						// only if definition-crf has been modified, will it be saved for the site
 						int defaultId = defaultVersionId > 0 ? defaultVersionId : edcBean.getDefaultVersionId();
 						int dbDefaultVersionId = edcBean.getDefaultVersionId();
-						if (defaultId == dbDefaultVersionId && isRequired == edcBean.isRequiredCRF() && isDouble == edcBean.isDoubleEntry()
+						if (defaultId == dbDefaultVersionId && isRequired == edcBean.isRequiredCRF()
+								&& isDouble == edcBean.isDoubleEntry()
 								&& hasPassword == edcBean.isElectronicSignature() && isHide == edcBean.isHideCrf()) {
 							if (selectedVersionIdListSize > 0) {
-								if (selectedVersionIdListSize == edcBean.getVersions().size() && emailOnStep.equals(edcBean.getEmailStep())
-										&& emailCRFTo.equals(edcBean.getEmailTo()) && isEvaluatedCRF == edcBean.isEvaluatedCRF()) {
+								if (selectedVersionIdListSize == edcBean.getVersions().size()
+										&& emailOnStep.equals(edcBean.getEmailStep())
+										&& emailCRFTo.equals(edcBean.getEmailTo())
+										&& isEvaluatedCRF == edcBean.isEvaluatedCRF()) {
 									if (sdvId > 0) {
 										if (sdvId != edcBean.getSourceDataVerification().getCode()) {
 											changed = true;
@@ -473,7 +493,8 @@ public class UpdateSubStudyServlet extends Controller {
 							} else {
 								edcBean.setEmailTo(emailCRFTo);
 							}
-							if (selectedVersionIdListSize > 0 && selectedVersionIdListSize != edcBean.getVersions().size()) {
+							if (selectedVersionIdListSize > 0
+									&& selectedVersionIdListSize != edcBean.getVersions().size()) {
 								setSelectedVersionList(edcBean, selectedVersionIds);
 
 							}
@@ -554,6 +575,6 @@ public class UpdateSubStudyServlet extends Controller {
 			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
-		}
+	}
 	}
 }

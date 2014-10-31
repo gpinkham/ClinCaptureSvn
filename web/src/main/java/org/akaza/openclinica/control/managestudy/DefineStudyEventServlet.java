@@ -21,7 +21,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -51,7 +50,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -67,7 +65,8 @@ import java.util.Map;
 public class DefineStudyEventServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
@@ -75,16 +74,22 @@ public class DefineStudyEventServlet extends Controller {
 		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
 
 		if (currentStudy.getParentStudyId() > 0) {
-			addPageMessage(respage.getString("SED_may_only_added_top_level") + respage.getString("please_contact_sysadmin_questions"), request);
-			throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST, resexception.getString("not_top_study"), "1");
+			addPageMessage(
+					respage.getString("SED_may_only_added_top_level")
+							+ respage.getString("please_contact_sysadmin_questions"), request);
+			throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST,
+					resexception.getString("not_top_study"), "1");
 		}
 
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_persmission_add_SED_to_study") + respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST, resexception.getString("not_study_director"), "1");
+		addPageMessage(
+				respage.getString("no_have_persmission_add_SED_to_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST,
+				resexception.getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -119,7 +124,8 @@ public class DefineStudyEventServlet extends Controller {
 						if (nextAction != null) {
 							if (nextAction == 1) {
 								session.removeAttribute("definition");
-								addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"), request);
+								addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"),
+										request);
 								forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 							} else if (nextAction == 2) {
 								submitDefinition(request);
@@ -199,9 +205,12 @@ public class DefineStudyEventServlet extends Controller {
 		StudyBean currentStudy = getCurrentStudy(fp.getRequest());
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("type", Validator.NO_BLANKS);
-		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+				2000);
+		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
 
 		String calendaredVisitType = fp.getString("type");
 		if ("calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
@@ -290,9 +299,9 @@ public class DefineStudyEventServlet extends Controller {
 
 		EntityBeanTable table = fp.getEntityBeanTable();
 		ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
-		String[] columns = {resword.getString("CRF_name"), resword.getString("date_created"),
+		String[] columns = { resword.getString("CRF_name"), resword.getString("date_created"),
 				resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),
-				resword.getString("selected")};
+				resword.getString("selected") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(5);
 		StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) fp.getRequest().getSession()
@@ -353,12 +362,11 @@ public class DefineStudyEventServlet extends Controller {
 			edcBean.setCrfName(crfName);
 
 			String requiredCRF = fp.getString("requiredCRF" + i);
-			String doubleEntry = fp.getString("doubleEntry" + i);
+			String deQuality = fp.getString("deQuality" + i);
 			String decisionCondition = fp.getString("decisionCondition" + i);
 			String electronicSignature = fp.getString("electronicSignature" + i);
 			String emailCRFTo = fp.getString("mailTo" + i);
 			String emailOnStep = fp.getString("emailOnStep" + i);
-			String evaluatedCRF = fp.getString("evaluatedCRF" + i);
 
 			String hiddenCrf = fp.getString("hiddenCrf" + i);
 			// hideCRF is false by default in the bean
@@ -376,7 +384,7 @@ public class DefineStudyEventServlet extends Controller {
 			} else {
 				edcBean.setRequiredCRF(false);
 			}
-			if (!StringUtil.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim())) {
+			if (!StringUtil.isBlank(deQuality) && "dde".equalsIgnoreCase(deQuality.trim())) {
 				edcBean.setDoubleEntry(true);
 			} else {
 				edcBean.setDoubleEntry(false);
@@ -401,7 +409,7 @@ public class DefineStudyEventServlet extends Controller {
 			} else {
 				edcBean.setEmailStep("");
 			}
-			if (!StringUtil.isBlank(evaluatedCRF) && "yes".equalsIgnoreCase(evaluatedCRF.trim())) {
+			if (!StringUtil.isBlank(deQuality) && "evaluation".equalsIgnoreCase(deQuality.trim())) {
 				edcBean.setEvaluatedCRF(true);
 			} else {
 				edcBean.setEvaluatedCRF(false);
@@ -435,7 +443,7 @@ public class DefineStudyEventServlet extends Controller {
 	 * 
 	 * @param request
 	 *            the incoming request
-	 * @return <code>StudyEventDefinitionBean</code> bean that will be displayed on UX    
+	 * @return <code>StudyEventDefinitionBean</code> bean that will be displayed on UX
 	 */
 	private StudyEventDefinitionBean createStudyEventDefinition(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
@@ -471,7 +479,8 @@ public class DefineStudyEventServlet extends Controller {
 		return sed;
 	}
 
-	private void confirmDefinition2(HttpServletRequest request, HttpServletResponse response, boolean isBack) throws Exception {
+	private void confirmDefinition2(HttpServletRequest request, HttpServletResponse response, boolean isBack)
+			throws Exception {
 
 		FormProcessor fp = new FormProcessor(request);
 		CRFVersionDAO vdao = getCRFVersionDAO();

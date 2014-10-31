@@ -443,14 +443,13 @@ public class UpdateEventDefinitionServlet extends Controller {
 				edcBean.setDefaultVersionName(defaultVersion.getName());
 
 				String requiredCRF = fp.getString("requiredCRF" + i);
-				String doubleEntry = fp.getString("doubleEntry" + i);
+				String deQuality = fp.getString("deQuality" + i);
 				String decisionCondition = fp.getString("decisionCondition" + i);
 				String electronicSignature = fp.getString("electronicSignature" + i);
 				String hideCRF = fp.getString("hideCRF" + i);
 				int sdvId = fp.getInt("sdvOption" + i);
 				String emailStep = fp.getString("emailOnStep" + i);
 				String emailTo = fp.getString("mailTo" + i);
-				String evaluatedCrf = fp.getString("evaluatedCRF" + i);
 
 				if (!StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim())) {
 					edcBean.setHideCrf(true);
@@ -463,7 +462,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 					edcBean.setRequiredCRF(false);
 				}
 
-				if (!StringUtil.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim())) {
+				if (!StringUtil.isBlank(deQuality) && "dde".equalsIgnoreCase(deQuality.trim())) {
 					edcBean.setDoubleEntry(true);
 				} else {
 					edcBean.setDoubleEntry(false);
@@ -481,7 +480,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 					edcBean.setDecisionCondition(false);
 				}
 
-				if (!StringUtil.isBlank(evaluatedCrf) && "yes".equalsIgnoreCase(evaluatedCrf.trim())) {
+				if (!StringUtil.isBlank(deQuality) && "evaluation".equalsIgnoreCase(deQuality.trim())) {
 					edcBean.setEvaluatedCRF(true);
 				} else {
 					edcBean.setEvaluatedCRF(false);

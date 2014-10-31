@@ -93,10 +93,7 @@
                             	<input type="checkbox" onchange="javascript:changeIcon();" checked name="requiredCRF<c:out value="${count}"/>" value="yes">
                             </td>
 
-                            <td class="table_cell">
-                            	<fmt:message key="double_data_entry" bundle="${resword}"/>:
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="doubleEntry<c:out value="${count}"/>" value="yes">
-                            </td>
+                            <td class="table_cell">&nbsp;</td>
 
                             <td class="table_cell">
                             	<fmt:message key="password_required" bundle="${resword}"/>:
@@ -134,9 +131,31 @@
 							    </td>
                         </tr>
 
+                        <tr valign="top">
+                            <td class="table_cell" colspan="4">
+                                <fmt:message key="data_entry_quality" bundle="${resword}"/>:
+                                <c:set var="deQualityDE" value=""/>
+                                <c:set var="deQualityEvaluatedCRF" value=""/>
+                                <c:choose>
+                                    <c:when test="${edc.doubleEntry == true}">
+                                        <c:set var="deQualityDE" value="checked"/>
+                                    </c:when>
+                                    <c:when test="${edc.evaluatedCRF == true}">
+                                        <c:set var="deQualityEvaluatedCRF" value="checked"/>
+                                    </c:when>
+                                </c:choose>
+
+                                <input type="radio" name="deQuality${count}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="dde" class="email_field_trigger uncheckable_radio" ${deQualityDE}/>
+                                <fmt:message key="double_data_entry" bundle="${resword}"/>
+
+                                <input type="radio" name="deQuality${count}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="evaluation" class="email_field_trigger uncheckable_radio" ${deQualityEvaluatedCRF}/>
+                                <fmt:message key="crf_data_evaluation" bundle="${resword}"/>
+                            </td>
+                        </tr>
+
 						<tr valign="top">
 							<td class="table_cell" colspan="2" style="padding-bottom:9px;">
-								<fmt:message key="send_email_on" bundle="${resword}"/>: 
+								<fmt:message key="send_email_when" bundle="${resword}"/>:
 								<input type="radio" name="emailOnStep<c:out value="${count}"/>" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="complete" class="email_field_trigger uncheckable_radio">
 								<fmt:message key="complete" bundle="${resterms}"/>
 								<input type="radio" name="emailOnStep<c:out value="${count}"/>" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="sign" class="email_field_trigger uncheckable_radio">
@@ -144,19 +163,12 @@
 							</td>
 							<td class="table_cell" colspan="2">
 								<span class="email_wrapper" style="display:none">
-									<fmt:message key="email_crf_to" bundle="${resword}"/>: 
+									<fmt:message key="email_crf_to" bundle="${resword}"/>:
 									<input type="text" name="mailTo${count}" onchange="javascript:changeIcon();" style="width:115px;margin-left:79px" class="email_to_check_field"/>
 								</span>
 								<span class="alert" style="display:none"><fmt:message key="enter_valid_email" bundle="${resnotes}"/></span>
 							</td>
 						</tr>
-
-                        <tr>
-                            <td class="table_cell" colspan="4">
-                                <fmt:message key="evaluated_crf" bundle="${resword}"/>:
-                                <input type="checkbox" onchange="javascript:changeIcon();" name="evaluatedCRF<c:out value="${count}"/>" value="yes">
-                            </td>
-                        </tr>
 
                         <tr valign="top">
                             <td class="table_header_column" colspan="4"><fmt:message key="choose_null_values"  bundle="${resword}"/> (<a href="<fmt:message key="nullValue" bundle="${resformat}"/>" target="def_win" onClick="openDefWindow('<fmt:message key="nullValue" bundle="${resformat}"/>'); return false;"><fmt:message key="what_is_null_value"  bundle="${resword}"/></a>)</td>

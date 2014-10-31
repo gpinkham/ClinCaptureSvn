@@ -636,16 +636,7 @@
 					</c:choose>
 				</td>
 	
-				<td class="table_cell"><fmt:message key="double_data_entry" bundle="${resword}"/>:
-					<c:choose>
-						<c:when test="${edc.doubleEntry == true}">
-							<input type="checkbox" checked name="doubleEntry<c:out value="${num}"/>" value="yes">
-						</c:when>
-						<c:otherwise>
-							<input type="checkbox" name="doubleEntry<c:out value="${num}"/>" value="yes">
-						</c:otherwise>
-					</c:choose>
-				</td>
+				<td class="table_cell">&nbsp;</td>
 	
 				<td class="table_cell"><fmt:message key="password_required" bundle="${resword}"/>: 
 					<c:choose>
@@ -735,10 +726,32 @@
 				</td>
 			</tr>
 
+            <tr valign="top">
+                <td class="table_cell" colspan="4">
+                    <fmt:message key="data_entry_quality" bundle="${resword}"/>:
+                    <c:set var="deQualityDE" value=""/>
+                    <c:set var="deQualityEvaluatedCRF" value=""/>
+                    <c:choose>
+                        <c:when test="${edc.doubleEntry == true}">
+                            <c:set var="deQualityDE" value="checked"/>
+                        </c:when>
+                        <c:when test="${edc.evaluatedCRF == true}">
+                            <c:set var="deQualityEvaluatedCRF" value="checked"/>
+                        </c:when>
+                    </c:choose>
+
+                    <input type="radio" name="deQuality${num}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="dde" class="email_field_trigger uncheckable_radio" ${deQualityDE}/>
+                    <fmt:message key="double_data_entry" bundle="${resword}"/>
+
+                    <input type="radio" name="deQuality${num}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="evaluation" class="email_field_trigger uncheckable_radio" ${deQualityEvaluatedCRF}/>
+                    <fmt:message key="crf_data_evaluation" bundle="${resword}"/>
+                </td>
+            </tr>
+
 			<tr valign="top">
 				<td class="table_cell" colspan="2">
 					
-					<fmt:message key="send_email_on" bundle="${resword}"/>: 
+					<fmt:message key="send_email_when" bundle="${resword}"/>:
 					<c:choose>
 						<c:when test="${edc.emailStep eq 'complete'}">
 							<c:set var="emailStepComplete" value="checked"/>
@@ -781,18 +794,6 @@
 					<span class="alert" style="display:none"><fmt:message key="enter_valid_email" bundle="${resnotes}"/></span>
 				</td>
 			</tr>
-            <tr>
-                <td class="table_cell" colspan="4"><fmt:message key="evaluated_crf" bundle="${resword}"/>:
-                    <c:choose>
-                        <c:when test="${!edc.evaluatedCRF}">
-                            <input type="checkbox" name="evaluatedCRF<c:out value="${num}"/>" value="yes">
-                        </c:when>
-                        <c:otherwise>
-                            <input checked="checked" type="checkbox" name="evaluatedCRF<c:out value="${num}"/>" value="yes">
-                        </c:otherwise>
-                    </c:choose>
-                </td>
-            </tr>
 			<c:set var="count" value="${count+1}"/>
 			</c:if>
 

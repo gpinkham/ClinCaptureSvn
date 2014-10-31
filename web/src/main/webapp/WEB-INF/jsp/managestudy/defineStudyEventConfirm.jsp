@@ -89,7 +89,7 @@
 		<td class="table_header_row"><fmt:message key="default_version" bundle="${resword}"/></td>
 		<td class="table_header_row"><fmt:message key="sdv_option" bundle="${resword}"/></td>
 		<td class="table_header_row"><fmt:message key="null_values" bundle="${resword}"/></td>
-		<td class="table_header_row"><fmt:message key="send_email_on" bundle="${resword}"/></td>
+		<td class="table_header_row"><fmt:message key="send_email_when" bundle="${resword}"/></td>
 		<td class="table_header_row"><fmt:message key="email_crf_to" bundle="${resword}"/></td>
         <td class="table_header_row"><fmt:message key="evaluated_crf" bundle="${resword}"/></td>
 	</tr>
