@@ -114,7 +114,7 @@
 	<img id="excl_section1" src="images/bt_Collapse.gif" border="0"> <span class="table_title_Admin">
     <fmt:message key="study_description_status" bundle="${resword}"/>  </span></a>
 <div id="section1" style="">
-<div style="width: 660px">
+<div style="width: 670px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="textbox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="450">
@@ -666,7 +666,7 @@
 	<img id="excl_section3" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
          <fmt:message key="conditions_and_eligibility" bundle="${resword}"/></span></a>
 <div id="section3" style="display:none ">
-	<div style="width: 660px">
+	<div style="width: 670px">
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 			<div class="textbox_center">
 				<table border="0" cellpadding="0">
@@ -802,7 +802,7 @@
     <span class="table_title_Admin">
         <fmt:message key="facility_information" bundle="${resword}"/></span></a>
 <div id="section4" style="display:none ">
-	<div style="width: 660px">
+	<div style="width: 670px">
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 			<div class="textbox_center">
 				<table border="0" cellpadding="5">
@@ -918,7 +918,7 @@
 	</span>
 </a>
 <div id="section5" style="display:none ">
-	<div style="width: 660px">
+	<div style="width: 670px">
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 			<div class="textbox_center">
 				<table border="0" cellpadding="0">
@@ -1001,7 +1001,7 @@
 
 <div id="section6_1" name="" style="display:none" name="update_descriptions">
 
-	<div style="width: 660px">
+	<div style="width: 670px">
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 			<div class="textbox_center">
 				<table border="0" cellpadding="0">
@@ -1112,7 +1112,7 @@
 
 <div id="section6_2" style="display:none" name="close_descriptions">
 
-	<div style="width: 660px">
+	<div style="width: 670px">
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 			<div class="textbox_center">
 				<table border="0" cellpadding="0">
@@ -1222,7 +1222,7 @@
 
 <div id="section6_3" style="display:none" name="reasons_for_change_desciptions">
 
-	<div style="width: 660px">
+	<div style="width: 670px">
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 			<div class="textbox_center">
 				<table border="0" cellpadding="0">
@@ -1329,7 +1329,7 @@
 	<img id="excl_section7" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
     <fmt:message key="study_parameter_configuration" bundle="${resword}"/></span></a>
 <div id="section7" style="display:none ">
-<div style="width: 660px">
+<div style="width: 670px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="textbox_center">
 <table border="0" cellpadding="4" cellspacing="0" id="study_param_config">
@@ -1379,6 +1379,20 @@
 		<input type="radio" onchange="javascript:changeIcon()"
 		${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'yes' ? "" : "checked"}
 		       name="allowSdvWithOpenQueries" value="no"><fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="allowDynamicGroupsManagement" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.allowDynamicGroupsManagement == 'yes' ? "checked" : ""}
+		       name="allowDynamicGroupsManagement" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.allowDynamicGroupsManagement == 'yes' ? "" : "checked"}
+		       name=allowDynamicGroupsManagement value="no"><fmt:message key="no" bundle="${resword}"/>
 	</td>
 </tr>
 <tr>

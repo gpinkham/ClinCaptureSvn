@@ -512,6 +512,7 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setStartDateTimeLabel(fp.getString("startDateTimeLabel"));
 		study.getStudyParameterConfig().setEndDateTimeLabel(fp.getString("endDateTimeLabel"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
+		study.getStudyParameterConfig().setAllowDynamicGroupsManagement(fp.getString("allowDynamicGroupsManagement"));
 
 		//Data Import
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
@@ -873,6 +874,10 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setParameter("allowSdvWithOpenQueries");
 		spv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
 		updateParameter(spvdao, spv);
+		
+		spv.setParameter("allowDynamicGroupsManagement");
+		spv.setValue(study1.getStudyParameterConfig().getAllowDynamicGroupsManagement());
+		updateParameter(spvdao, spv);
 
 		spv.setParameter("markImportedCRFAsCompleted");
 		spv.setValue(study1.getStudyParameterConfig().getMarkImportedCRFAsCompleted());
@@ -1061,6 +1066,10 @@ public class UpdateStudyServletNew extends Controller {
 
 			childspv.setParameter("allowSdvWithOpenQueries");
 			childspv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("allowDynamicGroupsManagement");
+			childspv.setValue(study1.getStudyParameterConfig().getAllowDynamicGroupsManagement());
 			updateParameter(spvdao, childspv);
 
 			childspv.setParameter("markImportedCRFAsCompleted");

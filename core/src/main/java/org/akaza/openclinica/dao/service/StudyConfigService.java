@@ -155,6 +155,8 @@ public class StudyConfigService {
 				spc.setAutoCreateSubjectDuringImport(spv.getValue());
 			} else if (handle.equalsIgnoreCase("allowSdvWithOpenQueries")) {
 				spc.setAllowSdvWithOpenQueries(spv.getValue());
+			} else if (handle.equalsIgnoreCase("allowDynamicGroupsManagement")) {
+				spc.setAllowDynamicGroupsManagement(spv.getValue());
 			} else if (handle.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
 				spc.setReplaceExisitingDataDuringImport(spv.getValue());
 			} else if (handle.equalsIgnoreCase("allowCodingVerification")) {

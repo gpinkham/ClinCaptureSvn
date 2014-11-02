@@ -433,7 +433,8 @@
 			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 			<td>
 			<div class="formfieldM_BG">
-				<select name="dynamicGroupClassId" class="formfieldM" onChange="showDynamicEventsSection(${defaultDynGroupClassId});">
+				<c:set var="selectable" value="${study.studyParameterConfig.allowDynamicGroupsManagement == 'yes' ? '' : 'disabled'}"/>
+				<select name="dynamicGroupClassId" class="formfieldM" onChange="showDynamicEventsSection(${defaultDynGroupClassId});" ${selectable}>
 					<option value="0"><fmt:message key="default_group" bundle="${resword}"/></option>
 					<c:forEach var="dynGroup" items="${dynamicGroups}">
 					<c:if test="${dynGroup.id != defaultDynGroupClassId}">

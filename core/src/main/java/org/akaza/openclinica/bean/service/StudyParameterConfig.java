@@ -95,6 +95,8 @@ public class StudyParameterConfig {
 	private String markImportedCRFAsCompleted;
 
 	private String allowSdvWithOpenQueries;
+	
+	private String allowDynamicGroupsManagement;
 
 	private String replaceExisitingDataDuringImport;
 
@@ -163,6 +165,8 @@ public class StudyParameterConfig {
 		autoCreateSubjectDuringImport = "no";
 		allowSdvWithOpenQueries = "no";
 		replaceExisitingDataDuringImport = "no";
+		
+		allowDynamicGroupsManagement = "yes";
 	}
 
 	/**
@@ -639,5 +643,19 @@ public class StudyParameterConfig {
 
 	public void setEvaluateWithContext(String evaluateWithContext) {
 		this.evaluateWithContext = evaluateWithContext;
+	}
+
+	/**
+	 * @return the allowDynamicGroupsManagement
+	 */
+	public String getAllowDynamicGroupsManagement() {
+		return allowDynamicGroupsManagement;
+	}
+
+	/**
+	 * @param allowDynamicGroupsManagement the allowDynamicGroupsManagement to set
+	 */
+	public void setAllowDynamicGroupsManagement(String allowDynamicGroupsManagement) {
+		this.allowDynamicGroupsManagement = allowDynamicGroupsManagement;
 	}
 }
