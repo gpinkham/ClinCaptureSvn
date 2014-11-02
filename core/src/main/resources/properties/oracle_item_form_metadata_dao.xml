@@ -258,4 +258,13 @@
 		where s.scd_item_form_metadata_id = ifm.item_form_metadata_id);
 		</sql>
 	</query>
+    <query>
+        <name>crfSectionsMetric</name>
+        <sql>
+            select count(ifm.item_form_metadata_id)
+			from event_crf ec, item_form_metadata ifm
+			where ec.crf_version_id = ifm.crf_version_id
+			and ec.not_started = 0 and ec.status_id in (1,2)
+        </sql>
+    </query>
 </queries>

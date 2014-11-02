@@ -21,6 +21,8 @@
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +45,6 @@ public class SystemStatusServlet extends Controller {
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
 		Long databaseChangelLogCount = getDatabaseChangeLogDao().count();
 		String applicationStatus = "OK";
 		if (request.getSession().getAttribute("ome") != null) {
@@ -52,6 +53,8 @@ public class SystemStatusServlet extends Controller {
 
 		PrintWriter out = response.getWriter();
 		out.println(applicationStatus);
+		out.println("Users Assigned: " + new UserAccountDAO(getDataSource()).getUsersAssignedMetric());
+		out.println("CRF Sections: " + new ItemFormMetadataDAO(getDataSource()).getCrfSectionsMetric());
 		out.println(String.valueOf(databaseChangelLogCount));
 	}
 }

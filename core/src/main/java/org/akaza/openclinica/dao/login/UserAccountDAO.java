@@ -1038,4 +1038,16 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	public int getUsersAssignedMetric() {
+		int usersAssigned = 0;
+		unsetTypeExpected();
+		setTypeExpected(1, TypeNames.INT);
+		ArrayList rows = select(digester.getQuery("usersAssignedMetric"));
+		Iterator it = rows.iterator();
+		if (it.hasNext()) {
+			usersAssigned = (Integer) ((HashMap) it.next()).get("count");
+		}
+		return usersAssigned;
+	}
+
 }

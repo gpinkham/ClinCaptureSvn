@@ -5,8 +5,13 @@ import org.junit.Test;
 
 public class ItemFormMetadataDAOTest extends DefaultAppContextTest {
 
-    @Test
-    public void testTotalStudySubjects() {
-        assertNotNull(imfdao.findAllByCRFVersionIdAndItemId(2, 5));
-    }
+	@Test
+	public void testTotalStudySubjects() {
+		assertNotNull(imfdao.findAllByCRFVersionIdAndItemId(2, 5));
+	}
+
+	@Test
+	public void testThatGetCrfSectionsMetricReturnsCorrectValue() {
+		assertEquals(imfdao.getCrfSectionsMetric(), 94);
+	}
 }

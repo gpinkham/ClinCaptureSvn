@@ -283,4 +283,10 @@
                 <name>findByUserEmail</name>
                 <sql>select * from user_account where email=?</sql>
     </query>
+    <query>
+        <name>usersAssignedMetric</name>
+        <sql>
+            select count(distinct sur.oid) from study_user_role sur
+        </sql>
+    </query>
 </queries>
