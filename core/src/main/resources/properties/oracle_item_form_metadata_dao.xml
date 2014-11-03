@@ -261,10 +261,12 @@
     <query>
         <name>crfSectionsMetric</name>
         <sql>
-            select count(ifm.item_form_metadata_id)
-			from event_crf ec, item_form_metadata ifm
-			where ec.crf_version_id = ifm.crf_version_id
-			and ec.not_started = 0 and ec.status_id in (1,2)
+			select count(sec.section_id) as total
+			from event_crf ec, section sec, study_subject ss, study s
+			where ec.not_started = false
+			and ss.study_subject_id = ec.study_subject_id
+			and sec.crf_version_id = ec.crf_version_id
+			and ss.study_id = s.study_id and (s.study_id = ? or s.parent_study_id = ?)
         </sql>
     </query>
 </queries>

@@ -876,14 +876,17 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return pairs;
 	}
 
-	public int getCrfSectionsMetric() {
+	public int getCrfSectionsMetric(int studyId) {
 		int crfSections = 0;
 		unsetTypeExpected();
 		setTypeExpected(1, TypeNames.INT);
-		ArrayList rows = select(digester.getQuery("crfSectionsMetric"));
+		HashMap variables = new HashMap();
+		variables.put(1, studyId);
+		variables.put(2, studyId);
+		ArrayList rows = select(digester.getQuery("crfSectionsMetric"), variables);
 		Iterator it = rows.iterator();
 		if (it.hasNext()) {
-			crfSections = (Integer) ((HashMap) it.next()).get("count");
+			crfSections = (Integer) ((HashMap) it.next()).get("total");
 		}
 		return crfSections;
 	}

@@ -286,7 +286,10 @@
     <query>
         <name>usersAssignedMetric</name>
         <sql>
-            select count(distinct sur.oid) from study_user_role sur
+            select count(distinct sur.oid)
+			from study_user_role sur, study s
+			where sur.study_id = s.study_id
+			and (s.study_id = ? or s.parent_study_id = ?)
         </sql>
     </query>
 </queries>

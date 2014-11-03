@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
+import java.util.List;
 
 // allows both deletion and restoration of a study user role
 
@@ -53,8 +55,16 @@ public class SystemStatusServlet extends Controller {
 
 		PrintWriter out = response.getWriter();
 		out.println(applicationStatus);
-		out.println("Users Assigned: " + new UserAccountDAO(getDataSource()).getUsersAssignedMetric());
-		out.println("CRF Sections: " + new ItemFormMetadataDAO(getDataSource()).getCrfSectionsMetric());
 		out.println(String.valueOf(databaseChangelLogCount));
+		out.println("");
+
+		for (StudyBean studyBean : (List<StudyBean>) getStudyDAO().findAllParents()) {
+			out.println("Study: " + studyBean.getName());
+			out.println("      - Users Assigned: "
+					+ new UserAccountDAO(getDataSource()).getUsersAssignedMetric(studyBean.getId()));
+			out.println("      - CRF Sections: "
+					+ new ItemFormMetadataDAO(getDataSource()).getCrfSectionsMetric(studyBean.getId()));
+			out.println("");
+		}
 	}
 }
