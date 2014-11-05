@@ -173,7 +173,12 @@
 			<span class="filler">filler</span>
 		</div>
 	</div>
-	<a onclick="javascript:toolbarToggle(this)" href="#" class="show_hide_link"><div id="show_hide">Hide</div></a>
+	<a onclick="javascript:toolbarToggle(this)" href="#" class="show_hide_link">
+		<div id="show_hide">
+			<span class="show-message" active="false" style="display: none;"><fmt:message bundle="${resword}" key="show"/></span>
+			<span class="hide-message" active="true"><fmt:message bundle="${resword}" key="hide"/></span>
+		</div>
+	</a>
 </div>
 
 </c:if>

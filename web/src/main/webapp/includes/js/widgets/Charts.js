@@ -4,22 +4,24 @@ var scrollTrigger = true;
 /**
  * This function is used to show/hide toolbar when user click on "Show/Hide"
  * button.
- * 
+ *
  * @param e -
  *            an element on which user will click.
  */
 function toolbarToggle(e) {
-	if ($(e).children().text() == "Hide") {
+	var activeTab = $("span[active=true]");
+	var inActiveTab = $("span[active=false]");
+	if (activeTab.attr("class") == "hide-message") {
 		$(e).parent().animate({
 			right : "-430px"
 		}, 500);
-		$(e).children().html("Show");
 	} else {
 		$(e).parent().animate({
 			right : "0px"
 		}, 500);
-		$(e).children().html("Hide");
 	}
+	inActiveTab.attr("active","true").css("display","inline");
+	activeTab.attr("active","false").css("display","none");
 }
 
 /**
