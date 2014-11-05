@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.controller;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -83,7 +84,7 @@ public class ScheduledJobController {
 	@RequestMapping("/listCurrentScheduledJobs")
 	public ModelMap listScheduledJobs(HttpServletRequest request, HttpServletResponse response)
 			throws SchedulerException {
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		if (!mayProceed(request)) {
 			try {
 				response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
@@ -93,11 +94,11 @@ public class ScheduledJobController {
 			return null;
 		}
 
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		ModelMap gridMap = new ModelMap();
 		StdScheduler scheduler = getScheduler(request);
-		boolean showMoreLink = request.getParameter("showMoreLink") == null || Boolean
-				.parseBoolean(request.getParameter("showMoreLink"));
+		boolean showMoreLink = request.getParameter("showMoreLink") == null
+				|| Boolean.parseBoolean(request.getParameter("showMoreLink"));
 
 		request.setAttribute("showMoreLink", showMoreLink + "");
 
@@ -118,7 +119,7 @@ public class ScheduledJobController {
 			currentJobList.add(temp.getTrigger().getKey().getName() + temp.getTrigger().getKey().getGroup());
 		}
 
-		for (String group: scheduler.getPausedTriggerGroups()) {
+		for (String group : scheduler.getPausedTriggerGroups()) {
 
 			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(group));
 			for (TriggerKey triggerKey : legacyTriggers) {
@@ -169,11 +170,11 @@ public class ScheduledJobController {
 						.append("this.form.theTriggerGroupName.value='").append(st.getGroup()).append("';")
 						.append("this.form.submit();").append("setAccessedObjected(this);");
 
-				actions.append("<td><input type=\"button\" class=\"button_medium\" value=\"Skip Next Run\" name=\"skipNextRun\" ")
+				actions.append(
+						"<td><input type=\"button\" class=\"button_medium\" value=\"Skip Next Run\" name=\"skipNextRun\" ")
 						.append("onclick=\"").append(jsCodeString.toString()).append("\" />")
 						.append("<a href='#' data-cc-runningJobId='").append(st.getName())
-						.append("' style='display: none;'></a>")
-						.append("</td></tr></table>");
+						.append("' style='display: none;'></a>").append("</td></tr></table>");
 
 				jobs.setCheckbox(checkbox.toString());
 				jobs.setDatasetId(epBean.getDatasetName());
@@ -209,7 +210,7 @@ public class ScheduledJobController {
 			@RequestParam("theTriggerGroupName") String triggerGroupName,
 			@RequestParam("redirection") String redirection, ModelMap model) throws SchedulerException {
 
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(request.getLocale());
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
 		MessageFormat messageFormat = new MessageFormat("");
 
 		if (!mayProceed(request)) {
@@ -299,8 +300,8 @@ public class ScheduledJobController {
 
 	private StdScheduler getScheduler(HttpServletRequest request) {
 
-		return (StdScheduler) SpringServletAccess
-				.getApplicationContext(request.getSession().getServletContext()).getBean(SCHEDULER);
+		return (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext())
+				.getBean(SCHEDULER);
 	}
 
 	private boolean mayProceed(HttpServletRequest request) {
@@ -314,7 +315,8 @@ public class ScheduledJobController {
 	/**
 	 * Common exception handler.
 	 *
-	 * @param ex an object, which represents the exception was thrown.
+	 * @param ex
+	 *            an object, which represents the exception was thrown.
 	 * @return URL to redirect the user to.
 	 */
 	@ExceptionHandler(Exception.class)

@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.extract;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -40,23 +41,23 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class EditSelectedServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -66,16 +67,17 @@ public class EditSelectedServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 
 	/**
-	 * This function exists in four different places... needs to be added to an additional superclass for Submit
-	 * Data Control Servlets, tbh July 2007
+	 * This function exists in four different places... needs to be added to an additional superclass for Submit Data
+	 * Control Servlets, tbh July 2007
 	 */
 	public void setUpStudyGroups(UserAccountBean ub, DatasetBean db) {
 		ArrayList sgclasses = db.getAllSelectedGroups();
@@ -85,10 +87,10 @@ public class EditSelectedServlet extends Controller {
 			StudyBean theStudy = (StudyBean) studydao.findByPK(ub.getActiveStudyId());
 			sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
 		}
-        db.setAllSelectedGroups(sgclasses);
+		db.setAllSelectedGroups(sgclasses);
 	}
 
-    @Override
+	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -96,7 +98,7 @@ public class EditSelectedServlet extends Controller {
 		request.setAttribute("subjectAgeAtEvent",
 				currentStudy.getStudyParameterConfig().getCollectDob().equals("3") ? "0" : "1");
 
-        FormProcessor fp = new FormProcessor(request);
+		FormProcessor fp = new FormProcessor(request);
 		boolean selectAll = fp.getBoolean("all");
 		boolean selectAllItemsGroupsAttrs = fp.getBoolean("allAttrsAndItems");
 		// Only show a "select all items" like on a side info panel if
@@ -110,7 +112,7 @@ public class EditSelectedServlet extends Controller {
 			db = selectAll(db, null, request);
 
 			MessageFormat msg = new MessageFormat("");
-			msg.setLocale(request.getLocale());
+			msg.setLocale(SessionUtil.getLocale(request));
 			msg.applyPattern(respage.getString("choose_include_all_items_dataset"));
 			Object[] arguments = { db.getItemIds().size() };
 			addPageMessage(msg.format(arguments), request);
@@ -143,13 +145,13 @@ public class EditSelectedServlet extends Controller {
 			StudyDAO studydao = getStudyDAO();
 			StudyGroupClassDAO sgclassdao = getStudyGroupClassDAO();
 			StudyBean theStudy = (StudyBean) studydao.findByPK(ub.getActiveStudyId());
-            ArrayList sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
-            for (Object sgclass1 : sgclasses) {
-                StudyGroupClassBean sgclass = (StudyGroupClassBean) sgclass1;
-                sgclass.setSelected(true);
-                newsgclasses.add(sgclass);
-            }
-            db.setAllSelectedGroups(newsgclasses);
+			ArrayList sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
+			for (Object sgclass1 : sgclasses) {
+				StudyGroupClassBean sgclass = (StudyGroupClassBean) sgclass1;
+				sgclass.setSelected(true);
+				newsgclasses.add(sgclass);
+			}
+			db.setAllSelectedGroups(newsgclasses);
 		}
 
 		request.setAttribute("numberOfStudyItems", db.getItemIds().size());
@@ -165,70 +167,75 @@ public class EditSelectedServlet extends Controller {
 		request.setAttribute("eventlist", events);
 
 		db.getItemMap().clear();
-        db.getItemIds().clear();
+		db.getItemIds().clear();
 		db.getItemDefCrf().clear();
 
-        for (Object o : events.keySet()) {
-            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) o;
-            if (!db.getEventIds().contains(new Integer(sed.getId()))) {
-                db.getEventIds().add(sed.getId());
-            }
-        }
+		for (Object o : events.keySet()) {
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) o;
+			if (!db.getEventIds().contains(new Integer(sed.getId()))) {
+				db.getEventIds().add(sed.getId());
+			}
+		}
 
-        ItemDAO idao = getItemDAO();
-        CRFDAO crfdao = getCRFDAO();
-        db.setItemDefCrf(selectAll(events, crfdao, idao, imfdao));
+		ItemDAO idao = getItemDAO();
+		CRFDAO crfdao = getCRFDAO();
+		db.setItemDefCrf(selectAll(events, crfdao, idao, imfdao));
 		for (ItemBean item : (List<ItemBean>) db.getItemDefCrf()) {
-            db.getItemIds().add(item.getId());
-			db.getItemMap().put(item.getDefId() + "_" + item.getItemMeta().getCrfVersionId()+ "_" + item.getId(), item);
+			db.getItemIds().add(item.getId());
+			db.getItemMap()
+					.put(item.getDefId() + "_" + item.getItemMeta().getCrfVersionId() + "_" + item.getId(), item);
 		}
 
 		return db;
 	}
 
-    @SuppressWarnings("unused")
+	@SuppressWarnings("unused")
 	private static boolean containsItem(ArrayList allItems, ItemBean item) {
-        boolean result = false;
-        for (ItemBean itemBean : (List<ItemBean>)allItems) {
-            if (itemBean.getId() == item.getId()) {
-                result = true;
-                break;
-            }
-        }
-        return result;
-    }
+		boolean result = false;
+		for (ItemBean itemBean : (List<ItemBean>) allItems) {
+			if (itemBean.getId() == item.getId()) {
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
 
 	/**
 	 * Finds all the items in a study giving all events in the study
 	 * 
-	 * @param events HashMap
-     * @param crfdao CRFDAO
-     * @param idao ItemDAO
-     * @param imfdao ItemFormMetadataDAO
+	 * @param events
+	 *            HashMap
+	 * @param crfdao
+	 *            CRFDAO
+	 * @param idao
+	 *            ItemDAO
+	 * @param imfdao
+	 *            ItemFormMetadataDAO
 	 * @return ArrayList
 	 */
 	public static ArrayList selectAll(HashMap events, CRFDAO crfdao, ItemDAO idao, ItemFormMetadataDAO imfdao) {
-        ArrayList allItems = new ArrayList();
-        for (Object o : events.keySet()) {
-            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) o;
-            ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
-            for (Object crf1 : crfs) {
-                CRFBean crf = (CRFBean) crf1;
-                ArrayList items = idao.findAllActiveByCRF(crf);
-                for (Object item1 : items) {
-                    ItemBean item = (ItemBean) item1;
-                    item.setCrfName(crf.getName());
-                    item.setDefName(sed.getName());
-                    item.setDefId(sed.getId());
-                    item.setSelected(true);
-                    item.setCrfVersion("" + crf.getId());
-                    if (imfdao != null) {
-                        item.setItemMetas(imfdao.findAllByItemId(item.getId()));
-                    }
-                }
-                allItems.addAll(items);
-            }
-        }
+		ArrayList allItems = new ArrayList();
+		for (Object o : events.keySet()) {
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) o;
+			ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
+			for (Object crf1 : crfs) {
+				CRFBean crf = (CRFBean) crf1;
+				ArrayList items = idao.findAllActiveByCRF(crf);
+				for (Object item1 : items) {
+					ItemBean item = (ItemBean) item1;
+					item.setCrfName(crf.getName());
+					item.setDefName(sed.getName());
+					item.setDefId(sed.getId());
+					item.setSelected(true);
+					item.setCrfVersion("" + crf.getId());
+					if (imfdao != null) {
+						item.setItemMetas(imfdao.findAllByItemId(item.getId()));
+					}
+				}
+				allItems.addAll(items);
+			}
+		}
 		Collections.sort(allItems, new ItemBean.ItemBeanComparator());
 		return allItems;
 	}

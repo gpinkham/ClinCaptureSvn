@@ -13,15 +13,7 @@
 
 package org.akaza.openclinica.web.filter;
 
-import java.util.Date;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -33,6 +25,7 @@ import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.util.InactiveAnalyzer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -42,6 +35,15 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.TextEscapeUtils;
 import org.springframework.util.Assert;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Processes an authentication form submission. Called {@code AuthenticationProcessingFilter} prior to Spring Security
@@ -59,6 +61,7 @@ import org.springframework.util.Assert;
  * @author Luke Taylor
  * @since 3.0
  */
+@SuppressWarnings({ "serial", "static-access" })
 public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
 	public static final String SPRING_SECURITY_FORM_USERNAME_KEY = "j_username";
@@ -73,17 +76,29 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	private ConfigurationDao configurationDao;
 	private DataSource dataSource;
 
-	// ~ Constructors
-	// ===================================================================================================
+	@Autowired
+	private SessionLocaleResolver localeResolver;
 
+	@Autowired
+	private CoreResources coreResources;
+
+	/**
+	 * OpenClinicaUsernamePasswordAuthenticationFilter constructor.
+	 */
 	public OpenClinicaUsernamePasswordAuthenticationFilter() {
 		super("/j_spring_security_check");
 	}
 
-	// ~ Methods
-	// ========================================================================================================
-
-	@SuppressWarnings("serial")
+	/**
+	 * Attemp authentication.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @return Authentication
+	 * @throws AuthenticationException
+	 */
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
@@ -92,7 +107,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 		}
 
 		String hostName = request.getRequestURL().toString().replaceAll("http.{0,1}://", "").replaceAll(":.*|/.*", "");
-		CoreResources.setField("currentHostName", hostName);
+		coreResources.setField("currentHostName", hostName);
 
 		String username = obtainUsername(request);
 		String password = obtainPassword(request);
@@ -122,11 +137,11 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 
 		Authentication authentication;
 		UserAccountBean userAccountBean = null;
-		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
-		Locale locale = request.getLocale();
-		ResourceBundleProvider.updateLocale(locale); // Set current language preferences
+		Locale locale = SessionUtil.getLocale(request);
+		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle restext = ResourceBundleProvider.getTextsBundle(locale);
+
 		try {
 			EntityBean eb = getUserAccountDao().findByUserName(username);
 			if (eb.getId() != 0) {

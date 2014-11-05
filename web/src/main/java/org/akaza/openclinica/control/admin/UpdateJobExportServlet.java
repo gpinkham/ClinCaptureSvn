@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.SessionUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
@@ -203,8 +204,8 @@ public class UpdateJobExportServlet extends Controller {
 
 				newTrigger = xsltService.generateXsltTrigger(xsltPath,
 						generalFileDir, // xml_file_path
-						endFilePath + File.separator, exportFileName, dsBean.getId(), epBean, userBean, request
-								.getLocale().getLanguage(), cnt, SQLInitServlet.getField("filePath") + "xslt",
+						endFilePath + File.separator, exportFileName, dsBean.getId(), epBean, userBean, SessionUtil
+								.getLocale(request).getLanguage(), cnt, SQLInitServlet.getField("filePath") + "xslt",
 						XsltTriggerService.TRIGGER_GROUP_NAME);
 
 				newTrigger.setName(jobName);

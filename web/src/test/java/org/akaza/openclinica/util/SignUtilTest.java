@@ -27,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * SignUtilTest class.
  */
+@SuppressWarnings("rawtypes")
 public class SignUtilTest {
 
 	private DAOWrapper daoWrapper;

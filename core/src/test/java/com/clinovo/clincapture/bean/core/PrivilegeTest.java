@@ -41,7 +41,7 @@ public class PrivilegeTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ResourceBundleProvider.updateLocale(Locale.getDefault());
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		resterm = ResourceBundleProvider.getTermsBundle();
 	}
 

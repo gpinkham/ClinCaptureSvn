@@ -4,11 +4,12 @@ import com.clinovo.dao.SystemDAO;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.service.EventCRFService;
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.service.UserAccountService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
-import com.clinovo.service.EventCRFService;
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -63,6 +64,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.ServletContextAware;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
@@ -125,7 +127,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public static final String MODULE = "module";// to determine which module
 
 	public static final String NOT_USED = "not_used";
-	
+
 	public static final String DOMAIN_NAME = "domain_name";
 
 	private static final Map<Integer, Integer> unavailableCRFList = new HashMap<Integer, Integer>();
@@ -159,6 +161,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	private ServletContext servletContext;
 
+	@Autowired
+	private SessionLocaleResolver localeResolver;
 	@Autowired
 	private DataSource dataSource;
 	@Autowired
@@ -249,7 +253,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	}
 
 	public SimpleDateFormat getLocalDf(HttpServletRequest request) {
-		return new SimpleDateFormat(resformat.getString("date_format_string"), request.getLocale());
+		return new SimpleDateFormat(resformat.getString("date_format_string"), SessionUtil.getLocale(request));
 	}
 
 	public SessionManager getSessionManager(HttpServletRequest request) {
@@ -505,5 +509,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public EventCRFService getEventCRFService() {
 		return eventCRFService;
+	}
+
+	public SessionLocaleResolver getLocaleResolver() {
+		return localeResolver;
 	}
 }

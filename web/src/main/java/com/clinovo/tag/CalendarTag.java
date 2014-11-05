@@ -13,10 +13,12 @@
 
 package com.clinovo.tag;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
@@ -31,7 +33,7 @@ public class CalendarTag extends TagSupport {
 
 	@Override
 	public int doStartTag() throws JspException {
-		String language = pageContext.getRequest().getLocale().getLanguage();
+		String language = SessionUtil.getLocale((HttpServletRequest) pageContext.getRequest()).getLanguage();
 		language = CoreResources.CALENDAR_LANGS.contains(language) ? language : "en";
 		String contextPath = pageContext.getServletContext().getContextPath();
 		String html = "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"".concat(contextPath).concat(

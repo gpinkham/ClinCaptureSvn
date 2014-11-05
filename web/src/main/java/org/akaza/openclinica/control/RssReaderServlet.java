@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.control;
 
+import com.clinovo.util.SessionUtil;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.fetcher.FeedFetcher;
@@ -43,8 +44,10 @@ public class RssReaderServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String rssUrl = SQLInitServlet.getField("rss.url");
-		ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", req.getLocale());
-		ResourceBundle resformat = ResourceBundle.getBundle("org.akaza.openclinica.i18n.format", req.getLocale());
+		ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",
+				SessionUtil.getLocale(req));
+		ResourceBundle resformat = ResourceBundle.getBundle("org.akaza.openclinica.i18n.format",
+				SessionUtil.getLocale(req));
 		PrintWriter pw = new PrintWriter(resp.getOutputStream());
 		if (rssUrl == null || rssUrl.length() == 0) {
 			about(resword, pw);

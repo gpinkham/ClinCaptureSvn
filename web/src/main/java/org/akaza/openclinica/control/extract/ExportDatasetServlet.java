@@ -20,20 +20,15 @@
  */
 package org.akaza.openclinica.control.extract;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.extract.*;
+import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
+import org.akaza.openclinica.bean.extract.CommaReportBean;
+import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.extract.ExportFormatBean;
+import org.akaza.openclinica.bean.extract.ExtractBean;
+import org.akaza.openclinica.bean.extract.SPSSReportBean;
+import org.akaza.openclinica.bean.extract.TabReportBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -57,6 +52,22 @@ import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Take a dataset and show it in different formats,<BR/>
@@ -89,7 +100,8 @@ public class ExportDatasetServlet extends Controller {
 		ArchivedDatasetFileDAO asdfdao = getArchivedDatasetFileDAO();
 		FormProcessor fp = new FormProcessor(request);
 
-		GenerateExtractFileService generateFileService = new GenerateExtractFileService(getDataSource(), request, ub,
+		Locale locale = SessionUtil.getLocale(request);
+		GenerateExtractFileService generateFileService = new GenerateExtractFileService(getDataSource(), locale, ub,
 				getCoreResources(), getRuleSetRuleDao());
 		String action = fp.getString("action");
 		int datasetId = fp.getInt("datasetId");

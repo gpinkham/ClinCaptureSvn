@@ -1,9 +1,6 @@
 package com.clinovo.clincapture.control.submit;
 
-import java.util.Arrays;
-import java.util.Locale;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.AbstractContextSentiveTest;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
@@ -17,6 +14,10 @@ import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import java.util.Locale;
 
 public class UpdateDNShortcutAnchorsServletTest extends AbstractContextSentiveTest {
 
@@ -37,8 +38,8 @@ public class UpdateDNShortcutAnchorsServletTest extends AbstractContextSentiveTe
 		request = new MockHttpServletRequest();
 		response = new MockHttpServletResponse();
 		request = new MockHttpServletRequest();
-		request.setPreferredLocales(Arrays.asList(new Locale[] { new Locale("en") }));
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		SessionUtil.updateLocale(request.getSession(), Locale.ENGLISH);
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		formDiscrepancyNotes = new FormDiscrepancyNotes();
 		request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, formDiscrepancyNotes);
 		Whitebox.setInternalState(servlet, "servletContext", servletContext);

@@ -1,5 +1,6 @@
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,7 +40,6 @@ public class ViewStudyEventsServletTest {
 		Mockito.when(request.getParameter("refreshPage")).thenReturn("1");
 		Mockito.when(request.getRequestURL()).thenReturn(
 				new StringBuffer("http://localhost:8080/clincapture/ViewStudyEvents"));
-		Mockito.when(request.getLocale()).thenReturn(Locale.ENGLISH);
 		PowerMockito.mockStatic(ResourceBundleProvider.class);
 		PowerMockito.when(ResourceBundleProvider.getFormatBundle()).thenReturn(resformat);
 		PowerMockito.doReturn("dd-MMM-yyyy").when(resformat).getString("date_format_string");
@@ -48,18 +48,18 @@ public class ViewStudyEventsServletTest {
 
 	@Test
 	public void testThatSavedUrlIsChangedIfRequestLocaleWasChanged() {
-		Mockito.when(request.getLocale()).thenReturn(Locale.ENGLISH);
+		SessionUtil.updateLocale(session, Locale.ENGLISH);
 		String key = viewStudyEventsServlet.getUrlKey(request);
 		viewStudyEventsServlet.getDefaultUrl(request);
 		String savedUrl = (String) request.getSession().getAttribute(key);
-		Mockito.when(request.getLocale()).thenReturn(Locale.JAPAN);
+		SessionUtil.updateLocale(session, Locale.JAPAN);
 		viewStudyEventsServlet.getDefaultUrl(request);
 		Assert.assertFalse(request.getSession().getAttribute(key).equals(savedUrl));
 	}
 
 	@Test
 	public void testThatSavedUrlIsNotChangedIfRequestLocaleWasNotChanged() {
-		Mockito.when(request.getLocale()).thenReturn(Locale.ENGLISH);
+		SessionUtil.updateLocale(session, Locale.ENGLISH);
 		String key = viewStudyEventsServlet.getUrlKey(request);
 		viewStudyEventsServlet.getDefaultUrl(request);
 		String savedUrl = (String) request.getSession().getAttribute(key);

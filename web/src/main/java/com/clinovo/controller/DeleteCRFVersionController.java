@@ -15,6 +15,7 @@ package com.clinovo.controller;
 
 import com.clinovo.service.CodedItemService;
 import com.clinovo.util.PageMessagesUtil;
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.Role;
@@ -81,7 +82,7 @@ public class DeleteCRFVersionController {
 	 * @return String
 	 * @throws Exception
 	 *             an exception
-	 */	
+	 */
 	@RequestMapping(method = RequestMethod.GET)
 	public String mainGet(HttpServletRequest request, Model model, @RequestParam("crfVersionId") int crfVersionId)
 			throws Exception {
@@ -120,11 +121,15 @@ public class DeleteCRFVersionController {
 
 			if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0
 					|| eventDefinitionListAvailable.size() > 0 || ruleSetBeanList.size() > 0) {
-				PageMessagesUtil.addPageMessage(request,
-						messageSource.getMessage("this_crf_version_has_associated_data", null, request.getLocale()));
+				PageMessagesUtil.addPageMessage(
+						request,
+						messageSource.getMessage("this_crf_version_has_associated_data", null,
+								SessionUtil.getLocale(request)));
 			} else {
-				PageMessagesUtil.addPageMessage(request,
-						messageSource.getMessage("this_crf_version_has_no_conflict_data", null, request.getLocale()));
+				PageMessagesUtil.addPageMessage(
+						request,
+						messageSource.getMessage("this_crf_version_has_no_conflict_data", null,
+								SessionUtil.getLocale(request)));
 			}
 
 		} else {
@@ -168,8 +173,10 @@ public class DeleteCRFVersionController {
 
 		if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0 || eventDefinitionListAvailable.size() > 0
 				|| ruleSetBeanList.size() > 0) {
-			request.getSession().setAttribute("controllerMessage",
-					messageSource.getMessage("this_crf_version_has_associated_data", null, request.getLocale()));
+			request.getSession().setAttribute(
+					"controllerMessage",
+					messageSource.getMessage("this_crf_version_has_associated_data", null,
+							SessionUtil.getLocale(request)));
 		} else {
 			ArrayList items = crfVersionDao.findNotSharedItemsByVersion(crfVersionBean.getId());
 			NewCRFBean nib = new NewCRFBean(dataSource, crfVersionBean.getCrfId());
@@ -180,7 +187,7 @@ public class DeleteCRFVersionController {
 			codedItemService.deleteByCRFVersion(crfVersionBean.getId());
 
 			request.getSession().setAttribute("controllerMessage",
-					messageSource.getMessage("the_crf_version_has_been_removed", null, request.getLocale()));
+					messageSource.getMessage("the_crf_version_has_been_removed", null, SessionUtil.getLocale(request)));
 		}
 
 		return CRF_LIST;

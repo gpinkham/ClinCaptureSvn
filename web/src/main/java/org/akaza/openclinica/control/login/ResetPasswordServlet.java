@@ -20,18 +20,8 @@
  */
 package org.akaza.openclinica.control.login;
 
+import com.clinovo.util.SessionUtil;
 import com.clinovo.util.ValidatorHelper;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -46,6 +36,15 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * Reset expired password
  * 
@@ -57,8 +56,9 @@ public class ResetPasswordServlet extends Controller {
 	private static final long serialVersionUID = -5259201015824317949L;
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        //
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		//
 	}
 
 	/**
@@ -77,13 +77,13 @@ public class ResetPasswordServlet extends Controller {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 
 		logger.info("Change expired password");
 
 		UserAccountDAO udao = new UserAccountDAO(getDataSource());
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
-        HashMap errors = new HashMap();
+		HashMap errors = new HashMap();
 		FormProcessor fp = new FormProcessor(request);
 		String mustChangePwd = request.getParameter("mustChangePwd");
 		String newPwd = fp.getString("passwd").trim();
@@ -93,8 +93,9 @@ public class ResetPasswordServlet extends Controller {
 		if ("yes".equalsIgnoreCase(mustChangePwd)) {
 			addPageMessage(respage.getString("your_password_has_expired_must_change"), request);
 		} else {
-			addPageMessage(respage.getString("password_expired") + " "
-					+ respage.getString("if_you_do_not_want_change_leave_blank"), request);
+			addPageMessage(
+					respage.getString("password_expired") + " "
+							+ respage.getString("if_you_do_not_want_change_leave_blank"), request);
 		}
 		request.setAttribute("mustChangePass", mustChangePwd);
 
@@ -133,7 +134,7 @@ public class ResetPasswordServlet extends Controller {
 
 				PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
 
-				Locale locale = request.getLocale();
+				Locale locale = SessionUtil.getLocale(request);
 				ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
 
 				pwdErrors = PasswordValidator.validatePassword(passwordRequirementsDao, udao, ub.getId(), newPwd,

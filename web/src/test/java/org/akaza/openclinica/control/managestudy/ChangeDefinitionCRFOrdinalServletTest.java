@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -35,7 +36,6 @@ import org.springframework.mock.web.MockRequestDispatcher;
 import org.springframework.mock.web.MockServletContext;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -54,8 +54,8 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 	@Mock
 	private MockRequestDispatcher mockedRequestDispatcher;
 
-	private ChangeDefinitionCRFOrdinalServlet spiedChangeDefinitionCRFOrdinalServlet =
-			Mockito.spy(new ChangeDefinitionCRFOrdinalServlet());
+	private ChangeDefinitionCRFOrdinalServlet spiedChangeDefinitionCRFOrdinalServlet = Mockito
+			.spy(new ChangeDefinitionCRFOrdinalServlet());
 
 	private MockHttpServletResponse spiedResponse = Mockito.spy(new MockHttpServletResponse());
 
@@ -82,10 +82,11 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 		PowerMockito.when(ResourceBundleProvider.getFormatBundle(Mockito.any(Locale.class))).thenReturn(resFormat);
 
 		request = new MockHttpServletRequest();
-		request.setPreferredLocales(Arrays.asList(locale));
+		SessionUtil.updateLocale(request, locale);
 
 		// setting up Servlet Context mock
-		Mockito.when(mockedServletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(mockedRequestDispatcher);
+		Mockito.when(mockedServletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(
+				mockedRequestDispatcher);
 
 		// setting up the test list of EventDefinitionCRFBeans of study level,
 		// assigned to the same study event definition
@@ -104,17 +105,19 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 		currentStudy.setId(1);
 
 		// setting up DAO mocks
-		Mockito.when(mockedEventDefinitionCRFDAO.findAllByDefinition(Mockito.any(StudyBean.class),
-				Mockito.any(Integer.class))).thenReturn(studyLevelEventDefCRFBeanList);
-		Mockito.when(mockedEventDefinitionCRFDAO.findAllChildrenByDefinition(Mockito.any(Integer.class)))
-				.thenReturn(siteLevelEventDefCRFBeanList);
+		Mockito.when(
+				mockedEventDefinitionCRFDAO.findAllByDefinition(Mockito.any(StudyBean.class),
+						Mockito.any(Integer.class))).thenReturn(studyLevelEventDefCRFBeanList);
+		Mockito.when(mockedEventDefinitionCRFDAO.findAllChildrenByDefinition(Mockito.any(Integer.class))).thenReturn(
+				siteLevelEventDefCRFBeanList);
 
 		// setting up spied ChangeDefinitionCRFOrdinalServlet
 		Whitebox.setInternalState(spiedChangeDefinitionCRFOrdinalServlet, "respage", resPage);
 		Mockito.doReturn(mockedServletContext).when(spiedChangeDefinitionCRFOrdinalServlet).getServletContext();
 		Mockito.doReturn(currentUser).when(spiedChangeDefinitionCRFOrdinalServlet).getUserAccountBean(request);
 		Mockito.doReturn(currentStudy).when(spiedChangeDefinitionCRFOrdinalServlet).getCurrentStudy(request);
-		Mockito.doReturn(mockedEventDefinitionCRFDAO).when(spiedChangeDefinitionCRFOrdinalServlet).getEventDefinitionCRFDAO();
+		Mockito.doReturn(mockedEventDefinitionCRFDAO).when(spiedChangeDefinitionCRFOrdinalServlet)
+				.getEventDefinitionCRFDAO();
 	}
 
 	private void setupStudyLevelEventDefCRFBeanList() {
@@ -160,7 +163,8 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 	}
 
 	@Test
-	public void testChangeDefinitionCRFOrdinalServletBehaviorWhenRequestParameterEventCRFDefIdIsInvalid() throws Exception {
+	public void testChangeDefinitionCRFOrdinalServletBehaviorWhenRequestParameterEventCRFDefIdIsInvalid()
+			throws Exception {
 
 		// 1. SETTING UP TEST
 
@@ -189,8 +193,8 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 		String action = "someAction";
 		request.setParameter("action", action);
 
-		Mockito.when(mockedEventDefinitionCRFDAO.findByPK(Mockito.any(Integer.class)))
-				.thenReturn(studyLevelEventDefCRFBeanList.get(1));
+		Mockito.when(mockedEventDefinitionCRFDAO.findByPK(Mockito.any(Integer.class))).thenReturn(
+				studyLevelEventDefCRFBeanList.get(1));
 
 		// 2. TESTING BEHAVIOR
 
@@ -211,8 +215,8 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 		String action = "moveDown";
 		request.setParameter("action", action);
 
-		Mockito.when(mockedEventDefinitionCRFDAO.findByPK(Mockito.any(Integer.class)))
-				.thenReturn(studyLevelEventDefCRFBeanList.get(1));
+		Mockito.when(mockedEventDefinitionCRFDAO.findByPK(Mockito.any(Integer.class))).thenReturn(
+				studyLevelEventDefCRFBeanList.get(1));
 
 		int expectedOrdinalForTargetBean = 3;
 		int expectedOrdinalForNeighbourBean = 2;
@@ -234,8 +238,8 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 		Mockito.verify(mockedEventDefinitionCRFDAO).update(studyLevelEventDefCRFBeanList.get(2));
 
 		// checking forward
-		Assert.assertTrue(request.getAttribute("id")
-				.equals(String.valueOf(studyLevelEventDefCRFBeanList.get(1).getStudyEventDefinitionId())));
+		Assert.assertTrue(request.getAttribute("id").equals(
+				String.valueOf(studyLevelEventDefCRFBeanList.get(1).getStudyEventDefinitionId())));
 		Mockito.verify(mockedServletContext).getRequestDispatcher(Page.VIEW_EVENT_DEFINITION_SERVLET.getFileName());
 		Mockito.verify(mockedRequestDispatcher).forward(request, spiedResponse);
 	}
@@ -248,8 +252,8 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 		String action = "moveUp";
 		request.setParameter("action", action);
 
-		Mockito.when(mockedEventDefinitionCRFDAO.findByPK(Mockito.any(Integer.class)))
-				.thenReturn(studyLevelEventDefCRFBeanList.get(1));
+		Mockito.when(mockedEventDefinitionCRFDAO.findByPK(Mockito.any(Integer.class))).thenReturn(
+				studyLevelEventDefCRFBeanList.get(1));
 
 		int expectedOrdinalForTargetBean = 1;
 		int expectedOrdinalForNeighbourBean = 2;
@@ -271,8 +275,8 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 		Mockito.verify(mockedEventDefinitionCRFDAO).update(studyLevelEventDefCRFBeanList.get(0));
 
 		// checking forward
-		Assert.assertTrue(request.getAttribute("id")
-				.equals(String.valueOf(studyLevelEventDefCRFBeanList.get(1).getStudyEventDefinitionId())));
+		Assert.assertTrue(request.getAttribute("id").equals(
+				String.valueOf(studyLevelEventDefCRFBeanList.get(1).getStudyEventDefinitionId())));
 		Mockito.verify(mockedServletContext).getRequestDispatcher(Page.VIEW_EVENT_DEFINITION_SERVLET.getFileName());
 		Mockito.verify(mockedRequestDispatcher).forward(request, spiedResponse);
 	}

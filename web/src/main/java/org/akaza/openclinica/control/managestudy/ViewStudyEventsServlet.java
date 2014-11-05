@@ -12,6 +12,7 @@
  ******************************************************************************/
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.SessionUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -499,8 +500,8 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1");
 		Locale locale = (Locale) request.getSession().getAttribute("viewStudyEventsServletPreviousLocale");
 		boolean localeChanged = locale != null
-				&& !request.getLocale().getLanguage().equalsIgnoreCase(locale.getLanguage());
-		request.getSession().setAttribute("viewStudyEventsServletPreviousLocale", request.getLocale());
+				&& !SessionUtil.getLocale(request).getLanguage().equalsIgnoreCase(locale.getLanguage());
+		request.getSession().setAttribute("viewStudyEventsServletPreviousLocale", SessionUtil.getLocale(request));
 		if (request.getParameter("refreshPage") != null || localeChanged) {
 			saveUrl(getUrlKey(request), request.getRequestURL() + sb.toString(), request);
 		}

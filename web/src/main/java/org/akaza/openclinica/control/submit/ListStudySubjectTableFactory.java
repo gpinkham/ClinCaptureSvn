@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -133,7 +134,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	// To avoid showing title in other pages, the request element is used to determine where the request came from.
 	@Override
 	public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
-		locale = request.getLocale();
+		locale = SessionUtil.getLocale(request);
 		TableFacade tableFacade = getTableFacadeImpl(request, response);
 		tableFacade.setStateAttr("restore");
 		setDataAndLimitVariables(tableFacade);

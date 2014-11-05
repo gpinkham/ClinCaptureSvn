@@ -10,8 +10,6 @@
 
 package com.clinovo.clincapture.bean.core;
 
-import static org.junit.Assert.*;
-
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.After;
@@ -20,6 +18,11 @@ import org.junit.Test;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * User: Pavel Date: 14.10.12
@@ -37,7 +40,7 @@ public class EntityActionTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ResourceBundleProvider.updateLocale(Locale.getDefault());
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		resterm = ResourceBundleProvider.getTermsBundle();
 	}
 

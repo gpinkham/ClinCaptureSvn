@@ -16,6 +16,7 @@
 package com.clinovo.interceptor;
 
 import com.clinovo.controller.Redirection;
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -52,7 +53,7 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 					BaseController.USER_BEAN_NAME);
 			StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(BaseController.STUDY);
 			ok = userBean != null && userRole != null && currentStudy != null;
-			ResourceBundleProvider.updateLocale(request.getLocale());
+			ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 			request.setAttribute(BaseController.USER_ROLE, userRole);
 			request.setAttribute(BaseController.STUDY, currentStudy);
 			request.setAttribute(BaseController.USER_BEAN_NAME, userBean);

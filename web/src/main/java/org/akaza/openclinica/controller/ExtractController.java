@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.controller;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -83,7 +84,7 @@ public class ExtractController {
 	public ModelMap processSubmit(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("id") String id, @RequestParam("datasetId") String datasetId) throws IOException {
 		ModelMap map = new ModelMap();
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		// String datasetId = (String)request.getAttribute("datasetId");
 		// String id = (String)request.getAttribute("id");
 		System.out.println("found both id " + id + " and dataset " + datasetId);
@@ -166,11 +167,9 @@ public class ExtractController {
 			// String xmlFilePath = generalFileDir + ODMXMLFileName;
 			simpleTrigger = xsltService.generateXsltTrigger(xsltPath,
 					generalFileDir, // xml_file_path
-					endFilePath + File.separator, exportFileName, dsBean.getId(), epBean, userBean, request.getLocale()
-							.getLanguage(), cnt, SQLInitServlet.getField("filePath") + "xslt",
+					endFilePath + File.separator, exportFileName, dsBean.getId(), epBean, userBean, SessionUtil
+							.getLocale(request).getLanguage(), cnt, SQLInitServlet.getField("filePath") + "xslt",
 					ExtractController.TRIGGER_GROUP_NAME);
-			// System.out.println("just set locale: " +
-			// request.getLocale().getLanguage());
 
 			cnt++;
 

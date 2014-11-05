@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.control;
 
+import com.clinovo.util.SessionUtil;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.facade.TableFacadeImpl;
 import org.jmesa.limit.ExportType;
@@ -28,16 +29,15 @@ import org.jmesa.view.html.component.HtmlTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public abstract class AbstractTableFactory {
 
 	protected Locale locale;
@@ -63,7 +63,7 @@ public abstract class AbstractTableFactory {
 	public abstract void setDataAndLimitVariables(TableFacade tableFacade);
 
 	public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
-		locale = request.getLocale();
+		locale = SessionUtil.getLocale(request);
 		TableFacade tableFacade = getTableFacadeImpl(request, response);
 		setStateAttr(tableFacade);
 		setDataAndLimitVariables(tableFacade);
@@ -90,7 +90,7 @@ public abstract class AbstractTableFactory {
 	 * @see filter & sort methods in implementations
 	 */
 	public void exportCSVTable(HttpServletRequest request, HttpServletResponse response, String path) {
-		locale = request.getLocale();
+		locale = SessionUtil.getLocale(request);
 		String DATE_FORMAT = "yyyyMMddHHmmss";
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 		String fileName = getTableName() + "_" + sdf.format(new Date());
@@ -179,7 +179,7 @@ public abstract class AbstractTableFactory {
 	public Locale getLocale() {
 		return locale;
 	}
-	
+
 	public void setLocale(Locale locale) {
 		this.locale = locale;
 	}

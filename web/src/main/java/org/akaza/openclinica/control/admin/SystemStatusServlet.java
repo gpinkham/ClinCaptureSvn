@@ -42,7 +42,7 @@ public class SystemStatusServlet extends Controller {
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		request.getLocale();
+		//
 	}
 
 	@Override

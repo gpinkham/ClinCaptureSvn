@@ -21,6 +21,7 @@
 package org.akaza.openclinica.control.submit;
 
 import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -197,7 +198,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			request.setAttribute(LOCKED_FLAG, "no");
 		}
 
-		Locale locale = request.getLocale();
+		Locale locale = SessionUtil.getLocale(request);
 		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
 
 		int stSubjectId = fp.getInt(CreateDiscrepancyNoteServlet.ST_SUBJECT_ID, true);

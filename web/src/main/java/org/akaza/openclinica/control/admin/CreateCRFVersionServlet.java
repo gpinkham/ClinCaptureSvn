@@ -20,20 +20,7 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.Role;
@@ -67,6 +54,19 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Create a new CRF version by uploading excel file.
  *
@@ -95,8 +95,7 @@ public class CreateCRFVersionServlet extends Controller {
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
-				"1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	/**
@@ -349,8 +348,7 @@ public class CreateCRFVersionServlet extends Controller {
 					logger.info("Version already exists; owner or not:" + ub.getId() + "," + version1.getOwnerId());
 					if (ub.getId() != version1.getOwnerId()) {
 						addPageMessage(respage.getString("CRF_version_try_upload_exists_database")
-										+ version1.getOwner().getName() + respage
-										.getString("please_contact_owner_to_delete"),
+								+ version1.getOwner().getName() + respage.getString("please_contact_owner_to_delete"),
 								request);
 						forwardPage(Page.CREATE_CRF_VERSION, request, response);
 						return false;
@@ -392,11 +390,15 @@ public class CreateCRFVersionServlet extends Controller {
 	/**
 	 * Uploads the excel version file.
 	 *
-	 * @param request HttpServletRequest
-	 * @param theDir  String
-	 * @param version CRFVersionBean
+	 * @param request
+	 *            HttpServletRequest
+	 * @param theDir
+	 *            String
+	 * @param version
+	 *            CRFVersionBean
 	 * @return temp file name
-	 * @throws Exception in case of failure
+	 * @throws Exception
+	 *             in case of failure
 	 */
 	public String uploadFile(HttpServletRequest request, String theDir, CRFVersionBean version) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
@@ -432,13 +434,13 @@ public class CreateCRFVersionServlet extends Controller {
 				try {
 					inStream = new FileInputStream(theDir + tempFile);
 
-					htab = new SpreadSheetTableRepeating(inStream, ub, version.getName(), request.getLocale(),
-							currentStudy.getId(), isXlsx);
+					htab = new SpreadSheetTableRepeating(inStream, ub, version.getName(),
+							SessionUtil.getLocale(request), currentStudy.getId(), isXlsx);
 					htab.setMeasurementUnitDao(getMeasurementUnitDao());
 					if (!htab.isRepeating()) {
 						inStreamClassic = new FileInputStream(theDir + tempFile);
-						sstc = new SpreadSheetTableClassic(inStreamClassic, ub, version.getName(), request.getLocale(),
-								currentStudy.getId(), isXlsx);
+						sstc = new SpreadSheetTableClassic(inStreamClassic, ub, version.getName(),
+								SessionUtil.getLocale(request), currentStudy.getId(), isXlsx);
 						sstc.setMeasurementUnitDao(getMeasurementUnitDao());
 					}
 					if (htab.isRepeating()) {
@@ -506,14 +508,12 @@ public class CreateCRFVersionServlet extends Controller {
 							if (isOwner) {
 								warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
 										+ resexception.getString("in_your_spreadsheet_already_exists")
-										+ ib.getDataType().getName() + ") " + resword.getString("and_or")
-										+ " UNITS("
+										+ ib.getDataType().getName() + ") " + resword.getString("and_or") + " UNITS("
 										+ ib.getUnits() + ").");
 							} else {
 								warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
 										+ resexception.getString("in_your_spreadsheet_already_exists")
-										+ ib.getDataType().getName() + ") " + resword.getString("and_or")
-										+ " UNITS("
+										+ ib.getDataType().getName() + ") " + resword.getString("and_or") + " UNITS("
 										+ ib.getUnits() + ").");
 							}
 
@@ -563,8 +563,10 @@ public class CreateCRFVersionServlet extends Controller {
 	/**
 	 * Checks whether the version can be deleted.
 	 *
-	 * @param request           HttpServletRequest
-	 * @param previousVersionId int
+	 * @param request
+	 *            HttpServletRequest
+	 * @param previousVersionId
+	 *            int
 	 * @return boolean
 	 */
 	private boolean canDeleteVersion(HttpServletRequest request, int previousVersionId) {
@@ -607,8 +609,10 @@ public class CreateCRFVersionServlet extends Controller {
 	 * Checks whether the item with same name has the same other fields: units, phi_status if no, they are two different
 	 * items, cannot have the same same.
 	 *
-	 * @param items   items from excel
-	 * @param version crf version bean
+	 * @param items
+	 *            items from excel
+	 * @param version
+	 *            crf version bean
 	 * @return the items found
 	 */
 	public List<ItemBean> isItemSame(HashMap<String, ItemBean> items, CRFVersionBean version) {
@@ -673,8 +677,10 @@ public class CreateCRFVersionServlet extends Controller {
 	 * For a given RESPONSE_OPTIONS_TEXT string, the associated RESPONSE_VALUES code is different than in a previous
 	 * version
 	 *
-	 * @param oldRes ResponseSetBean
-	 * @param newRes ResponseSetBean
+	 * @param oldRes
+	 *            ResponseSetBean
+	 * @param newRes
+	 *            ResponseSetBean
 	 * @return The original option
 	 */
 	@SuppressWarnings("unused")
@@ -718,9 +724,12 @@ public class CreateCRFVersionServlet extends Controller {
 	/**
 	 * Copy one file to another.
 	 *
-	 * @param src File
-	 * @param dst File
-	 * @throws IOException in case of IO errors
+	 * @param src
+	 *            File
+	 * @param dst
+	 *            File
+	 * @throws IOException
+	 *             in case of IO errors
 	 */
 	public void copy(File src, File dst) throws IOException {
 		final int maxSize = 1024;
@@ -742,7 +751,8 @@ public class CreateCRFVersionServlet extends Controller {
 	 * example. If the option text has single quote, it is changed to double quotes for SQL compatibility, so we will
 	 * change it back before the comparison
 	 *
-	 * @param subj the subject line
+	 * @param subj
+	 *            the subject line
 	 * @return A string with all the quotes escaped.
 	 */
 	public String restoreQuotes(String subj) {

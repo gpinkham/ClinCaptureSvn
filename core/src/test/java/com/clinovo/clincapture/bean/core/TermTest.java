@@ -39,7 +39,7 @@ public class TermTest {
 	@Before
 	public void setUp() throws Exception {
 		term = new Term();
-		ResourceBundleProvider.updateLocale(Locale.getDefault());
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 	}
 
 	@After

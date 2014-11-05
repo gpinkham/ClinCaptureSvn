@@ -747,6 +747,15 @@ public class CoreResources implements ResourceLoaderAware {
 		return dataInfo.getProperty("dbType");
 	}
 
+	public static String getSystemLanguage() {
+		String language = CoreResources.getField("system.language");
+		if (language == null || language.trim().isEmpty()) {
+			language = "en";
+			CoreResources.setField("system.language", language);
+		}
+		return language;
+	}
+
 	public static String getField(String key) {
 		if (dataInfo == null) {
 			return "";

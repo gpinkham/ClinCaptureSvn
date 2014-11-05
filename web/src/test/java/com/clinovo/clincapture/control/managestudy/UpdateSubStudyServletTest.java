@@ -33,7 +33,6 @@ import org.mockito.internal.util.reflection.Whitebox;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
-
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -51,7 +50,7 @@ public class UpdateSubStudyServletTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ResourceBundleProvider.updateLocale(Locale.getDefault());
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 
 		context.mock(DataSource.class);
 		context.mock(IStudyParameterValueDAO.class);

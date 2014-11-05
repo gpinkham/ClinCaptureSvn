@@ -37,8 +37,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/system")
@@ -49,6 +51,9 @@ public class SystemController {
 	public static final String SYSTEM_COMMAND_RESULT = "systemCommandResult";
 	public static final String SYSTEM_COMMAND_ERROR = "systemCommandError";
 	public static final String SYSTEM_COMMAND = "systemCommand";
+
+	@Autowired
+	private SessionLocaleResolver localeResolver;
 
 	@Autowired
 	private SystemValidator validator;
@@ -89,7 +94,7 @@ public class SystemController {
 			request.getSession().removeAttribute(SYSTEM_COMMAND_RESULT);
 			if (messageCode != null) {
 				PageMessagesUtil.addPageMessage(request,
-						messageSource.getMessage(messageCode, null, request.getLocale()));
+						messageSource.getMessage(messageCode, null, SessionUtil.getLocale(request)));
 			}
 		}
 		return page;
@@ -109,7 +114,7 @@ public class SystemController {
 		if (!MayProceedUtil.mayProceed(request, Role.SYSTEM_ADMINISTRATOR, Role.STUDY_ADMINISTRATOR)) {
 			page = "redirect:/MainMenu?message=system_no_permission";
 		} else {
-			validator.validate(command, result, request.getLocale());
+			validator.validate(command, result, SessionUtil.getLocale(request));
 			if (result.hasErrors()) {
 				page = "system/system";
 			} else {
@@ -127,7 +132,7 @@ public class SystemController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, params = "confirm")
-	public String confirm(HttpServletRequest request) throws Exception {
+	public String confirm(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String page = "redirect:system";
 		SystemCommand systemCommand = (SystemCommand) request.getSession().getAttribute(SYSTEM_COMMAND);
 		request.getSession().removeAttribute(SYSTEM_COMMAND);
@@ -137,7 +142,7 @@ public class SystemController {
 		} else {
 			try {
 				systemService.updateSystemProperties(systemCommand);
-				SessionUtil.updateSession(coreResources, request.getSession());
+				SessionUtil.updateSession(coreResources, localeResolver, request, response);
 				SQLInitServlet.updateParams(coreResources.getDataInfo());
 				request.getSession().setAttribute(SYSTEM_COMMAND_RESULT, "systemCommand.dataWasSuccessfullySaved");
 			} catch (Exception ex) {

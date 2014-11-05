@@ -10,18 +10,18 @@
 
 package com.clinovo.clincapture.bean.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ItemDataTypeTest {
 
@@ -68,7 +68,7 @@ public class ItemDataTypeTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ResourceBundleProvider.updateLocale(Locale.getDefault());
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		resterm = ResourceBundleProvider.getTermsBundle();
 	}
 

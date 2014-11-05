@@ -13,14 +13,7 @@
 
 package org.akaza.openclinica.web.table.scheduledjobs;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.dao.ScheduledJobSort;
@@ -38,6 +31,13 @@ import org.jmesa.view.html.component.HtmlTable;
 import org.jmesa.web.WebContext;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * View builder for the list of scheduled jobs with an ability to cancel the job
  * 
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({ "unchecked" })
 public class ScheduledJobTableFactory extends AbstractTableFactory {
 	@Override
 	protected String getTableName() {
@@ -79,7 +79,7 @@ public class ScheduledJobTableFactory extends AbstractTableFactory {
 	 */
 	@Override
 	public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
-		locale = request.getLocale();
+		locale = SessionUtil.getLocale(request);
 		TableFacade tableFacade = getTableFacadeImpl(request, response);
 		tableFacade.setStateAttr("restore");
 		int maxJobs = (Integer) request.getAttribute("totalJobs");

@@ -10,21 +10,21 @@
 
 package com.clinovo.clincapture.bean.admin;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Date;
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-@SuppressWarnings({"unchecked"})
+import java.util.Date;
+import java.util.Locale;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+@SuppressWarnings({ "unchecked" })
 public class AuditEventBeanTest {
 
 	private AuditEventBean auditEvent;
@@ -36,7 +36,7 @@ public class AuditEventBeanTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ResourceBundleProvider.updateLocale(Locale.getDefault());
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		auditEvent = new AuditEventBean();
 	}
 

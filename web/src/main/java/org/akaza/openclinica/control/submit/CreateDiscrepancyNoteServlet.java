@@ -21,6 +21,7 @@
 package org.akaza.openclinica.control.submit;
 
 import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.util.SessionUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -64,7 +65,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
-
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -94,7 +94,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 	public static final String ENTITY_ID = "id";
 
 	public static final String ST_SUBJECT_ID = "stSubjectId";
-	
+
 	public static final String SUBJECT_ID = "subjectId";
 
 	public static final String ITEM_ID = "itemId";
@@ -143,7 +143,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 	public static final String PARENT_ROW_COUNT = "rowCount";
 
 	public static final String NO_PERMISSION_EXCEPTION = "no_permission_to_create_discrepancy_note";
-	
+
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -202,7 +202,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		// subjectId has to be added to the database when disc notes area saved
 		// as entity_type 'subject'
 		int stSubjectId = fp.getInt(ST_SUBJECT_ID);
-		
+
 		int itemId = fp.getInt(ITEM_ID);
 		String entityType = fp.getString(ENTITY_TYPE);
 
@@ -256,7 +256,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			request.setAttribute("enterItemData", "yes");
 		}
 
-		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, request.getLocale());
+		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, SessionUtil.getLocale(request));
 		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 		StudySubjectBean ssub = (StudySubjectBean) ssdao.findByPK(stSubjectId);
 		int preUserId = 0;
@@ -398,7 +398,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		}
 
 		// finds all the related notes
-		ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumnAndStudy(currentStudy, entityType, entityId, column);
+		ArrayList notes = (ArrayList) dndao
+				.findAllByEntityAndColumnAndStudy(currentStudy, entityType, entityId, column);
 
 		DiscrepancyNoteBean parent = new DiscrepancyNoteBean();
 		if (parentId > 0) {
@@ -516,7 +517,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			request.setAttribute("unlock", "0");
 			request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");// this should go from UI & here
 
-			request.setAttribute(USER_ACCOUNTS, DiscrepancyNoteUtil.generateUserAccounts(ssub.getId(), currentStudy, 
+			request.setAttribute(USER_ACCOUNTS, DiscrepancyNoteUtil.generateUserAccounts(ssub.getId(), currentStudy,
 					new UserAccountDAO(getDataSource()), new StudyDAO(getDataSource())));
 
 			// ideally should be only two cases
@@ -660,9 +661,9 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 			request.setAttribute(DIS_NOTE, note);
 			request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");// this should go from UI & here
-			ArrayList userAccounts = DiscrepancyNoteUtil.generateUserAccounts(ssub.getId(), currentStudy, 
+			ArrayList userAccounts = DiscrepancyNoteUtil.generateUserAccounts(ssub.getId(), currentStudy,
 					new UserAccountDAO(getDataSource()), new StudyDAO(getDataSource()));
-					
+
 			request.setAttribute(USER_ACCOUNT_ID, Integer.valueOf(note.getAssignedUserId()).toString());
 			// formality more than anything else, we should go to say the note
 			// is done
@@ -961,7 +962,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			if (item_data_id > 0) {
 				if (field.contains("_0input") || field.contains("manual")) {
 					// get ordinal
-					ItemDataDAO iddao = new ItemDataDAO(getDataSource(), request.getLocale());
+					ItemDataDAO iddao = new ItemDataDAO(getDataSource(), SessionUtil.getLocale(request));
 
 					boolean isExistInDB = iddao.isItemExists(item_id, ordinal_for_repeating_group_field, event_crf_id);
 					return (isExistInDB) ? 1 : -1;
@@ -996,7 +997,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 			} else {
 				// get max ordinal from DB
-				ItemDataDAO iddao = new ItemDataDAO(getDataSource(), request.getLocale());
+				ItemDataDAO iddao = new ItemDataDAO(getDataSource(), SessionUtil.getLocale(request));
 				String[] field_name_items = field_name.split("_");
 
 				String group_oid = field_name.substring(0,
@@ -1114,22 +1115,23 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				MessageFormat.format(respage.getString("mailDNSubject"), study.getName(), note.getEntityName()),
 				emailBodyString, true, null, null, true, request);
 	}
-	
 
-	public static void checkSubjectInCorrectStudy(String entityType, StudySubjectBean ssub, StudyBean currentStudy, DataSource dataSource,
-			Logger aLogger, HttpServletRequest request) throws InsufficientPermissionException {
-		if ("subject".equals(entityType)) 
+	public static void checkSubjectInCorrectStudy(String entityType, StudySubjectBean ssub, StudyBean currentStudy,
+			DataSource dataSource, Logger aLogger, HttpServletRequest request) throws InsufficientPermissionException {
+		if ("subject".equals(entityType))
 			return;
-		
+
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(ssub.getStudyId());
 		if (ssub.getStudyId() != currentStudy.getId() && currentStudy.getId() != studyBeanSub.getParentStudyId()) {
-			addPageMessage(respage.getString("you_may_not_create_discrepancy_note")
-					+ respage.getString("change_study_contact_sysadmin"), request, aLogger);
-			throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString(NO_PERMISSION_EXCEPTION), "1");
+			addPageMessage(
+					respage.getString("you_may_not_create_discrepancy_note")
+							+ respage.getString("change_study_contact_sysadmin"), request, aLogger);
+			throw new InsufficientPermissionException(Page.MENU_SERVLET,
+					resexception.getString(NO_PERMISSION_EXCEPTION), "1");
 		}
 	}
-	
+
 	private void sendDNTypesAndResStatusesLists(boolean isRFC, StudyUserRoleBean currentRole, HttpServletRequest request) {
 		if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
 				|| currentRole.getRole().equals(Role.INVESTIGATOR)) {

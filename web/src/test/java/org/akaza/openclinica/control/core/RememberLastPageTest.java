@@ -1,10 +1,6 @@
 package org.akaza.openclinica.control.core;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.Locale;
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +9,11 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
+
+import java.util.Locale;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class RememberLastPageTest {
 
@@ -26,13 +27,13 @@ public class RememberLastPageTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Locale locale = new Locale("en");
+		Locale locale = Locale.ENGLISH;
 
 		MockHttpSession session = new MockHttpSession();
 		request = new MockHttpServletRequest();
 		request.setMethod("GET");
-		request.setPreferredLocales(Arrays.asList(locale));
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		SessionUtil.updateLocale(request, locale);
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		Whitebox.setInternalState(request, "session", session);
 
 		session.setAttribute(SAVED_URL, URL);

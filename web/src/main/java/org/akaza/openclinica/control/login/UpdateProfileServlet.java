@@ -20,19 +20,8 @@
  */
 package org.akaza.openclinica.control.login;
 
+import com.clinovo.util.SessionUtil;
 import com.clinovo.util.ValidatorHelper;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -57,6 +46,16 @@ import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
+
 /**
  * @author jxu
  * @version CVS: $Id: UpdateProfileServlet.java,v 1.9 2005/02/23 18:58:11 jxu Exp $
@@ -71,15 +70,16 @@ public class UpdateProfileServlet extends Controller {
 	public static final String USER_ID = "user_id";
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        //
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		//
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String action = request.getParameter("action");// action sent by user
 		StudyDAO sdao = new StudyDAO(getDataSource());
@@ -116,8 +116,9 @@ public class UpdateProfileServlet extends Controller {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void confirmProfile(HttpServletRequest request, HttpServletResponse response, UserAccountBean userBean1, UserAccountDAO udao) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
+	private void confirmProfile(HttpServletRequest request, HttpServletResponse response, UserAccountBean userBean1,
+			UserAccountDAO udao) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
 
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
@@ -143,7 +144,7 @@ public class UpdateProfileServlet extends Controller {
 			// password
 
 			PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
-			Locale locale = request.getLocale();
+			Locale locale = SessionUtil.getLocale(request);
 			ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
 
 			pwdErrors = PasswordValidator.validatePassword(passwordRequirementsDao, udao, userBean1.getId(), password,
@@ -182,13 +183,13 @@ public class UpdateProfileServlet extends Controller {
 					userBean1.setPasswd(newDigestPass);
 					userBean1.setPasswdTimestamp(new Date());
 				}
-                request.getSession().setAttribute("userBean1", userBean1);
+				request.getSession().setAttribute("userBean1", userBean1);
 				forwardPage(Page.UPDATE_PROFILE_CONFIRM, request, response);
 			}
 
 		} else {
 			logger.info("has validation errors");
-            request.getSession().setAttribute("userBean1", userBean1);
+			request.getSession().setAttribute("userBean1", userBean1);
 			request.setAttribute("formMessages", errors);
 			forwardPage(Page.UPDATE_PROFILE, request, response);
 		}
@@ -210,16 +211,16 @@ public class UpdateProfileServlet extends Controller {
 			updateCalendarEmailJob(userBean1);
 			udao.update(userBean1);
 
-            request.getSession().setAttribute("reloadUserBean", true);
+			request.getSession().setAttribute("reloadUserBean", true);
 			request.getSession().setAttribute("userBean", userBean1);
 			request.getSession().removeAttribute("userBean1");
 		}
 	}
-	
+
 	@SuppressWarnings("null")
-	private void updateCalendarEmailJob (UserAccountBean uaBean) {
+	private void updateCalendarEmailJob(UserAccountBean uaBean) {
 		String triggerGroup = "CALENDAR";
-        StdScheduler scheduler = getStdScheduler();
+		StdScheduler scheduler = getStdScheduler();
 		try {
 			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
 			if (legacyTriggers == null && legacyTriggers.size() == 0) {
@@ -230,9 +231,9 @@ public class UpdateProfileServlet extends Controller {
 				JobDataMap dataMap = trigger.getJobDataMap();
 				String contactEmail = dataMap.getString(EMAIL).toString();
 				int userId = (Integer) dataMap.getInt(USER_ID);
-				logger.info("contact email from calendared " +contactEmail + " for user userId " +userId);
-				logger.info("Old email " +dataMap.getString(EMAIL).toString());
-				if(uaBean.getId() == userId) {
+				logger.info("contact email from calendared " + contactEmail + " for user userId " + userId);
+				logger.info("Old email " + dataMap.getString(EMAIL).toString());
+				if (uaBean.getId() == userId) {
 					dataMap.put(EMAIL, uaBean.getEmail());
 					JobDetailImpl jobDetailBean = new JobDetailImpl();
 					jobDetailBean.setKey(trigger.getJobKey());
@@ -241,7 +242,7 @@ public class UpdateProfileServlet extends Controller {
 					jobDetailBean.setName(triggerKey.getName());
 					jobDetailBean.setJobClass(org.akaza.openclinica.service.calendar.EmailStatefulJob.class);
 					jobDetailBean.setJobDataMap(dataMap);
-					logger.info("New email " +dataMap.getString(EMAIL).toString());
+					logger.info("New email " + dataMap.getString(EMAIL).toString());
 					jobDetailBean.setDurability(true);
 					scheduler.addJob(jobDetailBean, true);
 				}

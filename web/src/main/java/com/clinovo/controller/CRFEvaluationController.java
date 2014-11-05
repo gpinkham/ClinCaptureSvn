@@ -1,6 +1,7 @@
 package com.clinovo.controller;
 
 import com.clinovo.model.CRFEvaluationTableFactory;
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -72,7 +73,8 @@ public class CRFEvaluationController extends Redirection {
 							.getParameter(SHOW_MORE_LINK)).createTable(request, response).render());
 		} else {
 			org.akaza.openclinica.control.core.Controller.addPageMessage(
-					messageSource.getMessage(NO_PERMISSION_TO_EVALUATE, null, request.getLocale()), request, LOGGER);
+					messageSource.getMessage(NO_PERMISSION_TO_EVALUATE, null, SessionUtil.getLocale(request)), request,
+					LOGGER);
 			org.akaza.openclinica.control.core.Controller.storePageMessages(request);
 			page = MAIN_MENU_REDIRECT;
 		}

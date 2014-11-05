@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.controller;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -81,7 +82,7 @@ public class SDVController {
 			}
 			return null;
 		}
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		ModelMap gridMap = new ModelMap();
 		HttpSession session = request.getSession();
 		boolean showMoreLink;
@@ -173,7 +174,7 @@ public class SDVController {
 			}
 			return null;
 		}
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		// Reseting the side info panel set by SecureControler Mantis Issue: 8680.
 		// Todo need something to reset panel from all the Spring Controllers
 		StudyInfoPanel panel = new StudyInfoPanel();
@@ -284,7 +285,7 @@ public class SDVController {
 		// The application is POSTing parameters with the name "sdvCheck_" plus the
 		// Event CRF id, so the parameter is sdvCheck_534.
 
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(request.getLocale());
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
 
 		Enumeration paramNames = request.getParameterNames();
 		Map<String, String> parameterMap = new HashMap<String, String>();
@@ -341,7 +342,7 @@ public class SDVController {
 	public String sdvOneCRFFormHandler(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("crfId") int crfId, @RequestParam("redirection") String redirection) {
 
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(request.getLocale());
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
 
 		if (!mayProceed(request)) {
 			try {
@@ -391,7 +392,7 @@ public class SDVController {
 	public String changeSDVHandler(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("crfId") int crfId, @RequestParam("redirection") String redirection) {
 
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(request.getLocale());
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
 
 		// For the messages that appear in the left column of the results page
 		ArrayList<String> pageMessages = new ArrayList<String>();
@@ -432,7 +433,7 @@ public class SDVController {
 	public String sdvStudySubjectHandler(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("theStudySubjectId") int studySubjectId, @RequestParam("redirection") String redirection) {
 
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(request.getLocale());
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
 
 		// For the messages that appear in the left column of the results page
 		ArrayList<String> pageMessages = new ArrayList<String>();
@@ -470,7 +471,7 @@ public class SDVController {
 	public String unSdvStudySubjectHandler(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("theStudySubjectId") int studySubjectId, @RequestParam("redirection") String redirection) {
 
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(request.getLocale());
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
 
 		ArrayList<String> pageMessages = new ArrayList<String>();
 		List<Integer> studySubjectIds = new ArrayList<Integer>();
@@ -509,7 +510,7 @@ public class SDVController {
 		// The application is POSTing parameters with the name "sdvCheck_" plus the
 		// Event CRF id, so the parameter is sdvCheck_534.
 
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(request.getLocale());
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
 
 		Enumeration paramNames = request.getParameterNames();
 		Map<String, String> parameterMap = new HashMap<String, String>();

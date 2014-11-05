@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.controller;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -94,7 +95,7 @@ public class StudyModuleController {
 		panel.reset();
 		request.getSession().setAttribute("panel", panel);
 
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 

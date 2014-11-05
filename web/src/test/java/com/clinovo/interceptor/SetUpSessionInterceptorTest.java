@@ -1,6 +1,7 @@
 package com.clinovo.interceptor;
 
 import com.clinovo.controller.CRFEvaluationController;
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -69,12 +70,12 @@ public class SetUpSessionInterceptorTest {
 		PowerMockito.mockStatic(SecurityContextHolder.class);
 		PowerMockito.when(SecurityContextHolder.getContext()).thenReturn(securityContext);
 		PowerMockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-		request.addPreferredLocale(Locale.ENGLISH);
 		request.setContextPath(CLINCAPTURE);
 		request.setSession(session);
 		Mockito.when(session.getAttribute(BaseController.STUDY)).thenReturn(studyBean);
 		Mockito.when(session.getAttribute(BaseController.USER_BEAN_NAME)).thenReturn(userBean);
 		Mockito.when(session.getAttribute(BaseController.USER_ROLE)).thenReturn(userRole);
+		Mockito.when(session.getAttribute(SessionUtil.CURRENT_SESSION_LOCALE)).thenReturn(Locale.ENGLISH);
 	}
 
 	@Test

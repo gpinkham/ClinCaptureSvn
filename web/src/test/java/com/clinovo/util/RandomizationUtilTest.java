@@ -1,10 +1,7 @@
 package com.clinovo.util;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-
-import com.clinovo.model.Randomization;
-import com.clinovo.servlet.RandomizeServlet;
+import com.clinovo.exception.RandomizationException;
+import com.clinovo.model.RandomizationResult;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -25,8 +22,8 @@ import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import com.clinovo.exception.RandomizationException;
-import com.clinovo.model.RandomizationResult;
+import java.sql.SQLException;
+import java.util.HashMap;
 
 public class RandomizationUtilTest extends DefaultAppContextTest {
 
@@ -239,7 +236,7 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 	public void testThatGetStudySubjectBeanReturnsCorrectResult() {
 
 		request.setParameter("subjectId", "1");
-		StudySubjectBean subject =  RandomizationUtil.getStudySubjectBean(request);
+		StudySubjectBean subject = RandomizationUtil.getStudySubjectBean(request);
 		assertEquals("some-subject-label", subject.getName());
 	}
 
@@ -274,7 +271,7 @@ public class RandomizationUtilTest extends DefaultAppContextTest {
 		Mockito.when(dao.isQuerySuccessful()).thenReturn(Boolean.TRUE);
 		Mockito.when(dao.update(Mockito.any(EntityBean.class))).thenReturn(new StudyGroupClassBean());
 		Mockito.when(dao.findByLabelAndStudy(Mockito.anyString(), Mockito.any(StudyBean.class))).thenReturn(subject);
-		Mockito.when(dao.findBySubjectIdAndStudy(Mockito.anyInt(),Mockito.any(StudyBean.class))).thenReturn(subject);
+		Mockito.when(dao.findBySubjectIdAndStudy(Mockito.anyInt(), Mockito.any(StudyBean.class))).thenReturn(subject);
 		return dao;
 	}
 

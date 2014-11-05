@@ -10,8 +10,6 @@
 
 package com.clinovo.clincapture.bean.core;
 
-import static org.junit.Assert.*;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.After;
@@ -22,6 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * User: Pavel Date: 13.10.12
@@ -56,7 +59,7 @@ public class DataEntryStageTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ResourceBundleProvider.updateLocale(Locale.getDefault());
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		resterm = ResourceBundleProvider.getTermsBundle();
 	}
 

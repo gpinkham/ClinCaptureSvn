@@ -31,7 +31,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -81,7 +80,7 @@ public class ListSiteServletTest {
 		Mockito.doReturn(mapContainer).when(studyDAO).analyzeEvents(studies);
 		Mockito.doCallRealMethod().when(listSiteServlet).processRequest(request, response);
 
-		ResourceBundleProvider.updateLocale(Locale.getDefault());
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		Whitebox.setInternalState(listSiteServlet, "resword", ResourceBundleProvider.getWordsBundle());
 
 		listSiteServlet.processRequest(request, response);

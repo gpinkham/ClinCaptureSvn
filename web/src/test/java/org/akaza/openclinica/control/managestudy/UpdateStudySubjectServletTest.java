@@ -1,5 +1,6 @@
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -33,7 +34,6 @@ import org.springframework.mock.web.MockServletContext;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -84,7 +84,7 @@ public class UpdateStudySubjectServletTest {
 				resExceptions);
 
 		request = new MockHttpServletRequest();
-		request.setPreferredLocales(Arrays.asList(locale));
+		SessionUtil.updateLocale(request, locale);
 
 		subjectToUpdate = new StudySubjectBean();
 

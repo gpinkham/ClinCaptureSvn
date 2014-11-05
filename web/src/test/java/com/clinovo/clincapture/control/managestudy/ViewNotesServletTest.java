@@ -1,5 +1,6 @@
 package com.clinovo.clincapture.control.managestudy;
 
+import com.clinovo.util.SessionUtil;
 import com.google.common.collect.Iterables;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Role;
@@ -21,7 +22,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -52,13 +52,13 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		studyBean.setId(1);
 		studyBean.setName("Demo Study");
 		studyBean.setStatus(Status.AVAILABLE);
-		ResourceBundleProvider.updateLocale(request.getLocale());
-		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("root", "root"));
 		request.setParameter("print", "no");
 		request.setParameter("module", "admin");
 		request.setParameter("showMoreLink", "true");
 		request.setParameter("oneSubjectId", "1");
-		request.setPreferredLocales(Arrays.asList(new Locale("en")));
+		SessionUtil.updateLocale(request.getSession(), Locale.ENGLISH);
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
+		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("root", "root"));
 		request.getSession().setAttribute("study", studyBean);
 		currentUser = new UserAccountBean();
 		currentUser.addUserType(UserType.USER);
@@ -116,7 +116,7 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatViewNotesServletReturnsCorrectStatusesInSummaryMap() throws Exception {
-		viewNotesServlet.processRequest(request, response);		
+		viewNotesServlet.processRequest(request, response);
 		Map<String, Map<String, String>> customStat = (Map<String, Map<String, String>>) request
 				.getAttribute("summaryMap");
 		Map.Entry entry0 = Iterables.get(customStat.entrySet(), 0);

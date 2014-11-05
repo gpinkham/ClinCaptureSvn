@@ -1,17 +1,17 @@
 package com.clinovo.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.Locale;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
+
+import java.util.Locale;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ValidatorHelperTest {
 
@@ -23,11 +23,10 @@ public class ValidatorHelperTest {
 
 	@Before
 	public void setUp() throws Exception {
-		locale = new Locale("en");
-
+		locale = Locale.ENGLISH;
 		request = new MockHttpServletRequest();
-		request.setPreferredLocales(Arrays.asList(new Locale[] { locale }));
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		SessionUtil.updateLocale(request, locale);
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		configurationDao = Mockito.mock(ConfigurationDao.class);
 
@@ -66,7 +65,7 @@ public class ValidatorHelperTest {
 
 	@Test
 	public void testThatRequestBasedValidatorHelperReturnsCorrectLocale() {
-		assertEquals(requestBasedValidatorHelper.getLocale(), request.getLocale());
+		assertEquals(requestBasedValidatorHelper.getLocale(), SessionUtil.getLocale(request));
 	}
 
 	@Test

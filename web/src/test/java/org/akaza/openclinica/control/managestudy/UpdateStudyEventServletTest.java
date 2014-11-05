@@ -1,14 +1,6 @@
 package org.akaza.openclinica.control.managestudy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -48,6 +40,14 @@ import org.slf4j.Logger;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ Status.class, ResourceBundleProvider.class, UpdateStudyEventServlet.class, FormProcessor.class,
@@ -116,7 +116,7 @@ public class UpdateStudyEventServletTest {
 		PowerMockito.doReturn(0).when(studyBean).getParentStudyId();
 		PowerMockito.doReturn(1).when(studySubjectBean).getStudyId();
 		currentStudyLocked = "current study locked";
-		request.setPreferredLocales(Arrays.asList(new Locale("en")));
+		PowerMockito.doReturn(Locale.ENGLISH).when(session).getAttribute(SessionUtil.CURRENT_SESSION_LOCALE);
 		PowerMockito.mockStatic(Status.class);
 		PowerMockito.mockStatic(SignUtil.class);
 		PowerMockito.mockStatic(ResourceBundleProvider.class);

@@ -14,17 +14,22 @@
  *******************************************************************************/
 package com.clinovo.controller;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
+import com.clinovo.coding.Search;
+import com.clinovo.coding.model.Classification;
+import com.clinovo.coding.model.ClassificationElement;
+import com.clinovo.coding.source.impl.BioPortalSearchInterface;
+import com.clinovo.dao.SystemDAO;
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.CodedItemElement;
+import com.clinovo.model.CodedItemsTableFactory;
+import com.clinovo.model.Dictionary;
+import com.clinovo.model.Status.CodeStatus;
+import com.clinovo.model.Term;
+import com.clinovo.model.TermElement;
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DictionaryService;
+import com.clinovo.service.TermService;
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -50,22 +55,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.clinovo.coding.Search;
-import com.clinovo.coding.model.Classification;
-import com.clinovo.coding.model.ClassificationElement;
-import com.clinovo.coding.source.impl.BioPortalSearchInterface;
-import com.clinovo.dao.SystemDAO;
-import com.clinovo.model.CodedItem;
-import com.clinovo.model.CodedItemElement;
-import com.clinovo.model.CodedItemsTableFactory;
-import com.clinovo.model.Dictionary;
-import com.clinovo.model.Status.CodeStatus;
-import com.clinovo.model.Term;
-import com.clinovo.model.TermElement;
-import com.clinovo.service.CodedItemService;
-import com.clinovo.service.DictionaryService;
-import com.clinovo.service.TermService;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * The controller for managing coded items. Acts as the glue between the service layer and the UI -
@@ -77,16 +75,16 @@ public class CodedItemsController {
 	private StudyDAO studyDAO;
 	@Autowired
 	private SystemDAO systemDAO;
-	
+
 	@Autowired
-    private DataSource datasource;
+	private DataSource datasource;
 
 	@Autowired
 	private TermService termService;
 
 	@Autowired
 	private DictionaryService dictionaryService;
-	
+
 	@Autowired
 	private CodedItemService codedItemService;
 
@@ -102,70 +100,78 @@ public class CodedItemsController {
 	/**
 	 * Handle for retrieving all the coded items.
 	 * 
-	 * @param request The incoming request
-	 * @param response The response to redirect to
+	 * @param request
+	 *            The incoming request
+	 * @param response
+	 *            The response to redirect to
 	 * 
 	 * @return Map The map with coded item attributes that will be placed on the UX.
 	 * 
-	 * @throws Exception For all exceptions
+	 * @throws Exception
+	 *             For all exceptions
 	 */
 	@RequestMapping("/codedItems")
 	public ModelMap codedItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        String httpPath = (String) request.getSession().getAttribute("codedItemUrl");
-        String queryString = request.getQueryString();
+		String httpPath = (String) request.getSession().getAttribute("codedItemUrl");
+		String queryString = request.getQueryString();
 
-        if (queryString == null && httpPath != null) {
+		if (queryString == null && httpPath != null) {
 
-            response.sendRedirect("codedItems?" + httpPath);
-        } else {
+			response.sendRedirect("codedItems?" + httpPath);
+		} else {
 
-            request.getSession().setAttribute("codedItemUrl", queryString);
-        }
+			request.getSession().setAttribute("codedItemUrl", queryString);
+		}
 
 		ModelMap model = new ModelMap();
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
-        String showMoreLink = request.getParameter("showMoreLink");
-        String showContext = request.getParameter("showContext");
-        String themeColor = (String) request.getSession().getAttribute("newThemeColor");
-        showMoreLink = showMoreLink == null ? "false" : showMoreLink;
-        showContext =  showContext == null ? "false" : showContext;
-        themeColor = themeColor == null ? "blue" : themeColor;
+		String showMoreLink = request.getParameter("showMoreLink");
+		String showContext = request.getParameter("showContext");
+		String themeColor = (String) request.getSession().getAttribute("newThemeColor");
+		showMoreLink = showMoreLink == null ? "false" : showMoreLink;
+		showContext = showContext == null ? "false" : showContext;
+		themeColor = themeColor == null ? "blue" : themeColor;
 
 		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
-		StudyParameterValueBean mcApprovalNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingApprovalNeeded");
-        StudyParameterValueBean medicalCodingContextNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingContextNeeded");
-        StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "autoCodeDictionaryName");
+		StudyParameterValueBean mcApprovalNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(),
+				"medicalCodingApprovalNeeded");
+		StudyParameterValueBean medicalCodingContextNeeded = getStudyParameterValueDAO().findByHandleAndStudy(
+				study.getId(), "medicalCodingContextNeeded");
+		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(),
+				"autoCodeDictionaryName");
 
-        boolean configuredDictionaryIsAvailable = configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty() ? true : false;
+		boolean configuredDictionaryIsAvailable = configuredDictionary.getValue() != null
+				&& !configuredDictionary.getValue().isEmpty() ? true : false;
 
-        List<CodedItem> items = new ArrayList<CodedItem>();
-		
+		List<CodedItem> items = new ArrayList<CodedItem>();
+
 		// Scope the items
 		if (study.isSite(study.getParentStudyId())) {
 			items = codedItemService.findByStudyAndSite(study.getParentStudyId(), study.getId());
 		} else {
 			items = codedItemService.findByStudy(study.getId());
 		}
-		
+
 		List<CodedItem> codedItems = getItems(items, CodeStatus.CODED);
 		List<CodedItem> unCodedItems = getItems(items, CodeStatus.NOT_CODED);
 		List<CodedItem> codeNotFoundItems = getItems(items, CodeStatus.CODE_NOT_FOUND);
-		
-		CodedItemsTableFactory factory = new CodedItemsTableFactory(medicalCodingContextNeeded.getValue(), showMoreLink, showContext);
+
+		CodedItemsTableFactory factory = new CodedItemsTableFactory(medicalCodingContextNeeded.getValue(),
+				showMoreLink, showContext);
 
 		factory.setStudyId(study.getId());
 		factory.setCodedItems(items);
 		factory.setDataSource(datasource);
-        factory.setThemeColor(themeColor);
+		factory.setThemeColor(themeColor);
 		factory.setStudyDAO(getStudyDAO());
 		factory.setTerms(termService.findAll());
 		factory.setCrfDAO(new CRFDAO(datasource));
 		factory.setEventCRFDAO(new EventCRFDAO(datasource));
 		factory.setCrfVersionDAO(new CRFVersionDAO(datasource));
 		factory.setItemDataDAO(new ItemDataDAO(datasource));
-        factory.setStudyEventDAO(new StudyEventDAO(datasource));
+		factory.setStudyEventDAO(new StudyEventDAO(datasource));
 		factory.setStudySubjectDAO(new StudySubjectDAO(datasource));
 		factory.setEventDefinitionCRFDAO(new EventDefinitionCRFDAO(datasource));
 		factory.setStudyEventDefinitionDAO(new StudyEventDefinitionDAO(datasource));
@@ -182,8 +188,8 @@ public class CodedItemsController {
 		model.addAttribute("unCodedItems", unCodedItems.size());
 		model.addAttribute("codeNotFoundItems", codeNotFoundItems.size());
 		model.addAttribute("mcApprovalNeeded", mcApprovalNeeded.getValue().equals("yes"));
-        model.addAttribute("configuredDictionaryIsAvailable", configuredDictionaryIsAvailable);
-		
+		model.addAttribute("configuredDictionaryIsAvailable", configuredDictionaryIsAvailable);
+
 		// After auto coding attempt
 		model.addAttribute("skippedItems", request.getAttribute("skippedItems"));
 		model.addAttribute("autoCodedItems", request.getAttribute("autoCodedItems"));
@@ -194,95 +200,101 @@ public class CodedItemsController {
 	/**
 	 * Handle for coding a specified item
 	 * 
-	 * @param request The request containing the item to code
+	 * @param request
+	 *            The request containing the item to code
 	 * 
 	 * @return Map with attributes to be used on the UX-
 	 * 
-	 * @throws Exception For all exceptions
+	 * @throws Exception
+	 *             For all exceptions
 	 */
 	@RequestMapping("/codeItem")
 	public ModelMap codeItemHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		Term term = null;
 		ModelMap model = new ModelMap();
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		String itemId = request.getParameter("item");
-        String dictionary = request.getParameter("dictionary");
-        String prefLabel = request.getParameter("prefLabel");
+		String dictionary = request.getParameter("dictionary");
+		String prefLabel = request.getParameter("prefLabel");
 
-        List<Classification> classifications = new ArrayList<Classification>();
-        CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(itemId));
-        StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "autoCodeDictionaryName");
+		List<Classification> classifications = new ArrayList<Classification>();
+		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(itemId));
+		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(
+				codedItem.getStudyId(), "autoCodeDictionaryName");
 
-        boolean configuredDictionaryIsAvailable = configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty() ? true : false;
+		boolean configuredDictionaryIsAvailable = configuredDictionary.getValue() != null
+				&& !configuredDictionary.getValue().isEmpty() ? true : false;
 
 		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
 		com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
 
-        if (configuredDictionaryIsAvailable) {
+		if (configuredDictionaryIsAvailable) {
 
-            ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
-            ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
-            // Ignore case - (until Marc changes his mind)
-            term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(), codedItem.getDictionary());
-        }
+			ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
+			ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
+			// Ignore case - (until Marc changes his mind)
+			term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(),
+					codedItem.getDictionary());
+		}
 
- 		if (term != null) {
+		if (term != null) {
 
- 			Classification classification = new Classification();
-  
- 			classification.setHttpPath(term.getHttpPath());
- 			classification.setClassificationElement(generateClassificationElements(term.getTermElementList()));
+			Classification classification = new Classification();
+
+			classification.setHttpPath(term.getHttpPath());
+			classification.setClassificationElement(generateClassificationElements(term.getTermElementList()));
 
 			generateCodedItemFields(codedItem.getCodedItemElements(), classification.getClassificationElement());
 
- 			codedItem.setAutoCoded(true);
- 			codedItem.setPreferredTerm(term.getPreferredName());
-            codedItem.setHttpPath(term.getHttpPath());
- 			codedItem.setStatus((String.valueOf(CodeStatus.CODED)));
-  
- 			codedItemService.saveCodedItem(codedItem);
+			codedItem.setAutoCoded(true);
+			codedItem.setPreferredTerm(term.getPreferredName());
+			codedItem.setHttpPath(term.getHttpPath());
+			codedItem.setStatus((String.valueOf(CodeStatus.CODED)));
 
- 			classifications.add(classification);
+			codedItemService.saveCodedItem(codedItem);
 
- 			model.addAttribute("autoCoded", true);
+			classifications.add(classification);
 
- 		} else {
-  
+			model.addAttribute("autoCoded", true);
+
+		} else {
+
 			// Don't attempt to code the item again
 			if (!codedItem.isCoded()) {
 
-                search.setSearchInterface(new BioPortalSearchInterface());
+				search.setSearchInterface(new BioPortalSearchInterface());
 
-                try {
+				try {
 
-                    classifications = search.getClassifications(prefLabel, dictionary, bioontologyUrl.getValue(), bioontologyApiKey.getValue());
-                    
-                    if (classifications.size() == 0) {
-                    	
-                    	codedItem.setStatus(String.valueOf(CodeStatus.CODE_NOT_FOUND));
-                    	codedItemService.saveCodedItem(codedItem);
-                    	
-                    	model.addAttribute("notCoded", true);
-                    }
-                } catch (Exception ex) {
+					classifications = search.getClassifications(prefLabel, dictionary, bioontologyUrl.getValue(),
+							bioontologyApiKey.getValue());
 
-                    response.sendError(HttpServletResponse.SC_BAD_GATEWAY);
-                    return model;
-                }
-            }
- 		}
+					if (classifications.size() == 0) {
+
+						codedItem.setStatus(String.valueOf(CodeStatus.CODE_NOT_FOUND));
+						codedItemService.saveCodedItem(codedItem);
+
+						model.addAttribute("notCoded", true);
+					}
+				} catch (Exception ex) {
+
+					response.sendError(HttpServletResponse.SC_BAD_GATEWAY);
+					return model;
+				}
+			}
+		}
 
 		model.addAttribute("bioontologyUrl", normalizeUrl(bioontologyUrl.getValue(), codedItem.getDictionary()));
- 		model.addAttribute("itemDictionary", dictionary);
-        model.addAttribute("itemDataId", codedItem.getItemId());
-        model.addAttribute("codedElementList", classifications);
-        model.addAttribute("configuredDictionaryIsAvailable", configuredDictionaryIsAvailable);
+		model.addAttribute("itemDictionary", dictionary);
+		model.addAttribute("itemDataId", codedItem.getItemId());
+		model.addAttribute("codedElementList", classifications);
+		model.addAttribute("configuredDictionaryIsAvailable", configuredDictionaryIsAvailable);
 
-        return model;
+		return model;
 
-    }
+	}
 
 	private String normalizeUrl(String bioontologyUrl, String dictionary) throws MalformedURLException {
 
@@ -295,27 +307,31 @@ public class CodedItemsController {
 	}
 
 	@RequestMapping("/autoCode")
- 	public void autoCodeItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
- 
- 		List<CodedItem> items = new ArrayList<CodedItem>();
- 		ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
+	public void autoCodeItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		List<CodedItem> items = new ArrayList<CodedItem>();
+		ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
 		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(datasource);
 		StudyEventDAO studyEventDAO = new StudyEventDAO(datasource);
- 		List<CodedItem> skippedItems = new ArrayList<CodedItem>();
- 
- 		List<CodedItem> uncodedItems = codedItemService.findCodedItemsByStatus(CodeStatus.NOT_CODED);
+		List<CodedItem> skippedItems = new ArrayList<CodedItem>();
+
+		List<CodedItem> uncodedItems = codedItemService.findCodedItemsByStatus(CodeStatus.NOT_CODED);
 
 		for (CodedItem item : uncodedItems) {
 
 			StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByPK(item.getEventCrfId());
 			CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDAO.findByPK(item.getCrfVersionId());
 
-			boolean crfIsLocked = studyEventBean.getSubjectEventStatus().isLocked() || studyEventBean.getSubjectEventStatus().isStopped() || studyEventBean.getSubjectEventStatus().isSkipped() || !crfVersionBean.getStatus().equals(Status.AVAILABLE);
+			boolean crfIsLocked = studyEventBean.getSubjectEventStatus().isLocked()
+					|| studyEventBean.getSubjectEventStatus().isStopped()
+					|| studyEventBean.getSubjectEventStatus().isSkipped()
+					|| !crfVersionBean.getStatus().equals(Status.AVAILABLE);
 
 			if (!crfIsLocked) {
 
 				ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(item.getItemId());
-				Term term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(), item.getDictionary());
+				Term term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(),
+						item.getDictionary());
 
 				if (term != null) {
 
@@ -341,29 +357,31 @@ public class CodedItemsController {
 				}
 			}
 		}
- 
- 		request.setAttribute("autoCodedItems", items);
- 		request.setAttribute("skippedItems", skippedItems);
- 		
- 		// Redirect to main
- 		codedItemsHandler(request, response);
- 
- 	}
-	
+
+		request.setAttribute("autoCodedItems", items);
+		request.setAttribute("skippedItems", skippedItems);
+
+		// Redirect to main
+		codedItemsHandler(request, response);
+
+	}
+
 	/**
 	 * Handle for saving a coded item
 	 * 
-	 * @param request The request containing the coded item to save
+	 * @param request
+	 *            The request containing the coded item to save
 	 * 
 	 * @return Redirects to the coded items handler.
 	 * 
-	 * @throws Exception For all exception
+	 * @throws Exception
+	 *             For all exception
 	 */
 
 	@RequestMapping("/saveCodedItem")
 	public String saveCodedItemHandler(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		String itemId = request.getParameter("item");
 		String categoryList = request.getParameter("categoryList");
@@ -372,10 +390,11 @@ public class CodedItemsController {
 
 		CodedItem codedItem = codedItemService.findCodedItem(Integer.valueOf(itemId));
 		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
-        com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
+		com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
 
 		try {
-			provideCoding(verbatimTerm, false, categoryList, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), codedItem.getItemId());
+			provideCoding(verbatimTerm, false, categoryList, codeSearchTerm, bioontologyUrl.getValue(),
+					bioontologyApiKey.getValue(), codedItem.getItemId());
 
 		} catch (Exception ex) {
 
@@ -388,16 +407,18 @@ public class CodedItemsController {
 	/**
 	 * Handle for uncoding a given coded item.
 	 * 
-	 * @param request The request containing the item to uncode.
+	 * @param request
+	 *            The request containing the item to uncode.
 	 * 
 	 * @return Redirects to coded items.
 	 * 
-	 * @throws Exception For all exceptions
+	 * @throws Exception
+	 *             For all exceptions
 	 */
 	@RequestMapping("/uncodeCodedItem")
 	public String unCodeCodedItemHandler(HttpServletRequest request) throws Exception {
 
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		String codedItemItemDataId = request.getParameter("item");
 
@@ -426,16 +447,18 @@ public class CodedItemsController {
 	/**
 	 * Handle for getting specified item additional fields
 	 *
-	 * @param request The request containing the term url to getting additional fields.
+	 * @param request
+	 *            The request containing the term url to getting additional fields.
 	 *
 	 * @return Map with attributes to be used on the UX-
 	 *
-	 * @throws Exception For all exceptions
+	 * @throws Exception
+	 *             For all exceptions
 	 */
 	@RequestMapping("/codeItemFields")
 	public ModelMap termAdditinalFieldsHandler(HttpServletRequest request) throws Exception {
 
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		String codedItemUrl = request.getParameter("codedItemUrl");
 		String term = request.getParameter("term");
@@ -443,9 +466,10 @@ public class CodedItemsController {
 		search.setSearchInterface(new BioPortalSearchInterface());
 
 		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
-        com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
+		com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
 
-		Classification classificationWithTerms = search.getClassificationWithTerms(codedItemUrl, bioontologyUrl.getValue(), bioontologyApiKey.getValue());
+		Classification classificationWithTerms = search.getClassificationWithTerms(codedItemUrl,
+				bioontologyUrl.getValue(), bioontologyApiKey.getValue());
 
 		if (codedItemUrl.indexOf("MEDDRA") > 0 || codedItemUrl.indexOf("MDR") > 0) {
 			ClassificationElement ptElement = new ClassificationElement();
@@ -456,7 +480,8 @@ public class CodedItemsController {
 
 			for (ClassificationElement classification : classificationWithTerms.getClassificationElement()) {
 				String classificationCodeName = classification.getCodeName();
-				classification.setCodeName(classificationCodeName.substring(0, classificationCodeName.indexOf("@")).replaceAll("_", " ").replaceAll(" and ", " & "));
+				classification.setCodeName(classificationCodeName.substring(0, classificationCodeName.indexOf("@"))
+						.replaceAll("_", " ").replaceAll(" and ", " & "));
 			}
 		}
 
@@ -481,7 +506,7 @@ public class CodedItemsController {
 	@RequestMapping("/codeAndAlias")
 	public String codeAndAliasHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		boolean isAlias = false;
 		String item = request.getParameter("item");
@@ -491,9 +516,10 @@ public class CodedItemsController {
 
 		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
 
-		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "autoCodeDictionaryName");
+		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(),
+				"autoCodeDictionaryName");
 		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
-        com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
+		com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
 
 		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(item));
 
@@ -505,7 +531,8 @@ public class CodedItemsController {
 		if (codedItem != null) {
 			try {
 
-				provideCoding(verbatimTerm, isAlias, categoryList, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), codedItem.getItemId());
+				provideCoding(verbatimTerm, isAlias, categoryList, codeSearchTerm, bioontologyUrl.getValue(),
+						bioontologyApiKey.getValue(), codedItem.getItemId());
 			} catch (Exception ex) {
 
 				logger.error(ex.getMessage());
@@ -575,7 +602,8 @@ public class CodedItemsController {
 		return classElementList;
 	}
 
-	private CodedItem provideCoding(String verbatimTerm, boolean isAlias, String categoryList, String codeSearchTerm, String bioontologyUrl, String bioontologyApiKey, int codedItemId) throws Exception {
+	private CodedItem provideCoding(String verbatimTerm, boolean isAlias, String categoryList, String codeSearchTerm,
+			String bioontologyUrl, String bioontologyApiKey, int codedItemId) throws Exception {
 
 		StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(datasource);
 
@@ -590,22 +618,26 @@ public class CodedItemsController {
 			String whodKey = getWhodKey(classificationResult);
 
 			for (ClassificationElement whodClassElement : classificationResult.getClassificationElement()) {
-				whodClassElement.setCodeName(whodClassElement.getCodeName().replaceAll(" &amp; ", " and ").replaceAll(" ", "_") + whodKey);
+				whodClassElement.setCodeName(whodClassElement.getCodeName().replaceAll(" &amp; ", " and ")
+						.replaceAll(" ", "_")
+						+ whodKey);
 			}
 
 			addClassificationResultSufix(classificationResult);
 		}
 
-		//get codes for all verb terms & save it in classification
-		search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "), bioontologyUrl, bioontologyApiKey);
+		// get codes for all verb terms & save it in classification
+		search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "),
+				bioontologyUrl, bioontologyApiKey);
 
-		//replace all terms & codes from classification to coded elements
+		// replace all terms & codes from classification to coded elements
 		generateCodedItemFields(codedItem.getCodedItemElements(), classificationResult.getClassificationElement());
 
-		//if isAlias is true, create term using completed classification
+		// if isAlias is true, create term using completed classification
 		if (isAlias) {
 
-			StudyParameterValueBean configuredDictionary = studyParameterValueDAO.findByHandleAndStudy(codedItem.getStudyId(), "autoCodeDictionaryName");
+			StudyParameterValueBean configuredDictionary = studyParameterValueDAO.findByHandleAndStudy(
+					codedItem.getStudyId(), "autoCodeDictionaryName");
 			Dictionary dictionary = dictionaryService.findDictionary(configuredDictionary.getValue());
 
 			Term term = new Term();
@@ -685,14 +717,16 @@ public class CodedItemsController {
 
 		for (ClassificationElement classElement : classificationElementList) {
 
-			TermElement newTermElement = new TermElement(classElement.getCodeName(), classElement.getCodeValue(), classElement.getElementName());
+			TermElement newTermElement = new TermElement(classElement.getCodeName(), classElement.getCodeValue(),
+					classElement.getElementName());
 			termElementList.add(newTermElement);
 		}
 
 		return termElementList;
 	}
 
-	private void generateCodedItemFields(List<CodedItemElement> codedItemElements, List<ClassificationElement> classificationElements) {
+	private void generateCodedItemFields(List<CodedItemElement> codedItemElements,
+			List<ClassificationElement> classificationElements) {
 
 		for (CodedItemElement codedItemElement : codedItemElements) {
 			for (ClassificationElement classificationElement : classificationElements) {
@@ -701,7 +735,8 @@ public class CodedItemsController {
 
 				if (name.equals(classificationElement.getElementName())) {
 
-					codedItemElement.setItemCode(classificationElement.getCodeName().replaceAll(classificationElement.getCodeValue(), ""));
+					codedItemElement.setItemCode(classificationElement.getCodeName().replaceAll(
+							classificationElement.getCodeValue(), ""));
 				} else if (name.equals(classificationElement.getElementName() + "C")) {
 
 					codedItemElement.setItemCode(classificationElement.getCodeValue());

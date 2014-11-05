@@ -393,7 +393,7 @@ public abstract class Controller extends BaseController {
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		// Set current language preferences
-		Locale locale = request.getLocale();
+		Locale locale = getLocaleResolver().resolveLocale(request);
 		ResourceBundleProvider.updateLocale(locale);
 		resadmin = ResourceBundleProvider.getAdminBundle(locale);
 		resaudit = ResourceBundleProvider.getAuditEventsBundle(locale);

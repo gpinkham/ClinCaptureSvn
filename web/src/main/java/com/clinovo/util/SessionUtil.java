@@ -18,18 +18,42 @@ package com.clinovo.util;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.jsp.jstl.core.Config;
+import java.util.Locale;
 
+/**
+ * SessionUtil.
+ */
 @SuppressWarnings("unused")
 public final class SessionUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SessionUtil.class);
 
+	public static final String CURRENT_SESSION_LOCALE = "current.session.locale";
+
 	private SessionUtil() {
 	}
 
-	public static void updateSession(CoreResources coreResources, HttpSession session) {
+	/**
+	 * Method that updates session attributes.
+	 * 
+	 * @param coreResources
+	 *            CoreResources
+	 * @param localeResolver
+	 *            SessionLocaleResolver
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
+	public static void updateSession(CoreResources coreResources, SessionLocaleResolver localeResolver,
+			HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession();
 		for (Object key : coreResources.getDataInfo().keySet()) {
 			if (key instanceof String) {
 				Object value = session.getAttribute((String) key);
@@ -39,5 +63,56 @@ public final class SessionUtil {
 			}
 		}
 		session.setAttribute("newThemeColor", CoreResources.getField("themeColor"));
+		Locale locale = new Locale(CoreResources.getSystemLanguage());
+		updateLocale(session, locale);
+		localeResolver.setLocale(request, response, locale);
+	}
+
+	/**
+	 * Method that updates locale.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param locale
+	 *            Locale
+	 */
+	public static void updateLocale(HttpServletRequest request, Locale locale) {
+		request.getSession().setAttribute(CURRENT_SESSION_LOCALE, locale);
+		Config.set(request.getSession(), Config.FMT_LOCALE, locale);
+	}
+
+	/**
+	 * Method that updates locale.
+	 *
+	 * @param session
+	 *            HttpSession
+	 * @param locale
+	 *            Locale
+	 */
+	public static void updateLocale(HttpSession session, Locale locale) {
+		session.setAttribute(CURRENT_SESSION_LOCALE, locale);
+		Config.set(session, Config.FMT_LOCALE, locale);
+	}
+
+	/**
+	 * Method return locale.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @return Locale
+	 */
+	public static Locale getLocale(HttpServletRequest request) {
+		return (Locale) request.getSession().getAttribute(CURRENT_SESSION_LOCALE);
+	}
+
+	/**
+	 * Method return locale.
+	 * 
+	 * @param session
+	 *            HttpSession
+	 * @return Locale
+	 */
+	public static Locale getLocale(HttpSession session) {
+		return (Locale) session.getAttribute(CURRENT_SESSION_LOCALE);
 	}
 }

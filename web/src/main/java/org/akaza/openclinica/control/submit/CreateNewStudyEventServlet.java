@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.util.SessionUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Status;
@@ -816,7 +817,7 @@ public class CreateNewStudyEventServlet extends Controller {
 			factory.setStudyBean(currentStudy);
 			factory.setCurrentRole(currentRole);
 			factory.setCurrentUser(ub);
-			factory.setLocale(request.getLocale());
+			factory.setLocale(SessionUtil.getLocale(request));
 
 			sed = (StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(selectedEventDefId);
 			studyEvents = getStudyEventDAO().findAllByStudySubjectAndDefinition(studySubject, sed);
@@ -863,7 +864,8 @@ public class CreateNewStudyEventServlet extends Controller {
 			studyEvents = getStudyEventDAO().findAllByStudySubjectAndDefinition(studySubject, sed);
 			Collections.reverse(studyEvents);
 
-			return factory.eventDivBuilder(subject, rowCount, studyEvents, sed, studySubject, request.getLocale());
+			return factory.eventDivBuilder(subject, rowCount, studyEvents, sed, studySubject,
+					SessionUtil.getLocale(request));
 		}
 	}
 

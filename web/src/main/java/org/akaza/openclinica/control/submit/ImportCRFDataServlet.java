@@ -20,21 +20,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.util.SessionUtil;
 import com.clinovo.util.ValidatorHelper;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.sax.SAXSource;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -62,6 +49,18 @@ import org.springframework.stereotype.Component;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.sax.SAXSource;
+import java.io.File;
+import java.io.FileInputStream;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Create a new CRF verison by uploading excel file. Makes use of several other classes to validate and provide accurate
@@ -174,8 +173,10 @@ public class ImportCRFDataServlet extends Controller {
 
 			try {
 				odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
-				logger.debug("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
-				logger.debug("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
+				logger.debug("Found crf data container for study oid: "
+						+ odmContainer.getCrfDataPostImportContainer().getStudyOID());
+				logger.debug("found length of subject list: "
+						+ odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
 				addPageMessage(respage.getString("passed_xml_validation"), request);
 			} catch (Exception me1) {
 				me1.printStackTrace();
@@ -187,8 +188,8 @@ public class ImportCRFDataServlet extends Controller {
 				return;
 			}
 
-			List<String> errors = new ImportCRFDataService(getStudySubjectIdService(), getDataSource(), request.getLocale()).validateStudyMetadata(
-					odmContainer, ub.getActiveStudyId(), ub);
+			List<String> errors = new ImportCRFDataService(getStudySubjectIdService(), getDataSource(),
+					SessionUtil.getLocale(request)).validateStudyMetadata(odmContainer, ub.getActiveStudyId(), ub);
 			if (errors != null) {
 				// add to session
 				// forward to another page
@@ -208,7 +209,8 @@ public class ImportCRFDataServlet extends Controller {
 			}
 			logger.debug("passed error check");
 
-			ImportCRFDataService importCRFDataService = new ImportCRFDataService(getStudySubjectIdService(), getDataSource(), request.getLocale());
+			ImportCRFDataService importCRFDataService = new ImportCRFDataService(getStudySubjectIdService(),
+					getDataSource(), SessionUtil.getLocale(request));
 			List<EventCRFBean> eventCRFBeans = importCRFDataService.fetchEventCRFBeans(odmContainer, ub);
 			List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
 			HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
@@ -283,8 +285,8 @@ public class ImportCRFDataServlet extends Controller {
 				request.getSession().setAttribute("hardValidationErrors", hardValidationErrors);
 
 				logger.debug("+++ content of total validation errors: " + totalValidationErrors.toString());
-				SummaryStatsBean ssBean = new ImportCRFDataService(getStudySubjectIdService(), getDataSource(), request.getLocale())
-						.generateSummaryStatsBean(odmContainer, displayItemBeanWrappers);
+				SummaryStatsBean ssBean = new ImportCRFDataService(getStudySubjectIdService(), getDataSource(),
+						SessionUtil.getLocale(request)).generateSummaryStatsBean(odmContainer, displayItemBeanWrappers);
 				request.getSession().setAttribute("summaryStats", ssBean);
 				request.getSession().setAttribute("subjectData",
 						odmContainer.getCrfDataPostImportContainer().getSubjectData());

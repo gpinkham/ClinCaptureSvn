@@ -119,4 +119,5 @@
 	<include file="migration/clincaptrue/oracle/2014-10-08-TICKET1773.xml" />
 	<include file="migration/clincaptrue/postgres/2014-10-08-TICKET1773.xml" />
 	<include file="migration/clincaptrue/2014-10-29-TICKET1789.xml" />
+    <include file="migration/clincaptrue/2014-10-28-TICKET1829.xml" />
 </databaseChangeLog>

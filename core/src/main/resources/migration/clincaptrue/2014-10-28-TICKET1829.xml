@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="skirpichenok" id="2014-10-28-TICKET1829-1">
+        <comment>Add language support for clincapture</comment>
+        <insert tableName="system_group"><column name="id" value="120"/><column name="name" value="language"/><column name="parent_id" value="1"/><column name="order_id" value="8"/></insert>
+        <insert tableName="system"><column name="id" value="77"/><column name="name" value="system.language" /><column name="value_type" value="STRING"/><column name="type_values" value="en,ru"/><column name="type" value="COMBOBOX"/><column name="required" valueBoolean="false" /><column name="size" value="80" /><column name="value" value="en" /><column name="group_id" value="120"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+    </changeSet>
+
+</databaseChangeLog>

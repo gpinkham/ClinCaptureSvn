@@ -1,7 +1,9 @@
 package com.clinovo.servlet;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.clinovo.context.impl.JSONSubmissionContext;
+import com.clinovo.exception.RandomizationException;
+import com.clinovo.rule.ext.HttpTransportProtocol;
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -14,11 +16,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import com.clinovo.context.impl.JSONSubmissionContext;
-import com.clinovo.exception.RandomizationException;
-import com.clinovo.rule.ext.HttpTransportProtocol;
-
-import java.util.Arrays;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -54,24 +52,20 @@ public class RandomizeServletTest {
 		PowerMockito.whenNew(JSONSubmissionContext.class).withNoArguments().thenReturn(jsonSubmissionContext);
 		PowerMockito.whenNew(HttpTransportProtocol.class).withNoArguments().thenReturn(httpTransportProtocol);
 
-		Locale locale = new Locale("en");
-		request.setPreferredLocales(Arrays.asList(locale));
+		Locale locale = Locale.ENGLISH;
+		SessionUtil.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
-		org.mockito.internal.util.reflection.Whitebox.setInternalState(randomizeServlet, "resexception", resexception);
-	}
+		org.mockito.internal.util.reflection.Whitebox.setInternalState(randomizeServlet, "resexception", resexception);	}
 
 	@Test(expected = RandomizationException.class)
-	public void testThatExceptionWillBeThrownIfTrialIdIsConfiguredInCRFAndInStudyParams() throws Exception {
-		study.getStudyParameterConfig().setRandomizationTrialId("123");
+	public void testThatExceptionWillBeThrownIfTrialIdIsConfiguredInCRFAndInStudyParams() throws Exception {		study.getStudyParameterConfig().setRandomizationTrialId("123");
 		request.setParameter("trialId", "123");
 		Whitebox.invokeMethod(randomizeServlet, "initiateRandomizationCall", request);
 	}
-
 	@Test(expected = RandomizationException.class)
 	public void testThatExceptionWillBeThrownIfTrialIdIsNotConfigured() throws Exception {
-		study.getStudyParameterConfig().setRandomizationTrialId("");
-		request.setParameter("trialId", "");
+		study.getStudyParameterConfig().setRandomizationTrialId("");		request.setParameter("trialId", "");
 		Whitebox.invokeMethod(randomizeServlet, "initiateRandomizationCall", request);
 	}
 

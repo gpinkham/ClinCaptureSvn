@@ -12,16 +12,7 @@
  ******************************************************************************/
 package org.akaza.openclinica.control.extract;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote;
@@ -56,6 +47,15 @@ import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
 /**
  * A servlet that sends via HTTP a file containing Discrepancy-Note related data.
  * 
@@ -63,7 +63,7 @@ import org.springframework.stereotype.Component;
  * @see ChooseDownloadFormat
  * @see org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class DiscrepancyNoteOutputServlet extends Controller {
 	// These are the headers that must appear in the HTTP response, when sending a
@@ -74,7 +74,7 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 	/* Handle the HTTP Get or Post request. */
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		String studyIdentifier = "";
 		if (currentStudy != null) {
@@ -95,7 +95,7 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 		fileName = fileName == null ? "" : fileName;
 		// the format will be either csv (comma separated values) or pdf (portable document format)
 		String format = request.getParameter("fmt");
-		
+
 		int discNoteType = fp.getInt("discNoteType");
 
 		DownloadDiscrepancyNote downLoader = new DownloadDiscrepancyNote();
@@ -130,8 +130,8 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 
 		ListNotesSort listNotesSort = new ListNotesSort();
 		listNotesSort.addSort("", "");
-		ArrayList<DiscrepancyNoteBean> allDiscNotes = getDiscrepancyNoteDAO()
-				.getNotesWithFilterAndSort(studyBean, listNotesFilter);
+		ArrayList<DiscrepancyNoteBean> allDiscNotes = getDiscrepancyNoteDAO().getNotesWithFilterAndSort(studyBean,
+				listNotesFilter);
 
 		// Downloaded notes will contain only filtered notes.
 		ArrayList sessionNotes = (ArrayList) request.getSession().getAttribute("allNotes");
@@ -161,9 +161,10 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 
 	}
 
-	private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList<DiscrepancyNoteBean> noteRows, HttpServletRequest request) {
-        StudyBean currentStudy = getCurrentStudy(request);
-		Locale l = request.getLocale();
+	private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList<DiscrepancyNoteBean> noteRows,
+			HttpServletRequest request) {
+		StudyBean currentStudy = getCurrentStudy(request);
+		Locale l = SessionUtil.getLocale(request);
 		resword = ResourceBundleProvider.getWordsBundle(l);
 		resformat = ResourceBundleProvider.getFormatBundle(l);
 		SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"),
@@ -377,7 +378,8 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 	}
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        //
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		//
 	}
 }

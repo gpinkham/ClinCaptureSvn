@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.web.table.sdv;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -321,13 +322,14 @@ public class SDVUtil {
 
 		tableFacade.autoFilterAndSort(false);
 
-		resformat = ResourceBundleProvider.getFormatBundle(request.getLocale());
+		resformat = ResourceBundleProvider.getFormatBundle(SessionUtil.getLocale(request));
 		this.pathPrefix = pathPrefix;
 
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
 		// i18n caption; TODO: convert to Spring messages
-		ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", request.getLocale());
+		ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",
+				SessionUtil.getLocale(request));
 
 		String[] allTitles = new String[] {
 				resword.getString("SDV_status"),
@@ -463,7 +465,7 @@ public class SDVUtil {
 		crfStatus.getFilterRenderer().setFilterEditor(new CrfStatusFilter());
 
 		HtmlColumn actions = row.getColumn("sdvStatusActions");
-		actions.getFilterRenderer().setFilterEditor(new DefaultActionsEditor(request.getLocale()));
+		actions.getFilterRenderer().setFilterEditor(new DefaultActionsEditor(SessionUtil.getLocale(request)));
 
 		HtmlColumn sdvStatus = row.getColumn("sdvStatus");
 		sdvStatus.getFilterRenderer().setFilterEditor(new SdvStatusFilter());
@@ -508,7 +510,7 @@ public class SDVUtil {
 		// if(totalRowCount > 0){
 		sDVToolbar.setMaxRowsIncrements(new int[] { 15, 25, 50 });
 		tableFacade.setToolbar(sDVToolbar);
-		tableFacade.setView(new SDVView(request.getLocale(), request));
+		tableFacade.setView(new SDVView(SessionUtil.getLocale(request), request));
 
 		// Fix column titles
 		HtmlTable table = (HtmlTable) tableFacade.getTable();
@@ -541,7 +543,8 @@ public class SDVUtil {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
 		// i18n caption; TODO: convert to Spring messages
-		ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", request.getLocale());
+		ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",
+				SessionUtil.getLocale(request));
 
 		String[] allTitles = new String[] {
 				currentStudy == null ? resword.getString("study_subject_ID") : currentStudy.getStudyParameterConfig()
@@ -714,7 +717,7 @@ public class SDVUtil {
 
 		Locale locale = ResourceBundleProvider.localeMap.get(Thread.currentThread());
 		if (locale == null) {
-			ResourceBundleProvider.updateLocale(request.getLocale());
+			ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		}
 		ResourceBundle bundle = ResourceBundleProvider.getFormatBundle();
 		String format = bundle.getString("date_time_format_string");
@@ -799,7 +802,7 @@ public class SDVUtil {
 
 			// TODO: I18N Date must be formatted properly
 			String pattern = getDateFormat();
-			SimpleDateFormat sdformat = new SimpleDateFormat(pattern, request.getLocale());
+			SimpleDateFormat sdformat = new SimpleDateFormat(pattern, SessionUtil.getLocale(request));
 
 			if (studySubjectBean.getEnrollmentDate() != null) {
 				tempSDVBean.setEnrollmentDate(sdformat.format(studySubjectBean.getEnrollmentDate()));
@@ -1031,7 +1034,7 @@ public class SDVUtil {
 				exceptedEventCrfIdForSubjectList = dndao.findAllEvCRFIdsWithUnclosedDNsByStSubId(studySubjectId);
 			}
 			ArrayList<EventCRFBean> eventCrfs = eventCRFDAO.getEventCRFsByStudySubjectCompleteOrLocked(studySubjectId);
-			StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);			
+			StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
 			for (EventCRFBean eventCRFBean : eventCrfs) {
 				if (!isSdvWithOpenQueriesAllowed && exceptedEventCrfIdForSubjectList.contains(eventCRFBean.getId()))
 					continue;
@@ -1183,7 +1186,8 @@ public class SDVUtil {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
 		// i18n caption; TODO: convert to Spring messages
-		ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", request.getLocale());
+		ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",
+				SessionUtil.getLocale(request));
 
 		String[] allTitles = {
 				currentStudy == null ? resword.getString("study_subject_ID") : currentStudy.getStudyParameterConfig()

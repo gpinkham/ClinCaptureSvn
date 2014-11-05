@@ -13,22 +13,6 @@
 
 package com.clinovo.clincapture.control.submit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteStatisticBean;
@@ -45,6 +29,21 @@ import org.jmesa.limit.SortSetImpl;
 import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * User: Pavel Date: 16.10.12
@@ -81,7 +80,7 @@ public class ListNoteTableFactoryTest {
 	@Before
 	public void setUp() throws Exception {
 
-		ResourceBundleProvider.updateLocale(Locale.getDefault());
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		resterm = ResourceBundleProvider.getTermsBundle();
 
 		context.mock(HttpServletRequest.class);
@@ -103,7 +102,7 @@ public class ListNoteTableFactoryTest {
 		limit.setFilterSet(filterSet);
 		limit.setSortSet(sortSet);
 
-		ResourceBundleProvider.updateLocale(Locale.getDefault());
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 
 		statisticBeans = new ArrayList<DiscrepancyNoteStatisticBean>();
 		statisticBeans.add(new DiscrepancyNoteStatisticBean(10, 1, 1));

@@ -13,13 +13,8 @@
 
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.SessionUtil;
 import com.clinovo.util.ValidatorHelper;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -37,6 +32,13 @@ import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Create Job Import Servlet, by Tom Hickerson, 2009
@@ -137,8 +139,8 @@ public class CreateJobImportServlet extends Controller {
 				int studyId = fp.getInt(ImportSpringJob.STUDY_ID);
 				StudyDAO studyDAO = getStudyDAO();
 				StudyBean studyBean = (StudyBean) studyDAO.findByPK(studyId);
-				SimpleTriggerImpl trigger = triggerService.generateImportTrigger(fp, ub, studyBean, request.getLocale()
-						.getLanguage(), startTime);
+				SimpleTriggerImpl trigger = triggerService.generateImportTrigger(fp, ub, studyBean, SessionUtil
+						.getLocale(request).getLanguage(), startTime);
 
 				JobDetailImpl jobDetailBean = new JobDetailImpl();
 				jobDetailBean.setGroup(IMPORT_TRIGGER);

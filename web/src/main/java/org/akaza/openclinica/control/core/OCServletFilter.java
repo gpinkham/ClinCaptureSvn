@@ -16,8 +16,14 @@
  */
 package org.akaza.openclinica.control.core;
 
-import java.io.IOException;
-import java.security.Principal;
+import com.clinovo.util.SessionUtil;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.log.LoggingConstants;
+import org.slf4j.MDC;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -25,11 +31,10 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.log.LoggingConstants;
-import org.slf4j.MDC;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.Locale;
 
 /**
  * @author pgawade
@@ -39,6 +44,32 @@ public class OCServletFilter implements javax.servlet.Filter {
 
 	public static final String USER_BEAN_NAME = "userBean";
 
+	private WebApplicationContext springContext;
+
+	/**
+	 * Filter init method.
+	 * 
+	 * @param config
+	 *            FilterConfig
+	 */
+	public void init(FilterConfig config) {
+		springContext = WebApplicationContextUtils.getWebApplicationContext(config.getServletContext());
+	}
+
+	/**
+	 * Filter method implementation.
+	 * 
+	 * @param request
+	 *            ServletRequest
+	 * @param response
+	 *            ServletResponse
+	 * @param chain
+	 *            FilterChain
+	 * @throws IOException
+	 *             the IOException
+	 * @throws ServletException
+	 *             the ServletException
+	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
 			ServletException {
 		HttpServletRequest req = (HttpServletRequest) request;
@@ -48,8 +79,14 @@ public class OCServletFilter implements javax.servlet.Filter {
 
 		CoreResources.setField("remoteIp", request.getRemoteAddr());
 
+		Locale locale = new Locale(CoreResources.getSystemLanguage());
+		((SessionLocaleResolver) springContext.getBean("localeResolver")).setLocale((HttpServletRequest) request,
+				(HttpServletResponse) response, locale);
+		SessionUtil.updateLocale((HttpServletRequest) request, locale);
+
 		((HttpServletRequest) request).getSession().setAttribute("logoUrl", CoreResources.getField("logo"));
-        ((HttpServletRequest) request).getSession().setAttribute("instanceType", CoreResources.getField("instanceType"));
+		((HttpServletRequest) request).getSession()
+				.setAttribute("instanceType", CoreResources.getField("instanceType"));
 
 		Principal principal = req.getUserPrincipal();
 
@@ -70,9 +107,9 @@ public class OCServletFilter implements javax.servlet.Filter {
 		}
 	}
 
-	public void init(FilterConfig arg0) throws ServletException {
-	}
-
+	/**
+	 * Destroy method.
+	 */
 	public void destroy() {
 		// FIXME close logging here?
 	}
@@ -80,7 +117,8 @@ public class OCServletFilter implements javax.servlet.Filter {
 	/**
 	 * Register the user in the MDC under USERNAME.
 	 * 
-	 * @param username String
+	 * @param username
+	 *            String
 	 * @return true id the user can be successfully registered
 	 */
 	private boolean registerUsernameWithLogContext(String username) {

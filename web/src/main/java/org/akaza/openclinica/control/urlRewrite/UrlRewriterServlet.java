@@ -16,15 +16,7 @@
  */
 package org.akaza.openclinica.control.urlRewrite;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.ResourceBundle;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -48,6 +40,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.ResourceBundle;
+
 /**
  * Servlet to call appropriate application pages corresponding to supported RESTful URLs
  * 
@@ -55,18 +55,18 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class UrlRewriterServlet extends Controller {
-	
+
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-        //
+		//
 	}
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        //
+		//
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class UrlRewriterServlet extends Controller {
 						requestURI.length());
 			}
 
-			ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(request.getLocale());
+			ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(SessionUtil.getLocale(request));
 			ocResource = getOpenClinicaResourceFromURL(requestOIDStr, resexception);
 			if (null != ocResource) {
 				if (ocResource.isInValid()) {
@@ -131,7 +131,7 @@ public class UrlRewriterServlet extends Controller {
 							request.setAttribute("tabId", mapQueryParams.get("tabId"));
 						}
 						if ((null != ocResource.getStudySubjectID()) && (mapQueryParams.containsKey("exitTo"))) {
-							//request.setAttribute("exitTo", "ViewStudySubject?id=" + ocResource.getStudySubjectID());
+							// request.setAttribute("exitTo", "ViewStudySubject?id=" + ocResource.getStudySubjectID());
 						}
 						SectionDAO sdao = getSectionDAO();
 						if (mapQueryParams.containsKey("tabId")) {
@@ -263,14 +263,14 @@ public class UrlRewriterServlet extends Controller {
 								// separate study event OID and study event
 								// repeat key
 								String seoid = "";
-                                eventRepeatKey = null;
+								eventRepeatKey = null;
 								String eventOrdinal = "";
 								if (URLParamValue.contains("%5B") && URLParamValue.contains("%5D")) {
 									seoid = URLParamValue.substring(0, URLParamValue.indexOf("%5B"));
 									openClinicaResource.setStudyEventDefOID(seoid);
 									eventOrdinal = URLParamValue.substring(URLParamValue.indexOf("%5B") + 3,
 											URLParamValue.indexOf("%5D"));
-                                    eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
+									eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
 								} else if (URLParamValue.contains("[") && URLParamValue.contains("]")) {
 									seoid = URLParamValue.substring(0, URLParamValue.indexOf("["));
 									logger.info("seoid" + seoid);
@@ -278,7 +278,7 @@ public class UrlRewriterServlet extends Controller {
 									eventOrdinal = URLParamValue.substring(URLParamValue.indexOf("[") + 1,
 											URLParamValue.indexOf("]"));
 									logger.info("eventOrdinal::" + eventOrdinal);
-                                    eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
+									eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
 								} else {
 									seoid = URLParamValue;
 									openClinicaResource.setStudyEventDefOID(seoid);

@@ -13,26 +13,6 @@
 
 package org.akaza.openclinica.service.extract;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.zip.ZipOutputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.DisplayItemHeaderBean;
@@ -63,12 +43,31 @@ import org.akaza.openclinica.logic.odmExport.OdmStudyBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+import javax.sql.DataSource;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.zip.ZipOutputStream;
+
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class GenerateExtractFileService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
 	private final DataSource ds;
-	private HttpServletRequest request;
+	private Locale locale;
 	public static ResourceBundle resword;
 	private final UserAccountBean userBean;
 	private final CoreResources coreResources;
@@ -77,10 +76,10 @@ public class GenerateExtractFileService {
 	private static List<File> oldFiles = new LinkedList<File>();
 	private final RuleSetRuleDao ruleSetRuleDao;
 
-	public GenerateExtractFileService(DataSource ds, HttpServletRequest request, UserAccountBean userBean,
+	public GenerateExtractFileService(DataSource ds, Locale locale, UserAccountBean userBean,
 			CoreResources coreResources, RuleSetRuleDao ruleSetRuleDao) {
 		this.ds = ds;
-		this.request = request;
+		this.locale = locale;
 		this.userBean = userBean;
 		this.coreResources = coreResources;
 		this.ruleSetRuleDao = ruleSetRuleDao;
@@ -89,19 +88,13 @@ public class GenerateExtractFileService {
 	public GenerateExtractFileService(DataSource ds, UserAccountBean userBean, CoreResources coreResources,
 			RuleSetRuleDao ruleSetRuleDao) {
 		this.ds = ds;
+		this.locale = new Locale("en-US");
 		this.userBean = userBean;
 		this.coreResources = coreResources;
 		this.ruleSetRuleDao = ruleSetRuleDao;
 	}
 
 	public void setUpResourceBundles() {
-		Locale locale;
-		try {
-			locale = request.getLocale();
-		} catch (NullPointerException ne) {
-			locale = new Locale("en-US");
-		}
-
 		ResourceBundleProvider.updateLocale(locale);
 		resword = ResourceBundleProvider.getWordsBundle(locale);
 	}
@@ -223,8 +216,8 @@ public class GenerateExtractFileService {
 		int fId = this.createFileK(ODMXMLFileName, generalFileDir, metaReport.getXmlOutput().toString(), datasetBean,
 				sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld);
 		if (!"".equals(generalFileDirCopy)) {
-			this.createFileK(ODMXMLFileName, generalFileDirCopy, metaReport.getXmlOutput().toString(),
-					datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld);
+			this.createFileK(ODMXMLFileName, generalFileDirCopy, metaReport.getXmlOutput().toString(), datasetBean,
+					sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld);
 		}
 
 		adc.collectFileData();
@@ -237,8 +230,8 @@ public class GenerateExtractFileService {
 		fId = this.createFileK(ODMXMLFileName, generalFileDir, adminReport.getXmlOutput().toString(), datasetBean,
 				sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld);
 		if (!"".equals(generalFileDirCopy)) {
-			this.createFileK(ODMXMLFileName, generalFileDirCopy, adminReport.getXmlOutput().toString(),
-					datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld);
+			this.createFileK(ODMXMLFileName, generalFileDirCopy, adminReport.getXmlOutput().toString(), datasetBean,
+					sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld);
 		}
 
 		DatasetDAO dsdao = new DatasetDAO(ds);
@@ -293,8 +286,8 @@ public class GenerateExtractFileService {
 				fId = this.createFileK(ODMXMLFileName, generalFileDir, report.getXmlOutput().toString(), datasetBean,
 						sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld);
 				if (!"".equals(generalFileDirCopy)) {
-					this.createFileK(ODMXMLFileName, generalFileDirCopy, report.getXmlOutput().toString(),
-							datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld);
+					this.createFileK(ODMXMLFileName, generalFileDirCopy, report.getXmlOutput().toString(), datasetBean,
+							sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld);
 				}
 			}
 		}
@@ -591,7 +584,7 @@ public class GenerateExtractFileService {
 			logger.info("finished writing the text file...");
 			// now, we write the file to the zip file
 			FileInputStream is = new FileInputStream(newFile);
-			
+
 			@SuppressWarnings("resource")
 			ZipOutputStream z = new ZipOutputStream(new FileOutputStream(new File(complete, name + ".zip")));
 			logger.info("created zip output stream...");

@@ -20,28 +20,12 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.io.File;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.CodedItemElement;
+import com.clinovo.service.DataEntryService;
+import com.clinovo.service.ReportCRFService;
+import com.clinovo.util.SessionUtil;
+import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -143,11 +127,26 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.impl.StdScheduler;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.model.CodedItemElement;
-import com.clinovo.service.DataEntryService;
-import com.clinovo.service.ReportCRFService;
-import com.clinovo.util.ValidatorHelper;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author ssachs
@@ -305,7 +304,7 @@ public abstract class DataEntryServlet extends Controller {
 	@SuppressWarnings("unused")
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Locale locale = request.getLocale();
+		Locale locale = SessionUtil.getLocale(request);
 		FormProcessor fp = new FormProcessor(request);
 		String action = fp.getString(ACTION);
 
@@ -1385,8 +1384,8 @@ public abstract class DataEntryServlet extends Controller {
 					String noteDescription = resword.getString("crf_eval_rfc_description");
 					String detailedDescription = resword.getString("crf_eval_rfc_detailed_description");
 					List<DiscrepancyNoteBean> dbns = new DiscrepancyNoteService(getDataSource())
-							.generateRFCsForChangedFields(changedItemsList, changedItemNamesList, oldItemdata,
-									ub, noteDescription, detailedDescription);
+							.generateRFCsForChangedFields(changedItemsList, changedItemNamesList, oldItemdata, ub,
+									noteDescription, detailedDescription);
 					fdn.addAutoRFCs(dbns);
 				}
 
@@ -1880,7 +1879,7 @@ public abstract class DataEntryServlet extends Controller {
 
 	private void sendEmailWithCRFReport(CRFVersionBean crfVersionBean, CRFBean crfBean, StudySubjectBean ssb,
 			EventDefinitionCRFBean edcb, EventCRFBean ecb, StudyBean currentStudy, HttpServletRequest request) {
-		Locale locale = request.getLocale();
+		Locale locale = SessionUtil.getLocale(request);
 		ReportCRFService reportCRFService = (ReportCRFService) SpringServletAccess.getApplicationContext(
 				getServletContext()).getBean("reportCRFService");
 		try {
@@ -4563,9 +4562,8 @@ public abstract class DataEntryServlet extends Controller {
 	private RuleSetServiceInterface getRuleSetService(HttpServletRequest request) {
 
 		RuleSetServiceInterface ruleSetService = null;
-		String requestUrl =
-				request.getScheme() + "://" + request.getSession().getAttribute(DOMAIN_NAME) + request.getRequestURI()
-						.toString().replaceAll(request.getServletPath(), "");
+		String requestUrl = request.getScheme() + "://" + request.getSession().getAttribute(DOMAIN_NAME)
+				+ request.getRequestURI().toString().replaceAll(request.getServletPath(), "");
 		ruleSetService = ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
 				.getApplicationContext(getServletContext()).getBean("ruleSetService");
 		ruleSetService.setContextPath(getContextPath(request));

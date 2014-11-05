@@ -20,18 +20,7 @@
  */
 package org.akaza.openclinica.view;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.TreeMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -50,13 +39,24 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.TreeMap;
+
 /**
  * To create a flexible panel of information that will change while the user manages his or her session.
  * 
  * @author thickerson
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class StudyInfoPanel {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -192,7 +192,7 @@ public class StudyInfoPanel {
 	 */
 	public void setData(Page page, HttpSession session, HttpServletRequest request) {
 
-		Locale locale = request.getLocale();
+		Locale locale = SessionUtil.getLocale(request);
 		resword = ResourceBundleProvider.getWordsBundle(locale);
 		local_sdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string"));
 
@@ -256,7 +256,7 @@ public class StudyInfoPanel {
 				if (fb != null) {
 					this.setData("Added Filter", fb.getName());
 				}
-			
+
 			} else if (page.equals(Page.CONFIRM_DATASET)) {
 				this.reset();
 				this.setStudyInfoShown(false);
@@ -284,7 +284,7 @@ public class StudyInfoPanel {
 				if (fb != null) {
 					this.setData(resword.getString("added_filter"), fb.getName());
 				}
-			
+
 			} else if (page.equals(Page.ADMIN_SYSTEM)) {
 				// blank here , info set in servlet itself
 			} else if (page.equals(Page.VIEW_STUDY_SUBJECT)) {
@@ -375,8 +375,8 @@ public class StudyInfoPanel {
 				this.setSubmitDataModule(false);
 				this.setCreateDataset(false);
 
-			} else if (page.equals(Page.LIST_STUDY_SUBJECTS)
-					|| page.equals(Page.SUBMIT_DATA) || page.equals(Page.SUBMIT_DATA_SERVLET)) {
+			} else if (page.equals(Page.LIST_STUDY_SUBJECTS) || page.equals(Page.SUBMIT_DATA)
+					|| page.equals(Page.SUBMIT_DATA_SERVLET)) {
 				this.reset();
 				this.setStudyInfoShown(true);
 				this.setOrderedData(true);

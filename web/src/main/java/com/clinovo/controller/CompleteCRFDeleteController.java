@@ -14,6 +14,7 @@
 package com.clinovo.controller;
 
 import com.clinovo.util.PageMessagesUtil;
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -108,10 +109,13 @@ public class CompleteCRFDeleteController {
 			if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0
 					|| eventDefinitionListAvailable.size() > 0 || ruleSetBeanList.size() > 0) {
 				PageMessagesUtil.addPageMessage(request,
-						messageSource.getMessage("this_crf_has_associated_data", null, request.getLocale()));
+						messageSource.getMessage("this_crf_has_associated_data", null, SessionUtil.getLocale(request)));
 			} else {
-				PageMessagesUtil.addPageMessage(request,
-						messageSource.getMessage("this_crf_has_no_conflict_data", null, request.getLocale()));
+				PageMessagesUtil
+						.addPageMessage(
+								request,
+								messageSource.getMessage("this_crf_has_no_conflict_data", null,
+										SessionUtil.getLocale(request)));
 			}
 
 		} else {
@@ -150,11 +154,11 @@ public class CompleteCRFDeleteController {
 		if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0 || eventDefinitionListAvailable.size() > 0
 				|| ruleSetBeanList.size() > 0) {
 			request.getSession().setAttribute("controllerMessage",
-					messageSource.getMessage("this_crf_has_associated_data", null, request.getLocale()));
+					messageSource.getMessage("this_crf_has_associated_data", null, SessionUtil.getLocale(request)));
 		} else {
 			crfDao.deleteCrfById(crfId);
 			request.getSession().setAttribute("controllerMessage",
-					messageSource.getMessage("the_crf_has_been_removed", null, request.getLocale()));
+					messageSource.getMessage("the_crf_has_been_removed", null, SessionUtil.getLocale(request)));
 		}
 
 		return CRF_LIST;

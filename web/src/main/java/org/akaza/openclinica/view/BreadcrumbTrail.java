@@ -20,16 +20,16 @@
  */
 package org.akaza.openclinica.view;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Maintain the breadcrumbs on the page, remain seamless, for example, it gets set when the Page gets set in the
@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author thickerson
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class BreadcrumbTrail {
 	private ArrayList trail = new ArrayList();
 
@@ -69,9 +69,9 @@ public class BreadcrumbTrail {
 	}
 
 	/**
-	 * method to be called right before forwardPage() in the Controller. Generates an arraylist of breadcrumb
-	 * beans, which is then set to the request/session. Has the possibility of getting quite long, since we will be
-	 * setting up all breadcrumb bean configurations here based on the Page submitted to us.
+	 * method to be called right before forwardPage() in the Controller. Generates an arraylist of breadcrumb beans,
+	 * which is then set to the request/session. Has the possibility of getting quite long, since we will be setting up
+	 * all breadcrumb bean configurations here based on the Page submitted to us.
 	 * 
 	 * @param jspPage
 	 *            the page which is the new target.
@@ -81,7 +81,7 @@ public class BreadcrumbTrail {
 	 */
 	public ArrayList generateTrail(Page jspPage, HttpServletRequest request) {
 
-		Locale locale = request.getLocale();
+		Locale locale = SessionUtil.getLocale(request);
 		ResourceBundle resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
 		try {
@@ -185,7 +185,7 @@ public class BreadcrumbTrail {
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_subjects"), "ListStudySubject",
 						Status.AVAILABLE));
-				
+
 				if (request.getAttribute("id") != null) {
 					trail.add(new BreadcrumbBean(resworkflow.getString("view_study_subject"),
 							"ViewStudySubject?module=manage&id=" + (String) request.getAttribute("id"),
@@ -718,7 +718,7 @@ public class BreadcrumbTrail {
 			else if (jspPage.equals(Page.MENU)) {
 				trail = new ArrayList();
 			}
-			
+
 			else if (jspPage.equals(Page.EDIT_DATASET)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("extract_datasets"), "ExtractDatasetsMain",
@@ -733,7 +733,7 @@ public class BreadcrumbTrail {
 						Status.UNAVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("generate_dataset"), "CreateDataset",
 						Status.UNAVAILABLE));
-			
+
 			} else if (jspPage.equals(Page.VIEW_DATASET_DETAILS)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("extract_datasets"), "ExtractDatasetsMain",
@@ -749,7 +749,7 @@ public class BreadcrumbTrail {
 				trail.add(new BreadcrumbBean(resworkflow.getString("extract_datasets"), "ExtractDatasetsMain",
 						Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("view_dataset"), "#", Status.PENDING));
-			
+
 			} else if (jspPage.equals(Page.VIEW_RULES)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));

@@ -14,6 +14,7 @@
 package com.clinovo.tag;
 
 import com.clinovo.dao.SystemDAO;
+import com.clinovo.util.SessionUtil;
 import com.clinovo.util.StudyParameterPriorityUtil;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -27,6 +28,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
@@ -82,8 +84,8 @@ public class DataEntryLinkTag extends TagSupport {
 				if (dynamicAlt.isEmpty()) {
 					if (dec.isContinueInitialDataEntryPermitted()) {
 						eventCrfBean = dec.getEventCRF();
-						dynamicAlt = messageSource.getMessage("continue_entering_data", null, pageContext.getRequest()
-								.getLocale());
+						dynamicAlt = messageSource.getMessage("continue_entering_data", null,
+								SessionUtil.getLocale((HttpServletRequest) pageContext.getRequest()));
 						if (dynamicActionQuery.isEmpty()) {
 							dynamicActionQuery = "'InitialDataEntry".concat(actionQueryTail).concat("'");
 						}
@@ -92,15 +94,15 @@ public class DataEntryLinkTag extends TagSupport {
 						dynamicAlt = messageSource.getMessage(eventCrfBean.getValidatorId() == 0 ? (allowCrfEvaluation
 								&& dec.getEventDefinitionCRF().isEvaluatedCRF()
 								&& !dec.getEventDefinitionCRF().isDoubleEntry() ? "begin_crf_evaluation"
-								: "begin_double_data_entry") : "continue_entering_data", null, pageContext.getRequest()
-								.getLocale());
+								: "begin_double_data_entry") : "continue_entering_data", null, SessionUtil
+								.getLocale((HttpServletRequest) pageContext.getRequest()));
 						if (dynamicActionQuery.isEmpty()) {
 							dynamicActionQuery = "'DoubleDataEntry".concat(actionQueryTail).concat("'");
 						}
 					} else if (dec.isPerformAdministrativeEditingPermitted()) {
 						eventCrfBean = dec.getEventCRF();
-						dynamicAlt = messageSource.getMessage("administrative_editing", null, pageContext
-								.getRequest().getLocale());
+						dynamicAlt = messageSource.getMessage("administrative_editing", null,
+								SessionUtil.getLocale((HttpServletRequest) pageContext.getRequest()));
 						if (dynamicActionQuery.isEmpty()) {
 							dynamicActionQuery = "'AdministrativeEditing".concat(actionQueryTail).concat("'");
 						}
@@ -110,7 +112,8 @@ public class DataEntryLinkTag extends TagSupport {
 				DisplayEventDefinitionCRFBean dedc = (DisplayEventDefinitionCRFBean) object;
 				eventCrfBean = dedc.getEventCRF();
 				if (dynamicAlt.isEmpty()) {
-					dynamicAlt = messageSource.getMessage("enter_data", null, pageContext.getRequest().getLocale());
+					dynamicAlt = messageSource.getMessage("enter_data", null,
+							SessionUtil.getLocale((HttpServletRequest) pageContext.getRequest()));
 				}
 				if (dynamicActionQuery.isEmpty()) {
 					dynamicActionQuery = "document.startForm".concat(actionQueryTail);

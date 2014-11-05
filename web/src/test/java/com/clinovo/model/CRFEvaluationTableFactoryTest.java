@@ -1,6 +1,7 @@
 package com.clinovo.model;
 
 import com.clinovo.BaseControllerTest;
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -30,6 +31,7 @@ public class CRFEvaluationTableFactoryTest extends BaseControllerTest {
 		request = new MockHttpServletRequest();
 		response = new MockHttpServletResponse();
 
+		SessionUtil.updateLocale(request, LOCALE);
 		StudyBean currentStudy = new StudyBean();
 		currentStudy.setId(1);
 		currentStudy.setStatus(org.akaza.openclinica.bean.core.Status.AVAILABLE);

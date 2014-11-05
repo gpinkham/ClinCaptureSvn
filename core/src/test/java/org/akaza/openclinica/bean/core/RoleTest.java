@@ -36,7 +36,7 @@ public class RoleTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ResourceBundleProvider.updateLocale(Locale.getDefault());
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		resTerm = ResourceBundleProvider.getTermsBundle();
 		role = Role.ROLE_MAP;
 		roleWithDescription = Role.ROLE_MAP_WITH_DESCRIPTION;

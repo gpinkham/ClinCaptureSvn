@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.SessionUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -167,7 +168,7 @@ public class UpdateJobImportServlet extends Controller {
 				int studyId = fp.getInt(ImportSpringJob.STUDY_ID);
 				StudyBean study = (StudyBean) studyDAO.findByPK(studyId);
 				SimpleTriggerImpl newTrigger = triggerService.generateImportTrigger(fp, getUserAccountBean(request),
-						study, startTime, request.getLocale().getLanguage());
+						study, startTime, SessionUtil.getLocale(request).getLanguage());
 				JobDetailImpl jobDetailBean = new JobDetailImpl();
 				jobDetailBean.setGroup(TRIGGER_IMPORT_GROUP);
 				jobDetailBean.setName(newTrigger.getKey().getName());
