@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -150,7 +149,7 @@
         </c:forEach>
       </select>
       &nbsp;
-      <input type="submit" name="saveStudyStatus" value="Save Status" class="button_medium">
+      <input type="submit" name="saveStudyStatus" value="<fmt:message key="save_status" bundle="${resword}"/>" class="button_medium">
   </div>
   &nbsp;&nbsp;&nbsp;
   <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">

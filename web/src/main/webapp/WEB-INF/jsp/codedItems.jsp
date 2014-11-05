@@ -124,7 +124,7 @@
             <td align="center" width="100px"><fmt:message key="total" bundle="${resword}"/></td>
         </tr>
         <tr>
-        	<td align="center">Medical Terms</td>
+        	<td align="center"><fmt:message key="medical_terms" bundle="${resword}"/></td>
         	<td align="center" name="tdNotCoded"><a href='javascript:redirectUrl("Not Coded");'>${unCodedItems}</a></td>
         	<c:if test="${mcApprovalNeeded}">
             	<td align="center">0</td>
