@@ -479,7 +479,11 @@ public abstract class Controller extends BaseController {
 					startWith = "";
 					pageMessages = new ArrayList();
 				}
-				pageMessages.add(startWith + resword.getString(STUDY_SHOUD_BE_IN_AVAILABLE_MODE) + BR);
+				String message = resword.getString(STUDY_SHOUD_BE_IN_AVAILABLE_MODE) + BR;
+
+				if (!pageMessages.contains(message) && !pageMessages.contains(startWith + message)) {
+					pageMessages.add(startWith + message);
+				}
 				request.setAttribute(PAGE_MESSAGE, pageMessages);
 			}
 
