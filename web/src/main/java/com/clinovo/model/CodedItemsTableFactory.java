@@ -556,7 +556,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 		UserAccountDAO userDAO = new UserAccountDAO(datasource);
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		UserAccountBean loggedInUser = (UserAccountBean) userDAO.findByUserName(authentication.getName());
-		return loggedInUser.getRoleByStudy(studyId).getName().equalsIgnoreCase("study monitor");
+		return loggedInUser.getRoleByStudy(studyId).getRoleCode().equalsIgnoreCase("study_monitor");
 	}
 	
 	public void setStudySubjectDAO(StudySubjectDAO studySubjectDAO) { this.studySubjectDAO = studySubjectDAO; }

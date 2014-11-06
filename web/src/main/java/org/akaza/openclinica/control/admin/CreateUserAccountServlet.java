@@ -296,7 +296,7 @@ public class CreateUserAccountServlet extends Controller {
 		StudyUserRoleBean activeStudyRole = new StudyUserRoleBean();
 
 		activeStudyRole.setStudyId(studyId);
-		activeStudyRole.setRoleName(r.getName());
+		activeStudyRole.setRoleName(r.getCode());
 		activeStudyRole.setStatus(Status.AVAILABLE);
 		activeStudyRole.setOwner(ub);
 

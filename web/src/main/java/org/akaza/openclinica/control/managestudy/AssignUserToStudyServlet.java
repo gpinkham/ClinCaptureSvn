@@ -187,7 +187,7 @@ public class AssignUserToStudyServlet extends Controller {
 				addedUsers.add(id);
 
 				StudyUserRoleBean sub = new StudyUserRoleBean();
-				sub.setRoleName(Role.get(roleId).getName());
+				sub.setRoleName(Role.get(roleId).getCode());
 				sub.setStudyId(currentStudy.getId());
 				sub.setStatus(Status.AVAILABLE);
 				sub.setOwner(ub);
@@ -222,7 +222,7 @@ public class AssignUserToStudyServlet extends Controller {
 					UserAccountBean user = (UserAccountBean) udao.findByPK(id);
 
 					StudyUserRoleBean sub = new StudyUserRoleBean();
-					sub.setRoleName(Role.get(roleId).getName());
+					sub.setRoleName(Role.get(roleId).getCode());
 					sub.setStudyId(currentStudy.getId());
 					sub.setStatus(Status.AVAILABLE);
 					sub.setOwner(ub);
@@ -266,10 +266,10 @@ public class AssignUserToStudyServlet extends Controller {
 
 		if (currentStudy.getParentStudyId() > 0) {
 			userListbyRoles = (ArrayList<UserAccountBean>) udao.findAllByRole(
-					Role.CLINICAL_RESEARCH_COORDINATOR.getName(), Role.INVESTIGATOR.getName());
+					Role.CLINICAL_RESEARCH_COORDINATOR.getCode(), Role.INVESTIGATOR.getCode());
 		} else {
-			userListbyRoles = (ArrayList<UserAccountBean>) udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getName(),
-					Role.STUDY_MONITOR.getName());
+			userListbyRoles = (ArrayList<UserAccountBean>) udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getCode(),
+					Role.STUDY_MONITOR.getCode());
 		}
 
 		iterateUser = userListbyRoles.listIterator();

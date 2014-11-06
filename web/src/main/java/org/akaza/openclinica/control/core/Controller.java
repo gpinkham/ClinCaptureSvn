@@ -1711,21 +1711,21 @@ public abstract class Controller extends BaseController {
 	protected boolean isEvaluator(UserAccountBean loggedInUser, HttpServletRequest request) {
 		// site
 		if (getCurrentStudy(request).isSite(getCurrentStudy(request).getParentStudyId())) {
-			return loggedInUser.getRoleByStudy(getCurrentStudy(request).getParentStudyId()).getName()
-					.equalsIgnoreCase("study evaluator");
+			return loggedInUser.getRoleByStudy(getCurrentStudy(request).getParentStudyId()).getRoleCode()
+					.equalsIgnoreCase("study_evaluator");
 		}
 		// Otherwise, study
-		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("study evaluator");
+		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getRoleCode().equalsIgnoreCase("study_evaluator");
 	}
 
 	protected boolean isCoder(UserAccountBean loggedInUser, HttpServletRequest request) {
 		// site
 		if (getCurrentStudy(request).isSite(getCurrentStudy(request).getParentStudyId())) {
-			return loggedInUser.getRoleByStudy(getCurrentStudy(request).getParentStudyId()).getName()
-					.equalsIgnoreCase("study coder");
+			return loggedInUser.getRoleByStudy(getCurrentStudy(request).getParentStudyId()).getRoleCode()
+					.equalsIgnoreCase("study_coder");
 		}
 		// Otherwise, study
-		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("study coder");
+		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getRoleCode().equalsIgnoreCase("study_coder");
 	}
 
 	/* Determining the resolution status that will be shown in color flag for an item. */

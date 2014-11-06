@@ -120,7 +120,7 @@ public class EditStudyUserRoleServlet extends Controller {
 					Page forwardTo = Page.LIST_USER_ACCOUNTS_SERVLET;
 					int roleId = fp.getInt(INPUT_ROLE);
 					Role r = Role.get(roleId);
-					studyUserRole.setRoleName(r.getName());
+					studyUserRole.setRoleName(r.getCode());
 					studyUserRole.setUpdater(ub);
 					udao.updateStudyUserRole(studyUserRole, uName);
 					addPageMessage(respage.getString("the_user_in_study_has_been_updated"), request);

@@ -102,6 +102,10 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		return role.getName();
 	}
 
+	public String getRoleCode() {
+		return role.getCode();
+	}
+
 	/**
 	 * Set new role for current user role bean using role name.
 	 * 

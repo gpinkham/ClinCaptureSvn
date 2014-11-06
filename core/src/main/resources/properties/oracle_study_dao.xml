@@ -92,7 +92,7 @@
             <sql>
                 SELECT s.* FROM study s, study_user_role sur
                 WHERE sur.user_name = ?
-                AND (s.study_id=sur.study_id or (sur.study_id is null and sur.role_name = 'system administrator'))
+                AND (s.study_id=sur.study_id or (sur.study_id is null and sur.role_name = 'system_administrator'))
                 AND sur.status_id != 5
                 AND sur.status_id != 7
             </sql>
@@ -121,7 +121,7 @@
 					OR study.study_id IN (SELECT s.study_id 
 											FROM study s, study_user_role sur
 											WHERE sur.user_name = ?
-											AND (s.study_id = sur.study_id OR (sur.study_id IS NULL AND sur.role_name = 'system administrator'))
+											AND (s.study_id = sur.study_id OR (sur.study_id IS NULL AND sur.role_name = 'system_administrator'))
 											AND s.parent_study_id IS NULL
 											AND sur.status_id NOT IN (5,7)
 											AND s.status_id NOT IN (5,7))
