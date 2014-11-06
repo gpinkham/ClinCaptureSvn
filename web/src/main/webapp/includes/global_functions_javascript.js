@@ -1977,10 +1977,11 @@ var hideContentForCurrentPopup = function() {
     subjectMatrixPopupStick = undefined;
 };
 
-var hideCurrentPopup = function(ev) {
-    var element =  ev.target || ev.srcElement;
+var hideCurrentPopup = function (ev) {
+    var element = ev.target || ev.srcElement;
     if (ev.target.nodeName.toLowerCase() != "html") {
-        if (currentPopupUid != undefined && jQuery(ev.target).closest("#Event_" + currentPopupUid).length == 0) {
+        if ((currentPopupUid != undefined && jQuery(ev.target).closest("#Event_" + currentPopupUid).length == 0)
+            && jQuery(ev.target).parents('#ui-datepicker-div').length == 0) {
             hideContentForCurrentPopup();
             jQuery("*").unbind("mousedown", hideCurrentPopup);
         } else {

@@ -507,8 +507,9 @@
                     </c:otherwise>
                     </c:choose>
                 </span>
-                <a href="#" onmouseover="Calendar.setup({inputField  : 'interviewDate', ifFormat    : '<fmt:message key='date_format_calender' bundle='${resformat}'/>', button      : 'interviewDateTrigger' });">
-                    <img style="vertical-align: middle;" src="<c:out value="${contextPath}" />/images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="interviewDateTrigger" /></a>
+                <a href="#!" onclick="$('#interviewDate').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
+                    <img style="vertical-align: middle;" src="<c:out value="${contextPath}" />/images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
+                </a>
                 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
                     <c:set var="isNewDNDate" value="${hasDateNote eq 'yes' ? 0 : 1}"/>
                 <c:choose>

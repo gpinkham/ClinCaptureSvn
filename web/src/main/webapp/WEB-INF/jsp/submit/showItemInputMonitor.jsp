@@ -179,10 +179,9 @@ form element in red --%>
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
-    <A HREF="#" onmouseover="Calendar.setup({inputField  : getSib(this.previousSibling), ifFormat    : '<fmt:message key="date_format_calender" bundle="${resformat}"/>', button      : 'anchor<c:out value="${itemId}"/>' });"
-       NAME="anchor<c:out value="${itemId}"/>" ID="anchor<c:out value="${itemId}"/>">
-        <img src="<c:out value="${contextPath}" />/images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" ID="anchor<c:out value="${itemId}"/>"/></a>
-
+      <a href="#!" onclick="$(getSib(this.previousSibling)).datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');" NAME="anchor<c:out value="${itemId}"/>" ID="anchor<c:out value="${itemId}"/>">
+        <img src="<c:out value="${contextPath}" />/images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" ID="anchor<c:out value="${itemId}"/>"/>
+      </a>
     <c:set var="numOfDate" value="${numOfDate+1}"/>
   </c:if>
 </c:if>

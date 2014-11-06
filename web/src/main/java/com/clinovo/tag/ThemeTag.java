@@ -35,7 +35,7 @@ public class ThemeTag extends TagSupport {
 		String html = "<script type=\"text/JavaScript\" language=\"JavaScript\" src=\"".concat(
 				pageContext.getServletContext().getContextPath()).concat("/includes/theme.js\"></script>");
 		if (!newThemeColor.equalsIgnoreCase("blue")) {
-			html = html.concat("<style class=\"hideStuff\" type=\"text/css\">body {display:none;}</style>");
+			html = html.concat("<style class=\"hideStuff\" type=\"text/css\">body {visibility:hidden;}</style>");
 		}
 		html = html.concat("<link rel=\"stylesheet\" href=\"").concat(pageContext.getServletContext().getContextPath())
 				.concat("/includes/css/charts_").concat(newThemeColor).concat(".css\" type=\"text/css\"/>");

@@ -58,6 +58,7 @@ public class CalendarTagTest {
 		Mockito.when(pageContext.getOut()).thenReturn(jspWriter);
 		Mockito.when(pageContext.getRequest()).thenReturn(request);
 		Mockito.when(request.getSession()).thenReturn(session);
+		Mockito.when(pageContext.getSession()).thenReturn(session);
 		SessionUtil.updateLocale(session, Locale.ENGLISH);
 		Mockito.when(pageContext.getServletContext()).thenReturn(servletContext);
 		Mockito.when(servletContext.getContextPath()).thenReturn("/clincapture");

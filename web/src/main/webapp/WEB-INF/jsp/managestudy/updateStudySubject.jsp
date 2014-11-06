@@ -160,14 +160,9 @@
 																	</td>
 																	
 																	<td valign="top">
-																		<a href="#"> 
-																			<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
-																					title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" /> 
-																				<script type="text/javascript">
-                  																	Calendar.setup({inputField: "enrollmentDateField", 
-                  																			ifFormat: "<fmt:message key="date_format_calender" bundle="${resformat}"/>", 
-                  																			button: "enrollmentDateTrigger" });
-                 																</script>
+                                                                        <a href="#!" onclick="$('#enrollmentDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
+                                                                        <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
+																					title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
 																		</a> 
 																		<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 																			<c:choose>

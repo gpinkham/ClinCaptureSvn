@@ -432,12 +432,8 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
             <%--        document.getElementById('testdiv1').style.top=(parseInt(document.getElementById('testdiv1').style.top) - 10)+'px'; --%>
             <td valign="top" nowrap>
 
-                <a href="#">
-                    <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="interviewDateTrigger" /></a>
-                <script type="text/javascript">
-                    Calendar.setup({inputField  : "interviewDate", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "interviewDateTrigger" });
-                </script>
-
+                <a href="#!" onclick="$('#interviewDate').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
+                <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" /></a>
                 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
                     <%--BWP: 2808 related>> --%>
                     <c:if test="${! (enclosingPage eq 'viewSectionData')}">

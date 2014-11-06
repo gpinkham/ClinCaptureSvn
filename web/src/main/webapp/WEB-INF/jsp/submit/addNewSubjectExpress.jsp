@@ -94,11 +94,9 @@
 					<input onfocus="<%--if (this.value == '<fmt:message key="eventMMDDYYYY" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="startDate" size="15" value="<fmt:message key="eventMMDDYYYY" bundle="${resword}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield" id="enrollmentDateField"/>
 					<span class="formlabel">*</span></td>
 					 <c:set var="tabCount" value="${tabCount+1}"/>				
-				     <td valign="top"><A HREF="#" >
-                         <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger"/></a>
-                         <script type="text/javascript">
-                         Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger" });
-                         </script>
+				     <td valign="top">
+                         <a href="#!" onclick="$('#enrollmentDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
+                         <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" /></a>
 
                     </td>
 				</tr>
@@ -141,12 +139,8 @@
 						&nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="DOB" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="dob" size="20" value="<fmt:message key="DOB" bundle="${resword}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield" id="dobField" ><span class="formlabel">*</span>
 						</td>
 						 <td valign="top" align="left">
-                             <a href="#" >
-                                 <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger"/>
-                                 <script type="text/javascript">
-                                 Calendar.setup({inputField  : "dobField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "dobTrigger" });
-                                 </script>
-
+                             <a href="#!" onclick="$('#dobField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
+                             <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
                              </a>
 
                         </c:when>
@@ -170,11 +164,9 @@
 			  <input onfocus="<%--if (this.value == '<fmt:message key="enrollMMDDYYYY" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="enrollmentDate" size="20" value="<fmt:message key="enrollMMDDYYYY" bundle="${resword}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield" id="enrollmentDateField2"/>
 			  <span class="formlabel">*</span></td>
 					 <c:set var="tabCount" value="${tabCount+1}"/>				
-				     <td valign="top"><A HREF="#" >
+				     <td valign="top">
+                         <a href="#!" onclick="$('#enrollmentDateField2').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
                          <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger2"/></a>
-                         <script type="text/javascript">
-                         Calendar.setup({inputField  : "enrollmentDateField2", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger2" });
-                         </script>
                       </td>
               </tr>
             </table>

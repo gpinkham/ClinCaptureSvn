@@ -261,11 +261,8 @@
                     ><script>spliceAndReturn('${mapEntry.key}')</script></a>:</td>
                 <td style="color: #789EC5;"><input name="${mapEntry.key}" value="${mapEntry.value}" id="${mapEntry.key}"/>
                 <c:if test="${dibItemDataType == 9 }">
-                    <A HREF="#">
-                      <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="${mapEntry.key}trigger" />
-                        <script type="text/javascript">
-                        Calendar.setup({inputField  : "${mapEntry.key}", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "${mapEntry.key}trigger" });
-                        </script>
+                    <a href="#!" onclick="$('#${mapEntry.key}').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
+                        <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" />
                     </a>
                 </td>     
                 

@@ -34,16 +34,26 @@ public class CalendarTag extends TagSupport {
 	@Override
 	public int doStartTag() throws JspException {
 		String language = SessionUtil.getLocale((HttpServletRequest) pageContext.getRequest()).getLanguage();
-		language = CoreResources.CALENDAR_LANGS.contains(language) ? language : "en";
+		language = CoreResources.CALENDAR_LANGS.contains(language) ? language : "";
 		String contextPath = pageContext.getServletContext().getContextPath();
-		String html = "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"".concat(contextPath).concat(
-				"/includes/new_cal/skins/aqua/theme.css\" title=\"Aqua\" />");
-		html = html.concat("<script type=\"text/javascript\" src=\"").concat(contextPath)
-				.concat("/includes/new_cal/calendar.js\"></script>");
-		html = html.concat("<script type=\"text/javascript\" src=\"").concat(contextPath)
-				.concat("/includes/new_cal/lang/calendar-").concat(language).concat(".js\"></script>");
-		html = html.concat("<script type=\"text/javascript\" src=\"").concat(contextPath)
-				.concat("/includes/new_cal/calendar-setup.js\"></script>");
+		String html = "";
+		if (!language.isEmpty()) {
+			html = html.concat("<script type=\"text/javascript\" src=\"").concat(contextPath)
+					.concat("/includes/calendar/locales/datepicker-").concat(language).concat(".js\"></script>");
+		}
+		html = html.concat("<script>$.datepicker.regional['" + language + "']</script>");
+
+		String color = (String) pageContext.getSession().getAttribute("newThemeColor");
+		color = color == null ? "blue" : color;
+		html = html.concat("<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"").concat(contextPath);
+		if (color.equals("violet")) {
+			html = html.concat("/includes/calendar/css/calendar_violet.css\"/>");
+		} else if (color.equals("green")) {
+			html = html.concat("/includes/calendar/css/calendar_green.css\"/>");
+		} else {
+			html = html.concat("/includes/calendar/css/calendar_blue.css\"/>");
+		}
+
 		JspWriter writer = pageContext.getOut();
 		try {
 			writer.write(html);

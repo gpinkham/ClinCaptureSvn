@@ -168,14 +168,12 @@
                                                             <jsp:param name="key" value="startDate"/>
                                                         </jsp:include>
                                                     </td>
-                                                    <td><A HREF="#">
+                                                    <td>
+                                                        <a href="#!" onclick="$('#startDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
                                                         <img src="images/bt_Calendar.gif"
                                                              alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
                                                              title="<fmt:message key="show_calendar" bundle="${resword}"/>"
-                                                             border="0" id="startDateTrigger"/>
-                                                        <script type="text/javascript">
-                                                            Calendar.setup({inputField: "startDateField", ifFormat: "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button: "startDateTrigger" });
-                                                        </script>
+                                                             border="0"/>
                                                     </a>
                                                         (<fmt:message key="date_format" bundle="${resformat}"/>)
                                                     </td>
@@ -191,14 +189,12 @@
                                                             <jsp:param name="key" value="endDate"/>
                                                         </jsp:include>
                                                     </td>
-                                                    <td><A HREF="#">
+                                                    <td>
+                                                        <a href="#!" onclick="$('#endDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
                                                         <img src="images/bt_Calendar.gif"
                                                              alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
                                                              title="<fmt:message key="show_calendar" bundle="${resword}"/>"
-                                                             border="0" id="endDateTrigger"/>
-                                                        <script type="text/javascript">
-                                                            Calendar.setup({inputField: "endDateField", ifFormat: "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button: "endDateTrigger" });
-                                                        </script>
+                                                             border="0"/>
 
                                                     </a> (<fmt:message key="date_format" bundle="${resformat}"/>)
                                                     </td>

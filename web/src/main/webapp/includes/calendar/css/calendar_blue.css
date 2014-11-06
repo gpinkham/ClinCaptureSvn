@@ -1,0 +1,34 @@
+.ui-datepicker {
+    border: 1px solid #BCCFE2 !important;
+    z-index: 9999 !important;
+}
+
+.ui-datepicker th {
+    color: #4D4D4D !important;
+}
+
+.ui-datepicker-calendar td a {
+    background: #BCCFE2 !important;
+}
+
+.ui-datepicker-header {
+    background: #BCCFE2 !important;
+    color: #4D4D4D !important;
+}
+
+.ui-datepicker-today {
+    border: #4D4D4D !important;
+}
+
+.ui-state-active {
+    border: 2px solid #789EC5 !important;
+    color: #4D4D4D !important;
+    font-weight: bold !important;
+}
+
+.ui-state-highlight {
+    border: 2px solid #fcefa1 !important;
+}
+
+
+

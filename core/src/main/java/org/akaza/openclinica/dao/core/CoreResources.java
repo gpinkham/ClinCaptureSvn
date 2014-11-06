@@ -198,8 +198,8 @@ public class CoreResources implements ResourceLoaderAware {
 	private void fillCalendarLangs() {
 		try {
 			Resource resource = new DefaultResourceLoader().getResource("..".concat(File.separator).concat("..")
-					.concat(File.separator).concat("includes").concat(File.separator).concat("new_cal")
-					.concat(File.separator).concat("lang"));
+					.concat(File.separator).concat("includes").concat(File.separator).concat("calendar")
+					.concat(File.separator).concat("locales"));
 			if (resource.exists()) {
 				for (String fileName : resource.getFile().list()) {
 					CALENDAR_LANGS.add(fileName.replaceAll(".*-", "").replaceAll("\\..*", ""));

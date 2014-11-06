@@ -41,11 +41,16 @@
 <body class="aka_bodywidth"
 	onload="<c:if test='${popUpURL != ""}'>            openDNoteWindow('<c:out value="${popUpURL}" />');	        </c:if>">
 	
-<script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script><script language="JavaScript" type="text/javascript">
-		jQuery(document).ready(function() {            jQuery("table > tbody  tr").attr("repeat", "0");
-            jQuery("table > tbody  button").attr("disabled", "true");            jQuery("table > tbody  input").attr("disabled", "disabled");
-            jQuery("table > tbody a").removeAttr("onmouseover");
-            jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");            jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");            jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
+<script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script>
+<script language="JavaScript" type="text/javascript">
+		jQuery(document).ready(function() {
+            jQuery("table > tbody  tr").attr("repeat", "0");
+            jQuery("table > tbody  button").attr("disabled", "true");
+            jQuery("table > tbody  input").attr("disabled", "disabled");
+            jQuery("table > tbody a").not('[tabindex]').removeAttr("onclick");
+            jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
+            jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
+            jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
 		});
 </script>
 <c:set var="prevItemHolderId" value="0"/>

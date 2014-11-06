@@ -242,7 +242,7 @@ function changeImage(obj) {
 	turnOnIsDataChangedParamOfDN(obj.name); 
 	setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); 
 	setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');
-	if(formChanged != undefined){
+    if(typeof formChanged != "undefined") {
 		formChanged = true;
 	}
 }
@@ -405,14 +405,9 @@ function changeImage(obj) {
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
-    <A HREF="#"
-       onmouseover="Calendar.setup({inputField  : getSib(this.previousSibling), ifFormat    : '<fmt:message key="date_format_calender" bundle="${resformat}"/>', button      : 'anchor<c:out value="${inputName}"/>' });"
-       NAME="anchor<c:out value="${inputName}"/>"
-       ID="anchor<c:out value="${inputName}"/>">
+      <a href="#!" onclick="$(getSib(this.previousSibling)).datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');" NAME="anchor<c:out value="${inputName}"/>" ID="anchor<c:out value="${inputName}"/>">
         <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
-
-    </a>
-    <%-- TODO l10n for the above line? --%>
+      </a>
     <c:set var="numOfDate" value="${numOfDate+1}"/>
   </c:if>
 </c:if>

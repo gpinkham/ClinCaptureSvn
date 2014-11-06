@@ -54,11 +54,8 @@
     </div>
 </td>
 <td valign="top" style="width: 30px;">
-    <a href="#" >
-        <img class="showCalendar" src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="${prefix}dateTrigger" rel='Calendar.setup({inputField  : "${prefix}dateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "${prefix}dateTrigger" })'/>
-        <script type="text/javascript">
-            Calendar.setup({inputField  : "${prefix}dateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "${prefix}dateTrigger" });
-        </script>
+    <a href="#!" onclick="$('#${prefix}dateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
+        <img class="showCalendar" src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
     </a>
 </td>
 

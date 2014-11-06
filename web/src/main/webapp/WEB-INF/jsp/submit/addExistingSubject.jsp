@@ -206,11 +206,8 @@
                         <c:if test="${study.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'yes'}">
                             <span class="formlabel">*</span>
                         </c:if>
-                        <A HREF="#" >
-                        <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="trigger"/>
-                        <script type="text/javascript">
-                        Calendar.setup({inputField  : "enrollmentDate", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "trigger" });
-                        </script>
+                        <a href="#!" onclick="$('#enrollmentDate').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
+                        <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" />
                     </a>
 					<%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%> *
 					<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">

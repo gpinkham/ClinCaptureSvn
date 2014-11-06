@@ -584,16 +584,15 @@ public class DataEntryInputGenerator implements InputGenerator {
 	// Returns an Element representing an "a href" tag containing an img tag
 	public Element getDateWidgetForCell(Integer itemId) {
 
-
 		Element href = new Element("a");
-		href.setAttribute("href", "#");
+		href.setAttribute("href", "#!");
 		String pattn = "";
 		pattn = ResourceBundleProvider.getFormatBundle().getString("date_format_calender");
 		StringBuilder sbuilder = new StringBuilder(
-				"Calendar.setup({inputField  : getSib(this.previousSibling), ifFormat    :'");
-		sbuilder.append(pattn).append("',").append("button     :'anchor").append(itemId).append("'});");
+				"$(getSib(this.previousSibling)).datepicker({ dateFormat: '");
+		sbuilder.append(pattn).append("',").append("showOn: 'none'}).datepicker('show');");
 
-		href.setAttribute("onmouseover", sbuilder.toString());
+		href.setAttribute("onclick", sbuilder.toString());
 		href.setAttribute("name", "anchor" + itemId);
 		href.setAttribute("id", "anchor" + itemId);
 		Element img = new Element("img");
