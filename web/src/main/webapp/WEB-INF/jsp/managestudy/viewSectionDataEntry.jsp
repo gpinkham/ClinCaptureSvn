@@ -53,6 +53,7 @@
             jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
 		});
 </script>
+<input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
 <c:set var="prevItemHolderId" value="0"/>
 	<div id="centralContainer"		style="padding-left: 3em; margin-top: 1em; background-color: white; color: black;">
 
