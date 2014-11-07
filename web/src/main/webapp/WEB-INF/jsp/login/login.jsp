@@ -72,7 +72,7 @@
                                 <div class="formfieldM_BG">
                                     <input type="password" id="j_password" name="j_password"  class="formfieldM">
                                 </div>
-                                <input type="submit" name="submit" value="<fmt:message key='login' bundle='${resword}'/>" class="loginbutton" />
+                                <input type="submit" name="submit" value="<fmt:message key='login_button' bundle='${resword}'/>" class="loginbutton" />
                                 <div style="display:inline; position:absolute;"><a style="" href="#" id="requestPassword"> <fmt:message key="forgot_password" bundle="${resword}"/></a></div>
                             </form>
                             <br/><jsp:include page="../login-include/login-alertbox.jsp"/>
