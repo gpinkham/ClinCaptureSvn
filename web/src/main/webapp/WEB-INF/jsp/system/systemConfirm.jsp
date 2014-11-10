@@ -117,7 +117,7 @@
 					<td>
 						<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>"
 								class="button_medium" 
-								onClick="confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}')" />
+								onClick="confirmCancel('${defaultURL}')" />
 					</td>
 				</tr>
 			</table>
