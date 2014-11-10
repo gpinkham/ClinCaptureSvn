@@ -34,7 +34,7 @@
 	<input type="text" id="evaluationProgressYear" value="${evaluationProgressYear}"/>
 	<input type="text" class="currentColor" value="${newThemeColor}">
 	<input type="text" id="evaluationProgressActivateLegend" value="${evaluationProgressActivateLegend}">
-	<input type="hidden" id="evaluationStatusList" value="<fmt:message key="evaluation_completed" bundle="${resword}"/>;<fmt:message key="ready_for_evaluation" bundle="${resword}"/>"/>
+	<input type="text" id="evaluationStatusList" value="<fmt:message key="evaluation_completed" bundle="${resword}"/>;<fmt:message key="ready_for_evaluation" bundle="${resword}"/>"/>
 </form>
 
 <script>applyThemeForChart();</script>
