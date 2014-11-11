@@ -292,9 +292,10 @@
 																					
 																			<td>
 																				<div class="formfieldM_BG">
+																					<c:set var="selectable" value="${study.studyParameterConfig.allowDynamicGroupsManagement == 'yes' ? '' : 'disabled'}"/> 
 																					<select name="dynamicGroupClassId" class="formfieldM"
 																						onChange="setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. '); 
-																								showDynamicEventsSection(${defaultDynGroupClassId});">
+																								showDynamicEventsSection(${defaultDynGroupClassId});"  ${selectable}>
 																						<c:forEach var="dynGroup" items="${dynamicGroups}">
 																							<c:choose>
 																								<c:when
