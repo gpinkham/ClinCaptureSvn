@@ -959,7 +959,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private static String createNotesAndDiscrepanciesIcon(StudySubjectBean studySubject, String flagColor,
 			ResourceBundle resword) {
 		String imagePath = "images/icon_flagYellow.gif";
-		String status = "Not+Closed";
+		String status = resword.getString("not_closed").replace(" ","+");
 		if (flagColor.equals("red")) {
 			imagePath = "images/icon_Note.gif";
 		}
