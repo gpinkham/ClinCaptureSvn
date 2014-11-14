@@ -889,7 +889,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
 	private String buildEditRuleLink(Integer ruleId, Integer ruleSetRuleId, Integer study) {
 		HtmlBuilder actionLink = new HtmlBuilder();
-		actionLink.a().href("designer/rule.html?action=edit&id=" + ruleId + "&rId=" + ruleSetRuleId + "&study=" + study);
+		actionLink.a().href("designer/rule.jsp?action=edit&id=" + ruleId + "&rId=" + ruleSetRuleId + "&study=" + study);
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Edit1','images/bt_Edit.gif');\"");
 		actionLink.append("onMouseUp=\"javascript:setImage('bt_Edit1','images/bt_Edit.gif');\"");
 		actionLink.append("data-cc-ruleId=\"" + ruleId + "\" onclick=\"setAccessedObjected(this)\"").close();

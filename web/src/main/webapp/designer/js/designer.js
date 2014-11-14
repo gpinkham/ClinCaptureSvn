@@ -305,7 +305,7 @@ function createDropSurface(params) {
 function createStartExpressionDroppable() {
 	var div = createDropSurface({
 		class: "group",
-		text: "Group or Data"
+		text: messageSource.texts.groupOrData
 	});
 	createDroppable({
 		element: div,
@@ -323,7 +323,7 @@ function createStartExpressionDroppable() {
 function createSymbolDroppable() {
 	var div = createDropSurface({
 		class: "comp compare",
-		text: "Compare or Calculate"
+		text: messageSource.texts.compareOrCalculate
 	});
 	createDroppable({
 		element: div,
@@ -354,7 +354,7 @@ function createRPARENDiv() {
 function createConditionDroppable() {
 	var div = createDropSurface({
 		class: "eval condition",
-		text: "Condition"
+		text: messageSource.texts.condition
 	});
 	createDroppable({
 		element: div,
@@ -391,7 +391,7 @@ function createPopover(droppable) {
   		// Edit tool-tip
   		createToolTip({
   			element: $(this).find("#edit-pop"),
-  			title: "Add a new box"
+  			title: messageSource.messages.addPopUp
   		});
 		$(this).find("#edit-pop").on('show.bs.tooltip', function(x) {
 			$(".tooltip").remove();
@@ -399,7 +399,7 @@ function createPopover(droppable) {
   		// Delete tool-tip
   		createToolTip({
   			element: $(this).find("#del-pop"),
-  			title: "Remove the current element from the expression"
+  			title: messageSource.messages.removePopUp
   		});
   		$(this).find("#del-pop").on('show.bs.tooltip', function(x) {
 			$(".tooltip").remove();
@@ -437,7 +437,7 @@ function addDroppable(popov) {
 	}));
 
 	var groupBtn = createButton({
-		text: "Group / Data",
+		text: messageSource.texts.groupData,
 		btnClass: "btn btn-success space-right-m"
 	}).click(function() {
 		modalOuterDiv.remove();
@@ -452,7 +452,7 @@ function addDroppable(popov) {
 	});
 
 	var compBtn = createButton({
-		text: "Compare / Calculate",
+		text: messageSource.texts.compareCalculate,
 		btnClass: "btn btn-primary space-right-m"
 	}).click(function() {	
 		modalOuterDiv.remove();
@@ -473,7 +473,7 @@ function addDroppable(popov) {
 	});
 
 	var evalBtn = createButton({
-		text: "Condition",
+		text: messageSource.texts.condition,
 		btnClass: "btn btn-warning"
 	}).click(function() {
 		modalOuterDiv.remove();
@@ -578,7 +578,7 @@ function handleErrorResponse(params) {
 	if (params.response.status === 404) {
 		bootbox.alert({
 			backdrop: false,
-			message: "The server you are attempting to connect to appears to be unavailable at the moment. Please try again later!"
+			message: messageSource.messages.serverIsNotAvailable
 		});
 
 	} else {
@@ -647,7 +647,7 @@ function createDroppable(params) {
 				if ($(this).val()) {
 					params.element.text($(this).val());
 				} else {
-					params.element.text("Data");
+					params.element.text(messageSource.texts.dataText);
 				}
 				$(this).remove();
 			});
@@ -751,7 +751,7 @@ function handleTextDrop(element) {
 		if ($(this).val()) {
 			element.text('"' + $(this).val() + '"');
 		} else {
-			element.text('"Data"');
+			element.text('"' + messageSource.texts.dataText + '"');
 		}
 	});
 
@@ -778,8 +778,8 @@ function handleNumberDrop(element) {
 		if ($(this).val() && /[0-9]|\./.test($(this).val())) {
 			element.text($(this).val());
 		} else {
-			element.text("Number");
-			$("#designSurface").find(".panel-body").prepend(createAlert("Please enter a number"));
+			element.text(messageSource.texts.numberText);
+			$("#designSurface").find(".panel-body").prepend(createAlert(messageSource.messages.enterNumber));
 		}
 	});
 
@@ -805,7 +805,7 @@ function handleDateDrop(element) {
 		if ($(this).val()) {
 			element.text($(this).val());
 		} else {
-			element.text("Select Date");
+			element.text(messageSource.texts.selectDate);
 		}
 	});
 	element.append(newInput);
@@ -825,7 +825,7 @@ function loadStudies(studies) {
 	$("div[id='studies']").find("table").remove();
 	if (studies) {
 		// Table headers
-		var table = createTable(['Name', 'Identifier']);
+		var table = createTable([messageSource.texts.nameText, messageSource.texts.identifier]);
 		for (var x = 0; x < studies.length; x++) {
 			var study = studies[x];
 			var tr = $("<tr>");
@@ -906,7 +906,7 @@ function loadStudyEvents(study) {
 	var itemArr = [];
 	$("div[id='events']").find("table").remove();
 	if (study.events) {
-		var eventTable = createTable(['Name', 'Description']);
+		var eventTable = createTable([messageSource.texts.nameText, messageSource.texts.description]);
 		for (var x = 0; x < study.events.length; x++) {
 
 			var studyEvent = study.events[x];
@@ -967,7 +967,7 @@ function loadStudyEvents(study) {
 			table: eventTable,
 			arr: chunkedItemsArr,
 			pagination: pagination
-		});		
+		});
 	}
 }
 
@@ -981,9 +981,10 @@ function loadStudyEvents(study) {
 function loadEventCRFs(params) {
 
 	var itemArr = [];
-	$("div[id='crfs']").find("table").remove();
+	var crfsDiv = $("div[id='crfs']");
+	crfsDiv.find("table").remove();
 	if (params.studyEvent && params.studyEvent.crfs) {
-		var crfTable = createTable(['Name', 'Description']);
+		var crfTable = createTable([messageSource.texts.nameText, messageSource.texts.description]);
 		for (var cf = 0; cf < params.studyEvent.crfs.length; cf++) {
 			var crf = params.studyEvent.crfs[cf];
 			var tr = $("<tr>");
@@ -1027,13 +1028,13 @@ function loadEventCRFs(params) {
 			itemArr.push(tr);
 		}
 
-		$("div[id='crfs']").append(crfTable);
+		crfsDiv.append(crfTable);
 		currentPageIndex = 0;
 
 		// Global
 		var chunkedItemsArr = itemArr.chunk(10);
 		var pagination = createPagination({
-			div: $("div[id='crfs']"),
+			div: crfsDiv,
 			itemsArr: chunkedItemsArr
 		});
 
@@ -1048,9 +1049,10 @@ function loadEventCRFs(params) {
 
 function loadCRFVersions(params) {
 	var itemArr = [];
-	$("div[id='versions']").find("table").remove();
+	var versionsDiv = $("div[id='versions']");
+	versionsDiv.find("table").remove();
 	if (params.crf.versions) {
-		var versionTable = createTable(['Name']);
+		var versionTable = createTable([messageSource.texts.nameText]);
 		for (var ver = 0; ver < params.crf.versions.length; ver++) {
 			var version = params.crf.versions[ver];
 			var tr = $("<tr>");
@@ -1083,11 +1085,11 @@ function loadCRFVersions(params) {
 			itemArr.push(tr);
 		}
 
-		$("div[id='versions']").append(versionTable);
+		versionsDiv.append(versionTable);
 		currentPageIndex = 0;
 		var chunkedItemsArr = itemArr.chunk(10);
 		var pagination = createPagination({
-			div: $("div[id='versions']"),
+			div: versionsDiv,
 			itemsArr: chunkedItemsArr
 		});
 
@@ -1109,9 +1111,12 @@ function loadCRFVersions(params) {
  * ============================================================== */
 function loadCRFVersionItems(params) {
 	var itemArr = [];
-	$("div[id='items']").find("table").remove();
+	var itemsDiv = $("div[id='items']");
+	itemsDiv.find("table").remove();
 	if (params.version && params.version.items) {
-		var itemsTable = createTable(['Name', 'Description', 'Data Type']);
+		var itemsTable = createTable([messageSource.texts.nameText,
+				messageSource.texts.description,
+				messageSource.texts.dataType]);
 		for (var it = 0; it < params.version.items.length; it++) {
 			var item = params.version.items[it];
 			var tr = $("<tr>");
@@ -1167,13 +1172,13 @@ function loadCRFVersionItems(params) {
 			itemArr.push(tr);
 		}
 
-		$("div[id='items']").append(itemsTable);
+		itemsDiv.append(itemsTable);
 		currentPageIndex = 0;
 
 		// Global
 		var chunkedItemsArr = itemArr.chunk(10);
 		var pagination = createPagination({
-			div: $("div[id='items']"),
+			div: itemsDiv,
 			itemsArr: chunkedItemsArr
 		});
 
@@ -1205,11 +1210,11 @@ function removeLoader() {
 
 function createPrompt(params) {
 	bootbox.dialog({
-		message: "The current expresion will be lost. Are you sure you want to select another study?",
-		title: "Changing the study",
+		message: messageSource.messages.expressionWillBeLost,
+		title: messageSource.texts.changingStudy,
 		buttons: {
 			keep: {
-				label: "Keep",
+				label: messageSource.texts.keep,
 				className: "btn-success",
 				callback: function() {
 					params.reset = false;
@@ -1231,7 +1236,7 @@ function createPrompt(params) {
 				}
 			},
 			clear: {
-				label: "Clear",
+				label: messageSource.texts.clear,
 				className: "btn-danger",
 				callback: function() {
 					params.reset = true;
@@ -1239,7 +1244,7 @@ function createPrompt(params) {
 				}
 			},
 			main: {
-				label: "Cancel",
+				label: messageSource.texts.cancel,
 				className: "btn-primary",
 				callback: function() {
 					bootbox.hideAll();
@@ -1379,7 +1384,7 @@ function getDropSurfaceElement(clickedElement) {
 	//If left parenthesis is clicked
 	if($(clickedElement).is('.leftPAREN')){
 		//If there's more than one element and Group or Data is left most surface
-		if($('.dotted-border.' + 'group').length > 1 && $('.dotted-border.' + 'group').first().text() == 'Group or Data') {
+		if($('.dotted-border.' + 'group').length > 1 && $('.dotted-border.' + 'group').first().text() == messageSource.texts.groupOrData) {
 			return $('.dotted-border.' + 'group').first();
 		} else {
 			return $('.dotted-border.' + 'group').last();
@@ -1459,7 +1464,7 @@ function findNextBestAlternative(params) {
 		$(params.target).addClass('invalid');
 		$("a[href='#studies']").click();
 		if ($(".alert").size() == 0) {
-			$(".targettable").find(".panel-body").prepend(createAlert("The target item doesn't exist in the current study."));
+			$(".targettable").find(".panel-body").prepend(createAlert(messageSource.messages.itemDoesNotExistInTheStudy));
 		}
 	}
 }

@@ -1,3 +1,6 @@
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page contentType="text/html; charset=UTF-8" %>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <!DOCTYPE html>
 <html>
   <head>
@@ -36,16 +39,16 @@
     <div class="container">
       <div class="row">
         <div class="col-md-offset-3">
-          <legend >Rule validation results</legend>
-          <div class="alert alert-success success">Rule is valid</div>
-          <div class="alert alert-danger failure">Rule is Invalid</div>
-          <legend id="failure">Rule failure message</legend>
+          <legend><fmt:message bundle="${resword}" key="rs.validation.result"/></legend>
+          <div class="alert alert-success success"><fmt:message bundle="${resword}" key="rs.validation.valid"/></div>
+          <div class="alert alert-danger failure"><fmt:message bundle="${resword}" key="rs.validation.invalid"/></div>
+          <legend id="failure"><fmt:message bundle="${resword}" key="rs.validation.failure"/></legend>
           <div class="alert alert-info"></div>
-          <legend class="success">CRF items affected:</legend>
+          <legend class="success"><fmt:message bundle="${resword}" key="rs.validation.items"/></legend>
           <ul id="items" class="list-group success"></ul>
-          <legend class="success">Rule executions</legend>
+          <legend class="success"><fmt:message bundle="${resword}" key="rs.validation.execution"/></legend>
           <ul id="executions" class="list-group success"></ul>
-          <legend class="success">Rule action</legend>
+          <legend class="success"><fmt:message bundle="${resword}" key="rs.validation.action"/></legend>
           <ul id="action" class="list-group success"></ul>
         </div>
       </div>
@@ -53,9 +56,21 @@
         <div class="col-md-12">
           <nav class="navbar navbar-default nav-cont navbar-fixed-bottom" role="navigation">
             <ul class="nav nav-justified">
-              <li><a id="back" href="" class="btn btn-primary navbar-btn">Back</a></li>
-              <li><a id="save" class="btn btn-primary navbar-btn">Save</a></li>
-              <li><a id="exit" href="" class="btn btn-warning navbar-btn">Exit</a></li>
+              <li>
+	              <a id="back" href="" class="btn btn-primary navbar-btn">
+		              <fmt:message bundle="${resword}" key="back"/>
+	              </a>
+              </li>
+              <li>
+	              <a id="save" class="btn btn-primary navbar-btn">
+		              <fmt:message bundle="${resword}" key="save"/>
+	              </a>
+              </li>
+              <li>
+	              <a id="exit" href="" class="btn btn-warning navbar-btn">
+		              <fmt:message bundle="${resword}" key="exit"/>
+	              </a>
+              </li>
             </ul>
           </nav>
         </div>

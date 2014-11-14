@@ -17,6 +17,8 @@ var editing = true;
 var parser = new Parser();
 
 $(function() {
+	// Get all values for messages
+	getMessagesValues();
 	// Get url component
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment");
@@ -25,147 +27,147 @@ $(function() {
 		container: "body",
 		placement: "top",
 		trigger: "hover focus",
-		title: "Press to clear the current rule expression"
+		title: messageSource.tooltips.deleteButton
 	});
 	$(".target").tooltip({
 		container: "body",
 		placement: "auto",
 		trigger: "hover focus",
-		title: "Apply the rule to the selected CRF item(s). Drag and drop CRF item(s) to target the rule.  Multiple targets can be selected. To replace a target, drop another target on it."
+		title: messageSource.tooltips.targetTip
 	});
 	$("#ruleName").tooltip({
 		container: "body",
 		placement: "bottom",
 		trigger: "hover focus",
-		title: "Enter a description for the new rule"
+		title: messageSource.tooltips.ruleName
 	});
 	createToolTip({
-		title: "Start grouping",
+		title: messageSource.tooltips.leftTip,
 		element: $(".leftPAREN")
 	});
 	createToolTip({
-		title: "End grouping",
+		title: messageSource.tooltips.rightTip,
 		element: $(".rightPAREN")
 	});
 	createToolTip({
-		title: "And...",
+		title: messageSource.tooltips.and,
 		element: $(".and")
 	});
 	createToolTip({
-		title: "Or...",
+		title: messageSource.tooltips.or,
 		element: $(".or")
 	});
 	createToolTip({
-		title: "Equal",
+		title: messageSource.tooltips.eqTip,
 		element: $(".eq")
 	});
 	createToolTip({
-		title: "Not equal",
+		title: messageSource.tooltips.neq,
 		element: $(".neq")
 	});
 	createToolTip({
-		title: "Less than",
+		title: messageSource.tooltips.ltTip,
 		element: $(".lt")
 	});
 	createToolTip({
-		title: "Greater than",
+		title: messageSource.tooltips.gtTip,
 		element: $(".gt")
 	});
 	createToolTip({
-		title: "Less than or equal to",
+		title: messageSource.tooltips.lte,
 		element: $(".lte")
 	});
 	createToolTip({
-		title: "Greater than or equal to",
+		title: messageSource.tooltips.gte,
 		element: $(".gte")
 	});
 	createToolTip({
-		title: "Contains",
+		title: messageSource.tooltips.ct,
 		element: $(".ct")
 	});
 	createToolTip({
 		element: $(".nct"),
-		title: "Does not contain"
+		title: messageSource.tooltips.nct
 	});
 	createToolTip({
-		title: "Plus",
+		title: messageSource.tooltips.plus,
 		element: $(".plus")
 	});
 	createToolTip({
-		title: "Minus",
+		title: messageSource.tooltips.minus,
 		element: $(".minus")
 	});
 	createToolTip({
-		title: "Divide by",
+		title: messageSource.tooltips.divide,
 		element: $(".divide")
 	});
 	createToolTip({
-		title: "Multiplied by",
+		title: messageSource.tooltips.mult,
 		element: $(".mult")
 	});
 	createToolTip({
 		element: $(".number"),
-		title: "Integer and float number field"
+		title: messageSource.tooltips.numberTip
 	});
 	createToolTip({
-		title: "Null field",
+		title: messageSource.tooltips.emptyTip,
 		element: $(".empty")
 	});
 	createToolTip({
-		title: "Date field",
+		title: messageSource.tooltips.dateTip,
 		element: $(".date")
 	});
 	createToolTip({
-		title: "Text field",
+		title: messageSource.tooltips.textTip,
 		element: $(".text")
 	});
 	createToolTip({
-		title: "Current system date",
+		title: messageSource.tooltips.currentDateTip,
 		element: $(".current-date")
 	});
 	createToolTip({
-		title: "Select a study",
+		title: messageSource.tooltips.studiesLink,
 		element: $("#studiesLink")
 	});
 	createToolTip({
 		element: $("#eventsLink"),
-		title: "Select a study event"
+		title: messageSource.tooltips.eventsLink
 	});
 	createToolTip({
 		element: $("#crfsLink"),
-		title: "Select an event CRF"
+		title: messageSource.tooltips.crfsLink
 	});
 	createToolTip({
 		element: $("#versionsLink"),
-		title: "Select a CRF Version"
+		title: messageSource.tooltips.versionsLink
 	});
 	createToolTip({
 		element: $("#itemsLink"),
-		title: "Select a CRF item"
+		title: messageSource.tooltips.itemsLink
 	});
 	createToolTip({
 		element: $(".dotted-border"),
-		title: "Drag and drop an item from the Group tool box, the data toolbox or a CRF item."
+		title: messageSource.tooltips.dottedBorder
 	});
 	createToolTip({
 		element: $(".item"),
-		title: "Drag and drop a CRF item."
+		title: messageSource.tooltips.item
 	});
 	createToolTip({
 		element: $(".eventify"),
-		title: "Click to bind the target to the event."
+		title: messageSource.tooltips.eventify
 	});
 	createToolTip({
 		element: $(".versionify"),
-		title: "Click to bind the target to the crf version."
+		title: messageSource.tooltips.versionifyTip
 	});
 	createToolTip({
 		element: $(".linefy"),
-		title: "Specify the line number in the repeating group to which the rule will apply"
+		title: messageSource.tooltips.linefy
 	});
 	createToolTip({
 		element: $(".opt"),
-		title: "Specify target options"
+		title: messageSource.tooltips.opt
 	});
 
 	// ======================= End of tool tip creation =======================
@@ -266,7 +268,7 @@ $(function() {
 	});
 	// Handles the setting of administrative editing action
 	$(document).on('change', '#ae', function() {
-		parser.setAdministrativeEditingExecute($(this).is(":checked"));	
+		parser.setAdministrativeEditingExecute($(this).is(":checked"));
 	});
 	// Handles the setting of double data entry action
 	$(document).on('change', '#dde', function() {
@@ -468,7 +470,7 @@ $(function() {
 
 	$("#deleteButton").click(function() {
 		if ($("#designSurface").find(".panel-body").children().size() > 2) {
-			bootbox.confirm("Are you sure you want to clear the entire expression?", function(result) {
+			bootbox.confirm(messageSource.messages.clearExpression, function(result) {
 				if (result) {
 					resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
 				}
@@ -519,27 +521,27 @@ $(function() {
 	});
 
 	$('body').on('click', function(e, data){
-        if (!data && !$(e.target).is('a')) {
-            $(".tops").remove();
+		if (!data && !$(e.target).is('a')) {
+			$(".tops").remove();
 			$(".popover").remove();
 		}
 	});
 });
 
 Array.prototype.chunk = function(arr) {
-    if (!this.length) {
-        return [];
-    }
-    return [this.slice(0, arr)].concat(this.slice(arr).chunk(arr));
+	if (!this.length) {
+		return [];
+	}
+	return [this.slice(0, arr)].concat(this.slice(arr).chunk(arr));
 };
 
 function resizeBody() {
-    var height = parseInt($(window).height());
-    $("body").css("height", height + "px");
+	var height = parseInt($(window).height());
+	$("body").css("height", height + "px");
 
-    var wrapperHeight = parseInt($(".navbar").offset().top) - parseInt($(".inner-scrollbar-wrapper").offset().top) - 20;
-    var percent = parseInt((wrapperHeight / height) * 100);
-    $(".inner-scrollbar-wrapper").css("height", percent + "%");
+	var wrapperHeight = parseInt($(".navbar").offset().top) - parseInt($(".inner-scrollbar-wrapper").offset().top) - 20;
+	var percent = parseInt((wrapperHeight / height) * 100);
+	$(".inner-scrollbar-wrapper").css("height", percent + "%");
 
 	var breadHeight = 34;
 	var navHeight = parseInt($(".navbar").offset().top) - parseInt($(".data-scrollbar").offset().top) - breadHeight - 40;
@@ -547,14 +549,14 @@ function resizeBody() {
 }
 
 $(window).load(function() {
-    resizeBody();
+	resizeBody();
 });
 
 $(window).resize(function(){
-    resizeBody();
+	resizeBody();
 });
 
 function showHideOnEvaluationAlert() {
 	$('.alert').remove();
-	$('.targettable .panel-body').prepend(createAlert('Rule evaluation is not valid for a Show or Hide action. Please unselect True/False evaluation.'));
+	$('.targettable .panel-body').prepend(createAlert(messageSource.messages.showHideEvaluation));
 }

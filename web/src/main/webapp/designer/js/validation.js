@@ -12,10 +12,12 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO‚ÄôS ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  * =================================================================================================================================================================================================================================================================================================================================================================================================================================================================== */
+var messageSource = "";
 
 $(function() {
+	messageSource = JSON.parse(localStorage.getItem("messageSource"));
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
-	$("a[id='back']").attr("href", c + "/designer/rule.html");
+	$("a[id='back']").attr("href", c + "/designer/rule.jsp");
 	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment");
 	var rule = JSON.parse(sessionStorage.getItem("rule"));
 	if (rule.validation) {
@@ -28,7 +30,7 @@ $(function() {
 			$(".success").show();
 			$("#failure").hide();
 			$(".alert-info").hide();
-			$(".alert-success").text("Rule is valid: " + rule.targets[0].expression);
+			$(".alert-success").text(messageSource.validations.ruleValid + ": " + rule.targets[0].expression);
 			if (rule.targets) {
 				for (var x = 0; x < rule.targets.length; x++) {
 					var list = $("<li class='list-group-item'>");
@@ -38,38 +40,38 @@ $(function() {
 				// Rule actions
 				var list = $("<li class='list-group-item'>");
 				if (rule.actions[0].type === "discrepancy") {
-					list.text("Discrepancy Action");
+					list.text(messageSource.validations.discrepancyAction);
 				} else if (rule.actions[0].type === "email") {
-					list.text("Email Action");
+					list.text(messageSource.validations.emailAction);
 				} else if (rule.actions[0].type === "insert") {
-					list.text("Insert Action");
+					list.text(messageSource.validations.insertAction);
 				} else if (rule.actions[0].type === "showHide") {
-					list.text("Show/Hide Action");
+					list.text(messageSource.validations.showHideAction);
 				}
 				$("#action").append(list);
 				// Initial data entry action
 				if (rule.ide) {
 					var list = $("<li class='list-group-item'>");
-					list.text("Initial data entry");
+					list.text(messageSource.validations.initialDe);
 					$("#executions").append(list);
 				}
 				// Double data entry action
 				if (rule.dde) {
 					var list = $("<li class='list-group-item'>");
-					list.text("Double data entry");
+					list.text(messageSource.validations.doubleDe);
 					$("#executions").append(list);
 				}
 				// Administrative data entry action
 				if (rule.ae) {
 					var list = $("<li class='list-group-item'>");
-					list.text("Administrative data entry");
+					list.text(messageSource.validations.administrativeDe);
 
 					$("#executions").append(list);
 				}
 				// Data import action
 				if (rule.di) {
 					var list = $("<li class='list-group-item'>");
-					list.text("Import data entry");
+					list.text(messageSource.validations.importDe);
 					$("#executions").append(list);
 				}
 			}
@@ -78,7 +80,7 @@ $(function() {
 			$("#save").remove();
 			$(".success").hide();
 			$(".failure").show();
-			$("#evaluates").text("Rule failure message");
+			$("#evaluates").text(messageSource.validations.ruleFailure);
 			$(".alert-info").text(validation.ruleValidationFailMessage);
 		}
 	} else {
@@ -135,12 +137,12 @@ function saveRule(rule) {
 				// Persist in sessin
 				sessionStorage.setItem("context", JSON.stringify(ctx));
 				cleanUp();
-				window.open(rule.submission + "/designer/rule.html", '_self');
+				window.open(rule.submission + "/designer/rule.jsp", '_self');
 			} catch (e) {
 				removeLoader();
 				bootbox.alert({
 					backdrop: false,
-					message: "The rule was not saved! Check the server logs for details"
+					message: messageSource.validations.checkLog
 				});
 			}
 		},

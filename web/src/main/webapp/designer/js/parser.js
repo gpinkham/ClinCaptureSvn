@@ -180,7 +180,7 @@ Parser.prototype.createNextDroppable = function(params) {
 	if (__NEXT__ === "ANY") {
 		var RPAREN = createRPARENDiv();
 		var dataPredicate = createStartExpressionDroppable();
-		dataPredicate.text("Group or Data");
+		dataPredicate.text(messageSource.texts.groupOrData);
 		if (params.element.next().length === 0) {
 			params.element.after(dataPredicate);
 			dataPredicate.after(RPAREN);
@@ -579,7 +579,7 @@ Parser.prototype.createRule = function() {
         $(".dotted-border").each(function(index) {
             var pred = $($(".dotted-border")[index]).text();
             if (parser.isOp(pred)) {
-                pred = parser.isConditionalOp(pred) ? pred = pred.toLowerCase() : pred = parser.getOp(pred);
+                pred = parser.getOp(pred);
             }
             var attrMap = parser.createAttrMap($($(".dotted-border")[index]).get(0).attributes);
             var item = parser.getItem(pred, attrMap);
@@ -723,33 +723,33 @@ Parser.prototype.isValid = function(expression) {
     var message = "";
     if (this.rule.actions.length === 0) {
         valid = false;
-        message = "A rule is supposed to fire an action. Please select the action(s) to take if the rule evaluates as intended.";
+        message = messageSource.messages.selectAnAction;
     }
 
     if (!$("#ide").is(":checked") && !$("#ae").is(":checked") && !$("#dde").is(":checked") && !$("#dataimport").is(":checked")) {
         valid = false;
-        message = "Please specify when the rule should be run";
+        message = messageSource.messages.selectWhenRun;
     }
 
     if (!$("input[name=ruleInvoke]").is(':checked') && this.getActions()[0].type != 'showHide') {
         valid = false;
-        message = "A rule is supposed to evaluate to true or false. Please specify";
+        message = messageSource.messages.selectEvaluate;
     }
 
     if (this.rule.targets.length === 0) {
         valid = false;
-        message = "Please specify a rule target";
+        message = messageSource.messages.specifyTarget;
     }
 
     if ($("#ruleName").val().length == 0) {
         valid = false;
-        message = "Please specify the rule description";
+        message = messageSource.messages.specifyDescription;
     }
 
     if ($("input[action=discrepancy]").is(":checked")) {
         if ($(".discrepancy-properties").find("textarea").val().length <= 0) {
             valid = false;
-            message = "A discrepancy action was selected but no discrepancy text has been specified.";
+            message = messageSource.messages.specifyDiscrepancyText;
             $(".discrepancy-properties").find("textarea").focus();
         }
     }
@@ -757,7 +757,7 @@ Parser.prototype.isValid = function(expression) {
     if ($("input[action=email]").is(":checked")) {
         if ($(".email-properties").find("textarea").val().length <= 0) {
             valid = false;
-            message = "Please provide a valid email message";
+            message = messageSource.messages.specifyEmailMessage;
             $(".email-properties").find("textarea").focus();
         }
     }
@@ -766,7 +766,7 @@ Parser.prototype.isValid = function(expression) {
         var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (!re.test($(".to").val().trim())) {
             valid = false;
-            message = "The email address is invalid. Check the email and try again.";
+            message = messageSource.messages.invalidEmail;
             $(".to").focus();
         }
     }
@@ -774,20 +774,22 @@ Parser.prototype.isValid = function(expression) {
     if ($("input[action=insert]").is(":checked")) {
         if (this.getInsertAction() && this.getInsertAction().destinations.length < 1) {
             valid = false;
-            message = "An insert action was selected but the items to insert values into are not specified.";
+            message = messageSource.messages.selectItemsToInsert;
         }
     }
 
     if ($("input[name='ruleInvoke']").is(":checked")) {
         if (this.getShowHideAction() && this.getShowHideAction().destinations.length < 1) {
             valid = false;
-            message = "An show/hide action was selected but the items to show/hide are not specified.";
+            message = messageSource.messages.selectItemsToShowHide;
         }
     }
 
     if (expression != undefined) {
         for (var x = 0; x < expression.length; x++) {
-            if (expression[x] === "Group or Data" || expression[x] === "Compare or Calculate" || expression[x] === "Condition") {
+            if (expression[x] === messageSource.texts.groupOrData
+	            || expression[x] === messageSource.texts.compareOrCalculate
+	            || expression[x] === messageSource.texts.condition) {
                 var index = expression.indexOf(expression[x]);
                 expression.splice(index, 1);
             }
@@ -796,13 +798,13 @@ Parser.prototype.isValid = function(expression) {
         // It should not be empty
         if (expression.length < 3) {
             valid = false;
-            message = "Cannot validate an empty or incomplete expressions.";
+            message = messageSource.messages.invalidExpression;
         }
     }
 
 	if ($(".invalid").size() > 0) {
 		valid = false;
-		message = "A rule should only contain valid items in the selected study but the current rule contains invalid items that do not exist in the selected study. Fix the items to proceed";	
+		message = messageSource.messages.invalidItemsSelected;
 	}
 
 	return {
@@ -820,7 +822,7 @@ Parser.prototype.isValid = function(expression) {
  * Returns true if the predicate is among the allowed math symbols in CC
  * ============================================================================ */
 Parser.prototype.isOp = function(predicate) {
-	var ops = ['=', '<', '>', '+', 'AND', 'OR', 'NOT'];
+	var ops = ['=', '<', '>', '+', messageSource.terms.and, messageSource.terms.or, messageSource.terms.not];
 	// not equals
 	ops.push(unescape(JSON.parse('"\u2260"')));
 	// gte
@@ -864,7 +866,7 @@ Parser.prototype.isAllowedOp = function(predicate) {
  * Returns true if the predicate is a 'AND' or 'OR'
  * =========================================================== */
 Parser.prototype.isConditionalOp = function(predicate) {
-	var ops = ['AND', 'OR'];
+	var ops = [messageSource.terms.and, messageSource.terms.or];
 	return ops.indexOf(predicate) > -1;
 };
 
@@ -898,6 +900,10 @@ Parser.prototype.getOp = function(predicate) {
 			return "ct";
 		} else if (predicate === unescape(JSON.parse('"\u0078"'))) {
 			return "*";
+		} else if (predicate === messageSource.terms.or) {
+			return "or";
+		} else if (predicate === messageSource.terms.and) {
+			return "and";
 		}
 	}
 };
@@ -925,9 +931,9 @@ Parser.prototype.getLocalOp = function(predicate) {
 		} else if (predicate === "*") {
 			return "x";
 		} else if (predicate === "and") {
-			return "AND";
+			return messageSource.terms.and;
 		} else if (predicate === "or") {
-			return "OR";
+			return messageSource.terms.or;
 		} 
 	}
 	return false;
@@ -1395,41 +1401,42 @@ Parser.prototype.setShowHideActionMessage = function(message) {
 Parser.prototype.setShowHideAction = function(params) {
 	if (params) {
 		var action = Object.create(null);
+		var showHide = $(".show-hide-properties");
 		// function to toggle display
 		action.render = function(visible) {
 			if (visible.show || visible.hide) {
 				$(".dotted-border-lg").show();
-				$(".show-hide-properties").show();
+				showHide.show();
 				if (!params.context) {
-					$(".show-hide-properties").find("textarea").val(action.message);
-					$(".show-hide-properties").find("textarea").focus();
+					showHide.find("textarea").val(action.message);
+					showHide.find("textarea").focus();
 				}
 				if (visible.hide) {
-					$(".show-hide-properties").find("textarea").hide();
-					$(".show-hide-properties").find("textarea").val("");
+					showHide.find("textarea").hide();
+					showHide.find("textarea").val("");
 					$(".show-hide-properties").find(".control-label").first().hide();
 				} else {
-					$(".show-hide-properties").find("textarea").show();
-					$(".show-hide-properties").find(".control-label").show();
+					showHide.find("textarea").show();
+					showHide.find(".control-label").show();
 				}
 			} else {
 				// Update UI
-				$(".show-hide-properties").hide();
+				showHide.hide();
 				if ($(".dotted-border-lg").find("div:visible").length === 0) {
 					$(".dotted-border-lg").hide();
 				}
-				$(".show-hide-properties").find("textarea").val("");
-				var div = $(".show-hide-properties").find(".input-group").first().clone();
+				showHide.find("textarea").val("");
+				var div = showHide.find(".input-group").first().clone();
 				div.find(".dest").val("");
 				div.find(".dest").attr("type", "text");
 				div.find(".dest").removeClass("invalid");
-				$(".show-hide-properties").find(".input-group").remove();
+				showHide.find(".input-group").remove();
 				createDroppable({
 					element: div.find(".dest"),
 					accept: "div[id='items'] td"
 				});
 
-				$(".show-hide-properties").find(".col-md-6").append(div);
+				showHide.find(".col-md-6").append(div);
 			}
 			$("input[action=show]").prop("checked", visible.show);
 			$("input[action=hide]").prop("checked", visible.hide);
@@ -1616,29 +1623,30 @@ Parser.prototype.setExpression = function(expression, attrMap) {
 		for (var e = 0; e < expression.length; e++) {
 			var itm = this.getItem(expression[e], attrMap);
 			if (e === 0) {
+				var dottedBorder = $(".dotted-border");
 				if (itm) {
 					var preds = expression[e].split(".");
 					if (preds.length == 4) {
-						$(".dotted-border").attr("event-oid", preds[0]);
-						$(".dotted-border").attr("crf-oid", preds[preds.length - 3]);
-						$(".dotted-border").attr("item-oid", preds[preds.length - 1]);
-						$(".dotted-border").attr("group-oid", preds[preds.length - 2]);
+						dottedBorder.attr("event-oid", preds[0]);
+						dottedBorder.attr("crf-oid", preds[preds.length - 3]);
+						dottedBorder.attr("item-oid", preds[preds.length - 1]);
+						dottedBorder.attr("group-oid", preds[preds.length - 2]);
 					} else if (preds.length == 3) {
-						$(".dotted-border").attr("crf-oid", preds[0]);
-						$(".dotted-border").attr("item-oid", preds[2]);
-						$(".dotted-border").attr("group-oid", preds[1]);
-						$(".dotted-border").attr("event-oid", itm.eventOid);
+						dottedBorder.attr("crf-oid", preds[0]);
+						dottedBorder.attr("item-oid", preds[2]);
+						dottedBorder.attr("group-oid", preds[1]);
+						dottedBorder.attr("event-oid", itm.eventOid);
 					} else {
-						$(".dotted-border").attr("item-oid", itm.oid);
-						$(".dotted-border").attr("crf-oid", itm.crfOid);
-						$(".dotted-border").attr("group-oid", itm.group);
-						$(".dotted-border").attr("event-oid", itm.eventOid);
+						dottedBorder.attr("item-oid", itm.oid);
+						dottedBorder.attr("crf-oid", itm.crfOid);
+						dottedBorder.attr("group-oid", itm.group);
+						dottedBorder.attr("event-oid", itm.eventOid);
 					}
-					$(".dotted-border").attr("version-oid", itm.crfVersionOid);
-					$(".dotted-border").attr("study-oid", this.extractStudy(this.getStudy()).oid);
-					$(".dotted-border").text(itm.name);
+					dottedBorder.attr("version-oid", itm.crfVersionOid);
+					dottedBorder.attr("study-oid", this.extractStudy(this.getStudy()).oid);
+					dottedBorder.text(itm.name);
 				} else {
-					$(".dotted-border").text(expression[e]);
+					dottedBorder.text(expression[e]);
 				}
 			} else {
 				var predicate = expression[e];
@@ -1746,15 +1754,15 @@ Parser.prototype.setTargets = function(targets) {
 			div.find(".target").attr("study-oid", this.extractStudy(this.getStudy()).oid);
 			createToolTip({
 				element: div.find(".eventify"),
-				title: "Click to bind the target to only the event."
+				title: messageSource.tooltips.eventify
 			});
 			createToolTip({
 				element: div.find(".versionify"),
-				title: "Click to bind the target to the crf version."
+				title: messageSource.tooltips.versionifyTip
 			});
 			createToolTip({
 				element: div.find(".linefy"),
-				title: "Specify the line number in the repeating group to which the rule will apply"
+				title: messageSource.tooltips.linefy
 			});
 			x === 0 ? targetDiv.before(div) : $(".parent-target").last().before(div);
 			div.after($('.opt:last').clone());
@@ -1964,7 +1972,7 @@ Parser.prototype.displayValidationResults = function(rule) {
 				rule.xml = response;
 				sessionStorage.setItem("rule", JSON.stringify(rule));
 				// launch validation window
-				window.open("validation.html", '_self');
+				window.open("validation.jsp", '_self');
 			}
 		},
 		error: function(response) {
@@ -2148,9 +2156,9 @@ Parser.prototype.resetTarget = function(params) {
  * 
  * Returns version if found, null otherwise
  * ============================================================== */
-Parser.prototype.getCrfVersionByOid = function(params) {	
+Parser.prototype.getCrfVersionByOid = function(params) {
 	for (var e in params.study.events) {
-		var evt = params.study.events[e];		
+		var evt = params.study.events[e];
 		for (var c in evt.crfs) {
 			var crf = evt.crfs[c];
 			for (var v in crf.versions) {
@@ -2159,9 +2167,9 @@ Parser.prototype.getCrfVersionByOid = function(params) {
 					ver.crfOid = crf.oid;
 					ver.eventOid = evt.oid;
 					return ver;
-				}				
+				}
 			}
-		}		
+		}
 	}
 	return null;
 };
@@ -2173,9 +2181,9 @@ Parser.prototype.getCrfVersionByOid = function(params) {
  * - itemName - the target element to be updated
  * - study - the study being changed to
  * ============================================================== */
-Parser.prototype.getStudyItemByName = function(params) {	
+Parser.prototype.getStudyItemByName = function(params) {
 	for (var e in params.study.events) {
-		var evt = params.study.events[e];		
+		var evt = params.study.events[e];
 		for (var c in evt.crfs) {
 			var crf = evt.crfs[c];
 			for (var v in crf.versions) {
@@ -2188,9 +2196,9 @@ Parser.prototype.getStudyItemByName = function(params) {
 						itm.crfVersionOid = ver.oid;
 						return itm;
 					}
-				}				
+				}
 			}
-		}		
+		}
 	}
 	return null;
 };
