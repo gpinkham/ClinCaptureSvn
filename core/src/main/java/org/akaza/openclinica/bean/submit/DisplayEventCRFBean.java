@@ -171,7 +171,7 @@ public class DisplayEventCRFBean implements Comparable {
 		boolean crfEvaluationOrDDEPermitted = eventDefinitionCRF.isDoubleEntry() || eventDefinitionCRF.isEvaluatedCRF();
 		stage = eventCRF.getStage();
 		Role r = surb.getRole();
-		boolean isEditor = isEditor(user, r);
+		boolean isEditor = isEditor(r);
 
 		if (stage.equals(DataEntryStage.LOCKED)) {
 			locked = true;
@@ -226,7 +226,7 @@ public class DisplayEventCRFBean implements Comparable {
 	 * @return <code>true</code> if the user is a System Administrator or Study Director for the current study;
 	 *         <code>false</code> otherwise.
 	 */
-	public static boolean isSuper(UserAccountBean user, Role studyRole) {
+	public static boolean isSuper(Role studyRole) {
 		return studyRole.equals(Role.SYSTEM_ADMINISTRATOR) || studyRole.equals(Role.STUDY_DIRECTOR)
 				|| studyRole.equals(Role.STUDY_ADMINISTRATOR);
 	}
@@ -240,14 +240,14 @@ public class DisplayEventCRFBean implements Comparable {
 	 *            Role
 	 * @return boolean
 	 */
-	public static boolean isEditor(UserAccountBean user, Role studyRole) {
-		return isSuper(user, studyRole) || studyRole.equals(Role.INVESTIGATOR)
-				|| studyRole.equals(Role.CLINICAL_RESEARCH_COORDINATOR);
+	public static boolean isEditor(Role studyRole) {
+		return isSuper(studyRole) || studyRole.equals(Role.INVESTIGATOR)
+				|| studyRole.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || studyRole.equals(Role.STUDY_EVALUATOR);
 	}
 
 	/**
 	 * Method checks that data entry was completed more than 12 hours ago.
-	 *
+	 * 
 	 * @param eventCRF
 	 *            EventCRFBean
 	 * @return boolean

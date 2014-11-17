@@ -484,7 +484,7 @@ public class TableOfContentsServlet extends Controller {
         ObjectPairs objectPairs = getEventCRFAndAction(request);
 
 		Role r = currentRole.getRole();
-		boolean isSuper = DisplayEventCRFBean.isSuper(ub, r);
+		boolean isSuper = DisplayEventCRFBean.isSuper(r);
 
 		if (!SubmitDataServlet.maySubmitData(ub, currentRole)) {
 			String exceptionName = resexception.getString("no_permission_to_perform_data_entry");
