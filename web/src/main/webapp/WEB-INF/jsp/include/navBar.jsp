@@ -223,7 +223,7 @@
                                         <form METHOD="GET" action="${urlPrefix}ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == '${studySubjectIDLabel}') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
                                             <input type="text" name="findSubjects_f_studySubject.label" onblur="if (this.value == '') this.value = '${studySubjectIDLabel}'" onfocus="if (this.value == '${studySubjectIDLabel}') this.value = ''" value="${studySubjectIDLabel}" class="navSearch"/>
                                             <input type="hidden" name="navBar" value="yes"/>
-                                            <input type="submit" value="<fmt:message key="go" bundle="${resword}"/>"  class="navSearchButton"/>
+                                            <input type="submit" value=" " class="navSearchButton"/>
                                         </form>
 
                                     </td>

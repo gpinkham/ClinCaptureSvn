@@ -2197,7 +2197,17 @@ div#sumBox table tr:first-child td { border-top-width: 0px;
 
 .navSearch { width: 120px; height: 13px; font-size: 10px; line-height: 13px; background-color: #BCCFE2; border-width: 1px; border-color: #BCCFE2; margin-left: 4px;}
 
-.navSearchButton { width: 20px; height: 15px; font-size: 10px; background: url(../images/bt_navSearch.gif) no-repeat top left; border-style: none; color: #FFFFFF; font-size: 9px; font-weight: bold; line-height: 10px; padding: 0px; margin-left: 2px; }
+.navSearchButton {
+	width: 18px;
+	height: 16px;
+	background: url(../images/bt_navSearch.gif) no-repeat top left;
+	border-style: none;
+	margin-left: -18px;
+	margin-top: 1px;
+	padding: 0;
+	cursor: pointer;
+	position: absolute;
+}
 
 .dropdown { 
 	position: absolute; 
