@@ -29,6 +29,8 @@ public class BaseTest {
 	protected static String whodSearchResult;
     protected static String treeResult;
 	protected static String termCodeResult;
+	protected static String ctcaeSearchResult;
+	protected static String ctcaeTermCodeResult;
 
 	private final static Logger log = LoggerFactory.getLogger(BaseTest.class.getName());
 
@@ -40,7 +42,8 @@ public class BaseTest {
 			whodSearchResult = readFile("src/test/resources/com/clinovo/coding/ExampleWHODSearchResponse.json");
             treeResult = readFile("src/test/resources/com/clinovo/coding/ExampleTreeResponse.json");
 			termCodeResult = readFile("src/test/resources/com/clinovo/coding/ExampleTermCodeResponse.json");
-
+			ctcaeSearchResult = readFile("src/test/resources/com/clinovo/coding/ExampleCTCAESearchResponse.json");
+			ctcaeTermCodeResult = readFile("src/test/resources/com/clinovo/coding/ExampleCTCAETermCodeResponse.json");
 		} catch (Exception ex) {
 
 			log.error(ex.getMessage());

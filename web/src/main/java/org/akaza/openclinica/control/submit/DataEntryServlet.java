@@ -2073,31 +2073,51 @@ public abstract class DataEntryServlet extends Controller {
 				.getData().getOrdinal());
 
 		if (refItemData.getId() > 0) {
-
 			for (DisplayItemBean displayItemBean : changedItemsList) {
-
-				if (refItemData.getId() == displayItemBean.getData().getId()
-						&& !refItemData.getValue().equalsIgnoreCase(displayItemBean.getData().getValue())) {
-
-					CodedItem codedItem = (CodedItem) getCodedItemService().findCodedItem(refItemData.getId());
-
-					if (codedItem != null && codedItem.getId() > 0) {
-
+				CodedItem codedItem = (CodedItem) getCodedItemService().findCodedItem(refItemData.getId());
+				if (codedItem != null && codedItem.getId() > 0) {
+					CodedItemElement gradeElement = codedItem.getCodedItemElementByItemName("GR");
+					ItemDataBean gradeItemData = (ItemDataBean) getItemDataDAO().findByPK(gradeElement.getItemDataId());
+					if (refItemData.getId() == displayItemBean.getData().getId()
+							&& !refItemData.getValue().equalsIgnoreCase(displayItemBean.getData().getValue())) {
 						codedItem.setStatus("NOT_CODED");
 						codedItem.setHttpPath("");
 						codedItem.setPreferredTerm(displayItemBean.getData().getValue());
-
 						for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
-
-							codedItemElement.setItemCode("");
+							if (!codedItemElement.getItemName().equals("GR")) {
+								codedItemElement.setItemCode("");
+							}
 						}
-
 						if (displayItemBean.getData().getValue().isEmpty()) {
 							getCodedItemService().deleteCodedItem(codedItem);
 						} else {
 							getCodedItemService().saveCodedItem(codedItem);
 						}
-
+						item.getData().setValue("");
+					} else if (gradeItemData.getId() == displayItemBean.getData().getId()) {
+						ItemDataBean refItemDataBean = iddao.findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), ecrfBean.getId(), item.getData().getOrdinal());
+						for (DisplayItemBean changedItem : changedItemsList) {
+							if (refItemDataBean.getId() == changedItem.getData().getId()
+									&& !refItemDataBean.getValue().equalsIgnoreCase(changedItem.getData().getValue())) {
+								refItemDataBean = changedItem.getData();
+								break;
+							}
+						}
+						codedItem.setPreferredTerm(refItemDataBean.getValue());
+						codedItem.setStatus("NOT_CODED");
+						codedItem.setHttpPath("");
+						for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
+							if (codedItemElement.getItemName().equals("GR")) {
+								codedItemElement.setItemCode(displayItemBean.getData().getValue());
+							} else {
+								codedItemElement.setItemCode("");
+							}
+						}
+						getCodedItemService().saveCodedItem(codedItem);
+						item.getData().setValue("");
+					} else if (gradeElement.getItemDataId() < 0 && codedItem.getDictionary().equals("CTCAE")) {
+						StudyBean study = (StudyBean) getStudyDAO().findByPK(codedItem.getSiteId() > 0 ? codedItem.getSiteId() : codedItem.getStudyId());
+						getCodedItemService().createCodedItem(ecrfBean, displayItemBean.getItem(), displayItemBean.getData(), study);
 						item.getData().setValue("");
 					}
 				}

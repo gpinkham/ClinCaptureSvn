@@ -66,8 +66,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * The controller for managing coded items. Acts as the glue between the service layer and the UI -
- * 
+ * The controller for managing coded items. Acts as the glue between the service layer and the UI.
  */
 @Controller
 public class CodedItemsController {
@@ -89,13 +88,14 @@ public class CodedItemsController {
 	private CodedItemService codedItemService;
 
 	private Search search = new Search();
-	Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-	private ItemDataDAO ItemDataDAO;
+	private ItemDataDAO itemDataDAO;
 	private StudyParameterValueDAO studyParamDAO;
 
-	private final static String BIOONTOLOGY_URL = "http://bioportal.bioontology.org";
-	private final static String BIOONTOLOGY_WS_URL = "http://data.bioontology.org";
+	private static final String BIOONTOLOGY_URL = "http://bioportal.bioontology.org";
+	private static final String BIOONTOLOGY_WS_URL = "http://data.bioontology.org";
+	private static final int COUNTRY_INDEX = 4;
 
 	/**
 	 * Handle for retrieving all the coded items.
@@ -141,6 +141,7 @@ public class CodedItemsController {
 				study.getId(), "medicalCodingContextNeeded");
 		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(),
 				"autoCodeDictionaryName");
+		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
 
 		boolean configuredDictionaryIsAvailable = configuredDictionary.getValue() != null
 				&& !configuredDictionary.getValue().isEmpty() ? true : false;
@@ -175,6 +176,7 @@ public class CodedItemsController {
 		factory.setStudySubjectDAO(new StudySubjectDAO(datasource));
 		factory.setEventDefinitionCRFDAO(new EventDefinitionCRFDAO(datasource));
 		factory.setStudyEventDefinitionDAO(new StudyEventDefinitionDAO(datasource));
+		factory.setBioontologyUrl(bioontologyUrl.getValue());
 
 		String codedItemsTable = factory.createTable(request, response).render();
 
@@ -198,15 +200,12 @@ public class CodedItemsController {
 	}
 
 	/**
-	 * Handle for coding a specified item
-	 * 
-	 * @param request
-	 *            The request containing the item to code
-	 * 
-	 * @return Map with attributes to be used on the UX-
-	 * 
-	 * @throws Exception
-	 *             For all exceptions
+	 * Handle for coding a specified item.
+	 *
+	 * @param request The request containing the item to code.
+	 * @param response The response to redirect to.
+	 * @return Map with attributes to be used on the UX.
+	 * @throws Exception For all exceptions.
 	 */
 	@RequestMapping("/codeItem")
 	public ModelMap codeItemHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -231,18 +230,21 @@ public class CodedItemsController {
 		com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
 
 		if (configuredDictionaryIsAvailable) {
-
 			ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
 			ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
-			// Ignore case - (until Marc changes his mind)
-			term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(),
+			String dataValue = "";
+			if (codedItem.getCodedItemElementByItemName("GR").getItemDataId() > 0) {
+				dataValue = data.getValue() + " (Grade " + codedItem.getCodedItemElementByItemName("GR").getItemCode() + ")";
+			} else {
+				dataValue = data.getValue();
+			}
+
+			term = termService.findByAliasAndExternalDictionary(dataValue.toLowerCase(),
 					codedItem.getDictionary());
 		}
 
 		if (term != null) {
-
 			Classification classification = new Classification();
-
 			classification.setHttpPath(term.getHttpPath());
 			classification.setClassificationElement(generateClassificationElements(term.getTermElementList()));
 
@@ -254,32 +256,21 @@ public class CodedItemsController {
 			codedItem.setStatus((String.valueOf(CodeStatus.CODED)));
 
 			codedItemService.saveCodedItem(codedItem);
-
 			classifications.add(classification);
-
 			model.addAttribute("autoCoded", true);
 
 		} else {
-
-			// Don't attempt to code the item again
 			if (!codedItem.isCoded()) {
-
 				search.setSearchInterface(new BioPortalSearchInterface());
-
 				try {
-
 					classifications = search.getClassifications(prefLabel, dictionary, bioontologyUrl.getValue(),
 							bioontologyApiKey.getValue());
-
 					if (classifications.size() == 0) {
-
 						codedItem.setStatus(String.valueOf(CodeStatus.CODE_NOT_FOUND));
 						codedItemService.saveCodedItem(codedItem);
-
 						model.addAttribute("notCoded", true);
 					}
 				} catch (Exception ex) {
-
 					response.sendError(HttpServletResponse.SC_BAD_GATEWAY);
 					return model;
 				}
@@ -306,6 +297,13 @@ public class CodedItemsController {
 		}
 	}
 
+	/**
+	 * Handle for auto-coding using terms from database.
+	 *
+	 * @param request The request containing the item to code.
+	 * @param response The response to redirect to.
+	 * @throws Exception The exception for all exceptions.
+	 */
 	@RequestMapping("/autoCode")
 	public void autoCodeItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -328,31 +326,28 @@ public class CodedItemsController {
 					|| !crfVersionBean.getStatus().equals(Status.AVAILABLE);
 
 			if (!crfIsLocked) {
-
 				ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(item.getItemId());
-				Term term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(),
-						item.getDictionary());
+				String dataValue = "";
+				if (item.getCodedItemElementByItemName("GR").getItemDataId() > 0) {
+					dataValue = data.getValue() + " (Grade " + item.getCodedItemElementByItemName("GR").getItemCode() + ")";
+				} else {
+					dataValue = data.getValue();
+				}
 
+				Term term = termService.findByAliasAndExternalDictionary(dataValue.toLowerCase(), item.getDictionary());
 				if (term != null) {
-
 					Classification classification = new Classification();
-
 					classification.setHttpPath(term.getHttpPath());
 					classification.setClassificationElement(generateClassificationElements(term.getTermElementList()));
-
 					generateCodedItemFields(item.getCodedItemElements(), classification.getClassificationElement());
-
 					item.setPreferredTerm(term.getPreferredName());
 					item.setHttpPath(term.getHttpPath());
 					item.setAutoCoded(true);
 					item.setStatus((String.valueOf(CodeStatus.CODED)));
 
 					codedItemService.saveCodedItem(item);
-
 					items.add(item);
-
 				} else {
-
 					skippedItems.add(item);
 				}
 			}
@@ -361,28 +356,22 @@ public class CodedItemsController {
 		request.setAttribute("autoCodedItems", items);
 		request.setAttribute("skippedItems", skippedItems);
 
-		// Redirect to main
 		codedItemsHandler(request, response);
-
 	}
 
 	/**
-	 * Handle for saving a coded item
-	 * 
-	 * @param request
-	 *            The request containing the coded item to save
-	 * 
+	 * Handle for saving a coded item.
+	 *
+	 * @param request The request containing the coded item to save
+	 * @param response The response to redirect to.
 	 * @return Redirects to the coded items handler.
-	 * 
-	 * @throws Exception
-	 *             For all exception
+	 * @throws IOException For all exception
 	 */
 
 	@RequestMapping("/saveCodedItem")
 	public String saveCodedItemHandler(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
-
 		String itemId = request.getParameter("item");
 		String categoryList = request.getParameter("categoryList");
 		String verbatimTerm = request.getParameter("verbatimTerm");
@@ -395,9 +384,7 @@ public class CodedItemsController {
 		try {
 			provideCoding(verbatimTerm, false, categoryList, codeSearchTerm, bioontologyUrl.getValue(),
 					bioontologyApiKey.getValue(), codedItem.getItemId());
-
 		} catch (Exception ex) {
-
 			logger.error(ex.getMessage());
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY);
 		}
@@ -406,14 +393,10 @@ public class CodedItemsController {
 
 	/**
 	 * Handle for uncoding a given coded item.
-	 * 
-	 * @param request
-	 *            The request containing the item to uncode.
-	 * 
+	 *
+	 * @param request The request containing the item to uncode.
 	 * @return Redirects to coded items.
-	 * 
-	 * @throws Exception
-	 *             For all exceptions
+	 * @throws Exception For all exceptions
 	 */
 	@RequestMapping("/uncodeCodedItem")
 	public String unCodeCodedItemHandler(HttpServletRequest request) throws Exception {
@@ -424,10 +407,15 @@ public class CodedItemsController {
 
 		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
 		ItemDataBean itemData = (ItemDataBean) getItemDataDAO().findByPK(codedItem.getItemId());
-
+		boolean isGradeTerm = codedItem.getCodedItemElementByItemName("GR").getItemDataId() > 0 ? true : false;
 		for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
-
-			codedItemElement.setItemCode("");
+			if (isGradeTerm) {
+				if (!codedItemElement.getItemName().equals("GR")) {
+					codedItemElement.setItemCode("");
+				}
+			} else {
+				codedItemElement.setItemCode("");
+			}
 		}
 
 		if (codedItem.isAutoCoded()) {
@@ -445,18 +433,14 @@ public class CodedItemsController {
 	}
 
 	/**
-	 * Handle for getting specified item additional fields
+	 * Handle for getting specified item additional fields.
 	 *
-	 * @param request
-	 *            The request containing the term url to getting additional fields.
-	 *
+	 * @param request The request containing the term url to getting additional fields.
 	 * @return Map with attributes to be used on the UX-
-	 *
-	 * @throws Exception
-	 *             For all exceptions
+	 * @throws Exception For all exceptions
 	 */
 	@RequestMapping("/codeItemFields")
-	public ModelMap termAdditinalFieldsHandler(HttpServletRequest request) throws Exception {
+	public ModelMap termAdditionalFieldsHandler(HttpServletRequest request) throws Exception {
 
 		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
@@ -477,7 +461,6 @@ public class CodedItemsController {
 			ptElement.setElementName(ResourceBundleProvider.getResWord("pt"));
 			classificationWithTerms.addClassificationElement(ptElement);
 		} else if (codedItemUrl.indexOf("whod") > 0) {
-
 			for (ClassificationElement classification : classificationWithTerms.getClassificationElement()) {
 				String classificationCodeName = classification.getCodeName();
 				classification.setCodeName(classificationCodeName.substring(0, classificationCodeName.indexOf("@"))
@@ -486,22 +469,17 @@ public class CodedItemsController {
 		}
 
 		ModelMap model = new ModelMap();
-
 		model.addAttribute("codedElement", classificationWithTerms);
-
 		return model;
 	}
 
 	/**
 	 * Handle for coding and aliasing a given coded item.
 	 *
-	 * @param request
-	 *            The request containing the item to code and alias.
-	 *
+	 * @param request The request containing the item to code and alias.
+	 * @param response The response to redirect to.
 	 * @return Redirects to coded items.
-	 *
-	 * @throws Exception
-	 *             For all exceptions
+	 * @throws Exception For all exceptions
 	 */
 	@RequestMapping("/codeAndAlias")
 	public String codeAndAliasHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -567,7 +545,6 @@ public class CodedItemsController {
 	}
 
 	private StudyParameterValueDAO getStudyParameterValueDAO() {
-
 		if (studyParamDAO == null) {
 			studyParamDAO = new StudyParameterValueDAO(datasource);
 		}
@@ -577,11 +554,11 @@ public class CodedItemsController {
 
 	private ItemDataDAO getItemDataDAO() {
 
-		if (ItemDataDAO == null) {
-			ItemDataDAO = new ItemDataDAO(datasource);
+		if (itemDataDAO == null) {
+			itemDataDAO = new ItemDataDAO(datasource);
 		}
 
-		return ItemDataDAO;
+		return itemDataDAO;
 	}
 
 	private ArrayList<ClassificationElement> generateClassificationElements(List<TermElement> termElementList) {
@@ -662,7 +639,7 @@ public class CodedItemsController {
 
 	private void addClassificationResultSufix(Classification classificationResult) {
 
-		int countryIndex = classificationResult.getClassificationElement().size() - 4;
+		int countryIndex = classificationResult.getClassificationElement().size() - COUNTRY_INDEX;
 		String countryField = classificationResult.getClassificationElement().get(countryIndex).getCodeName() + "_con";
 		classificationResult.getClassificationElement().get(countryIndex).setCodeName(countryField);
 
@@ -680,12 +657,10 @@ public class CodedItemsController {
 		List<String> list = new ArrayList<String>(Arrays.asList(categoryList.split("\\|")));
 
 		for (int i = 0; i < list.size(); i++) {
-
 			if (list.get(i).equals("HTTP")) {
 				classification.setHttpPath(list.get(i + 1));
 				i++;
 			} else if (!list.get(i).isEmpty()) {
-
 				ClassificationElement classificationElement = new ClassificationElement();
 				classificationElement.setElementName(list.get(i));
 				classificationElement.setCodeName(list.get(i + 1));

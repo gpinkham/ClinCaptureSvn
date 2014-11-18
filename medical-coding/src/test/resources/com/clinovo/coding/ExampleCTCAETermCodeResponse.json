@@ -1,0 +1,21 @@
+{
+    "page": 1,
+    "pageCount": 1,
+    "prevPage": null,
+    "nextPage": null,
+    "links": {
+        "nextPage": null,
+        "prevPage": null
+    },
+    "collection": [{
+        "prefLabel": "Gastrointestinal disorders",
+        "property": ["http://ncicb.nci.nih.gov/xml/owl/EVS/ctcae.owl#Adverse_Event_by_System_Organ_Class",
+            "<ncicp:ComplexTerm><ncicp:term-name>Gastrointestinal disorders</ncicp:term-name><ncicp:term-group>PT</ncicp:term-group><ncicp:term-source>CTCAE</ncicp:term-source></ncicp:ComplexTerm>",
+            "E10904",
+            "10017947",
+            "Gastrointestinal disorders",
+            "http://www.w3.org/2002/07/owl#Class"],
+        "@id": "http://ncicb.nci.nih.gov/xml/owl/EVS/ctcae.owl#Gastrointestinal_disorders",
+        "@type": "http://www.w3.org/2002/07/owl#Class"
+    }]
+}

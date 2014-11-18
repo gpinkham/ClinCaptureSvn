@@ -1,10 +1,10 @@
 /*******************************************************************************
  * CLINOVO RESERVES ALL RIGHTS TO THIS SOFTWARE, INCLUDING SOURCE AND DERIVED BINARY CODE. BY DOWNLOADING THIS SOFTWARE YOU AGREE TO THE FOLLOWING LICENSE:
- * 
+ *
  * Subject to the terms and conditions of this Agreement including, Clinovo grants you a non-exclusive, non-transferable, non-sublicenseable limited license without license fees to reproduce and use internally the software complete and unmodified for the sole purpose of running Programs on one computer. 
  * This license does not allow for the commercial use of this software except by IRS approved non-profit organizations; educational entities not working in joint effort with for profit business.
  * To use the license for other purposes, including for profit clinical trials, an additional paid license is required. Please contact our licensing department at http://www.clinovo.com/contact for pricing information.
- * 
+ *
  * You may not modify, decompile, or reverse engineer the software.
  * Clinovo disclaims any express or implied warranty of fitness for use. 
  * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
@@ -31,15 +31,17 @@ import java.util.List;
 
 public class BioPortalSearchInterfaceTest extends BaseTest {
 
-    BioPortalSearchInterface searchInterface = Mockito.mock(BioPortalSearchInterface.class);
+	BioPortalSearchInterface searchInterface = Mockito.mock(BioPortalSearchInterface.class);
 
 	@Before
 	public void setUp() throws Exception {
 
 		Mockito.doReturn(searchResult).when(searchInterface).termListRequest(Mockito.eq("Leukaemia plasmacytic (in remission)"), Mockito.anyString(), Mockito.anyString());
 		Mockito.doReturn(whodSearchResult).when(searchInterface).termListRequest(Mockito.eq("Benzalkonium"), Mockito.anyString(), Mockito.anyString());
+		Mockito.doReturn(ctcaeSearchResult).when(searchInterface).termListRequest(Mockito.eq("Leg Pain"), Mockito.anyString(), Mockito.anyString());
 		Mockito.doReturn(treeResult).when(searchInterface).getPageDataRequest(Mockito.anyString(), Mockito.anyString());
-		Mockito.doReturn(termCodeResult).when(searchInterface).getTermCodeRequest(Mockito.any(ClassificationElement.class), Mockito.anyString(), Mockito.anyString());
+		Mockito.doReturn(termCodeResult).when(searchInterface).getTermCodeRequest(Mockito.any(ClassificationElement.class), Mockito.eq("MEDDRA"), Mockito.anyString());
+		Mockito.doReturn(ctcaeTermCodeResult).when(searchInterface).getTermCodeRequest(Mockito.any(ClassificationElement.class), Mockito.eq("CTCAE"), Mockito.anyString());
 
 		Mockito.doCallRealMethod().when(searchInterface).search(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 		Mockito.doCallRealMethod().when(searchInterface).getClassificationTerms(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
@@ -136,7 +138,7 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 		classification.addClassificationElement(classificationElement);
 		classification.addClassificationElement(classificationElement1);
 
-		searchInterface.getClassificationCodes(classification, "MEDDRA", "http://1.1.1.1", "api key");
+		searchInterface.getClassificationCodes(classification, "MEDDRA", "MEDDRA", "api key");
 
 		assertEquals("10033371", classification.getClassificationElement().get(0).getCodeValue());
 		assertEquals("10033371", classification.getClassificationElement().get(1).getCodeValue());
@@ -170,4 +172,29 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 		assertEquals("MPN", classifications.get(0).getClassificationElement().get(0).getElementName());
 		assertEquals("MPN", classifications.get(1).getClassificationElement().get(0).getElementName());
 	}
+
+	@Test
+	public void testThatCTCAESearchReturnsExpectedNumberOfTerms() throws Exception {
+
+		assertEquals(1, searchInterface.search("Leg Pain", "CTCAE", "http://1.1.1.1", "api key").size());
+	}
+
+	@Test
+	public void testThatCTCAESearchReturnsCorrectTermNames() throws Exception {
+		List<Classification> classifications = searchInterface.search("Leg Pain", "CTCAE", "http://1.1.1.1", "api key");
+		assertEquals("Leg pain Grade 2", classifications.get(0).getClassificationElement().get(0).getCodeName());
+	}
+
+	@Test
+	public void testThatGetCodeReturnsClassificationWithCTCAECodes() throws Exception {
+
+		Classification classification = new Classification();
+		ClassificationElement classificationElement = new ClassificationElement();
+		classificationElement.setElementName("Leg pain");
+		classification.addClassificationElement(classificationElement);
+		searchInterface.getClassificationCodes(classification, "CTCAE", "CTCAE", "api key");
+
+		assertEquals("E10904", classification.getClassificationElement().get(0).getCodeValue());
+	}
+
 }

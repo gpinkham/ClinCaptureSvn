@@ -14,18 +14,27 @@
  *******************************************************************************/
 package com.clinovo.model;
 
-import javax.persistence.*;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
-import org.hibernate.annotations.*;
 
 import com.clinovo.model.Status.CodeStatus;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+
 
 /**
  * Encapsulates a definition of an item that can be coded.
@@ -49,14 +58,14 @@ public class CodedItem extends AbstractMutableDomainObject {
     private Boolean autoCoded = Boolean.FALSE;
     private String status = String.valueOf(CodeStatus.NOT_CODED);
 
-    List<CodedItemElement> codedItemElement;
+    private List<CodedItemElement> codedItemElement;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
-    @JoinColumn(name="coded_Item_id", referencedColumnName = "id", nullable=false)
-    public List<CodedItemElement> getCodedItemElements() {
-        return codedItemElement;
-    }
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	@JoinColumn(name = "coded_Item_id", referencedColumnName = "id", nullable = false)
+	public List<CodedItemElement> getCodedItemElements() {
+		return codedItemElement;
+	}
 
     public int getItemId() {
         return itemId;
@@ -147,12 +156,15 @@ public class CodedItem extends AbstractMutableDomainObject {
         this.codedItemElement = codedItemElements;
     }
 
+	/**
+	 * Method adds new coded item elements to the coded item element list.
+	 *
+	 * @param cItemElement the code item element.
+	 */
     public void addCodedItemElements(CodedItemElement cItemElement) {
-    	
         if (codedItemElement == null) {
             codedItemElement = new ArrayList<CodedItemElement>();
         }
-        
         codedItemElement.add(cItemElement);
     }
 
@@ -171,4 +183,19 @@ public class CodedItem extends AbstractMutableDomainObject {
     public void setHttpPath(String httpPath) {
         this.httpPath = httpPath;
     }
+
+	/**
+	 * Returns the coded item element from the coded item by name.
+	 *
+	 * @param elementName the coded item element name.
+	 * @return the coded item element.
+	 */
+	public CodedItemElement getCodedItemElementByItemName(String elementName) {
+		for (CodedItemElement element : this.getCodedItemElements()) {
+			if (element.getItemName().equals(elementName)) {
+				return element;
+			}
+		}
+		return new CodedItemElement();
+	}
 }

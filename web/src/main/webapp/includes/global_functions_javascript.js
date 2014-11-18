@@ -2987,8 +2987,8 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
         if (contextBox.length > 0) {
 
             var idReg = /idToAppend=\"(\d*)\"/;
-            var termReg = /termToAppend=\"([\w\s\d]+)\"?/;
-            var prefReg = /prefToAppend=\"([\w\s\d]+)\"?/;
+            var termReg = /termToAppend=\"([\w\s\d\(\)]+)\"?/;
+            var prefReg = /prefToAppend=\"([\w\s\d\(\)]+)\"?/;
 
             var id = contextBox.match(idReg)[1];
             var term = undefined;
@@ -3043,8 +3043,8 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
                 var dictionary = $("div[id=" + id + "]").parent().siblings("td").find("div[name='termDictionary']").text();
 
                 $("a[name='unCode']").filter(function () {
-                    return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary &&
-                        $(this).parents().siblings("td").find("div[name='itemDataValue']").text().toLowerCase() == term;}).attr('term', term).attr('pref', pref);
+                    return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary
+                        && $(this).parents().siblings("td").find("div[name='itemDataValue']").text().toLowerCase() == term;}).attr('term', term).attr('pref', pref);
             }
 
             if ($("div:contains('In process')").size() == 0) {
@@ -3249,7 +3249,7 @@ codeItemFields = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
     var term = $(item).closest('tbody').find('td').filter(function () {
-        return $.trim($(this).attr('id')) == "EXT" || $.trim($(this).attr('id')) == "LLT" || $.trim($(this).attr('id')) == "MPN";
+        return $.trim($(this).attr('id')) == "EXT" || $.trim($(this).attr('id')) == "LLT" || $.trim($(this).attr('id')) == "MPN" || $.trim($(this).attr('id')) == "AEG";
     }).next().text();
 
     $("<div class='ui-widget-overlay' style='width:" + $(document).width() + "px; height:" + $(document).height() + "px; z-index: 1005;' />").appendTo('body');

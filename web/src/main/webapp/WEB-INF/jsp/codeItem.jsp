@@ -39,7 +39,7 @@
                         <c:set var="hyperlinkColor" value="#2c6caf"/>
                     </c:if>
                     <td>
-                        <c:set var="objectHttpPath" value="${(fn:replace(obj.httpPath, '/MDR/', '/MEDDRA/'))}"/>
+                        <c:set var="objectHttpPath" value="${fn:replace(fn:replace(obj.httpPath, '/MDR/', '/MEDDRA/'), '#', '%23')}"/>
                         <a target="_blank" style="color:<c:out value="${hyperlinkColor}"/>"
                            href="${bioontologyUrl}/ontologies/<c:out value="${fn:toUpperCase(fn:replace(itemDictionary, ' ', ''))}"/>?p=classes&conceptid=<c:out value="${objectHttpPath}"/>">
                             <c:out value="${obj.httpPath}"/>

@@ -91,6 +91,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private CRFDAO crfDAO;
     private StudyEventDAO studyEventDAO;
     private String themeColor;
+	private String bioontologyUrl;
 
     private final String medicalCodingContextNeeded;
     private final String showMoreLink;
@@ -174,10 +175,15 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 		public Object getValue(Object item, String property, int rowcount) {
             HtmlBuilder builder = new HtmlBuilder();
             String itemDataValue = (String) ((HashMap<Object, Object>) item).get("itemDataValue");
-            if (!itemDataValue.isEmpty()) {
-                builder.div().name("itemDataValue").close().append(itemDataValue).divEnd()
-                       .div().style("width:160px").close().divEnd();
-            }
+			CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
+			String termWithGrade = codedItem.getCodedItemElementByItemName("GR").getItemDataId() > 0 ? itemDataValue + " (Grade "
+					+ codedItem.getCodedItemElementByItemName("GR").getItemCode() + ")" : itemDataValue;
+
+			if (!itemDataValue.isEmpty()) {
+				builder.div().name("itemDataValue").style("display:none").close().append(termWithGrade).divEnd()
+						.div().name("termValue").close().append(itemDataValue).divEnd()
+						.div().style("width:160px").close().divEnd();
+			}
 
             return builder.toString();
         }
@@ -204,6 +210,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 			return "MedDRA";
 		} else if (codedItemDictionary.equalsIgnoreCase("WHOD")) {
 			return "WHOD";
+		} else if (codedItemDictionary.equalsIgnoreCase("CTCAE")) {
+			return "CTCAE";
 		}
 		return "Dictionary Not Found";
 	}
@@ -215,13 +223,21 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             HtmlBuilder builder = new HtmlBuilder();
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
             if (codedItem != null) {
+				Term term = getCodedItemTerm(codedItem);
+				String preferredTerm = codedItem.getCodedItemElementByItemName("GR").getItemDataId() > 0
+						&& !codedItem.getCodedItemElementByItemName("GR").getItemCode().isEmpty()
+						&& codedItem.getPreferredTerm().toLowerCase().indexOf("grade") < 0
+						&& term.getLocalAlias().isEmpty()
+						&& codedItem.getStatus().equals("NOT_CODED")
+						? codedItem.getPreferredTerm() + " (Grade " + codedItem.getCodedItemElementByItemName("GR").getItemCode() + ")"
+						: codedItem.getPreferredTerm();
 				if (isLoggedInUserMonitor()) {
-                   builder.append(codedItem.getPreferredTerm()).div().style("width:250px").close().divEnd();
+                   builder.append(preferredTerm).div().style("width:250px").close().divEnd();
 					return builder.toString();
 				} else if (codedItem.getStatus().equals("CODED")) {
-                    builder.append(ResourceBundleProvider.getResWord("search") + ": ").input().style("border:1px solid #a6a6a6; margin-bottom: 2px; color:#4D4D4D").disabled().type("text").value(codedItem.getPreferredTerm()).close();
+                    builder.append(ResourceBundleProvider.getResWord("search") + ": ").input().style("border:1px solid #a6a6a6; margin-bottom: 2px; color:#4D4D4D").disabled().type("text").value(preferredTerm).close();
                 } else {
-                    builder.append(ResourceBundleProvider.getResWord("search") + ": ").input().style("border:1px solid #a6a6a6; margin-bottom: 2px; color:#4D4D4D").type("text").value(codedItem.getPreferredTerm()).close();
+                    builder.append(ResourceBundleProvider.getResWord("search") + ": ").input().style("border:1px solid #a6a6a6; margin-bottom: 2px; color:#4D4D4D").type("text").value(preferredTerm).close();
                 }
 
 				String codedItemContextBox = null;
@@ -248,8 +264,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 				builder.table(1).id("tablepaging").styleClass("itemsTable").style("display:" + showContextValue + ";").close()
 						.tr(1).style(codedItem.getDictionary().equals("WHOD") ? "display:none;" : "").close()
 						.td(1).close().append(ResourceBundleProvider.getResWord("http") + ": ").tdEnd()
-						.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href(normalizeUrl(codedItem.getHttpPath(), codedItem.getDictionary())
-						+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid=" + codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
+						.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href(normalizeUrl(getBioontologyUrl(), codedItem.getDictionary())
+						+ "/ontologies/" + codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid=" + codedItem.getHttpPath().replace("#", "%23").replace("/MDR/", "/MEDDRA/")).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
 						.td(2).width("360px").colspan("2").close().tdEnd()
 						.td(2).close().tdEnd().trEnd(1);
 
@@ -420,9 +436,18 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private Term getCodedItemTerm(CodedItem codedItem) {
 
         ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
+
         ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
-        for (Term term : terms) {
-            if (data.getValue().equalsIgnoreCase(term.getLocalAlias())
+		String dataValue = data.getValue();
+		if (codedItem.getCodedItemElementByItemName("GR").getItemDataId() > 0) {
+			ItemDataBean gradeDataBean = (ItemDataBean) itemDataDAO.findByPK(codedItem.getCodedItemElementByItemName("GR").getItemDataId());
+			if (!gradeDataBean.getValue().isEmpty()) {
+				dataValue = dataValue.concat(" (Grade ").concat(gradeDataBean.getValue()).concat(")");
+			}
+		}
+
+		for (Term term : terms) {
+            if (dataValue.equalsIgnoreCase(term.getLocalAlias())
                     && term.getExternalDictionaryName().equals(codedItem.getDictionary())) {
                 return term;
             }
@@ -515,6 +540,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             options.add(new Option("ICD 10", " ICD 10"));
             options.add(new Option("MedDRA", "MedDRA"));
             options.add(new Option("WHOD", "WHOD"));
+			options.add(new Option("CTCAE", "CTCAE"));
 
             return options;
         }
@@ -635,5 +661,14 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 			return "#2c6caf";
 		}
 		return "#729fcf";
+	}
+
+
+	public String getBioontologyUrl() {
+		return bioontologyUrl;
+	}
+
+	public void setBioontologyUrl(String bioontologyUrl) {
+		this.bioontologyUrl = bioontologyUrl;
 	}
 }

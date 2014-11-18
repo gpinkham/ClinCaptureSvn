@@ -15,6 +15,7 @@
 
 package com.clinovo.controller;
 
+import com.clinovo.dao.SystemDAO;
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemElement;
 import com.clinovo.model.Term;
@@ -56,6 +57,9 @@ public class CodedItemAutoUpdater {
 	@Autowired
 	private DataSource datasource;
 
+	@Autowired
+	private SystemDAO systemDAO;
+
 	private String themeColor;
 
 	private final String bioontologyUrlDefault = "http://bioportal.bioontology.org";
@@ -96,8 +100,13 @@ public class CodedItemAutoUpdater {
 			if (codedItem.isCoded()) {
 				ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
 				ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
-				Term term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(),
-						codedItem.getDictionary());
+				String dataValue = "";
+				if (codedItem.getCodedItemElementByItemName("GR").getItemDataId() > 0) {
+					dataValue = data.getValue() + " (Grade " + codedItem.getCodedItemElementByItemName("GR").getItemCode() + ")";
+				} else {
+					dataValue = data.getValue();
+				}
+				Term term = termService.findByAliasAndExternalDictionary(dataValue.toLowerCase(), codedItem.getDictionary());
 				if (term != null) {
 					codedItemToAppend.add(contextBoxBuilder(codedItem, term.getLocalAlias(), term.getPreferredName(),
 							showContext));
@@ -113,6 +122,7 @@ public class CodedItemAutoUpdater {
 	private String contextBoxBuilder(CodedItem codedItem, String alise, String prefTerm, String showContext)
 			throws MalformedURLException {
 
+		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
 		String termToAppend = "";
 		String prefToAppend = "";
 		String displayStyle = "display:none;";
@@ -126,37 +136,18 @@ public class CodedItemAutoUpdater {
 		}
 
 		HtmlBuilder builder = new HtmlBuilder();
-		builder.table(1)
-				.id("tablepaging")
-				.styleClass("itemsTable")
-				.append(" idToAppend=\"" + codedItem.getItemId() + "\" ")
-				.style(displayStyle)
-				.append(" termToAppend=\"" + termToAppend + "\" ")
-				.append(" prefToAppend=\"" + prefToAppend + "\" ")
-				.close()
-				.tr(1)
-				.style(httpPathDisplay)
-				.close()
-				.td(1)
-				.close()
-				.append(ResourceBundleProvider.getResWord("http") + ": ")
-				.tdEnd()
-				.td(2)
-				.close()
-				.a()
-				.style("color:" + getThemeColor() + "")
-				.append(" target=\"_blank\" ")
-				.href(normalizeUrl(codedItem.getHttpPath(), codedItem.getDictionary())
+		builder.table(1).id("tablepaging").styleClass("itemsTable")
+				.append(" idToAppend=\"" + codedItem.getItemId() + "\" ").style(displayStyle)
+				.append(" termToAppend=\"" + termToAppend + "\" ").append(" prefToAppend=\"" + prefToAppend + "\" ").close()
+				.tr(1).style(httpPathDisplay).close().td(1).close().append(ResourceBundleProvider.getResWord("http") + ": ")
+				.tdEnd().td(2).close().a().style("color:" + getThemeColor() + "")
+				.append(" target=\"_blank\" ").href(normalizeUrl(bioontologyUrl.getValue(), codedItem.getDictionary()) + "/ontologies/"
 						+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid="
-						+ codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd().td(2)
+						+ codedItem.getHttpPath().replace("#", "%23").replace("/MDR/", "/MEDDRA/")).close().append(codedItem.getHttpPath()).aEnd().tdEnd().td(2)
 				.width("360px").colspan("2").close().tdEnd().td(2).close().tdEnd().trEnd(1);
 
 		for (CodedItemElement codedItemElement : codedItemElementsFilter(codedItem).getCodedItemElements()) {
-			builder.tr(1)
-					.close()
-					.td(1)
-					.style("white-space: nowrap;")
-					.close()
+			builder.tr(1).close().td(1).style("white-space: nowrap;").close()
 					.append(" " + ResourceBundleProvider.getResWord(codedItemElement.getItemName().toLowerCase())
 							+ ": ").tdEnd().td(2).close().append(codedItemElement.getItemCode()).tdEnd().tdEnd().td(2)
 					.width("360px").colspan("2").close().tdEnd().td(2).close().tdEnd().trEnd(1).trEnd(1);
