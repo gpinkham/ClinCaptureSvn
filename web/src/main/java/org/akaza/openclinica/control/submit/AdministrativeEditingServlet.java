@@ -170,7 +170,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 		}
 		logger.info("stage name:" + stage.getName());
 		if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)) {
-			if (r.equals(Role.STUDY_MONITOR)) {
+			if (Role.isMonitor(r)) {
 				session.setAttribute("mayProcessUploading", "false");
 				addPageMessage(
 						respage.getString("no_have_correct_privilege_current_study")

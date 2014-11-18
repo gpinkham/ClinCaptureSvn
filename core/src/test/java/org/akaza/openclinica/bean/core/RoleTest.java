@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings({ "rawtypes" })
 public class RoleTest {
@@ -44,12 +46,12 @@ public class RoleTest {
 
 	@Test
 	public void testThatRoleMapContainsValidNumberOfRoles() {
-		assertEquals(EIGHT, role.size());
+		assertEquals(NINE, role.size());
 	}
 
 	@Test
 	public void testThatRoleMapWithDescriptionContainsValidNumberOfRoles() {
-		assertEquals(EIGHT, roleWithDescription.size());
+		assertEquals(NINE, roleWithDescription.size());
 	}
 
 	@Test
@@ -63,7 +65,6 @@ public class RoleTest {
 	@Test
 	public void testThatContainsMethodWorksAsExpected() {
 		assertEquals(true, Role.contains(EIGHT));
-		assertEquals(false, Role.contains(NINE));
 	}
 
 	@Test
@@ -87,5 +88,20 @@ public class RoleTest {
 	@Test
 	public void testThatSystemAdminRoleGetsCorrectly() {
 		assertEquals(Role.SYSTEM_ADMINISTRATOR, Role.getByName("system administrator"));
+	}
+	
+	@Test
+	public void testThatRoleIsMonitorReturnsTrueForStudyMonitor() {
+		assertTrue(Role.isMonitor(Role.STUDY_MONITOR));
+	}
+	
+	@Test
+	public void testThatRoleIsMonitorReturnsTrueForSiteMonitor() {
+		assertTrue(Role.isMonitor(Role.SITE_MONITOR));
+	}
+	
+	@Test
+	public void testThatRoleIsMonitorReturnsFalseForNonMonitor() {
+		assertFalse(Role.isMonitor(Role.STUDY_CODER));
 	}
 }

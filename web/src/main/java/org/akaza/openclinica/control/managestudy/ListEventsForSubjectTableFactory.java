@@ -239,7 +239,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	@Override
 	public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
 		Role r = currentRole.getRole();
-		boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.STUDY_MONITOR);
+		boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !Role.isMonitor(r);
 		tableFacade.setToolbar(new ListEventsForSubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(),
 				selectedStudyEventDefinition, addSubjectLinkShow, showMoreLink));
 	}
@@ -1166,7 +1166,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 			if (eventStatus == SubjectEventStatus.NOT_SCHEDULED
 					&& canScheduleStudySubject(eventDivBuilderWrapper.studySubject)
-					&& currentRole.getRole() != Role.STUDY_MONITOR && studyBean.getStatus().isAvailable()) {
+					&& !Role.isMonitor(currentRole.getRole()) && studyBean.getStatus().isAvailable()) {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
 				String href1 = "PageToCreateNewStudyEvent?studySubjectId="
@@ -1214,7 +1214,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		if (eventStatus != SubjectEventStatus.NOT_SCHEDULED
 				|| (eventStatus == SubjectEventStatus.NOT_SCHEDULED
 						&& canScheduleStudySubject(eventDivBuilderWrapper.studySubject)
-						&& currentRole.getRole() != Role.STUDY_MONITOR && studyBean.getStatus().isAvailable())) {
+						&& !Role.isMonitor(currentRole.getRole()) && studyBean.getStatus().isAvailable())) {
 			iconLinkBuilder(eventDiv, studySubjectLabel, eventDivBuilderWrapper.rowCount, eventDivBuilderWrapper.sed,
 					studyEventId, eventDivBuilderWrapper.eventCRFId, eventDivBuilderWrapper.eventDefintionCRFId);
 		}

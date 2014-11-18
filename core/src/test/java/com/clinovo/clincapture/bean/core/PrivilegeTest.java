@@ -31,10 +31,12 @@ public class PrivilegeTest {
 	public static final String INVESTIGATOR_KEY = "investigator";
 	public static final String CLINICAL_RESEARCH_COORDINATOR_KEY = "clinical_research_coordinator";
 	public static final String STUDY_MONITOR_KEY = "study_monitor";
+	public static final String SITE_MONITOR_KEY = "site_monitor";
 	public static final int THREE = 3;
 	public static final int FOUR = 4;
 	public static final int FIVE = 5;
 	public static final int EIGHT = 8;
+	public static final int NINE = 9;
 
 	private Privilege privilege;
 	private ResourceBundle resterm;
@@ -86,11 +88,17 @@ public class PrivilegeTest {
 	}
 
 	@Test
+	public void testGetSiteMonitorPrivilegeById() {
+		privilege = Privilege.get(EIGHT);
+		assertEquals(Privilege.SITE_MONITOR, privilege);
+	}
+
+	@Test
 	public void testGet() {
 		assertNull(Privilege.get(-1));
 		assertNull(Privilege.get(0));
 		assertNotNull(Privilege.get(2));
-		assertNull(Privilege.get(EIGHT));
+		assertNull(Privilege.get(NINE));
 	}
 
 	@Test
@@ -98,6 +106,6 @@ public class PrivilegeTest {
 		assertFalse(Privilege.contains(-1));
 		assertFalse(Privilege.contains(0));
 		assertTrue(Privilege.contains(2));
-		assertFalse(Privilege.contains(EIGHT));
+		assertFalse(Privilege.contains(NINE));
 	}
 }

@@ -45,23 +45,23 @@ import org.springframework.stereotype.Component;
 public class StudyAuditLogServlet extends RememberLastPage {
 
 	public static final String STUDY_AUDIT_LOG_URL = "studyAuditLogUrl";
-	
+
 	public static String getLink(int userId) {
 		return "AuditLogStudy";
 	}
 
 	/*
-	 * TODO: Redo this servlet to run the audits per study subject for the study; need to add a studyId param
-	 * and then use the StudySubjectDAO.findAllByStudyOrderByLabel() method to grab a lot of study subject beans and
-	 * then return them much like in ViewStudySubjectAuditLogServet.process() currentStudy instead of studyId?
+	 * TODO: Redo this servlet to run the audits per study subject for the study; need to add a studyId param and then
+	 * use the StudySubjectDAO.findAllByStudyOrderByLabel() method to grab a lot of study subject beans and then return
+	 * them much like in ViewStudySubjectAuditLogServet.process() currentStudy instead of studyId?
 	 */
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+
 		if (shouldRedirect(request, response)) {
 			return;
 		}
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		StudySubjectDAO subdao = getStudySubjectDAO();
 		SubjectDAO sdao = getSubjectDAO();
@@ -81,21 +81,23 @@ public class StudyAuditLogServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
 		}
 
 		Role r = currentRole.getRole();
-		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR) || r.equals(Role.STUDY_MONITOR)) {
+		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR) || Role.isMonitor(r)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 	}
 
@@ -108,13 +110,12 @@ public class StudyAuditLogServlet extends RememberLastPage {
 	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		String module = fp.getString("module") != null ? fp.getString("module") : "submit";
-		return "?module=" + module
-				+ "&maxRows=15&studyAuditLogs_tr_=true&studyAuditLogs_p_=1&studyAuditLogs_mr_=15";
+		return "?module=" + module + "&maxRows=15&studyAuditLogs_tr_=true&studyAuditLogs_p_=1&studyAuditLogs_mr_=15";
 	}
 
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
-		return request.getQueryString() == null || !request.getQueryString().contains("&studyAuditLogs_p_="); 
+		return request.getQueryString() == null || !request.getQueryString().contains("&studyAuditLogs_p_=");
 	}
 
 }

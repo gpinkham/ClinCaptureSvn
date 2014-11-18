@@ -146,6 +146,7 @@ public class AssignUserToStudyServlet extends Controller {
 				}
 				roles.remove(Role.INVESTIGATOR);
 				roles.remove(Role.CLINICAL_RESEARCH_COORDINATOR);
+				roles.remove(Role.SITE_MONITOR);
 			}
 
 			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy

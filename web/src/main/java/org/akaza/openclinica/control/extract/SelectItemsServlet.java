@@ -55,27 +55,29 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * 
  */
-@SuppressWarnings({"rawtypes","unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class SelectItemsServlet extends Controller {
 
 	public static String CURRENT_DEF_ID = "currentDefId";
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR) || currentRole.getRole().equals(Role.INVESTIGATOR) 
-				|| currentRole.getRole().equals(Role.STUDY_MONITOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)
+				|| Role.isMonitor(currentRole.getRole())) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
@@ -98,13 +100,13 @@ public class SelectItemsServlet extends Controller {
 				// hmm, set it back into the array list? tbh
 			}
 		}
-        db.setAllSelectedGroups(sgclasses);
+		db.setAllSelectedGroups(sgclasses);
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		int crfId = fp.getInt("crfId");
@@ -156,15 +158,15 @@ public class SelectItemsServlet extends Controller {
 		CRFBean crf = (CRFBean) crfdao.findByPK(crfId);
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(defId);
 
-        request.getSession().setAttribute("crf", crf);
-        request.getSession().setAttribute("definition", sed);
+		request.getSession().setAttribute("crf", crf);
+		request.getSession().setAttribute("definition", sed);
 
 		DatasetBean db = (DatasetBean) request.getSession().getAttribute("newDataset");
 
 		ArrayList items = idao.findAllActiveByCRF(crf);
 		for (int i = 0; i < items.size(); i++) {
 			ItemBean item = (ItemBean) items.get(i);
-            item.setDefId(sed.getId());
+			item.setDefId(sed.getId());
 			ItemFormMetadataBean meta = imfdao.findByItemIdAndCRFVersionId(item.getId(), item.getItemMeta()
 					.getCrfVersionId());
 			item.setItemMeta(meta);
@@ -182,10 +184,10 @@ public class SelectItemsServlet extends Controller {
 		}
 
 		ArrayList allCrfItems = new ArrayList(itemMap.values());
-        // now sort them by ordinal/crf version
-		
-        Collections.sort(allCrfItems, new ItemBean.ItemBeanComparator());
-        request.getSession().setAttribute("allCrfItems", allCrfItems);
+		// now sort them by ordinal/crf version
+
+		Collections.sort(allCrfItems, new ItemBean.ItemBeanComparator());
+		request.getSession().setAttribute("allCrfItems", allCrfItems);
 
 		forwardPage(Page.CREATE_DATASET_2, request, response);
 	}

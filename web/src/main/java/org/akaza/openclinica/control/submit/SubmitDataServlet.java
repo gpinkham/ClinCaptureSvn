@@ -59,8 +59,8 @@ public class SubmitDataServlet extends Controller {
 			if (r != null
 					&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
 							|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
-							|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_MONITOR)
-							|| r.equals(Role.STUDY_CODER) || r.equals(Role.STUDY_EVALUATOR))) {
+							|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_CODER)
+							|| r.equals(Role.STUDY_EVALUATOR) || Role.isMonitor(r))) {
 				return true;
 			}
 		}

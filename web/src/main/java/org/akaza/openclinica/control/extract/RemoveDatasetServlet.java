@@ -53,8 +53,8 @@ public class RemoveDatasetServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		int dsId = fp.getInt("dsId");
@@ -65,17 +65,19 @@ public class RemoveDatasetServlet extends Controller {
 		StudyBean study = (StudyBean) sdao.findByPK(dataset.getStudyId());
 		checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
 		if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"), request);
-			forwardPage(Page.MENU_SERVLET, request, response);
-			return;
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study") + " "
+							+ respage.getString("change_active_study_or_contact"), request);
+			throw new InsufficientPermissionException(Page.MENU,
+					resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 		}
 
 		if (!ub.isSysAdmin() && (dataset.getOwnerId() != ub.getId())) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"), request);
-			forwardPage(Page.MENU_SERVLET, request, response);
-			return;
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study") + " "
+							+ respage.getString("change_active_study_or_contact"), request);
+			throw new InsufficientPermissionException(Page.MENU,
+					resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 		}
 
 		String action = request.getParameter("action");
@@ -96,27 +98,30 @@ public class RemoveDatasetServlet extends Controller {
 	}
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
-			return;// TODO limit to owner only?
+			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
+				|| Role.isMonitor(currentRole.getRole())) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 
 	private EntityBeanTable getDatasetTable(HttpServletRequest request) {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		FormProcessor fp = new FormProcessor(request);
 

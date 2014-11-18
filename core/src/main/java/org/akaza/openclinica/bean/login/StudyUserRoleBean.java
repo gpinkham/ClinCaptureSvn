@@ -83,7 +83,7 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		this.canManageStudy = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
 				|| this.role == Role.STUDY_DIRECTOR;
 
-		this.canMonitor = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_MONITOR;
+		this.canMonitor = this.role == Role.SYSTEM_ADMINISTRATOR || Role.isMonitor(this.role);
 
 		this.canCode = this.role == Role.STUDY_CODER || this.role == Role.STUDY_ADMINISTRATOR;
 
@@ -212,6 +212,10 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
 	public boolean isClinicalResearchCoordinator() {
 		return this.role == Role.CLINICAL_RESEARCH_COORDINATOR;
+	}
+
+	public boolean isSiteMonitor() {
+		return this.role == Role.SITE_MONITOR;
 	}
 
 	public boolean isStudyAdministrator() {

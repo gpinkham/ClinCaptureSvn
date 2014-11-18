@@ -292,6 +292,11 @@
             <c:when test="${userRole.studyEvaluator}">
                 <c:import url="/WEB-INF/jsp/include/navBarMonitorAndManageData.jsp"/>
             </c:when>
+            <c:when test="${userRole.siteMonitor}">
+                <c:import url="/WEB-INF/jsp/include/navBarMonitorAndManageData.jsp"/>
+                <c:import url="/WEB-INF/jsp/include/navBarExtractData.jsp"/>
+                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarAdministration.jsp"/></c:if>
+            </c:when>
 
         </c:choose>
 

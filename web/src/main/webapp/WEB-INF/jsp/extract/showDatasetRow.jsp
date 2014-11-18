@@ -82,7 +82,7 @@
                 </tr>
           </c:when>
           <c:otherwise>
-              <tr>
+              <tr class="innerTable">
                 <c:choose>
                     <c:when test='${currRow.bean.status.name == "removed"}'>
                         <c:choose>

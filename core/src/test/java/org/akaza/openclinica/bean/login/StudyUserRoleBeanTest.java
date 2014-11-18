@@ -33,6 +33,12 @@ public class StudyUserRoleBeanTest {
 	}
 
 	@Test
+	public void testThatGetRoleCodeReturnsCorrectCodeForSiteMonitor() {
+		userRole.setRole(Role.SITE_MONITOR);
+		Assert.assertEquals("site_monitor", userRole.getRoleCode());
+	}
+
+	@Test
 	public void testThatGetRoleCodeReturnsCorrectCodeForStudyCoder() {
 		userRole.setRole(Role.STUDY_CODER);
 		Assert.assertEquals("study_coder", userRole.getRoleCode());

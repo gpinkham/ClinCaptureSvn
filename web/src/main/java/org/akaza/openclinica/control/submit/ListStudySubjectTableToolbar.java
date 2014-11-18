@@ -37,7 +37,7 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
 	private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
 
 	public ListStudySubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions,
-			List<StudyGroupClassBean> studyGroupClasses, boolean addSubjectLinkShow, boolean showMoreLink) {
+			List<StudyGroupClassBean> studyGroupClasses, boolean showMoreLink) {
 		super();
 		this.studyEventDefinitions = studyEventDefinitions;
 		this.studyGroupClasses = studyGroupClasses;

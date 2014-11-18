@@ -139,10 +139,8 @@ public class ResolveDiscrepancyServlet extends Controller {
 					&& (ub.getActiveStudyRole().equals(Role.SYSTEM_ADMINISTRATOR)
 							|| ub.getActiveStudyRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
 							|| ub.getActiveStudyRole().equals(Role.INVESTIGATOR)
-							|| ub.getActiveStudyRole().equals(Role.STUDY_MONITOR)
-							|| ub.getActiveStudyRole().equals(Role.STUDY_ADMINISTRATOR))
-							|| ub.getActiveStudyRole().equals(Role.STUDY_EVALUATOR)
-					) {
+							|| Role.isMonitor(ub.getActiveStudyRole()) || ub.getActiveStudyRole().equals(
+							Role.STUDY_ADMINISTRATOR)) || ub.getActiveStudyRole().equals(Role.STUDY_EVALUATOR)) {
 				if (dec.isContinueInitialDataEntryPermitted()) {
 					return Page.INITIAL_DATA_ENTRY_SERVLET;
 				} else if (dec.isStartDoubleDataEntryPermitted()) {
@@ -227,7 +225,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 			request.setAttribute(TAB_ID, "" + tabNum);
 			request.setAttribute(SECTION_ID, "" + ifmb.getSectionId());
 
-			if (currentRole.getRole().equals(Role.STUDY_MONITOR) || !isCompleted) {
+			if (Role.isMonitor(currentRole.getRole()) || !isCompleted) {
 				StudyEventDAO sedao = new StudyEventDAO(ds);
 				StudyEventBean seb = (StudyEventBean) sedao.findByPK(id);
 				request.setAttribute(EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
@@ -309,7 +307,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 		// If it's not an ItemData type note, redirect
 		// Monitors to View Subject or
 		// View Study Events <<
-		if (currentRole.getRole().equals(Role.STUDY_MONITOR) && !"itemdata".equalsIgnoreCase(entityType)
+		if (Role.isMonitor(currentRole.getRole()) && !"itemdata".equalsIgnoreCase(entityType)
 				&& !"eventcrf".equalsIgnoreCase(entityType)) {
 			redirectMonitor(request, response, module, discrepancyNoteBean);
 			return;
@@ -364,11 +362,11 @@ public class ResolveDiscrepancyServlet extends Controller {
 		}
 
 		if (currentRole.getRole().equals(Role.STUDY_EVALUATOR) || currentRole.getRole().equals(Role.STUDY_CODER)
-				|| currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.STUDY_MONITOR)
-				|| currentRole.getRole().equals(Role.STUDY_DIRECTOR)
+				|| currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.STUDY_DIRECTOR)
 				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR)
-				|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)) {
+				|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
+				|| Role.isMonitor(currentRole.getRole())) {
 
 			return;
 		}

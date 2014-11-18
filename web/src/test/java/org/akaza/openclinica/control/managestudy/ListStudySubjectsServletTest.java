@@ -202,6 +202,13 @@ public class ListStudySubjectsServletTest {
 		listStudySubjectsServlet.mayProceed(request, response);
 		Assert.assertNull(request.getAttribute("pageMessages"));
 	}
+	
+	@Test
+	public void testThatListStudySubjectServletGrantsAccessToSiteMonitor() throws InsufficientPermissionException {
+		currentRole.setRole(Role.SITE_MONITOR);
+		listStudySubjectsServlet.mayProceed(request, response);
+		Assert.assertNull(request.getAttribute("pageMessages"));
+	}
 
 	@Test
 	public void testThatListStudySubjectServletGrantAccessToCRC() throws InsufficientPermissionException {

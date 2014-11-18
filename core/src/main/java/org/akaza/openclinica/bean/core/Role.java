@@ -29,7 +29,7 @@ import java.util.ResourceBundle;
 
 /**
  * User role types container.
- *
+ * 
  */
 
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
@@ -45,9 +45,10 @@ public final class Role extends Term {
 	public static final Role STUDY_MONITOR = new Role(6, "study_monitor", "Study_Monitor");
 	public static final Role STUDY_CODER = new Role(7, "study_coder", "study_coder");
 	public static final Role STUDY_EVALUATOR = new Role(8, "study_evaluator", "study_evaluator");
+	public static final Role SITE_MONITOR = new Role(9, "site_monitor", "site_monitor");
 
 	private static final Role[] MEMBERS = { SYSTEM_ADMINISTRATOR, STUDY_ADMINISTRATOR, STUDY_DIRECTOR, STUDY_MONITOR,
-			INVESTIGATOR, CLINICAL_RESEARCH_COORDINATOR, STUDY_CODER, STUDY_EVALUATOR };
+			INVESTIGATOR, CLINICAL_RESEARCH_COORDINATOR, STUDY_CODER, STUDY_EVALUATOR, SITE_MONITOR };
 	public static final List MEMBERS_LIST = Arrays.asList(MEMBERS);
 
 	public static final Map ROLE_MAP = new LinkedHashMap();
@@ -62,7 +63,8 @@ public final class Role extends Term {
 		ROLE_MAP.put(index++, "Clinical_Research_Coordinator");
 		ROLE_MAP.put(index++, "Study_Monitor");
 		ROLE_MAP.put(index++, "study_coder");
-		ROLE_MAP.put(index, "study_evaluator");
+		ROLE_MAP.put(index++, "study_evaluator");
+		ROLE_MAP.put(index, "site_monitor");
 	}
 
 	static {
@@ -74,7 +76,8 @@ public final class Role extends Term {
 		ROLE_MAP_WITH_DESCRIPTION.put(index++, "Clinical_Research_Coordinator");
 		ROLE_MAP_WITH_DESCRIPTION.put(index++, "Study_Monitor");
 		ROLE_MAP_WITH_DESCRIPTION.put(index++, "study_coder");
-		ROLE_MAP_WITH_DESCRIPTION.put(index, "study_evaluator");
+		ROLE_MAP_WITH_DESCRIPTION.put(index++, "study_evaluator");
+		ROLE_MAP_WITH_DESCRIPTION.put(index, "site_monitor");
 	}
 
 	private Role(int id, String name, String description) {
@@ -83,7 +86,7 @@ public final class Role extends Term {
 
 	/**
 	 * Prepare role description for user role localisation.
-	 *
+	 * 
 	 * @param resterm
 	 *            Res term dictionary.
 	 */
@@ -108,7 +111,7 @@ public final class Role extends Term {
 
 	/**
 	 * Get role by role id.
-	 *
+	 * 
 	 * @param id
 	 *            role id.
 	 * @return Role bean.
@@ -119,7 +122,7 @@ public final class Role extends Term {
 
 	/**
 	 * Find role by role name.
-	 *
+	 * 
 	 * @param name
 	 *            role name.
 	 * @return Role bean.
@@ -137,7 +140,7 @@ public final class Role extends Term {
 
 	/**
 	 * Returns list with all role beans.
-	 *
+	 * 
 	 * @return list with role beans.
 	 */
 	public static ArrayList toArrayList() {
@@ -146,7 +149,7 @@ public final class Role extends Term {
 
 	/**
 	 * Pick the higher role.
-	 *
+	 * 
 	 * @param r1
 	 *            the first role for comparing.
 	 * @param r2
@@ -166,5 +169,16 @@ public final class Role extends Term {
 			return r1;
 		}
 		return r2;
+	}
+
+	/**
+	 * Checks if role is monitor role.
+	 * 
+	 * @param role
+	 *            Role to check
+	 * @return true if yes, false otherwise
+	 */
+	public static boolean isMonitor(Role role) {
+		return role.equals(Role.STUDY_MONITOR) || role.equals(Role.SITE_MONITOR);
 	}
 }

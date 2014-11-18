@@ -66,8 +66,8 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 						|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
 						|| currentRole.getRole().equals(Role.STUDY_DIRECTOR)
 						|| currentRole.getRole().equals(Role.INVESTIGATOR)
-						|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || currentRole.getRole()
-						.equals(Role.STUDY_MONITOR))) {
+						|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || Role
+							.isMonitor(currentRole.getRole()))) {
 			return;
 		}
 

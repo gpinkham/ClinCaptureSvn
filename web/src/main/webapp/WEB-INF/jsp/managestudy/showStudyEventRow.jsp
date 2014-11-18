@@ -40,7 +40,7 @@
             <td>&nbsp;</td>
         </tr>
 
-        <c:if test="${(studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && !currRow.bean.studyEvent.status.deleted && currRow.bean.studyEvent.editable) && (study.status.available)}">
+        <c:if test="${(studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && !currRow.bean.studyEvent.status.deleted && currRow.bean.studyEvent.editable) && (study.status.available) and userRole.id ne 6 and userRole.id ne 9}">
             <tr class="innerTable">
                 <td>
                     <a href="UpdateStudyEvent?event_id=<c:out value="${currRow.bean.studyEvent.id}"/>&ss_id=<c:out value="${studySub.id}"/>"
@@ -131,7 +131,7 @@
                 <c:if test="${dedc.edc.requiredCRF}">
                     <span style="color: orange">*</span>
                 </c:if>
-                <c:if test="${(dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6)}">
+                <c:if test="${(dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6 or userRole.role.id eq 9)}">
                     <img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/>
                 </c:if>
             </td>
@@ -259,7 +259,7 @@
                     <tr class="innerTable">
                         <td>
                             <c:choose>
-                                <c:when test="${!dedc.status.locked && currRow.bean.studyEvent.subjectEventStatus.name != 'locked' && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6}">
+                                <c:when test="${!dedc.status.locked && currRow.bean.studyEvent.subjectEventStatus.name != 'locked' && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
                                     <ui:dataEntryLink object="${dedc}" rowCount="${rowCount}" actionQueryTail="${currRow.bean.studyEvent.id}${dedc.edc.crf.id}" onClickFunction="setAccessedObjected(this); checkCRFLockedInitial"  imgAlign="right" imgHSpace="6"/>
                                 </c:when>
                                 <c:otherwise>
@@ -287,7 +287,7 @@
                                     alt="<fmt:message key="print" bundle="${resword}"/>"
                                     title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
                         </td>
-                        <c:if test="${dedc.eventCRF.id == 0 and dedc.eventCRF.notStarted && userRole.id == 6 || userRole.id == 4 || userRole.id == 2  || userRole.id == 1}">
+                        <c:if test="${dedc.eventCRF.id == 0 and dedc.eventCRF.notStarted && (userRole.id == 9 || userRole.id == 6 || userRole.id == 4 || userRole.id == 2  || userRole.id == 1)}">
                             <td><img src="images/bt_Transparent.gif" border="0" hspace="6"></td>
                             <td><img src="images/bt_Transparent.gif" border="0" hspace="6"></td>
                             <td><img src="images/bt_Transparent.gif" border="0" hspace="6"></td>
@@ -322,7 +322,7 @@
     <c:set var="dec" value="${dedc}"/>
     <tr class="innerTable">
         <td class="table_cell_border" width="180px"><c:out value="${dec.eventCRF.crf.name}"/> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if
-                test="${(dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6)}">
+                test="${(dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6 or userRole.role.id eq 9)}">
             <img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
         <td class="table_cell_border" width="60px"><c:out value="${dec.eventCRF.crfVersion.name}"/></td>
         <td class="table_cell_border" bgcolor="#F5F5F5" align="center" width="20">
@@ -396,7 +396,7 @@
                 <tr valign="top" class="innerTable <c:if test='${dec.eventDefinitionCRF.hideCrf and study.parentStudyId > 0}'>hidden</c:if>">
                     <td>
                         <c:choose>
-                            <c:when test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6}">
+                            <c:when test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6 && userRole.role.id ne 9}">
                                 <ui:dataEntryLink object="${dec}" actionQueryTail="?eventCRFId=${dec.eventCRF.id}&exitTo=ViewStudySubject?id=${studySub.id}" imgAlign="left" imgHSpace="6" onClickFunction="setAccessedObjected(this); checkCRFLocked"/>
                                 <%-- locked status here --%>
                                 <c:if test="${dec.locked || dec.eventCRF.status.locked || dec.stage.locked || currRow.bean.studyEvent.subjectEventStatus.locked}">
@@ -443,7 +443,7 @@
                             </c:if>
                         </c:when>
                         <c:otherwise>
-                            <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 && (studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (study.status.available)}">
+                            <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 && (studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (study.status.available)}">
                                 <td>
                                     <a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
                                        onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
@@ -461,12 +461,12 @@
                             </c:if>
                         </c:otherwise>
                     </c:choose>
-                    <c:if test="${!dec.eventCRF.status.deleted && userRole.id == 6}">
+                    <c:if test="${!dec.eventCRF.status.deleted && (userRole.id == 6 or userRole.id == 9)}">
                         <td>
                             <img src="images/bt_Transparent.gif" border="0" hspace="6">
                         </td>
                     </c:if>
-                    <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6  and (studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (study.status.available) && (!dec.locked) && (!dec.stage.locked)}">
+                    <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 and (studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (study.status.available) && (!dec.locked) && (!dec.stage.locked)}">
                         <td>
                             <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
                                onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
@@ -510,7 +510,7 @@
                         <c:otherwise>
                             <td width="150px">
                                 <img src="images/bt_Transparent.gif" border="0" hspace="6">
-                                <c:if test="${userRole.id == 6 or userRole.id == 2 or userRole.id == 1}">
+                                <c:if test="${userRole.id == 9 or userRole.id == 6 or userRole.id == 2 or userRole.id == 1}">
                                     <img src="images/bt_Transparent.gif" border="0" hspace="6">
                                     <img src="images/bt_Transparent.gif" border="0" hspace="6">
                                 </c:if>

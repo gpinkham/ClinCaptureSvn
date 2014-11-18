@@ -361,7 +361,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 			if (!"removed".equalsIgnoreCase(studySub.getStatus().getName())
 					&& !"auto-removed".equalsIgnoreCase(studySub.getStatus().getName())) {
-				if (currentStudy.getStatus().isAvailable() && !currentRole.getRole().equals(Role.STUDY_MONITOR)) {
+				if (currentStudy.getStatus().isAvailable() && !Role.isMonitor(currentRole.getRole())) {
 
 					request.setAttribute("link_schedule_new_event",
 							"CreateNewStudyEvent?" + CreateNewStudyEventServlet.INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT

@@ -20,6 +20,13 @@
  */
 package org.akaza.openclinica.control.extract;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -29,18 +36,12 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DatasetRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 @Component
@@ -68,34 +69,56 @@ public class RestoreDatasetServlet extends Controller {
 			request.setAttribute("table", getDatasetTable(request));
 			forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
 		} else {
+			UserAccountBean ub = getUserAccountBean(request);
+			StudyBean currentStudy = getCurrentStudy(request);
+			StudyDAO sdao = getStudyDAO();
+			StudyBean study = (StudyBean) sdao.findByPK(dataset.getStudyId());
+			checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
+			if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
+				addPageMessage(
+						respage.getString("no_have_correct_privilege_current_study") + " "
+								+ respage.getString("change_active_study_or_contact"), request);
+				throw new InsufficientPermissionException(Page.MENU,
+						resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+			}
+
+			if (!ub.isSysAdmin() && (dataset.getOwnerId() != ub.getId())) {
+				addPageMessage(
+						respage.getString("no_have_correct_privilege_current_study") + " "
+								+ respage.getString("change_active_study_or_contact"), request);
+				throw new InsufficientPermissionException(Page.MENU,
+						resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+			}
 			request.setAttribute("dataset", dataset);
 			forwardPage(Page.RESTORE_DATASET, request, response);
 		}
 	}
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
-			return;// TODO limit to owner only?
+			return;
 		}
 		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
-				|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
+				|| currentRole.getRole().equals(Role.INVESTIGATOR) || Role.isMonitor(currentRole.getRole())) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_restore_dataset"), "1");
 
 	}
 
 	private EntityBeanTable getDatasetTable(HttpServletRequest request) {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		FormProcessor fp = new FormProcessor(request);
 

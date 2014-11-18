@@ -669,7 +669,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			// is done
 
 			Role r = currentRole.getRole();
-			if (r.equals(Role.STUDY_MONITOR) || r.equals(Role.INVESTIGATOR)
+			if (Role.isMonitor(r) || r.equals(Role.INVESTIGATOR)
 					|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_ADMINISTRATOR)) { // investigator
 				request.setAttribute("unlock", "1");
 				logger.debug("set UNLOCK to ONE");

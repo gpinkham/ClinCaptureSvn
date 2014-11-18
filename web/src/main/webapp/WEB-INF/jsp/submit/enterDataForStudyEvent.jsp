@@ -280,7 +280,7 @@
 		<c:if test="${dedc.edc.requiredCRF}">
 			<span style="color: orange">*</span>
 		</c:if> 
-		<c:if test="${(dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6)}">
+		<c:if test="${(dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6 or userRole.role.id eq 9)}">
 			<img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/>
 		</c:if>
 	</td>
@@ -401,7 +401,7 @@
 					<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4"/>
                 </c:when>
 
-                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && userRole.role.id ne 6}">
+                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
                     <ui:dataEntryLink object="${dedc}" rowCount="${rowCount}" actionQueryTail="${studyEvent.id}${dedc.edc.crf.id}" onClickFunction="checkCRFLockedInitial"/>
                 </c:when>
 
@@ -444,7 +444,7 @@
 <c:set var="dec" value="${dedc}"/>
 
 <tr>
-<td class="table_cell"><c:out value="${dec.eventCRF.crf.name}" /> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${(dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6)}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
+<td class="table_cell"><c:out value="${dec.eventCRF.crf.name}" /> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${(dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6 or userRole.role.id eq 9)}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
 <td class="table_cell"><c:out value="${dec.eventCRF.crfVersion.name}" />&nbsp;</td>
 <td class="table_cell" bgcolor="#F5F5F5" align="center">
 
@@ -527,7 +527,7 @@
                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
               ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="4"></a>
 
-            <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and (studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed') && (study.status.available)}">
+            <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and (studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed') && (study.status.available)}">
                 <a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                    onMouseDown="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
                    onMouseUp="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
@@ -555,7 +555,7 @@
         </c:when>
         <c:otherwise>
 			<c:choose>
-            <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && userRole.role.id ne 6}">
+            <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && userRole.role.id ne 6 and userRole.role.id ne 9}">
                 <ui:dataEntryLink object="${dec}" actionQueryTail="?eventCRFId=${dec.eventCRF.id}"/>
                 <c:if test="${dec.locked || dec.eventCRF.status.locked || dec.stage.locked || currRow.bean.studyEvent.subjectEventStatus.locked}">
 				    <img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
@@ -625,7 +625,9 @@
     <input type="hidden" name="id" value="<c:out value="${studySubject.id}"/>" />
     <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
     <input type="button" name="BTN_BackToSV" id="GoToSV" value="<fmt:message key="view_subject_record2" bundle="${resword}"/>" class="button_long" onClick="window.location.href = 'ViewStudySubject?id=${studySubject.id}';"/>
-    <input type="button" name="BTN_Schedule" id="ScheduleEvent" value="<fmt:message key="schedule_event" bundle="${resword}"/>" class="button_long" onClick="javascript: window.location.href=('CreateNewStudyEvent?studySubjectId=<c:out value="${studySubject.id}"/>&studyEventDefinition=<c:out value="${studyEvent.studyEventDefinition.id}"/>');">
+    <c:if test="${userRole.id ne 6 and userRole.id ne 9}">
+    	<input type="button" name="BTN_Schedule" id="ScheduleEvent" value="<fmt:message key="schedule_event" bundle="${resword}"/>" class="button_long" onClick="javascript: window.location.href=('CreateNewStudyEvent?studySubjectId=<c:out value="${studySubject.id}"/>&studyEventDefinition=<c:out value="${studyEvent.studyEventDefinition.id}"/>');">
+    </c:if>
 </form>
 <br>
 

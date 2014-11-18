@@ -72,7 +72,7 @@
         <!-- Subject Controls section -->
         <td class="table_header_row" style="white-space: nowrap;">
             <c:choose>
-                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and userRole.id ne 6 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and userRole.id ne 6 and userRole.role.id ne 9 and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol1" value="false"/>
                     <a href="UpdateStudySubject?id=${studySubject.id}&action=show"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_subject" bundle="${resword}"/>" title="<fmt:message key="edit_study_subject" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -84,7 +84,7 @@
             <a href="ViewStudySubject?id=${studySubject.id}"><img src="images/bt_View.gif" border="0" align="left" alt="<fmt:message key="view_subject_record" bundle="${resword}"/>" title="<fmt:message key="view_subject_record" bundle="${resword}"/>" hspace="4"/></a>
 
             <c:choose>
-                <c:when test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and not study.status.frozen and not study.status.locked and not studySubject.status.signed}">
+                <c:when test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and not study.status.frozen and not study.status.locked and not studySubject.status.signed}">
                     <c:set var="insertBlankCell" value="true"/>
                     <c:choose>
                         <c:when test="${not studySubject.status.deleted}">
@@ -105,7 +105,7 @@
             <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
 
             <c:choose>
-                <c:when test="${showSubjectSDVButton and not studySubject.status.deleted and not study.status.frozen and not study.status.locked and (userRole.id eq 6 or userRole.id eq 2 or userRole.id eq 1) and not study.status.frozen and not study.status.locked and ((currentStudy.studyParameterConfig.allowSdvWithOpenQueries eq 'yes') or (currentStudy.studyParameterConfig.allowSdvWithOpenQueries eq 'no' and subjectFlagColor eq null))}">
+                <c:when test="${showSubjectSDVButton and not studySubject.status.deleted and not study.status.frozen and not study.status.locked and (userRole.id eq 9 or userRole.role.id eq 6 or userRole.id eq 2 or userRole.id eq 1) and not study.status.frozen and not study.status.locked and ((currentStudy.studyParameterConfig.allowSdvWithOpenQueries eq 'yes') or (currentStudy.studyParameterConfig.allowSdvWithOpenQueries eq 'no' and subjectFlagColor eq null))}">
                     <c:set var="hideCol5" value="false"/>
                     <a class="sdvLink" href="pages/viewSubjectAggregate?sbb=true&studyId=${studyId}&studySubjectId=&theStudySubjectId=0&redirection=viewSubjectAggregate&maxRows=15&showMoreLink=true&s_sdv_tr_=true&s_sdv_p_=1&s_sdv_mr_=15&s_sdv_f_studySubjectId=${studySubject.label}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -165,7 +165,7 @@
         <td class="table_header_row" style="white-space: nowrap;">
 
             <c:choose>
-                <c:when test="${not(studyEvent.subjectEventStatus.id eq 7 and (userRole.id eq 4 or userRole.id eq 5 or userRole.id eq 6 or userRole.id eq 7)) and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and userRole.id ne 6 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${not(studyEvent.subjectEventStatus.id eq 7 and (userRole.id eq 4 or userRole.id eq 5 or userRole.id eq 6 or userRole.id eq 7 or userRole.role.id eq 9)) and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and userRole.id ne 6 and userRole.role.id ne 9 and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol1" value="false"/>
                     <a href="UpdateStudyEvent?event_id=${studyEvent.id}&ss_id=${studySubject.id}"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_event" bundle="${resword}"/>" title="<fmt:message key="edit_study_event" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -177,7 +177,7 @@
             <a href="EnterDataForStudyEvent?eventId=${studyEvent.id}"><img src="images/bt_View.gif" border="0" align="left" alt="<fmt:message key="view_study_event" bundle="${resword}"/>" title="<fmt:message key="view_study_event" bundle="${resword}"/>" hspace="4"/></a>
 
             <c:choose>
-                <c:when test="${not studySubject.status.deleted and userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${not studySubject.status.deleted and userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and not study.status.frozen and not study.status.locked}">
                     <c:choose>
                         <c:when test="${studyEvent.subjectEventStatus.id ne 10}">
                             <c:set var="hideCol3" value="false"/>
@@ -197,7 +197,7 @@
             <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
 
             <c:choose>
-                <c:when test="${showSDVButton and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (userRole.id eq 6 or userRole.id eq 2 or userRole.id eq 1) and not study.status.frozen and not study.status.locked}">
+                <c:when test="${showSDVButton and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (userRole.id eq 9 or userRole.role.id eq 6 or userRole.id eq 2 or userRole.id eq 1) and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol5" value="false"/>
                     <a class="sdvLink" href="pages/viewAllSubjectSDVtmp?sbb=true&studyId=${studyId}&imagePathPrefix=..%2F&crfId=0&redirection=viewAllSubjectSDVtmp&maxRows=15&showMoreLink=true&sdv_tr_=true&sdv_p_=1&sdv_mr_=15&sdv_f_studySubjectId=${studySubject.label}&sdv_f_eventName=${studyEvent.studyEventDefinition.name}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -303,7 +303,7 @@
                                 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" />
                                     <c:if test="${dedc.edc.requiredCRF}"><span style="color: orange">*</span>
                                     </c:if>
-                                    <c:if test="${(dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6)}">
+                                    <c:if test="${(dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6 or userRole.role.id eq 9)}">
                                         <img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/>
                                     </c:if>
                                 </td>
@@ -434,7 +434,7 @@
                                             <%--<c:when test="${dedc.status.name=='locked'}">--%>
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         </c:when>
-                                        <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && (study.status.available) && !studyEvent.status.deleted && userRole.role.id ne 6}">
+                                        <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && (study.status.available) && !studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
                                             <c:set var="hideCol1" value="false"/>
                                             <ui:dataEntryLink object="${dedc}" rowCount="${rowCount}" actionQueryTail="${studyEvent.id}${dedc.edc.crf.id}" onClickFunction="checkCRFLockedInitial"/>
                                         </c:when>
@@ -479,7 +479,7 @@
                         <c:set var="dec" value="${dedc}"/>
 
                         <tr>
-                            <td class="table_cell_left"><c:out value="${dec.eventCRF.crf.name}" /> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${(dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6)}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
+                            <td class="table_cell_left"><c:out value="${dec.eventCRF.crf.name}" /> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${(dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6 or userRole.role.id eq 9)}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
                             <td class="table_cell_left"><c:out value="${dec.eventCRF.crfVersion.name}" />&nbsp;</td>
                             <td class="table_cell_left"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
                             <td class="table_cell_left ddeColumn">
@@ -562,7 +562,7 @@
                                            onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                           ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="4"></a>
 
-                                        <c:if test="${userRole.id ne 4 && userRole.id ne 5 and userRole.id ne 6 and (studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed') && (study.status.available)}">
+                                        <c:if test="${userRole.id ne 4 && userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and (studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed') && (study.status.available)}">
                                             <c:set var="hideCol3" value="false"/>
                                             <c:set var="hideCol4" value="false"/>
                                             <c:set var="crfSpacersCount" value="4"/>
@@ -589,7 +589,7 @@
                                     </c:when>
                                     <c:otherwise>
                                         <c:set var="enterDataWasInserted" value="false"/>
-                                        <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && userRole.role.id ne 6}">
+                                        <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && userRole.role.id ne 6 and userRole.role.id ne 9}">
                                             <c:set var="hideCol1" value="false"/>
                                             <c:set var="enterDataWasInserted" value="true"/>
                                             <ui:dataEntryLink object="${dec}" actionQueryTail="?eventCRFId=${dec.eventCRF.id}"/>

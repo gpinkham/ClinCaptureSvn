@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * Users privileges container.
- *
+ * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public final class Privilege extends Term {
@@ -38,9 +38,10 @@ public final class Privilege extends Term {
 	public static final Privilege STUDY_MONITOR = new Privilege(5, "study_monitor");
 	public static final Privilege STUDY_CODER = new Privilege(6, "study_coder");
 	public static final Privilege STUDY_EVALUATOR = new Privilege(7, "study_evaluator");
+	public static final Privilege SITE_MONITOR = new Privilege(8, "site_monitor");
 
 	private static final Privilege[] MEMBERS = { SYSTEM_ADMINISTRATOR, STUDY_DIRECTOR, INVESTIGATOR,
-			CLINICAL_RESEARCH_COORDINATOR, STUDY_MONITOR, STUDY_CODER, STUDY_EVALUATOR };
+			CLINICAL_RESEARCH_COORDINATOR, STUDY_MONITOR, STUDY_CODER, STUDY_EVALUATOR, SITE_MONITOR };
 	public static final List MEMBERS_LIST = Arrays.asList(MEMBERS);
 
 	private Privilege(int id, String name) {

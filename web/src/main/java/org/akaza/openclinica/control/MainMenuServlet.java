@@ -309,7 +309,7 @@ public class MainMenuServlet extends Controller {
 						setupListStudySubjectTable(request, response);
 					}
 
-					if (currentRole.getRole() == Role.STUDY_MONITOR) {
+					if (Role.isMonitor(currentRole.getRole())) {
 
 						setupSubjectSDVTable(request);
 					} else if (currentRole.getRole().equals(Role.STUDY_CODER)) {

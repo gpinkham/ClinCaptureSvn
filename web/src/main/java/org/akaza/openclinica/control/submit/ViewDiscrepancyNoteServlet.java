@@ -598,7 +598,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 						dn.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
 					} else if (note.getResStatus().getId() == ResolutionStatus.CLOSED.getId()) {
 						dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
-					} else if (r.equals(Role.STUDY_MONITOR)) {
+					} else if (Role.isMonitor(r)) {
 						dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
 					} else if (dn.getDiscrepancyNoteTypeId() == 1) {
 						dn.setResolutionStatusId(ResolutionStatus.RESOLVED.getId());
@@ -798,7 +798,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			ArrayList types2 = DiscrepancyNoteType.toArrayList();
 			types2.remove(DiscrepancyNoteType.QUERY);
 			request.setAttribute(DIS_TYPES2, types2);
-		} else if (currentRole.getRole().equals(Role.STUDY_MONITOR)) {
+		} else if (Role.isMonitor(currentRole.getRole())) {
 			ArrayList<ResolutionStatus> resStatuses = new ArrayList();
 			resStatuses.add(ResolutionStatus.OPEN);
 			resStatuses.add(ResolutionStatus.UPDATED);

@@ -199,7 +199,7 @@ public class AccessFileServlet extends Controller {
 			return;
 		}
 		if (currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)
-				|| currentRole.getRole().equals(Role.STUDY_MONITOR)) {
+				|| Role.isMonitor(currentRole.getRole())) {
 			return;
 		}
 
