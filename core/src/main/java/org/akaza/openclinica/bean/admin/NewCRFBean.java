@@ -354,6 +354,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
 
 	}
 
+	@SuppressWarnings("resource")
 	public void insertToDB() throws OpenClinicaException {
 		/*
 		 * insertToDB() will implement rollback functionality, throwing an error will write the error to the setErrors
@@ -423,7 +424,6 @@ public class NewCRFBean extends Object implements java.io.Serializable {
 				rs = ps.executeQuery();
 				if (rs.next()) {
 					if (rs.wasNull()) {
-
 						String sql2 = digester.getQuery("updateDefaultVersion");
 						ps = con.prepareStatement(sql2);
 						ps.setInt(1, crfId);

@@ -17,7 +17,6 @@ import java.util.List;
  * A select row filter for a table that binds to the CRF names in the database.
  * 
  */
-@SuppressWarnings({ "unused" })
 public class CRFFilter extends DroplistFilterEditor {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(StudyEventTableRowFilter.class);
