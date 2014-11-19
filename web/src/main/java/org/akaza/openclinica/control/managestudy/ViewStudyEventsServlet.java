@@ -97,13 +97,14 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		if (shouldRedirect(request, response)) {
+		FormProcessor fp = new FormProcessor(request);
+		if (fp.getString(PRINT).isEmpty() && shouldRedirect(request, response)) {
 			return;
 		}
 		StudyBean currentStudy = getCurrentStudy(request);
 		SimpleDateFormat localDf = getLocalDf(request);
 
-		FormProcessor fp = new FormProcessor(request);
+
 		// checks which module requests are from
 		String module = fp.getString(MODULE);
 		request.setAttribute(MODULE, module);
@@ -146,7 +147,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		request.setAttribute(INPUT_STARTDATE, localDf.format(startDate));
 		request.setAttribute(INPUT_ENDDATE, localDf.format(endDate));
 
-		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
+		Validator v = getValidator(request);
 		v.addValidation(INPUT_STARTDATE, Validator.IS_A_DATE);
 		v.addValidation(INPUT_ENDDATE, Validator.IS_A_DATE);
 		HashMap errors = v.validate();
@@ -375,7 +376,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 			// find the first lastCompletionDate
 			for (Object event1 : events) {
 				StudyEventBean se = (StudyEventBean) event1;
-				if (se.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
+				if (se.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED) && se.getDateEnded() != null) {
 					lastCompletionDate = se.getDateEnded();
 					break;
 				}
@@ -400,7 +401,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 					subjectCompleted++;
 					if (lastCompletionDate == null) {
 						lastCompletionDate = se.getDateEnded();
-					} else if (se.getDateEnded().after(lastCompletionDate)) {
+					} else if (se.getDateEnded() != null && se.getDateEnded().after(lastCompletionDate)) {
 						lastCompletionDate = se.getDateEnded();
 					}
 				} else if (se.getSubjectEventStatus().getId() > SubjectEventStatus.COMPLETED.getId()) {
@@ -511,5 +512,9 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
+	}
+
+	private Validator getValidator(HttpServletRequest request) {
+		return new Validator(new ValidatorHelper(request, getConfigurationDao()));
 	}
 }
