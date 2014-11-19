@@ -1,4 +1,20 @@
+/*******************************************************************************
+ * CLINOVO RESERVES ALL RIGHTS TO THIS SOFTWARE, INCLUDING SOURCE AND DERIVED BINARY CODE. BY DOWNLOADING THIS SOFTWARE YOU AGREE TO THE FOLLOWING LICENSE:
+ * 
+ * Subject to the terms and conditions of this Agreement including, Clinovo grants you a non-exclusive, non-transferable, non-sublicenseable limited license without license fees to reproduce and use internally the software complete and unmodified for the sole purpose of running Programs on one computer. 
+ * This license does not allow for the commercial use of this software except by IRS approved non-profit organizations; educational entities not working in joint effort with for profit business.
+ * To use the license for other purposes, including for profit clinical trials, an additional paid license is required. Please contact our licensing department at http://www.clinovo.com/contact for pricing information.
+ * 
+ * You may not modify, decompile, or reverse engineer the software.
+ * Clinovo disclaims any express or implied warranty of fitness for use. 
+ * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
+ * THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. CLINOVO FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
+
+ * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
+ *******************************************************************************/
 package org.akaza.openclinica.control.extract;
+
+import static org.junit.Assert.assertNull;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -18,16 +34,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.clinovo.util.SessionUtil;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-public class AccessFileServletTest {
-
-	public static final String URL = "http://www.site.com/clincapture/AccessFile?fid=123";
+public class SelectItemsServletTest {
 
 	private MockHttpServletRequest request;
 	private MockHttpServletResponse response;
-	private AccessFileServlet accessFileServlet;
+	private SelectItemsServlet servlet;
 	private UserAccountBean currentUser;
 	private StudyUserRoleBean currentRole;
 
@@ -35,34 +46,26 @@ public class AccessFileServletTest {
 	public void setUp() throws Exception {
 		request = new MockHttpServletRequest();
 		response = new MockHttpServletResponse();
-		accessFileServlet = Mockito.mock(AccessFileServlet.class);
+		servlet = Mockito.mock(SelectItemsServlet.class);
 		currentUser = new UserAccountBean();
 		currentRole = new StudyUserRoleBean();
-		request.getSession().setAttribute("redirectAfterLogin", URL);
-		Mockito.doCallRealMethod().when(accessFileServlet).processRequest(request, response);
-		Mockito.doCallRealMethod().when(accessFileServlet).mayProceed(request, response);
-		Mockito.when(accessFileServlet.getCurrentRole(request)).thenReturn(currentRole);
-		Mockito.when(accessFileServlet.getUserAccountBean(request)).thenReturn(currentUser);
-		
+		Mockito.when(servlet.getCurrentRole(request)).thenReturn(currentRole);
+		Mockito.when(servlet.getUserAccountBean(request)).thenReturn(currentUser);
+		Mockito.doCallRealMethod().when(servlet).mayProceed(request, response);
+
 		Locale locale = new Locale("en");
 		SessionUtil.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
-		Whitebox.setInternalState(accessFileServlet, "respage", respage);
-		Whitebox.setInternalState(accessFileServlet, "resexception", resexception);
+		Whitebox.setInternalState(servlet, "respage", respage);
+		Whitebox.setInternalState(servlet, "resexception", resexception);
 	}
 
 	@Test
-	public void testThatProcessRequestDoesRedirectToMainMenuIfAttributeRedirectAfterLoginIsPresent() throws Exception {
-		accessFileServlet.processRequest(request, response);
-		assertTrue(response.getHeader("Location").equals("/MainMenu"));
-	}
-	
-	@Test
 	public void testThatSysAdminCanProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.SYSADMIN);
-		accessFileServlet.mayProceed(request, response);
+		servlet.mayProceed(request, response);
 		assertNull(request.getAttribute("pageMessages"));
 	}
 
@@ -70,7 +73,7 @@ public class AccessFileServletTest {
 	public void testThatAdminUserCanProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.SYSADMIN);
 		currentRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
-		accessFileServlet.mayProceed(request, response);
+		servlet.mayProceed(request, response);
 		assertNull(request.getAttribute("pageMessages"));
 	}
 
@@ -78,31 +81,31 @@ public class AccessFileServletTest {
 	public void testThatStudyAdminUserCanProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);
 		currentRole.setRole(Role.STUDY_ADMINISTRATOR);
-		accessFileServlet.mayProceed(request, response);
+		servlet.mayProceed(request, response);
 		assertNull(request.getAttribute("pageMessages"));
 	}
-	
+
 	@Test
 	public void testThatInvestigatorCanProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);
 		currentRole.setRole(Role.INVESTIGATOR);
-		accessFileServlet.mayProceed(request, response);
+		servlet.mayProceed(request, response);
 		assertNull(request.getAttribute("pageMessages"));
 	}
-	
+
 	@Test
 	public void testThatStudyMonitorCanProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);
 		currentRole.setRole(Role.STUDY_MONITOR);
-		accessFileServlet.mayProceed(request, response);
+		servlet.mayProceed(request, response);
 		assertNull(request.getAttribute("pageMessages"));
 	}
-	
+
 	@Test
 	public void testThatSiteMonitorCanProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);
 		currentRole.setRole(Role.SITE_MONITOR);
-		accessFileServlet.mayProceed(request, response);
+		servlet.mayProceed(request, response);
 		assertNull(request.getAttribute("pageMessages"));
 	}
 
@@ -110,6 +113,6 @@ public class AccessFileServletTest {
 	public void testThatUnAuthorizedNonAdminUserCannotProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);
 		currentRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
-		accessFileServlet.mayProceed(request, response);
+		servlet.mayProceed(request, response);
 	}
 }

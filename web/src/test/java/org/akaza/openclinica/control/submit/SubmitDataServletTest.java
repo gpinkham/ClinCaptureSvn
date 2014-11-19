@@ -77,4 +77,58 @@ public class SubmitDataServletTest {
 		Mockito.when(userRole.getRole()).thenReturn(Role.STUDY_EVALUATOR);
 		assertTrue(SubmitDataServlet.maySubmitData(userBean, userRole));
 	}
+
+	@Test
+	public void testThatSystemAdministratorMayViewData() {
+		Mockito.when(userRole.getRole()).thenReturn(Role.SYSTEM_ADMINISTRATOR);
+		assertTrue(SubmitDataServlet.mayViewData(userBean, userRole));
+	}
+
+	@Test
+	public void testThatStudyAdministratorMayViewData() {
+		Mockito.when(userRole.getRole()).thenReturn(Role.STUDY_ADMINISTRATOR);
+		assertTrue(SubmitDataServlet.mayViewData(userBean, userRole));
+	}
+
+	@Test
+	public void testThatStudyDirectorMayViewData() {
+		Mockito.when(userRole.getRole()).thenReturn(Role.STUDY_DIRECTOR);
+		assertTrue(SubmitDataServlet.mayViewData(userBean, userRole));
+	}
+
+	@Test
+	public void testThatStudyCoderMayViewData() {
+		Mockito.when(userRole.getRole()).thenReturn(Role.STUDY_CODER);
+		assertTrue(SubmitDataServlet.mayViewData(userBean, userRole));
+	}
+
+	@Test
+	public void testThatStudyMonitorMayViewData() {
+		Mockito.when(userRole.getRole()).thenReturn(Role.STUDY_MONITOR);
+		assertTrue(SubmitDataServlet.mayViewData(userBean, userRole));
+	}
+
+	@Test
+	public void testThatSiteMonitorMayViewData() {
+		Mockito.when(userRole.getRole()).thenReturn(Role.SITE_MONITOR);
+		assertTrue(SubmitDataServlet.mayViewData(userBean, userRole));
+	}
+
+	@Test
+	public void testThatInvestigatorMayViewData() {
+		Mockito.when(userRole.getRole()).thenReturn(Role.INVESTIGATOR);
+		assertTrue(SubmitDataServlet.mayViewData(userBean, userRole));
+	}
+
+	@Test
+	public void testThatClinicalResearchCoordinatorMayViewData() {
+		Mockito.when(userRole.getRole()).thenReturn(Role.CLINICAL_RESEARCH_COORDINATOR);
+		assertTrue(SubmitDataServlet.mayViewData(userBean, userRole));
+	}
+
+	@Test
+	public void testThatStudyEvaluatorMayViewData() {
+		Mockito.when(userRole.getRole()).thenReturn(Role.STUDY_EVALUATOR);
+		assertTrue(SubmitDataServlet.mayViewData(userBean, userRole));
+	}
 }
