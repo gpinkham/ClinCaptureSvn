@@ -107,7 +107,7 @@ onload="TabsForwardByNum(<c:out value="${tabId}"/>);<jsp:include page="../includ
             <table border="0" cellpadding="0" cellspacing="0" class="header">
                 <tr>
                     <td valign="top">
-                        <div class="disabled_header"><img src="images/spacer.gif"></img></div>
+                        <div class="disabled_header"><img src="<c:url value='/images/spacer.gif'/>"></img></div>
                         <!-- *JSP* ${pageContext.page['class'].simpleName} -->
                         <div class="logo"><img src="<c:url value='/images/Logo.gif'/>"></div>
                         <!-- Main Navigation -->

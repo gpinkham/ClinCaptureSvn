@@ -68,7 +68,7 @@
 				javascript:setImage('ExpandIcon_<c:out value="${subjectName}"/>_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>','images/icon_collapse.gif');" onclick="layersShowOrHide('hidden','Lock_all'); 
 				layersShowOrHide('hidden','Event_<c:out value="${subjectName}"/>_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');
 				layersShowOrHide('hidden','Lock_<c:out value="${subjectName}"/>_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');
-				javascript:setImage('ExpandIcon_<c:out value="${subjectName}"/>_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>','images/icon_blank.gif');"><img src="images/spacer.gif" border="0" height="30" width="50"></a>
+				javascript:setImage('ExpandIcon_<c:out value="${subjectName}"/>_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>','images/icon_blank.gif');"><img src="<c:url value='/images/spacer.gif'/>" border="0" height="30" width="50"></a>
 			  
 </div>
 		

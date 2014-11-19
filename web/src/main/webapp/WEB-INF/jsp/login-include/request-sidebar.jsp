@@ -81,7 +81,7 @@ function reportBug(versionNumber) {
 
 <!-- End Sidebar Contents -->
 
-				<br><img src="images/spacer.gif" width="160" height="1">
+				<br><img src="<c:url value='/images/spacer.gif'/>" width="160" height="1">
 
 				</td>
 				<td class="content" valign="top">

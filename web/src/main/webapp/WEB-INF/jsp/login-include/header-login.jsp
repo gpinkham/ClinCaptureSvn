@@ -196,7 +196,7 @@
 		</td>
 	   </tr>
 	   <tr>
-		<td colspan="3" height="1" bgcolor="#"><img src="images/spacer.gif" width="1" height="1"></td>
+		<td colspan="3" height="1" bgcolor="#"><img src="<c:url value='/images/spacer.gif'/>" width="1" height="1"></td>
 	   </tr>
 	</table>
 	<table border="0" cellpadding="20" cellspacing="0" width="100%">

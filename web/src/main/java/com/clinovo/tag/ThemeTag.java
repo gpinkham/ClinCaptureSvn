@@ -39,6 +39,8 @@ public class ThemeTag extends TagSupport {
 		}
 		html = html.concat("<link rel=\"stylesheet\" href=\"").concat(pageContext.getServletContext().getContextPath())
 				.concat("/includes/css/charts_").concat(newThemeColor).concat(".css\" type=\"text/css\"/>");
+		html = html.concat("<link rel=\"stylesheet\" href=\"").concat(pageContext.getServletContext().getContextPath())
+				.concat("/includes/css/styles_").concat(newThemeColor).concat(".css\" type=\"text/css\"/>");
 		JspWriter writer = pageContext.getOut();
 		try {
 			writer.write(html);

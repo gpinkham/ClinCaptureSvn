@@ -42,7 +42,7 @@
 	    onClick="layersShowOrHide('hidden','Lock_all'); 
 		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
 		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Complete.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Complete.gif');"><img src="<c:url value='/images/spacer.gif'/>" width="144" height="30" border="0"></a>
 
 		
   </c:when>
@@ -54,7 +54,7 @@
 	    onClick="layersShowOrHide('hidden','Lock_all'); 
 		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
 		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_InitialDEcomplete.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_InitialDEcomplete.gif');"><img src="<c:url value='/images/spacer.gif'/>" width="144" height="30" border="0"></a>
 
 		
   </c:when>
@@ -66,7 +66,7 @@
 	    onClick="layersShowOrHide('hidden','Lock_all'); 
 		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
 		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_DDE.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_DDE.gif');"><img src="<c:url value='/images/spacer.gif'/>" width="144" height="30" border="0"></a>
 
 		
   </c:when>
@@ -82,7 +82,7 @@
 	    onClick="layersShowOrHide('hidden','Lock_all'); 
 		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
 		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Scheduled.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Scheduled.gif');"><img src="<c:url value='/images/spacer.gif'/>" width="144" height="30" border="0"></a>
   
   </c:when>
   <c:when test="${crfStatus =='invalid' }">
@@ -92,7 +92,7 @@
 	    onClick="layersShowOrHide('hidden','Lock_all'); 
 		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
 		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Invalid.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Invalid.gif');"><img src="<c:url value='/images/spacer.gif'/>" width="144" height="30" border="0"></a>
   
   </c:when>
   <c:otherwise>
@@ -102,7 +102,7 @@
 	    onClick="layersShowOrHide('hidden','Lock_all'); 
 		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
 		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Started.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Started.gif');"><img src="<c:url value='/images/spacer.gif'/>" width="144" height="30" border="0"></a>
   
   </c:otherwise>
   </c:choose>
