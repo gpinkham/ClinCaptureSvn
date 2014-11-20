@@ -1,5 +1,9 @@
 .DS_Store
 build.properties
+rest/target/
+rest/.project
+rest/.classpath
+rest/.settings/
 core/target/
 core/.project
 core/.classpath
