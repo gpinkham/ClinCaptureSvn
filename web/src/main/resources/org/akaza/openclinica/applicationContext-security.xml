@@ -14,6 +14,7 @@
 
 
 	<security:http pattern="/ws/**" security="none" />
+	<security:http pattern="/rest/**" security="none" />
 	<security:http pattern="/Contact" security="none" />
 	<security:http pattern="/help/**" security="none" />
 	<security:http pattern="/images/**" security="none" />

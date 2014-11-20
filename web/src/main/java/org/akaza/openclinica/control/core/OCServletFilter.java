@@ -19,6 +19,7 @@ package org.akaza.openclinica.control.core;
 import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.log.LoggingConstants;
 import org.slf4j.MDC;
 import org.springframework.web.context.WebApplicationContext;
@@ -83,6 +84,7 @@ public class OCServletFilter implements javax.servlet.Filter {
 		((SessionLocaleResolver) springContext.getBean("localeResolver")).setLocale((HttpServletRequest) request,
 				(HttpServletResponse) response, locale);
 		SessionUtil.updateLocale((HttpServletRequest) request, locale);
+		ResourceBundleProvider.updateLocale(locale);
 
 		((HttpServletRequest) request).getSession().setAttribute("logoUrl", CoreResources.getField("logo"));
 		((HttpServletRequest) request).getSession()

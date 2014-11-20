@@ -59,6 +59,9 @@ public class CoreResources implements ResourceLoaderAware {
 	public static final String UTF_8 = "utf-8";
 
 	public static String PROPERTIES_DIR;
+
+	private static boolean copyODM;
+
 	private ResourceLoader resourceLoader;
 
 	private static Properties dataInfo;
@@ -148,6 +151,7 @@ public class CoreResources implements ResourceLoaderAware {
 					attachedFileLocation != null ? attachedFileLocation.replace("\\", "\\\\") : "");
 
 			setDatabaseProperties(dbType);
+
 			// setup dataSource
 			dataSource = new BasicDataSource();
 			dataSource.setUrl(dataInfo.getProperty("url"));
@@ -233,7 +237,9 @@ public class CoreResources implements ResourceLoaderAware {
 				loadSystemProperties();
 				if (extractInfo != null) {
 					copyBaseToDest(resourceLoader);
-					copyODMMappingXMLtoResources(resourceLoader);
+					if (copyODM) {
+						copyODMMappingXMLtoResources(resourceLoader);
+					}
 					extractProperties = findExtractProperties();
 					// JN: this is in for junits to run without extract props
 					copyImportRulesFiles();
@@ -862,5 +868,9 @@ public class CoreResources implements ResourceLoaderAware {
 
 	public static void setShouldBeRestarted(boolean shouldBeRestarted) {
 		CoreResources.shouldBeRestarted = shouldBeRestarted;
+	}
+
+	public static void setCopyODM(boolean copyODM) {
+		CoreResources.copyODM = copyODM;
 	}
 }

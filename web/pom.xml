@@ -33,6 +33,10 @@
 			<groupId>com.clinovo.clincapture</groupId>
 			<artifactId>medical-coding</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.clinovo.clincapture</groupId>
+			<artifactId>rest</artifactId>
+		</dependency>
         <dependency>
             <groupId>com.clinovo.clincapture</groupId>
             <artifactId>core</artifactId>

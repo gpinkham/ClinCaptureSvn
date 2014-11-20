@@ -20,6 +20,13 @@
  */
 package org.akaza.openclinica.dao.core;
 
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.CacheManager;
+import org.akaza.openclinica.dao.cache.EhCacheWrapper;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.xml.sax.SAXException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,14 +34,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
-
-import org.akaza.openclinica.dao.cache.EhCacheWrapper;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.xml.sax.SAXException;
-
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.CacheManager;
 
 /**
  * Provides a singleton SQLFactory instance
@@ -94,22 +93,6 @@ public class SQLFactory {
 
 	public void setEhCacheWrapper(EhCacheWrapper ehCacheWrapper) {
 		this.ehCacheWrapper = ehCacheWrapper;
-	}
-
-	public static String JUNIT_XML_DIR = (System.getProperty("user.dir").indexOf(File.separator + "web") > 0 ? System
-			.getProperty("user.dir").replace(File.separator + "web", "") : System.getProperty("user.dir"))
-			+ (System.getProperty("user.dir").indexOf(File.separator + "core") < 0 ? (File.separator + "core") : "")
-			+ File.separator
-			+ "src"
-			+ File.separator
-			+ "main"
-			+ File.separator
-			+ "resources"
-			+ File.separator
-			+ "properties" + File.separator;
-
-	public static void setXMLDir(String path) {
-		JUNIT_XML_DIR = path;
 	}
 
 	private static Hashtable digesters = new Hashtable();
@@ -213,11 +196,13 @@ public class SQLFactory {
 			DAODigester newDaoDigester = new DAODigester();
 
 			try {
-				if (System.getProperty("catalina.home") == null) {
-					newDaoDigester.setInputStream(new FileInputStream(JUNIT_XML_DIR + DAOFileName));
+				String coreBuildClassesDirectory = System.getProperty("test.core.build.classes");
+				if (coreBuildClassesDirectory != null) {
+					newDaoDigester.setInputStream(new FileInputStream(coreBuildClassesDirectory.concat(File.separator)
+							.concat("properties").concat(File.separator).concat(DAOFileName)));
 				} else {
-					newDaoDigester.setInputStream(resourceLoader.getResource("classpath:properties/" + DAOFileName)
-							.getInputStream());
+					newDaoDigester.setInputStream(resourceLoader.getResource(
+							"classpath:properties/".concat(DAOFileName)).getInputStream());
 				}
 				try {
 					newDaoDigester.run();

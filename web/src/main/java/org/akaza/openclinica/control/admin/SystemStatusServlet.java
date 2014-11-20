@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.PrintWriter;
 import java.util.List;
 
@@ -46,6 +47,7 @@ public class SystemStatusServlet extends Controller {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Long databaseChangelLogCount = getDatabaseChangeLogDao().count();
 		String applicationStatus = "OK";

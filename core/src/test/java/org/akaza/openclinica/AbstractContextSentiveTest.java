@@ -42,7 +42,6 @@ import java.util.Properties;
 		"classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-scheduler.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
-		"classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-security.xml" })
 public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCase {
 
