@@ -1,6 +1,5 @@
 $(window).load(function() {
 	initEnrollStatusPerSiteWidget("init");
-	getEnrollStatusPerSiteLegendValues();
 });
 
 /**
@@ -77,10 +76,7 @@ function initEnrollStatusPerSiteWidget(action) {
 				}
 			});
 			var element = document.getElementById('toolbar');
-			if (element) {
-				$(".enrollment_status_per_site .chart_wrapper a").attr("href", "#");
-				$(".enrollment_status_per_site .bar_name a").attr("href", "#");
-			} else {
+			if (!element) {
 				activateEnrollStatusPerSiteLegend();
 			}
 		},
@@ -98,16 +94,32 @@ function activateEnrollStatusPerSiteLegend() {
 	var urlPrefix = "ListStudySubjects?module=admin&maxRows=15&showMoreLink=false&findSubjects_tr_"
 			+ "=true&findSubjects_p_=1&findSubjects_mr_=15&findSubjects_s_0_studySubject.createdDate="
 			+ "desc&findSubjects_f_studySubject.status=";
-	var statuses = [ "available", "removed", "signed", "locked" ];
+	var statuses = [];
+	$("#esps_form .status").each(function(){
+		statuses.push($(this).val());
+	});
 	$(".enrollment_status_per_site .pop-up-visible").css('display', '');
-	$(".enrollment_status_per_site .signs td").each(
+	$($(".enrollment_status_per_site .signs td").get().reverse()).each(
 			function(index) {
 				$(this).click(
 						function() {
-							window.location.href = urlPrefix + statuses[index];
+							window.location.href = urlPrefix + statuses[index].toLowerCase().replace(/\s/g,"+");
 						});
 				$(this).css("cursor", "pointer");
 			});
+	var captionPrefix = "ListStudySubjects?module=admin&maxRows=15&showMoreLink=false&findSubjects_tr_=true&findSubjects_p_=" +
+		"1&findSubjects_mr_=15&findSubjects_s_0_studySubject.createdDate=desc&findSubjects_f_studySubject.status=";
+	var captionSuffix = "&findSubjects_f_enrolledAt=";
+
+	$(".enrollment_status_per_site .stacked_bar a").each(
+		function() {
+			var index = $(this).attr("status-id");
+			var status = statuses[parseInt(index)];
+			var name = $(this).attr("site-oid");
+			var url = captionPrefix + status.toLowerCase().replace(/\s/g,"+") + captionSuffix + name;
+			$(this).attr("href", url);
+		});
+	getEnrollStatusPerSiteLegendValues();
 }
 
 /**
@@ -115,7 +127,10 @@ function activateEnrollStatusPerSiteLegend() {
  */
 function getEnrollStatusPerSiteLegendValues() {
 	var element = document.getElementById('toolbar');
-	var statusNames = [ 'Available', 'Removed', 'Signed', 'Locked'];
+	var statusNames = [];
+	$($("#esps_form .status").get().reverse()).each(function(){
+		statusNames.push($(this).val());
+	});
 	if (!element) {
 		var url = getCurrentUrl();
 		$.ajax({

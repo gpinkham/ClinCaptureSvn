@@ -350,7 +350,7 @@ public class WidgetsLayoutController {
 
 				int eventsWithStatusNoRepeats = studySubjectDAO.getCountWithFilter(listEventsForSubjectFilter, sb);
 
-				countOfSubjectEventStatuses.put(subjectEventStatus.getName().toLowerCase().replaceAll(" ", "_"),
+				countOfSubjectEventStatuses.put(subjectEventStatus.getCode().toLowerCase().replaceAll(" ", "_"),
 						eventsWithStatusNoRepeats);
 
 				countOfSubjectsStartedEvent += eventsWithStatusNoRepeats;
@@ -492,12 +492,12 @@ public class WidgetsLayoutController {
 		for (SubjectEventStatus eventStatus : subjectEventStatuses) {
 			int countOfEventsWithStatus = studyEventDAO.getCountofEventsBasedOnEventStatus(sb, eventStatus);
 			int countOfEventsNoRepeats = studyEventDAO.getCountOfEventsBasedOnEventStatusNoRepeats(sb, eventStatus);
-			mapOfEventsWithStatuses.put(eventStatus.getName(), countOfEventsWithStatus);
+			mapOfEventsWithStatuses.put(eventStatus.getCode(), countOfEventsWithStatus);
 			countOfStartedEvents += countOfEventsNoRepeats;
 		}
 
 		countOfNotStartedEvents = countOfSubject * studyEventDefinitions.size() - countOfStartedEvents;
-		mapOfEventsWithStatuses.put(SubjectEventStatus.NOT_SCHEDULED.getName(), countOfNotStartedEvents);
+		mapOfEventsWithStatuses.put(SubjectEventStatus.NOT_SCHEDULED.getCode(), countOfNotStartedEvents);
 
 		model.addAttribute("studyProgressMap", mapOfEventsWithStatuses);
 
@@ -1078,12 +1078,12 @@ public class WidgetsLayoutController {
 
 			for (Status status : listOfStatuses) {
 				if (status == Status.AUTO_DELETED) {
-					int countOfDeletedSubjects = values.get(Status.DELETED.getName());
+					int countOfDeletedSubjects = values.get(Status.DELETED.getCode());
 					int countOfAutoRemovedSubject = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(site, status);
-					values.put(Status.DELETED.getName(), countOfAutoRemovedSubject + countOfDeletedSubjects);
+					values.put(Status.DELETED.getCode(), countOfAutoRemovedSubject + countOfDeletedSubjects);
 				} else {
 					int countOfSubjectWithStatus = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(site, status);
-					values.put(status.getName(), countOfSubjectWithStatus);
+					values.put(status.getCode(), countOfSubjectWithStatus);
 				}
 			}
 			currentRow.setRowValues(values);

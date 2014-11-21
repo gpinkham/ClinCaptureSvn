@@ -56,5 +56,9 @@
 	</table>
 	<form class="hidden" id="ndsWidgetForm">
 		<input type="hidden" id="cUser" value="${userBean.name}" />
+		<input type="hidden" class="status" value="<fmt:message key='new' bundle='${resword}'/>" />
+		<input type="hidden" class="status" value="<fmt:message key='updated' bundle='${resword}'/>" />
+		<input type="hidden" class="status" value="<fmt:message key='Resolution_Proposed' bundle='${resword}'/>" />
+		<input type="hidden" class="status" value="<fmt:message key='Closed' bundle='${resterm}'/>" />
 	</form>
 </div>

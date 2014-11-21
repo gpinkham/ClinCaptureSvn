@@ -29,12 +29,12 @@
 				<div class="available sign"></div> - <fmt:message bundle="${resword}" key="available" /></td>
 			<td>
 				<div class="popup_legend_medium"><p></p></div>
-				<div class="removed sign"></div> - <fmt:message bundle="${resword}" key="removed" /></td>
-		</tr>
+				<div class="signed sign"></div> - <fmt:message bundle="${resword}" key="subjectEventSigned" /></td>
+			</tr>
 		<tr align="left">
 			<td>
 				<div class="popup_legend_medium"><p></p></div>
-				<div class="signed sign"></div> - <fmt:message bundle="${resword}" key="subjectEventSigned" /></td>		
+				<div class="removed sign"></div> - <fmt:message bundle="${resword}" key="removed" /></td>
 			<td>
 				<div class="popup_legend_medium"><p></p></div>
 				<div class="locked sign"></div> - <fmt:message bundle="${resword}" key="locked" /></td>
@@ -50,6 +50,6 @@
 			</td>
 		</tr> 
 	</table>
-	<div class="hint"><fmt:message bundle="${restext}" key="widget_enrollment_per_site_hint"/></div>
+	<div class="hint" style="display: none"><fmt:message bundle="${restext}" key="widget_enrollment_per_site_hint"/></div>
 </div>
 

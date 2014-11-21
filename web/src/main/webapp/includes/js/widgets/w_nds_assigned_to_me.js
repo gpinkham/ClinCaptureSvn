@@ -54,19 +54,22 @@ function activateNDsWidgetLegend() {
 	var urlPrefix = "ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=";
 	var currentUser = $("form#ndsWidgetForm input#cUser").val();
 	var urlSufix = "&listNotes_f_discrepancyNoteBean.resolutionStatus=";
-	var Statuses = [ "New", "Updated", "Resolution Proposed", "Closed" ];
+	var statuses = [];
+	$(".dns_assigned_to_me .status").each(function(){
+		statuses.push($(this).val());
+	});
 	$(".dns_assigned_to_me .pop-up-visible").css('display', 'table');
 	$(".dns_assigned_to_me .stacked_bar a").each(
 			function(index) {
 				$(this).attr("href",
-						urlPrefix + currentUser + urlSufix + Statuses[index]);
+						urlPrefix + currentUser + urlSufix + statuses[index]);
 			});
 	$(".dns_assigned_to_me .signs td").each(
 			function(index) {
 				$(this).click(
 						function() {
 							window.location.href = urlPrefix + currentUser
-									+ urlSufix + Statuses[index];
+									+ urlSufix + statuses[index];
 						});
 				$(this).css("cursor", "pointer");
 			});
