@@ -116,16 +116,8 @@
             <td align="right">
 
                 <a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)</a>
-                <c:set var="formatLocale"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
                 &nbsp;
-                <c:choose>
-                    <c:when test="${formatLocale == null}">
-                        en
-                    </c:when>
-                    <c:otherwise>
-                        <img src="${urlPrefix}images/flags/${fn:toUpperCase(formatLocale)}.png" alt="${formatLocale}" class="toolbarFlag"/>
-                    </c:otherwise>
-                </c:choose>
+	            <img src="${urlPrefix}images/flags/${fn:toUpperCase(sessionScope["current.session.locale"])}.png" alt="${fn:toUpperCase(sessionScope["current.session.locale"])}" class="toolbarFlag"/>
                 &nbsp;|&nbsp;
                 <a href="${urlPrefix}j_spring_security_logout" onClick="clearLastAccessedObjects();"><fmt:message key="log_out" bundle="${resword}"/></a>
 
