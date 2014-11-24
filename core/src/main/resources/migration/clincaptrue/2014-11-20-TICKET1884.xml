@@ -1,0 +1,17 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="vitaly" id="2014-11-20-TICKET1884">
+		<comment>Insert the study parameter flag to control events autoscheduling for insert rules</comment>
+		<insert tableName="study_parameter">
+			<column name="study_parameter_id" valueNumeric="48" />
+			<column name="handle" value="allowRulesAutoScheduling" />
+			<column name="name" value="allowRulesAutoScheduling" />
+			<column name="description" value="Flag to determine if events should be scheduled with insert rules" />
+			<column name="default_value" value="no" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+	</changeSet>
+</databaseChangeLog>

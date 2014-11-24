@@ -784,6 +784,24 @@
       </td>
   </tr>
 
+  <tr valign="top">
+      <td class="formlabel">
+          <fmt:message key="allowRulesAutoScheduling" bundle="${resword}"/>?
+      </td>
+      <td>
+          <c:choose>
+              <c:when test="${studyToView.studyParameterConfig.allowRulesAutoScheduling == 'yes'}">
+                  <input type="radio" checked name="allowRulesAutoScheduling" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                  <input type="radio" name="allowRulesAutoScheduling" value="no"><fmt:message key="no" bundle="${resword}"/>
+              </c:when>
+              <c:otherwise>
+                  <input type="radio" name="allowRulesAutoScheduling" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                  <input type="radio" checked name="allowRulesAutoScheduling" value="no"><fmt:message key="no" bundle="${resword}"/>
+              </c:otherwise>
+          </c:choose>
+      </td>
+  </tr>
+
   <tr>
       <td>&nbsp;</td>
   </tr>

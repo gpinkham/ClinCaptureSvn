@@ -57,7 +57,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * Processes request to create a new study.
- * @author jxu
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 @Component
@@ -86,6 +85,15 @@ public class CreateStudyServlet extends Controller {
 	public static final String FAC_CONTACT_PHONE = "FacContactPhone";
 
 	public static final String FAC_CONTACT_EMAIL = "FacContactEmail";
+
+	public static final int VALIDATION_NUM1 = 20;
+	public static final int VALIDATION_NUM2 = 30;
+	public static final int VALIDATION_NUM3 = 64;
+	public static final int VALIDATION_NUM4 = 100;
+	public static final int VALIDATION_NUM5 = 255;
+	public static final int VALIDATION_NUM6 = 500;
+	public static final int VALIDATION_NUM7 = 1000;
+	public static final int VALIDATION_NUM8 = 2000;
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -167,16 +175,21 @@ public class CreateStudyServlet extends Controller {
 				response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
 			} else if ("next".equalsIgnoreCase(action)) {
 				Integer pageNumber = Integer.valueOf(request.getParameter("pageNum"));
+				final int page2 = 2;
+				final int page3 = 3;
+				final int page4 = 4;
+				final int page5 = 5;
+				final int page6 = 6;
 				if (pageNumber != null) {
-					if (pageNumber == 6) {
+					if (pageNumber == page6) {
 						confirmStudy6(request, response, errors);
-					} else if (pageNumber == 5) {
+					} else if (pageNumber == page5) {
 						confirmStudy5(request, response, errors);
-					} else if (pageNumber == 4) {
+					} else if (pageNumber == page4) {
 						confirmStudy4(request, response, errors);
-					} else if (pageNumber == 3) {
+					} else if (pageNumber == page3) {
 						confirmStudy3(request, response, errors);
-					} else if (pageNumber == 2) {
+					} else if (pageNumber == page2) {
 						confirmStudy2(request, response, errors);
 					} else {
 						System.out.println("confirm study 1 " + pageNumber);
@@ -199,7 +212,7 @@ public class CreateStudyServlet extends Controller {
 	}
 
 	/**
-	 * Validates the first section of study and save it into study bean
+	 * Validates the first section of study and save it into study bean.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
@@ -221,11 +234,11 @@ public class CreateStudyServlet extends Controller {
 		v.addValidation("sponsor", Validator.NO_BLANKS);
 
 		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("collaborators", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1000);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM7);
 		v.addValidation("protocolDescription", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1000);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM7);
 
 		// check param presents before validation
 		addValidatorIfParamPresented(request, "studySubjectIdLabel", v, Validator.NO_BLANKS);
@@ -250,45 +263,45 @@ public class CreateStudyServlet extends Controller {
 				Validator.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
 			}
 		}
-		if (fp.getString("name").trim().length() > 100) {
+		if (fp.getString("name").trim().length() > VALIDATION_NUM4) {
 			Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
 		}
-		if (fp.getString("uniqueProId").trim().length() > 30) {
+		if (fp.getString("uniqueProId").trim().length() > VALIDATION_NUM2) {
 			Validator.addError(errors, "uniqueProId", resexception.getString("maximum_lenght_unique_protocol_30"));
 		}
-		if (fp.getString("description").trim().length() > 2000) {
+		if (fp.getString("description").trim().length() > VALIDATION_NUM8) {
 			Validator.addError(errors, "description", resexception.getString("maximum_lenght_brief_summary_2000"));
 		}
-		if (fp.getString("prinInvestigator").trim().length() > 255) {
+		if (fp.getString("prinInvestigator").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "prinInvestigator",
 					resexception.getString("maximum_lenght_principal_investigator_255"));
 		}
-		if (fp.getString("sponsor").trim().length() > 255) {
+		if (fp.getString("sponsor").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "sponsor", resexception.getString("maximum_lenght_sponsor_255"));
 		}
-		if (fp.getString("officialTitle").trim().length() > 255) {
+		if (fp.getString("officialTitle").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "officialTitle", resexception.getString("maximum_lenght_official_title_255"));
 		}
-		if (fp.getString("studySubjectIdLabel").trim().length() > 255) {
+		if (fp.getString("studySubjectIdLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "studySubjectIdLabel",
 					resexception.getString("maximum_lenght_studySubjectIdLabel_255"));
 		}
-		if (fp.getString("secondaryIdLabel").trim().length() > 255) {
+		if (fp.getString("secondaryIdLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "secondaryIdLabel",
 					resexception.getString("maximum_lenght_secondaryIdLabel_255"));
 		}
-		if (fp.getString("dateOfEnrollmentForStudyLabel").trim().length() > 255) {
+		if (fp.getString("dateOfEnrollmentForStudyLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "dateOfEnrollmentForStudyLabel",
 					resexception.getString("maximum_lenght_dateOfEnrollmentForStudyLabel_255"));
 		}
-		if (fp.getString("genderLabel").trim().length() > 255) {
+		if (fp.getString("genderLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "genderLabel", resexception.getString("maximum_lenght_genderLabel_255"));
 		}
-		if (fp.getString("startDateTimeLabel").trim().length() > 255) {
+		if (fp.getString("startDateTimeLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "startDateTimeLabel",
 					resexception.getString("maximum_lenght_startDateTimeLabel_255"));
 		}
-		if (fp.getString("endDateTimeLabel").trim().length() > 255) {
+		if (fp.getString("endDateTimeLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "endDateTimeLabel",
 					resexception.getString("maximum_lenght_endDateTimeLabel_255"));
 		}
@@ -362,36 +375,39 @@ public class CreateStudyServlet extends Controller {
 	private void createDefaultDiscrepancyDescriptions(int studyId, HttpServletRequest request) {
 		DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess
 				.getApplicationContext(getServletContext()).getBean("discrepancyDescriptionService");
-		
+		final int dnFailedValidationCheckTypeId = 1;
+		final int dnAnnotationTypeId = 2;
+		final int dnQueryTypeId = 3;
+
 		// create default update discrepancy descriptions
 		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("corrected_CRF_data"), "", studyId, "Study and Site", 1));
+				new DiscrepancyDescription(respage.getString("corrected_CRF_data"), "", studyId, "Study and Site", dnFailedValidationCheckTypeId));
 		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("CRF_data_was_correctly_entered"), "", studyId, "Study and Site", 1));
+				new DiscrepancyDescription(respage.getString("CRF_data_was_correctly_entered"), "", studyId, "Study and Site", dnFailedValidationCheckTypeId));
 		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("need_additional_clarification"), "", studyId, "Study and Site", 1));
+				new DiscrepancyDescription(respage.getString("need_additional_clarification"), "", studyId, "Study and Site", dnFailedValidationCheckTypeId));
 		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("requested_information_is_provided"), "", studyId, "Study and Site", 1));
+				new DiscrepancyDescription(respage.getString("requested_information_is_provided"), "", studyId, "Study and Site", dnFailedValidationCheckTypeId));
 
 		// create default close discrepancy descriptions
 		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("query_response_monitored"), "", studyId, "Study and Site", 2));
+				new DiscrepancyDescription(respage.getString("query_response_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
 		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("CRF_data_change_monitored"), "", studyId, "Study and Site", 2));
+				new DiscrepancyDescription(respage.getString("CRF_data_change_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
 		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("calendared_event_monitored"), "", studyId, "Study and Site", 2));
+				new DiscrepancyDescription(respage.getString("calendared_event_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
 		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("failed_edit_check_monitored"), "", studyId, "Study and Site", 2));	
+				new DiscrepancyDescription(respage.getString("failed_edit_check_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
 
 		// create default RFC discrepancy descriptions
 		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("corrected_CRF_data_entry_error"), "", studyId, "Study and Site", 3));
+				new DiscrepancyDescription(respage.getString("corrected_CRF_data_entry_error"), "", studyId, "Study and Site", dnQueryTypeId));
 		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("source_data_was_missing"), "", studyId, "Study and Site", 3));
+				new DiscrepancyDescription(respage.getString("source_data_was_missing"), "", studyId, "Study and Site", dnQueryTypeId));
 		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("source_data_was_incorrect"), "", studyId, "Study and Site", 3));
+				new DiscrepancyDescription(respage.getString("source_data_was_incorrect"), "", studyId, "Study and Site", dnQueryTypeId));
 		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("information_was_not_available"), "", studyId, "Study and Site", 3));
+				new DiscrepancyDescription(respage.getString("information_was_not_available"), "", studyId, "Study and Site", dnQueryTypeId));
 	}
 
 	private void addValidatorIfParamPresented(HttpServletRequest request, String paramName, Validator v,
@@ -402,7 +418,7 @@ public class CreateStudyServlet extends Controller {
 	}
 
 	/**
-	 * Validates the second section of study info inputs
+	 * Validates the second section of study info inputs.
 	 * 
 	 * @throws Exception
 	 */
@@ -424,7 +440,7 @@ public class CreateStudyServlet extends Controller {
 		boolean isInterventional = updateStudy2(request);
 		request.getSession().setAttribute("isInterventionalFlag", isInterventional);
 
-		SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat localDf = getLocalDf(request);
 
 		if (errors.isEmpty()) {
 			logger.info("no errors");
@@ -438,20 +454,20 @@ public class CreateStudyServlet extends Controller {
 		} else {
 			logger.info("has validation errors");
 			try {
-				local_df.parse(fp.getString(INPUT_START_DATE));
-				fp.addPresetValue(INPUT_START_DATE, local_df.format(fp.getDate(INPUT_START_DATE)));
+				localDf.parse(fp.getString(INPUT_START_DATE));
+				fp.addPresetValue(INPUT_START_DATE, localDf.format(fp.getDate(INPUT_START_DATE)));
 			} catch (ParseException pe) {
 				fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
 			}
 			try {
-				local_df.parse(fp.getString(INPUT_VER_DATE));
-				fp.addPresetValue(INPUT_VER_DATE, local_df.format(fp.getDate(INPUT_VER_DATE)));
+				localDf.parse(fp.getString(INPUT_VER_DATE));
+				fp.addPresetValue(INPUT_VER_DATE, localDf.format(fp.getDate(INPUT_VER_DATE)));
 			} catch (ParseException pe) {
 				fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
 			}
 			try {
-				local_df.parse(fp.getString(INPUT_END_DATE));
-				fp.addPresetValue(INPUT_END_DATE, local_df.format(fp.getDate(INPUT_END_DATE)));
+				localDf.parse(fp.getString(INPUT_END_DATE));
+				fp.addPresetValue(INPUT_END_DATE, localDf.format(fp.getDate(INPUT_END_DATE)));
 			} catch (ParseException pe) {
 				fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 			}
@@ -465,7 +481,7 @@ public class CreateStudyServlet extends Controller {
 	}
 
 	/**
-	 * Confirms the third section of study info inputs
+	 * Confirms the third section of study info inputs.
 	 * 
 	 * @throws Exception
 	 */
@@ -475,7 +491,8 @@ public class CreateStudyServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 
 		v.addValidation("purpose", Validator.NO_BLANKS);
-		for (int i = 0; i < 10; i++) {
+		final int counter = 10;
+		for (int i = 0; i < counter; i++) {
 			String type = fp.getString("interType" + i);
 			String name = fp.getString("interName" + i);
 			if (!StringUtil.isBlank(type) && StringUtil.isBlank(name)) {
@@ -522,7 +539,7 @@ public class CreateStudyServlet extends Controller {
 	}
 
 	/**
-	 * Validates the forth section of study and save it into study bean
+	 * Validates the forth section of study and save it into study bean.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
@@ -536,11 +553,11 @@ public class CreateStudyServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 
 		v.addValidation("conditions", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM6);
 		v.addValidation("keywords", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("eligibility", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM6);
 
 		logger.info("expectedTotalEnrollment:" + fp.getInt("expectedTotalEnrollment"));
 		errors.putAll(v.validate());
@@ -583,7 +600,7 @@ public class CreateStudyServlet extends Controller {
 	}
 
 	/**
-	 * Validates the forth section of study and save it into study bean
+	 * Validates the forth section of study and save it into study bean.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
@@ -599,23 +616,23 @@ public class CreateStudyServlet extends Controller {
 			v.addValidation("facConEmail", Validator.IS_A_EMAIL);
 		}
 		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 20);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM1);
 		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				64);
+				VALIDATION_NUM3);
 		v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM3);
 		v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 
 		errors.putAll(v.validate());
 
@@ -643,7 +660,7 @@ public class CreateStudyServlet extends Controller {
 	}
 
 	/**
-	 * Lets user confirm all the study info entries input
+	 * Lets user confirm all the study info entries input.
 	 * 
 	 * @throws Exception
 	 */
@@ -653,11 +670,11 @@ public class CreateStudyServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		v.addValidation("medlineIdentifier", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("url", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				255);
+				VALIDATION_NUM5);
 		v.addValidation("urlDescription", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 
 		errors.putAll(v.validate());
 
@@ -685,7 +702,7 @@ public class CreateStudyServlet extends Controller {
 	}
 
 	/**
-	 * Lets user confirm all the study info entries input
+	 * Lets user confirm all the study info entries input.
 	 * 
 	 * @throws Exception
 	 */
@@ -757,6 +774,8 @@ public class CreateStudyServlet extends Controller {
 		newStudy.getStudyParameterConfig().setAllowCrfEvaluation(fp.getString("allowCrfEvaluation"));
 		newStudy.getStudyParameterConfig().setEvaluateWithContext(fp.getString("evaluateWithContext"));
 
+		newStudy.getStudyParameterConfig().setAllowRulesAutoScheduling(fp.getString("allowRulesAutoScheduling"));
+
 		request.getSession().setAttribute("newStudy", newStudy);
 
 		if (errors.isEmpty()) {
@@ -774,10 +793,6 @@ public class CreateStudyServlet extends Controller {
 		}
 	}
 
-	/**
-	 * Inserts the new study into database
-	 * 
-	 */
 	private void submitStudy(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 
@@ -969,11 +984,15 @@ public class CreateStudyServlet extends Controller {
 		spv.setValue(newStudy.getStudyParameterConfig().getEvaluateWithContext());
 		spvdao.create(spv);
 
+		spv.setParameter("allowRulesAutoScheduling");
+		spv.setValue(newStudy.getStudyParameterConfig().getAllowRulesAutoScheduling());
+		spvdao.create(spv);
+
 		logger.info("study parameters created done");
 	}
 
 	/**
-	 * Constructs study bean from the first section
+	 * Constructs study bean from the first section.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
@@ -1000,7 +1019,7 @@ public class CreateStudyServlet extends Controller {
 	}
 
 	/**
-	 * Updates the study bean with inputs from the second section
+	 * Updates the study bean with inputs from the second section.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
@@ -1009,11 +1028,7 @@ public class CreateStudyServlet extends Controller {
 	private boolean updateStudy2(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		StudyBean newStudy = (StudyBean) request.getSession().getAttribute("newStudy");
-		newStudy.setProtocolType(fp.getString("protocolType"));// protocolType
-
-		// this is not fully supported yet, because the system will not handle
-		// studies which are pending
-		// or private...
+		newStudy.setProtocolType(fp.getString("protocolType"));
 		newStudy.setStatus(Status.get(fp.getInt("statusId")));
 
 		if (StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
@@ -1045,10 +1060,10 @@ public class CreateStudyServlet extends Controller {
 	}
 
 	/**
-	 * Updates the study bean with inputs from the third section
+	 * Updates the study bean with inputs from the third section.
 	 * 
 	 * @param isInterventional
-	 *            if the study type is internventional
+	 *            if the study type is internventional.
 	 */
 	private void updateStudy3(HttpServletRequest request, boolean isInterventional) {
 		FormProcessor fp = new FormProcessor(request);
@@ -1066,8 +1081,8 @@ public class CreateStudyServlet extends Controller {
 			StringBuilder interventions = new StringBuilder();
 
 			ArrayList interventionArray = new ArrayList();
-
-			for (int i = 0; i < 10; i++) {
+			final int counter = 10;
+			for (int i = 0; i < counter; i++) {
 				String type = fp.getString("interType" + i);
 				String name = fp.getString("interName" + i);
 				if (!StringUtil.isBlank(type) && !StringUtil.isBlank(name)) {
@@ -1080,7 +1095,7 @@ public class CreateStudyServlet extends Controller {
 			newStudy.setInterventions(interventions.toString());
 			request.getSession().setAttribute("interventionArray", interventionArray);
 
-		} else {// type = observational
+		} else { // type is observational
 			newStudy.setDuration(fp.getString("duration"));
 			newStudy.setSelection(fp.getString("selection"));
 			newStudy.setTiming(fp.getString("timing"));
@@ -1090,7 +1105,7 @@ public class CreateStudyServlet extends Controller {
 	}
 
 	/**
-	 * Sets map in request for different JSP pages
+	 * Sets map in request for different JSP pages.
 	 * 
 	 * @param request
 	 *            HttpServletRequest

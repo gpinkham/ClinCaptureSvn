@@ -120,6 +120,8 @@ public class StudyParameterConfig {
 	private String allowCrfEvaluation = "no";
 	private String evaluateWithContext = "no";
 
+	private String  allowRulesAutoScheduling = "no";
+
 	/**
 	 * This is base constructor to set all default values.
 	 */
@@ -657,5 +659,19 @@ public class StudyParameterConfig {
 	 */
 	public void setAllowDynamicGroupsManagement(String allowDynamicGroupsManagement) {
 		this.allowDynamicGroupsManagement = allowDynamicGroupsManagement;
+	}
+
+	/**
+	 * @return the allowRulesAutoScheduling
+	 */
+	public String getAllowRulesAutoScheduling() {
+		return allowRulesAutoScheduling;
+	}
+
+	/**
+	 * @param allowRulesAutoScheduling the allowRulesAutoScheduling to set
+	 */
+	public void setAllowRulesAutoScheduling(String allowRulesAutoScheduling) {
+		this.allowRulesAutoScheduling = allowRulesAutoScheduling;
 	}
 }

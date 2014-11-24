@@ -2092,6 +2092,36 @@
 <tr>
 	<td>&nbsp;</td>
 </tr>
+
+<tr valign="top" style="border: 1px solid black;width: 100%;">
+    <td class="formlabel" style="border-top: 1px solid black;text-align: left; width:170px">
+        <fmt:message key="rule_rules" bundle="${resword}"/>:
+    </td>
+    <td style=" border-top: 1px solid black; text-align: left;">
+        &nbsp;
+    </td>
+</tr>
+<tr valign="top">
+    <td class="formlabel">
+        <fmt:message key="allowRulesAutoScheduling" bundle="${resword}"/>?
+    </td>
+    <td>
+        <c:choose>
+            <c:when test="${studyToView.studyParameterConfig.allowRulesAutoScheduling == 'yes'}">
+                <input type="radio" checked name="allowRulesAutoScheduling" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                <input type="radio" name="allowRulesAutoScheduling" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+            </c:when>
+            <c:otherwise>
+                <input type="radio" name="allowRulesAutoScheduling" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                <input type="radio" checked name="allowRulesAutoScheduling" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+            </c:otherwise>
+        </c:choose>
+    </td>
+</tr>
+<tr>
+    <td>&nbsp;</td>
+</tr>
+
 </table>
 </div>
 </div></div></div></div></div></div></div></div>

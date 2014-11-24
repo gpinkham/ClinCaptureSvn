@@ -58,6 +58,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
+/**
+ * Processes request to update study.
+ **/
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class UpdateStudyServletNew extends Controller {
@@ -66,10 +69,15 @@ public class UpdateStudyServletNew extends Controller {
 	public static final String INPUT_END_DATE = "endDate";
 	public static final String INPUT_VER_DATE = "protocolDateVerification";
 
-	/**
-	 * @param request  HttpServletRequest
-	 * @param response HttpServletResponse
-	 */
+	public static final int VALIDATION_NUM1 = 20;
+	public static final int VALIDATION_NUM2 = 30;
+	public static final int VALIDATION_NUM3 = 64;
+	public static final int VALIDATION_NUM4 = 100;
+	public static final int VALIDATION_NUM5 = 255;
+	public static final int VALIDATION_NUM6 = 500;
+	public static final int VALIDATION_NUM7 = 1000;
+	public static final int VALIDATION_NUM8 = 2000;
+
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -149,19 +157,19 @@ public class UpdateStudyServletNew extends Controller {
 		}
 		setMaps(request, isInterventional, interventionArray);
 
-		SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat localDf = getLocalDf(request);
 
 		if (!action.equals("submit")) {
 
 			// First Load First Form
 			if (study.getDatePlannedStart() != null) {
-				fp.addPresetValue(INPUT_START_DATE, local_df.format(study.getDatePlannedStart()));
+				fp.addPresetValue(INPUT_START_DATE, localDf.format(study.getDatePlannedStart()));
 			}
 			if (study.getDatePlannedEnd() != null) {
-				fp.addPresetValue(INPUT_END_DATE, local_df.format(study.getDatePlannedEnd()));
+				fp.addPresetValue(INPUT_END_DATE, localDf.format(study.getDatePlannedEnd()));
 			}
 			if (study.getProtocolDateVerification() != null) {
-				fp.addPresetValue(INPUT_VER_DATE, local_df.format(study.getProtocolDateVerification()));
+				fp.addPresetValue(INPUT_VER_DATE, localDf.format(study.getProtocolDateVerification()));
 			}
 			setPresetValues(fp.getPresetValues(), request);
 			// first load 2nd form
@@ -207,11 +215,11 @@ public class UpdateStudyServletNew extends Controller {
 		v.addValidation("sponsor", Validator.NO_BLANKS);
 
 		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("collaborators", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1000);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM7);
 		v.addValidation("protocolDescription", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1000);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM7);
 
 		v.addValidation("studySubjectIdLabel", Validator.NO_BLANKS);
 		v.addValidation("secondaryIdLabel", Validator.NO_BLANKS);
@@ -223,47 +231,47 @@ public class UpdateStudyServletNew extends Controller {
 
 		errors.putAll(v.validate());
 
-		if (fp.getString("name").trim().length() > 100) {
+		if (fp.getString("name").trim().length() > VALIDATION_NUM4) {
 			Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
 		}
-		if (fp.getString("uniqueProId").trim().length() > 30) {
+		if (fp.getString("uniqueProId").trim().length() > VALIDATION_NUM2) {
 			Validator.addError(errors, "uniqueProId", resexception.getString("maximum_lenght_unique_protocol_30"));
 		}
-		if (fp.getString("description").trim().length() > 2000) {
+		if (fp.getString("description").trim().length() > VALIDATION_NUM8) {
 			Validator.addError(errors, "description", resexception.getString("maximum_lenght_brief_summary_2000"));
 		}
-		if (fp.getString("prinInvestigator").trim().length() > 255) {
+		if (fp.getString("prinInvestigator").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "prinInvestigator",
 					resexception.getString("maximum_lenght_principal_investigator_255"));
 		}
-		if (fp.getString("sponsor").trim().length() > 255) {
+		if (fp.getString("sponsor").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "sponsor", resexception.getString("maximum_lenght_sponsor_255"));
 		}
-		if (fp.getString("officialTitle").trim().length() > 255) {
+		if (fp.getString("officialTitle").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "officialTitle", resexception.getString("maximum_lenght_official_title_255"));
 		}
 
-		if (fp.getString("studySubjectIdLabel").trim().length() > 255) {
+		if (fp.getString("studySubjectIdLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "studySubjectIdLabel",
 					resexception.getString("maximum_lenght_studySubjectIdLabel_255"));
 		}
-		if (fp.getString("secondaryIdLabel").trim().length() > 255) {
+		if (fp.getString("secondaryIdLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "secondaryIdLabel",
 					resexception.getString("maximum_lenght_secondaryIdLabel_255"));
 		}
-		if (fp.getString("dateOfEnrollmentForStudyLabel").trim().length() > 255) {
+		if (fp.getString("dateOfEnrollmentForStudyLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "dateOfEnrollmentForStudyLabel",
 					resexception.getString("maximum_lenght_dateOfEnrollmentForStudyLabel_255"));
 		}
-		if (fp.getString("genderLabel").trim().length() > 255) {
+		if (fp.getString("genderLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "genderLabel", resexception.getString("maximum_lenght_genderLabel_255"));
 		}
 
-		if (fp.getString("startDateTimeLabel").trim().length() > 255) {
+		if (fp.getString("startDateTimeLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "startDateTimeLabel",
 					resexception.getString("maximum_lenght_startDateTimeLabel_255"));
 		}
-		if (fp.getString("endDateTimeLabel").trim().length() > 255) {
+		if (fp.getString("endDateTimeLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "endDateTimeLabel",
 					resexception.getString("maximum_lenght_endDateTimeLabel_255"));
 		}
@@ -282,22 +290,22 @@ public class UpdateStudyServletNew extends Controller {
 		}
 
 		logger.info("has validation errors");
-		SimpleDateFormat local_df = getLocalDf(fp.getRequest());
+		SimpleDateFormat localDf = getLocalDf(fp.getRequest());
 		try {
-			local_df.parse(fp.getString(INPUT_START_DATE));
-			fp.addPresetValue(INPUT_START_DATE, local_df.format(fp.getDate(INPUT_START_DATE)));
+			localDf.parse(fp.getString(INPUT_START_DATE));
+			fp.addPresetValue(INPUT_START_DATE, localDf.format(fp.getDate(INPUT_START_DATE)));
 		} catch (ParseException pe) {
 			fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
 		}
 		try {
-			local_df.parse(fp.getString(INPUT_VER_DATE));
-			fp.addPresetValue(INPUT_VER_DATE, local_df.format(fp.getDate(INPUT_VER_DATE)));
+			localDf.parse(fp.getString(INPUT_VER_DATE));
+			fp.addPresetValue(INPUT_VER_DATE, localDf.format(fp.getDate(INPUT_VER_DATE)));
 		} catch (ParseException pe) {
 			fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
 		}
 		try {
-			local_df.parse(fp.getString(INPUT_END_DATE));
-			fp.addPresetValue(INPUT_END_DATE, local_df.format(fp.getDate(INPUT_END_DATE)));
+			localDf.parse(fp.getString(INPUT_END_DATE));
+			fp.addPresetValue(INPUT_END_DATE, localDf.format(fp.getDate(INPUT_END_DATE)));
 		} catch (ParseException pe) {
 			fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 		}
@@ -309,7 +317,8 @@ public class UpdateStudyServletNew extends Controller {
 	private void validateStudy3(FormProcessor fp, StudyBean study, Validator v, boolean isInterventional) {
 
 		v.addValidation("purpose", Validator.NO_BLANKS);
-		for (int i = 0; i < 10; i++) {
+		final int counter = 10;
+		for (int i = 0; i < counter; i++) {
 			String type = fp.getString("interType" + i);
 			String name = fp.getString("interName" + i);
 			if (!StringUtil.isBlank(type) && StringUtil.isBlank(name)) {
@@ -330,11 +339,11 @@ public class UpdateStudyServletNew extends Controller {
 	private void validateStudy4(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
 
 		v.addValidation("conditions", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM6);
 		v.addValidation("keywords", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("eligibility", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM6);
 		errors.putAll(v.validate());
 		if (fp.getInt("expectedTotalEnrollment") <= 0) {
 			Validator.addError(errors, "expectedTotalEnrollment",
@@ -345,7 +354,8 @@ public class UpdateStudyServletNew extends Controller {
 		study.setKeywords(fp.getString("keywords"));
 		study.setEligibility(fp.getString("eligibility"));
 		study.setGender(fp.getString("gender"));
-		if (fp.getString("ageMax").length() > 3) {
+		final int ageMaxSize = 3;
+		if (fp.getString("ageMax").length() > ageMaxSize) {
 			Validator.addError(errors, "ageMax", respage.getString("condition_eligibility_3"));
 		}
 		study.setAgeMax(fp.getString("ageMax"));
@@ -362,23 +372,23 @@ public class UpdateStudyServletNew extends Controller {
 			v.addValidation("facConEmail", Validator.IS_A_EMAIL);
 		}
 		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 20);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM1);
 		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				64);
+				VALIDATION_NUM3);
 		v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM3);
 		v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 
 		errors.putAll(v.validate());
 
@@ -401,11 +411,11 @@ public class UpdateStudyServletNew extends Controller {
 
 	private void validateStudy6(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
 		v.addValidation("medlineIdentifier", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 		v.addValidation("url", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				255);
+				VALIDATION_NUM5);
 		v.addValidation("urlDescription", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 
 		errors.putAll(v.validate());
 
@@ -435,9 +445,10 @@ public class UpdateStudyServletNew extends Controller {
 			List<DiscrepancyDescription> newDescriptions, String descriptionName, String visibilityLevel,
 			String descriptionId, String descriptionError, int typeId) {
 		newDescriptions.clear();
-		for (int i = 0; i < 25; i++) {
+		final int counter = 25;
+		for (int i = 0; i < counter; i++) {
 			v.addValidation(descriptionName + i, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
 			// set list of dn descriptions for specified type here
 			if (!"".equals(fp.getString(descriptionName + i))) {
 				DiscrepancyDescription dDescription = new DiscrepancyDescription();
@@ -535,6 +546,8 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setAllowCrfEvaluation(fp.getString("allowCrfEvaluation"));
 		study.getStudyParameterConfig().setEvaluateWithContext(fp.getString("evaluateWithContext"));
 
+		study.getStudyParameterConfig().setAllowRulesAutoScheduling(fp.getString("allowRulesAutoScheduling"));
+
 		try {
 
 			// Create custom dictionary 
@@ -613,8 +626,8 @@ public class UpdateStudyServletNew extends Controller {
 			study.setEndpoint(fp.getString("endpoint"));
 
 			StringBuilder interventions = new StringBuilder();
-
-			for (int i = 0; i < 10; i++) {
+			final int counter = 10;
+			for (int i = 0; i < counter; i++) {
 				String type = fp.getString("interType" + i);
 				String name = fp.getString("interName" + i);
 				if (!StringUtil.isBlank(type) && !StringUtil.isBlank(name)) {
@@ -927,6 +940,10 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getEvaluateWithContext());
 		updateParameter(spvdao, spv);
 
+		spv.setParameter("allowRulesAutoScheduling");
+		spv.setValue(study1.getStudyParameterConfig().getAllowRulesAutoScheduling());
+		updateParameter(spvdao, spv);
+
 		try {
 
 			// Create custom dictionary 
@@ -953,7 +970,7 @@ public class UpdateStudyServletNew extends Controller {
 		ArrayList children = (ArrayList) sdao.findAllByParent(study1.getId());
 		for (Object aChildren : children) {
 			StudyBean child = (StudyBean) aChildren;
-			child.setType(study1.getType());// same as parent's type
+			child.setType(study1.getType()); // same as parent's type
 			child.setUpdatedDate(new Date());
 			child.setUpdater(ub);
 			sdao.update(child);

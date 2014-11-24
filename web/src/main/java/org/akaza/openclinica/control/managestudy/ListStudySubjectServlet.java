@@ -358,6 +358,9 @@ public abstract class ListStudySubjectServlet extends Controller {
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "evaluateWithContext");
 		currentStudy.getStudyParameterConfig().setEvaluateWithContext(parentSPV.getValue());
 
+		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "allowRulesAutoScheduling");
+		currentStudy.getStudyParameterConfig().setAllowRulesAutoScheduling(parentSPV.getValue());
+
 		// for all the study groups for each group class
 		for (Object studyGroupClass1 : studyGroupClasses) {
 			StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass1;
