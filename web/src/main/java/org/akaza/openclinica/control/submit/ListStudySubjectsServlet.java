@@ -88,7 +88,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 					fp.getString("findSubjects_f_studySubject.label"), currentStudy);
 			if (studySubject.getId() > 0) {
 				response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id="
-						+ Integer.toString(studySubject.getId()));
+						+ Integer.toString(studySubject.getId()) + "&ref=sm");
 				return;
 			} else {
 				request.getSession().removeAttribute(getUrlKey(request));

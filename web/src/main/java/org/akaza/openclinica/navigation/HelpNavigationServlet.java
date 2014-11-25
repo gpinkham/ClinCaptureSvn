@@ -62,6 +62,6 @@ public class HelpNavigationServlet extends HttpServlet {
     		visitedURLs.push(defaultUrl);
         }
         
-		return request.getContextPath() + visitedURLs.peek();
+		return request.getContextPath() + (visitedURLs.isEmpty() ? defaultUrl : visitedURLs.peek());
 	}
 }

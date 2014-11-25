@@ -114,7 +114,7 @@ public final class Navigation {
 				}
 				if (!exclusionURLs.contains(requestShortURI)) {
 					if (!visitedURLs.peek().split("\\?")[0].equals(requestShortURI)) {
-						if (!specialURLs.contains(requestShortURI)) {
+						if (!specialURLs.contains(requestShortURI) && !requestShortURL.contains("ref=sm")) {
 							visitedURLs.push(requestShortURL);
 						} else {
 							specialProcessingForURL(visitedURLs, requestShortURL);
@@ -152,16 +152,18 @@ public final class Navigation {
 			}
 		}
 
-		if ("/ListStudySubjects".equals(requestShortURI)) {
-			if (requestShortURL.contains("findSubjects_f_studySubject")) {
-				return;
-			} else {
-				if (!visitedURLs.isEmpty()
-						&& (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects") || visitedURLs.peek()
-								.split("\\?")[0].equals("/ListStudySubjects"))) {
-					visitedURLs.pop();
-				}
+		if (!visitedURLs.isEmpty() && "/ListStudySubjects".equals(requestShortURI)
+				&& requestShortURL.contains("navBar=yes")) {
+			visitedURLs.push(requestShortURL.replace("&navBar=yes", "&fromSearch=true"));
+			return;
+		}
+		if (!visitedURLs.isEmpty() && "/ViewStudySubject".equals(requestShortURI) && requestShortURL.contains("ref=sm")) {
+			//remove subject matrix url
+			if (visitedURLs.peek().contains("&fromSearch=true")) {
+				visitedURLs.pop();
 			}
+			visitedURLs.push(requestShortURL);
+			return;
 		}
 
 		if ("/EnterDataForStudyEvent".equals(requestShortURI)) {

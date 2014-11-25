@@ -27,13 +27,14 @@ import static org.junit.Assert.assertNotNull;
 public class HelpNavigationServletTest {
 
 	private MockHttpServletRequest request;
+	MockHttpSession session;
 
 	@Before
 	public void setUp() throws Exception {
 		Stack<String> visitedURLs = new Stack<String>();
 		visitedURLs.push("/testURL1?abc=144&cde=53");
 		visitedURLs.push("/testURL2?abc=12&cde=13");
-		MockHttpSession session = new MockHttpSession();
+		session = new MockHttpSession();
 		session.setAttribute("visitedURLs", visitedURLs);
 		request = Mockito.mock(MockHttpServletRequest.class);
 
@@ -49,5 +50,13 @@ public class HelpNavigationServletTest {
 	@Test
 	public void testThatGetSavedUrlReturnsCorrectURL() {
 		assertEquals(HelpNavigationServlet.getSavedUrl(request), "/ClinCapture-SNAPSHOT/testURL1?abc=144&cde=53");
+	}
+
+	@Test
+	public void testThatGetSavedUrlReturnsDefaultURLIfStackContainsOneElement() {
+		Stack<String> visitedURLs = new Stack<String>();
+		visitedURLs.push("/testURL2");
+		session.setAttribute("visitedURLs", visitedURLs);
+		assertEquals(HelpNavigationServlet.getSavedUrl(request), "/ClinCapture-SNAPSHOT/MainMenu");
 	}
 }
