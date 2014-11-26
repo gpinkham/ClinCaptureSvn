@@ -3,12 +3,14 @@ package org.akaza.openclinica.dao.extract;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.DatasetItemStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,6 +24,7 @@ public class OdmExtractDAOTest extends DefaultAppContextTest {
 	private String dateConstraint;
 	private String studySubjectIds;
 	private int datasetItemStatusId;
+	private StudyBean study;
 
 	private DatasetBean createDateset() {
 		DatasetBean dataset = new DatasetBean();
@@ -49,21 +52,15 @@ public class OdmExtractDAOTest extends DefaultAppContextTest {
 
 	@Before
 	public void setUp() throws Exception {
-		StudyBean study = new StudyBean();
-		study.setId(1);
-
+		study = (StudyBean) studyDAO.findByPK(1);
 		studySubjectIds = "1";
-
 		odmVersion = "oc1.3";
-
 		studyIds = study.getId() + "";
 		parentStudyIds = study.getParentStudyId() > 0 ? study.getParentStudyId() + "" : studyIds;
-
 		DatasetBean dataset = (DatasetBean) datasetDAO.findByNameAndStudy("OdmExtractDAOTest", study);
-        if (dataset.getId() == 0) {
-            dataset = createDateset();
-        }
-
+		if (dataset.getId() == 0) {
+			dataset = createDateset();
+		}
 		datasetItemStatusId = 3;
 		String sql = dataset.getSQLStatement().split("order by")[0].trim();
 		sql = sql.split("study_event_definition_id in")[1];
@@ -71,7 +68,6 @@ public class OdmExtractDAOTest extends DefaultAppContextTest {
 		sedIds = ss[0];
 		String[] sss = ss[1].split("and");
 		itemIds = sss[0];
-
 		dateConstraint = "";
 		if (dbDriverClassName.toLowerCase().contains("postgresql")) {
 			dateConstraint = "and " + sss[1] + " and " + sss[2];
@@ -90,5 +86,49 @@ public class OdmExtractDAOTest extends DefaultAppContextTest {
 				odmExtractDAO.select(
 						odmExtractDAO.getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint,
 								datasetItemStatusId, studySubjectIds, parentStudyIds)).size(), 3);
+	}
+
+	@Test
+	public void testThatGetEventGroupItemWithUnitSqlWithBlanksReturnsCorrectNoOfRecords() throws Exception {
+		odmExtractDAO.setSubjectEventFormDataTypesExpected(odmVersion);
+		String query = odmExtractDAO.getEventGroupItemWithUnitSql("(1)", "(1,2)", "(1,2,3,4)", dateConstraint,
+				datasetItemStatusId, "(1)", false);
+		odmExtractDAO.setEventGroupItemDataWithUnitTypesExpected();
+		assertEquals(6, odmExtractDAO.select(query).size());
+	}
+
+	@Test
+	public void testThatGetEventGroupItemWithUnitSqlWithoutBlanksReturnsCorrectNoOfRecords() throws Exception {
+		odmExtractDAO.setSubjectEventFormDataTypesExpected(odmVersion);
+		String query = odmExtractDAO.getEventGroupItemWithUnitSql("(1)", "(1,2)", "(1,2,3,4)", dateConstraint,
+				datasetItemStatusId, "(1)", true);
+		odmExtractDAO.setEventGroupItemDataWithUnitTypesExpected();
+		assertEquals(4, odmExtractDAO.select(query).size());
+	}
+
+	@Test
+	public void testThatNumberOfItemsInClinicalDataIsCorrectWhenBlanksAreNotSkipped() {
+		DatasetBean dataset = createDateset();
+		OdmClinicalDataBean data = new OdmClinicalDataBean();
+		data.setStudyOID(study.getOid());
+		data.setMetaDataVersionOID(dataset.getOdmMetaDataVersionOid());
+		dataset.setSQLStatement("select distinct * from extract_data_table where study_event_definition_id in (1) and item_id in (14, 15, 16, 27) and (date(date_created) >= date('2000-01-01')) and (date(date_created) <= date('2100-01-31')) order by date_start asc");
+		odmExtractDAO.getClinicalData(study, dataset, data, odmVersion, studySubjectIds, "clinical_data", false);
+		int numOfItems = data.getExportSubjectData().get(0).getExportStudyEventData().get(0).getExportFormData().get(0)
+				.getItemGroupData().get(0).getItemData().size();
+		assertEquals(4, numOfItems);
+	}
+	
+	@Test
+	public void testThatNumberOfItemsInClinicalDataIsCorrectWhenBlanksAreSkipped() {
+		DatasetBean dataset = createDateset();
+		OdmClinicalDataBean data = new OdmClinicalDataBean();
+		data.setStudyOID(study.getOid());
+		data.setMetaDataVersionOID(dataset.getOdmMetaDataVersionOid());
+		dataset.setSQLStatement("select distinct * from extract_data_table where study_event_definition_id in (1) and item_id in (14, 15, 16, 27) and (date(date_created) >= date('2000-01-01')) and (date(date_created) <= date('2100-01-31')) order by date_start asc");
+		odmExtractDAO.getClinicalData(study, dataset, data, odmVersion, studySubjectIds, "clinical_data", true);
+		int numOfItems = data.getExportSubjectData().get(0).getExportStudyEventData().get(0).getExportFormData().get(0)
+				.getItemGroupData().get(0).getItemData().size();
+		assertEquals(1, numOfItems);
 	}
 }

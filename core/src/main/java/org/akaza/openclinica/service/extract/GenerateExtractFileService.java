@@ -143,13 +143,13 @@ public class GenerateExtractFileService {
 			Integer currentStudyId, Integer parentStudyId, String studySubjectNumber) {
 		// default zipped - true
 		return createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, currentStudy, generalFileDirCopy,
-				eb, currentStudyId, parentStudyId, studySubjectNumber, true, true, true, null);
+				eb, currentStudyId, parentStudyId, studySubjectNumber, true, true, true, false, null);
 	}
 
 	public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir,
 			DatasetBean datasetBean, StudyBean currentStudy, String generalFileDirCopy, ExtractBean eb,
 			Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB,
-			boolean deleteOld, String odmType) {
+			boolean deleteOld, boolean skipBlanks, String odmType) {
 
 		Integer ssNumber = getStudySubjectNumber(studySubjectNumber);
 		MetaDataCollector mdc = new MetaDataCollector(ds, datasetBean, currentStudy, ruleSetRuleDao);
@@ -265,6 +265,7 @@ public class GenerateExtractFileService {
 				ClinicalDataUnit cdata = new ClinicalDataUnit(ds, datasetBean, cdc.getOdmbean(), u.getStudy(),
 						cdc.getCategory(), studySubjectIds);
 				cdata.setCategory(cdc.getCategory());
+				cdata.setSkipBlanks(skipBlanks);
 				cdata.collectOdmClinicalData();
 
 				FullReportBean report = new FullReportBean();

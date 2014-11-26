@@ -191,7 +191,7 @@ public class ExportDatasetServlet extends Controller {
 				String ODMXMLFileName = "";
 				HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db,
 						currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", true, true,
-						true, null);
+						true, false, null);
 
 				for (Object o : answerMap.entrySet()) {
 					Map.Entry entry = (Map.Entry) o;

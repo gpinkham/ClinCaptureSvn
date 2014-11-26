@@ -41,6 +41,7 @@ import javax.sql.DataSource;
 public class ClinicalDataUnit extends OdmUnit {
 	private OdmClinicalDataBean odmClinicalData;
 	private String studySubjectIds;
+	private boolean skipBlanks;
 
 	public ClinicalDataUnit() {
 	}
@@ -92,7 +93,7 @@ public class ClinicalDataUnit extends OdmUnit {
 			}
 		}
 		oedao.getClinicalData(study, this.dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds,
-				this.odmBean.getOdmType());
+				this.odmBean.getOdmType(), this.skipBlanks);
 	}
 
 	public OdmClinicalDataBean getOdmClinicalData() {
@@ -125,5 +126,13 @@ public class ClinicalDataUnit extends OdmUnit {
 
 	public void setStudySubjectIds(String studySubjectIds) {
 		this.studySubjectIds = studySubjectIds;
+	}
+
+	public boolean getSkipBlanks() {
+		return skipBlanks;
+	}
+
+	public void setSkipBlanks(boolean skipBlanks) {
+		this.skipBlanks = skipBlanks;
 	}
 }

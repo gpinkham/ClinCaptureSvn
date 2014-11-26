@@ -599,6 +599,7 @@ public class CoreResources implements ResourceLoaderAware {
 			String whichFunction = getExtractField("extract." + i + ".post").toLowerCase();
 			epbean.setZipFormat(getExtractFieldBoolean("extract." + i + ".zip"));
 			epbean.setDeleteOld(getExtractFieldBoolean("extract." + i + ".deleteOld"));
+			epbean.setSkipBlanks(getExtractFieldBoolean("extract." + i + ".skipBlanks"));
 			epbean.setSuccessMessage(getExtractField("extract." + i + ".success"));
 			epbean.setFailureMessage(getExtractField("extract." + i + ".failure"));
 			epbean.setZipName(getExtractField("extract." + i + ".zipName"));

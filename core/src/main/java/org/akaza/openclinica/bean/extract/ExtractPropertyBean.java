@@ -68,6 +68,8 @@ public class ExtractPropertyBean implements Comparable, Serializable {
 
 	private String datasetName;
 
+	private boolean skipBlanks;
+
 	public String getOdmType() {
 		return odmType;
 	}
@@ -287,6 +289,14 @@ public class ExtractPropertyBean implements Comparable, Serializable {
 
 	public void setOrder(int order) {
 		this.order = order;
+	}
+
+	public boolean getSkipBlanks() {
+		return skipBlanks;
+	}
+
+	public void setSkipBlanks(boolean skipBlanks) {
+		this.skipBlanks = skipBlanks;
 	}
 
 	public int compareTo(Object o) {

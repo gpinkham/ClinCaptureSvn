@@ -289,12 +289,16 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 	}
 
 	public ItemGroupBean findByItemAndCRFVersion(ItemBean item, CRFVersionBean crfVersion) {
+		return this.findByItemIdAndCRFVersionId(item.getId(), crfVersion.getId());
+	}
+	
+	public ItemGroupBean findByItemIdAndCRFVersionId(int itemId, int crfVersionId) {
 		this.unsetTypeExpected();
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, item.getId());
-		variables.put(2, crfVersion.getId());
+		variables.put(1, itemId);
+		variables.put(2, crfVersionId);
 		String sql = digester.getQuery("findByItemAndCRFVersion");
 
 		ArrayList rows = this.select(sql, variables);
