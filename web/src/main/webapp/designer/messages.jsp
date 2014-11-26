@@ -25,8 +25,8 @@
 		messageSource.texts.cancel = '<fmt:message bundle="${resword}" key="cancel"/>';
 		messageSource.texts.clear = '<fmt:message bundle="${resword}" key="clear"/>';
 
-		messageSource.terms.and = '<fmt:message bundle="${resword}" key="OR"/>';
-		messageSource.terms.or = '<fmt:message bundle="${resword}" key="AND"/>';
+		messageSource.terms.and = '<fmt:message bundle="${resword}" key="AND"/>';
+		messageSource.terms.or = '<fmt:message bundle="${resword}" key="OR"/>';
 		messageSource.terms.not = '<fmt:message bundle="${resword}" key="NOT"/>';
 
 		messageSource.tooltips.deleteButton = '<fmt:message bundle="${resword}" key="rs.tooltip.deleteButton"/>';

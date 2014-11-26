@@ -60,7 +60,15 @@ import java.util.LinkedHashMap;
 public class ViewDatasetsServlet extends RememberLastPage {
 
 	public static final String SAVED_VIEW_DATASETS_URL = "savedViewDatasetsUrl";
+	private static final int FIVE = 5;
 
+	/**
+	 * Get ViewDatasets link by Dataset ID.
+	 * 
+	 * @param dsId
+	 *            Dataset ID
+	 * @return Link
+	 */
 	public static String getLink(int dsId) {
 		return "ViewDatasets?action=details&datasetId=" + dsId;
 	}
@@ -68,21 +76,18 @@ public class ViewDatasetsServlet extends RememberLastPage {
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String action = request.getParameter("action");
-		if (!(action != null && action.equalsIgnoreCase("details")) && shouldRedirect(request, response)) {
+		if (!(action != null && (action.equalsIgnoreCase("details") || action.equalsIgnoreCase("owner")))
+				&& shouldRedirect(request, response)) {
 			return;
 		}
-
 		if ("ongoing".equals(request.getSession().getAttribute("exportStatus"))) {
 			addPageMessage(respage.getString("extract_is_running"), request);
 			request.getSession().removeAttribute("exportStatus");
 		}
-
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
-
 		request.setAttribute("subjectAgeAtEvent",
 				currentStudy.getStudyParameterConfig().getCollectDob().equals("3") ? "0" : "1");
-
 		DatasetDAO dsdao = getDatasetDAO();
 		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.reset();
@@ -106,74 +111,46 @@ public class ViewDatasetsServlet extends RememberLastPage {
 				}
 			}
 			request.getSession().setAttribute("eventsForCreateDataset", events);
-			// YW >>
-
 			FormProcessor fp = new FormProcessor(request);
-
 			EntityBeanTable table = fp.getEntityBeanTable();
 			ArrayList datasets;
-			// if (ub.isSysAdmin()) {
-			// datasets = dsdao.findAllByStudyIdAdmin(currentStudy.getId());
-			// } else {
 			datasets = dsdao.findAllByStudyId(currentStudy.getId());
-			// }
-
 			ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
-
 			String[] columns = { resword.getString("dataset_name"), resword.getString("description"),
 					resword.getString("created_by"), resword.getString("created_date"), resword.getString("status"),
 					resword.getString("actions") };
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
-			table.hideColumnLink(5);
+			table.hideColumnLink(FIVE);
 			table.addLink(resword.getString("show_only_my_datasets"), "ViewDatasets?action=owner&ownerId=" + ub.getId());
-			// table.addLink(resword.getString("create_dataset"), "CreateDataset");
 			table.setQuery("ViewDatasets", new HashMap());
 			table.setRows(datasetRows);
 			table.computeDisplay();
-
 			request.setAttribute("table", table);
-			// this is the old code that the tabling code replaced:
-			// ArrayList datasets = (ArrayList)dsdao.findAll();
-			// request.setAttribute("datasets", datasets);
 			forwardPage(Page.VIEW_DATASETS, request, response);
 		} else {
 			if ("owner".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
 				int ownerId = fp.getInt("ownerId");
 				EntityBeanTable table = fp.getEntityBeanTable();
-
 				ArrayList datasets = (ArrayList) dsdao.findByOwnerId(ownerId, currentStudy.getId());
-
-				/*
-				 * if (datasets.isEmpty()) { forwardPage(Page.VIEW_EMPTY_DATASETS); } else {
-				 */
-
 				ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
 				String[] columns = { resword.getString("dataset_name"), resword.getString("description"),
 						resword.getString("created_by"), resword.getString("created_date"),
 						resword.getString("status"), resword.getString("actions") };
 				table.setColumns(new ArrayList(Arrays.asList(columns)));
-				table.hideColumnLink(5);
+				table.hideColumnLink(FIVE);
 				table.addLink(resword.getString("show_all_datasets"), "ViewDatasets");
-				// table.addLink(resword.getString("create_dataset"), "CreateDataset");
-				table.setQuery("ViewDatasets?action=owner&ownerId=" + ub.getId(), new HashMap());
+				table.setQuery("ViewDatasets", getOwnerQueryArgs(ub.getId()));
 				table.setRows(datasetRows);
 				table.computeDisplay();
 				request.setAttribute("table", table);
-				// this is the old code:
-
-				// ArrayList datasets = (ArrayList)dsdao.findByOwnerId(ownerId);
-				// request.setAttribute("datasets", datasets);
 				forwardPage(Page.VIEW_DATASETS, request, response);
-				// }
 			} else if ("details".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
 				int datasetId = fp.getInt("datasetId");
-
 				DatasetBean db = initializeAttributes(datasetId, request);
 				StudyDAO sdao = getStudyDAO();
 				StudyBean study = (StudyBean) sdao.findByPK(db.getStudyId());
-
 				if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
 					addPageMessage(
 							respage.getString("no_have_correct_privilege_current_study") + " "
@@ -181,20 +158,17 @@ public class ViewDatasetsServlet extends RememberLastPage {
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				}
-
-				/*
-				 * EntityBeanTable table = fp.getEntityBeanTable(); ArrayList datasetRows =
-				 * DatasetRow.generateRowFromBean(db); String[] columns = { "Dataset Name", "Description", "Created By",
-				 * "Created Date", "Status", "Actions" }; table.setColumns(new ArrayList(Arrays.asList(columns)));
-				 * table.hideColumnLink(5); table.setQuery("ViewDatasets", new HashMap()); table.setRows(datasetRows);
-				 * table.computeDisplay(); request.setAttribute("table", table);
-				 */
 				request.setAttribute("dataset", db);
-
 				forwardPage(Page.VIEW_DATASET_DETAILS, request, response);
 			}
 		}
+	}
 
+	private HashMap<String, String> getOwnerQueryArgs(Integer ownerId) {
+		HashMap<String, String> args = new HashMap<String, String>();
+		args.put("ownerId", ownerId.toString());
+		args.put("action", "owner");
+		return args;
 	}
 
 	@Override
@@ -221,7 +195,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
 	}
 
 	/**
-	 * Initialize data of a DatasetBean and set session attributes for displaying selected data of this DatasetBean
+	 * Initialize data of a DatasetBean and set session attributes for displaying selected data of this DatasetBean.
 	 * 
 	 * @param datasetId
 	 *            int
