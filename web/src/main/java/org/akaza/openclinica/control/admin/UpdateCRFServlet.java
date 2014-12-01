@@ -44,49 +44,57 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 
+ * Updates CRF.
+ * 
+ */
 @SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class UpdateCRFServlet extends Controller {
 
-	private static String CRF = "crf";
+	private static final String CRF = "crf";
+	private static final int MAXIMUM_NAME_SIZE = 255;
+	private static final int MAXIMUM_DESCRIPTION_SIZE = 2048;
 
 	/**
-     *
-     */
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyBean currentStudy = getCurrentStudy(request);
-
-		if (ub.isSysAdmin()) {
+		if (userCanUpdateCRF(request)) {
 			return;
 		}
-		boolean isStudyDirectorInParent = false;
-		if (currentStudy.getParentStudyId() > 0) {
-			logger.info("2222");
-			Role r = ub.getRoleByStudy(currentStudy.getParentStudyId()).getRole();
-			if (r.equals(Role.SYSTEM_ADMINISTRATOR)) {
-				isStudyDirectorInParent = true;
-			}
-		}
-
-		// get current studyid
-		int studyId = currentStudy.getId();
-
-		if (ub.hasRoleInStudy(studyId)) {
-			Role r = ub.getRoleByStudy(studyId).getRole();
-			if (isStudyDirectorInParent || r.equals(Role.SYSTEM_ADMINISTRATOR)) {
-				return;
-			}
-		}
-
 		addPageMessage(
 				respage.getString("you_not_have_permission_update_a_CRF")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_study_director"),
 				"1");
 
+	}
+
+	private boolean userCanUpdateCRF(HttpServletRequest request) {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		if (ub.isSysAdmin()) {
+			return true;
+		}
+		boolean isStudyDirectorInParent = false;
+		if (currentStudy.getParentStudyId() > 0) {
+			logger.info("2222");
+			Role r = ub.getRoleByStudy(currentStudy.getParentStudyId()).getRole();
+			if (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
+				isStudyDirectorInParent = true;
+			}
+		}
+		if (ub.hasRoleInStudy(currentStudy.getId())) {
+			Role r = ub.getRoleByStudy(currentStudy.getId()).getRole();
+			if (isStudyDirectorInParent || r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -136,10 +144,10 @@ public class UpdateCRFServlet extends Controller {
 
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				255);
+				MAXIMUM_NAME_SIZE);
 
 		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2048);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, MAXIMUM_DESCRIPTION_SIZE);
 
 		HashMap errors = v.validate();
 
@@ -174,7 +182,7 @@ public class UpdateCRFServlet extends Controller {
 	}
 
 	/**
-	 * Inserts the new study into database
+	 * Inserts the new study into database.
 	 * 
 	 */
 	@SuppressWarnings("unchecked")

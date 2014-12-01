@@ -12,7 +12,7 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package org.akaza.openclinica.control.extract;
+package org.akaza.openclinica.control.admin;
 
 import static org.junit.Assert.assertNull;
 
@@ -39,11 +39,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.clinovo.util.SessionUtil;
 
-public class RemoveDatasetServletTest {
+public class InitUpdateCRFServletTest {
 
 	private MockHttpServletRequest request;
 	private MockHttpServletResponse response;
-	private RemoveDatasetServlet servlet;
+	private InitUpdateCRFServlet servlet;
 	private UserAccountBean currentUser;
 	private StudyUserRoleBean currentRole;
 	private DatasetBean dataset;
@@ -52,10 +52,12 @@ public class RemoveDatasetServletTest {
 	public void setUp() throws Exception {
 		request = new MockHttpServletRequest();
 		response = new MockHttpServletResponse();
-		servlet = Mockito.mock(RemoveDatasetServlet.class);
+		servlet = Mockito.mock(InitUpdateCRFServlet.class);
 		currentUser = new UserAccountBean();
 		currentUser.setId(1);
 		currentRole = new StudyUserRoleBean();
+		currentRole.setStudyId(1);
+		currentUser.addRole(currentRole);
 		StudyBean currentStudy = new StudyBean();
 		StudyBean otherStudy = new StudyBean();
 		Mockito.when(servlet.getCurrentRole(request)).thenReturn(currentRole);
@@ -97,14 +99,6 @@ public class RemoveDatasetServletTest {
 	}
 
 	@Test
-	public void testThatAdminUserCanProceed() throws InsufficientPermissionException {
-		currentUser.addUserType(UserType.SYSADMIN);
-		currentRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
-		servlet.mayProceed(request, response);
-		assertNull(request.getAttribute("pageMessages"));
-	}
-
-	@Test
 	public void testThatStudyAdminUserCanProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);
 		currentRole.setRole(Role.STUDY_ADMINISTRATOR);
@@ -113,45 +107,52 @@ public class RemoveDatasetServletTest {
 	}
 
 	@Test
-	public void testThatStudyMonitorCanProceed() throws InsufficientPermissionException {
+	public void testThatStudyAdminCanProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.SYSADMIN);
-		currentRole.setRole(Role.STUDY_MONITOR);
-		servlet.mayProceed(request, response);
-		assertNull(request.getAttribute("pageMessages"));
-	}
-
-	@Test
-	public void testThatSiteMonitorCanProceed() throws InsufficientPermissionException {
-		currentUser.addUserType(UserType.USER);
-		currentRole.setRole(Role.SITE_MONITOR);
+		currentRole.setRole(Role.STUDY_ADMINISTRATOR);
 		servlet.mayProceed(request, response);
 		assertNull(request.getAttribute("pageMessages"));
 	}
 
 	@Test(expected = InsufficientPermissionException.class)
-	public void testThatUnAuthorizedNonAdminUserCannotProceed() throws InsufficientPermissionException {
+	public void testThatStudyCoderCannotProceed() throws InsufficientPermissionException {
+		currentUser.addUserType(UserType.USER);
+		currentRole.setRole(Role.STUDY_CODER);
+		servlet.mayProceed(request, response);
+	}
+
+	@Test(expected = InsufficientPermissionException.class)
+	public void testThatStudyMonitorCannotProceed() throws InsufficientPermissionException {
+		currentUser.addUserType(UserType.USER);
+		currentRole.setRole(Role.STUDY_MONITOR);
+		servlet.mayProceed(request, response);
+	}
+
+	@Test(expected = InsufficientPermissionException.class)
+	public void testThatStudyEvaluatorCannotProceed() throws InsufficientPermissionException {
+		currentUser.addUserType(UserType.USER);
+		currentRole.setRole(Role.STUDY_EVALUATOR);
+		servlet.mayProceed(request, response);
+	}
+
+	@Test(expected = InsufficientPermissionException.class)
+	public void testThatClinicalResearchCoordinatorCannotProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);
 		currentRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
 		servlet.mayProceed(request, response);
 	}
 
 	@Test(expected = InsufficientPermissionException.class)
-	public void testThatNonOwnerUserCannotProceed() throws Exception {
+	public void testThatInvestigatorCannotProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);
-		currentRole.setRole(Role.STUDY_MONITOR);
-		dataset.setOwner(new UserAccountBean());
-		dataset.getOwner().setId(10);
-		dataset.setStudyId(1);
-		servlet.processRequest(request, response);
+		currentRole.setRole(Role.INVESTIGATOR);
+		servlet.mayProceed(request, response);
 	}
 
 	@Test(expected = InsufficientPermissionException.class)
-	public void testThatWhenInDiffStudyCannotProceed() throws Exception {
+	public void testThatSiteMonitorCannotProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);
-		currentRole.setRole(Role.STUDY_MONITOR);
-		dataset.setOwner(new UserAccountBean());
-		dataset.getOwner().setId(10);
-		dataset.setStudyId(12);
-		servlet.processRequest(request, response);
+		currentRole.setRole(Role.SITE_MONITOR);
+		servlet.mayProceed(request, response);
 	}
 }

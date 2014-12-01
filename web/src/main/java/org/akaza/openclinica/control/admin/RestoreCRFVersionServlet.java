@@ -45,6 +45,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 
+ * Restores removed CRF Version.
+ * 
+ */
 @Component
 @SuppressWarnings({ "rawtypes", "serial" })
 public class RestoreCRFVersionServlet extends Controller {
@@ -62,17 +67,23 @@ public class RestoreCRFVersionServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+		if (userCanRestoreCRFVersion(request)) {
+			return;
+		}
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
+	}
 
+	private boolean userCanRestoreCRFVersion(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
-			return;
+			return true;
 		}
-
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -99,8 +110,9 @@ public class RestoreCRFVersionServlet extends Controller {
 			eventCRFs = evdao.findAllByCRFVersion(versionId);
 
 			if (ACTION_CONFIRM.equalsIgnoreCase(action)) {
-				if (!currentUser.isSysAdmin() && (version.getOwnerId() != currentUser.getId())) {
-					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+				if (!userCanRestoreCRFVersion(request)) {
+					addPageMessage(
+							respage.getString("no_have_correct_privilege_current_study") + " "
 									+ respage.getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
@@ -135,8 +147,10 @@ public class RestoreCRFVersionServlet extends Controller {
 				// Restore coded items
 				getCodedItemService().restoreByCRFVersion(versionId);
 
-				addPageMessage(new StringBuilder("").append(respage.getString("the_CRF_version")).append(version.getName())
-						.append(" ").append(respage.getString("has_been_restored_succesfully")).toString(), request);
+				addPageMessage(
+						new StringBuilder("").append(respage.getString("the_CRF_version")).append(version.getName())
+								.append(" ").append(respage.getString("has_been_restored_succesfully")).toString(),
+						request);
 
 			} else {
 				addPageMessage(respage.getString("invalid_http_request_parameters"), request);

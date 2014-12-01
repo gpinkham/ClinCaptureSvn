@@ -53,7 +53,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Removes a crf
+ * Removes a crf.
  * 
  * @author jxu
  */
@@ -77,18 +77,23 @@ public class RemoveCRFServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+		if (userCanRemoveCRF(request)) {
+			return;
+		}
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
+	}
 
+	private boolean userCanRemoveCRF(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
-			return;
+			return true;
 		}
-
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
-
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -132,7 +137,7 @@ public class RemoveCRFServlet extends Controller {
 
 			if (ACTION_CONFIRM.equalsIgnoreCase(action)) {
 
-				if (!currentUser.isSysAdmin() && (crf.getOwnerId() != currentUser.getId())) {
+				if (!userCanRemoveCRF(request)) {
 					addPageMessage(
 							respage.getString("no_have_correct_privilege_current_study") + " "
 									+ respage.getString("change_active_study_or_contact"), request);
@@ -191,8 +196,9 @@ public class RemoveCRFServlet extends Controller {
 
 				getEventCRFService().setEventCRFsToAutoRemovedState(eventCRFs, currentUser);
 
-				addPageMessage(new StringBuilder("").append(respage.getString("the_CRF")).append(crf.getName()).append(" ")
-						.append(respage.getString("has_been_removed_succesfully")).toString(), request);
+				addPageMessage(
+						new StringBuilder("").append(respage.getString("the_CRF")).append(crf.getName()).append(" ")
+								.append(respage.getString("has_been_removed_succesfully")).toString(), request);
 
 			} else {
 				addPageMessage(respage.getString("invalid_http_request_parameters"), request);

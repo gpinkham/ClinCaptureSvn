@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Removes a crf version
+ * Removes a crf version.
  * 
  * @author jxu
  * 
@@ -71,17 +71,23 @@ public class RemoveCRFVersionServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+		if (userCanRemoveCRFVersion(request)) {
+			return;
+		}
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
+	}
 
+	private boolean userCanRemoveCRFVersion(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
-			return;
+			return true;
 		}
-
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -108,7 +114,7 @@ public class RemoveCRFVersionServlet extends Controller {
 			eventCRFs = evdao.findAllByCRFVersion(versionId);
 
 			if (ACTION_CONFIRM.equalsIgnoreCase(action)) {
-				if (!currentUser.isSysAdmin() && (version.getOwnerId() != currentUser.getId())) {
+				if (!userCanRemoveCRFVersion(request)) {
 					addPageMessage(
 							respage.getString("no_have_correct_privilege_current_study") + " "
 									+ respage.getString("change_active_study_or_contact"), request);
@@ -155,8 +161,10 @@ public class RemoveCRFVersionServlet extends Controller {
 				// Remove coded items
 				getCodedItemService().removeByCRFVersion(versionId);
 
-				addPageMessage(new StringBuilder("").append(respage.getString("the_CRF_version")).append(version.getName())
-						.append(" ").append(respage.getString("has_been_removed_succesfully")).toString(), request);
+				addPageMessage(
+						new StringBuilder("").append(respage.getString("the_CRF_version")).append(version.getName())
+								.append(" ").append(respage.getString("has_been_removed_succesfully")).toString(),
+						request);
 
 			} else {
 				addPageMessage(respage.getString("invalid_http_request_parameters"), request);
@@ -186,6 +194,15 @@ public class RemoveCRFVersionServlet extends Controller {
 		}
 	}
 
+	/**
+	 * 
+	 * @param edcBean
+	 *            EventDefinitionCRFBean
+	 * @param edcDao
+	 *            EventDefinitionCRFDAO
+	 * @param versionList
+	 *            List<CRFVersionBean>
+	 */
 	public static void updateEventDef(EventDefinitionCRFBean edcBean, EventDefinitionCRFDAO edcDao,
 			List<CRFVersionBean> versionList) {
 		ArrayList<Integer> idList = new ArrayList<Integer>();
@@ -209,10 +226,17 @@ public class RemoveCRFVersionServlet extends Controller {
 		}
 	}
 
-	// @pgawade 18-May-2011 #5414 - Ovrloaded the method updateEventDef for an
-	// additional parameter of crf version being locked.
-	// These are changes for setting the correct default crf version Id to event
-	// when existing default version is locked
+	/**
+	 * 
+	 * @param edcBean
+	 *            EventDefinitionCRFBean
+	 * @param edcDao
+	 *            EventDefinitionCRFDAO
+	 * @param versionList
+	 *            List<CRFVersionBean>
+	 * @param crfVIdToLock
+	 *            int
+	 */
 	public static void updateEventDef(EventDefinitionCRFBean edcBean, EventDefinitionCRFDAO edcDao,
 			List<CRFVersionBean> versionList, int crfVIdToLock) {
 		ArrayList<Integer> idList = new ArrayList<Integer>();

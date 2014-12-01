@@ -20,6 +20,9 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -32,9 +35,11 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+/**
+ * 
+ * Initializes Update CRF Servlet.
+ *
+ */
 @SuppressWarnings({ "serial" })
 @Component
 public class InitUpdateCRFServlet extends Controller {
@@ -43,53 +48,46 @@ public class InitUpdateCRFServlet extends Controller {
 	private static final String CRF = "crf";
 
 	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyBean currentStudy = getCurrentStudy(request);
-
-		if (ub.isSysAdmin()) {
+		if (userCanUpdateCRF(request)) {
 			return;
 		}
-
-		boolean isStudyDirectorInParent = false;
-		if (currentStudy.getParentStudyId() > 0) {
-			logger.info("2222");
-			Role r = ub.getRoleByStudy(currentStudy.getParentStudyId()).getRole();
-			if (r.equals(Role.SYSTEM_ADMINISTRATOR)) {
-				isStudyDirectorInParent = true;
-			}
-		}
-
-		// get current studyid
-		int studyId = currentStudy.getId();
-
-		if (ub.hasRoleInStudy(studyId)) {
-			Role r = ub.getRoleByStudy(studyId).getRole();
-			if (isStudyDirectorInParent || r.equals(Role.SYSTEM_ADMINISTRATOR)) {
-				return;
-			}
-		}
-
 		addPageMessage(
 				respage.getString("you_not_have_permission_to_update_a_CRF")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_study_director"),
 				"1");
+	}
 
+	private boolean userCanUpdateCRF(HttpServletRequest request) {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		if (ub.isSysAdmin()) {
+			return true;
+		}
+		boolean isStudyDirectorInParent = false;
+		if (currentStudy.getParentStudyId() > 0) {
+			logger.info("2222");
+			Role r = ub.getRoleByStudy(currentStudy.getParentStudyId()).getRole();
+			if (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
+				isStudyDirectorInParent = true;
+			}
+		}
+		if (ub.hasRoleInStudy(currentStudy.getId())) {
+			Role r = ub.getRoleByStudy(currentStudy.getId()).getRole();
+			if (isStudyDirectorInParent || r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
-
 		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.reset();
 		panel.setStudyInfoShown(false);
@@ -113,7 +111,7 @@ public class InitUpdateCRFServlet extends Controller {
 		} else {
 			CRFDAO cdao = getCRFDAO();
 			CRFBean crf = (CRFBean) cdao.findByPK(crfId);
-			if (!ub.isSysAdmin() && (crf.getOwnerId() != ub.getId())) {
+			if (!userCanUpdateCRF(request)) {
 				addPageMessage(
 						respage.getString("no_have_correct_privilege_current_study") + " "
 								+ respage.getString("change_active_study_or_contact"), request);

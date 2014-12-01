@@ -42,7 +42,7 @@
         </td>
         <c:choose>
           <c:when test="${currRow.bean.status.available}">
-            <c:if test="${userBean.sysAdmin || (userRole.manageStudy && userBean.name==currRow.bean.owner.name)}">
+            <c:if test="${userRole.manageStudy}">
               <td>
                 <a href="InitUpdateCRF?crfId=<c:out value="${currRow.bean.id}"/>"
                    onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
@@ -57,7 +57,7 @@
                 name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
               </td>
             </c:if>
-            <c:if test="${(userRole.role.id eq 1 or userRole.role.id eq 2) and userRole.sysAdmin}">
+            <c:if test="${userRole.manageStudy}">
                   <td>
                       <a href='pages/completeCRFDelete?crfId=<c:out value="${currRow.bean.id}"/>'
                          onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
@@ -81,7 +81,7 @@
               name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
             </td>
 
-              <c:if test="${(userRole.role.id eq 1 or userRole.role.id eq 2) and userRole.sysAdmin}">
+              <c:if test="${userRole.manageStudy}">
                   <td>
                       <a href='pages/completeCRFDelete?crfId=<c:out value="${currRow.bean.id}"/>'
                          onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
@@ -136,7 +136,7 @@
                data-cc-crfId="${currRow.bean.id}_${version.id}" onclick="setAccessedObjectWithRowspans(this)"><img
               name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
           </td>
-          <c:if test="${version.status.available && userBean.sysAdmin}">
+          <c:if test="${version.status.available && userRole.manageStudy}">
               <td><a href="LockCRFVersion?id=<c:out value="${version.id}"/>"
                 onMouseDown="javascript:setImage('bt_Lock1','images/bt_Lock_d.gif');"
                 onMouseUp="javascript:setImage('bt_Lock1','images/bt_Lock.gif');"
@@ -152,7 +152,7 @@
 			  name="bt_Unlock1" src="images/bt__Unlock.png" border="0" alt="<fmt:message key="unlock" bundle="${resword}"/>" title="<fmt:message key="unlock" bundle="${resword}"/>" align="left" hspace="6"></a>
 		     </td>       
           </c:if>
-          <c:if test="${userBean.sysAdmin || (userRole.manageStudy && userBean.name==version.owner.name)}">
+          <c:if test="${userRole.manageStudy}">
             <c:choose>
               <c:when test="${version.status.available}">			
 				</td>
@@ -182,7 +182,7 @@
 			<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
 			</td>
 		  </c:if>
-		  <c:if test="${version.status.name=='removed' && !(userBean.sysAdmin)}">
+		  <c:if test="${version.status.name=='removed' && !(userRole.manageStudy)}">
 		  	<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
 			</td>
 		  </c:if>
@@ -190,7 +190,7 @@
 		  	<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
 			</td>
 		  </c:if>
-          <c:if test="${userBean.sysAdmin}">
+          <c:if test="${userRole.manageStudy}">
             <td><a href="pages/deleteCRFVersion?crfVersionId=<c:out value="${version.id}"/>"
                    onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
                    onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"

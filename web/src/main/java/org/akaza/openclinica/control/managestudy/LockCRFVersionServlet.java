@@ -45,22 +45,24 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+/**
+ * 
+ * Locks CRF version.
+ * 
+ */
 @Component
 @SuppressWarnings({ "rawtypes", "serial" })
 public class LockCRFVersionServlet extends Controller {
-	/**
-    *
-    */
-	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-		
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		if (userCanLockCRFVersion(request)) {
 			return;
 		}
-
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
@@ -68,10 +70,19 @@ public class LockCRFVersionServlet extends Controller {
 
 	}
 
+	private boolean userCanLockCRFVersion(HttpServletRequest request) {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+			return true;
+		}
+		return false;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+
 		UserAccountBean ub = getUserAccountBean(request);
 
 		FormProcessor fp = new FormProcessor(request);
@@ -91,8 +102,9 @@ public class LockCRFVersionServlet extends Controller {
 		CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(crfVersionId);
 		CRFBean crf = (CRFBean) cdao.findByPK(version.getCrfId());
 
-		if (!ub.isSysAdmin() && (version.getOwnerId() != ub.getId())) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+		if (!userCanLockCRFVersion(request)) {
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study") + " "
 							+ respage.getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
@@ -113,13 +125,14 @@ public class LockCRFVersionServlet extends Controller {
 			cvdao.update(version);
 
 			ArrayList versionList = (ArrayList) cvdao.findAllByCRF(version.getCrfId());
-			
+
 			if (versionList.size() > 0) {
-				
+
 				EventDefinitionCRFDAO edCRFDao = getEventDefinitionCRFDAO();
-				List<EventDefinitionCRFBean> edcList = (ArrayList<EventDefinitionCRFBean>) edCRFDao.findAllByCRF(version.getCrfId());
+				List<EventDefinitionCRFBean> edcList = (ArrayList<EventDefinitionCRFBean>) edCRFDao
+						.findAllByCRF(version.getCrfId());
 				for (EventDefinitionCRFBean edcBean : edcList) {
-					
+
 					RemoveCRFVersionServlet.updateEventDef(edcBean, edCRFDao, versionList, crfVersionId);
 				}
 			}
