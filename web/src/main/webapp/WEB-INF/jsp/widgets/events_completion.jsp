@@ -36,14 +36,16 @@
 			<td>
 				<div class="popup_legend_medium"><p></p></div>
 				<div class="data_entry_started sign"></div> - <fmt:message bundle="${resword}" key="data_entry_started" /></td>
-			<td>
-				<div class="popup_legend_medium"><p></p></div>
-				<div class="completed sign"></div> - <fmt:message bundle="${resword}" key="completed" /></td>
 		</tr>
 		<tr align="left">
 			<td>
 				<div class="popup_legend_medium"><p></p></div>
-				<div class="signed sign"></div> - <fmt:message bundle="${resword}" key="subjectEventSigned" /></td>		
+				<div class="completed sign"></div> - <fmt:message bundle="${resword}" key="completed" /></td>
+			<td>
+				<div class="popup_legend_medium"><p></p></div>
+				<div class="signed sign"></div> - <fmt:message bundle="${resword}" key="subjectEventSigned" /></td>
+		</tr>
+		<tr align="left">
 			<td>
 				<div class="popup_legend_medium"><p></p></div>
 				<div class="locked sign"></div> - <fmt:message bundle="${resword}" key="locked" /></td>
@@ -57,7 +59,9 @@
 				<div class="stopped sign"></div> - <fmt:message bundle="${resword}" key="stopped" /></td>
 			<td>
 				<div class="popup_legend_medium"><p></p></div>
-				<div class="sdved sign"></div> - <fmt:message bundle="${resword}" key="sourceDataVerified" /></td>
+				<div class="sdved sign"></div> - <fmt:message bundle="${resword}" key="SDV_complete" /></td>
+		</tr>
+		<tr align="left">
 			<td>
 				<div class="popup_legend_medium"><p></p></div>
 				<div class="not_scheduled sign"></div> - <fmt:message bundle="${resword}" key="notScheduled" /></td>

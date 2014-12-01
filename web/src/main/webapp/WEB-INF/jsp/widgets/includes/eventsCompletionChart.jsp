@@ -37,6 +37,15 @@
 	<input type="hidden" class="status" value="<fmt:message bundle='${resterm}' key='stopped' />" />
 	<input type="hidden" class="status" value="<fmt:message bundle='${resterm}' key='locked' />" />
 	<input type="hidden" class="status" value="<fmt:message bundle='${resterm}' key='not_scheduled' />" />
+	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='scheduled' />" />
+	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='data_entry_started' />" />
+	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='completed' />" />
+	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='subjectEventSigned' />" />
+	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='locked' />" />
+	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='skipped' />" />
+	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='stopped' />" />
+	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='SDV_complete' />" />
+	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='notScheduled' />" />
 </form>
 
 <script>applyThemeForChart();</script>

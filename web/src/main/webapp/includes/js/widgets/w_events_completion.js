@@ -1,5 +1,4 @@
 $(window).load(function() {
-	getEventsCompletionLegendValues();
 	initEventsCompletionWidget("init");
 });
 
@@ -68,6 +67,7 @@ function initEventsCompletionWidget(action) {
 			var element = document.getElementById('toolbar');
 			if (!element) {
 				activateEventCompletionLegend();
+				getEventsCompletionLegendValues();
 			}
 		},
 		error : function(e) {
@@ -81,8 +81,10 @@ function initEventsCompletionWidget(action) {
  */
 function getEventsCompletionLegendValues() {
 	var element = document.getElementById('toolbar');
-	var statusNames = [ 'Scheduled', 'Data Entry Started', 'Completed',
-			'Signed', 'Locked', 'Skipped', 'Stopped', 'Source Data Verified', 'Not Scheduled'];
+	var statusNames = [];
+	$("#events_completion_form .pop_up_status").each(function(){
+		statusNames.push($(this).val());
+	});
 	if (!element) {
 		var url = getCurrentUrl();
 		$.ajax({

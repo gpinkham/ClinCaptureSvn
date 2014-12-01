@@ -267,8 +267,9 @@ form#actionForSave input {
 }
 
 .widget .events_completion table.signs {
-	margin-top: 25px;
-	margin-bottom: 27px;
+	margin-top: 15px;
+	margin-bottom: 5px;
+	margin-left: 35px;
 }
 
 .widget table.signs td {
@@ -353,7 +354,7 @@ form#actionForSave input {
 
 .enrollment_status_per_site table.signs {
 	width: 260px;
-	margin: 28px 90px;
+	margin: 38px 80px;
 }
 
 .enrollment_status_per_site .bar_name {
@@ -375,10 +376,6 @@ form#actionForSave input {
 /* /DNs assigned to me */
 
 /* Events Completion */
-.events_completion .signs td {
-	width: auto;
-}
-
 .events_completion ul.stacked_bar,.events_completion .not_cheduled {
 	background-color: #ecf8ff;
 }
