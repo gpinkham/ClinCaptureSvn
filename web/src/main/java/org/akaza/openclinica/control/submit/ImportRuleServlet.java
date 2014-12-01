@@ -52,10 +52,12 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.text.MessageFormat;
 import java.util.Arrays;
 
@@ -67,7 +69,8 @@ import java.util.Arrays;
 @Component
 public class ImportRuleServlet extends Controller {
 	private static final long serialVersionUID = 9116068126651934226L;
-	protected final Logger log = LoggerFactory.getLogger(ImportRuleServlet.class);
+	private final Logger log = LoggerFactory.getLogger(ImportRuleServlet.class);
+	private static final int FIVE_H = 500;
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -146,7 +149,7 @@ public class ImportRuleServlet extends Controller {
 						getRuleSetService().saveImport(importedRules);
 					} catch (Exception ex) {
 						logger.error("RS save error.", ex);
-						response.sendError(500, ex.getMessage());
+						response.sendError(FIVE_H, ex.getMessage());
 					}
 				} else {
 					request.getSession().setAttribute("importedData", importedRules);
@@ -210,12 +213,12 @@ public class ImportRuleServlet extends Controller {
 				mapping.loadMapping(getCoreResources().getURL("mapping.xml"));
 
 			xmlContext.addMapping(mapping);
-			// create a new Unmarshaller
+			/* create a new Unmarshaller */
 			Unmarshaller unmarshaller = xmlContext.createUnmarshaller();
 			unmarshaller.setWhitespacePreserve(false);
 			unmarshaller.setClass(RulesPostImportContainer.class);
 			// Create a Reader to the file to unmarshal from
-			FileReader reader = new FileReader(xmlFile);
+			Reader reader = new InputStreamReader(new FileInputStream(xmlFile), "UTF-8");
 			ruleImport = (RulesPostImportContainer) unmarshaller.unmarshal(reader);
 			ruleImport.initializeRuleDef();
 			logRuleImport(ruleImport);
