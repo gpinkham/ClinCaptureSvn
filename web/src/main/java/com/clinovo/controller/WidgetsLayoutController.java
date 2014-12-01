@@ -1129,8 +1129,8 @@ public class WidgetsLayoutController {
 		List<Integer> listOfEventsWithStatuses = new ArrayList<Integer>();
 
 		listOfEventsWithStatuses.add(availableSubjects);
-		listOfEventsWithStatuses.add(removedSubjects + autoRemovedSubjects);
 		listOfEventsWithStatuses.add(signedSubjects);
+		listOfEventsWithStatuses.add(removedSubjects + autoRemovedSubjects);
 		listOfEventsWithStatuses.add(lockedSubjects);
 
 		response.getWriter().println(listOfEventsWithStatuses);
