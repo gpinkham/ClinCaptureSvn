@@ -12,10 +12,10 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <c:choose>
-  <c:when test="${currRow.bean.status.name eq 'available'}">
+  <c:when test="${currRow.bean.status.available}">
     <c:set var="className" value="aka_green_highlight"/>
   </c:when>
-  <c:when test="${currRow.bean.status.name eq 'removed' || currRow.bean.status.name eq 'auto-removed'}">
+  <c:when test="${currRow.bean.status.deleted}">
     <c:set var="className" value="aka_red_highlight"/>
   </c:when>
 </c:choose>
@@ -98,10 +98,10 @@
 <c:forEach var ="version" items="${currRow.bean.versions}">
   <%-- color-coded statuses...--%>
   <c:choose>
-    <c:when test="${version.status.name eq 'available'}">
+    <c:when test="${version.status.available}">
       <c:set var="className" value="aka_green_highlight"/>
     </c:when>
-    <c:when test="${version.status.name eq 'removed' || version.status.name eq 'auto-removed'}">
+    <c:when test="${version.status.deleted}">
       <c:set var="className" value="aka_red_highlight"/>
     </c:when>
   </c:choose>
@@ -144,7 +144,7 @@
                 name="bt_Lock1" src="images/bt__Lock.png" border="0" alt="<fmt:message key="lock" bundle="${resword}"/>" title="<fmt:message key="lock" bundle="${resword}"/>" align="left" hspace="6"></a>
               </td>
 		  </c:if>
-		  <c:if test="${version.status.name=='locked'}">             
+		  <c:if test="${version.status.locked}">
              <td><a href="UnlockCRFVersion?id=<c:out value="${version.id}"/>"
 			  onMouseDown="javascript:setImage('bt_Unlock1','images/bt_Unlock_d.gif');"
 			  onMouseUp="javascript:setImage('bt_Unlock1','images/bt_Unlock.gif');"
@@ -163,7 +163,7 @@
                   name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </td>                
               </c:when>
-              <c:when test="${version.status.name == 'removed'}">
+              <c:when test="${version.status.id eq 5}">
 			  
 			<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
 			</td>
@@ -176,17 +176,17 @@
              </c:when>
             </c:choose>
           </c:if>
-		  <c:if test="${version.status.name=='auto-removed'}">
+		  <c:if test="${version.status.id eq 7}">
 		  	<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
 			</td>
 			<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
 			</td>
 		  </c:if>
-		  <c:if test="${version.status.name=='removed' && !(userRole.manageStudy)}">
+		  <c:if test="${version.status.id eq 5 && !(userRole.manageStudy)}">
 		  	<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
 			</td>
 		  </c:if>
-		  <c:if test="${version.status.name=='locked'}">
+		  <c:if test="${version.status.locked}">
 		  	<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
 			</td>
 		  </c:if>
