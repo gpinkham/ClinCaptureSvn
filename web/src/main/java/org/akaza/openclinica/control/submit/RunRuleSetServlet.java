@@ -62,13 +62,13 @@ public class RunRuleSetServlet extends Controller {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole()
-				.equals(Role.STUDY_ADMINISTRATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
@@ -89,14 +89,14 @@ public class RunRuleSetServlet extends Controller {
 			List<RuleSetBean> ruleSets = new ArrayList<RuleSetBean>();
 			ruleSets.add(ruleSetBean);
 			if (dryRun != null && dryRun.equals("no")) {
-				List<RuleSetBasedViewContainer> resultOfRunningRules = getRuleSetService()
-						.runRulesInBulk(ruleSets, false, currentStudy, ub);
+				List<RuleSetBasedViewContainer> resultOfRunningRules = getRuleSetService(request).runRulesInBulk(
+						ruleSets, false, currentStudy, ub);
 				addPageMessage(respage.getString("actions_successfully_taken"), request);
 				forwardPage(Page.LIST_RULE_SETS_SERVLET, request, response);
 
 			} else {
-				List<RuleSetBasedViewContainer> resultOfRunningRules = getRuleSetService().runRulesInBulk(ruleSets,
-						true, currentStudy, ub);
+				List<RuleSetBasedViewContainer> resultOfRunningRules = getRuleSetService(request).runRulesInBulk(
+						ruleSets, true, currentStudy, ub);
 				request.setAttribute(RULESET, ruleSetBean);
 				request.setAttribute(RULESET_RESULT, resultOfRunningRules);
 				if (resultOfRunningRules.size() > 0) {
@@ -136,11 +136,9 @@ public class RunRuleSetServlet extends Controller {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private RuleSetService getRuleSetService(HttpServletRequest request) {
-		String requestUrl =
-				request.getScheme() + "://" + request.getSession().getAttribute(DOMAIN_NAME) + request.getRequestURI()
-						.replaceAll(request.getServletPath(), "");
+		String requestUrl = request.getScheme() + "://" + request.getSession().getAttribute(DOMAIN_NAME)
+				+ request.getRequestURI().replaceAll(request.getServletPath(), "");
 		RuleSetService ruleSetService = getRuleSetService();
 		ruleSetService.setContextPath(getContextPath(request));
 		ruleSetService.setMailSender(getMailSender());

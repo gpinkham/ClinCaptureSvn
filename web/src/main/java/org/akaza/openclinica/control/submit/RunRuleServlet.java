@@ -20,6 +20,12 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.HashMap;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -29,32 +35,24 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
- * Run Rules Using this Servlet
+ * Run Rules Using this Servlet.
  * 
  * @author Krikor krumlian
  */
 @Component
 public class RunRuleServlet extends Controller {
 	private static final long serialVersionUID = 9116068126651934226L;
-	protected final Logger log = LoggerFactory.getLogger(RunRuleServlet.class);
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		String action = request.getParameter("action");
 		String crfId = request.getParameter("crfId");
@@ -62,12 +60,9 @@ public class RunRuleServlet extends Controller {
 		String versionId = request.getParameter("versionId");
 
 		if (StringUtil.isBlank(action)) {
-			// TODO : if someone tampers with URL catch here and forwar to correct place
 			forwardPage(Page.MENU_SERVLET, request, response);
-            return;
+			return;
 		}
-
-		// Boolean dryRun = action == null || "dryRun".equalsIgnoreCase(action) ? true : false;
 		ExecutionMode executionMode = action == null || "dryRun".equalsIgnoreCase(action) ? ExecutionMode.DRY_RUN
 				: ExecutionMode.SAVE;
 		String submitLinkParams = "";
@@ -75,10 +70,11 @@ public class RunRuleServlet extends Controller {
 		HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> result = null;
 		if (ruleSetRuleId != null && versionId != null) {
 			submitLinkParams = "ruleSetRuleId=" + ruleSetRuleId + "&versionId=" + versionId + "&action=no";
-			result = getRuleSetService().runRulesInBulk(ruleSetRuleId, versionId, executionMode, currentStudy, ub);
+			result = getRuleSetService(request).runRulesInBulk(ruleSetRuleId, versionId, executionMode, currentStudy,
+					ub);
 		} else {
 			submitLinkParams = "crfId=" + crfId + "&action=no";
-			result = getRuleSetService().runRulesInBulk(crfId, executionMode, currentStudy, ub);
+			result = getRuleSetService(request).runRulesInBulk(crfId, executionMode, currentStudy, ub);
 		}
 
 		request.setAttribute("result", result);
@@ -90,9 +86,19 @@ public class RunRuleServlet extends Controller {
 		}
 	}
 
+	private RuleSetService getRuleSetService(HttpServletRequest request) {
+		String requestUrl = request.getScheme() + "://" + request.getSession().getAttribute(DOMAIN_NAME)
+				+ request.getRequestURI().replaceAll(request.getServletPath(), "");
+		RuleSetService ruleSetService = getRuleSetService();
+		ruleSetService.setContextPath(getContextPath(request));
+		ruleSetService.setMailSender(getMailSender());
+		ruleSetService.setRequestURLMinusServletPath(requestUrl);
+		return ruleSetService;
+	}
+
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
 			return Controller.ADMIN_SERVLET_CODE;
 		} else {
@@ -101,9 +107,10 @@ public class RunRuleServlet extends Controller {
 	}
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -112,8 +119,9 @@ public class RunRuleServlet extends Controller {
 		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 }

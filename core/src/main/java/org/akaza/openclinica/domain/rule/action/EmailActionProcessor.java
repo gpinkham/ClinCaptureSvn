@@ -38,10 +38,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+/**
+ * Processes rule email actions.
+ * 
+ */
 @SuppressWarnings("unchecked")
 public class EmailActionProcessor implements ActionProcessor {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private Connection connection;
 	private DataSource ds;
 	private JavaMailSenderImpl mailSender;
@@ -49,6 +53,19 @@ public class EmailActionProcessor implements ActionProcessor {
 	private DiscrepancyNoteService discrepancyNoteService;
 	private RuleSetRuleBean ruleSetRule;
 
+	/**
+	 * 
+	 * @param connection
+	 *            Connection
+	 * @param ds
+	 *            DataSource
+	 * @param mailSender
+	 *            JavaMailSenderImpl
+	 * @param ruleActionRunLogDao
+	 *            RuleActionRunLogDao
+	 * @param ruleSetRule
+	 *            RuleSetRuleBean
+	 */
 	public EmailActionProcessor(Connection connection, DataSource ds, JavaMailSenderImpl mailSender,
 			RuleActionRunLogDao ruleActionRunLogDao, RuleSetRuleBean ruleSetRule) {
 		this.connection = connection;
@@ -58,28 +75,39 @@ public class EmailActionProcessor implements ActionProcessor {
 		this.ruleActionRunLogDao = ruleActionRunLogDao;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode,
 			RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy,
 			UserAccountBean ub, Object... arguments) {
 		switch (executionMode) {
-		case DRY_RUN: {
+		case DRY_RUN:
 			return ruleAction;
-		}
-
-		case SAVE: {
-			HashMap<String, String> arg0 = (HashMap<String, String>) arguments[1];
-			if (!sendEmail(ruleAction, arg0.get("body"), arg0.get("subject"))) {
-				getDiscrepancyNoteService().saveFieldNotes(((EmailActionBean) ruleAction).getExceptionMessage(),
-						itemDataBean.getId(), itemData, connection, currentStudy, ub, true);
+		case SAVE:
+			HashMap<String, String> email = getEmailArgument(arguments);
+			if (email != null) {
+				if (!sendEmail(ruleAction, email.get("body"), email.get("subject"))) {
+					getDiscrepancyNoteService().saveFieldNotes(((EmailActionBean) ruleAction).getExceptionMessage(),
+							itemDataBean.getId(), itemData, connection, currentStudy, ub, true);
+				}
+				RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(ruleAction.getActionType(),
+						itemDataBean, itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
+				ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog, connection);
 			}
-			RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean,
-					itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
-			ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog, connection);
 			return null;
-		}
 		default:
 			return null;
 		}
+	}
+
+	private HashMap<String, String> getEmailArgument(Object[] arguments) {
+		for (Object arg : arguments) {
+			if (arg instanceof HashMap<?, ?>) {
+				return (HashMap<String, String>) arg;
+			}
+		}
+		return null;
 	}
 
 	private boolean sendEmail(RuleActionBean ruleAction, String body, String subject) {
@@ -125,8 +153,10 @@ public class EmailActionProcessor implements ActionProcessor {
 		return discrepancyNoteService;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Object execute(SubmissionContext context) {
-		// Do nothing
 		return null;
 	}
 }

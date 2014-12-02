@@ -96,6 +96,10 @@ public class EmailActionProcessorTest {
 				emailActionProcessor1.execute(RuleRunner.RuleRunnerMode.DATA_ENTRY, ExecutionMode.SAVE,
 						emailActionBean, itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, true, map))
 				.thenCallRealMethod();
+		Mockito.when(
+				emailActionProcessor1.execute(RuleRunner.RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE,
+						emailActionBean, itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, map))
+				.thenCallRealMethod();
 		mimeMessage = Mockito.mock(MimeMessage.class);
 		mailSender = Mockito.mock(JavaMailSenderImpl.class);
 		Mockito.when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
@@ -109,6 +113,10 @@ public class EmailActionProcessorTest {
 		Mockito.when(
 				emailActionProcessor2.execute(RuleRunner.RuleRunnerMode.DATA_ENTRY, ExecutionMode.SAVE,
 						emailActionBean, itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, true, map))
+				.thenCallRealMethod();
+		Mockito.when(
+				emailActionProcessor2.execute(RuleRunner.RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE,
+						emailActionBean, itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, map))
 				.thenCallRealMethod();
 		Whitebox.setInternalState(emailActionProcessor2, "discrepancyNoteService", customDiscrepancyNoteService);
 		Whitebox.setInternalState(emailActionProcessor2, "ruleActionRunLogDao", ruleActionRunLogDao);
@@ -132,6 +140,24 @@ public class EmailActionProcessorTest {
 		PowerMockito.when(EmailEngine.getAdminEmail()).thenReturn("admin@test.com");
 		emailActionProcessor2.execute(RuleRunner.RuleRunnerMode.DATA_ENTRY, ExecutionMode.SAVE, emailActionBean,
 				itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, true, map);
+		assertFalse(emailActionProcessorResult);
+	}
+	
+	@Test
+	public void testThatForBulkRuleRunEmailActionProcessorResultIsTrue() {
+		emailActionProcessorResult = false;
+		PowerMockito.when(EmailEngine.getAdminEmail()).thenReturn("");
+		emailActionProcessor1.execute(RuleRunner.RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, emailActionBean,
+				itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, map);
+		assertTrue(emailActionProcessorResult);
+	}
+
+	@Test
+	public void testThatForBulkRuleRunEmailActionProcessorResultIsFalse() {
+		emailActionProcessorResult = false;
+		PowerMockito.when(EmailEngine.getAdminEmail()).thenReturn("admin@test.com");
+		emailActionProcessor2.execute(RuleRunner.RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, emailActionBean,
+				itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, map);
 		assertFalse(emailActionProcessorResult);
 	}
 }
