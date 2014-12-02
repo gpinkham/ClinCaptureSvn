@@ -81,9 +81,8 @@ public class OCServletFilter implements javax.servlet.Filter {
 		CoreResources.setField("remoteIp", request.getRemoteAddr());
 
 		Locale locale = new Locale(CoreResources.getSystemLanguage());
-		((SessionLocaleResolver) springContext.getBean("localeResolver")).setLocale((HttpServletRequest) request,
-				(HttpServletResponse) response, locale);
-		SessionUtil.updateLocale((HttpServletRequest) request, locale);
+		SessionUtil.updateLocale((HttpServletRequest) request, (HttpServletResponse) response,
+				(SessionLocaleResolver) springContext.getBean("localeResolver"), locale);
 		ResourceBundleProvider.updateLocale(locale);
 
 		((HttpServletRequest) request).getSession().setAttribute("logoUrl", CoreResources.getField("logo"));

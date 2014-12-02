@@ -63,8 +63,24 @@ public final class SessionUtil {
 			}
 		}
 		session.setAttribute("newThemeColor", CoreResources.getField("themeColor"));
-		Locale locale = new Locale(CoreResources.getSystemLanguage());
-		updateLocale(session, locale);
+		updateLocale(request, response, localeResolver, new Locale(CoreResources.getSystemLanguage()));
+	}
+
+	/**
+	 * Method that updates locale.
+	 *
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param localeResolver
+	 *            SessionLocaleResolver
+	 * @param locale
+	 *            Locale
+	 */
+	public static void updateLocale(HttpServletRequest request, HttpServletResponse response,
+			SessionLocaleResolver localeResolver, Locale locale) {
+		updateLocale(request.getSession(), locale);
 		localeResolver.setLocale(request, response, locale);
 	}
 
