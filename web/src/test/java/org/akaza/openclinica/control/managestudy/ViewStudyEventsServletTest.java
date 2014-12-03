@@ -29,6 +29,7 @@ import java.util.ResourceBundle;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ ResourceBundleProvider.class, ViewStudyEventsServlet.class })
+@SuppressWarnings("rawtypes")
 public class ViewStudyEventsServletTest {
 
 	@Spy
@@ -77,7 +78,9 @@ public class ViewStudyEventsServletTest {
 		Mockito.doCallRealMethod().when(viewStudyEventsServlet).getLocalDf(request);
 		SessionUtil.updateLocale(session, Locale.ENGLISH);
 		Validator validator = PowerMockito.mock(Validator.class);
-		PowerMockito.when(viewStudyEventsServlet, PowerMockito.method(ViewStudyEventsServlet.class, "getValidator", HttpServletRequest.class))
+		PowerMockito
+				.when(viewStudyEventsServlet,
+						PowerMockito.method(ViewStudyEventsServlet.class, "getValidator", HttpServletRequest.class))
 				.withArguments(request).thenReturn(validator);
 		Mockito.when(validator.validate()).thenReturn(new HashMap());
 		Mockito.when(request.getMethod()).thenReturn("POST");

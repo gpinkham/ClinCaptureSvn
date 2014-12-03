@@ -158,6 +158,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		if (hm.get("item_id") != null) {
 			eb.setItemId((Integer) hm.get("item_id"));
 		}
+		if (hm.get("event_crf_id") != null) {
+			eb.setEventCRFId((Integer) hm.get("event_crf_id"));
+		}
 		if (eb.getAssignedUserId() > 0) {
 			UserAccountDAO userAccountDAO = new UserAccountDAO(ds);
 			UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(eb.getAssignedUserId());
@@ -2010,6 +2013,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public ArrayList<DiscrepancyNoteBean> findAllTopNotesByEventCRF(int eventCRFId) {
 		this.setTypesExpected();
 		this.setTypeExpected(12, TypeNames.INT);
+		this.setTypeExpected(13, TypeNames.INT);
 		ArrayList alist;
 		HashMap variables = new HashMap();
 		variables.put(1, eventCRFId);
@@ -2328,7 +2332,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Select discrepancy notes counter for eCRFs marked as evaluation required.
 	 *
-	 * @param currentStudy the current study bean.
+	 * @param currentStudy
+	 *            the current study bean.
 	 * @return the list with discrepancy note statistic beans.
 	 */
 	public List<DiscrepancyNoteStatisticBean> countNotesStatisticForEvaluationCrf(StudyBean currentStudy) {
@@ -2345,8 +2350,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 				"SELECT sum(count), discrepancy_note_type_id, resolution_status_id FROM (");
 		sql.append(digester.getQuery("countAllEventCrfDNByStudyForStat"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( ")
-					.append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
 		sql.append(" and ec.crf_version_id in (select crf_version_id from crf_version where crf_id in (select crf_id from event_definition_crf where event_definition_crf.evaluated_crf = ");
@@ -2359,8 +2363,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllItemDataDNByStudyForStat"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( ")
-					.append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
 		sql.append(" and ec.crf_version_id in (select crf_version_id from crf_version where crf_id in (select crf_id from event_definition_crf where event_definition_crf.evaluated_crf = ");

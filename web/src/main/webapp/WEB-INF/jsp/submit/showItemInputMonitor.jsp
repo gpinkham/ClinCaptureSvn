@@ -419,11 +419,13 @@ form element in red --%>
     </c:otherwise>
   </c:choose>
 
-  <c:if test="${displayItem.firstNewDn}"><a id="firstNewDn" rel="${itemId}" alt=""></a></c:if>
-  <c:if test="${displayItem.firstUpdatedDn}"><a id="firstUpdatedDn" rel="${itemId}" alt=""></a></c:if>
-  <c:if test="${displayItem.firstResolutionProposed}"><a id="firstResolutionProposed" rel="${itemId}" alt=""></a></c:if>
-  <c:if test="${displayItem.firstClosedDn}"><a id="firstClosedDn" rel="${itemId}" alt=""></a></c:if>
-  <c:if test="${displayItem.firstAnnotation}"><a id="firstAnnotation" rel="${itemId}" alt=""></a></c:if>
+  <div id="dnShortcutAnchors_item_${displayItem.item.id}" field="${inputName}" class="hidden">
+      <c:forEach items="${displayItem.newDn}" var="value"><a id="${value}" rel="${itemId}" alt=""></a></c:forEach>
+      <c:forEach items="${displayItem.updatedDn}" var="value"><a id="${value}" rel="${itemId}" alt=""></a></c:forEach>
+      <c:forEach items="${displayItem.resolutionProposedDn}" var="value"><a id="${value}" rel="${itemId}" alt=""></a></c:forEach>
+      <c:forEach items="${displayItem.closedDn}" var="value"><a id="${value}" rel="${itemId}" alt=""></a></c:forEach>
+      <c:forEach items="${displayItem.annotationDn}" var="value"><a id="${value}" rel="${itemId}" alt=""></a></c:forEach>
+  </div>
 
   <c:choose>
     <c:when test="${displayItem.numDiscrepancyNotes > 0}">

@@ -758,9 +758,6 @@ public final class Page {
 
 	public static final Page UPDATE_CRF_HEADER_PAGE = new Page(PATH + "submit/updateCRFHeader.jsp", "Update CRF Header");
 
-	public static final Page UPDATE_DN_SHORTCUT_ANCHORS_PAGE = new Page(PATH + "submit/updateDNShortcutAnchors.jsp",
-			"Update DN Shortcut  Anchors");
-
 	public static final Page VIEW_DISCREPANCY_NOTE = new Page("/WEB-INF/jsp/submit/viewDiscrepancyNote.jsp",
 			"View Discrepancy Note");
 	public static final Page VIEW_DISCREPANCY_NOTES_IN_STUDY = new Page("/WEB-INF/jsp/managestudy/viewNotes.jsp",

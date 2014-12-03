@@ -589,11 +589,11 @@
                         <td valign="top" width="${dnShortcutsWidth}" align="center" class="table_cell_left"  style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;" width="20%"> <fmt:message key="annotations" bundle="${resword}"/></td>
                     </tr>
                     <tr>
-                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#CC0000;" width="20%"><a class="dnShortcut" href="${discrepancyShortcutsAnalyzer.firstNewDnLink}" onclick="highlightFieldForDNShortcutAnchor('firstNewDn');"><div style="width: 100%; text-align: center;" id="dnShortcutTotalNew">&nbsp;${discrepancyShortcutsAnalyzer.totalNew}&nbsp;</div></a></td>
-                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#D4A718;" width="20%"><a class="dnShortcut" href="${discrepancyShortcutsAnalyzer.firstUpdatedDnLink}" onclick="highlightFieldForDNShortcutAnchor('firstUpdatedDn');"><div style="width: 100%; text-align: center;" id="dnShortcutTotalUpdated">&nbsp;${discrepancyShortcutsAnalyzer.totalUpdated}&nbsp;</div></a></td>
-                        <c:if test="${discrepancyShortcutsAnalyzer.totalResolutionProposed != 0}"><td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black;" width="20%"><a class="dnShortcut" href="${discrepancyShortcutsAnalyzer.firstResolutionProposedLink}" onclick="highlightFieldForDNShortcutAnchor('firstResolutionProposed');"><div style="width: 100%; text-align: center;" id="dnShortcutTotalResolutionProposed">&nbsp;${discrepancyShortcutsAnalyzer.totalResolutionProposed}&nbsp;</div></a></td></c:if>
-                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#7CB98F;" width="20%"><a class="dnShortcut" href="${discrepancyShortcutsAnalyzer.firstClosedDnLink}" onclick="highlightFieldForDNShortcutAnchor('firstClosedDn');"><div style="width: 100%; text-align: center;" id="dnShortcutTotalClosed">&nbsp;${discrepancyShortcutsAnalyzer.totalClosed}&nbsp;</div></a></td>
-                        <td valign="top" align="center" class="table_cell_left"  style="border-right:1px solid #E6E6E6;color:black" width="20%"><a class="dnShortcut" href="${discrepancyShortcutsAnalyzer.firstAnnotationLink}" onclick="highlightFieldForDNShortcutAnchor('firstAnnotation');"><div style="width: 100%; text-align: center;" id="dnShortcutTotalAnnotations">&nbsp;${discrepancyShortcutsAnalyzer.totalAnnotations}&nbsp;</div></a></td>
+                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#CC0000;" width="20%"><a class="dnShortcut" href="#" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalNew}" firstdnlink="${discrepancyShortcutsAnalyzer.firstNewDnLink}" nextdnlink="${discrepancyShortcutsAnalyzer.nextNewDnLink}" onclick="highlightFieldForDNShortcutAnchor(0, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalNew" rel="${discrepancyShortcutsAnalyzer.sectionTotalNew}">&nbsp;${discrepancyShortcutsAnalyzer.totalNew}&nbsp;</div></a></td>
+                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#D4A718;" width="20%"><a class="dnShortcut" href="#" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalUpdated}" firstdnlink="${discrepancyShortcutsAnalyzer.firstUpdatedDnLink}" nextdnlink="${discrepancyShortcutsAnalyzer.nextUpdatedDnLink}" onclick="highlightFieldForDNShortcutAnchor(1, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalUpdated" rel="${discrepancyShortcutsAnalyzer.sectionTotalUpdated}">&nbsp;${discrepancyShortcutsAnalyzer.totalUpdated}&nbsp;</div></a></td>
+                        <c:if test="${discrepancyShortcutsAnalyzer.totalResolutionProposed != 0}"><td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black;" width="20%"><a class="dnShortcut" href="#" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalResolutionProposed}" firstdnlink="${discrepancyShortcutsAnalyzer.firstResolutionProposedLink}" nextdnlink="${discrepancyShortcutsAnalyzer.nextResolutionProposedLink}" onclick="highlightFieldForDNShortcutAnchor(2, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalResolutionProposed" rel="${discrepancyShortcutsAnalyzer.sectionTotalResolutionProposed}">&nbsp;${discrepancyShortcutsAnalyzer.totalResolutionProposed}&nbsp;</div></a></td></c:if>
+                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#7CB98F;" width="20%"><a class="dnShortcut" href="#" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalClosed}" firstdnlink="${discrepancyShortcutsAnalyzer.firstClosedDnLink}" nextdnlink="${discrepancyShortcutsAnalyzer.nextClosedDnLink}" onclick="highlightFieldForDNShortcutAnchor(3, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalClosed" rel="${discrepancyShortcutsAnalyzer.sectionTotalClosed}">&nbsp;${discrepancyShortcutsAnalyzer.totalClosed}&nbsp;</div></a></td>
+                        <td valign="top" align="center" class="table_cell_left"  style="border-right:1px solid #E6E6E6;color:black" width="20%"><a class="dnShortcut" href="#" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalAnnotations}" firstdnlink="${discrepancyShortcutsAnalyzer.firstAnnotationLink}" nextdnlink="${discrepancyShortcutsAnalyzer.nextAnnotationLink}" onclick="highlightFieldForDNShortcutAnchor(4, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalAnnotations" rel="${discrepancyShortcutsAnalyzer.sectionTotalAnnotations}">&nbsp;${discrepancyShortcutsAnalyzer.totalAnnotations}&nbsp;</div></a></td>
                     </tr>
                 </table>
             </div></div></div></div></div></div></div></div></div>
@@ -614,14 +614,18 @@
             var start = document.location.href.indexOf("#");
             if (start > 0) {
                 var dnShortcutId = document.location.href.substring(start, end);
-                var positionTop = parseInt($(dnShortcutId).position().top);
-                var browserClientHeight = getBrowserClientHeight();
-                if (positionTop > 0) {
-                    if (positionTop > browserClientHeight) {
-                        document.location.href = document.location.href;
-                    }
-                    highlightFieldForDNShortcutAnchor(dnShortcutId.replace("#", ""));
+                if (dnShortcutId == "#" || $(dnShortcutId).length == 0) {
                     clearInterval(dnShortcutInterval);
+                } else {
+                    var positionTop = parseInt($(dnShortcutId).position().top);
+                    var browserClientHeight = getBrowserClientHeight();
+                    if (positionTop >= 0) {
+                        if (positionTop > browserClientHeight) {
+                            document.location.href = document.location.href;
+                        }
+                        highlightFirstFieldForDNShortcutAnchors(dnShortcutId.replace("#", ""));
+                        clearInterval(dnShortcutInterval);
+                    }
                 }
             } else {
                 clearInterval(dnShortcutInterval);
@@ -634,6 +638,7 @@
         dnShortcutInterval = setInterval(dnShortcutFunction, 1);
     });
     window.updateCRFHeader = function(field, itemId, rowCount, resolutionStatusId) {
+        gfAddOverlay();
         var parametersHolder = {
             contextPath: "<%=request.getContextPath()%>",
             servletPath: document.location.pathname.replace("<%=request.getContextPath()%>", ""),
@@ -655,7 +660,8 @@
         if (parametersHolder.exitTo.toLowerCase() == "null") {
             parametersHolder.exitTo = "";
         }
-        addDNShortcutAnchor(parametersHolder);
+        resetHighlightedFieldsForDNShortcutAnchors();
+        updateCRFHeaderFunction(parametersHolder);
     };
 
     $(document).ready(function () {

@@ -1218,7 +1218,7 @@
     <query>
         <name>findAllTopNotesByEventCRF</name>
         <sql>
-            SELECT distinct dn.*, id.item_id
+            SELECT distinct dn.*, id.item_id, id.ordinal item_data_ordinal
             FROM discrepancy_note dn, dn_item_data_map dsm,
             item_data id
             where id.event_crf_id=?

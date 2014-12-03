@@ -73,35 +73,35 @@ public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 	public void testThatIsFirstNewDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(1);
 		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
-		assertTrue(displayItemBean.isFirstNewDn());
+		assertEquals(displayItemBean.getNewDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstUpdatedDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(2);
 		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
-		assertTrue(displayItemBean.isFirstUpdatedDn());
+		assertEquals(displayItemBean.getUpdatedDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstResolutionProposedReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(THREE);
 		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
-		assertTrue(displayItemBean.isFirstResolutionProposed());
+		assertEquals(displayItemBean.getResolutionProposedDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstClosedDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(FOUR);
 		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
-		assertTrue(displayItemBean.isFirstClosedDn());
+		assertEquals(displayItemBean.getClosedDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstAnnotationReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(FIVE);
 		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
-		assertTrue(displayItemBean.isFirstAnnotation());
+		assertEquals(displayItemBean.getAnnotationDn().size(), 1);
 	}
 
 	@Test
@@ -109,7 +109,7 @@ public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 		buildAnalyzerUrl(false);
 		DiscrepancyShortcutsAnalyzer analyzer = (DiscrepancyShortcutsAnalyzer) request
 				.getAttribute("discrepancyShortcutsAnalyzer");
-		assertEquals("http://clincapture.com?eventCRFId=2&sectionId=0&tabId=1#firstNewDn", analyzer.getFirstNewDnLink());
+		assertEquals("http://clincapture.com?eventCRFId=2&sectionId=0&tabId=1#newDn_1", analyzer.getFirstNewDnLink());
 
 	}
 
@@ -118,7 +118,7 @@ public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 		buildAnalyzerUrl(true);
 		DiscrepancyShortcutsAnalyzer analyzer = (DiscrepancyShortcutsAnalyzer) request
 				.getAttribute("discrepancyShortcutsAnalyzer");
-		assertEquals("http://clincapture.com?eventCRFId=2&cw=1&sectionId=0&tabId=1#firstNewDn",
+		assertEquals("http://clincapture.com?eventCRFId=2&cw=1&sectionId=0&tabId=1#newDn_1",
 				analyzer.getFirstNewDnLink());
 
 	}

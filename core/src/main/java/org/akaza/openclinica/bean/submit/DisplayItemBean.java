@@ -19,24 +19,24 @@
  */
 package org.akaza.openclinica.bean.submit;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.service.crfdata.SCDData;
 import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
 
-@SuppressWarnings({"rawtypes"})
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+@SuppressWarnings({ "rawtypes" })
 public class DisplayItemBean implements Comparable {
 	private ItemDataBean data;
 	private ItemBean item;
 	private ItemFormMetadataBean metadata;
 	private String editFlag = "";// used for items in a group
 	private ItemDataBean dbData; // used for DDE, items in a group
-	private boolean autoAdded; //used for data import
+	private boolean autoAdded; // used for data import
 
 	// adding totals here for display purposes
 
@@ -87,11 +87,11 @@ public class DisplayItemBean implements Comparable {
 	 */
 	private int discrepancyNoteStatus;
 
-	private boolean firstNewDn;
-	private boolean firstUpdatedDn;
-	private boolean firstResolutionProposed;
-	private boolean firstClosedDn;
-	private boolean firstAnnotation;
+	private List<String> newDn = new ArrayList<String>();
+	private List<String> updatedDn = new ArrayList<String>();
+	private List<String> resolutionProposedDn = new ArrayList<String>();
+	private List<String> closedDn = new ArrayList<String>();
+	private List<String> annotationDn = new ArrayList<String>();
 
 	/**
 	 * It is true if a scd item will display because of chosen options.
@@ -105,6 +105,16 @@ public class DisplayItemBean implements Comparable {
 	private boolean blankDwelt;
 
 	private InstantOnChangeFrontStrGroup instantFrontStrGroup;
+
+	private String field;
+
+	public String getField() {
+		return field;
+	}
+
+	public void setField(String field) {
+		this.field = field;
+	}
 
 	private void setProperties() {
 		data = new ItemDataBean();
@@ -617,44 +627,44 @@ public class DisplayItemBean implements Comparable {
 		this.skip = skip;
 	}
 
-	public boolean isFirstNewDn() {
-		return firstNewDn;
+	public List<String> getNewDn() {
+		return newDn;
 	}
 
-	public void setFirstNewDn(boolean firstNewDn) {
-		this.firstNewDn = firstNewDn;
+	public void setNewDn(List<String> newDn) {
+		this.newDn = newDn;
 	}
 
-	public boolean isFirstUpdatedDn() {
-		return firstUpdatedDn;
+	public List<String> getUpdatedDn() {
+		return updatedDn;
 	}
 
-	public void setFirstUpdatedDn(boolean firstUpdatedDn) {
-		this.firstUpdatedDn = firstUpdatedDn;
+	public void setUpdatedDn(List<String> updatedDn) {
+		this.updatedDn = updatedDn;
 	}
 
-	public boolean isFirstResolutionProposed() {
-		return firstResolutionProposed;
+	public List<String> getResolutionProposedDn() {
+		return resolutionProposedDn;
 	}
 
-	public void setFirstResolutionProposed(boolean firstResolutionProposed) {
-		this.firstResolutionProposed = firstResolutionProposed;
+	public void setResolutionProposedDn(List<String> resolutionProposedDn) {
+		this.resolutionProposedDn = resolutionProposedDn;
 	}
 
-	public boolean isFirstClosedDn() {
-		return firstClosedDn;
+	public List<String> getClosedDn() {
+		return closedDn;
 	}
 
-	public void setFirstClosedDn(boolean firstClosedDn) {
-		this.firstClosedDn = firstClosedDn;
+	public void setClosedDn(List<String> closedDn) {
+		this.closedDn = closedDn;
 	}
 
-	public boolean isFirstAnnotation() {
-		return firstAnnotation;
+	public List<String> getAnnotationDn() {
+		return annotationDn;
 	}
 
-	public void setFirstAnnotation(boolean firstAnnotation) {
-		this.firstAnnotation = firstAnnotation;
+	public void setAnnotationDn(List<String> annotationDn) {
+		this.annotationDn = annotationDn;
 	}
 
 	/**
@@ -665,7 +675,8 @@ public class DisplayItemBean implements Comparable {
 	}
 
 	/**
-	 * @param autoAdded the autoAdded to set
+	 * @param autoAdded
+	 *            the autoAdded to set
 	 */
 	public void setAutoAdded(boolean autoAdded) {
 		this.autoAdded = autoAdded;

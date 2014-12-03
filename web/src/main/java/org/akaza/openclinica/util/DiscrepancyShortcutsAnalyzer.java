@@ -36,11 +36,11 @@ public class DiscrepancyShortcutsAnalyzer {
 
 	public static final String DISCREPANCY_SHORTCUTS_ANALYZER = "discrepancyShortcutsAnalyzer";
 
-	public static final String FIRST_NEW_DN = "#firstNewDn";
-	public static final String FIRST_UPDATED_DN = "#firstUpdatedDn";
-	public static final String FIRST_RESOLUTION_PROPOSED = "#firstResolutionProposed";
-	public static final String FIRST_CLOSED_DN = "#firstClosedDn";
-	public static final String FIRST_ANNOTATION = "#firstAnnotation";
+	public static final String FIRST_NEW_DN = "#newDn_1";
+	public static final String FIRST_UPDATED_DN = "#updatedDn_1";
+	public static final String FIRST_RESOLUTION_PROPOSED = "#resolutionProposedDn_1";
+	public static final String FIRST_CLOSED_DN = "#closedDn_1";
+	public static final String FIRST_ANNOTATION = "#annotationDn_1";
 	public static final String SERVLET_PATH = "servletPath";
 	public static final String SECTION_ID = "sectionId";
 	public static final String TAB_ID = "tabId";
@@ -65,6 +65,12 @@ public class DiscrepancyShortcutsAnalyzer {
 	private int sectionTotalResolutionProposed;
 	private int sectionTotalClosed;
 	private int sectionTotalAnnotations;
+
+	private String nextNewDnLink = FIRST_NEW_DN;
+	private String nextUpdatedDnLink = FIRST_UPDATED_DN;
+	private String nextResolutionProposedLink = FIRST_RESOLUTION_PROPOSED;
+	private String nextClosedDnLink = FIRST_CLOSED_DN;
+	private String nextAnnotationLink = FIRST_ANNOTATION;
 
 	private String firstNewDnLink = FIRST_NEW_DN;
 	private String firstUpdatedDnLink = FIRST_UPDATED_DN;
@@ -182,6 +188,46 @@ public class DiscrepancyShortcutsAnalyzer {
 		sectionTotalAnnotations++;
 	}
 
+	public String getNextNewDnLink() {
+		return nextNewDnLink;
+	}
+
+	public void setNextNewDnLink(String nextNewDnLink) {
+		this.nextNewDnLink = nextNewDnLink;
+	}
+
+	public String getNextUpdatedDnLink() {
+		return nextUpdatedDnLink;
+	}
+
+	public void setNextUpdatedDnLink(String nextUpdatedDnLink) {
+		this.nextUpdatedDnLink = nextUpdatedDnLink;
+	}
+
+	public String getNextResolutionProposedLink() {
+		return nextResolutionProposedLink;
+	}
+
+	public void setNextResolutionProposedLink(String nextResolutionProposedLink) {
+		this.nextResolutionProposedLink = nextResolutionProposedLink;
+	}
+
+	public String getNextClosedDnLink() {
+		return nextClosedDnLink;
+	}
+
+	public void setNextClosedDnLink(String nextClosedDnLink) {
+		this.nextClosedDnLink = nextClosedDnLink;
+	}
+
+	public String getNextAnnotationLink() {
+		return nextAnnotationLink;
+	}
+
+	public void setNextAnnotationLink(String nextAnnotationLink) {
+		this.nextAnnotationLink = nextAnnotationLink;
+	}
+
 	public String getFirstNewDnLink() {
 		return firstNewDnLink;
 	}
@@ -230,6 +276,26 @@ public class DiscrepancyShortcutsAnalyzer {
 		this.hasNotes = hasNotes;
 	}
 
+	public void setTotalNew(int totalNew) {
+		this.totalNew = totalNew;
+	}
+
+	public void setTotalUpdated(int totalUpdated) {
+		this.totalUpdated = totalUpdated;
+	}
+
+	public void setTotalResolutionProposed(int totalResolutionProposed) {
+		this.totalResolutionProposed = totalResolutionProposed;
+	}
+
+	public void setTotalClosed(int totalClosed) {
+		this.totalClosed = totalClosed;
+	}
+
+	public void setTotalAnnotations(int totalAnnotations) {
+		this.totalAnnotations = totalAnnotations;
+	}
+
 	/**
 	 * Select section bean from the list by section id.
 	 * 
@@ -252,30 +318,38 @@ public class DiscrepancyShortcutsAnalyzer {
 		return tabNum;
 	}
 
+	private static final class CurrentSectionInfo {
+
+		private int currentTabId;
+		private int currentSectionId;
+
+		private CurrentSectionInfo(FormProcessor fp, List<SectionBean> sections) {
+			SectionBean currentSection = (SectionBean) fp.getRequest().getAttribute("section");
+			if (fp.getRequest().getMethod().equalsIgnoreCase("POST")) {
+				currentSectionId = currentSection.getId();
+				currentTabId = getTabNum(sections, currentSectionId);
+			} else {
+				currentTabId = fp.getInt(TAB_ID) == 0 ? 1 : fp.getInt(TAB_ID);
+				currentSectionId = fp.getInt(SECTION_ID, true) == 0 ? (sections != null && sections.size() > 0 ? sections
+						.get(0).getId() : 0)
+						: fp.getInt(SECTION_ID, true);
+			}
+		}
+	}
+
 	private static String buildLink(FormProcessor fp, ItemFormMetadataBean ifmbean, EventCRFBean eventCrfBean,
 			int eventDefinitionCRFId, List<SectionBean> sections) {
 		String link;
-		int currentTabId;
-		int currentSectionId;
 		int tabNum = getTabNum(sections, ifmbean.getSectionId());
 		String servletPath = fp.getString(SERVLET_PATH).isEmpty() ? fp.getRequest().getServletPath() : fp
 				.getString("servletPath");
-		SectionBean currentSection = (SectionBean) fp.getRequest().getAttribute("section");
-		if (fp.getRequest().getMethod().equalsIgnoreCase("POST")) {
-			currentSectionId = currentSection.getId();
-			currentTabId = getTabNum(sections, currentSectionId);
-		} else {
-			currentTabId = fp.getInt(TAB_ID) == 0 ? 1 : fp.getInt(TAB_ID);
-			currentSectionId = fp.getInt(SECTION_ID, true) == 0 ? (sections != null && sections.size() > 0 ? sections
-					.get(0).getId() : 0) : fp.getInt(SECTION_ID, true);
-		}
-
+		CurrentSectionInfo currentSectionInfo = new CurrentSectionInfo(fp, sections);
 		String cw = fp.getRequest().getParameter("cw");
 		String closeWindowParameter = cw != null ? "&cw=1" : "";
 		if (servletPath.equalsIgnoreCase("/ResolveDiscrepancy")
 				|| servletPath.equalsIgnoreCase("/ViewSectionDataEntry")
 				|| servletPath.equalsIgnoreCase("/ViewSectionDataEntryRESTUrlServlet")) {
-			link = currentSectionId == ifmbean.getSectionId() ? "" : fp.getRequest().getScheme()
+			link = currentSectionInfo.currentSectionId == ifmbean.getSectionId() ? "" : fp.getRequest().getScheme()
 					+ "://"
 					+ fp.getRequest().getSession().getAttribute(DOMAIN_NAME)
 					+ fp.getRequest().getRequestURI()
@@ -285,7 +359,7 @@ public class DiscrepancyShortcutsAnalyzer {
 					+ eventCrfBean.getStudySubjectId() + "&eventDefinitionCRFId=" + eventDefinitionCRFId
 					+ (fp.getString("exitTo", true).isEmpty() ? "" : "&exitTo=" + fp.getString("exitTo", true));
 		} else {
-			link = currentTabId == tabNum ? "" : fp.getRequest().getScheme() + "://"
+			link = currentSectionInfo.currentTabId == tabNum ? "" : fp.getRequest().getScheme() + "://"
 					+ fp.getRequest().getSession().getAttribute(DOMAIN_NAME)
 					+ fp.getRequest().getRequestURI().replaceAll(fp.getRequest().getServletPath(), servletPath)
 					+ "?eventCRFId=" + eventCrfBean.getId() + closeWindowParameter + "&sectionId="
@@ -316,12 +390,14 @@ public class DiscrepancyShortcutsAnalyzer {
 			List<DiscrepancyNoteThread> noteThreads) {
 		DiscrepancyNoteBean tempBean;
 		FormProcessor fp = new FormProcessor(request);
-		Map<String, Integer> linkMap = new HashMap<String, Integer>();
+		Map<String, Integer> nextDnLinkMap = new HashMap<String, Integer>();
+		Map<String, Integer> firstDnLinkMap = new HashMap<String, Integer>();
 		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = new DiscrepancyShortcutsAnalyzer();
 		request.setAttribute(DISCREPANCY_SHORTCUTS_ANALYZER, discrepancyShortcutsAnalyzer);
 		if (request.getMethod().equalsIgnoreCase("POST") && request.getAttribute("section") == null) {
 			return;
 		}
+		CurrentSectionInfo currentSectionInfo = new CurrentSectionInfo(fp, sections);
 		for (DiscrepancyNoteThread dnThread : noteThreads) {
 			tempBean = dnThread.getLinkedNoteList().getLast();
 			if (tempBean != null && tempBean.getEntityType().equalsIgnoreCase("itemData")
@@ -332,42 +408,76 @@ public class DiscrepancyShortcutsAnalyzer {
 				String link = buildLink(fp, ifmbean, eventCrfBean, eventDefinitionCRFId, sections);
 				if (ResolutionStatus.UPDATED.equals(tempBean.getResStatus())) {
 					discrepancyShortcutsAnalyzer.incTotalUpdated();
-					Integer sectionId = linkMap.get(FIRST_UPDATED_DN);
-					if (sectionId == null || ifmbean.getSectionId() < sectionId) {
-						linkMap.put(FIRST_UPDATED_DN, ifmbean.getSectionId());
+					Integer nextSectionId = nextDnLinkMap.get(FIRST_UPDATED_DN);
+					Integer firstSectionId = firstDnLinkMap.get(FIRST_UPDATED_DN);
+					if (firstSectionId == null || ifmbean.getSectionId() < firstSectionId) {
+						nextDnLinkMap.put(FIRST_UPDATED_DN, ifmbean.getSectionId());
+						firstDnLinkMap.put(FIRST_UPDATED_DN, ifmbean.getSectionId());
 						discrepancyShortcutsAnalyzer.setFirstUpdatedDnLink(link + FIRST_UPDATED_DN);
+						discrepancyShortcutsAnalyzer.setNextUpdatedDnLink(link + FIRST_UPDATED_DN);
+					} else if (ifmbean.getSectionId() > currentSectionInfo.currentSectionId
+							&& (nextSectionId.equals(firstSectionId) || ifmbean.getSectionId() < nextSectionId)) {
+						nextDnLinkMap.put(FIRST_UPDATED_DN, ifmbean.getSectionId());
+						discrepancyShortcutsAnalyzer.setNextUpdatedDnLink(link + FIRST_UPDATED_DN);
 					}
 				} else if (ResolutionStatus.OPEN.equals(tempBean.getResStatus())) {
 					discrepancyShortcutsAnalyzer.incTotalNew();
-					Integer sectionId = linkMap.get(FIRST_NEW_DN);
-					if (sectionId == null || ifmbean.getSectionId() < sectionId) {
-						linkMap.put(FIRST_NEW_DN, ifmbean.getSectionId());
+					Integer nextSectionId = nextDnLinkMap.get(FIRST_NEW_DN);
+					Integer firstSectionId = firstDnLinkMap.get(FIRST_NEW_DN);
+					if (firstSectionId == null || ifmbean.getSectionId() < firstSectionId) {
+						nextDnLinkMap.put(FIRST_NEW_DN, ifmbean.getSectionId());
+						firstDnLinkMap.put(FIRST_NEW_DN, ifmbean.getSectionId());
 						discrepancyShortcutsAnalyzer.setFirstNewDnLink(link + FIRST_NEW_DN);
+						discrepancyShortcutsAnalyzer.setNextNewDnLink(link + FIRST_NEW_DN);
+					} else if (ifmbean.getSectionId() > currentSectionInfo.currentSectionId
+							&& (nextSectionId.equals(firstSectionId) || ifmbean.getSectionId() < nextSectionId)) {
+						nextDnLinkMap.put(FIRST_NEW_DN, ifmbean.getSectionId());
+						discrepancyShortcutsAnalyzer.setNextNewDnLink(link + FIRST_NEW_DN);
 					}
 				} else if (ResolutionStatus.CLOSED.equals(tempBean.getResStatus())) {
 					discrepancyShortcutsAnalyzer.incTotalClosed();
-					Integer sectionId = linkMap.get(FIRST_CLOSED_DN);
-					if (sectionId == null || ifmbean.getSectionId() < sectionId) {
-						linkMap.put(FIRST_CLOSED_DN, ifmbean.getSectionId());
+					Integer nextSectionId = nextDnLinkMap.get(FIRST_CLOSED_DN);
+					Integer firstSectionId = firstDnLinkMap.get(FIRST_CLOSED_DN);
+					if (firstSectionId == null || ifmbean.getSectionId() < firstSectionId) {
+						nextDnLinkMap.put(FIRST_CLOSED_DN, ifmbean.getSectionId());
+						firstDnLinkMap.put(FIRST_CLOSED_DN, ifmbean.getSectionId());
 						discrepancyShortcutsAnalyzer.setFirstClosedDnLink(link + FIRST_CLOSED_DN);
+						discrepancyShortcutsAnalyzer.setNextClosedDnLink(link + FIRST_CLOSED_DN);
+					} else if (ifmbean.getSectionId() > currentSectionInfo.currentSectionId
+							&& (nextSectionId.equals(firstSectionId) || ifmbean.getSectionId() < nextSectionId)) {
+						nextDnLinkMap.put(FIRST_CLOSED_DN, ifmbean.getSectionId());
+						discrepancyShortcutsAnalyzer.setNextClosedDnLink(link + FIRST_CLOSED_DN);
 					}
 				} else if (ResolutionStatus.RESOLVED.equals(tempBean.getResStatus())) {
 					discrepancyShortcutsAnalyzer.incTotalResolutionProposed();
-					Integer sectionId = linkMap.get(FIRST_RESOLUTION_PROPOSED);
-					if (sectionId == null || ifmbean.getSectionId() < sectionId) {
-						linkMap.put(FIRST_RESOLUTION_PROPOSED, ifmbean.getSectionId());
+					Integer nextSectionId = nextDnLinkMap.get(FIRST_RESOLUTION_PROPOSED);
+					Integer firstSectionId = firstDnLinkMap.get(FIRST_RESOLUTION_PROPOSED);
+					if (firstSectionId == null || ifmbean.getSectionId() < firstSectionId) {
+						nextDnLinkMap.put(FIRST_RESOLUTION_PROPOSED, ifmbean.getSectionId());
+						firstDnLinkMap.put(FIRST_RESOLUTION_PROPOSED, ifmbean.getSectionId());
 						discrepancyShortcutsAnalyzer.setFirstResolutionProposedLink(link + FIRST_RESOLUTION_PROPOSED);
+						discrepancyShortcutsAnalyzer.setNextResolutionProposedLink(link + FIRST_RESOLUTION_PROPOSED);
+					} else if (ifmbean.getSectionId() > currentSectionInfo.currentSectionId
+							&& (nextSectionId.equals(firstSectionId) || ifmbean.getSectionId() < nextSectionId)) {
+						nextDnLinkMap.put(FIRST_RESOLUTION_PROPOSED, ifmbean.getSectionId());
+						discrepancyShortcutsAnalyzer.setNextResolutionProposedLink(link + FIRST_RESOLUTION_PROPOSED);
 					}
 				} else if (ResolutionStatus.NOT_APPLICABLE.equals(tempBean.getResStatus())) {
 					discrepancyShortcutsAnalyzer.incTotalAnnotations();
-					Integer sectionId = linkMap.get(FIRST_ANNOTATION);
-					if (sectionId == null || ifmbean.getSectionId() < sectionId) {
-						linkMap.put(FIRST_ANNOTATION, ifmbean.getSectionId());
+					Integer nextSectionId = nextDnLinkMap.get(FIRST_ANNOTATION);
+					Integer firstSectionId = firstDnLinkMap.get(FIRST_ANNOTATION);
+					if (firstSectionId == null || ifmbean.getSectionId() < firstSectionId) {
+						nextDnLinkMap.put(FIRST_ANNOTATION, ifmbean.getSectionId());
+						firstDnLinkMap.put(FIRST_ANNOTATION, ifmbean.getSectionId());
 						discrepancyShortcutsAnalyzer.setFirstAnnotationLink(link + FIRST_ANNOTATION);
+						discrepancyShortcutsAnalyzer.setNextAnnotationLink(link + FIRST_ANNOTATION);
+					} else if (ifmbean.getSectionId() > currentSectionInfo.currentSectionId
+							&& (nextSectionId.equals(firstSectionId) || ifmbean.getSectionId() < nextSectionId)) {
+						nextDnLinkMap.put(FIRST_ANNOTATION, ifmbean.getSectionId());
+						discrepancyShortcutsAnalyzer.setNextAnnotationLink(link + FIRST_ANNOTATION);
 					}
 				}
 			}
-
 		}
 	}
 
@@ -378,48 +488,54 @@ public class DiscrepancyShortcutsAnalyzer {
 	 *            the incoming request.
 	 * @param dib
 	 *            the crf item that should be highlighted.
+	 * @param additionalCheck
+	 *            boolean
 	 * @param noteThreads
 	 *            the list of discrepancy notes threads.
 	 */
 	public static void prepareDnShortcutAnchors(HttpServletRequest request, DisplayItemBean dib,
-			List<DiscrepancyNoteThread> noteThreads) {
+			List<DiscrepancyNoteThread> noteThreads, boolean additionalCheck) {
 		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = (DiscrepancyShortcutsAnalyzer) request
 				.getAttribute(DISCREPANCY_SHORTCUTS_ANALYZER);
 		if (discrepancyShortcutsAnalyzer != null) {
 			for (DiscrepancyNoteThread dnThread : noteThreads) {
 				DiscrepancyNoteBean tempBean = dnThread.getLinkedNoteList().getLast();
-				if (tempBean != null && tempBean.getEntityType().equalsIgnoreCase("itemData")
-						&& tempBean.getParentDnId() == 0) {
+				if (tempBean != null
+						&& tempBean.getEntityType().equalsIgnoreCase("itemData")
+						&& tempBean.getParentDnId() == 0
+						&& (!additionalCheck || (tempBean.getId() > 0
+								&& tempBean.getItemId() == dib.getDbData().getItemId()
+								&& tempBean.getItemDataOrdinal() == dib.getDbData().getOrdinal() || (tempBean.getId() == 0 && tempBean
+								.getField().equalsIgnoreCase(dib.getField()))))) {
 					switch (tempBean.getResolutionStatusId()) {
 					case RES_STATUS_OPEN:
 						discrepancyShortcutsAnalyzer.incSectionTotalNew();
-						if (discrepancyShortcutsAnalyzer.getSectionTotalNew() == 1) {
-							dib.setFirstNewDn(true);
-						}
+						dib.getNewDn().add(
+								"newDn_".concat(Integer.toString(discrepancyShortcutsAnalyzer.getSectionTotalNew())));
 						break;
 					case RES_STATUS_UPDATED:
 						discrepancyShortcutsAnalyzer.incSectionTotalUpdated();
-						if (discrepancyShortcutsAnalyzer.getSectionTotalUpdated() == 1) {
-							dib.setFirstUpdatedDn(true);
-						}
+						dib.getUpdatedDn().add(
+								"updatedDn_".concat(Integer.toString(discrepancyShortcutsAnalyzer
+										.getSectionTotalUpdated())));
 						break;
 					case RES_STATUS_RESOLVED:
 						discrepancyShortcutsAnalyzer.incSectionTotalResolutionProposed();
-						if (discrepancyShortcutsAnalyzer.getSectionTotalResolutionProposed() == 1) {
-							dib.setFirstResolutionProposed(true);
-						}
+						dib.getResolutionProposedDn().add(
+								"resolutionProposedDn_".concat(Integer.toString(discrepancyShortcutsAnalyzer
+										.getSectionTotalResolutionProposed())));
 						break;
 					case RES_STATUS_CLOSED:
 						discrepancyShortcutsAnalyzer.incSectionTotalClosed();
-						if (discrepancyShortcutsAnalyzer.getSectionTotalClosed() == 1) {
-							dib.setFirstClosedDn(true);
-							break;
-						}
+						dib.getClosedDn().add(
+								"closedDn_".concat(Integer.toString(discrepancyShortcutsAnalyzer
+										.getSectionTotalClosed())));
+						break;
 					case RES_STATUS_NOT_APPLICABLE:
 						discrepancyShortcutsAnalyzer.incSectionTotalAnnotations();
-						if (discrepancyShortcutsAnalyzer.getSectionTotalAnnotations() == 1) {
-							dib.setFirstAnnotation(true);
-						}
+						dib.getAnnotationDn().add(
+								"annotationDn_".concat(Integer.toString(discrepancyShortcutsAnalyzer
+										.getSectionTotalAnnotations())));
 						break;
 					default:
 						break;
@@ -427,5 +543,20 @@ public class DiscrepancyShortcutsAnalyzer {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Generates url anchors suffixes for current note threads.
+	 *
+	 * @param request
+	 *            the incoming request.
+	 * @param dib
+	 *            the crf item that should be highlighted.
+	 * @param noteThreads
+	 *            the list of discrepancy notes threads.
+	 */
+	public static void prepareDnShortcutAnchors(HttpServletRequest request, DisplayItemBean dib,
+			List<DiscrepancyNoteThread> noteThreads) {
+		prepareDnShortcutAnchors(request, dib, noteThreads, false);
 	}
 }

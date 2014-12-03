@@ -2,7 +2,11 @@ var currentPopupUid;
 var subjectMatrixPopupStick;
 var popupInterval;
 var firstFormState;
-var dnShortcutAnchors = ["firstNewDn", "firstUpdatedDn", "firstResolutionProposed", "firstClosedDn", "firstAnnotation"];
+var dnShortcutAnchorsItemIds;
+var currentHighlightedShortcutAnchor;
+var currentHighlightedShortcutAnchorInd;
+var currentHighlightedShortcutAnchorCounter;
+var dnShortcutAnchors = ["newDn_", "updatedDn_", "resolutionProposedDn_", "closedDn_", "annotationDn_"];
 var dnShortcutLinks = ["dnShortcutTotalNew", "dnShortcutTotalUpdated", "dnShortcutTotalResolutionProposed", "dnShortcutTotalClosed", "dnShortcutTotalAnnotations"];
 var dnFlagImages = ["icon_Note.gif", "icon_flagYellow.gif", "icon_flagBlack.gif", "icon_flagGreen.gif", "icon_flagWhite.gif"];
 var rowHighlightTypes = {NORMAL: 0, ROWSPAN: 1, MULTIPLE: 2};
@@ -3450,160 +3454,159 @@ function getBrowserClientHeight() {
   return v;
 }
 
-function resetHighlightedFieldsForDNShortcutAnchors(idToHighlight) {
-  var bgc = "";
-  var commonParent = undefined;
-  for (var i = 0; i < dnShortcutAnchors.length; i++) {
-    var id = dnShortcutAnchors[i];
+function highlightDn(id, color) {
     var inputHolderElement = $("#itemHolderId_" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel"));
     var inputElement = inputHolderElement.find("input[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]");
     inputElement = inputElement.length == 0 ? inputHolderElement.find("select[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]") : inputElement;
     inputElement = inputElement.length == 0 ? inputHolderElement.find("textarea[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]") : inputElement;
     if (inputElement.attr("type") != undefined && (inputElement.attr("type").toLowerCase() == "radio" || inputElement.attr("type").toLowerCase() == "checkbox")) {
-      inputElement = inputElement.parent();
+        inputElement = inputElement.parent();
     }
-    bgc = id == idToHighlight? "yellow" : "";
-    if (commonParent == undefined || (bgc == "" && inputElement.parent()[0] != commonParent[0])) {
-      inputElement.css("background-color", bgc);
-    }
-    if (bgc == "yellow" && commonParent == undefined) {
-      commonParent = inputElement.parent();
-    }
-  }
+    inputElement.css("background-color", color);
 }
 
-function highlightFieldForDNShortcutAnchor(idToHighlight) {
-  resetHighlightedFieldsForDNShortcutAnchors(idToHighlight);
+function resetHighlightedFieldsForDNShortcutAnchors() {
+    if (currentHighlightedShortcutAnchor != undefined) {
+        highlightDn(currentHighlightedShortcutAnchor, "");
+    }
+    currentHighlightedShortcutAnchorCounter = 0;
+    currentHighlightedShortcutAnchor = undefined;
+    currentHighlightedShortcutAnchorInd = undefined;
 }
 
-function getDNShortcutAnchorId(resolutionStatusId) {
-  var result = "";
-  switch (resolutionStatusId) {
-    case 1 : {
-      result = dnShortcutAnchors[0];
-      break;
+function highlightFirstFieldForDNShortcutAnchors(idToHighlight) {
+    resetHighlightedFieldsForDNShortcutAnchors();
+    for (var i = 0; i < dnShortcutAnchors.length; i++) {
+        if (idToHighlight.startsWith(dnShortcutAnchors[i])) {
+            currentHighlightedShortcutAnchorInd = i;
+            currentHighlightedShortcutAnchorCounter = parseInt(idToHighlight.replace(/.*_/g, ""));
+        }
     }
-    case 2 : {
-      result = dnShortcutAnchors[1];
-      break;
+    if (currentHighlightedShortcutAnchorInd != undefined) {
+        currentHighlightedShortcutAnchor = idToHighlight;
+        highlightDn(currentHighlightedShortcutAnchor, "yellow");
     }
-    case 3 : {
-      result = dnShortcutAnchors[2];
-      break;
+}
+
+function highlightFieldForDNShortcutAnchor(ind, currentElement) {
+    var firstDnLink = $(currentElement).attr("firstdnlink");
+    var nextDnLink = $(currentElement).attr("nextdnlink");
+    if (currentHighlightedShortcutAnchor != undefined) {
+        highlightDn(currentHighlightedShortcutAnchor, "");
     }
-    case 4 : {
-      result = dnShortcutAnchors[3];
-      break;
+    if (currentHighlightedShortcutAnchorInd == undefined || currentHighlightedShortcutAnchorInd != ind) {
+        currentHighlightedShortcutAnchorCounter = 0;
     }
-    case 5 : {
-      result = dnShortcutAnchors[4];
-      break;
+    currentHighlightedShortcutAnchorCounter++;
+    var sectionTotal = parseInt($(currentElement).attr("sectiontotal"));
+    if (currentHighlightedShortcutAnchorCounter > sectionTotal) {
+        if (firstDnLink.startsWith("#") && firstDnLink == nextDnLink) {
+            currentHighlightedShortcutAnchorCounter = 1;
+        } else {
+            location.href = sectionTotal == 0 ? firstDnLink : nextDnLink;
+            return;
+        }
     }
-  }
-  return result;
+    currentHighlightedShortcutAnchorInd = ind;
+    var newCurrentHighlightedShortcutAnchor = dnShortcutAnchors[currentHighlightedShortcutAnchorInd] + currentHighlightedShortcutAnchorCounter;
+    if (currentHighlightedShortcutAnchor != undefined && currentHighlightedShortcutAnchor != newCurrentHighlightedShortcutAnchor && $("#" + currentHighlightedShortcutAnchor).parent()[0] == $("#" + newCurrentHighlightedShortcutAnchor).parent()[0]) {
+        highlightFieldForDNShortcutAnchor(ind, currentElement);
+        return;
+    }
+    currentHighlightedShortcutAnchor = newCurrentHighlightedShortcutAnchor;
+    highlightDn(currentHighlightedShortcutAnchor, "yellow");
 }
 
 function updateCRFHeaderFunction(parametersHolder) {
-	try {
-		jQuery.ajax({
-	    url : parametersHolder.contextPath + "/UpdateCRFHeader",
-		  type : "GET",
-			data : parametersHolder,
-			cache : false,
-			success : function(data) {
-				if (data.indexOf("dnShortcutsTable") >= 0) {
-          $('#dnShortcutsTable').removeClass("hidden");
-					$('#dnShortcutsTable')[0].outerHTML = $.trim(data);
-          for (var i = 0; i < dnShortcutLinks.length; i++) {
-            if (parseInt($.trim($("#" + dnShortcutLinks[i]).text())) == 0) {
-              var inputHolderElement = $("#itemHolderId_" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel"));
-              var inputElement = inputHolderElement.find("input[id*=" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel") + "]");
-              inputElement = inputElement.length == 0 ? inputHolderElement.find("select[id*=" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel") + "]") : inputElement;
-              inputElement = inputElement.length == 0 ? inputHolderElement.find("textarea[id*=" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel") + "]") : inputElement;
-              if (inputElement.attr("type") != undefined && (inputElement.attr("type").toLowerCase() == "radio" || inputElement.attr("type").toLowerCase() == "checkbox")) {
-                inputElement =  inputElement.parent();
-              }
-              inputElement.css("background", "");
-              $("#" + dnShortcutAnchors[i]).remove();
+    try {
+        parametersHolder.totalItems = 0;
+        $("div[id^=dnShortcutAnchors_]").each(function() {
+            var rowCount = $(this).attr("id").replace("dnShortcutAnchors_", "").replace(/item_.*/, "");
+            var itemId = parseInt($(this).attr("id").replace(/dnShortcutAnchors_.*item_/, ""));
+            var field = $(this).attr("field");
+            if ($(this).parent().parent().attr("repeat") != "template") {
+                parametersHolder.totalItems++;
+                parametersHolder["rowCount_" + parametersHolder.totalItems] = rowCount;
+                parametersHolder["itemId_" + parametersHolder.totalItems] = itemId;
+                parametersHolder["field_" + parametersHolder.totalItems] = field;
             }
-          }
-				}
-			}
-    });
-	} catch (e) {
-		//
-	}
-}
+            $("#dnShortcutAnchors_" + rowCount + "item_" + itemId).remove();
+        });
+        jQuery.ajax({
+            url : parametersHolder.contextPath + "/UpdateCRFHeader",
+            type : "GET",
+            data : parametersHolder,
+            cache : false,
+            success : function(data) {
+                var jsonObject = eval("(" + data + ")");
 
-function addMissedDNShortcutAnchors() {
-  var regexp = new RegExp("flag_.*input\d*");
-  $("img[id^=flag]").filter(function () { return regexp.test($(this).attr("id")) && $(this).attr("id").indexOf("_[") < 0; }).each(function(){
-    var v = $(this).attr("id").match(/_(\d*)input\d*/) || $(this).attr("id").match(/_manual(\d*)input\d*/);
-    for (var i = 0; i < dnShortcutAnchors.length; i++) {
-      if ($(this).attr("src").toLowerCase().indexOf(dnFlagImages[i].toLowerCase()) >= 0 && $("#" + dnShortcutAnchors[i]).length == 0) {
-        $(this).closest(".itemHolderClass").prepend( "<a id=\"" + dnShortcutAnchors[i] + "\" rel=\"" + $(this).attr("id").replace(/flag_.*input/, "") + "\" alt=\"" + (v != undefined && v.length == 2 ? v[1] : "") + "\"></a>" );
-      }
+                $("#dnShortcutTotalNew").text(" " + jsonObject.totalNew + " ");
+                $("#dnShortcutTotalUpdated").text(" " + jsonObject.totalUpdated + " ");
+                $("#dnShortcutTotalResolutionProposed").text(" " + jsonObject.totalResolutionProposed + " ");
+                $("#dnShortcutTotalClosed").text(" " + jsonObject.totalClosed + " ");
+                $("#dnShortcutTotalAnnotations").text(" " + jsonObject.totalAnnotations + " ");
+
+                $("#dnShortcutTotalNew").attr("rel", jsonObject.sectionTotalNew);
+                $("#dnShortcutTotalNew").parent().attr("sectiontotal", jsonObject.sectionTotalNew);
+                $("#dnShortcutTotalNew").parent().attr("firstdnlink", jsonObject.firstNewDnLink);
+                $("#dnShortcutTotalNew").parent().attr("nextdnlink", jsonObject.nextNewDnLink);
+
+                $("#dnShortcutTotalUpdated").attr("rel", jsonObject.sectionTotalUpdated);
+                $("#dnShortcutTotalUpdated").parent().attr("sectiontotal", jsonObject.sectionTotalUpdated);
+                $("#dnShortcutTotalUpdated").parent().attr("firstdnlink", jsonObject.firstUpdatedDnLink);
+                $("#dnShortcutTotalUpdated").parent().attr("nextdnlink", jsonObject.nextUpdatedDnLink);
+
+                $("#dnShortcutTotalResolutionProposed").attr("rel", jsonObject.sectionTotalResolutionProposed);
+                $("#dnShortcutTotalResolutionProposed").parent().attr("sectiontotal", jsonObject.sectionTotalResolutionProposed);
+                $("#dnShortcutTotalResolutionProposed").parent().attr("firstdnlink", jsonObject.firstResolutionProposedDnLink);
+                $("#dnShortcutTotalResolutionProposed").parent().attr("nextdnlink", jsonObject.nextResolutionProposedDnLink);
+
+                $("#dnShortcutTotalClosed").attr("rel", jsonObject.sectionTotalClosed);
+                $("#dnShortcutTotalClosed").parent().attr("sectiontotal", jsonObject.sectionTotalClosed);
+                $("#dnShortcutTotalClosed").parent().attr("firstdnlink", jsonObject.firstClosedDnLink);
+                $("#dnShortcutTotalClosed").parent().attr("nextdnlink", jsonObject.nextClosedDnLink);
+
+                $("#dnShortcutTotalAnnotations").attr("rel", jsonObject.sectionTotalAnnotations);
+                $("#dnShortcutTotalAnnotations").parent().attr("sectiontotal", jsonObject.sectionTotalAnnotations);
+                $("#dnShortcutTotalAnnotations").parent().attr("firstdnlink", jsonObject.firstAnnotationDnLink);
+                $("#dnShortcutTotalAnnotations").parent().attr("nextdnlink", jsonObject.nextAnnotationDnLink);
+
+                if (parseInt(jsonObject.totalNew) > 0 || parseInt(jsonObject.totalUpdated) > 0 || parseInt(jsonObject.totalResolutionProposed) > 0 || parseInt(jsonObject.totalClosed) > 0 || parseInt(jsonObject.totalAnnotations) > 0) {
+                    $('#dnShortcutsTable').removeClass("hidden");
+                }
+
+                for (var n = 0; n < jsonObject.items.length; n++) {
+                    var p;
+                    var item = jsonObject.items[n];
+                    var data = "<div id=\"dnShortcutAnchors_" + item.rowCount + "item_" + item.itemId + "\" field=\"" + item.field + "\" class=\"hidden\">";
+                    var inputHolderElement = $("#itemHolderId_" + item.rowCount + "input" + item.itemId);
+                    for (p = 0; p < item.newDn.length; p++) {
+                        data += "<a id=\"" + item.newDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                    }
+                    for (p = 0; p < item.updatedDn.length; p++) {
+                        data += "<a id=\"" + item.updatedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                    }
+                    for (p = 0; p < item.resolutionProposedDn.length; p++) {
+                        data += "<a id=\"" + item.resolutionProposedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                    }
+                    for (p = 0; p < item.closedDn.length; p++) {
+                        data += "<a id=\"" + item.closedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                    }
+                    for (p = 0; p < item.annotationDn.length; p++) {
+                        data += "<a id=\"" + item.annotationDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                    }
+                    data += "</div>";
+                    inputHolderElement.prepend(data);
+                }
+
+                gfRemoveOverlay();
+            }
+        });
+    } catch (e) {
+        //
     }
-  });
 }
 
-function addDNShortcutAnchorsForItem(parametersHolder) {
-  try {
-    jQuery.ajax({
-      url : parametersHolder.contextPath + "/UpdateDNShortcutAnchors",
-      type : "GET",
-      data : parametersHolder,
-      cache : false,
-      success : function(data) {
-        if (data.indexOf("id=") >= 0) {
-          var inputHolderElement = $("#itemHolderId_" + parametersHolder.rowCount + "input" + parametersHolder.itemId);
-          inputHolderElement.prepend(data);
-        }
-        addMissedDNShortcutAnchors();
-      }
-    });
-  } catch (e) {
-    //
-  }
-}
-
-function removeAllDNShortcutAnchorsForItem(parametersHolder) {
-  var inputHolderElement = $("#itemHolderId_" + parametersHolder.rowCount + "input" + parametersHolder.itemId);
-  for (var i = 0; i < dnShortcutAnchors.length; i++) {
-    inputHolderElement.find("#" + dnShortcutAnchors[i]).remove();
-  }
-}
-
-function removeAnchorIfItsBelowThanCurrent(id, parametersHolder) {
-  if ($("#" + id).length == 1) {
-    var prevAnchorHolder = $("#" + id).closest(".itemHolderClass");
-    var newAnchorHolder = $("#itemHolderId_" + parametersHolder.rowCount + "input" + parametersHolder.itemId);
-    var prevAnchorHolderRowCount = parseInt(prevAnchorHolder.attr("id").replace(/itemHolderId_/, "").replace(/input.*/, ""));
-    var newAnchorHolderRowCount = parseInt(parametersHolder.rowCount);
-    var prevAnchorHolderItemId = parseInt(prevAnchorHolder.attr("id").replace(/itemHolderId_.*input/, ""));
-    var newAnchorHolderItemId = parseInt(parametersHolder.itemId);
-    if ((isNaN(prevAnchorHolderRowCount) || isNaN(newAnchorHolderRowCount)) && prevAnchorHolderItemId > newAnchorHolderItemId) {
-      $("#" + id).remove();
-    } else
-    if (!isNaN(prevAnchorHolderRowCount) && !isNaN(newAnchorHolderRowCount) && newAnchorHolderRowCount < prevAnchorHolderRowCount) {
-      $("#" + id).remove();
-    } else
-    if (!isNaN(prevAnchorHolderRowCount) && !isNaN(newAnchorHolderRowCount) && newAnchorHolderRowCount == prevAnchorHolderRowCount && prevAnchorHolderItemId > newAnchorHolderItemId) {
-      $("#" + id).remove();
-    }
-  }
-}
-
-function addDNShortcutAnchor(parametersHolder) {
-  var id = getDNShortcutAnchorId(parametersHolder.resolutionStatusId);
-  if (id != "") {
-    resetHighlightedFieldsForDNShortcutAnchors();
-    removeAnchorIfItsBelowThanCurrent(id, parametersHolder);
-    removeAllDNShortcutAnchorsForItem(parametersHolder);
-    addDNShortcutAnchorsForItem(parametersHolder);
-    updateCRFHeaderFunction(parametersHolder);
-  }
-}
 function hideElement(elementName){
 	setDisplayProperty(elementName, "none");
 }
