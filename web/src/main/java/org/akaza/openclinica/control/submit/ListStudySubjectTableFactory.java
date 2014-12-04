@@ -1645,7 +1645,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 		}
 		if (studyBean.getStatus() == Status.AVAILABLE
-				&& Role.isMonitor(currentRole.getRole())
+				&& !Role.isMonitor(currentRole.getRole())
 				&& currentRole.getRole() != Role.CLINICAL_RESEARCH_COORDINATOR
 				&& (studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)) {
 			url.append(restoreStudySubjectLinkBuilder(studySubjectBean, resword, currentRole));
