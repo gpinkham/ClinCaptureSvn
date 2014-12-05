@@ -216,6 +216,11 @@ public class DisplayEventCRFBean implements Comparable {
 			startDoubleDataEntryPermitted = false;
 			continueDoubleDataEntryPermitted = false;
 		}
+		if ((startInitialDataEntryPermitted || continueInitialDataEntryPermitted)
+				&& surb.getRole().equals(Role.STUDY_EVALUATOR)) {
+			startInitialDataEntryPermitted = false;
+			continueInitialDataEntryPermitted = false;
+		}
 	}
 
 	/**
