@@ -271,10 +271,10 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 					dnb.setCrfName(cb.getName());
 
 					String crfStatus = resword.getString(ecb.getStage().getNameRaw());
-					if (crfStatus.equals("Invalid")) {
+					if (crfStatus.equals(resword.getString("invalid"))) {
 						crfStatus = "";
-					} else if (crfStatus.equals("Data Entry Complete")) {
-						crfStatus = "Complete";
+					} else if (crfStatus.equals(resword.getString("data_entry_complete"))) {
+						crfStatus = resterm.getString("complete");
 					}
 					dnb.setCrfStatus(crfStatus);
 
@@ -346,10 +346,10 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 					dnb.setEventName(se.getName());
 					dnb.setCrfName(cb.getName());
 					String crfStatus = resword.getString(ec.getStage().getNameRaw());
-					if (crfStatus.equals("Invalid")) {
+					if (crfStatus.equals(resword.getString("invalid"))) {
 						crfStatus = "";
-					} else if (crfStatus.equals("Data Entry Complete")) {
-						crfStatus = "Complete";
+					} else if (crfStatus.equals(resword.getString("data_entry_complete"))) {
+						crfStatus = resterm.getString("complete");
 					}
 					dnb.setCrfStatus(crfStatus);
 

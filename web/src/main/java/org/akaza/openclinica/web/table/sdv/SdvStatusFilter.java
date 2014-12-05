@@ -13,21 +13,26 @@
 
 package org.akaza.openclinica.web.table.sdv;
 
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 /**
  * Created by IntelliJ IDEA. User: bruceperry Date: May 27, 2009 Time: 4:49:20 PM To change this template use File |
  * Settings | File Templates.
  */
 public class SdvStatusFilter extends DroplistFilterEditor {
+
+	private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
+
 	@Override
 	protected List<Option> getOptions() {
 		List<Option> options = new ArrayList<Option>();
-		options.add(new Option("complete", "Complete"));
-		options.add(new Option("not done", "Not Done"));
+		options.add(new Option(reswords.getString("complete"), reswords.getString("complete")));
+		options.add(new Option(reswords.getString("not_done"), reswords.getString("not_done")));
 		return options;
 	}
 }

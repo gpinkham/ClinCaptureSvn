@@ -113,7 +113,7 @@ public class VerifyImportedCRFDataServlet extends Controller {
 		DiscrepancyNoteBean note = new DiscrepancyNoteBean();
 		StudySubjectDAO ssdao = new StudySubjectDAO(ds, con);
 		note.setDescription(message);
-		note.setDetailedNotes("Failed Validation Check");
+		note.setDetailedNotes(restext.getString("failed_validation_check"));
 		note.setOwner(uab);
 		note.setCreatedDate(new Date());
 		note.setResolutionStatusId(ResolutionStatus.OPEN.getId());
@@ -502,7 +502,7 @@ public class VerifyImportedCRFDataServlet extends Controller {
 		if (warnings.isEmpty())
 			return "";
 		else {
-			StringBuilder mesg = new StringBuilder("Rule Action Warnings: ");
+			StringBuilder mesg = new StringBuilder(respage.getString("rule_action_warnings"));
 			for (String s : warnings) {
 				mesg.append(s).append("; ");
 			}

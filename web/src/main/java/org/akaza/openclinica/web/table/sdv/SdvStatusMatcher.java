@@ -13,18 +13,24 @@
 
 package org.akaza.openclinica.web.table.sdv;
 
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.filter.FilterMatcher;
+
+import java.util.ResourceBundle;
 
 /**
  * A FilterMatcher designed to filter values of source data verification in a Jmesa table cell.
  */
 public class SdvStatusMatcher implements FilterMatcher {
+
+	private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
+
 	public boolean evaluate(Object itemValue, String filterValue) {
 
 		String item = String.valueOf(itemValue);
 		String filter = String.valueOf(filterValue);
 
-		return (filter.equalsIgnoreCase("not done"))
-				|| (filter.equalsIgnoreCase("complete") && (item.contains("icon_DoubleCheck")));
+		return (filter.equalsIgnoreCase(reswords.getString("not_done"))
+				|| (filter.equalsIgnoreCase(reswords.getString("complete")) && (item.contains("icon_DoubleCheck"))));
 	}
 }

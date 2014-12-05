@@ -337,7 +337,7 @@ public class AssignUserToStudyServlet extends Controller {
 			return sb.append(u.getFirstName()).append(" ").append(u.getLastName()).append("(")
 					.append(resword.getString("username")).append(": ").append(u.getName()).append(") ")
 					.append(respage.getString("has_been_assigned_to_the_site")).append(currentStudy.getName())
-					.append(" under the Study ").append(currentStudy.getParentStudyName()).append(" ")
+					.append(" " + resword.getString("under_the_study") + " ").append(currentStudy.getParentStudyName()).append(" ")
 					.append(resword.getString("as")).append(" \"").append(sub.getRole().getDescription())
 					.append("\". ").toString();
 		} else {

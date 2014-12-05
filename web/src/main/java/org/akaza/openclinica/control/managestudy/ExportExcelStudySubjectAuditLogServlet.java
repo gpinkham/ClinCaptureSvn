@@ -8,6 +8,7 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.SessionUtil;
 import jxl.CellView;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
@@ -53,7 +54,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * ExportExcelStudySubjectAuditLogServlet class.
@@ -123,6 +123,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 
 		int studySubId = fp.getInt("id", true);
+
+		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		if (studySubId == 0) {
 			addPageMessage(respage.getString("please_choose_a_subject_to_view"), request);
@@ -223,7 +225,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 		response.setHeader("Content-Disposition", "attachment; filename=export.xls");
 
 		WorkbookSettings wbSettings = new WorkbookSettings();
-		wbSettings.setLocale(new Locale("en", "EN"));
+		wbSettings.setLocale(SessionUtil.getLocale(request));
 		WritableWorkbook workbook = Workbook.createWorkbook(response.getOutputStream(), wbSettings);
 
 		int row = 0;

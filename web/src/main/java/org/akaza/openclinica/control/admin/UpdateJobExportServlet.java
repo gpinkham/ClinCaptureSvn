@@ -270,15 +270,15 @@ public class UpdateJobExportServlet extends Controller {
 		int formatId = fp.getInt(FORMAT_ID);
 		Date jobDate = fp.getDateTime(DATE_START_JOB);
 		if (formatId == 0) {
-			Validator.addError(errors, FORMAT_ID, "Please pick at least one.");
+			Validator.addError(errors, FORMAT_ID, respage.getString("please_pick_at_least_one"));
 		}
 		for (TriggerKey triggerKey : triggerKeys) {
 			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
-				Validator.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
+				Validator.addError(errors, JOB_NAME, resexception.getString("a_job_with_that_name_already_exist_please_pick"));
 			}
 		}
 		if (jobDate.before(new Date())) {
-			Validator.addError(errors, DATE_START_JOB + "Date", "This date needs to be later than the present time.");
+			Validator.addError(errors, DATE_START_JOB + "Date", resexception.getString("this_date_needs_to_be_later"));
 		}
 		return errors;
 	}

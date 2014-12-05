@@ -813,8 +813,8 @@ public class Validator {
 				break;
 			case IS_PARTIAL_DATE:
 				errorMessage = resexception.getString("input_not_partial_date") + " ("
-						+ resformat.getString("date_format_year") + ", or "
-						+ resformat.getString("date_format_year_month") + ", or "
+						+ resformat.getString("date_format_year") + ", " + resword.getString("or") + " "
+						+ resformat.getString("date_format_year_month") + ", " + resword.getString("or") + " "
 						+ resformat.getString("date_format_string");
 				break;
 			case IS_A_IMPORT_DATE:
@@ -822,7 +822,7 @@ public class Validator {
 						+ resexception.getString("format1") + ".";
 				break;
 			case IS_A_IMPORT_PARTIAL_DATE:
-				errorMessage = resexception.getString("input_not_valid_pdate") + "yyyy, or yyyy-MM, or yyyy-MM-dd"
+				errorMessage = resexception.getString("input_not_valid_pdate") + "yyyy, " + resword.getString("or") + " yyyy-MM, " + resword.getString("or") + " yyyy-MM-dd"
 						+ " " + resexception.getString("format1") + ".";
 				break;
 			case IS_DATE_TIME:

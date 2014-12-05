@@ -15,6 +15,7 @@ package org.akaza.openclinica.dao;
 
 import org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class StudySubjectSDVFilter implements CriteriaCommand {
 		value = StringEscapeUtils.escapeSql(value.toString());
 		if (value != null) {
 			if (property.equals("sdvStatus")) {
-				if (value.equals("complete")) {
+				if (value.toString().equalsIgnoreCase(ResourceBundleProvider.getResWord("complete"))) {
 					criteria += " AND mss.study_subject_id IN (" + studySubjectDAO.getQuery("sdvCompleteFilterForStudySubject") + ") ";
 				} else {
 					criteria += " AND NOT mss.study_subject_id IN (" + studySubjectDAO.getQuery("sdvCompleteFilterForStudySubject") + ") ";

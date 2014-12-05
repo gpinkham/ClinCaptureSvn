@@ -32,55 +32,36 @@ import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
- * Xalan Transform Job, an XSLT transform job using the Xalan classes
+ * Xalan Transform Job, an XSLT transform job using the Xalan classes.
  * 
  * @author thickerson
  * 
  */
 public class XalanTransformJob extends QuartzJobBean {
 
-	public static final String DATASET_ID = "dsId";
 	public static final String EMAIL = "contactEmail";
-	public static final String USER_ID = "user_id";
 	public static final String XSL_FILE_PATH = "xslFilePath";
 	public static final String XML_FILE_PATH = "xmlFilePath";
 	public static final String SQL_FILE_PATH = "sqlFilePath";
 
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-		// need to generate a Locale so that user beans and other things will
-		// generate normally
-		// TODO make dynamic?
 		Locale locale = new Locale("en-US");
 		ResourceBundleProvider.updateLocale(locale);
 		JobDataMap dataMap = context.getMergedJobDataMap();
 		try {
 			TransformerFactory tFactory = TransformerFactory.newInstance();
-
-			// Use the TransformerFactory to instantiate a Transformer that will work with
-			// the stylesheet you specify. This method call also processes the stylesheet
-			// into a compiled Templates object.
 			java.io.InputStream in = new java.io.FileInputStream(dataMap.getString(XSL_FILE_PATH));
 			Transformer transformer = tFactory.newTransformer(new StreamSource(in));
-
-			// Use the Transformer to apply the associated Templates object to an XML document
-			// (foo.xml) and write the output to a file (foo.out).
-			System.out.println("--> job starting: ");
-			final long start = System.currentTimeMillis();
 			transformer.transform(new StreamSource(dataMap.getString(XML_FILE_PATH)), new StreamResult(
 					new FileOutputStream(dataMap.getString(SQL_FILE_PATH))));
-			final long done = System.currentTimeMillis() - start;
-			System.out.println("--> job completed in " + done + " ms");
+
 		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerFactoryConfigurationError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

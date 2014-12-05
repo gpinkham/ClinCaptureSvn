@@ -133,7 +133,6 @@ public class XsltTransformJob extends QuartzJobBean {
 	private AuditEventDAO auditEventDAO;
 	public static final String EP_BEAN = "epBean";
 
-	// POST PROCESSING VARIABLES
 	public static final String POST_PROC_DELETE_OLD = "postProcDeleteOld";
 	public static final String POST_PROC_ZIP = "postProcZip";
 	public static final String POST_PROC_LOCATION = "postProcLocation";
@@ -145,7 +144,6 @@ public class XsltTransformJob extends QuartzJobBean {
 	/**
 	 * Class that holds info about files.
 	 */
-
 	public static class DeleteOldObject implements Serializable {
 		private String endFile;
 		private Boolean deleteOld;
@@ -183,6 +181,7 @@ public class XsltTransformJob extends QuartzJobBean {
 		Locale locale = new Locale("en-US");
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
+		ResourceBundle words = ResourceBundleProvider.getWordsBundle();
 		List<File> markForDelete = new LinkedList<File>();
 		Boolean zipped;
 		Boolean deleteOld = true;
@@ -203,6 +202,7 @@ public class XsltTransformJob extends QuartzJobBean {
 			locale = new Locale(localeStr);
 			ResourceBundleProvider.updateLocale(locale);
 			pageMessages = ResourceBundleProvider.getPageMessagesBundle();
+			words = ResourceBundleProvider.getWordsBundle();
 		}
 		// get the file information from the job
 		String alertEmail = dataMap.getString(EMAIL);
@@ -233,11 +233,6 @@ public class XsltTransformJob extends QuartzJobBean {
 
 			int dsId = dataMap.getInt(DATASET_ID);
 
-			// JN: Change from earlier versions, cannot get static reference as
-			// static references don't work. Reason being for example there
-			// could be
-			// datasetId as a variable which is different for each dataset and
-			// that needs to be loaded dynamically
 			ExtractPropertyBean epBean = (ExtractPropertyBean) dataMap.get(EP_BEAN);
 			boolean sasDatasetJob = epBean.getId() == SAS_DATASET_JOB_ID
 					&& context.getTrigger() instanceof SimpleTriggerImpl;
@@ -353,9 +348,9 @@ public class XsltTransformJob extends QuartzJobBean {
 						datasetBean, done, sasOdmDirArchivedFile.length(), ExportFormatBean.TXTFILE, userAccountId);
 
 				if (jobName != null) {
-					subject = "Job Ran: " + jobName;
+					subject = pageMessages.getString("job_ran") + ": " + jobName;
 				} else {
-					subject = "Job Ran: " + datasetBean.getName();
+					subject = pageMessages.getString("job_ran") + ": " + datasetBean.getName();
 				}
 
 				if (sasSideHasWarnings) {
@@ -402,22 +397,13 @@ public class XsltTransformJob extends QuartzJobBean {
 						datasetBean, currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99",
 						(Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getSkipBlanks(), epBean.getOdmType());
 
-				// won't save a record of the XML to db
-				// won't be a zipped file, so that we can submit it for
-				// transformation
-				// this will have to be toggled by the export data format? no, the
-				// export file will have to be zipped/not zipped
 				String odmXMLFileName = "";
 				for (Object o : answerMap.entrySet()) {
 					Map.Entry entry = (Map.Entry) o;
 					Object key = entry.getKey();
 					Object value = entry.getValue();
 					odmXMLFileName = (String) key;
-					// JN: Since there is a logic to
-					// delete all the intermittent
-					// files, this file could be a
-					// zip
-					// file.
+
 					logger.debug("found " + value + " and " + odmXMLFileName);
 				}
 
@@ -430,12 +416,6 @@ public class XsltTransformJob extends QuartzJobBean {
 
 				TransformerFactory tFactory = TransformerFactory.newInstance();
 
-				// Use the TransformerFactory to instantiate a Transformer that will
-				// work with
-				// the stylesheet you specify. This method call also processes the
-				// stylesheet
-				// into a compiled Templates object.
-
 				int numXLS = epBean.getFileName().length;
 				int fileCntr = 0;
 
@@ -447,9 +427,6 @@ public class XsltTransformJob extends QuartzJobBean {
 					in = new java.io.FileInputStream(xsltPath);
 
 					Transformer transformer = tFactory.newTransformer(new StreamSource(in));
-
-					// String endFile = outputPath + File.separator +
-					// dataMap.getString(POST_FILE_NAME);
 					endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
 
 					endFileStream = new FileOutputStream(endFile);
@@ -478,8 +455,8 @@ public class XsltTransformJob extends QuartzJobBean {
 				emailBuffer.append("<p>").append(pageMessages.getString("email_header_1")).append(" ")
 						.append(pageMessages.getString("email_header_2")).append(" Job Execution ")
 						.append(pageMessages.getString("email_header_3")).append("</p>");
-				emailBuffer.append("<P>Dataset: ").append(datasetBean.getName()).append("</P>");
-				emailBuffer.append("<P>Study: ").append(currentStudy.getName()).append("</P>");
+				emailBuffer.append("<P>").append(words.getString("dataset")).append(": ").append(datasetBean.getName()).append("</P>");
+				emailBuffer.append("<P>").append(words.getString("study")).append(": ").append(currentStudy.getName()).append("</P>");
 				if (function != null
 						&& function.getClass().equals(org.akaza.openclinica.bean.service.SqlProcessingFunction.class)) {
 					String dbUrl = ((org.akaza.openclinica.bean.service.SqlProcessingFunction) function)
@@ -489,11 +466,11 @@ public class XsltTransformJob extends QuartzJobBean {
 					int hostIndex = dbUrl.substring(0, lastIndex).indexOf("//");
 					String host = dbUrl.substring(hostIndex, lastIndex);
 					emailBuffer
-							.append("<P>Database: ")
+							.append("<P>").append(words.getString("dataset")).append(": ")
 							.append(((org.akaza.openclinica.bean.service.SqlProcessingFunction) function)
 									.getDatabaseType()).append("</P>");
-					emailBuffer.append("<P>Schema: ").append(schemaName.replace("/", "")).append("</P>");
-					emailBuffer.append("<P>Host: ").append(host.replace("//", "")).append("</P>");
+					emailBuffer.append("<P>").append(words.getString("schema")).append(": ").append(schemaName.replace("/", "")).append("</P>");
+					emailBuffer.append("<P>").append(words.getString("host")).append(": ").append(host.replace("//", "")).append("</P>");
 
 				}
 				emailBuffer.append("<p>").append(pageMessages.getString("html_email_body_1"))
@@ -524,15 +501,11 @@ public class XsltTransformJob extends QuartzJobBean {
 
 					if (!function.getClass().equals(org.akaza.openclinica.bean.service.SqlProcessingFunction.class)) {
 						String archivedFile = dataMap.getString(POST_FILE_NAME) + "." + function.getFileType();
-						// JN: if the properties is set to zip the output file,
-						// download the zip file
+
 						if (function.isZip()) {
 							archivedFile = archivedFile + ".zip";
 						}
-						// JN: The above 2 lines code is useless, it should be
-						// removed..added it only for the sake of custom processing
-						// but it will produce erroneous results in case of custom
-						// post processing as well.
+
 						if (function.getClass().equals(org.akaza.openclinica.bean.service.PdfProcessingFunction.class)) {
 							archivedFile = function.getArchivedFileName();
 						}
@@ -561,15 +534,15 @@ public class XsltTransformJob extends QuartzJobBean {
 					// otherwise don't do it
 					if (message.getCode() == 1) {
 						if (jobName != null) {
-							subject = "Success: " + jobName;
+							subject = words.getString("success") + ": " + jobName;
 						} else {
-							subject = "Success: " + datasetBean.getName();
+							subject = words.getString("success") + ": " + datasetBean.getName();
 						}
 					} else if (message.getCode() == TWO) {
 						if (jobName != null) {
-							subject = "Failure: " + jobName;
+							subject = words.getString("failure") + ": " + jobName;
 						} else {
-							subject = "Failure: " + datasetBean.getName();
+							subject = words.getString("failure") + ": " + datasetBean.getName();
 						}
 						if (failureMsg != null && !failureMsg.isEmpty()) {
 							emailBuffer.append(failureMsg);
@@ -578,28 +551,20 @@ public class XsltTransformJob extends QuartzJobBean {
 						postErrorMessage(message.getDescription(), context);
 					} else if (message.getCode() == THREE) {
 						if (jobName != null) {
-							subject = "Update: " + jobName;
+							subject = words.getString("update") + ": " + jobName;
 						} else {
-							subject = "Update: " + datasetBean.getName();
+							subject = words.getString("update") + ": " + datasetBean.getName();
 						}
 					}
 
 				} else {
-					// extract ran but no post-processing - we send an email with
-					// success and url to link to
-					// generate archived dataset file bean here, and use the id to
-					// build the URL
 					String archivedFilename = dataMap.getString(POST_FILE_NAME);
-					// JN: if the properties is set to zip the output file, download
-					// the zip file
 					if (zipped) {
 						archivedFilename = dataMap.getString(POST_FILE_NAME) + ".zip";
 					}
 					// delete old files now
 					List<File> intermediateFiles = generateFileService.getOldFiles();
 					String[] dontDelFiles = epBean.getDoNotDelFiles();
-					// JN: The following is the code for zipping up the files, in
-					// case of more than one xsl being provided.
 					if (dontDelFiles.length > 1 && zipped) {
 						// unzip(dontDelFiles);
 						logMe("count =====" + cnt + "dontDelFiles length==---" + dontDelFiles.length);
@@ -694,9 +659,9 @@ public class XsltTransformJob extends QuartzJobBean {
 							done, odmFile.length(), ExportFormatBean.TXTFILE, userAccountId);
 
 					if (jobName != null) {
-						subject = "Job Ran: " + jobName;
+						subject = pageMessages.getString("job_ran") + ": " + jobName;
 					} else {
-						subject = "Job Ran: " + datasetBean.getName();
+						subject = pageMessages.getString("job_ran") + ": " + datasetBean.getName();
 					}
 
 					if (successMsg == null || successMsg.isEmpty()) {
@@ -738,10 +703,10 @@ public class XsltTransformJob extends QuartzJobBean {
 					triggerBean.setUserAccount(userBean);
 					triggerBean.setFullName(extractName);
 					triggerBean.setFiredDate(context.getFireTime());
-					String actionMsg = "You may access the " + dataMap.get(XsltTriggerService.EXPORT_FORMAT)
-							+ " file by changing your study/site to " + currentStudy.getName()
-							+ " and selecting the Export Data icon for " + datasetBean.getName()
-							+ " dataset on the View Datasets page.";
+					String actionMsg = pageMessages.getString("you_may_access") + " " + dataMap.get(XsltTriggerService.EXPORT_FORMAT)
+							+ " " + pageMessages.getString("file_by_changing") + " " + currentStudy.getName()
+							+ " " + pageMessages.getString("and_selecting_the_export_data") + " " + datasetBean.getName()
+							+ " " + pageMessages.getString("dataset_on_the_view_dataset");
 					auditEventDAO
 							.createRowForJobExecution(triggerBean,
 									sasExtractJob && sasSideHasWarnings ? "__job_fired_success_warings"
@@ -1165,14 +1130,10 @@ public class XsltTransformJob extends QuartzJobBean {
 		fbInitial.setName(name);
 		fbInitial.setFileReference(dir + name);
 
-		// JN: the following is to convert to KB, not possible without changing
-		// database schema
-		// fbInitial.setFileSize( setFormat(bytesToKilo(fileLength)));
-
 		fbInitial.setFileSize((int) (fileLength));
 
 		fbInitial.setRunTime(time);
-		// to convert to seconds
+
 		fbInitial.setDatasetId(datasetBean.getId());
 		fbInitial.setExportFormatBean(efb);
 		fbInitial.setExportFormatId(efb.getId());
@@ -1204,7 +1165,6 @@ public class XsltTransformJob extends QuartzJobBean {
 		sendErrorEmail(message, null, context, target);
 	}
 
-	// Utility method to format upto 3 decimals.
 	private double setFormat(double number) {
 		if (number < 1) {
 			number = 1.0;
@@ -1212,11 +1172,6 @@ public class XsltTransformJob extends QuartzJobBean {
 		BigDecimal num = new BigDecimal(number);
 		logger.trace("Number is" + num.setScale(THREE, BigDecimal.ROUND_HALF_UP).doubleValue());
 		return num.setScale(THREE, BigDecimal.ROUND_HALF_UP).doubleValue();
-		/*
-		 * DecimalFormat df = new DecimalFormat("#.#"); logger.trace("Number is" +
-		 * Double.parseDouble(df.format(number))); logger.trace("Number is" + (float)
-		 * Double.parseDouble(df.format(number))); return Double.valueOf(df.format(number));
-		 */
 	}
 
 }

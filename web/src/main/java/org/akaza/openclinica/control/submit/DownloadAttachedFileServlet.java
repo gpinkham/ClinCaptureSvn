@@ -123,7 +123,7 @@ public class DownloadAttachedFileServlet extends Controller {
 							currentStudy.getId());
 					for (StudyBean s : sites) {
 						testPath = Utils.getAttachedFilePath(s);
-						testName = testPath + tail;// + s.getIdentifier() + tail;
+						testName = testPath + tail; // + s.getIdentifier() + tail;
 						File test = new File(testName);
 						if (test.exists()) {
 							filePathName = testName;
@@ -140,7 +140,7 @@ public class DownloadAttachedFileServlet extends Controller {
 		String realName = file.getName();
 		logger.info("realName = " + realName);
 		if (!file.exists() || file.length() <= 0) {
-			addPageMessage("File " + filePathName + " " + respage.getString("not_exist"), request);
+			addPageMessage(resterm.getString("file_upper_case") + " " + filePathName + " " + respage.getString("not_exist"), request);
 		} else {
 			// response.setContentType("application/octet-stream");
 			response.setHeader("Content-disposition", "attachment; filename=\"" + fileNameOid + realName + "\";");

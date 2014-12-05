@@ -110,12 +110,12 @@ import java.util.Set;
 @SuppressWarnings({ "rawtypes" })
 public class ImportSpringJob extends QuartzJobBean {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-	ResourceBundle respage;
-	ResourceBundle resword;
+	private ResourceBundle respage;
+	private ResourceBundle resword;
 
-	Locale locale;
+	private Locale locale;
 	public static final String DIRECTORY = "filePathDir";
 	public static final String EMAIL = "contactEmail";
 	public static final String USER_ID = "user_id";
@@ -163,7 +163,7 @@ public class ImportSpringJob extends QuartzJobBean {
 
 	@Override
 	protected void executeInternal(final JobExecutionContext context) throws JobExecutionException {
-		logger.debug("=== starting execute internal ===");
+		logger.debug("Starting execute internal");
 		ApplicationContext appContext;
 		try {
 			appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
@@ -183,14 +183,18 @@ public class ImportSpringJob extends QuartzJobBean {
 	}
 
 	protected void executeInternalInTransaction(JobExecutionContext context) {
-		locale = new Locale("en-US");
 
+		JobDataMap dataMap = context.getMergedJobDataMap();
+		String localeStr = dataMap.getString(ExampleSpringJob.LOCALE);
+		if (localeStr != null) {
+			locale = new Locale(localeStr);
+		} else {
+			locale = new Locale("en-US");
+		}
 		ResourceBundleProvider.updateLocale(locale);
 		respage = ResourceBundleProvider.getPageMessagesBundle();
 		resword = ResourceBundleProvider.getWordsBundle();
 		triggerService = new TriggerService();
-
-		JobDataMap dataMap = context.getMergedJobDataMap();
 		SimpleTriggerImpl trigger = (SimpleTriggerImpl) context.getTrigger();
 		TriggerBean triggerBean = new TriggerBean();
 		triggerBean.setFullName(trigger.getName());
@@ -228,7 +232,6 @@ public class ImportSpringJob extends QuartzJobBean {
 			String directory = dataMap.getString(DIRECTORY);
 			String studyName = dataMap.getString(STUDY_NAME);
 			String studyOid = dataMap.getString(STUDY_OID);
-			String localeStr = dataMap.getString(ExampleSpringJob.LOCALE);
 			if (localeStr != null) {
 				locale = new Locale(localeStr);
 				ResourceBundleProvider.updateLocale(locale);
@@ -453,10 +456,10 @@ public class ImportSpringJob extends QuartzJobBean {
 					Object[] arguments = { f.getName(), errors.size() };
 					auditMsg.append(mf.format(arguments) + "<br/>");
 					msg.append(mf.format(arguments) + "<br/>");
-					auditMsg.append("You can see the log file <a href='" + SQLInitServlet.getSystemURL()
+					auditMsg.append(respage.getString("you_can_see_the_log_file") + " <a href='" + SQLInitServlet.getSystemURL()
 							+ "ViewLogMessage?n=" + generalFileDir + f.getName() + "&tn=" + triggerBean.getName()
 							+ "&gn=1'>here</a>.<br/>");
-					msg.append("You can see the log file <a href='" + SQLInitServlet.getSystemURL()
+					msg.append(respage.getString("you_can_see_the_log_file") + " <a href='" + SQLInitServlet.getSystemURL()
 							+ "ViewLogMessage?n=" + generalFileDir + f.getName() + "&tn=" + triggerBean.getName()
 							+ "&gn=1'>here</a>.<br/>");
 					continue;
@@ -630,7 +633,7 @@ public class ImportSpringJob extends QuartzJobBean {
 								}
 								ItemDAO idao = new ItemDAO(dataSource);
 								ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
-								logger.debug("*** checking for validation errors: " + ibean.getName());
+								logger.debug("Checking for validation errors: " + ibean.getName());
 								String itemOid = displayItemBean.getItem().getOid() + "_"
 										+ wrapper.getStudyEventRepeatKey() + "_"
 										+ displayItemBean.getData().getOrdinal() + "_" + wrapper.getStudySubjectOid();
@@ -642,7 +645,7 @@ public class ImportSpringJob extends QuartzJobBean {
 												eventCrfBean, displayItemBean, null, ub, dataSource, studyBean);
 										createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean,
 												parentDn.getId(), ub, dataSource, studyBean);
-										logger.debug("*** created disc note with message: " + message);
+										logger.debug("Created disc note with message: " + message);
 									}
 								}
 							} else {
@@ -804,7 +807,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				tar[j].delete();
 			} catch (NullPointerException npe) {
 				// list can be 'gappy' which is why we need to catch this
-				logger.error("found Npe: " + npe.getMessage());
+				logger.error("Found Npe: " + npe.getMessage());
 			}
 		}
 	}
@@ -816,20 +819,20 @@ public class ImportSpringJob extends QuartzJobBean {
 		List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
 		if (odmContainer != null) {
 			ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
-			logger.debug("=== found number of rules present: " + ruleSetService.getCountByStudy(studyBean) + " ===");
+			logger.debug("Found number of rules present: " + ruleSetService.getCountByStudy(studyBean) + " ===");
 			if (ruleSetService.getCountByStudy(studyBean) > 0) {
 				ImportDataRuleRunnerContainer container;
 				for (SubjectDataBean subjectDataBean : subjectDataBeans) {
 					container = new ImportDataRuleRunnerContainer();
 					container.initRuleSetsAndTargets(dataSource, studyBean, subjectDataBean, ruleSetService);
-					logger.debug("=== found container: should run rules? " + container.getShouldRunRules() + " ===");
+					logger.debug("Found container: should run rules? " + container.getShouldRunRules());
 					if (container.getShouldRunRules()) {
-						logger.debug("=== added a container in run rule setup ===");
+						logger.debug("Added a container in run rule setup");
 						containers.add(container);
 					}
 				}
 				if (!containers.isEmpty()) {
-					logger.debug("=== dry run of rules in data entry ===");
+					logger.debug("Dry run of rules in data entry");
 					ruleSetService.runRulesInImportData(runRulesOptimisation, connection, containers, studyBean,
 							userBean, ExecutionMode.DRY_RUN);
 				}
@@ -845,7 +848,7 @@ public class ImportSpringJob extends QuartzJobBean {
 			RuleSetServiceInterface ruleSetService, ExecutionMode executionMode) {
 		StringBuffer messages = new StringBuffer();
 		if (containers != null && !containers.isEmpty()) {
-			logger.debug("=== real running of rules in import data ===");
+			logger.debug("Real running of rules in import data");
 			HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(runRulesOptimisation,
 					connection, containers, skippedItemIds, studyBean, userBean, executionMode);
 			messages = extractRuleActionWarnings(summary);

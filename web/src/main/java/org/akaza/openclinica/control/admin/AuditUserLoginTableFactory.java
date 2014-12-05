@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -21,6 +21,7 @@ import org.akaza.openclinica.dao.hibernate.AuditUserLoginSort;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -42,12 +43,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
+/**
+ * Encapsulates all the functionality required to create tables for user login audit.
+ */
 public class AuditUserLoginTableFactory extends AbstractTableFactory {
 
 	private AuditUserLoginDao auditUserLoginDao;
-	private ResourceBundle resword;
 
 	@Override
 	protected String getTableName() {
@@ -58,11 +60,11 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 	protected void configureColumns(TableFacade tableFacade, Locale locale) {
 		tableFacade.setColumnProperties("userName", "loginAttemptDate", "loginStatus", "actions");
 		Row row = tableFacade.getTable().getRow();
-		configureColumn(row.getColumn("userName"), "User Name", null, null);
-		configureColumn(row.getColumn("loginAttemptDate"), "Login Attempt Date", new DateCellEditor(
+		configureColumn(row.getColumn("userName"), ResourceBundleProvider.getResWord("user_name"), null, null);
+		configureColumn(row.getColumn("loginAttemptDate"), ResourceBundleProvider.getResWord("login_attempt_date"), new DateCellEditor(
 				"yyyy-MM-dd HH:mm:ss"), null);
-		configureColumn(row.getColumn("loginStatus"), "Login Status", null, new AvailableDroplistFilterEditor());
-		String actionsHeader = resword.getString("actions")
+		configureColumn(row.getColumn("loginStatus"), ResourceBundleProvider.getResWord("login_status"), null, new AvailableDroplistFilterEditor());
+		String actionsHeader = ResourceBundleProvider.getResWord("actions")
 				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
 		configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(
 				locale), true, false);
@@ -73,18 +75,18 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 	protected void configureExportColumns(TableFacade tableFacade, Locale locale) {
 		tableFacade.setColumnProperties("userName", "loginAttemptDate", "loginStatus");
 		Row row = tableFacade.getTable().getRow();
-		configureColumn(row.getColumn("userName"), "User Name", null, null);
-		configureColumn(row.getColumn("loginAttemptDate"), "Login Attempt Date", new DateCellEditor(
+		configureColumn(row.getColumn("userName"), ResourceBundleProvider.getResWord("user_name"), null, null);
+		configureColumn(row.getColumn("loginAttemptDate"), ResourceBundleProvider.getResWord("login_attempt_date"), new DateCellEditor(
 				"yyyy-MM-dd HH:mm:ss"), null);
-		configureColumn(row.getColumn("loginStatus"), "Login Status", null, new AvailableDroplistFilterEditor());
+		configureColumn(row.getColumn("loginStatus"), ResourceBundleProvider.getResWord("login_status"), null, new AvailableDroplistFilterEditor());
 	}
 
 	@Override
 	public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {
 		super.configureTableFacade(response, tableFacade);
+		tableFacade.addFilterMatcher(new MatcherKey(String.class, "loginStatus"), new AvailableFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "loginAttemptDate"), new DateFilterMatcher(
 				"yyyy-MM-dd HH:mm"));
-		tableFacade.addFilterMatcher(new MatcherKey(LoginStatus.class, "loginStatus"), new AvailableFilterMatcher());
 	}
 
 	@Override
@@ -94,8 +96,6 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 
 	@Override
 	public void setDataAndLimitVariables(TableFacade tableFacade) {
-		// initialize i18n
-		resword = ResourceBundleProvider.getWordsBundle(getLocale());
 
 		Limit limit = tableFacade.getLimit();
 		AuditUserLoginFilter auditUserLoginFilter = getAuditUserLoginFilter(limit);
@@ -119,9 +119,7 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 		int rowEnd = limit.getRowSelect().getRowEnd();
 		Collection<AuditUserLoginBean> items = getAuditUserLoginDao().getWithFilterAndSort(auditUserLoginFilter,
 				auditUserLoginSort, rowStart, rowEnd);
-		tableFacade.setItems(items); // Do not forget to set the items back on
-		// the tableFacade.
-
+		tableFacade.setItems(items);
 	}
 
 	/**
@@ -181,7 +179,7 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 		protected List<Option> getOptions() {
 			List<Option> options = new ArrayList<Option>();
 			for (LoginStatus loginStatus : LoginStatus.values()) {
-				options.add(new Option(loginStatus.name(), loginStatus.toString()));
+				options.add(new Option(loginStatus.toString(), loginStatus.toString()));
 			}
 			return options;
 		}
@@ -189,14 +187,11 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 
 	private class AvailableFilterMatcher implements FilterMatcher {
 		public boolean evaluate(Object itemValue, String filterValue) {
-
-			LoginStatus filter = LoginStatus.getByName(String.valueOf(filterValue));
-			LoginStatus item = (LoginStatus) itemValue;
-
-			if (item.equals(filter)) {
+			String item = StringUtils.lowerCase(String.valueOf(itemValue));
+			String filter = StringUtils.lowerCase(String.valueOf(filterValue)).replaceAll("\\+", " ");
+			if (filter.equals(item)) {
 				return true;
 			}
-
 			return false;
 		}
 	}

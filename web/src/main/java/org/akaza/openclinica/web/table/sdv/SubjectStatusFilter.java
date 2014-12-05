@@ -13,30 +13,32 @@
 
 package org.akaza.openclinica.web.table.sdv;
 
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
-/**
- * Created by IntelliJ IDEA. User: bruceperry Date: May 19, 2009
- */
+
 public class SubjectStatusFilter extends DroplistFilterEditor {
-	// AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED,
-	// AUTO_DELETED, SIGNED, FROZEN,SOURCE_DATA_VERIFICATION
+
+	private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
+
 	@Override
 	protected List<Option> getOptions() {
+		ResourceBundleProvider.updateLocale(getWebContext().getLocale());
 		List<Option> options = new ArrayList<Option>();
-		options.add(new Option("available", "Available"));
-		options.add(new Option("pending", "Pending"));
-		options.add(new Option("private", "Private"));
-		options.add(new Option("unavailable", "Unavailable"));
-		options.add(new Option("locked", "Locked"));
-		options.add(new Option("deleted", "Deleted"));
-		options.add(new Option("auto_deleted", "Auto deleted"));
-		options.add(new Option("signed", "Signed"));
-		options.add(new Option("frozen", "Frozen"));
-		options.add(new Option("source_data_verification", "SDV"));
+		options.add(new Option("available", reswords.getString("available")));
+		options.add(new Option("pending", reswords.getString("pending")));
+		options.add(new Option("private", reswords.getString("private")));
+		options.add(new Option("unavailable", reswords.getString("unavailable")));
+		options.add(new Option("locked", reswords.getString("locked")));
+		options.add(new Option("deleted", reswords.getString("deleted")));
+		options.add(new Option("auto_deleted", reswords.getString("auto_deleted")));
+		options.add(new Option("signed", reswords.getString("Signed")));
+		options.add(new Option("frozen", reswords.getString("frozen")));
+		options.add(new Option("source_data_verification", reswords.getString("nav_sdv")));
 		return options;
 	}
 }

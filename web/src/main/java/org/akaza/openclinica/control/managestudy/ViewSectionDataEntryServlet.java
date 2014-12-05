@@ -439,7 +439,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				}
 			}
 
-			addPageMessage("Discrepancy notes are saved successfully.", request);
+			addPageMessage(respage.getString("discrepancy_notes_are_saved_successfully"), request);
 			request.setAttribute("id", studySubjectId + "");
 			forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 		} else {

@@ -107,7 +107,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 	public static final String ENTITY_COLUMN = "column";
 	public static final String ENTITY_FIELD = "field";
 	public static final String DIS_NOTES = "discrepancyNotes";
-	public static final String LOCKED_FLAG = "isLocked";// if an event crf is
+	public static final String LOCKED_FLAG = "isLocked"; // if an event crf is
 	public static final String RES_STATUSES = "resolutionStatuses";
 	public static final String RES_STATUSES2 = "resolutionStatuses2";
 	public static final String DIS_TYPES = "discrepancyTypes";
@@ -156,7 +156,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		request.setAttribute("unlock", "0");
 		String monitor = fp.getString("study_monitor");
 
-		if ("1".equalsIgnoreCase(monitor)) {// change to allow user to
+		if ("1".equalsIgnoreCase(monitor)) { // change to allow user to
 			// enter note for all items,
 			// not just blank items
 			request.setAttribute(CAN_MONITOR, "1");
@@ -469,7 +469,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 				note.setEntityType(name);
 
 				int pId = note.getParentDnId();
-				if (pId == 0) {// we can only keep one unsaved note because
+				if (pId == 0) { // we can only keep one unsaved note because
 					// note.id == 0
 					noteTree.put(note.getId(), note);
 				}
@@ -571,9 +571,9 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 				dn.setId(key);
 				int dnTypeId = note.getDiscrepancyNoteTypeId();
 				dn.setDiscrepancyNoteTypeId(dnTypeId);
-				if (dnTypeId == 3) {// Query
+				if (dnTypeId == 3) { // Query
 					dn.setAssignedUserId(note.getOwnerId());
-				} else if (dnTypeId == 1) {// FVC
+				} else if (dnTypeId == 1) { // FVC
 					if (fvcInitAssigns.containsKey(key)) {
 						String[] s = fvcInitAssigns.get(key).split("\\.");
 						int i = Integer.parseInt(s.length == 2 ? s[1].trim() : "0");
@@ -653,7 +653,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		if (!"XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
 			forwardPage(Page.VIEW_DISCREPANCY_NOTE, request, response);
 		} else {
-			request.setAttribute("responseMessage", "Error in data");
+			request.setAttribute("responseMessage", respage.getString("error_in_data"));
 			forwardPage(Page.ADD_ONE_DISCREPANCY_NOTE_DIV, request, response);
 		}
 	}

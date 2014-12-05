@@ -155,16 +155,14 @@ public class CreateJobImportServlet extends Controller {
 					Date dateStart = getStdScheduler().scheduleJob(jobDetailBean, trigger);
 					System.out.println("== found job date: " + dateStart.toString());
 					// set a success message here
-					addPageMessage("You have successfully created a new job: " + trigger.getName()
-							+ " which is now set to run at the time you specified.", request);
+					addPageMessage(respage.getString("you_have_successfully_created_a_new_job") + " " + trigger.getName()
+							+ " " + respage.getString("which_is_now_set_to_run"), request);
 					forwardPage(Page.VIEW_IMPORT_JOB_SERVLET, request, response);
 				} catch (SchedulerException se) {
 					se.printStackTrace();
 					// set a message here with the exception message
 					setUpServlet(request, response);
-					addPageMessage(
-							"There was an unspecified error with your creation, please contact an administrator.",
-							request);
+					addPageMessage(resexception.getString("there_was_an_unspecified_error"), request);
 					forwardPage(Page.CREATE_JOB_IMPORT, request, response);
 				}
 			}

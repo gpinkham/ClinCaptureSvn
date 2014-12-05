@@ -13,26 +13,27 @@
 
 package org.akaza.openclinica.web.table.sdv;
 
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * The drop list for the CRF Status filter.
  */
 public class CrfStatusFilter extends DroplistFilterEditor {
+
+	private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
+
 	@Override
 	protected List<Option> getOptions() {
+		ResourceBundleProvider.updateLocale(getWebContext().getLocale());
 		List<Option> options = new ArrayList<Option>();
-		// options.add(new Option("1", "Scheduled"));
-		// options.add(new Option("2", "Not scheduled"));
-		// options.add(new Option("3", "Data entry started"));
-		options.add(new Option("Completed", "Completed"));
-		// options.add(new Option("5", "Stopped"));
-		// options.add(new Option("6", "Skipped"));
-		options.add(new Option("Locked", "Locked"));
-		// options.add(new Option("8", "Signed"));
+
+		options.add(new Option(reswords.getString("completed"), reswords.getString("completed")));
+		options.add(new Option(reswords.getString("locked"), reswords.getString("locked")));
 		return options;
 	}
 }

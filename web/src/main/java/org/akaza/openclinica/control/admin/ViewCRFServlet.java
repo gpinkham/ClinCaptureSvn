@@ -207,13 +207,13 @@ public class ViewCRFServlet extends Controller {
 		sDVUtil.setHtmlCellEditors(tableFacade, colNames, true);
 
 		HtmlColumn firstName = row.getColumn("name");
-		firstName.setTitle("Study Name");
+		firstName.setTitle(resword.getString("study_name"));
 
 		HtmlColumn protocol = row.getColumn("uniqueProtocolid");
-		protocol.setTitle("Unique Protocol Id");
+		protocol.setTitle(resword.getString("unique_protocol_ID"));
 
 		HtmlColumn actions = row.getColumn("actions");
-		actions.setTitle("Actions");
+		actions.setTitle(resword.getString("actions"));
 
 		return tableFacade.render();
 	}

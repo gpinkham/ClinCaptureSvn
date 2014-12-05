@@ -30,26 +30,31 @@ public enum LoginStatus implements CodedEnum {
 	SUCCESSFUL_LOGIN(1, "successful_login"), FAILED_LOGIN(2, "failed_login"), FAILED_LOGIN_LOCKED(3,
 			"failed_login_locked"), SUCCESSFUL_LOGOUT(4, "successful_logout");
 
-	private int code;
-	private String description;
+		private int code;
+		private String description;
 
-	LoginStatus(int code) {
-		this(code, null);
-	}
+		LoginStatus(int code) {
+			this(code, null);
+		}
 
-	LoginStatus(int code, String description) {
-		this.code = code;
-		this.description = description;
-	}
+		LoginStatus(int code, String description) {
+			this.code = code;
+			this.description = description;
+		}
 
-	@Override
-	public String toString() {
-		ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
-		return resterm.getString(getDescription());
-	}
+		@Override
+		public String toString() {
+			ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
+			return resterm.getString(getDescription());
+		}
 
 	public static LoginStatus getByName(String name) {
-		return LoginStatus.valueOf(LoginStatus.class, name);
+		for (LoginStatus theEnum : LoginStatus.values()) {
+			if (theEnum.toString().equalsIgnoreCase(name)) {
+				return theEnum;
+			}
+		}
+		return null;
 	}
 
 	public static LoginStatus getByCode(Integer code) {

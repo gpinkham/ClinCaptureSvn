@@ -98,7 +98,7 @@ public class UrlRewriterServlet extends Controller {
 				if (ocResource.isInValid()) {
 					response.sendError(HttpServletResponse.SC_NOT_FOUND);
 					HashMap errors = getErrorsHolder(request);
-					Validator.addError(errors, "error:", ocResource.getMessages().get(0));
+					Validator.addError(errors, resword.getString("error"), ocResource.getMessages().get(0));
 					request.setAttribute("formMessages", errors);
 				}
 

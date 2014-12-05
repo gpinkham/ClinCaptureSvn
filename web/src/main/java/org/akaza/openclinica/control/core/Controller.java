@@ -294,13 +294,12 @@ public abstract class Controller extends BaseController {
 					// add the message here that your export is done
 					logger.info("adding a message!");
 					// TODO make absolute paths in the message, for example a link from /pages/* would break
-					// TODO i18n
 					if (failMessage != null) {
 						// The extract data job failed with the message:
 						// ERROR: relation "demographics" already exists
 						// More information may be available in the log files.
-						addPageMessage("The extract data job failed with the message: <br/><br/>" + failMessage
-								+ "<br/><br/>More information may be available in the log files.", request);
+						addPageMessage(respage.getString("the_extract_data_job_failed") + failMessage
+								+ respage.getString("more_information_may_be_available"), request);
 						request.getSession().removeAttribute("jobName");
 						request.getSession().removeAttribute("groupName");
 						request.getSession().removeAttribute("datasetId");
@@ -316,9 +315,8 @@ public abstract class Controller extends BaseController {
 							if (successMsg != null && !successMsg.isEmpty()) {
 								addPageMessage(successMsg, request);
 							} else {
-								addPageMessage(
-										"Your Extract is now completed. Please go to review it <a href='ExportDataset?datasetId="
-												+ datasetId + "'>here</a>.", request);
+								addPageMessage(respage.getString("your_extract_is_now_completed") + " <a href='ExportDataset?datasetId="
+												+ datasetId + "'>" + resword.getString("here_lower_case") + "</a>.", request);
 							}
 							request.getSession().removeAttribute("jobName");
 							request.getSession().removeAttribute("groupName");
@@ -343,7 +341,7 @@ public abstract class Controller extends BaseController {
 
 		if (fileBeans.size() > 0) {
 			successMsg = successMsg.replace("$linkURL", "<a href=\"" + SQLInitServlet.getSystemURL()
-					+ "AccessFile?fileId=" + fileBeans.get(0).getId() + "\">here</a>");
+					+ "AccessFile?fileId=" + fileBeans.get(0).getId() + "\">" + resword.getString("here_lower_case") + "</a>");
 		}
 
 		return successMsg;
@@ -1267,11 +1265,11 @@ public abstract class Controller extends BaseController {
 
 		if (!(h >= 0)) {
 			List<String> messages = new ArrayList<String>();
-			messages.add("Select the start hour, please.");
+			messages.add(respage.getString("select_the_hour_start"));
 			errors.put("jobHour", messages);
 		} else if (!(m >= 0)) {
 			List<String> messages = new ArrayList<String>();
-			messages.add("Select the start minute, please.");
+			messages.add(respage.getString("select_the_start_minute"));
 			errors.put("jobHour", messages);
 		}
 

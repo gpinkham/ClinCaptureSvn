@@ -350,7 +350,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 							dnb.setEntityId(item.getId());
 							dnb.setColumn("value");
 							dnb.setCreatedDate(new Date());
-							dnb.setDescription("The item has been removed, this Discrepancy Note has been Closed.");
+							dnb.setDescription(respage.getString("the_item_has_been_removed"));
 							dnDao.create(dnb);
 							dnDao.createMapping(dnb);
 							if (itemParentNote != null) {

@@ -93,7 +93,7 @@ public class InactiveAnalyzer {
 			if (reason.equals(INACTIVE_ACCOUNT)) {
 				body += restext.getString("when_a_user_tried_to_login_with_this_account") + " "
 						+ restext.getString("after_a_period_of_inactivity_of_more_than") + " " + (-1) * numdays
-						+ " days.\n\n\n\n";
+						+ " " + restext.getString("days");
 			} else {
 				body += restext.getString("due_to_excessive_failed_login_attempts") + ".\n\n\n\n";
 			}
@@ -103,7 +103,7 @@ public class InactiveAnalyzer {
 		} catch (MissingResourceException mre) {
 			throw mre;
 		} catch (Exception e) {
-			//
+			logger.error("Error: " + e.getMessage());
 		}
 		logger.info("Sending email...done");
 	}

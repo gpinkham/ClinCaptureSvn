@@ -24,6 +24,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,7 +40,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PauseJobServlet extends Controller {
 
-	private static final String groupImportName = "importTrigger";
+	private static final String GROUP_IMPORT_NAME = "importTrigger";
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -54,10 +57,7 @@ public class PauseJobServlet extends Controller {
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
-		// above copied from create dataset servlet, needs to be changed to
-		// allow only admin-level users
-
+				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 	}
 
 	@Override
@@ -70,8 +70,8 @@ public class PauseJobServlet extends Controller {
 		String finalGroupName;
 		if ("".equals(gName) || "0".equals(gName)) {
 			finalGroupName = XsltTriggerService.TRIGGER_GROUP_NAME;
-		} else {// should equal 1
-			finalGroupName = groupImportName;
+		} else { // should equal 1
+			finalGroupName = GROUP_IMPORT_NAME;
 		}
 		String deleteMe = fp.getString("del");
 		StdScheduler scheduler = getStdScheduler();
@@ -80,30 +80,27 @@ public class PauseJobServlet extends Controller {
 			if (("y".equals(deleteMe)) && (ub.isSysAdmin())) {
 				scheduler.deleteJob(trigger.getJobKey());
 				// set return message here
-				System.out.println("deleted job: " + triggerName);
-				addPageMessage("The following job " + triggerName
-						+ " and its corresponding Trigger have been deleted from the system.", request);
+				logger.debug("Deleted job: " + triggerName);
+				addPageMessage(respage.getString("the_following_job") + " " + triggerName
+						+ " " + respage.getString("corresponding_trigger_deleted"), request);
 			} else {
 
 				if (scheduler.getTriggerState(trigger.getKey()) == Trigger.TriggerState.PAUSED) {
 					scheduler.resumeTrigger(trigger.getKey());
-					System.out.println("-- resuming trigger! " + triggerName + " " + finalGroupName);
-					addPageMessage("This trigger " + triggerName
-							+ " has been resumed and will continue to run until paused or deleted.", request);
+					logger.debug("Resuming trigger! " + triggerName + " " + finalGroupName);
+					addPageMessage(respage.getString("this_trigger") + " " + triggerName
+							+ " " + respage.getString("resumed_and_will_continue"), request);
 				} else {
 					scheduler.pauseTrigger(trigger.getKey());
-					System.out.println("-- pausing trigger! " + triggerName + " " + finalGroupName);
-					addPageMessage("This trigger " + triggerName
-							+ " has been paused, and will not run again until it is restored.", request);
+					logger.debug("Pausing trigger! " + triggerName + " " + finalGroupName);
+					addPageMessage(respage.getString("this_trigger") + " " + triggerName
+							+ " " + respage.getString("has_been_paused"), request);
 				}
 			}
 		} catch (NullPointerException e) {
-			// TODO Auto-generated catch block
+		    logger.error("Error: " + e.getMessage());
 			e.printStackTrace();
 		}
-		// all validation done on JSP side
-		// forward back to view job servlet here
-		// set a message
 		if ("".equals(gName) || "0".equals(gName)) {
 			forwardPage(Page.VIEW_JOB_SERVLET, request, response);
 		} else {

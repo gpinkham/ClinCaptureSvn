@@ -125,20 +125,26 @@
         </tr>
         <tr>
         	<td align="center"><fmt:message key="medical_terms" bundle="${resword}"/></td>
-        	<td align="center" name="tdNotCoded"><a href='javascript:redirectUrl("Not Coded");'>${unCodedItems}</a></td>
+
+            <c:set var="nCoded"><fmt:message key="notCoded" bundle="${resword}"/></c:set>
+            <td align="center" name="tdNotCoded"><a href='javascript:redirectUrl("${nCoded}");'>${unCodedItems}</a></td>
         	<c:if test="${mcApprovalNeeded}">
             	<td align="center">0</td>
             </c:if>
             <c:choose>
         		<c:when test="${codeNotFoundItems gt 0}">
-        			<td align="center" name="tdCodeNotFound"><a href='javascript:redirectUrl("Code not Found");'>${codeNotFoundItems}</a></td>
+                    <c:set var="cNotFound"><fmt:message key="codeNotFound" bundle="${resword}"/></c:set>
+        			<td align="center" name="tdCodeNotFound"><a href='javascript:redirectUrl("${cNotFound}");'>${codeNotFoundItems}</a></td>
         		</c:when>
         		<c:otherwise>
-        			<td align="center" name="tdCodeNotFound" style="display:none"><a href='javascript:redirectUrl("Code not Found");'>${codeNotFoundItems}</a></td>
+                    <c:set var="cNotFound"><fmt:message key="codeNotFound" bundle="${resword}"/></c:set>
+        			<td align="center" name="tdCodeNotFound" style="display:none"><a href='javascript:redirectUrl("${cNotFound}");'>${codeNotFoundItems}</a></td>
         		</c:otherwise>
         	</c:choose>
-        	<td align="center" name="tdCoded"><a href='javascript:redirectUrl("Coded"); showUncodedItems();'>${codedItems}</a></td>
-            <td align="center" name="tdTotal"><a href='javascript:redirectUrl("All");'>${codeNotFoundItems + unCodedItems + codedItems}</a></td>
+            <c:set var="alreadyCoded"><fmt:message key="coded" bundle="${resword}"/></c:set>
+            <c:set var="all"><fmt:message key="all" bundle="${resword}"/></c:set>
+        	<td align="center" name="tdCoded"><a href='javascript:redirectUrl("${alreadyCoded}"); showUncodedItems();'>${codedItems}</a></td>
+            <td align="center" name="tdTotal"><a href='javascript:redirectUrl("${all}");'>${codeNotFoundItems + unCodedItems + codedItems}</a></td>
         </tr>
     </table> 
 </div>

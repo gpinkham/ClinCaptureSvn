@@ -54,7 +54,7 @@ public class TriggerService {
 
 	private static String IMPORT_TRIGGER = "importTrigger";
 	public static ResourceBundle resexception;
-	
+
 	public SimpleTriggerImpl generateTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study,
 			String locale) {
 		Date startDateTime = fp.getDateTime(DATE_START_JOB);
@@ -207,40 +207,28 @@ public class TriggerService {
 		if ((tab == "") && (cdisc == "") && (spss == "") && (cdisc12 == "") && (cdisc13 == "") && (cdisc13oc == "")) {
 			// throw an error here, at least one should work
 			// errors.put(TAB, "Error Message - Pick one of the below");
-			Validator.addError(errors, TAB, "Please pick at least one of the below.");
+			Validator.addError(errors, TAB, resexception.getString("please_pick_at_least_one"));
 		}
 		for (TriggerKey triggerKey : triggerKeys) {
 			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
-				Validator.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
+				Validator.addError(errors, JOB_NAME, resexception.getString("a_job_with_that_name_already_exist_please_pick"));
 			}
 		}
 		if (jobDate.before(new Date())) {
-			Validator.addError(errors, DATE_START_JOB + "Date", "This date needs to be later than the present time.");
+			Validator.addError(errors, DATE_START_JOB + "Date", resexception.getString("this_date_needs_to_be_later"));
 		}
 		return errors;
 	}
 
 	public String generateSummaryStatsMessage(SummaryStatsBean ssBean, ResourceBundle respage) {
-		// TODO i18n
 		StringBuffer sb = new StringBuffer();
 		sb.append("<table border=\'0\' cellpadding=\'0\' cellspacing=\'0\' width=\'100%\'>");
-		sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'>Summary Statistics:</td> </tr> <tr valign=\'top\'>");
-		sb.append("<td class=\'table_cell_left\'>Subjects Affected: " + ssBean.getStudySubjectCount() + "</td> </tr>");
-		sb.append("<tr valign=\'top\'> <td class=\'table_cell_left\'>Event CRFs Affected: " + ssBean.getEventCrfCount()
+		sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'>" + respage.getString("summary_statistics") + ":</td> </tr> <tr valign=\'top\'>");
+		sb.append("<td class=\'table_cell_left\'>" + respage.getString("subjects_affected") + ": " + ssBean.getStudySubjectCount() + "</td> </tr>");
+		sb.append("<tr valign=\'top\'> <td class=\'table_cell_left\'>" + respage.getString("event_crfs_affected") + ": " + ssBean.getEventCrfCount()
 				+ "</td> </tr> ");
-		sb.append("<tr valign=\'top\'><td class=\'table_cell_left\'>Validation Rules Generated: "
+		sb.append("<tr valign=\'top\'><td class=\'table_cell_left\'>" + respage.getString("validation_rules_generated") + ": "
 				+ ssBean.getDiscNoteCount() + "</td> </tr> </table>");
-		/*
-		 * <table border="0" cellpadding="0" cellspacing="0" width="100%">
-		 * 
-		 * <tr valign="top"> <td class="table_header_row">Summary Statistics:</td> </tr> <tr valign="top"> <td
-		 * class="table_cell_left">Subjects Affected: <c:out value="${summaryStats.studySubjectCount}" /></td> </tr> <tr
-		 * valign="top"> <td class="table_cell_left">Event CRFs Affected: <c:out value="${summaryStats.eventCrfCount}"
-		 * /></td> </tr> <tr valign="top"> <td class="table_cell_left">Validation Rules Generated: <c:out
-		 * value="${summaryStats.discNoteCount}" /></td> </tr>
-		 * 
-		 * </table>
-		 */
 
 		return sb.toString();
 	}
@@ -266,12 +254,12 @@ public class TriggerService {
 			// next step here
 			ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
 			for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
-				sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'>Event CRF OID</td> <td class=\'table_header_row\' colspan=\'" + eventCrfOidSpan + "\'></td>");
+				sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'>" + respage.getString("event_crf_oid") + "</td> <td class=\'table_header_row\' colspan=\'" + eventCrfOidSpan + "\'></td>");
 				sb.append("</tr> <tr valign=\'top\'> <td class=\'table_cell_left\'>");
 				sb.append(studyEventDataBean.getStudyEventOID());
 				if (studyEventDataBean.getStudyEventRepeatKey() != null) {
 					studyEventRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
-					sb.append(" (Repeat key " + studyEventDataBean.getStudyEventRepeatKey() + ")");
+					sb.append(" (").append(respage.getString("repeat_key")).append(studyEventDataBean.getStudyEventRepeatKey()).append(")");
 				} else {
 					// reset
 					studyEventRepeatKey = "1";
@@ -280,7 +268,7 @@ public class TriggerService {
 				ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 				for (FormDataBean formDataBean : formDataBeans) {
 					sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'></td> ");
-					sb.append("<td class=\'table_header_row\'>CRF Version OID</td> <td class=\'table_header_row\' colspan=\'" + crfVersionOidSpan + "\'></td></tr>");
+					sb.append("<td class=\'table_header_row\'>" + respage.getString("crf_version_oid") + "</td> <td class=\'table_header_row\' colspan=\'" + crfVersionOidSpan + "\'></td></tr>");
 					sb.append("<tr valign=\'top\'> <td class=\'table_cell_left\'></td> <td class=\'table_cell\'>");
 					sb.append(formDataBean.getFormOID());
 					sb.append("</td> <td class=\'table_cell\' colspan=\'" + formOidSpan + "\'></td> </tr>");
@@ -291,7 +279,7 @@ public class TriggerService {
 						sb.append(itemGroupDataBean.getItemGroupOID());
 						if (itemGroupDataBean.getItemGroupRepeatKey() != null) {
 							groupRepeatKey = itemGroupDataBean.getItemGroupRepeatKey();
-							sb.append(" (Repeat key " + itemGroupDataBean.getItemGroupRepeatKey() + ")");
+							sb.append(" (").append(respage.getString("repeat_key")).append(" " + itemGroupDataBean.getItemGroupRepeatKey()).append(")");
 						} else {
 							groupRepeatKey = "1";
 						}
@@ -379,16 +367,16 @@ public class TriggerService {
 		}
 		int studyId = fp.getInt(STUDY_ID);
 		if (!(studyId > 0)) {
-			Validator.addError(errors, STUDY_ID, "The study should be selected.");
+			Validator.addError(errors, STUDY_ID, resexception.getString("the_study_should_be_selected"));
 		}
 		if ((hours.equals("0")) && (minutes.equals("0"))) {
 			// throw an error here, at least one should be greater than zero
 			// errors.put(TAB, "Error Message - Pick one of the below");
-			Validator.addError(errors, "hours", "At least one of the following should be greater than zero.");
+			Validator.addError(errors, "hours", resexception.getString("at_least_one_of_the_following"));
 		}
 		for (TriggerKey triggerKey : triggerKeys) {
 			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
-				Validator.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
+				Validator.addError(errors, JOB_NAME, resexception.getString("a_job_with_that_name_already_exist_please_pick"));
 			}
 		}
 		return errors;

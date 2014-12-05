@@ -84,6 +84,7 @@ public class ExampleSpringJob extends QuartzJobBean {
 		Locale locale = new Locale("en-US");
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
+		ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
 		JobDataMap dataMap = context.getMergedJobDataMap();
 		SimpleTriggerImpl trigger = (SimpleTriggerImpl) context.getTrigger();
 		try {
@@ -101,7 +102,7 @@ public class ExampleSpringJob extends QuartzJobBean {
 				locale = new Locale(localeStr);
 				ResourceBundleProvider.updateLocale(locale);
 				pageMessages = ResourceBundleProvider.getPageMessagesBundle();
-
+				reswords = ResourceBundleProvider.getWordsBundle();
 			}
 			int dsId = dataMap.getInt(DATASET_ID);
 			String tab = dataMap.getString(TAB);
@@ -176,8 +177,8 @@ public class ExampleSpringJob extends QuartzJobBean {
 				message.append("<p>" + pageMessages.getString("email_header_1") + " "
 						+ pageMessages.getString("email_header_2") + " Job Execution "
 						+ pageMessages.getString("email_header_3") + "</p>");
-				message.append("<P>Dataset: " + datasetBean.getName() + "</P>");
-				message.append("<P>Study: " + activeStudy.getName() + "</P>");
+				message.append("<P>" + reswords.getString("dataset") + ": " + datasetBean.getName() + "</P>");
+				message.append("<P>" + reswords.getString("study") + ": " + activeStudy.getName() + "</P>");
 				message.append("<p>" + pageMessages.getString("html_email_body_1") + datasetBean.getName()
 						+ pageMessages.getString("html_email_body_2") + SQLInitServlet.getSystemURL()
 						+ pageMessages.getString("html_email_body_3") + "</p>");

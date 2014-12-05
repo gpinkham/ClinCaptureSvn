@@ -250,7 +250,7 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 		if (userBean.getName() != null) {
 			request.getSession().setAttribute("userNameInsteadEmail", userBean.getName());
 		} else {
-			request.getSession().setAttribute("userNameInsteadEmail", "Not found in the db");
+			request.getSession().setAttribute("userNameInsteadEmail", resexception.getString("not_found_in_the_db"));
 		}
 	}
 

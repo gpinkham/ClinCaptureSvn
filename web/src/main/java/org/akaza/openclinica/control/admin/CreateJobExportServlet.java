@@ -255,13 +255,13 @@ public class CreateJobExportServlet extends Controller {
 				} catch (SchedulerException se) {
 					se.printStackTrace();
 					setUpServlet(request);
-					addPageMessage("Error creating Job.", request);
+					addPageMessage(respage.getString("error_creating_job"), request);
 					forwardPage(Page.VIEW_JOB_SERVLET, request, response);
 					return;
 				}
 				setUpServlet(request);
-				addPageMessage("You have successfully created a new job: " + jobName
-						+ " which is now set to run at the time you specified.", request);
+				addPageMessage(respage.getString("you_have_successfully_created_a_new_job") + " " + jobName
+						+ " " + respage.getString("which_is_now_set_to_run"), request);
 				forwardPage(Page.VIEW_JOB_SERVLET, request, response);
 			}
 		} else {
@@ -289,20 +289,20 @@ public class CreateJobExportServlet extends Controller {
 		if (formatId == 0) {
 			// throw an error here, at least one should work
 			// errors.put(TAB, "Error Message - Pick one of the below");
-			Validator.addError(errors, FORMAT_ID, "Please pick at least one.");
+			Validator.addError(errors, FORMAT_ID, respage.getString("please_pick_at_least_one"));
 		}
 		for (TriggerKey triggerKey : triggerKeys) {
 			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
-				Validator.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
+				Validator.addError(errors, JOB_NAME, respage.getString("a_job_with_that_name_already_exist_please_pick"));
 			}
 		}
 		if (jobDate.before(new Date())) {
-			Validator.addError(errors, DATE_START_JOB + "Date", "This date needs to be later than the present time.");
+			Validator.addError(errors, DATE_START_JOB + "Date", respage.getString("this_date_needs_to_be_later"));
 		}
 		String jobDesc = fp.getString(JOB_DESC);
 		if ((null != jobDesc) && (!jobDesc.equals(""))) {
 			if (jobDesc.length() > 250) {
-				Validator.addError(errors, JOB_DESC, "A job description cannot be more than 250 characters.");
+				Validator.addError(errors, JOB_DESC, respage.getString("a_job_description_cannot_be_more_than"));
 			}
 		}
 		Matcher matcher = Pattern.compile("[^\\w_\\d ]").matcher(fp.getString(JOB_NAME));

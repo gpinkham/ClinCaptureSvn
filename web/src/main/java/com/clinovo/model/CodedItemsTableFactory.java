@@ -96,7 +96,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private final String medicalCodingContextNeeded;
     private final String showMoreLink;
     private final String showContext;
-	
+
 	/**
 	 * CodedItemsTableFactory constructor.
 	 *
@@ -122,14 +122,14 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
 		Row row = tableFacade.getTable().getRow();
 
-		configureColumn(row.getColumn("itemDataValue"), "Verbatim Term", new ItemDataValueCellEditor(), null);
-		configureColumn(row.getColumn("dictionary"), "Dictionary", new DictionaryCellEditor(), new DictionaryDroplistFilterEditor());
-		configureColumn(row.getColumn("status"), "Status", new StatusCellEditor(), new StatusDroplistFilterEditor());
-		configureColumn(row.getColumn("subjectName"), "Study Subject ID", new SubjectCellEditor(), null, true, true);
-		configureColumn(row.getColumn("eventName"), "Study Event", new EventCellEditor(), null, true, true);
-		configureColumn(row.getColumn("crfName"), "CRF", new CrfCellEditor(), null, true, true);
-		configureColumn(row.getColumn("codedColumn"), "Medical Codes", new CodedCellEditor(), null, false, false);
-		configureColumn(row.getColumn("actionColumn"), "Actions", new ActionCellEditor(), new DefaultActionsEditor(
+		configureColumn(row.getColumn("itemDataValue"), ResourceBundleProvider.getResWord("verbatim_term"), new ItemDataValueCellEditor(), null);
+		configureColumn(row.getColumn("dictionary"), ResourceBundleProvider.getResWord("dictionary"), new DictionaryCellEditor(), new DictionaryDroplistFilterEditor());
+		configureColumn(row.getColumn("status"), ResourceBundleProvider.getResWord("coding_status"), new StatusCellEditor(), new StatusDroplistFilterEditor());
+		configureColumn(row.getColumn("subjectName"), ResourceBundleProvider.getResWord("study_subject_ID"), new SubjectCellEditor(), null, true, true);
+		configureColumn(row.getColumn("eventName"), ResourceBundleProvider.getResWord("study_event"), new EventCellEditor(), null, true, true);
+		configureColumn(row.getColumn("crfName"), ResourceBundleProvider.getResWord("CRF"), new CrfCellEditor(), null, true, true);
+		configureColumn(row.getColumn("codedColumn"), ResourceBundleProvider.getResWord("medical_codes"), new CodedCellEditor(), null, false, false);
+		configureColumn(row.getColumn("actionColumn"), ResourceBundleProvider.getResWord("actions"), new ActionCellEditor(), new DefaultActionsEditor(
 				locale), true, false);
 	}
 
@@ -161,11 +161,11 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
 	private String getCodedItemStatus(CodedItem codedItem) {
 		if (codedItem.getStatus().equals("NOT_CODED")) {
-			return "Not Coded";
+			return ResourceBundleProvider.getResWord("notCoded");
 		} else if (codedItem.getStatus().equals("CODED")) {
-			return "Coded";
+			return ResourceBundleProvider.getResWord("coded");
 		} else if (codedItem.getStatus().equals("CODE_NOT_FOUND")) {
-			return "Code not Found";
+			return ResourceBundleProvider.getResWord("codeNotFound");
 		}
 		return "Unknown";
 	}
@@ -213,7 +213,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 		} else if (codedItemDictionary.equalsIgnoreCase("CTCAE")) {
 			return "CTCAE";
 		}
-		return "Dictionary Not Found";
+		return ResourceBundleProvider.getResWord("dictionary_not_found");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -516,15 +516,15 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         	
         	StudyParameterValueBean mcApprovalNeeded = new StudyParameterValueDAO(datasource).findByHandleAndStudy(studyId, "medicalCodingApprovalNeeded");
             List<Option> options = new ArrayList<Option>();
-            options.add(new Option("All", "All"));
-            options.add(new Option("Not Coded", "Not Coded"));
+            options.add(new Option(ResourceBundleProvider.getResWord("all"), ResourceBundleProvider.getResWord("all")));
+            options.add(new Option(ResourceBundleProvider.getResWord("notCoded"), ResourceBundleProvider.getResWord("notCoded")));
             
 			if (mcApprovalNeeded.getValue().equals("yes")) {
-				options.add(new Option("Not Approved", "Not Approved"));
+				options.add(new Option(ResourceBundleProvider.getResWord("notApproved"), ResourceBundleProvider.getResWord("notApproved")));
 			}
 
-		    options.add(new Option("Code not Found", "Code not Found"));
-            options.add(new Option("Coded", "Coded"));
+		    options.add(new Option(ResourceBundleProvider.getResWord("codeNotFound"), ResourceBundleProvider.getResWord("codeNotFound")));
+            options.add(new Option(ResourceBundleProvider.getResWord("coded"), ResourceBundleProvider.getResWord("coded")));
             
             return options;
         }
@@ -645,7 +645,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 		public boolean evaluate(Object itemValue, String filterValue) {
 			String item = StringUtils.lowerCase(String.valueOf(itemValue));
 			String filter = StringUtils.lowerCase(String.valueOf(filterValue));
-			if (filter.equals(item) || filter.equals("all")) {
+			if (filter.equals(item) || filter.equalsIgnoreCase(ResourceBundleProvider.getResWord("all"))) {
 				return true;
 			}
 			return false;
