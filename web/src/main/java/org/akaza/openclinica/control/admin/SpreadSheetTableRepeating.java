@@ -1590,9 +1590,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 											+ "' AND crf_id = "
 											+ crfId
 											+ " ORDER BY OID DESC LIMIT 1),'"
-											+ igMeta.getHeader()
+											+ stripQuotes(igMeta.getHeader())
 											+ "', '"
-											+ igMeta.getSubheader()
+											+ stripQuotes(igMeta.getSubheader())
 											+ "', '"
 											+
 											// above removed?
@@ -2328,6 +2328,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 			}
 			returnme += subjarray[subjarray.length - 1];
 		}
+		returnme = returnme.replaceAll("\\\\", "\\\\\\\\");
 		return returnme;
 	}
 
