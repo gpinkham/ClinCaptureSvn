@@ -15,7 +15,6 @@ package org.akaza.openclinica.dao.submit;
 
 import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
 import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
-
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -111,6 +110,7 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 		assertEquals(eventCRFBean.getOwnerId(), newOwner.getId());
 		eventCRFBean.setOwner(root);
 		eventCRFDAO.update(eventCRFBean);
-		userAccountDAO.execute("delete from user_account where user_id = ".concat(Integer.toString(newOwner.getId())));
+		userAccountDAO.execute("delete from user_account where user_id = ".concat(Integer.toString(newOwner.getId())),
+				new HashMap());
 	}
 }

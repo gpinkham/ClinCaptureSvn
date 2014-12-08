@@ -13,14 +13,70 @@
 
 package org.akaza.openclinica;
 
+import com.clinovo.dao.CodedItemDAO;
+import com.clinovo.dao.DictionaryDAO;
+import com.clinovo.dao.DiscrepancyDescriptionDAO;
+import com.clinovo.dao.StudySubjectIdDAO;
+import com.clinovo.dao.SystemDAO;
+import com.clinovo.dao.TermDAO;
+import com.clinovo.dao.WidgetDAO;
+import com.clinovo.dao.WidgetsLayoutDAO;
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DataEntryService;
+import com.clinovo.service.DictionaryService;
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.service.ReportCRFService;
+import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.service.SystemService;
+import com.clinovo.service.TermService;
+import com.clinovo.service.WidgetService;
+import com.clinovo.service.WidgetsLayoutService;
+import org.akaza.openclinica.dao.admin.AuditDAO;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
+import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.extract.OdmExtractDAO;
+import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
+import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
+import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
+import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
+import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
+import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
+import org.akaza.openclinica.dao.hibernate.RuleDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.EventServiceInterface;
+import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
+import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.dbunit.DataSourceBasedDBTestCase;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.hibernate.SessionFactory;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -47,18 +103,117 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractContextSentiveTest.class);
 
+	public static final String ORACLE = "oracle";
+	public static final String POSTGRESQL = "postgresql";
+
 	protected static Properties properties = new Properties();
+
 	public static String dbName;
 	public static String dbUrl;
 	public static String dbUserName;
 	public static String dbPassword;
 	public static String dbDriverClassName;
 	public static String locale;
-	public BasicDataSource ds;
+
+	protected static DataSource dataSource;
+
+	protected static AuditDAO auditDao;
+	protected static ItemDAO idao;
+	protected static CRFDAO crfdao;
+	protected static EventCRFDAO eventCRFDAO;
+	protected static StudyDAO studyDAO;
+	protected static SectionDAO sectionDAO;
+	protected static DatasetDAO datasetDAO;
+	protected static ItemDataDAO itemDataDAO;
+	protected static ItemFormMetadataDAO imfdao;
+	protected static OdmExtractDAO odmExtractDAO;
+	protected static CRFVersionDAO crfVersionDao;
+	protected static StudyEventDAO studyEventDao;
+	protected static UserAccountDAO userAccountDAO;
+	protected static StudySubjectDAO studySubjectDAO;
+	protected static DynamicEventDao dynamicEventDao;
+	protected static StudyGroupClassDAO studyGroupClassDAO;
+	protected static DiscrepancyNoteDAO discrepancyNoteDAO;
+	protected static ItemGroupMetadataDAO itemGroupMetadataDAO;
+	protected static EventDefinitionCRFDAO eventDefinitionCRFDAO;
+	protected static StudyEventDefinitionDAO studyEventDefinitionDAO;
+	protected static RulesPostImportContainerService postImportContainerService;
+	protected static PasswordRequirementsDao requirementsDao;
+	protected static EventServiceInterface eventService;
+	protected static DiscrepancyNoteService discrepancyNoteService;
+
+	// DAOS
+	@Autowired
+	protected RuleDao ruleDao;
+	@Autowired
+	protected RuleSetDao ruleSetDao;
+	@Autowired
+	protected AuthoritiesDao authoritiesDao;
+	@Autowired
+	protected RuleSetRuleDao ruleSetRuleDao;
+	@Autowired
+	protected RuleActionRunLogDao ruleActionRunLogDao;
+
+	@Autowired
+	protected RuleSetAuditDao ruleSetAuditDao;
+	@Autowired
+	protected ConfigurationDao configurationDao;
+	@Autowired
+	protected AuditUserLoginDao auditUserLoginDao;
+	@Autowired
+	protected RuleSetRuleAuditDao ruleSetRuleAuditDao;
+	@Autowired
+	protected DatabaseChangeLogDao databaseChangeLogDao;
+	@Autowired
+	protected DiscrepancyDescriptionDAO discrepancyDescriptionDAO;
+
+	@Autowired
+	protected TermDAO termDAO;
+	@Autowired
+	protected CodedItemDAO codedItemDAO;
+	@Autowired
+	protected DictionaryDAO dictionaryDAO;
+	@Autowired
+	protected StudySubjectIdDAO studySubjectIdDAO;
+	@Autowired
+	protected SystemDAO systemDAO;
+	@Autowired
+	protected WidgetDAO widgetDAO;
+	@Autowired
+	protected WidgetsLayoutDAO widgetsLayoutDAO;
+
+	// Services
+	@Autowired
+	protected DiscrepancyDescriptionService discrepancyDescriptionService;
+	@Autowired
+	protected TermService termService;
+	@Autowired
+	protected CodedItemService codedItemService;
+	@Autowired
+	protected DictionaryService dictionaryService;
+	@Autowired
+	protected StudySubjectIdService studySubjectIdService;
+	@Autowired
+	protected SystemService systemService;
+	@Autowired
+	protected RuleSetServiceInterface ruleSetService;
+	@Autowired
+	protected WidgetService widgetService;
+	@Autowired
+	protected WidgetsLayoutService widgetsLayoutService;
+	@Autowired
+	protected DataEntryService dataEntryService;
+	@Autowired
+	protected ReportCRFService reportCRFService;
+	@Autowired
+	protected MessageSource messageSource;
+
+	@Autowired
+	protected SessionFactory sessionFactory;
 
 	protected static PlatformTransactionManager transactionManager;
-	static {
 
+	static {
 		loadProperties();
 		dbName = properties.getProperty("dbName");
 		dbUrl = properties.getProperty("url");
@@ -68,6 +223,15 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 		locale = properties.getProperty("locale");
 		initializeLocale();
 
+		if (dataSource == null) {
+			BasicDataSource ds = new BasicDataSource();
+			ds.setAccessToUnderlyingConnectionAllowed(true);
+			ds.setDriverClassName(dbDriverClassName);
+			ds.setUsername(dbUserName);
+			ds.setPassword(dbPassword);
+			ds.setUrl(dbUrl);
+			dataSource = ds;
+		}
 	}
 
 	@Override
@@ -80,13 +244,7 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 
 	@Override
 	public DataSource getDataSource() {
-		ds = new BasicDataSource();
-		ds.setAccessToUnderlyingConnectionAllowed(true);
-		ds.setDriverClassName(dbDriverClassName);
-		ds.setUsername(dbUserName);
-		ds.setPassword(dbPassword);
-		ds.setUrl(dbUrl);
-		return ds;
+		return dataSource;
 	}
 
 	public static void loadProperties() {
@@ -128,8 +286,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 
 			transactionManager.commit(transactionManager.getTransaction(new DefaultTransactionDefinition()));
 			super.tearDown();
-			if (ds != null)
-				ds.getConnection().close();
+			if (dataSource != null)
+				dataSource.getConnection().close();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}

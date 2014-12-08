@@ -30,6 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -138,13 +139,15 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 
 	protected void deleteUser(UserAccountBean userAccountBean) {
 		userAccountDAO.execute("delete from study_user_role where user_name = '".concat(userAccountBean.getName())
-				.concat("'"));
-		userAccountDAO.execute("delete from user_account where user_name = '".concat(userAccountBean.getName()).concat(
-				"'"));
+				.concat("'"), new HashMap());
+		userAccountDAO.execute(
+				"delete from user_account where user_name = '".concat(userAccountBean.getName()).concat("'"),
+				new HashMap());
 	}
 
 	protected void deleteStudy(StudyBean studyBean) {
-		studyDAO.execute("delete from study where study_id = ".concat(Integer.toString(studyBean.getId())));
+		studyDAO.execute("delete from study where study_id = ".concat(Integer.toString(studyBean.getId())),
+				new HashMap());
 	}
 
 	@Before
@@ -153,8 +156,8 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 
 		setTestProperties();
 
-		studyDAO = new StudyDAO(ds);
-		userAccountDAO = new UserAccountDAO(ds);
+		studyDAO = new StudyDAO(dataSource);
+		userAccountDAO = new UserAccountDAO(dataSource);
 
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
 
