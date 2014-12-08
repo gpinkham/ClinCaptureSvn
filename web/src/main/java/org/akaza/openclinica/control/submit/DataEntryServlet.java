@@ -462,12 +462,14 @@ public abstract class DataEntryServlet extends Controller {
 			eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
 		}
 
+		StudyDAO studydao = new StudyDAO(getDataSource());
 		StudyBean study = (StudyBean) session.getAttribute("study");
 
 		if (eventDefinitionCRFId <= 0) {
 			// TODO we have to get that id before we can continue
-			EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(),
-					ecb.getCRFVersionId());
+			EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId((StudyBean) studydao
+					.findByPK(((StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId())).getStudyId()), ecb
+					.getStudyEventId(), ecb.getCRFVersionId());
 			eventDefinitionCRFId = edcBean.getId();
 		}
 
@@ -544,7 +546,6 @@ public abstract class DataEntryServlet extends Controller {
 		// this is for generating side info panel
 		// and the information panel under the Title
 		SubjectDAO subjectDao = new SubjectDAO(getDataSource());
-		StudyDAO studydao = new StudyDAO(getDataSource());
 		SubjectBean subject = (SubjectBean) subjectDao.findByPK(ssb.getSubjectId());
 
 		// Get the study then the parent study
@@ -2095,7 +2096,8 @@ public abstract class DataEntryServlet extends Controller {
 						}
 						item.getData().setValue("");
 					} else if (gradeItemData.getId() == displayItemBean.getData().getId()) {
-						ItemDataBean refItemDataBean = iddao.findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), ecrfBean.getId(), item.getData().getOrdinal());
+						ItemDataBean refItemDataBean = iddao.findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(),
+								ecrfBean.getId(), item.getData().getOrdinal());
 						for (DisplayItemBean changedItem : changedItemsList) {
 							if (refItemDataBean.getId() == changedItem.getData().getId()
 									&& !refItemDataBean.getValue().equalsIgnoreCase(changedItem.getData().getValue())) {
@@ -2116,8 +2118,10 @@ public abstract class DataEntryServlet extends Controller {
 						getCodedItemService().saveCodedItem(codedItem);
 						item.getData().setValue("");
 					} else if (gradeElement.getItemDataId() < 0 && codedItem.getDictionary().equals("CTCAE")) {
-						StudyBean study = (StudyBean) getStudyDAO().findByPK(codedItem.getSiteId() > 0 ? codedItem.getSiteId() : codedItem.getStudyId());
-						getCodedItemService().createCodedItem(ecrfBean, displayItemBean.getItem(), displayItemBean.getData(), study);
+						StudyBean study = (StudyBean) getStudyDAO().findByPK(
+								codedItem.getSiteId() > 0 ? codedItem.getSiteId() : codedItem.getStudyId());
+						getCodedItemService().createCodedItem(ecrfBean, displayItemBean.getItem(),
+								displayItemBean.getData(), study);
 						item.getData().setValue("");
 					}
 				}

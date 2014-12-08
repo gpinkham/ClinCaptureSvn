@@ -20,6 +20,7 @@ import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
@@ -31,6 +32,8 @@ import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -69,9 +72,12 @@ public class DataEntryServiceImpl implements DataEntryService {
 		// Find out whether there are ungrouped items in this section
 		boolean hasUngroupedItems = false;
 
+		StudyDAO studydao = new StudyDAO(dataSource);
+		StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
-		EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(),
-				ecb.getCRFVersionId());
+		EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId((StudyBean) studydao
+				.findByPK(((StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId())).getStudyId()), ecb
+				.getStudyEventId(), ecb.getCRFVersionId());
 		int eventDefinitionCRFId = edcb.getId();
 
 		logger.trace("eventDefinitionCRFId " + eventDefinitionCRFId);
