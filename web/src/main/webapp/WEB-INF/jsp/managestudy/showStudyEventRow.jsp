@@ -40,7 +40,7 @@
             <td>&nbsp;</td>
         </tr>
 
-        <c:if test="${(studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && !currRow.bean.studyEvent.status.deleted && currRow.bean.studyEvent.editable) && (study.status.available) and userRole.id ne 6 and userRole.id ne 9}">
+        <c:if test="${(!studySub.status.deleted && !currRow.bean.studyEvent.status.deleted && currRow.bean.studyEvent.editable) && (study.status.available) and userRole.id ne 6 and userRole.id ne 9}">
             <tr class="innerTable">
                 <td>
                     <a href="UpdateStudyEvent?event_id=<c:out value="${currRow.bean.studyEvent.id}"/>&ss_id=<c:out value="${studySub.id}"/>"
@@ -72,7 +72,7 @@
                 </c:if>
                 </c:when>
                 <c:otherwise>
-                <c:if test="${(userRole.manageStudy && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (study.status.available)}">
+                <c:if test="${(userRole.manageStudy && !studySub.status.deleted) && (study.status.available)}">
                 <a href="RestoreStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
                    onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
                    onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
@@ -223,14 +223,14 @@
             </td>
 
             <c:choose>
-                <c:when test="${dedc.status.name=='locked'}">
+                <c:when test="${dedc.status.locked}">
                     <td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
                         <img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>"
                              title="<fmt:message key="locked" bundle="${resword}"/>">
                     </td>
                 </c:when>
 
-                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
+                <c:when test="${!studySubject.status.deleted}">
                     <c:choose>
                         <c:when test="${dedc.eventCRF.id > 0 and !dedc.eventCRF.notStarted}">
                             <td class="table_cell" bgcolor="#F5F5F5" align="center" width="20"><img
@@ -259,7 +259,7 @@
                     <tr class="innerTable">
                         <td>
                             <c:choose>
-                                <c:when test="${!dedc.status.locked && currRow.bean.studyEvent.subjectEventStatus.name != 'locked' && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
+                                <c:when test="${!dedc.status.locked && !currRow.bean.studyEvent.subjectEventStatus.locked && !studySub.status.deleted && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
                                     <ui:dataEntryLink object="${dedc}" rowCount="${rowCount}" actionQueryTail="${currRow.bean.studyEvent.id}${dedc.edc.crf.id}" onClickFunction="setAccessedObjected(this); checkCRFLockedInitial"  imgAlign="right" imgHSpace="6"/>
                                 </c:when>
                                 <c:otherwise>
@@ -443,7 +443,7 @@
                             </c:if>
                         </c:when>
                         <c:otherwise>
-                            <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 && (studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (study.status.available)}">
+                            <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 && (!studySub.status.deleted) && (study.status.available)}">
                                 <td>
                                     <a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
                                        onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
@@ -466,7 +466,7 @@
                             <img src="images/bt_Transparent.gif" border="0" hspace="6">
                         </td>
                     </c:if>
-                    <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 and (studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (study.status.available) && (!dec.locked) && (!dec.stage.locked)}">
+                    <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 and (!studySub.status.deleted) && (study.status.available) && (!dec.locked) && (!dec.stage.locked)}">
                         <td>
                             <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
                                onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
@@ -476,7 +476,7 @@
                                     title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
                         </td>
                     </c:if>
-                    <c:if test="${dec.stage.invalid && (userRole.id == 1 || userRole.id == 2) && (studySub.status.name == 'removed' || studySub.status.name == 'auto-removed')}">
+                    <c:if test="${dec.stage.invalid && (userRole.id == 1 || userRole.id == 2) && (studySub.status.deleted)}">
                         <td>
                             <img src="images/bt_Transparent.gif" border="0" hspace="6">
                         </td>
@@ -484,7 +484,7 @@
                             <img src="images/bt_Transparent.gif" border="0" hspace="6">
                         </td>
                     </c:if>
-                    <c:if test="${(studySub.status.name == 'removed' || studySub.status.name == 'auto-removed') && !dec.stage.invalid && (userRole.id == 1 || userRole.id == 2)}">
+                    <c:if test="${(studySub.status.deleted) && !dec.stage.invalid && (userRole.id == 1 || userRole.id == 2)}">
                         <td>
                             <img src="images/bt_Transparent.gif" border="0" hspace="6">
                         </td>

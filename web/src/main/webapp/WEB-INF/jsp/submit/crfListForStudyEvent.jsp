@@ -155,7 +155,7 @@
         <td class="table_header_row" align="center" style="vertical-align: middle;">
         <c:set var="removedTitle" value="Removed"/>
         <c:choose>
-            <c:when test="${studyEvent.subjectEventStatus.name eq 'deleted'}">
+            <c:when test="${studyEvent.subjectEventStatus.id eq 10}">
                 <img src="${sesIconUrl}" alt="${studyEvent.subjectEventStatus.name}" title="<c:out value="${removedTitle}"/>" /></td>
             </c:when>
             <c:otherwise>
@@ -403,13 +403,13 @@
                                 </td>
 
                                 <c:choose>
-                                    <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.name=='locked'}">
+                                    <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.locked}">
                                         <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;">
                                             <img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
                                         </td>
                                     </c:when>
 
-                                    <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
+                                    <c:when test="${!studySubject.status.deleted}">
                                         <c:choose>
                                             <c:when test="${dedc.eventCRF.id>0 and !dedc.eventCRF.notStarted}">
                                                 <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;"><img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>"></td>
@@ -430,11 +430,11 @@
 
                                 <td class="table_cell_left" style="vertical-align: middle;">
                                     <c:choose>
-                                        <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.name=='locked'}">
+                                        <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.locked}">
                                             <%--<c:when test="${dedc.status.name=='locked'}">--%>
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         </c:when>
-                                        <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && (study.status.available) && !studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
+                                        <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and !studySubject.status.deleted && (study.status.available) && !studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
                                             <c:set var="hideCol1" value="false"/>
                                             <ui:dataEntryLink object="${dedc}" rowCount="${rowCount}" actionQueryTail="${studyEvent.id}${dedc.edc.crf.id}" onClickFunction="checkCRFLockedInitial"/>
                                         </c:when>
@@ -562,7 +562,7 @@
                                            onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                           ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="4"></a>
 
-                                        <c:if test="${userRole.id ne 4 && userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and (studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed') && (study.status.available)}">
+                                        <c:if test="${userRole.id ne 4 && userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and (!studySubject.status.deleted) && (study.status.available)}">
                                             <c:set var="hideCol3" value="false"/>
                                             <c:set var="hideCol4" value="false"/>
                                             <c:set var="crfSpacersCount" value="4"/>
@@ -589,7 +589,7 @@
                                     </c:when>
                                     <c:otherwise>
                                         <c:set var="enterDataWasInserted" value="false"/>
-                                        <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && userRole.role.id ne 6 and userRole.role.id ne 9}">
+                                        <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and !studySubject.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
                                             <c:set var="hideCol1" value="false"/>
                                             <c:set var="enterDataWasInserted" value="true"/>
                                             <ui:dataEntryLink object="${dec}" actionQueryTail="?eventCRFId=${dec.eventCRF.id}"/>

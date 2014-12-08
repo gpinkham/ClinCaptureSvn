@@ -361,14 +361,14 @@
 </td>
 
 <c:choose>
-    <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.name=='locked'}">
+    <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.locked}">
         <%--<c:when test="${dedc.status.name=='locked'}">--%>
         <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;">
             <img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
         </td>
     </c:when>
 
-    <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
+    <c:when test="${!studySubject.status.deleted}">
         <c:choose>
             <c:when test="${dedc.eventCRF.id>0 and !dedc.eventCRF.notStarted}">
                 <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;"><img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>"></td>
@@ -396,12 +396,12 @@
 <td class="table_cell" style="vertical-align: middle; width:200px;">
             <c:choose>
 
-                <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.name=='locked'}">
+                <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.locked}">
                     <%--<c:when test="${dedc.status.name=='locked'}">--%>
 					<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4"/>
                 </c:when>
 
-                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
+                <c:when test="${!studySubject.status.deleted && study.status.available && !studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
                     <ui:dataEntryLink object="${dedc}" rowCount="${rowCount}" actionQueryTail="${studyEvent.id}${dedc.edc.crf.id}" onClickFunction="checkCRFLockedInitial"/>
                 </c:when>
 
@@ -527,7 +527,7 @@
                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
               ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="4"></a>
 
-            <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and (studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed') && (study.status.available)}">
+            <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and (!studySubject.status.deleted) && (study.status.available)}">
                 <a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                    onMouseDown="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
                    onMouseUp="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
@@ -555,7 +555,7 @@
         </c:when>
         <c:otherwise>
 			<c:choose>
-            <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && userRole.role.id ne 6 and userRole.role.id ne 9}">
+            <c:when test="${!studySubject.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
                 <ui:dataEntryLink object="${dec}" actionQueryTail="?eventCRFId=${dec.eventCRF.id}"/>
                 <c:if test="${dec.locked || dec.eventCRF.status.locked || dec.stage.locked || currRow.bean.studyEvent.subjectEventStatus.locked}">
 				    <img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
