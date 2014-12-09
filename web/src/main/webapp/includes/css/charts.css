@@ -1,6 +1,6 @@
 table.widgets_container {
 	width: 800px;
-	margin: 10px 0px;
+	margin: 10px 0;
 	border-spacing: 3px;
 }
 
@@ -18,7 +18,7 @@ table.widgets_container td {
 
 .widget {
 	width: 380px;
-	margin: 6px 0px;
+	margin: 6px 0;
 }
 
 .widget_big {
@@ -35,19 +35,20 @@ table.widgets_container td {
 .toolbar_wrapper {
 	height: 98%;
 	position: fixed;
-	right: 0px;
-	top: 0px;
+	right: 0;
+	top: 0;
 	vertical-align: top;
 	width: 420px;
 	padding: 5px;
 	border: 1px solid gray;
 	background-color: white;
+	z-index: 5;
 }
 
 .toolbar_wrapper h2 {
 	width: auto;
 	padding: 1px 10px;
-	margin: 0px;
+	margin: 0;
 	color: white;
 	font-family: Tahoma, Arial, Helvetica, Sans-Serif;
 	font-size: 11px;
@@ -66,9 +67,7 @@ table.widgets_container td {
 	overflow-y: scroll;
 	max-height: 87%;
 	height: 87%;
-	border: 1px;
-	border-style: solid;
-	border-color: gray;
+	border: 1px solid gray;
 	padding: 3px;
 }
 
@@ -131,7 +130,7 @@ form#actionForSave input {
 	visibility: hidden;
 	height: 1px;
 	display: block;
-	margin: 1px 0px;
+	margin: 1px 0;
 }
 
 #toolbar_tc,#toolbar {
@@ -157,7 +156,7 @@ form#actionForSave input {
 	width: 330px;
 	border-bottom: 1px solid gray;
 	border-left: 1px solid gray;
-	padding: 10px 0px;
+	padding: 10px 0;
 	margin-top: 20px;
 }
 
@@ -172,13 +171,13 @@ form#actionForSave input {
 
 .widget .stacked_bar {
 	height: 20px;
-	padding: 0px;
-	margin: 0px;
+	padding: 0;
+	margin: 0;
 }
 
 .widget .stacked_bar li {
 	display: inline-block !important;
-	width: 0px;
+	width: 0;
 	height: 20px;
 	margin-right: -3px;
 }
@@ -186,9 +185,9 @@ form#actionForSave input {
 @-moz-document url-prefix() {
 .stacked_bar li {
 	display: inline-block !important;
-	width: 0px;
+	width: 0;
     height: 20px;
-	margin-right: 0px;
+	margin-right: 0;
 	margin-left: -1px;
 }
 }

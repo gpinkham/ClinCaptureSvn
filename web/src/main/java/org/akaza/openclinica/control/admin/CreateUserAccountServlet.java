@@ -206,7 +206,7 @@ public class CreateUserAccountServlet extends Controller {
 						}
 					} else {
 						addPageMessage(
-								respage.getString("user_password") + ":<br/>" + password + "<br/> "
+								respage.getString("user_password") + "<br/>" + password + "<br/> "
 										+ respage.getString("please_write_down_the_password_and_provide"), request);
 					}
 				} else {
