@@ -2,6 +2,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+
 <form id="nds_per_crf_form" class="hidden">
 <c:forEach items="${ndsCrfDataColumns}" var="column" varStatus="ndsPerCrfIndex">
 	<input type="text" new="${column.value[0]}" updated="${column.value[1]}" closed="${column.value[2]}" not_applicable="${column.value[3]}" value="${column.key}"/>
@@ -12,6 +15,11 @@
 </c:forEach>
 	<input type="hidden" value="${ndsCrfStart}" id="nds_per_crf_start" />
 	<input type="hidden" class="currentColor" value="${newThemeColor}">
+	<input type="hidden" class="status legend" value="<fmt:message bundle='${resterm}' key='Closed'/>" />
+	<input type="hidden" class="status legend" value="<fmt:message bundle='${resterm}' key='Updated'/>" />
+	<input type="hidden" class="status legend" value="<fmt:message bundle='${resterm}' key='New'/>" />
+	<input type="hidden" class="status " value="<fmt:message bundle='${resterm}' key='Not_Applicable'/>" />
+	<input type="hidden" class="status legend" value="<fmt:message bundle='${resword}' key='w_legend_notes'/>" />
 </form>
 
 <div class="tc_column_var_wrapper" align="left" style="overflow:hidden">
@@ -20,12 +28,12 @@
 		<tr>
 			<td align="left">
 				<c:if test="${ndsCrfHasPrevious}">
-					<input type="button" name="BTN_Back" id="previous" value="Previous" class="button_medium" onClick="javascript: initNdsPerCrf('goBack');"/>
+					<input type="button" name="BTN_Back" id="previous" value="<fmt:message bundle='${resword}' key='previous' />" class="button_medium" onClick="javascript: initNdsPerCrf('goBack');"/>
 				</c:if>
 			</td>
 			<td align="right">
 				<c:if test="${ndsCrfHasNext}">
-					<input type="button" name="BTN_Forvard" id="next" value="Next" class="button_medium" onClick="javascript: initNdsPerCrf('goForward');"/>
+					<input type="button" name="BTN_Forvard" id="next" value="<fmt:message bundle='${resword}' key='next' />" class="button_medium" onClick="javascript: initNdsPerCrf('goForward');"/>
 				</c:if>
 			</td>
 		</tr>

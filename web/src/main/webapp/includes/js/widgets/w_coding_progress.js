@@ -41,13 +41,15 @@ function initCodingProgress(action) {
 			var activate = $("#cpActivateLegend").val();
 			if (!element && activate == "true") {
 				function selectHandler() {
+					var statuses = [];
+					statuses.push(($("#coding_progress_form .coded_status_jmesa_filter").val()).replace(/\s/g, '+'));
+					statuses.push(($("#coding_progress_form .not_coded_status_jmesa_filter").val()).replace(/\s/g, '+'));
 					var selectedItem = codingProgressChart.getSelection()[0];
 					var currentYear = new Date().getFullYear();
 					var currentMonth = new Date().getMonth();
 					if (selectedItem && selectedItem.row == currentMonth && currentYear == displayedYear) {
-						var arr = ["Coded","Not+Coded"];
 						var statusNumber = (selectedItem.column % 2 == 0 ? selectedItem.column - 2 : selectedItem.column - 1) / 2;
-						var currentStatus = arr[statusNumber];
+						var currentStatus = statuses[statusNumber];
 						var redirectPrefix = "pages/codedItems?maxRows=15&showContext=false&showMoreLink=false&codedItemsId_tr_=true&codedItemsId_p_=1&codedItemsId_mr_=15&codedItemsId_f_itemDataValue=&codedItemsId_f_status=";
 						window.location.href = redirectPrefix + currentStatus;
 					} else 
@@ -70,18 +72,23 @@ function getCodingProgressWidgetData() {
 	var regexp = /^stat\-(.+)$/;
 	var i;
 	// Set the order of statuses in chart
-	var arr = ["coded_items", "items_to_be_coded"];
+	var statuses = [];
+
+	$("#coding_progress_form .status").each(function(){
+		statuses.push($(this).val());
+	});
 	var data = new google.visualization.DataTable();
-	var arrLength = arr.length;
+	var arrLength = statuses.length;
 	data.addColumn('string', 'Month');
 	for (i = 0; i < arrLength; i++) {
-		data.addColumn('number', capitalizeFirstLetter(arr[i]).replace(/_/g," "));
+		data.addColumn('number', statuses[i]);
 		data.addColumn({
 			type : 'number',
 			role : 'annotation'
 		});
 	}
 	$("form#coding_progress_form input[type=hidden]").each(function() {
+		var arr = ["coded_items", "items_to_be_coded"];
 		var currentValues = getNodeAttributes($(this), regexp);
 		var currentMonth = $(this).val();
 		var row = [];

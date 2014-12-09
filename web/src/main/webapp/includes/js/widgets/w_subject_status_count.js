@@ -55,7 +55,10 @@ function initSubjectStatusCount() {
  */
 function getSubjectStatusWidgetData() {
 	var data = new google.visualization.DataTable();
-	var statuses = [ 'Available', 'Signed', 'Removed', 'Locked' ];
+	var statuses = [];
+	$("#subjects_status_count .status").each(function(){
+		statuses.push($(this).val());
+	});
 	data.addColumn('string', 'Statuses');
 	data.addColumn('number', 'Count');
 	$("form#subjects_status_count input").each(function(index) {

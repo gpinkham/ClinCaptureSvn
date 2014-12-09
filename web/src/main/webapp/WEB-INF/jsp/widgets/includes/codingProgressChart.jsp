@@ -2,18 +2,20 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+
 <div class="tc_column_var_wrapper" align="left" style="overflow:hidden">
 	<div id="coding_progress_chart"></div>
 	<table>
 		<tr>
 			<td align="left">
 				<c:if test="${cpPreviousYearExists}">
-					<input type="button" name="BTN_Back" id="previous" value="Previous" class="button_medium" onClick="javascript: initCodingProgress('back');"/>
+					<input type="button" name="BTN_Back" id="previous" value="<fmt:message bundle='${resword}' key='previous' />" class="button_medium" onClick="javascript: initCodingProgress('back');"/>
 				</c:if>
 			</td>
 			<td align="right">
 				<c:if test="${cpNextYearExists}">
-					<input type="button" name="BTN_Forvard" id="next" value="Next" class="button_medium" onClick="javascript: initCodingProgress('next');"/>
+					<input type="button" name="BTN_Forvard" id="next" value="<fmt:message bundle='${resword}' key='next' />" class="button_medium" onClick="javascript: initCodingProgress('next');"/>
 				</c:if>
 			</td>
 		</tr>
@@ -28,7 +30,10 @@
 		</c:forEach>
 	/>
 </c:forEach>
-
+	<input type="text" class="not_coded_status_jmesa_filter" value="<fmt:message bundle='${resword}' key='notCoded' />" />
+	<input type="text" class="coded_status_jmesa_filter" value="<fmt:message bundle='${resword}' key='coded' />" />
+	<input type="text" class="status" value="<fmt:message bundle='${resword}' key='w_status_coded_item' />" />
+	<input type="text" class="status" value="<fmt:message bundle='${resword}' key='w_status_items_to_be_coded' />" />
 	<input type="text" value="${cpYear}" id="cpYear" />
 	<input type="text" class="currentColor" value="${newThemeColor}">
 	<input type="text" id="cpActivateLegend" value="${cpActivateLegend}">

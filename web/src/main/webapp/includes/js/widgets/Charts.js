@@ -455,7 +455,7 @@ function getPieOptions() {
 		left : 10,
 		top : 20,
 		right : 20,
-		width : "85%",
+		width : "80%",
 		height : "85%"
 	};
 	this.colors = [ '#8ac819' ];

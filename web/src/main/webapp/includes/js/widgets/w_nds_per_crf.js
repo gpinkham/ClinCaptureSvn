@@ -39,7 +39,10 @@ function initNdsPerCrf(action){
 			var element = document.getElementById('toolbar');
 			if (!element) {
 				function selectHandler() {
-					var statuses = [ "Closed", "Updated", "New", "Not+Applicable"];
+					var statuses = [];
+					$("#nds_per_crf_form .status").each(function(){
+						statuses.push(($(this).val()).replace(/\s/g, '+'));
+					});
 					var selectedItem = ndsPerCrfChart.getSelection()[0];
 					var crfName = $("#nds_per_crf_form input[type=text]:nth-child(" + (selectedItem.row+1) + ")").val().replace(/\s/g, '+');
 					var statusNumber = (selectedItem.column % 2 == 0 ? selectedItem.column - 2 : selectedItem.column - 1) / 2;
@@ -74,26 +77,14 @@ function initNdsPerCrf(action){
 function getNdsPerCrfWidgetData() {
 	var data = new google.visualization.DataTable();
 	data.addColumn('string', 'CRF Name');
-	data.addColumn('number', 'Closed');
-	data.addColumn({
-		type : 'number',
-		role : 'annotation'
-	});
-	data.addColumn('number', 'Updated');
-	data.addColumn({
-		type : 'number',
-		role : 'annotation'
-	});
-	data.addColumn('number', 'New');
-	data.addColumn({
-		type : 'number',
-		role : 'annotation'
-	});
-	data.addColumn('number', 'Notes');
-	data.addColumn({
-		type : 'number',
-		role : 'annotation'
-	});
+	// Closed, Updated, New, Not Applicable
+	$("#nds_per_crf_form .legend").each(function(){
+		data.addColumn('number', $(this).val());
+		data.addColumn({
+			type : 'number',
+			role : 'annotation'
+		});
+});
 	var counter = 0;
 	$("#nds_per_crf_form input[type=text]").each(
 			function() {

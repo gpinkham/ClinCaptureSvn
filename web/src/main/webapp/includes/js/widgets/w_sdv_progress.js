@@ -43,12 +43,14 @@ function initSdvProgress(action) {
 			var element = document.getElementById('toolbar');
 			if (!element) {
 				function selectHandler() {
-					var selectedItem = sdvProgressChart
-						.getSelection()[0];
+					var statuses = [];
+					statuses.push(($("#sdv_progress .status_available_for_sdv_jmesa_filter").val()).replace(/\s/g, '+'));
+					statuses.push(($("#sdv_progress .status_sdved_jmesa_filter").val()).replace(/\s/g, '+'));
+					var selectedItem = sdvProgressChart.getSelection()[0];
 					var currentYear = new Date().getFullYear();
 					var currentMonth = new Date().getMonth();
 					if (selectedItem && selectedItem.row == currentMonth && currentYear == displayedYear) {
-						var sdvStep = (selectedItem.column == "3" || selectedItem.column == "4") ? "not+done" : "complete";
+						var sdvStep = (selectedItem.column == "3" || selectedItem.column == "4") ? statuses[0] : statuses[1];
 						var redirectPrefix = "pages/viewAllSubjectSDVtmp?studyId=";
 						var redirectSufix = "&showMoreLink=true&sdv_tr_=true&sdv_p_=1&sdv_mr_=15";
 						var studyId = $("input[id=sdvWStudyId]").val();
@@ -74,12 +76,12 @@ function initSdvProgress(action) {
 function getSdvWidgetData() {
 	var data = new google.visualization.DataTable();
 	data.addColumn('string', 'Month');
-	data.addColumn('number', 'SDV-ed event CRFs');
+	data.addColumn('number', $("#sdv_progress .sdved").val());
 	data.addColumn({
 		type : 'number',
 		role : 'annotation'
 	});
-	data.addColumn('number', 'Available for SDV');
+	data.addColumn('number', $("#sdv_progress .available_for_sdv").val());
 	data.addColumn({
 		type : 'number',
 		role : 'annotation'

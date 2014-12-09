@@ -66,12 +66,14 @@ function initStudyProgress() {
 function getStudyProgressWidgetData() {
 	var spData = new google.visualization.DataTable();
 	var statusIds = [ 1, 3, 9, 8, 4, 6, 5, 7 ];
-	var statusNames = [ 'Scheduled', 'Data Entry Started', 'SDV-ed', 'Signed',
-			'Completed', 'Skipped', 'Stopped', 'Locked' ];
+	var statusNames = [];
+	$("#study_progress .status").each(function(){
+		statusNames.push($(this).val());
+	});
 	spData.addColumn('string', 'Statuses');
 	spData.addColumn('number', 'Count');
 	spData.addColumn('number', 'StatusId');
-	$("form[id=study_progress] input").each(
+	$("#study_progress input[type=text]").each(
 			function(index) {
 				if (statusIds[index] != undefined) {
 					spData.addRow([ " - " + statusNames[index],

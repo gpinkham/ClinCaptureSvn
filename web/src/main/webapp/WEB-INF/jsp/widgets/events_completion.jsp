@@ -70,10 +70,10 @@
 	<table>
 		<tr>
 			<td align="left">
-				<input type="button" name="BTN_Back" id="previous" value="Previous" class="button_medium" onClick="javascript: initEventsCompletionWidget('goBack');"/>
+				<input type="button" name="BTN_Back" id="previous" value="<fmt:message bundle='${resword}' key='previous' />" class="button_medium" onClick="javascript: initEventsCompletionWidget('goBack');"/>
 			</td>
 			<td align="right">
-				<input type="button" name="BTN_Forvard" id="next" value="Next" class="button_medium" onClick="javascript: initEventsCompletionWidget('goForward');"/>
+				<input type="button" name="BTN_Forvard" id="next" value="<fmt:message bundle='${resword}' key='next' />" class="button_medium" onClick="javascript: initEventsCompletionWidget('goForward');"/>
 			</td>
 		</tr> 
 	</table>

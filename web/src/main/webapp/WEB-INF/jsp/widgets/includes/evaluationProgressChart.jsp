@@ -9,12 +9,12 @@
 		<tr>
 			<td align="left">
 				<c:if test="${evalProgPreviousYearExists}">
-					<input type="button" name="BTN_Back" id="previous" value="Previous" class="button_medium" onClick="javascript: initEvaluationProgress('back');"/>
+					<input type="button" name="BTN_Back" id="previous" value="<fmt:message bundle='${resword}' key='previous' />" class="button_medium" onClick="javascript: initEvaluationProgress('back');"/>
 				</c:if>
 			</td>
 			<td align="right">
 				<c:if test="${evalProgNextYearExists}">
-					<input type="button" name="BTN_Forward" id="next" value="Next" class="button_medium" onClick="javascript: initEvaluationProgress('next');"/>
+					<input type="button" name="BTN_Forward" id="next" value="<fmt:message bundle='${resword}' key='next' />" class="button_medium" onClick="javascript: initEvaluationProgress('next');"/>
 				</c:if>
 			</td>
 		</tr>

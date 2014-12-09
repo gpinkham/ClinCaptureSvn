@@ -45,7 +45,11 @@ function initEnrollmentProgress(action) {
 					var currentYear = new Date().getFullYear();
 					var currentMonth = new Date().getMonth();
 					if (selectedItem && selectedItem.row == currentMonth && currentYear == displayedYear) {
-						var arr = ["locked","signed","removed","available"];
+						var arr = [];
+						// locked, signed, removed, available.
+						$("#enrollment_progress .status").each(function(){
+							arr.push($(this).val());
+						});
 						var statusNumber = (selectedItem.column % 2 == 0 ? selectedItem.column - 2 : selectedItem.column - 1) / 2;
 						var currentStatus = arr[statusNumber];
 						var redirectPrefix = "ListStudySubjects?module=admin&maxRows=15&showMoreLink=false&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_=15&findSubjects_f_studySubject.status=";
@@ -70,7 +74,11 @@ function getEnrollmentProgressWidgetData() {
 	var regexp = /^stat\-(.+)$/;
 	var i;
 	// Set the order of statuses in chart
-	var arr = [ "locked", "signed", "removed", "available" ];
+	var arr = [];
+	// locked, signed, removed, available.
+	$("#enrollment_progress .status").each(function(){
+		arr.push($(this).val());
+	});
 	var data = new google.visualization.DataTable();
 	var arrLength = arr.length;
 	data.addColumn('string', 'Month');

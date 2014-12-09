@@ -43,10 +43,10 @@
 	<table>
 		<tr>
 			<td align="left">
-				<input type="button" name="BTN_Back" id="esps_previous" value="Previous" class="button_medium" onClick="javascript: initEnrollStatusPerSiteWidget('goBack');"/>
+				<input type="button" name="BTN_Back" id="esps_previous" value="<fmt:message bundle='${resword}' key='previous' />" class="button_medium" onClick="javascript: initEnrollStatusPerSiteWidget('goBack');"/>
 			</td>
 			<td align="right">
-				<input type="button" name="BTN_Forvard" id="esps_next" value="Next" class="button_medium" onClick="javascript: initEnrollStatusPerSiteWidget('goForward');"/>
+				<input type="button" name="BTN_Forvard" id="esps_next" value="<fmt:message bundle='${resword}' key='next' />" class="button_medium" onClick="javascript: initEnrollStatusPerSiteWidget('goForward');"/>
 			</td>
 		</tr> 
 	</table>
