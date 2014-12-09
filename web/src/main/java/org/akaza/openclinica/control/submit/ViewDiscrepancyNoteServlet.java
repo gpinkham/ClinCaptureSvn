@@ -20,8 +20,26 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.util.SessionUtil;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -50,7 +68,6 @@ import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -66,24 +83,8 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.util.SessionUtil;
 
 /**
  * @author jxu
@@ -121,6 +122,9 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 	public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
 	public static final String CAN_MONITOR = "canMonitor";
 	public static final String FROM_BOX = "fromBox";
+	
+	private static final int THREE = 3;
+	private static final int FOUR = 4;
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -145,6 +149,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
+		EventCRFBean ecb = null;
 
 		FormProcessor fp = new FormProcessor(request);
 		int itemId = fp.getInt(CreateDiscrepancyNoteServlet.ITEM_ID);
@@ -225,16 +230,16 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 				request.setAttribute("strErrMsg", request.getParameter("strErrMsg"));
 
 				EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-				EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
-				preUserId = ec.getOwnerId() > 0 ? ec.getOwnerId() : 0;
-				request.setAttribute("entityCreatedDate", sdf.format(ec.getCreatedDate()));
-				request.setAttribute("eventCrfOwnerId", ec.getOwnerId());
+				ecb = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
+				preUserId = ecb.getOwnerId() > 0 ? ecb.getOwnerId() : 0;
+				request.setAttribute("entityCreatedDate", sdf.format(ecb.getCreatedDate()));
+				request.setAttribute("eventCrfOwnerId", ecb.getOwnerId());
 
 				if (field.isEmpty()) {
 					ItemGroupDAO igdao = new ItemGroupDAO(getDataSource());
 					ItemGroupMetadataDAO igmdao = new ItemGroupMetadataDAO(getDataSource());
 					ItemGroupMetadataBean igmBean = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(
-							itemData.getItemId(), ec.getCRFVersionId());
+							itemData.getItemId(), ecb.getCRFVersionId());
 					ItemGroupBean igBean = (ItemGroupBean) igdao.findByPK(igmBean.getItemGroupId());
 					if (igmBean.isRepeatingGroup()) {
 						field = igBean.getOid() + "_" + (itemData.getOrdinal() == 1 ? "" : "manual")
@@ -245,7 +250,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 				}
 
 				StudyEventDAO sed = new StudyEventDAO(getDataSource());
-				StudyEventBean se = (StudyEventBean) sed.findByPK(ec.getStudyEventId());
+				StudyEventBean se = (StudyEventBean) sed.findByPK(ecb.getStudyEventId());
 
 				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
 				StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se
@@ -255,7 +260,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 				request.setAttribute("studyEvent", se);
 
 				CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
-				CRFVersionBean cv = (CRFVersionBean) cvdao.findByPK(ec.getCRFVersionId());
+				CRFVersionBean cv = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
 
 				CRFDAO cdao = new CRFDAO(getDataSource());
 				CRFBean crf = (CRFBean) cdao.findByPK(cv.getCrfId());
@@ -374,23 +379,23 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 
 			} else if ("eventCrf".equalsIgnoreCase(name)) {
 				EventCRFDAO ecdao = getEventCRFDAO();
-				EventCRFBean ec = (EventCRFBean) ecdao.findByPK(entityId);
+				ecb = (EventCRFBean) ecdao.findByPK(entityId);
 				if (!StringUtil.isBlank(column)) {
 					if ("date_interviewed".equals(column)) {
-						if (ec.getDateInterviewed() != null) {
-							request.setAttribute("entityValue", dateFormatter.format(ec.getDateInterviewed()));
+						if (ecb.getDateInterviewed() != null) {
+							request.setAttribute("entityValue", dateFormatter.format(ecb.getDateInterviewed()));
 						}
 						request.setAttribute("entityName", resword.getString("date_interviewed"));
 					} else if ("interviewer_name".equals(column)) {
-						request.setAttribute("entityValue", ec.getInterviewerName());
+						request.setAttribute("entityValue", ecb.getInterviewerName());
 						request.setAttribute("entityName", resword.getString("interviewer_name"));
 					}
 				}
 
-				setupStudyEventCRFAttributes(ec, request);
+				setupStudyEventCRFAttributes(ecb, request);
 
-				preUserId = ec.getOwnerId() > 0 ? ec.getOwnerId() : 0;
-				request.setAttribute("entityCreatedDate", sdf.format(ec.getCreatedDate()));
+				preUserId = ecb.getOwnerId() > 0 ? ecb.getOwnerId() : 0;
+				request.setAttribute("entityCreatedDate", sdf.format(ecb.getCreatedDate()));
 			}
 
 		}
@@ -405,7 +410,8 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			// initialize dn for a new thread
 			DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
 			if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
-					|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
+					|| currentRole.getRole().equals(Role.INVESTIGATOR)
+					|| currentRole.getRole().equals(Role.STUDY_EVALUATOR)) {
 				dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
 				dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
 				autoviews.put(0, 0);
@@ -417,11 +423,11 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			boxDNMap.put(0, dnb);
 		} else if (boxDNMap.containsKey(0)) {
 			int dnTypeId = boxDNMap.get(0).getDiscrepancyNoteTypeId();
-			autoviews.put(0, (dnTypeId == 3 ? 1 : 0));
+			autoviews.put(0, (dnTypeId == THREE ? 1 : 0));
 		}
 		if (boxDNMap.containsKey(0)) {
 			int dnTypeId0 = boxDNMap.get(0).getDiscrepancyNoteTypeId();
-			if (dnTypeId0 == 2 || dnTypeId0 == 4) {
+			if (dnTypeId0 == 2 || dnTypeId0 == FOUR) {
 				request.setAttribute("typeID0", dnTypeId0 + "");
 			}
 		}
@@ -571,7 +577,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 				dn.setId(key);
 				int dnTypeId = note.getDiscrepancyNoteTypeId();
 				dn.setDiscrepancyNoteTypeId(dnTypeId);
-				if (dnTypeId == 3) { // Query
+				if (dnTypeId == THREE) { // Query
 					dn.setAssignedUserId(note.getOwnerId());
 				} else if (dnTypeId == 1) { // FVC
 					if (fvcInitAssigns.containsKey(key)) {
@@ -581,7 +587,8 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 					}
 				}
 				Role r = currentRole.getRole();
-				if (r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.INVESTIGATOR)) {
+				if (r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.INVESTIGATOR)
+						|| r.equals(Role.STUDY_EVALUATOR)) {
 					if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.QUERY.getId()
 							&& note.getResStatus().getId() == ResolutionStatus.UPDATED.getId()) {
 						dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
@@ -626,7 +633,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		request.setAttribute(DIS_NOTES, noteTree);
 
 		ArrayList<StudyUserRoleBean> userAccounts = DiscrepancyNoteUtil.generateUserAccounts(ssub.getId(),
-				currentStudy, udao, new StudyDAO(getDataSource()));
+				currentStudy, udao, getStudyDAO(), ecb, getEventDefinitionCRFDAO());
 
 		request.setAttribute(USER_ACCOUNTS, userAccounts);
 		request.setAttribute(VIEW_DN_LINK, this.getPageServletFileName(request));
@@ -758,7 +765,8 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		request.setAttribute("dDescriptionsMap", dDescriptionService.getAssignedToStudySortedDescriptions(currentStudy));
 
 		if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
-				|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
+				|| currentRole.getRole().equals(Role.INVESTIGATOR)
+				|| currentRole.getRole().equals(Role.STUDY_EVALUATOR)) {
 			request.setAttribute(SHOW_STATUS, false);
 			request.setAttribute(CAN_CLOSE, false);
 			request.setAttribute(DIS_TYPES, Arrays.asList(DiscrepancyNoteType.ANNOTATION));
@@ -787,7 +795,8 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 	private void sendDNTypesAndResStatusesLists(StudyUserRoleBean currentRole, HttpServletRequest request) {
 		request.setAttribute(DIS_TYPES, DiscrepancyNoteType.list);
 		if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
-				|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
+				|| currentRole.getRole().equals(Role.INVESTIGATOR)
+				|| currentRole.getRole().equals(Role.STUDY_EVALUATOR)) {
 			ArrayList<ResolutionStatus> resStatuses = new ArrayList();
 			resStatuses.add(ResolutionStatus.UPDATED);
 			request.setAttribute(RES_STATUSES, resStatuses);

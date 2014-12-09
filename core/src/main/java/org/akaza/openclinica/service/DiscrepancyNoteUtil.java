@@ -13,6 +13,21 @@
 
 package org.akaza.openclinica.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
@@ -20,6 +35,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -32,6 +48,7 @@ import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -42,19 +59,6 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * DiscrepancyNoteUtil is a convenience class for managing discrepancy notes, such as getting all notes for a study, or
@@ -1652,7 +1656,7 @@ public class DiscrepancyNoteUtil {
 	}
 
 	public static ArrayList<StudyUserRoleBean> generateUserAccounts(int studySubjectId, StudyBean currentStudy,
-			UserAccountDAO udao, StudyDAO studyDAO) {
+			UserAccountDAO udao, StudyDAO studyDAO, EventCRFBean ecb, EventDefinitionCRFDAO eddao) {
 		StudyBean subjectStudy = studyDAO.findByStudySubjectId(studySubjectId);
 		int studyId = currentStudy.getId();
 		ArrayList<StudyUserRoleBean> userAccounts = new ArrayList<StudyUserRoleBean>();
@@ -1664,14 +1668,42 @@ public class DiscrepancyNoteUtil {
 		} else {
 			userAccounts = udao.findAllUsersByStudyOrSite(studyId, 0, studySubjectId);
 		}
-
 		UserAccountBean rootUserAccount = (UserAccountBean) udao.findByPK(1);
 		if (!rootUserAccount.getStatus().isLocked() && !rootUserAccount.getStatus().isDeleted()) {
 			StudyUserRoleBean rootStudyUserRole = createRootUserRole(rootUserAccount, studyId);
 			userAccounts.add(rootStudyUserRole);
 		}
-
+		removeEvaluatorsBasedOnCrfStage(userAccounts, ecb, eddao);
 		return userAccounts;
+	}
+
+	private static void removeEvaluatorsBasedOnCrfStage(List<StudyUserRoleBean> userAccounts, EventCRFBean ecb,
+			EventDefinitionCRFDAO eddao) {
+		if (!shouldRemoveEvaluators(ecb, eddao)) {
+			return;
+		}
+		List<StudyUserRoleBean> evaluators = new ArrayList<StudyUserRoleBean>();
+		for (StudyUserRoleBean surb : userAccounts) {
+			if (surb.getRole().equals(Role.STUDY_EVALUATOR)) {
+				evaluators.add(surb);
+			}
+		}
+		userAccounts.removeAll(evaluators);
+	}
+
+	private static boolean shouldRemoveEvaluators(EventCRFBean ecb, EventDefinitionCRFDAO eddao) {
+		if (ecb == null) {
+			return true;
+		}
+		EventDefinitionCRFBean edcb = eddao.findForStudyByStudyEventIdAndCRFVersionId(ecb.getStudyEventId(),
+				ecb.getCRFVersionId());
+		if (!edcb.isEvaluatedCRF()) {
+			return true;
+		}
+		if (ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) || ecb.isNotStarted()) {
+			return true;
+		}
+		return false;
 	}
 
 	private static StudyUserRoleBean createRootUserRole(UserAccountBean rootUserAccount, int studyId) {

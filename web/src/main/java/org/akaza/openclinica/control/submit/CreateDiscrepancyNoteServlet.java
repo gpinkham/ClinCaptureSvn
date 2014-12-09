@@ -76,7 +76,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Create a discrepancy note for a data entity
+ * Create a discrepancy note for a data entity.
  * 
  * @author jxu
  * 
@@ -101,7 +101,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 	public static final String IS_GROUP_ITEM = "isGroup";
 
-	public static final String PARENT_ID = "parentId";// parent note id
+	public static final String PARENT_ID = "parentId"; // parent note id
 
 	public static final String ENTITY_TYPE = "name";
 
@@ -143,6 +143,11 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 	public static final String PARENT_ROW_COUNT = "rowCount";
 
 	public static final String NO_PERMISSION_EXCEPTION = "no_permission_to_create_discrepancy_note";
+
+	private static final int FOUR = 4;
+	private static final int FIVE = 5;
+	private static final int TWO_FIFTY_FIVE = 255;
+	private static final int ONE_THOUSAND = 1000;
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -212,14 +217,15 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		int isGroup = fp.getInt(IS_GROUP_ITEM);
 		int eventCRFId = fp.getInt(EVENT_CRF_ID);
 		request.setAttribute(EVENT_CRF_ID, eventCRFId);
+		EventCRFBean ecb = (EventCRFBean) getEventCRFDAO().findByPK(eventCRFId);
 		int rowCount = fp.getInt(PARENT_ROW_COUNT);
 		// run only once: try to recalculate writeToDB
 		if (!StringUtil.isBlank(entityType) && "itemData".equalsIgnoreCase(entityType) && isGroup != 0
 				&& eventCRFId != 0) {
-			int ordinal_for_repeating_group_field = calculateOrdinal(request, isGroup, field, eventCRFId, rowCount);
+			int ordinalForRepeatingGroupField = calculateOrdinal(request, isGroup, field, eventCRFId, rowCount);
 			logger.info("*** found entity id: " + entityId);
-			int writeToDBStatus = isWriteToDB(request, isGroup, field, entityId, itemId,
-					ordinal_for_repeating_group_field, eventCRFId);
+			int writeToDBStatus = isWriteToDB(request, isGroup, field, entityId, itemId, ordinalForRepeatingGroupField,
+					eventCRFId);
 			writeToDB = writeToDBStatus != -1 && (writeToDBStatus == 1 || writeToDB);
 		}
 
@@ -240,7 +246,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			request.setAttribute("monitor", monitor);
 
 			enteringData = true;
-		} else if ("1".equalsIgnoreCase(monitor)) {// change to allow user to
+		} else if ("1".equalsIgnoreCase(monitor)) { // change to allow user to
 			// enter note for all items,
 			// not just blank items
 
@@ -267,10 +273,10 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				request.setAttribute("entityValue", itemData.getValue());
 				request.setAttribute("entityName", item.getName());
 				EventCRFDAO ecdao = getEventCRFDAO();
-				EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
+				ecb = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
 
-				request.setAttribute("eventCrfOwnerId", ec.getOwnerId());
-				preUserId = ec.getOwnerId();
+				request.setAttribute("eventCrfOwnerId", ecb.getOwnerId());
+				preUserId = ecb.getOwnerId();
 			} else if ("studySub".equalsIgnoreCase(entityType)) {
 				ssub = (StudySubjectBean) getStudySubjectDAO().findByPK(entityId);
 				SubjectBean sub = (SubjectBean) getSubjectDAO().findByPK(ssub.getSubjectId());
@@ -377,19 +383,19 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 					}
 				}
 			} else if ("eventCrf".equalsIgnoreCase(entityType)) {
-				EventCRFBean ec = (EventCRFBean) getEventCRFDAO().findByPK(entityId);
-				preUserId = ec.getOwnerId();
+				ecb = (EventCRFBean) getEventCRFDAO().findByPK(entityId);
+				preUserId = ecb.getOwnerId();
 
 				if (!StringUtil.isBlank(column)) {
 					if ("date_interviewed".equals(column)) {
-						if (ec.getDateInterviewed() != null) {
-							request.setAttribute("entityValue", dateFormatter.format(ec.getDateInterviewed()));
+						if (ecb.getDateInterviewed() != null) {
+							request.setAttribute("entityValue", dateFormatter.format(ecb.getDateInterviewed()));
 						} else {
 							request.setAttribute("entityValue", resword.getString("N/A"));
 						}
 						request.setAttribute("entityName", resword.getString("date_interviewed"));
 					} else if ("interviewer_name".equals(column)) {
-						request.setAttribute("entityValue", ec.getInterviewerName());
+						request.setAttribute("entityValue", ecb.getInterviewerName());
 						request.setAttribute("entityName", resword.getString("interviewer_name"));
 					}
 				}
@@ -451,7 +457,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			dnb.setCreatedDate(new Date());
 			dnb.setItemId(itemId);
 
-			if (parent.getId() == 0 || isNew) {// no parent, new note thread
+			if (parent.getId() == 0 || isNew) { // no parent, new note thread
 				if (enteringData) {
 					dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
 					dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
@@ -464,7 +470,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				} else {
 					dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.QUERY.getId());
 					if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
-							|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
+							|| currentRole.getRole().equals(Role.INVESTIGATOR)
+							|| currentRole.getRole().equals(Role.STUDY_EVALUATOR)) {
 						request.setAttribute("autoView", "0");
 					} else {
 						request.setAttribute("autoView", "1");
@@ -490,7 +497,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			}
 
 			if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
-					|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
+					|| currentRole.getRole().equals(Role.INVESTIGATOR)
+					|| currentRole.getRole().equals((Role.STUDY_EVALUATOR))) {
 				dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
 				dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
 			}
@@ -502,7 +510,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			}
 
 			// If the data entry form has not been saved yet, collecting info from parent page.
-			dnb = getNoteInfo(request, dnb);// populate note infos
+			dnb = getNoteInfo(request, dnb); // populate note infos
 			if (dnb.getEventName() == null || dnb.getEventName().equals("")) {
 				dnb.setEventName(fp.getString("eventName"));
 			}
@@ -515,10 +523,10 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			// // #4346 TBH 10/2009
 			request.setAttribute(DIS_NOTE, dnb);
 			request.setAttribute("unlock", "0");
-			request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");// this should go from UI & here
+			request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0"); // this should go from UI & here
 
 			request.setAttribute(USER_ACCOUNTS, DiscrepancyNoteUtil.generateUserAccounts(ssub.getId(), currentStudy,
-					new UserAccountDAO(getDataSource()), new StudyDAO(getDataSource())));
+					getUserAccountDAO(), getStudyDAO(), ecb, getEventDefinitionCRFDAO()));
 
 			// ideally should be only two cases
 			if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
@@ -529,9 +537,9 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			} else if (dnb.getEventCRFId() > 0) {
 				logger.debug("found a event crf id: " + dnb.getEventCRFId());
 				EventCRFDAO eventCrfDAO = getEventCRFDAO();
-				EventCRFBean eventCrfBean = (EventCRFBean) eventCrfDAO.findByPK(dnb.getEventCRFId());
-				request.setAttribute(USER_ACCOUNT_ID, Integer.valueOf(eventCrfBean.getOwnerId()).toString());
-				logger.debug("assigned owner id: " + eventCrfBean.getOwnerId());
+				ecb = (EventCRFBean) eventCrfDAO.findByPK(dnb.getEventCRFId());
+				request.setAttribute(USER_ACCOUNT_ID, Integer.valueOf(ecb.getOwnerId()).toString());
+				logger.debug("assigned owner id: " + ecb.getOwnerId());
 			}
 			request.getSession().setAttribute("cdn_eventCRFId", fp.getString("eventCRFId"));
 			request.getSession().setAttribute("cdn_groupOid", fp.getString("groupOid"));
@@ -560,9 +568,9 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			DiscrepancyNoteBean note = new DiscrepancyNoteBean();
 			v.addValidation("description", Validator.NO_BLANKS);
 			v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, TWO_FIFTY_FIVE);
 			v.addValidation("detailedDes", Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1000);
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, ONE_THOUSAND);
 
 			v.addValidation("typeId", Validator.NO_BLANKS);
 
@@ -657,20 +665,20 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				note.setStudyId(ssub.getStudyId());
 			}
 
-			note = getNoteInfo(request, note);// populate note infos
+			note = getNoteInfo(request, note);
 
 			request.setAttribute(DIS_NOTE, note);
-			request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");// this should go from UI & here
+			request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");
 			ArrayList userAccounts = DiscrepancyNoteUtil.generateUserAccounts(ssub.getId(), currentStudy,
-					new UserAccountDAO(getDataSource()), new StudyDAO(getDataSource()));
+					getUserAccountDAO(), getStudyDAO(), ecb, getEventDefinitionCRFDAO());
 
 			request.setAttribute(USER_ACCOUNT_ID, Integer.valueOf(note.getAssignedUserId()).toString());
 			// formality more than anything else, we should go to say the note
 			// is done
 
 			Role r = currentRole.getRole();
-			if (Role.isMonitor(r) || r.equals(Role.INVESTIGATOR)
-					|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_ADMINISTRATOR)) { // investigator
+			if (Role.isMonitor(r) || r.equals(Role.INVESTIGATOR) || r.equals(Role.STUDY_EVALUATOR)
+					|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 				request.setAttribute("unlock", "1");
 				logger.debug("set UNLOCK to ONE");
 			} else {
@@ -740,8 +748,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 							&& note.getAssignedUserId() == 0) {
 
 						ItemDataBean itemData = (ItemDataBean) getItemDataDAO().findByPK(entityId);
-						EventCRFBean ec = (EventCRFBean) getEventCRFDAO().findByPK(itemData.getEventCRFId());
-						int userToAssignId = ec.getUpdaterId() == 0 ? ec.getOwnerId() : ec.getUpdaterId();
+						ecb = (EventCRFBean) getEventCRFDAO().findByPK(itemData.getEventCRFId());
+						int userToAssignId = ecb.getUpdaterId() == 0 ? ecb.getOwnerId() : ecb.getUpdaterId();
 						note.setAssignedUserId(userToAssignId);
 					}
 
@@ -808,37 +816,91 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		}
 	}
 
+	/**
+	 * 
+	 * @param note
+	 *            DiscrepancyNoteBean
+	 * @param request
+	 *            HttpServletRequest
+	 */
 	public static void saveNoteToSubmittedDNsMap(DiscrepancyNoteBean note, HttpServletRequest request) {
 		if (note.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.ANNOTATION.getId()
 				&& note.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()
-				&& note.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.FAILEDVAL.getId())
+				&& note.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.FAILEDVAL.getId()) {
 			return;
+		}
 		HashMap<String, DiscrepancyNoteBean> submittedDNs = (HashMap) request.getSession().getAttribute(
 				SUBMITTED_DNS_MAP);
-		if (submittedDNs == null)
+		if (submittedDNs == null) {
 			submittedDNs = new HashMap<String, DiscrepancyNoteBean>();
+		}
 		if (submittedDNs.get(note.getField()) == null) {
 			submittedDNs.put(note.getField(), note);
 		}
 		request.getSession().setAttribute(SUBMITTED_DNS_MAP, submittedDNs);
 	}
 
+	/**
+	 * 
+	 * @param field
+	 *            String
+	 * @param request
+	 *            HttpServletRequest
+	 */
 	public static void turnOffIsDataChangedParamOfDN(String field, HttpServletRequest request) {
 		setParameterForDN(field, "isDataChanged", "0", request);
 	}
 
+	/**
+	 * 
+	 * @param field
+	 *            String
+	 * @param request
+	 *            HttpServletRequest
+	 */
 	public static void turnOffIsInRFCErrorParamOfDN(String field, HttpServletRequest request) {
 		setParameterForDN(field, "isInRFCError", "0", request);
 	}
 
+	/**
+	 * 
+	 * @param field
+	 *            String
+	 * @param request
+	 *            HttpServletRequest
+	 */
 	public static void turnOffIsInErrorParamOfDN(String field, HttpServletRequest request) {
 		setParameterForDN(field, "isInError", "0", request);
 	}
 
+	/**
+	 * 
+	 * @param field
+	 *            String
+	 * @param parameterName
+	 *            String
+	 * @param value
+	 *            String
+	 * @param request
+	 *            HttpServletRequest
+	 */
 	public static void setParameterForDN(String field, String parameterName, String value, HttpServletRequest request) {
 		setParameterForDN("1", field, parameterName, value, request);
 	}
 
+	/**
+	 * 
+	 * @param toOverwrite
+	 *            String
+	 * @param field
+	 *            String
+	 * @param parameterName
+	 *            String
+	 * @param value
+	 *            String
+	 * @param request
+	 *            HttpServletRequest
+	 */
 	public static void setParameterForDN(String toOverwrite, String field, String parameterName, String value,
 			HttpServletRequest request) {
 		Map<String, HashMap<String, String>> dnAdditionalCreatingParameters = (Map<String, HashMap<String, String>>) request
@@ -863,6 +925,14 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		}
 	}
 
+	/**
+	 * 
+	 * @param field
+	 *            String
+	 * @param request
+	 *            HttpServletRequest
+	 * @return Map<String, String>
+	 */
 	public static Map<String, String> getMapWithParameters(String field, HttpServletRequest request) {
 		Map<String, HashMap<String, String>> dnAdditionalCreatingParameters = (Map<String, HashMap<String, String>>) request
 				.getSession().getAttribute("dnAdditionalCreatingParameters");
@@ -897,7 +967,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 	}
 
 	/**
-	 * Constructs a url for creating new note on 'view note list' page
+	 * Constructs a url for creating new note on 'view note list' page.
 	 * 
 	 * @param note
 	 *            DiscrepancyNoteBean
@@ -913,7 +983,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		arguments.add(ENTITY_TYPE + "=" + note.getEntityType());
 		arguments.add(ENTITY_ID + "=" + note.getEntityId());
 		arguments.add(WRITE_TO_DB + "=" + "1");
-		arguments.add("monitor" + "=" + 1);// of course, when resolving a note,
+		arguments.add("monitor" + "=" + 1); // of course, when resolving a note,
 		// we have monitor privilege
 
 		if (preset.isActive()) {
@@ -948,23 +1018,23 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
 	}
 
-	private int isWriteToDB(HttpServletRequest request, int isGroup, String field, int item_data_id, int item_id,
-			int ordinal_for_repeating_group_field, int event_crf_id) {
-		if (item_data_id > 0 && isGroup == -1) {// non repeating group; coming from showItemInput.jsp
+	private int isWriteToDB(HttpServletRequest request, int isGroup, String field, int itemDataId, int itemId,
+			int ordinalForRepeatingGroupField, int ecId) {
+		if (itemDataId > 0 && isGroup == -1) { // non repeating group; coming from showItemInput.jsp
 			return 1;
-		} else if (item_data_id < 0 && isGroup == -1) {// non repeating group; coming from showItemInput.jsp
+		} else if (itemDataId < 0 && isGroup == -1) { // non repeating group; coming from showItemInput.jsp
 			return -1;
-		} else if (isGroup == 1) {// repeating group;
+		} else if (isGroup == 1) { // repeating group;
 			// initial data entry or if template cell is empty (last row)
-			if (item_data_id < 0) {
+			if (itemDataId < 0) {
 				return -1;
 			}
-			if (item_data_id > 0) {
+			if (itemDataId > 0) {
 				if (field.contains("_0input") || field.contains("manual")) {
 					// get ordinal
 					ItemDataDAO iddao = new ItemDataDAO(getDataSource(), SessionUtil.getLocale(request));
 
-					boolean isExistInDB = iddao.isItemExists(item_id, ordinal_for_repeating_group_field, event_crf_id);
+					boolean isExistInDB = iddao.isItemExists(itemId, ordinalForRepeatingGroupField, ecId);
 					return (isExistInDB) ? 1 : -1;
 				} else if (field.contains("input")) {
 					return -1;
@@ -974,53 +1044,74 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		return 0;
 	}
 
-	public int calculateOrdinal(HttpServletRequest request, int isGroup, String field_name, int event_crf_id,
-			int rowCount) {
+	/**
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param isGroup
+	 *            int
+	 * @param fieldName
+	 *            String
+	 * @param ecId
+	 *            int
+	 * @param rowCount
+	 *            int
+	 * @return int
+	 */
+	public int calculateOrdinal(HttpServletRequest request, int isGroup, String fieldName, int ecId, int rowCount) {
 		int ordinal = 0;
 		int start;
 		int end;
 		if (isGroup == -1) {
 			return 1;
 		}
-		if (field_name.contains("_0input")) {
+		if (fieldName.contains("_0input")) {
 			return 1;
 		}
 		try {
-			if (field_name.contains("manual")) {
-				start = field_name.indexOf("manual") + 5;
-				end = field_name.indexOf("input");
-				if (start == 4 || end == -1) {
+			if (fieldName.contains("manual")) {
+				start = fieldName.indexOf("manual") + FIVE;
+				end = fieldName.indexOf("input");
+				if (start == FOUR || end == -1) {
 					return 0;
 				}
-				ordinal = Integer.valueOf(field_name.substring(start + 1, end));
+				ordinal = Integer.valueOf(fieldName.substring(start + 1, end));
 				return ordinal + 1;
 
 			} else {
 				// get max ordinal from DB
 				ItemDataDAO iddao = new ItemDataDAO(getDataSource(), SessionUtil.getLocale(request));
-				String[] field_name_items = field_name.split("_");
+				String[] fieldNameItems = fieldName.split("_");
 
-				String group_oid = field_name.substring(0,
-						field_name.indexOf(field_name_items[field_name_items.length - 1]) - 1);
-				int maxOrdinal = iddao.getMaxOrdinalForGroupByGroupOID(group_oid, event_crf_id);
+				String groupOid = fieldName.substring(0,
+						fieldName.indexOf(fieldNameItems[fieldNameItems.length - 1]) - 1);
+				int maxOrdinal = iddao.getMaxOrdinalForGroupByGroupOID(groupOid, ecId);
 
 				// get ordinal from field
-				end = field_name.indexOf("input");
-				start = field_name.lastIndexOf("_");
+				end = fieldName.indexOf("input");
+				start = fieldName.lastIndexOf("_");
 				if (end == -1 || start == -1) {
 					return 0;
 				}
-				ordinal = Integer.valueOf(field_name.substring(start + 1, end));
+				ordinal = Integer.valueOf(fieldName.substring(start + 1, end));
 				return ordinal + maxOrdinal + rowCount;
 			}
 		} catch (NumberFormatException e) {
-			// DO NOTHING
+			logger.error(e.getLocalizedMessage());
 		}
 
 		return ordinal;
 
 	}
 
+	/**
+	 * 
+	 * @param study
+	 *            StudyBean
+	 * @param sm
+	 *            SessionManager
+	 * @return boolean
+	 */
 	public static boolean isStudyParamForRFCSwitchOn(StudyBean study, SessionManager sm) {
 		// Study Parameter: Forced Reason For Change in Administrative Editing
 		StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
@@ -1032,6 +1123,16 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		}
 	}
 
+	/**
+	 * 
+	 * @param additionalParameters
+	 *            Map<String, String>
+	 * @param request
+	 *            HttpServletRequest
+	 * @param sm
+	 *            Session Manager
+	 * @return boolean
+	 */
 	public static boolean calculateIsRFC(Map<String, String> additionalParameters, HttpServletRequest request,
 			SessionManager sm) {
 		boolean isInRFCError = "1".equals(additionalParameters.get("isInRFCError"));
@@ -1116,11 +1217,28 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				emailBodyString, true, null, null, true, request);
 	}
 
+	/**
+	 * 
+	 * @param entityType
+	 *            String
+	 * @param ssub
+	 *            StudySubjectBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param dataSource
+	 *            DataSource
+	 * @param aLogger
+	 *            Logger
+	 * @param request
+	 *            HttpServletRequest
+	 * @throws InsufficientPermissionException
+	 *             thrown if incorrect study is detected.
+	 */
 	public static void checkSubjectInCorrectStudy(String entityType, StudySubjectBean ssub, StudyBean currentStudy,
 			DataSource dataSource, Logger aLogger, HttpServletRequest request) throws InsufficientPermissionException {
-		if ("subject".equals(entityType))
+		if ("subject".equals(entityType)) {
 			return;
-
+		}
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(ssub.getStudyId());
 		if (ssub.getStudyId() != currentStudy.getId() && currentStudy.getId() != studyBeanSub.getParentStudyId()) {
@@ -1134,7 +1252,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 	private void sendDNTypesAndResStatusesLists(boolean isRFC, StudyUserRoleBean currentRole, HttpServletRequest request) {
 		if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
-				|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
+				|| currentRole.getRole().equals(Role.INVESTIGATOR)
+				|| currentRole.getRole().equals(Role.STUDY_EVALUATOR)) {
 			request.setAttribute("showStatus", false);
 			request.setAttribute(RES_STATUSES, Arrays.asList(ResolutionStatus.NOT_APPLICABLE));
 			request.setAttribute(DIS_TYPES, Arrays.asList(DiscrepancyNoteType.ANNOTATION));
