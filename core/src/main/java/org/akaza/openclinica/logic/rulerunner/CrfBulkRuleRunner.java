@@ -50,8 +50,24 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+/**
+ * 
+ * CRF Bulk Rule Runner.
+ * 
+ */
 public class CrfBulkRuleRunner extends RuleRunner {
 
+	/**
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param requestURLMinusServletPath
+	 *            String
+	 * @param contextPath
+	 *            String
+	 * @param mailSender
+	 *            JavaMailSenderImpl
+	 */
 	public CrfBulkRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath,
 			JavaMailSenderImpl mailSender) {
 		super(ds, requestURLMinusServletPath, contextPath, mailSender);
@@ -60,7 +76,7 @@ public class CrfBulkRuleRunner extends RuleRunner {
 	/**
 	 * Organize objects in a certain way so that we can show to Users on UI. step1 : Get StudyEvent , eventCrf ,
 	 * crfVersion from studyEventId.
-	 *
+	 * 
 	 * @param crfViewSpecificOrderedObjects
 	 * @param ruleSet
 	 * @param rule
@@ -77,7 +93,8 @@ public class CrfBulkRuleRunner extends RuleRunner {
 				getExpressionService().getCrfOid(ruleSet.getTarget().getValue())).get(0);
 		CRFVersionBean crfVersion = (CRFVersionBean) getCrfVersionDao().findByPK(eventCrf.getCRFVersionId());
 
-		RuleBulkExecuteContainer key = new RuleBulkExecuteContainer(crfVersion.getName(), rule, ruleSet.getOriginalTarget().getValue(), actions);
+		RuleBulkExecuteContainer key = new RuleBulkExecuteContainer(crfVersion.getName(), rule, ruleSet
+				.getOriginalTarget().getValue(), actions);
 		String key2String = getExpressionService().getCustomExpressionUsedToCreateView(ruleSet.getTarget().getValue(),
 				studyEvent.getSampleOrdinal());
 		String studyEventDefinitionName = getExpressionService().getStudyEventDefinitionFromExpression(
@@ -97,22 +114,40 @@ public class CrfBulkRuleRunner extends RuleRunner {
 		if (crfViewSpecificOrderedObjects.containsKey(key)) {
 			HashMap<RuleBulkExecuteContainerTwo, Set<String>> k = crfViewSpecificOrderedObjects.get(key);
 			if (k.containsKey(key2)) {
-				k.get(key2).add(String.valueOf(studySubject.getLabel() + "," + studySubject.getCreatedDate() + "," + studySubject.getStatus().getName() + "," + studySubject.getStudyName()));
+				k.get(key2).add(
+						String.valueOf(studySubject.getLabel() + "," + studySubject.getCreatedDate() + ","
+								+ studySubject.getStatus().getName() + "," + studySubject.getStudyName()));
 			} else {
 				HashSet<String> values = new HashSet<String>();
-				values.add(String.valueOf(studySubject.getLabel() + "," + studySubject.getCreatedDate() + "," + studySubject.getStatus().getName() + "," + studySubject.getStudyName()));
+				values.add(String.valueOf(studySubject.getLabel() + "," + studySubject.getCreatedDate() + ","
+						+ studySubject.getStatus().getName() + "," + studySubject.getStudyName()));
 				k.put(key2, values);
 			}
 		} else {
 			HashMap<RuleBulkExecuteContainerTwo, Set<String>> k = new HashMap<RuleBulkExecuteContainerTwo, Set<String>>();
 			HashSet<String> values = new HashSet<String>();
-			values.add(String.valueOf(studySubject.getLabel() + "," + studySubject.getCreatedDate() + "," + studySubject.getStatus().getName() + "," + studySubject.getStudyName()));
+			values.add(String.valueOf(studySubject.getLabel() + "," + studySubject.getCreatedDate() + ","
+					+ studySubject.getStatus().getName() + "," + studySubject.getStudyName()));
 			k.put(key2, values);
 			crfViewSpecificOrderedObjects.put(key, k);
 		}
 		return crfViewSpecificOrderedObjects;
 	}
 
+	/**
+	 * 
+	 * @param ruleSets
+	 *            List of RuleSetBeans
+	 * @param executionMode
+	 *            ExecutionMode
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param variableAndValue
+	 *            HashMap
+	 * @param ub
+	 *            UserAccountBean
+	 * @return HashMap
+	 */
 	@Deprecated
 	public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesBulkOLD(
 			List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy,
@@ -149,7 +184,7 @@ public class CrfBulkRuleRunner extends RuleRunner {
 								RuleActionBean ruleActionBean = itr.next();
 								RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(
 										ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule
-										.getRuleBean().getOid());
+												.getRuleBean().getOid());
 								if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
 									itr.remove();
 								}
@@ -195,6 +230,20 @@ public class CrfBulkRuleRunner extends RuleRunner {
 		return crfViewSpecificOrderedObjects;
 	}
 
+	/**
+	 * 
+	 * @param ruleSets
+	 *            List
+	 * @param executionMode
+	 *            ExecutionMode
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param variableAndValue
+	 *            HashMap
+	 * @param ub
+	 *            UserAccountBean
+	 * @return HashMap
+	 */
 	public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesBulk(
 			List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy,
 			HashMap<String, String> variableAndValue, UserAccountBean ub) {
@@ -240,7 +289,7 @@ public class CrfBulkRuleRunner extends RuleRunner {
 								RuleActionBean ruleActionBean = itr.next();
 								RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(
 										ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule
-										.getRuleBean().getOid());
+												.getRuleBean().getOid());
 								if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
 									itr.remove();
 								}
@@ -256,7 +305,8 @@ public class CrfBulkRuleRunner extends RuleRunner {
 								new Object[] { ruleSet.getTarget().getValue(), rule.getName(), result,
 										actionListBasedOnRuleExecutionResult.size(), executionMode.name() });
 					} catch (OpenClinicaSystemException osa) {
-						// TODO: report something useful
+						logger.error(osa.getLocalizedMessage());
+						// TODO report something useful
 					}
 				}
 			}
@@ -267,18 +317,28 @@ public class CrfBulkRuleRunner extends RuleRunner {
 			Collections.sort(entry.getValue(), new RuleActionContainerComparator());
 			HashMap<Key, List<RuleActionBean>> hms = new HashMap<Key, List<RuleActionBean>>();
 			for (RuleActionContainer ruleActionContainer : entry.getValue()) {
-				ruleActionContainer.setExpressionBean(ruleActionContainer.getExpressionBean());
+				ruleActionContainer.getRuleSetBean().setTarget(ruleActionContainer.getExpressionBean());
 				ruleActionContainer.getRuleAction().setCuratedMessage(
-						curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction().getRuleSetRule()));
-				ActionProcessor ap = ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction().getActionType(), ds, getMailSender(), dynamicsMetadataService,
-						ruleActionContainer.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
+						curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction()
+								.getRuleSetRule()));
+				ActionProcessor ap = ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction()
+						.getActionType(), ds, getMailSender(), dynamicsMetadataService, ruleActionContainer
+						.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction()
+						.getRuleSetRule());
 
-				ap.execute(RuleRunnerMode.RULSET_BULK, executionMode, ruleActionContainer.getRuleAction(), ruleActionContainer.getItemDataBean(),
-						DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub, prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer
-						.getRuleAction().getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
+				ap.execute(
+						RuleRunnerMode.RULSET_BULK,
+						executionMode,
+						ruleActionContainer.getRuleAction(),
+						ruleActionContainer.getItemDataBean(),
+						DiscrepancyNoteBean.ITEM_DATA,
+						currentStudy,
+						ub,
+						prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction()
+								.getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
 
-				Key k = new Key(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getExpressionBean().getValue(),
-						ruleActionContainer.getRuleAction().getRuleSetRule().getRuleBean());
+				Key k = new Key(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getExpressionBean()
+						.getValue(), ruleActionContainer.getRuleAction().getRuleSetRule().getRuleBean());
 				if (hms.containsKey(k)) {
 					hms.get(k).add(ruleActionContainer.getRuleAction());
 				} else {
@@ -290,7 +350,8 @@ public class CrfBulkRuleRunner extends RuleRunner {
 			for (Map.Entry<Key, List<RuleActionBean>> theEntry : hms.entrySet()) {
 				Key key = theEntry.getKey();
 				List<RuleActionBean> value = theEntry.getValue();
-				crfViewSpecificOrderedObjects = populateForCrfBasedRulesView(crfViewSpecificOrderedObjects, key.getRuleSet(), key.getRule(), key.getResult(), currentStudy, value);
+				crfViewSpecificOrderedObjects = populateForCrfBasedRulesView(crfViewSpecificOrderedObjects,
+						key.getRuleSet(), key.getRule(), key.getResult(), currentStudy, value);
 			}
 		}
 		return crfViewSpecificOrderedObjects;
@@ -300,9 +361,9 @@ public class CrfBulkRuleRunner extends RuleRunner {
 
 class Key {
 
-	RuleSetBean ruleSet;
-	String result;
-	RuleBean rule;
+	private RuleSetBean ruleSet;
+	private String result;
+	private RuleBean rule;
 
 	public Key(RuleSetBean ruleSet, String result, RuleBean rule) {
 		super();
@@ -347,28 +408,37 @@ class Key {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Key other = (Key) obj;
 		if (result == null) {
-			if (other.result != null)
+			if (other.result != null) {
 				return false;
-		} else if (!result.equals(other.result))
+			}
+		} else if (!result.equals(other.result)) {
 			return false;
+		}
 		if (rule == null) {
-			if (other.rule != null)
+			if (other.rule != null) {
 				return false;
-		} else if (!rule.equals(other.rule))
+			}
+		} else if (!rule.equals(other.rule)) {
 			return false;
+		}
 		if (ruleSet == null) {
-			if (other.ruleSet != null)
+			if (other.ruleSet != null) {
 				return false;
-		} else if (!ruleSet.equals(other.ruleSet))
+			}
+		} else if (!ruleSet.equals(other.ruleSet)) {
 			return false;
+		}
 		return true;
 	}
 }
