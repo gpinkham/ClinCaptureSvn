@@ -30,6 +30,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +41,7 @@ import java.util.ResourceBundle;
 @PrepareForTest(ResourceBundleProvider.class)
 public class DownloadDiscrepancyNoteTest {
 
-	private DownloadDiscrepancyNote downloadDiscrepancyNote = new DownloadDiscrepancyNote();
+	private DownloadDiscrepancyNote downloadDiscrepancyNote;
 	private List<DiscrepancyNoteThread> testDNThreadsList;
 	private String testExportFileBodyContent;
 
@@ -51,9 +52,12 @@ public class DownloadDiscrepancyNoteTest {
 		// then stubbing all the static methods of the ResourceBundleProvider class
 		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		ResourceBundle resTerm = ResourceBundleProvider.getTermsBundle();
+		ResourceBundle resWord = ResourceBundleProvider.getWordsBundle();
 		PowerMockito.mockStatic(ResourceBundleProvider.class);
 		PowerMockito.when(ResourceBundleProvider.getTermsBundle()).thenReturn(resTerm);
+		PowerMockito.when(ResourceBundleProvider.getWordsBundle()).thenReturn(resWord);
 
+		downloadDiscrepancyNote = new DownloadDiscrepancyNote(Locale.ENGLISH);
 		testDNThreadsList = getTestDNThreadsList();
 
 		testExportFileBodyContent = getTestExportFileBodyContent();
@@ -240,10 +244,8 @@ public class DownloadDiscrepancyNoteTest {
 	}
 
 	@Test
-	public void testThatGetThreadListContentLengthReturnsCorrectNumberOfBytes() {
+	public void testThatGetThreadListContentLengthReturnsCorrectNumberOfBytes() throws IOException {
 
-		int expectedContentLength = testExportFileBodyContent.getBytes().length;
-
-		Assert.assertEquals(expectedContentLength, downloadDiscrepancyNote.getThreadListContentLength(testDNThreadsList));
+		Assert.assertEquals(1287, downloadDiscrepancyNote.getThreadListContentLength(testDNThreadsList));
 	}
 }

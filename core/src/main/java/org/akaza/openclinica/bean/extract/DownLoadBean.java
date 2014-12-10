@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.bean.extract;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -28,9 +29,9 @@ import org.akaza.openclinica.bean.core.EntityBean;
  */
 public interface DownLoadBean {
 
-	void downLoad(EntityBean bean, String format, OutputStream stream);
+	void downLoad(EntityBean bean, String format, OutputStream stream) throws Exception;
 
-	void downLoad(List<EntityBean> listOfBeans, String format, OutputStream stream);
+	void downLoad(List<EntityBean> listOfBeans, String format, OutputStream stream) throws IOException;
 
-	int getContentLength(EntityBean bean, String format);
+	int getContentLength(EntityBean bean, String format) throws IOException;
 }

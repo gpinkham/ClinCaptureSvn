@@ -68,8 +68,11 @@ import java.util.Set;
 public class DiscrepancyNoteOutputServlet extends Controller {
 	// These are the headers that must appear in the HTTP response, when sending a
 	// file back to the user
-	public static String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
-	public static String CONTENT_DISPOSITION_VALUE = "attachment; filename=";
+	public static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
+	public static final String CONTENT_DISPOSITION_VALUE = "attachment; filename=";
+	private static final int UTF8_ENCODING_BYTE_1 = 239;
+	private static final int UTF8_ENCODING_BYTE_2 = 187;
+	private static final int UTF8_ENCODING_BYTE_3 = 191;
 
 	/* Handle the HTTP Get or Post request. */
 	@Override
@@ -97,8 +100,7 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 		String format = request.getParameter("fmt");
 
 		int discNoteType = fp.getInt("discNoteType");
-
-		DownloadDiscrepancyNote downLoader = new DownloadDiscrepancyNote();
+		DownloadDiscrepancyNote downLoader = new DownloadDiscrepancyNote(SessionUtil.getLocale(request));
 		if ("csv".equalsIgnoreCase(format)) {
 			fileName = fileName + ".csv";
 			response.setContentType(DownloadDiscrepancyNote.CSV);
@@ -147,12 +149,15 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 		List<DiscrepancyNoteThread> discrepancyNoteThreads = discNoteUtil.createThreads(allDiscNotes, getDataSource(),
 				studyBean, resolutionStatusIds, discNoteType);
 
-		if ("csv".equalsIgnoreCase(format)) {
-			int contentLen = downLoader.getThreadListContentLength(discrepancyNoteThreads);
-			response.setContentLength(contentLen);
+		response.getOutputStream().write(UTF8_ENCODING_BYTE_1);
+		response.getOutputStream().write(UTF8_ENCODING_BYTE_2);
+		response.getOutputStream().write(UTF8_ENCODING_BYTE_3);
 
+		if ("csv".equalsIgnoreCase(format)) {
 			downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.CSV,
 					response.getOutputStream(), null);
+			int contentLen = downLoader.getThreadListContentLength(discrepancyNoteThreads);
+			response.setContentLength(contentLen);
 		} else {
 			response.setHeader("Pragma", "public");
 			downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.PDF,
@@ -352,7 +357,6 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 						crfStatus = resterm.getString("complete");
 					}
 					dnb.setCrfStatus(crfStatus);
-
 				}
 			}
 
@@ -380,6 +384,6 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		//
+
 	}
 }
