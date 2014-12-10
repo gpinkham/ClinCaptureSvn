@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -166,6 +167,8 @@ public class EntityBeanTable {
 
 	protected String noRowsMessage;
 	protected String noColsMessage;
+
+	private Locale locale;
 
 	public EntityBeanTable() {
 		rows = new ArrayList();
@@ -457,7 +460,7 @@ public class EntityBeanTable {
 
 					loopRows: for (int i = 0; i < rows.size(); i++) {
 						EntityBeanRow row = (EntityBeanRow) rows.get(i);
-
+						row.setLocale(getLocale());
 						String searchString = row.getSearchString().toLowerCase();
 						// If the keyword matches the whole search string,
 						// return a match
@@ -642,5 +645,13 @@ public class EntityBeanTable {
 			c.setShowLink(false);
 			columns.set(i, c);
 		}
+	}
+
+	public Locale getLocale() {
+		return locale;
+	}
+
+	public void setLocale(Locale locale) {
+		this.locale = locale;
 	}
 }

@@ -42,7 +42,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 /**
- * purpose: to generate the list of jobs and allow us to view them
+ * Generates the list of jobs and allow us to view them.
  * 
  * @author thickerson
  */
@@ -51,6 +51,8 @@ import java.util.Set;
 public class ViewJobServlet extends RememberLastPage {
 
 	public static final String SAVED_VIEW_EXPORT_JOB_URL = "savedViewExportJobUrl";
+	public static final int DESCRIPTION_COL = 3;
+	public static final int ACTION_COL = 7;
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -64,7 +66,7 @@ public class ViewJobServlet extends RememberLastPage {
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 	}
 
 	@Override
@@ -129,21 +131,18 @@ public class ViewJobServlet extends RememberLastPage {
 
 		EntityBeanTable table = fp.getEntityBeanTable();
 		String[] columns = { resword.getString("name"), resword.getString("previous_fire_time"),
-				resword.getString("next_fire_time"), resword.getString("description"),
-				resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("study"),
-				resword.getString("actions") };
+				resword.getString("next_fire_time"), resword.getString("description"), resword.getString("study"),
+				resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("actions") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(3);
-		table.hideColumnLink(7);
+		table.hideColumnLink(DESCRIPTION_COL);
+		table.hideColumnLink(ACTION_COL);
 		table.setQuery("ViewJob", new HashMap());
-		table.setSortingColumnInd(0);
 		table.setRows(allRows);
 		table.computeDisplay();
 
 		request.setAttribute("table", table);
 
 		forwardPage(Page.VIEW_JOB, request, response);
-
 	}
 
 	@Override

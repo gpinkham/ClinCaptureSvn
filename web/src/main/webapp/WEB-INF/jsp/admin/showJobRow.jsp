@@ -17,9 +17,10 @@
 	</c:if>
 	</td>
 	<td class="table_cell"><c:out value="${currRow.bean.description}" /></td>
-	<td class="table_cell"><c:out value="${currRow.bean.periodToRun}" /></td>
+    <td class="table_cell"><c:out value="${currRow.bean.studyName}" /></td>
+    <td class="table_cell"><fmt:message key="${currRow.bean.periodToRun}" bundle="${resword}"/></td>
 	<td class="table_cell"><c:out value="${currRow.bean.datasetName}" /></td>
-	<td class="table_cell"><c:out value="${currRow.bean.studyName}" /></td>
+
 	<!-- actions -->
 	
 	<td class="table_cell">

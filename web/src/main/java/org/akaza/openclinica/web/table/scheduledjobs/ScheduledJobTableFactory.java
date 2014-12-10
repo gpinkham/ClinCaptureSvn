@@ -39,7 +39,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * View builder for the list of scheduled jobs with an ability to cancel the job
+ * View builder for the list of scheduled jobs with an ability to cancel the job.
  * 
  * @author jnyayapathi
  * 
@@ -63,19 +63,24 @@ public class ScheduledJobTableFactory extends AbstractTableFactory {
 		ResourceBundleProvider.getWordsBundle(locale);
 		Row row = tableFacade.getTable().getRow();
 
-		String[] allTitles = new String[] { "DataSet Name", "Fire Time", "Export File", "Job Status", "Actions" };
-		SDVUtil sdvUtil = new SDVUtil();// TODO check if this is viable
+		String[] allTitles = new String[] { ResourceBundleProvider.getResWord("dataset_name"), ResourceBundleProvider.getResWord("fire_time"),
+				ResourceBundleProvider.getResWord("export_file"), ResourceBundleProvider.getResWord("job_status"), ResourceBundleProvider.getResWord("actions") };
+		SDVUtil sdvUtil = new SDVUtil(); // TODO check if this is viable
 		sdvUtil.setTitles(allTitles, (HtmlTable) tableFacade.getTable());
 
 		sdvUtil.setHtmlCellEditors(tableFacade, new String[] { "action" }, false);
 
-		configureColumn(row.getColumn("action"), "Actions", sdvUtil.getCellEditorNoEscapes(), new DefaultActionsEditor(
+		configureColumn(row.getColumn("action"), ResourceBundleProvider.getResWord("actions"), sdvUtil.getCellEditorNoEscapes(), new DefaultActionsEditor(
 				locale), true, false);
 
 	}
 
 	/**
-	 * Creating table
+	 * Methods creates table.
+	 *
+	 * @param request The incoming request.
+	 * @param response The response to redirect to.
+	 * @return the object with data required.
 	 */
 	@Override
 	public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {

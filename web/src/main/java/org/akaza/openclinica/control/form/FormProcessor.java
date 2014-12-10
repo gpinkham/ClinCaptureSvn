@@ -28,6 +28,7 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -468,7 +469,7 @@ public class FormProcessor {
 
 	public EntityBeanTable getEntityBeanTable() {
 		EntityBeanTable answer = new EntityBeanTable();
-
+		answer.setLocale(SessionUtil.getLocale(request));
 		String sortingColumn = request.getParameter(EBL_SORT_COLUMN);
 		if (sortingColumn != null && !"".equals(sortingColumn)) {
 			answer.setSortingColumnExplicitlySet(true);

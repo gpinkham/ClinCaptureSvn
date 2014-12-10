@@ -45,10 +45,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -81,6 +83,14 @@ public class ScheduledJobController {
 
 	}
 
+	/**
+	 *
+	 *
+	 * @param request The incoming request.
+	 * @param response The response to redirect to.
+	 * @return  The map with job attributes that will be placed on the UX.
+	 * @throws SchedulerException for job schedule exceptions.
+	 */
 	@RequestMapping("/listCurrentScheduledJobs")
 	public ModelMap listScheduledJobs(HttpServletRequest request, HttpServletResponse response)
 			throws SchedulerException {
@@ -170,22 +180,21 @@ public class ScheduledJobController {
 						.append("this.form.theTriggerGroupName.value='").append(st.getGroup()).append("';")
 						.append("this.form.submit();").append("setAccessedObjected(this);");
 
-				actions.append(
-						"<td><input type=\"button\" class=\"button_medium\" value=\"Skip Next Run\" name=\"skipNextRun\" ")
-						.append("onclick=\"").append(jsCodeString.toString()).append("\" />")
+				actions.append("<td><input type=\"button\" class=\"button_medium\" value=\"").append(ResourceBundleProvider.getResWord("skip_next_run"))
+						.append("\" name=\"skipNextRun\" ").append("onclick=\"").append(jsCodeString.toString()).append("\" />")
 						.append("<a href='#' data-cc-runningJobId='").append(st.getName())
 						.append("' style='display: none;'></a>").append("</td></tr></table>");
 
 				jobs.setCheckbox(checkbox.toString());
 				jobs.setDatasetId(epBean.getDatasetName());
-				jobs.setFireTime(st.getStartTime() + "");
+				jobs.setFireTime(dateTimeFormat(st.getStartTime(), SessionUtil.getLocale(request)) + "");
 				if (st.getNextFireTime() != null) {
-					jobs.setScheduledFireTime(st.getNextFireTime() + "");
+					jobs.setScheduledFireTime(dateTimeFormat(st.getNextFireTime(), SessionUtil.getLocale(request)) + "");
 				}
 				jobs.setExportFileName(epBean.getExportFileName()[0]);
 				jobs.setAction(actions.toString());
-				jobs.setJobStatus(currentJobList.contains(st.getJobName() + st.getGroup()) ? "Currently Executing"
-						: "Scheduled");
+				jobs.setJobStatus(currentJobList.contains(st.getJobName() + st.getGroup()) ? ResourceBundleProvider.getResWord("currently_executing")
+						: ResourceBundleProvider.getResWord("scheduled"));
 
 				jobsScheduled.add(jobs);
 			}
@@ -203,6 +212,20 @@ public class ScheduledJobController {
 
 	}
 
+	/**
+	 * Method cancels job run.
+	 *
+	 * @param request The incoming request.
+	 * @param response The response to redirect to.
+	 * @param theJobName The job name.
+	 * @param theJobGroupName The selected job group name.
+	 * @param triggerName the job trigger name.
+	 * @param triggerGroupName the job trigger group name.
+	 * @param redirection the page for redirection.
+	 * @param model Map The map with job attributes.
+	 * @return The page for redirection.
+	 * @throws SchedulerException for job schedule exceptions.
+	 */
 	@RequestMapping("/cancelScheduledJob")
 	public String cancelScheduledJob(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("theJobName") String theJobName, @RequestParam("theJobGroupName") String theJobGroupName,
@@ -251,12 +274,7 @@ public class ScheduledJobController {
 			newTrigger.setStartTime(startTime);
 			newTrigger.setRepeatInterval(oldTrigger.getRepeatInterval());
 
-			scheduler.unscheduleJob(TriggerKey.triggerKey(triggerName, triggerGroupName)); // these are the jobs which
-																							// are from
-																							// extract data and
-																							// are not not required to
-																							// be
-																							// rescheduled.
+			scheduler.unscheduleJob(TriggerKey.triggerKey(triggerName, triggerGroupName));
 
 			ArrayList<String> pageMessages = new ArrayList<String>();
 
@@ -324,5 +342,14 @@ public class ScheduledJobController {
 
 		ex.printStackTrace();
 		return "redirect:/MainMenu";
+	}
+
+	private String dateTimeFormat(Date date, Locale locale) {
+		if (date == null) {
+			return "";
+		} else {
+			SimpleDateFormat dateFormat = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString("date_time_format_string"), locale);
+			return dateFormat.format(date);
+		}
 	}
 }

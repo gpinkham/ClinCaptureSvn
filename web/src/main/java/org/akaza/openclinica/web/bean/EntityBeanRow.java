@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * <p>
@@ -72,6 +73,11 @@ public abstract class EntityBeanRow implements Comparable {
 	 * The object which will be displayed.
 	 */
 	protected EntityBean bean;
+
+	/**
+	 * The current system locale.
+	 */
+	protected Locale locale;
 
 	/**
 	 * The column we are sorting by.
@@ -202,6 +208,21 @@ public abstract class EntityBeanRow implements Comparable {
 	 */
 	public void setBean(EntityBean bean) {
 		this.bean = bean;
+	}
+
+	/**
+	 * @return Returns the locale.
+	 */
+	public Locale getLocale() {
+		return locale;
+	}
+
+	/**
+	 * @param locale
+	 *            The locale to set.
+	 */
+	public void setLocale(Locale locale) {
+		this.locale = locale;
 	}
 
 	/**

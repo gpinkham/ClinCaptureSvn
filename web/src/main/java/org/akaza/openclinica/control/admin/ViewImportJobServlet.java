@@ -36,12 +36,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
+/**
+ * The servlet for managing import jobs.
+ */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class ViewImportJobServlet extends RememberLastPage {
 
 	public static final String SAVED_VIEW_IMPORT_JOB_URL = "savedViewImportJobUrl";
-	public static String IMPORT_TRIGGER = "importTrigger";
+	public static final String IMPORT_TRIGGER = "importTrigger";
+	public static final int DESCRIPTION_COL = 3;
+	public static final int ACTION_COL = 5;
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -79,15 +84,6 @@ public class ViewImportJobServlet extends RememberLastPage {
 
 		for (TriggerKey triggerKey : triggerKeys) {
 			Trigger trigger = scheduler.getTrigger(triggerKey);
-			logger.debug("found trigger, full name: " + trigger.getKey().getName());
-			try {
-				logger.debug("prev fire time " + trigger.getPreviousFireTime().toString());
-				logger.debug("next fire time " + trigger.getNextFireTime().toString());
-				logger.debug("final fire time: " + trigger.getFinalFireTime().toString());
-			} catch (NullPointerException npe) {
-				// could be nulls in the dates, etc
-			}
-
 			TriggerBean triggerBean = new TriggerBean();
 			triggerBean.setFullName(trigger.getKey().getName());
 			triggerBean.setPreviousDate(trigger.getPreviousFireTime());
@@ -118,18 +114,17 @@ public class ViewImportJobServlet extends RememberLastPage {
 		}
 
 		// set up the table here and get ready to send to the web page
-
 		ArrayList allRows = TriggerRow.generateRowsFromBeans(triggerBeans);
 
 		EntityBeanTable table = fp.getEntityBeanTable();
 		String[] columns = { resword.getString("name"), resword.getString("previous_fire_time"),
 				resword.getString("next_fire_time"), resword.getString("description"), resword.getString("study"), resword.getString("actions") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(3);
-		table.hideColumnLink(5);
+		table.hideColumnLink(DESCRIPTION_COL);
+		table.hideColumnLink(ACTION_COL);
 		table.setQuery("ViewImportJob", new HashMap());
-		table.setSortingColumnInd(0);
 		table.setRows(allRows);
+
 		table.computeDisplay();
 
 		request.setAttribute("table", table);
