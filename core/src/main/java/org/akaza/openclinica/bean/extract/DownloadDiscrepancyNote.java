@@ -277,7 +277,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 			writer.append(escapeQuotesInCSV(discNoteBean.getDisType().getName())).append(",");
 		}
 
-		writer.append(escapeQuotesInCSV(resword.getString(RESOLUTION_STATUS_MAP.get(discNoteBean.getResolutionStatusId()))).replaceAll(" ", "_").toLowerCase() + "").append(",");
+		writer.append(escapeQuotesInCSV(resword.getString(RESOLUTION_STATUS_MAP.get(discNoteBean.getResolutionStatusId()).replaceAll(" ", "_").toLowerCase() + ""))).append(",");
 		writer.append(escapeQuotesInCSV(discNoteBean.getEventName())).append(",");
 		writer.append(escapeQuotesInCSV(discNoteBean.getCrfName())).append(",");
 		writer.append(escapeQuotesInCSV(discNoteBean.getCrfStatus())).append(",");
