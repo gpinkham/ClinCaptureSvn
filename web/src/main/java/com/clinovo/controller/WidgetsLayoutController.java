@@ -544,7 +544,8 @@ public class WidgetsLayoutController {
 		boolean nextDataExists = sdvProgressYear < currentYear || nextYear.size() > 0;
 
 		EventCRFSDVFilter sdvFilterDone = new EventCRFSDVFilter(sb.getId());
-		sdvFilterDone.addFilter("sdvStatus", "complete");
+		sdvFilterDone.addFilter("sdvStatus", messageSource.getMessage("complete", null,
+				SessionUtil.getLocale(request)).toLowerCase());
 		EventCRFSDVSort sdvSortDone = new EventCRFSDVSort();
 		boolean sdvWithOpenQueries = sb.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes");
 		ArrayList<EventCRFBean> ecrfs = eCrfdao.getAvailableWithFilterAndSort(sb.getId(),
@@ -586,7 +587,7 @@ public class WidgetsLayoutController {
 		}
 
 		EventCRFSDVFilter sdvFilter = new EventCRFSDVFilter(sb.getId());
-		sdvFilter.addFilter("sdvStatus", "not done");
+		sdvFilter.addFilter("sdvStatus", messageSource.getMessage("not_done", null, SessionUtil.getLocale(request)));
 		EventCRFSDVSort sdvSort = new EventCRFSDVSort();
 		ArrayList<EventCRFBean> availableForSDV = eCrfdao.getAvailableWithFilterAndSort(sb.getId(),
 				sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries,
