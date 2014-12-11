@@ -51,6 +51,8 @@ public class DiscrepancyShortcutsAnalyzer {
 	public static final int RES_STATUS_RESOLVED = 3;
 	public static final int RES_STATUS_CLOSED = 4;
 	public static final int RES_STATUS_NOT_APPLICABLE = 5;
+	public static final String MIN_LEFT_D = "_minLeftD";
+	public static final String MIN_RIGHT_D = "_minRightD";
 
 	private boolean hasNotes;
 
@@ -71,12 +73,6 @@ public class DiscrepancyShortcutsAnalyzer {
 	private String nextResolutionProposedLink = FIRST_RESOLUTION_PROPOSED;
 	private String nextClosedDnLink = FIRST_CLOSED_DN;
 	private String nextAnnotationLink = FIRST_ANNOTATION;
-
-	private String firstNewDnLink = FIRST_NEW_DN;
-	private String firstUpdatedDnLink = FIRST_UPDATED_DN;
-	private String firstResolutionProposedLink = FIRST_RESOLUTION_PROPOSED;
-	private String firstClosedDnLink = FIRST_CLOSED_DN;
-	private String firstAnnotationLink = FIRST_ANNOTATION;
 
 	public int getTotalNew() {
 		return totalNew;
@@ -228,46 +224,6 @@ public class DiscrepancyShortcutsAnalyzer {
 		this.nextAnnotationLink = nextAnnotationLink;
 	}
 
-	public String getFirstNewDnLink() {
-		return firstNewDnLink;
-	}
-
-	public void setFirstNewDnLink(String firstNewDnLink) {
-		this.firstNewDnLink = firstNewDnLink;
-	}
-
-	public String getFirstUpdatedDnLink() {
-		return firstUpdatedDnLink;
-	}
-
-	public void setFirstUpdatedDnLink(String firstUpdatedDnLink) {
-		this.firstUpdatedDnLink = firstUpdatedDnLink;
-	}
-
-	public String getFirstResolutionProposedLink() {
-		return firstResolutionProposedLink;
-	}
-
-	public void setFirstResolutionProposedLink(String firstResolutionProposedLink) {
-		this.firstResolutionProposedLink = firstResolutionProposedLink;
-	}
-
-	public String getFirstClosedDnLink() {
-		return firstClosedDnLink;
-	}
-
-	public void setFirstClosedDnLink(String firstClosedDnLink) {
-		this.firstClosedDnLink = firstClosedDnLink;
-	}
-
-	public String getFirstAnnotationLink() {
-		return firstAnnotationLink;
-	}
-
-	public void setFirstAnnotationLink(String firstAnnotationLink) {
-		this.firstAnnotationLink = firstAnnotationLink;
-	}
-
 	public boolean isHasNotes() {
 		return hasNotes;
 	}
@@ -324,16 +280,16 @@ public class DiscrepancyShortcutsAnalyzer {
 		private int currentSectionId;
 
 		private CurrentSectionInfo(FormProcessor fp, List<SectionBean> sections) {
+			Boolean sectionChanged = (Boolean) fp.getRequest().getAttribute("sectionChanged");
 			SectionBean currentSection = (SectionBean) fp.getRequest().getAttribute("section");
 			if (fp.getRequest().getMethod().equalsIgnoreCase("POST")) {
-				currentSectionId = currentSection.getId();
-				currentTabId = getTabNum(sections, currentSectionId);
+				currentSectionId = currentSection.getId() + (sectionChanged == null ? 1 : 0);
 			} else {
-				currentTabId = fp.getInt(TAB_ID) == 0 ? 1 : fp.getInt(TAB_ID);
 				currentSectionId = fp.getInt(SECTION_ID, true) == 0 ? (sections != null && sections.size() > 0 ? sections
 						.get(0).getId() : 0)
 						: fp.getInt(SECTION_ID, true);
 			}
+			currentTabId = getTabNum(sections, currentSectionId);
 		}
 	}
 
@@ -370,7 +326,7 @@ public class DiscrepancyShortcutsAnalyzer {
 	}
 
 	/**
-	 * Generates discrepancy note urls for jumping between sections.
+	 * Method that generates discrepancy note urls for jumping between sections.
 	 * 
 	 * @param request
 	 *            the incoming request.
@@ -390,8 +346,7 @@ public class DiscrepancyShortcutsAnalyzer {
 			List<DiscrepancyNoteThread> noteThreads) {
 		DiscrepancyNoteBean tempBean;
 		FormProcessor fp = new FormProcessor(request);
-		Map<String, Integer> nextDnLinkMap = new HashMap<String, Integer>();
-		Map<String, Integer> firstDnLinkMap = new HashMap<String, Integer>();
+		Map<String, Integer> deltaMap = new HashMap<String, Integer>();
 		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = new DiscrepancyShortcutsAnalyzer();
 		request.setAttribute(DISCREPANCY_SHORTCUTS_ANALYZER, discrepancyShortcutsAnalyzer);
 		if (request.getMethod().equalsIgnoreCase("POST") && request.getAttribute("section") == null) {
@@ -408,76 +363,87 @@ public class DiscrepancyShortcutsAnalyzer {
 				String link = buildLink(fp, ifmbean, eventCrfBean, eventDefinitionCRFId, sections);
 				if (ResolutionStatus.UPDATED.equals(tempBean.getResStatus())) {
 					discrepancyShortcutsAnalyzer.incTotalUpdated();
-					Integer nextSectionId = nextDnLinkMap.get(FIRST_UPDATED_DN);
-					Integer firstSectionId = firstDnLinkMap.get(FIRST_UPDATED_DN);
-					if (firstSectionId == null || ifmbean.getSectionId() < firstSectionId) {
-						nextDnLinkMap.put(FIRST_UPDATED_DN, ifmbean.getSectionId());
-						firstDnLinkMap.put(FIRST_UPDATED_DN, ifmbean.getSectionId());
-						discrepancyShortcutsAnalyzer.setFirstUpdatedDnLink(link + FIRST_UPDATED_DN);
-						discrepancyShortcutsAnalyzer.setNextUpdatedDnLink(link + FIRST_UPDATED_DN);
-					} else if (ifmbean.getSectionId() > currentSectionInfo.currentSectionId
-							&& (nextSectionId.equals(firstSectionId) || ifmbean.getSectionId() < nextSectionId)) {
-						nextDnLinkMap.put(FIRST_UPDATED_DN, ifmbean.getSectionId());
-						discrepancyShortcutsAnalyzer.setNextUpdatedDnLink(link + FIRST_UPDATED_DN);
-					}
+					analyze(discrepancyShortcutsAnalyzer, currentSectionInfo, deltaMap, link, FIRST_UPDATED_DN,
+							ifmbean.getSectionId());
 				} else if (ResolutionStatus.OPEN.equals(tempBean.getResStatus())) {
 					discrepancyShortcutsAnalyzer.incTotalNew();
-					Integer nextSectionId = nextDnLinkMap.get(FIRST_NEW_DN);
-					Integer firstSectionId = firstDnLinkMap.get(FIRST_NEW_DN);
-					if (firstSectionId == null || ifmbean.getSectionId() < firstSectionId) {
-						nextDnLinkMap.put(FIRST_NEW_DN, ifmbean.getSectionId());
-						firstDnLinkMap.put(FIRST_NEW_DN, ifmbean.getSectionId());
-						discrepancyShortcutsAnalyzer.setFirstNewDnLink(link + FIRST_NEW_DN);
-						discrepancyShortcutsAnalyzer.setNextNewDnLink(link + FIRST_NEW_DN);
-					} else if (ifmbean.getSectionId() > currentSectionInfo.currentSectionId
-							&& (nextSectionId.equals(firstSectionId) || ifmbean.getSectionId() < nextSectionId)) {
-						nextDnLinkMap.put(FIRST_NEW_DN, ifmbean.getSectionId());
-						discrepancyShortcutsAnalyzer.setNextNewDnLink(link + FIRST_NEW_DN);
-					}
+					analyze(discrepancyShortcutsAnalyzer, currentSectionInfo, deltaMap, link, FIRST_NEW_DN,
+							ifmbean.getSectionId());
 				} else if (ResolutionStatus.CLOSED.equals(tempBean.getResStatus())) {
 					discrepancyShortcutsAnalyzer.incTotalClosed();
-					Integer nextSectionId = nextDnLinkMap.get(FIRST_CLOSED_DN);
-					Integer firstSectionId = firstDnLinkMap.get(FIRST_CLOSED_DN);
-					if (firstSectionId == null || ifmbean.getSectionId() < firstSectionId) {
-						nextDnLinkMap.put(FIRST_CLOSED_DN, ifmbean.getSectionId());
-						firstDnLinkMap.put(FIRST_CLOSED_DN, ifmbean.getSectionId());
-						discrepancyShortcutsAnalyzer.setFirstClosedDnLink(link + FIRST_CLOSED_DN);
-						discrepancyShortcutsAnalyzer.setNextClosedDnLink(link + FIRST_CLOSED_DN);
-					} else if (ifmbean.getSectionId() > currentSectionInfo.currentSectionId
-							&& (nextSectionId.equals(firstSectionId) || ifmbean.getSectionId() < nextSectionId)) {
-						nextDnLinkMap.put(FIRST_CLOSED_DN, ifmbean.getSectionId());
-						discrepancyShortcutsAnalyzer.setNextClosedDnLink(link + FIRST_CLOSED_DN);
-					}
+					analyze(discrepancyShortcutsAnalyzer, currentSectionInfo, deltaMap, link, FIRST_CLOSED_DN,
+							ifmbean.getSectionId());
 				} else if (ResolutionStatus.RESOLVED.equals(tempBean.getResStatus())) {
 					discrepancyShortcutsAnalyzer.incTotalResolutionProposed();
-					Integer nextSectionId = nextDnLinkMap.get(FIRST_RESOLUTION_PROPOSED);
-					Integer firstSectionId = firstDnLinkMap.get(FIRST_RESOLUTION_PROPOSED);
-					if (firstSectionId == null || ifmbean.getSectionId() < firstSectionId) {
-						nextDnLinkMap.put(FIRST_RESOLUTION_PROPOSED, ifmbean.getSectionId());
-						firstDnLinkMap.put(FIRST_RESOLUTION_PROPOSED, ifmbean.getSectionId());
-						discrepancyShortcutsAnalyzer.setFirstResolutionProposedLink(link + FIRST_RESOLUTION_PROPOSED);
-						discrepancyShortcutsAnalyzer.setNextResolutionProposedLink(link + FIRST_RESOLUTION_PROPOSED);
-					} else if (ifmbean.getSectionId() > currentSectionInfo.currentSectionId
-							&& (nextSectionId.equals(firstSectionId) || ifmbean.getSectionId() < nextSectionId)) {
-						nextDnLinkMap.put(FIRST_RESOLUTION_PROPOSED, ifmbean.getSectionId());
-						discrepancyShortcutsAnalyzer.setNextResolutionProposedLink(link + FIRST_RESOLUTION_PROPOSED);
-					}
+					analyze(discrepancyShortcutsAnalyzer, currentSectionInfo, deltaMap, link,
+							FIRST_RESOLUTION_PROPOSED, ifmbean.getSectionId());
 				} else if (ResolutionStatus.NOT_APPLICABLE.equals(tempBean.getResStatus())) {
 					discrepancyShortcutsAnalyzer.incTotalAnnotations();
-					Integer nextSectionId = nextDnLinkMap.get(FIRST_ANNOTATION);
-					Integer firstSectionId = firstDnLinkMap.get(FIRST_ANNOTATION);
-					if (firstSectionId == null || ifmbean.getSectionId() < firstSectionId) {
-						nextDnLinkMap.put(FIRST_ANNOTATION, ifmbean.getSectionId());
-						firstDnLinkMap.put(FIRST_ANNOTATION, ifmbean.getSectionId());
-						discrepancyShortcutsAnalyzer.setFirstAnnotationLink(link + FIRST_ANNOTATION);
-						discrepancyShortcutsAnalyzer.setNextAnnotationLink(link + FIRST_ANNOTATION);
-					} else if (ifmbean.getSectionId() > currentSectionInfo.currentSectionId
-							&& (nextSectionId.equals(firstSectionId) || ifmbean.getSectionId() < nextSectionId)) {
-						nextDnLinkMap.put(FIRST_ANNOTATION, ifmbean.getSectionId());
-						discrepancyShortcutsAnalyzer.setNextAnnotationLink(link + FIRST_ANNOTATION);
-					}
+					analyze(discrepancyShortcutsAnalyzer, currentSectionInfo, deltaMap, link, FIRST_ANNOTATION,
+							ifmbean.getSectionId());
 				}
 			}
+		}
+	}
+
+	/**
+	 * Method that analyzes data to build dn shortcut link.
+	 * 
+	 * @param discrepancyShortcutsAnalyzer
+	 *            DiscrepancyShortcutsAnalyzer
+	 * @param currentSectionInfo
+	 *            CurrentSectionInfo
+	 * @param deltaMap
+	 *            Map<String, Integer>
+	 * @param link
+	 *            String
+	 * @param key
+	 *            String
+	 * @param itemSectionId
+	 *            int
+	 */
+	public static void analyze(DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer,
+			CurrentSectionInfo currentSectionInfo, Map<String, Integer> deltaMap, String link, String key,
+			int itemSectionId) {
+		int d = itemSectionId - currentSectionInfo.currentSectionId;
+		Integer minLeftD = deltaMap.get(key.concat(MIN_LEFT_D));
+		Integer minRightD = deltaMap.get(key.concat(MIN_RIGHT_D));
+		if (d <= 0 && minRightD == null) {
+			minLeftD = minLeftD == null ? d : Math.min(d, minLeftD);
+			if (minLeftD == d) {
+				deltaMap.put(key.concat(MIN_LEFT_D), minLeftD);
+				setNextLink(discrepancyShortcutsAnalyzer, link, key);
+			}
+		} else if (d > 0) {
+			minRightD = minRightD == null ? d : Math.min(d, minRightD);
+			if (minRightD == d) {
+				deltaMap.put(key.concat(MIN_RIGHT_D), minRightD);
+				setNextLink(discrepancyShortcutsAnalyzer, link, key);
+			}
+		}
+	}
+
+	/**
+	 * Method that sets next dn link for certain resolution.
+	 *
+	 * @param discrepancyShortcutsAnalyzer
+	 *            DiscrepancyShortcutsAnalyzer
+	 * @param link
+	 *            String
+	 * @param key
+	 *            String
+	 */
+	public static void setNextLink(DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer, String link, String key) {
+		if (key.equals(FIRST_UPDATED_DN)) {
+			discrepancyShortcutsAnalyzer.setNextUpdatedDnLink(link + FIRST_UPDATED_DN);
+		} else if (key.equals(FIRST_NEW_DN)) {
+			discrepancyShortcutsAnalyzer.setNextNewDnLink(link + FIRST_NEW_DN);
+		} else if (key.equals(FIRST_CLOSED_DN)) {
+			discrepancyShortcutsAnalyzer.setNextClosedDnLink(link + FIRST_CLOSED_DN);
+		} else if (key.equals(FIRST_RESOLUTION_PROPOSED)) {
+			discrepancyShortcutsAnalyzer.setNextResolutionProposedLink(link + FIRST_RESOLUTION_PROPOSED);
+		} else if (key.equals(FIRST_ANNOTATION)) {
+			discrepancyShortcutsAnalyzer.setNextAnnotationLink(link + FIRST_ANNOTATION);
 		}
 	}
 

@@ -260,6 +260,8 @@ public abstract class DataEntryServlet extends Controller {
 
 	public static final String DN_ADDITIONAL_CR_PARAMS = "dnAdditionalCreatingParameters";
 
+	public static final String SECTION_CHANGED = "sectionChanged";
+
 	@Override
 	protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException;
@@ -1768,13 +1770,10 @@ public abstract class DataEntryServlet extends Controller {
 								forwardingSucceeded = true;
 								request.setAttribute(INPUT_EVENT_CRF, ecb);
 								request.setAttribute(INPUT_SECTION, previousSec);
-								int tabNum = 0;
-								if (fp.getString("tabId") == null) {
-									tabNum = 1;
-								} else {
-									tabNum = fp.getInt("tabId");
-								}
-								request.setAttribute("tabId", new Integer(tabNum - 1).toString());
+								request.setAttribute(SECTION_CHANGED, true);
+								request.setAttribute(INPUT_SECTION_ID, Integer.toString(previousSec.getId()));
+								request.setAttribute("tabId", Integer.toString(DiscrepancyShortcutsAnalyzer.getTabNum(
+										allSections, previousSec.getId())));
 								forwardPage(getServletPage(request), request, response);
 							}
 						} else if (!fp.getString(GO_NEXT).equals("")) {
@@ -1782,13 +1781,12 @@ public abstract class DataEntryServlet extends Controller {
 								forwardingSucceeded = true;
 								request.setAttribute(INPUT_EVENT_CRF, ecb);
 								request.setAttribute(INPUT_SECTION, nextSec);
-								int tabNum = 0;
-								if (fp.getString("tabId") == null) {
-									tabNum = 1;
-								} else {
-									tabNum = fp.getInt("tabId");
-								}
-								request.setAttribute("tabId", new Integer(tabNum + 1).toString());
+								request.setAttribute(SECTION_CHANGED, true);
+								request.setAttribute(INPUT_SECTION_ID, Integer.toString(nextSec.getId()));
+								request.setAttribute(
+										"tabId",
+										Integer.toString(DiscrepancyShortcutsAnalyzer.getTabNum(allSections,
+												nextSec.getId())));
 								forwardPage(getServletPage(request), request, response);
 							}
 						}
@@ -1819,7 +1817,10 @@ public abstract class DataEntryServlet extends Controller {
 								// is not the last section
 								if (!section.isLastSection()) {
 									request.setAttribute(INPUT_SECTION, nextSec);
-									request.setAttribute(INPUT_SECTION_ID, new Integer(nextSec.getId()).toString());
+									request.setAttribute(SECTION_CHANGED, true);
+									request.setAttribute(INPUT_SECTION_ID, Integer.toString(nextSec.getId()));
+									request.setAttribute("tabId", Integer.toString(DiscrepancyShortcutsAnalyzer
+											.getTabNum(allSections, nextSec.getId())));
 									session.removeAttribute("mayProcessUploading");
 								} else if (section.isLastSection()) {
 									// already the last section, should go back to
@@ -1850,16 +1851,6 @@ public abstract class DataEntryServlet extends Controller {
 										response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
 									}
 									return;
-								}
-
-								int tabNum = 0;
-								if (fp.getString("tabId") == null) {
-									tabNum = 1;
-								} else {
-									tabNum = fp.getInt("tabId");
-								}
-								if (!section.isLastSection()) {
-									request.setAttribute("tabId", new Integer(tabNum + 1).toString());
 								}
 
 								forwardPage(getServletPage(request), request, response);

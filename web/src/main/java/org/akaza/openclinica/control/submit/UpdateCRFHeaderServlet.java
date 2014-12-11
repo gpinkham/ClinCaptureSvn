@@ -132,24 +132,19 @@ public class UpdateCRFHeaderServlet extends Controller {
 		jsonObject.put("totalAnnotations", discrepancyShortcutsAnalyzer.getTotalAnnotations());
 
 		jsonObject.put("sectionTotalNew", discrepancyShortcutsAnalyzer.getSectionTotalNew());
-		jsonObject.put("firstNewDnLink", discrepancyShortcutsAnalyzer.getFirstNewDnLink());
 		jsonObject.put("nextNewDnLink", discrepancyShortcutsAnalyzer.getNextNewDnLink());
 
 		jsonObject.put("sectionTotalUpdated", discrepancyShortcutsAnalyzer.getSectionTotalUpdated());
-		jsonObject.put("firstUpdatedDnLink", discrepancyShortcutsAnalyzer.getFirstUpdatedDnLink());
 		jsonObject.put("nextUpdatedDnLink", discrepancyShortcutsAnalyzer.getNextUpdatedDnLink());
 
 		jsonObject.put("sectionTotalResolutionProposed",
 				discrepancyShortcutsAnalyzer.getSectionTotalResolutionProposed());
-		jsonObject.put("firstResolutionProposedDnLink", discrepancyShortcutsAnalyzer.getFirstResolutionProposedLink());
 		jsonObject.put("nextResolutionProposedDnLink", discrepancyShortcutsAnalyzer.getNextResolutionProposedLink());
 
 		jsonObject.put("sectionTotalClosed", discrepancyShortcutsAnalyzer.getSectionTotalClosed());
-		jsonObject.put("firstClosedDnLink", discrepancyShortcutsAnalyzer.getFirstClosedDnLink());
 		jsonObject.put("nextClosedDnLink", discrepancyShortcutsAnalyzer.getNextClosedDnLink());
 
 		jsonObject.put("sectionTotalAnnotations", discrepancyShortcutsAnalyzer.getSectionTotalAnnotations());
-		jsonObject.put("firstAnnotationDnLink", discrepancyShortcutsAnalyzer.getFirstAnnotationLink());
 		jsonObject.put("nextAnnotationDnLink", discrepancyShortcutsAnalyzer.getNextAnnotationLink());
 
 		jsonObject.put("items", jsonArray);

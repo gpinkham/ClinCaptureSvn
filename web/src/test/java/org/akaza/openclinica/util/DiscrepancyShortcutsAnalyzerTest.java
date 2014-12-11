@@ -109,7 +109,7 @@ public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 		buildAnalyzerUrl(false);
 		DiscrepancyShortcutsAnalyzer analyzer = (DiscrepancyShortcutsAnalyzer) request
 				.getAttribute("discrepancyShortcutsAnalyzer");
-		assertEquals("http://clincapture.com?eventCRFId=2&sectionId=0&tabId=1#newDn_1", analyzer.getFirstNewDnLink());
+		assertEquals("#newDn_1", analyzer.getNextNewDnLink());
 
 	}
 
@@ -118,8 +118,7 @@ public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 		buildAnalyzerUrl(true);
 		DiscrepancyShortcutsAnalyzer analyzer = (DiscrepancyShortcutsAnalyzer) request
 				.getAttribute("discrepancyShortcutsAnalyzer");
-		assertEquals("http://clincapture.com?eventCRFId=2&cw=1&sectionId=0&tabId=1#newDn_1",
-				analyzer.getFirstNewDnLink());
+		assertEquals("#newDn_1", analyzer.getNextNewDnLink());
 
 	}
 

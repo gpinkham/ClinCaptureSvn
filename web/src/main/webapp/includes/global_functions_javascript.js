@@ -2,13 +2,10 @@ var currentPopupUid;
 var subjectMatrixPopupStick;
 var popupInterval;
 var firstFormState;
-var dnShortcutAnchorsItemIds;
 var currentHighlightedShortcutAnchor;
 var currentHighlightedShortcutAnchorInd;
 var currentHighlightedShortcutAnchorCounter;
 var dnShortcutAnchors = ["newDn_", "updatedDn_", "resolutionProposedDn_", "closedDn_", "annotationDn_"];
-var dnShortcutLinks = ["dnShortcutTotalNew", "dnShortcutTotalUpdated", "dnShortcutTotalResolutionProposed", "dnShortcutTotalClosed", "dnShortcutTotalAnnotations"];
-var dnFlagImages = ["icon_Note.gif", "icon_flagYellow.gif", "icon_flagBlack.gif", "icon_flagGreen.gif", "icon_flagWhite.gif"];
 var rowHighlightTypes = {NORMAL: 0, ROWSPAN: 1, MULTIPLE: 2};
 
 var pageTitle_SMForAllOfEvents = "/ListStudySubjects";
@@ -3454,7 +3451,7 @@ function getBrowserClientHeight() {
   return v;
 }
 
-function highlightDn(id, color) {
+function highlightDn(id, color, delay) {
     var inputHolderElement = $("#itemHolderId_" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel"));
     var inputElement = inputHolderElement.find("input[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]");
     inputElement = inputElement.length == 0 ? inputHolderElement.find("select[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]") : inputElement;
@@ -3462,7 +3459,7 @@ function highlightDn(id, color) {
     if (inputElement.attr("type") != undefined && (inputElement.attr("type").toLowerCase() == "radio" || inputElement.attr("type").toLowerCase() == "checkbox")) {
         inputElement = inputElement.parent();
     }
-    inputElement.css("background-color", color);
+    setTimeout(function () { inputElement.css("background-color", color) }, delay == undefined ? 0 : parseInt(delay));
 }
 
 function resetHighlightedFieldsForDNShortcutAnchors() {
@@ -3489,7 +3486,7 @@ function highlightFirstFieldForDNShortcutAnchors(idToHighlight) {
 }
 
 function highlightFieldForDNShortcutAnchor(ind, currentElement) {
-    var firstDnLink = $(currentElement).attr("firstdnlink");
+    var delay = 0;
     var nextDnLink = $(currentElement).attr("nextdnlink");
     if (currentHighlightedShortcutAnchor != undefined) {
         highlightDn(currentHighlightedShortcutAnchor, "");
@@ -3500,21 +3497,25 @@ function highlightFieldForDNShortcutAnchor(ind, currentElement) {
     currentHighlightedShortcutAnchorCounter++;
     var sectionTotal = parseInt($(currentElement).attr("sectiontotal"));
     if (currentHighlightedShortcutAnchorCounter > sectionTotal) {
-        if (firstDnLink.startsWith("#") && firstDnLink == nextDnLink) {
+        if (nextDnLink.startsWith("#")) {
+            delay = 100;
             currentHighlightedShortcutAnchorCounter = 1;
         } else {
-            location.href = sectionTotal == 0 ? firstDnLink : nextDnLink;
+            location.href = nextDnLink;
             return;
         }
     }
     currentHighlightedShortcutAnchorInd = ind;
     var newCurrentHighlightedShortcutAnchor = dnShortcutAnchors[currentHighlightedShortcutAnchorInd] + currentHighlightedShortcutAnchorCounter;
     if (currentHighlightedShortcutAnchor != undefined && currentHighlightedShortcutAnchor != newCurrentHighlightedShortcutAnchor && $("#" + currentHighlightedShortcutAnchor).parent()[0] == $("#" + newCurrentHighlightedShortcutAnchor).parent()[0]) {
-        highlightFieldForDNShortcutAnchor(ind, currentElement);
-        return;
+        if (currentHighlightedShortcutAnchor.replace(/_.*/g,"") == newCurrentHighlightedShortcutAnchor.replace(/_.*/g,"") && $("#" + currentHighlightedShortcutAnchor).parent()[0] == $("#" + newCurrentHighlightedShortcutAnchor).parent()[0]) {
+            highlightFieldForDNShortcutAnchor(ind, currentElement);
+            return;
+        }
+        delay = 100;
     }
     currentHighlightedShortcutAnchor = newCurrentHighlightedShortcutAnchor;
-    highlightDn(currentHighlightedShortcutAnchor, "yellow");
+    highlightDn(currentHighlightedShortcutAnchor, "yellow", delay);
 }
 
 function updateCRFHeaderFunction(parametersHolder) {
@@ -3546,29 +3547,19 @@ function updateCRFHeaderFunction(parametersHolder) {
                 $("#dnShortcutTotalClosed").text(" " + jsonObject.totalClosed + " ");
                 $("#dnShortcutTotalAnnotations").text(" " + jsonObject.totalAnnotations + " ");
 
-                $("#dnShortcutTotalNew").attr("rel", jsonObject.sectionTotalNew);
                 $("#dnShortcutTotalNew").parent().attr("sectiontotal", jsonObject.sectionTotalNew);
-                $("#dnShortcutTotalNew").parent().attr("firstdnlink", jsonObject.firstNewDnLink);
                 $("#dnShortcutTotalNew").parent().attr("nextdnlink", jsonObject.nextNewDnLink);
 
-                $("#dnShortcutTotalUpdated").attr("rel", jsonObject.sectionTotalUpdated);
                 $("#dnShortcutTotalUpdated").parent().attr("sectiontotal", jsonObject.sectionTotalUpdated);
-                $("#dnShortcutTotalUpdated").parent().attr("firstdnlink", jsonObject.firstUpdatedDnLink);
                 $("#dnShortcutTotalUpdated").parent().attr("nextdnlink", jsonObject.nextUpdatedDnLink);
 
-                $("#dnShortcutTotalResolutionProposed").attr("rel", jsonObject.sectionTotalResolutionProposed);
                 $("#dnShortcutTotalResolutionProposed").parent().attr("sectiontotal", jsonObject.sectionTotalResolutionProposed);
-                $("#dnShortcutTotalResolutionProposed").parent().attr("firstdnlink", jsonObject.firstResolutionProposedDnLink);
                 $("#dnShortcutTotalResolutionProposed").parent().attr("nextdnlink", jsonObject.nextResolutionProposedDnLink);
 
-                $("#dnShortcutTotalClosed").attr("rel", jsonObject.sectionTotalClosed);
                 $("#dnShortcutTotalClosed").parent().attr("sectiontotal", jsonObject.sectionTotalClosed);
-                $("#dnShortcutTotalClosed").parent().attr("firstdnlink", jsonObject.firstClosedDnLink);
                 $("#dnShortcutTotalClosed").parent().attr("nextdnlink", jsonObject.nextClosedDnLink);
 
-                $("#dnShortcutTotalAnnotations").attr("rel", jsonObject.sectionTotalAnnotations);
                 $("#dnShortcutTotalAnnotations").parent().attr("sectiontotal", jsonObject.sectionTotalAnnotations);
-                $("#dnShortcutTotalAnnotations").parent().attr("firstdnlink", jsonObject.firstAnnotationDnLink);
                 $("#dnShortcutTotalAnnotations").parent().attr("nextdnlink", jsonObject.nextAnnotationDnLink);
 
                 if (parseInt(jsonObject.totalNew) > 0 || parseInt(jsonObject.totalUpdated) > 0 || parseInt(jsonObject.totalResolutionProposed) > 0 || parseInt(jsonObject.totalClosed) > 0 || parseInt(jsonObject.totalAnnotations) > 0) {
