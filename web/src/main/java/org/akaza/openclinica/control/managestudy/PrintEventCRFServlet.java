@@ -13,13 +13,6 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -50,7 +43,13 @@ import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class PrintEventCRFServlet extends DataEntryServlet {
 
@@ -154,7 +153,7 @@ public class PrintEventCRFServlet extends DataEntryServlet {
 					// ('false' in terms of this
 					// servlet; see PrintDataEntryServlet).
 					DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, getDataSource(),
-							getItemMetadataService(getServletContext()));
+							getDynamicsMetadataService());
 					handler.setCrfVersionId(crfVersionBean.getId());
 					handler.setEventCRFId(eventCRFId);
 					List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
@@ -193,7 +192,7 @@ public class PrintEventCRFServlet extends DataEntryServlet {
 				sectionBeans = super.getAllDisplayBeans(request);
 				request.setAttribute(SECTION_BEAN, sb);
 				DisplaySectionBean dsb = super.getDisplayBean(false, false, request, isSubmitted);
-				
+
 				PrintCRFBean printCrfBean = new PrintCRFBean();
 				printCrfBean.setAllSections(sectionBeans);
 				printCrfBean.setDisplaySectionBean(dsb);
@@ -261,7 +260,7 @@ public class PrintEventCRFServlet extends DataEntryServlet {
 	@Override
 	protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName,
 			HttpServletRequest request) {
-		
+
 		org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
 
 		// note that this step sets us up both for

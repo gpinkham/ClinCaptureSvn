@@ -13,15 +13,6 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -53,7 +44,15 @@ import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
 
@@ -170,7 +169,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
 					// ('false' in terms of this
 					// servlet; see PrintDataEntryServlet).
 					DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, getDataSource(),
-							getItemMetadataService(getServletContext()));
+							getDynamicsMetadataService());
 					handler.setCrfVersionId(crfVersionBean.getId());
 					// handler.setEventCRFId(eventCRFId);
 					List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
@@ -242,10 +241,9 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
 	}
 
 	private void checkWasPrintOpenedBefore(HttpServletRequest request) {
-		if (request.getSession().getAttribute("firstPrint")!=null){
+		if (request.getSession().getAttribute("firstPrint") != null) {
 			request.getSession().setAttribute("firstPrint", "false");
-		}
-		else{
+		} else {
 			request.getSession().setAttribute("firstPrint", "true");
 		}
 	}
@@ -328,7 +326,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
 		return formGroups;
 
 	}
-	
+
 	@Override
 	protected boolean shouldRunRules() {
 		return false;

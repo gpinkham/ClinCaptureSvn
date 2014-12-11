@@ -32,6 +32,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
@@ -73,7 +74,6 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -88,7 +88,6 @@ import java.util.Set;
 /**
  * Contains RuleSet services.
  */
-@Service
 public class RuleSetService implements RuleSetServiceInterface {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -105,6 +104,45 @@ public class RuleSetService implements RuleSetServiceInterface {
 	private String contextPath;
 	private DynamicsMetadataService dynamicsMetadataService;
 	private RuleActionRunLogDao ruleActionRunLogDao;
+
+	/**
+	 * RuleSetService constructor.
+	 * 
+	 * @param dataSource
+	 *            DataSource
+	 * @param dynamicsItemFormMetadataDao
+	 *            DynamicsItemFormMetadataDao
+	 * @param dynamicsItemGroupMetadataDao
+	 *            DynamicsItemGroupMetadataDao
+	 * @param mailSender
+	 *            JavaMailSenderImpl
+	 * @param ruleDao
+	 *            RuleDao
+	 * @param ruleSetDao
+	 *            RuleSetDao
+	 * @param ruleSetRuleDao
+	 *            RuleSetRuleDao
+	 * @param ruleSetAuditDao
+	 *            RuleSetAuditDao
+	 * @param ruleActionRunLogDao
+	 *            RuleActionRunLogDao
+	 */
+	public RuleSetService(DataSource dataSource, DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao,
+			DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao, JavaMailSenderImpl mailSender, RuleDao ruleDao,
+			RuleSetDao ruleSetDao, RuleSetRuleDao ruleSetRuleDao, RuleSetAuditDao ruleSetAuditDao,
+			RuleActionRunLogDao ruleActionRunLogDao) {
+		dynamicsMetadataService = new DynamicsMetadataService(dynamicsItemFormMetadataDao,
+				dynamicsItemGroupMetadataDao, dataSource);
+		this.expressionService = dynamicsMetadataService.getExpressionService();
+		this.ruleDao = ruleDao;
+		this.ruleSetDao = ruleSetDao;
+		this.dataSource = dataSource;
+		this.mailSender = mailSender;
+		this.ruleSetRuleDao = ruleSetRuleDao;
+		this.ruleSetAuditDao = ruleSetAuditDao;
+		this.ruleActionRunLogDao = ruleActionRunLogDao;
+		this.dynamicsItemFormMetadataDao = dynamicsItemFormMetadataDao;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -248,7 +286,6 @@ public class RuleSetService implements RuleSetServiceInterface {
 		ruleSets = filterRuleSetsByGroupOrdinal(ruleSets);
 		CrfBulkRuleRunner ruleRunner = new CrfBulkRuleRunner(dataSource, requestURLMinusServletPath, contextPath,
 				mailSender);
-		dynamicsMetadataService.setExpressionService(getExpressionService());
 		ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
 		ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
 		return ruleRunner.runRulesBulk(ruleSets, executionMode, currentStudy, null, ub);
@@ -272,7 +309,6 @@ public class RuleSetService implements RuleSetServiceInterface {
 		ruleSets = filterRuleSetsByGroupOrdinal(ruleSets);
 		CrfBulkRuleRunner ruleRunner = new CrfBulkRuleRunner(dataSource, requestURLMinusServletPath, contextPath,
 				mailSender);
-		dynamicsMetadataService.setExpressionService(getExpressionService());
 		ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
 		ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
 		return ruleRunner.runRulesBulk(ruleSets, executionMode, currentStudy, null, ub);
@@ -288,7 +324,6 @@ public class RuleSetService implements RuleSetServiceInterface {
 		ruleSets = filterRuleSetsByGroupOrdinal(ruleSets);
 		RuleSetBulkRuleRunner ruleRunner = new RuleSetBulkRuleRunner(dataSource, requestURLMinusServletPath,
 				contextPath, mailSender);
-		dynamicsMetadataService.setExpressionService(getExpressionService());
 		ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
 		ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
 		ExecutionMode executionMode = dryRun ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE;
@@ -303,7 +338,6 @@ public class RuleSetService implements RuleSetServiceInterface {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		DataEntryRuleRunner ruleRunner = new DataEntryRuleRunner(dataSource, requestURLMinusServletPath, contextPath,
 				mailSender, ecb);
-		dynamicsMetadataService.setExpressionService(getExpressionService());
 		ruleRunner.setPhase(phase);
 		ruleRunner.setRequest(request);
 		ruleRunner.setCurrentStudy(currentStudy);
@@ -339,7 +373,6 @@ public class RuleSetService implements RuleSetServiceInterface {
 			StudyBean study, UserAccountBean ub, ExecutionMode executionMode) {
 		ImportDataRuleRunner ruleRunner = new ImportDataRuleRunner(dataSource, requestURLMinusServletPath, contextPath,
 				mailSender);
-		dynamicsMetadataService.setExpressionService(getExpressionService());
 		ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
 		ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
 
@@ -932,11 +965,6 @@ public class RuleSetService implements RuleSetServiceInterface {
 		return new ItemFormMetadataDAO(dataSource);
 	}
 
-	private ExpressionService getExpressionService() {
-		expressionService = this.expressionService != null ? expressionService : new ExpressionService(dataSource);
-		return expressionService;
-	}
-
 	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
 		return new StudyEventDefinitionDAO(dataSource);
 	}
@@ -951,6 +979,14 @@ public class RuleSetService implements RuleSetServiceInterface {
 
 	private CRFVersionDAO getCrfVersionDao() {
 		return new CRFVersionDAO(dataSource);
+	}
+
+	private ExpressionService getExpressionService() {
+		return expressionService;
+	}
+
+	public void setExpressionService(ExpressionService expressionService) {
+		this.expressionService = expressionService;
 	}
 
 	public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {

@@ -14,6 +14,7 @@
 package org.akaza.openclinica.web.job;
 
 import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.util.RuleSetServiceUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -55,6 +56,7 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.ImportSummaryInfo;
@@ -206,9 +208,10 @@ public class ImportSpringJob extends QuartzJobBean {
 					.get("applicationContext");
 			DataSource dataSource = (DataSource) appContext.getBean("dataSource");
 			mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
-			RuleSetServiceInterface ruleSetService = (RuleSetServiceInterface) appContext.getBean("ruleSetService");
 			ConfigurationDao configurationDao = (ConfigurationDao) appContext.getBean("configurationDao");
 			studySubjectIdService = (StudySubjectIdService) appContext.getBean("studySubjectIdServiceImpl");
+
+			RuleSetService ruleSetService = RuleSetServiceUtil.createRuleSetService(appContext);
 
 			sdao = new StudyDAO(dataSource);
 			ecdao = new EventCRFDAO(dataSource);
@@ -456,12 +459,12 @@ public class ImportSpringJob extends QuartzJobBean {
 					Object[] arguments = { f.getName(), errors.size() };
 					auditMsg.append(mf.format(arguments) + "<br/>");
 					msg.append(mf.format(arguments) + "<br/>");
-					auditMsg.append(respage.getString("you_can_see_the_log_file") + " <a href='" + SQLInitServlet.getSystemURL()
-							+ "ViewLogMessage?n=" + generalFileDir + f.getName() + "&tn=" + triggerBean.getName()
-							+ "&gn=1'>here</a>.<br/>");
-					msg.append(respage.getString("you_can_see_the_log_file") + " <a href='" + SQLInitServlet.getSystemURL()
-							+ "ViewLogMessage?n=" + generalFileDir + f.getName() + "&tn=" + triggerBean.getName()
-							+ "&gn=1'>here</a>.<br/>");
+					auditMsg.append(respage.getString("you_can_see_the_log_file") + " <a href='"
+							+ SQLInitServlet.getSystemURL() + "ViewLogMessage?n=" + generalFileDir + f.getName()
+							+ "&tn=" + triggerBean.getName() + "&gn=1'>here</a>.<br/>");
+					msg.append(respage.getString("you_can_see_the_log_file") + " <a href='"
+							+ SQLInitServlet.getSystemURL() + "ViewLogMessage?n=" + generalFileDir + f.getName()
+							+ "&tn=" + triggerBean.getName() + "&gn=1'>here</a>.<br/>");
 					continue;
 				} else {
 					msg.append(respage.getString("passed_study_check") + "<br/>");

@@ -15,6 +15,8 @@
 
 package com.clinovo.service;
 
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -34,11 +36,14 @@ public interface ReportCRFService {
 	 *            EventDefinitionCRF Id to be used
 	 * @param locale
 	 *            Locale to be used
+	 * @param dynamicsMetadataService
+	 *            DynamicsMetadataService
 	 * @return path for file created
 	 * @throws Exception
 	 *             thrown in case of failure
 	 */
-	String createPDFReport(int eventCRFId, Locale locale) throws Exception;
+	String createPDFReport(int eventCRFId, Locale locale, DynamicsMetadataService dynamicsMetadataService)
+			throws Exception;
 
 	/**
 	 * 

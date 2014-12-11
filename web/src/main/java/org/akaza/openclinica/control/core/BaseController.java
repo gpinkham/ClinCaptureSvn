@@ -9,6 +9,7 @@ import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.service.UserAccountService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
+import com.clinovo.util.RuleSetServiceUtil;
 import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -26,6 +27,8 @@ import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.MeasurementUnitDao;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
@@ -55,6 +58,7 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
@@ -64,6 +68,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.ServletContextAware;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import javax.servlet.ServletContext;
@@ -92,6 +98,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public static final String USER_BEAN_NAME = "userBean";
 	public static final String ERRORS_HOLDER = "errors_holder";
 	public static final String SESSION_MANAGER = "sessionManager";
+	public static final String DYNAMICS_METADATA_SERVICE = "dynamicsMetadataService";
 
 	public static final String BR = "<br/>";
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
@@ -162,6 +169,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private ServletContext servletContext;
 
 	@Autowired
+	private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
+	@Autowired
+	private DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
+	@Autowired
 	private SessionLocaleResolver localeResolver;
 	@Autowired
 	private DataSource dataSource;
@@ -187,8 +198,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private RuleSetAuditDao ruleSetAuditDao;
 	@Autowired
 	private RuleSetRuleAuditDao ruleSetRuleAuditDao;
-	@Autowired
-	private RuleSetService ruleSetService;
 	@Autowired
 	private StudyConfigService studyConfigService;
 	@Autowired
@@ -291,6 +300,23 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return (StudyUserRoleBean) request.getSession().getAttribute(USER_ROLE);
 	}
 
+	public DynamicsMetadataService getDynamicsMetadataService() {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
+		DynamicsMetadataService dynamicsMetadataService = (DynamicsMetadataService) request
+				.getAttribute(DYNAMICS_METADATA_SERVICE);
+		if (dynamicsMetadataService == null) {
+			dynamicsMetadataService = new DynamicsMetadataService(getDynamicsItemFormMetadataDao(),
+					getDynamicsItemGroupMetadataDao(), getDataSource());
+			request.setAttribute(DYNAMICS_METADATA_SERVICE, dynamicsMetadataService);
+		}
+		return dynamicsMetadataService;
+	}
+
+	public RuleSetService getRuleSetService() {
+		return RuleSetServiceUtil.getRuleSetService();
+	}
+
 	public DataSource getDataSource() {
 		return dataSource;
 	}
@@ -305,10 +331,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public SDVUtil getSDVUtil() {
 		return sdvUtil;
-	}
-
-	public RuleSetService getRuleSetService() {
-		return ruleSetService;
 	}
 
 	public CoreResources getCoreResources() {
@@ -513,5 +535,13 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public SessionLocaleResolver getLocaleResolver() {
 		return localeResolver;
+	}
+
+	public DynamicsItemGroupMetadataDao getDynamicsItemGroupMetadataDao() {
+		return dynamicsItemGroupMetadataDao;
+	}
+
+	public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
+		return dynamicsItemFormMetadataDao;
 	}
 }

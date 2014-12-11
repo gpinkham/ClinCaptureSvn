@@ -20,12 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.util.ArrayList;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -36,7 +30,6 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -50,6 +43,14 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
+
+/**
+ * MarkEventCRFCompleteServlet.
+ */
 @SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class MarkEventCRFCompleteServlet extends Controller {
@@ -65,10 +66,10 @@ public class MarkEventCRFCompleteServlet extends Controller {
 	public static final String BEAN_DISPLAY = "toc";
 
 	private EventCRFBean getEventCRFBean(HttpServletRequest request) {
-        FormProcessor fp = new FormProcessor(request);
+		FormProcessor fp = new FormProcessor(request);
 		int eventCRFId = fp.getInt(INPUT_EVENT_CRF_ID);
 
-        EventCRFDAO ecdao = getEventCRFDAO();
+		EventCRFDAO ecdao = getEventCRFDAO();
 		return (EventCRFBean) ecdao.findByPK(eventCRFId);
 	}
 
@@ -80,19 +81,19 @@ public class MarkEventCRFCompleteServlet extends Controller {
 	}
 
 	private EventDefinitionCRFBean getEventDefinitionCRFBean(EventCRFBean ecb) {
-        EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
+		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 		return edcdao.findForStudyByStudyEventIdAndCRFVersionId(ecb.getStudyEventId(), ecb.getCRFVersionId());
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 
-        FormProcessor fp = new FormProcessor(request);
+		FormProcessor fp = new FormProcessor(request);
 
-        EventCRFBean ecb = getEventCRFBean(request);
-        EventDefinitionCRFBean edcb = getEventDefinitionCRFBean(ecb);
+		EventCRFBean ecb = getEventCRFBean(request);
+		EventDefinitionCRFBean edcb = getEventDefinitionCRFBean(ecb);
 		DataEntryStage stage = ecb.getStage();
 
 		request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, ecb);
@@ -119,13 +120,13 @@ public class MarkEventCRFCompleteServlet extends Controller {
 		}
 
 		if (!fp.isSubmitted()) {
+			DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 			DisplayTableOfContentsBean toc = getDisplayBean(ecb);
-			toc = getDisplayBeanWithShownSections(toc, (DynamicsMetadataService) SpringServletAccess
-					.getApplicationContext(getServletContext()).getBean("dynamicsMetadataService"));
+			toc = getDisplayBeanWithShownSections(toc, dynamicsMetadataService);
 			request.setAttribute(BEAN_DISPLAY, toc);
 
-            StudyInfoPanel panel = getStudyInfoPanel(request);
-            panel.reset();
+			StudyInfoPanel panel = getStudyInfoPanel(request);
+			panel.reset();
 			panel.setStudyInfoShown(false);
 			panel.setOrderedData(true);
 			setToPanel(resword.getString("subject"), toc.getStudySubject().getLabel(), request);
@@ -162,7 +163,7 @@ public class MarkEventCRFCompleteServlet extends Controller {
 					ecb.setDateValidateCompleted(new Date());
 					ide = false;
 				}
-                EventCRFDAO ecdao = getEventCRFDAO();
+				EventCRFDAO ecdao = getEventCRFDAO();
 				ecb.setStatus(newStatus);
 				ecb = (EventCRFBean) ecdao.update(ecb);
 				ecdao.markComplete(ecb, ide);
@@ -206,16 +207,17 @@ public class MarkEventCRFCompleteServlet extends Controller {
 	}
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (currentRole.equals(Role.SYSTEM_ADMINISTRATOR) || currentRole.equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.equals(Role.STUDY_DIRECTOR)) {
 			return;
 		}
 
-        EventCRFBean ecb = getEventCRFBean(request);
+		EventCRFBean ecb = getEventCRFBean(request);
 
 		Role r = currentRole.getRole();
 		if (ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
@@ -226,7 +228,8 @@ public class MarkEventCRFCompleteServlet extends Controller {
 						resexception.getString("not_study_owner"), "1");
 			}
 		} else if (ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-			if (ecb.getValidatorId() != ub.getId() && !r.equals(Role.STUDY_ADMINISTRATOR) && !r.equals(Role.STUDY_DIRECTOR)) {
+			if (ecb.getValidatorId() != ub.getId() && !r.equals(Role.STUDY_ADMINISTRATOR)
+					&& !r.equals(Role.STUDY_DIRECTOR)) {
 				request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, ecb);
 				addPageMessage(respage.getString("not_mark_CRF_complete7"), request);
 				throw new InsufficientPermissionException(Page.TABLE_OF_CONTENTS_SERVLET,

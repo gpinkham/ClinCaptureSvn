@@ -14,21 +14,76 @@
  *******************************************************************************/
 package com.clinovo.service;
 
-import java.util.ArrayList;
-
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
 
+import java.util.ArrayList;
+
+/**
+ * DataEntryService interface.
+ */
 public interface DataEntryService {
 
-	public DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems, boolean isSubmitted, Page servletPage,
-			StudyBean study, EventCRFBean ecb, SectionBean sb) throws Exception;
+	/**
+	 * Method that builds and returns DisplaySectionBean.
+	 *
+	 * @param hasGroup
+	 *            boolean
+	 * @param includeUngroupedItems
+	 *            boolean
+	 * @param isSubmitted
+	 *            boolean
+	 * @param servletPage
+	 *            Page
+	 * @param study
+	 *            StudyBean
+	 * @param ecb
+	 *            EventCRFBean
+	 * @param sb
+	 *            SectionBean
+	 * @param dynamicsMetadataService
+	 *            DynamicsMetadataService
+	 * @return DisplaySectionBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems, boolean isSubmitted,
+			Page servletPage, StudyBean study, EventCRFBean ecb, SectionBean sb,
+			DynamicsMetadataService dynamicsMetadataService) throws Exception;
 
-	public boolean shouldLoadDBValues(DisplayItemBean dib, Page servletPage);
-	
-	public ArrayList<DisplaySectionBean> getAllDisplayBeans(ArrayList<SectionBean> allSectionBeans, EventCRFBean ecb, StudyBean study, Page servletPage) throws Exception;
+	/**
+	 * Method that checks that values should be loaded from DB.
+	 *
+	 * @param dib
+	 *            DisplayItemBean
+	 * @param servletPage
+	 *            Page
+	 * @return boolean
+	 */
+	boolean shouldLoadDBValues(DisplayItemBean dib, Page servletPage);
+
+	/**
+	 * Method returns list of DisplaySectionBean.
+	 *
+	 * @param allSectionBeans
+	 *            ArrayList<SectionBean>
+	 * @param ecb
+	 *            EventCRFBean
+	 * @param study
+	 *            StudyBean
+	 * @param servletPage
+	 *            Page
+	 * @param dynamicsMetadataService
+	 *            DynamicsMetadataService
+	 * @return ArrayList<DisplaySectionBean>
+	 * @throws Exception
+	 *             an Exception
+	 */
+	ArrayList<DisplaySectionBean> getAllDisplayBeans(ArrayList<SectionBean> allSectionBeans, EventCRFBean ecb,
+			StudyBean study, Page servletPage, DynamicsMetadataService dynamicsMetadataService) throws Exception;
 }

@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.controller;
 
+import com.clinovo.util.RuleSetServiceUtil;
 import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -29,7 +30,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ import java.util.Map;
 @Controller("studyModuleController")
 @RequestMapping("/studymodule")
 @SessionAttributes("studyModuleStatus")
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
 public class StudyModuleController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -67,9 +67,6 @@ public class StudyModuleController {
 
 	@Autowired
 	private StudyModuleStatusDao studyModuleStatusDao;
-
-	@Autowired
-	private RuleSetServiceInterface ruleSetService;
 
 	@Autowired
 	private BasicDataSource dataSource;
@@ -119,7 +116,7 @@ public class StudyModuleController {
 
 		int subjectGroupCount = studyGroupClassDao.findAllByStudy(currentStudy).size();
 
-		int ruleCount = ruleSetService.getCountByStudy(currentStudy);
+		int ruleCount = RuleSetServiceUtil.getRuleSetService().getCountByStudy(currentStudy);
 
 		int siteCount = studyDao.findOlnySiteIdsByStudy(currentStudy).size();
 		int userCount = userDao.findAllUsersByStudy(currentStudy.getId()).size();

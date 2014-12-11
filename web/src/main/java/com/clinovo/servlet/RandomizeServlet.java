@@ -111,12 +111,10 @@ public class RandomizeServlet extends Controller {
 						randomize(request, writer);
 					}
 				} else {
-					throw new RandomizationException(
-							resexception.getString("crf_is_not_complete"));
+					throw new RandomizationException(resexception.getString("crf_is_not_complete"));
 				}
 			} else {
-				throw new RandomizationException(
-						resexception.getString("subject_label_and_id_not_equals"));
+				throw new RandomizationException(resexception.getString("subject_label_and_id_not_equals"));
 			}
 		} catch (Exception ex) {
 			log.error("Randomization Error: {0}", ex.getMessage());
@@ -187,8 +185,7 @@ public class RandomizeServlet extends Controller {
 		if (RandomizationUtil.isConfiguredTrialIdValid(configuredTrialId)) {
 			// Trial Id should be configured in one place
 			if (RandomizationUtil.isTrialIdDoubleConfigured(configuredTrialId, crfConfiguredTrialId)) {
-				throw new RandomizationException(
-						resexception.getString("trial_id_not_configured_correctly"));
+				throw new RandomizationException(resexception.getString("trial_id_not_configured_correctly"));
 			} else {
 				trialId = configuredTrialId;
 			}

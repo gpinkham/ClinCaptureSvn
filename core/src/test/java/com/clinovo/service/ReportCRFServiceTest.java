@@ -17,35 +17,38 @@ package com.clinovo.service;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 public class ReportCRFServiceTest extends DefaultAppContextTest {
 
 	private int eventCRFId;
 	private Locale testLocale;
+	private DynamicsMetadataService dynamicsMetadataService;
 
 	@Before
 	public void setUp() {
 		eventCRFId = 1;
 		testLocale = new Locale(locale);
-		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(testLocale);
 		reportCRFService.setUrlPath("");
 		reportCRFService.setSysPath("");
 		reportCRFService.setDataPath("");
-		reportCRFService.setResword(resword);
+		reportCRFService.setResword(ResourceBundleProvider.getWordsBundle(testLocale));
+		dynamicsMetadataService = new DynamicsMetadataService(dynamicsItemFormMetadataDao,
+				dynamicsItemGroupMetadataDao, dataSource);
 	}
 
 	@Test
 	public void testCreatePDFReportReturnsNotNull() throws Exception {
-		assertNotNull(reportCRFService.createPDFReport(eventCRFId, testLocale));
+		assertNotNull(reportCRFService.createPDFReport(eventCRFId, testLocale, dynamicsMetadataService));
 	}
 
 	@Test
 	public void testCreatePDFReportReturnsCorrectFileName() throws Exception {
-		assertEquals("Agent_Administration_v2.0_ssID1.pdf", reportCRFService.createPDFReport(1, testLocale));
+		assertEquals("Agent_Administration_v2.0_ssID1.pdf",
+				reportCRFService.createPDFReport(1, testLocale, dynamicsMetadataService));
 	}
 }

@@ -31,6 +31,8 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -56,17 +58,21 @@ import java.util.Iterator;
 import java.util.List;
 
 @Service("dataEntryService")
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
 public class DataEntryServiceImpl implements DataEntryService {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
 	@Autowired
 	private DataSource dataSource;
 	@Autowired
-	private DynamicsMetadataService dynamicsMetadataService;
+	private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
+	@Autowired
+	private DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
 
 	public DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems, boolean isSubmitted,
-			Page servletPage, StudyBean study, EventCRFBean ecb, SectionBean sb) throws Exception {
+			Page servletPage, StudyBean study, EventCRFBean ecb, SectionBean sb,
+			DynamicsMetadataService dynamicsMetadataService) throws Exception {
 		DisplaySectionBean section = new DisplaySectionBean();
 
 		// Find out whether there are ungrouped items in this section
@@ -83,6 +89,7 @@ public class DataEntryServiceImpl implements DataEntryService {
 		logger.trace("eventDefinitionCRFId " + eventDefinitionCRFId);
 		// Use this class to find out whether there are ungrouped items in this
 		// section
+
 		FormBeanUtil formBeanUtil = new FormBeanUtil();
 		List<DisplayItemGroupBean> itemGroups = new ArrayList<DisplayItemGroupBean>();
 		if (hasGroup) {
@@ -137,7 +144,7 @@ public class DataEntryServiceImpl implements DataEntryService {
 		// get all the parent display item beans not in group
 		logger.debug("Entering getParentDisplayItems::: Thread is? " + Thread.currentThread());
 		ArrayList displayItems = getParentDisplayItems(hasGroup, sb, edcb, idao, ifmdao, iddao, ecb, hasUngroupedItems,
-				Page.isDDEServletPage(servletPage));
+				Page.isDDEServletPage(servletPage), dynamicsMetadataService);
 		logger.debug("Entering getParentDisplayItems::: Done and Thread is? " + Thread.currentThread());
 
 		logger.debug("just ran get parent display, has group " + hasGroup + " has ungrouped " + hasUngroupedItems);
@@ -147,7 +154,7 @@ public class DataEntryServiceImpl implements DataEntryService {
 		// now get the child DisplayItemBeans
 		for (int i = 0; i < displayItems.size(); i++) {
 			DisplayItemBean dib = (DisplayItemBean) displayItems.get(i);
-			dib.setChildren(getChildrenDisplayItems(dib, edcb, ecb, servletPage));
+			dib.setChildren(getChildrenDisplayItems(dib, edcb, ecb, servletPage, dynamicsMetadataService));
 
 			// TODO use the setData command here to make sure we get a value?
 			// On Submition of the Admin Editing form the loadDBValue does not required
@@ -221,7 +228,7 @@ public class DataEntryServiceImpl implements DataEntryService {
 	 */
 	private ArrayList getParentDisplayItems(boolean hasGroup, SectionBean sb, EventDefinitionCRFBean edcb,
 			ItemDAO idao, ItemFormMetadataDAO ifmdao, ItemDataDAO iddao, EventCRFBean ecb, boolean hasUngroupedItems,
-			boolean isDDEPage) throws Exception {
+			boolean isDDEPage, DynamicsMetadataService dynamicsMetadataService) throws Exception {
 		ArrayList answer = new ArrayList();
 
 		// DisplayItemBean objects are composed of an ItemBean, ItemDataBean and
@@ -320,7 +327,7 @@ public class DataEntryServiceImpl implements DataEntryService {
 	 *         sorted by column number (ascending), then ordinal (ascending).
 	 */
 	private ArrayList getChildrenDisplayItems(DisplayItemBean parent, EventDefinitionCRFBean edcb, EventCRFBean ecb,
-			Page servletPage) {
+			Page servletPage, DynamicsMetadataService dynamicsMetadataService) {
 		boolean isDDEPage = Page.isDDEServletPage(servletPage);
 		ArrayList answer = new ArrayList();
 		int parentId = parent.getItem().getId();
@@ -378,7 +385,7 @@ public class DataEntryServiceImpl implements DataEntryService {
 	 *            TODO
 	 */
 	public ArrayList getAllDisplayBeans(ArrayList<SectionBean> allSectionBeans, EventCRFBean ecb, StudyBean study,
-			Page servletPage) throws Exception {
+			Page servletPage, DynamicsMetadataService dynamicsMetadataService) throws Exception {
 		ArrayList<DisplaySectionBean> sections = new ArrayList<DisplaySectionBean>();
 		SectionDAO sdao = new SectionDAO(dataSource);
 		ItemDataDAO iddao = new ItemDataDAO(dataSource);
@@ -418,7 +425,7 @@ public class DataEntryServiceImpl implements DataEntryService {
 
 			// get all the display item beans
 			ArrayList displayItems = getParentDisplayItems(false, sb, edcb, idao, ifmdao, iddao, ecb, false,
-					Page.isDDEServletPage(servletPage));
+					Page.isDDEServletPage(servletPage), dynamicsMetadataService);
 
 			logger.debug("222 just ran get parent display, has group " + " FALSE has ungrouped FALSE");
 			// now sort them by ordinal
@@ -427,7 +434,7 @@ public class DataEntryServiceImpl implements DataEntryService {
 			// now get the child DisplayItemBeans
 			for (int i = 0; i < displayItems.size(); i++) {
 				DisplayItemBean dib = (DisplayItemBean) displayItems.get(i);
-				dib.setChildren(getChildrenDisplayItems(dib, edcb, ecb, servletPage));
+				dib.setChildren(getChildrenDisplayItems(dib, edcb, ecb, servletPage, dynamicsMetadataService));
 
 				if (shouldLoadDBValues(dib, servletPage)) {
 					logger.trace("should load db values is true, set value");

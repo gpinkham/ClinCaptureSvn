@@ -20,12 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -34,6 +28,11 @@ import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system and what is not.
@@ -48,14 +47,16 @@ public class VerifyImportedRuleServlet extends Controller {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String action = request.getParameter("action");
 		if ("confirm".equalsIgnoreCase(action)) {
-			RulesPostImportContainer rulesContainer = (RulesPostImportContainer) request.getSession().getAttribute("importedData");
+			RulesPostImportContainer rulesContainer = (RulesPostImportContainer) request.getSession().getAttribute(
+					"importedData");
 			logger.info("Size of ruleDefs : " + rulesContainer.getRuleDefs().size());
 			logger.info("Size of ruleSets : " + rulesContainer.getRuleSets().size());
 			forwardPage(Page.VERIFY_RULES_IMPORT, request, response);
 		}
 
 		if ("save".equalsIgnoreCase(action)) {
-			RulesPostImportContainer rulesContainer = (RulesPostImportContainer) request.getSession().getAttribute("importedData");
+			RulesPostImportContainer rulesContainer = (RulesPostImportContainer) request.getSession().getAttribute(
+					"importedData");
 			getRuleSetService().saveImport(rulesContainer);
 			MessageFormat mf = new MessageFormat("");
 			mf.applyPattern(resword.getString("successful_rule_upload"));
@@ -65,14 +66,16 @@ public class VerifyImportedRuleServlet extends Controller {
 					rulesContainer.getValidRuleSetDefs().size() + rulesContainer.getDuplicateRuleSetDefs().size() };
 			addPageMessage(mf.format(arguments), request);
 			ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
-            request.getSession().setAttribute("pageMessages", pageMessages);
+			request.getSession().setAttribute("pageMessages", pageMessages);
 			response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
 		}
 	}
+
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -84,8 +87,9 @@ public class VerifyImportedRuleServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 }

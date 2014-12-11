@@ -13,15 +13,6 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -53,7 +44,15 @@ import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class PrintAllEventCRFServlet extends DataEntryServlet {
 
@@ -165,7 +164,7 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
 					// servlet; see PrintDataEntryServlet).
 
 					DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, getDataSource(),
-							getItemMetadataService(getServletContext()));
+							getDynamicsMetadataService());
 					handler.setCrfVersionId(crfVersionBean.getId());
 					// handler.setEventCRFId(eventCRFId);
 					List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();

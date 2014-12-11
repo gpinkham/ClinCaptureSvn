@@ -42,6 +42,8 @@ import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -52,6 +54,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -81,7 +84,7 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.type;
  * 
  */
 @Service("reportCRFService")
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({ "unchecked", "unused" })
 public class ReportCRFServiceImpl implements ReportCRFService {
 	@Autowired
 	private DataSource dataSource;
@@ -89,6 +92,10 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 	private DataEntryService dataEntryService;
 	@Autowired
 	private StudyConfigService studyConfigService;
+	@Autowired
+	private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
+	@Autowired
+	private DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
 
 	private ResourceBundle resword;
 	private String urlPath;
@@ -104,8 +111,9 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String createPDFReport(int eventCRFId, Locale locale) throws Exception {
-		return createReport(eventCRFId, locale, ".pdf");
+	public String createPDFReport(int eventCRFId, Locale locale, DynamicsMetadataService dynamicsMetadataService)
+			throws Exception {
+		return createReport(eventCRFId, locale, ".pdf", dynamicsMetadataService);
 	}
 
 	/**
@@ -117,11 +125,14 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 	 *            Locale to be used
 	 * @param fileExt
 	 *            File extension of report
+	 * @param dynamicsMetadataService
+	 *            DynamicsMetadataService
 	 * @return String representing full path to report file
 	 * @throws Exception
 	 *             Thrown in case of failure
 	 */
-	private String createReport(int eventCRFId, Locale locale, String fileExt) throws Exception {
+	private String createReport(int eventCRFId, Locale locale, String fileExt,
+			DynamicsMetadataService dynamicsMetadataService) throws Exception {
 		if (eventCRFId == 0) {
 			return "";
 		}
@@ -165,7 +176,7 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 
 		// Get the section beans from dataEntryService
 		sectionBeans = dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study,
-				Page.VIEW_SECTION_DATA_ENTRY_SERVLET);
+				Page.VIEW_SECTION_DATA_ENTRY_SERVLET, dynamicsMetadataService);
 		String titleText = cb.getName() + " " + crfVerBean.getName();
 		String reportFilePath = dataPath + (titleText + " " + ssubj.getLabel()).replaceAll("( |/|\\\\)", "_");
 

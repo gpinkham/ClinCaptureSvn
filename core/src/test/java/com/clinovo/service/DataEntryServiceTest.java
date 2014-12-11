@@ -24,20 +24,32 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 
 @SuppressWarnings("unchecked")
 public class DataEntryServiceTest extends DefaultAppContextTest {
+
+	private DynamicsMetadataService dynamicsMetadataService;
+
+	@Before
+	public void setUp() throws Exception {
+		dynamicsMetadataService = new DynamicsMetadataService(dynamicsItemFormMetadataDao,
+				dynamicsItemGroupMetadataDao, dataSource);
+	}
+
 	@Test
 	public void testGetAllDisplayBeansReturnsNotNull() throws Exception {
 		SectionDAO sdao = new SectionDAO(getDataSource());
 		ArrayList<SectionBean> allSectionBeans = sdao.findAllByCRFVersionId(1);
 		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		StudyBean study = (StudyBean) studyDAO.findByPK(1);
-		assertNotNull(dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study, Page.INITIAL_DATA_ENTRY_SERVLET));
+		assertNotNull(dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study, Page.INITIAL_DATA_ENTRY_SERVLET,
+				dynamicsMetadataService));
 	}
 
 	@Test
@@ -46,7 +58,7 @@ public class DataEntryServiceTest extends DefaultAppContextTest {
 		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		StudyBean study = (StudyBean) studyDAO.findByPK(1);
 		assertEquals(3, (dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study,
-				Page.INITIAL_DATA_ENTRY_SERVLET).size()));
+				Page.INITIAL_DATA_ENTRY_SERVLET, dynamicsMetadataService).size()));
 	}
 
 	@Test
@@ -102,7 +114,7 @@ public class DataEntryServiceTest extends DefaultAppContextTest {
 		items.add(ib);
 		sb.setItems(items);
 		DisplaySectionBean dsb = dataEntryService.getDisplayBean(hasGroup, includeUngroupedItems, isSubmitted,
-				servletPage, study, ecb, sb);
+				servletPage, study, ecb, sb, dynamicsMetadataService);
 		assertNotNull(dsb);
 	}
 }

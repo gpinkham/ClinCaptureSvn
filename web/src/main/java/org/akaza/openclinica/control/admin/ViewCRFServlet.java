@@ -29,7 +29,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.core.Controller;
-
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -39,6 +38,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -153,8 +153,9 @@ public class ViewCRFServlet extends Controller {
 		for (CRFVersionBean versionBean : versions) {
 			hm.put(versionBean, new ArrayList<TableColumnHolder>());
 		}
-		List<RuleSetBean> ruleSets = getRuleSetService().getRuleSetsByCrfAndStudy(crf, currentStudy);
-		ruleSets = getRuleSetService().filterByStatusEqualsAvailable(ruleSets);
+		RuleSetService ruleSetService = getRuleSetService();
+		List<RuleSetBean> ruleSets = ruleSetService.getRuleSetsByCrfAndStudy(crf, currentStudy);
+		ruleSets = ruleSetService.filterByStatusEqualsAvailable(ruleSets);
 		for (RuleSetBean ruleSetBean : ruleSets) {
 			if (ruleSetBean.getCrfVersion() == null) {
 				for (CRFVersionBean key : hm.keySet()) {

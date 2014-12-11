@@ -20,13 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -45,6 +38,12 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
@@ -67,7 +66,7 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 
 		FormProcessor fp = new FormProcessor(request);
 		boolean isDesigner = false;
-        boolean showMoreLink;
+		boolean showMoreLink;
 		if (fp.getString("showMoreLink").equals("")) {
 			showMoreLink = true;
 		} else {
@@ -79,7 +78,7 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void createStudyEventForInfoPanel(HttpServletRequest request) {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		ItemDAO itemdao = getItemDAO();
@@ -114,8 +113,9 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 
 	}
 
-	private void createTable(HttpServletRequest request, HttpServletResponse response, boolean showMoreLink, boolean isDesigner) {
-        StudyBean currentStudy = getCurrentStudy(request);
+	private void createTable(HttpServletRequest request, HttpServletResponse response, boolean showMoreLink,
+			boolean isDesigner) {
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		log.debug("Creating table");
 
@@ -127,7 +127,7 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 
 		// Datasource needed for pulling extra model objects from db
 		factory.setDataSource(getDataSource());
-		
+
 		factory.setCurrentUser(((UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME)));
 
 		String ruleAssignmentsHtml = factory.createTable(request, response).render();
@@ -161,7 +161,7 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
 			return Controller.ADMIN_SERVLET_CODE;
 		} else {
@@ -170,9 +170,10 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 	}
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -181,8 +182,9 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
@@ -207,6 +209,7 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 	@Override
 	protected String getSavedUrl(String key, HttpServletRequest request) {
 		String savedUrl = (String) request.getSession().getAttribute(key);
-		return savedUrl == null ? savedUrl : savedUrl.replace("&ruleAssignments_e_=pdf", "").replace("&ruleAssignments_e_=jexcel", "");
+		return savedUrl == null ? savedUrl : savedUrl.replace("&ruleAssignments_e_=pdf", "").replace(
+				"&ruleAssignments_e_=jexcel", "");
 	}
 }

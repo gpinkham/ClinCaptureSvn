@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.controller;
 
+import com.clinovo.util.RuleSetServiceUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.odm.AdminDataReportBean;
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
@@ -46,7 +47,6 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.joda.time.DateTime;
@@ -101,7 +101,6 @@ public class RuleController {
 	@Autowired
 	private BasicDataSource dataSource;
 	private RuleSetRuleDao ruleSetRuleDao;
-	private RuleSetServiceInterface ruleSetService;
 	private MessageSource messageSource;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	@Autowired
@@ -390,7 +389,7 @@ public class RuleController {
 				response.getMessages().add(messageType);
 			}
 		} else {
-			getRuleSetService().saveImportFromDesigner(rpic);
+			RuleSetServiceUtil.getRuleSetService().saveImportFromDesigner(rpic);
 		}
 		logger.debug("RPIC READY");
 		return response;
@@ -482,15 +481,6 @@ public class RuleController {
 
 	public static boolean isAjaxUploadRequest(HttpServletRequest request) {
 		return request.getParameter("ajaxUpload") != null;
-	}
-
-	public RuleSetServiceInterface getRuleSetService() {
-		return ruleSetService;
-	}
-
-	@Autowired
-	public void setRuleSetService(RuleSetServiceInterface ruleSetService) {
-		this.ruleSetService = ruleSetService;
 	}
 
 	public RuleSetRuleDao getRuleSetRuleDao() {

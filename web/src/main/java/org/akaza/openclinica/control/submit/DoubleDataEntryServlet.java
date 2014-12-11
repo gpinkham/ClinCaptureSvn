@@ -20,14 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -45,11 +37,19 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "serial"})
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+@SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class DoubleDataEntryServlet extends DataEntryServlet {
 
@@ -171,12 +171,13 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 			dib = loadFormValue(dib, request);
 		}
 
-		boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, valueToCompare);
+		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
+		boolean showOriginalItem = dynamicsMetadataService.isShown(dib.getItem().getId(), ecb, valueToCompare);
 		boolean showItem = dib.getMetadata().isShowItem();
 		if (!showItem && dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0) {
 			showItem = true;
 		}
-		boolean showDuplicateItem = getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);
+		boolean showDuplicateItem = dynamicsMetadataService.hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);
 		logger.debug("*** show original item has value " + dib.getData().getValue() + " and show item has value "
 				+ valueToCompare.getValue());
 		logger.debug("--- show original: " + showOriginalItem + " show duplicate: " + showDuplicateItem
@@ -311,12 +312,13 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 		} else {
 			valueToCompare = dib.getDbData();
 		}
+		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 		if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION)
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
-			boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, valueToCompare);
+			boolean showOriginalItem = dynamicsMetadataService.isShown(dib.getItem().getId(), ecb, valueToCompare);
 			boolean showItem = dib.getMetadata().isShowItem();
-			boolean showDuplicateItem = getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);
-			
+			boolean showDuplicateItem = dynamicsMetadataService.hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);
+
 			if (showOriginalItem && showDuplicateItem || showItem) {
 				dib = validateDisplayItemBeanText(sv, dib, inputName, request);
 			}
@@ -441,7 +443,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
 			List<DisplayItemBean> items = displayGroup.getItems();
 			int order = displayGroup.getOrdinal();
-			
+
 			for (DisplayItemBean displayItem : items) {
 				if (displayGroup.isAuto()) {
 					inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
@@ -450,7 +452,8 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 							displayItem);
 				}
 				if (displayItem.getMetadata().isShowItem()
-						|| getItemMetadataService().isShown(displayItem.getItem().getId(), ecb, displayItem.getData())) {
+						|| getDynamicsMetadataService().isShown(displayItem.getItem().getId(), ecb,
+								displayItem.getData())) {
 					// add the validation
 					if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
 							|| groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1)

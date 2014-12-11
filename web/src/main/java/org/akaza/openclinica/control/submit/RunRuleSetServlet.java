@@ -32,11 +32,10 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class used to run rules set.
@@ -83,20 +82,20 @@ public class RunRuleSetServlet extends Controller {
 		String ruleSetId = request.getParameter(RULESET_ID);
 		String ruleId = request.getParameter(RULE_ID);
 		String dryRun = request.getParameter("dryRun");
-
+		RuleSetService ruleSetService = getRuleSetService();
 		RuleSetBean ruleSetBean = getRuleSetBean(currentStudy, ruleSetId, ruleId);
 		if (ruleSetBean != null) {
 			List<RuleSetBean> ruleSets = new ArrayList<RuleSetBean>();
 			ruleSets.add(ruleSetBean);
 			if (dryRun != null && dryRun.equals("no")) {
-				List<RuleSetBasedViewContainer> resultOfRunningRules = getRuleSetService(request).runRulesInBulk(
-						ruleSets, false, currentStudy, ub);
+				List<RuleSetBasedViewContainer> resultOfRunningRules = ruleSetService.runRulesInBulk(ruleSets, false,
+						currentStudy, ub);
 				addPageMessage(respage.getString("actions_successfully_taken"), request);
 				forwardPage(Page.LIST_RULE_SETS_SERVLET, request, response);
 
 			} else {
-				List<RuleSetBasedViewContainer> resultOfRunningRules = getRuleSetService(request).runRulesInBulk(
-						ruleSets, true, currentStudy, ub);
+				List<RuleSetBasedViewContainer> resultOfRunningRules = ruleSetService.runRulesInBulk(ruleSets, true,
+						currentStudy, ub);
 				request.setAttribute(RULESET, ruleSetBean);
 				request.setAttribute(RULESET_RESULT, resultOfRunningRules);
 				if (resultOfRunningRules.size() > 0) {
@@ -117,11 +116,12 @@ public class RunRuleSetServlet extends Controller {
 
 	private RuleSetBean getRuleSetBean(StudyBean currentStudy, String ruleSetId, String ruleId) {
 		RuleSetBean ruleSetBean = null;
+		RuleSetService ruleSetService = getRuleSetService();
 		if (ruleId != null && ruleSetId != null && ruleId.length() > 0 && ruleSetId.length() > 0) {
-			ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
-			ruleSetBean = getRuleSetService().filterByRules(ruleSetBean, Integer.valueOf(ruleId));
+			ruleSetBean = ruleSetService.getRuleSetById(currentStudy, ruleSetId);
+			ruleSetBean = ruleSetService.filterByRules(ruleSetBean, Integer.valueOf(ruleId));
 		} else if (ruleSetId != null && ruleSetId.length() > 0) {
-			ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
+			ruleSetBean = ruleSetService.getRuleSetById(currentStudy, ruleSetId);
 		}
 		return ruleSetBean;
 	}
@@ -134,15 +134,5 @@ public class RunRuleSetServlet extends Controller {
 		} else {
 			return "";
 		}
-	}
-
-	private RuleSetService getRuleSetService(HttpServletRequest request) {
-		String requestUrl = request.getScheme() + "://" + request.getSession().getAttribute(DOMAIN_NAME)
-				+ request.getRequestURI().replaceAll(request.getServletPath(), "");
-		RuleSetService ruleSetService = getRuleSetService();
-		ruleSetService.setContextPath(getContextPath(request));
-		ruleSetService.setMailSender(getMailSender());
-		ruleSetService.setRequestURLMinusServletPath(requestUrl);
-		return ruleSetService;
 	}
 }

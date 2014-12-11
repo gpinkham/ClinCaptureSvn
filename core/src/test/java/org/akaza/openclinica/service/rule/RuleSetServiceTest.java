@@ -49,6 +49,7 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 	private ODMContainer container;
 	private StudyBean studyBean;
 	private UserAccountBean ub;
+	private RuleSetService ruleSetService;
 
 	{
 		skippedItemsIds = new HashSet<Integer>();
@@ -67,6 +68,8 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 	@Before
 	public void setUp() throws Exception {
 		parseFile("import4.xml");
+		ruleSetService = new RuleSetService(dataSource, dynamicsItemFormMetadataDao, dynamicsItemGroupMetadataDao,
+				mailSender, ruleDao, ruleSetDao, ruleSetRuleDao, ruleSetAuditDao, ruleActionRunLogDao);
 	}
 
 	private void parseFile(String fileName) throws Exception {

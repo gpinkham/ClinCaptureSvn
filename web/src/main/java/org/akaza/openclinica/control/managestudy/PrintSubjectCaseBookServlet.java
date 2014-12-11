@@ -13,14 +13,7 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.util.PrintCRFUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
@@ -58,22 +51,25 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import com.clinovo.util.PrintCRFUtil;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 
 	@Override
-	public void mayProceed(HttpServletRequest request,
-			HttpServletResponse response)
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
 
-		UserAccountBean ub = (UserAccountBean) request.getSession()
-				.getAttribute(USER_BEAN_NAME);
-		StudyUserRoleBean currentRole = (StudyUserRoleBean) request
-				.getSession().getAttribute("userRole");
+		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -85,22 +81,19 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"),
-				request);
+						+ respage.getString("change_study_contact_sysadmin"), request);
 
-		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_director"), "1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 	}
 
 	@Override
-	public void processRequest(HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		int subjectId = fp.getInt("subjectId", true);
 
 		logger.info("Printing casebook for subject #" + subjectId);
 
-        SessionManager sm = (SessionManager) getSessionManager(request);
+		SessionManager sm = (SessionManager) getSessionManager(request);
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
 		String age = "";
@@ -123,8 +116,7 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 		edcs.addAll(edcdao.getEventCRFsByStudySubjectExceptInvalid(subjectId));
 
 		if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
-			age = Utils.getInstance().processAge(sub.getEnrollmentDate(),
-					subject.getDateOfBirth());
+			age = Utils.getInstance().processAge(sub.getEnrollmentDate(), subject.getDateOfBirth());
 		}
 
 		String isIE = fp.getString("ie");
@@ -139,11 +131,9 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 		if (study.getParentStudyId() > 0) {
 
 			// this is a site,find parent
-			StudyBean parentStudy = (StudyBean) studydao.findByPK(study
-					.getParentStudyId());
+			StudyBean parentStudy = (StudyBean) studydao.findByPK(study.getParentStudyId());
 
-			request.setAttribute("studyTitle", parentStudy.getName() + " - "
-					+ study.getName());
+			request.setAttribute("studyTitle", parentStudy.getName() + " - " + study.getName());
 		} else {
 			request.setAttribute("studyTitle", study.getName());
 		}
@@ -168,8 +158,7 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 			logger.info("I have found eCRF with status: " + crfStatus);
 
 			CRFBean crfBean = cdao.findByVersionId(ecb.getCRFVersionId());
-			List<ItemGroupBean> itemGroupBeans = itemGroupDao
-					.findOnlyGroupsByCRFVersionID(ecb.getCRFVersionId());
+			List<ItemGroupBean> itemGroupBeans = itemGroupDao.findOnlyGroupsByCRFVersionID(ecb.getCRFVersionId());
 			ArrayList sects = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 
 			allSectionBeans = new ArrayList<SectionBean>();
@@ -185,28 +174,25 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 			}
 
 			if (itemGroupBeans.size() > 0) {
-				StudyEventBean sedBean = (StudyEventBean) sedao.findByPK(ecb
-						.getStudyEventId());
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
-						.findByPK(sedBean.getStudyEventDefinitionId());
+				StudyEventBean sedBean = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(sedBean
+						.getStudyEventDefinitionId());
 
 				sedBean.setStudyEventDefinition(sed);
 
-				DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(
-						true, getDataSource(), getItemMetadataService(getServletContext()));
+				DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(true, getDataSource(),
+						getDynamicsMetadataService());
 
 				handler.setCrfVersionId(crfverBean.getId());
 				handler.setEventCRFId(ecb.getId());
-				crfverBean = (CRFVersionBean) cvdao
-						.findByPK(crfverBean.getId());
+				crfverBean = (CRFVersionBean) cvdao.findByPK(crfverBean.getId());
 				crfBean = cdao.findByVersionId(ecb.getCRFVersionId());
 				request.setAttribute("dataInvolved", "true");
 
-				List<DisplaySectionBean> displaySectionBeans = handler
-						.getDisplaySectionBeans();
-				
+				List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
+
 				PrintCRFUtil.clearSectionDataFromHtmlTagsAndJS(displaySectionBeans);
-				
+
 				PrintCRFBean printCrfBean = new PrintCRFBean();
 
 				printCrfBean.setDisplaySectionBeans(displaySectionBeans);
@@ -227,10 +213,9 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 
 				continue;
 			} else {
-				StudyEventBean sedBean = (StudyEventBean) sedao.findByPK(ecb
-						.getStudyEventId());
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
-						.findByPK(sedBean.getStudyEventDefinitionId());
+				StudyEventBean sedBean = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(sedBean
+						.getStudyEventDefinitionId());
 
 				sedBean.setStudyEventDefinition(sed);
 				request.setAttribute("studyEvent", sedBean);
@@ -238,11 +223,10 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 				request.setAttribute(SECTION_BEAN, sb);
 				request.setAttribute(ALL_SECTION_BEANS, allSectionBeans);
 				sectionBeans = super.getAllDisplayBeans(request);
-				
+
 				PrintCRFUtil.clearSectionDataFromHtmlTagsAndJS(sectionBeans);
 
-				DisplaySectionBean dsb = super.getDisplayBean(false, false,
-						request, isSubmitted);
+				DisplaySectionBean dsb = super.getDisplayBean(false, false, request, isSubmitted);
 				PrintCRFBean printCrfBean = new PrintCRFBean();
 
 				printCrfBean.setAllSections(sectionBeans);
@@ -261,7 +245,7 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 
 				list.add(printCrfBean);
 				sedCrfBeans.put(sedBean, list);
-			}	
+			}
 		}
 
 		request.setAttribute("studySubject", sub);
@@ -279,8 +263,7 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 
 	@Override
 	protected Status getNonBlankItemStatus(HttpServletRequest request) {
-		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request
-				.getAttribute(EVENT_DEF_CRF_BEAN);
+		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
 
 		return edcb.isDoubleEntry() ? Status.PENDING : Status.UNAVAILABLE;
 	}
@@ -293,8 +276,7 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 	}
 
 	@Override
-	protected void setEventCRFAnnotations(String annotations,
-			HttpServletRequest request) {
+	protected void setEventCRFAnnotations(String annotations, HttpServletRequest request) {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
 		ecb.setAnnotations(annotations);
@@ -316,10 +298,9 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 	}
 
 	@Override
-	protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v,
-			DisplayItemBean dib, String inputName, HttpServletRequest request) {
-		org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata()
-				.getResponseSet().getResponseType();
+	protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName,
+			HttpServletRequest request) {
+		org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
 
 		// note that this step sets us up both for
 		// displaying the data on the form again, in the event of an error
@@ -330,16 +311,13 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 		if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT)
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
 			dib = validateDisplayItemBeanText(v, dib, inputName, request);
-		} else if (rt
-				.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO)
+		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO)
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
 			dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
-		} else if (rt
-				.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX)
+		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX)
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
 			dib = validateDisplayItemBeanMultipleCV(v, dib, inputName);
-		} else if (rt
-				.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION)
+		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION)
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
 
 			// for now, treat calculation like any other text input --
@@ -351,11 +329,9 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 	}
 
 	@Override
-	protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(
-			DiscrepancyValidator v, DisplayItemGroupBean digb,
-			List<DisplayItemGroupBean> digbs,
-			List<DisplayItemGroupBean> formGroups, HttpServletRequest request,
-			HttpServletResponse response) {
+	protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v,
+			DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs, List<DisplayItemGroupBean> formGroups,
+			HttpServletRequest request, HttpServletResponse response) {
 		return formGroups;
 	}
 

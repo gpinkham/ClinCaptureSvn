@@ -20,12 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
@@ -63,13 +57,18 @@ import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * View a CRF version section data entry
  * 
  * @author Krikor Krumlian 10/26/2006
  * 
  */
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class PrintDataEntryServlet extends DataEntryServlet {
 
@@ -190,7 +189,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
 			// a boolean value depending on whether an event or data is involved
 			// or not
 			DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(true, getDataSource(),
-					getItemMetadataService(getServletContext()));
+					getDynamicsMetadataService());
 
 			handler.setCrfVersionId(crfVersionId);
 			handler.setEventCRFId(eventCRFId);
@@ -223,7 +222,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
 			request.setAttribute("sec", sb);
 
 			forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PRINT, request, response);
-		} else { 
+		} else {
 			forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PRINT_GROUPS, request, response);
 		}
 	}

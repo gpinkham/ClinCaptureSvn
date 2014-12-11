@@ -298,8 +298,9 @@ public abstract class Controller extends BaseController {
 						// The extract data job failed with the message:
 						// ERROR: relation "demographics" already exists
 						// More information may be available in the log files.
-						addPageMessage(respage.getString("the_extract_data_job_failed") + failMessage
-								+ respage.getString("more_information_may_be_available"), request);
+						addPageMessage(
+								respage.getString("the_extract_data_job_failed") + failMessage
+										+ respage.getString("more_information_may_be_available"), request);
 						request.getSession().removeAttribute("jobName");
 						request.getSession().removeAttribute("groupName");
 						request.getSession().removeAttribute("datasetId");
@@ -315,8 +316,10 @@ public abstract class Controller extends BaseController {
 							if (successMsg != null && !successMsg.isEmpty()) {
 								addPageMessage(successMsg, request);
 							} else {
-								addPageMessage(respage.getString("your_extract_is_now_completed") + " <a href='ExportDataset?datasetId="
-												+ datasetId + "'>" + resword.getString("here_lower_case") + "</a>.", request);
+								addPageMessage(
+										respage.getString("your_extract_is_now_completed")
+												+ " <a href='ExportDataset?datasetId=" + datasetId + "'>"
+												+ resword.getString("here_lower_case") + "</a>.", request);
 							}
 							request.getSession().removeAttribute("jobName");
 							request.getSession().removeAttribute("groupName");
@@ -341,7 +344,8 @@ public abstract class Controller extends BaseController {
 
 		if (fileBeans.size() > 0) {
 			successMsg = successMsg.replace("$linkURL", "<a href=\"" + SQLInitServlet.getSystemURL()
-					+ "AccessFile?fileId=" + fileBeans.get(0).getId() + "\">" + resword.getString("here_lower_case") + "</a>");
+					+ "AccessFile?fileId=" + fileBeans.get(0).getId() + "\">" + resword.getString("here_lower_case")
+					+ "</a>");
 		}
 
 		return successMsg;
@@ -1717,7 +1721,8 @@ public abstract class Controller extends BaseController {
 					.equalsIgnoreCase("study_evaluator");
 		}
 		// Otherwise, study
-		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getRoleCode().equalsIgnoreCase("study_evaluator");
+		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getRoleCode()
+				.equalsIgnoreCase("study_evaluator");
 	}
 
 	protected boolean isCoder(UserAccountBean loggedInUser, HttpServletRequest request) {
@@ -1727,7 +1732,8 @@ public abstract class Controller extends BaseController {
 					.equalsIgnoreCase("study_coder");
 		}
 		// Otherwise, study
-		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getRoleCode().equalsIgnoreCase("study_coder");
+		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getRoleCode()
+				.equalsIgnoreCase("study_coder");
 	}
 
 	/* Determining the resolution status that will be shown in color flag for an item. */

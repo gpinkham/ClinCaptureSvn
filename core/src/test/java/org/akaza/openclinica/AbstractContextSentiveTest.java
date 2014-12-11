@@ -40,6 +40,8 @@ import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
@@ -65,7 +67,6 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.EventServiceInterface;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.dbunit.DataSourceBasedDBTestCase;
@@ -77,6 +78,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -142,6 +144,9 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected static EventServiceInterface eventService;
 	protected static DiscrepancyNoteService discrepancyNoteService;
 
+	@Autowired
+	protected JavaMailSenderImpl mailSender;
+
 	// DAOS
 	@Autowired
 	protected RuleDao ruleDao;
@@ -181,6 +186,10 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected WidgetDAO widgetDAO;
 	@Autowired
 	protected WidgetsLayoutDAO widgetsLayoutDAO;
+	@Autowired
+	protected DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
+	@Autowired
+	protected DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
 
 	// Services
 	@Autowired
@@ -195,8 +204,6 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected StudySubjectIdService studySubjectIdService;
 	@Autowired
 	protected SystemService systemService;
-	@Autowired
-	protected RuleSetServiceInterface ruleSetService;
 	@Autowired
 	protected WidgetService widgetService;
 	@Autowired
@@ -236,10 +243,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 
 	@Override
 	protected IDataSet getDataSet() throws Exception {
-
 		InputStream resource = AbstractContextSentiveTest.class.getResourceAsStream(getTestDataFilePath());
-		FlatXmlDataSet flatXmlDataSet = new FlatXmlDataSet(resource);
-		return flatXmlDataSet;
+		return new FlatXmlDataSet(resource);
 	}
 
 	@Override

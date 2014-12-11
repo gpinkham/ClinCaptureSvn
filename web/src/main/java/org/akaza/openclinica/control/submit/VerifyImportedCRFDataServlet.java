@@ -52,7 +52,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.ImportSummaryInfo;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
@@ -255,10 +255,9 @@ public class VerifyImportedCRFDataServlet extends Controller {
 
 			if ("save".equalsIgnoreCase(action)) {
 				// setup ruleSets to run if applicable
-				RuleSetServiceInterface ruleSetService = getRuleSetService();
 				logger.debug("=== about to generate rule containers ===");
 				List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(request, true, con, getDataSource(),
-						currentStudy, ub, ruleSetService);
+						currentStudy, ub);
 				List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) request
 						.getSession().getAttribute("importedData");
 				Set<Integer> studyEventIds = new HashSet<Integer>();
@@ -421,7 +420,7 @@ public class VerifyImportedCRFDataServlet extends Controller {
 					con.setAutoCommit(false);
 					logger.debug("=== about to run rules ===");
 					addPageMessage(this.ruleActionWarnings(this.runRules(true, con, skippedItemIds, currentStudy, ub,
-							containers, ruleSetService, ExecutionMode.SAVE)), request);
+							containers, ExecutionMode.SAVE)), request);
 					con.commit();
 					con.close();
 				} catch (SQLException sqle) {
@@ -441,8 +440,8 @@ public class VerifyImportedCRFDataServlet extends Controller {
 	}
 
 	private List<ImportDataRuleRunnerContainer> ruleRunSetup(HttpServletRequest request, Boolean runRulesOptimisation,
-			Connection connection, DataSource dataSource, StudyBean studyBean, UserAccountBean userBean,
-			RuleSetServiceInterface ruleSetService) {
+			Connection connection, DataSource dataSource, StudyBean studyBean, UserAccountBean userBean) {
+		RuleSetService ruleSetService = getRuleSetService();
 		List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
 		ODMContainer odmContainer = (ODMContainer) request.getSession().getAttribute("odmContainer");
 		logger.debug("=== about to check if odm container is null ===");
@@ -472,11 +471,11 @@ public class VerifyImportedCRFDataServlet extends Controller {
 
 	private List<String> runRules(Boolean runRulesOptimisation, Connection connection, Set<Integer> skippedItemIds,
 			StudyBean studyBean, UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
-			RuleSetServiceInterface ruleSetService, ExecutionMode executionMode) {
+			ExecutionMode executionMode) {
 
 		List<String> messages = new ArrayList<String>();
 		if (containers != null && !containers.isEmpty()) {
-			HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(runRulesOptimisation,
+			HashMap<String, ArrayList<String>> summary = getRuleSetService().runRulesInImportData(runRulesOptimisation,
 					connection, containers, skippedItemIds, studyBean, userBean, executionMode);
 			logger.debug("=== found summary " + summary.toString());
 			messages = extractRuleActionWarnings(summary);

@@ -18,23 +18,15 @@
     <bean id="studyConfigService" class="org.akaza.openclinica.dao.service.StudyConfigService" autowire="byName">
         <constructor-arg name="ds" ref="dataSource"/>
     </bean>
-    <bean id="dynamicsMetadataService" class="org.akaza.openclinica.service.crfdata.DynamicsMetadataService" autowire="byName">
-        <constructor-arg ref="dataSource"/>
-    </bean>      
-    <bean id="ruleSetService" class="org.akaza.openclinica.service.rule.RuleSetService" autowire="byName">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
+
     <bean id="subjectService" class="org.akaza.openclinica.service.subject.SubjectService">
         <constructor-arg ref="dataSource"/>
     </bean>
+
     <bean id="eventService" class="org.akaza.openclinica.service.EventService">
         <constructor-arg ref="dataSource"/>
     </bean>
 
-    <bean id="insertActionValidator" class="org.akaza.openclinica.validator.rule.action.InsertActionValidator">
-        <constructor-arg ref="dataSource"/>
-    </bean>
-    
     <bean id="simpleConditionalDisplayService" class="org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService" autowire="byName">
         <constructor-arg ref="dataSource"/>
     </bean>

@@ -74,7 +74,7 @@ public class ImportRuleServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+
 		UserAccountBean ub = getUserAccountBean(request);
 		// Reset the study if RS is saving a rule for a different study
 		StudyBean originalScope = null;
@@ -210,7 +210,7 @@ public class ImportRuleServlet extends Controller {
 			XMLContext xmlContext = new XMLContext();
 			// create and set a Mapping instance
 			Mapping mapping = xmlContext.createMapping();
-				mapping.loadMapping(getCoreResources().getURL("mapping.xml"));
+			mapping.loadMapping(getCoreResources().getURL("mapping.xml"));
 
 			xmlContext.addMapping(mapping);
 			/* create a new Unmarshaller */

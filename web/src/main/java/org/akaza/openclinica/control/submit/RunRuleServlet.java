@@ -20,12 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.util.HashMap;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -39,6 +33,11 @@ import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Run Rules Using this Servlet.
@@ -66,15 +65,14 @@ public class RunRuleServlet extends Controller {
 		ExecutionMode executionMode = action == null || "dryRun".equalsIgnoreCase(action) ? ExecutionMode.DRY_RUN
 				: ExecutionMode.SAVE;
 		String submitLinkParams = "";
-
+		RuleSetService ruleSetService = getRuleSetService();
 		HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> result = null;
 		if (ruleSetRuleId != null && versionId != null) {
 			submitLinkParams = "ruleSetRuleId=" + ruleSetRuleId + "&versionId=" + versionId + "&action=no";
-			result = getRuleSetService(request).runRulesInBulk(ruleSetRuleId, versionId, executionMode, currentStudy,
-					ub);
+			result = ruleSetService.runRulesInBulk(ruleSetRuleId, versionId, executionMode, currentStudy, ub);
 		} else {
 			submitLinkParams = "crfId=" + crfId + "&action=no";
-			result = getRuleSetService(request).runRulesInBulk(crfId, executionMode, currentStudy, ub);
+			result = ruleSetService.runRulesInBulk(crfId, executionMode, currentStudy, ub);
 		}
 
 		request.setAttribute("result", result);
@@ -84,16 +82,6 @@ public class RunRuleServlet extends Controller {
 		} else {
 			forwardPage(Page.VIEW_EXECUTED_RULES_FROM_CRF, request, response);
 		}
-	}
-
-	private RuleSetService getRuleSetService(HttpServletRequest request) {
-		String requestUrl = request.getScheme() + "://" + request.getSession().getAttribute(DOMAIN_NAME)
-				+ request.getRequestURI().replaceAll(request.getServletPath(), "");
-		RuleSetService ruleSetService = getRuleSetService();
-		ruleSetService.setContextPath(getContextPath(request));
-		ruleSetService.setMailSender(getMailSender());
-		ruleSetService.setRequestURLMinusServletPath(requestUrl);
-		return ruleSetService;
 	}
 
 	@Override

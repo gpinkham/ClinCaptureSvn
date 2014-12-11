@@ -20,9 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -35,6 +32,9 @@ import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Krikor Krumlian
@@ -50,9 +50,10 @@ public class RemoveRuleSetServlet extends Controller {
 	private static String ACTION = "action";
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -62,8 +63,9 @@ public class RemoveRuleSetServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -71,8 +73,8 @@ public class RemoveRuleSetServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		String ruleSetId = request.getParameter(RULESET_ID);
 		String action = request.getParameter(ACTION);
@@ -80,8 +82,7 @@ public class RemoveRuleSetServlet extends Controller {
 			addPageMessage(respage.getString("please_choose_a_CRF_to_view"), request);
 			forwardPage(Page.CRF_LIST, request, response);
 		} else {
-			RuleSetBean ruleSetBean = null;
-			ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
+			RuleSetBean ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
 			if (action != null && action.equals("confirm")) {
 				request.setAttribute(RULESET, ruleSetBean);
 				forwardPage(Page.REMOVE_RULE_SET, request, response);

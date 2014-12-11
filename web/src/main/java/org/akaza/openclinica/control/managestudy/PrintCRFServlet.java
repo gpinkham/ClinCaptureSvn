@@ -20,12 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -51,13 +45,18 @@ import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * View a CRF version section data entry
  * 
- * @author Krikor Krumlian 
+ * @author Krikor Krumlian
  * 
  */
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class PrintCRFServlet extends DataEntryServlet {
 
@@ -120,7 +119,7 @@ public class PrintCRFServlet extends DataEntryServlet {
 
 			if (itemGroupBeans.size() > 0) {
 				DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, getDataSource(),
-						getItemMetadataService(getServletContext()));
+						getDynamicsMetadataService());
 				handler.setCrfVersionId(crfVersionId);
 				handler.setEventCRFId(eventCRFId);
 				List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
@@ -179,7 +178,7 @@ public class PrintCRFServlet extends DataEntryServlet {
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
 		return edcb.isDoubleEntry() ? Status.PENDING : Status.UNAVAILABLE;
 	}
-	
+
 	@Override
 	protected String getEventCRFAnnotations(HttpServletRequest request) {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);

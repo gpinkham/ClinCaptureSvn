@@ -114,7 +114,7 @@ import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
 import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
 import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrParcel;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
@@ -125,7 +125,6 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.impl.StdScheduler;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -307,7 +306,7 @@ public abstract class DataEntryServlet extends Controller {
 		Locale locale = SessionUtil.getLocale(request);
 		FormProcessor fp = new FormProcessor(request);
 		String action = fp.getString(ACTION);
-
+		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 		if (request.getMethod().equalsIgnoreCase("POST") && action.equalsIgnoreCase("ide_s")) {
 			// when we start IDE
 			request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME,
@@ -525,13 +524,11 @@ public abstract class DataEntryServlet extends Controller {
 		List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups(section, hasGroup,
 				eventDefinitionCRFId, request);
 		logMe("Entering  displayItemWithGroups end " + System.currentTimeMillis());
-		this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(),
-				ecb);
+
+		dynamicsMetadataService.updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(), ecb);
 		section.setDisplayItemGroups(displayItemWithGroups);
 		DisplayTableOfContentsBean toc = getDisplayBeanWithShownSections(
-				(DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY),
-				(DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
-						"dynamicsMetadataService"));
+				(DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY), dynamicsMetadataService);
 		request.setAttribute(TOC_DISPLAY, toc);
 		LinkedList<Integer> sectionIdsInToc = TableOfContentsServlet.sectionIdsInToc(toc);
 
@@ -781,9 +778,11 @@ public abstract class DataEntryServlet extends Controller {
 					}
 				}
 			}
+
+			RuleSetService ruleSetService = getRuleSetService();
 			List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean,
 					studyEventBean, ecb, true, request, response, itemBeansWithSCDShown);
-			boolean shouldRunRules = getRuleSetService(request).shouldRunRulesForRuleSets(ruleSets, phase2);
+			boolean shouldRunRules = ruleSetService.shouldRunRulesForRuleSets(ruleSets, phase2);
 
 			HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = null;
 			groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules, MessageType.ERROR, phase2,
@@ -1507,10 +1506,9 @@ public abstract class DataEntryServlet extends Controller {
 				}
 
 				logMe("DisplayItemWithGroupBean allitems4 end " + System.currentTimeMillis());
-				List<Integer> prevShownDynItemDataIds = shouldRunRules ? this.getItemMetadataService()
-						.getDynamicsItemFormMetadataDao()
-						.findShowItemDataIdsInSection(section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId())
-						: new ArrayList<Integer>();
+				List<Integer> prevShownDynItemDataIds = shouldRunRules ? dynamicsMetadataService
+						.getDynamicsItemFormMetadataDao().findShowItemDataIdsInSection(section.getSection().getId(),
+								ecb.getCRFVersionId(), ecb.getId()) : new ArrayList<Integer>();
 				logMe("DisplayItemWithGroupBean dryrun  start" + System.currentTimeMillis());
 				HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false,
 						shouldRunRules, MessageType.WARNING, phase2, ecb, request);
@@ -1637,12 +1635,10 @@ public abstract class DataEntryServlet extends Controller {
 
 					}
 					//
-					this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups,
-							section.getSection().getId(), ecb);
+					dynamicsMetadataService.updateGroupDynamicsInSection(displayItemWithGroups, section.getSection()
+							.getId(), ecb);
 					toc = getDisplayBeanWithShownSections(
-							(DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY),
-							(DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext())
-									.getBean("dynamicsMetadataService"));
+							(DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY), dynamicsMetadataService);
 					request.setAttribute(TOC_DISPLAY, toc);
 					sectionIdsInToc = TableOfContentsServlet.sectionIdsInToc(toc);
 					sIndex = TableOfContentsServlet.sectionIndexInToc(section.getSection(), toc, sectionIdsInToc);
@@ -1893,7 +1889,7 @@ public abstract class DataEntryServlet extends Controller {
 			reportCRFService.setDataPath(dataPath);
 			reportCRFService.setResword(resword);
 
-			String reportFilePath = reportCRFService.createPDFReport(ecb.getId(), locale);
+			String reportFilePath = reportCRFService.createPDFReport(ecb.getId(), locale, getDynamicsMetadataService());
 
 			if (!StringUtil.isBlank(reportFilePath) && "complete".equals(edcb.getEmailStep())) {
 				StringBuilder body = new StringBuilder();
@@ -2520,6 +2516,8 @@ public abstract class DataEntryServlet extends Controller {
 		List<String> nullValuesList = new ArrayList<String>();
 		nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(eventDefCRFId, getDataSource());
 
+		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
+
 		for (int i = 0; i < repeatMax; i++) {
 
 			DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
@@ -2529,7 +2527,7 @@ public abstract class DataEntryServlet extends Controller {
 					|| !StringUtil.isBlank(fp.getString(igb.getOid() + "_manual" + i + ".newRow"))) {
 
 				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-						sb.getId(), nullValuesList, getItemMetadataService(getServletContext()));
+						sb.getId(), nullValuesList, dynamicsMetadataService);
 
 				dibs = processInputForGroupItem(fp, dibs, i, digb, false);
 
@@ -2562,7 +2560,7 @@ public abstract class DataEntryServlet extends Controller {
 					|| !StringUtil.isBlank(fp.getString(igb.getOid() + "_" + i + ".newRow"))) {
 
 				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-						sb.getId(), nullValuesList, getItemMetadataService(getServletContext()));
+						sb.getId(), nullValuesList, dynamicsMetadataService);
 
 				dibs = processInputForGroupItem(fp, dibs, i, digb, true);
 
@@ -2703,13 +2701,14 @@ public abstract class DataEntryServlet extends Controller {
 	 * dynamics.
 	 */
 	private ItemGroupMetadataBean runDynamicsCheck(ItemGroupMetadataBean metadataBean, HttpServletRequest request) {
+		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		try {
 			if (!metadataBean.isShowGroup()) {
-				boolean showGroup = getItemMetadataService().isGroupShown(metadataBean.getId(), ecb);
+				boolean showGroup = dynamicsMetadataService.isGroupShown(metadataBean.getId(), ecb);
 
 				if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-					showGroup = getItemMetadataService().hasGroupPassedDDE(metadataBean.getId(), ecb.getId());
+					showGroup = dynamicsMetadataService.hasGroupPassedDDE(metadataBean.getId(), ecb.getId());
 				}
 				metadataBean.setShowGroup(showGroup);
 			}
@@ -2721,10 +2720,11 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	private DisplayItemBean runDynamicsItemCheck(DisplayItemBean dib, Object newParam, HttpServletRequest request) {
+		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		try {
 			if (!dib.getMetadata().isShowItem()) {
-				boolean showItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData());
+				boolean showItem = dynamicsMetadataService.isShown(dib.getItem().getId(), ecb, dib.getData());
 				dib.getMetadata().setShowItem(showItem);
 			}
 		} catch (NullPointerException npe) {
@@ -2976,25 +2976,25 @@ public abstract class DataEntryServlet extends Controller {
 	 */
 	protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, HttpServletRequest request)
 			throws Exception {
-
+		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 		ItemDataBean idb = dib.getData();
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		if (dib.getEditFlag() != null && "remove".equalsIgnoreCase(dib.getEditFlag())
-				&& getItemMetadataService().isShown(idb.getItemId(), ecb, idb)) {
-			getItemMetadataService().hideItem(dib.getMetadata(), ecb, idb);
+				&& dynamicsMetadataService.isShown(idb.getItemId(), ecb, idb)) {
+			dynamicsMetadataService.hideItem(dib.getMetadata(), ecb, idb);
 		} else {
 			if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
 				if (!dib.getMetadata().isShowItem()
 						&& !(dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0)
 						&& idb.getValue().equals("")
-						&& !getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, idb)) {
+						&& !dynamicsMetadataService.hasPassedDDE(dib.getMetadata(), ecb, idb)) {
 
 					return true;
 				}
 			} else {
 
 				if (!dib.getMetadata().isShowItem() && idb.getValue().equals("")
-						&& !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())
+						&& !dynamicsMetadataService.isShown(dib.getItem().getId(), ecb, dib.getData())
 						&& !(dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0)
 						&& !(dib.getItem().getItemDataTypeId() == 12)) {
 
@@ -3203,7 +3203,7 @@ public abstract class DataEntryServlet extends Controller {
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
 
 		return getDataEntryService(getServletContext()).getDisplayBean(hasGroup, includeUngroupedItems, isSubmitted,
-				getServletPage(request), study, ecb, sb);
+				getServletPage(request), study, ecb, sb, getDynamicsMetadataService());
 	}
 
 	/**
@@ -3219,18 +3219,7 @@ public abstract class DataEntryServlet extends Controller {
 		ArrayList<SectionBean> allSectionBeans = (ArrayList<SectionBean>) request.getAttribute(ALL_SECTION_BEANS);
 
 		return getDataEntryService(getServletContext()).getAllDisplayBeans(allSectionBeans, ecb, study,
-				getServletPage(request));
-	}
-
-	/**
-	 * gets the available dynamics service
-	 */
-	public DynamicsMetadataService getItemMetadataService() {
-		DynamicsMetadataService itemMetadataService = null;
-		itemMetadataService = itemMetadataService != null ? itemMetadataService
-				: (DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
-						"dynamicsMetadataService");
-		return itemMetadataService;
+				getServletPage(request), getDynamicsMetadataService());
 	}
 
 	/**
@@ -3258,6 +3247,7 @@ public abstract class DataEntryServlet extends Controller {
 	 */
 	protected DisplaySectionBean populateNotesWithDBNoteCounts(FormDiscrepancyNotes discNotes,
 			List<DiscrepancyNoteThread> noteThreads, DisplaySectionBean section, HttpServletRequest request) {
+		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(STUDY);
 		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
@@ -3915,6 +3905,7 @@ public abstract class DataEntryServlet extends Controller {
 	 */
 	protected List<DisplayItemWithGroupBean> createItemWithGroups(DisplaySectionBean dsb, boolean hasItemGroup,
 			int eventCRFDefId, HttpServletRequest request) {
+		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 		HttpSession session = request.getSession();
 		List<DisplayItemWithGroupBean> displayItemWithGroups = new ArrayList<DisplayItemWithGroupBean>();
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
@@ -3982,7 +3973,7 @@ public abstract class DataEntryServlet extends Controller {
 						// better way to
 						// do deep copy, like clone
 						List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(),
-								ecb, sb.getId(), edcb, idb.getOrdinal(), getItemMetadataService(getServletContext()));
+								ecb, sb.getId(), edcb, idb.getOrdinal(), dynamicsMetadataService);
 
 						digb.setItems(dibs);
 						logger.trace("set with dibs list of : " + dibs.size());
@@ -4030,7 +4021,7 @@ public abstract class DataEntryServlet extends Controller {
 					// no data, still add a blank row for displaying
 					DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
 					List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-							sb.getId(), nullValuesList, getItemMetadataService(getServletContext()));
+							sb.getId(), nullValuesList, dynamicsMetadataService);
 					digb2.setItems(dibs);
 					logger.trace("set with nullValuesList of : " + nullValuesList);
 					digb2.setEditFlag("initial");
@@ -4055,7 +4046,7 @@ public abstract class DataEntryServlet extends Controller {
 		// this method is a copy of the method: createItemWithGroups ,
 		// only modified for load one DisplayItemWithGroupBean.
 		//
-
+		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 		ItemDAO idao = new ItemDAO(getDataSource());
 		// For adding null values to display items
 		FormBeanUtil formBeanUtil = new FormBeanUtil();
@@ -4097,7 +4088,7 @@ public abstract class DataEntryServlet extends Controller {
 				// better way to
 				// do deep copy, like clone
 				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-						sb.getId(), edcb, idb.getOrdinal(), getItemMetadataService(getServletContext()));
+						sb.getId(), edcb, idb.getOrdinal(), dynamicsMetadataService);
 
 				digb.setItems(dibs);
 				logger.trace("set with dibs list of : " + dibs.size());
@@ -4142,7 +4133,7 @@ public abstract class DataEntryServlet extends Controller {
 			// no data, still add a blank row for displaying
 			DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
 			List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-					sb.getId(), nullValuesList, getItemMetadataService(getServletContext()));
+					sb.getId(), nullValuesList, dynamicsMetadataService);
 			digb2.setItems(dibs);
 			logger.trace("set with nullValuesList of : " + nullValuesList);
 			digb2.setEditFlag("initial");
@@ -4535,18 +4526,19 @@ public abstract class DataEntryServlet extends Controller {
 			StudyEventDefinitionBean studyEventDefinition, CRFVersionBean crfVersionBean,
 			StudyEventBean studyEventBean, EventCRFBean eventCrfBean, Boolean shouldRunRules,
 			HttpServletRequest request, HttpServletResponse response, List<ItemBean> itemBeansWithSCDShown) {
+		RuleSetService ruleSetService = getRuleSetService();
 		if (shouldRunRules) {
 			logMe("Current Thread:::" + Thread.currentThread());
-			List<RuleSetBean> ruleSets = getRuleSetService(request).getRuleSetsByCrfStudyAndStudyEventDefinition(
-					currentStudy, studyEventDefinition, crfVersionBean);
+			List<RuleSetBean> ruleSets = ruleSetService.getRuleSetsByCrfStudyAndStudyEventDefinition(currentStudy,
+					studyEventDefinition, crfVersionBean);
 			logMe("Current Thread:::" + Thread.currentThread() + "RuleSet Now?" + ruleSets);
 			if (ruleSets != null && ruleSets.size() > 0) {
 
-				ruleSets = getRuleSetService(request).filterByStatusEqualsAvailable(ruleSets);
-				ruleSets = getRuleSetService(request).filterRuleSetsByStudyEventOrdinal(ruleSets, studyEventBean,
-						crfVersionBean, studyEventDefinition);
-				ruleSets = getRuleSetService(request).filterRuleSetsByHiddenItems(ruleSets, eventCrfBean,
-						crfVersionBean, itemBeansWithSCDShown);
+				ruleSets = ruleSetService.filterByStatusEqualsAvailable(ruleSets);
+				ruleSets = ruleSetService.filterRuleSetsByStudyEventOrdinal(ruleSets, studyEventBean, crfVersionBean,
+						studyEventDefinition);
+				ruleSets = ruleSetService.filterRuleSetsByHiddenItems(ruleSets, eventCrfBean, crfVersionBean,
+						itemBeansWithSCDShown);
 			}
 			return ruleSets != null && ruleSets.size() > 0 ? ruleSets : new ArrayList<RuleSetBean>();
 		} else
@@ -4559,18 +4551,19 @@ public abstract class DataEntryServlet extends Controller {
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 		if (shouldRunRules) {
 			Container c = new Container();
+			RuleSetService ruleSetService = getRuleSetService();
 			try {
 				c = populateRuleSpecificHashMaps(allItems, c, dryRun);
-				ruleSets = getRuleSetService(request).filterRuleSetsBySectionAndGroupOrdinal(ruleSets, c.grouped);
-				ruleSets = getRuleSetService(request).solidifyGroupOrdinalsUsingFormProperties(ruleSets, c.grouped);
+				ruleSets = ruleSetService.filterRuleSetsBySectionAndGroupOrdinal(ruleSets, c.grouped);
+				ruleSets = ruleSetService.solidifyGroupOrdinalsUsingFormProperties(ruleSets, c.grouped);
 				// next line here ?
 			} catch (NullPointerException npe) {
 				logger.debug("found NPE " + npe.getMessage());
 				npe.printStackTrace();
 			}
 			logger.debug("running rules ... rule sets size is " + ruleSets.size());
-			return getRuleSetService(request).runRulesInDataEntry(ruleSets, dryRun, ub, c.variableAndValue, phase, ecb,
-					request).getByMessageType(mt);
+			return ruleSetService.runRulesInDataEntry(ruleSets, dryRun, ub, c.variableAndValue, phase, ecb, request)
+					.getByMessageType(mt);
 		} else {
 			return new HashMap<String, ArrayList<String>>();
 		}
@@ -4582,20 +4575,6 @@ public abstract class DataEntryServlet extends Controller {
 	protected abstract boolean isAdministrativeEditing();
 
 	protected abstract boolean isAdminForcedReasonForChange(HttpServletRequest request);
-
-	private RuleSetServiceInterface getRuleSetService(HttpServletRequest request) {
-
-		RuleSetServiceInterface ruleSetService = null;
-		String requestUrl = request.getScheme() + "://" + request.getSession().getAttribute(DOMAIN_NAME)
-				+ request.getRequestURI().toString().replaceAll(request.getServletPath(), "");
-		ruleSetService = ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
-				.getApplicationContext(getServletContext()).getBean("ruleSetService");
-		ruleSetService.setContextPath(getContextPath(request));
-		ruleSetService.setMailSender((JavaMailSenderImpl) SpringServletAccess
-				.getApplicationContext(getServletContext()).getBean("mailSender"));
-		ruleSetService.setRequestURLMinusServletPath(requestUrl);
-		return ruleSetService;
-	}
 
 	private void ensureSelectedOption(DisplayItemBean displayItemBean) {
 		if (displayItemBean == null || displayItemBean.getData() == null) {
@@ -4890,12 +4869,6 @@ public abstract class DataEntryServlet extends Controller {
 		result.put("field", field);
 
 		return result;
-	}
-
-	protected DynamicsMetadataService getItemMetadataService(ServletContext context) {
-		DynamicsMetadataService itemMetadataService = (DynamicsMetadataService) SpringServletAccess
-				.getApplicationContext(context).getBean("dynamicsMetadataService");
-		return itemMetadataService;
 	}
 
 	protected DataEntryService getDataEntryService(ServletContext context) {
