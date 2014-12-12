@@ -41,9 +41,9 @@ public final class Navigation {
 			"/RestoreSite", "/extract", "/ViewSelected", "/SelectItems", "/CreateDataset", "/EditSelected",
 			"/EditDataset", "/pages/managestudy/chooseCRFVersion", "/pages/managestudy/confirmCRFVersionChange",
 			"/pages/managestudy/changeCRFVersion", "/CreateCRFVersion", "/RemoveCRF", "/RemoveCRFVersion",
-			"/RestoreCRF", "/RestoreCRFVersion", "/DeleteCRFVersion", "/LockCRFVersion", "/UnlockCRFVersion",
+			"/RestoreCRF", "/RestoreCRFVersion", "/pages/deleteCRFVersion", "/LockCRFVersion", "/UnlockCRFVersion",
 			"/CreateSubStudy", "/RemoveCRFFromDefinition", "/RestoreCRFFromDefinition", "/AddCRFToDefinition",
-			"/InitialDataEntry", "/AdministrativeEditing"));
+			"/InitialDataEntry", "/AdministrativeEditing", "/pages/completeCRFDelete"));
 	// ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintAllEventCRF", "/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
@@ -54,7 +54,7 @@ public final class Navigation {
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc", "/help",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
 			"/ChangeDefinitionCRFOrdinal", "/CreateOneDiscrepancyNote", "/MatchPassword", "/pages/handleSDVPost",
-			"/pages/handleSDVRemove", "/CompleteCrfDelete", "/pages/sdvStudySubjects", "/UploadFile",
+			"/pages/handleSDVRemove", "/pages/sdvStudySubjects", "/UploadFile",
 			"/DownloadAttachedFile"));
 	// set of pages with special processing
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
