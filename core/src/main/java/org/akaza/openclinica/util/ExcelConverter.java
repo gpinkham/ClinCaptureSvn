@@ -25,7 +25,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,28 +33,26 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * @author Frank
- * 
+ * This class is used to convert tab delimited files to Excel Tables.
  */
 public class ExcelConverter {
 
 	/***
-	 * Parses file in TSV format and converts it to Excel 2007-2013 format
-	 * 
+	 * Parses file in TSV format and converts it to Excel 2007-2013 format.
+	 *
 	 * @param tsvFileName
 	 *            String
 	 * @param outputFileName
 	 *            String
 	 * @param sheetName
 	 *            String
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws IOException if file was not found
 	 */
 	public static void convertTabDelimitedToExcel(String tsvFileName, String outputFileName, String sheetName)
 			throws IOException {
 
 		FileInputStream fis = new FileInputStream(tsvFileName);
-		BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+		BufferedReader br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
 		Workbook workbook = new XSSFWorkbook();
 		Sheet worksheet = workbook.createSheet(sheetName);
 		Row row;
@@ -101,8 +98,8 @@ public class ExcelConverter {
 	private static void setDateCellValue(Cell cell, String value) {
 
 		try {
-			SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd");
-			Date date = formater.parse(value);
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			Date date = formatter.parse(value);
 			cell.setCellValue(date);
 			formatDateCell(cell);
 

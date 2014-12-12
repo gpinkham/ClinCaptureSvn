@@ -139,6 +139,10 @@ public class XsltTransformJob extends QuartzJobBean {
 	public static final String POST_PROC_EXPORT_NAME = "postProcExportName";
 	private static final long KILOBYTE = 1024;
 
+	private static final int UTF8_ENCODING_BYTE_1 = 239;
+	private static final int UTF8_ENCODING_BYTE_2 = 187;
+	private static final int UTF8_ENCODING_BYTE_3 = 191;
+
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	/**
@@ -430,13 +434,16 @@ public class XsltTransformJob extends QuartzJobBean {
 					endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
 
 					endFileStream = new FileOutputStream(endFile);
+					endFileStream.write(UTF8_ENCODING_BYTE_1);
+					endFileStream.write(UTF8_ENCODING_BYTE_2);
+					endFileStream.write(UTF8_ENCODING_BYTE_3);
 					transformer.transform(new StreamSource(xmlFilePath), new StreamResult(endFileStream));
 
 					in.close();
 					endFileStream.close();
 
-					// Convert file if Excel 2013
-					if (endFile.endsWith("xlsx")) {
+					// Convert file to Table if Excel
+					if (endFile.endsWith("xlsx") || endFile.endsWith("xls")) {
 						ExcelConverter.convertTabDelimitedToExcel(endFile, endFile, datasetBean.getName());
 					}
 
