@@ -546,8 +546,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 		table.addCell(cell);
 		cell = new Cell(new Phrase(resword.getString("parent_note_id") + ": " + (discBean.getParentDnId() > 0 ? discBean.getParentDnId() : ""), getFont(PARENT_DN_SECTION_FONT_SIZE_PDF)));
 		table.addCell(cell);
-		cell = new Cell(new Phrase(resword.getString("resolution_status") + ": "
-				+ new DiscrepancyNoteUtil().getResolutionStatusName(discBean.getResolutionStatusId()), getFont(PARENT_DN_SECTION_FONT_SIZE_PDF)));
+		cell = createCell(resword.getString("resolution_status"),
+				resword.getString((new DiscrepancyNoteUtil().getResolutionStatusName(discBean.getResolutionStatusId())).replaceAll(" ", "_").toLowerCase()));
 		table.addCell(cell);
 		cell = new Cell(new Phrase(resword.getString("detailed_notes") + ": " + discBean.getDetailedNotes(), getFont(PARENT_DN_SECTION_FONT_SIZE_PDF)));
 		table.addCell(cell);
