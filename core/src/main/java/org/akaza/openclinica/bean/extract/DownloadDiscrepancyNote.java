@@ -63,6 +63,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 
 	public static final Map<Integer, String> RESOLUTION_STATUS_MAP = new HashMap<Integer, String>();
 	private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
+	private ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
 
 	static {
 		int index = 1;
@@ -336,9 +337,10 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 			pdfDoc.open();
 			// Create header for the study identifier or name
 			if (studyIdentifier != null) {
-				HeaderFooter header = new HeaderFooter(new Phrase(resword.getString("study_identifier") + ": " + studyIdentifier + " pg.", getFont(STUDY_IDENTIFIER_FONT_SIZE_PDF)), true);
+				HeaderFooter header = new HeaderFooter(new Phrase(resword.getString("study_identifier")
+						+ ": " + studyIdentifier + " " + resword.getString("pg")
+						+ " ", getFont(STUDY_IDENTIFIER_FONT_SIZE_PDF)), true);
 				header.setAlignment(Element.ALIGN_CENTER);
-
 				Paragraph para = new Paragraph(resword.getString("study_identifier") + ": " + studyIdentifier, getFont(STUDY_IDENTIFIER_FONT_SIZE_PDF));
 				para.setAlignment(Element.ALIGN_CENTER);
 				pdfDoc.setHeader(header);
@@ -355,7 +357,6 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 					for (DiscrepancyNoteBean discNoteBean : discNoteThread.getLinkedNoteList()) {
 						if (discNoteBean.getParentDnId() > 0) {
 							pdfDoc.add(this.createTableFromBean(discNoteBean));
-							pdfDoc.add(new Paragraph("\n"));
 						}
 					}
 					newPage = true;
@@ -473,7 +474,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 			table.addCell(cell);
 
 			// row 2
-			cell = createCell(resword.getString("study_event") + " " + resword.getString("date"), dnBean.getEventStart() + "");
+			cell = createCell(resword.getString("study_event_date"),
+					dnBean.getEventStart() != null ? String.valueOf(dnBean.getEventStart()) : "");
 			table.addCell(cell);
 
 			content.append(dnBean.getCrfName());
@@ -484,7 +486,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 			table.addCell(cell);
 
 			// row 3
-			cell = createCell(resword.getString("type"), resword.getString(discUtil.getResolutionStatusTypeName(dnBean.getDiscrepancyNoteTypeId()).replaceAll(" ", "_").toLowerCase()));
+			cell = createCell(resword.getString("type"), resterm.getString(discUtil.getResolutionStatusTypeName(dnBean.getDiscrepancyNoteTypeId()).replaceAll(" ", "_").toLowerCase()));
 
 			table.addCell(cell);
 
