@@ -17,8 +17,15 @@ package org.akaza.openclinica.bean.submit;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DisplayEventCRFBeanTest {
 	@Test
@@ -54,5 +61,35 @@ public class DisplayEventCRFBeanTest {
 	@Test
 	public void testThatStudyCoderIsNotSuper() {
 		assertFalse(DisplayEventCRFBean.isEditor(Role.STUDY_CODER));
+	}
+
+	@Test
+	public void testThatStudyAdministratorIsAbleToContinueDDE() {
+
+		EventCRFBean eventCRFBean = new EventCRFBean();
+		eventCRFBean.setStage(DataEntryStage.DOUBLE_DATA_ENTRY);
+		eventCRFBean.setNotStarted(false);
+		eventCRFBean.setValidatorId(2);
+
+		UserAccountBean userAccountBean = new UserAccountBean();
+		userAccountBean.setId(3);
+		userAccountBean.setActiveStudyId(1);
+
+		List<StudyUserRoleBean> userRolesList = new ArrayList<StudyUserRoleBean>();
+		StudyUserRoleBean roleBean = new StudyUserRoleBean();
+		roleBean.setRole(Role.STUDY_ADMINISTRATOR);
+		roleBean.setStudyId(1);
+		userRolesList.add(roleBean);
+		userAccountBean.setRoles((ArrayList<StudyUserRoleBean>) userRolesList);
+
+
+		StudyUserRoleBean studyUserRoleBean = new StudyUserRoleBean();
+		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFBean();
+		eventDefinitionCRFBean.setEvaluatedCRF(true);
+
+		DisplayEventCRFBean displayEventCRFBean = new DisplayEventCRFBean();
+		displayEventCRFBean.setFlags(eventCRFBean, userAccountBean, studyUserRoleBean, eventDefinitionCRFBean);
+
+		assertTrue(displayEventCRFBean.isContinueDoubleDataEntryPermitted());
 	}
 }

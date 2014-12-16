@@ -200,7 +200,7 @@ public class DisplayEventCRFBean implements Comparable {
 				}
 			}
 		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY) && crfEvaluationOrDDEPermitted) {
-			if (eventCRF.getValidatorId() == user.getId()) {
+			if (eventCRF.getValidatorId() == user.getId() || isSuper(user.getActiveStudyRole())) {
 				continueDoubleDataEntryPermitted = true;
 			}
 		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)) {
