@@ -115,4 +115,13 @@ function MessageSourceGetter() {
 		ruleValid: "",
 		ruleInvalid: ""
 	};
+	this.dataType = {
+		st: "",
+		int: "",
+		real: "",
+		date: "",
+		file: "",
+		pdate: "",
+		code: ""
+	};
 }

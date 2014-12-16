@@ -98,6 +98,15 @@
 		messageSource.validations.ruleFailure = '<fmt:message bundle="${resword}" key="rs.validation.failure"/>';
 		messageSource.validations.ruleValid = '<fmt:message bundle="${resword}" key="rs.validation.valid"/>';
 		messageSource.validations.ruleInvalid = '<fmt:message bundle="${resword}" key="rs.validation.invalid"/>';
+
+		messageSource.dataType.st = '<fmt:message bundle="${resword}" key="data_type_st"/>';
+		messageSource.dataType.int = '<fmt:message bundle="${resword}" key="data_type_int"/>';
+		messageSource.dataType.real = '<fmt:message bundle="${resword}" key="data_type_real"/>';
+		messageSource.dataType.date = '<fmt:message bundle="${resword}" key="data_type_date"/>';
+		messageSource.dataType.file = '<fmt:message bundle="${resword}" key="data_type_file"/>';
+		messageSource.dataType.pdate = '<fmt:message bundle="${resword}" key="data_type_pdate"/>';
+		messageSource.dataType.code = '<fmt:message bundle="${resword}" key="data_type_code"/>';
+
 		localStorage.setItem("messageSource", JSON.stringify(messageSource));
 	}
 </script>

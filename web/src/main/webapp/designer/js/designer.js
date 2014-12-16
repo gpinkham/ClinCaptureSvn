@@ -1352,13 +1352,34 @@ function showCRFItem(ele) {
 }
 
 function mapItemType(type) {
-	if (type == 'st') {
-		return 'text';
-	} else if (type == 'int') {
-		return 'number';
-	} else {
-		return type;
+	var result = "";
+	switch (type) {
+		case 'st':
+			result = messageSource.dataType.st;
+			break;
+		case 'int':
+			result = messageSource.dataType.int;
+			break;
+		case 'real':
+			result = messageSource.dataType.real;
+			break;
+		case 'date':
+			result = messageSource.dataType.date;
+			break;
+		case 'pdate':
+			result = messageSource.dataType.pdate;
+			break;
+		case 'file':
+			result = messageSource.dataType.file;
+			break;
+		case 'code':
+            result = messageSource.dataType.code;
+            break;
+		default:
+			result = type;
+			break;
 	}
+	return result;
 }
 
 function handleClickDrop(ele) {
