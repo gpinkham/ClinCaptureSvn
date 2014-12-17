@@ -194,6 +194,7 @@ $(document).ready(function() {
 
 </script>
 
+<c:set var="isRFC" value="${param.isRFC == null or empty param.isRFC ? false : param.isRFC}"/>
 <c:set var="parentId" value="${param.parentId}"/>
 <c:set var="boxId" value="${param.boxId}"/>
 <c:set var="displayAll" value="none" />
@@ -225,7 +226,7 @@ $(document).ready(function() {
 	<input type="hidden" name="column" value="${param.column}"/>
 	<input type="hidden" name="close${parentId}" value=""/>
 	<input type="hidden" name="ypos${parentId}" value="0"/>
-	<input type="hidden" name="isRFC" value="${param.isRFC}"/>
+	<input type="hidden" name="isRFC" value="${isRFC}"/>
 	<input type="hidden" name="originJSP" value="${originJSP}"/>
 	<!-- *JSP* submit/discrepancyNote.jsp -->
 	<td valign="top">
