@@ -20,27 +20,28 @@
  */
 package org.akaza.openclinica.bean.login;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * @author thickerson
  */
 public class UserAccountBean extends AuditableEntityBean {
 
-    private static final long serialVersionUID = -7373737639499260727L;
+	private static final long serialVersionUID = -7373737639499260727L;
 
-    public static final String ROOT = "root";
+	public static final String ROOT = "root";
 
-    private String passwd;
+	private String passwd;
 	private String firstName;
 	private String lastName;
 	private String email;
@@ -422,9 +423,9 @@ public class UserAccountBean extends AuditableEntityBean {
 	}
 
 	public StudyUserRoleBean getRoleByStudy(int studyId) {
-        if (name.equals(ROOT)) {
-            return getSysAdminRole();
-        }
+		if (name.equals(ROOT)) {
+			return getSysAdminRole();
+		}
 
 		Integer key = new Integer(studyId);
 
@@ -498,9 +499,9 @@ public class UserAccountBean extends AuditableEntityBean {
 			Integer value = new Integer(this.roles.size() - 1);
 			rolesByStudy.put(key, value);
 
-            if (sur.getRole().equals(Role.SYSTEM_ADMINISTRATOR)) {
-                addUserType(UserType.SYSADMIN);
-            }
+			if (sur.getRole().equals(Role.SYSTEM_ADMINISTRATOR)) {
+				addUserType(UserType.SYSADMIN);
+			}
 		}
 	}
 
@@ -567,5 +568,24 @@ public class UserAccountBean extends AuditableEntityBean {
 
 	public void setPentahoTokenDate(Date pentahoTokenDate) {
 		this.pentahoTokenDate = pentahoTokenDate;
+	}
+
+	public String getJsonData(String password, UserType userType, Role role) throws Exception {
+		JSONObject jsonData = new JSONObject();
+		jsonData.put("id", id);
+		jsonData.put("username", name);
+		jsonData.put("firstname", firstName);
+		jsonData.put("lastname", lastName);
+		jsonData.put("email", email);
+		jsonData.put("phone", phone);
+		jsonData.put("scope", activeStudyId);
+		if (!password.isEmpty()) {
+			jsonData.put("password", password);
+		}
+		jsonData.put("company", institutionalAffiliation);
+		jsonData.put("allowsoap", runWebservices);
+		jsonData.put("role", role.getCode());
+		jsonData.put("usertype", userType.getCode());
+		return jsonData.toString();
 	}
 }

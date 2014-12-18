@@ -20,16 +20,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -47,6 +37,15 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 /**
  * Servlet for user account list table.
@@ -83,20 +82,21 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		StudyDAO sdao = getStudyDAO();
 		EntityBeanTable table = fp.getEntityBeanTable();
 		UserAccountBean currentUser = getUserAccountBean(request);
-		List<StudyBean> studyListCurrentUserHasAccessTo = sdao.findAllActiveStudiesWhereUserHasRole(currentUser.getName());
+		List<StudyBean> studyListCurrentUserHasAccessTo = sdao.findAllActiveStudiesWhereUserHasRole(currentUser
+				.getName());
 		List<UserAccountBean> allUsers = getAllUsers(udao);
 		ListIterator<UserAccountBean> iterateUser;
-	
+
 		if (!currentUser.getName().equals(UserAccountBean.ROOT)) {
 			iterateUser = allUsers.listIterator();
 			while (iterateUser.hasNext()) {
-				if (!getUserAccountService().doesUserHaveRoleInStydies(iterateUser.next(),
+				if (!getUserAccountService().doesUserHaveRoleInStudies(iterateUser.next(),
 						studyListCurrentUserHasAccessTo)) {
-					iterateUser.remove();			
+					iterateUser.remove();
 				}
 			}
 		}
-		
+
 		setStudyNamesInStudyUserRoles(allUsers);
 
 		for (Object allUser : allUsers) {
@@ -116,7 +116,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 			}
 			userRolesRemovedCountMap.put(uab.getName(), removedRolesCount);
 		}
-		
+
 		StudyBean sb = (StudyBean) sdao.findByPK(((UserAccountBean) (request.getSession().getAttribute("userBean")))
 				.getActiveStudyId());
 
@@ -157,12 +157,10 @@ public class ListUserAccountsServlet extends RememberLastPage {
 	}
 
 	/**
-	 * For each user, for each study user role, set the study user role's
-	 * studyName property.
+	 * For each user, for each study user role, set the study user role's studyName property.
 	 * 
 	 * @param users
-	 *            The users to display in the table of users. Each element is a
-	 *            UserAccountBean.
+	 *            The users to display in the table of users. Each element is a UserAccountBean.
 	 */
 	private void setStudyNamesInStudyUserRoles(List<UserAccountBean> users) {
 		StudyDAO sdao = getStudyDAO();
@@ -211,16 +209,16 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
 		String eblSortAscending = fp.getString("ebl_sortAscending");
 		return new StringBuilder("").append("?submitted=1&module=").append(fp.getString("module"))
-				.append("&ebl_page=1&ebl_sortColumnInd=").append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0"))
-				.append("&ebl_sortAscending=").append((!eblSortAscending.isEmpty() ? eblSortAscending : "1"))
-				.append("&ebl_filtered=").append((!eblFiltered.isEmpty() ? eblFiltered : "0"))
-				.append("&ebl_filterKeyword=").append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : ""))
-				.append("&&ebl_paginated=1").toString();
+				.append("&ebl_page=1&ebl_sortColumnInd=")
+				.append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0")).append("&ebl_sortAscending=")
+				.append((!eblSortAscending.isEmpty() ? eblSortAscending : "1")).append("&ebl_filtered=")
+				.append((!eblFiltered.isEmpty() ? eblFiltered : "0")).append("&ebl_filterKeyword=")
+				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1").toString();
 	}
 
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
 	}
-	
+
 }

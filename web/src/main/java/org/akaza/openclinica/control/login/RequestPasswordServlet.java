@@ -138,7 +138,7 @@ public class RequestPasswordServlet extends Controller {
 					SecurityManager scm = getSecurityManager();
 					String newPass = scm.genPassword();
 					OpenClinicaJdbcService ocService = getOpenClinicaJdbcService();
-					String newDigestPass = scm.encrytPassword(newPass, ocService.loadUserByUsername(ubForm.getName()));
+					String newDigestPass = scm.encryptPassword(newPass, ocService.loadUserByUsername(ubForm.getName()));
 					ubDB.setPasswd(newDigestPass);
 
 					ubDB.setPasswdTimestamp(null);

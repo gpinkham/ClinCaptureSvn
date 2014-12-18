@@ -15,6 +15,8 @@
 
 package com.clinovo.rest.model;
 
+import com.clinovo.rest.security.PermissionChecker;
+import com.clinovo.rest.util.RequestUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -78,5 +80,15 @@ public class UserDetails {
 
 	public void setUserTypeCode(String userTypeCode) {
 		this.userTypeCode = userTypeCode;
+	}
+
+	/**
+	 * Method that returns current user details.
+	 * 
+	 * @return UserDetails
+	 */
+	public static UserDetails getCurrentUserDetails() {
+		return (UserDetails) RequestUtil.getRequest().getSession()
+				.getAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
 	}
 }

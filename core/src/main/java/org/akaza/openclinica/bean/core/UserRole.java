@@ -20,6 +20,10 @@ package org.akaza.openclinica.bean.core;
  */
 public enum UserRole {
 
+	ANY_USER(null, null),
+
+	ANY_ADMIN(null, null),
+
 	SYS_ADMIN(Role.SYSTEM_ADMINISTRATOR.getCode(), UserType.SYSADMIN.getCode()),
 
 	STUDY_ADMIN_ADMIN(Role.STUDY_ADMINISTRATOR.getCode(), UserType.SYSADMIN.getCode()), STUDY_ADMIN_USER(

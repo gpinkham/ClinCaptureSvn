@@ -1,9 +1,6 @@
 package com.clinovo.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-
+import com.clinovo.service.impl.UserAccountServiceImpl;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Role;
@@ -16,19 +13,23 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Test;
+import org.powermock.api.mockito.PowerMockito;
 
-import static org.mockito.internal.util.reflection.Whitebox.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
-import com.clinovo.service.impl.UserAccountServiceImpl;
-
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 public class UserAccountServiceTest extends DefaultAppContextTest {
 
 	private UserAccountService spyUserAccountService;
 
 	private StudyDAO spyStudyDAO;
-	
+
 	private UserAccountDAO spyUserAccountDAO;
 
 	private ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
@@ -36,16 +37,18 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 	private UserAccountBean currentUser;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 
 		UserAccountService userAccountService = new UserAccountServiceImpl();
 		spyUserAccountService = spy(userAccountService);
 
 		spyStudyDAO = spy(studyDAO);
-		setInternalState(spyUserAccountService, "studyDAO", spyStudyDAO);
-		
+		PowerMockito.when(spyUserAccountService, spyUserAccountService.getClass().getMethod("getStudyDAO"))
+				.withNoArguments().thenReturn(spyStudyDAO);
+
 		spyUserAccountDAO = spy(userAccountDAO);
-		setInternalState(spyUserAccountService, "userAccountDAO", spyUserAccountDAO);
+		PowerMockito.when(spyUserAccountService, spyUserAccountService.getClass().getMethod("getUserAccountDAO"))
+				.withNoArguments().thenReturn(spyUserAccountDAO);
 
 		currentUser = new UserAccountBean();
 		currentUser.setId(1);
@@ -54,7 +57,7 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatDoesUserHaveRoleInStydiesRuturnsTrue() throws Exception {
+	public void testThatDoesUserHaveRoleInStudiesRuturnsTrue() throws Exception {
 
 		UserAccountBean user = new UserAccountBean();
 
@@ -97,11 +100,11 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		doReturn(siteListFirst).when(spyStudyDAO).findAllByParentAndActive(studyList.get(0).getId());
 		doReturn(siteListSecond).when(spyStudyDAO).findAllByParentAndActive(studyList.get(1).getId());
 
-		assertTrue(spyUserAccountService.doesUserHaveRoleInStydies(user, studyList));
+		assertTrue(spyUserAccountService.doesUserHaveRoleInStudies(user, studyList));
 	}
 
 	@Test
-	public void testThatDoesUserHaveRoleInStydiesRuturnsFalse() throws Exception {
+	public void testThatDoesUserHaveRoleInStudiesRuturnsFalse() throws Exception {
 
 		UserAccountBean user = new UserAccountBean();
 
@@ -144,7 +147,7 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		doReturn(siteListFirst).when(spyStudyDAO).findAllByParentAndActive(studyList.get(0).getId());
 		doReturn(siteListSecond).when(spyStudyDAO).findAllByParentAndActive(studyList.get(1).getId());
 
-		assertFalse(spyUserAccountService.doesUserHaveRoleInStydies(user, studyList));
+		assertFalse(spyUserAccountService.doesUserHaveRoleInStudies(user, studyList));
 	}
 
 	@Test
@@ -154,8 +157,8 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		int studyId = 1;
 		StringBuilder messages = new StringBuilder("");
 
-		doReturn(Boolean.TRUE).when(spyUserAccountService)
-				.removeStudyUserRole(userId, studyId, currentUser, messages, respage);
+		doReturn(Boolean.TRUE).when(spyUserAccountService).removeStudyUserRole(userId, studyId, currentUser, messages,
+				respage);
 		assertTrue(spyUserAccountService.performActionOnStudyUserRole(userId, studyId, EntityAction.REMOVE.getId(),
 				currentUser, messages, respage));
 	}
@@ -176,36 +179,38 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatDeleteStudyUserRoleReturnsFalseOnInvalidUserAccount()  throws Exception {
-		
+	public void testThatDeleteStudyUserRoleReturnsFalseOnInvalidUserAccount() throws Exception {
+
 		int userId = 34;
 		int studyId = 5;
 
 		doReturn(new UserAccountBean()).when(spyUserAccountDAO).findByPK(userId);
-		
-		assertFalse(spyUserAccountService.deleteStudyUserRole(userId, studyId, currentUser, new StringBuilder(""), respage));
+
+		assertFalse(spyUserAccountService.deleteStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
+				respage));
 	}
-	
+
 	@Test
-	public void testThatDeleteStudyUserRoleReturnsFalseOnInvalidStudyUserRole()  throws Exception {
-		
+	public void testThatDeleteStudyUserRoleReturnsFalseOnInvalidStudyUserRole() throws Exception {
+
 		int userId = 34;
 		int studyId = 5;
 		String userName = "Mockito";
-		
+
 		UserAccountBean user = new UserAccountBean();
 		user.setId(userId);
 		user.setName(userName);
 
 		doReturn(user).when(spyUserAccountDAO).findByPK(userId);
 		doReturn(new StudyUserRoleBean()).when(spyUserAccountDAO).findRoleByUserNameAndStudyId(user.getName(), studyId);
-		
-		assertFalse(spyUserAccountService.deleteStudyUserRole(userId, studyId, currentUser, new StringBuilder(""), respage));
+
+		assertFalse(spyUserAccountService.deleteStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
+				respage));
 	}
-	
+
 	@Test
-	public void testThatDeleteStudyUserRoleLocksUserAccountSinceUserHaveNoAvailableRole()  throws Exception {
-		
+	public void testThatDeleteStudyUserRoleLocksUserAccountSinceUserHaveNoAvailableRole() throws Exception {
+
 		int userId = 18;
 		int studyId = 1;
 		String userName = "Mockito";
@@ -214,12 +219,12 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		StudyBean study = new StudyBean();
 		study.setId(studyId);
 		study.setName(studyName);
-		
+
 		UserAccountBean user = new UserAccountBean();
 		user.setId(userId);
 		user.setName(userName);
 		user.setActiveStudyId(studyId);
-		
+
 		List<StudyUserRoleBean> userRolesList = new ArrayList<StudyUserRoleBean>();
 
 		StudyUserRoleBean roleBean = new StudyUserRoleBean();
@@ -237,16 +242,17 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		doReturn(user).when(spyUserAccountDAO).findByPK(userId);
 		doReturn(user.getRoles().get(1)).when(spyUserAccountDAO).findRoleByUserNameAndStudyId(user.getName(), studyId);
 		doReturn(study).when(spyStudyDAO).findByPK(studyId);
-		
-		assertTrue(spyUserAccountService.deleteStudyUserRole(userId, studyId, currentUser, new StringBuilder(""), respage));
-		
+
+		assertTrue(spyUserAccountService.deleteStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
+				respage));
+
 		verify(spyUserAccountDAO).deleteUserRole(user.getRoles().get(1));
 		verify(spyUserAccountDAO).lockUser(user.getId());
 	}
-	
+
 	@Test
-	public void testThatDeleteStudyUserRoleWillSetNewActiveStudyIdForUser()  throws Exception {
-		
+	public void testThatDeleteStudyUserRoleWillSetNewActiveStudyIdForUser() throws Exception {
+
 		int userId = 18;
 		int studyId = 1;
 		int newActiveStudyId = 11;
@@ -256,12 +262,12 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		StudyBean study = new StudyBean();
 		study.setId(studyId);
 		study.setName(studyName);
-		
+
 		UserAccountBean user = new UserAccountBean();
 		user.setId(userId);
 		user.setName(userName);
 		user.setActiveStudyId(studyId);
-		
+
 		List<StudyUserRoleBean> userRolesList = new ArrayList<StudyUserRoleBean>();
 		StudyUserRoleBean roleBean = new StudyUserRoleBean();
 		roleBean.setRole(Role.INVESTIGATOR);
@@ -279,46 +285,49 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		doReturn(user.getRoles().get(1)).when(spyUserAccountDAO).findRoleByUserNameAndStudyId(user.getName(), studyId);
 		doReturn(study).when(spyStudyDAO).findByPK(studyId);
 		doReturn(user).when(spyUserAccountDAO).update(user);
-		
-		assertTrue(spyUserAccountService.deleteStudyUserRole(userId, studyId, currentUser, new StringBuilder(""), respage));
-		
+
+		assertTrue(spyUserAccountService.deleteStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
+				respage));
+
 		verify(spyUserAccountDAO).deleteUserRole(user.getRoles().get(1));
 		verify(spyUserAccountDAO).update(user);
 		verify(spyUserAccountDAO, never()).lockUser(user.getId());
 		assertEquals(newActiveStudyId, user.getActiveStudyId());
 	}
-	
+
 	@Test
-	public void testThatRemoveStudyUserRoleReturnsFalseOnInvalidUserAccount()  throws Exception {
-		
+	public void testThatRemoveStudyUserRoleReturnsFalseOnInvalidUserAccount() throws Exception {
+
 		int userId = 129;
 		int studyId = 43;
 
 		doReturn(new UserAccountBean()).when(spyUserAccountDAO).findByPK(userId);
-		
-		assertFalse(spyUserAccountService.removeStudyUserRole(userId, studyId, currentUser, new StringBuilder(""), respage));
+
+		assertFalse(spyUserAccountService.removeStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
+				respage));
 	}
-	
+
 	@Test
-	public void testThatRemoveStudyUserRoleReturnsFalseOnInvalidStudyUserRole()  throws Exception {
-		
+	public void testThatRemoveStudyUserRoleReturnsFalseOnInvalidStudyUserRole() throws Exception {
+
 		int userId = 129;
 		int studyId = 43;
 		String userName = "Mockito";
-		
+
 		UserAccountBean user = new UserAccountBean();
 		user.setId(userId);
 		user.setName(userName);
 
 		doReturn(user).when(spyUserAccountDAO).findByPK(userId);
 		doReturn(new StudyUserRoleBean()).when(spyUserAccountDAO).findRoleByUserNameAndStudyId(user.getName(), studyId);
-		
-		assertFalse(spyUserAccountService.removeStudyUserRole(userId, studyId, currentUser, new StringBuilder(""), respage));
+
+		assertFalse(spyUserAccountService.removeStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
+				respage));
 	}
-	
+
 	@Test
-	public void testThatRemoveStudyUserRoleLocksUserAccountSinceUserHaveNoAvailableRole()  throws Exception {
-		
+	public void testThatRemoveStudyUserRoleLocksUserAccountSinceUserHaveNoAvailableRole() throws Exception {
+
 		int userId = 3;
 		int studyId = 12;
 		String userName = "Mockito";
@@ -327,12 +336,12 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		StudyBean study = new StudyBean();
 		study.setId(studyId);
 		study.setName(studyName);
-		
+
 		UserAccountBean user = new UserAccountBean();
 		user.setId(userId);
 		user.setName(userName);
 		user.setActiveStudyId(studyId);
-		
+
 		List<StudyUserRoleBean> userRolesList = new ArrayList<StudyUserRoleBean>();
 
 		StudyUserRoleBean roleBean = new StudyUserRoleBean();
@@ -353,16 +362,17 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		doReturn(user).when(spyUserAccountDAO).findByUserName(userName);
 		doReturn(user.getRoles().get(1)).when(spyUserAccountDAO).findRoleByUserNameAndStudyId(user.getName(), studyId);
 		doReturn(study).when(spyStudyDAO).findByPK(studyId);
-		
-		assertTrue(spyUserAccountService.removeStudyUserRole(userId, studyId, currentUser, new StringBuilder(""), respage));
-		
+
+		assertTrue(spyUserAccountService.removeStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
+				respage));
+
 		verify(spyUserAccountDAO).updateStudyUserRole(user.getRoles().get(1), user.getName());
 		verify(spyUserAccountDAO).lockUser(user.getId());
 	}
-	
+
 	@Test
-	public void testThatRemoveStudyUserRoleWillSetNewActiveStudyIdForUser()  throws Exception {
-		
+	public void testThatRemoveStudyUserRoleWillSetNewActiveStudyIdForUser() throws Exception {
+
 		int userId = 8;
 		int studyId = 88;
 		int newActiveStudyId = 122;
@@ -372,12 +382,12 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		StudyBean study = new StudyBean();
 		study.setId(studyId);
 		study.setName(studyName);
-		
+
 		UserAccountBean user = new UserAccountBean();
 		user.setId(userId);
 		user.setName(userName);
 		user.setActiveStudyId(studyId);
-		
+
 		List<StudyUserRoleBean> userRolesList = new ArrayList<StudyUserRoleBean>();
 		StudyUserRoleBean roleBean = new StudyUserRoleBean();
 		roleBean.setRole(Role.STUDY_ADMINISTRATOR);
@@ -398,46 +408,49 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		doReturn(user.getRoles().get(1)).when(spyUserAccountDAO).findRoleByUserNameAndStudyId(user.getName(), studyId);
 		doReturn(study).when(spyStudyDAO).findByPK(studyId);
 		doReturn(user).when(spyUserAccountDAO).update(user);
-		
-		assertTrue(spyUserAccountService.removeStudyUserRole(userId, studyId, currentUser, new StringBuilder(""), respage));
-		
+
+		assertTrue(spyUserAccountService.removeStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
+				respage));
+
 		verify(spyUserAccountDAO).updateStudyUserRole(user.getRoles().get(1), user.getName());
 		verify(spyUserAccountDAO).update(user);
 		verify(spyUserAccountDAO, never()).lockUser(user.getId());
 		assertEquals(newActiveStudyId, user.getActiveStudyId());
 	}
-	
+
 	@Test
-	public void testThatRestoreStudyUserRoleReturnsFalseOnInvalidUserAccount()  throws Exception {
-		
+	public void testThatRestoreStudyUserRoleReturnsFalseOnInvalidUserAccount() throws Exception {
+
 		int userId = 129;
 		int studyId = 43;
 
 		doReturn(new UserAccountBean()).when(spyUserAccountDAO).findByPK(userId);
-		
-		assertFalse(spyUserAccountService.restoreStudyUserRole(userId, studyId, currentUser, new StringBuilder(""), respage));
+
+		assertFalse(spyUserAccountService.restoreStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
+				respage));
 	}
-	
+
 	@Test
-	public void testThatRestoreStudyUserRoleReturnsFalseOnInvalidStudyUserRole()  throws Exception {
-		
+	public void testThatRestoreStudyUserRoleReturnsFalseOnInvalidStudyUserRole() throws Exception {
+
 		int userId = 129;
 		int studyId = 43;
 		String userName = "Mockito";
-		
+
 		UserAccountBean user = new UserAccountBean();
 		user.setId(userId);
 		user.setName(userName);
 
 		doReturn(user).when(spyUserAccountDAO).findByPK(userId);
 		doReturn(new StudyUserRoleBean()).when(spyUserAccountDAO).findRoleByUserNameAndStudyId(user.getName(), studyId);
-		
-		assertFalse(spyUserAccountService.restoreStudyUserRole(userId, studyId, currentUser, new StringBuilder(""), respage));
+
+		assertFalse(spyUserAccountService.restoreStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
+				respage));
 	}
-	
+
 	@Test
 	public void testThatRestoreStudyUserRoleWillNotRestoreUserRoleSinceTheStudyIsRemoved() throws Exception {
-		
+
 		int userId = 8;
 		int studyId = 88;
 		int removedStudyId = 123;
@@ -448,13 +461,13 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		removedStudy.setId(removedStudyId);
 		removedStudy.setName(removedStudyName);
 		removedStudy.setStatus(Status.DELETED);
-		
+
 		UserAccountBean user = new UserAccountBean();
 		user.setId(userId);
 		user.setName(userName);
 		user.setActiveStudyId(studyId);
 		user.setStatus(Status.AVAILABLE);
-		
+
 		List<StudyUserRoleBean> userRolesList = new ArrayList<StudyUserRoleBean>();
 		StudyUserRoleBean roleBean = new StudyUserRoleBean();
 		roleBean.setRole(Role.STUDY_ADMINISTRATOR);
@@ -466,18 +479,20 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 
 		doReturn(user).when(spyUserAccountDAO).findByPK(userId);
 		doReturn(user).when(spyUserAccountDAO).findByUserName(userName);
-		doReturn(user.getRoles().get(0)).when(spyUserAccountDAO).findRoleByUserNameAndStudyId(user.getName(), removedStudyId);
+		doReturn(user.getRoles().get(0)).when(spyUserAccountDAO).findRoleByUserNameAndStudyId(user.getName(),
+				removedStudyId);
 		doReturn(removedStudy).when(spyStudyDAO).findByPK(removedStudyId);
-		
-		assertFalse(spyUserAccountService.restoreStudyUserRole(userId, removedStudyId, currentUser, new StringBuilder(""), respage));
-		
+
+		assertFalse(spyUserAccountService.restoreStudyUserRole(userId, removedStudyId, currentUser, new StringBuilder(
+				""), respage));
+
 		verify(spyUserAccountDAO, never()).updateStudyUserRole(user.getRoles().get(0), user.getName());
 		verify(spyUserAccountDAO, never()).update(user);
 	}
-	
+
 	@Test
 	public void testThatRestoreStudyUserRoleWillNotRestoreUserRoleSinceTheUserAccountIsRemoved() throws Exception {
-		
+
 		int userId = 10;
 		int studyId = 213;
 		String userName = "Mockito";
@@ -487,13 +502,13 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		study.setId(studyId);
 		study.setName(studyName);
 		study.setStatus(Status.AVAILABLE);
-		
+
 		UserAccountBean user = new UserAccountBean();
 		user.setId(userId);
 		user.setName(userName);
 		user.setActiveStudyId(studyId);
 		user.setStatus(Status.DELETED);
-		
+
 		List<StudyUserRoleBean> userRolesList = new ArrayList<StudyUserRoleBean>();
 		StudyUserRoleBean roleBean = new StudyUserRoleBean();
 		roleBean.setRole(Role.STUDY_ADMINISTRATOR);
@@ -507,16 +522,17 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		doReturn(user).when(spyUserAccountDAO).findByUserName(userName);
 		doReturn(user.getRoles().get(0)).when(spyUserAccountDAO).findRoleByUserNameAndStudyId(user.getName(), studyId);
 		doReturn(study).when(spyStudyDAO).findByPK(studyId);
-		
-		assertFalse(spyUserAccountService.restoreStudyUserRole(userId, studyId, currentUser, new StringBuilder(""), respage));
-		
+
+		assertFalse(spyUserAccountService.restoreStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
+				respage));
+
 		verify(spyUserAccountDAO, never()).updateStudyUserRole(user.getRoles().get(0), user.getName());
 		verify(spyUserAccountDAO, never()).update(user);
 	}
-	
+
 	@Test
 	public void testThatRestoreStudyUserRoleWillRestoreUserRole() throws Exception {
-		
+
 		int userId = 10;
 		int studyId = 213;
 		int newActiveSstudyId = 444;
@@ -527,13 +543,13 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		study.setId(newActiveSstudyId);
 		study.setName(studyName);
 		study.setStatus(Status.AVAILABLE);
-		
+
 		UserAccountBean user = new UserAccountBean();
 		user.setId(userId);
 		user.setName(userName);
 		user.setActiveStudyId(studyId);
 		user.setStatus(Status.AVAILABLE);
-		
+
 		List<StudyUserRoleBean> userRolesList = new ArrayList<StudyUserRoleBean>();
 		StudyUserRoleBean roleBean = new StudyUserRoleBean();
 		roleBean.setRole(Role.STUDY_ADMINISTRATOR);
@@ -545,11 +561,13 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 
 		doReturn(user).when(spyUserAccountDAO).findByPK(userId);
 		doReturn(user).when(spyUserAccountDAO).findByUserName(userName);
-		doReturn(user.getRoles().get(0)).when(spyUserAccountDAO).findRoleByUserNameAndStudyId(user.getName(), newActiveSstudyId);
+		doReturn(user.getRoles().get(0)).when(spyUserAccountDAO).findRoleByUserNameAndStudyId(user.getName(),
+				newActiveSstudyId);
 		doReturn(study).when(spyStudyDAO).findByPK(newActiveSstudyId);
-		
-		assertTrue(spyUserAccountService.restoreStudyUserRole(userId, newActiveSstudyId, currentUser, new StringBuilder(""), respage));
-		
+
+		assertTrue(spyUserAccountService.restoreStudyUserRole(userId, newActiveSstudyId, currentUser,
+				new StringBuilder(""), respage));
+
 		verify(spyUserAccountDAO).updateStudyUserRole(user.getRoles().get(0), user.getName());
 		verify(spyUserAccountDAO).update(user);
 		assertEquals(newActiveSstudyId, user.getActiveStudyId());

@@ -15,134 +15,179 @@
 
 package com.clinovo.service;
 
-import java.util.List;
-import java.util.ResourceBundle;
-
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 
+import java.util.List;
+import java.util.ResourceBundle;
+
+/**
+ * UserAccountService.
+ */
 public interface UserAccountService {
 
 	/**
-	 * Discovers, if the user has a role, assigned to the one of studies from specified list,
-	 * no matter if the role has status REMOVED or AVAILABLE.
+	 * Discovers, if the user has a role, assigned to the one of studies from specified list, no matter if the role has
+	 * status REMOVED or AVAILABLE.
 	 * 
 	 * @param user
-	 *				user account, for which search should be performed
+	 *            user account, for which search should be performed
 	 * @param studyList
-	 *				list of studies to search in (must contain only studies, and no sites)
+	 *            list of studies to search in (must contain only studies, and no sites)
 	 * @return TRUE, if the user has a role, assigned to the one of studies from specified list, and FALSE otherwise
+	 * @throws Exception
+	 *             an Exception
 	 */
-	public boolean doesUserHaveRoleInStydies(UserAccountBean user, List<StudyBean> studyList) throws Exception;
-	
+	boolean doesUserHaveRoleInStudies(UserAccountBean user, List<StudyBean> studyList) throws Exception;
+
 	/**
 	 * Performs specified action on study user role (remove, restore, delete).
 	 * 
 	 * @param userId
-	 *				the user's account ID, that owns the role to be processed
+	 *            the user's account ID, that owns the role to be processed
 	 * @param studyId
-	 *				the study ID, role was assigned to
+	 *            the study ID, role was assigned to
 	 * @param actionId
-	 *				the action ID, to be performed
+	 *            the action ID, to be performed
 	 * @param currentUser
-	 *				the user, that performs action (user logged into the system)
+	 *            the user, that performs action (user logged into the system)
 	 * @param message
-	 *				buffer for messages, that should be displayed on the webpage in 'Alerts & Messages' tab
+	 *            buffer for messages, that should be displayed on the webpage in 'Alerts & Messages' tab
 	 * @param respage
-	 *				localized message source
+	 *            localized message source
+	 * @return boolean
+	 * @throws Exception
+	 *             an Exception
 	 */
-	public boolean performActionOnStudyUserRole(int userId, int studyId, int actionId, UserAccountBean currentUser,
+	boolean performActionOnStudyUserRole(int userId, int studyId, int actionId, UserAccountBean currentUser,
 			StringBuilder message, ResourceBundle respage) throws Exception;
-	
+
 	/**
 	 * Deletes a role for a user account.
 	 * 
 	 * @param userId
-	 *				the user's account ID, that owns the role to be deleted
+	 *            the user's account ID, that owns the role to be deleted
 	 * @param studyId
-	 *				the study ID, role was assigned to
+	 *            the study ID, role was assigned to
 	 * @param currentUser
-	 *				the user, that performs delete operation (user logged into the system)
+	 *            the user, that performs delete operation (user logged into the system)
 	 * @param message
-	 *				buffer for messages, that should be displayed on the webpage in 'Alerts & Messages' tab
+	 *            buffer for messages, that should be displayed on the webpage in 'Alerts & Messages' tab
 	 * @param respage
-	 *				localized message source
+	 *            localized message source
+	 * @return boolean
+	 * @throws Exception
+	 *             an Exception
 	 */
-	public boolean deleteStudyUserRole(int userId, int studyId, UserAccountBean currentUser, StringBuilder message,
+	boolean deleteStudyUserRole(int userId, int studyId, UserAccountBean currentUser, StringBuilder message,
 			ResourceBundle respage) throws Exception;
-	
+
 	/**
 	 * Removes a role for a user account. Sets role status as REMOVED.
 	 * 
 	 * @param userId
-	 *				the user's account ID, that owns the role to be removed
+	 *            the user's account ID, that owns the role to be removed
 	 * @param studyId
-	 *				the study ID, role was assigned to
+	 *            the study ID, role was assigned to
 	 * @param currentUser
-	 *				the user, that performs remove operation (user logged into the system)
+	 *            the user, that performs remove operation (user logged into the system)
 	 * @param message
-	 *				buffer for messages, that should be displayed on the webpage in 'Alerts & Messages' tab
+	 *            buffer for messages, that should be displayed on the webpage in 'Alerts & Messages' tab
 	 * @param respage
-	 *				localized message source
+	 *            localized message source
+	 * @return boolean
+	 * @throws Exception
+	 *             an Exception
 	 */
-	public boolean removeStudyUserRole(int userId, int studyId, UserAccountBean currentUser, StringBuilder message,
+	boolean removeStudyUserRole(int userId, int studyId, UserAccountBean currentUser, StringBuilder message,
 			ResourceBundle respage) throws Exception;
-	
+
 	/**
-	 * Removes a role for a user account. Sets role status as AUTO_REMOVED. 
-	 * Use this method when removing the role should be performed in the context of some other operation, e.g. removing study/site. 
+	 * Removes a role for a user account. Sets role status as AUTO_REMOVED. Use this method when removing the role
+	 * should be performed in the context of some other operation, e.g. removing study/site.
 	 * 
 	 * @param studyUserRole
-	 *				the role to be removed
+	 *            the role to be removed
 	 * @param currentUser
-	 *				the user, that performs remove operation (user logged into the system)
+	 *            the user, that performs remove operation (user logged into the system)
+	 * @throws Exception
+	 *             an Exception
 	 */
-	public void autoRemoveStudyUserRole(StudyUserRoleBean studyUserRole, UserAccountBean currentUser) throws Exception ;
-	
+	void autoRemoveStudyUserRole(StudyUserRoleBean studyUserRole, UserAccountBean currentUser) throws Exception;
+
 	/**
 	 * Restores a role for a user account.
 	 * 
 	 * @param userId
-	 *				the user's account ID, that owns the role to be restored
+	 *            the user's account ID, that owns the role to be restored
 	 * @param studyId
-	 *				the study ID, role was assigned to
+	 *            the study ID, role was assigned to
 	 * @param currentUser
-	 *				the user, that performs restore operation (user logged into the system)
+	 *            the user, that performs restore operation (user logged into the system)
 	 * @param message
-	 *				buffer for messages, that should be displayed on the webpage in 'Alerts & Messages' tab
+	 *            buffer for messages, that should be displayed on the webpage in 'Alerts & Messages' tab
 	 * @param respage
-	 *				localized message source
+	 *            localized message source
+	 * @return boolean
+	 * @throws Exception
+	 *             an Exception
 	 */
-	public boolean restoreStudyUserRole(int userId, int studyId, UserAccountBean currentUser, StringBuilder message,
+	boolean restoreStudyUserRole(int userId, int studyId, UserAccountBean currentUser, StringBuilder message,
 			ResourceBundle respage) throws Exception;
-	
+
 	/**
-	 * Restores a role for a user account.
-	 * Use this method when restoring the role should be performed in the context of some other operation, e.g. restoring study/site. 
+	 * Restores a role for a user account. Use this method when restoring the role should be performed in the context of
+	 * some other operation, e.g. restoring study/site.
 	 * 
 	 * @param studyUserRole
-	 *				the role to be restored
+	 *            the role to be restored
 	 * @param currentUser
-	 *				the user, that performs restore operation (user logged into the system)
+	 *            the user, that performs restore operation (user logged into the system)
+	 * @throws Exception
+	 *             an Exception
 	 */
-	public void autoRestoreStudyUserRole(StudyUserRoleBean studyUserRole, UserAccountBean currentUser) throws Exception;
-	
+	void autoRestoreStudyUserRole(StudyUserRoleBean studyUserRole, UserAccountBean currentUser) throws Exception;
+
 	/**
 	 * Discovers, if the user still has at least one role with status AVAILABLE.
 	 * 
 	 * @param userId
-	 *				the user account ID, for which search should be performed
+	 *            the user account ID, for which search should be performed
+	 * @return boolean
+	 * @throws Exception
+	 *             an Exception
 	 */
-	public boolean doesUserHaveAvailableRole(int userId) throws Exception;
-	
+	boolean doesUserHaveAvailableRole(int userId) throws Exception;
+
 	/**
 	 * Sets activeStudyId property of a user account.
 	 * 
 	 * @param user
-	 *				the user account, to be updated
+	 *            the user account, to be updated
 	 * @param studyId
-	 *				study ID, to be set as activeStudyId
+	 *            study ID, to be set as activeStudyId
+	 * @throws Exception
+	 *             an Exception
 	 */
-	public void setActiveStudyId(UserAccountBean user, int studyId) throws Exception;
+	void setActiveStudyId(UserAccountBean user, int studyId) throws Exception;
+
+	/**
+	 * Method that creates new user.
+	 * 
+	 * @param ownerUserName
+	 *            String
+	 * @param userAccountBean
+	 *            UserAccountBean
+	 * @param role
+	 *            Role
+	 * @param displayPassword
+	 *            boolean
+	 * @param password
+	 *            String
+	 * @return UserAccountBean
+	 */
+	UserAccountBean createUser(String ownerUserName, UserAccountBean userAccountBean, Role role,
+			boolean displayPassword, String password);
 }

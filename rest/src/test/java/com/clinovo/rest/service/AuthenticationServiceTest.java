@@ -2,9 +2,6 @@ package com.clinovo.rest.service;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.junit.After;
 import org.junit.Test;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -15,19 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * AuthenticationServiceTest.
  */
 public class AuthenticationServiceTest extends BaseServiceTest {
-
-	private StudyBean newSite;
-	private UserAccountBean newUser;
-
-	@After
-	public void deleteData() {
-		if (newUser != null && newUser.getId() > 0) {
-			deleteUser(newUser);
-		}
-		if (newSite != null && newSite.getId() > 0) {
-			deleteStudy(newSite);
-		}
-	}
 
 	@Test
 	public void testThatAuthenticationServiceReturnsNotFoundIfRequestIsNotMapped() throws Exception {
@@ -83,23 +67,20 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatAuthenticationServiceReturnsUnauthorizedForUserThatIsNotAssignedToAnyStudy() throws Exception {
-		String password = securityManager.genPassword();
-		newUser = createUser(password, null, UserType.SYSADMIN, studyBean.getId());
-		assertTrue(newUser.getId() > 0);
+		createUserWithoutRole(UserType.SYSADMIN, studyBean.getId());
 		this.mockMvc.perform(
-				post(API_AUTHENTICATION).secure(true).param("username", newUser.getName()).param("password", password)
-						.param("studyname", studyBean.getName())).andExpect(status().isUnauthorized());
+				post(API_AUTHENTICATION).secure(true).param("username", newUser.getName())
+						.param("password", newUser.getPasswd()).param("studyname", studyBean.getName())).andExpect(
+				status().isUnauthorized());
 	}
 
 	@Test
 	public void testThatAuthenticationServiceReturnsOkForNewlyCreatedStudyAdministrator() throws Exception {
-		String password = securityManager.genPassword();
-		newUser = createUser(password, Role.STUDY_ADMINISTRATOR, UserType.SYSADMIN, studyBean.getId());
-		assertTrue(newUser.getId() > 0);
+		createNewUser(studyBean.getId(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
 				.perform(
 						post(API_AUTHENTICATION).secure(true).param("username", newUser.getName())
-								.param("password", password).param("studyname", studyBean.getName()))
+								.param("password", newUser.getPasswd()).param("studyname", studyBean.getName()))
 				.andExpect(status().isOk())
 				.andExpect(
 						content().string(
@@ -111,13 +92,11 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatAuthenticationServiceReturnsOkForNewlyCreatedStudyMonitor() throws Exception {
-		String password = securityManager.genPassword();
-		newUser = createUser(password, Role.STUDY_MONITOR, UserType.SYSADMIN, studyBean.getId());
-		assertTrue(newUser.getId() > 0);
+		createNewUser(studyBean.getId(), UserType.SYSADMIN, Role.STUDY_MONITOR);
 		this.mockMvc
 				.perform(
 						post(API_AUTHENTICATION).secure(true).param("username", newUser.getName())
-								.param("password", password).param("studyname", studyBean.getName()))
+								.param("password", newUser.getPasswd()).param("studyname", studyBean.getName()))
 				.andExpect(status().isOk())
 				.andExpect(
 						content().string(
@@ -129,13 +108,11 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatAuthenticationServiceReturnsOkForNewlyCreatedStudyEvaluator() throws Exception {
-		String password = securityManager.genPassword();
-		newUser = createUser(password, Role.STUDY_EVALUATOR, UserType.SYSADMIN, studyBean.getId());
-		assertTrue(newUser.getId() > 0);
+		createNewUser(studyBean.getId(), UserType.SYSADMIN, Role.STUDY_EVALUATOR);
 		this.mockMvc
 				.perform(
 						post(API_AUTHENTICATION).secure(true).param("username", newUser.getName())
-								.param("password", password).param("studyname", studyBean.getName()))
+								.param("password", newUser.getPasswd()).param("studyname", studyBean.getName()))
 				.andExpect(status().isOk())
 				.andExpect(
 						content().string(
@@ -147,13 +124,11 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatAuthenticationServiceReturnsOkForNewlyCreatedStudyCoder() throws Exception {
-		String password = securityManager.genPassword();
-		newUser = createUser(password, Role.STUDY_CODER, UserType.SYSADMIN, studyBean.getId());
-		assertTrue(newUser.getId() > 0);
+		createNewUser(studyBean.getId(), UserType.SYSADMIN, Role.STUDY_CODER);
 		this.mockMvc
 				.perform(
 						post(API_AUTHENTICATION).secure(true).param("username", newUser.getName())
-								.param("password", password).param("studyname", studyBean.getName()))
+								.param("password", newUser.getPasswd()).param("studyname", studyBean.getName()))
 				.andExpect(status().isOk())
 				.andExpect(
 						content().string(
@@ -165,15 +140,12 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatAuthenticationServiceReturnsOkForNewlyCreatedCRC() throws Exception {
-		newSite = createSite(studyBean.getId());
-		assertTrue(newSite.getId() > 0);
-		String password = securityManager.genPassword();
-		newUser = createUser(password, Role.CLINICAL_RESEARCH_COORDINATOR, UserType.USER, newSite.getId());
-		assertTrue(newUser.getId() > 0);
+		createNewSite(studyBean.getId());
+		createNewUser(newSite.getId(), UserType.USER, Role.CLINICAL_RESEARCH_COORDINATOR);
 		this.mockMvc
 				.perform(
 						post(API_AUTHENTICATION).secure(true).param("username", newUser.getName())
-								.param("password", password).param("studyname", newSite.getName()))
+								.param("password", newUser.getPasswd()).param("studyname", newSite.getName()))
 				.andExpect(status().isOk())
 				.andExpect(
 						content().string(
@@ -185,15 +157,12 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatAuthenticationServiceReturnsOkForNewlyCreatedInvestigator() throws Exception {
-		newSite = createSite(studyBean.getId());
-		assertTrue(newSite.getId() > 0);
-		String password = securityManager.genPassword();
-		newUser = createUser(password, Role.INVESTIGATOR, UserType.USER, newSite.getId());
-		assertTrue(newUser.getId() > 0);
+		createNewSite(studyBean.getId());
+		createNewUser(newSite.getId(), UserType.USER, Role.INVESTIGATOR);
 		this.mockMvc
 				.perform(
 						post(API_AUTHENTICATION).secure(true).param("username", newUser.getName())
-								.param("password", password).param("studyname", newSite.getName()))
+								.param("password", newUser.getPasswd()).param("studyname", newSite.getName()))
 				.andExpect(status().isOk())
 				.andExpect(
 						content().string(

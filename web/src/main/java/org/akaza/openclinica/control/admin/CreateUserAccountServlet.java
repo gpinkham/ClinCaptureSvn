@@ -162,7 +162,7 @@ public class CreateUserAccountServlet extends Controller {
 
 				SecurityManager secm = getSecurityManager();
 				String password = secm.genPassword();
-				String passwordHash = secm.encrytPassword(password, getUserDetails());
+				String passwordHash = secm.encryptPassword(password, getUserDetails());
 
 				createdUserAccountBean.setPasswd(passwordHash);
 

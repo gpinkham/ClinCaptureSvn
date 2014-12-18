@@ -122,7 +122,7 @@ public class ResetPasswordServlet extends Controller {
 				v.addValidation("passwd", Validator.CHECK_DIFFERENT, "oldPasswd");
 			}
 
-			String newDigestPass = sm.encrytPassword(newPwd, getUserDetails());
+			String newDigestPass = sm.encryptPassword(newPwd, getUserDetails());
 
 			List<String> pwdErrors = new ArrayList<String>();
 

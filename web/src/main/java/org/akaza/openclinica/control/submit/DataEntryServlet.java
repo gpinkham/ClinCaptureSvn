@@ -575,7 +575,7 @@ public abstract class DataEntryServlet extends Controller {
 		request.setAttribute(
 				"decryptedPassword",
 				((SecurityManager) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
-						"securityManager")).encrytPassword("root", getUserDetails()));
+						"securityManager")).encryptPassword("root", getUserDetails()));
 
 		// set up interviewer name and date
 		fp.addPresetValue(INPUT_INTERVIEWER, ecb.getInterviewerName());

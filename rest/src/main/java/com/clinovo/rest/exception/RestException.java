@@ -57,6 +57,23 @@ public class RestException extends Exception {
 		this.code = code;
 	}
 
+	/**
+	 * RestException constructor.
+	 *
+	 * @param messageSource
+	 *            MessageSource
+	 * @param messageCode
+	 *            String
+	 * @param args
+	 *            Object[]
+	 * @param code
+	 *            integer
+	 */
+	public RestException(MessageSource messageSource, String messageCode, Object[] args, int code) {
+		super(messageSource.getMessage(messageCode, args, new Locale(CoreResources.getSystemLanguage())));
+		this.code = code;
+	}
+
 	public int getCode() {
 		return code;
 	}

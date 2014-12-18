@@ -27,6 +27,7 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,8 +39,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
 /**
  * The workhorse for instrument generation, the NewInstrumentBean holds some information, but also updates and inserts
  * rows in the database, using the insertToDB method. </p>
@@ -49,7 +48,7 @@ import javax.sql.DataSource;
  * @author thickerson
  * @version 1.1 modified by jxu
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial", "resource" })
 public class NewCRFBean extends Object implements java.io.Serializable {
 
 	private DataSource ds;
@@ -354,7 +353,6 @@ public class NewCRFBean extends Object implements java.io.Serializable {
 
 	}
 
-	@SuppressWarnings("resource")
 	public void insertToDB() throws OpenClinicaException {
 		/*
 		 * insertToDB() will implement rollback functionality, throwing an error will write the error to the setErrors
@@ -375,7 +373,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
 				error.add(msg);
 				throw new OpenClinicaException("newCRFBean, insertToDB, connection not open", "1");
 			}
-			
+
 			// commenting this out temporarily so that mistakes are not made,
 			con.setAutoCommit(false);
 			Set mySet = itemQueries.entrySet();

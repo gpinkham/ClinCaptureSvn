@@ -21,11 +21,6 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -48,6 +43,12 @@ import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Servlet for creating a user account.
@@ -230,7 +231,7 @@ public class EditUserAccountServlet extends Controller {
 				if (fp.getBoolean(INPUT_RESET_PASSWORD)) {
 					SecurityManager sm = getSecurityManager();
 					String password = sm.genPassword();
-					String passwordHash = sm.encrytPassword(password, getUserDetails());
+					String passwordHash = sm.encryptPassword(password, getUserDetails());
 
 					user.setPasswd(passwordHash);
 					user.setPasswdTimestamp(null);
@@ -377,7 +378,7 @@ public class EditUserAccountServlet extends Controller {
 		}
 		body += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
 		sendEmail(user.getEmail().trim(), restext.getString("your_openclinica_account_password_reset"), body, false,
-                request);
+				request);
 	}
 
 	@Override

@@ -19,8 +19,10 @@ import com.clinovo.rest.annotation.RestAccess;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.service.AuthenticationService;
+import com.clinovo.rest.util.RequestParametersValidator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserRole;
+import org.akaza.openclinica.bean.core.UserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * PermissionChecker class.
@@ -41,9 +45,6 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PermissionChecker.class);
 
-	public static final String USERNAME = "username";
-	public static final String PASSWORD = "password";
-	public static final String STUDYNAME = "studyname";
 	public static final String API_AUTHENTICATED_USER_DETAILS = "API_AUTHENTICATED_USER_DETAILS";
 
 	@Autowired
@@ -63,6 +64,7 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 		} else {
 			boolean proceed = false;
 			if (handler instanceof HandlerMethod) {
+				RequestParametersValidator.validate(request, messageSource, (HandlerMethod) handler);
 				proceed = ((HandlerMethod) handler).getBean() instanceof AuthenticationService;
 				if (!proceed) {
 					UserDetails userDetails = (UserDetails) request.getSession().getAttribute(
@@ -73,11 +75,18 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 						} else {
 							RestAccess accessAnnotation = ((HandlerMethod) handler).getMethod().getAnnotation(
 									RestAccess.class);
-							if (accessAnnotation != null) {
-								UserRole[] methodUserRoles = accessAnnotation.value();
-								if (methodUserRoles != null) {
+							if (accessAnnotation != null && accessAnnotation.value() != null) {
+								List<UserRole> methodUserRoles = Arrays.asList(accessAnnotation.value());
+								if (methodUserRoles.contains(UserRole.ANY_USER)) {
+									proceed = true;
+								} else if (methodUserRoles.contains(UserRole.ANY_ADMIN)) {
+									proceed = userDetails.getUserTypeCode().equals(UserType.SYSADMIN.getCode());
+								}
+								if (!proceed) {
 									for (UserRole methodUserRole : methodUserRoles) {
-										if (methodUserRole.getRoleCode().equals(userDetails.getRoleCode())
+										if (methodUserRole != UserRole.ANY_USER
+												&& methodUserRole != UserRole.ANY_ADMIN
+												&& methodUserRole.getRoleCode().equals(userDetails.getRoleCode())
 												&& methodUserRole.getUserTypeCode().equals(
 														userDetails.getUserTypeCode())) {
 											proceed = true;
@@ -87,22 +96,14 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 								}
 							}
 						}
-					}
-				} else {
-					if (request.getParameter(USERNAME) == null) {
-						throw new RestException(messageSource, "rest.authentication.missingUsername",
-								HttpServletResponse.SC_BAD_REQUEST);
-					} else if (request.getParameter(PASSWORD) == null) {
-						throw new RestException(messageSource, "rest.authentication.missingPassword",
-								HttpServletResponse.SC_BAD_REQUEST);
-					} else if (request.getParameter(STUDYNAME) == null) {
-						throw new RestException(messageSource, "rest.authentication.missingStudyName",
-								HttpServletResponse.SC_BAD_REQUEST);
+					} else {
+						throw new RestException(messageSource, "rest.authentication.userShouldBeAuthenticated",
+								HttpServletResponse.SC_UNAUTHORIZED);
 					}
 				}
 				if (!proceed) {
-					throw new RestException(messageSource, "rest.authentication.userShouldBeAuthenticated",
-							HttpServletResponse.SC_UNAUTHORIZED);
+					throw new RestException(messageSource, "rest.authentication.authorisedUserDoesNotHaveAccess",
+							HttpServletResponse.SC_FORBIDDEN);
 				}
 			}
 			return proceed;

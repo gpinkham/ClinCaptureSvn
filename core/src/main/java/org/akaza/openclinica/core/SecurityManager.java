@@ -65,7 +65,7 @@ public class SecurityManager {
 		return ret;
 	}
 
-	public String encrytPassword(String password, UserDetails userDetails) throws NoSuchAlgorithmException {
+	public String encryptPassword(String password, UserDetails userDetails) throws NoSuchAlgorithmException {
 		Object salt = null;
 
 		if (this.saltSource != null) {

@@ -20,11 +20,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.text.MessageFormat;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -37,6 +32,10 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.MessageFormat;
 
 // allows both deletion and restoration of a study user role
 @SuppressWarnings("serial")
@@ -57,7 +56,8 @@ public class DeleteUserServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study")
 							+ respage.getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
@@ -110,7 +110,7 @@ public class DeleteUserServlet extends Controller {
 			} else {
 				SecurityManager sm = getSecurityManager();
 				String password = sm.genPassword();
-				String passwordHash = sm.encrytPassword(password, getUserDetails());
+				String passwordHash = sm.encryptPassword(password, getUserDetails());
 
 				u.setPasswd(passwordHash);
 				u.setPasswdTimestamp(null);

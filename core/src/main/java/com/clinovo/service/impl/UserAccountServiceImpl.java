@@ -15,59 +15,79 @@
 
 package com.clinovo.service.impl;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.sql.DataSource;
-
+import com.clinovo.service.UserAccountService;
 import org.akaza.openclinica.bean.core.EntityAction;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.core.EmailEngine;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.user.AuthoritiesBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.clinovo.service.UserAccountService;
+import javax.mail.internet.MimeMessage;
+import javax.sql.DataSource;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
+/**
+ * UserAccountServiceImpl.
+ */
 @Service("userAccountService")
 public class UserAccountServiceImpl implements UserAccountService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserAccountService.class);
 
 	@Autowired
 	private DataSource dataSource;
 
-	private UserAccountDAO userAccountDAO;
+	@Autowired
+	private MessageSource messageSource;
 
-	private StudyDAO studyDAO;
+	@Autowired
+	private AuthoritiesDao authoritiesDao;
+
+	@Autowired
+	private JavaMailSenderImpl mailSender;
 
 	private MessageFormat messageFormat = new MessageFormat("");
 
 	public UserAccountDAO getUserAccountDAO() {
-		return userAccountDAO == null ? new UserAccountDAO(dataSource) : userAccountDAO;
+		return new UserAccountDAO(dataSource);
 	}
 
 	public StudyDAO getStudyDAO() {
-		return studyDAO == null ? new StudyDAO(dataSource) : studyDAO;
+		return new StudyDAO(dataSource);
 	}
 
 	public MessageFormat getMessageFormat() {
 		return messageFormat;
 	}
 
-	public boolean doesUserHaveRoleInStydies(UserAccountBean user, List<StudyBean> studyList) throws Exception {
+	public boolean doesUserHaveRoleInStudies(UserAccountBean user, List<StudyBean> studyList) throws Exception {
 
 		List<StudyBean> fullStudyList = new ArrayList<StudyBean>();
 		List<StudyUserRoleBean> rolesList = user.getRoles();
-		
-		if (rolesList.isEmpty()) {	//return FALSE in case if the user has no roles assigned
-			return false; 
+
+		if (rolesList.isEmpty()) { // return FALSE in case if the user has no roles assigned
+			return false;
 		}
-		
+
 		boolean isStudyLevelUser = rolesList.get(0).isStudyLevelRole();
 
 		if (isStudyLevelUser) {
@@ -128,16 +148,17 @@ public class UserAccountServiceImpl implements UserAccountService {
 			StudyUserRoleBean studyUserRole = getUserAccountDAO().findRoleByUserNameAndStudyId(user.getName(), studyId);
 
 			if (studyUserRole.isActive()
-					&& !(currentUser.getId() == user.getId() && currentUser.getActiveStudyId() == studyUserRole.getStudyId())) {
+					&& !(currentUser.getId() == user.getId() && currentUser.getActiveStudyId() == studyUserRole
+							.getStudyId())) {
 
 				getUserAccountDAO().deleteUserRole(studyUserRole);
 
 				if (user.getActiveStudyId() == studyUserRole.getStudyId()) {
-					updateUserAcocunt(user.getId(), currentUser);
+					updateUserAcocunt(user.getId());
 				}
 
-				Object argsForMessageFormat[] = { studyUserRole.getRoleName(), user.getName(),
-						((StudyBean) getStudyDAO().findByPK(studyId)).getName() };
+				Object[] argsForMessageFormat = { studyUserRole.getRoleName(), user.getName(),
+						(getStudyDAO().findByPK(studyId)).getName() };
 
 				getMessageFormat().applyPattern(respage.getString("the_study_user_role_deleted"));
 				message.append(getMessageFormat().format(argsForMessageFormat));
@@ -159,12 +180,13 @@ public class UserAccountServiceImpl implements UserAccountService {
 			StudyUserRoleBean studyUserRole = getUserAccountDAO().findRoleByUserNameAndStudyId(user.getName(), studyId);
 
 			if (studyUserRole.isActive()
-					&& !(currentUser.getId() == user.getId() && currentUser.getActiveStudyId() == studyUserRole.getStudyId())) {
+					&& !(currentUser.getId() == user.getId() && currentUser.getActiveStudyId() == studyUserRole
+							.getStudyId())) {
 
 				if (removeRole(studyUserRole, currentUser, false)) {
 
-					Object argsForMessageFormat[] = { studyUserRole.getRoleName(), user.getName(),
-							((StudyBean) getStudyDAO().findByPK(studyId)).getName() };
+					Object[] argsForMessageFormat = { studyUserRole.getRoleName(), user.getName(),
+							(getStudyDAO().findByPK(studyId)).getName() };
 
 					getMessageFormat().applyPattern(respage.getString("the_study_user_role_removed"));
 					message.append(getMessageFormat().format(argsForMessageFormat));
@@ -202,7 +224,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 			getUserAccountDAO().updateStudyUserRole(studyUserRole, user.getName());
 
 			if (user.getActiveStudyId() == studyUserRole.getStudyId()) {
-				updateUserAcocunt(user.getId(), currentUser);
+				updateUserAcocunt(user.getId());
 			}
 
 			operationSucceeded = true;
@@ -222,12 +244,13 @@ public class UserAccountServiceImpl implements UserAccountService {
 			StudyUserRoleBean studyUserRole = getUserAccountDAO().findRoleByUserNameAndStudyId(user.getName(), studyId);
 
 			if (studyUserRole.isActive()
-					&& !(currentUser.getId() == user.getId() && currentUser.getActiveStudyId() == studyUserRole.getStudyId())) {
+					&& !(currentUser.getId() == user.getId() && currentUser.getActiveStudyId() == studyUserRole
+							.getStudyId())) {
 
 				if (restoreRole(studyUserRole, currentUser, message, respage, false)) {
 
-					Object argsForMessageFormat[] = { studyUserRole.getRoleName(), user.getName(),
-							((StudyBean) getStudyDAO().findByPK(studyId)).getName() };
+					Object[] argsForMessageFormat = { studyUserRole.getRoleName(), user.getName(),
+							(getStudyDAO().findByPK(studyId)).getName() };
 
 					getMessageFormat().applyPattern(respage.getString("the_study_user_role_restored"));
 					message.append(getMessageFormat().format(argsForMessageFormat));
@@ -249,10 +272,10 @@ public class UserAccountServiceImpl implements UserAccountService {
 			ResourceBundle respage, boolean autoRestore) throws Exception {
 
 		boolean operationSucceeded = false;
-		
-		boolean checkRoleStatus = autoRestore ? studyUserRole.getStatus().equals(Status.AUTO_DELETED) : (studyUserRole.getStatus().equals(Status.AUTO_DELETED) 
-				|| studyUserRole.getStatus().equals(Status.DELETED));
-		
+
+		boolean checkRoleStatus = autoRestore ? studyUserRole.getStatus().equals(Status.AUTO_DELETED) : (studyUserRole
+				.getStatus().equals(Status.AUTO_DELETED) || studyUserRole.getStatus().equals(Status.DELETED));
+
 		if (checkRoleStatus) {
 
 			StudyBean study = (StudyBean) getStudyDAO().findByPK(studyUserRole.getStudyId());
@@ -266,7 +289,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 			} else {
 
-				UserAccountBean user = (UserAccountBean) getUserAccountDAO().findByUserName(studyUserRole.getUserName());
+				UserAccountBean user = (UserAccountBean) getUserAccountDAO()
+						.findByUserName(studyUserRole.getUserName());
 
 				if (!user.getStatus().equals(Status.DELETED)) {
 
@@ -276,7 +300,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 					getUserAccountDAO().updateStudyUserRole(studyUserRole, user.getName());
 
 					setActiveStudyId(user, studyUserRole.getStudyId());
-					
+
 					operationSucceeded = true;
 				}
 			}
@@ -285,7 +309,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 		return operationSucceeded;
 	}
 
-	private void updateUserAcocunt(int userId, UserAccountBean currentUser) throws Exception {
+	private void updateUserAcocunt(int userId) throws Exception {
 
 		boolean doesUserHaveActiveRole = false;
 		UserAccountBean user = (UserAccountBean) getUserAccountDAO().findByPK(userId);
@@ -322,4 +346,76 @@ public class UserAccountServiceImpl implements UserAccountService {
 		getUserAccountDAO().update(user);
 	}
 
+	private void sendEmail(UserAccountBean userAccountBean, String password, String studyName) {
+		try {
+			Locale locale = new Locale(CoreResources.getSystemLanguage());
+			MimeMessage mimeMessage = mailSender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
+			helper.setFrom(EmailEngine.getAdminEmail());
+			helper.setTo(userAccountBean.getEmail());
+			helper.setSubject(messageSource.getMessage("your_new_openclinica_account", null, locale));
+			helper.setText(
+					"".concat("<html><body>")
+							.concat(messageSource.getMessage("dear", null, locale))
+							.concat(" ")
+							.concat(userAccountBean.getFirstName())
+							.concat(" ")
+							.concat(userAccountBean.getLastName())
+							.concat(",<br><br>")
+							.concat(messageSource.getMessage("a_new_user_account_has_been_created_for_you", null,
+									locale))
+							.concat("<br><br>")
+							.concat(messageSource.getMessage("user_name", null, locale))
+							.concat(": ")
+							.concat(userAccountBean.getName())
+							.concat("<br>")
+							.concat(messageSource.getMessage("password", null, locale))
+							.concat(": ")
+							.concat(password)
+							.concat("<br><br>")
+							.concat(messageSource
+									.getMessage("please_test_your_login_information_and_let", null, locale))
+							.concat("<br>")
+							.concat(CoreResources.getSystemURL())
+							.concat(" . <br><br> ")
+							.concat(messageSource.getMessage("best_system_administrator", null, locale).replace("{0}",
+									studyName)).concat("</body></html>"), true);
+			mailSender.send(mimeMessage);
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+	}
+
+	public UserAccountBean createUser(String ownerUserName, UserAccountBean userAccountBean, Role role,
+			boolean displayPassword, String password) {
+		UserAccountDAO userAccountDAO = getUserAccountDAO();
+
+		UserAccountBean ownerUser = (UserAccountBean) userAccountDAO.findByUserName(ownerUserName);
+
+		userAccountBean.setPasswdTimestamp(null);
+		userAccountBean.setLastVisitDate(null);
+		userAccountBean.setStatus(Status.AVAILABLE);
+		userAccountBean.setPasswdChallengeQuestion("");
+		userAccountBean.setPasswdChallengeAnswer("");
+		userAccountBean.setOwner(ownerUser);
+
+		StudyUserRoleBean activeStudyRole = new StudyUserRoleBean();
+		activeStudyRole.setStudyId(userAccountBean.getActiveStudyId());
+		activeStudyRole.setRoleName(role.getCode());
+		activeStudyRole.setStatus(Status.AVAILABLE);
+		activeStudyRole.setOwner(ownerUser);
+		userAccountBean.addRole(activeStudyRole);
+
+		userAccountBean = (UserAccountBean) userAccountDAO.create(userAccountBean);
+
+		if (userAccountBean.getId() > 0) {
+			authoritiesDao.saveOrUpdate(new AuthoritiesBean(userAccountBean.getName()));
+			if (!displayPassword) {
+				sendEmail(userAccountBean, password,
+						new StudyDAO(dataSource).findByPK(userAccountBean.getActiveStudyId()).getName());
+			}
+		}
+
+		return userAccountBean;
+	}
 }

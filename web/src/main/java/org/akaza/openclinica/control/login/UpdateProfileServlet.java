@@ -135,7 +135,7 @@ public class UpdateProfileServlet extends Controller {
 
 		org.akaza.openclinica.core.SecurityManager sm = getSecurityManager();
 
-		String newDigestPass = sm.encrytPassword(password, getUserDetails());
+		String newDigestPass = sm.encryptPassword(password, getUserDetails());
 		List<String> pwdErrors = new ArrayList<String>();
 
 		if (!StringUtils.isBlank(password)) {

@@ -18,6 +18,7 @@ package com.clinovo.rest.service;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.security.PermissionChecker;
+import com.clinovo.rest.util.RequestUtil;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -34,11 +35,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 /**
@@ -46,7 +44,7 @@ import javax.sql.DataSource;
  */
 @Controller
 @SuppressWarnings("unused")
-public class AuthenticationService {
+public class AuthenticationService extends BaseService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
 
@@ -54,10 +52,10 @@ public class AuthenticationService {
 	private DataSource dataSource;
 
 	@Autowired
-	private OpenClinicaPasswordEncoder passwordEncoder;
+	private MessageSource messageSource;
 
 	@Autowired
-	private MessageSource messageSource;
+	private OpenClinicaPasswordEncoder passwordEncoder;
 
 	/**
 	 * Method does user authentication.
@@ -77,16 +75,6 @@ public class AuthenticationService {
 	public UserDetails authenticate(@RequestParam("username") String userName,
 			@RequestParam("password") String password, @RequestParam("studyname") String studyName)
 			throws RestException {
-		if (userName.trim().isEmpty()) {
-			throw new RestException(messageSource, "rest.authentication.emptyUsername",
-					HttpServletResponse.SC_BAD_REQUEST);
-		} else if (password.trim().isEmpty()) {
-			throw new RestException(messageSource, "rest.authentication.emptyPassword",
-					HttpServletResponse.SC_BAD_REQUEST);
-		} else if (studyName.trim().isEmpty()) {
-			throw new RestException(messageSource, "rest.authentication.emptyStudyName",
-					HttpServletResponse.SC_BAD_REQUEST);
-		}
 		UserDetails userDetails;
 		StudyDAO studyDao = new StudyDAO(dataSource);
 		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
@@ -123,9 +111,8 @@ public class AuthenticationService {
 			throw new RestException(messageSource, "rest.authentication.noUserFound",
 					HttpServletResponse.SC_UNAUTHORIZED);
 		}
-		HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
-				.getSession();
-		session.setAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS, userDetails);
+		RequestUtil.getRequest().getSession()
+				.setAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS, userDetails);
 		return userDetails;
 	}
 }

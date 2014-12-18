@@ -97,7 +97,7 @@ public class UnLockUserServlet extends Controller {
 
 			SecurityManager sm = getSecurityManager();
 			String password = sm.genPassword();
-			String passwordHash = sm.encrytPassword(password, getUserDetails());
+			String passwordHash = sm.encryptPassword(password, getUserDetails());
 
 			user.setPasswd(passwordHash);
 			user.setPasswdTimestamp(null);
