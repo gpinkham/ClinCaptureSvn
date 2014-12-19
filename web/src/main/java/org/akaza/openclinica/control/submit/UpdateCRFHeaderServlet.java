@@ -59,6 +59,8 @@ public class UpdateCRFHeaderServlet extends Controller {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
 
+		request.setAttribute("section", new SectionDAO(getDataSource()).findByPK(fp.getInt("sectionId")));
+
 		EventCRFBean ecb = new EventCRFBean();
 		int eventCRFId = fp.getInt(EVENT_CRF_ID);
 		int eventDefinitionCRFId = fp.getInt(EVENT_DEFINITION_CRF_ID);

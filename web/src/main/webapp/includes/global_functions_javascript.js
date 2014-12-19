@@ -3533,9 +3533,10 @@ function updateCRFHeaderFunction(parametersHolder) {
             }
             $("#dnShortcutAnchors_" + rowCount + "item_" + itemId).remove();
         });
+        parametersHolder.sectionId = $("input[name=sectionId]").val();
         jQuery.ajax({
             url : parametersHolder.contextPath + "/UpdateCRFHeader",
-            type : "GET",
+            type : "POST",
             data : parametersHolder,
             cache : false,
             success : function(data) {
@@ -3594,7 +3595,7 @@ function updateCRFHeaderFunction(parametersHolder) {
             }
         });
     } catch (e) {
-        //
+        console.log(e.message);
     }
 }
 

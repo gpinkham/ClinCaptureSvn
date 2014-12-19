@@ -38,10 +38,12 @@ public class UpdateCRFHeaderServletTest extends AbstractContextSentiveTest {
 		request = new MockHttpServletRequest();
 		response = new MockHttpServletResponse();
 		request = new MockHttpServletRequest();
+		request.setParameter("sectionId", "1");
 		SessionUtil.updateLocale(request.getSession(), Locale.ENGLISH);
 		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		formDiscrepancyNotes = new FormDiscrepancyNotes();
 		request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, formDiscrepancyNotes);
+		Whitebox.setInternalState(servlet, "dataSource", dataSource);
 		Whitebox.setInternalState(servlet, "servletContext", servletContext);
 		Mockito.when(servletContext.getRequestDispatcher(Page.UPDATE_CRF_HEADER_PAGE.getFileName())).thenReturn(
 				requestDispatcher);
