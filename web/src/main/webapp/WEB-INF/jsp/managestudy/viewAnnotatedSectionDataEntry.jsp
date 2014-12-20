@@ -704,7 +704,16 @@
 											</td>
 										</c:if>
 										<td class="annotated_itemOID">
-											<span class="annotated_itemOID">${displayItem.singleItem.item.name}</span>
+											<span class="annotated_itemOID">
+												<c:choose>
+													<c:when test="${study.studyParameterConfig.annotatedCrfSasItemNames == 'yes'}">
+														${sasItemNamesMap[displayItem.singleItem.item.name]}
+													</c:when>
+													<c:otherwise>
+														${displayItem.singleItem.item.name}
+													</c:otherwise>
+												</c:choose>
+											</span>
 										</td>
 									</tr>
 									<tr>

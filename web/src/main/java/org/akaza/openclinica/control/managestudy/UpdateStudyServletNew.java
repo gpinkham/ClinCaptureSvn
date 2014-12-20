@@ -548,6 +548,9 @@ public class UpdateStudyServletNew extends Controller {
 
 		study.getStudyParameterConfig().setAllowRulesAutoScheduling(fp.getString("allowRulesAutoScheduling"));
 
+		//SAS Item Names
+		study.getStudyParameterConfig().setAnnotatedCrfSasItemNames(fp.getString("annotatedCrfSasItemNames"));
+
 		try {
 
 			// Create custom dictionary 
@@ -944,6 +947,10 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getAllowRulesAutoScheduling());
 		updateParameter(spvdao, spv);
 
+		spv.setParameter("annotatedCrfSasItemNames");
+		spv.setValue(study1.getStudyParameterConfig().getAnnotatedCrfSasItemNames());
+		updateParameter(spvdao, spv);
+
 		try {
 
 			// Create custom dictionary 
@@ -1119,6 +1126,10 @@ public class UpdateStudyServletNew extends Controller {
 
 			childspv.setParameter("randomizationTrialId");
 			childspv.setValue(study1.getStudyParameterConfig().getRandomizationTrialId());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("annotatedCrfSasItemNames");
+			childspv.setValue(study1.getStudyParameterConfig().getAnnotatedCrfSasItemNames());
 			updateParameter(spvdao, childspv);
 		}
 	}

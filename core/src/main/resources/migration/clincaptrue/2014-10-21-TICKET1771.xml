@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2014-10-21-TICKET1771">
+		<comment>Insert the study parameter flag to control Auto Generated subject ID prefix.</comment>
+		<insert tableName="study_parameter">
+			<column name="study_parameter_id" valueNumeric="49"/>
+			<column name="handle" value="annotatedCrfSasItemNames"/>
+			<column name="name" value="annotatedCrfSasItemNames"/>
+			<column name="description" value="Flag to check - should SAS item names be displayed in aCRFs."/>
+			<column name="default_value" value="no"/>
+			<column name="inheritable" valueBoolean="true"/>
+			<column name="overridable" valueBoolean="false"/>
+		</insert>
+	</changeSet>
+
+</databaseChangeLog>

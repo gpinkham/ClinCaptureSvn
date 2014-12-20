@@ -23,6 +23,7 @@ package org.akaza.openclinica.control.managestudy;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.extract.SasNameValidator;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -38,6 +39,7 @@ import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
@@ -55,6 +57,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
@@ -200,7 +203,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-		SectionDAO sdao = new SectionDAO(getDataSource());
+		SectionDAO sdao = getSectionDAO();
 		String age = "";
 
 		if (studySubjectId > 0) {
@@ -317,7 +320,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			} else {
 				request.setAttribute("studyTitle", currentStudy.getName());
 			}
-
 		} else {
 			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
@@ -460,6 +462,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 				CRFVersionDAO crfVerDao = getCRFVersionDAO();
 				CRFVersionBean crfVerBean = (CRFVersionBean) crfVerDao.findByPK(crfVersionId);
+				HashMap<String, String> sasItemNamesMap = getSasItemNamesMap(request);
+				request.setAttribute("sasItemNamesMap", sasItemNamesMap);
 				request.setAttribute("crfVerFormOID", crfVerBean.getOid());
 				request.setAttribute("studyEventDefs",
 						seddao.findAllActiveByStudyIdAndCRFId(currentStudy.getId(), crfId));
@@ -597,5 +601,20 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 	@Override
 	protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
 		return false;
+	}
+
+	private HashMap<String, String> getSasItemNamesMap(HttpServletRequest request) {
+
+		HashMap<String, String> sasItemNamesMap = new HashMap<String, String>();
+		ItemDAO itemDAO = new ItemDAO(getDataSource());
+		SectionBean section = (SectionBean) request.getAttribute("sec");
+		ArrayList<ItemBean> items = itemDAO.findAllBySectionId(section.getId());
+		SasNameValidator sasNameValidator = new SasNameValidator();
+
+		for (ItemBean item : items) {
+			String sasItemName = sasNameValidator.getValidName(item.getName());
+			sasItemNamesMap.put(item.getName(), sasItemName);
+		}
+		return sasItemNamesMap;
 	}
 }

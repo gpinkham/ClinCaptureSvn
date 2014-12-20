@@ -20,7 +20,7 @@
  */
 package org.akaza.openclinica.bean.service;
 
-/**
+	/**
  * This is a help class for each study, it saves all the parameter configurations.
  *
  * @author jxu
@@ -121,6 +121,8 @@ public class StudyParameterConfig {
 	private String evaluateWithContext = "no";
 
 	private String  allowRulesAutoScheduling = "no";
+	//Annotated CRF SAS Item Names
+	private String annotatedCrfSasItemNames = "no";
 
 	/**
 	 * This is base constructor to set all default values.
@@ -167,7 +169,8 @@ public class StudyParameterConfig {
 		autoCreateSubjectDuringImport = "no";
 		allowSdvWithOpenQueries = "no";
 		replaceExisitingDataDuringImport = "no";
-		
+
+		annotatedCrfSasItemNames = "no";
 		allowDynamicGroupsManagement = "yes";
 	}
 
@@ -673,5 +676,19 @@ public class StudyParameterConfig {
 	 */
 	public void setAllowRulesAutoScheduling(String allowRulesAutoScheduling) {
 		this.allowRulesAutoScheduling = allowRulesAutoScheduling;
+	}
+
+	/**
+	 * @return the aCrfSasItemNames
+	 */
+	public String getAnnotatedCrfSasItemNames() {
+		return annotatedCrfSasItemNames;
+	}
+
+	/**
+	 * @param annotatedCrfSasItemNames the aCrfSasItemNames to set
+	 */
+	public void setAnnotatedCrfSasItemNames(String annotatedCrfSasItemNames) {
+		this.annotatedCrfSasItemNames = annotatedCrfSasItemNames;
 	}
 }
