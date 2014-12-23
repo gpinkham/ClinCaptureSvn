@@ -251,12 +251,8 @@ public class AddNewSubjectServlet extends Controller {
 					discNotes);
 
 			v.addValidation(INPUT_LABEL, Validator.NO_BLANKS);
-
-			String subIdSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
-			if (!subIdSetting.equalsIgnoreCase("auto non-editable") && !subIdSetting.equalsIgnoreCase("auto editable")) {
-				v.addValidation(INPUT_LABEL, Validator.LENGTH_NUMERIC_COMPARISON,
-						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_30);
-			}
+			v.addValidation(INPUT_LABEL, Validator.LENGTH_NUMERIC_COMPARISON,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_30);
 
 			if (currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("required")) {
 				v.addValidation(INPUT_UNIQUE_IDENTIFIER, Validator.NO_BLANKS);
