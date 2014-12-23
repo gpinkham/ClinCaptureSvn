@@ -20,12 +20,13 @@
  */
 package org.akaza.openclinica.bean.submit;
 
+import com.clinovo.util.DRUtil;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.core.form.StringUtil;
 
-import com.clinovo.util.DRUtil;
+import java.util.List;
 
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	//
 	private int itemId;
@@ -225,7 +226,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	private String crfName;// not in the DB
 
 	private String sectionName;// not in the DB only for display
-	private int repeatMax;// not in the DB, 
+	private int repeatMax;// not in the DB,
 
 	private boolean isHighlighted;// not in the db
 
@@ -238,6 +239,52 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	 * Not in the table. Text in simple_conditional_display field
 	 */
 	private String conditionalDisplay; // simple_conditional_display
+
+	public ItemFormMetadataBean copy() {
+		ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
+		ifmb.setId(getId());
+		ifmb.setItemId(getItemId());
+		ifmb.setCrfVersionId(getCrfVersionId());
+		ifmb.setHeader(getHeader());
+		ifmb.setSubHeader(getSubHeader());
+		ifmb.setParentId(getParentId());
+		ifmb.setParentLabel(getParentLabel());
+		ifmb.setColumnNumber(getColumnNumber());
+		ifmb.setPageNumberLabel(getPageNumberLabel());
+		ifmb.setQuestionNumberLabel(getQuestionNumberLabel());
+		ifmb.setLeftItemText(getLeftItemText());
+		ifmb.setRightItemText(getRightItemText());
+		ifmb.setSectionId(getSectionId());
+		ifmb.setDescisionConditionId(getDescisionConditionId());
+		ifmb.setResponseSetId(getResponseSetId());
+		ifmb.setRegexp(getRegexp());
+		ifmb.setRegexpErrorMsg(getRegexpErrorMsg());
+		ifmb.setOrdinal(getOrdinal());
+		ifmb.setRequired(isRequired());
+		ifmb.setDefaultValue(getDefaultValue());
+		ifmb.setResponseLayout(getResponseLayout());
+		ifmb.setWidthDecimal(getWidthDecimal());
+		ifmb.setShowItem(isShowItem());
+		ifmb.setCodeRef(getCodeRef());
+		ifmb.setCrfVersionName(getCrfVersionName());
+		ifmb.setGroupLabel(getGroupLabel());
+		ifmb.setSectionName(getSectionName());
+		ifmb.setRepeatMax(getRepeatMax());
+		ifmb.setConditionalDisplay(getConditionalDisplay());
+		ifmb.setCrfName(getCrfName());
+		ifmb.setHighlighted(isHighlighted());
+		ifmb.setActive(isActive());
+		ifmb.setName(getName());
+		ResponseSetBean rsb = new ResponseSetBean();
+		rsb.setId(getResponseSet().getId());
+		rsb.setLabel(getResponseSet().getLabel());
+		rsb.setResponseTypeId(getResponseSet().getResponseTypeId());
+		for (ResponseOptionBean ro : (List<ResponseOptionBean>) getResponseSet().getOptions()) {
+			rsb.setOptions(ro.getText(), ro.getValue());
+		}
+		ifmb.setResponseSet(rsb);
+		return ifmb;
+	}
 
 	public ItemFormMetadataBean() {
 		itemId = 0;
@@ -703,11 +750,11 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	public String getCodeRef() {
 		return this.codeRef;
 	}
-	
+
 	public void setCodeRef(String codeRef) {
 		this.codeRef = codeRef;
 	}
-		
+
 	/**
 	 * @return Returns text without break spaces from the leftItemText.
 	 */

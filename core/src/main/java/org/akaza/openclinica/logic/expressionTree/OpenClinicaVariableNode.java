@@ -22,7 +22,6 @@ package org.akaza.openclinica.logic.expressionTree;
 
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.joda.time.DateMidnight;
@@ -36,26 +35,19 @@ import java.util.Date;
  * 
  */
 public class OpenClinicaVariableNode extends ExpressionNode {
-	
+
 	String number;
-	ExpressionService expressionService;
-	ExpressionObjectWrapper expressionWrapper;
-	Boolean optimiseRuleValidator = new Boolean(false); 
-	
-	OpenClinicaVariableNode(String val) {
+	Boolean optimiseRuleValidator = new Boolean(false);
+
+	OpenClinicaVariableNode(String val, ExpressionService expressionService, Boolean optimiseRuleValidator) {
 		number = val;
-	}
-	
-	OpenClinicaVariableNode(String val, ExpressionObjectWrapper expressionWrapper, Boolean optimiseRuleValidator) {
-		number = val;
-		this.expressionWrapper = expressionWrapper;
+		this.expressionService = expressionService;
 		this.optimiseRuleValidator = optimiseRuleValidator;
 	}
 
-	OpenClinicaVariableNode(String val,
-			ExpressionObjectWrapper expressionWrapper) {
-		this.expressionWrapper = expressionWrapper;
+	OpenClinicaVariableNode(String val, ExpressionService expressionService) {
 		number = val;
+		this.expressionService = expressionService;
 	}
 
 	@Override
@@ -66,9 +58,8 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 
 	/**
 	 * 
-	 * getTestValues() returns a hashMap of user defined values
-	 * getResponseTestValues() is empty and will be filled with variables being
-	 * processed
+	 * getTestValues() returns a hashMap of user defined values getResponseTestValues() is empty and will be filled with
+	 * variables being processed
 	 * 
 	 * @param var
 	 *            the default test value
@@ -96,16 +87,14 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 		if (variableValue != null) {
 			return variableValue;
 		}
-		ItemBean item = getExpressionService()
-				.getItemBeanFromExpression(number);
+		ItemBean item = getExpressionService().getItemBeanFromExpression(number);
 		String testString = "test";
 		String testInt = "1";
 		String testBoolean = "true";
 		String testDate = "2008-01-01";
 		String testPDate = "";
 		if (item != null) {
-			ItemDataType itemDataType = ItemDataType.get(item
-					.getItemDataTypeId());
+			ItemDataType itemDataType = ItemDataType.get(item.getItemDataTypeId());
 			switch (itemDataType.getId()) {
 			case 1: {
 				return theTest(testBoolean);
@@ -144,8 +133,7 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 				throw new OpenClinicaSystemException("OCRERR_0011");
 			}
 		} else {
-			throw new OpenClinicaSystemException("OCRERR_0012",
-					new String[] { number });
+			throw new OpenClinicaSystemException("OCRERR_0012", new String[] { number });
 		}
 	}
 
@@ -162,14 +150,12 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 	}
 
 	void validate() throws OpenClinicaSystemException {
-		
+
 		if (calculateVariable() != null) {
-		
-		}
-		else if (!getExpressionService().ruleExpressionChecker(number, optimiseRuleValidator)) {
+
+		} else if (!getExpressionService().ruleExpressionChecker(number, optimiseRuleValidator)) {
 			logger.info("Go down");
-			throw new OpenClinicaSystemException("OCRERR_0013",
-					new Object[] { number });
+			throw new OpenClinicaSystemException("OCRERR_0013", new Object[] { number });
 		}
 	}
 
@@ -185,12 +171,10 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 				if (getExpressionParser().isImportRulesMode()) {
 					getExpressionParser().setSubjectDob(new Date());
 				} else {
-					throw new OpenClinicaSystemException(
-							"OCRERR_CANT_GET_SUBJEC_DOB", new Object[] {});
+					throw new OpenClinicaSystemException("OCRERR_CANT_GET_SUBJEC_DOB", new Object[] {});
 				}
 			}
-			DateMidnight dm = new DateMidnight(getExpressionParser()
-					.getSubjectDob().getTime());
+			DateMidnight dm = new DateMidnight(getExpressionParser().getSubjectDob().getTime());
 			DateTimeFormatter fmt = ISODateTimeFormat.date();
 			return fmt.print(dm);
 		} else if (number.equals("_SUBJECT_ENROLLMENT")) {
@@ -199,13 +183,10 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 				if (getExpressionParser().isImportRulesMode()) {
 					getExpressionParser().setSubjectEnrollment(new Date());
 				} else {
-					throw new OpenClinicaSystemException(
-							"OCRERR_CANT_GET_SUBJECT_ENROLLMENT",
-							new Object[] {});
+					throw new OpenClinicaSystemException("OCRERR_CANT_GET_SUBJECT_ENROLLMENT", new Object[] {});
 				}
 			}
-			DateMidnight dm = new DateMidnight(getExpressionParser()
-					.getSubjectEnrollment().getTime());
+			DateMidnight dm = new DateMidnight(getExpressionParser().getSubjectEnrollment().getTime());
 			DateTimeFormatter fmt = ISODateTimeFormat.date();
 			return fmt.print(dm);
 		}
@@ -224,12 +205,10 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 				if (getExpressionParser().isImportRulesMode()) {
 					getExpressionParser().setSubjectDob(new Date());
 				} else {
-					throw new OpenClinicaSystemException(
-							"OCRERR_CANT_GET_SUBJEC_DOB", new Object[] {});
+					throw new OpenClinicaSystemException("OCRERR_CANT_GET_SUBJEC_DOB", new Object[] {});
 				}
 			}
-			DateMidnight dm = new DateMidnight(getExpressionParser()
-					.getSubjectDob().getTime());
+			DateMidnight dm = new DateMidnight(getExpressionParser().getSubjectDob().getTime());
 			DateTimeFormatter fmt = ISODateTimeFormat.date();
 			return fmt.print(dm);
 		} else if (number.equals("_SUBJECT_ENROLLMENT")) {
@@ -238,13 +217,10 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 				if (getExpressionParser().isImportRulesMode()) {
 					getExpressionParser().setSubjectEnrollment(new Date());
 				} else {
-					throw new OpenClinicaSystemException(
-							"OCRERR_CANT_GET_SUBJECT_ENROLLMENT",
-							new Object[] {});
+					throw new OpenClinicaSystemException("OCRERR_CANT_GET_SUBJECT_ENROLLMENT", new Object[] {});
 				}
 			}
-			DateMidnight dm = new DateMidnight(getExpressionParser()
-					.getSubjectEnrollment().getTime());
+			DateMidnight dm = new DateMidnight(getExpressionParser().getSubjectEnrollment().getTime());
 			DateTimeFormatter fmt = ISODateTimeFormat.date();
 			return fmt.print(dm);
 		}
@@ -256,11 +232,4 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 		// On a stack machine, just push the number onto the stack.
 		logger.info("  Push " + number);
 	}
-
-	private ExpressionService getExpressionService() {
-		expressionService = this.expressionService != null ? expressionService
-				: new ExpressionService(expressionWrapper);
-		return expressionService;
-	}
-
 }

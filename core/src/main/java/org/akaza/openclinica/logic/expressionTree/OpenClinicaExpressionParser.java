@@ -24,13 +24,14 @@ import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * @author Krikor Krumlian
@@ -38,11 +39,10 @@ import java.util.*;
  */
 public class OpenClinicaExpressionParser {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass()
-			.getName());
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	TextIO textIO;
-	ExpressionObjectWrapper expressionWrapper;
+	private ExpressionService expressionService;
 	private final String ERROR_MESSAGE_KEY = "OCRERR_0005";
 
 	public static final String ONE = "1";
@@ -80,31 +80,24 @@ public class OpenClinicaExpressionParser {
 		this.responseTestValues = responseTestValues;
 	}
 
-	public OpenClinicaExpressionParser(ExpressionObjectWrapper expressionWrapper) {
+	public OpenClinicaExpressionParser(ExpressionService expressionService) {
 		textIO = new TextIO();
-		this.expressionWrapper = expressionWrapper;
+		this.expressionService = expressionService;
 	}
 
-	public OpenClinicaExpressionParser(StudyBean currentStudy,
-			HttpServletRequest request,
-			ExpressionObjectWrapper expressionWrapper) {
-		this(expressionWrapper);
+	public OpenClinicaExpressionParser(StudyBean currentStudy, HttpServletRequest request,
+			ExpressionService expressionService) {
+		this(expressionService);
 		importRulesMode = false;
-		if (currentStudy.getStudyParameterConfig().getCollectDob()
-				.equalsIgnoreCase(ONE)) {
-			setSubjectDob(((SubjectBean) request.getAttribute(SUBJECT))
-					.getDateOfBirth());
+		if (currentStudy.getStudyParameterConfig().getCollectDob().equalsIgnoreCase(ONE)) {
+			setSubjectDob(((SubjectBean) request.getAttribute(SUBJECT)).getDateOfBirth());
 		}
-		if (!currentStudy.getStudyParameterConfig()
-				.getDateOfEnrollmentForStudyRequired()
-				.equalsIgnoreCase(NOT_USED)) {
-			setSubjectEnrollment(((StudySubjectBean) request
-					.getAttribute(STUDY_SUBJECT)).getEnrollmentDate());
+		if (!currentStudy.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired().equalsIgnoreCase(NOT_USED)) {
+			setSubjectEnrollment(((StudySubjectBean) request.getAttribute(STUDY_SUBJECT)).getEnrollmentDate());
 		}
 	}
 
-	public void parseExpression(String expression)
-			throws OpenClinicaSystemException {
+	public void parseExpression(String expression) throws OpenClinicaSystemException {
 		getTextIO().fillBuffer(expression);
 		getTextIO().skipBlanks();
 		ExpressionNode exp = expressionTree(false);
@@ -112,11 +105,11 @@ public class OpenClinicaExpressionParser {
 			throw new OpenClinicaSystemException(ERROR_MESSAGE_KEY);
 		exp.printStackCommands();
 	}
-	
+
 	public String parseAndEvaluateExpression(String expression) {
 		return parseAndEvaluateExpression(expression, false);
 	}
-	
+
 	public String parseAndEvaluateExpression(String expression, Boolean optimiseRuleValidator)
 			throws OpenClinicaSystemException {
 		getTextIO().fillBuffer(expression);
@@ -127,8 +120,7 @@ public class OpenClinicaExpressionParser {
 		return exp.calculate();
 	}
 
-	public String parseAndTestEvaluateExpression(String expression)
-			throws OpenClinicaSystemException {
+	public String parseAndTestEvaluateExpression(String expression) throws OpenClinicaSystemException {
 		getTextIO().fillBuffer(expression);
 		getTextIO().skipBlanks();
 		ExpressionNode exp = expressionTree(false);
@@ -138,8 +130,7 @@ public class OpenClinicaExpressionParser {
 
 	}
 
-	public HashMap<String, String> parseAndTestEvaluateExpression(
-			String expression, HashMap<String, String> h)
+	public HashMap<String, String> parseAndTestEvaluateExpression(String expression, HashMap<String, String> h)
 			throws OpenClinicaSystemException {
 		getTextIO().fillBuffer(expression);
 		getTextIO().skipBlanks();
@@ -156,18 +147,16 @@ public class OpenClinicaExpressionParser {
 	}
 
 	/**
-	 * Reads an expression from the current line of input and builds an
-	 * expression tree that represents the expression.
+	 * Reads an expression from the current line of input and builds an expression tree that represents the expression.
 	 * 
-	 * @return an ExpNode which is a pointer to the root node of the expression
-	 *         tree
+	 * @return an ExpNode which is a pointer to the root node of the expression tree
 	 * @throws OpenClinicaSystemException
 	 *             if a syntax error is found in the input
 	 */
 	protected ExpressionNode expressionTree() throws OpenClinicaSystemException {
 		return expressionTree(false);
 	}
-	
+
 	protected ExpressionNode expressionTree(Boolean optimiseRuleValidator) throws OpenClinicaSystemException {
 		try {
 			textIO.skipBlanks();
@@ -183,20 +172,19 @@ public class OpenClinicaExpressionParser {
 				exp = new UnaryMinusNode(exp);
 			textIO.skipBlanks();
 
-			while (textIO.peek() == 'o' && textIO.peek(3).matches("or ")
-					|| textIO.peek() == 'a' && textIO.peek(4).matches("and ")) {
+			while (textIO.peek() == 'o' && textIO.peek(3).matches("or ") || textIO.peek() == 'a'
+					&& textIO.peek(4).matches("and ")) {
 				// Read the next term and combine it with the
 				// previous terms into a bigger expression tree.
 				// char op = textIO.getAnyChar();
-				String op = textIO.peek() == 'o' ? textIO.getAnyString(3)
-						: textIO.getAnyString(4);
+				String op = textIO.peek() == 'o' ? textIO.getAnyString(3) : textIO.getAnyString(4);
 				logger.info("Operator" + op);
 				ExpressionNode nextTerm = termTree3(optimiseRuleValidator);
-				exp = ExpressionNodeFactory.getExpNode(
-						Operator.getByDescription(op), exp, nextTerm);
+				exp = ExpressionNodeFactory.getExpNode(Operator.getByDescription(op), exp, nextTerm);
 				textIO.skipBlanks();
 			}
 			exp.setExpressionParser(this);
+			exp.setExpressionService(expressionService);
 			return exp;
 		} catch (NullPointerException e) {
 			throw new OpenClinicaSystemException(ERROR_MESSAGE_KEY);
@@ -204,32 +192,26 @@ public class OpenClinicaExpressionParser {
 			throw e;
 		}
 	} // end expressionTree()
-	
+
 	private ExpressionNode termTree3(Boolean optimiseRuleValidator) throws OpenClinicaSystemException {
 		textIO.skipBlanks();
 		ExpressionNode term; // The expression tree representing the term.
 		term = termTree2(optimiseRuleValidator);
 		textIO.skipBlanks();
 
-		while (textIO.peek() == 'e' && textIO.peek(3).matches("eq ")
-				|| textIO.peek() == 'n' && textIO.peek(3).matches("ne ")
-				|| textIO.peek() == 'c' && textIO.peek(3).matches("ct ")
-				|| textIO.peek() == 'n' && textIO.peek(4).matches("nct ")
-				|| textIO.peek() == 'g' && textIO.peek(3).matches("gt ")
-				|| textIO.peek() == 'g' && textIO.peek(4).matches("gte ")
-				|| textIO.peek() == 'l' && textIO.peek(3).matches("lt ")
-				|| textIO.peek() == 'l' && textIO.peek(4).matches("lte ")) {
+		while (textIO.peek() == 'e' && textIO.peek(3).matches("eq ") || textIO.peek() == 'n'
+				&& textIO.peek(3).matches("ne ") || textIO.peek() == 'c' && textIO.peek(3).matches("ct ")
+				|| textIO.peek() == 'n' && textIO.peek(4).matches("nct ") || textIO.peek() == 'g'
+				&& textIO.peek(3).matches("gt ") || textIO.peek() == 'g' && textIO.peek(4).matches("gte ")
+				|| textIO.peek() == 'l' && textIO.peek(3).matches("lt ") || textIO.peek() == 'l'
+				&& textIO.peek(4).matches("lte ")) {
 			// Read the next term and combine it with the
 			// previous terms into a bigger expression tree.
 			// char op = textIO.getAnyChar();
-			String op = textIO.peek(4).matches("gte ")
-					|| textIO.peek(4).matches("lte ")
-					|| textIO.peek(4).matches("nct ") ? textIO.getAnyString(4)
-					: textIO.getAnyString(3);
+			String op = textIO.peek(4).matches("gte ") || textIO.peek(4).matches("lte ")
+					|| textIO.peek(4).matches("nct ") ? textIO.getAnyString(4) : textIO.getAnyString(3);
 			ExpressionNode nextTerm = termTree2(optimiseRuleValidator);
-			term = ExpressionNodeFactory.getExpNode(
-					Operator.getByDescription(String.valueOf(op)), term,
-					nextTerm);
+			term = ExpressionNodeFactory.getExpNode(Operator.getByDescription(String.valueOf(op)), term, nextTerm);
 			// term = new BooleanOpNode(Operator.getByDescription(op), term,
 			// nextTerm);
 			textIO.skipBlanks();
@@ -237,8 +219,7 @@ public class OpenClinicaExpressionParser {
 		term.setExpressionParser(this);
 		return term;
 	} // end termValue()
-	
-	
+
 	private ExpressionNode termTree2(Boolean optimiseRuleValidator) throws OpenClinicaSystemException {
 		textIO.skipBlanks();
 		ExpressionNode term; // The expression tree representing the term.
@@ -250,9 +231,7 @@ public class OpenClinicaExpressionParser {
 			// previous terms into a bigger expression tree.
 			char op = textIO.getAnyChar();
 			ExpressionNode nextTerm = termTree(optimiseRuleValidator);
-			term = ExpressionNodeFactory.getExpNode(
-					Operator.getByDescription(String.valueOf(op)), term,
-					nextTerm);
+			term = ExpressionNodeFactory.getExpNode(Operator.getByDescription(String.valueOf(op)), term, nextTerm);
 			// term = new
 			// BinOpNode(Operator.getByDescription(String.valueOf(op)), term,
 			// nextTerm);
@@ -263,15 +242,13 @@ public class OpenClinicaExpressionParser {
 	} // end termValue()
 
 	/**
-	 * Reads a term from the current line of input and builds an expression tree
-	 * that represents the expression.
+	 * Reads a term from the current line of input and builds an expression tree that represents the expression.
 	 * 
-	 * @return an ExpNode which is a pointer to the root node of the expression
-	 *         tree
+	 * @return an ExpNode which is a pointer to the root node of the expression tree
 	 * @throws OpenClinicaSystemException
 	 *             if a syntax error is found in the input
 	 */
-	
+
 	private ExpressionNode termTree(Boolean optimiseRuleValidator) throws OpenClinicaSystemException {
 		textIO.skipBlanks();
 		ExpressionNode term; // The expression tree representing the term.
@@ -283,9 +260,7 @@ public class OpenClinicaExpressionParser {
 			// previous factors into a bigger expression tree.
 			char op = textIO.getAnyChar();
 			ExpressionNode nextFactor = factorTree(optimiseRuleValidator);
-			term = ExpressionNodeFactory.getExpNode(
-					Operator.getByDescription(String.valueOf(op)), term,
-					nextFactor);
+			term = ExpressionNodeFactory.getExpNode(Operator.getByDescription(String.valueOf(op)), term, nextFactor);
 			// term = new
 			// BinOpNode(Operator.getByDescription(String.valueOf(op)), term,
 			// nextFactor);
@@ -296,15 +271,13 @@ public class OpenClinicaExpressionParser {
 	} // end termValue()
 
 	/**
-	 * Reads a factor from the current line of input and builds an expression
-	 * tree that represents the expression.
+	 * Reads a factor from the current line of input and builds an expression tree that represents the expression.
 	 * 
-	 * @return an ExpNode which is a pointer to the root node of the expression
-	 *         tree
+	 * @return an ExpNode which is a pointer to the root node of the expression tree
 	 * @throws OpenClinicaSystemException
 	 *             if a syntax error is found in the input
 	 */
-	
+
 	private ExpressionNode factorTree(Boolean optimiseRuleValidator) throws OpenClinicaSystemException {
 		ExpressionNode resultNode = null;
 		textIO.skipBlanks();
@@ -332,11 +305,11 @@ public class OpenClinicaExpressionParser {
 			String k = textIO.getWord();
 			logger.info("TheWord 1 is : " + k);
 			if (optimiseRuleValidator) {
-				resultNode = new OpenClinicaVariableNode(k, expressionWrapper, optimiseRuleValidator);
+				resultNode = new OpenClinicaVariableNode(k, expressionService, optimiseRuleValidator);
 			} else {
-				resultNode = new OpenClinicaVariableNode(k, expressionWrapper);
+				resultNode = new OpenClinicaVariableNode(k, expressionService);
 			}
-			
+
 		} else if (String.valueOf(ch).matches("\"")) {
 			String k = textIO.getDoubleQuoteWord();
 			logger.info("TheWord 2 is : " + k);
@@ -348,8 +321,7 @@ public class OpenClinicaExpressionParser {
 		else if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
 			throw new OpenClinicaSystemException("OCRERR_0009");
 		else
-			throw new OpenClinicaSystemException("OCRERR_0010",
-					new Object[] { ch });
+			throw new OpenClinicaSystemException("OCRERR_0010", new Object[] { ch });
 		resultNode.setExpressionParser(this);
 		return resultNode;
 	} // end factorTree()
@@ -396,25 +368,21 @@ public class OpenClinicaExpressionParser {
 	public boolean isDateItem() {
 		boolean result = false;
 		try {
-			result = expressionWrapper.getRuleSet().getItem()
-					.getItemDataTypeId() == ItemDataType.DATE.getId();
+			result = expressionService.getExpressionWrapper().getRuleSet().getItem().getItemDataTypeId() == ItemDataType.DATE
+					.getId();
 		} catch (Exception ex) {
 			//
 		}
 		return result;
 	}
 	/*
-	 * public static void main(String[] args) { SimpleParser4 smp4 = new
-	 * SimpleParser4(); // textIO.putln("\n\nEnter an expression, or press
-	 * return to end."); // textIO.put("\n? "); smp4.getTextIO().fillBuffer("
-	 * ((2 +2 * 4+2 *2 gte 15) or false or false or 3+4 * 2 lt 10) and yellow eq
-	 * \"yellow\" "); // smp4.getTextIO().fillBuffer(" \"yellow\" eq yellow ");
-	 * smp4.getTextIO().skipBlanks(); try { ExpNode exp = smp4.expressionTree();
-	 * logger.info("\nValue 1 is " + exp.value());
-	 * logger.info("\nOrder of postfix evaluation is:\n");
-	 * exp.printStackCommands(); } catch (OpenClinicaSystemException e) {
-	 * logger.info("\n*** Error in input: " + e.getMessage());
-	 * logger.info("*** Discarding input: " + smp4.getTextIO().getln()); } } //
-	 * end main()
+	 * public static void main(String[] args) { SimpleParser4 smp4 = new SimpleParser4(); // textIO.putln("\n\nEnter an
+	 * expression, or press return to end."); // textIO.put("\n? "); smp4.getTextIO().fillBuffer(" ((2 +2 * 4+2 *2 gte
+	 * 15) or false or false or 3+4 * 2 lt 10) and yellow eq \"yellow\" "); //
+	 * smp4.getTextIO().fillBuffer(" \"yellow\" eq yellow "); smp4.getTextIO().skipBlanks(); try { ExpNode exp =
+	 * smp4.expressionTree(); logger.info("\nValue 1 is " + exp.value());
+	 * logger.info("\nOrder of postfix evaluation is:\n"); exp.printStackCommands(); } catch (OpenClinicaSystemException
+	 * e) { logger.info("\n*** Error in input: " + e.getMessage()); logger.info("*** Discarding input: " +
+	 * smp4.getTextIO().getln()); } } // end main()
 	 */
 }

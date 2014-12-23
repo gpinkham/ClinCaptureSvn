@@ -27,12 +27,11 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
-
-import javax.sql.DataSource;
 
 /**
  * @author Krikor Krumlian
@@ -47,18 +46,16 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
 	OpenClinicaExpressionParser oep;
 	DataSource ds;
 	ExpressionService expressionService;
-	ExpressionObjectWrapper expressionWrapper;
 	ResourceBundle respage;
 
-	public OpenClinicaV1ExpressionProcessor(ExpressionObjectWrapper expressionWrapper) {
-		this.expressionWrapper = expressionWrapper;
-		this.e = expressionWrapper.getExpressionBean();
+	public OpenClinicaV1ExpressionProcessor(ExpressionService expressionService) {
+		this.expressionService = expressionService;
+		this.e = expressionService.getExpressionWrapper().getExpressionBean();
 
 	}
 
 	public String isRuleAssignmentExpressionValid() {
 		try {
-			expressionService = new ExpressionService(expressionWrapper);
 			if (expressionService.ruleSetExpressionChecker(e.getValue())) {
 				return null;
 			} else {
@@ -78,7 +75,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
 
 	public String isRuleExpressionValid() {
 		try {
-			oep = new OpenClinicaExpressionParser(expressionWrapper);
+			oep = new OpenClinicaExpressionParser(expressionService);
 			String result = oep.parseAndTestEvaluateExpression(e.getValue());
 			logger.info("Test Result : " + result);
 			return null;
@@ -93,7 +90,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
 
 	public String testEvaluateExpression() {
 		try {
-			oep = new OpenClinicaExpressionParser(expressionWrapper);
+			oep = new OpenClinicaExpressionParser(expressionService);
 			String result = oep.parseAndTestEvaluateExpression(e.getValue());
 			logger.info("Test Result : " + result);
 			return "Pass : " + result;
@@ -107,7 +104,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
 
 	public HashMap<String, String> testEvaluateExpression(HashMap<String, String> testValues) {
 		try {
-			oep = new OpenClinicaExpressionParser(expressionWrapper);
+			oep = new OpenClinicaExpressionParser(expressionService);
 			HashMap<String, String> resultAndTestValues = oep.parseAndTestEvaluateExpression(e.getValue(), testValues);
 			String returnedResult = resultAndTestValues.get("result");
 			logger.info("Test Result : " + returnedResult);

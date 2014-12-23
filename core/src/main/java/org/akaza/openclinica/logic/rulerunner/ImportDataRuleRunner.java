@@ -13,17 +13,6 @@
 
 package org.akaza.openclinica.logic.rulerunner;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -44,6 +33,16 @@ import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ImportDataRuleRunner extends RuleRunner {
 
@@ -121,12 +120,11 @@ public class ImportDataRuleRunner extends RuleRunner {
 				for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
 					String result;
 					RuleBean rule = ruleSetRule.getRuleBean();
-					// ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(),
-					// ruleSet, variableAndValue,ecb);
-					ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, study, rule.getExpression(), ruleSet,
-							variableAndValue);
+					dynamicsMetadataService.getExpressionService().setExpressionWrapper(
+							new ExpressionObjectWrapper(ds, study, rule.getExpression(), ruleSet, variableAndValue));
 					try {
-						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
+						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(
+								dynamicsMetadataService.getExpressionService());
 						result = oep.parseAndEvaluateExpression(rule.getExpression().getValue(), optimiseRuleValidator);
 						itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
 

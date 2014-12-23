@@ -82,6 +82,30 @@ public class ItemDataBean extends AuditableEntityBean {
 
 	private boolean auditLog = false;
 
+	public ItemDataBean copy() {
+		ItemDataBean idb = new ItemDataBean();
+		idb.setAuditLog(isAuditLog());
+		idb.setEventCRFId(getEventCRFId());
+		idb.setItemId(getItemId());
+		idb.setOrdinal(getOrdinal());
+		idb.setSelected(isSelected());
+		idb.setValue(getValue());
+		idb.setActive(isActive());
+		idb.setCreatedDate(getCreatedDate());
+		idb.setId(getId());
+		idb.setName(getName());
+		idb.setOldStatus(getOldStatus());
+		if (owner != null) {
+			idb.setOwner(owner);
+		}
+		idb.setStatus(getStatus());
+		idb.setUpdatedDate(getUpdatedDate());
+		if (updater != null) {
+			idb.setUpdater(updater);
+		}
+		return idb;
+	}
+
 	public ItemDataBean() {
 		eventCRFId = 0;
 		itemId = 0;

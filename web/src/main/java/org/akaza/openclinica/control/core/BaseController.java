@@ -68,8 +68,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.ServletContextAware;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import javax.servlet.ServletContext;
@@ -98,7 +96,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public static final String USER_BEAN_NAME = "userBean";
 	public static final String ERRORS_HOLDER = "errors_holder";
 	public static final String SESSION_MANAGER = "sessionManager";
-	public static final String DYNAMICS_METADATA_SERVICE = "dynamicsMetadataService";
 
 	public static final String BR = "<br/>";
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
@@ -301,16 +298,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	}
 
 	public DynamicsMetadataService getDynamicsMetadataService() {
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-				.getRequest();
-		DynamicsMetadataService dynamicsMetadataService = (DynamicsMetadataService) request
-				.getAttribute(DYNAMICS_METADATA_SERVICE);
-		if (dynamicsMetadataService == null) {
-			dynamicsMetadataService = new DynamicsMetadataService(getDynamicsItemFormMetadataDao(),
-					getDynamicsItemGroupMetadataDao(), getDataSource());
-			request.setAttribute(DYNAMICS_METADATA_SERVICE, dynamicsMetadataService);
-		}
-		return dynamicsMetadataService;
+		return getRuleSetService().getDynamicsMetadataService();
 	}
 
 	public RuleSetService getRuleSetService() {

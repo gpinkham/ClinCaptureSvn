@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class EventCRFSDVFilter implements CriteriaCommand {
 
 	private List<Filter> filters = new ArrayList<Filter>();

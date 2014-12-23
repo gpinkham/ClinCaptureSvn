@@ -31,14 +31,15 @@ import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.ActionProcessor;
 import org.akaza.openclinica.domain.rule.action.ActionProcessorFacade;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,8 +48,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.sql.DataSource;
 
 /**
  * 
@@ -164,12 +163,14 @@ public class CrfBulkRuleRunner extends RuleRunner {
 				ruleSet.setTarget(expressionBean);
 
 				for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
-					String result = null;
+					String result;
 					RuleBean rule = ruleSetRule.getRuleBean();
-					ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(),
-							ruleSet, variableAndValue);
+					dynamicsMetadataService.getExpressionService().setExpressionWrapper(
+							new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,
+									variableAndValue));
 					try {
-						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
+						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(
+								dynamicsMetadataService.getExpressionService());
 						result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
 
 						// Actions
@@ -272,10 +273,12 @@ public class CrfBulkRuleRunner extends RuleRunner {
 				for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
 					String result = null;
 					RuleBean rule = ruleSetRule.getRuleBean();
-					ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(),
-							ruleSet, variableAndValue);
+					dynamicsMetadataService.getExpressionService().setExpressionWrapper(
+							new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,
+									variableAndValue));
 					try {
-						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
+						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(
+								dynamicsMetadataService.getExpressionService());
 						result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
 						itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
 

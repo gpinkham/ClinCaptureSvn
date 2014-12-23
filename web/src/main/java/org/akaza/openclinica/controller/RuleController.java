@@ -48,6 +48,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
+import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -319,8 +320,9 @@ public class RuleController {
 		UserAccountBean userAccount = getUserAccount();
 		mayProceed(userAccount, currentStudy);
 
-		RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(
-				currentStudy, userAccount);
+		RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService(
+				dataSource, currentStudy, userAccount, ruleDao, ruleSetDao,
+				ResourceBundleProvider.getPageMessagesBundle(new Locale("en_US")));
 		rpic = rulesPostImportContainerService.validateRuleDefs(rpic);
 		rpic = rulesPostImportContainerService.validateRuleSetDefs(rpic);
 		Response response = new Response();
@@ -359,8 +361,9 @@ public class RuleController {
 		UserAccountBean userAccount = getUserAccount();
 		mayProceed(userAccount, currentStudy);
 
-		RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(
-				currentStudy, userAccount);
+		RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService(
+				dataSource, currentStudy, userAccount, ruleDao, ruleSetDao,
+				ResourceBundleProvider.getPageMessagesBundle(new Locale("en_US")));
 		rpic = rulesPostImportContainerService.validateRuleDefs(rpic);
 		rpic = rulesPostImportContainerService.validateRuleSetDefs(rpic);
 		Response response = new Response();
@@ -407,8 +410,9 @@ public class RuleController {
 		UserAccountBean userAccount = getUserAccount();
 		mayProceed(userAccount, currentStudy);
 
-		RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(
-				currentStudy, userAccount);
+		RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService(
+				dataSource, currentStudy, userAccount, ruleDao, ruleSetDao,
+				ResourceBundleProvider.getPageMessagesBundle(new Locale("en_US")));
 		rpic = rulesPostImportContainerService.validateRuleDefs(rpic);
 		rpic = rulesPostImportContainerService.validateRuleSetDefs(rpic);
 		Response response = new Response();
@@ -435,9 +439,9 @@ public class RuleController {
 		for (ParameterType parameterType : ruleTest.getParameters()) {
 			p.put(parameterType.getKey(), parameterType.getValue());
 		}
-		ExpressionObjectWrapper eow = new ExpressionObjectWrapper(dataSource, currentStudy, rpic.getRuleDefs().get(0)
-				.getExpression(), rpic.getRuleSets().get(0));
-		ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
+		ExpressionService expressionService = new ExpressionService(new ExpressionObjectWrapper(dataSource,
+				currentStudy, rpic.getRuleDefs().get(0).getExpression(), rpic.getRuleSets().get(0)));
+		ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(expressionService);
 
 		// Run expression with populated HashMap
 		DateTime start = new DateTime();
@@ -490,20 +494,6 @@ public class RuleController {
 	@Autowired
 	public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
 		this.ruleSetRuleDao = ruleSetRuleDao;
-	}
-
-	// TODO: fix locale
-	public RulesPostImportContainerService getRulesPostImportContainerService(StudyBean currentStudy,
-			UserAccountBean userAccount) {
-		Locale l = new Locale("en_US");
-		RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService(
-				dataSource);
-		rulesPostImportContainerService.setRuleDao(ruleDao);
-		rulesPostImportContainerService.setRuleSetDao(ruleSetDao);
-		rulesPostImportContainerService.setCurrentStudy(currentStudy);
-		rulesPostImportContainerService.setRespage(ResourceBundleProvider.getPageMessagesBundle(l));
-		rulesPostImportContainerService.setUserAccount(userAccount);
-		return rulesPostImportContainerService;
 	}
 
 	public MessageSource getMessageSource() {

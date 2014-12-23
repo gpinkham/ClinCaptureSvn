@@ -1122,6 +1122,42 @@
         </sql>
     </query>
     <query>
+        <name>findExistingNotesForToolTipByEventCrfId</name>
+        <sql>
+            SELECT dn.*, id.item_data_id
+            FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
+            where
+            id.event_crf_id = ? AND
+            dn.discrepancy_note_id=dsm.discrepancy_note_id and
+            dsm.item_data_id = id.item_data_id
+            and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id) FROM discrepancy_note dn2,
+            dn_item_data_map dsms,item_data id
+            where
+            id.event_crf_id = ? AND
+            dn2.discrepancy_note_id=dsms.discrepancy_note_id and
+            dsms.item_data_id = id.item_data_id
+
+            )
+            union
+
+            SELECT dn.*, id.item_data_id
+            FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
+            where
+            dn.parent_dn_id is null AND
+            id.event_crf_id = ? AND
+            dn.discrepancy_note_id=dsm.discrepancy_note_id and
+            dsm.item_data_id = id.item_data_id
+            and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id) FROM discrepancy_note dn2,
+            dn_item_data_map dsms,item_data id
+            where
+            id.event_crf_id = ? AND
+            dn2.discrepancy_note_id=dsms.discrepancy_note_id and
+            dsms.item_data_id = id.item_data_id
+
+            )
+        </sql>
+    </query>
+    <query>
         <name>findExistingNotesForToolTip</name>
         <sql>
             SELECT dn.*
@@ -1279,6 +1315,18 @@
             AND dn.entity_type='itemData'
             AND dn.parent_dn_id is null
             AND ss.study_subject_id = dsm.study_subject_id
+        </sql>
+    </query>
+    <query>
+        <name>findAllByEventCrfId</name>
+        <sql>
+            SELECT distinct dn.*, itd.item_data_id
+            FROM item_data itd, discrepancy_note dn, dn_item_data_map dsm
+            WHERE itd.event_crf_id = ?
+            AND dsm.item_data_id = itd.item_data_id
+            AND dsm.column_name='value'
+            AND dsm.discrepancy_note_id = dn.discrepancy_note_id
+            AND dn.entity_type='itemData'
         </sql>
     </query>
 </queries>

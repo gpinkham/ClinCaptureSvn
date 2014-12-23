@@ -21,6 +21,7 @@
 package org.akaza.openclinica.domain.rule.expression;
 
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.rule.expression.ExpressionService;
 
 /**
  * @author Krikor Krumlian
@@ -28,18 +29,16 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
  */
 public class ExpressionProcessorFactory {
 
-	public static ExpressionProcessor createExpressionProcessor(ExpressionObjectWrapper expressionWrapper) {
-
-		ExpressionProcessor ep = null;
-
-		switch (expressionWrapper.getExpressionBean().getContext()) {
+	public static ExpressionProcessor createExpressionProcessor(ExpressionService expressionService) {
+		ExpressionProcessor ep;
+		switch (expressionService.getExpressionWrapper().getExpressionBean().getContext()) {
 		case OC_RULES_V1: {
-			ep = new OpenClinicaV1ExpressionProcessor(expressionWrapper);
+			ep = new OpenClinicaV1ExpressionProcessor(expressionService);
 			break;
 		}
 		default:
-			throw new OpenClinicaSystemException("Context : " + expressionWrapper.getExpressionBean().getContext()
-					+ " not Valid");
+			throw new OpenClinicaSystemException("Context : "
+					+ expressionService.getExpressionWrapper().getExpressionBean().getContext() + " not Valid");
 		}
 
 		return ep;

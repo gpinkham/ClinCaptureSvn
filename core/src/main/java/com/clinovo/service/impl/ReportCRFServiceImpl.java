@@ -84,7 +84,7 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.type;
  * 
  */
 @Service("reportCRFService")
-@SuppressWarnings({ "unchecked", "unused" })
+@SuppressWarnings("unchecked")
 public class ReportCRFServiceImpl implements ReportCRFService {
 	@Autowired
 	private DataSource dataSource;

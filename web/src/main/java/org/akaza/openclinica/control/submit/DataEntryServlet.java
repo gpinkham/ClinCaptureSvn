@@ -785,7 +785,6 @@ public abstract class DataEntryServlet extends Controller {
 			List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean,
 					studyEventBean, ecb, true, request, response, itemBeansWithSCDShown);
 			boolean shouldRunRules = ruleSetService.shouldRunRulesForRuleSets(ruleSets, phase2);
-
 			HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = null;
 			groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules, MessageType.ERROR, phase2,
 					ecb, request);
@@ -946,7 +945,8 @@ public abstract class DataEntryServlet extends Controller {
 									logger.debug("RESET: formName group-item-input-manual:" + formName);
 								}
 								changedItems.add(formName);
-								changedItemsList.add(displayItem);
+								changedItemsList.add(displayItem); // /
+																	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 								changedItemNamesList.add(formName);
 								changedItemsMap.put(formName, displayGroup);
 								logger.debug("adding to changed items map: " + formName);
@@ -2500,12 +2500,19 @@ public abstract class DataEntryServlet extends Controller {
 		int repeatMax = digb.getGroupMetaBean().getRepeatMax();
 		FormProcessor fp = new FormProcessor(request);
 		ItemDAO idao = new ItemDAO(getDataSource());
+		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+		ItemFormMetadataDAO metaDao = new ItemFormMetadataDAO(getDataSource());
 		List<ItemBean> itBeans = idao.findAllItemsByGroupId(digb.getItemGroupBean().getId(), sb.getCRFVersionId());
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
 		FormBeanUtil formBeanUtil = new FormBeanUtil();
 		List<String> nullValuesList = new ArrayList<String>();
 		nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(eventDefCRFId, getDataSource());
+
+		Map<Integer, List<ItemDataBean>> itemDataCache = FormBeanUtil.getItemDataCache(sb.getId(), ecb.getId(), iddao,
+				false);
+		Map<Integer, ItemFormMetadataBean> itemFormMetadataCache = FormBeanUtil.getItemFormMetadataCache(
+				ecb.getCRFVersionId(), metaDao);
 
 		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 
@@ -2517,8 +2524,8 @@ public abstract class DataEntryServlet extends Controller {
 			if (fp.getStartsWith(igb.getOid() + "_manual" + i + "input")
 					|| !StringUtil.isBlank(fp.getString(igb.getOid() + "_manual" + i + ".newRow"))) {
 
-				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-						sb.getId(), nullValuesList, dynamicsMetadataService);
+				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, itemDataCache,
+						itemFormMetadataCache, ecb, sb.getId(), nullValuesList, dynamicsMetadataService);
 
 				dibs = processInputForGroupItem(fp, dibs, i, digb, false);
 
@@ -2550,8 +2557,8 @@ public abstract class DataEntryServlet extends Controller {
 			if (fp.getStartsWith(igb.getOid() + "_" + i + "input")
 					|| !StringUtil.isBlank(fp.getString(igb.getOid() + "_" + i + ".newRow"))) {
 
-				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-						sb.getId(), nullValuesList, dynamicsMetadataService);
+				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, itemDataCache,
+						itemFormMetadataCache, ecb, sb.getId(), nullValuesList, dynamicsMetadataService);
 
 				dibs = processInputForGroupItem(fp, dibs, i, digb, true);
 
@@ -3282,6 +3289,29 @@ public abstract class DataEntryServlet extends Controller {
 		request.setAttribute("IntrvDateNoteResStatus",
 				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(existingIntrvDateNotes));
 
+		Map<Integer, List<DiscrepancyNoteBean>> itemDataDNCache = new HashMap<Integer, List<DiscrepancyNoteBean>>();
+		List<DiscrepancyNoteBean> discrepancyNoteBeanList = dndao.findAllByEventCrfId(ecb.getId());
+		for (DiscrepancyNoteBean discrepancyNoteBean : discrepancyNoteBeanList) {
+			List<DiscrepancyNoteBean> dnList = itemDataDNCache.get(discrepancyNoteBean.getEntityId());
+			if (dnList == null) {
+				dnList = new ArrayList<DiscrepancyNoteBean>();
+				itemDataDNCache.put(discrepancyNoteBean.getEntityId(), dnList);
+			}
+			dnList.add(discrepancyNoteBean);
+		}
+
+		Map<Integer, List<DiscrepancyNoteBean>> toolTipItemDataDNCache = new HashMap<Integer, List<DiscrepancyNoteBean>>();
+		List<DiscrepancyNoteBean> toolTipDiscrepancyNoteBeanList = dndao.findExistingNotesForToolTipByEventCrfId(ecb
+				.getId());
+		for (DiscrepancyNoteBean discrepancyNoteBean : toolTipDiscrepancyNoteBeanList) {
+			List<DiscrepancyNoteBean> dnList = toolTipItemDataDNCache.get(discrepancyNoteBean.getEntityId());
+			if (dnList == null) {
+				dnList = new ArrayList<DiscrepancyNoteBean>();
+				toolTipItemDataDNCache.put(discrepancyNoteBean.getEntityId(), dnList);
+			}
+			dnList.add(discrepancyNoteBean);
+		}
+
 		List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
 		logger.debug("start to populate notes: " + section.getDisplayItemGroups().size());
 		for (int k = 0; k < allItems.size(); k++) {
@@ -3310,7 +3340,12 @@ public abstract class DataEntryServlet extends Controller {
 							dib.getData().setId(0);
 						}
 
-						List dbNotes = dndao.findExistingNotesForItemData(itemDataId);
+						List<DiscrepancyNoteBean> toolTipDNotes = toolTipItemDataDNCache.get(itemDataId);
+						toolTipDNotes = toolTipDNotes == null ? new ArrayList() : new ArrayList(toolTipDNotes);
+
+						List dbNotes = itemDataDNCache.get(itemDataId);
+						List parentNotes = dbNotes == null ? new ArrayList() : new ArrayList(dbNotes);
+						dbNotes = dbNotes == null ? new ArrayList() : new ArrayList(dbNotes);
 
 						dbNotes = filterNotesByUserRole(dbNotes, request);
 
@@ -3322,7 +3357,7 @@ public abstract class DataEntryServlet extends Controller {
 						dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
 						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(request, dndao, itemDataId,
 								discNotes.getNotes(inputName)));
-						dib = setTotals(dib, itemDataId, notes, ecb.getId(), request);
+						dib = setTotals(dib, itemDataId, toolTipDNotes, parentNotes, notes, ecb.getId(), request);
 						DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
 						logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId()
 								+ " " + inputName);
@@ -3340,7 +3375,13 @@ public abstract class DataEntryServlet extends Controller {
 				int itemId = dib.getItem().getId();
 				String inputFieldName = "input" + itemId;
 
-				List dbNotes = dndao.findExistingNotesForItemData(itemDataId);
+				List<DiscrepancyNoteBean> toolTipDNotes = toolTipItemDataDNCache.get(itemDataId);
+				toolTipDNotes = toolTipDNotes == null ? new ArrayList() : new ArrayList(toolTipDNotes);
+
+				List dbNotes = itemDataDNCache.get(itemDataId);
+				List parentNotes = dbNotes == null ? new ArrayList() : new ArrayList(dbNotes);
+				dbNotes = dbNotes == null ? new ArrayList() : new ArrayList(dbNotes);
+
 				ArrayList notes = new ArrayList(discNotes.getNotes(inputFieldName));
 
 				dbNotes = filterNotesByUserRole(dbNotes, request);
@@ -3350,7 +3391,8 @@ public abstract class DataEntryServlet extends Controller {
 				dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
 				dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(request, dndao, itemDataId,
 						discNotes.getNotes(inputFieldName)));
-				dib = setTotals(dib, itemDataId, discNotes.getNotes(inputFieldName), ecb.getId(), request);
+				dib = setTotals(dib, itemDataId, toolTipDNotes, parentNotes, discNotes.getNotes(inputFieldName),
+						ecb.getId(), request);
 				noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
 				DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
 
@@ -3361,9 +3403,16 @@ public abstract class DataEntryServlet extends Controller {
 					int childItemDataId = child.getData().getId();
 					int childItemId = child.getItem().getId();
 					String childInputFieldName = "input" + childItemId;
-
 					logger.debug("*** setting " + childInputFieldName);
-					List dbChildNotes = dndao.findExistingNotesForItemData(childItemId);
+
+					List<DiscrepancyNoteBean> toolTipChildDNotes = toolTipItemDataDNCache.get(childItemDataId);
+					toolTipChildDNotes = toolTipChildDNotes == null ? new ArrayList() : new ArrayList(
+							toolTipChildDNotes);
+
+					List dbChildNotes = itemDataDNCache.get(childItemDataId);
+					List parentChildNotes = dbChildNotes == null ? new ArrayList() : new ArrayList(dbChildNotes);
+					dbChildNotes = dbChildNotes == null ? new ArrayList() : new ArrayList(dbChildNotes);
+
 					List childNotes = new ArrayList(discNotes.getNotes(inputFieldName));
 
 					dbChildNotes = filterNotesByUserRole(dbChildNotes, request);
@@ -3375,8 +3424,8 @@ public abstract class DataEntryServlet extends Controller {
 					child.setNumDiscrepancyNotes(dbChildNotes.size() + childNotes.size());
 					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(request, dndao, childItemDataId,
 							discNotes.getNotes(childInputFieldName)));
-					child = setTotals(child, childItemDataId, discNotes.getNotes(childInputFieldName), ecb.getId(),
-							request);
+					child = setTotals(child, childItemDataId, toolTipChildDNotes, parentChildNotes,
+							discNotes.getNotes(childInputFieldName), ecb.getId(), request);
 					DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, child, noteThreads);
 					childItems.set(j, child);
 				}
@@ -3423,18 +3472,17 @@ public abstract class DataEntryServlet extends Controller {
 	 * @param ecbId
 	 *            TODO
 	 */
-	private DisplayItemBean setTotals(DisplayItemBean dib, int itemDataId, ArrayList<DiscrepancyNoteBean> notes,
-			int ecbId, HttpServletRequest request) {
+	private DisplayItemBean setTotals(DisplayItemBean dib, int itemDataId, List<DiscrepancyNoteBean> toolTipDNotes,
+			List parentNotes, ArrayList<DiscrepancyNoteBean> notes, int ecbId, HttpServletRequest request) {
 
 		int totNew = 0, totRes = 0, totClosed = 0, totUpdated = 0, totNA = 0;
 		boolean hasOtherThread = false;
 
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-		List<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForToolTip(itemDataId);
 
-		existingNotes = filterNotesByUserRole(existingNotes, request);
+		toolTipDNotes = filterNotesByUserRole(toolTipDNotes, request);
 
-		dib.setDiscrepancyNotes(existingNotes);
+		dib.setDiscrepancyNotes(toolTipDNotes);
 
 		for (DiscrepancyNoteBean obj : dib.getDiscrepancyNotes()) {
 			DiscrepancyNoteBean note = obj;
@@ -3444,7 +3492,6 @@ public abstract class DataEntryServlet extends Controller {
 			}
 		}
 
-		ArrayList parentNotes = dndao.findExistingNotesForItemData(itemDataId);
 		// Adding this to show the value of only parent threads on discrepancy notes tool tip
 		for (Object obj : parentNotes) {
 			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
@@ -3901,6 +3948,8 @@ public abstract class DataEntryServlet extends Controller {
 		List<DisplayItemWithGroupBean> displayItemWithGroups = new ArrayList<DisplayItemWithGroupBean>();
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		ItemDAO idao = new ItemDAO(getDataSource());
+		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+		ItemFormMetadataDAO metaDao = new ItemFormMetadataDAO(getDataSource());
 		// For adding null values to display items
 		FormBeanUtil formBeanUtil = new FormBeanUtil();
 		List<String> nullValuesList = new ArrayList<String>();
@@ -3920,8 +3969,10 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		if (hasItemGroup) {
-			ItemDataDAO iddao = new ItemDataDAO(getDataSource());
-			ArrayList data = iddao.findAllActiveBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
+			List<ItemDataBean> data = iddao.findAllActiveBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
+			Map<Integer, List<ItemDataBean>> itemDataCache = FormBeanUtil.getItemDataCache(data, false);
+			Map<Integer, ItemFormMetadataBean> itemFormMetadataCache = FormBeanUtil.getItemFormMetadataCache(
+					ecb.getCRFVersionId(), metaDao);
 			if (data != null && data.size() > 0) {
 				session.setAttribute(HAS_DATA_FLAG, true);
 			}
@@ -3963,8 +4014,9 @@ public abstract class DataEntryServlet extends Controller {
 						// always get a fresh copy for items, may use other
 						// better way to
 						// do deep copy, like clone
-						List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(),
-								ecb, sb.getId(), edcb, idb.getOrdinal(), dynamicsMetadataService);
+						List<DisplayItemBean> dibs = FormBeanUtil
+								.getDisplayBeansFromItems(itBeans, itemDataCache, itemFormMetadataCache, ecb,
+										sb.getId(), edcb, idb.getOrdinal(), dynamicsMetadataService);
 
 						digb.setItems(dibs);
 						logger.trace("set with dibs list of : " + dibs.size());
@@ -4011,8 +4063,8 @@ public abstract class DataEntryServlet extends Controller {
 					session.setAttribute(GROUP_HAS_DATA, Boolean.FALSE);
 					// no data, still add a blank row for displaying
 					DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
-					List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-							sb.getId(), nullValuesList, dynamicsMetadataService);
+					List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, itemDataCache,
+							itemFormMetadataCache, ecb, sb.getId(), nullValuesList, dynamicsMetadataService);
 					digb2.setItems(dibs);
 					logger.trace("set with nullValuesList of : " + nullValuesList);
 					digb2.setEditFlag("initial");
@@ -4039,12 +4091,13 @@ public abstract class DataEntryServlet extends Controller {
 		//
 		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 		ItemDAO idao = new ItemDAO(getDataSource());
+		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+		ItemFormMetadataDAO metaDao = new ItemFormMetadataDAO(getDataSource());
 		// For adding null values to display items
 		FormBeanUtil formBeanUtil = new FormBeanUtil();
 		List<String> nullValuesList = new ArrayList<String>();
 		// method returns null values as a List<String>
 		nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(edcb.getId(), getDataSource());
-		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
 		ArrayList data = iddao.findAllActiveBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
 		DisplayItemGroupBean itemGroup = itemWithGroup.getItemGroup();
 		// to arrange item groups and other single items, the ordinal of
@@ -4057,6 +4110,10 @@ public abstract class DataEntryServlet extends Controller {
 		itemWithGroup.setItemGroup(itemGroup);
 		itemWithGroup.setInGroup(true);
 		itemWithGroup.setOrdinal(itemGroup.getGroupMetaBean().getOrdinal());
+
+		Map<Integer, List<ItemDataBean>> itemDataCache = FormBeanUtil.getItemDataCache(data, false);
+		Map<Integer, ItemFormMetadataBean> itemFormMetadataCache = FormBeanUtil.getItemFormMetadataCache(
+				ecb.getCRFVersionId(), metaDao);
 
 		List<ItemBean> itBeans = idao.findAllItemsByGroupId(itemGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
 
@@ -4078,8 +4135,8 @@ public abstract class DataEntryServlet extends Controller {
 				// always get a fresh copy for items, may use other
 				// better way to
 				// do deep copy, like clone
-				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-						sb.getId(), edcb, idb.getOrdinal(), dynamicsMetadataService);
+				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, itemDataCache,
+						itemFormMetadataCache, ecb, sb.getId(), edcb, idb.getOrdinal(), dynamicsMetadataService);
 
 				digb.setItems(dibs);
 				logger.trace("set with dibs list of : " + dibs.size());
@@ -4123,8 +4180,8 @@ public abstract class DataEntryServlet extends Controller {
 		} else {
 			// no data, still add a blank row for displaying
 			DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
-			List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-					sb.getId(), nullValuesList, dynamicsMetadataService);
+			List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, itemDataCache,
+					itemFormMetadataCache, ecb, sb.getId(), nullValuesList, dynamicsMetadataService);
 			digb2.setItems(dibs);
 			logger.trace("set with nullValuesList of : " + nullValuesList);
 			digb2.setEditFlag("initial");
@@ -4539,10 +4596,12 @@ public abstract class DataEntryServlet extends Controller {
 	private HashMap<String, ArrayList<String>> runRules(List<DisplayItemWithGroupBean> allItems,
 			List<RuleSetBean> ruleSets, Boolean dryRun, Boolean shouldRunRules, MessageType mt, Phase phase,
 			EventCRFBean ecb, HttpServletRequest request) {
+		HashMap<String, ArrayList<String>> result = new HashMap<String, ArrayList<String>>();
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 		if (shouldRunRules) {
 			Container c = new Container();
 			RuleSetService ruleSetService = getRuleSetService();
+			ruleSetService.getDynamicsMetadataService().getExpressionService().clearItemDataCache();
 			try {
 				c = populateRuleSpecificHashMaps(allItems, c, dryRun);
 				ruleSets = ruleSetService.filterRuleSetsBySectionAndGroupOrdinal(ruleSets, c.grouped);
@@ -4553,12 +4612,10 @@ public abstract class DataEntryServlet extends Controller {
 				npe.printStackTrace();
 			}
 			logger.debug("running rules ... rule sets size is " + ruleSets.size());
-			return ruleSetService.runRulesInDataEntry(ruleSets, dryRun, ub, c.variableAndValue, phase, ecb, request)
+			result = ruleSetService.runRulesInDataEntry(ruleSets, dryRun, ub, c.variableAndValue, phase, ecb, request)
 					.getByMessageType(mt);
-		} else {
-			return new HashMap<String, ArrayList<String>>();
 		}
-
+		return result;
 	}
 
 	protected abstract boolean shouldRunRules();

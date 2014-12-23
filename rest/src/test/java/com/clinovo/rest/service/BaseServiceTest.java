@@ -47,6 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:servlet-context.xml")
+@SuppressWarnings("rawtypes")
 public class BaseServiceTest extends AbstractContextSentiveTest {
 
 	protected StudyDAO studyDAO;

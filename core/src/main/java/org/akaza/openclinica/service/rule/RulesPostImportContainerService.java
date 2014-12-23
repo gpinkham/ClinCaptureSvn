@@ -61,7 +61,7 @@ import java.util.ResourceBundle;
  * @author Krikor Krumlian
  * 
  */
-public class RulesPostImportContainerService {
+public final class RulesPostImportContainerService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -79,10 +79,17 @@ public class RulesPostImportContainerService {
 	private ExpressionService expressionService;
 	private InsertActionValidator insertActionValidator;
 
-	public RulesPostImportContainerService(DataSource ds) {
+	public RulesPostImportContainerService(DataSource ds, StudyBean currentStudy, UserAccountBean userAccount,
+			RuleDao ruleDao, RuleSetDao ruleSetDao, ResourceBundle respage) {
 		this.ds = ds;
+		this.respage = respage;
+		this.ruleDao = ruleDao;
+		this.ruleSetDao = ruleSetDao;
+		this.userAccount = userAccount;
+		this.currentStudy = currentStudy;
 		this.oidGenerator = new GenericOidGenerator();
 		insertActionValidator = new InsertActionValidator(ds);
+		expressionService = new ExpressionService(new ExpressionObjectWrapper(ds, currentStudy, null, null));
 	}
 
 	public RulesPostImportContainer validateRuleSetDefs(RulesPostImportContainer importContainer) {
@@ -90,8 +97,9 @@ public class RulesPostImportContainerService {
 			AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper = new AuditableBeanWrapper<RuleSetBean>(ruleSetBean);
 			ruleSetBeanWrapper.getAuditableBean().setStudy(currentStudy);
 			if (isRuleSetExpressionValid(ruleSetBeanWrapper)) {
-				
-				RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpressionAndStudy(ruleSetBean,currentStudy.getId());
+
+				RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpressionAndStudy(ruleSetBean,
+						currentStudy.getId());
 				if (persistentRuleSetBean != null) {
 					List<RuleSetRuleBean> importedRuleSetRules = ruleSetBeanWrapper.getAuditableBean()
 							.getRuleSetRules();
@@ -103,7 +111,8 @@ public class RulesPostImportContainerService {
 						ruleSetRuleBean.setRuleBean(getRuleDao().findByOid(ruleSetRuleBean.getOid(),
 								persistentRuleSetBean.getStudyId()));
 						if (ruleSetRuleBean.getRuleBean() == null) {
-							AuditableBeanWrapper<RuleBean> ruleBeanWrapper = importContainer.getValidRules().get(ruleSetRuleBean.getOid());
+							AuditableBeanWrapper<RuleBean> ruleBeanWrapper = importContainer.getValidRules().get(
+									ruleSetRuleBean.getOid());
 							if (ruleBeanWrapper != null) {
 								ruleSetRuleBean.setRuleBean(ruleBeanWrapper.getAuditableBean());
 							}
@@ -111,13 +120,15 @@ public class RulesPostImportContainerService {
 						for (RuleSetRuleBean persistentruleSetRuleBean : persistentRuleSetBean.getRuleSetRules()) {
 							if (persistentruleSetRuleBean.getStatus() != Status.DELETED
 									&& ruleSetRuleBean.equals(persistentruleSetRuleBean)) {
-								persistentruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.EXACT_DOUBLE);
+								persistentruleSetRuleBean
+										.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.EXACT_DOUBLE);
 								itr.remove();
 								break;
 							} else if (persistentruleSetRuleBean.getStatus() != Status.DELETED
 									&& ruleSetRuleBean.getRuleBean() != null
 									&& ruleSetRuleBean.getRuleBean().equals(persistentruleSetRuleBean.getRuleBean())) {
-								persistentruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.TO_BE_REMOVED);
+								persistentruleSetRuleBean
+										.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.TO_BE_REMOVED);
 								break;
 							}
 							ruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.LINE);
@@ -130,11 +141,18 @@ public class RulesPostImportContainerService {
 						ruleSetBeanWrapper.error(createError("OCRERR_0031"));
 					}
 					ruleSetBeanWrapper.getAuditableBean().setOwner(getUserAccount());
-					ruleSetBeanWrapper.getAuditableBean().setCrf(getExpressionService().getCRFFromExpression(ruleSetBean.getTarget().getValue()));
-					ruleSetBeanWrapper.getAuditableBean().setItem(getExpressionService().getItemBeanFromExpression(ruleSetBean.getTarget().getValue()));
-					ruleSetBeanWrapper.getAuditableBean().setItemGroup(getExpressionService().getItemGroupExpression(ruleSetBean.getTarget().getValue()));
-					ruleSetBeanWrapper.getAuditableBean().setCrfVersion(getExpressionService().getCRFVersionFromExpression(ruleSetBean.getTarget().getValue()));
-					ruleSetBeanWrapper.getAuditableBean().setStudyEventDefinition(getExpressionService().getStudyEventDefinitionFromExpression(ruleSetBean.getTarget().getValue()));
+					ruleSetBeanWrapper.getAuditableBean().setCrf(
+							expressionService.getCRFFromExpression(ruleSetBean.getTarget().getValue()));
+					ruleSetBeanWrapper.getAuditableBean().setItem(
+							expressionService.getItemBeanFromExpression(ruleSetBean.getTarget().getValue()));
+					ruleSetBeanWrapper.getAuditableBean().setItemGroup(
+							expressionService.getItemGroupExpression(ruleSetBean.getTarget().getValue()));
+					ruleSetBeanWrapper.getAuditableBean().setCrfVersion(
+							expressionService.getCRFVersionFromExpression(ruleSetBean.getTarget().getValue()));
+					ruleSetBeanWrapper.getAuditableBean()
+							.setStudyEventDefinition(
+									expressionService.getStudyEventDefinitionFromExpression(ruleSetBean.getTarget()
+											.getValue()));
 				}
 				isRuleSetRuleValid(importContainer, ruleSetBeanWrapper);
 			}
@@ -154,7 +172,9 @@ public class RulesPostImportContainerService {
 			ruleBeanWrapper
 					.getAuditableBean()
 					.getExpression()
-					.setValue(ruleBeanWrapper.getAuditableBean().getExpression().getValue().trim().replaceAll("(\n|\t|\r)", " "));
+					.setValue(
+							ruleBeanWrapper.getAuditableBean().getExpression().getValue().trim()
+									.replaceAll("(\n|\t|\r)", " "));
 
 			if (isRuleOidValid(ruleBeanWrapper) && isRuleExpressionValid(ruleBeanWrapper, null)) {
 				RuleBean persistentRuleBean = getRuleDao().findByOid(ruleBeanWrapper.getAuditableBean());
@@ -188,9 +208,9 @@ public class RulesPostImportContainerService {
 			RulesPostImportContainer importContainer) {
 		if (!ruleSetBeanWrapper.isSavable()) {
 			importContainer.getInValidRuleSetDefs().add(ruleSetBeanWrapper);
-		} else if (getExpressionService().getEventDefinitionCRF(
-				ruleSetBeanWrapper.getAuditableBean().getTarget().getValue()) != null
-				&& getExpressionService()
+		} else if (expressionService
+				.getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue()) != null
+				&& expressionService
 						.getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue())
 						.getStatus().isDeleted()) {
 			importContainer.getInValidRuleSetDefs().add(ruleSetBeanWrapper);
@@ -232,8 +252,8 @@ public class RulesPostImportContainerService {
 			String ruleDefOid = ruleSetRuleBean.getOid();
 			if (ruleSetRuleBean.getId() == null
 					|| ruleSetRuleBean.getRuleSetRuleBeanImportStatus() == RuleSetRuleBeanImportStatus.EXACT_DOUBLE) {
-				EventDefinitionCRFBean eventDefinitionCRFBean = getExpressionService().getEventDefinitionCRF(
-						ruleSetBeanWrapper.getAuditableBean().getTarget().getValue());
+				EventDefinitionCRFBean eventDefinitionCRFBean = expressionService
+						.getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue());
 				if (eventDefinitionCRFBean != null && eventDefinitionCRFBean.getStatus().isDeleted()) {
 					ruleSetBeanWrapper.error(createError("OCRERR_0026"));
 				}
@@ -276,7 +296,7 @@ public class RulesPostImportContainerService {
 						+ " is not Valid. You cannot have Batch=\"true\". ");
 			}
 			for (PropertyBean propertyBean : properties) {
-				String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(propertyBean.getOid(),
+				String result = expressionService.checkValidityOfItemOrItemGroupOidInCrf(propertyBean.getOid(),
 						ruleSetBeanWrapper.getAuditableBean());
 				if (!result.equals("OK")) {
 					ruleSetBeanWrapper.error("ShowAction OID " + result + " is not Valid. ");
@@ -290,7 +310,7 @@ public class RulesPostImportContainerService {
 						+ " is not Valid. You cannot have Batch=\"true\". ");
 			}
 			for (PropertyBean propertyBean : properties) {
-				String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(propertyBean.getOid(),
+				String result = expressionService.checkValidityOfItemOrItemGroupOidInCrf(propertyBean.getOid(),
 						ruleSetBeanWrapper.getAuditableBean());
 				if (!result.equals("OK")) {
 					ruleSetBeanWrapper.error("HideAction OID " + result + " is not Valid. ");
@@ -304,9 +324,12 @@ public class RulesPostImportContainerService {
 			DataBinder dataBinder = new DataBinder(ruleActionBean);
 			Errors errors = dataBinder.getBindingResult();
 			insertActionValidator.setExpressionService(expressionService);
-			insertActionValidator.validate(new InsertActionValidator.InsertActionHolder(ruleSetBeanWrapper.getAuditableBean(),eventDefinitionCRFBean, ruleActionBean), errors);
+			insertActionValidator.validate(
+					new InsertActionValidator.InsertActionHolder(ruleSetBeanWrapper.getAuditableBean(),
+							eventDefinitionCRFBean, ruleActionBean), errors);
 			if (errors.hasErrors()) {
-				ruleSetBeanWrapper.error("InsertAction is not valid: "+ errors.getAllErrors().get(0).getDefaultMessage());
+				ruleSetBeanWrapper.error("InsertAction is not valid: "
+						+ errors.getAllErrors().get(0).getDefaultMessage());
 			}
 		}
 	}
@@ -322,8 +345,8 @@ public class RulesPostImportContainerService {
 		boolean isValid = true;
 		ExpressionBean expressionBean = isExpressionValid(ruleBeanWrapper.getAuditableBean().getExpression(),
 				ruleBeanWrapper);
-		ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, expressionBean, ruleSet);
-		ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
+		expressionService.setExpressionWrapper(new ExpressionObjectWrapper(ds, currentStudy, expressionBean, ruleSet));
+		ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(expressionService);
 		ep.setRespage(respage);
 		String errorString = ep.isRuleExpressionValid();
 		if (errorString != null) {
@@ -336,8 +359,8 @@ public class RulesPostImportContainerService {
 	private boolean isRuleSetExpressionValid(AuditableBeanWrapper<RuleSetBean> beanWrapper) {
 		boolean isValid = true;
 		ExpressionBean expressionBean = isExpressionValid(beanWrapper.getAuditableBean().getTarget(), beanWrapper);
-		ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, expressionBean);
-		ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
+		expressionService.setExpressionWrapper(new ExpressionObjectWrapper(ds, currentStudy, expressionBean));
+		ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(expressionService);
 		ep.setRespage(respage);
 		String errorString = ep.isRuleAssignmentExpressionValid();
 		if (errorString != null) {
@@ -461,10 +484,8 @@ public class RulesPostImportContainerService {
 		this.userAccount = userAccount;
 	}
 
-	private ExpressionService getExpressionService() {
-		expressionService = this.expressionService != null ? expressionService : new ExpressionService(
-				new ExpressionObjectWrapper(ds, currentStudy, null, null));
-		expressionService.setExpressionWrapper(new ExpressionObjectWrapper(ds, currentStudy, null, null));
-		return expressionService;
+	public void setExpressionService(ExpressionService expressionService) {
+		this.expressionService = expressionService;
 	}
+
 }

@@ -155,6 +155,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		eb.setResStatus(ResolutionStatus.get(eb.getResolutionStatusId()));
 		eb.setStudyId(selectInt(hm, "study_id"));
 		eb.setAssignedUserId(selectInt(hm, "assigned_user_id"));
+		if (hm.get("item_data_id") != null) {
+			eb.setEntityId((Integer) hm.get("item_data_id"));
+		}
 		if (hm.get("item_id") != null) {
 			eb.setItemId((Integer) hm.get("item_id"));
 		}
@@ -1992,6 +1995,26 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	}
 
+	public ArrayList findExistingNotesForToolTipByEventCrfId(int eventCrfId) {
+		this.setTypesExpected();
+		ArrayList alist;
+		HashMap variables = new HashMap();
+		variables.put(1, eventCrfId);
+		variables.put(2, eventCrfId);
+		variables.put(3, eventCrfId);
+		variables.put(4, eventCrfId);
+		alist = this.select(digester.getQuery("findExistingNotesForToolTipByEventCrfId"), variables);
+		ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
+			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
+			al.add(eb);
+		}
+
+		return al;
+
+	}
+
 	public ArrayList findParentNotesForToolTip(int itemDataId) {
 		this.setTypesExpected();
 		ArrayList alist;
@@ -2323,6 +2346,32 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			String studySubLabel = String.valueOf((hm).get("label"));
 			eb.getStudySub().setLabel(studySubLabel);
+			returnedNotelist.add(eb);
+		}
+
+		return returnedNotelist;
+	}
+
+	/**
+	 * Find all by event crf id.
+	 *
+	 * @param eventCrfId
+	 *            event crf id
+	 * @return ArrayList<DiscrepancyNoteBean>
+	 */
+	public ArrayList<DiscrepancyNoteBean> findAllByEventCrfId(int eventCrfId) {
+
+		this.setTypesExpected();
+		this.setTypeExpected(12, TypeNames.INT);
+
+		ArrayList<DiscrepancyNoteBean> returnedNotelist = new ArrayList<DiscrepancyNoteBean>();
+
+		HashMap variables = new HashMap();
+		variables.put(1, eventCrfId);
+
+		ArrayList<HashMap> rows = select(digester.getQuery("findAllByEventCrfId"), variables);
+		for (HashMap hm : rows) {
+			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			returnedNotelist.add(eb);
 		}
 

@@ -21,6 +21,7 @@
 package org.akaza.openclinica.logic.expressionTree;
 
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +29,8 @@ import java.util.HashMap;
 
 public abstract class ExpressionNode {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass()
-			.getName());
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	protected ExpressionService expressionService;
 	private OpenClinicaExpressionParser expressionParser;
 	boolean dateParameter;
 
@@ -38,9 +39,8 @@ public abstract class ExpressionNode {
 	}
 
 	/*
-	 * Use this method to test the expression mainly Data types plugging test
-	 * data wherever necessary. This will not only validate the syntax but also
-	 * test the validity of the expression itself.
+	 * Use this method to test the expression mainly Data types plugging test data wherever necessary. This will not
+	 * only validate the syntax but also test the validity of the expression itself.
 	 */
 	String testValue() throws OpenClinicaSystemException {
 		return testCalculate();
@@ -68,8 +68,7 @@ public abstract class ExpressionNode {
 		return expressionParser;
 	}
 
-	protected void setExpressionParser(
-			OpenClinicaExpressionParser expressionParser) {
+	protected void setExpressionParser(OpenClinicaExpressionParser expressionParser) {
 		this.expressionParser = expressionParser;
 	}
 
@@ -81,12 +80,19 @@ public abstract class ExpressionNode {
 		this.dateParameter = dateParameter;
 	}
 
-	protected boolean dateShouldBeEntered(ExpressionNode left,
-			ExpressionNode right) {
+	protected boolean dateShouldBeEntered(ExpressionNode left, ExpressionNode right) {
 		boolean isNotImportRules = !expressionParser.isImportRulesMode();
 		boolean isDateItem = expressionParser.isDateItem();
-		boolean isNextToDate = (left.isDateParameter() ? (right.isDateParameter() ? false
-				: right.value().isEmpty()) : left.value().isEmpty());
+		boolean isNextToDate = (left.isDateParameter() ? (right.isDateParameter() ? false : right.value().isEmpty())
+				: left.value().isEmpty());
 		return isNotImportRules && isDateItem && isNextToDate;
+	}
+
+	public ExpressionService getExpressionService() {
+		return expressionService;
+	}
+
+	public void setExpressionService(ExpressionService expressionService) {
+		this.expressionService = expressionService;
 	}
 }

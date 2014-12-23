@@ -58,7 +58,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @Service("dataEntryService")
-@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class DataEntryServiceImpl implements DataEntryService {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());

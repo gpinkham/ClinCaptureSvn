@@ -103,10 +103,12 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
 				for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
 					String result;
 					RuleBean rule = ruleSetRule.getRuleBean();
-					ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(),
-							ruleSet, variableAndValue);
+					dynamicsMetadataService.getExpressionService().setExpressionWrapper(
+							new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,
+									variableAndValue));
 					try {
-						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
+						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(
+								dynamicsMetadataService.getExpressionService());
 						result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
 						itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
 

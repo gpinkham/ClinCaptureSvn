@@ -57,7 +57,7 @@ import java.util.Map;
 @Controller("studyModuleController")
 @RequestMapping("/studymodule")
 @SessionAttributes("studyModuleStatus")
-@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class StudyModuleController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

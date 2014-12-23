@@ -39,6 +39,7 @@ import java.util.ResourceBundle;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ResourceBundleProvider.class)
+@SuppressWarnings("unused")
 public class DownloadDiscrepancyNoteTest {
 
 	private DownloadDiscrepancyNote downloadDiscrepancyNote;
@@ -198,7 +199,8 @@ public class DownloadDiscrepancyNoteTest {
 	private String getTestExportFileBodyContent() {
 
 		StringBuilder fileContent = new StringBuilder("");
-		fileContent.append("Study Subject ID,Subject Status,Study/Site OID,Thread ID,Note ID,Parent Note ID,Date Created,")
+		fileContent
+				.append("Study Subject ID,Subject Status,Study/Site OID,Thread ID,Note ID,Parent Note ID,Date Created,")
 				.append("Date Update,Days Open,Days Since Updated,Discrepancy Type,Resolution Status,Event Name,CRF Name,")
 				.append("CRF Status,Entity name,Entity value,Description,Detailed Notes,Assigned User,Study Id\n");
 
@@ -209,8 +211,7 @@ public class DownloadDiscrepancyNoteTest {
 
 				fileContent.append(discNoteBean.getStudySub().getLabel()).append(",")
 						.append(discNoteBean.getStudySub().getStatus().getName()).append(",")
-						.append(discNoteBean.getStudy().getOid()).append(",")
-						.append(threadCount).append(",")
+						.append(discNoteBean.getStudy().getOid()).append(",").append(threadCount).append(",")
 						.append(discNoteBean.getId()).append(",")
 						.append(discNoteBean.getParentDnId() > 0 ? discNoteBean.getParentDnId() : "").append(",")
 						.append(discNoteBean.getCreatedDateString()).append(",")
@@ -226,14 +227,11 @@ public class DownloadDiscrepancyNoteTest {
 
 				fileContent.append(discNoteBean.getDisType().getName()).append(",")
 						.append(ResolutionStatus.get(discNoteBean.getResolutionStatusId()).getName()).append(",")
-						.append(discNoteBean.getEventName()).append(",")
-						.append(discNoteBean.getCrfName()).append(",")
-						.append(discNoteBean.getCrfStatus()).append(",")
-						.append(discNoteBean.getEntityName()).append(",")
-						.append(discNoteBean.getEntityValue()).append(",")
-						.append(discNoteBean.getDescription()).append(",")
-						.append(discNoteBean.getDetailedNotes()).append(",")
-						.append(discNoteBean.getAssignedUser().getName()).append(",")
+						.append(discNoteBean.getEventName()).append(",").append(discNoteBean.getCrfName()).append(",")
+						.append(discNoteBean.getCrfStatus()).append(",").append(discNoteBean.getEntityName())
+						.append(",").append(discNoteBean.getEntityValue()).append(",")
+						.append(discNoteBean.getDescription()).append(",").append(discNoteBean.getDetailedNotes())
+						.append(",").append(discNoteBean.getAssignedUser().getName()).append(",")
 						.append(discNoteBean.getStudyId()).append("\n");
 			}
 

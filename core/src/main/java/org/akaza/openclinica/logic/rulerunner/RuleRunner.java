@@ -54,7 +54,6 @@ public class RuleRunner {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-	private ExpressionService expressionService;
 	private final JavaMailSenderImpl mailSender;
 	protected DynamicsMetadataService dynamicsMetadataService;
 	protected RuleActionRunLogDao ruleActionRunLogDao;
@@ -200,8 +199,7 @@ public class RuleRunner {
 	}
 
 	ExpressionService getExpressionService() {
-		expressionService = this.expressionService != null ? expressionService : new ExpressionService(ds);
-		return expressionService;
+		return dynamicsMetadataService.getExpressionService();
 	}
 
 	CRFDAO getCrfDao() {

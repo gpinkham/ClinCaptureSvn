@@ -261,6 +261,10 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
 		this.setTypesExpected();
+		this.setTypeExpected(29, TypeNames.STRING);// version name
+		this.setTypeExpected(30, TypeNames.STRING);// group_label
+		this.setTypeExpected(31, TypeNames.INT);// repeat_max
+		this.setTypeExpected(32, TypeNames.STRING);// section_name
 
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		variables.put(1, crfVersionId);
@@ -270,6 +274,15 @@ public class ItemFormMetadataDAO extends EntityDAO {
 
 		for (Object anAlist : alist) {
 			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) anAlist);
+			String versionName = (String) ((HashMap) anAlist).get("cvname");
+			String groupLabel = (String) ((HashMap) anAlist).get("group_label");
+			String sectionName = (String) ((HashMap) anAlist).get("section_name");
+			Integer repeatMax = (Integer) ((HashMap) anAlist).get("repeat_max");
+			int repeatMaxInt = repeatMax != null ? repeatMax : 0;
+			ifmb.setCrfVersionName(versionName);
+			ifmb.setGroupLabel(groupLabel);
+			ifmb.setSectionName(sectionName);
+			ifmb.setRepeatMax(repeatMaxInt);
 			answer.add(ifmb);
 		}
 

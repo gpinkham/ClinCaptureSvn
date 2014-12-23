@@ -137,8 +137,8 @@ public class ImportRuleServlet extends Controller {
 					}
 				}
 
-				RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(
-						currentStudy, ub);
+				RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService(
+						getDataSource(), currentStudy, ub, getRuleDao(), getRuleSetDao(), respage);
 				importedRules = rulesPostImportContainerService.validateRuleDefs(importedRules);
 				importedRules = rulesPostImportContainerService.validateRuleSetDefs(importedRules);
 				provideMessage(importedRules, request);
@@ -239,18 +239,6 @@ public class ImportRuleServlet extends Controller {
 	private void logRuleImport(RulesPostImportContainer ruleImport) {
 		logger.info("Total Number of RuleDefs Being imported : {} ", ruleImport.getRuleDefs().size());
 		logger.info("Total Number of RuleAssignments Being imported : {} ", ruleImport.getRuleSets().size());
-	}
-
-	private RulesPostImportContainerService getRulesPostImportContainerService(StudyBean currentStudy,
-			UserAccountBean ub) {
-		RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService(
-				getDataSource());
-		rulesPostImportContainerService.setRuleDao(getRuleDao());
-		rulesPostImportContainerService.setRuleSetDao(getRuleSetDao());
-		rulesPostImportContainerService.setCurrentStudy(currentStudy);
-		rulesPostImportContainerService.setRespage(respage);
-		rulesPostImportContainerService.setUserAccount(ub);
-		return rulesPostImportContainerService;
 	}
 
 	@Override

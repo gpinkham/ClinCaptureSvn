@@ -28,6 +28,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Locale;
 
+@SuppressWarnings("rawtypes")
 public class EventCRFDAOTest extends DefaultAppContextTest {
 
 	@Test

@@ -13,20 +13,6 @@
 
 package org.akaza.openclinica.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -59,6 +45,19 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * DiscrepancyNoteUtil is a convenience class for managing discrepancy notes, such as getting all notes for a study, or
@@ -702,33 +701,13 @@ public class DiscrepancyNoteUtil {
 			currentStudy = new StudyBean();
 		}
 
-		List<DiscrepancyNoteBean> childDiscBeans = new ArrayList<DiscrepancyNoteBean>();
-		List<DiscrepancyNoteBean> eventCRFChildDiscBeans = new ArrayList<DiscrepancyNoteBean>();
-
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
-		DiscrepancyNoteThread tempDNThread = null;
-		int resolutionStatusId = 0;
-
 		for (DiscrepancyNoteBean discBean : allDiscNotes) {
-			tempDNThread = new DiscrepancyNoteThread();
+			DiscrepancyNoteThread tempDNThread = new DiscrepancyNoteThread();
 			tempDNThread.setStudyId(currentStudy.getId());
 
 			tempDNThread.getLinkedNoteList().addFirst(discBean);
-			// childDiscBeans should be empty here
-			if (!childDiscBeans.isEmpty()) {
-				childDiscBeans.clear();
-			}
-			childDiscBeans = discrepancyNoteDAO.findAllItemDataByStudyAndParent(currentStudy, discBean);
-			if (includeEventCRFNotes) {
-				eventCRFChildDiscBeans = discrepancyNoteDAO.findAllEventCRFByStudyAndParent(currentStudy, discBean);
-			}
-			if (!eventCRFChildDiscBeans.isEmpty()) {
-				childDiscBeans.addAll(eventCRFChildDiscBeans);
-				// sort the discnote beans, because we have eventCRF and
-				// ItemDate types mixed here.
-				Collections.sort(childDiscBeans);
-			}
-			resolutionStatusId = discBean.getResolutionStatusId();
+
+			int resolutionStatusId = discBean.getResolutionStatusId();
 			// the thread's status id is the parent's in this case, when there
 			// are no children
 			tempDNThread.setLatestResolutionStatus(this.getResolutionStatusName(resolutionStatusId));
