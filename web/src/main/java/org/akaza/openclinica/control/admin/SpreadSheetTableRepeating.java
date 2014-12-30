@@ -18,6 +18,7 @@ import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.extract.SasNameValidator;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.oid.MeasurementUnitOidGenerator;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -159,6 +160,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
 	@SuppressWarnings({ "unused" })
 	public NewCRFBean toNewCRF(DataSource ds, ResourceBundle resPageMsg) throws IOException, CRFReadingException {
+
+		SasNameValidator sasNameValidator = new SasNameValidator();
 
 		String dbName = SQLInitServlet.getDBType();
 
@@ -1065,23 +1068,22 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 						// Create oid for Item Bean
 						String itemOid = idao.getValidOid(new ItemBean(), crfName, itemName, itemOids);
 						itemOids.add(itemOid);
-
-						// better spot for checking item might be right here,
+                        String validSasName = sasNameValidator.getValidName(itemName);
 						String vlSql = "";
 						if (dbName.equals("oracle")) {
 
 							vlSql = "INSERT INTO ITEM (NAME,DESCRIPTION,UNITS,PHI_STATUS,"
-									+ "ITEM_DATA_TYPE_ID, ITEM_REFERENCE_TYPE_ID,STATUS_ID,OWNER_ID,DATE_CREATED,OC_OID) "
+									+ "ITEM_DATA_TYPE_ID, ITEM_REFERENCE_TYPE_ID,STATUS_ID,OWNER_ID,DATE_CREATED,OC_OID,SAS_NAME) "
 									+ "VALUES ('" + stripQuotes(itemName) + "','" + stripQuotes(descLabel) + "','"
 									+ stripQuotes(unit) + "'," + (phiBoolean == true ? 1 : 0) + "," + dataTypeIdString
-									+ ",1,1," + ub.getId() + ", sysdate" + ",'" + itemOid + "')";
+									+ ",1,1," + ub.getId() + ", sysdate" + ",'" + itemOid + "','" + sasNameValidator.getValidName(itemName) + "')";
 
 						} else {
 							vlSql = "INSERT INTO ITEM (NAME,DESCRIPTION,UNITS,PHI_STATUS,"
-									+ "ITEM_DATA_TYPE_ID, ITEM_REFERENCE_TYPE_ID,STATUS_ID,OWNER_ID,DATE_CREATED,OC_OID) "
+									+ "ITEM_DATA_TYPE_ID, ITEM_REFERENCE_TYPE_ID,STATUS_ID,OWNER_ID,DATE_CREATED,OC_OID,SAS_NAME) "
 									+ "VALUES ('" + stripQuotes(itemName) + "','" + stripQuotes(descLabel) + "','"
 									+ stripQuotes(unit) + "'," + phiBoolean + "," + dataTypeIdString + ",1,1,"
-									+ ub.getId() + ", NOW()" + ",'" + itemOid + "')";
+									+ ub.getId() + ", NOW()" + ",'" + itemOid + "','" + validSasName + "')";
 						}
 
 						backupItemQueries.put(itemName, vlSql);
@@ -1094,6 +1096,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 						ib.setPhiStatus(phiBoolean);
 						ib.setDescription(descLabel);
 						ib.setDataType(ItemDataType.getByName(dataType.toLowerCase()));
+						ib.setSasName(validSasName);
 
 						// put metadata into item
 						ResponseSetBean rsb = new ResponseSetBean();

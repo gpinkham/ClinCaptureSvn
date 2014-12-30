@@ -50,7 +50,7 @@ import java.util.Map;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ItemDAO extends AuditableEntityDAO {
-	// private DAODigester digester;
+
 	public ItemDAO(DataSource ds) {
 		super(ds);
 	}
@@ -80,15 +80,16 @@ public class ItemDAO extends AuditableEntityDAO {
 		this.setTypeExpected(2, TypeNames.STRING);
 		this.setTypeExpected(3, TypeNames.STRING);
 		this.setTypeExpected(4, TypeNames.STRING);
-		this.setTypeExpected(5, TypeNames.BOOL);// phi status
-		this.setTypeExpected(6, TypeNames.INT);// data type id
-		this.setTypeExpected(7, TypeNames.INT);// reference type id
-		this.setTypeExpected(8, TypeNames.INT);// status id
-		this.setTypeExpected(9, TypeNames.INT);// owner id
-		this.setTypeExpected(10, TypeNames.DATE);// created
-		this.setTypeExpected(11, TypeNames.DATE);// updated
-		this.setTypeExpected(12, TypeNames.INT);// update id
-		this.setTypeExpected(13, TypeNames.STRING);// oc_oid
+		this.setTypeExpected(5, TypeNames.BOOL); // phi status
+		this.setTypeExpected(6, TypeNames.INT); // data type id
+		this.setTypeExpected(7, TypeNames.INT); // reference type id
+		this.setTypeExpected(8, TypeNames.INT); // status id
+		this.setTypeExpected(9, TypeNames.INT); // owner id
+		this.setTypeExpected(10, TypeNames.DATE); // created
+		this.setTypeExpected(11, TypeNames.DATE); // updated
+		this.setTypeExpected(12, TypeNames.INT); // update id
+		this.setTypeExpected(13, TypeNames.STRING); // oc_oid
+		this.setTypeExpected(14, TypeNames.STRING); //sas_name
 	}
 
 	public EntityBean update(EntityBean eb) {
@@ -187,6 +188,7 @@ public class ItemDAO extends AuditableEntityDAO {
 		eb.setItemReferenceTypeId((Integer) hm.get("item_reference_type_id"));
 		eb.setDataType(ItemDataType.get(eb.getItemDataTypeId()));
 		eb.setOid((String) hm.get("oc_oid"));
+		eb.setSasName((String) hm.get("sas_name"));
 		// the rest should be all set
 		return eb;
 	}
@@ -326,8 +328,8 @@ public class ItemDAO extends AuditableEntityDAO {
 	public ArrayList findAllActiveByCRF(CRFBean crf) {
 		HashMap variables = new HashMap();
 		this.setTypesExpected();
-		this.setTypeExpected(14, TypeNames.INT);// crf_version_id
-		this.setTypeExpected(15, TypeNames.STRING);// version name
+		this.setTypeExpected(15, TypeNames.INT); // crf_version_id
+		this.setTypeExpected(16, TypeNames.STRING);// version name
 		variables.put(1, crf.getId());
 		String sql = digester.getQuery("findAllActiveByCRF");
 		ArrayList alist = this.select(sql, variables);
@@ -605,15 +607,15 @@ public class ItemDAO extends AuditableEntityDAO {
 
 	public ArrayList<ItemGroupCrvVersionUtil> findAllWithItemDetailsGroupCRFVersionMetadataByCRFId(String crfName) {
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.STRING);// (crf)name
-		this.setTypeExpected(2, TypeNames.STRING);// (crf)description
-		this.setTypeExpected(3, TypeNames.INT);// (crf)item_id
-		this.setTypeExpected(4, TypeNames.INT);// (crf)data_type
-		this.setTypeExpected(5, TypeNames.STRING);// (crf)item_oid
-		this.setTypeExpected(6, TypeNames.STRING);// (crf)group_name
-		this.setTypeExpected(7, TypeNames.STRING);// (crf)group_oid
-		this.setTypeExpected(8, TypeNames.STRING);// (crf)version_name
-		this.setTypeExpected(9, TypeNames.INT);// (crf)v_status
+		this.setTypeExpected(1, TypeNames.STRING); // (crf)name
+		this.setTypeExpected(2, TypeNames.STRING); // (crf)description
+		this.setTypeExpected(3, TypeNames.INT); // (crf)item_id
+		this.setTypeExpected(4, TypeNames.INT); // (crf)data_type
+		this.setTypeExpected(5, TypeNames.STRING); // (crf)item_oid
+		this.setTypeExpected(6, TypeNames.STRING); // (crf)group_name
+		this.setTypeExpected(7, TypeNames.STRING); // (crf)group_oid
+		this.setTypeExpected(8, TypeNames.STRING); // (crf)version_name
+		this.setTypeExpected(9, TypeNames.INT); // (crf)v_status
 
 		HashMap variables = new HashMap();
 		variables.put(1, crfName);
@@ -631,7 +633,7 @@ public class ItemDAO extends AuditableEntityDAO {
 			item.setCrfVersionStatus((Integer) row.get("v_status"));
 			item.setGroupName((String) row.get("group_name"));
 			item.setGroupOID((String) row.get("group_oid"));
-			this.setTypeExpected(2, TypeNames.STRING);// (crf)
+			this.setTypeExpected(2, TypeNames.STRING); // (crf)
 			this.setTypeExpected(3, TypeNames.INT);// (crf)item_id
 			this.setTypeExpected(4, TypeNames.INT);// (crf)data_type
 			this.setTypeExpected(5, TypeNames.STRING);// (crf)item_oid

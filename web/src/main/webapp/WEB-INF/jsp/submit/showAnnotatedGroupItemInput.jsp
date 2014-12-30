@@ -42,13 +42,23 @@
 <table border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td class="annotated_itemOID">
-			<span class="annotated_itemOID">${displayItem.item.name}</span>
+			<span class="annotated_itemOID">
+				<c:choose>
+					<c:when test="${study.studyParameterConfig.annotatedCrfSasItemNames == 'yes'}">
+						${sasItemNamesMap[displayItem.item.name]}
+					</c:when>
+					<c:otherwise>
+						${displayItem.item.name}
+					</c:otherwise>
+				</c:choose>
+			</span>
 		</td>
 	</tr>
+
+
 	<tr>
 		<td class="hidden_cell">
-			<c:if test='${inputType=="file"}'>
-				<label for="${inputName}"></label>
+			<c:if test='${inputType=="file"}'>				<label for="${inputName}"></label>
 				<input type="text" id="ft${itemId}" name="fileText${itemId}" value="">
 				<input type="button" id="up${inputName}" name="uploadFile${inputName}" value="<fmt:message key="click_to_upload" bundle="${resword}"/>">
 			</c:if>

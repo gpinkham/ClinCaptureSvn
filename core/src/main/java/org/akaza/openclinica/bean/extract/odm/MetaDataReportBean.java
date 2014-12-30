@@ -432,7 +432,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
 			if (len > 0) {
 				xml.append(" SignificantDigits=\"" + len + "\"");
 			}
-			xml.append(" SASFieldName=\"" + this.getSasNameValidator().getValidName(item.getPreSASFieldName()) + "\"");
+			xml.append(" SASFieldName=\"" + item.getPreSASFieldName() + "\"");
 			if (item.getComment().length() > 0) {
 				xml.append(" Comment=\"" + StringEscapeUtils.escapeXml(item.getComment()) + "\"");
 			}

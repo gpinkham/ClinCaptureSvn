@@ -23,7 +23,6 @@ package org.akaza.openclinica.control.managestudy;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.extract.SasNameValidator;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -609,10 +608,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		ItemDAO itemDAO = new ItemDAO(getDataSource());
 		SectionBean section = (SectionBean) request.getAttribute("sec");
 		ArrayList<ItemBean> items = itemDAO.findAllBySectionId(section.getId());
-		SasNameValidator sasNameValidator = new SasNameValidator();
 
 		for (ItemBean item : items) {
-			String sasItemName = sasNameValidator.getValidName(item.getName());
+			String sasItemName = item.getSasName();
 			sasItemNamesMap.put(item.getName(), sasItemName);
 		}
 		return sasItemNamesMap;

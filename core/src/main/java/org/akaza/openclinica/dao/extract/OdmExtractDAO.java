@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -41,6 +41,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.extract.SasNameValidator;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
@@ -213,25 +214,26 @@ public class OdmExtractDAO extends DatasetDAO {
 		this.setTypeExpected(6, TypeNames.STRING);// crf_version_oid
 		this.setTypeExpected(7, TypeNames.STRING);// item_group_oid
 		this.setTypeExpected(8, TypeNames.STRING);// item_oid
-		this.setTypeExpected(9, TypeNames.STRING); // item_group_name
-		this.setTypeExpected(10, TypeNames.STRING);// item_name
-		this.setTypeExpected(11, TypeNames.INT);// item_data_type_id
-		this.setTypeExpected(12, TypeNames.STRING);// item_header
-		this.setTypeExpected(13, TypeNames.STRING);// left_item_text
-		this.setTypeExpected(14, TypeNames.STRING);// right_item_text
-		this.setTypeExpected(15, TypeNames.BOOL);// item_required
-		this.setTypeExpected(16, TypeNames.STRING);// regexp
-		this.setTypeExpected(17, TypeNames.STRING);// regexp_error_msg
-		this.setTypeExpected(18, TypeNames.STRING);// width_decimal
-		this.setTypeExpected(19, TypeNames.INT);// response_type_id
-		this.setTypeExpected(20, TypeNames.STRING);// options_text
-		this.setTypeExpected(21, TypeNames.STRING);// options_values
-		this.setTypeExpected(22, TypeNames.STRING);// response_label
-		this.setTypeExpected(23, TypeNames.STRING);// item_group_header
-		this.setTypeExpected(24, TypeNames.STRING);// item_description
-		this.setTypeExpected(25, TypeNames.INT);// section_id
-		this.setTypeExpected(26, TypeNames.STRING); // question_number_label
-		this.setTypeExpected(27, TypeNames.STRING);// mu_oid
+		this.setTypeExpected(9, TypeNames.STRING);// sas_name
+		this.setTypeExpected(10, TypeNames.STRING); // item_group_name
+		this.setTypeExpected(11, TypeNames.STRING);// item_name
+		this.setTypeExpected(12, TypeNames.INT);// item_data_type_id
+		this.setTypeExpected(13, TypeNames.STRING);// item_header
+		this.setTypeExpected(14, TypeNames.STRING);// left_item_text
+		this.setTypeExpected(15, TypeNames.STRING);// right_item_text
+		this.setTypeExpected(16, TypeNames.BOOL);// item_required
+		this.setTypeExpected(17, TypeNames.STRING);// regexp
+		this.setTypeExpected(18, TypeNames.STRING);// regexp_error_msg
+		this.setTypeExpected(19, TypeNames.STRING);// width_decimal
+		this.setTypeExpected(20, TypeNames.INT);// response_type_id
+		this.setTypeExpected(21, TypeNames.STRING);// options_text
+		this.setTypeExpected(22, TypeNames.STRING);// options_values
+		this.setTypeExpected(23, TypeNames.STRING);// response_label
+		this.setTypeExpected(24, TypeNames.STRING);// item_group_header
+		this.setTypeExpected(25, TypeNames.STRING);// item_description
+		this.setTypeExpected(26, TypeNames.INT);// section_id
+		this.setTypeExpected(27, TypeNames.STRING); // question_number_label
+		this.setTypeExpected(28, TypeNames.STRING);// mu_oid
 	}
 
 	public void setItemGroupAndItemMetaOC1_3TypesExpected() {
@@ -842,6 +844,7 @@ public class OdmExtractDAO extends DatasetDAO {
 		Set<Integer> clset = new HashSet<Integer>();
 		Set<Integer> mslset = new HashSet<Integer>();
 		ItemGroupDefBean igdef = new ItemGroupDefBean();
+		SasNameValidator sasNameValidator = new SasNameValidator();
 		HashMap<String, String> igMandatories = new HashMap<String, String>();
 		boolean isLatest = false;
 		int cvprev = -1;
@@ -859,6 +862,7 @@ public class OdmExtractDAO extends DatasetDAO {
 			Integer rsId = (Integer) row.get("response_set_id");
 			String igOID = (String) row.get("item_group_oid");
 			String itOID = (String) row.get("item_oid");
+			String sasName = (String) row.get("sas_name");
 			String igName = (String) row.get("item_group_name");
 			String itName = (String) row.get("item_name");
 			Integer dataTypeId = (Integer) row.get("item_data_type_id");
@@ -988,7 +992,8 @@ public class OdmExtractDAO extends DatasetDAO {
 					measurementUnitRef.setElementDefOID(muOid);
 					idef.setMeasurementUnitRef(measurementUnitRef);
 				}
-				idef.setPreSASFieldName(itName);
+
+				idef.setPreSASFieldName(sasName.isEmpty()? sasNameValidator.getValidName(itName) : sasName);
 				idef.setCodeListOID(hasCode ? "CL_" + rsId : "");
 				if (hasMultiSelect) {
 					ElementRefBean multiSelectListRef = new ElementRefBean();
@@ -2721,7 +2726,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
 	protected String getItemGroupAndItemMetaSql(String crfVersionIds) {
 		return "select cv.crf_id, cv.crf_version_id,"
-				+ " ig.item_group_id, item.item_id, rs.response_set_id, cv.oc_oid as crf_version_oid, ig.oc_oid as item_group_oid, item.oc_oid as item_oid,"
+				+ " ig.item_group_id, item.item_id, rs.response_set_id, cv.oc_oid as crf_version_oid, ig.oc_oid as item_group_oid, item.oc_oid as item_oid, item.sas_name as sas_name,"
 				+ " ig.name as item_group_name, item.name as item_name, item.item_data_type_id, ifm.item_header, ifm.left_item_text,"
 				+ " ifm.right_item_text, ifm.required as item_required, ifm.regexp, ifm.regexp_error_msg, ifm.width_decimal,"
 				+ " rs.response_type_id, rs.options_text, rs.options_values, rs.label as response_label,"
