@@ -2,6 +2,7 @@ package org.akaza.openclinica;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.admin.AuditDAO;
+import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -14,7 +15,9 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -23,6 +26,8 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.service.EventService;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
@@ -50,6 +55,11 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			initialized = true;
 			// DAO that require data source
 			auditDao = new AuditDAO(dataSource);
+			subjectDAO = new SubjectDAO(dataSource);
+			auditEventDAO = new AuditEventDAO(dataSource);
+			subjectGroupMapDAO = new SubjectGroupMapDAO(dataSource);
+			studyGroupDAO = new StudyGroupDAO(dataSource);
+			studyParameterValueDAO = new StudyParameterValueDAO(dataSource);
 			idao = new ItemDAO(dataSource);
 			crfdao = new CRFDAO(dataSource);
 			eventCRFDAO = new EventCRFDAO(dataSource);
@@ -130,6 +140,21 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 				session.createSQLQuery("ALTER SEQUENCE item_data_item_data_id_seq RESTART WITH " + (max + 1))
 						.executeUpdate();
 
+				max = (Integer) session.createSQLQuery("SELECT max(section_id) from section").uniqueResult();
+				session.createSQLQuery("ALTER SEQUENCE section_section_id_seq RESTART WITH " + (max + 1))
+						.executeUpdate();
+
+				max = (Integer) session.createSQLQuery("SELECT max(item_id) from item").uniqueResult();
+				session.createSQLQuery("ALTER SEQUENCE item_item_id_seq RESTART WITH " + (max + 1)).executeUpdate();
+
+				max = (Integer) session.createSQLQuery("SELECT max(subject_id) from subject").uniqueResult();
+				session.createSQLQuery("ALTER SEQUENCE subject_subject_id_seq RESTART WITH " + (max + 1))
+						.executeUpdate();
+
+				max = (Integer) session.createSQLQuery("SELECT max(study_subject_id) from study_subject")
+						.uniqueResult();
+				session.createSQLQuery("ALTER SEQUENCE study_subject_study_subject_id_seq RESTART WITH " + (max + 1))
+						.executeUpdate();
 			} else if (dbDriverClassName.contains(ORACLE)) {
 				Integer max = (Integer) session.createSQLQuery("SELECT max(discrepancy_note_id) from discrepancy_note")
 						.uniqueResult();
@@ -204,6 +229,31 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 				session.createSQLQuery("DROP SEQUENCE item_data_item_data_id_seq").executeUpdate();
 				session.createSQLQuery(
 						"CREATE SEQUENCE item_data_item_data_id_seq START WITH " + (max + 1)
+								+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+				max = (Integer) session.createSQLQuery("SELECT max(section_id) from section").uniqueResult();
+				session.createSQLQuery("DROP SEQUENCE section_section_id_seq").executeUpdate();
+				session.createSQLQuery(
+						"CREATE SEQUENCE section_section_id_seq START WITH " + (max + 1)
+								+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+				max = (Integer) session.createSQLQuery("SELECT max(item_id) from item").uniqueResult();
+				session.createSQLQuery("DROP SEQUENCE item_item_id_seq").executeUpdate();
+				session.createSQLQuery(
+						"CREATE SEQUENCE item_item_id_seq START WITH " + (max + 1)
+								+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+				max = (Integer) session.createSQLQuery("SELECT max(subject_id) from subject").uniqueResult();
+				session.createSQLQuery("DROP SEQUENCE subject_subject_id_seq").executeUpdate();
+				session.createSQLQuery(
+						"CREATE SEQUENCE subject_subject_id_seq START WITH " + (max + 1)
+								+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+				max = (Integer) session.createSQLQuery("SELECT max(study_subject_id) from study_subject")
+						.uniqueResult();
+				session.createSQLQuery("DROP SEQUENCE study_subject_study_subject_id_seq").executeUpdate();
+				session.createSQLQuery(
+						"CREATE SEQUENCE study_subject_study_subject_id_seq START WITH " + (max + 1)
 								+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
 			}
 

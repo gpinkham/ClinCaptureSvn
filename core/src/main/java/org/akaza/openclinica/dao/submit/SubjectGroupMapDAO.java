@@ -27,15 +27,14 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
-import javax.sql.DataSource;
-
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SubjectGroupMapDAO extends AuditableEntityDAO {
 
 	private void setQueryNames() {
@@ -214,8 +213,10 @@ public class SubjectGroupMapDAO extends AuditableEntityDAO {
 		variables.put(new Integer(6), sb.getNotes());
 		// DATE_CREATED is now()
 
-		this.execute(digester.getQuery("create"), variables);
-
+		executeWithPK(digester.getQuery("create"), variables);
+		if (isQuerySuccessful()) {
+			eb.setId(getLatestPK());
+		}
 		return sb;
 	}
 

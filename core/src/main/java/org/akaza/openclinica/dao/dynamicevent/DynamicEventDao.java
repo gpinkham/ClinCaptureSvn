@@ -23,7 +23,12 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
 import javax.sql.DataSource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO {
@@ -120,7 +125,10 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 		variables.put(Integer.valueOf(5), new Integer(deb.getOwnerId()));
 		variables.put(Integer.valueOf(6), deb.getName());
 		variables.put(Integer.valueOf(7), deb.getDescription());
-		this.execute(digester.getQuery("create"), variables);
+		executeWithPK(digester.getQuery("create"), variables);
+		if (isQuerySuccessful()) {
+			eb.setId(getLatestPK());
+		}
 		return eb;
 	}
 

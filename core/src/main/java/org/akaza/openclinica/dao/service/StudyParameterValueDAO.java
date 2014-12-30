@@ -74,7 +74,10 @@ public class StudyParameterValueDAO extends AuditableEntityDAO implements IStudy
 		variables.put(new Integer(2), spvb.getValue());
 		variables.put(new Integer(3), spvb.getParameter());
 
-		this.execute(digester.getQuery("create"), variables);
+		executeWithPK(digester.getQuery("create"), variables);
+		if (isQuerySuccessful()) {
+			spvb.setId(getLatestPK());
+		}
 		return spvb;
 
 	}
@@ -103,13 +106,13 @@ public class StudyParameterValueDAO extends AuditableEntityDAO implements IStudy
 
 		return spvb;
 	}
-	
+
 	public com.clinovo.model.System getSystemEntityFromHashMap(HashMap hm) {
 		com.clinovo.model.System systemProp = new com.clinovo.model.System();
 		systemProp.setValue((String) hm.get("value"));
 		systemProp.setId(((Integer) hm.get("id")).intValue());
 		systemProp.setName((String) hm.get("name"));
-		
+
 		return systemProp;
 	}
 
@@ -134,16 +137,16 @@ public class StudyParameterValueDAO extends AuditableEntityDAO implements IStudy
 
 	@Override
 	public void setTypesExpected() {
-		
+
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.INT);
 		this.setTypeExpected(3, TypeNames.STRING);
 		this.setTypeExpected(4, TypeNames.STRING);
 	}
-	
+
 	public void setTypesExpectedForSystemProperty() {
-		
+
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.STRING);
@@ -151,7 +154,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO implements IStudy
 	}
 
 	public void setTypesExpectedForParameter() {
-		
+
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.STRING);
@@ -197,22 +200,22 @@ public class StudyParameterValueDAO extends AuditableEntityDAO implements IStudy
 		return sp;
 
 	}
-	
+
 	public com.clinovo.model.System findSystemPropertyByName(String handle) {
 		com.clinovo.model.System systemProperty = new com.clinovo.model.System();
 		this.setTypesExpectedForSystemProperty();
-		
+
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), handle);
-		
+
 		String sql = digester.getQuery("findSystemPropertyByName");
 		ArrayList alist = this.select(sql, variables);
 		Iterator it = alist.iterator();
-		
-		if(it.hasNext()) {
-			systemProperty = this.getSystemEntityFromHashMap((HashMap)it.next());
+
+		if (it.hasNext()) {
+			systemProperty = this.getSystemEntityFromHashMap((HashMap) it.next());
 		}
-		
+
 		return systemProperty;
 	}
 

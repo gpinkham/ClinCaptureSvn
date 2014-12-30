@@ -342,15 +342,14 @@ public class CRFDaoTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatCreateReturnsActiveCRFBean() {
-
+	public void testThatCreateWorksFine() throws OpenClinicaException {
 		CRFBean crfBean = new CRFBean();
 		crfBean.setStatus(Status.AVAILABLE);
 		crfBean.setName(testCRFBean.getName());
 		crfBean.setDescription(testCRFBean.getDescription());
 		crfBean.setOwner(testCRFBean.getOwner());
-
 		crfBean = (CRFBean) crfdao.create(crfBean);
+		assertTrue(crfBean.getId() > 0);
 		assertTrue(crfBean.isActive());
 	}
 

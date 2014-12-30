@@ -1,6 +1,8 @@
 package org.akaza.openclinica.dao.managestudy;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.StudySubjectSDVFilter;
@@ -17,7 +19,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * StudySubjectDaoTest class that tests the StudySubjectDao's methods.
@@ -46,10 +49,26 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 		assertEquals(result, false);
 	}
 
+	@Test
+	public void testThatCreateWorksFine() throws OpenClinicaException {
+		StudySubjectBean studySubjectBean = new StudySubjectBean();
+		studySubjectBean.setStatus(Status.AVAILABLE);
+		studySubjectBean.setLabel("lbl_test_study_subject");
+		studySubjectBean.setSubjectId(1);
+		studySubjectBean.setStudyId(1);
+		studySubjectBean.setDynamicGroupClassId(1);
+		studySubjectBean.setSecondaryLabel("slbl_test_study_subject");
+		studySubjectBean.setOid("oid_test_study_subject");
+		studySubjectBean.setOwner((UserAccountBean) userAccountDAO.findByPK(1));
+		studySubjectBean = studySubjectDAO.create(studySubjectBean, false);
+		assertTrue(studySubjectBean.getId() > 0);
+	}
+
 	/**
 	 * Test that isStudySubjectSDVed returns correct value.
 	 *
-	 * @throws OpenClinicaException the suctom OpenClinicaException
+	 * @throws OpenClinicaException
+	 *             the suctom OpenClinicaException
 	 */
 	@Test
 	public void testTthatIsStudySubjectSDVedReturnsCorrectValue() throws OpenClinicaException {
@@ -64,7 +83,8 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 	/**
 	 * Test that method findAllByStudySDV returns the correct collection size.
 	 *
-	 * @throws OpenClinicaException the suctom OpenClinicaException
+	 * @throws OpenClinicaException
+	 *             the suctom OpenClinicaException
 	 */
 	@Test
 	public void testThatMethodFindAllByStudySDVReturnsTheCorrectCollectionSize() throws OpenClinicaException {
@@ -81,7 +101,8 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 	/**
 	 * Test that method countAllByStudySDV returns the correct value.
 	 *
-	 * @throws OpenClinicaException the suctom OpenClinicaException
+	 * @throws OpenClinicaException
+	 *             the suctom OpenClinicaException
 	 */
 	@Test
 	public void testThatMethodCountAllByStudySDVReturnsTheCorrectValue() throws OpenClinicaException {
@@ -95,7 +116,8 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 	/**
 	 * Test that the allowSDVSubject method return correct value.
 	 *
-	 * @throws OpenClinicaException the custom OpenClinicaException
+	 * @throws OpenClinicaException
+	 *             the custom OpenClinicaException
 	 */
 	@Test
 	public void testAllowSDVSubject() throws OpenClinicaException {
@@ -106,7 +128,8 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 	/**
 	 * Test that findByLabelAndStudy method returns a subject with randomization date.
 	 *
-	 * @throws OpenClinicaException the custom OpenClinicaException
+	 * @throws OpenClinicaException
+	 *             the custom OpenClinicaException
 	 */
 	@Test
 	public void testThatFindByLabelAndStudyReturnsSubjectWithRandomizationDate() throws OpenClinicaException {
@@ -118,7 +141,8 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 	/**
 	 * Test that findByPK method returns a subject with randomization result.
 	 *
-	 * @throws OpenClinicaException the custom OpenClinicaException
+	 * @throws OpenClinicaException
+	 *             the custom OpenClinicaException
 	 */
 	@Test
 	public void testThatFindByPKReturnsSubjectWithRandomizationResult() throws OpenClinicaException {
@@ -129,8 +153,10 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 	/**
 	 * Test that findByPK method returns a subject with correct randomization date.
 	 *
-	 * @throws OpenClinicaException the custom OpenClinicaException
-	 * @throws ParseException       the custom ParseException
+	 * @throws OpenClinicaException
+	 *             the custom OpenClinicaException
+	 * @throws ParseException
+	 *             the custom ParseException
 	 */
 	@Test
 	public void testThatFindByPKReturnsSubjectWithCorrectRandomizationDate() throws OpenClinicaException,
@@ -145,7 +171,8 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 	/**
 	 * Test that findByPK method returns a subject with correct randomization result.
 	 *
-	 * @throws OpenClinicaException the custom OpenClinicaException
+	 * @throws OpenClinicaException
+	 *             the custom OpenClinicaException
 	 */
 	@Test
 	public void testThatFindByPKReturntSubjectWithCorrectRandomizationResult() throws OpenClinicaException {
@@ -188,8 +215,8 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 		StudyBean study = new StudyBean();
 		study.setId(1);
 
-		List<StudySubjectBean> listOfSubjects =
-				studySubjectDAO.getWithFilterAndSort(study, mockFilter, mockSort, 0, 15);
+		List<StudySubjectBean> listOfSubjects = studySubjectDAO
+				.getWithFilterAndSort(study, mockFilter, mockSort, 0, 15);
 
 		int expectedSubjectsAmount = 1;
 
@@ -204,8 +231,8 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 		int actualCount;
 		int expectedCount = 1;
 
-		actualCount = studySubjectDAO
-				.getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId(studyId, dynamicGroupClassId);
+		actualCount = studySubjectDAO.getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId(studyId,
+				dynamicGroupClassId);
 
 		assertEquals(expectedCount, actualCount);
 	}
@@ -218,8 +245,8 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 		int actualCount;
 		int expectedCount = 0;
 
-		actualCount = studySubjectDAO
-				.getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId(studyId, dynamicGroupClassId);
+		actualCount = studySubjectDAO.getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId(studyId,
+				dynamicGroupClassId);
 
 		assertEquals(expectedCount, actualCount);
 	}

@@ -266,7 +266,7 @@
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>8.1-404.jdbc3</version>
+			<version>${postgresql.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>

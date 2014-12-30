@@ -33,7 +33,7 @@
 		<cobertura.plugin.version>2.6</cobertura.plugin.version>
 		<cobertura.version>1.9.4.1</cobertura.version>
         <tomcat-dbcp.version>6.0.41</tomcat-dbcp.version>
-        <postgresql.version>8.1-404.jdbc3</postgresql.version>
+        <postgresql.version>8.4-701.jdbc3</postgresql.version>
         <tomcat.version>6.0.20</tomcat.version>
         <tomcat.containerId>tomcat6x</tomcat.containerId>
         <tomcat.servletPort>7070</tomcat.servletPort>

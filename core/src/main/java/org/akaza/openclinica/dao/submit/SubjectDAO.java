@@ -20,16 +20,6 @@
  */
 package org.akaza.openclinica.dao.submit;
 
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
@@ -38,6 +28,15 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
+
+import javax.sql.DataSource;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class SubjectDAO extends AuditableEntityDAO {
@@ -387,41 +386,8 @@ public class SubjectDAO extends AuditableEntityDAO {
 	 * @deprecated Creates a new subject
 	 */
 	@Deprecated
-	public EntityBean create(EntityBean eb) {
-		SubjectBean sb = (SubjectBean) eb;
-		HashMap variables = new HashMap();
-		HashMap nullVars = new HashMap();
-		// FATHER_ID,MOTHER_ID, STATUS_ID,
-		// DATE_OF_BIRTH,GENDER,UNIQUE_IDENTIFIER,DATE_CREATED,
-		// OWNER_ID
-		variables.put(new Integer(1), new Integer(sb.getFatherId()));
-		variables.put(new Integer(2), new Integer(sb.getMotherId()));
-		variables.put(new Integer(3), new Integer(sb.getStatus().getId()));
-		if (sb.getDateOfBirth() == null) {
-			nullVars.put(new Integer(4), new Integer(Types.DATE));
-			variables.put(new Integer(4), null);
-		} else {
-			variables.put(new Integer(4), sb.getDateOfBirth());
-		}
-		if (sb.getGender() != 'm' && sb.getGender() != 'f') {
-			nullVars.put(new Integer(5), new Integer(Types.CHAR));
-			variables.put(new Integer(5), null);
-		} else {
-			char[] ch = { sb.getGender() };
-			variables.put(new Integer(5), new String(ch));
-		}
-
-		variables.put(new Integer(6), sb.getUniqueIdentifier());
-		// DATE_CREATED is now()
-		variables.put(new Integer(7), new Integer(sb.getOwner().getId()));
-
-		execute(digester.getQuery("create"), variables, nullVars);
-
-		if (isQuerySuccessful()) {
-			sb.setId(getCurrentPK());
-		}
-
-		return sb;
+	public SubjectBean create(EntityBean eb) {
+		return create((SubjectBean) eb);
 	}
 
 	/**

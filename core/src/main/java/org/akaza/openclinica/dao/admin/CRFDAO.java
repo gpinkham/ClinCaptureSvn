@@ -154,7 +154,7 @@ public class CRFDAO extends AuditableEntityDAO {
 		} else {
 			variables.put(index, Boolean.TRUE);
 		}
-		this.executeWithPK(digester.getQuery("create"), variables, null);
+		executeWithPK(digester.getQuery("create"), variables, null);
 		if (isQuerySuccessful()) {
 			cb.setId(getLatestPK());
 		}

@@ -20,6 +20,19 @@
  */
 package org.akaza.openclinica.dao.core;
 
+import org.akaza.openclinica.bean.core.ApplicationConstants;
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.extract.ExtractBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.dao.cache.EhCacheWrapper;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -33,20 +46,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
-
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.core.ApplicationConstants;
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.extract.ExtractBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.dao.cache.EhCacheWrapper;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 
 /**
  * <p/>
@@ -166,7 +165,8 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	/**
 	 * getTypeExpected, returns the type of object to retrieve from the database
 	 *
-	 * @param num the order the column should be extracted from the database
+	 * @param num
+	 *            the order the column should be extracted from the database
 	 * @return a proper type id from TypeNames
 	 */
 	public Integer getTypeExpected(int num) {
@@ -594,6 +594,20 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 	/**
 	 * This method inserts one row for an entity table and gets latestPK of this row.
+	 *
+	 * @param query
+	 *            String
+	 * @param variables
+	 *            HashMap
+	 *
+	 */
+	public void executeWithPK(String query, HashMap variables) {
+		con = null;
+		executeWithPK(query, variables, new HashMap(), null);
+	}
+
+	/**
+	 * This method inserts one row for an entity table and gets latestPK of this row.
 	 * 
 	 * @param query
 	 *            String
@@ -627,7 +641,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					logger.warn("Connection is closed: EntityDAO.execute!");
 				throw new SQLException();
 			}
-			ps = con.prepareStatement(query);
+			ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			ps = psf.generate(ps);// enter variables here!
 			if (ps.executeUpdate() != 1) {
 				logger.warn("Problem with executing dynamic query, EntityDAO: " + query);
@@ -635,6 +649,13 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 			} else {
 				logger.trace("Executing dynamic query, EntityDAO: " + query);
+
+				ResultSet generatedKeys = ps.getGeneratedKeys();
+				if (generatedKeys.next()) {
+					latestPK = generatedKeys.getInt(1);
+					signalSuccess();
+					return;
+				}
 
 				if (getCurrentPKName == null) {
 					this.latestPK = 0;
@@ -649,7 +670,6 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					HashMap h = (HashMap) al.get(0);
 					this.latestPK = (Integer) h.get("key");
 				}
-
 			}
 
 		} catch (SQLException sqle) {

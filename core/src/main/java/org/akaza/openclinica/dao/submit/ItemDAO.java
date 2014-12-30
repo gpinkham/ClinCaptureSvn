@@ -120,8 +120,11 @@ public class ItemDAO extends AuditableEntityDAO {
 		variables.put(6, ib.getItemReferenceTypeId());
 		variables.put(7, ib.getStatus().getId());
 		variables.put(8, ib.getOwnerId());
-		this.execute(digester.getQuery("create"), variables);
-		// set the id here????
+		variables.put(9, ib.getOid());
+		executeWithPK(digester.getQuery("create"), variables);
+		if (isQuerySuccessful()) {
+			eb.setId(getLatestPK());
+		}
 		return eb;
 	}
 

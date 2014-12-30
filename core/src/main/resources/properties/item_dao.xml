@@ -17,9 +17,9 @@
 	<query>
 		<name>create</name>
 		<sql>INSERT INTO ITEM (NAME, DESCRIPTION, UNITS, PHI_STATUS,
-		ITEM_DATA_TYPE_ID, ITEM_REFERENCE_TYPE_ID, STATUS_ID, OWNER_ID,
+		ITEM_DATA_TYPE_ID, ITEM_REFERENCE_TYPE_ID, STATUS_ID, OWNER_ID, oc_oid,
 		DATE_CREATED) 
-		VALUES (?,?,?,?,?,?,?,?,NOW())</sql>
+		VALUES (?,?,?,?,?,?,?,?,?,NOW())</sql>
 	</query>
 	<query>
 		<name>update</name>

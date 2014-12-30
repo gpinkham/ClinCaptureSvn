@@ -57,7 +57,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * StudySubjectDAO constructor.
 	 *
-	 * @param ds the jdbc DataSource object
+	 * @param ds
+	 *            the jdbc DataSource object
 	 */
 	public StudySubjectDAO(DataSource ds) {
 		super(ds);
@@ -67,8 +68,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * StudySubjectDAO constructor.
 	 *
-	 * @param ds         the jdbc DataSource object
-	 * @param connection the jdbc Connection object
+	 * @param ds
+	 *            the jdbc DataSource object
+	 * @param connection
+	 *            the jdbc Connection object
 	 */
 	public StudySubjectDAO(DataSource ds, Connection connection) {
 		super(ds, connection);
@@ -78,8 +81,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * StudySubjectDAO constructor.
 	 *
-	 * @param ds       the jdbc DataSource object
-	 * @param digester the DAODigester object
+	 * @param ds
+	 *            the jdbc DataSource object
+	 * @param digester
+	 *            the DAODigester object
 	 */
 	public StudySubjectDAO(DataSource ds, DAODigester digester) {
 		super(ds);
@@ -192,7 +197,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that gets the object from the database query.
 	 *
-	 * @param hm HashMap
+	 * @param hm
+	 *            HashMap
 	 * @return Object
 	 */
 	public Object getEntityFromHashMap(HashMap hm) {
@@ -221,9 +227,12 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns List of groups by study subject, study id and parent study id.
 	 *
-	 * @param studySubjectId study subject id
-	 * @param studyId        study id
-	 * @param parentStudyId  parent study id
+	 * @param studySubjectId
+	 *            study subject id
+	 * @param studyId
+	 *            study id
+	 * @param parentStudyId
+	 *            parent study id
 	 * @return ArrayList
 	 */
 	public ArrayList getGroupByStudySubject(int studySubjectId, int studyId, int parentStudyId) {
@@ -257,8 +266,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that checks that study subject is ready to be source data verified.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param studySubject StudySubjectBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param studySubject
+	 *            StudySubjectBean
 	 * @return boolean
 	 */
 	public boolean isStudySubjectReadyToBeSDVed(StudyBean currentStudy, StudySubjectBean studySubject) {
@@ -303,8 +314,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that checks that study subject is source data verified.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param studySubject StudySubjectBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param studySubject
+	 *            StudySubjectBean
 	 * @return boolean
 	 */
 	public boolean isStudySubjectSDVed(StudyBean currentStudy, StudySubjectBean studySubject) {
@@ -350,11 +363,16 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	 * Method that returns List of study subjects by currentStudy, StudySubjectSDVFilter, StudySubjectSDVSort, rowStart
 	 * and rowEnd.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter       StudySubjectSDVFilter
-	 * @param sort         StudySubjectSDVSort
-	 * @param rowStart     rowStart
-	 * @param rowEnd       rowEnd
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            StudySubjectSDVFilter
+	 * @param sort
+	 *            StudySubjectSDVSort
+	 * @param rowStart
+	 *            rowStart
+	 * @param rowEnd
+	 *            rowEnd
 	 * @return boolean
 	 */
 	public ArrayList findAllByStudySDV(StudyBean currentStudy, StudySubjectSDVFilter filter, StudySubjectSDVSort sort,
@@ -403,7 +421,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns count of study subjects by label.
 	 *
-	 * @param label study subject label
+	 * @param label
+	 *            study subject label
 	 * @return Integer
 	 */
 	public Integer countByLabel(String label) {
@@ -428,7 +447,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns sql by query name.
 	 *
-	 * @param queryName query name
+	 * @param queryName
+	 *            query name
 	 * @return String
 	 */
 	public String getQuery(String queryName) {
@@ -438,8 +458,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns count of study subjects by currentStudy and StudySubjectSDVFilter.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter       StudySubjectSDVFilter
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            StudySubjectSDVFilter
 	 * @return int
 	 */
 	public int countAllByStudySDV(StudyBean currentStudy, StudySubjectSDVFilter filter) {
@@ -482,9 +504,12 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that checks that subject can be source data verified.
 	 *
-	 * @param studySubjectId study subject id
-	 * @param studyId        study id
-	 * @param parentStudyId  parent study id
+	 * @param studySubjectId
+	 *            study subject id
+	 * @param studyId
+	 *            study id
+	 * @param parentStudyId
+	 *            parent study id
 	 * @return boolean
 	 */
 	public boolean allowSDVSubject(int studySubjectId, int studyId, int parentStudyId) {
@@ -543,9 +568,12 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns collection of all study subjects by strOrderByColumn, blnAscendingSort and strSearchPhrase.
 	 *
-	 * @param strOrderByColumn order by column value as string
-	 * @param blnAscendingSort ascending sort value as string
-	 * @param strSearchPhrase  search phrase
+	 * @param strOrderByColumn
+	 *            order by column value as string
+	 * @param blnAscendingSort
+	 *            ascending sort value as string
+	 * @param strSearchPhrase
+	 *            search phrase
 	 * @return Collection collection of study subjects
 	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
@@ -555,7 +583,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns list of ordered by label study subjects by StudyBean.
 	 *
-	 * @param sb StudyBean
+	 * @param sb
+	 *            StudyBean
 	 * @return ArrayList list of study subjects
 	 */
 	public ArrayList findAllByStudyOrderByLabel(StudyBean sb) {
@@ -570,7 +599,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns list of active and ordered by label study subjects by StudyBean.
 	 *
-	 * @param sb StudyBean
+	 * @param sb
+	 *            StudyBean
 	 * @return ArrayList list of study subjects
 	 */
 	public ArrayList findAllActiveByStudyOrderByLabel(StudyBean sb) {
@@ -585,7 +615,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns list of study subjects by currentStudy.
 	 *
-	 * @param currentStudy StudyBean
+	 * @param currentStudy
+	 *            StudyBean
 	 * @return ArrayList list of study subjects
 	 */
 	public ArrayList findAllWithStudyEvent(StudyBean currentStudy) {
@@ -612,7 +643,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns list of study subjects by subjectId.
 	 *
-	 * @param subjectId subject id
+	 * @param subjectId
+	 *            subject id
 	 * @return ArrayList list of study subjects
 	 */
 	public ArrayList findAllBySubjectId(int subjectId) {
@@ -638,9 +670,12 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns study subject by label, studyId and studySubjectId.
 	 *
-	 * @param label          study subject label
-	 * @param studyId        study id
-	 * @param studySubjectId study subject id
+	 * @param label
+	 *            study subject label
+	 * @param studyId
+	 *            study id
+	 * @param studySubjectId
+	 *            study subject id
 	 * @return EntityBean study subject bean
 	 */
 	public EntityBean findAnotherBySameLabel(String label, int studyId, int studySubjectId) {
@@ -667,9 +702,12 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns study subject in sites by label, studyId and studySubjectId.
 	 *
-	 * @param label          study subject label
-	 * @param studyId        study id
-	 * @param studySubjectId study subject id
+	 * @param label
+	 *            study subject label
+	 * @param studyId
+	 *            study id
+	 * @param studySubjectId
+	 *            study subject id
 	 * @return EntityBean study subject bean
 	 */
 	public EntityBean findAnotherBySameLabelInSites(String label, int studyId, int studySubjectId) {
@@ -696,7 +734,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns study subject by id.
 	 *
-	 * @param id study subject id
+	 * @param id
+	 *            study subject id
 	 * @return EntityBean study subject bean
 	 */
 	public EntityBean findByPK(int id) {
@@ -721,8 +760,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns study subject by label and study.
 	 *
-	 * @param label study subject label
-	 * @param study study bean
+	 * @param label
+	 *            study subject label
+	 * @param study
+	 *            study bean
 	 * @return StudySubjectBean study subject bean
 	 */
 	public StudySubjectBean findByLabelAndStudy(String label, StudyBean study) {
@@ -750,9 +791,12 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns study subject by label and studyId.
 	 *
-	 * @param label   study subject label
-	 * @param studyId study id
-	 * @param id      id (it equals to zero. so it's not used)
+	 * @param label
+	 *            study subject label
+	 * @param studyId
+	 *            study id
+	 * @param id
+	 *            id (it equals to zero. so it's not used)
 	 * @return StudySubjectBean study subject bean
 	 */
 	public StudySubjectBean findSameByLabelAndStudy(String label, int studyId, int id) {
@@ -781,58 +825,24 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that creates a new study subject.
 	 *
-	 * @param eb EntityBean
+	 * @param eb
+	 *            EntityBean
 	 * @return EntityBean
 	 * @deprecated Creates a new study subject
 	 */
 	@Deprecated
-	public EntityBean create(EntityBean eb) {
-		StudySubjectBean sb = (StudySubjectBean) eb;
-		HashMap variables = new HashMap();
-		HashMap nullVars = new HashMap();
-
-		// INSERT INTO study_subject
-		// (LABEL, SUBJECT_ID, STUDY_ID, STATUS_ID,
-		// DATE_CREATED, OWNER_ID, ENROLLMENT_DATE,SECONDARY_LABEL, DYNAMIC_GROUP_CLASS_ID)
-		// VALUES (?,?,?,?,NOW(),?,?,?,?)
-
-		int ind = 1;
-		variables.put(ind, sb.getLabel());
-		ind++;
-		variables.put(ind, sb.getSubjectId());
-		ind++;
-		variables.put(ind, sb.getStudyId());
-		ind++;
-		variables.put(ind, sb.getStatus().getId());
-		ind++;
-		variables.put(ind, sb.getOwnerId());
-		ind++;
-		if (sb.getEnrollmentDate() == null) {
-			nullVars.put(ind, Types.DATE);
-			variables.put(ind, null);
-			ind++;
-		} else {
-			variables.put(ind, sb.getEnrollmentDate());
-			ind++;
-		}
-		variables.put(ind, sb.getSecondaryLabel());
-		ind++;
-		variables.put(ind, sb.getDynamicGroupClassId());
-		this.execute(digester.getQuery("create"), variables, nullVars);
-
-		if (isQuerySuccessful()) {
-			sb.setId(getCurrentPK());
-		}
-
-		return sb;
+	public StudySubjectBean create(EntityBean eb) {
+		return create((StudySubjectBean) eb, false);
 	}
 
 	/**
 	 * Create a study subject (that is, enroll a subject in a study).
 	 *
-	 * @param sb        The study subject to create.
-	 * @param withGroup <code>true</code> if the group id has been set (primarily for use with genetic studies);
-	 *                  <code>false</code> otherwise.
+	 * @param sb
+	 *            The study subject to create.
+	 * @param withGroup
+	 *            <code>true</code> if the group id has been set (primarily for use with genetic studies);
+	 *            <code>false</code> otherwise.
 	 * @return The study subject with id set to the insert id if the operation was successful, or 0 otherwise.
 	 */
 	public StudySubjectBean create(StudySubjectBean sb, boolean withGroup) {
@@ -869,7 +879,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
 		variables.put(ind, sb.getDynamicGroupClassId());
 
-		this.executeWithPK(digester.getQuery("create"), variables, nullVars);
+		executeWithPK(digester.getQuery("create"), variables, nullVars);
 		if (isQuerySuccessful()) {
 			sb.setId(getLatestPK());
 		}
@@ -890,7 +900,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that creates a study subject with group.
 	 *
-	 * @param sb StudySubjectBean
+	 * @param sb
+	 *            StudySubjectBean
 	 * @return String study subject oid
 	 */
 	public StudySubjectBean createWithGroup(StudySubjectBean sb) {
@@ -900,7 +911,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that creates a study subject without group.
 	 *
-	 * @param sb StudySubjectBean
+	 * @param sb
+	 *            StudySubjectBean
 	 * @return String study subject oid
 	 */
 	public StudySubjectBean createWithoutGroup(StudySubjectBean sb) {
@@ -910,7 +922,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns study subject oid by StudySubjectBean.
 	 *
-	 * @param ssb StudySubjectBean
+	 * @param ssb
+	 *            StudySubjectBean
 	 * @return String study subject oid
 	 */
 	private String getOid(StudySubjectBean ssb) {
@@ -939,8 +952,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that return study subject by oid and studyId.
 	 *
-	 * @param oid     study subject by oid
-	 * @param studyId study id
+	 * @param oid
+	 *            study subject by oid
+	 * @param studyId
+	 *            study id
 	 * @return StudySubjectBean study subject bean
 	 */
 	public StudySubjectBean findByOidAndStudy(String oid, int studyId) {
@@ -968,7 +983,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that return study subject by oid.
 	 *
-	 * @param oid study subject by oid
+	 * @param oid
+	 *            study subject by oid
 	 * @return StudySubjectBean study subject bean
 	 */
 	public StudySubjectBean findByOid(String oid) {
@@ -991,18 +1007,23 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Returns a part of the list of the study subjects, that matches specified filters and sorting
-	 * (if there were specified some).
+	 * Returns a part of the list of the study subjects, that matches specified filters and sorting (if there were
+	 * specified some).
 	 *
-	 * @param currentStudy an instance of the <code>StudyBean</code> class, which represents the study/site, to search in.
-	 * @param filter       an instance of the <code>CriteriaCommand</code> interface, which is a specific filter class
-	 *                     for generating string representation of SQL filters, to be applied to the list of subjects.
-	 * @param sort         an instance of the <code>CriteriaCommand</code> interface, which is a specific sorting class
-	 *                     for generating string representation of SQL sorting, to be applied to the list of subjects.
-	 * @param rowStart     the start position of the part of the subject's list, to be returned.
-	 * @param rowEnd       the end position of the part of the subject's list, to be returned.
-	 * @return the list of instances of <code>StudySubjectBean</code> class, which match the SQL query;
-	 * if no records, matching the SQL query, were found, returns empty list.
+	 * @param currentStudy
+	 *            an instance of the <code>StudyBean</code> class, which represents the study/site, to search in.
+	 * @param filter
+	 *            an instance of the <code>CriteriaCommand</code> interface, which is a specific filter class for
+	 *            generating string representation of SQL filters, to be applied to the list of subjects.
+	 * @param sort
+	 *            an instance of the <code>CriteriaCommand</code> interface, which is a specific sorting class for
+	 *            generating string representation of SQL sorting, to be applied to the list of subjects.
+	 * @param rowStart
+	 *            the start position of the part of the subject's list, to be returned.
+	 * @param rowEnd
+	 *            the end position of the part of the subject's list, to be returned.
+	 * @return the list of instances of <code>StudySubjectBean</code> class, which match the SQL query; if no records,
+	 *         matching the SQL query, were found, returns empty list.
 	 */
 	public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, CriteriaCommand filter,
 			CriteriaCommand sort, int rowStart, int rowEnd) {
@@ -1051,7 +1072,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns count of the study subjects by study / site.
 	 *
-	 * @param currentStudy StudyBean (study or site)
+	 * @param currentStudy
+	 *            StudyBean (study or site)
 	 * @return Integer count of the study subjects
 	 */
 	public Integer getCountofStudySubjectsAtStudyOrSite(StudyBean currentStudy) {
@@ -1075,7 +1097,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns count of the study subjects by study.
 	 *
-	 * @param study StudyBean
+	 * @param study
+	 *            StudyBean
 	 * @return Integer count of the study subjects
 	 */
 	public Integer getCountofStudySubjectsAtStudy(StudyBean study) {
@@ -1100,7 +1123,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns count of the study subjects by currentStudy.
 	 *
-	 * @param currentStudy StudyBean
+	 * @param currentStudy
+	 *            StudyBean
 	 * @return Integer count of the study subjects
 	 */
 	public Integer getCountofStudySubjects(StudyBean currentStudy) {
@@ -1125,8 +1149,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns count of the study subjects by currentStudy and status.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param status       Status
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param status
+	 *            Status
 	 * @return Integer count of the study subjects
 	 */
 	public Integer getCountofStudySubjectsBasedOnStatus(StudyBean currentStudy, Status status) {
@@ -1152,8 +1178,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns count of the study subjects by ListDiscNotesSubjectFilter and currentStudy.
 	 *
-	 * @param filter       ListDiscNotesSubjectFilter
-	 * @param currentStudy StudyBean
+	 * @param filter
+	 *            ListDiscNotesSubjectFilter
+	 * @param currentStudy
+	 *            StudyBean
 	 * @return Integer count of the study subjects
 	 */
 	public Integer getCountWithFilter(ListDiscNotesSubjectFilter filter, StudyBean currentStudy) {
@@ -1180,11 +1208,16 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	 * Method that returns list of study subjects by currentStudy, ListDiscNotesSubjectFilter, ListDiscNotesSubjectSort,
 	 * rowStart and rowEnd.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter       ListDiscNotesSubjectFilter
-	 * @param sort         ListDiscNotesSubjectSort
-	 * @param rowStart     rowStart
-	 * @param rowEnd       rowEnd
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListDiscNotesSubjectFilter
+	 * @param sort
+	 *            ListDiscNotesSubjectSort
+	 * @param rowStart
+	 *            rowStart
+	 * @param rowEnd
+	 *            rowEnd
 	 * @return Integer count of the study subjects
 	 */
 	public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, ListDiscNotesSubjectFilter filter,
@@ -1219,8 +1252,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns count of the study subjects by FindSubjectsFilter and currentStudy.
 	 *
-	 * @param filter       FindSubjectsFilter
-	 * @param currentStudy StudyBean
+	 * @param filter
+	 *            FindSubjectsFilter
+	 * @param currentStudy
+	 *            StudyBean
 	 * @return Integer count of the study subjects
 	 */
 	public Integer getCountWithFilter(FindSubjectsFilter filter, StudyBean currentStudy) {
@@ -1247,11 +1282,16 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	 * Method that returns list of study subjects by currentStudy, StudyAuditLogFilter, StudyAuditLogSort, rowStart and
 	 * rowEnd.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter       StudyAuditLogFilter
-	 * @param sort         StudyAuditLogSort
-	 * @param rowStart     rowStart
-	 * @param rowEnd       rowEnd
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            StudyAuditLogFilter
+	 * @param sort
+	 *            StudyAuditLogSort
+	 * @param rowStart
+	 *            rowStart
+	 * @param rowEnd
+	 *            rowEnd
 	 * @return Integer count of the study subjects
 	 */
 	public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, StudyAuditLogFilter filter,
@@ -1287,8 +1327,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns count of the study subjects by StudyAuditLogFilter and currentStudy.
 	 *
-	 * @param filter       StudyAuditLogFilter
-	 * @param currentStudy StudyBean
+	 * @param filter
+	 *            StudyAuditLogFilter
+	 * @param currentStudy
+	 *            StudyBean
 	 * @return Integer count of the study subjects
 	 */
 	public Integer getCountWithFilter(StudyAuditLogFilter filter, StudyBean currentStudy) {
@@ -1314,8 +1356,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns count of the study subjects by ListEventsForSubjectFilter and currentStudy.
 	 *
-	 * @param filter       ListEventsForSubjectFilter
-	 * @param currentStudy StudyBean
+	 * @param filter
+	 *            ListEventsForSubjectFilter
+	 * @param currentStudy
+	 *            StudyBean
 	 * @return Integer count of the study subjects
 	 */
 	public Integer getCountWithFilter(ListEventsForSubjectFilter filter, StudyBean currentStudy) {
@@ -1341,7 +1385,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that updates a study subject item.
 	 *
-	 * @param eb EntityBean
+	 * @param eb
+	 *            EntityBean
 	 * @return EntityBean
 	 */
 	public EntityBean update(EntityBean eb) {
@@ -1352,8 +1397,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that updates a study subject item. This method allows to run transactional updates for an action.
 	 *
-	 * @param eb  EntityBean
-	 * @param con Connection
+	 * @param eb
+	 *            EntityBean
+	 * @param con
+	 *            Connection
 	 * @return EntityBean
 	 */
 	public EntityBean update(EntityBean eb, Connection con) {
@@ -1425,13 +1472,19 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	 * Method that returns collection of study subjects by currentUser, ationType, strOrderByColumn, blnAscendingSort
 	 * and strSearchPhrase.
 	 *
-	 * @param objCurrentUser   current user object
-	 * @param intActionType    action type
-	 * @param strOrderByColumn order by column as string value
-	 * @param blnAscendingSort ascending sort as string value
-	 * @param strSearchPhrase  string search phrase
+	 * @param objCurrentUser
+	 *            current user object
+	 * @param intActionType
+	 *            action type
+	 * @param strOrderByColumn
+	 *            order by column as string value
+	 * @param blnAscendingSort
+	 *            ascending sort as string value
+	 * @param strSearchPhrase
+	 *            string search phrase
 	 * @return Collection collection of study subjects
-	 * @throws OpenClinicaException the custom OpenClinicaException
+	 * @throws OpenClinicaException
+	 *             the custom OpenClinicaException
 	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) throws OpenClinicaException {
@@ -1441,8 +1494,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns collection of study subjects by currentUser and ationType.
 	 *
-	 * @param objCurrentUser current user object
-	 * @param intActionType  action type
+	 * @param objCurrentUser
+	 *            current user object
+	 * @param intActionType
+	 *            action type
 	 * @return Collection collection of study subjects
 	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
@@ -1452,8 +1507,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns the study subject by subjectId and study.
 	 *
-	 * @param subjectId subject id
-	 * @param study     StudyBean
+	 * @param subjectId
+	 *            subject id
+	 * @param study
+	 *            StudyBean
 	 * @return StudySubjectBean study subject bean
 	 */
 	public StudySubjectBean findBySubjectIdAndStudy(int subjectId, StudyBean study) {
@@ -1482,7 +1539,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns list of study subjects by studyId.
 	 *
-	 * @param studyId study id
+	 * @param studyId
+	 *            study id
 	 * @return List<StudySubjectBean> list of study subjects
 	 */
 	public List<StudySubjectBean> findAllByStudyId(int studyId) {
@@ -1492,7 +1550,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns list of study subjects by studyId.
 	 *
-	 * @param studyId study id
+	 * @param studyId
+	 *            study id
 	 * @return List<StudySubjectBean> list of study subjects
 	 */
 	public List<StudySubjectBean> findAllWithAllStatesByStudyId(int studyId) {
@@ -1576,8 +1635,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns list of study subjects by studyId and isLimited.
 	 *
-	 * @param studyId   study id
-	 * @param isLimited parameter that limits the records amount to 5
+	 * @param studyId
+	 *            study id
+	 * @param isLimited
+	 *            parameter that limits the records amount to 5
 	 * @return List<StudySubjectBean> list of study subjects
 	 */
 	public List<StudySubjectBean> findAllByStudyIdAndLimit(int studyId, boolean isLimited) {
@@ -1665,7 +1726,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns the study subject ids as string by study id.
 	 *
-	 * @param studyIds study ids as string
+	 * @param studyIds
+	 *            study ids as string
 	 * @return String study subject ids
 	 */
 	public String findStudySubjectIdsByStudyIds(String studyIds) {
@@ -1686,7 +1748,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns the next study subject label.
 	 *
-	 * @param studyBean study from which generation format will be taken.
+	 * @param studyBean
+	 *            study from which generation format will be taken.
 	 * @return String study subject label
 	 */
 	public String findNextLabel(StudyBean studyBean) {
@@ -1713,11 +1776,13 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Returns a number of study subjects (no matter what status subject has currently),
-	 * which were enrolled at a specific study/site and are randomized to a specific dynamic group class.
+	 * Returns a number of study subjects (no matter what status subject has currently), which were enrolled at a
+	 * specific study/site and are randomized to a specific dynamic group class.
 	 *
-	 * @param studyId             the study/site id, to search on.
-	 * @param dynamicGroupClassId the dynamic group class id, to search on.
+	 * @param studyId
+	 *            the study/site id, to search on.
+	 * @param dynamicGroupClassId
+	 *            the dynamic group class id, to search on.
 	 * @return a number of study subjects, which match the SQL query.
 	 */
 	public int getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId(int studyId, int dynamicGroupClassId) {
@@ -1732,9 +1797,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		queryParameters.put(index++, studyId);
 		queryParameters.put(index, dynamicGroupClassId);
 
-		List<HashMap<String, Object>> recordsFromDB =
-				this.select(digester.getQuery("getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId"),
-						queryParameters);
+		List<HashMap<String, Object>> recordsFromDB = this.select(
+				digester.getQuery("getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId"), queryParameters);
 
 		return (Integer) recordsFromDB.get(0).get("count");
 	}

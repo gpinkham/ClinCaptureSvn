@@ -20,10 +20,6 @@
  */
 package org.akaza.openclinica.dao.admin;
 
-import java.util.*;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -37,6 +33,14 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class AuditEventDAO extends AuditableEntityDAO {
@@ -193,9 +197,10 @@ public class AuditEventDAO extends AuditableEntityDAO {
 		variables.put(new Integer(3), new Integer(sb.getEntityId()));
 		variables.put(new Integer(4), sb.getReasonForChangeKey());
 		variables.put(new Integer(5), sb.getActionMessageKey());
-
-		this.execute(digester.getQuery("create"), variables);
-
+		executeWithPK(digester.getQuery("create"), variables);
+		if (isQuerySuccessful()) {
+			eb.setId(getLatestPK());
+		}
 		return sb;
 	}
 

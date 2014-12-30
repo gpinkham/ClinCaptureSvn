@@ -98,7 +98,7 @@ public class DynamicEventDaoTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatCreateDoesNotReturnNull() throws OpenClinicaException {
+	public void testThatCreateWorksFine() throws OpenClinicaException {
 
 		DynamicEventBean dynamicEventBean = new DynamicEventBean();
 		dynamicEventBean.setStudyGroupClassId(2);
@@ -110,7 +110,7 @@ public class DynamicEventDaoTest extends DefaultAppContextTest {
 		dynamicEventBean.setDescription("test dynamic event 2");
 		EntityBean dynamicEvent = dynamicEventDao.create(dynamicEventBean);
 
-		assertNotNull(dynamicEvent);
+		assertTrue(dynamicEvent.getId() > 0);
 	}
 
 	@Test
