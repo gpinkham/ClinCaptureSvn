@@ -47,7 +47,7 @@
             jQuery("table > tbody  tr").attr("repeat", "0");
             jQuery("table > tbody  button").attr("disabled", "true");
             jQuery("table > tbody  input").attr("disabled", "disabled");
-            jQuery("table > tbody a").not('[tabindex]').removeAttr("onclick");
+            jQuery("table > tbody a").not('[tabindex]').not('.dnShortcut').removeAttr("onclick");
             jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
             jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
             jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
