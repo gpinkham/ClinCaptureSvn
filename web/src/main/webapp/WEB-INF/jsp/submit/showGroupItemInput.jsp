@@ -1,3 +1,4 @@
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -312,6 +313,7 @@ function changeImage(obj) {
   <c:if test="${frmMsg.key eq errorInputName}">
     <c:set var="isInError" value="${true}" />
     <c:set var="errorTxtMessage" value="${frmMsg.value}" />
+    <c:set var="errorTxtMessage" value='<%= StringEscapeUtils.escapeJavaScript(pageContext.getAttribute("errorTxtMessage").toString()) %>' />
   </c:if>
 </c:forEach>
 
