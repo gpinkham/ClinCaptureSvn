@@ -23,6 +23,7 @@ package org.akaza.openclinica.bean.login;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 
 /**
  * Container for study user role.
@@ -262,5 +263,22 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		return this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
 				|| this.role == Role.STUDY_MONITOR || this.role == Role.STUDY_CODER
 				|| this.role == Role.STUDY_EVALUATOR;
+	}
+
+	/**
+	 * Determines role of user in current study.
+	 * 
+	 * @param currentUser
+	 *            UserAccountBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return Role in currentStudy
+	 */
+	public static Role determineRoleInCurrentStudy(UserAccountBean currentUser, StudyBean currentStudy) {
+		Role role = currentUser.getRoleByStudy(currentStudy.getId()).getRole();
+		if (!role.equals(Role.INVALID)) {
+			return role;
+		}
+		return currentUser.getRoleByStudy(currentStudy.getParentStudyId()).getRole();
 	}
 }

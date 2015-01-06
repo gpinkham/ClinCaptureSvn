@@ -142,7 +142,8 @@ public class ViewNotesServlet extends RememberLastPage {
 			request.getSession().removeAttribute(WIN_LOCATION);
 			request.getSession().removeAttribute(NOTES_TABLE);
 		}
-		request.getSession().setAttribute(WIN_LOCATION,
+		request.getSession().setAttribute(
+				WIN_LOCATION,
 				"ViewNotes?viewForOne=" + viewForOne + "&id=" + oneSubjectId + "&module=" + module
 						+ " &removeSession=1");
 
@@ -213,10 +214,8 @@ public class ViewNotesServlet extends RememberLastPage {
 		List<DiscrepancyNoteStatisticBean> statisticBeans;
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		UserAccountBean loggedInUser = (UserAccountBean) uadao.findByUserName(authentication.getName());
-		if (isCoder(loggedInUser, request)) {
-			statisticBeans = factory.getCoderFilteredNotesStatistics();
-		} else if (isEvaluator(loggedInUser, request)) {
-			statisticBeans = dndao.countNotesStatisticForEvaluationCrf(currentStudy);
+		if (isCoder(loggedInUser, request) || isEvaluator(loggedInUser, request)) {
+			statisticBeans = dndao.countUserNotesStatistics(currentStudy, ub);
 		} else {
 			statisticBeans = dndao.countNotesStatistic(currentStudy);
 		}

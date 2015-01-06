@@ -1,6 +1,8 @@
 package org.akaza.openclinica.bean.login;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,10 +10,24 @@ import org.junit.Test;
 public class StudyUserRoleBeanTest {
 
 	private StudyUserRoleBean userRole;
+	private UserAccountBean currentUser;
+	private StudyUserRoleBean currentRole;
+	private StudyBean currentStudy;
+	private StudyBean currentSite;
 
 	@Before
 	public void prepareForTest() {
 		userRole = new StudyUserRoleBean();
+		currentUser = new UserAccountBean();
+		currentRole = new StudyUserRoleBean();
+		currentStudy = new StudyBean();
+		currentSite = new StudyBean();
+		currentStudy.setId(1);
+		currentStudy.setStatus(Status.AVAILABLE);
+		currentSite.setId(2);
+		currentSite.setParentStudyId(1);
+		currentSite.setStatus(Status.AVAILABLE);
+		currentRole.setStudyId(1);
 	}
 
 	@Test
@@ -60,5 +76,23 @@ public class StudyUserRoleBeanTest {
 	public void testThatGetRoleCodeReturnsCorrectCodeForPI() {
 		userRole.setRole(Role.INVESTIGATOR);
 		Assert.assertEquals("investigator", userRole.getRoleCode());
+	}
+
+	@Test
+	public void testThatSystemAdministratorGetsCorrectRoleWhenInStudy() {
+		currentRole.setRole(Role.SYSTEM_ADMINISTRATOR);
+		currentUser.addRole(currentRole);
+		currentUser.setActiveStudyId(currentStudy.getId());
+		Assert.assertEquals(Role.SYSTEM_ADMINISTRATOR,
+				StudyUserRoleBean.determineRoleInCurrentStudy(currentUser, currentStudy));
+	}
+
+	@Test
+	public void testThatSystemAdministratorGetsCorrectRoleWhenInSite() {
+		currentRole.setRole(Role.SYSTEM_ADMINISTRATOR);
+		currentUser.addRole(currentRole);
+		currentUser.setActiveStudyId(currentSite.getId());
+		Assert.assertEquals(Role.SYSTEM_ADMINISTRATOR,
+				StudyUserRoleBean.determineRoleInCurrentStudy(currentUser, currentSite));
 	}
 }

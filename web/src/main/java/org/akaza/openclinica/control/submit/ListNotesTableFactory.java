@@ -90,9 +90,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
- * Encapsulates all the functionality required to create table for notes and
- * discrepancy servlet.
- *
+ * Encapsulates all the functionality required to create table for notes and discrepancy servlet.
+ * 
  */
 @SuppressWarnings({ "unchecked", "unused" })
 public class ListNotesTableFactory extends AbstractTableFactory {
@@ -105,8 +104,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	public static final String QUERY_AND_FAILED_VALIDATION_CHECK_VALUE = "31";
 	public static final String NEW_AND_UPDATED_VALUE = "21";
 	public static final String NOT_CLOSED_VALUE = "321";
-	public static final String STUDY_CODER = "study coder";
-	public static final String STUDY_EVALUATOR = "study evaluator";
 
 	private AuditUserLoginDao auditUserLoginDao;
 	private StudySubjectDAO studySubjectDao;
@@ -144,10 +141,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	private static final int ITEM_DN_TYPE_QUERY = 3;
 	private static final int CRF_STAGE_COMPLETE = 5;
 
-
 	/**
 	 * ListNotesTableFactory constructor.
-	 *
+	 * 
 	 * @param showMoreLink
 	 *            the boolean parameter for show more columns table hyperlink
 	 */
@@ -177,20 +173,20 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
 
 		configureColumn(row.getColumn("discrepancyNoteBean.id"), resword.getString("note_id"), null, null, true, true);
-		configureColumn(row.getColumn("studySubject.label"), currentStudy != null
-				? currentStudy.getStudyParameterConfig().getStudySubjectIdLabel()
-				: resword.getString("study_subject_ID"), null, null, true, true);
+		configureColumn(row.getColumn("studySubject.label"), currentStudy != null ? currentStudy
+				.getStudyParameterConfig().getStudySubjectIdLabel() : resword.getString("study_subject_ID"), null,
+				null, true, true);
 		configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, false);
 		configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), resword.getString("date_created"),
 				new DateCellEditor(getDateFormat()), null, false, true);
 		configureColumn(row.getColumn("discrepancyNoteBean.updatedDate"), resword.getString("date_updated"),
 				new DateCellEditor(getDateFormat()), null, false, false);
-		configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"),
-				new DateCellEditor(getDateFormat()), null, false, false);
-		configureColumn(row.getColumn(eventName), resword.getString("event_name"), null,
-				new StudyEventTableRowFilter(dataSource, currentStudy), true, false);
-		configureColumn(row.getColumn(crfName), resword.getString("CRF"), null,
-				new CRFFilter(dataSource, currentStudy, getCurrentUserAccount()), true, false);
+		configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"), new DateCellEditor(
+				getDateFormat()), null, false, false);
+		configureColumn(row.getColumn(eventName), resword.getString("event_name"), null, new StudyEventTableRowFilter(
+				dataSource, currentStudy), true, false);
+		configureColumn(row.getColumn(crfName), resword.getString("CRF"), null, new CRFFilter(dataSource, currentStudy,
+				getCurrentUserAccount()), true, false);
 		configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, false, false);
 		configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), null, null, true, false);
 		configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, false);
@@ -202,12 +198,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"),
 				new AssignedUserCellEditor(), new UserAccountNameDroplistFilterEditor(dataSource), true, false);
 		configureColumn(row.getColumn(DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS), resword.getString("resolution_status"),
-				new ResolutionStatusCellEditor(), new ResolutionStatusDroplistFilterEditor(getExclusions()), true, false);
+				new ResolutionStatusCellEditor(), new ResolutionStatusDroplistFilterEditor(getExclusions()), true,
+				false);
 		configureColumn(row.getColumn(DISCREPANCY_NOTE_BEAN_DIS_TYPE), resword.getString("type"),
 				new DiscrepancyNoteTypeCellEditor(), new TypeDroplistFilterEditor(), true, false);
-		configureColumn(row.getColumn("discrepancyNoteBean.entityType"), resword.getString("entity_type"), null, null, true, false);
-		configureColumn(row.getColumn("discrepancyNoteBean.owner"), resword.getString("owner"),
-				new OwnerCellEditor(), null, false, false);
+		configureColumn(row.getColumn("discrepancyNoteBean.entityType"), resword.getString("entity_type"), null, null,
+				true, false);
+		configureColumn(row.getColumn("discrepancyNoteBean.owner"), resword.getString("owner"), new OwnerCellEditor(),
+				null, false, false);
 		configureColumn(row.getColumn("actions"), resword.getString("actions"), new ActionsCellEditor(),
 				new ListNotesActionsEditor(locale), true, false);
 		configureColumn(row.getColumn("age"), resword.getString("days_open"), null, null);
@@ -216,7 +214,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	private List<String> getExclusions() {
 		List<String> result = new ArrayList<String>();
-		if (getDiscrepancyNoteDao().countViewNotesByStatusId(getCurrentStudy().getId(), ResolutionStatus.RESOLVED.getId()) == 0) {
+		if (getDiscrepancyNoteDao().countViewNotesByStatusId(getCurrentStudy().getId(),
+				ResolutionStatus.RESOLVED.getId()) == 0) {
 			result.add(ResolutionStatus.RESOLVED.getName());
 		}
 		return result;
@@ -225,18 +224,24 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	@Override
 	public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {
 		super.configureTableFacade(response, tableFacade);
-		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "discrepancyNoteBean.createdDate"), new DateFilterMatcher(getDateFormat()));
-		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "discrepancyNoteBean.updatedDate"), new DateFilterMatcher(getDateFormat()));
-		tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "discrepancyNoteBean.user"), new GenericFilterMatcher());
-		tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "studySubject.label"), new GenericFilterMatcher());
+		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "discrepancyNoteBean.createdDate"),
+				new DateFilterMatcher(getDateFormat()));
+		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "discrepancyNoteBean.updatedDate"),
+				new DateFilterMatcher(getDateFormat()));
+		tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "discrepancyNoteBean.user"),
+				new GenericFilterMatcher());
+		tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "studySubject.label"),
+				new GenericFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "eventName"), new StringFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfName"), new StringFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityName"), new StringFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityValue"), new StringFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "age"), new AgeDaysFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "days"), new AgeDaysFilterMatcher());
-		tableFacade.addFilterMatcher(new MatcherKey(String.class, DISCREPANCY_NOTE_BEAN_DIS_TYPE), new DNTypeFilterMatcher());
-		tableFacade.addFilterMatcher(new MatcherKey(String.class, DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS), new DNResolutionStatusFilterMatcher());
+		tableFacade.addFilterMatcher(new MatcherKey(String.class, DISCREPANCY_NOTE_BEAN_DIS_TYPE),
+				new DNTypeFilterMatcher());
+		tableFacade.addFilterMatcher(new MatcherKey(String.class, DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS),
+				new DNResolutionStatusFilterMatcher());
 	}
 
 	@Override
@@ -254,68 +259,63 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	@Override
 	public void setDataAndLimitVariables(TableFacade tableFacade) {
-
 		resword = ResourceBundleProvider.getWordsBundle(getLocale());
 		resformat = ResourceBundleProvider.getFormatBundle(getLocale());
-
-
 		Limit limit = tableFacade.getLimit();
 		ListNotesFilter listNotesFilter = getListNoteFilter(limit);
-		if (checkUserRole(Role.getByName("study_evaluator").getName(), getCurrentUserAccount())) {
+		if (checkUserRole(Role.STUDY_EVALUATOR, getCurrentUserAccount())) {
 			listNotesFilter.addFilter("evaluationCrf", "true");
 		}
 		ListNotesSort listNotesSort = getListSubjectSort(limit);
-		DiscrepancyNoteDAO discrepancyNoteDAO = getDiscrepancyNoteDao();
-		Integer dnCount = discrepancyNoteDAO.countViewNotesWithFilter(getCurrentStudy(), listNotesFilter);
+		Integer dnCount = discrepancyNoteDao.countViewNotesWithFilter(getCurrentStudy(), listNotesFilter);
 		tableFacade.setTotalRows(dnCount == null ? 0 : dnCount);
-
 		RowSelect rowSelect = limit.getRowSelect();
 		int offset = rowSelect.getRowStart();
 		int count = rowSelect.getRowEnd() - rowSelect.getRowStart();
-		List<DiscrepancyNoteBean> customItems = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(getCurrentStudy(), listNotesFilter, listNotesSort, offset, count);
-
-        if (checkUserRole(Role.getByName("study_coder").getName(), getCurrentUserAccount())) {
-			customItems = extractNotesByRole(STUDY_CODER);
+		List<DiscrepancyNoteBean> customItems = discrepancyNoteDao.getViewNotesWithFilterAndSortLimits(
+				getCurrentStudy(), listNotesFilter, listNotesSort, offset, count);
+		if (checkUserRole(Role.STUDY_CODER, getCurrentUserAccount())
+				|| checkUserRole(Role.STUDY_EVALUATOR, getCurrentUserAccount())) {
+			customItems = discrepancyNoteDao.getViewNotesWithFilterAndSort(getCurrentStudy(),
+					getCurrentUserAccount(), listNotesFilter, listNotesSort);
 			tableFacade.setTotalRows(customItems.size());
 		}
-
 		this.setAllNotes(populateRowsWithAttachedData(customItems));
 		if (!limit.isComplete()) {
 			tableFacade.setTotalRows(allNotes.size());
 		}
-
 		Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 		for (DiscrepancyNoteBean discrepancyNoteBean : allNotes) {
-
 			UserAccountBean owner = (UserAccountBean) getUserAccountDao().findByPK(discrepancyNoteBean.getOwnerId());
 			Map<String, String> repeatingInfoMap = DiscrepancyNoteUtil.prepareRepeatingInfoMap(
 					discrepancyNoteBean.getEntityType(), discrepancyNoteBean.getEntityId(), itemDataDao, eventCRFDao,
 					studyEventDao, itemGroupMetadataDAO, studyEventDefinitionDao);
 			String itemDataOrdinal = repeatingInfoMap.get("itemDataOrdinal");
 			String studyEventOrdinal = repeatingInfoMap.get("studyEventOrdinal");
-
 			HashMap<Object, Object> h = new HashMap<Object, Object>();
-
 			h.put("discrepancyNoteBean.id", discrepancyNoteBean.getId());
 			h.put("studySubject", discrepancyNoteBean.getStudySub());
 			h.put("studySubject.label", discrepancyNoteBean.getStudySub().getLabel());
 			h.put(DISCREPANCY_NOTE_BEAN_DIS_TYPE, discrepancyNoteBean.getDisType());
 			h.put(DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS, discrepancyNoteBean.getResStatus());
-			h.put("age", discrepancyNoteBean.getResolutionStatusId() == STATUS_NOT_APPLICABLE ? null : discrepancyNoteBean.getAge());
-			h.put("days", discrepancyNoteBean.getResolutionStatusId() == STATUS_CLOSED
-					|| discrepancyNoteBean.getResolutionStatusId() == STATUS_NOT_APPLICABLE
-					? null : discrepancyNoteBean.getDays());
+			h.put("age", discrepancyNoteBean.getResolutionStatusId() == STATUS_NOT_APPLICABLE ? null
+					: discrepancyNoteBean.getAge());
+			h.put("days",
+					discrepancyNoteBean.getResolutionStatusId() == STATUS_CLOSED
+							|| discrepancyNoteBean.getResolutionStatusId() == STATUS_NOT_APPLICABLE ? null
+							: discrepancyNoteBean.getDays());
 			h.put("siteId", discrepancyNoteBean.getStudySub().getStudyName());
 			h.put("discrepancyNoteBean", discrepancyNoteBean);
 			h.put("discrepancyNoteBean.createdDate", discrepancyNoteBean.getCreatedDate());
 			h.put("discrepancyNoteBean.updatedDate", discrepancyNoteBean.getUpdatedDate());
-			h.put("eventName", studyEventOrdinal != null ? (discrepancyNoteBean.getEventName() + "(x" + studyEventOrdinal + ")") : discrepancyNoteBean.getEventName());
+			h.put("eventName", studyEventOrdinal != null ? (discrepancyNoteBean.getEventName() + "(x"
+					+ studyEventOrdinal + ")") : discrepancyNoteBean.getEventName());
 			h.put("eventStartDate", discrepancyNoteBean.getEventStart());
 			h.put("crfName", discrepancyNoteBean.getCrfName());
 			h.put("crfStatus", discrepancyNoteBean.getCrfStatus());
-			h.put("entityName", itemDataOrdinal != null ? (discrepancyNoteBean.getEntityName()
-					+ "(#" + itemDataOrdinal + ")")
-					: discrepancyNoteBean.getEntityName());
+			h.put("entityName",
+					itemDataOrdinal != null ? (discrepancyNoteBean.getEntityName() + "(#" + itemDataOrdinal + ")")
+							: discrepancyNoteBean.getEntityName());
 			h.put("entityValue", discrepancyNoteBean.getEntityValue());
 			h.put("discrepancyNoteBean", discrepancyNoteBean);
 			h.put("discrepancyNoteBean.description", discrepancyNoteBean.getDescription());
@@ -324,43 +324,26 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			h.put("discrepancyNoteBean.user", discrepancyNoteBean.getAssignedUser());
 			h.put("discrepancyNoteBean.entityType", discrepancyNoteBean.getEntityType());
 			h.put("discrepancyNoteBean.owner", owner);
-
 			theItems.add(h);
 			setStudyHasDiscNotes(true);
 		}
 		tableFacade.setItems(theItems);
-
 	}
 
-	private boolean checkUserRole(String userRole, UserAccountBean loggedInUser) {
-		if (userRole.equalsIgnoreCase(STUDY_CODER)) {
-			if (getCurrentStudy().isSite(getCurrentStudy().getParentStudyId())) {
-				return loggedInUser.getRoleByStudy(getCurrentStudy().getParentStudyId()).getName().equalsIgnoreCase(userRole);
+	private boolean checkUserRole(Role userRole, UserAccountBean loggedInUser) {
+		if (userRole.equals(Role.STUDY_CODER) || userRole.equals(Role.STUDY_EVALUATOR)) {
+			if (getCurrentStudy().isSite()) {
+				return loggedInUser.getRoleByStudy(getCurrentStudy().getParentStudyId()).getRole().equals(userRole);
 			}
-			return loggedInUser.getRoleByStudy(getCurrentStudy().getId()).getName().equalsIgnoreCase(userRole);
+			return loggedInUser.getRoleByStudy(getCurrentStudy().getId()).getRole().equals(userRole);
 		} else {
-			return loggedInUser.getRoleByStudy(getCurrentStudy().getId()).getName().equalsIgnoreCase(userRole);
+			return loggedInUser.getRoleByStudy(getCurrentStudy().getId()).getRole().equals(userRole);
 		}
-	}
-
-	private List<DiscrepancyNoteBean> extractNotesByRole(String userRole) {
-		List<DiscrepancyNoteBean> filteredNotes = new ArrayList<DiscrepancyNoteBean>();
-		List<DiscrepancyNoteBean> allDiscrepancyNotes = discrepancyNoteDao.getViewNotesWithFilterAndSort(getCurrentStudy(), new ListNotesFilter(), new ListNotesSort());
-		for (DiscrepancyNoteBean discrepancyNote : allDiscrepancyNotes) {
-			UserAccountBean owner = (UserAccountBean) userAccountDao.findByPK(discrepancyNote.getOwnerId());
-			UserAccountBean assignedUser = (UserAccountBean) userAccountDao.findByPK(discrepancyNote.getAssignedUserId());
-			if (checkUserRole(userRole, assignedUser) || checkUserRole(userRole, owner)) {
-				filteredNotes.add(discrepancyNote);
-			}
-		}
-
-		return filteredNotes;
 	}
 
 	/**
-	 * Returns list with additional information about discrepancy notes
-	 * depending on discrepancy notes type.
-	 *
+	 * Returns list with additional information about discrepancy notes depending on discrepancy notes type.
+	 * 
 	 * @param customItems
 	 *            the list of different discrepancy notes
 	 * @return list with discrepancy notes with additional information
@@ -368,7 +351,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(List<DiscrepancyNoteBean> customItems) {
 
 		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDao();
-		ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
+		ArrayList<DiscrepancyNoteBean> notes = new ArrayList<DiscrepancyNoteBean>();
 
 		for (DiscrepancyNoteBean dnb : customItems) {
 			dnb.setAssignedUser((UserAccountBean) getUserAccountDao().findByPK(dnb.getAssignedUserId()));
@@ -391,9 +374,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 				dnb.setSubjectId(dnb.getStudySub().getId());
 			}
 			dnb.setSiteId(((StudyBean) getStudyDao().findByPK(dnb.getStudySub().getStudyId())).getIdentifier());
-			allNotes.add(dnb);
+			notes.add(dnb);
 		}
-		return allNotes;
+		return notes;
 	}
 
 	private void populateWithItemData(DiscrepancyNoteBean dnb, AuditableEntityBean aeb) {
@@ -563,10 +546,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	}
 
 	/**
-	 * A very custom way to filter the items. The AuditUserLoginFilter acts as a
-	 * command for the Hibernate criteria object. Take the Limit information and
-	 * filter the rows.
-	 *
+	 * A very custom way to filter the items. The AuditUserLoginFilter acts as a command for the Hibernate criteria
+	 * object. Take the Limit information and filter the rows.
+	 * 
 	 * @param limit
 	 *            The Limit to use.
 	 * @return list with filtered notes.
@@ -599,10 +581,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	}
 
 	/**
-	 * A very custom way to sort the items. The AuditUserLoginSort acts as a
-	 * command for the Hibernate criteria object. Take the Limit information and
-	 * sort the rows.
-	 *
+	 * A very custom way to sort the items. The AuditUserLoginSort acts as a command for the Hibernate criteria object.
+	 * Take the Limit information and sort the rows.
+	 * 
 	 * @param limit
 	 *            The Limit to use.
 	 */
@@ -628,9 +609,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	}
 
 	/**
-	 * Returns map of <code>DiscrepancyNoteStatisticBean</code> total statuses
-	 * that will be placed on the UX.
-	 *
+	 * Returns map of <code>DiscrepancyNoteStatisticBean</code> total statuses that will be placed on the UX.
+	 * 
 	 * @param statisticBeans
 	 *            the list of beans what should be analysed.
 	 * @return the map with total number of statuses.
@@ -669,9 +649,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	}
 
 	/**
-	 * Returns map of <code>DiscrepancyNoteStatisticBean</code> numbers of
-	 * different statuses that will be placed on the UX.
-	 *
+	 * Returns map of <code>DiscrepancyNoteStatisticBean</code> numbers of different statuses that will be placed on the
+	 * UX.
+	 * 
 	 * @param statisticBeans
 	 *            the list of beans what should be analysed.
 	 * @return the map with statuses per .
@@ -770,7 +750,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			int itemDNTypeId = ((ResolutionStatus) itemValue).getId();
 			ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
 			if (reterm.getString(NOT_CLOSED_KEY).equals(filterValue)) {
-				return itemDNTypeId == STATUS_NEW || itemDNTypeId == STATUS_UPDATED || itemDNTypeId == STATUS_RESOLUTION_PROPOSED;
+				return itemDNTypeId == STATUS_NEW || itemDNTypeId == STATUS_UPDATED
+						|| itemDNTypeId == STATUS_RESOLUTION_PROPOSED;
 			} else {
 				return itemDNTypeId == ResolutionStatus.getByName(filterValue).getId();
 			}
@@ -794,7 +775,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	private class DiscrepancyNoteTypeCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
 			String value = "";
-			DiscrepancyNoteType type = (DiscrepancyNoteType) ((HashMap<Object, Object>) item).get(DISCREPANCY_NOTE_BEAN_DIS_TYPE);
+			DiscrepancyNoteType type = (DiscrepancyNoteType) ((HashMap<Object, Object>) item)
+					.get(DISCREPANCY_NOTE_BEAN_DIS_TYPE);
 
 			if (type != null) {
 				value = type.getName();
@@ -1108,8 +1090,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	/**
 	 * Returns list of discrepancy notes with fields for print.
-	 *
-	 * @param limit the bean with all required info about table (sorting, filtering, paging, max rows to display, and exporting).
+	 * 
+	 * @param limit
+	 *            the bean with all required info about table (sorting, filtering, paging, max rows to display, and
+	 *            exporting).
 	 * @return the list with prepared notes and discrepancies.
 	 */
 	public List<DiscrepancyNoteBean> getNotesForPrintPop(Limit limit) {
@@ -1121,61 +1105,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	public void setDataSource(DataSource dataSource) {
 
 		this.dataSource = dataSource;
-	}
-
-	/**
-	 * Filters the notes and discrepancies statics and returns only those issues
-	 * by a user with the coder role. It is assumed that the logged in user is
-	 * the coder user.
-	 *
-	 * @return List of ND statics for logged in user with coder role.
-	 */
-	public List<DiscrepancyNoteStatisticBean> getCoderFilteredNotesStatistics() {
-
-		List<DiscrepancyNoteStatisticBean> dnStatics = new ArrayList<DiscrepancyNoteStatisticBean>();
-		List<DiscrepancyNoteBean> coderNotes = extractNotesByRole(STUDY_CODER);
-		Map<String, Integer> noteTypes = extractFilteredNoteTypes(coderNotes);
-		for (DiscrepancyNoteBean discrepancyNote : coderNotes) {
-			DiscrepancyNoteStatisticBean stat = createDiscrepancyStatistic(discrepancyNote, noteTypes);
-			if (!added(stat, dnStatics)) {
-				dnStatics.add(stat);
-			}
-		}
-
-		return dnStatics;
-	}
-
-	private Boolean added(DiscrepancyNoteStatisticBean stat, List<DiscrepancyNoteStatisticBean> notes) {
-		for (DiscrepancyNoteStatisticBean st : notes) {
-			if (st.getDiscrepancyNoteTypeId() == stat.getDiscrepancyNoteTypeId() && st.getResolutionStatusId() == stat.getResolutionStatusId()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private Map<String, Integer> extractFilteredNoteTypes(List<DiscrepancyNoteBean> notes) {
-		Map<String, Integer> noteTypes = new HashMap<String, Integer>();
-		for (DiscrepancyNoteBean note : notes) {
-			if (noteTypes.containsKey(note.getResStatus().getName())) {
-				int currentValue = noteTypes.get(note.getResStatus().getName());
-				noteTypes.put(note.getResStatus().getName(), currentValue + 1);
-			} else {
-				noteTypes.put(note.getResStatus().getName(), 1);
-			}
-		}
-
-		return noteTypes;
-	}
-
-	private DiscrepancyNoteStatisticBean createDiscrepancyStatistic(DiscrepancyNoteBean note,
-			Map<String, Integer> noteTypes) {
-
-		DiscrepancyNoteStatisticBean statisticBean = new DiscrepancyNoteStatisticBean();
-		statisticBean.setDiscrepancyNoteTypeId(note.getDisType().getId());
-		statisticBean.setResolutionStatusId(note.getResolutionStatusId());
-		statisticBean.setDiscrepancyNotesCount(noteTypes.get(note.getResStatus().getName()));
-		return statisticBean;
 	}
 
 	private UserAccountBean getCurrentUserAccount() {

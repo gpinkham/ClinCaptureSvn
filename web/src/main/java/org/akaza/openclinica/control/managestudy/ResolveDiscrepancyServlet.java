@@ -133,7 +133,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 			dec.setEventDefinitionCRF(edcb);
 			dec.setFlags(ecb, ub, currentRole, edcb);
 			request.setAttribute(EVENT_CRF_ID, Integer.toString(ecb.getId()));
-			Role activeStudyRole = determineActiveStudyRole(ub, currentStudy);
+			Role activeStudyRole = StudyUserRoleBean.determineRoleInCurrentStudy(ub, currentStudy);
 			if (!ssb.getStatus().equals(Status.LOCKED)
 					&& currentStudy.getStatus().equals(Status.AVAILABLE)
 					&& (ecb.getStatus().equals(Status.AVAILABLE) || ecb.getStatus().equals(Status.UNAVAILABLE) || ecb
@@ -156,14 +156,6 @@ public class ResolveDiscrepancyServlet extends Controller {
 			return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
 		}
 		return null;
-	}
-
-	private Role determineActiveStudyRole(UserAccountBean ub, StudyBean study) {
-		Role role = ub.getRoleByStudy(study.getId()).getRole();
-		if (!role.equals(Role.INVALID)) {
-			return role;
-		}
-		return ub.getRoleByStudy(study.getParentStudyId()).getRole();
 	}
 
 	/**

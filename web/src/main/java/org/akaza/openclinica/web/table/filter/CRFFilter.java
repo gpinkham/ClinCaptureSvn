@@ -2,6 +2,7 @@ package org.akaza.openclinica.web.table.filter;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +48,8 @@ public class CRFFilter extends DroplistFilterEditor {
 	protected List<Option> getOptions() {
 
 		List<CRFBean> crfs;
-		if (Role.STUDY_EVALUATOR.equals(userAccountBean.getRoleByStudy(study).getRole())) {
+		Role roleInStudy = StudyUserRoleBean.determineRoleInCurrentStudy(userAccountBean, study);
+		if (roleInStudy.equals(Role.STUDY_EVALUATOR)) {
 			crfs = getEvaluationCRFs();
 		} else {
 			crfs = getCRFs();

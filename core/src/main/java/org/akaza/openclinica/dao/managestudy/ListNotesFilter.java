@@ -12,10 +12,6 @@
  ******************************************************************************/
 package org.akaza.openclinica.dao.managestudy;
 
-import com.clinovo.util.RegexpUtil;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,21 +20,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
+import com.clinovo.util.RegexpUtil;
+
 /**
  * Custom discrepancy notes table filter.
  */
 public class ListNotesFilter implements CriteriaCommand {
 
-	List<Filter> filters = new ArrayList<Filter>();
-	HashMap<String, String> columnMapping = new HashMap<String, String>();
+	private List<Filter> filters = new ArrayList<Filter>();
+	private HashMap<String, String> columnMapping = new HashMap<String, String>();
 
-	HashMap<String, String> additionalColumnMapping = new HashMap<String, String>();
+	private HashMap<String, String> additionalColumnMapping = new HashMap<String, String>();
 
-	HashMap<String, String> additionalStudyEventColumnMapping = new HashMap<String, String>();
+	private HashMap<String, String> additionalStudyEventColumnMapping = new HashMap<String, String>();
 
 	private boolean dateCreatedCorrect = true;
 	private boolean dateUpdatedCorrect = true;
 
+	/**
+	 * Constructor.
+	 */
 	public ListNotesFilter() {
 		columnMapping.put("discrepancyNoteBean.id", "dn.discrepancy_note_id");
 		columnMapping.put("studySubject.label", "ss.label");
@@ -64,10 +70,20 @@ public class ListNotesFilter implements CriteriaCommand {
 		additionalStudyEventColumnMapping.put("eventId", "se.study_event_id");
 	}
 
+	/**
+	 * 
+	 * @param property
+	 *            String
+	 * @param value
+	 *            Object
+	 */
 	public void addFilter(String property, Object value) {
 		filters.add(new Filter(property, value));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String execute(String criteria) {
 		String theCriteria = "";
 		for (Filter filter : filters) {
@@ -199,10 +215,22 @@ public class ListNotesFilter implements CriteriaCommand {
 		return result.toString();
 	}
 
+	/**
+	 * 
+	 * Class Filter.
+	 * 
+	 */
 	public static class Filter {
 		private final String property;
 		private final Object value;
 
+		/**
+		 * 
+		 * @param property
+		 *            String
+		 * @param value
+		 *            Object
+		 */
 		public Filter(String property, Object value) {
 			this.property = property;
 			this.value = value;
@@ -232,6 +260,11 @@ public class ListNotesFilter implements CriteriaCommand {
 		}
 	}
 
+	/**
+	 * Gets additional study event filter.
+	 * 
+	 * @return String
+	 */
 	public String getAdditionalStudyEventFilter() {
 		StringBuilder builder = new StringBuilder("");
 		for (ListNotesFilter.Filter filter : this.getFilters()) {
@@ -244,7 +277,14 @@ public class ListNotesFilter implements CriteriaCommand {
 		return builder.toString();
 	}
 
-	public String getAdditionalFilter() {
+	/**
+	 * Gets additional filter.
+	 * 
+	 * @param study
+	 *            StudyBean
+	 * @return String
+	 */
+	public String getAdditionalFilter(StudyBean study) {
 		StringBuilder builder = new StringBuilder(" where 1=1 ");
 		for (ListNotesFilter.Filter filter : this.getFilters()) {
 			String property = filter.getProperty();
@@ -259,12 +299,28 @@ public class ListNotesFilter implements CriteriaCommand {
 				if (property.equalsIgnoreCase("evaluationCrf")) {
 					builder.append(" and dns.crf_name in (select name from crf where crf.crf_id in (select crf_id from event_definition_crf where event_definition_crf.evaluated_crf = '");
 					if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
-						builder.append(value.equals("true") ? "1" : "0").append("')) ");
+						builder.append(value.equals("true") ? "1" : "0");
 					} else {
-						builder.append(value).append("')) ");
+						builder.append(value);
+					}
+					if (!study.isSite()) {
+						builder.append("' and study_id = ").append(study.getId()).append(")) ");
+					} else {
+						builder.append("' and (study_id = ")
+								.append(study.getId())
+								.append(" or study_id = ")
+								.append(study.getParentStudyId())
+								.append(") and crf_id not in (select crf_id from event_definition_crf where event_definition_crf.evaluated_crf = ");
+						if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
+							builder.append("0");
+						} else {
+							builder.append("'").append("false").append("'");
+						}
+						builder.append(" and study_id = ").append(study.getId()).append("))) ");
 					}
 				} else {
-					builder.append(" and ").append(additionalColumnMapping.get(property)).append(" like '%").append(value).append("%' ");
+					builder.append(" and ").append(additionalColumnMapping.get(property)).append(" like '%")
+							.append(value).append("%' ");
 				}
 				if (itemDataOrdinal != null) {
 					builder.append(" and ").append("dns.item_data_ordinal").append(" = ").append(itemDataOrdinal)
@@ -273,6 +329,20 @@ public class ListNotesFilter implements CriteriaCommand {
 			}
 		}
 		return builder.toString();
+	}
+
+	/**
+	 * Gets filter by owner or assigned user.
+	 * 
+	 * @param user
+	 *            UserAccountBean
+	 * @return Filter
+	 */
+	public String getOwnerOrAssignedFilter(UserAccountBean user) {
+		StringBuilder builder = new StringBuilder(" AND (dns.owner_id = ").append(user.getId())
+				.append("OR dns.assigned_user_id = ").append(user.getId()).append(") ");
+		return builder.toString();
+
 	}
 
 	public boolean isDateCreatedCorrect() {

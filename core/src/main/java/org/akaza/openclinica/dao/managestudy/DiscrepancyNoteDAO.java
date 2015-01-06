@@ -511,8 +511,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 		sql.append(filterPart).append(filter.getAdditionalStudyEventFilter());
 		sql.append(") dns ");
-		// additional filters crfName, eventName, entityName
-		sql.append(filter.getAdditionalFilter());
+		sql.append(filter.getAdditionalFilter(currentStudy));
 		if (!sortPart.isEmpty()) {
 			sql.append(sortPart);
 		} else {
@@ -587,17 +586,75 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 					.append(" ) ");
 		}
 		sql.append(filterPart);
-
-		sql.append(") dns ").append(filter.getAdditionalFilter());
-
+		sql.append(") dns ").append(filter.getAdditionalFilter(currentStudy));
 		ArrayList rows = select(sql.toString(), variables);
-
 		return rows.size() != 0 ? (Integer) ((Map) rows.get(0)).get("count") : new Integer(0);
 	}
 
+	/**
+	 * Gets all DNs for view with filter and sort applied.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param sort
+	 *            ListNotesSort
+	 * @return List of DiscrepancyNoteBeans
+	 */
 	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy, ListNotesFilter filter,
 			ListNotesSort sort) {
 		ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
+		Map variables = new HashMap();
+		for (int i = 1; i <= 10; i++) {
+			variables.put(i, currentStudy.getId());
+		}
+		StringBuilder sql = buildViewNotesSQL(currentStudy, filter, sort);
+		String sortPart = sort.execute("");
+		sql.append(sortPart);
+		ArrayList rows = select(sql.toString(), variables);
+		for (Object row : rows) {
+			DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) row);
+			discBean = findSingleMapping(discBean);
+			discNotes.add(discBean);
+		}
+		return discNotes;
+	}
+
+	/**
+	 * Gets DNs owned by or assigned to user for view with filter and sort applied.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param currentUser
+	 *            UserAccountBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param sort
+	 *            ListNotesSort
+	 * @return List of DiscrepancyNoteBeans
+	 */
+	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy,
+			UserAccountBean currentUser, ListNotesFilter filter, ListNotesSort sort) {
+		ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
+		Map variables = new HashMap();
+		for (int i = 1; i <= 10; i++) {
+			variables.put(i, currentStudy.getId());
+		}		
+		StringBuilder sql = buildViewNotesSQL(currentStudy, filter, sort);
+		sql.append(filter.getOwnerOrAssignedFilter(currentUser));
+		String sortPart = sort.execute("");
+		sql.append(sortPart);
+		ArrayList rows = select(sql.toString(), variables);
+		for (Object row : rows) {
+			DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) row);
+			discBean = findSingleMapping(discBean);
+			discNotes.add(discBean);
+		}
+		return discNotes;
+	}
+
+	private StringBuilder buildViewNotesSQL(StudyBean currentStudy, ListNotesFilter filter, ListNotesSort sort) {
 		setTypesExpected();
 		this.setTypeExpected(12, TypeNames.STRING);
 		this.setTypeExpected(13, TypeNames.INT);
@@ -605,17 +662,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(15, TypeNames.STRING);
 		this.setTypeExpected(16, TypeNames.STRING);
 		this.setTypeExpected(17, TypeNames.STRING);
-
-		Map variables = new HashMap();
-		for (int i = 1; i <= 10; i++) {
-			variables.put(i, currentStudy.getId());
-		}
-
 		StringBuilder sql = new StringBuilder("SELECT dns.* FROM ( ");
-
 		String filterPart = filter.execute("");
-		String sortPart = sort.execute("");
-
 		sql.append(digester.getQuery("findAllSubjectDNByStudy"));
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllStudySubjectDNByStudy"));
@@ -635,18 +683,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 		sql.append(filterPart);
 		sql.append(") dns ");
-		// additional filters crfName, eventName, entityName
-		sql.append(filter.getAdditionalFilter());
-		sql.append(sortPart);
-
-		ArrayList rows = select(sql.toString(), variables);
-
-		for (Object row : rows) {
-			DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) row);
-			discBean = findSingleMapping(discBean);
-			discNotes.add(discBean);
-		}
-		return discNotes;
+		sql.append(filter.getAdditionalFilter(currentStudy));
+		return sql;
 	}
 
 	public ArrayList<DiscrepancyNoteBean> findAllDiscrepancyNotesDataByStudy(StudyBean currentStudy) {
@@ -695,15 +733,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public List<DiscrepancyNoteStatisticBean> countNotesStatistic(StudyBean currentStudy) {
 		setStatisticTypesExpected();
-
 		Map variables = new HashMap();
 		for (int i = 1; i <= 10; i++) {
 			variables.put(i, currentStudy.getId());
 		}
-
 		StringBuilder sql = new StringBuilder(
 				"SELECT sum(count), discrepancy_note_type_id, resolution_status_id FROM (");
-
 		sql.append(digester.getQuery("countAllSubjectDNByStudyForStat"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllStudySubjectDNByStudyForStat"));
@@ -724,7 +759,47 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
 		sql.append(") types GROUP BY discrepancy_note_type_id, resolution_status_id");
-
+		ArrayList rows = select(sql.toString(), variables);
+		Iterator it = rows.iterator();
+		List<DiscrepancyNoteStatisticBean> notesStat = new ArrayList<DiscrepancyNoteStatisticBean>();
+		while (it.hasNext()) {
+			notesStat.add(getStatisticEntityFromHashMap((Map) it.next()));
+		}
+		return notesStat;
+	}
+	
+	public List<DiscrepancyNoteStatisticBean> countUserNotesStatistics(StudyBean currentStudy,
+			UserAccountBean currentUser) {
+		setStatisticTypesExpected();
+		Map variables = new HashMap();
+		for (int i = 1; i <= 20; i++) {
+			variables.put(i++, currentStudy.getId());
+			variables.put(i++, currentStudy.getId());
+			variables.put(i++, currentUser.getId());
+			variables.put(i, currentUser.getId());
+		}
+		StringBuilder sql = new StringBuilder(
+				"SELECT sum(count), discrepancy_note_type_id, resolution_status_id FROM (");
+		sql.append(digester.getQuery("countUserSubjectDNByStudyForStat"));
+		sql.append(UNION_OP);
+		sql.append(digester.getQuery("countUserStudySubjectDNByStudyForStat"));
+		sql.append(UNION_OP);
+		sql.append(digester.getQuery("countUserStudyEventDNByStudyForStat"));
+		sql.append(UNION_OP);
+		sql.append(digester.getQuery("countUserEventCrfDNByStudyForStat"));
+		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
+		}
+		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
+		sql.append(UNION_OP);
+		sql.append(digester.getQuery("countUserItemDataDNByStudyForStat"));
+		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
+		}
+		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
+		sql.append(") types GROUP BY discrepancy_note_type_id, resolution_status_id");
 		ArrayList rows = select(sql.toString(), variables);
 		Iterator it = rows.iterator();
 		List<DiscrepancyNoteStatisticBean> notesStat = new ArrayList<DiscrepancyNoteStatisticBean>();
@@ -771,8 +846,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 		sql.append(filterPart);
 		sql.append(") dns ");
-		// additional filters crfName, eventName, entityName
-		sql.append(filter.getAdditionalFilter());
+		sql.append(filter.getAdditionalFilter(currentStudy));
 		sql.append(" order by dns.label");
 
 		ArrayList rows = select(sql.toString(), variables);
@@ -2376,60 +2450,5 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 
 		return returnedNotelist;
-	}
-
-	/**
-	 * Select discrepancy notes counter for eCRFs marked as evaluation required.
-	 *
-	 * @param currentStudy
-	 *            the current study bean.
-	 * @return the list with discrepancy note statistic beans.
-	 */
-	public List<DiscrepancyNoteStatisticBean> countNotesStatisticForEvaluationCrf(StudyBean currentStudy) {
-
-		setStatisticTypesExpected();
-		Map variables = new HashMap();
-		int index = 1;
-		variables.put(index++, currentStudy.getId());
-		variables.put(index++, currentStudy.getId());
-		variables.put(index++, currentStudy.getId());
-		variables.put(index, currentStudy.getId());
-
-		StringBuilder sql = new StringBuilder(
-				"SELECT sum(count), discrepancy_note_type_id, resolution_status_id FROM (");
-		sql.append(digester.getQuery("countAllEventCrfDNByStudyForStat"));
-		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
-					.append(" ) ");
-		}
-		sql.append(" and ec.crf_version_id in (select crf_version_id from crf_version where crf_id in (select crf_id from event_definition_crf where event_definition_crf.evaluated_crf = ");
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
-			sql.append("'1')) ");
-		} else {
-			sql.append("'true')) ");
-		}
-		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
-		sql.append(UNION_OP);
-		sql.append(digester.getQuery("countAllItemDataDNByStudyForStat"));
-		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
-					.append(" ) ");
-		}
-		sql.append(" and ec.crf_version_id in (select crf_version_id from crf_version where crf_id in (select crf_id from event_definition_crf where event_definition_crf.evaluated_crf = ");
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
-			sql.append("'1')) ");
-		} else {
-			sql.append("'true')) ");
-		}
-		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
-		sql.append(") types GROUP BY discrepancy_note_type_id, resolution_status_id");
-
-		ArrayList rows = select(sql.toString(), variables);
-		Iterator it = rows.iterator();
-		List<DiscrepancyNoteStatisticBean> notesStat = new ArrayList<DiscrepancyNoteStatisticBean>();
-		while (it.hasNext()) {
-			notesStat.add(getStatisticEntityFromHashMap((Map) it.next()));
-		}
-		return notesStat;
 	}
 }

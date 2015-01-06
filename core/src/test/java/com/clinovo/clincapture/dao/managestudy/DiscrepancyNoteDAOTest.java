@@ -11,8 +11,6 @@
 package com.clinovo.clincapture.dao.managestudy;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,22 +31,21 @@ import org.junit.Test;
 
 public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 
-	StudyBean study;
-	ListNotesFilter notesFilter;
-	ListNotesSort notesSort;
+	private StudyBean study;
+	private UserAccountBean user;
+	private ListNotesFilter notesFilter;
+	private ListNotesSort notesSort;
 
 	Map<Integer, DiscrepancyNoteBean> noteBeanMap;
 
 	@Before
 	public void setUp() throws Exception {
-
 		study = new StudyBean();
 		study.setId(1);
 		study.setParentStudyId(0);
-
+		user = (UserAccountBean) userAccountDAO.findByPK(1);
 		notesFilter = new ListNotesFilter();
 		notesSort = new ListNotesSort();
-
 		noteBeanMap = new HashMap<Integer, DiscrepancyNoteBean>();
 		for (int i = 0; i < 5; i++) {
 			noteBeanMap.put(i + 1, (DiscrepancyNoteBean) discrepancyNoteDAO.findByPK(i + 1));
@@ -260,6 +257,18 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 				notesFilter, notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(1, 4));
 	}
+	
+	@Test
+	public void testThatGetUserDNsReturnsCorrectSizedListOfUserDNs() {
+		assertEquals(5, discrepancyNoteDAO.getViewNotesWithFilterAndSort(study, user, new ListNotesFilter(), new ListNotesSort()).size());
+	}
+	
+	@Test
+	public void testThatGetUserDNsReturnsEmptyListForUserWithNoDNs() {
+		UserAccountBean newUser = new UserAccountBean();
+		newUser.setId(111);
+		assertEquals(0, discrepancyNoteDAO.getViewNotesWithFilterAndSort(study, newUser, new ListNotesFilter(), new ListNotesSort()).size());
+	}
 
 	@Test
 	public void testStatistics() {
@@ -274,123 +283,135 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 	}
 	
 	@Test
+	public void testThatCountUserDNStatisticsReturnsCorrectSizedListOfStats() {
+		assertEquals(5, discrepancyNoteDAO.countUserNotesStatistics(study, user).size());
+	}
+	
+	@Test
+	public void testThatCountUserDNStatisticsReturnsEmptyListForUserWithNoDNs() {
+		UserAccountBean newUser = new UserAccountBean();
+		newUser.setId(111);
+		assertEquals(0, discrepancyNoteDAO.countUserNotesStatistics(study, newUser).size());
+	}	
+
+	@Test
 	public void testStatisticsOnStudySubjectRemoved() {
-		//change statuses to Removed and save initial statuses
+		// change statuses to Removed and save initial statuses
 		UserAccountBean updater = new UserAccountBean();
 		updater.setId(1);
-		
+
 		StudySubjectBean ssb = (StudySubjectBean) studySubjectDAO.findByPK(1);
 		Status subjectInitStatus = ssb.getStatus();
 		ssb.setStatus(Status.DELETED);
 		ssb.setUpdater(updater);
 		studySubjectDAO.update(ssb);
-		
+
 		StudyEventBean seb = (StudyEventBean) studyEventDao.findByPK(1);
 		Status eventInitStatus = seb.getStatus();
 		seb.setStatus(Status.AUTO_DELETED);
 		seb.setUpdater(updater);
 		studyEventDao.update(seb);
-		
+
 		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		Status eventCRFInitStatus = ecb.getStatus();
 		ecb.setStatus(Status.AUTO_DELETED);
 		eventCRFDAO.update(ecb);
-		//----------------------------------------------------
-		
+		// ----------------------------------------------------
+
 		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
 
 		assertTrue(statisticBeans.isEmpty());
-		
-		//restore initial statuses
+
+		// restore initial statuses
 		ssb.setStatus(subjectInitStatus);
 		studySubjectDAO.update(ssb);
-		
+
 		seb.setStatus(eventInitStatus);
 		studyEventDao.update(seb);
-		
+
 		ecb.setStatus(eventCRFInitStatus);
 		eventCRFDAO.update(ecb);
 	}
-	
+
 	@Test
 	public void testStatisticsOnStudyEventRemoved() {
-		//change statuses to Removed and save initial statuses
+		// change statuses to Removed and save initial statuses
 		UserAccountBean updater = new UserAccountBean();
 		updater.setId(1);
-		
+
 		StudySubjectBean ssb = (StudySubjectBean) studySubjectDAO.findByPK(1);
 		Status subjectInitStatus = ssb.getStatus();
 		ssb.setStatus(Status.AVAILABLE);
 		ssb.setUpdater(updater);
 		studySubjectDAO.update(ssb);
-			
+
 		StudyEventBean seb = (StudyEventBean) studyEventDao.findByPK(1);
 		Status eventInitStatus = seb.getStatus();
 		seb.setStatus(Status.DELETED);
 		seb.setUpdater(updater);
 		studyEventDao.update(seb);
-			
+
 		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		Status eventCRFInitStatus = ecb.getStatus();
 		ecb.setStatus(Status.AUTO_DELETED);
 		eventCRFDAO.update(ecb);
-		//----------------------------------------------------
-		
+		// ----------------------------------------------------
+
 		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
 
 		assertEquals(2, statisticBeans.size());
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 2, 5)));
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 2)));
-		
-		//restore initial statuses
+
+		// restore initial statuses
 		ssb.setStatus(subjectInitStatus);
 		studySubjectDAO.update(ssb);
-			
+
 		seb.setStatus(eventInitStatus);
 		studyEventDao.update(seb);
-				
+
 		ecb.setStatus(eventCRFInitStatus);
 		eventCRFDAO.update(ecb);
 	}
-	
+
 	@Test
 	public void testStatisticsOnEventCRFRemoved() {
-		//change statuses to Removed and save initial statuses
+		// change statuses to Removed and save initial statuses
 		UserAccountBean updater = new UserAccountBean();
 		updater.setId(1);
-		
+
 		StudySubjectBean ssb = (StudySubjectBean) studySubjectDAO.findByPK(1);
 		Status subjectInitStatus = ssb.getStatus();
 		ssb.setStatus(Status.AVAILABLE);
 		ssb.setUpdater(updater);
 		studySubjectDAO.update(ssb);
-				
+
 		StudyEventBean seb = (StudyEventBean) studyEventDao.findByPK(1);
 		Status eventInitStatus = seb.getStatus();
 		seb.setStatus(Status.AVAILABLE);
 		seb.setUpdater(updater);
 		studyEventDao.update(seb);
-				
+
 		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		Status eventCRFInitStatus = ecb.getStatus();
 		ecb.setStatus(Status.DELETED);
 		eventCRFDAO.update(ecb);
-		//----------------------------------------------------
-		
+		// ----------------------------------------------------
+
 		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
 
 		assertEquals(3, statisticBeans.size());
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 2, 5)));
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 1)));
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 2)));
-		
-		//restore initial statuses
+
+		// restore initial statuses
 		ssb.setStatus(subjectInitStatus);
 		studySubjectDAO.update(ssb);
-				
+
 		seb.setStatus(eventInitStatus);
 		studyEventDao.update(seb);
-				
+
 		ecb.setStatus(eventCRFInitStatus);
 		eventCRFDAO.update(ecb);
 	}
@@ -409,7 +430,7 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 			assertTrue(dns.contains(noteBean));
 		}
 	}
-	
+
 	@Test
 	public void testCountAllByStudyEventTypeAndStudyEvent() {
 		StudyEventBean studyEvent = new StudyEventBean();
@@ -418,7 +439,7 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		assertNotNull(discrepancyNoteDAO.countAllByStudyEventTypeAndStudyEvent(studyEvent));
 		assertEquals(new Integer(0), discrepancyNoteDAO.countAllByStudyEventTypeAndStudyEvent(studyEvent));
 	}
-	
+
 	@Test
 	public void testCountViewNotesByStatusId() {
 		int studyId = 1;
@@ -435,9 +456,10 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		currentStudy.setId(1);
 		currentStudy.setParentStudyId(0);
 		assertNotNull(discrepancyNoteDAO.findAllByEntityAndColumnAndStudy(currentStudy, "subject", entityId, ""));
-		assertEquals(1, discrepancyNoteDAO.findAllByEntityAndColumnAndStudy(currentStudy, "subject", entityId, "").size());
+		assertEquals(1, discrepancyNoteDAO.findAllByEntityAndColumnAndStudy(currentStudy, "subject", entityId, "")
+				.size());
 	}
-	
+
 	@Test
 	public void testFindAllEvCRFIdsWithUnclosedDNsByStSubIdReturnsCorrectValue() {
 		int studySubjectId = 1;
@@ -461,21 +483,6 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 	public void testThatFindAllByCRFIdContainsSubjectLabel() {
 
 		assertEquals("ssID1", discrepancyNoteDAO.findAllByCRFId(1).get(0).getStudySub().getLabel());
-	}
-
-	@Test
-	public void testThatCountNotesStatisticForEvaluationCrfContainsCorrectValues() {
-		List<DiscrepancyNoteStatisticBean> statisticBean = discrepancyNoteDAO.countNotesStatisticForEvaluationCrf(study);
-		Collections.sort(statisticBean, new Comparator<DiscrepancyNoteStatisticBean>() {
-			public int compare(DiscrepancyNoteStatisticBean o1, DiscrepancyNoteStatisticBean o2) {
-				if (o1.getResolutionStatusId() == o2.getResolutionStatusId()) {
-					return 0;
-				}
-				return o1.getResolutionStatusId() < o2.getResolutionStatusId() ? -1 : 1;
-			}
-		});
-		assertEquals(1, statisticBean.get(0).getResolutionStatusId());
-		assertEquals(4, statisticBean.get(1).getResolutionStatusId());
 	}
 
 }
