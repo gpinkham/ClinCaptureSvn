@@ -375,9 +375,8 @@ public class DataEntryRuleRunner extends RuleRunner {
 	private boolean ruleActionContainerAlreadyExistsInList(RuleActionContainer ruleActionContainer) {
 		for (RuleActionContainer rac : allActionContainerListBasedOnRuleExecutionResult) {
 			if (rac.getRuleAction().getId().equals(ruleActionContainer.getRuleAction().getId())
-					&& rac.getExpressionBean().getId().equals(ruleActionContainer.getExpressionBean().getId())
-					&& rac.getItemDataBean().getId() == ruleActionContainer.getItemDataBean().getId()
-					&& rac.getRuleSetBean().getId().equals(ruleActionContainer.getRuleSetBean().getId())) {
+					&& rac.getRuleSetBean().getId().equals(ruleActionContainer.getRuleSetBean().getId())
+					&& rac.getExpressionBean().getValue().equals(ruleActionContainer.getExpressionBean().getValue())) {
 				return true;
 			}
 		}
