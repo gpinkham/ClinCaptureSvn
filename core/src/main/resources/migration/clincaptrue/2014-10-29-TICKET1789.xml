@@ -4,6 +4,8 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
 	<changeSet author="Frank" id="2014-10-29-TICKET1789">
+		<validCheckSum>e1874447f6cd74e7a597eaa86d1d254f</validCheckSum>
+		<validCheckSum>153dde413e6e77b5b59956984a16dca</validCheckSum>
 		<comment>Adds study parameter to allow/deny dynamic groups management</comment>
 		<insert tableName="study_parameter">
 			<column name="study_parameter_id" value="47" />
