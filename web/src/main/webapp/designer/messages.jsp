@@ -86,6 +86,9 @@
 		messageSource.messages.invalidExpression = '<fmt:message bundle="${resword}" key="rs.message.invalidExpression"/>';
 		messageSource.messages.invalidItemsSelected = '<fmt:message bundle="${resword}" key="rs.message.invalidItemsSelected"/>';
 		messageSource.messages.checkLog = '<fmt:message bundle="${resword}" key="rs.message.checkLog"/>';
+		messageSource.messages.selectEvent = '<fmt:message bundle="${resword}" key="rs.message.selectEvent"/>';
+		messageSource.messages.selectCRF = '<fmt:message bundle="${resword}" key="rs.message.selectCRF"/>';
+		messageSource.messages.selectVersion = '<fmt:message bundle="${resword}" key="rs.message.selectVersion"/>';
 
 		messageSource.validations.initialDe = '<fmt:message bundle="${resword}" key="initial_data_entry"/>';
 		messageSource.validations.administrativeDe = '<fmt:message bundle="${resword}" key="administrative_editing"/>';

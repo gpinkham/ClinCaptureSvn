@@ -100,7 +100,10 @@ function MessageSourceGetter() {
 		selectItemsToShowHide: "",
 		invalidExpression: "",
 		invalidItemsSelected: "",
-		checkLog: ""
+		checkLog: "",
+		selectVersion: "",
+		selectCRF: "",
+		selectEvent: ""
 	};
 	this.validations = {
 		discrepancyAction: "",

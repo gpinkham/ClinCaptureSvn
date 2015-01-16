@@ -188,45 +188,47 @@ Parser.prototype.createNextDroppable = function(params) {
 			createPopover(dataPredicate);
 		}
 	} else if (params.element.is(".target")) {
-		if (!this.isAddedTarget(selectedItem)) {
-			if (params.existingValue) {
-				for (var x = 0; x < this.rule.targets.length; x++) {
-					var t = this.rule.targets[x];
-					if (t.name === params.existingValue) {
-						this.rule.targets.splice(x, 1);
+		if (this.isAddedTargetValid(selectedItem)) {
+			if (!this.isAddedTarget(selectedItem)) {
+				if (params.existingValue) {
+					for (var x = 0; x < this.rule.targets.length; x++) {
+						var t = this.rule.targets[x];
+						if (t.name === params.existingValue) {
+							this.rule.targets.splice(x, 1);
+						}
 					}
 				}
+				var target = Object.create(null);
+				target.oid = selectedItem.oid;
+				target.name = selectedItem.name;
+				target.crf = selectedItem.crfOid;
+				target.group = selectedItem.group;
+				target.evt = selectedItem.eventOid;
+				target.version = selectedItem.crfVersionOid;
+				this.rule.targets.push(target);
+				// If this is an edit - changing an eventified target
+				if (params.element.parent().find(".versionify").is(":checked")) {
+					target.versionify = true;
+				}
+				//Reset UI
+				var div = params.element.parent().clone();
+				div.find(".target").val("");
+				div.find(".target").removeClass("bordered");
+				// Re-bind Event handlers
+				createDroppable({
+					accept: "div[id='items'] td",
+					element: div.find(".target")
+				});
+				// create a new input
+				if (!params.element.val()) {
+					$('.opt:last').after(div);
+					div.after($('.opt:last').clone());
+				}
+				div.find(".target").focus();
 			}
-			var target = Object.create(null);
-			target.oid = selectedItem.oid;
-			target.name = selectedItem.name;
-			target.crf = selectedItem.crfOid;
-			target.group = selectedItem.group;
-			target.evt = selectedItem.eventOid;
-			target.version = selectedItem.crfVersionOid;
-			this.rule.targets.push(target);
-			// If this is an edit - changing an eventified target
-			if (params.element.parent().find(".versionify").is(":checked")) {
-				target.versionify = true;
-			}
-			//Reset UI
-			var div = params.element.parent().clone();
-			div.find(".target").val("");
-			div.find(".target").removeClass("bordered");
-			// Re-bind Event handlers
-			createDroppable({
-				accept: "div[id='items'] td",
-				element: div.find(".target")
-			});
-			// create a new input
-			if (!params.element.val()) {
-				$('.opt:last').after(div);
-				div.after($('.opt:last').clone());
-			}
-			div.find(".target").focus();
+			params.element.val(params.ui.draggable.attr("item-name"));
 		}
 		params.element.removeClass("bordered");
-		params.element.val(params.ui.draggable.attr("item-name"));
 	} else if (params.element.is(".dest")) {
 		if (!this.isAddedShowHideTarget(params.ui.draggable.attr("item-name"))) {
 			if (params.existingValue) {
@@ -646,7 +648,7 @@ Parser.prototype.getRule = function() {
 		rule.dde = this.getDoubleDataEntryExecute();
 		rule.ide = this.getInitialDataEntryExecute();
 		rule.ae = this.getAdministrativeEditingExecute();
-		
+
 		rule.evaluates = this.getEvaluates();
         for (var x = 0; x < parser.rule.targets.length; x++) {
             var target = parser.rule.targets[x];
@@ -712,7 +714,7 @@ Parser.prototype.render = function(rule) {
  *
  * Arguments [element]:
  * => expression - The rule expression as text
- 
+
  * Returns:
  * - validity of the rule
  * - message if the validation failed
@@ -934,7 +936,7 @@ Parser.prototype.getLocalOp = function(predicate) {
 			return messageSource.terms.and;
 		} else if (predicate === "or") {
 			return messageSource.terms.or;
-		} 
+		}
 	}
 	return false;
 };
@@ -950,10 +952,42 @@ Parser.prototype.getLocalOp = function(predicate) {
 Parser.prototype.isAddedTarget = function(target) {
 	for (var x = 0; x < this.rule.targets.length; x++) {
 		var tar = this.rule.targets[x];
-		if (tar.name === target.name && tar.eventOid === target.eventOid && 
+		if (tar.name === target.name && tar.eventOid === target.eventOid &&
 			tar.crfOid === target.crfOid && tar.crfVersionOid === target.crfVersionOid) {
 			return true;
 		}
+	}
+};
+
+/* =====================================================================
+ * Checks if the target that is added contains all required parameters:
+ * 1. Event OID.
+ * 2. CRF OID
+ * 3. CRF version OID
+ *
+ * Arguments [target]:
+ * => target - the target to check
+ *
+ * Returns true if target contains all parameters.
+ * =================================================================== */
+Parser.prototype.isAddedTargetValid = function(target) {
+	if (target == null) {
+		var messages = [];
+		if ($("div[id=events]").find(".selected").find("td[oid]").attr("oid") === undefined) {
+			messages.push(messageSource.messages.selectEvent);
+		}
+		if ($("div[id=crfs]").find(".selected").find("td[oid]").attr("oid") === undefined) {
+			messages.push(messageSource.messages.selectCRF);
+		}
+		if ($("div[id=versions]").find(".selected").find("td[oid]").attr("oid") === undefined) {
+			messages.push(messageSource.messages.selectVersion);
+		}
+		messages.forEach(function(element){
+			$(".targettable").find(".panel-body").prepend(createAlert(element));
+		});
+		return false;
+	} else {
+		return true;
 	}
 };
 
@@ -1197,7 +1231,7 @@ Parser.prototype.setActions = function(params) {
 					show: action.show,
 					context: params.context
 				});
-			} 
+			}
 		}
 	}
 };
@@ -1395,7 +1429,7 @@ Parser.prototype.getShowHideAction = function() {
 };
 
 Parser.prototype.setShowHideActionMessage = function(message) {
-	this.getShowHideAction().message = message;	
+	this.getShowHideAction().message = message;
 };
 
 Parser.prototype.setShowHideAction = function(params) {
@@ -1680,7 +1714,7 @@ Parser.prototype.setExpression = function(expression, attrMap) {
 							droppable.attr("group-oid", itm.group);
 							droppable.attr("crf-oid", itm.crfOid);
 							droppable.attr("event-oid", itm.eventOid);
-						} 
+						}
 						droppable.attr("version-oid", itm.crfVersionOid);
 						droppable.attr("study-oid", this.extractStudy(this.getStudy()).oid);
 						droppable.text(itm.name);
@@ -1693,7 +1727,7 @@ Parser.prototype.setExpression = function(expression, attrMap) {
 							}
 							droppable.text(value);
 						} else {
-							droppable.text(expression[e]);	
+							droppable.text(expression[e]);
 						}
 					}
 					currDroppable.after(droppable);
@@ -1886,7 +1920,7 @@ Parser.prototype.deleteTarget = function(target) {
 			var dest = act.destinations[x];
 			if (dest.oid === oid) {
 				act.destinations.splice(x, 1);
-				if ($(".insert-properties").find(".row").size() === 1) { 
+				if ($(".insert-properties").find(".row").size() === 1) {
 					$(target).closest(".row").find(".item").val("");
 					$(target).closest(".row").find(".value").val("");
 				} else {
@@ -1906,7 +1940,7 @@ Parser.prototype.deleteTarget = function(target) {
 			if (index > -1) {
 				this.getShowHideAction().destinations.splice(index, 1);
 				$(target).parent().remove();
-			}	
+			}
 		}
 	}
 };
