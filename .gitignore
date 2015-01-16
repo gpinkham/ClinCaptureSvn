@@ -4,6 +4,7 @@ rest/target/
 rest/.project
 rest/.classpath
 rest/.settings/
+rest/bin/
 core/target/
 core/.project
 core/.classpath
