@@ -523,12 +523,24 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 						if (labelWithOptions.containsKey(responseLabel)) {
 							if (!StringUtil.isBlank(resOptions)) {
 								for (int i = 0; i < resArray.length; i++) {
-									if (!resArray[i].equals(mapResArray[i])) {
-										errors.add(resPageMsg.getString("resp_label_with_different_resp_options") + " "
-												+ k + ", " + resPageMsg.getString("items_worksheet_with_dot"));
+									if (resArray.length != mapResArray.length) {
+										errors.add(resPageMsg.getString(("resp_label_template_different_resp_options"))
+												+ " "
+												+ k + ", " + resPageMsg
+												.getString("items_worksheet_with_dot"));
 										htmlErrors.put(j + "," + k + ",15", resPageMsg
-												.getString("resp_label_with_different_resp_options_html_error"));
+												.getString("resp_label_template_different_resp_options_html_error"));
 										break;
+									} else {
+										if (!resArray[i].equals(mapResArray[i])) {
+											errors.add(
+													resPageMsg.getString("resp_label_with_different_resp_options") + " "
+															+ k + ", " + resPageMsg
+															.getString("items_worksheet_with_dot"));
+											htmlErrors.put(j + "," + k + ",15", resPageMsg
+													.getString("resp_label_with_different_resp_options_html_error"));
+											break;
+										}
 									}
 								}
 							}
