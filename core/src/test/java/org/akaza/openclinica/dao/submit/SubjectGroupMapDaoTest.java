@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
+@SuppressWarnings("rawtypes")
 public class SubjectGroupMapDaoTest extends DefaultAppContextTest {
 
 	private SubjectGroupMapBean subjectGroupMapBean;
@@ -32,7 +33,7 @@ public class SubjectGroupMapDaoTest extends DefaultAppContextTest {
 		subjectGroupMapBean = (SubjectGroupMapBean) subjectGroupMapDAO.create(subjectGroupMapBean);
 		assertTrue(subjectGroupMapBean.getId() > 0);
 	}
-
+	
 	@After
 	public void tearDown() {
 		if (subjectGroupMapBean != null && subjectGroupMapBean.getId() > 0) {

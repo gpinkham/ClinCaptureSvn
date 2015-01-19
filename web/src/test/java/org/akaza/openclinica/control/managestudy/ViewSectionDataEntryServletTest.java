@@ -13,7 +13,6 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;

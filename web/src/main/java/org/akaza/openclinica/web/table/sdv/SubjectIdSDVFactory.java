@@ -16,6 +16,7 @@ package org.akaza.openclinica.web.table.sdv;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -394,7 +395,10 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 			studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventBean.getStudyEventId());
 			StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
 					.findByPK(studyEventBean.getStudyEventDefinitionId());
-			if (!studyEventDefinitionBean.getStatus().isAvailable()) {
+			if (!studyEventDefinitionBean.getStatus().isAvailable()
+					|| studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED
+					|| studyEventBean.getSubjectEventStatus() == SubjectEventStatus.STOPPED
+					|| studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SKIPPED) {
 				continue;
 			}
 			CRFBean crfBean = crfDAO.findByVersionId(eventBean.getCRFVersionId());
