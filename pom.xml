@@ -733,9 +733,12 @@
 				    <checkModificationExcludes>
 				    	<checkModificationExclude>build.properties</checkModificationExclude>
 				    	<checkModificationExclude>medical-coding/test.log</checkModificationExclude>
+				    	<checkModificationExclude>web/openclinica-test.log</checkModificationExclude>
 				      	<checkModificationExclude>core/openclinica-test.log</checkModificationExclude>
 				      	<checkModificationExclude>core/Agent_Administration_v2.0_ssID1.pdf</checkModificationExclude>
-				      	<checkModificationExclude>web/openclinica-test.log</checkModificationExclude>
+						<checkModificationExclude>rest/src/test/resources/datainfo.properties</checkModificationExclude>
+						<checkModificationExclude>rest/src/test/resources/rest-test.properties</checkModificationExclude>
+						<checkModificationExclude>rest/src/test/resources/servlet-context.xml</checkModificationExclude>
 				    </checkModificationExcludes>
 				  </configuration>
 				</plugin>
