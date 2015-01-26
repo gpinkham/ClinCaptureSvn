@@ -731,6 +731,7 @@
 				  <version>2.4.1</version>
 				  <configuration>
 				    <checkModificationExcludes>
+				    	<checkModificationExclude>rest/pom.xml</checkModificationExclude>
 				    	<checkModificationExclude>build.properties</checkModificationExclude>
 				    	<checkModificationExclude>medical-coding/test.log</checkModificationExclude>
 				    	<checkModificationExclude>web/openclinica-test.log</checkModificationExclude>
