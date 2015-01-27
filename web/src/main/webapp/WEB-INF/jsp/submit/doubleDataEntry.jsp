@@ -180,82 +180,12 @@
 <br />
 <%--I don't think we need this segment to accompany the existing error messages:--%>
 <%-- need to put this back, otherwise, error msg from 'mark complete' cannot show--%>
-<c:if test="${!empty pageMessages}">
-    <div class="alert">
-        <c:forEach var="message" items="${pageMessages}">
-            <c:out value="${message}" escapeXml="false"/>
-            <br><br>
-        </c:forEach>
-    </div>
-</c:if>
 
 <c:set var="sectionNum" value="0"/>
 <c:forEach var="section" items="${toc.sections}">
     <c:set var="sectionNum" value="${sectionNum+1}"/>
 </c:forEach>
 
-<c:if test="${! empty formMessages or !empty warningMessages}">
-    <!-- initial position for data entry error messages; we'll
-    improve the style as well -->
-	<div id="errorMessagesContainer"  style="word-wrap: break-word !important; width:600px;" class="aka_err_message">
-        <ul>
-            <c:forEach var="message" items="${warningMessages}">
-                <c:forEach items="${message.value}" var="value">
-                    <li style="color: #868686">
-                            <span style="text-decoration: underline"><strong>
-                                <label onclick="getFocused('<c:out value="${message.key}"/>');"><c:out value="${value}"/></label>
-                            </strong></span>
-                    </li>
-                </c:forEach>
-            </c:forEach>
-        </ul>
-        <ul>
-            <c:forEach var="message" items="${formMessages}">
-                <c:choose>
-                    <c:when test="${hasShown}">
-                        <c:forEach items="${message.value}" var="value">
-                            <li style="color:  #006633"><span style="text-decoration: underline"><strong>
-                                <label onclick="getFocused('<c:out value="${message.key}"/>');"><c:out value="${value}"/></label>
-                            </strong></span></li>
-                        </c:forEach>
-                    </c:when>
-                    <c:otherwise>
-                        <c:forEach items="${message.value}" var="value">
-                            <c:choose>
-                                <c:when test="${Hardrules}">
-                                    <li style="color: #ff0000">
-                                </c:when>
-                                <c:otherwise>
-                                    <li style="color: #E46E16">
-                                </c:otherwise>
-                            </c:choose>
-                           <span style="text-decoration: underline"><strong>
-                               <label onclick="getFocused('<c:out value="${message.key}"/>');"><c:out value="${value}"/></label>
-                           </strong></span></li>
-                        </c:forEach>
-                    </c:otherwise>
-                </c:choose>
-            </c:forEach>
-        </ul>
-        <!--  Use the formMessages request attribute to grab each validation
-      error message?
-      error messages look like:
-
-       Woops, you forgot to provide a value for
-       <strong><label for="formElementName">formElementName</label></strong>.<br/>-->
-    </div>
-
-    <%-- <div id="errorMessagesContainer" class="aka_err_message">
-        <ul>
-            <c:forEach var="formMsg" items="${formMessages}">
-                <li style="color:  #ff0000"><span style="text-decoration: underline"><strong>
-                    <label onclick="getFocused('<c:out value="${formMsg.key}" />');"><c:out value="${formMsg.value}" /></label>
-                </strong></span></li>
-            </c:forEach>
-        </ul>
-    </div> --%>
-	<%-- tbh << 04/2010 --%>
-</c:if><%-- error messages are not null --%>
 <div id="box" class="dialog" style="display:none;">
 <span id="mbm">
     <fmt:message key="crf_data_entry_password_required" bundle="${restext}"/>
@@ -267,7 +197,62 @@
 </div>
 
 <!-- section tabs here -->
-<table border="0" cellpadding="0" cellspacing="0">
+<table id="crfSectionTabsTable" border="0" cellpadding="0" cellspacing="0" style="${!(discrepancyShortcutsAnalyzer eq null || (discrepancyShortcutsAnalyzer.totalNew == 0 && discrepancyShortcutsAnalyzer.totalUpdated == 0 && discrepancyShortcutsAnalyzer.totalResolutionProposed == 0 && discrepancyShortcutsAnalyzer.totalClosed == 0 && discrepancyShortcutsAnalyzer.totalAnnotations == 0)) ? 'padding-top: 80px;' : 'padding-top: 0px;'}">
+<tr><td>
+    <c:if test="${!empty pageMessages}">
+        <div class="alert">
+            <c:forEach var="message" items="${pageMessages}">
+                <c:out value="${message}" escapeXml="false"/>
+                <br><br>
+            </c:forEach>
+        </div>
+    </c:if>
+    <c:if test="${! empty formMessages or !empty warningMessages}">
+        <!-- initial position for data entry error messages; we'll
+        improve the style as well -->
+        <div id="errorMessagesContainer"  style="word-wrap: break-word !important; width:600px;margin-bottom: 20px;" class="aka_err_message">
+            <ul>
+                <c:forEach var="message" items="${warningMessages}">
+                    <c:forEach items="${message.value}" var="value">
+                        <li style="color: #868686">
+                            <span style="text-decoration: underline"><strong>
+                                <label onclick="getFocused('<c:out value="${message.key}"/>');"><c:out value="${value}"/></label>
+                            </strong></span>
+                        </li>
+                    </c:forEach>
+                </c:forEach>
+            </ul>
+            <ul>
+                <c:forEach var="message" items="${formMessages}">
+                    <c:choose>
+                        <c:when test="${hasShown}">
+                            <c:forEach items="${message.value}" var="value">
+                                <li style="color:  #006633"><span style="text-decoration: underline"><strong>
+                                    <label onclick="getFocused('<c:out value="${message.key}"/>');"><c:out value="${value}"/></label>
+                                </strong></span></li>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <c:forEach items="${message.value}" var="value">
+                                <c:choose>
+                                    <c:when test="${Hardrules}">
+                                        <li style="color: #ff0000">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <li style="color: #E46E16">
+                                    </c:otherwise>
+                                </c:choose>
+                           <span style="text-decoration: underline"><strong>
+                               <label onclick="getFocused('<c:out value="${message.key}"/>');"><c:out value="${value}"/></label>
+                           </strong></span></li>
+                            </c:forEach>
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>
+            </ul>
+        </div>
+    </c:if><%-- error messages are not null --%>
+</td></tr>
 <tr>
 <!--
 <td align="right" valign="middle" style="padding-left: 12px; display: none" id="TabsBack">
@@ -366,8 +351,12 @@ function reverseRowsOrder() {
         document.write('<tr id="' + trId + '">');
         for (var j = 0; j <= rows[i].length - 1; j++) {
             var td = rows[i][j];
-            document.getElementById(trId).innerHTML = document.getElementById(trId).innerHTML + td.outerHTML;
-            td.outerHTML = "";
+            if ($.browser.msie) {
+                $(trId).html(document.getElementById(trId).innerHTML + td.outerHTML);
+            } else {
+                document.getElementById(trId).innerHTML = document.getElementById(trId).innerHTML + td.outerHTML;
+                td.outerHTML = "";
+            }
         }
         document.write('</tr>');
     }

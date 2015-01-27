@@ -11,6 +11,10 @@ var rowHighlightTypes = {NORMAL: 0, ROWSPAN: 1, MULTIPLE: 2};
 var pageTitle_SMForAllOfEvents = "/ListStudySubjects";
 var pageTitle_SMForSelectedEvent = "/ListEventsForSubjects";
 
+var windowScrollLeft = 0;
+var dnShortcutsTableDefTop = 174;
+var dnShortcutsTableDefLeft = 78;
+
 function selectAllChecks(formObj,value){
     if(formObj) {
         var allChecks = formObj.getElementsByTagName("input");
@@ -3108,28 +3112,34 @@ autoCode = function() {
 };
 
 function initCrfMoreInfo() {
+  var topVal = dnShortcutsTableDefTop;
   if (window.expandCrfInfo != undefined && window.expandCrfInfo == 'true' && $('#CRF_infobox_open').css('display') == 'none') {
     $('#CRF_infobox_closed').css('display', '');
     $('#CRF_infobox_open').css('display', '');
     $('img[id=moreInfoExpandedImg]').css('display', 'none');
     $('img[id=moreInfoCollapsedImg]').css('display', '');
+    topVal += $("#CRF_infobox_open").outerHeight();
   } else {
     $('#CRF_infobox_open').css('display', 'none');
     $('img[id=moreInfoExpandedImg]').css('display', '');
     $('img[id=moreInfoCollapsedImg]').css('display', 'none');
   }
+  $("#dnShortcutsTable").css("top", topVal + "px");
 }
 
 function processCrfMoreInfo() {
+  var topVal = dnShortcutsTableDefTop;
   var displayValue = $('#CRF_infobox_open').css('display');
   $('#CRF_infobox_open').css('display', displayValue == 'none' ? '' : 'none');
   if (displayValue == 'none') {
     $('img[id=moreInfoExpandedImg]').css('display', 'none');
     $('img[id=moreInfoCollapsedImg]').css('display', '');
+    topVal += $("#CRF_infobox_open").outerHeight();
   } else {
     $('img[id=moreInfoExpandedImg]').css('display', '');
     $('img[id=moreInfoCollapsedImg]').css('display', 'none');
   }
+  $("#dnShortcutsTable").css("top", topVal + "px");
 }
 
 function Pager(tableName, itemsPerPage) {
@@ -3451,15 +3461,90 @@ function getBrowserClientHeight() {
   return v;
 }
 
+function enableDNBoxFeatures() {
+    $("#dnShortcutsTable").css("position", "fixed");
+    $("#dnShortcutsTable").draggable({containment: "parent",
+        start: function(event, ui) {
+            $("#dnShortcutsTable").css("position", "absolute");
+        }, drag: function(event, ui) {
+            if (ui.offset != undefined && ui.position != undefined && ui.offset.top != ui.position.top) ui.position.top = ui.offset.top;
+            if (ui.offset != undefined && ui.position != undefined && ui.offset.left != ui.position.left) ui.position.left = ui.offset.left;
+        }, stop: function(event, ui) {
+            $("#dnShortcutsTable").css("position", "fixed");
+            $("#dnShortcutsTable").css("top", (parseInt($("#dnShortcutsTable").css("top")) - $(window).scrollTop()) + 'px');
+            $("#dnShortcutsTable").css("left", (parseInt($("#dnShortcutsTable").css("left")) - $(window).scrollLeft()) + 'px');
+        }
+    });
+}
+
+$(window).scroll(function() {
+    if ($("#dnShortcutsTable").length > 0 && $("#dnShortcutsTable").css("position") == "absolute") {
+        enableDNBoxFeatures();
+    }
+})
+
+$(window).resize(function() {
+    if ($("#dnShortcutsTable").length > 0) {
+        resetDnShortcutsTable();
+    }
+});
+
+function resetDnShortcutsTable() {
+    var dnShortcutsTableTop = dnShortcutsTableDefTop;
+    if ($('#CRF_infobox_open').css('display') != "none") {
+        dnShortcutsTableTop += $("#CRF_infobox_open").outerHeight();
+    }
+    $("#dnShortcutsTable").css("position", "absolute");
+    $("#dnShortcutsTable").css("top", dnShortcutsTableTop + 'px');
+    $("#dnShortcutsTable").css("left", dnShortcutsTableDefLeft + 'px');
+    $(window).scrollTop(0)
+    $(window).scrollLeft(0);
+    $("#dnShortcutsTable").draggable("destroy");
+    resetHighlightedFieldsForDNShortcutAnchors();
+}
+
+function isElementOutViewport(element) {
+    var result = false;
+    if (element != undefined) {
+        var additionalVal = 20;
+        var jqWindow = $(window);
+        var windowLeft = jqWindow.scrollLeft();
+        var windowTop = jqWindow.scrollTop();
+        var windowHeight = getBrowserClientHeight();
+        var windowWidth = getBrowserClientWidth();
+
+        var jqElement = $(element);
+        var jqElementOffset = jqElement.offset();
+        var elementTop = jqElementOffset.top;
+        var elementLeft = jqElementOffset.left;
+        var elementHeight = jqElement.outerHeight();
+        var elementWidth = jqElement.outerWidth();
+        var elementBottom = elementTop + elementHeight;
+        var elementRight = elementLeft + elementWidth;
+
+        result = elementLeft - additionalVal < windowLeft || elementTop - additionalVal < windowTop || elementRight + additionalVal > windowLeft + windowWidth || elementBottom + additionalVal > windowTop + windowHeight;
+    }
+    return result;
+}
+
 function highlightDn(id, color, delay) {
-    var inputHolderElement = $("#itemHolderId_" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel"));
-    var inputElement = inputHolderElement.find("input[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]");
-    inputElement = inputElement.length == 0 ? inputHolderElement.find("select[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]") : inputElement;
-    inputElement = inputElement.length == 0 ? inputHolderElement.find("textarea[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]") : inputElement;
+    var element = $("#" + id);
+    var inputHolderElement = $("#itemHolderId_" + element.attr("alt") + "input" + element.attr("rel"));
+    var inputElement = inputHolderElement.find("input[id*=" + element.attr("alt") + "input" + element.attr("rel") + "]");
+    inputElement = inputElement.length == 0 ? inputHolderElement.find("select[id*=" + element.attr("alt") + "input" + element.attr("rel") + "]") : inputElement;
+    inputElement = inputElement.length == 0 ? inputHolderElement.find("textarea[id*=" + element.attr("alt") + "input" + element.attr("rel") + "]") : inputElement;
     if (inputElement.attr("type") != undefined && (inputElement.attr("type").toLowerCase() == "radio" || inputElement.attr("type").toLowerCase() == "checkbox")) {
         inputElement = inputElement.parent();
     }
-    setTimeout(function () { inputElement.css("background-color", color) }, delay == undefined ? 0 : parseInt(delay));
+    setTimeout(function () {
+        inputElement.css("background-color", color);
+        if (color == "yellow" && isElementOutViewport(inputHolderElement.get(0))) {
+            var newTop = inputHolderElement.offset().top - $("#dnShortcutsTable").outerHeight() - 20;
+            var newLeft = inputHolderElement.offset().left - 20;
+            $(window).scrollTop(newTop < 0 ? 0 : newTop);
+            $(window).scrollLeft(newLeft < 0 ? 0 : newLeft);
+        }
+    }, delay == undefined ? 0 : parseInt(delay));
 }
 
 function resetHighlightedFieldsForDNShortcutAnchors() {
@@ -3487,6 +3572,7 @@ function highlightFirstFieldForDNShortcutAnchors(idToHighlight) {
 
 function highlightFieldForDNShortcutAnchor(ind, currentElement) {
     var delay = 0;
+    enableDNBoxFeatures();
     var nextDnLink = $(currentElement).attr("nextdnlink");
     if (currentHighlightedShortcutAnchor != undefined) {
         highlightDn(currentHighlightedShortcutAnchor, "");
@@ -3564,7 +3650,8 @@ function updateCRFHeaderFunction(parametersHolder) {
                 $("#dnShortcutTotalAnnotations").parent().attr("nextdnlink", jsonObject.nextAnnotationDnLink);
 
                 if (parseInt(jsonObject.totalNew) > 0 || parseInt(jsonObject.totalUpdated) > 0 || parseInt(jsonObject.totalResolutionProposed) > 0 || parseInt(jsonObject.totalClosed) > 0 || parseInt(jsonObject.totalAnnotations) > 0) {
-                    $('#dnShortcutsTable').removeClass("hidden");
+                    $("#dnShortcutsTable").removeClass("hidden");
+                    $("#crfSectionTabsTable").attr("style", "padding-top: 80px;");
                 }
 
                 for (var n = 0; n < jsonObject.items.length; n++) {

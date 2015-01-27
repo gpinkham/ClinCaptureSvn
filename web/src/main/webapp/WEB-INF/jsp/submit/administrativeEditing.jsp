@@ -6,7 +6,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
@@ -45,7 +45,7 @@
   TabsForwardByNum(<c:out value="${tabId}"/>); alert(self.screen.availWidth);margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <c:set var="markCRFMethodName" value="displayMessageFromCheckbox(this, undefined)"/>
 
-<div id="centralContainer" style=  "padding-left:3em; margin-top:10px;background-color: white; color:black;">
+<div id="centralContainer" style=  "padding-left:3em; margin-top:1em;background-color: white; color:black;">
 
 <%-- set button text depending on whether or not the user is confirming values --%><c:choose>
     <c:when test="${section.checkInputs}">        <c:set var="buttonAction"><fmt:message key="save" bundle="${resword}"/></c:set>
@@ -193,58 +193,54 @@
 <br />
 <%--I don't think we need this segment to accompany the existing error messages:--%>
 <%-- need to put this back, otherwise, error msg from 'mark complete' cannot show--%>
-<c:if test="${!empty pageMessages}">
-    <div class="alert">
-        <c:forEach var="message" items="${pageMessages}">
-            <c:out value="${message}" escapeXml="false"/>
-            <br><br>
-        </c:forEach>
-    </div>
-</c:if>
 
 <c:set var="sectionNum" value="0"/>
 <c:forEach var="section" items="${toc.sections}">
     <c:set var="sectionNum" value="${sectionNum+1}"/>
 </c:forEach>
 
-<c:if test="${!empty formMessages or !empty warningMessages}">
-    <!-- initial position for data entry error messages; we'll
-    improve the style as well -->
-    <div id="errorMessagesContainer" style="word-wrap: break-word !important; width:600px;" class="aka_err_message">
-        <ul>
-            <c:forEach var="message" items="${warningMessages}">
-                <c:forEach items="${message.value}" var="value">
-                    <li style="color: #868686">
+<!-- section tabs here -->
+<table id="crfSectionTabsTable" border="0" cellpadding="0" cellspacing="0" style="${!(discrepancyShortcutsAnalyzer eq null || (discrepancyShortcutsAnalyzer.totalNew == 0 && discrepancyShortcutsAnalyzer.totalUpdated == 0 && discrepancyShortcutsAnalyzer.totalResolutionProposed == 0 && discrepancyShortcutsAnalyzer.totalClosed == 0 && discrepancyShortcutsAnalyzer.totalAnnotations == 0)) ? 'padding-top: 80px;' : 'padding-top: 0px;'}">
+<tr><td>
+    <c:if test="${!empty pageMessages}">
+        <div class="alert">
+            <c:forEach var="message" items="${pageMessages}">
+                <c:out value="${message}" escapeXml="false"/>
+                <br><br>
+            </c:forEach>
+        </div>
+    </c:if>
+    <c:if test="${!empty formMessages or !empty warningMessages}">
+        <!-- initial position for data entry error messages; we'll
+        improve the style as well -->
+        <div id="errorMessagesContainer" style="word-wrap: break-word !important; width:600px;margin-bottom: 20px;" class="aka_err_message">
+            <ul>
+                <c:forEach var="message" items="${warningMessages}">
+                    <c:forEach items="${message.value}" var="value">
+                        <li style="color: #868686">
                             <span style="text-decoration: underline"><strong>
                                 <label onclick="getFocused('<c:out value="${message.key}"/>');"><c:out value="${value}"/></label>
                             </strong></span>
-                    </li>
+                        </li>
+                    </c:forEach>
                 </c:forEach>
-            </c:forEach>
-        </ul>
-        <ul>
-            <c:forEach var="formMsg" items="${formMessages}">
-                <c:choose>
-                    <c:when test="${Hardrules}">
-                        <li style="color: #ff0000">
-                    </c:when>
-                    <c:otherwise>
-                        <li style="color: #E46E16">
-                    </c:otherwise>
-                </c:choose>
-                <span style="text-decoration: underline"><strong><label for="<c:out value="${formMsg.key}" />"><c:out value="${formMsg.value}" /></label></strong></span></li>
-            </c:forEach>
-        </ul>
-        <!--  Use the formMessages request attribute to grab each validation
-      error message?
-      error messages look like:
-
-       Woops, you forgot to provide a value for
-       <strong><label for="formElementName">formElementName</label></strong>.<br/>-->
-    </div>
-</c:if><%-- error messages are not null --%>
-<!-- section tabs here -->
-<table border="0" cellpadding="0" cellspacing="0">
+            </ul>
+            <ul>
+                <c:forEach var="formMsg" items="${formMessages}">
+                    <c:choose>
+                        <c:when test="${Hardrules}">
+                            <li style="color: #ff0000">
+                        </c:when>
+                        <c:otherwise>
+                            <li style="color: #E46E16">
+                        </c:otherwise>
+                    </c:choose>
+                    <span style="text-decoration: underline"><strong><label for="<c:out value="${formMsg.key}" />"><c:out value="${formMsg.value}" /></label></strong></span></li>
+                </c:forEach>
+            </ul>
+        </div>
+    </c:if><%-- error messages are not null --%>
+</td></tr>
 <tr>
 <!--
 <td align="right" valign="middle" style="padding-left: 12px; display: none" id="TabsBack">
@@ -333,8 +329,12 @@
             document.write('<tr id="' + trId + '">');
             for (var j = 0; j <= rows[i].length - 1; j++) {
                 var td = rows[i][j];
-                document.getElementById(trId).innerHTML = document.getElementById(trId).innerHTML + td.outerHTML;
-                td.outerHTML = "";
+                if ($.browser.msie) {
+                    $(trId).html(document.getElementById(trId).innerHTML + td.outerHTML);
+                } else {
+                    document.getElementById(trId).innerHTML = document.getElementById(trId).innerHTML + td.outerHTML;
+                    td.outerHTML = "";
+                }
             }
             document.write('</tr>');
         }

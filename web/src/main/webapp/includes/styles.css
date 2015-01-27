@@ -2384,6 +2384,27 @@ span.asterisk {
     padding: 10px 0;
 }
 
+.notSelectable {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+#dnShortcutsTable a.closeLink{
+    float: right;
+    cursor: pointer;
+    color: #789EC5;
+    padding-right: 4px;
+    font-weight: bold;
+}
+
+a.dnShortcut {
+    color: #789EC5;
+    cursor: pointer;
+}
+
 a.dnShortcut:active {
     text-decoration: none !important;
 }
@@ -2865,4 +2886,8 @@ span.annotated_crfOID, span.annotated_eventOID{
     padding: 1px;
     padding-left: 5px;
     color: #789EC5;
+}
+
+a.dataEntryLink {
+    cursor: pointer;
 }

@@ -121,7 +121,7 @@ public class DataEntryLinkTag extends TagSupport {
 			}
 			String dynamicTitle = !title.isEmpty() ? title : dynamicAlt;
 			if (eventCrfBean != null) {
-				link = "<a href=\"#\" onclick=\"".concat(onClickFunction).concat("('")
+				link = "<a class=\"dataEntryLink\" onclick=\"".concat(onClickFunction).concat("('")
 						.concat(Integer.toString(eventCrfBean.getId())).concat("',").concat(dynamicActionQuery)
 						.concat(");\"").concat("onMouseDown=\"setImage('").concat(imgPrefix)
 						.concat(Integer.toString(rowCount)).concat("','").concat(imgSrcPrefix).concat(imgPrefix)

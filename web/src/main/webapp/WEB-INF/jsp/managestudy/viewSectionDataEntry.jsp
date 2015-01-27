@@ -43,11 +43,12 @@
 	
 <script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script>
 <script language="JavaScript" type="text/javascript">
+		dnShortcutsTableDefTop += 56;
 		jQuery(document).ready(function() {
             jQuery("table > tbody  tr").attr("repeat", "0");
             jQuery("table > tbody  button").attr("disabled", "true");
             jQuery("table > tbody  input").attr("disabled", "disabled");
-            jQuery("table > tbody a").not('[tabindex]').not('.dnShortcut').removeAttr("onclick");
+            jQuery("table > tbody a").not('[tabindex]').not('.dnShortcut').not('.closeLink').removeAttr("onclick");
             jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
             jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
             jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
@@ -195,7 +196,7 @@
 				<c:set var="sectionNum" value="${sectionNum+1}" />
 			</c:forEach> <%-- removed, tbh 102007 --%>
 <!-- section tabs here -->
-<table border="0" cellpadding="0" cellspacing="0">
+<table id="crfSectionTabsTable" border="0" cellpadding="0" cellspacing="0"  style="${!(discrepancyShortcutsAnalyzer eq null || (discrepancyShortcutsAnalyzer.totalNew == 0 && discrepancyShortcutsAnalyzer.totalUpdated == 0 && discrepancyShortcutsAnalyzer.totalResolutionProposed == 0 && discrepancyShortcutsAnalyzer.totalClosed == 0 && discrepancyShortcutsAnalyzer.totalAnnotations == 0)) ? 'padding-top: 80px;' : 'padding-top: 0px;'}">
 <tr>
 
 <script type="text/JavaScript" language="JavaScript">
@@ -309,8 +310,12 @@
             document.write('<tr id="' + trId + '">');
             for (var j = 0; j <= rows[i].length - 1; j++) {
                 var td = rows[i][j];
-                document.getElementById(trId).innerHTML = document.getElementById(trId).innerHTML + td.outerHTML;
-                td.outerHTML = "";
+				if ($.browser.msie) {
+					$(trId).html(document.getElementById(trId).innerHTML + td.outerHTML);
+				} else {
+					document.getElementById(trId).innerHTML = document.getElementById(trId).innerHTML + td.outerHTML;
+					td.outerHTML = "";
+				}
             }
             document.write('</tr>');
         }
