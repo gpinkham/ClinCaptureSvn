@@ -14,6 +14,7 @@
 package org.akaza.openclinica.control.submit;
 
 import com.clinovo.web.table.filter.UserAccountNameDroplistFilterEditor;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -78,6 +79,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -104,6 +106,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	public static final String QUERY_AND_FAILED_VALIDATION_CHECK_VALUE = "31";
 	public static final String NEW_AND_UPDATED_VALUE = "21";
 	public static final String NOT_CLOSED_VALUE = "321";
+	public static final String DCF_CHECKBOX_NAME = "dcfcheck";
 
 	private AuditUserLoginDao auditUserLoginDao;
 	private StudySubjectDAO studySubjectDao;
@@ -162,7 +165,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		final String crfName = "crfName";
 		final String eventName = "eventName";
 
-		tableFacade.setColumnProperties("discrepancyNoteBean.id", "studySubject.label", DISCREPANCY_NOTE_BEAN_DIS_TYPE,
+		tableFacade.setColumnProperties("dcf","discrepancyNoteBean.id", "studySubject.label", DISCREPANCY_NOTE_BEAN_DIS_TYPE,
 				DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS, "siteId", "discrepancyNoteBean.createdDate",
 				"discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName",
 				"crfStatus", "entityName", "entityValue", "discrepancyNoteBean.entityType",
@@ -172,6 +175,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		Row row = tableFacade.getTable().getRow();
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
 
+		configureColumn(row.getColumn("dcf"), resword.getString("dcf"), new DcfCellEditor(), null, false, false);
 		configureColumn(row.getColumn("discrepancyNoteBean.id"), resword.getString("note_id"), null, null, true, true);
 		configureColumn(row.getColumn("studySubject.label"), currentStudy != null ? currentStudy
 				.getStudyParameterConfig().getStudySubjectIdLabel() : resword.getString("study_subject_ID"), null,
@@ -853,6 +857,31 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			downloadNotesLinkBuilder(studySubjectBean);
 
 			return builder.toString();
+		}
+	}
+	
+	private class DcfCellEditor implements CellEditor {
+
+		public Object getValue(Object item, String property, int rowcount) {
+			DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) ((HashMap<Object, Object>) item).get("discrepancyNoteBean");
+			HtmlBuilder builder = new HtmlBuilder();
+			if (isEligibleForDCF(dnb)) {
+				builder.append("<center>");
+				builder.input().type("checkbox").value(dnb.getId() + "").name(DCF_CHECKBOX_NAME);
+				builder.append(" class=\"dcf\" onClick=\"setAccessedObjected(this);\"");
+				builder.close().append("</center>");
+			}
+			return builder.toString();
+		}
+
+		private boolean isEligibleForDCF(DiscrepancyNoteBean dnb) {
+			DiscrepancyNoteType dnType = DiscrepancyNoteType.get(dnb.getDiscrepancyNoteTypeId());
+			ResolutionStatus dnStatus = ResolutionStatus.get(dnb.getResolutionStatusId());
+			if ((dnType.equals(DiscrepancyNoteType.QUERY) || dnType.equals(DiscrepancyNoteType.FAILEDVAL))
+					&& dnStatus.isOpen()) {
+				return true;
+			}
+			return false;
 		}
 	}
 

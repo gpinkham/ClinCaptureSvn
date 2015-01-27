@@ -23,6 +23,7 @@ import com.clinovo.dao.WidgetDAO;
 import com.clinovo.dao.WidgetsLayoutDAO;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DataEntryService;
+import com.clinovo.service.DcfService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.ReportCRFService;
@@ -31,6 +32,7 @@ import com.clinovo.service.SystemService;
 import com.clinovo.service.TermService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
+
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -92,6 +94,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.sql.DataSource;
+
 import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
@@ -223,6 +226,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected DataEntryService dataEntryService;
 	@Autowired
 	protected ReportCRFService reportCRFService;
+	@Autowired
+	protected DcfService dcfService;
 	@Autowired
 	protected MessageSource messageSource;
 

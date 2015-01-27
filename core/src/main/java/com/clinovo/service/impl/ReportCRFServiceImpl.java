@@ -213,15 +213,15 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 
 		JasperReportBuilder report = DynamicReports.report();
 		TextColumnBuilder<String> groupColumn = col.column("group", "group_column", type.stringType());
-		ColumnGroupBuilder itemGroup = grp.group(groupColumn).setStyle(DRTemplates.groupColumnConditionalStyle)
+		ColumnGroupBuilder itemGroup = grp.group(groupColumn).setStyle(DRTemplates.GROUP_COLUMN_CONDITIONAL_STYLE)
 				.addHeaderComponent(cmp.horizontalList().newRow().add(cmp.verticalGap(FIVE)))
 				.addFooterComponent(cmp.horizontalList().newRow().add(cmp.verticalGap(FIVE)));
 
 		report.title(
 				DRTemplates.getTitleComponent(titleText, DRTemplates.getDynamicReportsComponent(urlPath, sysPath)),
 				cmp.subreport(createCRFHeaderTable(values)), DRTemplates.getGapComponent()).pageFooter(
-				DRTemplates.footerComponent);
-		report.setColumnTitleStyle(DRTemplates.columnTitleStyle)
+				DRTemplates.FOOTER_COMPONENT);
+		report.setColumnTitleStyle(DRTemplates.COLUMN_TITLE_STYLE)
 				.highlightDetailEvenRows()
 				.columns(
 						groupColumn,

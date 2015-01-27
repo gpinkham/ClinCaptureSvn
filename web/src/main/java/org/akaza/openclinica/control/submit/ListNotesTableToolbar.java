@@ -37,7 +37,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 
 	private ListNotesFilter listNotesFilter;
 	
-	private final static String INDEXES_OF_COLUMNS_TO_BE_HIDDEN = "0, 5, 6, 10, 12, 15, 17, 18, 20";
+	private final static String INDEXES_OF_COLUMNS_TO_BE_HIDDEN = "1, 6, 7, 11, 13, 16, 18, 19, 21";
 
 	public ListNotesTableToolbar(boolean showMoreLink) {
 		super();

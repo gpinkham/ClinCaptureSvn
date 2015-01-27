@@ -1,16 +1,16 @@
 package org.akaza.openclinica.control.core;
 
-import com.clinovo.dao.SystemDAO;
-import com.clinovo.service.CodedItemService;
-import com.clinovo.service.DictionaryService;
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.service.EventCRFService;
-import com.clinovo.service.StudySubjectIdService;
-import com.clinovo.service.UserAccountService;
-import com.clinovo.service.WidgetService;
-import com.clinovo.service.WidgetsLayoutService;
-import com.clinovo.util.RuleSetServiceUtil;
-import com.clinovo.util.SessionUtil;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -70,15 +70,18 @@ import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import com.clinovo.dao.SystemDAO;
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DcfService;
+import com.clinovo.service.DictionaryService;
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.service.EventCRFService;
+import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.service.UserAccountService;
+import com.clinovo.service.WidgetService;
+import com.clinovo.service.WidgetsLayoutService;
+import com.clinovo.util.RuleSetServiceUtil;
+import com.clinovo.util.SessionUtil;
 
 @SuppressWarnings({ "rawtypes", "serial" })
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
@@ -227,6 +230,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private DiscrepancyDescriptionService discrepancyDescriptionService;
 	@Autowired
 	private EventCRFService eventCRFService;
+	@Autowired
+	private DcfService dcfService;
 
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
@@ -519,6 +524,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public EventCRFService getEventCRFService() {
 		return eventCRFService;
+	}
+	
+	public DcfService getDcfService() {
+		return dcfService;
 	}
 
 	public SessionLocaleResolver getLocaleResolver() {

@@ -22,6 +22,19 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -49,16 +62,11 @@ import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.jmesa.facade.TableFacade;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * View a list of all discrepancy notes in current study.
@@ -69,7 +77,10 @@ public class ViewNotesServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 1L;
 
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
 	public static final String PRINT = "print";
+	public static final String GENERATE_DCF = "generateDcf";
 	public static final String RESOLUTION_STATUS = "resolutionStatus";
 	public static final String TYPE = "discNoteType";
 	public static final String WIN_LOCATION = "window_location";
@@ -87,9 +98,17 @@ public class ViewNotesServlet extends RememberLastPage {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		String print = fp.getString(PRINT);
+		String generateDcf = fp.getString(GENERATE_DCF);
 
-		if (!print.equalsIgnoreCase("yes") && shouldRedirect(request, response)) {
+		if (!generateDcf.equalsIgnoreCase("yes") && !print.equalsIgnoreCase("yes") && shouldRedirect(request, response)) {
 			return;
+		}
+		if (generateDcf != null && generateDcf.equals("yes")) {
+			List<String> selectedNoteIds = fp.getStringArray(ListNotesTableFactory.DCF_CHECKBOX_NAME);
+			if (selectedNoteIds.size() > 0) {
+				generateDcfs(selectedNoteIds, response);
+				return;
+			}
 		}
 		UserAccountBean ub = getUserAccountBean(request);
 		removeLockedCRF(ub.getId());
@@ -264,7 +283,42 @@ public class ViewNotesServlet extends RememberLastPage {
 
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
-		return request.getQueryString() == null || !request.getQueryString().contains("&listNotes_")
-				|| request.getQueryString().contains("&print=yes");
+		return request.getQueryString() == null
+				|| !request.getQueryString().contains("&listNotes_")
+				|| request.getQueryString().contains("&print=yes")
+				|| (request.getParameter(GENERATE_DCF) != null && request.getParameter(GENERATE_DCF).equalsIgnoreCase(
+						"yes"));
+	}
+
+	private void generateDcfs(List<String> selectedNoteIds, HttpServletResponse response) {
+		List<Integer> noteIds = transformSelectedNoteIdsToInt(selectedNoteIds);
+		String dcfFile = getDcfService().generateDcf(noteIds);
+		try {
+			if (dcfFile != null) {
+				File pdfFile = new File(dcfFile);
+				response.setContentType("application/pdf");
+				response.addHeader("Content-Disposition",
+						"attachment; filename=" + dcfFile.substring(dcfFile.lastIndexOf(File.separator) + 1));
+				response.setContentLength((int) pdfFile.length());
+				FileInputStream fileInputStream = new FileInputStream(pdfFile);
+				OutputStream responseOutputStream = response.getOutputStream();
+				int bytes;
+				while ((bytes = fileInputStream.read()) != -1) {
+					responseOutputStream.write(bytes);
+				}
+				responseOutputStream.flush();
+				fileInputStream.close();
+			}
+		} catch (IOException e) {
+			logger.error("An error occurred during DCF download. Details: " + e.getMessage());
+		}
+	}
+
+	private List<Integer> transformSelectedNoteIdsToInt(List<String> selectedNoteIds) {
+		List<Integer> noteIds = new ArrayList<Integer>();
+		for (String noteId : selectedNoteIds) {
+			noteIds.add(Integer.valueOf(noteId));
+		}
+		return noteIds;
 	}
 }

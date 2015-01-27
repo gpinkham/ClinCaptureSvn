@@ -20,6 +20,19 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Connection;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -31,6 +44,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
@@ -41,17 +55,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.clinovo.model.DiscrepancyCorrectionForm;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class DiscrepancyNoteDAO extends AuditableEntityDAO {
@@ -131,6 +135,34 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.INT);
 		this.setTypeExpected(3, TypeNames.INT);
+	}
+	
+	/**
+	 * Sets expected types for DCF query.
+	 */
+	public void setDcfTypesExpected() {
+		int index = 1;
+		this.unsetTypeExpected();
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
 	}
 
 	/**
@@ -2450,5 +2482,109 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 
 		return returnedNotelist;
+	}
+	
+	/**
+	 * Gets list of DiscrepancyCorrectionForms by note Ids.
+	 * 
+	 * @param noteIds
+	 *            int...
+	 * @return List of DiscrepancyCorrectionForms
+	 */
+	public List<DiscrepancyCorrectionForm> getDiscrepancyCorrectionFormsByNoteIds(Integer... noteIds) {
+		this.setDcfTypesExpected();
+		List<DiscrepancyCorrectionForm> dcfs = new ArrayList<DiscrepancyCorrectionForm>();
+		if (noteIds.length > 0) {
+			String query = buildDcfQuery(commaDelimitNoteIds(noteIds));
+			List<HashMap> resultRows = select(query, new HashMap());
+			for (HashMap resultRow : resultRows) {
+				dcfs.add(extractDfcFromResultRow(resultRow));
+			}
+		}
+		return dcfs;
+	}
+
+	private String buildDcfQuery(String commaDelimitedNoteIds) {
+		final String where = "\nWHERE dn.discrepancy_note_id IN (".concat(commaDelimitedNoteIds).concat(")");
+		final String union = "\n\nUNION\n\n";
+		StringBuilder query = new StringBuilder(digester.getQuery("findDcfsByNoteIdsForItemDataDNs")).append(where)
+				.append(union).append(digester.getQuery("findDcfsByNoteIdsForStudyEventDNs")).append(where)
+				.append(union).append(digester.getQuery("findDcfsByNoteIdsForEventCrfDNs")).append(where).append(union)
+				.append(digester.getQuery("findDcfsByNoteIdsForStudySubjectDNs")).append(where).append(union)
+				.append(digester.getQuery("findDcfsByNoteIdsForSubjectDNs")).append(where);
+		return query.toString();
+	}
+
+	private DiscrepancyCorrectionForm extractDfcFromResultRow(HashMap resultRow) {
+		int resolutionStatus = (Integer) resultRow.get("resolution_status_id");
+		int pageNumber = (Integer) resultRow.get("page_number");
+		DiscrepancyCorrectionForm dcf = new DiscrepancyCorrectionForm();
+		dcf.setCrfItemName(resultRow.get("item_name").toString().trim());
+		dcf.setCrfItemValue(getCrfItemValue(resultRow));
+		dcf.setCrfName(resultRow.get("crf_name").toString().trim());
+		dcf.setEventName(resultRow.get("event_name").toString().trim());
+		dcf.setInvestigatorName(resultRow.get("investigator").toString().trim());
+		dcf.setNoteDate((Date) resultRow.get("date_created"));
+		dcf.setNoteId((Integer) resultRow.get("discrepancy_note_id"));
+		dcf.setNoteType(DiscrepancyNoteType.get((Integer) resultRow.get("discrepancy_note_type_id")).getName().trim());
+		if (pageNumber > 0) {
+			dcf.setPage(pageNumber);
+		}
+		dcf.setQuestionToSite(getQuestionToSite(resultRow));
+		if (resolutionStatus < 0) {
+			dcf.setResolutionStatus("");
+		} else {
+			dcf.setResolutionStatus(ResolutionStatus.get(resolutionStatus).getName());
+		}
+		dcf.setSiteName(resultRow.get("site_name").toString().trim());
+		dcf.setSiteOID(resultRow.get("site_oid").toString().trim());
+		dcf.setStudyName(resultRow.get("study_name").toString().trim());
+		dcf.setStudyProtocolID(resultRow.get("study_protocol").toString().trim());
+		dcf.setSubjectId(resultRow.get("subject_id").toString().trim());
+		return dcf;
+	}
+
+	private String getCrfItemValue(HashMap resultRow) {
+		String itemValue = resultRow.get("item_value").toString().trim();
+		if (itemValue.length() > 0) {
+			String responseOptions = resultRow.get("options_text").toString();
+			String responseValues = resultRow.get("options_values").toString();
+			ResponseType responseType = ResponseType.get((Integer) resultRow.get("response_type_id"));
+			if (responseType.equals(ResponseType.CHECKBOX) || responseType.equals(ResponseType.RADIO)
+					|| responseType.equals(ResponseType.SELECT) || responseType.equals(ResponseType.SELECTMULTI)) {
+				return extractItemValueText(itemValue, responseOptions, responseValues);
+			}
+		}
+		return itemValue;
+	}
+
+	private String extractItemValueText(String itemValue, String responseOptions, String responseValues) {
+		String[] responseOptionsText = responseOptions.split(",");
+		String[] responseOptionsValues = responseValues.split(",");
+		int itemValueIndex = 0;
+		for (int i = 0; i < responseOptionsValues.length; i++) {
+			if (responseOptionsValues[i].trim().equals(itemValue.trim())) {
+				itemValueIndex = i;
+				break;
+			}
+		}
+		if (responseOptionsText.length > itemValueIndex) {
+			return responseOptionsText[itemValueIndex];
+		}
+		return "";
+	}
+
+	private String getQuestionToSite(HashMap resultRow) {
+		String questionToSite = resultRow.get("description").toString();
+		questionToSite = questionToSite.concat("\n").concat(resultRow.get("detailed_notes").toString());
+		return questionToSite.trim();
+	}
+
+	private String commaDelimitNoteIds(Integer... noteIds) {
+		String commaDelimitedNoteIds = "" + noteIds[0];
+		for (int i = 1; i < noteIds.length; i++) {
+			commaDelimitedNoteIds += "," + noteIds[i];
+		}
+		return commaDelimitedNoteIds;
 	}
 }

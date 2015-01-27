@@ -190,13 +190,16 @@
     <!-- End Of New Summary -->
 </div>
 
-<form  action="${pageContext.request.contextPath}/ViewNotes" style="clear:left; float:left;">
+<form action="${pageContext.request.contextPath}/ViewNotes" style="clear:left; float:left;" id="dnform">
         <input type="hidden" name="module" value="submit">
         ${viewNotesHtml}
+        <c:import url="dcfRenderType.jsp" />
     </form>
 
 
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" style="margin-top:20px"/> 
+
+<input type="button" name="btn_generate_dcf" id="btn_generate_dcf" value="<fmt:message key="dcf_generate" bundle="${resword}"/>" class="button_medium" style="margin-top:20px" />
 
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
    

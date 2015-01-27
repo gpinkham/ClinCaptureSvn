@@ -1425,5 +1425,142 @@
             AND dn.entity_type='itemData'
         </sql>
     </query>
+    <query>
+		<name>findDcfsByNoteIdsForItemDataDNs</name>
+		<sql>
+			SELECT dn.discrepancy_note_id, dn.description, dn.discrepancy_note_type_id, dn.resolution_status_id, dn.detailed_notes,
+			dn.date_created, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
+			sed.name as event_name, c.name as crf_name, i.description as item_name, id.value as item_value, rs.options_text, 
+			rs.options_values, rs.response_type_id, sec.ordinal as page_number
+			FROM discrepancy_note dn 
+			INNER JOIN dn_item_data_map dnid ON dn.discrepancy_note_id = dnid.discrepancy_note_id
+			INNER JOIN study_subject ss ON dnid.study_subject_id = ss.study_subject_id
+			INNER JOIN (
+				SELECT study_id, name as site_name, oc_oid, principal_investigator as investigator, 
+					CASE 
+						WHEN parent_study_id IS NULL THEN s1.name
+						ELSE (SELECT name FROM study WHERE study_id = s1.parent_study_id)
+					END as study_name,
+					CASE 
+						WHEN parent_study_id IS NULL THEN s1.unique_identifier
+						ELSE (SELECT unique_identifier FROM study WHERE study_id = s1.parent_study_id)
+					END as study_protocol
+				FROM study s1) s 
+			ON ss.study_id = s.study_id			
+			INNER JOIN item_data id ON dnid.item_data_id = id.item_data_id
+			INNER JOIN event_crf ec ON id.event_crf_id = ec.event_crf_id
+			INNER JOIN study_event se ON ec.study_event_id = se.study_event_id
+			INNER JOIN study_event_definition sed ON se.study_event_definition_id = sed.study_event_definition_id
+			INNER JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id
+			INNER JOIN crf c ON cv.crf_id = c.crf_id
+			INNER JOIN item i ON id.item_id = i.item_id
+			INNER JOIN item_form_metadata ifm ON id.item_id = ifm.item_id AND cv.crf_version_id = ifm.crf_version_id
+			INNER JOIN section sec ON ifm.section_id = sec.section_id
+			INNER JOIN response_set rs ON ifm.response_set_id = rs.response_set_id
+		</sql>
+	</query>
+	<query>
+		<name>findDcfsByNoteIdsForStudyEventDNs</name>
+		<sql>
+			SELECT dn.discrepancy_note_id, dn.description, dn.discrepancy_note_type_id, dn.resolution_status_id, dn.detailed_notes,
+			dn.date_created, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
+			sed.name as event_name, '' as crf_name, '' as item_name, '' as item_value, '' as options_text, '' as options_values, 
+			-1 as response_type_id, -1 as page_number
+			FROM discrepancy_note dn 
+			INNER JOIN dn_study_event_map dnse ON dn.discrepancy_note_id = dnse.discrepancy_note_id
+			INNER JOIN study_event se ON dnse.study_event_id = se.study_event_id
+			INNER JOIN study_event_definition sed ON se.study_event_definition_id = sed.study_event_definition_id
+			INNER JOIN study_subject ss ON se.study_subject_id = ss.study_subject_id
+			INNER JOIN (
+				SELECT study_id, name as site_name, oc_oid, principal_investigator as investigator, 
+					CASE 
+						WHEN parent_study_id IS NULL THEN s1.name
+						ELSE (SELECT name FROM study WHERE study_id = s1.parent_study_id)
+					END as study_name,
+					CASE 
+						WHEN parent_study_id IS NULL THEN s1.unique_identifier
+						ELSE (SELECT unique_identifier FROM study WHERE study_id = s1.parent_study_id)
+					END as study_protocol
+				FROM study s1) s 
+			ON ss.study_id = s.study_id	
+		</sql>
+	</query>
+	<query>
+		<name>findDcfsByNoteIdsForEventCrfDNs</name>
+		<sql>
+			SELECT dn.discrepancy_note_id, dn.description, dn.discrepancy_note_type_id, dn.resolution_status_id, dn.detailed_notes,
+			dn.date_created, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
+			sed.name as event_name, c.name as crf_name, '' as item_name, '' as item_value, '' as options_text, '' as options_values, 
+			-1 as response_type_id, -1 as page_number
+			FROM discrepancy_note dn 
+			INNER JOIN dn_event_crf_map dnec ON dn.discrepancy_note_id = dnec.discrepancy_note_id
+			INNER JOIN event_crf ec ON dnec.event_crf_id = ec.event_crf_id
+			INNER JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id
+			INNER JOIN crf c ON cv.crf_id = c.crf_id
+			INNER JOIN study_event se ON ec.study_event_id = se.study_event_id
+			INNER JOIN study_event_definition sed ON se.study_event_definition_id = sed.study_event_definition_id
+			INNER JOIN study_subject ss ON se.study_subject_id = ss.study_subject_id
+			INNER JOIN (
+				SELECT study_id, name as site_name, oc_oid, principal_investigator as investigator, 
+					CASE 
+						WHEN parent_study_id IS NULL THEN s1.name
+						ELSE (SELECT name FROM study WHERE study_id = s1.parent_study_id)
+					END as study_name,
+					CASE 
+						WHEN parent_study_id IS NULL THEN s1.unique_identifier
+						ELSE (SELECT unique_identifier FROM study WHERE study_id = s1.parent_study_id)
+					END as study_protocol
+				FROM study s1) s 
+			ON ss.study_id = s.study_id	
+		</sql>
+	</query>
+	<query>
+		<name>findDcfsByNoteIdsForStudySubjectDNs</name>
+		<sql>
+			SELECT dn.discrepancy_note_id, dn.description, dn.discrepancy_note_type_id, dn.resolution_status_id, dn.detailed_notes,
+			dn.date_created, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
+			'' as event_name, '' as crf_name, '' as item_name, '' as item_value, '' as options_text, '' as options_values, 
+			-1 as response_type_id, -1 as page_number
+			FROM discrepancy_note dn 
+			INNER JOIN dn_study_subject_map dnss ON dn.discrepancy_note_id = dnss.discrepancy_note_id
+			INNER JOIN study_subject ss ON dnss.study_subject_id = ss.study_subject_id
+			INNER JOIN (
+				SELECT study_id, name as site_name, oc_oid, principal_investigator as investigator, 
+					CASE 
+						WHEN parent_study_id IS NULL THEN s1.name
+						ELSE (SELECT name FROM study WHERE study_id = s1.parent_study_id)
+					END as study_name,
+					CASE 
+						WHEN parent_study_id IS NULL THEN s1.unique_identifier
+						ELSE (SELECT unique_identifier FROM study WHERE study_id = s1.parent_study_id)
+					END as study_protocol
+				FROM study s1) s 
+			ON ss.study_id = s.study_id	
+		</sql>
+	</query>
+	<query>
+		<name>findDcfsByNoteIdsForSubjectDNs</name>
+		<sql>
+			SELECT dn.discrepancy_note_id, dn.description, dn.discrepancy_note_type_id, dn.resolution_status_id, dn.detailed_notes,
+			dn.date_created, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
+			'' as event_name, '' as crf_name, '' as item_name, '' as item_value, '' as options_text, '' as options_values, 
+			-1 as response_type_id, -1 as page_number
+			FROM discrepancy_note dn 
+			INNER JOIN dn_subject_map dns ON dn.discrepancy_note_id = dns.discrepancy_note_id
+			INNER JOIN study_subject ss ON dns.subject_id = ss.subject_id AND dn.study_id = ss.study_id
+			INNER JOIN (
+				SELECT study_id, name as site_name, oc_oid, principal_investigator as investigator, 
+					CASE 
+						WHEN parent_study_id IS NULL THEN s1.name
+						ELSE (SELECT name FROM study WHERE study_id = s1.parent_study_id)
+					END as study_name,
+					CASE 
+						WHEN parent_study_id IS NULL THEN s1.unique_identifier
+						ELSE (SELECT unique_identifier FROM study WHERE study_id = s1.parent_study_id)
+					END as study_protocol
+				FROM study s1) s 
+			ON ss.study_id = s.study_id	
+		</sql>
+	</query>
 </queries>
 
