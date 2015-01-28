@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.EmailUtil;
 import com.clinovo.util.StudyParameterPriorityUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -35,6 +36,7 @@ import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.SecurityManager;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -51,6 +53,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -309,7 +312,7 @@ public class CreateUserAccountServlet extends Controller {
 			String password, String studyName) throws Exception {
 		StringBuilder sb = new StringBuilder("");
 		logger.info("Sending account creation notification to " + createdUserAccountBean.getName());
-		String body = sb.append("<html><body>").append(resword.getString("dear")).append(" ")
+		String body = sb.append(EmailUtil.getEmailBodyStart()).append(resword.getString("dear")).append(" ")
 				.append(createdUserAccountBean.getFirstName()).append(" ").append(createdUserAccountBean.getLastName())
 				.append(",<br><br>").append(restext.getString("a_new_user_account_has_been_created_for_you"))
 				.append("<br><br>").append(resword.getString("user_name")).append(": ")
@@ -318,7 +321,7 @@ public class CreateUserAccountServlet extends Controller {
 				.append(restext.getString("please_test_your_login_information_and_let")).append("<br>")
 				.append(SQLInitServlet.getSystemURL()).append(" . <br><br> ")
 				.append(respage.getString("best_system_administrator").replace("{0}", studyName))
-				.append("</body></html>").toString();
+				.append(EmailUtil.getEmailBodyEnd()).append(EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()))).toString();
 
 		sendEmail(createdUserAccountBean.getEmail().trim(), restext.getString("your_new_openclinica_account"), body,
 				false, request);

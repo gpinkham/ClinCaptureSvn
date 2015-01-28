@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -27,6 +28,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SecurityManager;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
@@ -38,8 +40,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.Locale;
 
-// allows both deletion and restoration of a study user role
+/**
+ * Allows both - locking and unlocking of a study user role.
+ */
 @SuppressWarnings({ "serial" })
 @Component
 public class UnLockUserServlet extends Controller {
@@ -48,6 +53,12 @@ public class UnLockUserServlet extends Controller {
 	public static final String ARG_USERID = "userId";
 	public static final String ARG_ACTION = "action";
 
+	/**
+	 * Get link to the current page.
+	 * @param u UserAccountBean.
+	 * @param action EntryAction.
+	 * @return String
+	 */
 	public static String getLink(UserAccountBean u, EntityAction action) {
 		return PATH + "?" + ARG_USERID + "=" + u.getId() + "&" + "&" + ARG_ACTION + "=" + action.getId();
 	}
@@ -139,7 +150,8 @@ public class UnLockUserServlet extends Controller {
 		logger.info("Sending restore and password reset notification to " + u.getName());
 		StudyBean currentStudy = getCurrentStudy(request);
 
-		String body = resword.getString("dear") + u.getFirstName() + " " + u.getLastName() + ",<br><br>";
+		String body = EmailUtil.getEmailBodyStart();
+		body += resword.getString("dear") + u.getFirstName() + " " + u.getLastName() + ",<br><br>";
 		body += restext.getString("your_account_has_been_unlocked_and_password_reset") + ":<br><br>";
 		body += resword.getString("user_name") + ": " + u.getName() + "<br>";
 		body += resword.getString("password") + ": " + password + "<br><br>";
@@ -154,6 +166,8 @@ public class UnLockUserServlet extends Controller {
 			emailParentStudy = currentStudy;
 		}
 		body += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
+		body += EmailUtil.getEmailBodyEnd();
+		body += EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
 		logger.info("Sending email...begin");
 		sendEmail(u.getEmail().trim(), restext.getString("your_new_openclinica_account_has_been_restored"), body,
 				false, request);

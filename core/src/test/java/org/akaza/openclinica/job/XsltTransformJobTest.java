@@ -97,6 +97,6 @@ public class XsltTransformJobTest extends DefaultAppContextTest {
 		PowerMockito.when(messageSource.getMessage(errorMessage, null, new Locale("en-US"))).thenReturn(errorMessage);
 		xsltTransformJob.executeInternal(context);
 		Mockito.verify(openClinicaMailSender).sendEmail(Mockito.anyString(), Mockito.anyString(),
-				Mockito.contains(errorMessage), Mockito.anyString(), Mockito.anyBoolean());
+				Mockito.anyString(), Mockito.contains(errorMessage), Mockito.anyBoolean());
 	}
 }

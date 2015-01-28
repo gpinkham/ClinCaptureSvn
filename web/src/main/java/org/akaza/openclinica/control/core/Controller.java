@@ -136,7 +136,7 @@ import java.util.StringTokenizer;
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public abstract class Controller extends BaseController {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	public final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	public static final String CW = "cw";
 	public static final String CC_DATE_FORMAT = "ccDateFormat";
@@ -674,6 +674,13 @@ public abstract class Controller extends BaseController {
 		timingMap.put("prospective", resadmin.getString("prospective"));
 	}
 
+	/**
+	 * This method is used to handle request and resend it to doGet or doPost methods.
+	 * @param request the HttpServletRequest.
+	 * @param response the HttpServletResponse.
+	 * @throws ServletException in case if servlet encounters difficulty.
+	 * @throws IOException will be thrown in case of failed or interrupted I/O operations.
+	 */
 	public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		if (request.getMethod().equalsIgnoreCase("GET")) {
@@ -685,13 +692,11 @@ public abstract class Controller extends BaseController {
 
 	/**
 	 * Handles the HTTP <code>GET</code> method.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 * @throws ServletException
-	 * @throws java.io.IOException
+	 *
+	 * @param request the HttpServletRequest.
+	 * @param response the HttpServletResponse.
+	 * @throws ServletException in case if servlet encounters difficulty.
+	 * @throws IOException will be thrown in case of failed or interrupted I/O operations.
 	 */
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
@@ -710,11 +715,11 @@ public abstract class Controller extends BaseController {
 
 	/**
 	 * Handles the HTTP <code>POST</code> method.
-	 * 
-	 * @param request
-	 *            servlet request
-	 * @param response
-	 *            servlet response
+	 *
+	 * @param request the HttpServletRequest.
+	 * @param response the HttpServletResponse.
+	 * @throws ServletException in case if servlet encounters difficulty.
+	 * @throws IOException will be thrown in case of failed or interrupted I/O operations.
 	 */
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
@@ -882,21 +887,40 @@ public abstract class Controller extends BaseController {
 		return false;
 	}
 
+	/**
+	 * This method is used to get request URL without name of the servlet in the path.
+	 * @param request the HttpServletRequest from which path will be take.
+	 * @return system URL without servlet path.
+	 */
 	public String getRequestURLMinusServletPath(HttpServletRequest request) {
 		return request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
 	}
 
+	/**
+	 * This method returns host URL.
+	 * @param request the HttpServletRequest from which URL will be take.
+	 * @return host URL.
+	 */
 	public String getHostPath(HttpServletRequest request) {
 		String requestURLMinusServletPath = getRequestURLMinusServletPath(request);
 		return requestURLMinusServletPath.substring(0, requestURLMinusServletPath.lastIndexOf("/"));
 	}
 
+	/**
+	 * This method returns context path.
+	 * @param request the HttpServletRequest from which path will be take.
+	 * @return context path.
+	 */
 	public String getContextPath(HttpServletRequest request) {
 		return request.getContextPath().replaceAll("/", "");
 	}
 
-	/*
-	 * To check if the current study is LOCKED
+	/**
+	 * Checks if the current study is LOCKED.
+	 * @param page the Page object.
+	 * @param message message that will be shown in the Alerts and Messages panel.
+	 * @param request the HttpServletRequest.
+	 * @param response the HttpServletResponse.
 	 */
 	public void checkStudyLocked(Page page, String message, HttpServletRequest request, HttpServletResponse response) {
 		if (getCurrentStudy(request).getStatus().equals(Status.LOCKED)) {
@@ -905,6 +929,13 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
+	/**
+	 * Checks if study is Locked using URL.
+	 * @param url String.
+	 * @param message message that will be shown in the Alerts and Messages panel.
+	 * @param request the HttpServletRequest.
+	 * @param response the HttpServletResponse.
+	 */
 	public void checkStudyLocked(String url, String message, HttpServletRequest request, HttpServletResponse response) {
 		try {
 			if (getCurrentStudy(request).getStatus().equals(Status.LOCKED)) {
@@ -916,10 +947,13 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
-	/*
-	 * To check if the current study is FROZEN
+	/**
+	 * Checks if study is Frozen.
+	 * @param page Page object.
+	 * @param message message that will be shown in the Alerts and Messages panel.
+	 * @param request the HttpServletRequest.
+	 * @param response the HttpServletResponse.
 	 */
-
 	public void checkStudyFrozen(Page page, String message, HttpServletRequest request, HttpServletResponse response) {
 		if (getCurrentStudy(request).getStatus().equals(Status.FROZEN)) {
 			addPageMessage(message, request);
@@ -927,6 +961,13 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
+	/**
+	 * Check if study is Frozen using URL.
+	 * @param url String.
+	 * @param message message that will be shown in the Alerts and Messages panel.
+	 * @param request the HttpServletRequest.
+	 * @param response the HttpServletResponse.
+	 */
 	public void checkStudyFrozen(String url, String message, HttpServletRequest request, HttpServletResponse response) {
 		try {
 			if (getCurrentStudy(request).getStatus().equals(Status.FROZEN)) {
@@ -939,6 +980,11 @@ public abstract class Controller extends BaseController {
 
 	}
 
+	/**
+	 * Get list of Events Definitions by current Study.
+	 * @param request the HttpServletRequest.
+	 * @return ArrayList.
+	 */
 	public ArrayList getEventDefinitionsByCurrentStudy(HttpServletRequest request) {
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyDAO studyDAO = getStudyDAO();
@@ -954,6 +1000,11 @@ public abstract class Controller extends BaseController {
 		return allDefs;
 	}
 
+	/**
+	 * Get list of Study Group Classes by Current Study.
+	 * @param request the HttpServletRequest.
+	 * @return ArrayList.
+	 */
 	public ArrayList getStudyGroupClassesByCurrentStudy(HttpServletRequest request) {
 		getSessionManager(request);
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -976,9 +1027,13 @@ public abstract class Controller extends BaseController {
 		}
 
 		return studyGroupClasses;
-
 	}
 
+	/**
+	 * Get list of Dynamic Groups by study ID.
+	 * @param studyId int.
+	 * @return List.
+	 */
 	public List<StudyGroupClassBean> getDynamicGroupClassesByStudyId(int studyId) {
 
 		ListIterator it;
@@ -1002,6 +1057,10 @@ public abstract class Controller extends BaseController {
 		return dynamicGroupClasses;
 	}
 
+	/**
+	 * Get UserDetails from Context.
+	 * @return UserDetails.
+	 */
 	protected UserDetails getUserDetails() {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (principal instanceof UserDetails) {
@@ -1011,6 +1070,17 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
+	/**
+	 * Send an email.
+	 * @param to String.
+	 * @param subject String.
+	 * @param body String.
+	 * @param htmlEmail Boolean.
+	 * @param sendMessage Boolean.
+	 * @param request HttpServletRequest.
+	 * @return result of the attempt.
+	 * @throws Exception if there was an error while attempt to send email.
+	 */
 	public Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail, Boolean sendMessage,
 			HttpServletRequest request) throws Exception {
 		return sendEmail(to, EmailEngine.getAdminEmail(), subject, body, htmlEmail,
@@ -1018,6 +1088,16 @@ public abstract class Controller extends BaseController {
 				sendMessage, request);
 	}
 
+	/**
+	 * Send an email.
+	 * @param to String.
+	 * @param subject String.
+	 * @param body String.
+	 * @param htmlEmail Boolean.
+	 * @param request HttpServletRequest.
+	 * @return result of the attempt.
+	 * @throws Exception if there was an error while attempt to send email.
+	 */
 	public Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail, HttpServletRequest request)
 			throws Exception {
 		return sendEmail(to, EmailEngine.getAdminEmail(), subject, body, htmlEmail,
@@ -1025,12 +1105,37 @@ public abstract class Controller extends BaseController {
 				true, request);
 	}
 
+	/**
+	 * Send an email.
+	 * @param to String.
+	 * @param from String.
+	 * @param subject String.
+	 * @param body String.
+	 * @param htmlEmail Boolean.
+	 * @param request HttpServletRequest.
+	 * @return result of the attempt.
+	 * @throws Exception if there was an error while attempt to send email.
+	 */
 	public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail,
 			HttpServletRequest request) throws Exception {
 		return sendEmail(to, from, subject, body, htmlEmail, respage.getString("your_message_sent_succesfully"),
 				respage.getString("mail_cannot_be_sent_to_admin"), true, request);
 	}
 
+	/**
+	 * Send an email with success message and fail message.
+	 * @param to String.
+	 * @param from String.
+	 * @param subject String.
+	 * @param body String.
+	 * @param htmlEmail Boolean.
+	 * @param successMessage String.
+	 * @param failMessage String
+	 * @param sendMessage Boolean.
+	 * @param request HttpServletRequest.
+	 * @return result of the attempt.
+	 * @throws Exception if there was an error while attempt to send email.
+	 */
 	public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail,
 			String successMessage, String failMessage, Boolean sendMessage, HttpServletRequest request)
 			throws Exception {
@@ -1038,6 +1143,21 @@ public abstract class Controller extends BaseController {
 				new String[0], request);
 	}
 
+	/**
+	 * Send an email with fail message, success message and attached files.
+	 * @param to String.
+	 * @param from String.
+	 * @param subject String.
+	 * @param body String.
+	 * @param htmlEmail Boolean.
+	 * @param successMessage String.
+	 * @param failMessage String.
+	 * @param sendMessage Boolean.
+	 * @param files String[].
+	 * @param request HttpServletRequest.
+	 * @return result of the attempt.
+	 * @throws Exception if there was an error while attempt to send email.
+	 */
 	public Boolean sendEmailWithAttach(String to, String from, String subject, String body, Boolean htmlEmail,
 			String successMessage, String failMessage, Boolean sendMessage, String[] files, HttpServletRequest request)
 			throws Exception {
@@ -1072,6 +1192,12 @@ public abstract class Controller extends BaseController {
 		return messageSent;
 	}
 
+	/**
+	 * Process Multiple Email Addresses.
+	 * @param to list of the recipients.
+	 * @return InternetAddress[].
+	 * @throws MessagingException if there was an error.
+	 */
 	private InternetAddress[] processMultipleImailAddresses(String to) throws MessagingException {
 		ArrayList<String> recipientsArray = new ArrayList<String>();
 		StringTokenizer st = new StringTokenizer(to, ",");
@@ -1088,6 +1214,14 @@ public abstract class Controller extends BaseController {
 
 	}
 
+	/**
+	 * Download file.
+	 * @param f File.
+	 * @param contentType String.
+	 * @param request HttpServletRequest.
+	 * @param response HttpServletResponse.
+	 * @throws Exception if there was some error.
+	 */
 	public void dowloadFile(File f, String contentType, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
@@ -1125,6 +1259,11 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
+	/**
+	 * Get name of the page Servlet.
+	 * @param request HttpServletRequest.
+	 * @return String name of the page Servlet.
+	 */
 	public String getPageServletFileName(HttpServletRequest request) {
 		String fileName = request.getServletPath();
 		String temp = request.getPathInfo();
@@ -1138,6 +1277,11 @@ public abstract class Controller extends BaseController {
 		return fileName;
 	}
 
+	/**
+	 * Get URL of the current page.
+	 * @param request the HttpServletRequest.
+	 * @return page URL.
+	 */
 	public String getPageURL(HttpServletRequest request) {
 		String url = request.getRequestURL().toString();
 		String query = request.getQueryString();
@@ -1147,6 +1291,12 @@ public abstract class Controller extends BaseController {
 		return url;
 	}
 
+	/**
+	 * Get DiscrepancyNote info.
+	 * @param request the HttpServletRequest.
+	 * @param note the DiscrepancyNoteBean.
+	 * @return DiscrepancyNoteBean with info.
+	 */
 	public DiscrepancyNoteBean getNoteInfo(HttpServletRequest request, DiscrepancyNoteBean note) {
 
 		StudySubjectDAO ssdao = getStudySubjectDAO();
@@ -1239,6 +1389,14 @@ public abstract class Controller extends BaseController {
 		return note;
 	}
 
+	/**
+	 * Check if user have role in the current study.
+	 * @param request the HttpServletRequest.
+	 * @param response the HttpServletResponse.
+	 * @param ub the UserAccountBean.
+	 * @param studyId int.
+	 * @param siteId int.
+	 */
 	public void checkRoleByUserAndStudy(HttpServletRequest request, HttpServletResponse response, UserAccountBean ub,
 			int studyId, int siteId) {
 		StudyUserRoleBean studyUserRole = ub.getRoleByStudy(studyId);
@@ -1280,6 +1438,10 @@ public abstract class Controller extends BaseController {
 		return calendar.getTime();
 	}
 
+	/**
+	 * Populate Custom Elements Config from request.
+	 * @param request the HttpServletRequest.
+	 */
 	public void populateCustomElementsConfig(HttpServletRequest request) {
 		StudyBean study = (StudyBean) request.getSession().getAttribute(STUDY);
 		if (study != null) {
@@ -1293,6 +1455,10 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
+	/**
+	 * Set domain name to the Session and CoreResources.
+	 * @param request the HttpServletRequest.
+	 */
 	public static void setDomainName(HttpServletRequest request) {
 		String domainName = request.getParameter(DOMAIN_NAME);
 
@@ -1301,8 +1467,15 @@ public abstract class Controller extends BaseController {
 		} else {
 			request.getSession().setAttribute(DOMAIN_NAME, request.getServerName());
 		}
+		CoreResources.setDomainName(domainName);
 	}
 
+	/**
+	 * Get value from hash map.
+	 * @param h the HashMap.
+	 * @param key Integer key.
+	 * @return value.
+	 */
 	public int getIntById(HashMap h, Integer key) {
 		Integer value = (Integer) h.get(key);
 		if (value == null) {
@@ -1312,6 +1485,11 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
+	/**
+	 * Get action depending on DataEntryStage.
+	 * @param stage DataEntryStage.
+	 * @return String action.
+	 */
 	public String getActionForStage(DataEntryStage stage) {
 		if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
 			return ACTION_CONTINUE_INITIAL_DATA_ENTRY;
@@ -1325,6 +1503,13 @@ public abstract class Controller extends BaseController {
 		return "";
 	}
 
+	/**
+	 * Get ArrayList of sections.
+	 * @param ecb EventCRFBean.
+	 * @param sdao SectionDAO.
+	 * @param igdao ItemGroupDAO.
+	 * @return an ArrayList of Sections.
+	 */
 	public ArrayList getSections(EventCRFBean ecb, SectionDAO sdao, ItemGroupDAO igdao) {
 		HashMap numItemsBySectionId = sdao.getNumItemsBySectionId();
 		HashMap numItemsPlusRepeatBySectionId = sdao.getNumItemsPlusRepeatBySectionId(ecb);
@@ -1366,6 +1551,11 @@ public abstract class Controller extends BaseController {
 		return sections;
 	}
 
+	/**
+	 * Get ArrayList of sections by CRF version ID.
+	 * @param crfVersionId int.
+	 * @return ArrayList of sections.
+	 */
 	public ArrayList getSectionsByCrfVersionId(int crfVersionId) {
 		SectionDAO sdao = getSectionDAO();
 
@@ -1383,6 +1573,11 @@ public abstract class Controller extends BaseController {
 		return sections;
 	}
 
+	/**
+	 * Get DisplayBean by CRF version ID.
+	 * @param crfVersionId int.
+	 * @return DisplayTableOfContentsBean.
+	 */
 	public DisplayTableOfContentsBean getDisplayBeanByCrfVersionId(int crfVersionId) {
 		DisplayTableOfContentsBean answer = new DisplayTableOfContentsBean();
 
@@ -1404,6 +1599,11 @@ public abstract class Controller extends BaseController {
 		return answer;
 	}
 
+	/**
+	 * Get DisplayBean by EventCRFBean.
+	 * @param ecb EventCRFBean.
+	 * @return DisplayTableOfContentsBean.
+	 */
 	public DisplayTableOfContentsBean getDisplayBean(EventCRFBean ecb) {
 		DisplayTableOfContentsBean answer = new DisplayTableOfContentsBean();
 
@@ -1633,6 +1833,15 @@ public abstract class Controller extends BaseController {
 		return answer;
 	}
 
+	/**
+	 * Get DisplayStudyEventBean by subject.
+	 * @param studySub StudySubjectBean.
+	 * @param ds DataSource.
+	 * @param ub UserAccountBean.
+	 * @param currentRole StudyUserRoleBean.
+	 * @param excludeEventDefinishionsRemoved boolean.
+	 * @return ArrayList of DisplayStidyEventBean.
+	 */
 	public ArrayList<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySub,
 			DataSource ds, UserAccountBean ub, StudyUserRoleBean currentRole, boolean excludeEventDefinishionsRemoved) {
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();

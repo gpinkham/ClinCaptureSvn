@@ -13,12 +13,14 @@
 
 package org.akaza.openclinica.job;
 
+import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExportFormatBean;
 import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.ProcessingFunction;
@@ -144,6 +146,8 @@ public class XsltTransformJob extends QuartzJobBean {
 	private static final int UTF8_ENCODING_BYTE_3 = 191;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private ResourceBundle words;
+	private ResourceBundle pageMessages;
 
 	/**
 	 * Class that holds info about files.
@@ -182,10 +186,10 @@ public class XsltTransformJob extends QuartzJobBean {
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		boolean reportAboutException = true;
-		Locale locale = new Locale("en-US");
+		Locale locale = new Locale(CoreResources.getSystemLanguage());
 		ResourceBundleProvider.updateLocale(locale);
-		ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
-		ResourceBundle words = ResourceBundleProvider.getWordsBundle();
+		pageMessages = ResourceBundleProvider.getPageMessagesBundle();
+		words = ResourceBundleProvider.getWordsBundle();
 		List<File> markForDelete = new LinkedList<File>();
 		Boolean zipped;
 		Boolean deleteOld = true;
@@ -236,6 +240,7 @@ public class XsltTransformJob extends QuartzJobBean {
 			String generalFileDir = dataMap.getString(XML_FILE_PATH);
 
 			int dsId = dataMap.getInt(DATASET_ID);
+			CoreResources.getSystemURL();
 
 			ExtractPropertyBean epBean = (ExtractPropertyBean) dataMap.get(EP_BEAN);
 			boolean sasDatasetJob = epBean.getId() == SAS_DATASET_JOB_ID
@@ -263,6 +268,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
 			String subject = "";
 			StringBuffer emailBuffer = new StringBuffer("");
+			emailBuffer.append(EmailUtil.getEmailBodyStart());
 			String jobName = dataMap.getString(XsltTriggerService.JOB_NAME);
 
 			datasetBean = (DatasetBean) dsdao.findByPK(dsId);
@@ -294,7 +300,7 @@ public class XsltTransformJob extends QuartzJobBean {
 							jobName != null ? jobName : datasetBean.getName(), sasTimer, sasTimer > 1 ? "s" : "" },
 							locale));
 				}
-				emailBuffer = (StringBuffer) dataMap.get(SAS_EMAIL_BUFFER);
+				emailBuffer.append((StringBuffer) dataMap.get(SAS_EMAIL_BUFFER));
 				String sasOdmOutputPath = (String) dataMap.get(SAS_ODM_OUTPUT_PATH);
 				String nextFireTimeStr = simpleDateFormat.format(nextFireTime);
 				if (!sasJobDirFile.exists()) {
@@ -700,6 +706,8 @@ public class XsltTransformJob extends QuartzJobBean {
 			emailBuffer.append("<p>")
 					.append(pageMessages.getString("html_email_body_5").replace("{0}", emailParentStudy.getName()))
 					.append("</p>");
+			emailBuffer.append(EmailUtil.getEmailBodyEnd());
+			emailBuffer.append(EmailUtil.getEmailFooter(locale));
 			try {
 
 				if ((null != dataMap.get("job_type"))
@@ -734,33 +742,32 @@ public class XsltTransformJob extends QuartzJobBean {
 			postSuccessMessage(successMsg, context);
 			logMe(emailBuffer.toString());
 		} catch (TransformerConfigurationException e) {
-			sendErrorEmail(e.getMessage(), context, alertEmail);
+			sendErrorEmail(e.getMessage(), context);
 			postErrorMessage(e.getMessage(), context);
 			e.printStackTrace();
 			logger.error("Error has occurred.", e);
 			exceptions = true;
 		} catch (FileNotFoundException e) {
-			sendErrorEmail(e.getMessage(), context, alertEmail);
+			sendErrorEmail(e.getMessage(), context);
 			postErrorMessage(e.getMessage(), context);
 			e.printStackTrace();
 			logger.error("Error has occurred.", e);
 			exceptions = true;
 		} catch (TransformerFactoryConfigurationError e) {
-			sendErrorEmail(e.getMessage(), context, alertEmail);
+			sendErrorEmail(e.getMessage(), context);
 			postErrorMessage(e.getMessage(), context);
 			e.printStackTrace();
 			logger.error("Error has occurred.", e);
 			exceptions = true;
 		} catch (TransformerException e) {
-			sendErrorEmail(e.getMessage(), context, alertEmail);
+			sendErrorEmail(e.getMessage(), context);
 			postErrorMessage(e.getMessage(), context);
 			e.printStackTrace();
 			logger.error("Error has occurred.", e);
 			exceptions = true;
 		} catch (Exception ee) {
 			if (reportAboutException) {
-				sendErrorEmail(ee.getMessage(), sasSideHasErrors ? sasErrors.replaceAll("\n", "<br/>") : null, context,
-						alertEmail);
+				sendErrorEmail(ee.getMessage(), sasSideHasErrors ? sasErrors.replaceAll("\n", "<br/>") : null, context);
 				postErrorMessage(!sasExtractJob && sasSideHasErrors ? sasExceptionMessage : ee.getMessage(),
 						sasSideHasErrors && sasExtractJob ? sasErrors.replaceAll("\n", "<br/>") : null, context);
 			}
@@ -1150,17 +1157,88 @@ public class XsltTransformJob extends QuartzJobBean {
 		return (ArchivedDatasetFileBean) asdfDAO.create(fbInitial);
 	}
 
-	private void sendErrorEmail(String message, String additionalBody, JobExecutionContext context, String target) {
-		String subject = "Warning: " + message;
-		String emailBody = "An exception was thrown while running an extract job on your server, please see the logs for more details."
-				.concat(additionalBody != null ? additionalBody : "");
+	private void sendErrorEmail(String message, String additionalBody, JobExecutionContext context) {
+		String emailText = "";
+		JobDataMap dataMap = context.getMergedJobDataMap();
+		Locale locale = new Locale(CoreResources.getSystemLanguage());
+		// Daos initialization
+		StudyDAO studyDAO = new StudyDAO(dataSource);
+		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+		DatasetDAO datasetDAO = new DatasetDAO(dataSource);
+		// Main fields of the email
+		String subject = words.getString("job_error_mail.subject");
+		String newLine = "<br>";
+		String listItemClosing = "</li>";
+		String listStart = "<ul>";
+		String to = dataMap.getString(EMAIL);
+		// Add heading of the email
+		emailText += EmailUtil.getEmailBodyStart();
+		emailText += words.getString("job_error_mail.greeting");
+		// Add general information about user
+		int userBeanId = dataMap.getInt(USER_ID);
+		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(userBeanId);
+		emailText += " " + userBean.getFirstName() + " " + userBean.getLastName() + newLine + newLine;
+		// Add body of the email
+		emailText += words.getString("job_error_mail.body") + newLine;
+		emailText += listStart;
+		// Add server url
+		emailText += words.getString("job_error_mail.serverUrl");
+		emailText += " " + CoreResources.getDomainName() + "." + listItemClosing;
+		// Add information about study/site
+		int studyId = dataMap.getInt(STUDY_ID);
+		if (studyId != 0) {
+			StudyBean studyBean = (StudyBean) studyDAO.findByPK(studyId);
+			emailText += words.getString("job_error_mail.studyName");
+			if (studyBean.isSite()) {
+				emailText += " " + studyBean.getParentStudyName() + listItemClosing;
+				emailText += words.getString("job_error_mail.siteName");
+			} else {
+				emailText += " " + studyBean.getName() + listItemClosing;
+			}
+		}
+		// Add additional information about user
+		emailText += words.getString("job_error_mail.userName");
+		emailText += " " + userBean.getName() + listItemClosing;
+		emailText += words.getString("job_error_mail.userEmail");
+		emailText += " " + userBean.getEmail() + listItemClosing;
+		// If information about study is present
+		if (studyId != 0) {
+			StudyUserRoleBean role = userBean.getRoleByStudy(studyId);
+			emailText += words.getString("job_error_mail.userRole");
+			emailText += " " + role.getRoleName() + listItemClosing;
+		}
+		// Add information about Job
+		String jobName = dataMap.getString(XsltTriggerService.JOB_NAME);
+		if (jobName != null && !jobName.isEmpty()) {
+			emailText += words.getString("job_error_mail.jobName");
+			emailText += " " + dataMap.getString(XsltTriggerService.JOB_NAME) + listItemClosing;
+		}
+		// Add information about file name
+		String fileName = dataMap.getString(XsltTriggerService.POST_FILE_NAME);
+		if (fileName != null && !fileName.isEmpty()) {
+			emailText += words.getString("job_error_mail.fileName");
+			emailText += " " + fileName + listItemClosing;
+		}
+		// Add information about dataset
+		int dsId = dataMap.getInt(DATASET_ID);
+		DatasetBean datasetBean = (DatasetBean) datasetDAO.findByPK(dsId);
+		if (datasetBean != null && datasetBean.getName() != null) {
+			emailText += words.getString("job_error_mail.datasetName");
+			emailText += " " + datasetBean.getName() + listItemClosing;
+		}
+		emailText += words.getString("job_error_mail.error");
+		emailText += " " + message + listItemClosing;
+		if (additionalBody != null && !additionalBody.isEmpty()) {
+			emailText += words.getString("job_error_mail.additionalInfo");
+			emailText += " " + additionalBody + listItemClosing;
+		}
+		emailText += "</ul>" + EmailUtil.getEmailBodyEnd();
+		emailText += EmailUtil.getEmailFooter(locale);
 		try {
 			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
 					.get("applicationContext");
 			mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
-
-			mailSender.sendEmail(target, EmailEngine.getAdminEmail(), subject, emailBody, false);
-			logger.trace("sending an email to " + target + " from " + EmailEngine.getAdminEmail());
+			mailSender.sendEmail(to, EmailEngine.getAdminEmail(), subject, emailText, true);
 		} catch (SchedulerException se) {
 			se.printStackTrace();
 		} catch (OpenClinicaSystemException ose) {
@@ -1168,8 +1246,8 @@ public class XsltTransformJob extends QuartzJobBean {
 		}
 	}
 
-	private void sendErrorEmail(String message, JobExecutionContext context, String target) {
-		sendErrorEmail(message, null, context, target);
+	private void sendErrorEmail(String message, JobExecutionContext context) {
+		sendErrorEmail(message, null, context);
 	}
 
 	private double setFormat(double number) {
@@ -1180,5 +1258,4 @@ public class XsltTransformJob extends QuartzJobBean {
 		logger.trace("Number is" + num.setScale(THREE, BigDecimal.ROUND_HALF_UP).doubleValue());
 		return num.setScale(THREE, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
-
 }

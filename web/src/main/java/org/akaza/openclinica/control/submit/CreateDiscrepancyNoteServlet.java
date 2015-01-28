@@ -21,6 +21,7 @@
 package org.akaza.openclinica.control.submit;
 
 import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.util.EmailUtil;
 import com.clinovo.util.SessionUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -46,6 +47,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -73,6 +75,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -1162,6 +1165,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		StudyDAO studyDAO = getStudyDAO();
 		UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(note.getAssignedUserId());
 		String alertEmail = assignedUser.getEmail();
+		message.append(EmailUtil.getEmailBodyStart());
 		message.append(MessageFormat.format(respage.getString("mailDNHeader"), assignedUser.getFirstName(),
 				assignedUser.getLastName()));
 		message.append("<A HREF='").append(SQLInitServlet.getSystemURL())
@@ -1209,7 +1213,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		message.append(respage.getString("email_body_separator"));
 		message.append(respage.getString("disclaimer"));
 		message.append(respage.getString("email_body_separator"));
-		message.append(respage.getString("email_footer"));
+		message.append(EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage())));
 
 		String emailBodyString = message.toString();
 		sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(),

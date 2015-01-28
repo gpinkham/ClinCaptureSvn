@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -37,9 +38,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.Stack;
 
-// allows both deletion and remove/restore of a study user role
+/**
+ * Allows both deletion and remove/restore of a study user role.
+ */
 @SuppressWarnings({ "unchecked", "serial" })
 @Component
 public class DeleteStudyUserRoleServlet extends Controller {
@@ -48,6 +52,13 @@ public class DeleteStudyUserRoleServlet extends Controller {
 	public static final String ARG_STUDYID = "studyId";
 	public static final String ARG_ACTION = "action";
 
+	/**
+	 * Get link to the current page.
+	 * @param userId int.
+	 * @param studyId int.
+	 * @param action EntryAction.
+	 * @return String
+	 */
 	public static String getLink(int userId, int studyId, EntityAction action) {
 		return PATH + "?" + ARG_USERID + "=" + userId + "&" + ARG_STUDYID + "=" + studyId + "&" + ARG_ACTION + "="
 				+ action.getId();
@@ -129,8 +140,11 @@ public class DeleteStudyUserRoleServlet extends Controller {
 			msg.applyPattern(restext.getString("restore_role_email_message_htm"));
 		}
 
-		body = msg.format(new Object[] { user.getFirstName() + " " + user.getLastName(),
+		body = EmailUtil.getEmailBodyStart();
+		body += msg.format(new Object[] { user.getFirstName() + " " + user.getLastName(),
 				CoreResources.getField("sysURL.base"), study.getName(), user.getName(), studyUserRole.getRoleName() });
+		body += EmailUtil.getEmailBodyEnd();
+		body += EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
 		sendEmail(user.getEmail().trim(), subject, body, false, request);
 
 	}

@@ -14,6 +14,7 @@
 package org.akaza.openclinica.web.job;
 
 import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.util.EmailUtil;
 import com.clinovo.util.RuleSetServiceUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.admin.TriggerBean;
@@ -39,6 +40,7 @@ import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -203,6 +205,7 @@ public class ImportSpringJob extends QuartzJobBean {
 		triggerBean.setFiredDate(trigger.getStartTime());
 		String contactEmail = dataMap.getString(EMAIL);
 		logger.debug("=== starting to run trigger " + trigger.getName() + " ===");
+		StudyBean emailParentStudy = null;
 		try {
 			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
 					.get("applicationContext");
@@ -252,13 +255,13 @@ public class ImportSpringJob extends QuartzJobBean {
 					String message = respage.getString("import_study_frozen");
 					auditEventDAO.createRowForExtractDataJobFailure(triggerBean, message);
 					if (contactEmail != null && !"".equals(contactEmail)) {
-						StudyBean emailParentStudy;
 						if (studyBean.getParentStudyId() > 0) {
 							emailParentStudy = (StudyBean) sdao.findByPK(studyBean.getParentStudyId());
 						} else {
 							emailParentStudy = studyBean;
 						}
-						String body = respage.getString("html_email_header_1")
+						String body = EmailUtil.getEmailBodyStart()
+								+ respage.getString("html_email_header_1")
 								+ " "
 								+ contactEmail
 								+ ",<br>"
@@ -268,7 +271,9 @@ public class ImportSpringJob extends QuartzJobBean {
 								+ message
 								+ "<br/>"
 								+ respage.getString("best_system_administrator").replace("{0}",
-										emailParentStudy.getName());
+										emailParentStudy.getName())
+								+ EmailUtil.getEmailBodyEnd()
+								+ EmailUtil.getEmailFooter(locale);
 						mailSender.sendEmail(contactEmail,
 								respage.getString("job_ran_for") + " " + triggerBean.getFullName(), body, true);
 					}
@@ -323,7 +328,6 @@ public class ImportSpringJob extends QuartzJobBean {
 				}
 				try {
 					if (contactEmail != null && !"".equals(contactEmail)) {
-						StudyBean emailParentStudy;
 						if (studyBean.getParentStudyId() > 0) {
 							emailParentStudy = (StudyBean) sdao.findByPK(studyBean.getParentStudyId());
 						} else {
@@ -351,12 +355,32 @@ public class ImportSpringJob extends QuartzJobBean {
 			e.printStackTrace();
 			auditEventDAO.createRowForExtractDataJobFailure(triggerBean, e.getMessage());
 			try {
+				String msg = EmailUtil.getEmailBodyStart()
+						+ respage.getString("html_email_header_1")
+						+ " "
+						+ contactEmail
+						+ ",<br>";
+				// Add information about error
+				msg += respage.getString("your_job_ran_html")
+						+ "<br/><ul>"
+						+ resword.getString("job_error_mail.error")
+						+ e.getMessage()
+						+ "</li>";
+				// Add information about server where this error was thrown
+				msg += resword.getString("job_error_mail.serverUrl")
+						+ CoreResources.getDomainName()
+						+ "</li></ul>";
+				if (emailParentStudy != null) {
+					msg += respage.getString("best_system_administrator").replace("{0}",
+							emailParentStudy.getName());
+				}
+				msg += EmailUtil.getEmailBodyEnd()
+						+ EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
 				mailSender.sendEmail(contactEmail,
-						respage.getString("job_failure_for") + " " + triggerBean.getFullName(), e.getMessage(), true);
+						respage.getString("job_failure_for") + " " + triggerBean.getFullName(), msg, true);
 			} catch (OpenClinicaSystemException ose) {
 				// Do nothing
 				logger.error("=== throw an ocse: " + ose.getMessage());
-
 			}
 		}
 	}
@@ -368,10 +392,12 @@ public class ImportSpringJob extends QuartzJobBean {
 	}
 
 	private String generateMsg(String msg, String contactEmail, String studyName) {
-		return respage.getString("html_email_header_1") + " " + contactEmail + ",<br>"
+		return EmailUtil.getEmailBodyStart()
+				+ respage.getString("html_email_header_1") + " " + contactEmail + ",<br>"
 				+ respage.getString("your_job_ran_success_html") + "  "
 				+ respage.getString("please_review_the_data_html") + msg + "<br/>"
-				+ respage.getString("best_system_administrator").replace("{0}", studyName);
+				+ respage.getString("best_system_administrator").replace("{0}", studyName)
+				+ EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
 	}
 
 	/*

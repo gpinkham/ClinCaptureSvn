@@ -52,7 +52,7 @@ import java.util.Set;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class CoreResources implements ResourceLoaderAware {
 
-	protected final static Logger logger = LoggerFactory.getLogger(CoreResources.class);
+	private final static Logger logger = LoggerFactory.getLogger(CoreResources.class);
 
 	public static final Set<String> CALENDAR_LANGS = new HashSet<String>();
 
@@ -78,6 +78,7 @@ public class CoreResources implements ResourceLoaderAware {
 	public static String ODM_MAPPING_DIR;
 	private static boolean shouldBeRestarted;
 	private static ArrayList<ExtractPropertyBean> extractProperties;
+	private static String domainName;
 
 	private static boolean loadPropertiesFromDB(Connection connection) throws Exception {
 		boolean result = false;
@@ -869,6 +870,14 @@ public class CoreResources implements ResourceLoaderAware {
 
 	public static void setShouldBeRestarted(boolean shouldBeRestarted) {
 		CoreResources.shouldBeRestarted = shouldBeRestarted;
+	}
+
+	public static void setDomainName(String domain) {
+		domainName = domain;
+	}
+
+	public static String getDomainName() {
+		return domainName;
 	}
 
 	public static void setCopyODM(boolean copyODM) {

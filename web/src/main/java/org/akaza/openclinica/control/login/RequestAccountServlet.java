@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.login;
 
+import com.clinovo.util.EmailUtil;
 import com.clinovo.util.ValidatorHelper;
 
 import org.akaza.openclinica.bean.core.Role;
@@ -33,6 +34,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -41,15 +43,15 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Processes request of 'request a user account'
+ * Processes request of 'request a user account'.
  * 
  * @author jxu
- * 
  */
 @SuppressWarnings({ "rawtypes", "serial" })
 public class RequestAccountServlet extends Controller {
@@ -145,7 +147,7 @@ public class RequestAccountServlet extends Controller {
 	}
 
 	/**
-	 * Gets user basic info and set email to the administrator
+	 * Gets user basic info and set email to the administrator.
 	 * 
 	 * @param request
 	 * @param response
@@ -156,7 +158,7 @@ public class RequestAccountServlet extends Controller {
 		UserAccountBean ubForm = (UserAccountBean) request.getSession().getAttribute("newUserBean");
 		logger.info("Sending email...");
 		// YW << <<
-		StringBuffer email = new StringBuffer("From: " + ubForm.getEmail() + "<br>");
+		StringBuffer email = new StringBuffer(EmailUtil.getEmailBodyStart() + "From: " + ubForm.getEmail() + "<br>");
 		email.append("Sent: " + new Date() + "<br>");
 		email.append("To: " + SQLInitServlet.getField("adminEmail") + "<br>");
 		email.append("Subject: Request Account<br><br><br>");
@@ -173,6 +175,7 @@ public class RequestAccountServlet extends Controller {
 				+ ubForm.getActiveStudyId());
 		email.append("<br>" + resword.getString("other_study") + otherStudy);
 		email.append("<br>" + resword.getString("user_role_requested") + ubForm.getActiveStudyRoleName());
+		email.append(EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage())));
 		String emailBody = email.toString();
 		// YW >>
 		logger.info("Sending email...begin" + emailBody);
@@ -182,7 +185,7 @@ public class RequestAccountServlet extends Controller {
 	}
 
 	/**
-	 * Constructs userbean from request
+	 * Constructs UserBean from request.
 	 * 
 	 * @param request
 	 * @return

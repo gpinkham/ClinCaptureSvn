@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.login;
 
+import com.clinovo.util.EmailUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.login.PwdChallengeQuestion;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -32,6 +33,7 @@ import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
@@ -44,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * @author jxu
@@ -164,8 +167,7 @@ public class RequestPasswordServlet extends Controller {
 	}
 
 	/**
-	 * Gets user basic info and set email to the administrator
-	 * 
+	 * Gets user basic info and set email to the administrator.
 	 */
 	private void sendPassword(String passwd, UserAccountBean ubDB, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -180,13 +182,14 @@ public class RequestPasswordServlet extends Controller {
 		} else {
 			emailParentStudy = sBean;
 		}
-		String emailBody = "Dear " + ubDB.getFirstName() + " " + ubDB.getLastName() + ", <br><br>"
+		String emailBody = EmailUtil.getEmailBodyStart() + "Dear " + ubDB.getFirstName() + " " + ubDB.getLastName() + ", <br><br>"
 				+ restext.getString("this_email_is_from_openclinica_admin") + "<br>"
 				+ restext.getString("your_password_has_been_reset_as") + ": " + passwd + "<br><br>"
 				+ restext.getString("you_will_be_required_to_change") + " "
 				+ restext.getString("time_you_login_to_the_system") + " "
 				+ restext.getString("use_the_following_link_to_log") + ":<br>" + SQLInitServlet.getSystemURL()
-				+ "<br><br>" + respage.getString("best_system_administrator");
+				+ "<br><br>" + respage.getString("best_system_administrator") + EmailUtil.getEmailBodyEnd()
+				+ EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
 		emailBody = emailBody.replace("{0}", emailParentStudy.getName());
 		sendEmail(ubDB.getEmail().trim(), EmailEngine.getAdminEmail(), restext.getString("your_openclinica_password"),
 				emailBody, true, respage.getString("your_password_reset_new_password_emailed"),
@@ -194,6 +197,5 @@ public class RequestPasswordServlet extends Controller {
 
 		request.getSession().removeAttribute("challengeQuestions");
 		forwardPage(Page.LOGIN, request, response);
-
 	}
 }

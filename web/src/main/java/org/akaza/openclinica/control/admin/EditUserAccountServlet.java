@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.EmailUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.UserType;
@@ -29,6 +30,7 @@ import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.SecurityManager;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
@@ -48,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -95,11 +98,20 @@ public class EditUserAccountServlet extends Controller {
 	public static final String EMAIL = "contactEmail";
 	public static final String USER_ID = "user_id";
 
+	public static final int FIFTY = 50;
+	public static final int ONE_H_TWENTY = 120;
+	public static final int TWO_H_FIFTY_FIVE = 55;
+
 	private ArrayList getAllStudies() {
 		StudyDAO sdao = getStudyDAO();
 		return (ArrayList) sdao.findAll();
 	}
 
+	/**
+	 * Get link to the current page.
+	 * @param userId int.
+\	 * @return String
+	 */
 	public static String getLink(int userId) {
 		return PATH + '?' + ARG_USERID + '=' + userId;
 	}
@@ -154,18 +166,18 @@ public class EditUserAccountServlet extends Controller {
 			v.addValidation(INPUT_LAST_NAME, Validator.NO_BLANKS);
 
 			v.addValidation(INPUT_FIRST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 50);
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, FIFTY);
 			v.addValidation(INPUT_LAST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 50);
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, FIFTY);
 
 			v.addValidation(INPUT_EMAIL, Validator.NO_BLANKS);
 			v.addValidation(INPUT_EMAIL, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 120);
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, ONE_H_TWENTY);
 			v.addValidation(INPUT_EMAIL, Validator.IS_A_EMAIL);
 
 			v.addValidation(INPUT_INSTITUTION, Validator.NO_BLANKS);
 			v.addValidation(INPUT_INSTITUTION, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, TWO_H_FIFTY_FIVE);
 
 			HashMap errors = v.validate();
 
@@ -276,37 +288,6 @@ public class EditUserAccountServlet extends Controller {
 		}
 	}
 
-	// public void processRequest(HttpServletRequest request,
-	// HttpServletResponse
-	// response)
-	// throws OpenClinicaException {
-	// session = request.getSession();
-	// session.setMaxInactiveInterval(60 * 60 * 3);
-	// logger.setLevel(Level.ALL);
-	// UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
-	// try {
-	// String userName = request.getRemoteUser();
-	//
-	// sm = new SessionManager(ub, userName);
-	// ub = sm.getUserBean();
-	// if (logger.isLoggable(Level.INFO)) {
-	// logger.info("user bean from DB" + ub.getName());
-	// }
-	//
-	// SQLFactory factory = SQLFactory.getInstance();
-	// UserAccountDAO udao = getUserAccountDAO();
-	//
-	// HashMap presetValues;
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// logger.warn("OpenClinicaException::
-	// OpenClinica.control.editUserAccount:
-	// " + e.getMessage());
-	//
-	// forwardPage(Page.ERROR, request, response);
-	// }
-	// }
-
 	private void loadPresetValuesFromBean(FormProcessor fp, UserAccountBean user) {
 		fp.addPresetValue(INPUT_FIRST_NAME, user.getFirstName());
 		fp.addPresetValue(INPUT_LAST_NAME, user.getLastName());
@@ -319,8 +300,6 @@ public class EditUserAccountServlet extends Controller {
 		} else if (user.isSysAdmin()) {
 			userTypeId = UserType.SYSADMIN.getId();
 		}
-		// int userTypeId = user.isSysAdmin() ? UserType.SYSADMIN.getId() :
-		// UserType.USER.getId();
 		fp.addPresetValue(INPUT_USER_TYPE, userTypeId);
 		fp.addPresetValue(ARG_USERID, user.getId());
 		fp.addPresetValue(INPUT_RUN_WEBSERVICES, user.getRunWebservices() ? 1 : 0);
@@ -338,9 +317,6 @@ public class EditUserAccountServlet extends Controller {
 
 		String ddlbFields[] = { INPUT_USER_TYPE, INPUT_RESET_PASSWORD, INPUT_RUN_WEBSERVICES };
 		fp.setCurrentIntValuesAsPreset(ddlbFields);
-
-		// String chkFields[] = { };
-		// fp.setCurrentBoolValuesAsPreset(chkFields);
 	}
 
 	private ArrayList getUserTypes() {
@@ -348,10 +324,7 @@ public class EditUserAccountServlet extends Controller {
 		ArrayList types = UserType.toArrayList();
 		types.remove(UserType.INVALID);
 		types.remove(UserType.TECHADMIN);
-		// Ticket #229
-		// if (!ub.isTechAdmin()) {
-		// types.remove(UserType.TECHADMIN);
-		// }
+
 		return types;
 	}
 
@@ -361,7 +334,8 @@ public class EditUserAccountServlet extends Controller {
 
 		logger.info("Sending password reset notification to " + user.getName());
 
-		String body = resword.getString("dear") + " " + user.getFirstName() + " " + user.getLastName()
+		String body = EmailUtil.getEmailBodyStart();
+		body += resword.getString("dear") + " " + user.getFirstName() + " " + user.getLastName()
 				+ ",<br/><br/>\n\n";
 		body += restext.getString("your_password_has_been_reset_on_openclinica") + ":<br/><br/>\n\n";
 		body += resword.getString("user_name") + ": " + user.getName() + "<br/>\n";
@@ -377,6 +351,8 @@ public class EditUserAccountServlet extends Controller {
 			emailParentStudy = currentStudy;
 		}
 		body += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
+		body += EmailUtil.getEmailBodyEnd();
+		body += EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
 		sendEmail(user.getEmail().trim(), restext.getString("your_openclinica_account_password_reset"), body, false,
 				request);
 	}
@@ -415,7 +391,7 @@ public class EditUserAccountServlet extends Controller {
 				}
 			}
 		} catch (SchedulerException e) {
-			// TODO Auto-generated catch block
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
 	}

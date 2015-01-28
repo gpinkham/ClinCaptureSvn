@@ -20,12 +20,14 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SecurityManager;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
@@ -36,8 +38,11 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
+import java.util.Locale;
 
-// allows both deletion and restoration of a study user role
+/**
+ * Allows both deletion and restoration of a study user role.
+ */
 @SuppressWarnings("serial")
 @Component
 public class DeleteUserServlet extends Controller {
@@ -46,6 +51,12 @@ public class DeleteUserServlet extends Controller {
 	public static final String ARG_USERID = "userId";
 	public static final String ARG_ACTION = "action";
 
+	/**
+	 * Get link to the current page.
+	 * @param u UserAccountBean.
+	 * @param action EntryAction.
+	 * @return String
+	 */
 	public static String getLink(UserAccountBean u, EntityAction action) {
 		return PATH + "?" + ARG_USERID + "=" + u.getId() + "&" + "&" + ARG_ACTION + "=" + action.getId();
 	}
@@ -164,8 +175,10 @@ public class DeleteUserServlet extends Controller {
 			arguments = new Object[] { u.getFirstName() + " " + u.getLastName(), u.getName(), password,
 					SQLInitServlet.getSystemURL(), emailParentStudy.getName() };
 		}
-
-		body = msg.format(arguments);
+		body = EmailUtil.getEmailBodyStart();
+		body += msg.format(arguments);
+		body += EmailUtil.getEmailBodyEnd();
+		body += EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
 		logger.info("Sending email...begin");
 		sendEmail(u.getEmail().trim(), subject, body, false, request);
 		logger.info("Sending email...done");

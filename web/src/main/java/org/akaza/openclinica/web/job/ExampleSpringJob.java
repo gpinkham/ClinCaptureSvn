@@ -22,6 +22,7 @@ import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
+import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractBean;
@@ -81,7 +82,7 @@ public class ExampleSpringJob extends QuartzJobBean {
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		// need to generate a Locale so that user beans and other things will
 		// generate normally
-		Locale locale = new Locale("en-US");
+		Locale locale = new Locale(CoreResources.getSystemLanguage());
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
 		ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
@@ -174,6 +175,7 @@ public class ExampleSpringJob extends QuartzJobBean {
 				ExtractBean eb = generateFileService.generateExtractBean(datasetBean, activeStudy, parentStudy);
 				StringBuffer message = new StringBuffer();
 				StringBuffer auditMessage = new StringBuffer();
+				message.append(EmailUtil.getEmailBodyStart());
 				message.append("<p>" + pageMessages.getString("email_header_1") + " "
 						+ pageMessages.getString("email_header_2") + " Job Execution "
 						+ pageMessages.getString("email_header_3") + "</p>");
@@ -269,8 +271,8 @@ public class ExampleSpringJob extends QuartzJobBean {
 				}
 
 				// wrap up the message, and send the email
-				message.append("<p>" + pageMessages.getString("html_email_body_5") + "</P><P>"
-						+ pageMessages.getString("email_footer"));
+				message.append("<p>" + pageMessages.getString("html_email_body_5") + "</P>"
+						+ EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(locale));
 				try {
 					mailSender.sendEmail(alertEmail.trim(),
 							pageMessages.getString("job_ran_for") + " " + datasetBean.getName(), message.toString(),
