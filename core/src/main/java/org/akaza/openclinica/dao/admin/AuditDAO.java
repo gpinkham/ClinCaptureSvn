@@ -324,7 +324,6 @@ public class AuditDAO extends EntityDAO {
 	 */
 	public ArrayList findItemAuditEvents(int entityId, String auditTable) {
 		this.setTypesExpected();
-
 		HashMap variables = new HashMap();
 		variables.put(1, entityId);
 		variables.put(2, auditTable);
@@ -337,8 +336,19 @@ public class AuditDAO extends EntityDAO {
 			// 3 6 12 32
 			if (eb.getAuditEventTypeId() == 3 || eb.getAuditEventTypeId() == 6 || eb.getAuditEventTypeId() == 12
 					|| eb.getAuditEventTypeId() == 32) {
-				eb.setOldValue(Status.get(new Integer(eb.getOldValue())).getName());
-				eb.setNewValue(Status.get(new Integer(eb.getNewValue())).getName());
+				// If status is pending/unavailable - we should replace it by Initial/Completed
+				String oldValue = eb.getOldValue().equals("4") ?
+						Status.INITIAL.getName() :
+						eb.getOldValue().equals("2") ?
+								Status.COMPLETED.getName() :
+								Status.get(new Integer(eb.getOldValue())).getName();
+				String newValue = eb.getNewValue().equals("4") ?
+						Status.INITIAL.getName() :
+						eb.getNewValue().equals("2") ?
+								Status.COMPLETED.getName() :
+								Status.get(new Integer(eb.getNewValue())).getName();
+				eb.setOldValue(oldValue);
+				eb.setNewValue(newValue);
 			}
 
 			al.add(eb);

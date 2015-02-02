@@ -33,4 +33,9 @@ public class AuditDAOTest extends DefaultAppContextTest {
 	public void testThatFindDeletedEventCrfsDoesNotReturnNull() throws OpenClinicaException {
 		assertTrue(auditDao.findDeletedEventCrfs(1, 1) != null);
 	}
+
+	@Test
+	public void testThatFindItemAuditEventsDoesNotReturnNull() throws OpenClinicaException {
+		assertTrue(auditDao.findItemAuditEvents(1, "item_data") != null);
+	}
 }

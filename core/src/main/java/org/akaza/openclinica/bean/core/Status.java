@@ -41,10 +41,11 @@ public class Status extends Term implements Comparable {
 	public static final Status INITIAL_DATA_ENTRY_COMPLETED = new Status(13, "initial_data_entry_completed");
 	public static final Status DOUBLE_DATA_ENTRY = new Status(14, "double_data_entry");
 	public static final Status COMPLETED = new Status(15, "completed");
+	public static final Status INITIAL = new Status(16, "initial");
 
 	private static final Status[] members = { INVALID, AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED,
 			AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFIED, NOT_STARTED, DATA_ENTRY_STARTED, INITIAL_DATA_ENTRY_COMPLETED, 
-			DOUBLE_DATA_ENTRY, COMPLETED };
+			DOUBLE_DATA_ENTRY, COMPLETED, INITIAL };
 	private static List list = Arrays.asList(members);
 
 	private static final Status[] activeMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
