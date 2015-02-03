@@ -745,17 +745,8 @@
 
 			<td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
 				<select name="sdvOption<c:out value="${num}"/>" disabled>
-					<c:set var="index" value="1"/>
-					<c:forEach var="sdv" items="${sdvOptions}">
-						<c:choose>
-							<c:when test="${edc.sourceDataVerification.code == index}">
-								<option value="${index}" selected disabled><c:out value="${sdv}"/>
-							</c:when>
-							<c:otherwise>
-								<option value="${index}" disabled><c:out value="${sdv}"/>
-							</c:otherwise>
-						</c:choose>
-						<c:set var="index" value="${index+1}"/>
+					<c:forEach var="sdv" items="${edc.sdvOptions}">
+						<option value="${sdv.code}" ${edc.sourceDataVerification.code == sdv.code ? "selected" : ""}><fmt:message key="${sdv.description}" bundle="${resterms}"/></option>
 					</c:forEach>
 				</select>
 			</td>

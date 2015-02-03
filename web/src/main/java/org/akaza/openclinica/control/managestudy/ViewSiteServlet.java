@@ -36,7 +36,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -46,16 +45,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
 /**
+ * ViewSiteServlet.
+ *
  * @author jxu
- * 
- *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
- *         Code Templates
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class ViewSiteServlet extends Controller {
+
 	/**
-	 * Checks whether the user has the correct privilege
+	 * Checks whether the user has the correct privilege.
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -163,13 +162,6 @@ public class ViewSiteServlet extends Controller {
 			sed.setCrfNum(defCrfs.size());
 		}
 		request.setAttribute("definitions", seds);
-		ArrayList<String> sdvOptions = new ArrayList<String>();
-		sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());
-		sdvOptions.add(SourceDataVerification.PARTIALREQUIRED.toString());
-		sdvOptions.add(SourceDataVerification.NOTREQUIRED.toString());
-		sdvOptions.add(SourceDataVerification.NOTAPPLICABLE.toString());
-		request.setAttribute("sdvOptions", sdvOptions);
-
 	}
 
 }

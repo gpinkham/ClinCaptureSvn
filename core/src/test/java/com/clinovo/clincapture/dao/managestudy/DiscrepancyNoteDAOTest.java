@@ -10,11 +10,7 @@
 
 package com.clinovo.clincapture.dao.managestudy;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.clinovo.model.DiscrepancyCorrectionForm;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -29,7 +25,10 @@ import org.akaza.openclinica.dao.managestudy.ListNotesSort;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.clinovo.model.DiscrepancyCorrectionForm;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 
@@ -259,17 +258,23 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 				notesFilter, notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(1, 4));
 	}
-	
+
 	@Test
 	public void testThatGetUserDNsReturnsCorrectSizedListOfUserDNs() {
-		assertEquals(5, discrepancyNoteDAO.getViewNotesWithFilterAndSort(study, user, new ListNotesFilter(), new ListNotesSort()).size());
+		assertEquals(
+				5,
+				discrepancyNoteDAO.getViewNotesWithFilterAndSort(study, user, new ListNotesFilter(),
+						new ListNotesSort()).size());
 	}
-	
+
 	@Test
 	public void testThatGetUserDNsReturnsEmptyListForUserWithNoDNs() {
 		UserAccountBean newUser = new UserAccountBean();
 		newUser.setId(111);
-		assertEquals(0, discrepancyNoteDAO.getViewNotesWithFilterAndSort(study, newUser, new ListNotesFilter(), new ListNotesSort()).size());
+		assertEquals(
+				0,
+				discrepancyNoteDAO.getViewNotesWithFilterAndSort(study, newUser, new ListNotesFilter(),
+						new ListNotesSort()).size());
 	}
 
 	@Test
@@ -283,18 +288,18 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 1)));
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 2)));
 	}
-	
+
 	@Test
 	public void testThatCountUserDNStatisticsReturnsCorrectSizedListOfStats() {
 		assertEquals(5, discrepancyNoteDAO.countUserNotesStatistics(study, user).size());
 	}
-	
+
 	@Test
 	public void testThatCountUserDNStatisticsReturnsEmptyListForUserWithNoDNs() {
 		UserAccountBean newUser = new UserAccountBean();
 		newUser.setId(111);
 		assertEquals(0, discrepancyNoteDAO.countUserNotesStatistics(study, newUser).size());
-	}	
+	}
 
 	@Test
 	public void testStatisticsOnStudySubjectRemoved() {
@@ -486,88 +491,96 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 
 		assertEquals("ssID1", discrepancyNoteDAO.findAllByCRFId(1).get(0).getStudySub().getLabel());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsCorrectNumberOfDCFs() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals(1, dcfs.size());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectStudyName() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals("Default Study", dcfs.get(0).getStudyName());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectSiteName() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals("Default Study", dcfs.get(0).getSiteName());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectCrfItemName() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals("Start of Agent Administration Period", dcfs.get(0).getCrfItemName());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectCrfName() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals("Agent Administration", dcfs.get(0).getCrfName());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectSubjectID() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals("ssID1", dcfs.get(0).getSubjectId());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectEventName() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals("ED-1-NonRepeating", dcfs.get(0).getEventName());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectQuestion() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals("10:00pm bedtime\n[The input you provided is not an integer.]", dcfs.get(0).getQuestionToSite());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectPageNumber() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals(1, dcfs.get(0).getPage().intValue());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectNoteId() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals(1, dcfs.get(0).getNoteId().intValue());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectNoteType() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals("Failed Validation Check", dcfs.get(0).getNoteType());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectResolutionStatus() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals("Closed", dcfs.get(0).getResolutionStatus());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectStudyProtocol() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals("default-study", dcfs.get(0).getStudyProtocolID());
 	}
-	
+
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectSiteOID() {
 		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
 		assertEquals("S_DEFAULTS1", dcfs.get(0).getSiteOID());
 	}
+
+	@Test
+	public void testThatEventCrfDoesNotHaveDNs() {
+		EventCRFBean ecb = new EventCRFBean();
+		ecb.setId(1);
+		assertFalse(discrepancyNoteDAO.doesNotHaveOutstandingDNs(ecb));
+	}
+
 }

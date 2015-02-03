@@ -5,6 +5,8 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -20,11 +22,17 @@ public class SDVControllerTest extends BaseControllerTest {
 		CURRENT_STUDY.setId(1);
 	}
 
+	@Before
+	public void before() throws Exception {
+		session.setAttribute(BaseController.USER_BEAN_NAME, new UserAccountDAO(dataSource).findByPK(1));
+	}
+
 	@Test
 	public void testThatViewSubjectAggregateHandlerReturnsCode200() throws Exception {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
-				get("/viewSubjectAggregate").param("studyId", "1").sessionAttr(BaseController.STUDY, CURRENT_STUDY)
+				get("/viewSubjectAggregate").param("studyId", "1").session(session)
+						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
 						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
 	}
 
@@ -32,16 +40,8 @@ public class SDVControllerTest extends BaseControllerTest {
 	public void testThatViewSubjectAggregateHandlerBlocksNonAdministrativeRoles() throws Exception {
 		USER_ROLE.setRole(Role.INVESTIGATOR);
 		this.mockMvc.perform(
-				MockMvcRequestBuilders.get("/viewSubjectAggregate").param("studyId", "1")
+				MockMvcRequestBuilders.get("/viewSubjectAggregate").param("studyId", "1").session(session)
 						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
-	}
-
-	@Test
-	public void testThatViewAllSubjectSDVHandlerReturnsCode200() throws Exception {
-		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
-		this.mockMvc.perform(
-				get("/viewAllSubjectSDV").param("studyId", "1").sessionAttr(BaseController.STUDY, CURRENT_STUDY)
 						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
 	}
 
@@ -49,7 +49,8 @@ public class SDVControllerTest extends BaseControllerTest {
 	public void testThatViewAllSubjectSDVTmpHandlerReturnsCode200() throws Exception {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
-				get("/viewAllSubjectSDVtmp").param("studyId", "1").sessionAttr(BaseController.STUDY, CURRENT_STUDY)
+				get("/viewAllSubjectSDVtmp").param("studyId", "1").session(session)
+						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
 						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
 	}
 
@@ -57,68 +58,60 @@ public class SDVControllerTest extends BaseControllerTest {
 	public void testThatViewAllSubjectSDVTmpHandlerBlocksNonAdministrativeRoles() throws Exception {
 		USER_ROLE.setRole(Role.INVESTIGATOR);
 		this.mockMvc.perform(
-				MockMvcRequestBuilders.get("/viewAllSubjectSDVtmp").param("studyId", "1")
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
-	}
-
-	@Test
-	public void testThatViewAllSubjectFormHandlerReturnsCode200() throws Exception {
-		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
-		this.mockMvc.perform(
-				get("/viewAllSubjectSDVform").param("studyId", "1").sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
-	}
-
-	@Test
-	public void testThatSdvAllSubjectsFormHandlerReturnsCode200() throws Exception {
-		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
-		this.mockMvc.perform(
-				get("/handleSDVPost").param("redirection", "viewAllSubjectSDVform")
+				MockMvcRequestBuilders.get("/viewAllSubjectSDVtmp").param("studyId", "1").session(session)
 						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
 						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
 	}
 
 	@Test
-	public void testThatSdvOneCRFFormHandlerReturnsCode200() throws Exception {
+	public void testThatSdvAllSubjectsFormHandlerReturnsCode302() throws Exception {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
-				get("/handleSDVGet").param("crfId", "1").param("redirection", "viewAllSubjectSDVform")
-						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
+				get("/handleSDVPost").session(session).sessionAttr(BaseController.STUDY, CURRENT_STUDY)
+						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
 	}
 
 	@Test
-	public void testThatChangeSDVHandlerReturnsCode200() throws Exception {
+	public void testThatSdvOneCRFFormHandlerReturnsCode302() throws Exception {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
-				get("/handleSDVRemove").param("crfId", "1").param("redirection", "viewAllSubjectSDVform")
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
+				get("/handleSDVGet").param("crfId", "1").session(session)
+						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
+						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
 	}
 
 	@Test
-	public void testThatSdvStudySubjectHandlerReturnsCode200() throws Exception {
+	public void testThatChangeSDVHandlerReturnsCode302() throws Exception {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
-				get("/sdvStudySubject").param("theStudySubjectId", "1").param("redirection", "viewAllSubjectSDVform")
+				get("/handleSDVRemove").param("crfId", "1").session(session)
 						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
+						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
 	}
 
 	@Test
-	public void testThatUnSdvStudySubjectHandlerReturnsCode200() throws Exception {
+	public void testThatSdvStudySubjectHandlerReturnsCode302() throws Exception {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
-				get("/unSdvStudySubject").param("theStudySubjectId", "1").param("redirection", "viewAllSubjectSDVform")
+				get("/sdvStudySubject").param("theStudySubjectId", "1").session(session)
 						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
+						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
 	}
 
 	@Test
-	public void testThatSdvStudySubjectsHandlerReturnsCode200() throws Exception {
+	public void testThatUnSdvStudySubjectHandlerReturnsCode302() throws Exception {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
-				get("/sdvStudySubjects").param("redirection", "viewAllSubjectSDVform")
+				get("/unSdvStudySubject").param("theStudySubjectId", "1").session(session)
 						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
+						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
+	}
+
+	@Test
+	public void testThatSdvStudySubjectsHandlerReturnsCode302() throws Exception {
+		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
+		this.mockMvc.perform(
+				get("/sdvStudySubjects").session(session).sessionAttr(BaseController.STUDY, CURRENT_STUDY)
+						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
 	}
 }

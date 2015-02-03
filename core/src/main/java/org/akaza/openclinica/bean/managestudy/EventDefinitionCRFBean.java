@@ -20,19 +20,19 @@
  */
 package org.akaza.openclinica.bean.managestudy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 /**
- *  The bean for event definition crf parameters
+ * The bean for event definition crf parameters.
  *
  */
-@SuppressWarnings({ "serial", "rawtypes", "unchecked" })
+@SuppressWarnings({"serial", "rawtypes", "unchecked"})
 public class EventDefinitionCRFBean extends AuditableEntityBean implements Comparable {
 
 	private boolean hideCrf = false;
@@ -63,6 +63,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	private ArrayList versions = new ArrayList(); // not in DB
 	private ArrayList<Integer> selectedVersionIdList = new ArrayList<Integer>(); // not in DB
 	private HashMap nullFlags = new LinkedHashMap(); // not in DB
+	private ArrayList<SourceDataVerification> sdvOptions = new ArrayList<SourceDataVerification>();
 
 	@Override
 	public int hashCode() {
@@ -71,21 +72,21 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		result = prime * result + ((crf == null) ? 0 : crf.hashCode());
 		result = prime * result + crfId;
 		result = prime * result + ((crfName == null) ? 0 : crfName.hashCode());
-		result = prime * result + (decisionCondition ? 1231 : 1237);
+		result = prime * result + (decisionCondition ? INT_1231 : INT_1237);
 		result = prime * result + defaultVersionId;
 		result = prime * result + ((defaultVersionName == null) ? 0 : defaultVersionName.hashCode());
-		result = prime * result + (doubleEntry ? 1231 : 1237);
-		result = prime * result + (electronicSignature ? 1231 : 1237);
+		result = prime * result + (doubleEntry ? INT_1231 : INT_1237);
+		result = prime * result + (electronicSignature ? INT_1231 : INT_1237);
 		result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
-		result = prime * result + (hidden ? 1231 : 1237);
-		result = prime * result + (hideCrf ? 1231 : 1237);
+		result = prime * result + (hidden ? INT_1231 : INT_1237);
+		result = prime * result + (hideCrf ? INT_1231 : INT_1237);
 		result = prime * result + ((nullFlags == null) ? 0 : nullFlags.hashCode());
 		result = prime * result + ((nullValues == null) ? 0 : nullValues.hashCode());
 		result = prime * result + ((nullValuesList == null) ? 0 : nullValuesList.hashCode());
 		result = prime * result + ordinal;
 		result = prime * result + parentId;
-		result = prime * result + (requireAllTextFilled ? 1231 : 1237);
-		result = prime * result + (requiredCRF ? 1231 : 1237);
+		result = prime * result + (requireAllTextFilled ? INT_1231 : INT_1237);
+		result = prime * result + (requiredCRF ? INT_1231 : INT_1237);
 		result = prime * result + ((selectedVersionIdList == null) ? 0 : selectedVersionIdList.hashCode());
 		result = prime * result + ((selectedVersionIds == null) ? 0 : selectedVersionIds.hashCode());
 		result = prime * result + ((selectedVersionNames == null) ? 0 : selectedVersionNames.hashCode());
@@ -95,7 +96,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		result = prime * result + ((versions == null) ? 0 : versions.hashCode());
 		result = prime * result + ((emailTo == null) ? 0 : emailTo.hashCode());
 		result = prime * result + ((emailStep == null) ? 0 : emailStep.hashCode());
-		result = prime * result + (evaluatedCRF ? 1231 : 1237);
+		result = prime * result + (evaluatedCRF ? INT_1231 : INT_1237);
 		return result;
 	}
 
@@ -375,17 +376,21 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		return nullValues;
 	}
 
+	/**
+	 * Method sets null values.
+	 * 
+	 * @param nullValues
+	 *            String
+	 */
 	public void setNullValues(String nullValues) {
 		this.nullValues = nullValues;
 		String[] nullValuesSeparated = nullValues.split(",");
 
 		nullValuesList = new ArrayList();
-		if (nullValuesSeparated != null) {
-			for (String val : nullValuesSeparated) {
-				org.akaza.openclinica.bean.core.NullValue nv = org.akaza.openclinica.bean.core.NullValue.getByName(val);
-				if (nv.isActive()) {
-					nullValuesList.add(nv);
-				}
+		for (String val : nullValuesSeparated) {
+			org.akaza.openclinica.bean.core.NullValue nv = org.akaza.openclinica.bean.core.NullValue.getByName(val);
+			if (nv.isActive()) {
+				nullValuesList.add(nv);
 			}
 		}
 	}
@@ -406,6 +411,11 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		this.crf = crf;
 	}
 
+	/**
+	 * Method returns null flag map.
+	 * 
+	 * @return HashMap
+	 */
 	public HashMap getNullFlags() {
 		if (nullFlags.size() == 0) {
 			nullFlags.put("NI", "0");
@@ -445,6 +455,13 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		this.defaultVersionName = defaultVersionName;
 	}
 
+	/**
+	 * Method compares objects.
+	 * 
+	 * @param o
+	 *            Object
+	 * @return int
+	 */
 	public int compareTo(Object o) {
 		if (o == null || !o.getClass().equals(this.getClass())) {
 			return 0;
@@ -508,5 +525,13 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	public void setEvaluatedCRF(boolean evaluatedCRF) {
 		this.evaluatedCRF = evaluatedCRF;
+	}
+
+	public ArrayList<SourceDataVerification> getSdvOptions() {
+		return sdvOptions;
+	}
+
+	public void setSdvOptions(ArrayList<SourceDataVerification> sdvOptions) {
+		this.sdvOptions = sdvOptions;
 	}
 }

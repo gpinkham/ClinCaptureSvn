@@ -13,15 +13,6 @@
 
 package org.akaza.openclinica.control.admin;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
@@ -40,8 +31,20 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.renderer.HtmlTableRenderer;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+/**
+ * EventStatusStatisticsTableFactory.
+ */
 public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
 
+	public static final int INT_100 = 100;
 	private StudyDAO studyDao;
 	private StudySubjectDAO studySubjectDao;
 	private StudyEventDAO studyEventDao;
@@ -81,9 +84,9 @@ public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
 	public void setDataAndLimitVariables(TableFacade tableFacade) {
 
 		Limit limit = tableFacade.getLimit();
-		SubjectEventStatus[] subjectEventStatuses = { SubjectEventStatus.SCHEDULED,
+		SubjectEventStatus[] subjectEventStatuses = {SubjectEventStatus.SCHEDULED,
 				SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SIGNED,
-				SubjectEventStatus.LOCKED, SubjectEventStatus.SKIPPED, SubjectEventStatus.STOPPED };
+				SubjectEventStatus.LOCKED, SubjectEventStatus.SKIPPED, SubjectEventStatus.STOPPED};
 
 		Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
@@ -100,12 +103,12 @@ public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
 
 		for (SubjectEventStatus subjectEventStatus : subjectEventStatuses) {
 
-			Integer totalEventsByEventStatus = studyEventDao.getCountofEventsBasedOnEventStatus(currentStudy,
+			Integer totalEventsByEventStatus = studyEventDao.getCountOfEventsBasedOnEventStatus(currentStudy,
 					subjectEventStatus);
-			Integer totalEvents = studyEventDao.getCountofEvents(currentStudy);
+			Integer totalEvents = studyEventDao.getCountOfEvents(currentStudy);
 
 			Long percentage = totalEvents == 0 ? 0 : Math.round((totalEventsByEventStatus.doubleValue() / totalEvents
-					.doubleValue()) * 100);
+					.doubleValue()) * INT_100);
 
 			HashMap<Object, Object> theItem = new HashMap<Object, Object>();
 			theItem.put("status", subjectEventStatus.getName());

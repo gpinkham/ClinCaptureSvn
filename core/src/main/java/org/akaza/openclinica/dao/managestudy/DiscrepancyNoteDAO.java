@@ -20,6 +20,30 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import com.clinovo.model.DiscrepancyCorrectionForm;
+import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.ResponseType;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteStatisticBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -31,33 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.core.AuditableEntityBean;
-import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.ResolutionStatus;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteStatisticBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.core.ResponseType;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-
-import com.clinovo.model.DiscrepancyCorrectionForm;
-
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public static final String UNION_OP = " UNION ";
 	// if true, we fetch the mapping along with the bean
@@ -136,7 +134,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(2, TypeNames.INT);
 		this.setTypeExpected(3, TypeNames.INT);
 	}
-	
+
 	/**
 	 * Sets expected types for DCF query.
 	 */
@@ -162,7 +160,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index, TypeNames.INT);
 	}
 
 	/**
@@ -672,7 +670,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		Map variables = new HashMap();
 		for (int i = 1; i <= 10; i++) {
 			variables.put(i, currentStudy.getId());
-		}		
+		}
 		StringBuilder sql = buildViewNotesSQL(currentStudy, filter, sort);
 		sql.append(filter.getOwnerOrAssignedFilter(currentUser));
 		String sortPart = sort.execute("");
@@ -799,7 +797,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 		return notesStat;
 	}
-	
+
 	public List<DiscrepancyNoteStatisticBean> countUserNotesStatistics(StudyBean currentStudy,
 			UserAccountBean currentUser) {
 		setStatisticTypesExpected();
@@ -2273,8 +2271,25 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return count != null && count == 0;
 	}
 
-	public boolean doesSubjectHaveNDsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
-		// NDs for subject only (like "Date of birth" and etc., not for event's NDs)
+	public boolean doesNotHaveOutstandingDNs(EventCRFBean ecb) {
+		Integer count = null;
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+
+		HashMap variables = new HashMap();
+		variables.put(1, ecb.getId());
+		variables.put(2, ecb.getId());
+
+		ArrayList rows = select(digester.getQuery("countOfOutstandingDNsForEventCrf"), variables);
+		Iterator it = rows.iterator();
+		if (it.hasNext()) {
+			count = (Integer) ((HashMap) it.next()).get("count");
+		}
+		return count != null && count == 0;
+	}
+
+	public boolean doesSubjectHaveDNsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
+		// DNs for subject only (like "Date of birth" and etc., not for event's DNs)
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
@@ -2283,16 +2298,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return noteBeans.size() > 0;
 	}
 
-	public boolean doesSubjectHaveNewNDsInStudy(StudyBean study, String subjectLabel) {
-		return doesSubjectHaveNDsInStudy(study, subjectLabel, "1");
+	public boolean doesSubjectHaveNewDNsInStudy(StudyBean study, String subjectLabel) {
+		return doesSubjectHaveDNsInStudy(study, subjectLabel, "1");
 	}
 
-	public boolean doesSubjectHaveUnclosedNDsInStudy(StudyBean study, String subjectLabel) {
-		return doesSubjectHaveNDsInStudy(study, subjectLabel, "123");
+	public boolean doesSubjectHaveUnclosedDNsInStudy(StudyBean study, String subjectLabel) {
+		return doesSubjectHaveDNsInStudy(study, subjectLabel, "123");
 	}
 
-	public boolean doesSubjectHaveAnyNDsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
-		// all NDs for subject (like "Date of birth" and etc., for event's NDs too)
+	public boolean doesSubjectHaveAnyDNsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
+		// all DNs for subject (like "Date of birth" and etc., for event's DNs too)
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
@@ -2301,15 +2316,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return noteBeans.size() > 0;
 	}
 
-	public boolean doesSubjectHaveAnyNewNDsInStudy(StudyBean study, String subjectLabel) {
-		return doesSubjectHaveAnyNDsInStudy(study, subjectLabel, "1");
+	public boolean doesSubjectHaveAnyNewDNsInStudy(StudyBean study, String subjectLabel) {
+		return doesSubjectHaveAnyDNsInStudy(study, subjectLabel, "1");
 	}
 
-	public boolean doesSubjectHaveAnyUnclosedNDsInStudy(StudyBean study, String subjectLabel) {
-		return doesSubjectHaveAnyNDsInStudy(study, subjectLabel, "123");
+	public boolean doesSubjectHaveAnyUnclosedDNsInStudy(StudyBean study, String subjectLabel) {
+		return doesSubjectHaveAnyDNsInStudy(study, subjectLabel, "123");
 	}
 
-	public boolean doesEventHaveSomeNDsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel,
+	public boolean doesEventHaveSomeDNsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel,
 			String resolutionStatus) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("eventId", eventId);
@@ -2321,12 +2336,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return noteBeans.size() > 0;
 	}
 
-	public boolean doesEventHaveNewNDsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel) {
-		return doesEventHaveSomeNDsInStudy(study, eventLabel, eventId, subjectLabel, "1");
+	public boolean doesEventHaveNewDNsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel) {
+		return doesEventHaveSomeDNsInStudy(study, eventLabel, eventId, subjectLabel, "1");
 	}
 
-	public boolean doesEventHaveUnclosedNDsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel) {
-		return doesEventHaveSomeNDsInStudy(study, eventLabel, eventId, subjectLabel, "123");
+	public boolean doesEventHaveUnclosedDNsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel) {
+		return doesEventHaveSomeDNsInStudy(study, eventLabel, eventId, subjectLabel, "123");
 	}
 
 	public boolean doesCRFHaveDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
@@ -2342,12 +2357,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return noteBeans.size() > 0;
 	}
 
-	public boolean doesCRFHaveNewNDsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
+	public boolean doesCRFHaveNewDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
 			String subjectLabel, String crfName) {
 		return doesCRFHaveDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "1");
 	}
 
-	public boolean doesCRFHaveUnclosedNDsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
+	public boolean doesCRFHaveUnclosedDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
 			String subjectLabel, String crfName) {
 		return doesCRFHaveDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "123");
 	}
@@ -2483,7 +2498,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		return returnedNotelist;
 	}
-	
+
 	/**
 	 * Gets list of DiscrepancyCorrectionForms by note Ids.
 	 * 
@@ -2507,12 +2522,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	private String buildDcfQuery(String commaDelimitedNoteIds) {
 		final String where = "\nWHERE dn.discrepancy_note_id IN (".concat(commaDelimitedNoteIds).concat(")");
 		final String union = "\n\nUNION\n\n";
-		StringBuilder query = new StringBuilder(digester.getQuery("findDcfsByNoteIdsForItemDataDNs")).append(where)
-				.append(union).append(digester.getQuery("findDcfsByNoteIdsForStudyEventDNs")).append(where)
-				.append(union).append(digester.getQuery("findDcfsByNoteIdsForEventCrfDNs")).append(where).append(union)
+		return new StringBuilder(digester.getQuery("findDcfsByNoteIdsForItemDataDNs")).append(where).append(union)
+				.append(digester.getQuery("findDcfsByNoteIdsForStudyEventDNs")).append(where).append(union)
+				.append(digester.getQuery("findDcfsByNoteIdsForEventCrfDNs")).append(where).append(union)
 				.append(digester.getQuery("findDcfsByNoteIdsForStudySubjectDNs")).append(where).append(union)
-				.append(digester.getQuery("findDcfsByNoteIdsForSubjectDNs")).append(where);
-		return query.toString();
+				.append(digester.getQuery("findDcfsByNoteIdsForSubjectDNs")).append(where).toString();
 	}
 
 	private DiscrepancyCorrectionForm extractDfcFromResultRow(HashMap resultRow) {

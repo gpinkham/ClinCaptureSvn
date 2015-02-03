@@ -143,9 +143,9 @@
         <query>
                 <name>create</name>
                 <sql>
-                        INSERT INTO
-                                item_form_metadata (item_form_metadata_id,
-                                        item_id,
+                    INSERT INTO
+                    item_form_metadata (item_form_metadata_id,
+                    item_id,
                     crf_version_id,
                     "header",
                     subheader,
@@ -166,16 +166,18 @@
                     default_value,
                     response_layout,
                     width_decimal,
-                    show_item  )
-                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    show_item,
+                    code_ref,
+                    sdv_required)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 </sql>
         </query>
         <query>
                 <name>update</name>
                 <sql>
-                        UPDATE item_form_metadata
-                        SET
-                                        item_id=?,
+                    UPDATE item_form_metadata
+                    SET
+                    item_id=?,
                     crf_version_id=?,
                     "header"=?,
                     subheader=?,
@@ -195,8 +197,11 @@
                     required =?,
                     default_value =?,
                     response_layout =?,
-                    width_decimal =?, show_item =?
-                        WHERE item_form_metadata_id = ?
+                    width_decimal =?,
+                    show_item =?,
+                    code_ref=?,
+                    sdv_required=?
+                    WHERE item_form_metadata_id = ?
                 </sql>
         </query>
         <query>
@@ -274,6 +279,12 @@
 			and ss.study_subject_id = ec.study_subject_id
 			and sec.crf_version_id = ec.crf_version_id
 			and ss.study_id = s.study_id and (s.study_id = ? or s.parent_study_id = ?)
+        </sql>
+    </query>
+    <query>
+        <name>hasItemsToSDV</name>
+        <sql>
+            select count(distinct cv.crf_id) = 1 as has from crf_version cv, item_form_metadata ifm where cv.crf_id = ? and ifm.crf_version_id = cv.crf_version_id and ifm.sdv_required = 1
         </sql>
     </query>
 </queries>

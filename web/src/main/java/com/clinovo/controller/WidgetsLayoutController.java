@@ -85,7 +85,7 @@ import java.util.Locale;
  * This controller was created to gather data from database and send it to widgets.
  */
 @Controller
-@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
+@SuppressWarnings({"unused", "rawtypes", "unchecked"})
 public class WidgetsLayoutController {
 
 	private static final int FILTER_START = 0;
@@ -321,10 +321,10 @@ public class WidgetsLayoutController {
 			displayFrom += maxDisplayNumber;
 		}
 
-		SubjectEventStatus[] subjectEventStatuses = { SubjectEventStatus.SCHEDULED,
+		SubjectEventStatus[] subjectEventStatuses = {SubjectEventStatus.SCHEDULED,
 				SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.SOURCE_DATA_VERIFIED,
 				SubjectEventStatus.SIGNED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SKIPPED,
-				SubjectEventStatus.STOPPED, SubjectEventStatus.LOCKED, SubjectEventStatus.NOT_SCHEDULED };
+				SubjectEventStatus.STOPPED, SubjectEventStatus.LOCKED, SubjectEventStatus.NOT_SCHEDULED};
 
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
 		List<StudyEventDefinitionBean> studyEventDefinitions = getListOfEventsDefinitions(sb);
@@ -392,10 +392,10 @@ public class WidgetsLayoutController {
 		StudyEventDAO studyEventDAO = new StudyEventDAO(datasource);
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
 
-		SubjectEventStatus[] subjectEventStatuses = { SubjectEventStatus.SCHEDULED,
+		SubjectEventStatus[] subjectEventStatuses = {SubjectEventStatus.SCHEDULED,
 				SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SIGNED,
 				SubjectEventStatus.LOCKED, SubjectEventStatus.SKIPPED, SubjectEventStatus.STOPPED,
-				SubjectEventStatus.SOURCE_DATA_VERIFIED };
+				SubjectEventStatus.SOURCE_DATA_VERIFIED};
 
 		List<StudyEventDefinitionBean> studyEventDefinitions = getListOfEventsDefinitions(sb);
 		int countOfSubject = getCountOfSubjects(sb);
@@ -404,7 +404,7 @@ public class WidgetsLayoutController {
 		List<Integer> listOfEventsWithStatuses = new ArrayList<Integer>();
 
 		for (SubjectEventStatus eventStatus : subjectEventStatuses) {
-			int countOfEventsWithStatus = studyEventDAO.getCountofEventsBasedOnEventStatus(sb, eventStatus);
+			int countOfEventsWithStatus = studyEventDAO.getCountOfEventsBasedOnEventStatus(sb, eventStatus);
 			int countOfEventsNoRepeats = studyEventDAO.getCountOfEventsBasedOnEventStatusNoRepeats(sb, eventStatus);
 			listOfEventsWithStatuses.add(countOfEventsWithStatus);
 			countOfStartedEvents += countOfEventsNoRepeats;
@@ -478,10 +478,10 @@ public class WidgetsLayoutController {
 		StudyEventDAO studyEventDAO = new StudyEventDAO(datasource);
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
 
-		SubjectEventStatus[] subjectEventStatuses = { SubjectEventStatus.SCHEDULED,
+		SubjectEventStatus[] subjectEventStatuses = {SubjectEventStatus.SCHEDULED,
 				SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.SOURCE_DATA_VERIFIED,
 				SubjectEventStatus.SIGNED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SKIPPED,
-				SubjectEventStatus.STOPPED, SubjectEventStatus.LOCKED };
+				SubjectEventStatus.STOPPED, SubjectEventStatus.LOCKED};
 
 		List<StudyEventDefinitionBean> studyEventDefinitions = getListOfEventsDefinitions(sb);
 		int countOfSubject = getCountOfSubjects(sb);
@@ -490,7 +490,7 @@ public class WidgetsLayoutController {
 		LinkedHashMap<String, Integer> mapOfEventsWithStatuses = new LinkedHashMap<String, Integer>();
 
 		for (SubjectEventStatus eventStatus : subjectEventStatuses) {
-			int countOfEventsWithStatus = studyEventDAO.getCountofEventsBasedOnEventStatus(sb, eventStatus);
+			int countOfEventsWithStatus = studyEventDAO.getCountOfEventsBasedOnEventStatus(sb, eventStatus);
 			int countOfEventsNoRepeats = studyEventDAO.getCountOfEventsBasedOnEventStatusNoRepeats(sb, eventStatus);
 			mapOfEventsWithStatuses.put(eventStatus.getCode(), countOfEventsWithStatus);
 			countOfStartedEvents += countOfEventsNoRepeats;
@@ -544,13 +544,13 @@ public class WidgetsLayoutController {
 		boolean nextDataExists = sdvProgressYear < currentYear || nextYear.size() > 0;
 
 		EventCRFSDVFilter sdvFilterDone = new EventCRFSDVFilter(sb.getId());
-		sdvFilterDone.addFilter("sdvStatus", messageSource.getMessage("complete", null,
-				SessionUtil.getLocale(request)).toLowerCase());
+		sdvFilterDone.addFilter("sdvStatus", messageSource.getMessage("complete", null, SessionUtil.getLocale(request))
+				.toLowerCase());
 		EventCRFSDVSort sdvSortDone = new EventCRFSDVSort();
 		boolean sdvWithOpenQueries = sb.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes");
-		ArrayList<EventCRFBean> ecrfs = eCrfdao.getAvailableWithFilterAndSort(sb.getId(),
-				sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilterDone, sdvSortDone,
-				sdvWithOpenQueries, 0, FILTER_END);
+		ArrayList<EventCRFBean> ecrfs = eCrfdao.getAvailableWithFilterAndSort(sb.getId(), sb.getParentStudyId() > 0
+				? sb.getParentStudyId()
+				: sb.getId(), sdvFilterDone, sdvSortDone, sdvWithOpenQueries, 0, FILTER_END);
 
 		List<Integer> countValues = new ArrayList<Integer>(Collections.nCopies(NUMBER_OF_MONTHS + 1, 0));
 
@@ -682,8 +682,8 @@ public class WidgetsLayoutController {
 		});
 
 		LinkedHashMap<String, List<Integer>> dataColumns = new LinkedHashMap<String, List<Integer>>();
-		ResolutionStatus[] statuses = { ResolutionStatus.CLOSED, ResolutionStatus.UPDATED, ResolutionStatus.OPEN,
-				ResolutionStatus.NOT_APPLICABLE };
+		ResolutionStatus[] statuses = {ResolutionStatus.CLOSED, ResolutionStatus.UPDATED, ResolutionStatus.OPEN,
+				ResolutionStatus.NOT_APPLICABLE};
 
 		int start = Integer.parseInt(request.getParameter("start"));
 		int maxDispay = ND_PER_CRF_DISPLAY_PER_SCREEN;
@@ -948,7 +948,8 @@ public class WidgetsLayoutController {
 						.getItemDataId());
 
 				Date createdDate = codedItemData.getCreatedDate();
-				Date updatedDate = codedItemData.getUpdatedDate() != null ? codedItemData.getUpdatedDate()
+				Date updatedDate = codedItemData.getUpdatedDate() != null
+						? codedItemData.getUpdatedDate()
 						: new Date(0);
 				Calendar createCalendar = Calendar.getInstance();
 				Calendar updateCalendar = Calendar.getInstance();
@@ -1058,7 +1059,7 @@ public class WidgetsLayoutController {
 			currentDisplay += ESPS_DISPLAY_PER_SCREEN;
 		}
 		ArrayList<Integer> listOfSitesIds = (ArrayList<Integer>) studyDAO.findAllSiteIdsByStudy(sb);
-		Status[] listOfStatuses = { Status.LOCKED, Status.DELETED, Status.AUTO_DELETED, Status.SIGNED, Status.AVAILABLE };
+		Status[] listOfStatuses = {Status.LOCKED, Status.DELETED, Status.AUTO_DELETED, Status.SIGNED, Status.AVAILABLE};
 		ArrayList<DisplayWidgetsRowWithExtraField> dataRows = new ArrayList<DisplayWidgetsRowWithExtraField>();
 		listOfSitesIds.remove(listOfSitesIds.indexOf(sb.getId()));
 		ArrayList<StudyBean> listOfSites = new ArrayList<StudyBean>();

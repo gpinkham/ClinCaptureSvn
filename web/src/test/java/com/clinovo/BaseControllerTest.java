@@ -1,5 +1,6 @@
 package com.clinovo;
 
+import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.AbstractContextSentiveTest;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
@@ -7,6 +8,7 @@ import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
@@ -32,6 +34,7 @@ public class BaseControllerTest extends AbstractContextSentiveTest {
 	// Managed controllers
 	public static final String TERM_CONTROLLER = "/deleteTerm";
 	public static final String CODED_ITEM_CONTROLLER = "/codedItems";
+	public static final String SDV_ITEM_CONTROLLER = "/sdvItem";
 	public static final String CONFIGURE_HOME_PAGE = "/configureHomePage";
 	public static final String SAVE_HOME_PAGE = "/saveHomePage";
 	public static final String NDS_ASSIGNED_TO_ME_WIDGET = "/initNdsAssignedToMeWidget";
@@ -58,6 +61,8 @@ public class BaseControllerTest extends AbstractContextSentiveTest {
 	@Autowired
 	protected MessageSource messageSource;
 
+	protected MockHttpSession session = new MockHttpSession();
+
 	@Before
 	public void setup() throws Exception {
 		super.setUp();
@@ -66,6 +71,7 @@ public class BaseControllerTest extends AbstractContextSentiveTest {
 		SecurityContextHolder.getContext().setAuthentication(
 				new UsernamePasswordAuthenticationToken("BB", "is dreaming about halle berry"));
 
+		SessionUtil.updateLocale(session, LOCALE);
 		ResourceBundleProvider.updateLocale(LOCALE);
 	}
 }

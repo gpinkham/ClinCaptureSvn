@@ -33,6 +33,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -52,7 +53,7 @@ import java.util.Map;
  * 
  * @author jxu
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class AddCRFToDefinitionServlet extends Controller {
 
@@ -153,6 +154,7 @@ public class AddCRFToDefinitionServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 
 		FormProcessor fp = new FormProcessor(request);
+		ItemFormMetadataDAO itemFormMetadataDao = getItemFormMetadataDAO();
 		CRFVersionDAO vdao = getCRFVersionDAO();
 		ArrayList crfArray = new ArrayList();
 		Map tmpCRFIdMap = (HashMap) request.getSession().getAttribute("tmpCRFIdMap");
@@ -228,7 +230,8 @@ public class AddCRFToDefinitionServlet extends Controller {
 				edcBean.setSourceDataVerification(SourceDataVerification.NOTREQUIRED);
 				edcBean.setOrdinal(++ordinalForNewCRF);
 				edcBean.setVersions(crf.getVersions());
-
+				SourceDataVerification.fillSDVStatuses(edcBean.getSdvOptions(),
+						itemFormMetadataDao.hasItemsToSDV(crf.getId()));
 				CRFVersionBean defaultVersion1 = (CRFVersionBean) vdao.findByPK(edcBean.getDefaultVersionId());
 				edcBean.setDefaultVersionName(defaultVersion1.getName());
 
@@ -245,9 +248,9 @@ public class AddCRFToDefinitionServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		EntityBeanTable table = fp.getEntityBeanTable();
 		ArrayList allRows = CRFRow.generateRowsFromBeans(crfs);
-		String[] columns = { resword.getString("CRF_name"), resword.getString("date_created"),
+		String[] columns = {resword.getString("CRF_name"), resword.getString("date_created"),
 				resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),
-				resword.getString("selected") };
+				resword.getString("selected")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(FIVE);
 		HashMap args = new HashMap();

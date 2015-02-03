@@ -69,7 +69,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%><d
         <c:set var="checkInputsValue" value="0" />    </c:otherwise></c:choose>
 
 <table width="75%"><tr><td>
-<span class="first_level_header"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
+<span class="first_level_header"> <b id="crfNameId"> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
     <c:choose>
             <c:when test="${eventCRF.stage.initialDE and !eventCRF.notStarted}">
                 <img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>"

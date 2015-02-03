@@ -20,15 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.Role;
@@ -47,6 +38,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.util.EventDefinitionInfo;
 import org.akaza.openclinica.util.SignStateRestorer;
@@ -54,18 +46,26 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- * Prepares to update study event definition
+ * Prepares to update study event definition.
  * 
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class InitUpdateEventDefinitionServlet extends Controller {
 
 	/**
-	 * Checks whether the user has the correct privilege
+	 * Checks whether the user has the correct privilege.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
@@ -125,8 +125,9 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 		SignStateRestorer signStateRestorer = new SignStateRestorer();
 		for (Object object : edcs) {
 			EventDefinitionCRFBean eventDefinitionCrf = (EventDefinitionCRFBean) object;
-			if (eventDefinitionCrf.getStatus() != Status.AVAILABLE || !eventDefinitionCrf.isActive())
+			if (eventDefinitionCrf.getStatus() != Status.AVAILABLE || !eventDefinitionCrf.isActive()) {
 				continue;
+			}
 			EventDefinitionInfo edi = new EventDefinitionInfo();
 			edi.id = eventDefinitionCrf.getId();
 			edi.required = eventDefinitionCrf.isRequiredCRF();
@@ -161,9 +162,10 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 
 			EventDefinitionCRFDAO edao = getEventDefinitionCRFDAO();
 			ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllParentsByDefinition(defId);
-			//Get list of child EventDefinitionCRFs for cascading actions
+			// Get list of child EventDefinitionCRFs for cascading actions
 			ArrayList<EventDefinitionCRFBean> childEventDefCRFs = edao.findAllChildrenByDefinition(defId);
 
+			ItemFormMetadataDAO itemFormMetadataDao = getItemFormMetadataDAO();
 			CRFVersionDAO cvdao = getCRFVersionDAO();
 			CRFDAO cdao = getCRFDAO();
 			ArrayList newEventDefinitionCRFs = new ArrayList();
@@ -179,9 +181,13 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 
 				CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
 				edc.setDefaultVersionName(defaultVersion.getName());
+
+				SourceDataVerification.fillSDVStatuses(edc.getSdvOptions(),
+						itemFormMetadataDao.hasItemsToSDV(crf.getId()));
+
 				newEventDefinitionCRFs.add(edc);
 			}
-			
+
 			for (EventDefinitionCRFBean childEdc : childEventDefCRFs) {
 				ArrayList versions = (ArrayList) cvdao.findAllActiveByCRF(childEdc.getCrfId());
 				childEdc.setVersions(versions);
@@ -196,13 +202,11 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 
 			request.getSession().setAttribute("definition", sed);
 			request.getSession().setAttribute("eventDefinitionCRFs", newEventDefinitionCRFs);
-			//store child list to session
+			// store child list to session
 			request.getSession().setAttribute("childEventDefCRFs", childEventDefCRFs);
 			// changed above to new list because static, in-place updating is updating all EDCs
 
 			request.getSession().setAttribute("signStateRestorer", prepareSignStateRestorer(newEventDefinitionCRFs));
-
-			addSDVstatuses(request);
 
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}
@@ -211,7 +215,8 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 
 	private HashMap processNullValues(EventDefinitionCRFBean edc) {
 		HashMap flags = new LinkedHashMap();
-		String s = "";// edc.getNullValues();
+		String s = "";
+		// edc.getNullValues();
 		for (int j = 0; j < edc.getNullValuesList().size(); j++) {
 			NullValue nv1 = (NullValue) edc.getNullValuesList().get(j);
 			s = s + nv1.getName().toUpperCase() + ",";
@@ -252,14 +257,5 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 		} else {
 			request.getSession().setAttribute("userNameInsteadEmail", resexception.getString("not_found_in_the_db"));
 		}
-	}
-
-	private void addSDVstatuses(HttpServletRequest request) {
-		ArrayList<String> sdvOptions = new ArrayList<String>();
-		sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());
-		sdvOptions.add(SourceDataVerification.PARTIALREQUIRED.toString());
-		sdvOptions.add(SourceDataVerification.NOTREQUIRED.toString());
-		sdvOptions.add(SourceDataVerification.NOTAPPLICABLE.toString());
-		request.getSession().setAttribute("sdvOptions", sdvOptions);
 	}
 }

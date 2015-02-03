@@ -38,13 +38,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * EventDefinitionCRFDAO class.
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
 	private void setQueryNames() {
@@ -614,8 +612,9 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 * @return Collection
 	 */
 	public Collection findAllByEventDefinitionId(StudyBean study, int eventDefinitionId) {
-		return study.isSite(study.getParentStudyId()) ? findAllByEventDefinitionIdAndSiteIdAndParentStudyId(
-				eventDefinitionId, study.getId(), study.getParentStudyId())
+		return study.isSite(study.getParentStudyId())
+				? findAllByEventDefinitionIdAndSiteIdAndParentStudyId(eventDefinitionId, study.getId(),
+						study.getParentStudyId())
 				: findAllParentsByEventDefinitionId(eventDefinitionId);
 	}
 
@@ -757,35 +756,6 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		for (HashMap anAList : aList) {
 			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap(anAList);
 			al.add(eb);
-		}
-		return al;
-	}
-
-	/**
-	 * Method that returns collection of active non hidden event definition crfs by definitionId and study.
-	 *
-	 * @param definitionId
-	 *            int
-	 * @param study
-	 *            StudyBean
-	 * @return ArrayList
-	 */
-	public Collection findAllActiveNonHiddenByEventDefinitionIdAndStudy(int definitionId, StudyBean study) {
-		int index = 1;
-		ArrayList al = new ArrayList();
-		this.setTypesExpected();
-		HashMap variables = new HashMap();
-		if (study.getParentStudyId() > 0) {
-			variables.put(index++, definitionId);
-			variables.put(index++, study.getId());
-			variables.put(index, definitionId);
-
-			String sql = digester.getQuery("findAllActiveNonHiddenByEventDefinitionIdAndSite");
-			List<HashMap> aList = this.select(sql, variables);
-			for (HashMap anAList : aList) {
-				EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap(anAList);
-				al.add(eb);
-			}
 		}
 		return al;
 	}
@@ -1012,8 +982,9 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 */
 	public EventDefinitionCRFBean findByStudyEventDefinitionIdAndCRFId(StudyBean study, int studyEventDefinitionId,
 			int crfId) {
-		return study.isSite(study.getParentStudyId()) ? findByStudyEventDefinitionIdAndCRFIdAndSiteIdAndParentStudyId(
-				studyEventDefinitionId, crfId, study.getId(), study.getParentStudyId())
+		return study.isSite(study.getParentStudyId())
+				? findByStudyEventDefinitionIdAndCRFIdAndSiteIdAndParentStudyId(studyEventDefinitionId, crfId,
+						study.getId(), study.getParentStudyId())
 				: findForStudyByStudyEventDefinitionIdAndCRFId(studyEventDefinitionId, crfId);
 	}
 
@@ -1078,56 +1049,6 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method that returns Set of hidden crf ids by site.
-	 * 
-	 * @param study
-	 *            StudyBean
-	 * @return Set<String>
-	 */
-	public Set<String> findHiddenCrfIdsBySite(StudyBean study) {
-		int index = 1;
-		Set<String> ids = new TreeSet<String>();
-		this.unsetTypeExpected();
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index, TypeNames.STRING);
-		HashMap variables = new HashMap();
-		variables.put(1, study.getId());
-		String sql = digester.getQuery("findHiddenCrfIdAndNamesBySite");
-		List<HashMap> aList = this.select(sql, variables);
-		for (HashMap hm : aList) {
-			ids.add(hm.get("study_event_definition_id") + "_" + hm.get("crf_id"));
-		}
-
-		return ids;
-	}
-
-	/**
-	 * Method that returns Set of hidden crf names by site.
-	 * 
-	 * @param study
-	 *            StudyBean
-	 * @return Set<String>
-	 */
-	public Set<String> findHiddenCrfNamesBySite(StudyBean study) {
-		int index = 1;
-		Set<String> names = new TreeSet<String>();
-		this.unsetTypeExpected();
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index, TypeNames.STRING);
-		HashMap variables = new HashMap();
-		variables.put(1, study.getId());
-		String sql = digester.getQuery("findHiddenCrfIdAndNamesBySite");
-		List<HashMap> aList = this.select(sql, variables);
-		for (HashMap hm : aList) {
-			names.add(hm.get("study_event_definition_id") + "_" + hm.get("name"));
-		}
-
-		return names;
-	}
-
-	/**
 	 * Method that finds EventDefinitionCRFBean by eventCrfId and studyId.
 	 * 
 	 * @param eventCrfId
@@ -1153,5 +1074,27 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		}
 
 		return eb;
+	}
+
+	/**
+	 * Method updates the source data verification code for event definition crfs.
+	 *
+	 * @param crfVersionId
+	 *            int
+	 * @param sourceDataVerification
+	 *            SourceDataVerification
+	 * @return boolean
+	 */
+	public boolean updateEDCThatHasItemsToSDV(int crfVersionId, SourceDataVerification sourceDataVerification) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+		int ind = 1;
+		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+		variables.put(ind++, sourceDataVerification.getCode());
+		variables.put(ind, crfVersionId);
+
+		execute(digester.getQuery("updateEDCThatHasItemsToSDV"), variables);
+
+		return isQuerySuccessful();
 	}
 }

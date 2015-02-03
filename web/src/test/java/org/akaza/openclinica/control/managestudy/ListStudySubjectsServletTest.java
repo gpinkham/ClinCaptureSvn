@@ -63,7 +63,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ListStudySubjectsServletTest {
 
 	private MockHttpServletRequest request;
@@ -202,7 +202,7 @@ public class ListStudySubjectsServletTest {
 		listStudySubjectsServlet.mayProceed(request, response);
 		Assert.assertNull(request.getAttribute("pageMessages"));
 	}
-	
+
 	@Test
 	public void testThatListStudySubjectServletGrantsAccessToSiteMonitor() throws InsufficientPermissionException {
 		currentRole.setRole(Role.SITE_MONITOR);
@@ -248,9 +248,11 @@ public class ListStudySubjectsServletTest {
 
 	@Test
 	public void testThatListStudySubjectServletReturnsSubjectMatrixTableWithSdvIcon() throws Exception {
-		Mockito.when(studySubjectDAO.allowSDVSubject(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(
-				true);
+		Mockito.when(
+				studySubjectDAO.isStudySubjectReadyToBeSDVed(Mockito.any(StudyBean.class),
+						Mockito.any(StudySubjectBean.class))).thenReturn(true);
 		listStudySubjectsServlet.processRequest(request, response);
 		String htmlCode = (String) request.getAttribute("findSubjectsHtml");
-		Assert.assertEquals(true, htmlCode.contains("icon_DoubleCheck_Action"));	}
+		Assert.assertEquals(true, htmlCode.contains("icon_DoubleCheck_Action"));
+	}
 }

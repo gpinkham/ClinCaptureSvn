@@ -20,10 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -44,12 +40,21 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+
+/**
+ * InitUpdateSubStudyServlet.
+ */
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class InitUpdateSubStudyServlet extends Controller {
 
@@ -128,19 +133,19 @@ public class InitUpdateSubStudyServlet extends Controller {
 			request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
 			request.setAttribute("statuses", Status.toStudyUpdateMembersList());
 
-			SimpleDateFormat local_df = getLocalDf(request);
+			SimpleDateFormat localDf = getLocalDf(request);
 			FormProcessor fp = new FormProcessor(request);
 			logger.info("start date:" + study.getDatePlannedEnd());
 			if (study.getDatePlannedEnd() != null) {
-				fp.addPresetValue(UpdateSubStudyServlet.INPUT_END_DATE, local_df.format(study.getDatePlannedEnd()));
+				fp.addPresetValue(UpdateSubStudyServlet.INPUT_END_DATE, localDf.format(study.getDatePlannedEnd()));
 			}
 			if (study.getDatePlannedStart() != null) {
-				fp.addPresetValue(UpdateSubStudyServlet.INPUT_START_DATE, local_df.format(study.getDatePlannedStart()));
+				fp.addPresetValue(UpdateSubStudyServlet.INPUT_START_DATE, localDf.format(study.getDatePlannedStart()));
 			}
 			setPresetValues(fp.getPresetValues(), request);
 			if (study.getProtocolDateVerification() != null) {
 				fp.addPresetValue(UpdateSubStudyServlet.INPUT_VER_DATE,
-						local_df.format(study.getProtocolDateVerification()));
+						localDf.format(study.getProtocolDateVerification()));
 			}
 
 			forwardPage(Page.UPDATE_SUB_STUDY, request, response);
@@ -151,6 +156,7 @@ public class InitUpdateSubStudyServlet extends Controller {
 	private void createEventDefinitions(HttpServletRequest request, StudyBean parentStudy) {
 		int siteId = Integer.parseInt(request.getParameter("id").trim());
 		ArrayList<StudyEventDefinitionBean> seds;
+		ItemFormMetadataDAO itemFormMetadataDao = getItemFormMetadataDAO();
 		StudyEventDefinitionDAO sedDao = getStudyEventDefinitionDAO();
 		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 		CRFVersionDAO cvdao = getCRFVersionDAO();
@@ -165,7 +171,8 @@ public class InitUpdateSubStudyServlet extends Controller {
 				int edcStatusId = edcBean.getStatus().getId();
 				CRFBean crf = (CRFBean) cdao.findByPK(edcBean.getCrfId());
 				int crfStatusId = crf.getStatusId();
-				if (!(edcStatusId == 5 || edcStatusId == 7 || crfStatusId == 5 || crfStatusId == 7)) {
+				if (!(edcStatusId == Status.DELETED.getId() || edcStatusId == Status.AUTO_DELETED.getId()
+						|| crfStatusId == Status.DELETED.getId() || crfStatusId == Status.AUTO_DELETED.getId())) {
 					ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) cvdao.findAllActiveByCRF(edcBean
 							.getCrfId());
 					edcBean.setVersions(versions);
@@ -181,6 +188,8 @@ public class InitUpdateSubStudyServlet extends Controller {
 						}
 					}
 					edcBean.setSelectedVersionIdList(idList);
+					SourceDataVerification.fillSDVStatuses(edcBean.getSdvOptions(),
+							itemFormMetadataDao.hasItemsToSDV(crf.getId()));
 					defCrfs.add(edcBean);
 				}
 			}
@@ -191,16 +200,6 @@ public class InitUpdateSubStudyServlet extends Controller {
 		// not sure if request is better, since not sure if there is another
 		// process using this.
 		request.getSession().setAttribute("definitions", seds);
-		request.getSession().setAttribute("sdvOptions", this.setSDVOptions());
-	}
-
-	private ArrayList<String> setSDVOptions() {
-		ArrayList<String> sdvOptions = new ArrayList<String>();
-		sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());
-		sdvOptions.add(SourceDataVerification.PARTIALREQUIRED.toString());
-		sdvOptions.add(SourceDataVerification.NOTREQUIRED.toString());
-		sdvOptions.add(SourceDataVerification.NOTAPPLICABLE.toString());
-		return sdvOptions;
 	}
 
 	@Override

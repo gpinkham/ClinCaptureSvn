@@ -16,6 +16,7 @@ package org.akaza.openclinica.bean.admin;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.oid.CrfOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
+import org.akaza.openclinica.domain.SourceDataVerification;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -33,19 +34,23 @@ import java.util.ArrayList;
 public class CRFBean extends AuditableEntityBean {
 	private int statusId = 1;
 	private String description = "";
-	private ArrayList versions;// not in DB
+	private ArrayList versions; // not in DB
 	private boolean selected = false; // not in DB
 
 	private String oid;
 	private OidGenerator oidGenerator;
 	private int studyId;
+	private ArrayList<SourceDataVerification> sdvOptions = new ArrayList<SourceDataVerification>();
 
 	/**
-	 * Determines if a given CRF should use auto-layout or not.
-	 * True indicates that auto layout should be applied, False otherwise
+	 * Determines if a given CRF should use auto-layout or not. True indicates that auto layout should be applied, False
+	 * otherwise
 	 */
 	private boolean autoLayout;
 
+	/**
+	 * CRFBean constructor.
+	 */
 	public CRFBean() {
 		this.oidGenerator = new CrfOidGenerator();
 		versions = new ArrayList();
@@ -123,6 +128,13 @@ public class CRFBean extends AuditableEntityBean {
 		this.oid = oid;
 	}
 
+	/**
+	 * Returns OidGenerator.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @return OidGenerator
+	 */
 	public OidGenerator getOidGenerator(DataSource ds) {
 		if (oidGenerator != null) {
 			oidGenerator.setDataSource(ds);
@@ -150,9 +162,18 @@ public class CRFBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param autoLayout The autoLayout to set.
+	 * @param autoLayout
+	 *            The autoLayout to set.
 	 */
 	public void setAutoLayout(boolean autoLayout) {
 		this.autoLayout = autoLayout;
+	}
+
+	public ArrayList<SourceDataVerification> getSdvOptions() {
+		return sdvOptions;
+	}
+
+	public void setSdvOptions(ArrayList<SourceDataVerification> sdvOptions) {
+		this.sdvOptions = sdvOptions;
 	}
 }

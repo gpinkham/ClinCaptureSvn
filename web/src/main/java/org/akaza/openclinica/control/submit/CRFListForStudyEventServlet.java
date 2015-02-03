@@ -68,7 +68,7 @@ import java.util.Map;
  * 
  * @author ssachs
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class CRFListForStudyEventServlet extends Controller {
 
@@ -275,19 +275,19 @@ public class CRFListForStudyEventServlet extends Controller {
 		request.setAttribute(BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS, uncompletedEventDefinitionCRFs);
 		request.setAttribute(BEAN_DISPLAY_EVENT_CRFS, displayEventCRFs);
 		request.setAttribute(SES_ICON_URL, SubjectEventStatusUtil.getSESIconUrl(seb.getSubjectEventStatus()));
-		if (discrepancyNoteDAO.doesSubjectHaveUnclosedNDsInStudy(currentStudy, studySubjectBean.getLabel())) {
+		if (discrepancyNoteDAO.doesSubjectHaveUnclosedDNsInStudy(currentStudy, studySubjectBean.getLabel())) {
 			String subjectFlagColor = "yellow";
-			if (discrepancyNoteDAO.doesSubjectHaveNewNDsInStudy(currentStudy, studySubjectBean.getLabel())) {
+			if (discrepancyNoteDAO.doesSubjectHaveNewDNsInStudy(currentStudy, studySubjectBean.getLabel())) {
 				subjectFlagColor = "red";
 			}
 			request.setAttribute(SUBJECT_FLAG_COLOR, subjectFlagColor);
 		}
 
 		String eventName = seb.getStudyEventDefinition().getName();
-		if (discrepancyNoteDAO.doesEventHaveUnclosedNDsInStudy(currentStudy, eventName, eventId,
+		if (discrepancyNoteDAO.doesEventHaveUnclosedDNsInStudy(currentStudy, eventName, eventId,
 				studySubjectBean.getLabel())) {
 			String eventFlagColor = "yellow";
-			if (discrepancyNoteDAO.doesEventHaveNewNDsInStudy(currentStudy, eventName, eventId,
+			if (discrepancyNoteDAO.doesEventHaveNewDNsInStudy(currentStudy, eventName, eventId,
 					studySubjectBean.getLabel())) {
 				eventFlagColor = "red";
 			}
@@ -309,10 +309,10 @@ public class CRFListForStudyEventServlet extends Controller {
 				String crfName = displayEventCRFBean.getEventCRF().getCrf().getName();
 				Integer crfId = displayEventCRFBean.getEventCRF().getCrf().getId();
 
-				if (discrepancyNoteDAO.doesCRFHaveUnclosedNDsInStudyForSubject(currentStudy, eventName, eventId,
+				if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
 						studySubjectBean.getLabel(), crfName)) {
 					String crfFlagColor = "yellow";
-					if (discrepancyNoteDAO.doesCRFHaveNewNDsInStudyForSubject(currentStudy, eventName, eventId,
+					if (discrepancyNoteDAO.doesCRFHaveNewDNsInStudyForSubject(currentStudy, eventName, eventId,
 							studySubjectBean.getLabel(), crfName)) {
 						crfFlagColor = "red";
 					}
@@ -325,10 +325,10 @@ public class CRFListForStudyEventServlet extends Controller {
 				String crfName = displayEventDefinitionCRFBean.getEdc().getCrf().getName();
 				Integer crfId = displayEventDefinitionCRFBean.getEdc().getCrf().getId();
 
-				if (discrepancyNoteDAO.doesCRFHaveUnclosedNDsInStudyForSubject(currentStudy, eventName, eventId,
+				if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
 						studySubjectBean.getLabel(), crfName)) {
 					String crfFlagColor = "yellow";
-					if (discrepancyNoteDAO.doesCRFHaveNewNDsInStudyForSubject(currentStudy, eventName, eventId,
+					if (discrepancyNoteDAO.doesCRFHaveNewDNsInStudyForSubject(currentStudy, eventName, eventId,
 							studySubjectBean.getLabel(), crfName)) {
 						crfFlagColor = "red";
 					}

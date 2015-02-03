@@ -567,26 +567,28 @@
 </tr>
 </table></table>
 
-<c:set var="dnShortcutsSpan" value="${5}"/>
-<c:set var="dnShortcutsWidth" value="110px"/>
+<c:set var="tdPercentWidth" value="16.7%"/>
+<c:set var="dnShortcutsSpan" value="${6}"/>
+<c:set var="dnShortcutsWidth" value="${110}"/>
 <c:if test="${discrepancyShortcutsAnalyzer.totalResolutionProposed == 0}">
+    <c:set var="tdPercentWidth" value="20%"/>
     <c:set var="dnShortcutsSpan" value="${dnShortcutsSpan - 1}"/>
 </c:if>
-<table id="dnShortcutsTable" border="0" cellspacing="0" cellpadding="0" style="cursor: default;position: absolute;left: 0px;top: 0px;width:468px;" class="notSelectable">
+<table id="dnShortcutsTable" border="0" cellspacing="0" cellpadding="0" style="cursor: default;position: absolute;left: 0px;top: 0px;" class="notSelectable">
     <tr>
         <td>
             <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR"><div class="tablebox_center">
-                <table border="0" cellspacing="0" cellpadding="0" width="">
+                <table border="0" cellspacing="0" cellpadding="0" width="${dnShortcutsSpan * dnShortcutsWidth}px">
                     <tr>
                         <td colspan="${dnShortcutsSpan}" valign="top" class="table_cell_left_header" style="padding-left: 6px; padding-right: 6px;"><b><fmt:message key="crf_shortcuts_header" bundle="${resword}"/>:</b><a class="closeLink" onclick="resetDnShortcutsTable();">x</a></td>
                     </tr>
                     <tr>
-                        <td valign="top" width="${dnShortcutsWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:#CC0000;text-align: center;"><fmt:message key="openDn" bundle="${resword}"/></td>
-                        <td valign="top" width="${dnShortcutsWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:#D4A718;text-align: center;"><fmt:message key="updatedDn" bundle="${resword}"/></td>
-                        <c:if test="${discrepancyShortcutsAnalyzer.totalResolutionProposed != 0}"><td valign="top" width="${dnShortcutsWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;"> <fmt:message key="resolved" bundle="${resword}"/></td></c:if>
-                        <td valign="top" width="${dnShortcutsWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:#7CB98F;text-align: center;"><fmt:message key="closedDn" bundle="${resword}"/></td>
-                        <td valign="top" width="${dnShortcutsWidth}" align="center" class="table_cell_left"  style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;"> <fmt:message key="annotations" bundle="${resword}"/></td>
-                        <td valign="top" width="${dnShortcutsWidth}" align="center" class="table_cell_left hidden"  style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;"> <fmt:message key="itemsToSDV" bundle="${resword}"/></td>
+                        <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:#CC0000;text-align: center;"><fmt:message key="openDn" bundle="${resword}"/></td>
+                        <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:#D4A718;text-align: center;"><fmt:message key="updatedDn" bundle="${resword}"/></td>
+                        <c:if test="${discrepancyShortcutsAnalyzer.totalResolutionProposed != 0}"><td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;"> <fmt:message key="resolved" bundle="${resword}"/></td></c:if>
+                        <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:#7CB98F;text-align: center;"><fmt:message key="closedDn" bundle="${resword}"/></td>
+                        <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left"  style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;"> <fmt:message key="annotations" bundle="${resword}"/></td>
+                        <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left hidden"  style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;"> <fmt:message key="itemsToSDV" bundle="${resword}"/></td>
                     </tr>
                     <tr>
                         <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#CC0000;"><a class="dnShortcut" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalNew}" nextdnlink="${discrepancyShortcutsAnalyzer.nextNewDnLink}" onclick="highlightFieldForDNShortcutAnchor(0, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalNew">&nbsp;${discrepancyShortcutsAnalyzer.totalNew}&nbsp;</div></a></td>
@@ -594,7 +596,7 @@
                         <c:if test="${discrepancyShortcutsAnalyzer.totalResolutionProposed != 0}"><td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black;"><a class="dnShortcut" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalResolutionProposed}" nextdnlink="${discrepancyShortcutsAnalyzer.nextResolutionProposedLink}" onclick="highlightFieldForDNShortcutAnchor(2, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalResolutionProposed">&nbsp;${discrepancyShortcutsAnalyzer.totalResolutionProposed}&nbsp;</div></a></td></c:if>
                         <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#7CB98F;"><a class="dnShortcut" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalClosed}" nextdnlink="${discrepancyShortcutsAnalyzer.nextClosedDnLink}" onclick="highlightFieldForDNShortcutAnchor(3, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalClosed">&nbsp;${discrepancyShortcutsAnalyzer.totalClosed}&nbsp;</div></a></td>
                         <td valign="top" align="center" class="table_cell_left"  style="border-right:1px solid #E6E6E6;color:black"><a class="dnShortcut" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalAnnotations}" nextdnlink="${discrepancyShortcutsAnalyzer.nextAnnotationLink}" onclick="highlightFieldForDNShortcutAnchor(4, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalAnnotations">&nbsp;${discrepancyShortcutsAnalyzer.totalAnnotations}&nbsp;</div></a></td>
-                        <td valign="top" align="center" class="table_cell_left hidden"  style="border-right:1px solid #E6E6E6;color:black"><a class="dnShortcut"><div style="width: 100%; text-align: center;">&nbsp;0&nbsp;</div></a></td>
+                        <td valign="top" align="center" class="table_cell_left hidden"  style="border-right:1px solid #E6E6E6;color:black"><a class="dnShortcut"><div style="width: 100%; text-align: center;" id="dnShortcutItemsToSDV">&nbsp;0&nbsp;</div></a></td>
                     </tr>
                 </table>
             </div></div></div></div></div></div></div></div></div>

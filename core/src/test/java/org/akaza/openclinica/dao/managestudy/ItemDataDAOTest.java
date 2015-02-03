@@ -66,6 +66,7 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 		assertEquals((Integer) TypeNames.INT, itemDataDAO.getTypeExpected(index++));
 		assertEquals((Integer) TypeNames.INT, itemDataDAO.getTypeExpected(index++));
 		assertEquals((Integer) TypeNames.INT, itemDataDAO.getTypeExpected(index++));
+		assertEquals((Integer) TypeNames.BOOL, itemDataDAO.getTypeExpected(index++));
 		assertNull(itemDataDAO.getTypeExpected(index));
 	}
 
@@ -411,5 +412,20 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 		map.put("update_id", 1);
 
 		return map;
+	}
+
+	@Test
+	public void testThatGetItemsToSDVReturnsTrue() {
+		assertEquals(itemDataDAO.getItemsToSDV(1), 0);
+	}
+
+	@Test
+	public void testThatSDVCrfItemsReturnsTrue() {
+		assertTrue(itemDataDAO.sdvCrfItems(1, true));
+	}
+
+	@Test
+	public void testThatUpdateItemDataSDVWhenCRFMetadataWasChangedReturnsTrue() {
+		assertTrue(itemDataDAO.updateItemDataSDVWhenCRFMetadataWasChanged(1));
 	}
 }

@@ -1,11 +1,12 @@
 package com.clinovo.clincapture.dao.managestudy;
 
-import java.util.Date;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
+
+import java.util.Date;
 
 public class StudyEventDAOTest extends DefaultAppContextTest {
 
@@ -35,5 +36,10 @@ public class StudyEventDAOTest extends DefaultAppContextTest {
 	public void testDelete() throws OpenClinicaException {
 		studyEventDao.deleteByPK(4);
 		assertEquals("", ((StudyEventBean) studyEventDao.findByPK(4)).getLocation());
+	}
+
+	@Test
+	public void testThatFindAllSDVStudyEventsReturnsCorrectSize() throws OpenClinicaException {
+		assertEquals(studyEventDao.findAllSDVStudyEvents(1).size(), 0);
 	}
 }

@@ -57,7 +57,7 @@
 <table width="75%">
     <tr>
         <td>
-	    <span class="first_level_header"> <b> <c:out value="${toc.crf.name}"/>
+	    <span class="first_level_header"> <b id="crfNameId"> <c:out value="${toc.crf.name}"/>
             <c:out value="${toc.crfVersion.name}"/>
         <c:choose>
             <c:when test="${eventCRF.stage.initialDE and !eventCRF.notStarted}">

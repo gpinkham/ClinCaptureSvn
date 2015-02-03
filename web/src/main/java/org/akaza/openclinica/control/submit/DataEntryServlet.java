@@ -1,13 +1,13 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
- * You should have received a copy of the Lesser GNU General Public License along with this program.  
+ *
+ * You should have received a copy of the Lesser GNU General Public License along with this program.
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
@@ -150,7 +150,7 @@ import java.util.TreeSet;
 /**
  * @author ssachs
  */
-@SuppressWarnings({ "all" })
+@SuppressWarnings({"all"})
 public abstract class DataEntryServlet extends Controller {
 
 	public static final String DATA_ENTRY_CURRENT_CRF_VERSION_OID = "dataEntryCurrentCrfVersionOid";
@@ -261,6 +261,10 @@ public abstract class DataEntryServlet extends Controller {
 	public static final String DN_ADDITIONAL_CR_PARAMS = "dnAdditionalCreatingParameters";
 
 	public static final String SECTION_CHANGED = "sectionChanged";
+	public static final int INT_3800 = 3800;
+	public static final int INT_255 = 255;
+	public static final int INT_3 = 3;
+	public static final int INT_4 = 4;
 
 	@Override
 	protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -302,7 +306,6 @@ public abstract class DataEntryServlet extends Controller {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Locale locale = SessionUtil.getLocale(request);
@@ -387,6 +390,9 @@ public abstract class DataEntryServlet extends Controller {
 		List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
 		dndao = new DiscrepancyNoteDAO(getDataSource());
 
+		request.setAttribute("eventCrfDoesNotHaveOutstandingDNs",
+				ecb.getId() <= 0 || dndao.doesNotHaveOutstandingDNs(ecb));
+
 		allNotes = dndao.findAllTopNotesByEventCRF(ecb.getId());
 		eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
 
@@ -430,9 +436,7 @@ public abstract class DataEntryServlet extends Controller {
 			// Removing the user and EventCRF from the locked CRF List
 			justRemoveLockedCRF(ecb.getId());
 			if (newUploadedFiles.size() > 0) {
-				if (this.unloadFiles(newUploadedFiles)) {
-
-				} else {
+				if (!this.unloadFiles(newUploadedFiles)) {
 					String missed = "";
 					Iterator iter = newUploadedFiles.keySet().iterator();
 					while (iter.hasNext()) {
@@ -580,10 +584,10 @@ public abstract class DataEntryServlet extends Controller {
 		// set up interviewer name and date
 		fp.addPresetValue(INPUT_INTERVIEWER, ecb.getInterviewerName());
 
-		SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat localDf = getLocalDf(request);
 
 		if (ecb.getDateInterviewed() != null) {
-			String idateFormatted = local_df.format(ecb.getDateInterviewed());
+			String idateFormatted = localDf.format(ecb.getDateInterviewed());
 			fp.addPresetValue(INPUT_INTERVIEW_DATE, idateFormatted);
 		} else {
 			fp.addPresetValue(INPUT_INTERVIEW_DATE, "");
@@ -591,7 +595,6 @@ public abstract class DataEntryServlet extends Controller {
 		setPresetValues(fp.getPresetValues(), request);
 		logMe("Entering Checks !submitted  " + System.currentTimeMillis());
 		if (!isSubmitted) {
-			// TODO: prevent data enterer from seeing results of first round of
 			// data entry, if this is second round
 			logMe("Entering Checks !submitted entered  " + System.currentTimeMillis());
 			long t = System.currentTimeMillis();
@@ -623,9 +626,7 @@ public abstract class DataEntryServlet extends Controller {
 
 			setUpPanel(request, section);
 			if (newUploadedFiles.size() > 0) {
-				if (this.unloadFiles(newUploadedFiles)) {
-
-				} else {
+				if (!this.unloadFiles(newUploadedFiles)) {
 					String missed = "";
 					Iterator iter = newUploadedFiles.keySet().iterator();
 					while (iter.hasNext()) {
@@ -754,9 +755,9 @@ public abstract class DataEntryServlet extends Controller {
 							// for scd item
 							// a control item is always before its scd item
 							dib.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(dib.getMetadata().getItemId()));
-							if (dib.getIsSCDtoBeShown())
+							if (dib.getIsSCDtoBeShown()) {
 								itemBeansWithSCDShown.add(dib.getItem());
-
+							}
 							validateSCDItemBean(v, dib);
 						}
 						ArrayList<DisplayItemBean> children = dib.getChildren();
@@ -772,8 +773,9 @@ public abstract class DataEntryServlet extends Controller {
 								// a control item is always before its scd item
 								child.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(
 										child.getMetadata().getItemId()));
-								if (child.getIsSCDtoBeShown())
+								if (child.getIsSCDtoBeShown()) {
 									itemBeansWithSCDShown.add(dib.getItem());
+								}
 								validateSCDItemBean(v, child);
 							}
 						}
@@ -1012,7 +1014,8 @@ public abstract class DataEntryServlet extends Controller {
 						for (DisplayItemBean displayItem : items) {
 							ItemFormMetadataBean ifmb = displayItem.getMetadata();
 							int responseTypeId = ifmb.getResponseSet().getResponseTypeId();
-							if (responseTypeId == 8 || responseTypeId == 9) {
+							if (responseTypeId == ResponseType.CALCULATION.getId()
+									|| responseTypeId == ResponseType.GROUP_CALCULATION.getId()) {
 								StringBuffer err = new StringBuffer();
 								ResponseOptionBean robBean = (ResponseOptionBean) ifmb.getResponseSet().getOptions()
 										.get(0);
@@ -1064,7 +1067,8 @@ public abstract class DataEntryServlet extends Controller {
 					DisplayItemBean dib = diwb.getSingleItem();
 					ItemFormMetadataBean ifmb = dib.getMetadata();
 					int responseTypeId = ifmb.getResponseSet().getResponseTypeId();
-					if (responseTypeId == 8 || responseTypeId == 9) {
+					if (responseTypeId == ResponseType.CALCULATION.getId()
+							|| responseTypeId == ResponseType.GROUP_CALCULATION.getId()) {
 						StringBuffer err = new StringBuffer();
 						ResponseOptionBean robBean = (ResponseOptionBean) ifmb.getResponseSet().getOptions().get(0);
 						String value = "";
@@ -1101,7 +1105,8 @@ public abstract class DataEntryServlet extends Controller {
 						DisplayItemBean child = (DisplayItemBean) children.get(j);
 						ItemFormMetadataBean cifmb = child.getMetadata();
 						int resTypeId = cifmb.getResponseSet().getResponseTypeId();
-						if (resTypeId == 8 || resTypeId == 9) {
+						if (resTypeId == ResponseType.CALCULATION.getId()
+								|| resTypeId == ResponseType.GROUP_CALCULATION.getId()) {
 							StringBuffer cerr = new StringBuffer();
 							child.getDbData().setValue(child.getData().getValue());
 							ResponseOptionBean crobBean = (ResponseOptionBean) cifmb.getResponseSet().getOptions()
@@ -1182,32 +1187,37 @@ public abstract class DataEntryServlet extends Controller {
 
 					for (DisplayItemBean displayItem : changedItemsList) {
 						if (displayItem.getMetadata().getResponseSet().getResponseType()
-								.equals(ResponseType.CALCULATION))
+								.equals(ResponseType.CALCULATION)) {
 							continue;
+						}
 						int index = changedItemsList.indexOf(displayItem);
 						String formName = changedItemNamesList.get(index);
 
 						ItemDataBean idb = displayItem.getData();
 						ItemFormMetadataBean ifmb = displayItem.getMetadata();
 						DisplayItemGroupBean digb = changedItemsMap.get(formName);
-						String newRowRfcKey = digb != null ? digb.getItemGroupBean().getId() + "_" + digb.getOrdinal()
+						String newRowRfcKey = digb != null
+								? digb.getItemGroupBean().getId() + "_" + digb.getOrdinal()
 								: null;
 						Boolean rfcWasAdded = rfcForNewRows.get(newRowRfcKey);
-						if (rfcWasAdded != null && rfcWasAdded)
+						if (rfcWasAdded != null && rfcWasAdded) {
 							continue;
+						}
 						logger.debug("-- found group label " + ifmb.getGroupLabel());
 						if (!ifmb.getGroupLabel().equalsIgnoreCase("Ungrouped")
 								&& !ifmb.getGroupLabel().equalsIgnoreCase("")) {
 							changedItemsMap.remove(formName);
 							if (digb != null) {
 								this.setReasonForChangeError(errors, idb, formName, error, request);
-								if (rfcWasAdded != null)
+								if (rfcWasAdded != null) {
 									rfcForNewRows.put(newRowRfcKey, true);
+								}
 							}
 						} else {
 							this.setReasonForChangeError(errors, idb, formName, error, request);
-							if (rfcWasAdded != null)
+							if (rfcWasAdded != null) {
 								rfcForNewRows.put(newRowRfcKey, true);
+							}
 							logger.debug("form name added: " + formName);
 						}
 					}
@@ -1294,7 +1304,7 @@ public abstract class DataEntryServlet extends Controller {
 
 				logger.debug("threw an error with data entry...");
 
-				String[] textFields = { INPUT_INTERVIEWER, INPUT_INTERVIEW_DATE };
+				String[] textFields = {INPUT_INTERVIEWER, INPUT_INTERVIEW_DATE};
 				fp.setCurrentStringValuesAsPreset(textFields);
 				setPresetValues(fp.getPresetValues(), request);
 
@@ -1532,8 +1542,9 @@ public abstract class DataEntryServlet extends Controller {
 						int ordinal = -1;
 						String newFieldName = fieldName;
 						String[] fieldNames = fieldName.split("\\.");
-						fieldNames = Arrays.copyOfRange(fieldNames, fieldNames.length == 3 ? 1
-								: (fieldNames.length == 4 ? 2 : 0), fieldNames.length);
+						fieldNames = Arrays.copyOfRange(fieldNames, fieldNames.length == INT_3
+								? 1
+								: (fieldNames.length == INT_4 ? 2 : 0), fieldNames.length);
 						if (fieldNames.length == 2) {
 							newFieldName = fieldNames[1];
 							// check items in item groups here?
@@ -1656,7 +1667,7 @@ public abstract class DataEntryServlet extends Controller {
 						// copy of one line from early on around line 400, forcing a re-show of the items
 						// section = getDisplayBean(hasGroup, true);// include all items, tbh
 						// below a copy of three lines from the if errors = true line, tbh 03/2010
-						String[] textFields = { INPUT_INTERVIEWER, INPUT_INTERVIEW_DATE };
+						String[] textFields = {INPUT_INTERVIEWER, INPUT_INTERVIEW_DATE};
 						fp.setCurrentStringValuesAsPreset(textFields);
 						setPresetValues(fp.getPresetValues(), request);
 						// below essetially a copy except for rulesPostDryRun
@@ -1673,8 +1684,8 @@ public abstract class DataEntryServlet extends Controller {
 					}
 				}
 
-				if (!inSameSection) {// else if not in same section, progress as usual
-
+				if (!inSameSection) {
+					// else if not in same section, progress as usual
 					ArrayList<String> updateFailedItems = sc.redoCalculations(scoreItems, scoreItemdata, changedItems,
 							itemOrdinals, sb.getId());
 					success = updateFailedItems.size() > 0 ? false : true;
@@ -1721,9 +1732,7 @@ public abstract class DataEntryServlet extends Controller {
 					request.setAttribute(INPUT_IGNORE_PARAMETERS, Boolean.TRUE);
 
 					if (newUploadedFiles.size() > 0) {
-						if (this.unloadFiles(newUploadedFiles)) {
-
-						} else {
+						if (!this.unloadFiles(newUploadedFiles)) {
 							String missed = "";
 							Iterator iter = newUploadedFiles.keySet().iterator();
 							while (iter.hasNext()) {
@@ -1891,7 +1900,7 @@ public abstract class DataEntryServlet extends Controller {
 				body.append(respage.getString("email_body_separator"));
 				body.append(respage.getString("email_body_simple_separator"));
 				body.append(respage.getString("email_footer"));
-				String[] files = { reportFilePath };
+				String[] files = {reportFilePath};
 
 				boolean isEmailSent = sendEmailWithAttach(
 						edcb.getEmailTo(),
@@ -1935,13 +1944,15 @@ public abstract class DataEntryServlet extends Controller {
 
 		HashMap<String, DiscrepancyNoteBean> submittedDNs = (HashMap) request.getSession().getAttribute(
 				CreateDiscrepancyNoteServlet.SUBMITTED_DNS_MAP);
-		if (submittedDNs == null || submittedDNs.isEmpty())
+		if (submittedDNs == null || submittedDNs.isEmpty()) {
 			return;
+		}
 
 		List<DiscrepancyNoteBean> listOfDNsToTransform = (ArrayList<DiscrepancyNoteBean>) request.getSession()
 				.getAttribute(DNS_TO_TRANSFORM);
-		if (listOfDNsToTransform == null)
+		if (listOfDNsToTransform == null) {
 			listOfDNsToTransform = new ArrayList<DiscrepancyNoteBean>();
+		}
 
 		HashMap ruleErrors = ruleValidator.validate();
 		Set<String> fieldNames = new HashSet(submittedDNs.keySet());
@@ -1965,8 +1976,9 @@ public abstract class DataEntryServlet extends Controller {
 		for (String fieldName : fieldNames) {
 			DiscrepancyNoteBean dn = submittedDNs.get(fieldName);
 			// for RFC we need to show validation error-message
-			if (dn.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.REASON_FOR_CHANGE.getId())
+			if (dn.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
 				ruleValidator.removeFieldValidations(fieldName);
+			}
 			if ((!transformedSavedDNIds.contains(dn.getId()) && dn.getId() > 0)
 					|| (!transformedUnSavedDNFieldNames.contains(fieldName) && !StringUtil.isBlank(dn.getField()))) {
 				listOfDNsToTransform.add(dn);
@@ -1981,8 +1993,9 @@ public abstract class DataEntryServlet extends Controller {
 
 		List<DiscrepancyNoteBean> listDNsToTransform = (ArrayList<DiscrepancyNoteBean>) request.getSession()
 				.getAttribute(DNS_TO_TRANSFORM);
-		if (listDNsToTransform == null || listDNsToTransform.isEmpty())
+		if (listDNsToTransform == null || listDNsToTransform.isEmpty()) {
 			return;
+		}
 
 		List<DiscrepancyNoteBean> transformedDNs = (List<DiscrepancyNoteBean>) request.getSession().getAttribute(
 				CreateDiscrepancyNoteServlet.TRANSFORMED_SUBMITTED_DNS);
@@ -2003,11 +2016,13 @@ public abstract class DataEntryServlet extends Controller {
 		for (DiscrepancyNoteBean dn : listDNsToTransform) {
 			// for RFC we need to show validation error-message
 			if (!transformedSavedDNIds.contains(dn.getId()) && dn.getId() > 0) {
-				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.ANNOTATION.getId())
+				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.ANNOTATION.getId()) {
 					DiscrepancyNoteUtil.transformSavedAnnotationToFVC(dn, ub, "", ResolutionStatus.UPDATED.getId(),
 							dndao);
-				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId())
+				}
+				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
 					DiscrepancyNoteUtil.transformSavedRFCToFVC(dn, ub, "", ResolutionStatus.UPDATED.getId(), dndao);
+				}
 				transformedDNs.add(dn);
 			} else if (!transformedUnSavedDNFieldNames.contains(dn.getField()) && !StringUtil.isBlank(dn.getField())) {
 				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.ANNOTATION.getId()) {
@@ -2119,7 +2134,8 @@ public abstract class DataEntryServlet extends Controller {
 	protected void setReasonForChangeError(HashMap errors, ItemDataBean idb, String formName, String error,
 			HttpServletRequest request) {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-		Set<String> setOfItemNamesWithRFCErrors = request.getAttribute("setOfItemNamesWithRFCErrors") == null ? new TreeSet<String>()
+		Set<String> setOfItemNamesWithRFCErrors = request.getAttribute("setOfItemNamesWithRFCErrors") == null
+				? new TreeSet<String>()
 				: (TreeSet<String>) request.getAttribute("setOfItemNamesWithRFCErrors");
 		if (getNumberOfNotesForField(idb.getId(), formName, dndao, request) > 0) {
 
@@ -2163,11 +2179,10 @@ public abstract class DataEntryServlet extends Controller {
 	 * Get the input beans - the EventCRFBean and the SectionBean. For both beans, look first in the request attributes
 	 * to see if the bean has been stored there. If not, look in the parameters for the bean id, and then retrieve the
 	 * bean from the database. The beans are stored as protected class members.
-	 * 
+	 *
 	 * @param request
-	 *            TODO
+	 *            HttpServletRequest
 	 */
-	@SuppressWarnings("unused")
 	protected void getInputBeans(HttpServletRequest request) throws InsufficientPermissionException {
 
 		HttpSession session = request.getSession();
@@ -2250,7 +2265,8 @@ public abstract class DataEntryServlet extends Controller {
 
 			for (int i = 0; i < sections.size(); i++) {
 				SectionBean sb = (SectionBean) sections.get(i);
-				sectionId = sb.getId();// find the first section of this CRF
+				sectionId = sb.getId();
+				// find the first section of this CRF
 				break;
 			}
 		}
@@ -2268,16 +2284,15 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	/**
-	 * Tries to check if a seciton has item groups
-	 * 
+	 * Tries to check if a seciton has item groups.
+	 *
 	 * @param fp
-	 *            TODO
+	 *            FormProcessor
 	 * @param ecb
-	 *            TODO
-	 * 
-	 * @return
+	 *            EventCRFBean
+	 *
+	 * @return boolean
 	 */
-	@SuppressWarnings("unused")
 	protected boolean checkGroups(FormProcessor fp, EventCRFBean ecb) {
 		int sectionId = fp.getInt(INPUT_SECTION_ID, true);
 		SectionDAO sdao = new SectionDAO(getDataSource());
@@ -2286,7 +2301,8 @@ public abstract class DataEntryServlet extends Controller {
 
 			for (int i = 0; i < sections.size(); i++) {
 				SectionBean sb = (SectionBean) sections.get(i);
-				sectionId = sb.getId();// find the first section of this CRF
+				sectionId = sb.getId();
+				// find the first section of this CRF
 				break;
 			}
 		}
@@ -2306,15 +2322,16 @@ public abstract class DataEntryServlet extends Controller {
 
 	/**
 	 * Creates a new Event CRF or update the exsiting one, that is, an event CRF can be created but not item data yet,
-	 * in this case, still consider it is not started(called uncompleted before)
-	 * 
+	 * in this case, still consider it is not started(called uncompleted before).
+	 *
 	 * @param request
-	 *            TODO
+	 *            HttpServletRequest
 	 * @param fp
-	 *            TODO
-	 * 
-	 * @return
+	 *            FormProcessor
+	 *
+	 * @return EventCRFBean
 	 * @throws Exception
+	 *             an Exception
 	 */
 	private EventCRFBean createEventCRF(HttpServletRequest request, FormProcessor fp) throws InconsistentStateException {
 
@@ -2379,7 +2396,8 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		ecb = new EventCRFBean();
-		if (eventCRFId == 0) {// no event CRF created yet
+		if (eventCRFId == 0) {
+			// no event CRF created yet
 			ArrayList ecList = ecdao.findByEventSubjectVersion(sEvent, ssb, (CRFVersionBean) eb);
 			if (ecList.size() > 0) {
 				ecb = (EventCRFBean) ecList.get(0);
@@ -2397,8 +2415,8 @@ public abstract class DataEntryServlet extends Controller {
 				}
 				if (!currentStudy.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
 					if (sEvent.getDateStarted() != null) {
-						ecb.setDateInterviewed(sEvent.getDateStarted());// default
-						// date
+						ecb.setDateInterviewed(sEvent.getDateStarted());
+						// default date
 					} else {
 						ecb.setDateInterviewed(null);
 					}
@@ -2447,7 +2465,7 @@ public abstract class DataEntryServlet extends Controller {
 	 * Read in form values and write them to a display item bean. Note that this results in the form value being written
 	 * to both the response set bean and the item data bean. The ResponseSetBean is used to display preset values on the
 	 * form in the event of error, and the ItemDataBean is used to send values to the database.
-	 * 
+	 *
 	 * @param dib
 	 *            The DisplayItemBean to write data into.
 	 * @param request
@@ -2479,7 +2497,7 @@ public abstract class DataEntryServlet extends Controller {
 	/**
 	 * This methods will create an array of DisplayItemGroupBean, which contains multiple rows for an item group on the
 	 * data entry form.
-	 * 
+	 *
 	 * @param digb
 	 *            The Item group which has multiple data rows
 	 * @param dbGroups
@@ -2653,7 +2671,7 @@ public abstract class DataEntryServlet extends Controller {
 	 * <p/>
 	 * validateDisplayItemBeanText, validateDisplayItemBeanSingleCV, and validateDisplayItemBeanMultipleCV are provided
 	 * to make implementing this method easy.
-	 * 
+	 *
 	 * @param v
 	 *            The Validator to add validations to.
 	 * @param dib
@@ -2748,7 +2766,7 @@ public abstract class DataEntryServlet extends Controller {
 	/**
 	 * Peform validation on a item which has a TEXT or TEXTAREA response type. If the item has a null value, it's
 	 * automatically validated. Otherwise, it's checked against its data type.
-	 * 
+	 *
 	 * @param v
 	 *            The Validator to add validations to.
 	 * @param dib
@@ -2762,7 +2780,8 @@ public abstract class DataEntryServlet extends Controller {
 
 		FormProcessor fp = new FormProcessor(request);
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-		if (StringUtil.isBlank(inputName)) {// for single items
+		if (StringUtil.isBlank(inputName)) {
+			// for single items
 			inputName = getInputName(dib);
 		}
 		ItemBean ib = dib.getItem();
@@ -2793,10 +2812,10 @@ public abstract class DataEntryServlet extends Controller {
 					// the db field length
 					if (ibMeta.getResponseSet().getResponseType() == org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) {
 						v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
-								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3800);
+								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_3800);
 					} else {
 						v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
-								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_255);
 					}
 
 				} else if (idt.equals(ItemDataType.INTEGER)) {
@@ -2807,15 +2826,6 @@ public abstract class DataEntryServlet extends Controller {
 
 					v.addValidation(inputName, Validator.IS_A_FLOAT);
 					v.alwaysExecuteLastValidation(inputName);
-				} else if (idt.equals(ItemDataType.BL)) {
-					// there is no validation here since this data type is
-					// explicitly
-					// allowed to be null
-					// if the string input for this field parses to a non-zero
-					// number, the
-					// value will be true; otherwise, 0
-				} else if (idt.equals(ItemDataType.BN)) {
-
 				} else if (idt.equals(ItemDataType.SET)) {
 					v.addValidation(inputName, Validator.IN_RESPONSE_SET_SINGLE_VALUE, dib.getMetadata()
 							.getResponseSet());
@@ -2862,7 +2872,7 @@ public abstract class DataEntryServlet extends Controller {
 	/**
 	 * Peform validation on a item which has a RADIO or SINGLESELECTresponse type. This function checks that the input
 	 * isn't blank, and that its value comes from the controlled vocabulary (ResponseSetBean) in the DisplayItemBean.
-	 * 
+	 *
 	 * @param v
 	 *            The Validator to add validations to.
 	 * @param dib
@@ -2901,7 +2911,7 @@ public abstract class DataEntryServlet extends Controller {
 	/**
 	 * Peform validation on a item which has a RADIO or SINGLESELECT response type. This function checks that the input
 	 * isn't blank, and that its value comes from the controlled vocabulary (ResponseSetBean) in the DisplayItemBean.
-	 * 
+	 *
 	 * @param v
 	 *            The Validator to add validations to.
 	 * @param dib
@@ -2937,6 +2947,19 @@ public abstract class DataEntryServlet extends Controller {
 		return inputName;
 	}
 
+	/**
+	 * Method returns group item input name.
+	 * 
+	 * @param digb
+	 *            DisplayItemGroupBean
+	 * @param rowCount
+	 *            int
+	 * @param manualRows
+	 *            int
+	 * @param dib
+	 *            DisplayItemBean
+	 * @return String
+	 */
 	public final String getGroupItemInputName(DisplayItemGroupBean digb, int rowCount, int manualRows,
 			DisplayItemBean dib) {
 		int ordinal = rowCount - manualRows;
@@ -2946,12 +2969,15 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	/**
-	 * Creates an input name for an item data entry in an item group
-	 * 
+	 * Creates an input name for an item data entry in an item group.
+	 *
 	 * @param digb
+	 *            DisplayItemGroupBean
 	 * @param ordinal
+	 *            int
 	 * @param dib
-	 * @return
+	 *            DisplayItemBean
+	 * @return String
 	 */
 	public final String getGroupItemInputName(DisplayItemGroupBean digb, int ordinal, DisplayItemBean dib) {
 		String inputName = digb.getItemGroupBean().getOid() + "_" + ordinal + getInputName(dib);
@@ -2962,7 +2988,7 @@ public abstract class DataEntryServlet extends Controller {
 	/**
 	 * Writes data from the DisplayItemBean to the database. Note that if the bean contains an inactive ItemDataBean,
 	 * the ItemDataBean is created; otherwise, the ItemDataBean is updated.
-	 * 
+	 *
 	 * @param dib
 	 *            The DisplayItemBean from which to write data.
 	 * @param iddao
@@ -2994,7 +3020,7 @@ public abstract class DataEntryServlet extends Controller {
 				if (!dib.getMetadata().isShowItem() && idb.getValue().equals("")
 						&& !dynamicsMetadataService.isShown(dib.getItem().getId(), ecb, dib.getData())
 						&& !(dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0)
-						&& !(dib.getItem().getItemDataTypeId() == 12)) {
+						&& !(dib.getItem().getItemDataTypeId() == ItemDataType.CODE.getId())) {
 
 					logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id "
 							+ dib.getItem().getId());
@@ -3160,7 +3186,7 @@ public abstract class DataEntryServlet extends Controller {
 	/**
 	 * Retrieve the status which should be assigned to ItemDataBeans which have non-blank values for this data entry
 	 * servlet.
-	 * 
+	 *
 	 * @param request
 	 *            TODO
 	 */
@@ -3170,7 +3196,7 @@ public abstract class DataEntryServlet extends Controller {
 
 	/**
 	 * Get the eventCRF's annotations as appropriate for this data entry servlet.
-	 * 
+	 *
 	 * @param request
 	 *            TODO
 	 */
@@ -3178,7 +3204,7 @@ public abstract class DataEntryServlet extends Controller {
 
 	/**
 	 * Set the eventCRF's annotations properties as appropriate for this data entry servlet.
-	 * 
+	 *
 	 * @param request
 	 *            TODO
 	 */
@@ -3187,7 +3213,7 @@ public abstract class DataEntryServlet extends Controller {
 	/**
 	 * Retrieve the DisplaySectionBean which will be used to display the Event CRF Section on the JSP, and also is used
 	 * to controll processRequest.
-	 * 
+	 *
 	 * @param request
 	 *            TODO
 	 * @param isSubmitted
@@ -3207,7 +3233,7 @@ public abstract class DataEntryServlet extends Controller {
 	/**
 	 * Retrieve the DisplaySectionBean which will be used to display the Event CRF Section on the JSP, and also is used
 	 * to controll processRequest.
-	 * 
+	 *
 	 * @param request
 	 *            TODO
 	 */
@@ -3263,17 +3289,18 @@ public abstract class DataEntryServlet extends Controller {
 				discNotes.setNumExistingFieldNotes(INPUT_INTERVIEWER, 1);
 				request.setAttribute("hasNameNote", "yes");
 				request.setAttribute(INTERVIEWER_NAME_NOTE, dn);
-				if (dn.getParentDnId() == 0)
+				if (dn.getParentDnId() == 0) {
 					existingNameNotes.add(dn);
-
+				}
 			}
 
 			if (DATE_INTERVIEWED.equalsIgnoreCase(dn.getColumn())) {
 				discNotes.setNumExistingFieldNotes(INPUT_INTERVIEW_DATE, 1);
 				request.setAttribute("hasDateNote", "yes");
 				request.setAttribute(INTERVIEWER_DATE_NOTE, dn);
-				if (dn.getParentDnId() == 0)
+				if (dn.getParentDnId() == 0) {
 					existingIntrvDateNotes.add(dn);
+				}
 			}
 		}
 
@@ -3466,7 +3493,7 @@ public abstract class DataEntryServlet extends Controller {
 
 	/**
 	 * To set the totals of each resolution status on the DisplayItemBean for each item.
-	 * 
+	 *
 	 * @param dib
 	 * @param notes
 	 * @param ecbId
@@ -3522,7 +3549,7 @@ public abstract class DataEntryServlet extends Controller {
 			}
 		}
 
-		dib.setTotNew(totNew);// totNew is used for parent thread count
+		dib.setTotNew(totNew); // totNew is used for parent thread count
 		dib.setTotRes(totRes);
 		dib.setTotUpdated(totUpdated);
 		dib.setTotClosed(totClosed);
@@ -3532,15 +3559,14 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	/**
-	 * The following methods are for 'mark CRF complete'
-	 * 
+	 * The following methods are for 'mark CRF complete'.
+	 *
 	 * @param request
-	 *            TODO
-	 * 
-	 * @return
+	 *            HttpServletRequest
+	 *
+	 * @return boolean
 	 */
 
-	@SuppressWarnings("deprecation")
 	protected boolean markCRFComplete(HttpServletRequest request) throws Exception {
 
 		HttpSession session = request.getSession();
@@ -3569,7 +3595,7 @@ public abstract class DataEntryServlet extends Controller {
 			}
 		}
 
-		if (isEachRequiredFieldFillout(request) == false) {
+		if (!isEachRequiredFieldFillout(request)) {
 			addPageMessage(respage.getString("not_mark_CRF_complete4"), request);
 			return false;
 		}
@@ -3609,8 +3635,7 @@ public abstract class DataEntryServlet extends Controller {
 		// for the non-reviewed sections, no item data in DB yet, need to
 		// create them
 		if (!isEachSectionReviewedOnce(request)) {
-			boolean canSave = saveItemsToMarkComplete(newStatus, request);
-			if (canSave == false) {
+			if (!saveItemsToMarkComplete(newStatus, request)) {
 				addPageMessage(respage.getString("not_mark_CRF_complete3"), request);
 				return false;
 			}
@@ -3668,7 +3693,6 @@ public abstract class DataEntryServlet extends Controller {
 		return true;
 	}
 
-	@SuppressWarnings("unused")
 	private void getEventCRFBean(HttpServletRequest request) {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		FormProcessor fp = new FormProcessor(request);
@@ -3732,10 +3756,13 @@ public abstract class DataEntryServlet extends Controller {
 	/**
 	 * 06/13/2007- jxu Since we don't require users to review each section before mark a CRF as complete, we need to
 	 * create item data in the database because items will not be created unless the section which contains the items is
-	 * reviewed by users
-	 * 
+	 * reviewed by users.
+	 *
+	 * @param completeStatus
+	 *            Status
 	 * @param request
-	 *            TODO
+	 *            HttpServletRequest
+	 * @return boolean
 	 */
 	private boolean saveItemsToMarkComplete(Status completeStatus, HttpServletRequest request) throws Exception {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
@@ -3758,33 +3785,34 @@ public abstract class DataEntryServlet extends Controller {
 					idb.setCreatedDate(new Date());
 					idb.setOrdinal(1);
 					idb.setOwner(ub);
-					if (completeStatus != null) {// to avoid null exception
+					if (completeStatus != null) {
+						// to avoid null exception
 						idb.setStatus(completeStatus);
 					} else {
 						idb.setStatus(Status.UNAVAILABLE);
 					}
 					idb.setValue("");
 					boolean save = true;
-					if (itemBean.size() > 0)
+					if (itemBean.size() > 0) {
 						save = false;
+					}
 					if (save) {
 						iddao.create(idb);
-
 					}
 				}
 			}
 		}
-
 		return true;
 	}
 
 	/**
-	 * Checks if a section is reviewed at least once by user updated tbh 03/2011, to fix duplicates issues
+	 * Checks if a section is reviewed at least once by user updated tbh 03/2011, to fix duplicates issues.
 	 * 
 	 * @param sb
+	 *            SectionBean
 	 * @param request
-	 *            TODO
-	 * @return
+	 *            HttpServletRequest
+	 * @return boolean
 	 */
 	protected boolean isSectionReviewedOnce(SectionBean sb, HttpServletRequest request) {
 		SectionDAO sdao = new SectionDAO(getDataSource());
@@ -3862,12 +3890,12 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	/**
-	 * Checks if all the sections in an event crf are reviewed once tbh updated to prevent duplicates, 03/2011
+	 * Checks if all the sections in an event crf are reviewed once tbh updated to prevent duplicates, 03/2011.
 	 * 
 	 * @param request
-	 *            TODO
+	 *            HttpServletRequest
 	 * 
-	 * @return
+	 * @return boolean
 	 */
 	protected boolean isEachSectionReviewedOnce(HttpServletRequest request) {
 		SectionDAO sdao = new SectionDAO(getDataSource());
@@ -3908,16 +3936,13 @@ public abstract class DataEntryServlet extends Controller {
 		// return true;
 	}
 
-	@SuppressWarnings("unused")
 	protected void getEventDefinitionCRFBean(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-		{
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
-			StudyBean study = (StudyBean) session.getAttribute("study");
-			edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), ecb.getCRFVersionId());
-		}
+		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
+		StudyBean study = (StudyBean) session.getAttribute("study");
+		edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), ecb.getCRFVersionId());
 	}
 
 	private DisplayItemBean getDisplayItemBeanForFirstItemDataBean(List<DisplayItemBean> items,
@@ -4227,6 +4252,17 @@ public abstract class DataEntryServlet extends Controller {
 		return dibs;
 	}
 
+	/**
+	 * Method returns group item manual input name.
+	 * 
+	 * @param digb
+	 *            DisplayItemGroupBean
+	 * @param ordinal
+	 *            int
+	 * @param dib
+	 *            DisplayItemBean
+	 * @return String
+	 */
 	public final String getGroupItemManualInputName(DisplayItemGroupBean digb, int ordinal, DisplayItemBean dib) {
 		String inputName = digb.getItemGroupBean().getOid() + "_manual" + ordinal + getInputName(dib);
 		logger.info("+++ returning manual: " + inputName);
@@ -4245,7 +4281,8 @@ public abstract class DataEntryServlet extends Controller {
 		if (!currentStudy.getStudyParameterConfig().getInterviewDateDefault().equals("blank")
 				&& ("".equals(ecb.getDateInterviewed()) || ecb.getDateInterviewed() == null)) {
 			if (sEvent.getDateStarted() != null) {
-				ecb.setDateInterviewed(sEvent.getDateStarted());// default date
+				ecb.setDateInterviewed(sEvent.getDateStarted());
+				// default date
 			} else {
 				ecb.setDateInterviewed(null);
 			}
@@ -4295,7 +4332,6 @@ public abstract class DataEntryServlet extends Controller {
 		return scoreItemdata;
 	}
 
-	@SuppressWarnings("null")
 	protected HashMap<Integer, TreeSet<Integer>> prepareItemdataOrdinals(HttpServletRequest request) {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		HashMap<Integer, TreeSet<Integer>> ordinals = new HashMap<Integer, TreeSet<Integer>>();
@@ -4373,12 +4409,14 @@ public abstract class DataEntryServlet extends Controller {
 		} else {
 			String oldValue = oldItemdata.get(idb.getId());
 			if (oldValue != null) {
-				if (value == null)
+				if (value == null) {
 					return true;
-				else if (!oldValue.equals(value))
+				} else if (!oldValue.equals(value)) {
 					return true;
-			} else if (value != null)
+				}
+			} else if (value != null) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -4395,15 +4433,17 @@ public abstract class DataEntryServlet extends Controller {
 			} else {
 				String oldValue = oldItemdata.get(idb.getId());
 				if (oldValue != null) {
-					if (value == null)
+					if (value == null) {
 						return true;
-					else if (dib.getItem().getDataType().getId() == 11) {
+					} else if (dib.getItem().getDataType().getId() == ItemDataType.FILE.getId()) {
 						String theOldValue = oldValue.split("(/|\\\\)")[oldValue.split("(/|\\\\)").length - 1].trim();
 						return !value.equals(theOldValue);
-					} else if (!oldValue.equals(value))
+					} else if (!oldValue.equals(value)) {
 						return true;
-				} else if (value != null)
+					}
+				} else if (value != null) {
 					return true;
+				}
 			}
 		} else {
 			ItemDataDAO itdao = new ItemDataDAO(getDataSource());
@@ -4496,6 +4536,7 @@ public abstract class DataEntryServlet extends Controller {
 				try {
 					customValidation = Validator.processCRFValidationRegex(customValidationString);
 				} catch (Exception e) {
+					logger.error("Error has occurred.", e);
 				}
 			}
 
@@ -4522,7 +4563,7 @@ public abstract class DataEntryServlet extends Controller {
 
 	/**
 	 * This method will populate grouped and variableAndValue HashMaps grouped : Used to correctly populate group
-	 * ordinals variableAndValue : Holds itemOID , value (in Form ) pairs passed in to rule processor
+	 * ordinals variableAndValue : Holds itemOID , value (in Form ) pairs passed in to rule processor.
 	 * 
 	 * @param allItems
 	 */
@@ -4550,9 +4591,9 @@ public abstract class DataEntryServlet extends Controller {
 			}
 			// Items in repeating groups
 			for (DisplayItemGroupBean itemGroupBean : displayItemWithGroupBean.getItemGroups()) {
-				logger.debug("Item Group Name : {} , Item Group OID : {} , Ordinal : {} ", new Object[] {
+				logger.debug("Item Group Name : {} , Item Group OID : {} , Ordinal : {} ", new Object[]{
 						itemGroupBean.getItemGroupBean().getName(), itemGroupBean.getItemGroupBean().getOid(),
-						itemGroupBean.getIndex() });
+						itemGroupBean.getIndex()});
 				for (DisplayItemBean displayItemBean : itemGroupBean.getItems()) {
 					String key1 = itemGroupBean.getItemGroupBean().getOid() + "[" + (itemGroupBean.getIndex() + 1)
 							+ "]." + displayItemBean.getItem().getOid();
@@ -4589,8 +4630,9 @@ public abstract class DataEntryServlet extends Controller {
 						itemBeansWithSCDShown);
 			}
 			return ruleSets != null && ruleSets.size() > 0 ? ruleSets : new ArrayList<RuleSetBean>();
-		} else
+		} else {
 			return new ArrayList<RuleSetBean>();
+		}
 	}
 
 	private HashMap<String, ArrayList<String>> runRules(List<DisplayItemWithGroupBean> allItems,
@@ -4669,7 +4711,7 @@ public abstract class DataEntryServlet extends Controller {
 		return success;
 	}
 
-	class Container {
+	private class Container {
 		HashMap<String, Integer> grouped;
 		HashMap<String, String> variableAndValue;
 
@@ -4680,16 +4722,21 @@ public abstract class DataEntryServlet extends Controller {
 		}
 	}
 
+	/**
+	 * Method returns menual rows.
+	 * 
+	 * @param formGroups
+	 *            List<DisplayItemGroupBean>
+	 * @return int
+	 */
 	public int getManualRows(List<DisplayItemGroupBean> formGroups) {
 		int manualRows = 0;
 		for (int j = 0; j < formGroups.size(); j++) {
 			DisplayItemGroupBean formItemGroup = formGroups.get(j);
 			logger.debug("begin formGroup Ordinal:" + formItemGroup.getOrdinal());
-
-			if (formItemGroup.isAuto() == false) {
+			if (!formItemGroup.isAuto()) {
 				manualRows = manualRows + 1;
 			}
-
 		}
 		logger.debug("+++ returning manual rows: " + manualRows + " from a form group size of " + formGroups.size());
 		return manualRows;
@@ -4748,7 +4795,8 @@ public abstract class DataEntryServlet extends Controller {
 			if (sectionBeans != null && sectionBeans.size() > 0) {
 				int sid = displaySectionBean.getSection().getId();
 				displaySectionBean.setFirstSection(sid == sectionBeans.get(0).getId() ? true : false);
-				displaySectionBean.setLastSection(sid == sectionBeans.get(sectionBeans.size() - 1).getId() ? true
+				displaySectionBean.setLastSection(sid == sectionBeans.get(sectionBeans.size() - 1).getId()
+						? true
 						: false);
 			}
 		}
@@ -4779,6 +4827,14 @@ public abstract class DataEntryServlet extends Controller {
 		return n != null && n.getId() > 0 ? n : new SectionBean();
 	}
 
+	/**
+	 * Method checks access.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @throws InsufficientPermissionException
+	 *             the InsufficientPermissionException
+	 */
 	public void mayAccess(HttpServletRequest request) throws InsufficientPermissionException {
 		FormProcessor fp = new FormProcessor(request);
 		EventCRFDAO edao = new EventCRFDAO(getDataSource());

@@ -41,7 +41,6 @@
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='definition' class='org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean'/>
-<jsp:useBean scope='request' id='sdvOptions' class='java.util.ArrayList'/>
 <h1>
 	<span class="first_level_header">
 		<fmt:message key="define_study_event"  bundle="${resword}"/> - <fmt:message key="selected_CRFs"  bundle="${resword}"/> - <fmt:message key="selected_default_version"  bundle="${resword}"/>
@@ -115,18 +114,9 @@
                     		
                             <td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
 							    <select name="sdvOption<c:out value="${count}"/>" onchange="javascript:changeIcon();">
-						        	<c:set var="index" value="1"/>
-						            <c:forEach var="sdv" items="${sdvOptions}">
-						            	<c:choose>
-						            	<c:when test="${index == 3}">
-						            		<option value="${index}" selected><c:out value="${sdv}"/>
-						                </c:when>
-						                <c:otherwise>
-						            		<option value="${index}"><c:out value="${sdv}"/>
-						                </c:otherwise>
-						                </c:choose>
-						            	<c:set var="index" value="${index+1}"/>
-						            </c:forEach>
+                                    <c:forEach var="sdv" items="${crf.sdvOptions}">
+                                        <option value="${sdv.code}"><fmt:message key="${sdv.description}" bundle="${resterms}"/></option>
+                                    </c:forEach>
 					        	</select>
 							    </td>
                         </tr>

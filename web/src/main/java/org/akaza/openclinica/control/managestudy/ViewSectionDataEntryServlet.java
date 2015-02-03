@@ -84,7 +84,7 @@ import java.util.Set;
  * 
  * @author jxu
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
@@ -135,8 +135,11 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		SectionBean sb;
 		EventCRFBean ecb;
-		boolean isSubmitted = false;
 		EventDefinitionCRFBean edcb;
+
+		StudyEventDAO studyEventDao = getStudyEventDAO();
+		StudySubjectDAO studySubjectDao = getStudySubjectDAO();
+		DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(getDataSource());
 
 		int crfVersionId = fp.getInt("crfVersionId", true);
 		int sectionId = fp.getInt("sectionId", true);
@@ -183,9 +186,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		}
 
 		if (crfId == 0 && eventDefinitionCRFId > 0) {
-			if (edcb != null) {
-				crfId = edcb.getCrfId();
-			}
+			crfId = edcb.getCrfId();
 		}
 		request.setAttribute("crfId", crfId + "");
 		request.setAttribute("eventDefinitionCRFId", eventDefinitionCRFId + "");
@@ -206,8 +207,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		String age = "";
 
 		if (studySubjectId > 0) {
-			StudySubjectDAO ssdao = getStudySubjectDAO();
-			StudySubjectBean sub = (StudySubjectBean) ssdao.findByPK(studySubjectId);
+			StudySubjectBean sub = (StudySubjectBean) studySubjectDao.findByPK(studySubjectId);
 			request.setAttribute("studySubject", sub);
 		}
 
@@ -220,27 +220,24 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 			if (ecb != null && ecb.getId() > 0) {
 				request.setAttribute("eventCRF", ecb);
-			}
-			StudyEventDAO sedao = getStudyEventDAO();
-			StudyEventBean event = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
-			if (event.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)) {
-				request.setAttribute("isLocked", "yes");
-			} else {
-				request.setAttribute("isLocked", "no");
+				StudyEventBean event = (StudyEventBean) studyEventDao.findByPK(ecb.getStudyEventId());
+				if (event.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)) {
+					request.setAttribute("isLocked", "yes");
+				} else {
+					request.setAttribute("isLocked", "no");
+				}
+				if (studySubjectId <= 0) {
+					studySubjectId = event.getStudySubjectId();
+					request.setAttribute("studySubjectId", studySubjectId + "");
+				}
 			}
 
-			if (studySubjectId <= 0) {
-
-				studySubjectId = event.getStudySubjectId();
-				request.setAttribute("studySubjectId", studySubjectId + "");
-			}
 			// Get the status/number of item discrepancy notes
-			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-			allNotes = dndao.findAllTopNotesByEventCRF(eventCRFId);
+			allNotes = discrepancyNoteDao.findAllTopNotesByEventCRF(eventCRFId);
 			allNotes = filterNotesByUserRole(allNotes, request);
 
 			// add interviewer.jsp related notes to this Collection
-			eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
+			eventCrfNotes = discrepancyNoteDao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
 			if (!eventCrfNotes.isEmpty()) {
 				allNotes.addAll(eventCrfNotes);
 				// make sure a necessary request attribute "hasNameNote" is set properly
@@ -250,7 +247,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 			noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
-			List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
+			List<SectionBean> allSections = ecb != null
+					? sdao.findAllByCRFVersionId(ecb.getCRFVersionId())
+					: new ArrayList<SectionBean>();
 			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, ifmdao, eventDefinitionCRFId,
 					allSections, noteThreads);
 
@@ -326,8 +325,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			request.setAttribute(SECTION_BEAN, sb);
 
 			// This is the StudySubjectBean
-			StudySubjectDAO ssdao = getStudySubjectDAO();
-			StudySubjectBean sub = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
+			StudySubjectBean sub = (StudySubjectBean) studySubjectDao.findByPK(ecb.getStudySubjectId());
 			// This is the SubjectBean
 			SubjectDAO subjectDao = getSubjectDAO();
 			int subjectId = sub.getSubjectId();
@@ -336,8 +334,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			// Check for a null currentStudy
 			// Let us process the age
 			if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
-				StudyEventDAO sedao = getStudyEventDAO();
-				StudyEventBean se = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+				StudyEventBean se = (StudyEventBean) studyEventDao.findByPK(ecb.getStudyEventId());
 				StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se
 						.getStudyEventDefinitionId());
@@ -365,6 +362,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		}
 
+		request.setAttribute("eventCrfDoesNotHaveOutstandingDNs",
+				ecb.getId() <= 0 || discrepancyNoteDao.doesNotHaveOutstandingDNs(ecb));
+
 		boolean hasItemGroup = false;
 		// we will look into db to see if any repeating items for this CRF
 		// section
@@ -383,7 +383,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);
 		request.setAttribute(INPUT_EVENT_CRF, ecb);
 		request.setAttribute(SECTION_BEAN, sb);
-		dsb = super.getDisplayBean(hasItemGroup, false, request, isSubmitted);
+		dsb = super.getDisplayBean(hasItemGroup, false, request, false);
 
 		FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session
 				.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -401,7 +401,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		if ("saveNotes".equalsIgnoreCase(action)) {
 
 			// let's save notes for the blank items
-			DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 			discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
 			for (int i = 0; i < dsb.getDisplayItemGroups().size(); i++) {
@@ -417,8 +416,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 							String inputName = getGroupItemInputName(displayGroup, j, displayItem);
 							logger.info("inputName:" + inputName);
 							logger.info("item data id:" + displayItem.getData().getId());
-							AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, displayItem.getData()
-									.getId(), "itemData", currentStudy);
+							AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, discrepancyNoteDao, displayItem
+									.getData().getId(), "itemData", currentStudy);
 						}
 					}
 
@@ -427,15 +426,15 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 					// TODO work on this line
 
 					String inputName = getInputName(dib);
-					AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), "ItemData",
-							currentStudy);
+					AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, discrepancyNoteDao,
+							dib.getData().getId(), "ItemData", currentStudy);
 
 					ArrayList childItems = dib.getChildren();
 					for (Object childItem : childItems) {
 						DisplayItemBean child = (DisplayItemBean) childItem;
 						inputName = getInputName(child);
-						AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(),
-								"ItemData", currentStudy);
+						AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, discrepancyNoteDao, dib.getData()
+								.getId(), "ItemData", currentStudy);
 					}
 				}
 			}

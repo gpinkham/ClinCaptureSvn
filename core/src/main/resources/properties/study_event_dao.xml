@@ -345,4 +345,10 @@
         <name>deleteByPK</name>
         <sql>DELETE FROM study_event WHERE study_event_id=?</sql>
     </query>
+    <query>
+        <name>findAllSDVStudyEvents</name>
+        <sql>
+            select distinct se.* from event_crf ec, study_event se where ec.crf_version_id = ? and ec.study_event_id = se.study_event_id and se.subject_event_status_id = 9
+        </sql>
+    </query>
 </queries>

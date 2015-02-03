@@ -14,4 +14,9 @@ public class ItemFormMetadataDAOTest extends DefaultAppContextTest {
 	public void testThatGetCrfSectionsMetricReturnsCorrectValue() {
 		assertEquals(10, imfdao.getCrfSectionsMetric(1));
 	}
+
+	@Test
+	public void testThatHasItemsToSDVReturnsCorrectValue() {
+		assertFalse(imfdao.hasItemsToSDV(1));
+	}
 }

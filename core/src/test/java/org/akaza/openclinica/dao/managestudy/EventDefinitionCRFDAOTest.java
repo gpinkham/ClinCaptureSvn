@@ -14,6 +14,7 @@
 package org.akaza.openclinica.dao.managestudy;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.domain.SourceDataVerification;
 import org.junit.Test;
 
 public class EventDefinitionCRFDAOTest extends DefaultAppContextTest {
@@ -21,5 +22,10 @@ public class EventDefinitionCRFDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindByEventCrfIdAndStudyIdDoesNotReturnNull() {
 		assertNotNull(eventDefinitionCRFDAO.findByEventCrfIdAndStudyId(1, 1));
+	}
+
+	@Test
+	public void testThatUpdateEDCThatHasItemsToSDVReturnsCorrectValue() {
+		assertTrue(eventDefinitionCRFDAO.updateEDCThatHasItemsToSDV(1, SourceDataVerification.AllREQUIRED));
 	}
 }

@@ -18,17 +18,14 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory;
 import org.jmesa.facade.TableFacade;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -49,7 +45,7 @@ import java.util.ResourceBundle;
  * multiaction Controller.
  */
 @Controller("sdvController")
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class SDVController {
 
 	public static final String SUBJECT_SDV_TABLE_ATTRIBUTE = "sdvTableAttribute";
@@ -114,39 +110,6 @@ public class SDVController {
 		sdvFactory.setShowMoreLink(showMoreLink);
 		TableFacade facade = sdvFactory.createTable(request, response);
 		String sdvMatrix = facade.render();
-		gridMap.addAttribute(SUBJECT_SDV_TABLE_ATTRIBUTE, sdvMatrix);
-		return gridMap;
-	}
-
-	/**
-	 * Method that handles requests to viewAllSubjectSDV url.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param studySubjectId
-	 *            study subject id
-	 * @param studyId
-	 *            study id
-	 * @return ModelMap
-	 */
-	@RequestMapping("/viewAllSubjectSDV")
-	public ModelMap viewAllSubjectSDVHandler(HttpServletRequest request,
-			@RequestParam("studySubjectId") int studySubjectId, @RequestParam("studyId") int studyId) {
-
-		ModelMap gridMap = new ModelMap();
-
-		request.setAttribute("studyId", studyId);
-		request.setAttribute("studySubjectId", studySubjectId);
-		request.setAttribute("imagePathPrefix", "../");
-
-		ArrayList<String> pageMessages = (ArrayList<String>) request.getAttribute("pageMessages");
-		if (pageMessages == null) {
-			pageMessages = new ArrayList<String>();
-		}
-
-		request.setAttribute("pageMessages", pageMessages);
-
-		String sdvMatrix = sdvUtil.renderSubjectsTableWithLimit(request, studyId, studySubjectId);
 		gridMap.addAttribute(SUBJECT_SDV_TABLE_ATTRIBUTE, sdvMatrix);
 		return gridMap;
 	}
@@ -227,60 +190,18 @@ public class SDVController {
 	}
 
 	/**
-	 * Method that handles requests to viewAllSubjectSDVform url.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param studyId
-	 *            study id
-	 * @return ModelMap
-	 */
-	@RequestMapping("/viewAllSubjectSDVform")
-	public ModelMap viewAllSubjectFormHandler(HttpServletRequest request, @RequestParam("studyId") int studyId) {
-
-		ModelMap gridMap = new ModelMap();
-		String pattern = "MM/dd/yyyy";
-		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-
-		// set up the parameters to take part in filtering
-		ServletRequestDataBinder dataBinder = new ServletRequestDataBinder(new SdvFilterDataBean());
-		dataBinder.setAllowedFields("study_subject_id", "studyEventDefinition", "studyEventStatus", "eventCRFStatus",
-				"sdvRequirement", "eventcrfSDVStatus", "startUpdatedDate", "endDate", "eventCRFName");
-
-		dataBinder.registerCustomEditor(java.util.Date.class, new CustomDateEditor(sdf, true));
-		dataBinder.bind(request);
-
-		// set up request attributes for sidebar
-		// Not necessary when using old page design...
-		// setUpSidebar(request);
-
-		request.setAttribute("studyId", studyId);
-
-		ArrayList<String> pageMessages = (ArrayList<String>) request.getAttribute("pageMessages");
-		if (pageMessages == null) {
-			pageMessages = new ArrayList<String>();
-		}
-
-		request.setAttribute("pageMessages", pageMessages);
-		String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "");
-		gridMap.addAttribute(SUBJECT_SDV_TABLE_ATTRIBUTE, sdvMatrix);
-		return gridMap;
-	}
-
-	/**
 	 * Method that handles requests to handleSDVPost url.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
 	 * @param response
 	 *            HttpServletResponse
-	 * @param redirection
-	 *            redirection
-	 * @return String
+	 * @throws Exception
+	 *             an Exception
 	 */
 	@RequestMapping("/handleSDVPost")
-	public String sdvAllSubjectsFormHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("redirection") String redirection) {
+	public void sdvAllSubjectsFormHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
 		// The application is POSTing parameters with the name "sdvCheck_" plus the
 		// Event CRF id, so the parameter is sdvCheck_534.
@@ -305,24 +226,20 @@ public class SDVController {
 		if (parameterMap.isEmpty()) {
 			pageMessages.add(resPageMessages.getString("none_event_crf_selected_sdv"));
 			request.setAttribute("pageMessages", pageMessages);
-			sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
-
-		}
-		List<Integer> eventCRFIds = sdvUtil.getListOfSdvEventCRFIds(parameterMap.keySet());
-		boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), true);
-
-		if (updateCRFs) {
-			pageMessages.add(resPageMessages.getString("event_crf_sdved"));
 		} else {
-			pageMessages.add(resPageMessages.getString("sdv_database_problem"));
+			List<Integer> eventCRFIds = sdvUtil.getListOfSdvEventCRFIds(parameterMap.keySet());
+			boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), true);
+
+			if (updateCRFs) {
+				pageMessages.add(resPageMessages.getString("event_crf_sdved"));
+			} else {
+				pageMessages.add(resPageMessages.getString("sdv_database_problem"));
+			}
+			request.setAttribute("pageMessages", pageMessages);
 		}
-		request.setAttribute("pageMessages", pageMessages);
-
-		sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
-
-		// The name of the view, as in allSdvResult.jsp
-		return null;
-
+		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		response.sendRedirect(request.getContextPath().concat(
+				"/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=".concat(Integer.toString(currentStudy.getId()))));
 	}
 
 	/**
@@ -334,14 +251,13 @@ public class SDVController {
 	 *            HttpServletResponse
 	 * @param crfId
 	 *            crf id
-	 * @param redirection
-	 *            redirection
-	 * @return String
+	 * @throws Exception
+	 *             an Exception
 	 */
 	@RequestMapping("/handleSDVGet")
-	public String sdvOneCRFFormHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("crfId") int crfId, @RequestParam("redirection") String redirection) {
-
+	public void sdvOneCRFFormHandler(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam("crfId") int crfId) throws Exception {
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
 
 		if (!mayProceed(request)) {
@@ -350,7 +266,7 @@ public class SDVController {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			return null;
+			return;
 		}
 		// For the messages that appear in the left column of the results page
 		ArrayList<String> pageMessages = new ArrayList<String>();
@@ -368,11 +284,9 @@ public class SDVController {
 
 		request.setAttribute("sdv_restore", "true");
 
-		sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
-
-		// The name of the view, as in allSdvResult.jsp
-		return null;
-
+		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		response.sendRedirect(request.getContextPath().concat(
+				"/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=".concat(Integer.toString(currentStudy.getId()))));
 	}
 
 	/**
@@ -384,14 +298,13 @@ public class SDVController {
 	 *            HttpServletResponse
 	 * @param crfId
 	 *            crf id
-	 * @param redirection
-	 *            redirection
-	 * @return String
+	 * @throws Exception
+	 *             an Exception
 	 */
 	@RequestMapping("/handleSDVRemove")
-	public String changeSDVHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("crfId") int crfId, @RequestParam("redirection") String redirection) {
-
+	public void changeSDVHandler(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam("crfId") int crfId) throws Exception {
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
 
 		// For the messages that appear in the left column of the results page
@@ -409,11 +322,9 @@ public class SDVController {
 		request.setAttribute("pageMessages", pageMessages);
 		request.setAttribute("sdv_restore", "true");
 
-		sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
-
-		// The name of the view, as in allSdvResult.jsp
-		return null;
-
+		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		response.sendRedirect(request.getContextPath().concat(
+				"/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=".concat(Integer.toString(currentStudy.getId()))));
 	}
 
 	/**
@@ -425,14 +336,13 @@ public class SDVController {
 	 *            HttpServletResponse
 	 * @param studySubjectId
 	 *            study subject id
-	 * @param redirection
-	 *            redirection
-	 * @return String
+	 * @throws Exception
+	 *             an Exception
 	 */
 	@RequestMapping("/sdvStudySubject")
-	public String sdvStudySubjectHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("theStudySubjectId") int studySubjectId, @RequestParam("redirection") String redirection) {
-
+	public void sdvStudySubjectHandler(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam("theStudySubjectId") int studySubjectId) throws Exception {
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
 
 		// For the messages that appear in the left column of the results page
@@ -450,8 +360,10 @@ public class SDVController {
 		}
 		request.setAttribute("pageMessages", pageMessages);
 		request.setAttribute("s_sdv_restore", "true");
-		sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
-		return null;
+		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		response.sendRedirect(request.getContextPath()
+				.concat("/pages/viewSubjectAggregate?s_sdv_restore=true&studyId=".concat(Integer.toString(currentStudy
+						.getId()))));
 	}
 
 	/**
@@ -463,14 +375,13 @@ public class SDVController {
 	 *            HttpServletResponse
 	 * @param studySubjectId
 	 *            study subject id
-	 * @param redirection
-	 *            redirection
-	 * @return String
+	 * @throws Exception
+	 *             an Exception
 	 */
 	@RequestMapping("/unSdvStudySubject")
-	public String unSdvStudySubjectHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("theStudySubjectId") int studySubjectId, @RequestParam("redirection") String redirection) {
-
+	public void unSdvStudySubjectHandler(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam("theStudySubjectId") int studySubjectId) throws Exception {
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
 
 		ArrayList<String> pageMessages = new ArrayList<String>();
@@ -487,9 +398,11 @@ public class SDVController {
 		}
 		request.setAttribute("pageMessages", pageMessages);
 		request.setAttribute("s_sdv_restore", "true");
-		sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
-		return null;
 
+		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		response.sendRedirect(request.getContextPath()
+				.concat("/pages/viewSubjectAggregate?s_sdv_restore=true&studyId=".concat(Integer.toString(currentStudy
+						.getId()))));
 	}
 
 	/**
@@ -499,13 +412,12 @@ public class SDVController {
 	 *            HttpServletRequest
 	 * @param response
 	 *            HttpServletResponse
-	 * @param redirection
-	 *            redirection
-	 * @return String
+	 * @throws Exception
+	 *             an Exception
 	 */
 	@RequestMapping("/sdvStudySubjects")
-	public String sdvStudySubjectsHandler(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("redirection") String redirection) {
+	public void sdvStudySubjectsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
 		// The application is POSTing parameters with the name "sdvCheck_" plus the
 		// Event CRF id, so the parameter is sdvCheck_534.
@@ -530,26 +442,23 @@ public class SDVController {
 		if (parameterMap.isEmpty()) {
 			pageMessages.add(resPageMessages.getString("none_subjects_selected_sdv"));
 			request.setAttribute("pageMessages", pageMessages);
-			sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
-
-		}
-
-		List<Integer> studySubjectIds = sdvUtil.getListOfStudySubjectIds(parameterMap.keySet());
-		boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(),
-				isSdvWithOpenQueriesAllowed(request), true);
-
-		if (updateCRFs) {
-			pageMessages.add(resPageMessages.getString("event_crf_sdved"));
 		} else {
-			pageMessages.add(resPageMessages.getString("sdv_database_problem"));
+
+			List<Integer> studySubjectIds = sdvUtil.getListOfStudySubjectIds(parameterMap.keySet());
+			boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(),
+					isSdvWithOpenQueriesAllowed(request), true);
+
+			if (updateCRFs) {
+				pageMessages.add(resPageMessages.getString("event_crf_sdved"));
+			} else {
+				pageMessages.add(resPageMessages.getString("sdv_database_problem"));
+			}
+			request.setAttribute("pageMessages", pageMessages);
 		}
-		request.setAttribute("pageMessages", pageMessages);
-
-		sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
-
-		// The name of the view, as in allSdvResult.jsp
-		return null;
-
+		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		response.sendRedirect(request.getContextPath()
+				.concat("/pages/viewSubjectAggregate?s_sdv_restore=true&studyId=".concat(Integer.toString(currentStudy
+						.getId()))));
 	}
 
 	private boolean isSdvWithOpenQueriesAllowed(HttpServletRequest request) {

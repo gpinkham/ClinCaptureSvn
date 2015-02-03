@@ -20,8 +20,15 @@
  */
 package org.akaza.openclinica.bean.core;
 
+/**
+ * EntityBean.
+ */
 @SuppressWarnings("serial")
 public class EntityBean implements java.io.Serializable {
+
+	public static final int INT_1231 = 1231;
+
+	public static final int INT_1237 = 1237;
 
 	// ss - changed visibility of these fields so Term could see them
 	// think we should change all fields to protected here
@@ -46,7 +53,7 @@ public class EntityBean implements java.io.Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (active ? 1231 : 1237);
+		result = prime * result + (active ? INT_1231 : INT_1237);
 		result = prime * result + id;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
@@ -54,25 +61,35 @@ public class EntityBean implements java.io.Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		EntityBean other = (EntityBean) obj;
-		if (active != other.active)
+		if (active != other.active) {
 			return false;
-		if (id != other.id)
+		}
+		if (id != other.id) {
 			return false;
+		}
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		return true;
 	}
 
+	/**
+	 * EntityBean constructor.
+	 */
 	public EntityBean() {
 		id = 0;
 		name = "";
@@ -94,6 +111,12 @@ public class EntityBean implements java.io.Serializable {
 		return this.name;
 	}
 
+	/**
+	 * Method that sets id.
+	 * 
+	 * @param id
+	 *            int
+	 */
 	public void setId(int id) {
 		this.id = id;
 

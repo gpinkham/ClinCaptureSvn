@@ -41,7 +41,7 @@ import java.util.Map;
 /**
  * StudySubjectDAO class. It performs the CRUD operations related to study subject items.
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+@SuppressWarnings({"rawtypes", "unchecked", "unused"})
 public class StudySubjectDAO extends AuditableEntityDAO {
 
 	/**
@@ -498,39 +498,6 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return 0;
-		}
-	}
-
-	/**
-	 * Method that checks that subject can be source data verified.
-	 *
-	 * @param studySubjectId
-	 *            study subject id
-	 * @param studyId
-	 *            study id
-	 * @param parentStudyId
-	 *            parent study id
-	 * @return boolean
-	 */
-	public boolean allowSDVSubject(int studySubjectId, int studyId, int parentStudyId) {
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.BOOL);
-
-		HashMap variables = new HashMap();
-		int index = 1;
-		variables.put(index++, studySubjectId);
-		variables.put(index++, parentStudyId);
-		variables.put(index, studyId);
-
-		String sql = digester.getQuery("allowSDVSubject");
-
-		ArrayList rows = this.select(sql, variables);
-		Iterator it = rows.iterator();
-
-		if (it.hasNext()) {
-			return (Boolean) ((HashMap) it.next()).get("allow");
-		} else {
-			return false;
 		}
 	}
 
@@ -1432,7 +1399,12 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
 		variables.put(ind, new java.util.Date());
 		ind++;
-		variables.put(ind, sb.getUpdater().getId());
+		if (sb.getUpdater() == null) {
+			nullVars.put(ind, Types.INTEGER);
+			variables.put(ind, null);
+		} else {
+			variables.put(ind, sb.getUpdater().getId());
+		}
 		ind++;
 		variables.put(ind, sb.getSecondaryLabel());
 		ind++;
@@ -1740,7 +1712,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 			HashMap hm = (HashMap) anAlist;
 			studySubjectIds += hm.get("study_subject_id") + ",";
 		}
-		studySubjectIds = studySubjectIds.endsWith(",") ? studySubjectIds.substring(0, studySubjectIds.length() - 1)
+		studySubjectIds = studySubjectIds.endsWith(",")
+				? studySubjectIds.substring(0, studySubjectIds.length() - 1)
 				: studySubjectIds;
 		return studySubjectIds;
 	}

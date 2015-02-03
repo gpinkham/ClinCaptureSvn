@@ -26,7 +26,10 @@ import org.akaza.openclinica.core.form.StringUtil;
 
 import java.util.List;
 
-@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+/**
+ * ItemFormMetadataBean.
+ */
+@SuppressWarnings({"rawtypes", "serial", "unchecked"})
 public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	//
 	private int itemId;
@@ -38,6 +41,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	private int columnNumber;
 	private String pageNumberLabel;
 	private String codeRef = "";
+	private boolean sdvRequired;
 
 	@Override
 	public int hashCode() {
@@ -52,7 +56,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 		result = prime * result + descisionConditionId;
 		result = prime * result + ((groupLabel == null) ? 0 : groupLabel.hashCode());
 		result = prime * result + ((header == null) ? 0 : header.hashCode());
-		result = prime * result + (isHighlighted ? 1231 : 1237);
+		result = prime * result + (isHighlighted ? INT_1231 : INT_1237);
 		result = prime * result + itemId;
 		result = prime * result + ((leftItemText == null) ? 0 : leftItemText.hashCode());
 		result = prime * result + ordinal;
@@ -63,142 +67,196 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 		result = prime * result + ((regexp == null) ? 0 : regexp.hashCode());
 		result = prime * result + ((regexpErrorMsg == null) ? 0 : regexpErrorMsg.hashCode());
 		result = prime * result + repeatMax;
-		result = prime * result + (required ? 1231 : 1237);
+		result = prime * result + (required ? INT_1231 : INT_1237);
 		result = prime * result + ((responseLayout == null) ? 0 : responseLayout.hashCode());
 		result = prime * result + ((responseSet == null) ? 0 : responseSet.hashCode());
 		result = prime * result + responseSetId;
 		result = prime * result + ((rightItemText == null) ? 0 : rightItemText.hashCode());
 		result = prime * result + sectionId;
 		result = prime * result + ((sectionName == null) ? 0 : sectionName.hashCode());
-		result = prime * result + (showItem ? 1231 : 1237);
+		result = prime * result + (showItem ? INT_1231 : INT_1237);
 		result = prime * result + ((subHeader == null) ? 0 : subHeader.hashCode());
 		result = prime * result + ((widthDecimal == null) ? 0 : widthDecimal.hashCode());
+		result = prime * result + (sdvRequired ? INT_1231 : INT_1237);
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		ItemFormMetadataBean other = (ItemFormMetadataBean) obj;
-		if (columnNumber != other.columnNumber)
+		if (columnNumber != other.columnNumber) {
 			return false;
+		}
 		if (conditionalDisplay == null) {
-			if (other.conditionalDisplay != null)
+			if (other.conditionalDisplay != null) {
 				return false;
-		} else if (!conditionalDisplay.equals(other.conditionalDisplay))
+			}
+		} else if (!conditionalDisplay.equals(other.conditionalDisplay)) {
 			return false;
+		}
 		if (crfName == null) {
-			if (other.crfName != null)
+			if (other.crfName != null) {
 				return false;
-		} else if (!crfName.equals(other.crfName))
+			}
+		} else if (!crfName.equals(other.crfName)) {
 			return false;
-		if (crfVersionId != other.crfVersionId)
+		}
+		if (crfVersionId != other.crfVersionId) {
 			return false;
+		}
 		if (crfVersionName == null) {
-			if (other.crfVersionName != null)
+			if (other.crfVersionName != null) {
 				return false;
-		} else if (!crfVersionName.equals(other.crfVersionName))
+			}
+		} else if (!crfVersionName.equals(other.crfVersionName)) {
 			return false;
+		}
 		if (defaultValue == null) {
-			if (other.defaultValue != null)
+			if (other.defaultValue != null) {
 				return false;
-		} else if (!defaultValue.equals(other.defaultValue))
+			}
+		} else if (!defaultValue.equals(other.defaultValue)) {
 			return false;
-		if (descisionConditionId != other.descisionConditionId)
+		}
+		if (descisionConditionId != other.descisionConditionId) {
 			return false;
+		}
 		if (groupLabel == null) {
-			if (other.groupLabel != null)
+			if (other.groupLabel != null) {
 				return false;
-		} else if (!groupLabel.equals(other.groupLabel))
+			}
+		} else if (!groupLabel.equals(other.groupLabel)) {
 			return false;
+		}
 		if (header == null) {
-			if (other.header != null)
+			if (other.header != null) {
 				return false;
-		} else if (!header.equals(other.header))
+			}
+		} else if (!header.equals(other.header)) {
 			return false;
-		if (isHighlighted != other.isHighlighted)
+		}
+		if (isHighlighted != other.isHighlighted) {
 			return false;
-		if (itemId != other.itemId)
+		}
+		if (itemId != other.itemId) {
 			return false;
+		}
 		if (leftItemText == null) {
-			if (other.leftItemText != null)
+			if (other.leftItemText != null) {
 				return false;
-		} else if (!leftItemText.equals(other.leftItemText))
+			}
+		} else if (!leftItemText.equals(other.leftItemText)) {
 			return false;
-		if (ordinal != other.ordinal)
+		}
+		if (ordinal != other.ordinal) {
 			return false;
+		}
 		if (pageNumberLabel == null) {
-			if (other.pageNumberLabel != null)
+			if (other.pageNumberLabel != null) {
 				return false;
-		} else if (!pageNumberLabel.equals(other.pageNumberLabel))
+			}
+		} else if (!pageNumberLabel.equals(other.pageNumberLabel)) {
 			return false;
-		if (parentId != other.parentId)
+		}
+		if (parentId != other.parentId) {
 			return false;
+		}
 		if (parentLabel == null) {
-			if (other.parentLabel != null)
+			if (other.parentLabel != null) {
 				return false;
-		} else if (!parentLabel.equals(other.parentLabel))
+			}
+		} else if (!parentLabel.equals(other.parentLabel)) {
 			return false;
+		}
 		if (questionNumberLabel == null) {
-			if (other.questionNumberLabel != null)
+			if (other.questionNumberLabel != null) {
 				return false;
-		} else if (!questionNumberLabel.equals(other.questionNumberLabel))
+			}
+		} else if (!questionNumberLabel.equals(other.questionNumberLabel)) {
 			return false;
+		}
 		if (regexp == null) {
-			if (other.regexp != null)
+			if (other.regexp != null) {
 				return false;
-		} else if (!regexp.equals(other.regexp))
+			}
+		} else if (!regexp.equals(other.regexp)) {
 			return false;
+		}
 		if (regexpErrorMsg == null) {
-			if (other.regexpErrorMsg != null)
+			if (other.regexpErrorMsg != null) {
 				return false;
-		} else if (!regexpErrorMsg.equals(other.regexpErrorMsg))
+			}
+		} else if (!regexpErrorMsg.equals(other.regexpErrorMsg)) {
 			return false;
-		if (repeatMax != other.repeatMax)
+		}
+		if (repeatMax != other.repeatMax) {
 			return false;
-		if (required != other.required)
+		}
+		if (required != other.required) {
 			return false;
+		}
 		if (responseLayout == null) {
-			if (other.responseLayout != null)
+			if (other.responseLayout != null) {
 				return false;
-		} else if (!responseLayout.equals(other.responseLayout))
+			}
+		} else if (!responseLayout.equals(other.responseLayout)) {
 			return false;
+		}
 		if (responseSet == null) {
-			if (other.responseSet != null)
+			if (other.responseSet != null) {
 				return false;
-		} else if (!responseSet.equals(other.responseSet))
+			}
+		} else if (!responseSet.equals(other.responseSet)) {
 			return false;
-		if (responseSetId != other.responseSetId)
+		}
+		if (responseSetId != other.responseSetId) {
 			return false;
+		}
 		if (rightItemText == null) {
-			if (other.rightItemText != null)
+			if (other.rightItemText != null) {
 				return false;
-		} else if (!rightItemText.equals(other.rightItemText))
+			}
+		} else if (!rightItemText.equals(other.rightItemText)) {
 			return false;
-		if (sectionId != other.sectionId)
+		}
+		if (sectionId != other.sectionId) {
 			return false;
+		}
 		if (sectionName == null) {
-			if (other.sectionName != null)
+			if (other.sectionName != null) {
 				return false;
-		} else if (!sectionName.equals(other.sectionName))
+			}
+		} else if (!sectionName.equals(other.sectionName)) {
 			return false;
-		if (showItem != other.showItem)
+		}
+		if (showItem != other.showItem) {
 			return false;
+		}
 		if (subHeader == null) {
-			if (other.subHeader != null)
+			if (other.subHeader != null) {
 				return false;
-		} else if (!subHeader.equals(other.subHeader))
+			}
+		} else if (!subHeader.equals(other.subHeader)) {
 			return false;
+		}
 		if (widthDecimal == null) {
-			if (other.widthDecimal != null)
+			if (other.widthDecimal != null) {
 				return false;
-		} else if (!widthDecimal.equals(other.widthDecimal))
+			}
+		} else if (!widthDecimal.equals(other.widthDecimal)) {
 			return false;
+		} else if (sdvRequired != other.sdvRequired) {
+			return false;
+		}
 		return true;
 	}
 
@@ -222,13 +280,13 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	private String groupLabel;
 	private String responseLayout;
 
-	private String crfVersionName;// not in the DB,only for display purpose
-	private String crfName;// not in the DB
+	private String crfVersionName; // not in the DB,only for display purpose
+	private String crfName; // not in the DB
 
-	private String sectionName;// not in the DB only for display
-	private int repeatMax;// not in the DB,
+	private String sectionName; // not in the DB only for display
+	private int repeatMax; // not in the DB,
 
-	private boolean isHighlighted;// not in the db
+	private boolean isHighlighted; // not in the db
 
 	/**
 	 * Not in the database. Not guaranteed to correspond to responseSetId, although ItemFormDAO should take care of that
@@ -240,6 +298,11 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	 */
 	private String conditionalDisplay; // simple_conditional_display
 
+	/**
+	 * ItemFormMetadataBean clone method.
+	 * 
+	 * @return ItemFormMetadataBean
+	 */
 	public ItemFormMetadataBean copy() {
 		ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
 		ifmb.setId(getId());
@@ -283,9 +346,13 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 			rsb.setOptions(ro.getText(), ro.getValue());
 		}
 		ifmb.setResponseSet(rsb);
+		ifmb.setSdvRequired(isSdvRequired());
 		return ifmb;
 	}
 
+	/**
+	 * ItemFormMetadataBean constructor.
+	 */
 	public ItemFormMetadataBean() {
 		itemId = 0;
 		crfVersionId = 0;
@@ -319,9 +386,10 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	}
 
 	/**
-	 * If more than one default, will remove all the spaces between each default value
-	 * 
+	 * If more than one default, will remove all the spaces between each default value.
+	 *
 	 * @param defaults
+	 *            String
 	 */
 	public void setDefaultValue(String defaults) {
 
@@ -335,8 +403,8 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 				String t = defaults2[i].trim();
 
 				this.defaultValue = defaultValue + t;
-				if (i < defaults2.length - 1) {// don't want to add comma at
-					// the end, only in between
+				if (i < defaults2.length - 1) {
+					// don't want to add comma at the end, only in between
 					this.defaultValue = defaultValue + ",";
 				}
 			}
@@ -711,6 +779,13 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 		this.responseLayout = responseLayout;
 	}
 
+	/**
+	 * Method that compares objects.
+	 * 
+	 * @param o
+	 *            Object
+	 * @return int
+	 */
 	public int compareTo(Object o) {
 		if (o == null || !(o instanceof ItemFormMetadataBean)) {
 			return 1;
@@ -736,15 +811,12 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	}
 
 	/**
-	 * Return true if conditionalDisplay String length > 0
+	 * Return true if conditionalDisplay String length > 0.
 	 * 
-	 * @return
+	 * @return boolean
 	 */
 	public boolean isConditionalDisplayItem() {
-		if (this.conditionalDisplay != null && this.conditionalDisplay.length() > 0) {
-			return true;
-		}
-		return false;
+		return this.conditionalDisplay != null && this.conditionalDisplay.length() > 0;
 	}
 
 	public String getCodeRef() {
@@ -763,9 +835,21 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	}
 
 	/**
-	 * @return Returns text without break spaces from the rightItemText.
+	 * Method returns text without break spaces from the rightItemText.
+	 * 
+	 * @param leftItemText
+	 *            String
+	 * @return String
 	 */
 	public String getTextFromRightItemText(String leftItemText) {
 		return DRUtil.getTextFromHTML(this.rightItemText.replaceAll("&nbsp;", ""));
+	}
+
+	public boolean isSdvRequired() {
+		return sdvRequired;
+	}
+
+	public void setSdvRequired(boolean sdvRequired) {
+		this.sdvRequired = sdvRequired;
 	}
 }

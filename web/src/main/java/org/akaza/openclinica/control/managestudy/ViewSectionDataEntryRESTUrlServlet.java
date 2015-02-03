@@ -22,14 +22,38 @@ package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.managestudy.*;
-import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
+import org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.managestudy.*;
-import org.akaza.openclinica.dao.submit.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
@@ -54,7 +78,7 @@ import java.util.List;
  * View a CRF version section data entry
  * 
  * @author jxu
- *         
+ * 
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
@@ -68,9 +92,12 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
 		SectionBean sb;
-        EventCRFBean ecb;
-		boolean isSubmitted = false;
+		EventCRFBean ecb;
 		EventDefinitionCRFBean edcb;
+
+		StudyEventDAO studyEventDao = getStudyEventDAO();
+		StudySubjectDAO studySubjectDao = getStudySubjectDAO();
+		DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(getDataSource());
 
 		if (!fp.getString("exitTo", true).equals("")) {
 			request.setAttribute("exitTo", request.getContextPath() + "/" + fp.getString("exitTo", true));
@@ -132,35 +159,32 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		// for a particular event
 		session.removeAttribute("presetValues");
 
-        ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
+		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		SectionDAO sdao = new SectionDAO(getDataSource());
 		String age = "";
-		if (sectionId == 0 && crfVersionId == 0 && eventCRFId == 0) {
+		if (crfVersionId == 0 && eventCRFId == 0) {
 			addPageMessage(respage.getString("please_choose_a_CRF_to_view"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			return;
 		}
 		if (studySubjectId > 0) {
-			StudySubjectDAO ssdao = getStudySubjectDAO();
-			StudySubjectBean sub = (StudySubjectBean) ssdao.findByPK(studySubjectId);
+			StudySubjectBean sub = (StudySubjectBean) studySubjectDao.findByPK(studySubjectId);
 			request.setAttribute("studySubject", sub);
 		}
 
-        ArrayList<DiscrepancyNoteBean> allNotes;
-        List<DiscrepancyNoteBean> eventCrfNotes;
-        List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
+		ArrayList<DiscrepancyNoteBean> allNotes;
+		List<DiscrepancyNoteBean> eventCrfNotes;
+		List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
 
 		if (eventCRFId > 0) {
 			// for event crf, the input crfVersionId from url =0
 			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
-			StudyEventDAO sedao = getStudyEventDAO();
-			StudyEventBean event = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+			StudyEventBean event = (StudyEventBean) studyEventDao.findByPK(ecb.getStudyEventId());
 			if (event.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)) {
 				request.setAttribute("isLocked", "yes");
-			}
-			else {
+			} else {
 				request.setAttribute("isLocked", "no");
 			}
 
@@ -171,10 +195,9 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 
 			}
 			// Get the status/number of item discrepancy notes
-			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 
-			allNotes = dndao.findAllTopNotesByEventCRF(eventCRFId);
-			eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
+			allNotes = discrepancyNoteDao.findAllTopNotesByEventCRF(eventCRFId);
+			eventCrfNotes = discrepancyNoteDao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
 			if (!eventCrfNotes.isEmpty()) {
 				allNotes.addAll(eventCrfNotes);
 				this.setAttributeForInterviewerDNotes(eventCrfNotes, request);
@@ -183,12 +206,12 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 			noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
-            List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
+			List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, ifmdao, eventDefinitionCRFId,
 					allSections, noteThreads);
 
 			DisplayTableOfContentsBean displayBean = getDisplayBean(ecb);
-			
+
 			Date tmpDate = displayBean.getEventCRF().getDateInterviewed();
 			String formattedInterviewerDate;
 			try {
@@ -210,10 +233,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 
 			request.setAttribute("sectionNum", sections.size() + "");
 			if (!sections.isEmpty()) {
-				if (sectionId == 0) {
-					SectionBean firstSec = (SectionBean) sections.get(0);
-					sectionId = firstSec.getId();
-				}
+				SectionBean firstSec = (SectionBean) sections.get(0);
+				sectionId = firstSec.getId();
 			} else {
 				addPageMessage(respage.getString("there_are_no_sections_ins_this_CRF"), request);
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
@@ -226,10 +247,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 
 			request.setAttribute("sectionNum", sections.size() + "");
 			if (!sections.isEmpty()) {
-				if (sectionId == 0) {
-					SectionBean firstSec = (SectionBean) sections.get(0);
-					sectionId = firstSec.getId();
-				}
+				SectionBean firstSec = (SectionBean) sections.get(0);
+				sectionId = firstSec.getId();
 			} else {
 				addPageMessage(respage.getString("there_are_no_sections_ins_this_CRF_version"), request);
 				if (eventCRFId == 0) {
@@ -263,8 +282,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			request.setAttribute(SECTION_BEAN, sb);
 
 			// This is the StudySubjectBean
-			StudySubjectDAO ssdao = getStudySubjectDAO();
-			StudySubjectBean sub = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
+			StudySubjectBean sub = (StudySubjectBean) studySubjectDao.findByPK(ecb.getStudySubjectId());
 			// This is the SubjectBean
 			SubjectDAO subjectDao = getSubjectDAO();
 			int subjectId = sub.getSubjectId();
@@ -273,8 +291,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			// Check for a null currentStudy
 			// Let us process the age
 			if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
-				StudyEventDAO sedao = getStudyEventDAO();
-				StudyEventBean se = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+				StudyEventBean se = (StudyEventBean) studyEventDao.findByPK(ecb.getStudyEventId());
 				StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se
 						.getStudyEventDefinitionId());
@@ -303,6 +320,9 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 
 		}
 
+		request.setAttribute("eventCrfDoesNotHaveOutstandingDNs",
+				ecb.getId() <= 0 || discrepancyNoteDao.doesNotHaveOutstandingDNs(ecb));
+
 		boolean hasItemGroup = false;
 		// we will look into db to see if any repeating items for this CRF
 		// section
@@ -322,7 +342,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);
 		request.setAttribute(INPUT_EVENT_CRF, ecb);
 		request.setAttribute(SECTION_BEAN, sb);
-		dsb = super.getDisplayBean(hasItemGroup, false, request, isSubmitted);
+		dsb = super.getDisplayBean(hasItemGroup, false, request, false);
 
 		FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session
 				.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -347,7 +367,6 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			LOGGER.info("33333how many group rows:" + dsb.getDisplayItemGroups().size());
 
 			// let's save notes for the blank items
-			DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 			discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
 			for (int i = 0; i < dsb.getDisplayItemGroups().size(); i++) {
@@ -364,8 +383,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 							String inputName = getGroupItemInputName(displayGroup, j, displayItem);
 							LOGGER.info("inputName:" + inputName);
 							LOGGER.info("item data id:" + displayItem.getData().getId());
-							AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, displayItem.getData()
-									.getId(), "itemData", currentStudy);
+							AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, discrepancyNoteDao, displayItem
+									.getData().getId(), "itemData", currentStudy);
 
 						}
 					}
@@ -375,17 +394,17 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 					// TODO work on this line
 
 					String inputName = getInputName(dib);
-					AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(),
-							DiscrepancyNoteBean.ITEM_DATA, currentStudy);
+					AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, discrepancyNoteDao,
+							dib.getData().getId(), DiscrepancyNoteBean.ITEM_DATA, currentStudy);
 
 					ArrayList childItems = dib.getChildren();
-                    for (Object childItem : childItems) {
-                        DisplayItemBean child = (DisplayItemBean) childItem;
-                        inputName = getInputName(child);
-                        AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(),
-                                DiscrepancyNoteBean.ITEM_DATA, currentStudy);
+					for (Object childItem : childItems) {
+						DisplayItemBean child = (DisplayItemBean) childItem;
+						inputName = getInputName(child);
+						AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, discrepancyNoteDao, dib.getData()
+								.getId(), DiscrepancyNoteBean.ITEM_DATA, currentStudy);
 
-                    }
+					}
 				}
 			}
 

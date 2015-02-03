@@ -517,7 +517,7 @@
     </c:otherwise>
   </c:choose>
 
-
+  <c:import url="../submit/itemSDV.jsp"/>
 
 </c:if>
 <%-- we won't need this if we're not embedding error messages

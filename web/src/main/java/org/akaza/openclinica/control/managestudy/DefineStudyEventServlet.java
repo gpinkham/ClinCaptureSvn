@@ -40,6 +40,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -57,12 +58,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The servlet for creating event definition of user's current active study
+ * The servlet for creating event definition of user's current active study.
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class DefineStudyEventServlet extends Controller {
+
+	public static final int FIVE = 5;
+	public static final int INT_2000 = 2000;
+	public static final int INT_3 = 3;
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -206,25 +211,25 @@ public class DefineStudyEventServlet extends Controller {
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("type", Validator.NO_BLANKS);
 		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				2000);
+				INT_2000);
 		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_2000);
 		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_2000);
 
 		String calendaredVisitType = fp.getString("type");
 		if ("calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
 			v.addValidation("maxDay", Validator.IS_REQUIRED);
-			v.addValidation("maxDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			v.addValidation("maxDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_3);
 			v.addValidation("minDay", Validator.IS_REQUIRED);
-			v.addValidation("minDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			v.addValidation("minDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_3);
 			v.addValidation("schDay", Validator.IS_REQUIRED);
-			v.addValidation("schDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			v.addValidation("schDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_3);
 			if ("".equalsIgnoreCase(fp.getString("isReference"))) {
 				v.addValidation("emailUser", Validator.NO_BLANKS);
 			}
 			v.addValidation("emailDay", Validator.IS_REQUIRED);
-			v.addValidation("emailDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			v.addValidation("emailDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_3);
 			request.getSession().setAttribute("maxDay", fp.getString("maxDay"));
 			request.getSession().setAttribute("minDay", fp.getString("minDay"));
 			request.getSession().setAttribute("schDay", fp.getString("schDay"));
@@ -299,11 +304,11 @@ public class DefineStudyEventServlet extends Controller {
 
 		EntityBeanTable table = fp.getEntityBeanTable();
 		ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
-		String[] columns = { resword.getString("CRF_name"), resword.getString("date_created"),
+		String[] columns = {resword.getString("CRF_name"), resword.getString("date_created"),
 				resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),
-				resword.getString("selected") };
+				resword.getString("selected")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(5);
+		table.hideColumnLink(FIVE);
 		StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) fp.getRequest().getSession()
 				.getAttribute("definition");
 		UserAccountDAO uadao = getUserAccountDAO();
@@ -335,13 +340,14 @@ public class DefineStudyEventServlet extends Controller {
 	}
 
 	/**
-	 * Validates the entire definition
+	 * Validates the entire definition.
 	 * 
 	 * @param request
 	 *            the incoming request
 	 * @param response
 	 *            the response to redirect to
-	 * @throws <code>Exception</code> for all exceptions
+	 * @throws Exception
+	 *             an Exception
 	 */
 	private void confirmWholeDefinition(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
@@ -439,7 +445,7 @@ public class DefineStudyEventServlet extends Controller {
 	}
 
 	/**
-	 * Constructs study event definition bean from request
+	 * Constructs study event definition bean from request.
 	 * 
 	 * @param request
 	 *            the incoming request
@@ -483,6 +489,7 @@ public class DefineStudyEventServlet extends Controller {
 			throws Exception {
 
 		FormProcessor fp = new FormProcessor(request);
+		ItemFormMetadataDAO itemFormMetadataDao = getItemFormMetadataDAO();
 		CRFVersionDAO vdao = getCRFVersionDAO();
 		ArrayList crfArray = new ArrayList();
 		Map tmpCRFIdMap = (HashMap) request.getSession().getAttribute("tmpCRFIdMap");
@@ -505,7 +512,8 @@ public class DefineStudyEventServlet extends Controller {
 				// only find active versions
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
-
+				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(),
+						itemFormMetadataDao.hasItemsToSDV(cb.getId()));
 				crfArray.add(cb);
 			} else {
 				if (tmpCRFIdMap.containsKey(id)) {
@@ -532,7 +540,8 @@ public class DefineStudyEventServlet extends Controller {
 
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
-
+				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(),
+						itemFormMetadataDao.hasItemsToSDV(cb.getId()));
 				crfArray.add(cb);
 			}
 		}
@@ -553,13 +562,6 @@ public class DefineStudyEventServlet extends Controller {
 			sed.setCrfs(crfArray);
 
 			request.getSession().setAttribute("definition", sed);
-
-			ArrayList<String> sdvOptions = new ArrayList<String>();
-			sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());
-			sdvOptions.add(SourceDataVerification.PARTIALREQUIRED.toString());
-			sdvOptions.add(SourceDataVerification.NOTREQUIRED.toString());
-			sdvOptions.add(SourceDataVerification.NOTAPPLICABLE.toString());
-			request.setAttribute("sdvOptions", sdvOptions);
 
 			logger.info("forwarding to defineStudyEvent3.jsp");
 			forwardPage(Page.DEFINE_STUDY_EVENT3, request, response);

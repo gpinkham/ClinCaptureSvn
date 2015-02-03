@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA. User: bruceperry Date: May 19, 2009
+ * SDVRequirementFilter.
  */
 public class SDVRequirementFilter extends DroplistFilterEditor {
 
@@ -31,9 +31,7 @@ public class SDVRequirementFilter extends DroplistFilterEditor {
 				+ SourceDataVerification.PARTIALREQUIRED.toString();
 		options.add(new Option(optionA, optionA));
 		for (SourceDataVerification sdv : SourceDataVerification.values()) {
-			if (sdv != SourceDataVerification.NOTAPPLICABLE) {
-				options.add(new Option(sdv.toString(), sdv.toString()));
-			}
+			options.add(new Option(sdv.toString(), sdv.toString()));
 		}
 
 		return options;

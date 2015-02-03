@@ -23,8 +23,7 @@ package org.akaza.openclinica.bean.submit;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
 /**
- * <P>
- * ItemDataBean.java, the object that represents an actual answer, or a point of data, in the database.
+ * ItemDataBean, the object that represents an actual answer, or a point of data, in the database.
  * 
  * @author thickerson
  * 
@@ -32,56 +31,77 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
  */
 @SuppressWarnings("serial")
 public class ItemDataBean extends AuditableEntityBean {
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + (auditLog ? 1231 : 1237);
+		result = prime * result + (auditLog ? INT_1231 : INT_1237);
 		result = prime * result + eventCRFId;
 		result = prime * result + itemId;
 		result = prime * result + ordinal;
-		result = prime * result + (selected ? 1231 : 1237);
+		result = prime * result + (selected ? INT_1231 : INT_1237);
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		result = prime * result + (sdv ? INT_1231 : INT_1237);
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		ItemDataBean other = (ItemDataBean) obj;
-		if (auditLog != other.auditLog)
+		if (auditLog != other.auditLog) {
 			return false;
-		if (eventCRFId != other.eventCRFId)
+		}
+		if (eventCRFId != other.eventCRFId) {
 			return false;
-		if (itemId != other.itemId)
+		}
+		if (itemId != other.itemId) {
 			return false;
-		if (ordinal != other.ordinal)
+		}
+		if (ordinal != other.ordinal) {
 			return false;
-		if (selected != other.selected)
+		}
+		if (selected != other.selected) {
 			return false;
+		}
 		if (value == null) {
-			if (other.value != null)
+			if (other.value != null) {
 				return false;
-		} else if (!value.equals(other.value))
+			}
+		} else if (!value.equals(other.value)) {
 			return false;
+		} else if (sdv != other.sdv) {
+			return false;
+		}
 		return true;
 	}
 
 	private int eventCRFId;
 	private int itemId;
-	private String value;// name will be null
+	private String value; // name will be null
 
-	private int ordinal;// for repeating items
+	private int ordinal; // for repeating items
 
-	private boolean selected;// for construct data only
+	private boolean selected; // for construct data only
 
 	private boolean auditLog = false;
 
+	private boolean sdv;
+
+	/**
+	 * Method that clones the ItemDataBean.
+	 *
+	 * @return ItemDataBean
+	 */
 	public ItemDataBean copy() {
 		ItemDataBean idb = new ItemDataBean();
 		idb.setAuditLog(isAuditLog());
@@ -95,6 +115,7 @@ public class ItemDataBean extends AuditableEntityBean {
 		idb.setId(getId());
 		idb.setName(getName());
 		idb.setOldStatus(getOldStatus());
+		idb.setSdv(isSdv());
 		if (owner != null) {
 			idb.setOwner(owner);
 		}
@@ -106,6 +127,9 @@ public class ItemDataBean extends AuditableEntityBean {
 		return idb;
 	}
 
+	/**
+	 * ItemDataBean constructor.
+	 */
 	public ItemDataBean() {
 		eventCRFId = 0;
 		itemId = 0;
@@ -196,5 +220,13 @@ public class ItemDataBean extends AuditableEntityBean {
 
 	public void setAuditLog(boolean auditLog) {
 		this.auditLog = auditLog;
+	}
+
+	public boolean isSdv() {
+		return sdv;
+	}
+
+	public void setSdv(boolean sdv) {
+		this.sdv = sdv;
 	}
 }

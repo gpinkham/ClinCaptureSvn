@@ -36,6 +36,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,7 +45,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+/**
+ * ItemFormMetadataDAO.
+ */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ItemFormMetadataDAO extends EntityDAO {
 
 	@Override
@@ -52,17 +56,40 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		digesterName = SQLFactory.getInstance().DAO_ITEMFORMMETADATA;
 	}
 
+	/**
+	 * ItemFormMetadataDAO constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 */
 	public ItemFormMetadataDAO(DataSource ds) {
 		super(ds);
 	}
 
+	/**
+	 * ItemFormMetadataDAO constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param digester
+	 *            DAODigester
+	 */
 	public ItemFormMetadataDAO(DataSource ds, DAODigester digester) {
 		super(ds);
 		this.digester = digester;
 	}
 
-	// This constructor sets up the Locale for JUnit tests; see the locale
-	// member variable in EntityDAO, and its initializeI18nStrings() method
+	/**
+	 * This constructor sets up the Locale for JUnit tests; see the locale member variable in EntityDAO, and its
+	 * initializeI18nStrings() method.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param digester
+	 *            DAODigester
+	 * @param locale
+	 *            Locale
+	 */
 	public ItemFormMetadataDAO(DataSource ds, DAODigester digester, Locale locale) {
 
 		this(ds, digester);
@@ -84,6 +111,13 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return s == null ? "" : s;
 	}
 
+	/**
+	 * Method that builds ItemFormMetadataBean from the HashMap.
+	 * 
+	 * @param hm
+	 *            HashMap
+	 * @return Object
+	 */
 	public Object getEntityFromHashMap(HashMap hm) {
 
 		ItemFormMetadataBean answer = new ItemFormMetadataBean();
@@ -112,8 +146,9 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		answer.setWidthDecimal(getStringFromRow(hm, "width_decimal"));
 		answer.setShowItem(getBooleanFromRow(hm, "show_item"));
 		answer.setCodeRef(getStringFromRow(hm, "code_ref"));
-		ResponseSetBean rsb = new ResponseSetBean();
+		answer.setSdvRequired(getBooleanFromRow(hm, "sdv_required"));
 
+		ResponseSetBean rsb = new ResponseSetBean();
 		rsb.setId(getIntFromRow(hm, "response_set_id"));
 		rsb.setLabel(getStringFromRow(hm, "label"));
 		rsb.setResponseTypeId(getIntFromRow(hm, "response_type_id"));
@@ -126,9 +161,13 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return answer;
 	}
 
-	public void setTypesExpected() {
+	/***
+	 * Method sets expected types.
+	 * 
+	 * @return int
+	 */
+	public int setTypesExpected() {
 		this.unsetTypeExpected();
-
 		int ind = 1;
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // item form metadata id 2
@@ -179,22 +218,45 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		ind++; // show_item 24
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // code_ref 25
+		this.setTypeExpected(ind, TypeNames.BOOL);
+		ind++; // sdv_required 26
 		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // response_set.response_type_id 26
+		ind++; // response_set.response_type_id 27
 		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // response_set.label 27
+		ind++; // response_set.label 28
 		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // response_set.options_text 28
+		ind++; // response_set.options_text 29
 		this.setTypeExpected(ind, TypeNames.STRING);
-		// response_set.options_values // 29
+		// response_set.options_values // 30
+		return ++ind;
 	}
 
+	/**
+	 * Method returns collection of the ItemFormMetadataBeans.
+	 * 
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
+	 * @return Collection
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase)
 			throws OpenClinicaException {
 		// Auto-generated method stub
 		return null;
 	}
 
+	/**
+	 * Method returns all ItemFormMetadataBeans.
+	 * 
+	 * @return Collection<ItemFormMetadataBean>
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public Collection<ItemFormMetadataBean> findAll() throws OpenClinicaException {
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
@@ -211,6 +273,13 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns count of all hidden ItemFormMetadataBeans by crf version id.
+	 * 
+	 * @param crfVersionId
+	 *            int
+	 * @return int
+	 */
 	public int findCountAllHiddenByCRFVersionId(int crfVersionId) {
 		int answer = 0;
 		this.unsetTypeExpected();
@@ -238,6 +307,13 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return answer + answer2;
 	}
 
+	/**
+	 * Method returns count of all hidden ItemFormMetadataBeans by crf version id, but shown by event crf id.
+	 * 
+	 * @param eventCrfId
+	 *            int
+	 * @return int
+	 */
 	public int findCountAllHiddenButShownByEventCRFId(int eventCrfId) {
 		int answer = 0;
 		this.unsetTypeExpected();
@@ -257,14 +333,23 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns all ItemFormMetadataBeans by crf version id.
+	 * 
+	 * @param crfVersionId
+	 *            int
+	 * @return ArrayList<ItemFormMetadataBean>
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public ArrayList<ItemFormMetadataBean> findAllByCRFVersionId(int crfVersionId) throws OpenClinicaException {
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
-		this.setTypesExpected();
-		this.setTypeExpected(29, TypeNames.STRING);// version name
-		this.setTypeExpected(30, TypeNames.STRING);// group_label
-		this.setTypeExpected(31, TypeNames.INT);// repeat_max
-		this.setTypeExpected(32, TypeNames.STRING);// section_name
+		int ind = this.setTypesExpected();
+		this.setTypeExpected(ind++, TypeNames.STRING); // version name
+		this.setTypeExpected(ind++, TypeNames.STRING); // group_label
+		this.setTypeExpected(ind++, TypeNames.INT); // repeat_max
+		this.setTypeExpected(ind, TypeNames.STRING); // section_name
 
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		variables.put(1, crfVersionId);
@@ -289,6 +374,15 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns ItemFormMetadataBean by crf version id & item id.
+	 * 
+	 * @param crfVersionId
+	 *            int
+	 * @param itemId
+	 *            int
+	 * @return ItemFormMetadataBean
+	 */
 	public ItemFormMetadataBean findAllByCRFVersionIdAndItemId(int crfVersionId, int itemId) {
 		ItemFormMetadataBean answer = null;
 
@@ -309,6 +403,15 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns all ItemFormMetadataBeans by crf id, item id & that have validations.
+	 * 
+	 * @param crfId
+	 *            int
+	 * @param itemId
+	 *            int
+	 * @return ArrayList<ItemFormMetadataBean>
+	 */
 	public ArrayList<ItemFormMetadataBean> findAllByCRFIdItemIdAndHasValidations(int crfId, int itemId) {
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
@@ -329,6 +432,17 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns all ItemFormMetadataBeans by crf version id & response type id.
+	 * 
+	 * @param crfVersionId
+	 *            int
+	 * @param responseTypeId
+	 *            int
+	 * @return ArrayList<ItemFormMetadataBean>
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public ArrayList<ItemFormMetadataBean> findAllByCRFVersionIdAndResponseTypeId(int crfVersionId, int responseTypeId)
 			throws OpenClinicaException {
 		Object key;
@@ -346,10 +460,12 @@ public class ItemFormMetadataDAO extends EntityDAO {
 
 		key = (sql + "," + crfVersionId + "," + responseTypeId);
 
-		if ((alist = (ArrayList) cache.get(key)) == null) {
+		alist = (ArrayList) cache.get(key);
+		if (alist == null) {
 			alist = this.select(sql, variables);
-			if (alist != null)
+			if (alist != null) {
 				cache.put(key, alist);
+			}
 		}
 
 		if (alist != null) {
@@ -362,16 +478,22 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns all ItemFormMetadataBeans by item id.
+	 * 
+	 * @param itemId
+	 *            int
+	 * @return ArrayList<ItemFormMetadataBean>
+	 */
 	public ArrayList<ItemFormMetadataBean> findAllByItemId(int itemId) {
 
-		// TODO place holder for returning here, tbh
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
-		this.setTypesExpected();
-		this.setTypeExpected(29, TypeNames.STRING);// version name
-		this.setTypeExpected(30, TypeNames.STRING);// group_label
-		this.setTypeExpected(31, TypeNames.INT);// repeat_max
-		this.setTypeExpected(32, TypeNames.STRING);// section_name
+		int ind = this.setTypesExpected();
+		this.setTypeExpected(ind++, TypeNames.STRING); // version name
+		this.setTypeExpected(ind++, TypeNames.STRING); // group_label
+		this.setTypeExpected(ind++, TypeNames.INT); // repeat_max
+		this.setTypeExpected(ind, TypeNames.STRING); // section_name
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		variables.put(1, itemId);
 
@@ -395,16 +517,22 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns all ItemFormMetadataBeans by item id & that have validations.
+	 * 
+	 * @param itemId
+	 *            int
+	 * @return ArrayList<ItemFormMetadataBean>
+	 */
 	public ArrayList<ItemFormMetadataBean> findAllByItemIdAndHasValidations(int itemId) {
 
-		// TODO place holder for returning here, tbh
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
-		this.setTypesExpected();
-		this.setTypeExpected(29, TypeNames.STRING);// version name
-		this.setTypeExpected(30, TypeNames.STRING);// group_label
-		this.setTypeExpected(31, TypeNames.INT);// repeat_max
-		this.setTypeExpected(32, TypeNames.STRING);// section_name
+		int ind = this.setTypesExpected();
+		this.setTypeExpected(ind++, TypeNames.STRING); // version name
+		this.setTypeExpected(ind++, TypeNames.STRING); // group_label
+		this.setTypeExpected(ind++, TypeNames.INT); // repeat_max
+		this.setTypeExpected(ind, TypeNames.STRING); // section_name
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		variables.put(1, itemId);
 
@@ -428,6 +556,15 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns all ItemFormMetadataBeans by section id.
+	 * 
+	 * @param sectionId
+	 *            int
+	 * @return ArrayList<ItemFormMetadataBean>
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public ArrayList<ItemFormMetadataBean> findAllBySectionId(int sectionId) throws OpenClinicaException {
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
@@ -448,6 +585,17 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns all ItemFormMetadataBeans by crf version id & section id.
+	 * 
+	 * @param crfVersionId
+	 *            int
+	 * @param sectionId
+	 *            int
+	 * @return ArrayList<ItemFormMetadataBean>
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public ArrayList<ItemFormMetadataBean> findAllByCRFVersionIdAndSectionId(int crfVersionId, int sectionId)
 			throws OpenClinicaException {
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
@@ -469,11 +617,19 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns the ItemFormMetadataBean by id.
+	 * 
+	 * @param id
+	 *            int
+	 * @return EntityBean
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public EntityBean findByPK(int id) throws OpenClinicaException {
 		ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
 		this.setTypesExpected();
 
-		// TODO place holder to return here, tbh
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		variables.put(1, id);
 
@@ -488,61 +644,54 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return ifmb;
 	}
 
+	/**
+	 * Method creates / saves the ItemFormMetadataBean.
+	 * 
+	 * @param eb
+	 *            EntityBean
+	 * @return EntityBean
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public EntityBean create(EntityBean eb) throws OpenClinicaException {
 		ItemFormMetadataBean ifmb = (ItemFormMetadataBean) eb;
+		HashMap nullVars = new HashMap();
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
 
-		int ind = 0;
+		int ind = 1;
 		int id = getNextPK();
-		variables.put(ind, id);
-		ind++;
-		variables.put(ind, ifmb.getItemId());
-		ind++;
-		variables.put(ind, ifmb.getCrfVersionId());
-		ind++;
-		variables.put(ind, ifmb.getHeader());
-		ind++;
-		variables.put(ind, ifmb.getSubHeader());
-		ind++;
-		variables.put(ind, ifmb.getParentId());
-		ind++;
-		variables.put(ind, ifmb.getParentLabel());
-		ind++;
-		variables.put(ind, ifmb.getColumnNumber());
-		ind++;
-		variables.put(ind, ifmb.getPageNumberLabel());
-		ind++;
-		variables.put(ind, ifmb.getQuestionNumberLabel());
-		ind++;
-		variables.put(ind, ifmb.getLeftItemText());
-		ind++;
-		variables.put(ind, ifmb.getRightItemText());
-		ind++;
-		variables.put(ind, ifmb.getSectionId());
-		ind++;
-		variables.put(ind, ifmb.getDescisionConditionId());
-		ind++;
-		variables.put(ind, ifmb.getResponseSetId());
-		ind++;
-		variables.put(ind, ifmb.getRegexp());
-		ind++;
-		variables.put(ind, ifmb.getRegexpErrorMsg());
-		ind++;
-		variables.put(ind, ifmb.getOrdinal());
-		ind++;
-		variables.put(ind, ifmb.isRequired());
-		ind++;
-		variables.put(ind, ifmb.getDefaultValue());
-		ind++;
-		variables.put(ind, ifmb.getResponseLayout());
-		ind++;
-		variables.put(ind, ifmb.getWidthDecimal());
-		ind++;
-		variables.put(ind, ifmb.isShowItem());
-		ind++;
-		variables.put(ind, ifmb.getCodeRef());
+		variables.put(ind++, id);
+		variables.put(ind++, ifmb.getItemId());
+		variables.put(ind++, ifmb.getCrfVersionId());
+		variables.put(ind++, ifmb.getHeader());
+		variables.put(ind++, ifmb.getSubHeader());
+		variables.put(ind++, ifmb.getParentId());
+		variables.put(ind++, ifmb.getParentLabel());
+		variables.put(ind++, ifmb.getColumnNumber());
+		variables.put(ind++, ifmb.getPageNumberLabel());
+		variables.put(ind++, ifmb.getQuestionNumberLabel());
+		variables.put(ind++, ifmb.getLeftItemText());
+		variables.put(ind++, ifmb.getRightItemText());
+		variables.put(ind++, ifmb.getSectionId());
+		variables.put(ind++, ifmb.getDescisionConditionId());
+		variables.put(ind++, ifmb.getResponseSetId());
+		variables.put(ind++, ifmb.getRegexp());
+		variables.put(ind++, ifmb.getRegexpErrorMsg());
+		variables.put(ind++, ifmb.getOrdinal());
+		variables.put(ind++, ifmb.isRequired());
+		variables.put(ind++, ifmb.getDefaultValue());
+		variables.put(ind++, ifmb.getResponseLayout());
+		if (ifmb.getWidthDecimal() == null) {
+			nullVars.put(ind, Types.VARCHAR);
+			variables.put(ind++, null);
+		} else {
+			variables.put(ind++, ifmb.getWidthDecimal());
+		}
+		variables.put(ind++, ifmb.isShowItem());
+		variables.put(ind++, ifmb.getCodeRef());
+		variables.put(ind, ifmb.isSdvRequired());
 
-		execute("create", variables);
+		execute(digester.getQuery("create"), variables, nullVars);
 
 		if (isQuerySuccessful()) {
 			ifmb.setId(id);
@@ -551,63 +700,53 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return ifmb;
 	}
 
+	/**
+	 * Method updates the ItemFormMetadataBean.
+	 * 
+	 * @param eb
+	 *            EntityBean
+	 * @return EntityBean
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public EntityBean update(EntityBean eb) throws OpenClinicaException {
 		ItemFormMetadataBean ifmb = (ItemFormMetadataBean) eb;
+		HashMap nullVars = new HashMap();
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
 
-		int ind = 0;
-
-		variables.put(ind, ifmb.getItemId());
-		ind++;
-		variables.put(ind, ifmb.getCrfVersionId());
-		ind++;
-		variables.put(ind, ifmb.getHeader());
-		ind++;
-		variables.put(ind, ifmb.getSubHeader());
-		ind++;
-		variables.put(ind, ifmb.getParentId());
-		ind++;
-		variables.put(ind, ifmb.getParentLabel());
-		ind++;
-		variables.put(ind, ifmb.getColumnNumber());
-		ind++;
-		variables.put(ind, ifmb.getPageNumberLabel());
-		ind++;
-		variables.put(ind, ifmb.getQuestionNumberLabel());
-		ind++;
-		variables.put(ind, ifmb.getLeftItemText());
-		ind++;
-		variables.put(ind, ifmb.getRightItemText());
-		ind++;
-		variables.put(ind, ifmb.getSectionId());
-		ind++;
-		variables.put(ind, ifmb.getDescisionConditionId());
-		ind++;
-		variables.put(ind, ifmb.getResponseSetId());
-		ind++;
-		variables.put(ind, ifmb.getRegexp());
-		ind++;
-		variables.put(ind, ifmb.getRegexpErrorMsg());
-		ind++;
-		variables.put(ind, ifmb.getOrdinal());
-		ind++;
-		variables.put(ind, ifmb.isRequired());
-		ind++;
+		int ind = 1;
+		variables.put(ind++, ifmb.getItemId());
+		variables.put(ind++, ifmb.getCrfVersionId());
+		variables.put(ind++, ifmb.getHeader());
+		variables.put(ind++, ifmb.getSubHeader());
+		variables.put(ind++, ifmb.getParentId());
+		variables.put(ind++, ifmb.getParentLabel());
+		variables.put(ind++, ifmb.getColumnNumber());
+		variables.put(ind++, ifmb.getPageNumberLabel());
+		variables.put(ind++, ifmb.getQuestionNumberLabel());
+		variables.put(ind++, ifmb.getLeftItemText());
+		variables.put(ind++, ifmb.getRightItemText());
+		variables.put(ind++, ifmb.getSectionId());
+		variables.put(ind++, ifmb.getDescisionConditionId());
+		variables.put(ind++, ifmb.getResponseSetId());
+		variables.put(ind++, ifmb.getRegexp());
+		variables.put(ind++, ifmb.getRegexpErrorMsg());
+		variables.put(ind++, ifmb.getOrdinal());
+		variables.put(ind++, ifmb.isRequired());
+		variables.put(ind++, ifmb.getDefaultValue());
+		variables.put(ind++, ifmb.getResponseLayout());
+		if (ifmb.getWidthDecimal() == null) {
+			nullVars.put(ind, Types.VARCHAR);
+			variables.put(ind++, null);
+		} else {
+			variables.put(ind++, ifmb.getWidthDecimal());
+		}
+		variables.put(ind++, ifmb.isShowItem());
+		variables.put(ind++, ifmb.getCodeRef());
+		variables.put(ind++, ifmb.isSdvRequired());
 		variables.put(ind, ifmb.getId());
-		ind++;
-		variables.put(ind, ifmb.getDefaultValue());
-		ind++;
-		variables.put(ind, ifmb.getResponseLayout());
-		ind++;
-		variables.put(ind, ifmb.getWidthDecimal());
-		ind++;
-		variables.put(ind, ifmb.isShowItem());
-		ind++;
-		variables.put(ind, ifmb.getId());
-		ind++;
-		variables.put(ind, ifmb.getCodeRef());
 
-		execute("update", variables);
+		execute(digester.getQuery("update"), variables, nullVars);
 
 		if (!isQuerySuccessful()) {
 			ifmb.setId(0);
@@ -617,11 +756,39 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return ifmb;
 	}
 
+	/**
+	 * Method returns all ItemFormMetadataBeans by permission.
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
+	 * @return Collection
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) throws OpenClinicaException {
 		return null;
 	}
 
+	/**
+	 * Method returns all ItemFormMetadataBeans by permission.
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @return Collection
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) throws OpenClinicaException {
 		// Auto-generated method stub
 		return null;
@@ -631,14 +798,22 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		logger.debug(message);
 	}
 
+	/**
+	 * Method returns the ItemFormMetadataBean by item id & crf version id.
+	 * 
+	 * @param itemId
+	 *            int
+	 * @param crfVersionId
+	 *            int
+	 * @return ItemFormMetadataBean
+	 */
 	public ItemFormMetadataBean findByItemIdAndCRFVersionId(int itemId, int crfVersionId) {
-		this.setTypesExpected();
-		// TODO note to come back here, tbh
-		this.setTypeExpected(29, TypeNames.STRING);// version name
+		int ind = this.setTypesExpected();
+		this.setTypeExpected(ind++, TypeNames.STRING); // version name
 		// add more here for display, tbh 082007
-		this.setTypeExpected(30, TypeNames.STRING);// group_label
-		this.setTypeExpected(31, TypeNames.INT);// repeat_max
-		this.setTypeExpected(32, TypeNames.STRING);// section_name
+		this.setTypeExpected(ind++, TypeNames.STRING); // group_label
+		this.setTypeExpected(ind++, TypeNames.INT); // repeat_max
+		this.setTypeExpected(ind, TypeNames.STRING); // section_name
 
 		logMe("Current Thread:::" + Thread.currentThread() + "types Expected?");
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
@@ -672,6 +847,15 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return ifmb;
 	}
 
+	/**
+	 * Method returns the ItemFormMetadataBean by item id & crf version id that is not in IGM.
+	 * 
+	 * @param itemId
+	 *            int
+	 * @param crfVersionId
+	 *            int
+	 * @return ItemFormMetadataBean
+	 */
 	public ItemFormMetadataBean findByItemIdAndCRFVersionIdNotInIGM(int itemId, int crfVersionId) {
 		this.setTypesExpected();
 
@@ -688,24 +872,31 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		}
 	}
 
+	/**
+	 * Method returns the ResponseSetBean by id.
+	 * 
+	 * @param id
+	 *            int
+	 * @return ResponseSetBean
+	 */
 	public ResponseSetBean findResponseSetByPK(int id) {
 		this.unsetTypeExpected();
 		int ind = 1;
-		this.setTypeExpected(ind, TypeNames.INT);// response_set_id
+		this.setTypeExpected(ind, TypeNames.INT); // response_set_id
 		ind++;
-		this.setTypeExpected(ind, TypeNames.INT);// response_type_id
+		this.setTypeExpected(ind, TypeNames.INT); // response_type_id
 		ind++;
-		this.setTypeExpected(ind, TypeNames.STRING);// label
+		this.setTypeExpected(ind, TypeNames.STRING); // label
 		ind++;
-		this.setTypeExpected(ind, TypeNames.STRING);// option_text
+		this.setTypeExpected(ind, TypeNames.STRING); // option_text
 		ind++;
-		this.setTypeExpected(ind, TypeNames.STRING);// options_values
+		this.setTypeExpected(ind, TypeNames.STRING); // options_values
 		ind++;
-		this.setTypeExpected(ind, TypeNames.INT);// version_id
+		this.setTypeExpected(ind, TypeNames.INT); // version_id
 		ind++;
-		this.setTypeExpected(ind, TypeNames.STRING);// name
+		this.setTypeExpected(ind, TypeNames.STRING); // name
 		ind++;
-		this.setTypeExpected(ind, TypeNames.STRING);// description
+		this.setTypeExpected(ind, TypeNames.STRING); // description
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
 		variables.put(1, id);
@@ -714,7 +905,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
 	}
 
 	/**
-	 * Find all ItemFormMetadataBean which is simple_conditional_display
+	 * Find all ItemFormMetadataBean by section id, which is simple_conditional_display.
 	 * 
 	 * @param sectionId
 	 *            Integer
@@ -737,7 +928,13 @@ public class ItemFormMetadataDAO extends EntityDAO {
 	}
 
 	/**
-	 * need to use this method when you want the results to be cached. i.e they do not get updated.
+	 * Need to use this method when you want the results to be cached. i.e they do not get updated.
+	 * 
+	 * @param query
+	 *            String
+	 * @param variables
+	 *            Map
+	 * @return ArrayList
 	 */
 	@Override
 	public ArrayList select(String query, Map variables) {
@@ -753,16 +950,18 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		try {
 			con = ds.getConnection();
 			if (con.isClosed()) {
-				if (logger.isWarnEnabled())
+				if (logger.isWarnEnabled()) {
 					logger.warn("Connection is closed: GenericDAO.select!");
+				}
 				throw new SQLException();
 			}
 
 			ps = con.prepareStatement(query);
 
-			ps = psf.generate(ps);// enter variables here!
+			ps = psf.generate(ps); // enter variables here!
 			key = ps.toString();
-			if ((results = (ArrayList) cache.get(key)) == null) {
+			results = (ArrayList) cache.get(key);
+			if (results == null) {
 				rs = ps.executeQuery();
 				results = this.processResultRows(rs);
 				if (results != null) {
@@ -825,6 +1024,13 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		this.setTypeExpected(ind, TypeNames.STRING);
 	}
 
+	/**
+	 * Method checks that instant type exists in section.
+	 * 
+	 * @param sectionId
+	 *            int
+	 * @return boolean
+	 */
 	public boolean instantTypeExistsInSection(int sectionId) {
 		Integer id = null;
 		this.unsetTypeExpected();
@@ -839,15 +1045,23 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return id != null && id > 0;
 	}
 
+	/**
+	 * Method checks that section instant map is in the same section.
+	 * 
+	 * @param crfVersionId
+	 *            int
+	 * @return Map
+	 */
 	public Map<Integer, List<InstantOnChangePairContainer>> sectionInstantMapInSameSection(int crfVersionId) {
 		Map<Integer, List<InstantOnChangePairContainer>> pairs = new HashMap<Integer, List<InstantOnChangePairContainer>>();
 		this.setInstantTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(1, crfVersionId);
-		variables.put(2, crfVersionId);
-		variables.put(3, crfVersionId);
-		variables.put(4, crfVersionId);
-		variables.put(5, crfVersionId);
+		int ind = 1;
+		variables.put(ind++, crfVersionId);
+		variables.put(ind++, crfVersionId);
+		variables.put(ind++, crfVersionId);
+		variables.put(ind++, crfVersionId);
+		variables.put(ind, crfVersionId);
 		String sql = digester.getQuery("findInstantItemsByCrfVersionId");
 		ArrayList alist = this.select(sql, variables);
 		for (Object anAlist : alist) {
@@ -889,6 +1103,13 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		return pairs;
 	}
 
+	/**
+	 * Method returns crf sections metric for study id.
+	 * 
+	 * @param studyId
+	 *            int
+	 * @return int
+	 */
 	public int getCrfSectionsMetric(int studyId) {
 		int crfSections = 0;
 		unsetTypeExpected();
@@ -902,5 +1123,26 @@ public class ItemFormMetadataDAO extends EntityDAO {
 			crfSections = (Integer) ((HashMap) it.next()).get("total");
 		}
 		return crfSections;
+	}
+
+	/**
+	 * Method check that crf version has items to SDV.
+	 * 
+	 * @param crfId
+	 *            int
+	 * @return boolean
+	 */
+	public boolean hasItemsToSDV(int crfId) {
+		boolean has = false;
+		unsetTypeExpected();
+		setTypeExpected(1, TypeNames.BOOL);
+		HashMap variables = new HashMap();
+		variables.put(1, crfId);
+		ArrayList rows = select(digester.getQuery("hasItemsToSDV"), variables);
+		Iterator it = rows.iterator();
+		if (it.hasNext()) {
+			has = getBooleanFromRow((HashMap) it.next(), "has");
+		}
+		return has;
 	}
 }

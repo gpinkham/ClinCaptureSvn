@@ -96,6 +96,7 @@
     <td class="table_header_column_top"><fmt:message key="response_label" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="response_value" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="required" bundle="${resword}"/></td>
+    <td class="table_header_column_top"><fmt:message key="itemLevelSDVRequired" bundle="${resword}"/></td>
   </tr>
 
  <c:forEach var="did" items="${section.items}">
@@ -111,14 +112,24 @@
     <td class="table_cell"><c:out value="${did.metadata.responseSet.label}"/>&nbsp;</td>
     <td class="table_cell"><c:out value="${did.data.value}"/>&nbsp;</td>
     <td class="table_cell">
-     <c:choose>
-      <c:when test="${did.metadata.required==true}">
-       <fmt:message key="yes" bundle="${resword}"/>
-      </c:when>
-      <c:otherwise>
-        <fmt:message key="no" bundle="${resword}"/>
-      </c:otherwise>
-      </c:choose>
+        <c:choose>
+            <c:when test="${did.metadata.required==true}">
+                <fmt:message key="yes" bundle="${resword}"/>
+            </c:when>
+            <c:otherwise>
+                <fmt:message key="no" bundle="${resword}"/>
+            </c:otherwise>
+        </c:choose>
+    </td>
+    <td class="table_cell">
+        <c:choose>
+            <c:when test="${did.metadata.sdvRequired}">
+                <fmt:message key="yes" bundle="${resword}" />
+            </c:when>
+            <c:otherwise>
+                <fmt:message key="no" bundle="${resword}" />
+            </c:otherwise>
+        </c:choose>
     </td>
   </tr>
 

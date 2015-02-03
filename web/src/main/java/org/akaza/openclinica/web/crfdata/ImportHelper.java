@@ -23,11 +23,17 @@ import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.Validation;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/*
- * Helper methods will be placed in this class - DRY
+/**
+ * Helper methods will be placed in this class - DRY.
  */
 public class ImportHelper {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ImportHelper.class);
+
+	public static final int INT_255 = 255;
 
 	/**
 	 * @param dib
@@ -36,8 +42,7 @@ public class ImportHelper {
 	 */
 	public final String getInputName(DisplayItemBean dib) {
 		ItemBean ib = dib.getItem();
-		String inputName = "input" + ib.getId();
-		return inputName;
+		return "input" + ib.getId();
 	}
 
 	/**
@@ -48,6 +53,8 @@ public class ImportHelper {
 	 *            The Validator to add validations to.
 	 * @param dib
 	 *            The DisplayItemBean to validate.
+	 * @param inputName
+	 *            String
 	 * @return The DisplayItemBean which is validated.
 	 */
 	public DisplayItemBean validateDisplayItemBeanSingleCV(DiscrepancyValidator v, DisplayItemBean dib, String inputName) {
@@ -60,13 +67,7 @@ public class ImportHelper {
 			if (ibMeta.isRequired()) {
 				v.addValidation(inputName, Validator.IS_REQUIRED);
 			}
-		} else {
-			// commented out because it should be a hard edit check, tbh 05/2008
-			// v.addValidation(inputName,
-			// Validator.IN_RESPONSE_SET_SINGLE_VALUE,
-			// dib.getMetadata().getResponseSet());
 		}
-
 		return dib;
 	}
 
@@ -78,6 +79,8 @@ public class ImportHelper {
 	 *            The Validator to add validations to.
 	 * @param dib
 	 *            The DisplayItemBean to validate.
+	 * @param inputName
+	 *            String
 	 * @return The DisplayItemBean which is validated.
 	 */
 	public DisplayItemBean validateDisplayItemBeanMultipleCV(DiscrepancyValidator v, DisplayItemBean dib,
@@ -91,11 +94,6 @@ public class ImportHelper {
 			if (ibMeta.isRequired()) {
 				v.addValidation(inputName, Validator.IS_REQUIRED);
 			}
-		} else {
-			// comment this out since it should be a hard edit check, tbh
-			// 05/2008
-			// v.addValidation(inputName, Validator.IN_RESPONSE_SET,
-			// dib.getMetadata().getResponseSet());
 		}
 		return dib;
 	}
@@ -108,11 +106,14 @@ public class ImportHelper {
 	 *            The Validator to add validations to.
 	 * @param dib
 	 *            The DisplayItemBean to validate.
+	 * @param inputName
+	 *            String
 	 * @return The DisplayItemBean which is validated.
 	 */
 	public DisplayItemBean validateDisplayItemBeanText(DiscrepancyValidator v, DisplayItemBean dib, String inputName) {
 
-		if (StringUtil.isBlank(inputName)) {// for single items
+		if (StringUtil.isBlank(inputName)) {
+			// for single items
 			inputName = getInputName(dib);
 		}
 		ItemBean ib = dib.getItem();
@@ -120,75 +121,58 @@ public class ImportHelper {
 		ItemDataType idt = ib.getDataType();
 		ItemDataBean idb = dib.getData();
 
-		boolean isNull = false;
-		/*
-		 * ArrayList nullValues = edcb.getNullValuesList(); for (int i = 0; i < nullValues.size(); i++) { NullValue nv =
-		 * (NullValue) nullValues.get(i); if (nv.getName().equals(fp.getString(inputName))) { isNull = true; } }
-		 */
+		if (StringUtil.isBlank(idb.getValue())) {
+			// check required first
+			if (ibMeta.isRequired()) {
+				v.addValidation(inputName, Validator.IS_REQUIRED);
+			}
+		} else {
+			if (idt.equals(ItemDataType.ST)) {
+				// a string's size could be more than 255, which is more
+				// than
+				// the db field length
+				v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
+						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_255);
+			} else if (idt.equals(ItemDataType.INTEGER)) {
+				v.addValidation(inputName, Validator.IS_AN_INTEGER);
+				v.alwaysExecuteLastValidation(inputName);
+			} else if (idt.equals(ItemDataType.REAL)) {
+				// hard edit check, will comment out for now, tbh 05/08
+				v.addValidation(inputName, Validator.IS_A_FLOAT);
+				v.alwaysExecuteLastValidation(inputName);
+			} else if (idt.equals(ItemDataType.SET)) {
+				// v.addValidation(inputName, Validator.NO_BLANKS_SET);
+				v.addValidation(inputName, Validator.IN_RESPONSE_SET_SINGLE_VALUE, dib.getMetadata().getResponseSet());
+			} else if (idt.equals(ItemDataType.DATE)) {
+				// hard edit check, will comment out for now, tbh 05/08
+				v.addValidation(inputName, Validator.IS_A_IMPORT_DATE);
+				v.alwaysExecuteLastValidation(inputName);
+			} else if (idt.equals(ItemDataType.PDATE)) {
+				v.addValidation(inputName, Validator.IS_A_IMPORT_PARTIAL_DATE);
+				v.alwaysExecuteLastValidation(inputName);
+			}
 
-		if (!isNull) {
-			if (StringUtil.isBlank(idb.getValue())) {
-				// check required first
-				if (ibMeta.isRequired()) {
-					v.addValidation(inputName, Validator.IS_REQUIRED);
-				}
-			} else {
-				if (idt.equals(ItemDataType.ST)) {
-					// a string's size could be more than 255, which is more
-					// than
-					// the db field length
-					v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
-							NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-				} else if (idt.equals(ItemDataType.INTEGER)) {
-					v.addValidation(inputName, Validator.IS_AN_INTEGER);
-					v.alwaysExecuteLastValidation(inputName);
-				} else if (idt.equals(ItemDataType.REAL)) {
-					// hard edit check, will comment out for now, tbh 05/08
-					v.addValidation(inputName, Validator.IS_A_FLOAT);
-					v.alwaysExecuteLastValidation(inputName);
-				} else if (idt.equals(ItemDataType.BL)) {
-					// there is no validation here since this data type is
-					// explicitly
-					// allowed to be null
-					// if the string input for this field parses to a non-zero
-					// number, the
-					// value will be true; otherwise, 0
-				} else if (idt.equals(ItemDataType.BN)) {
-					//
-				} else if (idt.equals(ItemDataType.SET)) {
-					// v.addValidation(inputName, Validator.NO_BLANKS_SET);
-					v.addValidation(inputName, Validator.IN_RESPONSE_SET_SINGLE_VALUE, dib.getMetadata()
-							.getResponseSet());
-				} else if (idt.equals(ItemDataType.DATE)) {
-					// hard edit check, will comment out for now, tbh 05/08
-					v.addValidation(inputName, Validator.IS_A_IMPORT_DATE);
-					v.alwaysExecuteLastValidation(inputName);
-				} else if (idt.equals(ItemDataType.PDATE)) {
-					v.addValidation(inputName, Validator.IS_A_IMPORT_PARTIAL_DATE);
-					v.alwaysExecuteLastValidation(inputName);
-				}
-
-				String customValidationString = dib.getMetadata().getRegexp();
-				if (!StringUtil.isBlank(customValidationString)) {
-					Validation customValidation = null;
-					if (customValidationString.startsWith("func:")) {
-						try {
-							customValidation = Validator.processCRFValidationFunction(customValidationString);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					} else if (customValidationString.startsWith("regexp:")) {
-						try {
-							customValidation = Validator.processCRFValidationRegex(customValidationString);
-							customValidation.setConvertDate(idt.equals(ItemDataType.DATE));
-							customValidation.setConvertPDate(idt.equals(ItemDataType.PDATE));
-						} catch (Exception e) {
-						}
+			String customValidationString = dib.getMetadata().getRegexp();
+			if (!StringUtil.isBlank(customValidationString)) {
+				Validation customValidation = null;
+				if (customValidationString.startsWith("func:")) {
+					try {
+						customValidation = Validator.processCRFValidationFunction(customValidationString);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					if (customValidation != null) {
-						customValidation.setErrorMessage(dib.getMetadata().getRegexpErrorMsg());
-						v.addValidation(inputName, customValidation);
+				} else if (customValidationString.startsWith("regexp:")) {
+					try {
+						customValidation = Validator.processCRFValidationRegex(customValidationString);
+						customValidation.setConvertDate(idt.equals(ItemDataType.DATE));
+						customValidation.setConvertPDate(idt.equals(ItemDataType.PDATE));
+					} catch (Exception e) {
+						LOGGER.error("Error has occurred.", e);
 					}
+				}
+				if (customValidation != null) {
+					customValidation.setErrorMessage(dib.getMetadata().getRegexpErrorMsg());
+					v.addValidation(inputName, customValidation);
 				}
 			}
 		}

@@ -2891,3 +2891,9 @@ span.annotated_crfOID, span.annotated_eventOID{
 a.dataEntryLink {
     cursor: pointer;
 }
+
+a.sdvItemLink {
+    padding-left: 5px;
+    padding-right: 5px;
+    cursor: pointer;
+}

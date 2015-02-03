@@ -114,4 +114,9 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 		userAccountDAO.execute("delete from user_account where user_id = ".concat(Integer.toString(newOwner.getId())),
 				new HashMap());
 	}
+
+	@Test
+	public void testThatUpdateEventCRFSDVWhenCRFMetadataWasChangedReturnsTrue() {
+		assertTrue(eventCRFDAO.updateEventCRFSDVWhenCRFMetadataWasChanged(1));
+	}
 }

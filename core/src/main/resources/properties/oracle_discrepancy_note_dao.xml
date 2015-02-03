@@ -994,6 +994,31 @@
         </sql>
     </query>
     <query>
+        <name>countOfOutstandingDNsForEventCrf</name>
+        <sql>
+            select count(distinct dns.discrepancy_note_id)
+
+            from
+
+            (select dn.discrepancy_note_id from discrepancy_note dn, dn_event_crf_map dnecm
+            where
+            dnecm.event_crf_id = ?
+            AND dnecm.discrepancy_note_id = dn.discrepancy_note_id
+            AND dn.parent_dn_id is null
+            AND dn.resolution_status_id in (0,1,2,3)
+
+            union
+
+            select dn.discrepancy_note_id from discrepancy_note dn, dn_item_data_map dnidm, item_data id
+            where
+            id.event_crf_id = ?
+            AND dnidm.item_data_id = id.item_data_id
+            AND dnidm.discrepancy_note_id = dn.discrepancy_note_id
+            AND dn.parent_dn_id is null
+            AND dn.resolution_status_id in (0,1,2,3)) dns
+        </sql>
+    </query>
+    <query>
         <name>countOfOutstandingDNsForStudyEventFromStudyEventMap</name>
         <sql>
             select count(dn.resolution_status_id) from discrepancy_note dn, dn_study_event_map dsem, study_event se

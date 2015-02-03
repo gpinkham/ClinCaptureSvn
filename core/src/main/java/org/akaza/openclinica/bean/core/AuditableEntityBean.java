@@ -64,6 +64,9 @@ public class AuditableEntityBean extends EntityBean {
 	// used to retrieve the owner and updater when needed
 	protected UserAccountDAO udao;
 
+	/**
+	 * AuditableEntityBean constructor.
+	 */
 	public AuditableEntityBean() {
 		createdDate = new Date(0);
 		updatedDate = new Date(0);
@@ -125,10 +128,7 @@ public class AuditableEntityBean extends EntityBean {
 	@Deprecated
 	public void setOwnerId(int ownerId) {
 		this.ownerId = ownerId;
-
-		/*
-		 * if ((owner != null) || (owner.getId() != ownerId)) { owner = null; getOwner(); }
-		 */}
+	}
 
 	/**
 	 * @return Returns the updater.

@@ -1,0 +1,25 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="skirpichenok" id="2015-01-06-TICKET1946-01" dbms="postgresql">
+        <comment>Insert the new "SDV" column into the item_data table</comment>
+        <addColumn tableName="item_data" >
+            <column name="sdv" type="boolean" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2015-01-06-TICKET1946-02" dbms="postgresql">
+        <comment>Insert the new "sdv_required" column into the item_form_metadata table</comment>
+        <addColumn tableName="item_form_metadata" >
+            <column name="sdv_required" type="boolean" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2015-01-06-TICKET1946-03" dbms="postgresql">
+        <sql>
+            update event_definition_crf set source_data_verification_code = 3 where source_data_verification_code = 4
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

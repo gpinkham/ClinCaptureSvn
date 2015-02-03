@@ -15,7 +15,6 @@
 <jsp:useBean scope="request" id="parentName" class="java.lang.String"/>
 <jsp:useBean scope='session' id='fromListSite' class="java.lang.String"/>
 <jsp:useBean scope='request' id='definitions' class='java.util.ArrayList'/>
-<jsp:useBean scope='request' id='sdvOptions' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='idToSort' class="java.lang.String"/>
 
 

@@ -147,31 +147,32 @@
 		<name>create</name>
 		<sql>
 			INSERT INTO
-				item_form_metadata (item_form_metadata_id,
-					item_id,
-                    crf_version_id,
-                    header,
-                    subheader,
-                    parent_id,
-                    parent_label ,
-                    column_number,
-                    page_number_label,
-                    question_number_label,
-                    left_item_text,
-                    right_item_text,
-                    section_id,
-                    decision_condition_id,
-                    response_set_id,
-                    regexp,
-                    regexp_error_msg,
-                    ordinal,
-                    required,
-                    default_value,
-                    response_layout,
-                    width_decimal,
-                    show_item,
-                    code_ref)
-			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+			item_form_metadata (item_form_metadata_id,
+			item_id,
+            crf_version_id,
+            header,
+            subheader,
+            parent_id,
+            parent_label ,
+            column_number,
+            page_number_label,
+            question_number_label,
+            left_item_text,
+            right_item_text,
+            section_id,
+            decision_condition_id,
+            response_set_id,
+            regexp,
+            regexp_error_msg,
+            ordinal,
+            required,
+            default_value,
+            response_layout,
+            width_decimal,
+            show_item,
+            code_ref,
+            sdv_required)
+			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		</sql>
 	</query>
 	<query>
@@ -179,29 +180,30 @@
 		<sql>
 			UPDATE item_form_metadata
 			SET
-					item_id=?,
-                    crf_version_id=?,
-                    header=?,
-                    subheader=?,
-                    parent_id=?,
-                    parent_label=? ,
-                    column_number=?,
-                    page_number_label=?,
-                    question_number_label=?,
-                    left_item_text=?,
-                    right_item_text=?,
-                    section_id=?,
-                    decision_condition_id=?,
-                    response_set_id=?,
-                    regexp=?,
-                    regexp_error_msg=?,
-                    ordinal=?,
-                    required =?,
-                    default_value =?,
-                    response_layout =?,
-                    width_decimal =?,
-                    show_item =?,
-                    code_ref=?
+			item_id=?,
+            crf_version_id=?,
+            header=?,
+            subheader=?,
+            parent_id=?,
+            parent_label=? ,
+            column_number=?,
+            page_number_label=?,
+            question_number_label=?,
+            left_item_text=?,
+            right_item_text=?,
+            section_id=?,
+            decision_condition_id=?,
+            response_set_id=?,
+            regexp=?,
+            regexp_error_msg=?,
+            ordinal=?,
+            required =?,
+            default_value =?,
+            response_layout =?,
+            width_decimal =?,
+            show_item =?,
+            code_ref=?,
+            sdv_required=?
 			WHERE item_form_metadata_id = ?
 		</sql>
 	</query>
@@ -304,6 +306,12 @@
 			and ss.study_subject_id = ec.study_subject_id
 			and sec.crf_version_id = ec.crf_version_id
 			and ss.study_id = s.study_id and (s.study_id = ? or s.parent_study_id = ?)
+        </sql>
+    </query>
+    <query>
+        <name>hasItemsToSDV</name>
+        <sql>
+            select count(distinct cv.crf_id) = 1 as has from crf_version cv, item_form_metadata ifm where cv.crf_id = ? and ifm.crf_version_id = cv.crf_version_id and ifm.sdv_required = true
         </sql>
     </query>
 </queries>

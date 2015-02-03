@@ -13,9 +13,6 @@
 
 package org.akaza.openclinica.util;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -25,29 +22,60 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
+import java.util.ArrayList;
+import java.util.Map;
+
+/**
+ * SDVUtil.
+ */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public final class SDVUtil {
 
 	private SDVUtil() {
 	}
 
+	/**
+	 * Permits SDV.
+	 * 
+	 * @param studySubjectBean
+	 *            StudySubjectBean
+	 * @param daoWrapper
+	 *            DAOWrapper
+	 * @return boolean
+	 */
 	public static boolean permitSDV(StudySubjectBean studySubjectBean, DAOWrapper daoWrapper) {
 		boolean sdv = !studySubjectBean.getStatus().isSigned() && !studySubjectBean.getStatus().isDeleted();
 		if (sdv) {
 			StudyBean studyBean = (StudyBean) daoWrapper.getSdao().findByPK(studySubjectBean.getStudyId());
-			sdv = daoWrapper.getSsdao().allowSDVSubject(studySubjectBean.getId(), studyBean.getId(), studyBean.getId());
+			sdv = daoWrapper.getSsdao().isStudySubjectReadyToBeSDVed(studyBean, studySubjectBean);
 		}
 		return sdv;
 	}
 
+	/**
+	 * Permits SDV.
+	 * 
+	 * @param studyEventBean
+	 *            StudyEventBean
+	 * @param studyId
+	 *            int
+	 * @param daoWrapper
+	 *            DAOWrapper
+	 * @param allowSdvWithOpenQueries
+	 *            boolean
+	 * @param notedMap
+	 *            Map<Integer, String>
+	 * @return boolean
+	 */
 	public static boolean permitSDV(StudyEventBean studyEventBean, int studyId, DAOWrapper daoWrapper,
 			boolean allowSdvWithOpenQueries, Map<Integer, String> notedMap) {
 		boolean hasReadyForSDV = false;
 		StudyBean studyBean = (StudyBean) daoWrapper.getSdao().findByPK(studyId);
 		ArrayList eventCrfs = daoWrapper.getEcdao().findAllStartedByStudyEvent(studyEventBean);
 		for (EventCRFBean eventCRFBean : (ArrayList<EventCRFBean>) eventCrfs) {
-			if (eventCRFBean.isNotStarted())
+			if (eventCRFBean.isNotStarted()) {
 				continue;
+			}
 			EventDefinitionCRFBean eventDefinitionCrf = daoWrapper.getEdcdao().findByStudyEventIdAndCRFVersionId(
 					studyBean, studyEventBean.getId(), eventCRFBean.getCRFVersionId());
 			if ((eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED || eventDefinitionCrf

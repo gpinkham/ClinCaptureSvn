@@ -20,21 +20,6 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.sql.Connection;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import javax.sql.DataSource;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -51,7 +36,28 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.util.SignedData;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+import javax.sql.DataSource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.sql.Connection;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * StudyEventDAO.
+ */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class StudyEventDAO extends AuditableEntityDAO {
 
 	private void setQueryNames() {
@@ -59,26 +65,56 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		getCurrentPKName = "getCurrentPrimaryKey";
 	}
 
+	/**
+	 * Study event constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 */
 	public StudyEventDAO(DataSource ds) {
 		super(ds);
 		setQueryNames();
 	}
 
+	/**
+	 * Study event constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param con
+	 *            Connection
+	 */
 	public StudyEventDAO(DataSource ds, Connection con) {
 		super(ds, con);
 		setQueryNames();
 	}
 
+	/**
+	 * Study event constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param digester
+	 *            DAODigester
+	 */
 	public StudyEventDAO(DataSource ds, DAODigester digester) {
 		super(ds);
 		this.digester = digester;
 		setQueryNames();
 	}
 
-	// This constructor sets up the Locale for JUnit tests; see the locale
-	// member variable in EntityDAO, and its initializeI18nStrings() method
+	/**
+	 * This constructor sets up the Locale for JUnit tests; see the locale member variable in EntityDAO, and its
+	 * initializeI18nStrings() method.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param digester
+	 *            DAODigester
+	 * @param locale
+	 *            Locale
+	 */
 	public StudyEventDAO(DataSource ds, DAODigester digester, Locale locale) {
-
 		this(ds, digester);
 		this.locale = locale;
 	}
@@ -90,85 +126,90 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 	@Override
 	public void setTypesExpected() {
-		// SERIAL NUMERIC NUMERIC VARCHAR(2000)
-		// NUMERIC DATE DATE NUMERIC
-		// NUMERIC DATE DATE NUMERIC
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		this.setTypeExpected(2, TypeNames.INT);
-		this.setTypeExpected(3, TypeNames.INT);
-		this.setTypeExpected(4, TypeNames.STRING);
+		int ind = 1;
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.STRING);
 
-		this.setTypeExpected(5, TypeNames.INT);
-		this.setTypeExpected(6, TypeNames.TIMESTAMP); // YW 08-17-2007,
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.TIMESTAMP); // YW 08-17-2007,
 		// date_start
-		this.setTypeExpected(7, TypeNames.TIMESTAMP); // YW 08-17-2007,
+		this.setTypeExpected(ind++, TypeNames.TIMESTAMP); // YW 08-17-2007,
 		// date_end
-		this.setTypeExpected(8, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.INT);
 
-		this.setTypeExpected(9, TypeNames.INT);
-		this.setTypeExpected(10, TypeNames.DATE);
-		this.setTypeExpected(11, TypeNames.DATE);
-		this.setTypeExpected(12, TypeNames.INT);
-		this.setTypeExpected(13, TypeNames.INT);
-		this.setTypeExpected(14, TypeNames.BOOL); // start_time_flag
-		this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
-		this.setTypeExpected(16, TypeNames.INT); // prev_status
-		this.setTypeExpected(17, TypeNames.INT); // reference_visit_id
-		this.setTypeExpected(18, TypeNames.BINARY_STREAM); // signed_data
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.DATE);
+		this.setTypeExpected(ind++, TypeNames.DATE);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.BOOL); // start_time_flag
+		this.setTypeExpected(ind++, TypeNames.BOOL); // end_time_flag
+		this.setTypeExpected(ind++, TypeNames.INT); // prev_status
+		this.setTypeExpected(ind++, TypeNames.INT); // reference_visit_id
+		this.setTypeExpected(ind, TypeNames.BINARY_STREAM); // signed_data
 	}
 
+	/**
+	 * Method sets expected types.
+	 * 
+	 * @param withSubject
+	 *            boolean
+	 */
 	public void setTypesExpected(boolean withSubject) {
-		// SERIAL NUMERIC NUMERIC VARCHAR(2000)
-		// NUMERIC DATE DATE NUMERIC
-		// NUMERIC DATE DATE NUMERIC
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		this.setTypeExpected(2, TypeNames.INT);
-		this.setTypeExpected(3, TypeNames.INT);
-		this.setTypeExpected(4, TypeNames.STRING);
+		int ind = 1;
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.STRING);
 
-		this.setTypeExpected(5, TypeNames.INT);
-		this.setTypeExpected(6, TypeNames.TIMESTAMP); // YW 08-17-2007,
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.TIMESTAMP); // YW 08-17-2007,
 		// date_start
-		this.setTypeExpected(7, TypeNames.TIMESTAMP); // YW 08-17-2007,
+		this.setTypeExpected(ind++, TypeNames.TIMESTAMP); // YW 08-17-2007,
 		// date_end
-		this.setTypeExpected(8, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.INT);
 
-		this.setTypeExpected(9, TypeNames.INT);
-		this.setTypeExpected(10, TypeNames.DATE);
-		this.setTypeExpected(11, TypeNames.DATE);
-		this.setTypeExpected(12, TypeNames.INT);
-		this.setTypeExpected(13, TypeNames.INT);
-		this.setTypeExpected(14, TypeNames.BOOL); // start_time_flag
-		this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.DATE);
+		this.setTypeExpected(ind++, TypeNames.DATE);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.BOOL); // start_time_flag
+		this.setTypeExpected(ind++, TypeNames.BOOL); // end_time_flag
 
-		this.setTypeExpected(16, TypeNames.INT); // prev_status
-		this.setTypeExpected(17, TypeNames.INT); // reference_visit_id
+		this.setTypeExpected(ind++, TypeNames.INT); // prev_status
+		this.setTypeExpected(ind++, TypeNames.INT); // reference_visit_id
 		if (withSubject) {
-			this.setTypeExpected(18, TypeNames.STRING);
+			this.setTypeExpected(ind, TypeNames.STRING);
 		}
 	}
 
+	/**
+	 * Method sets expected types.
+	 */
 	public void setCRFTypesExpected() {
-		/*
-		 * <sql>SELECT C.CRF_ID, C.STATUS_ID, C.NAME, C.DESCRIPTION, V.CRF_VERSION_ID, V.NAME, V.REVISION_NOTES FROM CRF
-		 * C, CRF_VERSION V, EVENT_DEFINITION_CRF EDC WHERE C.CRF_ID = V.CRF_ID AND EDC.CRF_ID = C.CRF_ID AND
-		 * EDC.STUDY_EVENT_DEFINITION_ID =? </sql>
-		 */
+		int ind = 1;
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		this.setTypeExpected(2, TypeNames.INT);
-		this.setTypeExpected(3, TypeNames.STRING);
-		this.setTypeExpected(4, TypeNames.STRING);
-		this.setTypeExpected(5, TypeNames.INT);
-		this.setTypeExpected(6, TypeNames.STRING);
-		this.setTypeExpected(7, TypeNames.STRING);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.STRING);
+		this.setTypeExpected(ind++, TypeNames.STRING);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.STRING);
+		this.setTypeExpected(ind, TypeNames.STRING);
 	}
 
 	/**
 	 * <p>
 	 * getEntityFromHashMap, the method that gets the object from the database query.
+	 * 
+	 * @param hm
+	 *            HashMap
+	 * @return Object
 	 */
 	public Object getEntityFromHashMap(HashMap hm) {
 		StudyEventBean eb = new StudyEventBean();
@@ -207,7 +248,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 				}
 			}
 		} catch (Exception e) {
-			//
+			logger.error("Error has occurred.", e);
 		}
 
 		return eb;
@@ -216,6 +257,12 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	/**
 	 * <p>
 	 * getEntityFromHashMap, the method that gets the object from the database query.
+	 * 
+	 * @param hm
+	 *            HashMap
+	 * @param withSubject
+	 *            boolean
+	 * @return Object
 	 */
 	public Object getEntityFromHashMap(HashMap hm, boolean withSubject) {
 		StudyEventBean eb = new StudyEventBean();
@@ -249,8 +296,11 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
-	// public HashMap getListOfStudyEvents()
-
+	/**
+	 * Method returns all study events.
+	 * 
+	 * @return Collection
+	 */
 	public Collection findAll() {
 		this.setTypesExpected();
 		ArrayList alist = this.select(digester.getQuery("findAll"));
@@ -262,6 +312,13 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Method returns all study events by definition id.
+	 * 
+	 * @param definitionId
+	 *            int
+	 * @return Collection
+	 */
 	public Collection findAllByDefinition(int definitionId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
@@ -277,12 +334,22 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Method returns all study events by studyEventDefinitionOid & crfOrCrfVersionOid.
+	 * 
+	 * @param studyEventDefinitionOid
+	 *            String
+	 * @param crfOrCrfVersionOid
+	 *            String
+	 * @return ArrayList
+	 */
 	public ArrayList findAllByStudyEventDefinitionAndCrfOids(String studyEventDefinitionOid, String crfOrCrfVersionOid) {
 		this.setTypesExpected(true);
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(1, studyEventDefinitionOid);
-		variables.put(2, crfOrCrfVersionOid);
-		variables.put(3, crfOrCrfVersionOid);
+		int ind = 1;
+		variables.put(ind++, studyEventDefinitionOid);
+		variables.put(ind++, crfOrCrfVersionOid);
+		variables.put(ind, crfOrCrfVersionOid);
 
 		String sql = digester.getQuery("findAllByStudyEventDefinitionAndCrfOids");
 		ArrayList alist = this.select(sql, variables);
@@ -294,13 +361,23 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return al;
 	}
 
-	public Integer getCountofEventsBasedOnEventStatus(StudyBean currentStudy, SubjectEventStatus subjectEventStatus) {
+	/**
+	 * Method returns count of events based on event status.
+	 *
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param subjectEventStatus
+	 *            SubjectEventStatus
+	 * @return Integer
+	 */
+	public Integer getCountOfEventsBasedOnEventStatus(StudyBean currentStudy, SubjectEventStatus subjectEventStatus) {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
-		variables.put(3, subjectEventStatus.getId());
+		int ind = 1;
+		variables.put(ind++, currentStudy.getId());
+		variables.put(ind++, currentStudy.getId());
+		variables.put(ind, subjectEventStatus.getId());
 		String sql = digester.getQuery("getCountofEventsBasedOnEventStatus");
 
 		ArrayList rows = this.select(sql, variables);
@@ -312,14 +389,24 @@ public class StudyEventDAO extends AuditableEntityDAO {
 			return null;
 		}
 	}
-	
-	public Integer getCountOfEventsBasedOnEventStatusNoRepeats(StudyBean currentStudy, SubjectEventStatus subjectEventStatus) {
-		setTypesExpected();
 
+	/**
+	 * Method returns count of no repeats events based on event status.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param subjectEventStatus
+	 *            SubjectEventStatus
+	 * @return Integer
+	 */
+	public Integer getCountOfEventsBasedOnEventStatusNoRepeats(StudyBean currentStudy,
+			SubjectEventStatus subjectEventStatus) {
+		setTypesExpected();
+		int ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
-		variables.put(3, subjectEventStatus.getId());
+		variables.put(ind++, currentStudy.getId());
+		variables.put(ind++, currentStudy.getId());
+		variables.put(ind, subjectEventStatus.getId());
 		String sql = digester.getQuery("getCountOfEventsBasedOnEventStatusNoRepeats");
 
 		ArrayList rows = this.select(sql, variables);
@@ -331,41 +418,29 @@ public class StudyEventDAO extends AuditableEntityDAO {
 			return null;
 		}
 	}
-	
-	public Integer getCountofEventsBasedOnEventStatusAndStudyEventDefinitionId(StudyBean currentStudy, SubjectEventStatus subjectEventStatus, StudyEventDefinitionBean studyEventDefinitionBean) {
+
+	/**
+	 * Method returns count of no repeats events based on event status & study event definition id.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param subjectEventStatus
+	 *            SubjectEventStatus
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @return Integer
+	 */
+	public Integer getEventCountFromEventStatusAndStudyEventDefinitionIdNoRepeats(StudyBean currentStudy,
+			SubjectEventStatus subjectEventStatus, StudyEventDefinitionBean studyEventDefinitionBean) {
 		setTypesExpected();
-
+		int ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
-		variables.put(3, subjectEventStatus.getId());
-		variables.put(4, studyEventDefinitionBean.getId());
-		String sql = digester.getQuery("getCountofEventsBasedOnEventStatusAndStudyEventDefinitionId");
+		variables.put(ind++, currentStudy.getId());
+		variables.put(ind++, currentStudy.getId());
+		variables.put(ind++, subjectEventStatus.getId());
+		variables.put(ind, studyEventDefinitionBean.getId());
 
-		ArrayList rows = this.select(sql, variables);
-		Iterator it = rows.iterator();
-
-		if (it.hasNext()) {
-			return (Integer) ((HashMap) it.next()).get("count");
-		} else {
-			return null;
-		}
-	}
-	
-	public Integer getEventCountFromEventStatusAndStudyEventDefinitionIdNoRepeats(
-			StudyBean currentStudy, SubjectEventStatus subjectEventStatus,
-			StudyEventDefinitionBean studyEventDefinitionBean) {
-		
-		setTypesExpected();
-
-		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
-		variables.put(3, subjectEventStatus.getId());
-		variables.put(4, studyEventDefinitionBean.getId());
-		
-		String sql = digester
-				.getQuery("getEventCountFromEventStatusAndStudyEventDefinitionIdNoRepeats");
+		String sql = digester.getQuery("getEventCountFromEventStatusAndStudyEventDefinitionIdNoRepeats");
 
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
@@ -377,12 +452,19 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		}
 	}
 
-	public Integer getCountofEvents(StudyBean currentStudy) {
+	/**
+	 * Method returns count of events for current study.
+	 *
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return Integer
+	 */
+	public Integer getCountOfEvents(StudyBean currentStudy) {
 		setTypesExpected();
-
+		int ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, currentStudy.getId());
-		variables.put(2, currentStudy.getId());
+		variables.put(ind++, currentStudy.getId());
+		variables.put(ind, currentStudy.getId());
 		String sql = digester.getQuery("getCountofEvents");
 
 		ArrayList rows = this.select(sql, variables);
@@ -395,15 +477,29 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method returns all study events by passed parameters.
+	 * 
+	 * @param studyEventDefinitionOid
+	 *            String
+	 * @param crfOrCrfVersionOid
+	 *            String
+	 * @param ordinal
+	 *            String
+	 * @param studySubjectId
+	 *            String
+	 * @return StudyEventBean
+	 */
 	public StudyEventBean findAllByStudyEventDefinitionAndCrfOidsAndOrdinal(String studyEventDefinitionOid,
 			String crfOrCrfVersionOid, String ordinal, String studySubjectId) {
 		this.setTypesExpected(true);
+		int ind = 1;
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(1, studyEventDefinitionOid);
-		variables.put(2, Integer.valueOf(studySubjectId));
-		variables.put(3, Integer.valueOf(ordinal));
-		variables.put(4, crfOrCrfVersionOid);
-		variables.put(5, crfOrCrfVersionOid);
+		variables.put(ind++, studyEventDefinitionOid);
+		variables.put(ind++, Integer.valueOf(studySubjectId));
+		variables.put(ind++, Integer.valueOf(ordinal));
+		variables.put(ind++, crfOrCrfVersionOid);
+		variables.put(ind, crfOrCrfVersionOid);
 
 		String sql = digester.getQuery("findAllByStudyEventDefinitionAndCrfOidsAndOrdinal");
 		ArrayList alist = this.select(sql, variables);
@@ -425,6 +521,13 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method returns all study events with subject label by definition id.
+	 * 
+	 * @param definitionId
+	 *            int
+	 * @return ArrayList
+	 */
 	public ArrayList findAllWithSubjectLabelByDefinition(int definitionId) {
 		this.setTypesExpected(true);
 		HashMap variables = new HashMap();
@@ -440,11 +543,21 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Method returns all study events with subject label by study subject & definition id.
+	 * 
+	 * @param studySubject
+	 *            StudySubjectBean
+	 * @param definitionId
+	 *            int
+	 * @return ArrayList
+	 */
 	public ArrayList findAllWithSubjectLabelByStudySubjectAndDefinition(StudySubjectBean studySubject, int definitionId) {
 		this.setTypesExpected(true);
+		int ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, studySubject.getId());
-		variables.put(2, definitionId);
+		variables.put(ind++, studySubject.getId());
+		variables.put(ind, definitionId);
 
 		String sql = digester.getQuery("findAllWithSubjectLabelByStudySubjectAndDefinition");
 		ArrayList alist = this.select(sql, variables);
@@ -457,12 +570,24 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Method returns study event by passed parameters.
+	 * 
+	 * @param ssbid
+	 *            int
+	 * @param sedid
+	 *            int
+	 * @param ord
+	 *            int
+	 * @return EntityBean
+	 */
 	public EntityBean findByStudySubjectIdAndDefinitionIdAndOrdinal(int ssbid, int sedid, int ord) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(1, ssbid);
-		variables.put(2, sedid);
-		variables.put(3, ord);
+		int ind = 1;
+		variables.put(ind++, ssbid);
+		variables.put(ind++, sedid);
+		variables.put(ind, ord);
 
 		String sql = digester.getQuery("findByStudySubjectIdAndDefinitionIdAndOrdinal");
 		ArrayList alist = this.select(sql, variables);
@@ -474,18 +599,38 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * Method returns all study events.
+	 * 
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
+	 * @return Collection
+	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}
 
+	/**
+	 * Method returns list of all study events by definition & subject.
+	 * 
+	 * @param definition
+	 *            StudyEventDefinitionBean
+	 * @param subject
+	 *            StudySubjectBean
+	 * @return ArrayList
+	 */
 	public ArrayList findAllByDefinitionAndSubject(StudyEventDefinitionBean definition, StudySubjectBean subject) {
 		ArrayList answer = new ArrayList();
 
 		setTypesExpected();
-
+		int ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, definition.getId());
-		variables.put(2, subject.getId());
+		variables.put(ind++, definition.getId());
+		variables.put(ind, subject.getId());
 
 		String sql = digester.getQuery("findAllByDefinitionAndSubject");
 
@@ -499,15 +644,24 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
+	/**
+	 * method returns list of all study events by definition & subject.
+	 * 
+	 * @param definition
+	 *            StudyEventDefinitionBean
+	 * @param subject
+	 *            StudySubjectBean
+	 * @return ArrayList
+	 */
 	public ArrayList findAllByDefinitionAndSubjectOrderByOrdinal(StudyEventDefinitionBean definition,
 			StudySubjectBean subject) {
 		ArrayList answer = new ArrayList();
 
 		setTypesExpected();
-
+		int ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, definition.getId());
-		variables.put(2, subject.getId());
+		variables.put(ind++, definition.getId());
+		variables.put(ind, subject.getId());
 
 		String sql = digester.getQuery("findAllByDefinitionAndSubjectOrderByOrdinal");
 
@@ -521,12 +675,19 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
-	public EntityBean findByPK(int ID) {
+	/**
+	 * Method returns study event by id.
+	 * 
+	 * @param id
+	 *            int
+	 * @return EntityBean
+	 */
+	public EntityBean findByPK(int id) {
 		StudyEventBean eb = new StudyEventBean();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, ID);
+		variables.put(1, id);
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList alist = this.select(sql, variables);
@@ -539,58 +700,40 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
-	public EntityBean findByPKCached(int ID) {
-		StudyEventBean eb = new StudyEventBean();
-		this.setTypesExpected();
-
-		HashMap variables = new HashMap();
-		variables.put(1, ID);
-
-		String sql = digester.getQuery("findByPK");
-		ArrayList alist = this.selectByCache(sql, variables);
-		Iterator it = alist.iterator();
-
-		if (it.hasNext()) {
-			eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
-		}
-
-		return eb;
-	}
-
 	/**
-	 * Creates a new studysubject
+	 * Methdo creates a new study event.
+	 * 
+	 * @param eb
+	 *            EntityBean
+	 * @return EntityBean
 	 */
 	public EntityBean create(EntityBean eb) {
 		StudyEventBean sb = (StudyEventBean) eb;
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
-		// INSERT INTO STUDY_EVENT
-		// (STUDY_EVENT_DEFINITION_ID,SUBJECT_ID,LOCATION,SAMPLE_ORDINAL,
-		// DATE_START,DATE_END,OWNER_ID,STATUS_ID,DATE_CREATED,subject_event_status_id
-		// start_time_flag, end_time_flag)
-		// VALUES (?,?,?,?,?,?,?,?,NOW())
-		variables.put(1, sb.getStudyEventDefinitionId());
-		variables.put(2, sb.getStudySubjectId());
-		variables.put(3, sb.getLocation());
-		variables.put(4, sb.getSampleOrdinal());
+		int ind = 1;
+		variables.put(ind++, sb.getStudyEventDefinitionId());
+		variables.put(ind++, sb.getStudySubjectId());
+		variables.put(ind++, sb.getLocation());
+		variables.put(ind++, sb.getSampleOrdinal());
 		if (sb.getDateStarted() == null) {
-			nullVars.put(5, TypeNames.TIMESTAMP);
-			variables.put(5, null);
+			nullVars.put(ind, TypeNames.TIMESTAMP);
+			variables.put(ind++, null);
 		} else {
-			variables.put(5, new Timestamp(sb.getDateStarted().getTime()));
+			variables.put(ind++, new Timestamp(sb.getDateStarted().getTime()));
 		}
 		if (sb.getDateEnded() == null) {
-			nullVars.put(6, TypeNames.TIMESTAMP);
-			variables.put(6, null);
+			nullVars.put(ind, TypeNames.TIMESTAMP);
+			variables.put(ind++, null);
 		} else {
-			variables.put(6, new Timestamp(sb.getDateEnded().getTime()));
+			variables.put(ind++, new Timestamp(sb.getDateEnded().getTime()));
 		}
-		variables.put(7, sb.getOwner().getId());
-		variables.put(8, sb.getStatus().getId());
-		variables.put(9, sb.getSubjectEventStatus().getId());
-		variables.put(10, sb.getStartTimeFlag());
-		variables.put(11, sb.getEndTimeFlag());
-		variables.put(12, sb.getReferenceVisitId());
+		variables.put(ind++, sb.getOwner().getId());
+		variables.put(ind++, sb.getStatus().getId());
+		variables.put(ind++, sb.getSubjectEventStatus().getId());
+		variables.put(ind++, sb.getStartTimeFlag());
+		variables.put(ind++, sb.getEndTimeFlag());
+		variables.put(ind, sb.getReferenceVisitId());
 
 		this.executeWithPK(digester.getQuery("create"), variables, nullVars);
 		if (isQuerySuccessful()) {
@@ -601,61 +744,70 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Updates a Study event
+	 * Method updates study event.
 	 * 
-	 * updated 12/2012 clinovo #121
+	 * @param eb
+	 *            EntityBean
+	 * @return EntityBean
 	 */
 	public EntityBean update(EntityBean eb) {
 		return update(eb, null);
 	}
 
-	/* this function allows to run transactional updates for an action */
-
+	/**
+	 * This function allows to run transactional updates for an action.
+	 * 
+	 * @param eb
+	 *            EntityBean
+	 * @param con
+	 *            Connection
+	 * @return EntityBean
+	 */
 	public EntityBean update(EntityBean eb, Connection con) {
 		StudyEventBean sb = (StudyEventBean) eb;
 		HashMap nullVars = new HashMap();
 		HashMap variables = new HashMap();
-		// UPDATE study_event SET
-		// STUDY_EVENT_DEFINITION_ID=?,SUBJECT_ID=?,LOCATION=?,
-		// SAMPLE_ORDINAL=?, DATE_START=?,DATE_END=?,STATUS_ID=?,DATE_UPDATED=?,
-		// UPDATE_ID=?, subject_event_status_id=?, end_time_flag=? WHERE
-		// STUDY_EVENT_ID=?
 
 		sb.setActive(false);
-
-		variables.put(1, sb.getStudyEventDefinitionId());
-		variables.put(2, sb.getStudySubjectId());
-		variables.put(3, sb.getLocation());
-		variables.put(4, sb.getSampleOrdinal());
-		variables.put(5, new Timestamp(sb.getDateStarted().getTime()));
+		int ind = 1;
+		variables.put(ind++, sb.getStudyEventDefinitionId());
+		variables.put(ind++, sb.getStudySubjectId());
+		variables.put(ind++, sb.getLocation());
+		variables.put(ind++, sb.getSampleOrdinal());
+		variables.put(ind++, new Timestamp(sb.getDateStarted().getTime()));
 		if (sb.getDateEnded() == null) {
-			nullVars.put(6, TypeNames.TIMESTAMP);
-			variables.put(6, null);
+			nullVars.put(ind, TypeNames.TIMESTAMP);
+			variables.put(ind++, null);
 		} else {
-			variables.put(6, new Timestamp(sb.getDateEnded().getTime()));
+			variables.put(ind++, new Timestamp(sb.getDateEnded().getTime()));
 		}
-		variables.put(7, sb.getStatus().getId());
-		variables.put(8, new java.util.Date());// DATE_Updated
-		variables.put(9, sb.getUpdater().getId());
-		variables.put(10, sb.getSubjectEventStatus().getId());
-		variables.put(11, sb.getStartTimeFlag()); // YW
+		variables.put(ind++, sb.getStatus().getId());
+		variables.put(ind++, new java.util.Date()); // DATE_Updated
+		if (sb.getUpdater() == null) {
+			nullVars.put(ind, Types.INTEGER);
+			variables.put(ind++, null);
+		} else {
+			variables.put(ind++, sb.getUpdater().getId());
+		}
+		variables.put(ind++, sb.getSubjectEventStatus().getId());
+		variables.put(ind++, sb.getStartTimeFlag()); // YW
 		// start_time_flag
-		variables.put(12, sb.getEndTimeFlag()); // YW
+		variables.put(ind++, sb.getEndTimeFlag()); // YW
 		// end_time_flag
-		variables.put(13, sb.getPrevSubjectEventStatus().getId());
-		variables.put(14, sb.getReferenceVisitId());
+		variables.put(ind++, sb.getPrevSubjectEventStatus().getId());
+		variables.put(ind++, sb.getReferenceVisitId());
 
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ObjectOutputStream oout = new ObjectOutputStream(baos);
 			oout.writeObject(sb.getSignedData());
 			oout.close();
-			variables.put(15, baos);
+			variables.put(ind++, baos);
 		} catch (Exception e) {
-			nullVars.put(15, null);
+			nullVars.put(ind++, null);
 		}
 
-		variables.put(16, sb.getId());
+		variables.put(ind, sb.getId());
 
 		String sql = digester.getQuery("update");
 
@@ -668,11 +820,35 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return sb;
 	}
 
+	/**
+	 * Method returns collection of all study events by permission.
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
+	 * @return Collection
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}
 
+	/**
+	 * Method returns collection of all study events by permission.
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @return Collection
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
 		return new ArrayList();
 	}
@@ -693,15 +869,24 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return pk;
 	}
 
+	/**
+	 * Method returns all study events by study & study subject id.
+	 * 
+	 * @param study
+	 *            StudyBean
+	 * @param studySubjectId
+	 *            int
+	 * @return ArrayList
+	 */
 	public ArrayList findAllByStudyAndStudySubjectId(StudyBean study, int studySubjectId) {
 		ArrayList answer = new ArrayList();
 
 		this.setTypesExpected();
-
+		int ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, study.getId());
-		variables.put(2, study.getId());
-		variables.put(3, studySubjectId);
+		variables.put(ind++, study.getId());
+		variables.put(ind++, study.getId());
+		variables.put(ind, studySubjectId);
 
 		ArrayList alist = this.select(digester.getQuery("findAllByStudyAndStudySubjectId"), variables);
 
@@ -713,15 +898,24 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns all study events by study & event definition id.
+	 * 
+	 * @param study
+	 *            StudyBean
+	 * @param eventDefinitionId
+	 *            int
+	 * @return ArrayList
+	 */
 	public ArrayList findAllByStudyAndEventDefinitionId(StudyBean study, int eventDefinitionId) {
 		ArrayList answer = new ArrayList();
 
 		this.setTypesExpected();
-
+		int ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, study.getId());
-		variables.put(2, study.getId());
-		variables.put(3, eventDefinitionId);
+		variables.put(ind++, study.getId());
+		variables.put(ind++, study.getId());
+		variables.put(ind, eventDefinitionId);
 
 		ArrayList alist = this.select(digester.getQuery("findAllByStudyAndEventDefinitionId"), variables);
 
@@ -733,16 +927,25 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns all study events except locked, skipped, stopped, removed by study & event definition id.
+	 * 
+	 * @param study
+	 *            StudyBean
+	 * @param eventDefinitionId
+	 *            int
+	 * @return ArrayList
+	 */
 	public ArrayList findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved(StudyBean study,
 			int eventDefinitionId) {
 		ArrayList answer = new ArrayList();
 
 		this.setTypesExpected();
-
+		int ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, study.getId());
-		variables.put(2, study.getId());
-		variables.put(3, eventDefinitionId);
+		variables.put(ind++, study.getId());
+		variables.put(ind++, study.getId());
+		variables.put(ind, eventDefinitionId);
 
 		ArrayList alist = this.select(
 				digester.getQuery("findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved"), variables);
@@ -769,10 +972,10 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	public int getMaxSampleOrdinal(StudyEventDefinitionBean sedb, StudySubjectBean studySubject) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
-
+		int ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, sedb.getId());
-		variables.put(2, studySubject.getId());
+		variables.put(ind++, sedb.getId());
+		variables.put(ind, studySubject.getId());
 
 		ArrayList alist = this.select(digester.getQuery("getMaxSampleOrdinal"), variables);
 		Iterator it = alist.iterator();
@@ -781,7 +984,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 				HashMap hm = (HashMap) it.next();
 				return (Integer) hm.get("max_ord");
 			} catch (Exception e) {
-				//
+				logger.error("Error has occurred.", e);
 			}
 		}
 
@@ -808,22 +1011,25 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	}
 
 	/**
+	 * Method returns all study events by subject id & study id.
+	 * 
 	 * @deprecated
 	 * @param subjectId
 	 *            int
 	 * @param studyId
 	 *            int
+	 * @return ArrayList
 	 */
 	@Deprecated
 	public ArrayList findAllBySubjectAndStudy(int subjectId, int studyId) {
 		ArrayList answer = new ArrayList();
 
 		this.setTypesExpected();
-
+		int ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, subjectId);
-		variables.put(2, studyId);
-		variables.put(3, studyId);
+		variables.put(ind++, subjectId);
+		variables.put(ind++, studyId);
+		variables.put(ind, studyId);
 
 		ArrayList alist = this.select(digester.getQuery("findAllBySubjectAndStudy"), variables);
 
@@ -836,6 +1042,13 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 	}
 
+	/**
+	 * Method returns all study events by subject id.
+	 * 
+	 * @param subjectId
+	 *            int
+	 * @return ArrayList
+	 */
 	public ArrayList findAllBySubjectId(int subjectId) {
 		ArrayList answer = new ArrayList();
 
@@ -855,16 +1068,20 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 	}
 
+	/**
+	 * Method sets expected types.
+	 */
 	public void setNewCRFTypesExpected() {
+		int ind = 1;
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		this.setTypeExpected(2, TypeNames.STRING);
-		this.setTypeExpected(3, TypeNames.STRING);
-		this.setTypeExpected(4, TypeNames.INT);
-		this.setTypeExpected(5, TypeNames.STRING);
-		this.setTypeExpected(6, TypeNames.STRING);
-		this.setTypeExpected(7, TypeNames.INT);
-		this.setTypeExpected(8, TypeNames.STRING);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.STRING);
+		this.setTypeExpected(ind++, TypeNames.STRING);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.STRING);
+		this.setTypeExpected(ind++, TypeNames.STRING);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind, TypeNames.STRING);
 
 	}
 
@@ -907,76 +1124,39 @@ public class StudyEventDAO extends AuditableEntityDAO {
 				crfs = new ArrayList();
 				logger.warn("put a crf into a NEW event: " + crf.getName() + " into " + event.getName());
 				crfs.add(crf);
-				returnMe.put(event, crfs);// maybe combine the two crf +
+				returnMe.put(event, crfs);
+				// maybe combine the two crf +
 				// version?
 			}
-		}// end of cycling through answers
-
+		}
+		// end of cycling through answers
 		return returnMe;
 	}
 
-	// TODO: decide whether to use getEventsAndMultipleCRFVersionInformation
-	// instead of this method
-	public HashMap getEventAndCRFVersionInformation(ArrayList al) {
-		HashMap returnMe = new HashMap();
-		Iterator it = al.iterator();
-		EntityBean event;
-		EntityBean crf;
-		while (it.hasNext()) {
-			HashMap answers = (HashMap) it.next();
-			logger.warn("***Study Event Def ID: " + answers.get("study_event_definition_id"));
-			logger.warn("***CRF ID: " + answers.get("crf_id"));
-			logger.warn("***CRFVersion ID: " + answers.get("crf_version_id"));
-			event = new EntityBean();
-			event.setActive(true);
-			event.setName((String) answers.get("sed_name"));
-			event.setId((Integer) answers.get("study_event_definition_id"));
-			crf = new EntityBean();
-			crf.setActive(true);
-			crf.setName(answers.get("crf_name") + " " + answers.get("ver_name"));
-			crf.setId((Integer) answers.get("crf_version_id"));
-			returnMe.put(event, crf);// maybe combine the two crf + version?
-		}// end of cycling through answers
-
-		return returnMe;
-	}
-
+	/**
+	 * Method retuns crfs by sutdy.
+	 * 
+	 * @param sb
+	 *            StudyBean
+	 * @return HashMap
+	 */
 	public HashMap findCRFsByStudy(StudyBean sb) {
-		// SELECT DISTINCT
-		// C.CRF_ID
-		// , C.NAME AS CRF_NAME
-		// , C.DESCRIPTION
-		// , V.CRF_VERSION_ID
-		// , V.NAME AS VER_NAME
-		// , V.REVISION_NOTES
-		// , SED.STUDY_EVENT_DEFINITION_ID
-		// , SED.NAME AS SED_NAME
-		// FROM
-		// CRF C
-		// , CRF_VERSION V
-		// , EVENT_DEFINITION_CRF EDC
-		// , STUDY_EVENT_DEFINITION SED
-		// WHERE
-		// C.CRF_ID = V.CRF_ID
-		// AND EDC.CRF_ID = C.CRF_ID
-		// AND EDC.STUDY_EVENT_DEFINITION_ID = SED.STUDY_EVENT_DEFINITION_ID
-		// AND SED.STATUS_ID = 1
-		// AND SED.STUDY_ID = ?
-		// ORDER BY C.CRF_ID, V.CRF_VERSION_ID
-
 		HashMap crfs;
 		this.setNewCRFTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(1, sb.getId());
 		ArrayList alist = this.select(digester.getQuery("findCRFsByStudy"), variables);
-		// TODO make sure this other statement for eliciting crfs works, tbh
-		// switched from getEventAndCRFVersionInformation
-		// to getEventsAndMultipleCRFVersionInformation
-		// crfs = this.getEventAndCRFVersionInformation(alist);
 		crfs = this.getEventsAndMultipleCRFVersionInformation(alist);
 		return crfs;
 	}
 
+	/**
+	 * Method returns all crfs by study event.
+	 * 
+	 * @param seb
+	 *            StudyEventBean
+	 * @return HashMap
+	 */
 	public HashMap findCRFsByStudyEvent(StudyEventBean seb) {
 		// Soon-to-be-depreciated, replaced by find crfs by study, tbh 11-26
 		// returns a hashmap of crfs + arraylist of crfversions,
@@ -1018,13 +1198,17 @@ public class StudyEventDAO extends AuditableEntityDAO {
 						if (cvbCheck.getId() == cvb.getId()) {
 							versionFound = true;
 						}
-					}// end of iteration through versions
+					}
+					// end of iteration through versions
 					if (!versionFound) {
 						oldList.add(cvb);
 						crfs.put(cbean, oldList);
-					}// end of adding new version to old crf
-				}// end of check to see if current crf is in list
-			}// end of iterating
+					}
+					// end of adding new version to old crf
+				}
+				// end of check to see if current crf is in list
+			}
+			// end of iterating
 			if (!found) {
 				// add new crf here with version
 				// CRFVersionBean cvb = (CRFVersionBean)cvdao.findByPK(
@@ -1033,12 +1217,20 @@ public class StudyEventDAO extends AuditableEntityDAO {
 				newList.add(cvb);
 				crfs.put(cbean, newList);
 			}
-		}// end of cycling through answers
-
+		}
+		// end of cycling through answers
 		return crfs;
 	}
 
-	// TODO make sure we are returning the correct boolean, tbh
+	/**
+	 * Method checks for duplication.
+	 * 
+	 * @param hm
+	 *            HashMap
+	 * @param event
+	 *            EntityBean
+	 * @return boolean
+	 */
 	public boolean findDouble(HashMap hm, EntityBean event) {
 		boolean returnMe = false;
 		Set s = hm.entrySet();
@@ -1053,7 +1245,15 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return returnMe;
 	}
 
-	// so as not to get null pointer returns, tbh
+	/**
+	 * So as not to get null pointer returns, tbh.
+	 * 
+	 * @param hm
+	 *            HashMap
+	 * @param event
+	 *            EntityBean
+	 * @return ArrayList
+	 */
 	public ArrayList returnDouble(HashMap hm, EntityBean event) {
 		ArrayList al = new ArrayList();
 		Set s = hm.entrySet();
@@ -1068,7 +1268,15 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return al;
 	}
 
-	// so as to remove the object correctly, tbh
+	/**
+	 * So as to remove the object correctly, tbh.
+	 * 
+	 * @param hm
+	 *            HashMap
+	 * @param event
+	 *            EntityBean
+	 * @return HashMap
+	 */
 	public HashMap removeDouble(HashMap hm, EntityBean event) {
 		Set s = hm.entrySet();
 		EntityBean removeMe = new EntityBean();
@@ -1084,6 +1292,13 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return hm;
 	}
 
+	/**
+	 * Method returns definition id by study event id.
+	 * 
+	 * @param studyEventId
+	 *            int
+	 * @return int
+	 */
 	public int getDefinitionIdFromStudyEventId(int studyEventId) {
 		int answer = 0;
 
@@ -1103,6 +1318,13 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Method returns all study events by study subject.
+	 * 
+	 * @param ssb
+	 *            StudySubjectBean
+	 * @return ArrayList
+	 */
 	public ArrayList findAllByStudySubject(StudySubjectBean ssb) {
 		HashMap variables = new HashMap();
 		variables.put(1, ssb.getId());
@@ -1110,68 +1332,32 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return executeFindAllQuery("findAllByStudySubject", variables);
 	}
 
+	/**
+	 *
+	 * Method returns all study events by study subject & study event definition.
+	 * 
+	 * @param ssb
+	 *            StudySubjectBean
+	 * @param sed
+	 *            StudyEventDefinitionBean
+	 * @return ArrayList
+	 */
 	public ArrayList findAllByStudySubjectAndDefinition(StudySubjectBean ssb, StudyEventDefinitionBean sed) {
 		HashMap variables = new HashMap();
-		variables.put(1, ssb.getId());
-		variables.put(2, sed.getId());
+		int ind = 1;
+		variables.put(ind++, ssb.getId());
+		variables.put(ind, sed.getId());
 
 		return executeFindAllQuery("findAllByStudySubjectAndDefinition", variables);
 	}
 
-	private HashMap subjDefs;
-
-	public void updateSampleOrdinals_v092() {
-		subjDefs = new HashMap();
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		this.setTypeExpected(2, TypeNames.INT);
-		this.setTypeExpected(3, TypeNames.INT);
-		this.setTypeExpected(3, TypeNames.INT);
-
-		ArrayList rows = select("SELECT study_event_id, study_event_definition_id, study_subject_id, sample_ordinal FROM study_event ORDER BY study_subject_id ASC, study_event_definition_id ASC, sample_ordinal ASC");
-
-		for (Object row1 : rows) {
-			HashMap row = (HashMap) row1;
-
-			Integer studyEventId = (Integer) row.get("study_event_id");
-			Integer studyEventDefinitionId = (Integer) row.get("study_event_definition_id");
-			Integer studySubjectId = (Integer) row.get("study_subject_id");
-
-			addEvent(studySubjectId, studyEventDefinitionId, studyEventId);
-		}
-
-		for (Object o : subjDefs.keySet()) {
-			String key = (String) o;
-			ArrayList events = (ArrayList) subjDefs.get(key);
-
-			for (int i = 0; i < events.size(); i++) {
-				Integer id = (Integer) events.get(i);
-				if (id != null) {
-					int ordinal = i + 1;
-					logger.info("UPDATE study_event SET sample_ordinal = " + ordinal + " WHERE study_event_id = " + id);
-				}
-			}
-		}
-	}
-
-	private void addEvent(Integer studySubjectId, Integer studyEventDefinitionId, Integer studyEventId) {
-		if (studySubjectId == null || studyEventDefinitionId == null || studyEventId == null) {
-			return;
-		}
-
-		String key = studySubjectId + "-" + studyEventDefinitionId;
-
-		ArrayList events;
-		if (subjDefs.containsKey(key)) {
-			events = (ArrayList) subjDefs.get(key);
-		} else {
-			events = new ArrayList();
-		}
-		events.add(studyEventId);
-		logger.info("putting in key: " + key + " seid: " + studyEventId);
-		subjDefs.put(key, events);
-	}
-
+	/**
+	 * Method returns count of not removed events.
+	 * 
+	 * @param studyEventDefinitionId
+	 *            Integer
+	 * @return Integer
+	 */
 	public Integer countNotRemovedEvents(Integer studyEventDefinitionId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
@@ -1189,20 +1375,37 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Method returns study subject crf data.
+	 * 
+	 * @param sb
+	 *            StudyBean
+	 * @param studySubjectId
+	 *            int
+	 * @param eventDefId
+	 *            int
+	 * @param crfVersionOID
+	 *            String
+	 * @param eventOrdinal
+	 *            int
+	 * @return HashMap
+	 */
 	public HashMap getStudySubjectCRFData(StudyBean sb, int studySubjectId, int eventDefId, String crfVersionOID,
 			int eventOrdinal) {
 		HashMap studySubjectCRFDataDetails;
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		this.setTypeExpected(2, TypeNames.INT);
-		this.setTypeExpected(3, TypeNames.INT);
+		int ind = 1;
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind, TypeNames.INT);
 
+		ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId());
-		variables.put(2, eventOrdinal);
-		variables.put(3, crfVersionOID);
-		variables.put(4, studySubjectId);
-		variables.put(5, eventDefId);
+		variables.put(ind++, sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId());
+		variables.put(ind++, eventOrdinal);
+		variables.put(ind++, crfVersionOID);
+		variables.put(ind++, studySubjectId);
+		variables.put(ind, eventDefId);
 
 		ArrayList alist = this.select(digester.getQuery("getStudySubjectCRFDataDetails"), variables);
 		studySubjectCRFDataDetails = this.getStudySubjectCRFDataDetails(alist);
@@ -1211,7 +1414,6 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 	private HashMap getStudySubjectCRFDataDetails(ArrayList rows) {
 		HashMap returnMe = new HashMap();
-
 		for (Object row : rows) {
 			HashMap answers = (HashMap) row;
 
@@ -1219,20 +1421,45 @@ public class StudyEventDAO extends AuditableEntityDAO {
 			returnMe.put("event_definition_crf_id", answers.get("event_definition_crf_id"));
 			returnMe.put("study_event_id", answers.get("study_event_id"));
 
-		}// end of cycling through answers
-
+		}
+		// end of cycling through answers
 		return returnMe;
 	}
 
+	/**
+	 * Method deletes study event dn map by study event id.
+	 * 
+	 * @param studyEventId
+	 *            int
+	 */
 	public void deleteStudyEventDNMap(int studyEventId) {
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
 		variables.put(1, studyEventId);
 		this.execute(digester.getQuery("deleteStudyEventDNMap"), variables);
 	}
 
+	/**
+	 * Method deletes study event by id.
+	 * 
+	 * @param id
+	 *            int
+	 */
 	public void deleteByPK(int id) {
 		HashMap variables = new HashMap();
 		variables.put(1, id);
 		this.execute(digester.getQuery("deleteByPK"), variables);
+	}
+
+	/**
+	 * Method returns all study events that were SDVed.
+	 * 
+	 * @param crfVersionId
+	 *            int
+	 * @return List<StudyEventBean>
+	 */
+	public List<StudyEventBean> findAllSDVStudyEvents(int crfVersionId) {
+		HashMap variables = new HashMap();
+		variables.put(1, crfVersionId);
+		return executeFindAllQuery("findAllSDVStudyEvents", variables);
 	}
 }

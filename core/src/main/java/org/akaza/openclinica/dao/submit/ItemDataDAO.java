@@ -52,7 +52,7 @@ import java.util.Locale;
  * 
  * @author thickerson
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ItemDataDAO extends AuditableEntityDAO {
 
 	private void setQueryNames() {
@@ -163,7 +163,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT); // owner id
 		this.setTypeExpected(index++, TypeNames.INT); // update id
 		this.setTypeExpected(index++, TypeNames.INT); // ordinal
-		this.setTypeExpected(index, TypeNames.INT); // ordinal
+		this.setTypeExpected(index++, TypeNames.INT); // old status id
+		this.setTypeExpected(index, TypeNames.BOOL); // sdv
 	}
 
 	/**
@@ -210,6 +211,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		variables.put(index++, idb.getUpdaterId());
 		variables.put(index++, idb.getOrdinal());
 		variables.put(index++, idb.getOldStatus().getId());
+		variables.put(index++, idb.isSdv());
 		variables.put(index, idb.getId());
 		this.execute(digester.getQuery("update"), variables, con);
 		if (isQuerySuccessful()) {
@@ -587,6 +589,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		eb.setStatus(Status.get((Integer) hm.get("status_id")));
 		eb.setOrdinal((Integer) hm.get("ordinal"));
 		eb.setOldStatus(Status.get(hm.get("old_status_id") == null ? 1 : (Integer) hm.get("old_status_id")));
+		Boolean sdv = (Boolean) hm.get("sdv");
+		eb.setSdv(sdv != null ? sdv : false);
 		return eb;
 	}
 
@@ -1162,5 +1166,70 @@ public class ItemDataDAO extends AuditableEntityDAO {
 			vals.add((String) ((HashMap) anAlist).get("value"));
 		}
 		return vals;
+	}
+
+	/**
+	 * Method returns quantity of items that need to be SDV.
+	 * 
+	 * @param eventCrfId
+	 *            int
+	 * @return int
+	 */
+	public int getItemsToSDV(int eventCrfId) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+
+		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+		variables.put(1, eventCrfId);
+
+		ArrayList alist = this.select(digester.getQuery("getItemsToSDV"), variables);
+		Iterator it = alist.iterator();
+		if (it.hasNext()) {
+			return (Integer) ((HashMap) it.next()).get("count");
+		} else {
+			return 0;
+		}
+	}
+
+	/**
+	 * Method updates the sdv fields in the item_data table when crf metadata was changed.
+	 *
+	 * @param crfVersionId
+	 *            int
+	 * @return boolean
+	 */
+	public boolean updateItemDataSDVWhenCRFMetadataWasChanged(int crfVersionId) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+
+		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+		variables.put(1, crfVersionId);
+
+		execute(digester.getQuery("updateItemDataSDVWhenCRFMetadataWasChanged"), variables);
+
+		return isQuerySuccessful();
+	}
+
+	/**
+	 * SDV crf items.
+	 * 
+	 * @param eventCrfId
+	 *            int
+	 * @param sdv
+	 *            boolean
+	 * @return boolean
+	 */
+	public boolean sdvCrfItems(int eventCrfId, boolean sdv) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+
+		HashMap variables = new HashMap();
+		int ind = 1;
+		variables.put(ind++, sdv);
+		variables.put(ind, eventCrfId);
+
+		execute(digester.getQuery("sdvCrfItems"), variables);
+
+		return isQuerySuccessful();
 	}
 }

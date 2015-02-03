@@ -90,7 +90,7 @@ import java.util.ResourceBundle;
 /**
  * ListStudySubjectTableFactory class.
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
+@SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(ListStudySubjectTableFactory.class);
@@ -114,7 +114,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private DiscrepancyNoteDAO discrepancyNoteDAO;
 	private DynamicEventDao dynamicEventDao;
 	private StudyBean studyBean;
-	private String[] columnNames = new String[] {};
+	private String[] columnNames = new String[]{};
 	private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
 	private ArrayList<StudyEventDefinitionBean> studyEventDefinitionsFullList;
 	private List<StudyGroupClassBean> studyGroupClasses;
@@ -200,13 +200,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		++index;
 
 		if (currentStudy == null || currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
-			configureColumn(row.getColumn(columnNames[index]), currentStudy == null ? resword.getString("gender")
+			configureColumn(row.getColumn(columnNames[index]), currentStudy == null
+					? resword.getString("gender")
 					: currentStudy.getStudyParameterConfig().getGenderLabel(), null, null, true, false);
 			++index;
 		}
 		if (currentStudy == null
 				|| !currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equalsIgnoreCase("not_used")) {
-			configureColumn(row.getColumn(columnNames[index]), currentStudy == null ? resword.getString("secondary_ID")
+			configureColumn(row.getColumn(columnNames[index]), currentStudy == null
+					? resword.getString("secondary_ID")
 					: currentStudy.getStudyParameterConfig().getSecondaryIdLabel(), null, null);
 			++index;
 		}
@@ -741,7 +743,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			String item = StringUtils.lowerCase(String.valueOf(((Status) itemValue).getName()));
 			String filter = StringUtils.lowerCase(String.valueOf(filterValue));
 
-			return item.contains(filter);
+			return item != null && filter != null && item.contains(filter);
 		}
 	}
 
@@ -783,7 +785,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			String item = StringUtils
 					.lowerCase(studyGroupDAO.findByPK(Integer.valueOf(itemValue.toString())).getName());
 			String filter = StringUtils.lowerCase(String.valueOf(filterValue.trim()));
-			return filter.equals(item);
+			return filter != null && filter.equals(item);
 		}
 	}
 
@@ -1130,7 +1132,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 		String studySubjectLabel = SubjectLabelNormalizer.normalizeSubjectLabel(studySubject.getLabel());
 
-		String divWidth = studyEvents.size() > 1 ? ("" + (POPUP_BASE_WIDTH + FIFTY + EIGHT))
+		String divWidth = studyEvents.size() > 1
+				? ("" + (POPUP_BASE_WIDTH + FIFTY + EIGHT))
 				: ("" + (POPUP_BASE_WIDTH + EIGHT));
 
 		HtmlBuilder eventDiv = new HtmlBuilder();
@@ -1272,8 +1275,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		if (studyEvents.size() != 0
 				|| (studyEvents.size() == 0 && canScheduleStudySubject(studySubject)
 						&& !Role.isMonitor(currentRole.getRole()) && studyBean.getStatus().isAvailable())) {
-			repeatingIconLinkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed,
-					studyEvents.size() > 0 ? ("" + studyEvents.get(0).getId()) : "");
+			repeatingIconLinkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed, studyEvents.size() > 0
+					? ("" + studyEvents.get(0).getId())
+					: "");
 		}
 	}
 
@@ -1564,12 +1568,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 							Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(
 									sedBean.getMaxDay()).toDate();
 							if ((minDate.after(studyEventBean.getUpdatedDate()))
-									&& daoWrapper.getDiscDao().doesEventHaveNewNDsInStudy(studyBean, sedBean.getName(),
+									&& daoWrapper.getDiscDao().doesEventHaveNewDNsInStudy(studyBean, sedBean.getName(),
 											studyEventBean.getId(), subjectBean.getLabel())) {
 								defaultColor = false;
 								break;
 							} else if (maxDate.before(studyEventBean.getUpdatedDate())
-									&& daoWrapper.getDiscDao().doesEventHaveNewNDsInStudy(studyBean, sedBean.getName(),
+									&& daoWrapper.getDiscDao().doesEventHaveNewDNsInStudy(studyBean, sedBean.getName(),
 											studyEventBean.getId(), subjectBean.getLabel())) {
 								defaultColor = false;
 								break;
@@ -1618,9 +1622,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		Boolean isSignable = (Boolean) ((HashMap<Object, Object>) item).get("isSignable");
 		Integer studySubjectId = studySubjectBean.getId();
 		String flagColour = null;
-		if (daoWrapper.getDiscDao().doesSubjectHaveAnyUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel())) {
+		if (daoWrapper.getDiscDao().doesSubjectHaveAnyUnclosedDNsInStudy(studyBean, studySubjectBean.getLabel())) {
 			flagColour = "yellow";
-			if (daoWrapper.getDiscDao().doesSubjectHaveAnyNewNDsInStudy(studyBean, studySubjectBean.getLabel())) {
+			if (daoWrapper.getDiscDao().doesSubjectHaveAnyNewDNsInStudy(studyBean, studySubjectBean.getLabel())) {
 				flagColour = "red";
 			}
 		}
