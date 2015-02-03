@@ -4475,3 +4475,10 @@ function changeDefinitionOrdinal(params) {
         }
     });
 }
+
+function checkOrUncheckAllByClass(className, check) {
+	var selector = "input[type=checkbox][class=" + className + "]";
+	$(selector).each(function() {
+		this.checked = check;
+	});
+}

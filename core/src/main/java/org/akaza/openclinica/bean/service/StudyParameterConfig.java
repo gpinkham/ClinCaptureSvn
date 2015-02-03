@@ -20,9 +20,9 @@
  */
 package org.akaza.openclinica.bean.service;
 
-	/**
+/**
  * This is a help class for each study, it saves all the parameter configurations.
- *
+ * 
  * @author jxu
  */
 public class StudyParameterConfig {
@@ -95,7 +95,7 @@ public class StudyParameterConfig {
 	private String markImportedCRFAsCompleted;
 
 	private String allowSdvWithOpenQueries;
-	
+
 	private String allowDynamicGroupsManagement;
 
 	private String replaceExisitingDataDuringImport;
@@ -103,6 +103,8 @@ public class StudyParameterConfig {
 	private String autoScheduleEventDuringImport;
 
 	private String autoCreateSubjectDuringImport;
+
+	private String allowDiscrepancyCorrectionForms;
 
 	// Medical coding parameters
 	private String allowCodingVerification = "no";
@@ -112,16 +114,16 @@ public class StudyParameterConfig {
 	private String medicalCodingApprovalNeeded = "no";
 	private String medicalCodingContextNeeded = "no";
 
-	//Randomization
+	// Randomization
 	private String assignRandomizationResultTo = "none";
 	private String randomizationTrialId = "";
 
-	//Evaluation
+	// Evaluation
 	private String allowCrfEvaluation = "no";
 	private String evaluateWithContext = "no";
 
-	private String  allowRulesAutoScheduling = "no";
-	//Annotated CRF SAS Item Names
+	private String allowRulesAutoScheduling = "no";
+	// Annotated CRF SAS Item Names
 	private String annotatedCrfSasItemNames = "no";
 
 	/**
@@ -172,6 +174,7 @@ public class StudyParameterConfig {
 
 		annotatedCrfSasItemNames = "no";
 		allowDynamicGroupsManagement = "yes";
+		allowDiscrepancyCorrectionForms = "yes";
 	}
 
 	/**
@@ -182,7 +185,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param collectDob The collectDob to set.
+	 * @param collectDob
+	 *            The collectDob to set.
 	 */
 	public void setCollectDob(String collectDob) {
 		this.collectDob = collectDob;
@@ -196,7 +200,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param discrepancyManagement The discrepancyManagement to set.
+	 * @param discrepancyManagement
+	 *            The discrepancyManagement to set.
 	 */
 	public void setDiscrepancyManagement(String discrepancyManagement) {
 		this.discrepancyManagement = discrepancyManagement;
@@ -210,7 +215,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param genderRequired The genderRequired to set.
+	 * @param genderRequired
+	 *            The genderRequired to set.
 	 */
 	public void setGenderRequired(String genderRequired) {
 		this.genderRequired = genderRequired;
@@ -224,7 +230,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param interviewDateDefault The interviewDateDefault to set.
+	 * @param interviewDateDefault
+	 *            The interviewDateDefault to set.
 	 */
 	public void setInterviewDateDefault(String interviewDateDefault) {
 		this.interviewDateDefault = interviewDateDefault;
@@ -238,7 +245,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param interviewDateEditable The interviewDateEditable to set.
+	 * @param interviewDateEditable
+	 *            The interviewDateEditable to set.
 	 */
 	public void setInterviewDateEditable(String interviewDateEditable) {
 		this.interviewDateEditable = interviewDateEditable;
@@ -252,7 +260,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param interviewDateRequired The interviewDateRequired to set.
+	 * @param interviewDateRequired
+	 *            The interviewDateRequired to set.
 	 */
 	public void setInterviewDateRequired(String interviewDateRequired) {
 		this.interviewDateRequired = interviewDateRequired;
@@ -266,7 +275,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param interviewerNameDefault The interviewerNameDefault to set.
+	 * @param interviewerNameDefault
+	 *            The interviewerNameDefault to set.
 	 */
 	public void setInterviewerNameDefault(String interviewerNameDefault) {
 		this.interviewerNameDefault = interviewerNameDefault;
@@ -280,7 +290,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param interviewerNameEditable The interviewerNameEditable to set.
+	 * @param interviewerNameEditable
+	 *            The interviewerNameEditable to set.
 	 */
 	public void setInterviewerNameEditable(String interviewerNameEditable) {
 		this.interviewerNameEditable = interviewerNameEditable;
@@ -294,7 +305,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param interviewerNameRequired The interviewerNameRequired to set.
+	 * @param interviewerNameRequired
+	 *            The interviewerNameRequired to set.
 	 */
 	public void setInterviewerNameRequired(String interviewerNameRequired) {
 		this.interviewerNameRequired = interviewerNameRequired;
@@ -308,7 +320,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param subjectIdGeneration The subjectIdGeneration to set.
+	 * @param subjectIdGeneration
+	 *            The subjectIdGeneration to set.
 	 */
 	public void setSubjectIdGeneration(String subjectIdGeneration) {
 		this.subjectIdGeneration = subjectIdGeneration;
@@ -322,7 +335,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param autoGeneratedPrefix The autoGeneratedPrefix to set.
+	 * @param autoGeneratedPrefix
+	 *            The autoGeneratedPrefix to set.
 	 */
 	public void setAutoGeneratedPrefix(String autoGeneratedPrefix) {
 		this.autoGeneratedPrefix = autoGeneratedPrefix;
@@ -336,7 +350,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param autoGeneratedSeparator The autoGeneratedSeparator to set.
+	 * @param autoGeneratedSeparator
+	 *            The autoGeneratedSeparator to set.
 	 */
 	public void setAutoGeneratedSeparator(String autoGeneratedSeparator) {
 		this.autoGeneratedSeparator = autoGeneratedSeparator;
@@ -350,7 +365,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param autoGeneratedSuffix The autoGeneratedSuffix to set.
+	 * @param autoGeneratedSuffix
+	 *            The autoGeneratedSuffix to set.
 	 */
 	public void setAutoGeneratedSuffix(String autoGeneratedSuffix) {
 		this.autoGeneratedSuffix = autoGeneratedSuffix;
@@ -364,7 +380,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param subjectIdPrefixSuffix The subjectIdPrefixSuffix to set.
+	 * @param subjectIdPrefixSuffix
+	 *            The subjectIdPrefixSuffix to set.
 	 */
 	public void setSubjectIdPrefixSuffix(String subjectIdPrefixSuffix) {
 		this.subjectIdPrefixSuffix = subjectIdPrefixSuffix;
@@ -378,7 +395,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param subjectPersonIdRequired The subjectPersonIdRequired to set.
+	 * @param subjectPersonIdRequired
+	 *            The subjectPersonIdRequired to set.
 	 */
 	public void setSubjectPersonIdRequired(String subjectPersonIdRequired) {
 		this.subjectPersonIdRequired = subjectPersonIdRequired;
@@ -392,7 +410,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param personIdShownOnCRF The personIdShownOnCRF to set.
+	 * @param personIdShownOnCRF
+	 *            The personIdShownOnCRF to set.
 	 */
 	public void setPersonIdShownOnCRF(String personIdShownOnCRF) {
 		this.personIdShownOnCRF = personIdShownOnCRF;
@@ -614,7 +633,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param assignRandomizationResultTo the assignRandomizationResultTo to set
+	 * @param assignRandomizationResultTo
+	 *            the assignRandomizationResultTo to set
 	 */
 	public void setAssignRandomizationResultTo(String assignRandomizationResultTo) {
 		this.assignRandomizationResultTo = assignRandomizationResultTo;
@@ -628,7 +648,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param randomizationTrialId the randomizationTrialId to set
+	 * @param randomizationTrialId
+	 *            the randomizationTrialId to set
 	 */
 	public void setRandomizationTrialId(String randomizationTrialId) {
 		this.randomizationTrialId = randomizationTrialId;
@@ -658,7 +679,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param allowDynamicGroupsManagement the allowDynamicGroupsManagement to set
+	 * @param allowDynamicGroupsManagement
+	 *            the allowDynamicGroupsManagement to set
 	 */
 	public void setAllowDynamicGroupsManagement(String allowDynamicGroupsManagement) {
 		this.allowDynamicGroupsManagement = allowDynamicGroupsManagement;
@@ -672,7 +694,8 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param allowRulesAutoScheduling the allowRulesAutoScheduling to set
+	 * @param allowRulesAutoScheduling
+	 *            the allowRulesAutoScheduling to set
 	 */
 	public void setAllowRulesAutoScheduling(String allowRulesAutoScheduling) {
 		this.allowRulesAutoScheduling = allowRulesAutoScheduling;
@@ -686,9 +709,25 @@ public class StudyParameterConfig {
 	}
 
 	/**
-	 * @param annotatedCrfSasItemNames the aCrfSasItemNames to set
+	 * @param annotatedCrfSasItemNames
+	 *            the aCrfSasItemNames to set
 	 */
 	public void setAnnotatedCrfSasItemNames(String annotatedCrfSasItemNames) {
 		this.annotatedCrfSasItemNames = annotatedCrfSasItemNames;
+	}
+
+	/**
+	 * @return the allowDiscrepancyCorrectionForms
+	 */
+	public String getAllowDiscrepancyCorrectionForms() {
+		return allowDiscrepancyCorrectionForms;
+	}
+
+	/**
+	 * @param allowDiscrepancyCorrectionForms
+	 *            the allowDiscrepancyCorrectionForms to set
+	 */
+	public void setAllowDiscrepancyCorrectionForms(String allowDiscrepancyCorrectionForms) {
+		this.allowDiscrepancyCorrectionForms = allowDiscrepancyCorrectionForms;
 	}
 }

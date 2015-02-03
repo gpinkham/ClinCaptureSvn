@@ -13,7 +13,19 @@
 
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.web.table.filter.UserAccountNameDroplistFilterEditor;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -71,25 +83,15 @@ import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.AbstractFilterEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.DateCellEditor;
+import org.jmesa.view.html.AbstractHtmlView;
 import org.jmesa.view.html.HtmlBuilder;
+import org.jmesa.view.html.HtmlSnippets;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.jmesa.view.html.editor.HtmlFilterEditor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import com.clinovo.web.table.filter.UserAccountNameDroplistFilterEditor;
 
 /**
  * Encapsulates all the functionality required to create table for notes and discrepancy servlet.
@@ -132,6 +134,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	private Integer discNoteType;
 	private Boolean studyHasDiscNotes = false;
 	private final boolean showMoreLink;
+	private boolean enableDcf;
 
 	private DataSource dataSource;
 
@@ -165,17 +168,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		final String crfName = "crfName";
 		final String eventName = "eventName";
 
-		tableFacade.setColumnProperties("dcf","discrepancyNoteBean.id", "studySubject.label", DISCREPANCY_NOTE_BEAN_DIS_TYPE,
-				DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS, "siteId", "discrepancyNoteBean.createdDate",
-				"discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName",
-				"crfStatus", "entityName", "entityValue", "discrepancyNoteBean.entityType",
-				"discrepancyNoteBean.description", "discrepancyNoteBean.detailedNotes", "numberOfNotes",
-				"discrepancyNoteBean.user", "discrepancyNoteBean.owner", "actions");
+		tableFacade.setColumnProperties(getColumns());
 
 		Row row = tableFacade.getTable().getRow();
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
 
-		configureColumn(row.getColumn("dcf"), resword.getString("dcf"), new DcfCellEditor(), null, false, false);
+		if (enableDcf) {
+			configureColumn(row.getColumn("dcf"), resword.getString("dcf"), new DcfCellEditor(), null, false, false);
+		}
 		configureColumn(row.getColumn("discrepancyNoteBean.id"), resword.getString("note_id"), null, null, true, true);
 		configureColumn(row.getColumn("studySubject.label"), currentStudy != null ? currentStudy
 				.getStudyParameterConfig().getStudySubjectIdLabel() : resword.getString("study_subject_ID"), null,
@@ -215,6 +215,21 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn("age"), resword.getString("days_open"), null, null);
 		configureColumn(row.getColumn("days"), resword.getString("days_since_updated"), null, null);
 	}
+	
+	private String[] getColumns() {
+		TableColumnBuilder columnBuilder = new TableColumnBuilder();
+		if (enableDcf) {
+			columnBuilder.add("dcf");
+		}
+		columnBuilder.add("discrepancyNoteBean.id").add("studySubject.label").add(DISCREPANCY_NOTE_BEAN_DIS_TYPE)
+				.add(DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS).add("siteId").add("discrepancyNoteBean.createdDate")
+				.add("discrepancyNoteBean.updatedDate").add("age").add("days").add("eventName").add("eventStartDate")
+				.add("crfName").add("crfStatus").add("entityName").add("entityValue")
+				.add("discrepancyNoteBean.entityType").add("discrepancyNoteBean.description")
+				.add("discrepancyNoteBean.detailedNotes").add("numberOfNotes").add("discrepancyNoteBean.user")
+				.add("discrepancyNoteBean.owner").add("actions");
+		return columnBuilder.buildColumnsArray();
+	}
 
 	private List<String> getExclusions() {
 		List<String> result = new ArrayList<String>();
@@ -250,7 +265,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	@Override
 	public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
-		ListNotesTableToolbar toolbar = new ListNotesTableToolbar(showMoreLink);
+		ListNotesTableToolbar toolbar = new ListNotesTableToolbar(showMoreLink, getIndexesOfColumnsToBeHidden());
 		toolbar.setStudyHasDiscNotes(studyHasDiscNotes);
 		toolbar.setDiscNoteType(discNoteType);
 		toolbar.setResolutionStatus(resolutionStatus);
@@ -259,6 +274,23 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		ListNotesFilter listNotesFilter = getListNoteFilter(tableFacade.getLimit());
 		toolbar.setListNotesFilter(listNotesFilter);
 		tableFacade.setToolbar(toolbar);
+	}
+	
+	@Override
+	public void configureTableFacadeCustomView(TableFacade tableFacade) {
+		if (enableDcf) {
+			tableFacade.setView(new DcfSelectAllView());
+		} else {
+			super.configureTableFacadeCustomView(tableFacade);
+		}
+	}
+
+	private String getIndexesOfColumnsToBeHidden() {
+		if (enableDcf) {
+			return "1, 6, 7, 11, 13, 16, 18, 19, 21";
+		} else {
+			return "0, 5, 6, 10, 12, 15, 17, 18, 20";
+		}
 	}
 
 	@Override
@@ -952,6 +984,60 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			return true;
 		}
 	}
+	
+	private class TableColumnBuilder {
+		private List<String> columns;
+
+		public TableColumnBuilder() {
+			this.columns = new ArrayList<String>();
+		}
+
+		public TableColumnBuilder add(String columnName) {
+			this.columns.add(columnName);
+			return this;
+		}
+
+		public String[] buildColumnsArray() {
+			return this.columns.toArray(new String[0]);
+		}
+	}
+
+	private class DcfSelectAllView extends AbstractHtmlView {
+
+		public Object render() {
+			HtmlSnippets snippets = getHtmlSnippets();
+			HtmlBuilder html = new HtmlBuilder();
+			html.append(snippets.themeStart());
+			html.append(snippets.tableStart());
+			html.append(snippets.theadStart());
+			html.append(snippets.toolbar());
+			html.append(selectAll());
+			html.append(snippets.header());
+			html.append(snippets.filter());
+			html.append(snippets.tbodyStart());
+			html.append(snippets.body());
+			html.append(snippets.theadEnd());
+			html.append(snippets.footer());
+			html.append(snippets.statusBar());
+			html.append(snippets.tableEnd());
+			html.append(snippets.themeEnd());
+			html.append(snippets.initJavascriptLimit());
+			return html.toString();
+		}
+
+		private String selectAll() {
+			HtmlBuilder html = new HtmlBuilder();
+			html.tr(1).styleClass("logic").close().td(1).colspan("100%").style("font-size: 12px;").close();
+			html.append("<b>" + resword.getString("table_sdv_select") + "</b>&#160;&#160;");
+			html.append("<a class='allcheckbox check' href=''>" + resword.getString("table_sdv_all"));
+			html.append(",</a>");
+			html.append("&#160;&#160;&#160;");
+			html.append("<a class='allcheckbox' href=''>" + resword.getString("table_sdv_none"));
+			html.append("</a>");
+			html.tdEnd().trEnd(1);
+			return html.toString();
+		}
+	}
 
 	private String getDateFormat() {
 		return resformat.getString("date_format_string");
@@ -1115,6 +1201,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	public void setResolutionStatus(Integer resolutionStatus) {
 		this.resolutionStatus = resolutionStatus;
+	}
+	
+	public void setEnableDcf(boolean enableDcf) {
+		this.enableDcf = enableDcf;
 	}
 
 	/**

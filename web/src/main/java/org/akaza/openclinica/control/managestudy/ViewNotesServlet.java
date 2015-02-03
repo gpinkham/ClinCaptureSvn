@@ -106,8 +106,9 @@ public class ViewNotesServlet extends RememberLastPage {
 		if (generateDcf != null && generateDcf.equals("yes")) {
 			List<String> selectedNoteIds = fp.getStringArray(ListNotesTableFactory.DCF_CHECKBOX_NAME);
 			if (selectedNoteIds.size() > 0) {
-				generateDcfs(selectedNoteIds, response);
-				return;
+				if (generateDcfs(selectedNoteIds, response)) {
+					return;
+				}
 			}
 		}
 		UserAccountBean ub = getUserAccountBean(request);
@@ -129,6 +130,8 @@ public class ViewNotesServlet extends RememberLastPage {
 
 		boolean showMoreLink = fp.getString("showMoreLink").equals("")
 				|| Boolean.parseBoolean(fp.getString("showMoreLink"));
+		boolean allowDcf = allowDcfForUserInCurrentStudy(currentStudy, ub);
+		request.setAttribute("allowDcf", allowDcf);
 
 		int oneSubjectId = fp.getInt("id");
 		request.getSession().setAttribute("subjectId", oneSubjectId);
@@ -212,6 +215,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		factory.setModule(moduleStr);
 		factory.setDiscNoteType(discNoteTypeId);
 		factory.setResolutionStatus(resolutionStatusId);
+		factory.setEnableDcf(allowDcf);
 
 		factory.setDataSource(getDataSource());
 
@@ -290,7 +294,7 @@ public class ViewNotesServlet extends RememberLastPage {
 						"yes"));
 	}
 
-	private void generateDcfs(List<String> selectedNoteIds, HttpServletResponse response) {
+	private boolean generateDcfs(List<String> selectedNoteIds, HttpServletResponse response) {
 		List<Integer> noteIds = transformSelectedNoteIdsToInt(selectedNoteIds);
 		String dcfFile = getDcfService().generateDcf(noteIds);
 		try {
@@ -308,10 +312,12 @@ public class ViewNotesServlet extends RememberLastPage {
 				}
 				responseOutputStream.flush();
 				fileInputStream.close();
+				return true;
 			}
 		} catch (IOException e) {
 			logger.error("An error occurred during DCF download. Details: " + e.getMessage());
 		}
+		return false;
 	}
 
 	private List<Integer> transformSelectedNoteIdsToInt(List<String> selectedNoteIds) {
@@ -320,5 +326,13 @@ public class ViewNotesServlet extends RememberLastPage {
 			noteIds.add(Integer.valueOf(noteId));
 		}
 		return noteIds;
+	}
+
+	private boolean allowDcfForUserInCurrentStudy(StudyBean currentStudy, UserAccountBean ub) {
+		StudyUserRoleBean surb = StudyUserRoleBean.getStudyUserRoleInCurrentStudy(ub, currentStudy);
+		if (!surb.isCanGenerateDCF()) {
+			return false;
+		}
+		return currentStudy.getStudyParameterConfig().getAllowDiscrepancyCorrectionForms().equalsIgnoreCase("yes");
 	}
 }

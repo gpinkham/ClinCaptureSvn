@@ -47,6 +47,7 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	private boolean canManageStudy;
 	private boolean canCode;
 	private boolean canEvaluate;
+	private boolean canGenerateDCF;
 
 	/**
 	 * Default study user role bean constructor.
@@ -89,6 +90,9 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		this.canCode = this.role == Role.STUDY_CODER || this.role == Role.STUDY_ADMINISTRATOR;
 
 		this.canEvaluate = this.role == Role.STUDY_EVALUATOR || this.role == Role.STUDY_ADMINISTRATOR;
+
+		this.canGenerateDCF = this.canManageStudy || this.canMonitor || this.canCode;
+
 	}
 
 	public int getUserAccountId() {
@@ -265,6 +269,10 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 				|| this.role == Role.STUDY_EVALUATOR;
 	}
 
+	public boolean isCanGenerateDCF() {
+		return this.canGenerateDCF;
+	}
+
 	/**
 	 * Determines role of user in current study.
 	 * 
@@ -280,5 +288,22 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 			return role;
 		}
 		return currentUser.getRoleByStudy(currentStudy.getParentStudyId()).getRole();
+	}
+
+	/**
+	 * Gets StudyUserRoleBean of user in current study.
+	 * 
+	 * @param currentUser
+	 *            UserAccountBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return StudyUserRoleBean in currentStudy
+	 */
+	public static StudyUserRoleBean getStudyUserRoleInCurrentStudy(UserAccountBean currentUser, StudyBean currentStudy) {
+		StudyUserRoleBean surb = currentUser.getRoleByStudy(currentStudy.getId());
+		if (!surb.getRole().equals(Role.INVALID)) {
+			return surb;
+		}
+		return currentUser.getRoleByStudy(currentStudy.getParentStudyId());
 	}
 }

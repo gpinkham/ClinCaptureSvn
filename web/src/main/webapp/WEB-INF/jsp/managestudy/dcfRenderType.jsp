@@ -24,7 +24,14 @@
         		$("#dnform").submit();
         		$("#generateDcf").val("");
         	});
-        	
+           	$("a.allcheckbox").each(function(){
+                var a = $(this);
+                var check = a.hasClass("check");
+                a.click(function(){
+                    checkOrUncheckAllByClass("dcf", check);
+                    return false;
+                });
+            });
         });
         
         function showRenderDialog() {

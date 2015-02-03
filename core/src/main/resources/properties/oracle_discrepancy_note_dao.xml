@@ -1434,7 +1434,10 @@
 			rs.options_values, rs.response_type_id, sec.ordinal as page_number
 			FROM discrepancy_note dn 
 			INNER JOIN dn_item_data_map dnid ON dn.discrepancy_note_id = dnid.discrepancy_note_id
-			INNER JOIN study_subject ss ON dnid.study_subject_id = ss.study_subject_id
+			INNER JOIN item_data id ON dnid.item_data_id = id.item_data_id
+			INNER JOIN event_crf ec ON id.event_crf_id = ec.event_crf_id
+			INNER JOIN study_event se ON ec.study_event_id = se.study_event_id
+			INNER JOIN study_subject ss ON se.study_subject_id = ss.study_subject_id
 			INNER JOIN (
 				SELECT study_id, name as site_name, oc_oid, principal_investigator as investigator, 
 					CASE 
@@ -1446,10 +1449,7 @@
 						ELSE (SELECT unique_identifier FROM study WHERE study_id = s1.parent_study_id)
 					END as study_protocol
 				FROM study s1) s 
-			ON ss.study_id = s.study_id			
-			INNER JOIN item_data id ON dnid.item_data_id = id.item_data_id
-			INNER JOIN event_crf ec ON id.event_crf_id = ec.event_crf_id
-			INNER JOIN study_event se ON ec.study_event_id = se.study_event_id
+			ON ss.study_id = s.study_id	
 			INNER JOIN study_event_definition sed ON se.study_event_definition_id = sed.study_event_definition_id
 			INNER JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id
 			INNER JOIN crf c ON cv.crf_id = c.crf_id

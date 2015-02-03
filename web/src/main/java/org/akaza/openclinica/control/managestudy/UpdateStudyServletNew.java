@@ -94,8 +94,7 @@ public class UpdateStudyServletNew extends Controller {
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
-				"1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	@Override
@@ -524,36 +523,38 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setEndDateTimeLabel(fp.getString("endDateTimeLabel"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 		study.getStudyParameterConfig().setAllowDynamicGroupsManagement(fp.getString("allowDynamicGroupsManagement"));
+		study.getStudyParameterConfig().setAllowDiscrepancyCorrectionForms(
+				fp.getString("allowDiscrepancyCorrectionForms"));
 
-		//Data Import
+		// Data Import
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
 		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));
 		study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
-		study.getStudyParameterConfig()
-				.setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
+		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
+				fp.getString("replaceExisitingDataDuringImport"));
 
-		// Medical coding 
+		// Medical coding
 		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
 		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
 		study.getStudyParameterConfig().setMedicalCodingContextNeeded(fp.getString("medicalCodingContextNeeded"));
 		study.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("medicalCodingApprovalNeeded"));
 
-		//Randomization
+		// Randomization
 		study.getStudyParameterConfig().setAssignRandomizationResultTo(fp.getString("assignRandomizationResultTo"));
 		study.getStudyParameterConfig().setRandomizationTrialId(fp.getString("randomizationTrialId"));
 
-		//Evaluation
+		// Evaluation
 		study.getStudyParameterConfig().setAllowCrfEvaluation(fp.getString("allowCrfEvaluation"));
 		study.getStudyParameterConfig().setEvaluateWithContext(fp.getString("evaluateWithContext"));
 
 		study.getStudyParameterConfig().setAllowRulesAutoScheduling(fp.getString("allowRulesAutoScheduling"));
 
-		//SAS Item Names
+		// SAS Item Names
 		study.getStudyParameterConfig().setAnnotatedCrfSasItemNames(fp.getString("annotatedCrfSasItemNames"));
 
 		try {
 
-			// Create custom dictionary 
+			// Create custom dictionary
 			if (study.getStudyParameterConfig().getAutoCodeDictionaryName() != null
 					&& !study.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) {
 				getDictionaryService().createDictionary(study.getStudyParameterConfig().getAutoCodeDictionaryName(),
@@ -890,9 +891,13 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setParameter("allowSdvWithOpenQueries");
 		spv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
 		updateParameter(spvdao, spv);
-		
+
 		spv.setParameter("allowDynamicGroupsManagement");
 		spv.setValue(study1.getStudyParameterConfig().getAllowDynamicGroupsManagement());
+		updateParameter(spvdao, spv);
+
+		spv.setParameter("allowDiscrepancyCorrectionForms");
+		spv.setValue(study1.getStudyParameterConfig().getAllowDiscrepancyCorrectionForms());
 		updateParameter(spvdao, spv);
 
 		spv.setParameter("markImportedCRFAsCompleted");
@@ -953,7 +958,7 @@ public class UpdateStudyServletNew extends Controller {
 
 		try {
 
-			// Create custom dictionary 
+			// Create custom dictionary
 			if (study1.getStudyParameterConfig().getAutoCodeDictionaryName() != null
 					&& !study1.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) {
 				getDictionaryService().createDictionary(study1.getStudyParameterConfig().getAutoCodeDictionaryName(),
@@ -972,8 +977,7 @@ public class UpdateStudyServletNew extends Controller {
 		updateSiteParameters(study1, ub, sdao, spvdao);
 	}
 
-	private void updateSiteParameters(StudyBean study1, UserAccountBean ub, StudyDAO sdao,
-			StudyParameterValueDAO spvdao) {
+	private void updateSiteParameters(StudyBean study1, UserAccountBean ub, StudyDAO sdao, StudyParameterValueDAO spvdao) {
 		ArrayList children = (ArrayList) sdao.findAllByParent(study1.getId());
 		for (Object aChildren : children) {
 			StudyBean child = (StudyBean) aChildren;
@@ -1091,9 +1095,13 @@ public class UpdateStudyServletNew extends Controller {
 			childspv.setParameter("allowSdvWithOpenQueries");
 			childspv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
 			updateParameter(spvdao, childspv);
-			
+
 			childspv.setParameter("allowDynamicGroupsManagement");
 			childspv.setValue(study1.getStudyParameterConfig().getAllowDynamicGroupsManagement());
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("allowDiscrepancyCorrectionForms");
+			childspv.setValue(study1.getStudyParameterConfig().getAllowDiscrepancyCorrectionForms());
 			updateParameter(spvdao, childspv);
 
 			childspv.setParameter("markImportedCRFAsCompleted");

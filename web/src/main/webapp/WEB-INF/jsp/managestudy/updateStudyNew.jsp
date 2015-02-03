@@ -1386,6 +1386,20 @@
 		       name=allowDynamicGroupsManagement value="no"><fmt:message key="no" bundle="${resword}"/>
 	</td>
 </tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="dcf_allow_discrepancy_correction_forms" bundle="${resword}"/>
+	</td>
+	<td>
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.allowDiscrepancyCorrectionForms == 'yes' ? "checked" : ""}
+		       name="allowDiscrepancyCorrectionForms" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+
+		<input type="radio" onchange="javascript:changeIcon()"
+		${studyToView.studyParameterConfig.allowDiscrepancyCorrectionForms == 'yes' ? "" : "checked"}
+		       name=allowDiscrepancyCorrectionForms value="no"><fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
 <tr>
 	<td>&nbsp;</td>
 </tr>

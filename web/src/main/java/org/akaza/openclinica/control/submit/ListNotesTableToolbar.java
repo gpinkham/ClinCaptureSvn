@@ -27,6 +27,11 @@ import org.jmesa.view.html.toolbar.ToolbarItemType;
 
 import java.util.ResourceBundle;
 
+/**
+ * 
+ * ListNotesTableToolbar.
+ * 
+ */
 public class ListNotesTableToolbar extends DefaultToolbar {
 	private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
 	private String module;
@@ -36,18 +41,26 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 	private ResourceBundle resword;
 
 	private ListNotesFilter listNotesFilter;
-	
-	private final static String INDEXES_OF_COLUMNS_TO_BE_HIDDEN = "1, 6, 7, 11, 13, 16, 18, 19, 21";
 
-	public ListNotesTableToolbar(boolean showMoreLink) {
-		super();
+	private String indexesOfColumnsToBeHidden;
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param showMoreLink
+	 *            boolean
+	 * @param indexesOfColumnsToBeHidden
+	 *            String
+	 */
+	public ListNotesTableToolbar(boolean showMoreLink, String indexesOfColumnsToBeHidden) {
 		this.showMoreLink = showMoreLink;
+		this.indexesOfColumnsToBeHidden = indexesOfColumnsToBeHidden;
 	}
 
 	@Override
 	protected void addToolbarItems() {
 		addToolbarItem(ToolbarItemType.SEPARATOR);
-		addToolbarItem(createShowMoreLinkItem(resword, INDEXES_OF_COLUMNS_TO_BE_HIDDEN));
+		addToolbarItem(createShowMoreLinkItem(resword, indexesOfColumnsToBeHidden));
 		if (this.studyHasDiscNotes) {
 			addToolbarItem(createDownloadLinkItem());
 			addToolbarItem(createNotePopupLinkItem());
@@ -55,7 +68,11 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 		addToolbarItem(createCustomItem(new NewHiddenItem()));
 
 	}
-	
+
+	/**
+	 * 
+	 * @return ToolbarItem
+	 */
 	public ToolbarItem createDownloadLinkItem() {
 		DownloadLinkItem item = new DownloadLinkItem();
 		item.setCode(ToolbarItemType.CLEAR_ITEM.toCode());
@@ -65,6 +82,10 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 		return item;
 	}
 
+	/**
+	 * 
+	 * @return ToolbarItem
+	 */
 	public ToolbarItem createNotePopupLinkItem() {
 		NotePopupLinkItem item = new NotePopupLinkItem();
 		item.setCode(ToolbarItemType.CLEAR_ITEM.toCode());
@@ -82,6 +103,10 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 		return item;
 	}
 
+	/**
+	 * 
+	 * @return ToolbarItem
+	 */
 	public ToolbarItem createBackToNotesMatrixListItem() {
 		ShowLinkToNotesMatrix item = new ShowLinkToNotesMatrix();
 		item.setCode(ToolbarItemType.CLEAR_ITEM.toCode());

@@ -95,4 +95,52 @@ public class StudyUserRoleBeanTest {
 		Assert.assertEquals(Role.SYSTEM_ADMINISTRATOR,
 				StudyUserRoleBean.determineRoleInCurrentStudy(currentUser, currentSite));
 	}
+	
+	@Test
+	public void testThatSystemAdministratorIsAllowedToGenerateDCF() {
+		currentRole.setRole(Role.SYSTEM_ADMINISTRATOR);
+		Assert.assertTrue(currentRole.isCanGenerateDCF());
+	}
+	
+	@Test
+	public void testThatStudyAdministratorIsAllowedToGenerateDCF() {
+		currentRole.setRole(Role.STUDY_ADMINISTRATOR);
+		Assert.assertTrue(currentRole.isCanGenerateDCF());
+	}
+	
+	@Test
+	public void testThatStudyMonitorIsAllowedToGenerateDCF() {
+		currentRole.setRole(Role.STUDY_MONITOR);
+		Assert.assertTrue(currentRole.isCanGenerateDCF());
+	}
+	
+	@Test
+	public void testThatStudyCoderIsAllowedToGenerateDCF() {
+		currentRole.setRole(Role.STUDY_CODER);
+		Assert.assertTrue(currentRole.isCanGenerateDCF());
+	}
+	
+	@Test
+	public void testThatSiteMonitorIsAllowedToGenerateDCF() {
+		currentRole.setRole(Role.SITE_MONITOR);
+		Assert.assertTrue(currentRole.isCanGenerateDCF());
+	}
+	
+	@Test
+	public void testThatStudyEvaluatorIsNotAllowedToGenerateDCF() {
+		currentRole.setRole(Role.STUDY_EVALUATOR);
+		Assert.assertFalse(currentRole.isCanGenerateDCF());
+	}
+	
+	@Test
+	public void testThatClinicalResearchCoordinatorIsNotAllowedToGenerateDCF() {
+		currentRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
+		Assert.assertFalse(currentRole.isCanGenerateDCF());
+	}
+	
+	@Test
+	public void testThatInvestigatorIsNotAllowedToGenerateDCF() {
+		currentRole.setRole(Role.INVESTIGATOR);
+		Assert.assertFalse(currentRole.isCanGenerateDCF());
+	}
 }
