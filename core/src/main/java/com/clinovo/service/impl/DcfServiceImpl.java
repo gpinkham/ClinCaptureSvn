@@ -15,15 +15,26 @@
 package com.clinovo.service.impl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +65,8 @@ public class DcfServiceImpl implements DcfService {
 	private List<DcfRenderType> renderTypes;
 	private DcfReportBuilder dcfReportBuilder;
 	private DiscrepancyNoteDAO discrepancyNoteDAO;
+	private ResourceBundle resword;
+	private ResourceBundle resexception;
 
 	/**
 	 * Constructor.
@@ -66,37 +79,53 @@ public class DcfServiceImpl implements DcfService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String generateDcf(StudyBean study, ResourceBundle resword, List<Integer> noteIds) {
+	public String generateDcf(StudyBean study, Set<Integer> noteIds, String username) throws FileNotFoundException {
 		List<DiscrepancyCorrectionForm> dcfs = getDiscrepancyNoteDAO().getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, noteIds.toArray(new Integer[0]));
+				getWordsBundle(), noteIds.toArray(new Integer[0]));
 		String fileName = null;
 		if (dcfs.size() > 0) {
 			try {
-				fileName = getFileName(dcfs, ".pdf");
+				fileName = getFileName(dcfs, username, ".pdf");
 				dcfReportBuilder.buildPdf(dcfs, fileName);
+			} catch (FileNotFoundException e) {
+				logger.error(e.getMessage());
+				throw e;
 			} catch (IOException e) {
-				logger.error(e.getLocalizedMessage());
+				logger.error(e.getMessage());
 			} catch (Exception e) {
-				logger.error(e.getLocalizedMessage());
+				logger.error(e.getMessage());
 			}
 		}
 		return fileName;
 	}
 
-	private String getFileName(List<DiscrepancyCorrectionForm> dcfs, String extension) throws IOException {
+	private String getFileName(List<DiscrepancyCorrectionForm> dcfs, String username, String extension)
+			throws FileNotFoundException {
 		String dcfDirName = "";
-		String ccRepoPath = systemDAO.findByName("filePath").getValue();
+		String dcfUserDirName = "";
+		String ccRepoPath = systemDAO.findByName("filePath").getValue().trim();
+		File ccRepoDir = new File(ccRepoPath);
+		if (ccRepoPath.length() > 0 && !ccRepoDir.exists()) {
+			String exceptionMessage = MessageFormat.format(
+					getExceptionsBundle().getString("cc_repo_directory_not_found"), ccRepoPath);
+			throw new FileNotFoundException(exceptionMessage);
+		}
 		if (ccRepoPath.endsWith(File.separator) || ccRepoPath.trim().length() == 0) {
 			dcfDirName = ccRepoPath.concat("dcf");
 		} else {
-			dcfDirName = ccRepoPath.concat(File.separator).concat("dcf");
+			dcfDirName = ccRepoPath.concat(File.separator).concat("dcf").concat(File.separator).concat(username);
 		}
+		dcfUserDirName = dcfDirName.concat(File.separator).concat(username);
 		File dcfDir = new File(dcfDirName);
+		File dcfUserDir = new File(dcfUserDirName);
 		if (!dcfDir.exists()) {
 			dcfDir.mkdir();
 		}
+		if (!dcfUserDir.exists()) {
+			dcfUserDir.mkdir();
+		}
 		String fileName = dcfs.get(0).getDcfFileName().concat(extension);
-		fileName = dcfDirName.concat(File.separator).concat(fileName);
+		fileName = dcfUserDirName.concat(File.separator).concat(fileName);
 		logger.debug("Created file:" + fileName);
 		return fileName;
 	}
@@ -104,8 +133,15 @@ public class DcfServiceImpl implements DcfService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void renderDcf() {
-		// TODO To be implemented in #1997
+	public boolean renderDcf() {
+		boolean renderSuccessful = true;
+		for (DcfRenderType renderType : renderTypes) {
+			renderSuccessful = renderType.render();
+			if (!renderSuccessful) {
+				return renderSuccessful;
+			}
+		}
+		return renderSuccessful;
 	}
 
 	/**
@@ -115,10 +151,75 @@ public class DcfServiceImpl implements DcfService {
 		renderTypes.add(renderType);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public void clearRenderTypes() {
+		if (renderTypes != null) {
+			renderTypes.clear();
+		} else {
+			renderTypes = new ArrayList<DcfRenderType>();
+		}
+	}
+
 	private DiscrepancyNoteDAO getDiscrepancyNoteDAO() {
 		if (discrepancyNoteDAO == null) {
 			discrepancyNoteDAO = new DiscrepancyNoteDAO(datasource);
 		}
 		return discrepancyNoteDAO;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void updateDiscrepancyNotes(Map<Integer, Map<Integer, String>> noteAndEntityIds, StudyBean currentStudy,
+			UserAccountBean currentUser) {
+		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(new Locale(CoreResources.getSystemLanguage()));
+		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
+		for (Integer noteId : noteAndEntityIds.keySet()) {
+			DiscrepancyNoteBean note = (DiscrepancyNoteBean) getDiscrepancyNoteDAO().findByPK(noteId);
+			for (Integer entityId : noteAndEntityIds.get(noteId).keySet()) {
+				note.setEntityId(entityId);
+				note.setColumn(noteAndEntityIds.get(noteId).get(entityId));
+			}
+			note.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
+			createChildDN(note, dndao, resword.getString("dcf_generated_dcf"), currentStudy, currentUser);
+			note.setUpdater(currentUser);
+			note.setUpdatedDate(new Date());
+			dndao.update(note);
+		}
+	}
+
+	private void createChildDN(DiscrepancyNoteBean parentNote, DiscrepancyNoteDAO dndao, String childNoteDescription,
+			StudyBean currentStudy, UserAccountBean currentUser) {
+		DiscrepancyNoteBean childNote = new DiscrepancyNoteBean();
+		childNote.setParentDnId(parentNote.getId());
+		childNote.setDescription(childNoteDescription);
+		childNote.setDiscrepancyNoteTypeId(parentNote.getDiscrepancyNoteTypeId());
+		childNote.setResolutionStatusId(parentNote.getResolutionStatusId());
+		childNote.setAssignedUserId(parentNote.getAssignedUserId());
+		childNote.setOwner(currentUser);
+		childNote.setStudyId(currentStudy.getId());
+		childNote.setEntityId(parentNote.getEntityId());
+		childNote.setEntityType(parentNote.getEntityType());
+		childNote.setColumn(parentNote.getColumn());
+		childNote = (DiscrepancyNoteBean) dndao.create(childNote);
+		if (childNote.getId() > 0) {
+			dndao.createMapping(childNote);
+		}
+	}
+
+	private ResourceBundle getWordsBundle() {
+		if (resword == null) {
+			resword = ResourceBundleProvider.getWordsBundle(new Locale(CoreResources.getSystemLanguage()));
+		}
+		return resword;
+	}
+
+	private ResourceBundle getExceptionsBundle() {
+		if (resexception == null) {
+			resexception = ResourceBundleProvider.getExceptionsBundle(new Locale(CoreResources.getSystemLanguage()));
+		}
+		return resexception;
 	}
 }

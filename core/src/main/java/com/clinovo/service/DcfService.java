@@ -14,9 +14,11 @@
  *******************************************************************************/
 package com.clinovo.service;
 
-import java.util.List;
-import java.util.ResourceBundle;
+import java.io.FileNotFoundException;
+import java.util.Map;
+import java.util.Set;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 
 import com.clinovo.util.DcfRenderType;
@@ -34,13 +36,15 @@ public interface DcfService {
 	 * 
 	 * @param study
 	 *            current study
-	 * @param resword
-	 *            words properties bundl
 	 * @param noteIds
-	 *            List of IDs of DNs for which to generate DCFs
+	 *            Set of IDs of DNs for which to generate DCFs
+	 * @param username
+	 *            Current user's username
 	 * @return path to generated DCF file; null if generation was not successful.
+	 * @throws FileNotFoundException
+	 *             in case CC repository path doesn't exits on the server
 	 */
-	String generateDcf(StudyBean study, ResourceBundle resword, List<Integer> noteIds);
+	String generateDcf(StudyBean study, Set<Integer> noteIds, String username) throws FileNotFoundException;
 
 	/**
 	 * Adds DCF render type.
@@ -51,7 +55,27 @@ public interface DcfService {
 	void addDcfRenderType(DcfRenderType renderType);
 
 	/**
-	 * Renders generated DCFs.
+	 * Clears render types.
 	 */
-	void renderDcf();
+	void clearRenderTypes();
+
+	/**
+	 * Renders generated DCFs.
+	 * 
+	 * @return true if all render types are successful, false otherwise
+	 */
+	boolean renderDcf();
+
+	/**
+	 * Updates DiscrepancyNotes after DCFs have been generated and rendered.
+	 * 
+	 * @param noteAndEntityIds
+	 *            Map of DN Ids and their Entity Ids
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param currentUser
+	 *            UserAccountBean
+	 */
+	void updateDiscrepancyNotes(Map<Integer, Map<Integer, String>> noteAndEntityIds, StudyBean currentStudy,
+			UserAccountBean currentUser);
 }

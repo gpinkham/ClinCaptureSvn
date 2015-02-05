@@ -1,7 +1,11 @@
 package com.clinovo.clincapture.control.managestudy;
 
-import com.clinovo.util.SessionUtil;
-import com.google.common.collect.Iterables;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -10,6 +14,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
+import org.akaza.openclinica.control.submit.ListNotesTableFactory;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.junit.Before;
@@ -22,9 +27,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import com.clinovo.service.DcfService;
+import com.clinovo.service.impl.DcfServiceImpl;
+import com.clinovo.util.DcfRenderType;
+import com.clinovo.util.SessionUtil;
+import com.google.common.collect.Iterables;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ViewNotesServletTest extends DefaultAppContextTest {
@@ -37,10 +44,13 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 	private ViewNotesServlet viewNotesServlet;
 	private UserAccountBean currentUser;
 	private StudyUserRoleBean currentRole;
+	private DcfService dcfService;
+	private StudyBean currentStudy;
 
 	private ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
 	private ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
 	private ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
+	private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
 
 	@Before
 	public void setUp() throws Exception {
@@ -48,10 +58,11 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		request = new MockHttpServletRequest();
 		response = new MockHttpServletResponse();
 		viewNotesServlet = Mockito.mock(ViewNotesServlet.class);
-		StudyBean studyBean = new StudyBean();
-		studyBean.setId(1);
-		studyBean.setName("Demo Study");
-		studyBean.setStatus(Status.AVAILABLE);
+		dcfService = Mockito.mock(DcfServiceImpl.class);
+		currentStudy = new StudyBean();
+		currentStudy.setId(1);
+		currentStudy.setName("Demo Study");
+		currentStudy.setStatus(Status.AVAILABLE);
 		request.setParameter("print", "no");
 		request.setParameter("module", "admin");
 		request.setParameter("showMoreLink", "true");
@@ -59,14 +70,14 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		SessionUtil.updateLocale(request.getSession(), Locale.ENGLISH);
 		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("root", "root"));
-		request.getSession().setAttribute("study", studyBean);
+		request.getSession().setAttribute("study", currentStudy);
 		currentUser = new UserAccountBean();
 		currentUser.addUserType(UserType.USER);
 		currentRole = new StudyUserRoleBean();
 		currentRole.setRole(Role.STUDY_MONITOR);
 		Mockito.doCallRealMethod().when(viewNotesServlet).mayProceed(request, response);
 		Mockito.doCallRealMethod().when(viewNotesServlet).processRequest(request, response);
-		Mockito.doReturn(studyBean).when(viewNotesServlet).getCurrentStudy(request);
+		Mockito.doReturn(currentStudy).when(viewNotesServlet).getCurrentStudy(request);
 		Mockito.doReturn(currentUser).when(viewNotesServlet).getUserAccountBean(request);
 		Mockito.doReturn(currentRole).when(viewNotesServlet).getCurrentRole(request);
 		Mockito.doReturn(dataSource).when(viewNotesServlet).getDataSource();
@@ -82,9 +93,11 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		Mockito.doReturn(userAccountDAO).when(viewNotesServlet).getUserAccountDAO();
 		Mockito.doReturn(idao).when(viewNotesServlet).getItemDAO();
 		Mockito.doReturn(itemGroupMetadataDAO).when(viewNotesServlet).getItemGroupMetadataDAO();
+		Mockito.doReturn(dcfService).when(viewNotesServlet).getDcfService();
 		Whitebox.setInternalState(viewNotesServlet, "respage", respage);
 		Whitebox.setInternalState(viewNotesServlet, "resterm", resterm);
 		Whitebox.setInternalState(viewNotesServlet, "resexception", resexception);
+		Whitebox.setInternalState(viewNotesServlet, "resword", resword);
 		Whitebox.setInternalState(viewNotesServlet, "logger", LoggerFactory.getLogger("ViewNotesServlet"));
 
 	}
@@ -194,5 +207,35 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		Map<String, String> statusItems = (Map<String, String>) updatedItems.getValue();
 		assertEquals("Total", Iterables.get(statusItems.entrySet(), 0).getKey());
 		assertEquals("0", Iterables.get(statusItems.entrySet(), 0).getValue());
+	}
+	
+	@Test
+	public void testThatPrintDcfOptionStoresVariableInSession() throws Exception {
+		request.setParameter(ViewNotesServlet.GENERATE_DCF, "yes");
+		request.setParameter(ListNotesTableFactory.DCF_CHECKBOX_NAME, "1___1___value");
+		request.setParameter(ViewNotesServlet.DCF_RENDER_CHECKBOX_NAME, "print");
+		Set<Integer> noteIds = new HashSet<Integer>();
+		noteIds.add(1);
+		Mockito.doReturn("myfile.pdf").when(dcfService).generateDcf(currentStudy, noteIds, currentUser.getName());
+		Mockito.doCallRealMethod().when(dcfService).addDcfRenderType(Mockito.any(DcfRenderType.class));
+		Mockito.doCallRealMethod().when(dcfService).clearRenderTypes();
+		Mockito.doCallRealMethod().when(dcfService).renderDcf();
+		viewNotesServlet.processRequest(request, response);
+		assertNotNull(request.getAttribute(ViewNotesServlet.PRINT_DCF));
+	}
+	
+	@Test
+	public void testThatSavDcfOptionStoresVariableInSession() throws Exception {
+		request.setParameter(ViewNotesServlet.GENERATE_DCF, "yes");
+		request.setParameter(ListNotesTableFactory.DCF_CHECKBOX_NAME, "1___1___value");
+		request.setParameter(ViewNotesServlet.DCF_RENDER_CHECKBOX_NAME, "save");
+		Set<Integer> noteIds = new HashSet<Integer>();
+		noteIds.add(1);
+		Mockito.doReturn("myfile.pdf").when(dcfService).generateDcf(currentStudy, noteIds, currentUser.getName());
+		Mockito.doCallRealMethod().when(dcfService).addDcfRenderType(Mockito.any(DcfRenderType.class));
+		Mockito.doCallRealMethod().when(dcfService).clearRenderTypes();
+		Mockito.doCallRealMethod().when(dcfService).renderDcf();
+		viewNotesServlet.processRequest(request, response);
+		assertNotNull(request.getAttribute(ViewNotesServlet.SAVE_DCF));
 	}
 }

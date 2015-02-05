@@ -24,9 +24,12 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.text.MessageFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,9 +67,13 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.jmesa.facade.TableFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mail.MailSendException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import com.clinovo.util.DcfEmailer;
+import com.clinovo.util.DcfRenderType;
 
 /**
  * View a list of all discrepancy notes in current study.
@@ -81,6 +88,12 @@ public class ViewNotesServlet extends RememberLastPage {
 
 	public static final String PRINT = "print";
 	public static final String GENERATE_DCF = "generateDcf";
+	public static final String PRINT_DCF = "printDcf";
+	public static final String SAVE_DCF = "saveDcf";
+	public static final String DCF_SAVED = "dcfSaved";
+	public static final String DCF_FILE_NAME_ATTRIBUTE = "dcf_file_name";
+	public static final String DCF_RENDER_CHECKBOX_NAME = "dcfRenderType";
+	public static final String RECIPIENT_EMAIL = "email";
 	public static final String RESOLUTION_STATUS = "resolutionStatus";
 	public static final String TYPE = "discNoteType";
 	public static final String WIN_LOCATION = "window_location";
@@ -99,17 +112,13 @@ public class ViewNotesServlet extends RememberLastPage {
 		FormProcessor fp = new FormProcessor(request);
 		String print = fp.getString(PRINT);
 		String generateDcf = fp.getString(GENERATE_DCF);
-
-		if (!generateDcf.equalsIgnoreCase("yes") && !print.equalsIgnoreCase("yes") && shouldRedirect(request, response)) {
+		String printDcf = fp.getString(PRINT_DCF);
+		String saveDcf = fp.getString(SAVE_DCF);
+		if (!shouldProceedAfterProcessingDcfRequest(request, response, fp, generateDcf, printDcf, saveDcf)) {
 			return;
 		}
-		if (generateDcf != null && generateDcf.equals("yes")) {
-			List<String> selectedNoteIds = fp.getStringArray(ListNotesTableFactory.DCF_CHECKBOX_NAME);
-			if (selectedNoteIds.size() > 0) {
-				if (generateDcfs(selectedNoteIds, response, request)) {
-					return;
-				}
-			}
+		if (!print.equalsIgnoreCase("yes") && shouldRedirect(request, response)) {
+			return;
 		}
 		UserAccountBean ub = getUserAccountBean(request);
 		removeLockedCRF(ub.getId());
@@ -127,12 +136,10 @@ public class ViewNotesServlet extends RememberLastPage {
 				request.setAttribute("module", "manage");
 			}
 		}
-
 		boolean showMoreLink = fp.getString("showMoreLink").equals("")
 				|| Boolean.parseBoolean(fp.getString("showMoreLink"));
 		boolean allowDcf = allowDcfForUserInCurrentStudy(currentStudy, ub);
 		request.setAttribute("allowDcf", allowDcf);
-
 		int oneSubjectId = fp.getInt("id");
 		request.getSession().setAttribute("subjectId", oneSubjectId);
 		int discNoteTypeId;
@@ -159,7 +166,6 @@ public class ViewNotesServlet extends RememberLastPage {
 			e.printStackTrace();
 			resolutionStatusId = ALL;
 		}
-
 		if (removeSession) {
 			request.getSession().removeAttribute(WIN_LOCATION);
 			request.getSession().removeAttribute(NOTES_TABLE);
@@ -168,7 +174,6 @@ public class ViewNotesServlet extends RememberLastPage {
 				WIN_LOCATION,
 				"ViewNotes?viewForOne=" + viewForOne + "&id=" + oneSubjectId + "&module=" + module
 						+ " &removeSession=1");
-
 		boolean hasAResolutionStatus = resolutionStatusId >= DN_STATUS_NEW
 				&& resolutionStatusId <= DN_STATUS_NOT_APPLICABLE;
 		Set<Integer> resolutionStatusIds = (HashSet) request.getSession().getAttribute(RESOLUTION_STATUS);
@@ -183,7 +188,6 @@ public class ViewNotesServlet extends RememberLastPage {
 			resolutionStatusIds.add(resolutionStatusId);
 			request.getSession().setAttribute(RESOLUTION_STATUS, resolutionStatusIds);
 		}
-
 		StudySubjectDAO subdao = getStudySubjectDAO();
 		StudyDAO studyDao = getStudyDAO();
 		SubjectDAO sdao = getSubjectDAO();
@@ -216,24 +220,19 @@ public class ViewNotesServlet extends RememberLastPage {
 		factory.setDiscNoteType(discNoteTypeId);
 		factory.setResolutionStatus(resolutionStatusId);
 		factory.setEnableDcf(allowDcf);
-
 		factory.setDataSource(getDataSource());
-
 		TableFacade tf = factory.createTable(request, response);
-
 		if ("yes".equalsIgnoreCase(print)) {
 			request.setAttribute("allNotes", factory.getNotesForPrintPop(tf.getLimit()));
 			forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT, request, response);
 			return;
 		}
-
 		String viewNotesHtml = tf.render();
 		request.setAttribute("viewNotesHtml", viewNotesHtml);
 		String viewNotesURL = this.getPageURL(request);
 		request.getSession().setAttribute("viewNotesURL", viewNotesURL);
 		String viewNotesPageFileName = this.getPageServletFileName(request);
 		request.getSession().setAttribute("viewNotesPageFileName", viewNotesPageFileName);
-
 		List<DiscrepancyNoteStatisticBean> statisticBeans;
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		UserAccountBean loggedInUser = (UserAccountBean) uadao.findByUserName(authentication.getName());
@@ -242,18 +241,52 @@ public class ViewNotesServlet extends RememberLastPage {
 		} else {
 			statisticBeans = dndao.countNotesStatistic(currentStudy);
 		}
-
 		Map<String, String> customTotalMap = ListNotesTableFactory.getNotesTypesStatistics(statisticBeans);
 		Map<String, Map<String, String>> customStat = ListNotesTableFactory.getNotesStatistics(statisticBeans);
-
 		request.setAttribute("summaryMap", customStat);
 		request.setAttribute("typeKeys", customTotalMap);
 		request.setAttribute("mapKeys", ResolutionStatus.getMembers());
 		request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames(resterm));
-
 		request.setAttribute("grandTotal", customTotalMap.get("Total"));
-
+		if (request.getSession().getAttribute(PRINT_DCF) != null) {
+			request.setAttribute(PRINT_DCF, request.getSession().getAttribute(PRINT_DCF));
+			request.getSession().removeAttribute(PRINT_DCF);
+		}
+		if (request.getSession().getAttribute(SAVE_DCF) != null) {
+			request.setAttribute(SAVE_DCF, request.getSession().getAttribute(SAVE_DCF));
+			request.getSession().removeAttribute(SAVE_DCF);
+		}
 		forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY, request, response);
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean shouldProceedAfterProcessingDcfRequest(HttpServletRequest request, HttpServletResponse response,
+			FormProcessor fp, String generateDcf, String printDcf, String saveDcf) {
+		boolean shouldPrintDcf = printDcf != null && printDcf.equalsIgnoreCase("yes");
+		boolean shouldSaveDcf = saveDcf != null && saveDcf.equalsIgnoreCase("yes")
+				&& request.getSession().getAttribute(DCF_SAVED) == null;
+		if (generateDcf != null && generateDcf.equalsIgnoreCase("yes")) {
+			List<String> selectedNoteAndEntityIds = fp.getStringArray(ListNotesTableFactory.DCF_CHECKBOX_NAME);
+			List<String> selectedRenderTypes = fp.getStringArray(DCF_RENDER_CHECKBOX_NAME);
+			String recipientEmail = fp.getString(RECIPIENT_EMAIL);
+			if (selectedNoteAndEntityIds.size() > 0) {
+				generateDcfs(selectedNoteAndEntityIds, selectedRenderTypes, recipientEmail, request, response);
+			}
+		}
+		if (shouldPrintDcf || shouldSaveDcf) {
+			String dcfFileName = request.getSession().getAttribute(DCF_FILE_NAME_ATTRIBUTE).toString();
+			String contentDisposition = shouldPrintDcf ? "inline" : "attachement";
+			writeDcfToResponseStream(response, dcfFileName, contentDisposition);
+			if (shouldPrintDcf) {
+				request.removeAttribute(PRINT_DCF);
+			}
+			if (shouldSaveDcf) {
+				request.removeAttribute(SAVE_DCF);
+				request.getSession().setAttribute(DCF_SAVED, "yes");
+			}
+			return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -287,23 +320,75 @@ public class ViewNotesServlet extends RememberLastPage {
 
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
-		return request.getQueryString() == null
-				|| !request.getQueryString().contains("&listNotes_")
-				|| request.getQueryString().contains("&print=yes")
-				|| (request.getParameter(GENERATE_DCF) != null && request.getParameter(GENERATE_DCF).equalsIgnoreCase(
-						"yes"));
+		return request.getQueryString() == null || !request.getQueryString().contains("&listNotes_")
+				|| request.getQueryString().contains("&print=yes");
 	}
 
-	private boolean generateDcfs(List<String> selectedNoteIds, HttpServletResponse response, HttpServletRequest request) {
-		List<Integer> noteIds = transformSelectedNoteIdsToInt(selectedNoteIds);
+	private void generateDcfs(List<String> selectedNoteIds, List<String> selectedRenderTypes, String recipientEmail,
+			HttpServletRequest request, HttpServletResponse response) {
 		StudyBean currentStudy = getCurrentStudy(request);
-		String dcfFile = getDcfService().generateDcf(currentStudy, resword, noteIds);
+		UserAccountBean currentUser = getUserAccountBean(request);
+		request.getSession().removeAttribute(PRINT_DCF);
+		request.getSession().removeAttribute(SAVE_DCF);
+		request.getSession().removeAttribute(DCF_SAVED);
+		try {
+			Map<Integer, Map<Integer, String>> noteAndEntityIds = transformSelectedNoteAndEntityIdsToInt(selectedNoteIds);
+			String dcfFile = getDcfService()
+					.generateDcf(currentStudy, noteAndEntityIds.keySet(), currentUser.getName());
+			boolean multipleDcfs = noteAndEntityIds.keySet().size() > 1;
+			setRenderTypes(selectedRenderTypes, dcfFile, recipientEmail, multipleDcfs, request, currentStudy,
+					currentUser);
+			boolean renderSuccessful = getDcfService().renderDcf();
+			if (renderSuccessful) {
+				getDcfService().updateDiscrepancyNotes(noteAndEntityIds, currentStudy, currentUser);
+				String successMessage;
+				if (selectedRenderTypes.contains("email")) {
+					successMessage = MessageFormat.format(resword.getString("dcf_generated_successfully_emailed"),
+							recipientEmail);
+				} else {
+					successMessage = resword.getString("dcf_generated_successfully");
+				}
+				addPageMessage(successMessage, request);
+			} else {
+				addPageMessage(resword.getString("dcf_generation_failed"), request);
+			}
+		} catch (FileNotFoundException e) {
+			logger.debug("DCF generation failed on {} due to: {}", new Date(), e.getMessage());
+			e.printStackTrace();
+			addPageMessage(MessageFormat.format(resword.getString("dcf_generation_failed_details"), e.getMessage()),
+					request);
+		} catch (MailSendException e) {
+			logger.debug("DCF generation failed on {} due to: {}", new Date(), e.toString());
+			e.printStackTrace();
+			addPageMessage(resword.getString("dcf_generation_email_failed"), request);
+		} catch (Exception e) {
+			logger.debug("DCF generation failed on {} due to: {}", new Date(), e.toString());
+			e.printStackTrace();
+			addPageMessage(resword.getString("dcf_generation_failed"), request);
+		}
+	}
+
+	private Map<Integer, Map<Integer, String>> transformSelectedNoteAndEntityIdsToInt(List<String> selectedNoteIds) {
+		final int noteIdEntityIdAndColumnExpectedLength = 3;
+		Map<Integer, Map<Integer, String>> noteAndEntityIds = new HashMap<Integer, Map<Integer, String>>();
+		for (String noteAndEntityId : selectedNoteIds) {
+			String[] parts = noteAndEntityId.split("___");
+			if (parts.length == noteIdEntityIdAndColumnExpectedLength) {
+				int noteId = Integer.parseInt(parts[0]);
+				noteAndEntityIds.put(noteId, new HashMap<Integer, String>());
+				noteAndEntityIds.get(noteId).put(Integer.valueOf(parts[1]), parts[2]);
+			}
+		}
+		return noteAndEntityIds;
+	}
+
+	private void writeDcfToResponseStream(HttpServletResponse response, String dcfFile, String contentDisposition) {
 		try {
 			if (dcfFile != null) {
 				File pdfFile = new File(dcfFile);
 				response.setContentType("application/pdf");
 				response.addHeader("Content-Disposition",
-						"attachment; filename=" + dcfFile.substring(dcfFile.lastIndexOf(File.separator) + 1));
+						contentDisposition + "; filename=" + dcfFile.substring(dcfFile.lastIndexOf(File.separator) + 1));
 				response.setContentLength((int) pdfFile.length());
 				FileInputStream fileInputStream = new FileInputStream(pdfFile);
 				OutputStream responseOutputStream = response.getOutputStream();
@@ -313,20 +398,47 @@ public class ViewNotesServlet extends RememberLastPage {
 				}
 				responseOutputStream.flush();
 				fileInputStream.close();
-				return true;
 			}
 		} catch (IOException e) {
-			logger.error("An error occurred during DCF download. Details: " + e.getMessage());
+			logger.error("An error occurred while writing DCF to response stream. Details: " + e.getMessage());
 		}
-		return false;
 	}
 
-	private List<Integer> transformSelectedNoteIdsToInt(List<String> selectedNoteIds) {
-		List<Integer> noteIds = new ArrayList<Integer>();
-		for (String noteId : selectedNoteIds) {
-			noteIds.add(Integer.valueOf(noteId));
+	private void setRenderTypes(List<String> selectedRenderTypes, String dcfFile, String recipientEmail,
+			boolean multipleDcfs, HttpServletRequest request, StudyBean currentStudy, UserAccountBean currentUser) {
+		getDcfService().clearRenderTypes();
+		if (selectedRenderTypes.contains("email")) {
+			getDcfService().addDcfRenderType(
+					getEmailRenderType(dcfFile, recipientEmail, multipleDcfs, currentStudy, currentUser));
 		}
-		return noteIds;
+		if (selectedRenderTypes.contains("print")) {
+			getDcfService().addDcfRenderType(getPrintOrSaveRenderType(PRINT_DCF, dcfFile, request));
+		}
+		if (selectedRenderTypes.contains("save")) {
+			getDcfService().addDcfRenderType(getPrintOrSaveRenderType(SAVE_DCF, dcfFile, request));
+		}
+	}
+
+	private DcfRenderType getEmailRenderType(String dcfFile, String recipientEmail, boolean multipleDcfs,
+			StudyBean currentStudy, UserAccountBean currentUser) {
+		String dcfName = dcfFile.substring(dcfFile.lastIndexOf(File.separator) + 1).replace(".pdf", "");
+		String dcfEmailSubject = multipleDcfs ? resword.getString("dcf_email_subject_multiple") : resword
+				.getString("dcf").concat(": ").concat(dcfName);
+		DcfRenderType emailer = new DcfEmailer.DcfEmailerBuilder().addDcfFilePath(dcfFile).addDcfName(dcfName)
+				.addEmailSubject(dcfEmailSubject).addMailSender(getMailSender()).addRecipientEmail(recipientEmail)
+				.setMultipleDcfs(multipleDcfs).setCurrentStudy(currentStudy).setCurrentUser(currentUser).build();
+		return emailer;
+	}
+
+	private DcfRenderType getPrintOrSaveRenderType(final String printOrSave, final String dcfFile,
+			final HttpServletRequest request) {
+		return new DcfRenderType() {
+			public boolean render() {
+				request.getSession().setAttribute(DCF_FILE_NAME_ATTRIBUTE, dcfFile);
+				request.getSession().setAttribute(printOrSave, "yes");
+				return true;
+			}
+		};
 	}
 
 	private boolean allowDcfForUserInCurrentStudy(StudyBean currentStudy, UserAccountBean ub) {

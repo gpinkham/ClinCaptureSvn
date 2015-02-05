@@ -437,7 +437,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		se.setName(sedb.getName());
 		StudySubjectDAO ssdao = getStudySubjectDao();
 		StudySubjectBean ssub = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
+		StudyBean ssubStudy = (StudyBean) getStudyDao().findByPK(ssub.getStudyId());
 		dnb.setStudySub(ssub);
+		dnb.setSiteContactEmail(ssubStudy.getFacilityContactEmail());
 		dnb.setEventStart(se.getDateStarted());
 		dnb.setEventName(sedb.getName());
 		dnb.setCrfName(cb.getName());
@@ -458,7 +460,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		se.setName(sedb.getName());
 		dnb.setEntityName(sedb.getName());
 		StudySubjectBean ssub = (StudySubjectBean) getStudySubjectDao().findByPK(se.getStudySubjectId());
+		StudyBean ssubStudy = (StudyBean) getStudyDao().findByPK(ssub.getStudyId());
 		dnb.setStudySub(ssub);
+		dnb.setSiteContactEmail(ssubStudy.getFacilityContactEmail());
 		dnb.setEventStart(se.getDateStarted());
 		dnb.setEventName(sedb.getName());
 		String column = dnb.getColumn().trim();
@@ -495,7 +499,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		dnb.setEntityName(cb.getName() + " (" + cvb.getName() + ")");
 
 		StudySubjectBean ssub = (StudySubjectBean) getStudySubjectDao().findByPK(ecb.getStudySubjectId());
+		StudyBean ssubStudy = (StudyBean) getStudyDao().findByPK(ssub.getStudyId());
 		dnb.setStudySub(ssub);
+		dnb.setSiteContactEmail(ssubStudy.getFacilityContactEmail());
 		dnb.setEventStart(se.getDateStarted());
 		dnb.setEventName(sedb.getName());
 		dnb.setCrfName(cb.getName());
@@ -522,7 +528,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	private void populateWithStudySubjectData(DiscrepancyNoteBean dnb, AuditableEntityBean aeb) {
 		StudySubjectBean ssb = (StudySubjectBean) aeb;
+		StudyBean ssbStudy = (StudyBean) getStudyDao().findByPK(ssb.getStudyId());
 		dnb.setStudySub(ssb);
+		dnb.setSiteContactEmail(ssbStudy.getFacilityContactEmail());
 		String column = dnb.getColumn().trim();
 		if (!StringUtil.isBlank(column)) {
 			if ("enrollment_date".equals(column)) {
@@ -537,7 +545,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	private void populateWithSubjectData(DiscrepancyNoteBean dnb, AuditableEntityBean aeb) {
 		SubjectBean sb = (SubjectBean) aeb;
 		StudySubjectBean ssb = studySubjectDao.findBySubjectIdAndStudy(sb.getId(), currentStudy);
+		StudyBean ssbStudy = (StudyBean) getStudyDao().findByPK(ssb.getStudyId());
 		dnb.setStudySub(ssb);
+		dnb.setSiteContactEmail(ssbStudy.getFacilityContactEmail());
 		String column = dnb.getColumn().trim();
 		if (!StringUtil.isBlank(column)) {
 			if ("gender".equalsIgnoreCase(column)) {
@@ -899,8 +909,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			HtmlBuilder builder = new HtmlBuilder();
 			if (isEligibleForDCF(dnb)) {
 				builder.append("<center>");
-				builder.input().type("checkbox").value(dnb.getId() + "").name(DCF_CHECKBOX_NAME);
-				builder.append(" class=\"dcf\" onClick=\"setAccessedObjected(this);\"");
+				builder.input().type("checkbox").value(dnb.getId() + "___" + dnb.getEntityId() + "___" + dnb.getColumn()).name(DCF_CHECKBOX_NAME);
+				builder.append(" class=\"dcf\" onClick=\"toggleButtonEnable('dcf', 'btn_generate_dcf'); setAccessedObjected(this);\"");
+				builder.append(" data-site-email=\"" + dnb.getSiteContactEmail() + "\"");
 				builder.close().append("</center>");
 			}
 			return builder.toString();

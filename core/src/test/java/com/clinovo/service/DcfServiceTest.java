@@ -15,14 +15,11 @@
 package com.clinovo.service;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,43 +27,44 @@ import org.junit.Test;
 public class DcfServiceTest extends DefaultAppContextTest {
 
 	private StudyBean study;
-	private ResourceBundle resword;
 
 	@Before
 	public void setUp() {
 		study = (StudyBean) studyDAO.findByPK(1);
-		resword = ResourceBundleProvider.getWordsBundle(Locale.ENGLISH);
 	}
 
 	@Test
 	public void testThatDcfIsGeneratedWithCorrectFileName() throws Exception {
-		List<Integer> noteIds = new ArrayList<Integer>();
-		noteIds.add(1);
-		String fileName = dcfService.generateDcf(study, resword, noteIds);
-		String expectedFileName = "dcf" + File.separator + "default-study_S_DEFAULTS1_Failed_Validation_Check_1.pdf";
+		Map<Integer, Integer> noteIds = new HashMap<Integer, Integer>();
+		noteIds.put(1, 1);
+		String fileName = dcfService.generateDcf(study, noteIds.keySet(), "root");
+		String expectedFileName = "dcf" + File.separator + "root" + File.separator
+				+ "default-study_S_DEFAULTS1_ssID1_Failed_Validation_Check_1.pdf";
 		assertEquals(expectedFileName, fileName);
 	}
 
 	@Test
 	public void testThatDcfIsGeneratedAndSaved() throws Exception {
-		List<Integer> noteIds = new ArrayList<Integer>();
-		noteIds.add(1);
-		dcfService.generateDcf(study, resword, noteIds);
-		File dcfFile = new File("dcf" + File.separator + "default-study_S_DEFAULTS1_Failed_Validation_Check_1.pdf");
+		Map<Integer, Integer> noteIds = new HashMap<Integer, Integer>();
+		noteIds.put(1, 1);
+		dcfService.generateDcf(study, noteIds.keySet(), "root");
+		File dcfFile = new File("dcf" + File.separator + "root" + File.separator
+				+ "default-study_S_DEFAULTS1_ssID1_Failed_Validation_Check_1.pdf");
 		assertTrue(dcfFile.exists());
 	}
 
 	@After
 	public void cleanUp() throws Exception {
-		File dcfDir = new File("dcf");
-		if (dcfDir.exists()) {
-			if (dcfDir.isDirectory()) {
-				for (String file : dcfDir.list()) {
-					File fileToDelete = new File(dcfDir, file);
+		File dcfUserDir = new File("dcf" + File.separator + "root");
+		if (dcfUserDir.exists()) {
+			if (dcfUserDir.isDirectory()) {
+				for (String file : dcfUserDir.list()) {
+					File fileToDelete = new File(dcfUserDir, file);
 					fileToDelete.delete();
 				}
-				dcfDir.delete();
+				dcfUserDir.delete();
 			}
 		}
+		new File("dcf").delete();
 	}
 }

@@ -69,6 +69,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
 	private int subjectId = 0;
 	private String siteId;
+	private String siteContactEmail;
 
 	// indicates whether a note is in the db or
 	// not
@@ -629,6 +630,14 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
 	public void setSiteId(String siteId) {
 		this.siteId = siteId;
+	}
+
+	public String getSiteContactEmail() {
+		return siteContactEmail;
+	}
+
+	public void setSiteContactEmail(String siteContactEmail) {
+		this.siteContactEmail = siteContactEmail;
 	}
 
 	public String getFieldForDN() {

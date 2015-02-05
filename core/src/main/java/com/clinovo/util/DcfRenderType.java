@@ -24,6 +24,8 @@ public interface DcfRenderType {
 
 	/**
 	 * Renders generated DCFs.
+	 * 
+	 * @return true if successful, false otherwise
 	 */
-	void render();
+	boolean render();
 }

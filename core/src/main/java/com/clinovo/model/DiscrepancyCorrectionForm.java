@@ -231,7 +231,8 @@ public class DiscrepancyCorrectionForm {
 	public String getDcfFileName() {
 		final String underscore = "_";
 		StringBuilder fileName = new StringBuilder(getStudyProtocolID()).append(underscore).append(getSiteOID())
-				.append(underscore).append(getNoteType()).append(underscore).append(getNoteId());
+				.append(underscore).append(getSubjectId()).append(underscore).append(getNoteType())
+				.append(underscore).append(getNoteId());
 		return fileName.toString().replace(' ', '_');
 	}
 }
