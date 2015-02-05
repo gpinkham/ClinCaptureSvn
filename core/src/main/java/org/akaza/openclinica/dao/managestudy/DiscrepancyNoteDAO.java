@@ -20,7 +20,20 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
-import com.clinovo.model.DiscrepancyCorrectionForm;
+import java.sql.Connection;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -43,17 +56,8 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.clinovo.model.DiscrepancyCorrectionForm;
+import com.clinovo.util.DateUtil;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class DiscrepancyNoteDAO extends AuditableEntityDAO {
@@ -158,9 +162,20 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.STRING);
 	}
 
 	/**
@@ -2506,14 +2521,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 *            int...
 	 * @return List of DiscrepancyCorrectionForms
 	 */
-	public List<DiscrepancyCorrectionForm> getDiscrepancyCorrectionFormsByNoteIds(Integer... noteIds) {
+	public List<DiscrepancyCorrectionForm> getDiscrepancyCorrectionFormsByNoteIds(StudyBean study,
+			ResourceBundle resword, Integer... noteIds) {
 		this.setDcfTypesExpected();
 		List<DiscrepancyCorrectionForm> dcfs = new ArrayList<DiscrepancyCorrectionForm>();
 		if (noteIds.length > 0) {
 			String query = buildDcfQuery(commaDelimitNoteIds(noteIds));
 			List<HashMap> resultRows = select(query, new HashMap());
 			for (HashMap resultRow : resultRows) {
-				dcfs.add(extractDfcFromResultRow(resultRow));
+				dcfs.add(extractDfcFromResultRow(resultRow, study, resword));
 			}
 		}
 		return dcfs;
@@ -2529,21 +2545,20 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 				.append(digester.getQuery("findDcfsByNoteIdsForSubjectDNs")).append(where).toString();
 	}
 
-	private DiscrepancyCorrectionForm extractDfcFromResultRow(HashMap resultRow) {
+	private DiscrepancyCorrectionForm extractDfcFromResultRow(HashMap resultRow, StudyBean study, ResourceBundle resword) {
 		int resolutionStatus = (Integer) resultRow.get("resolution_status_id");
-		int pageNumber = (Integer) resultRow.get("page_number");
 		DiscrepancyCorrectionForm dcf = new DiscrepancyCorrectionForm();
-		dcf.setCrfItemName(resultRow.get("item_name").toString().trim());
-		dcf.setCrfItemValue(getCrfItemValue(resultRow));
+		String entityType = resultRow.get("entity_type").toString().trim();
+		dcf.setEntityType(entityType);
+		setDcfItemNameAndValue(resultRow, dcf, entityType, study, resword);
+		dcf.setEntityId((Integer) resultRow.get("entity_id"));
 		dcf.setCrfName(resultRow.get("crf_name").toString().trim());
 		dcf.setEventName(resultRow.get("event_name").toString().trim());
 		dcf.setInvestigatorName(resultRow.get("investigator").toString().trim());
 		dcf.setNoteDate((Date) resultRow.get("date_created"));
 		dcf.setNoteId((Integer) resultRow.get("discrepancy_note_id"));
 		dcf.setNoteType(DiscrepancyNoteType.get((Integer) resultRow.get("discrepancy_note_type_id")).getName().trim());
-		if (pageNumber > 0) {
-			dcf.setPage(pageNumber);
-		}
+		dcf.setPage(resultRow.get("page").toString().trim());
 		dcf.setQuestionToSite(getQuestionToSite(resultRow));
 		if (resolutionStatus < 0) {
 			dcf.setResolutionStatus("");
@@ -2558,6 +2573,99 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return dcf;
 	}
 
+	private void setDcfItemNameAndValue(HashMap resultRow, DiscrepancyCorrectionForm dcf, String entityType,
+			StudyBean study, ResourceBundle resword) {
+		if (entityType.equals("subject") || entityType.equals("studySub")) {
+			formatDcfSubjectItemNameAndValue(dcf, resultRow, study, resword);
+		} else if (entityType.equals("studyEvent")) {
+			formatDcfStudyEventItemNameAndValue(dcf, resultRow, study);
+		} else if (entityType.equals("eventCrf")) {
+			formatDcfEventCrfItemNameAndValue(dcf, resultRow, resword);
+		} else {
+			dcf.setCrfItemName(resultRow.get("item_name").toString().trim());
+			dcf.setCrfItemValue(getCrfItemValue(resultRow));
+		}
+	}
+
+	private void formatDcfSubjectItemNameAndValue(DiscrepancyCorrectionForm dcf, HashMap resultRow, StudyBean study,
+			ResourceBundle resword) {
+		String itemName = resultRow.get("item_name").toString().trim();
+		Object itemValue = resultRow.get(itemName);
+		if (itemName.equals("unique_identifier")) {
+			dcf.setSubjectItemName(resword.getString("person_ID"));
+			dcf.setSubjectItemValue(formatItemValue(itemValue));
+		} else if (itemName.equals("date_of_birth")) {
+			dcf.setSubjectItemName(resword.getString("date_of_birth"));
+			dcf.setSubjectItemValue(formatDateItemValue(itemValue, false));
+		} else if (itemName.equals("enrollment_date")) {
+			dcf.setSubjectItemName(study.getStudyParameterConfig().getDateOfEnrollmentForStudyLabel());
+			dcf.setSubjectItemValue(formatDateItemValue(itemValue, false));
+		} else if (itemName.equals("gender")) {
+			dcf.setSubjectItemName(study.getStudyParameterConfig().getGenderLabel());
+			itemValue = formatItemValue(itemValue);
+			if (itemValue.toString().equalsIgnoreCase("m")) {
+				itemValue = resword.getString("male");
+			} else if (itemValue.toString().equalsIgnoreCase("f")) {
+				itemValue = resword.getString("female");
+			}
+			dcf.setSubjectItemValue(itemValue.toString());
+		} else {
+			dcf.setSubjectItemName("");
+			dcf.setSubjectItemValue("");
+		}
+	}
+
+	private void formatDcfStudyEventItemNameAndValue(DiscrepancyCorrectionForm dcf, HashMap resultRow, StudyBean study) {
+		String itemName = resultRow.get("item_name").toString().trim();
+		Object itemValue = resultRow.get(itemName);
+		if (itemName.equals("date_start")) {
+			dcf.setEventItemName(study.getStudyParameterConfig().getStartDateTimeLabel());
+			dcf.setEventItemValue(formatDateItemValue(itemValue, study.getStudyParameterConfig().getUseStartTime()
+					.equalsIgnoreCase("yes")));
+		} else if (itemName.equals("date_end")) {
+			dcf.setEventItemName(study.getStudyParameterConfig().getEndDateTimeLabel());
+			dcf.setEventItemValue(formatDateItemValue(itemValue, study.getStudyParameterConfig().getUseEndTime()
+					.equalsIgnoreCase("yes")));
+		} else {
+			dcf.setEventItemName("");
+			dcf.setEventItemValue("");
+		}
+	}
+
+	private void formatDcfEventCrfItemNameAndValue(DiscrepancyCorrectionForm dcf, HashMap resultRow,
+			ResourceBundle resword) {
+		String itemName = resultRow.get("item_name").toString().trim();
+		Object itemValue = resultRow.get(itemName);
+		if (itemName.equals("interviewer_name")) {
+			dcf.setCrfItemName(resword.getString("interviewer_name"));
+			dcf.setCrfItemValue(formatItemValue(itemValue));
+		} else if (itemName.equals("date_interviewed")) {
+			dcf.setCrfItemName(resword.getString("interview_date"));
+			dcf.setCrfItemValue(formatDateItemValue(itemValue, false));
+		} else {
+			dcf.setCrfItemName("");
+			dcf.setCrfItemValue("");
+		}
+	}
+
+	private String formatItemValue(Object itemValue) {
+		if (itemValue == null) {
+			return "";
+		}
+		return itemValue.toString();
+	}
+
+	private String formatDateItemValue(Object itemValue, boolean considerTime) {
+		if (itemValue == null) {
+			return "";
+		}
+		if (DateUtil.isValidDate(itemValue.toString())) {
+			Date date = DateUtil.convertStringToDate(itemValue.toString());
+			return considerTime ? DateUtil.convertDateTimeToString(date) : DateUtil.convertDateToString(date);
+		}
+		return itemValue.toString();
+	}
+
 	private String getCrfItemValue(HashMap resultRow) {
 		String itemValue = resultRow.get("item_value").toString().trim();
 		if (itemValue.length() > 0) {
@@ -2567,6 +2675,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			if (responseType.equals(ResponseType.CHECKBOX) || responseType.equals(ResponseType.RADIO)
 					|| responseType.equals(ResponseType.SELECT) || responseType.equals(ResponseType.SELECTMULTI)) {
 				return extractItemValueText(itemValue, responseOptions, responseValues);
+			}
+			if (responseType.equals(ResponseType.TEXT) && DateUtil.isValidDate(itemValue)) {
+				Date date = DateUtil.convertStringToDate(itemValue.toString());
+				return DateUtil.convertDateToString(date);
 			}
 		}
 		return itemValue;

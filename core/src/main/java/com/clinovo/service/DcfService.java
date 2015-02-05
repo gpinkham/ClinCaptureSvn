@@ -15,6 +15,9 @@
 package com.clinovo.service;
 
 import java.util.List;
+import java.util.ResourceBundle;
+
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 
 import com.clinovo.util.DcfRenderType;
 
@@ -29,12 +32,15 @@ public interface DcfService {
 	/**
 	 * Generates DCFs for list of DNs.
 	 * 
+	 * @param study
+	 *            current study
+	 * @param resword
+	 *            words properties bundl
 	 * @param noteIds
 	 *            List of IDs of DNs for which to generate DCFs
-	 * 
 	 * @return path to generated DCF file; null if generation was not successful.
 	 */
-	String generateDcf(List<Integer> noteIds);
+	String generateDcf(StudyBean study, ResourceBundle resword, List<Integer> noteIds);
 
 	/**
 	 * Adds DCF render type.
