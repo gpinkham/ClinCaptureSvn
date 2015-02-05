@@ -18,11 +18,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,9 +64,9 @@ public class DcfServiceImpl implements DcfService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String generateDcf(StudyBean study, ResourceBundle resword, List<Integer> noteIds) {
-		List<DiscrepancyCorrectionForm> dcfs = getDiscrepancyNoteDAO().getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, noteIds.toArray(new Integer[0]));
+	public String generateDcf(List<Integer> noteIds) {
+		List<DiscrepancyCorrectionForm> dcfs = getDiscrepancyNoteDAO().getDiscrepancyCorrectionFormsByNoteIds(
+				noteIds.toArray(new Integer[0]));
 		String fileName = null;
 		if (dcfs.size() > 0) {
 			try {

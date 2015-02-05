@@ -335,11 +335,6 @@
 			<artifactId>json</artifactId>
 			<version>20090211</version>
 		</dependency>
-
-            <dependency>
-            	<groupId>net.sf.jasperreports</groupId>
-            	<artifactId>jasperreports-fonts</artifactId>
-            </dependency>
 	</dependencies>
 
 	<build>

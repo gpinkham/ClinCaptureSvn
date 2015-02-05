@@ -106,7 +106,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		if (generateDcf != null && generateDcf.equals("yes")) {
 			List<String> selectedNoteIds = fp.getStringArray(ListNotesTableFactory.DCF_CHECKBOX_NAME);
 			if (selectedNoteIds.size() > 0) {
-				if (generateDcfs(selectedNoteIds, response, request)) {
+				if (generateDcfs(selectedNoteIds, response)) {
 					return;
 				}
 			}
@@ -294,10 +294,9 @@ public class ViewNotesServlet extends RememberLastPage {
 						"yes"));
 	}
 
-	private boolean generateDcfs(List<String> selectedNoteIds, HttpServletResponse response, HttpServletRequest request) {
+	private boolean generateDcfs(List<String> selectedNoteIds, HttpServletResponse response) {
 		List<Integer> noteIds = transformSelectedNoteIdsToInt(selectedNoteIds);
-		StudyBean currentStudy = getCurrentStudy(request);
-		String dcfFile = getDcfService().generateDcf(currentStudy, resword, noteIds);
+		String dcfFile = getDcfService().generateDcf(noteIds);
 		try {
 			if (dcfFile != null) {
 				File pdfFile = new File(dcfFile);
