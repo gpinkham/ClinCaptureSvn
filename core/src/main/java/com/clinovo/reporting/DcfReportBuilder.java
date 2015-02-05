@@ -23,7 +23,6 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.type;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -49,6 +48,7 @@ import org.slf4j.LoggerFactory;
 
 import com.clinovo.model.DiscrepancyCorrectionForm;
 import com.clinovo.util.DRTemplates;
+import com.clinovo.util.DateUtil;
 
 /**
  * Builds DCF.
@@ -60,15 +60,13 @@ public class DcfReportBuilder {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-	private static final int FOUR = 4;
-	private static final int THREE = 3;
-	private static final int EIGHT = 8;
-	private static final int FOURTEEN = 14;
-	private static final int THIRTY_FIVE = 35;
-	private static final int ONE_TWENTY = 120;
-	private static final int ONE_FORTY_TWO = 142;
-	private static final int ONE_FIFTY = 150;
-	private static final float ZERO_POINT_FIVE = 0.5f;
+	private static final int REPORT_MARGIN = 35;
+	private static final int REPORT_TOP_MARGIN = 50;
+	private static final float BORDER_WIDTH_ZERO_POINT_FIVE = 0.5f;
+	private static final String CHECKBOX_UNICODE = "\u2610";
+	private final String entityTypeStudyEvent = "studyEvent";
+	private final String entityTypeSubject = "subject";
+	private final String entityTypeStudySubject = "studySub";
 	private ResourceBundle resword;
 	private ResourceBundle resformat;
 
@@ -106,7 +104,8 @@ public class DcfReportBuilder {
 		JasperReportBuilder report = DynamicReports.report();
 		report.title(getDcfReportComponents(dcf));
 		report.setPageFormat(PageType.A4).setPageMargin(
-				margin().setLeft(THIRTY_FIVE).setRight(THIRTY_FIVE).setTop(THIRTY_FIVE).setBottom(THIRTY_FIVE));
+				margin().setLeft(REPORT_MARGIN).setRight(REPORT_MARGIN).setTop(REPORT_TOP_MARGIN)
+						.setBottom(REPORT_MARGIN));
 		return report;
 	}
 
@@ -121,7 +120,8 @@ public class DcfReportBuilder {
 		dcfReportComponents.addAll(Arrays.asList(additionalDcfComponents));
 		report.title(dcfReportComponents.toArray(new ComponentBuilder[0]));
 		report.setPageFormat(PageType.A4).setPageMargin(
-				margin().setLeft(THIRTY_FIVE).setRight(THIRTY_FIVE).setTop(THIRTY_FIVE).setBottom(THIRTY_FIVE));
+				margin().setLeft(REPORT_MARGIN).setRight(REPORT_MARGIN).setTop(REPORT_TOP_MARGIN)
+						.setBottom(REPORT_MARGIN));
 		return report;
 	}
 
@@ -153,7 +153,7 @@ public class DcfReportBuilder {
 		components.add(DRTemplates.createTitleComponent(getReportTitle()));
 		components.add(cmp.subreport(createStudyInfoTable(dcf)));
 		components.add(cmp.subreport(createQueryInfoTable(dcf)));
-		components.add(cmp.subreport(createCrfInfoTable(dcf)));
+		components.add(cmp.subreport(createCrfOrStudyEventOrSubjectInfoTable(dcf)));
 		components.add(cmp.subreport(createQuestionTable(dcf)));
 		components.add(cmp.subreport(createResponseTable()));
 		components.add(cmp.subreport(createOfficialTable()));
@@ -164,13 +164,13 @@ public class DcfReportBuilder {
 		JasperReportBuilder report = report();
 		report.columns(
 				col.column("", "column_1", type.stringType()).setStyle(
-						DRTemplates.getHeaderColumnStyle(ZERO_POINT_FIVE, 0)),
+						DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0)),
 				col.column("", "column_2", type.stringType()).setStyle(
-						DRTemplates.getNormalColumnStyle(0, ZERO_POINT_FIVE)),
+						DRTemplates.getNormalColumnStyle(0, BORDER_WIDTH_ZERO_POINT_FIVE)),
 				col.column("", "column_3", type.stringType()).setStyle(
-						DRTemplates.getHeaderColumnStyle(ZERO_POINT_FIVE, 0)),
+						DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0)),
 				col.column("", "column_4", type.stringType()).setStyle(
-						DRTemplates.getNormalColumnStyle(0, ZERO_POINT_FIVE))).setDataSource(
+						DRTemplates.getNormalColumnStyle(0, BORDER_WIDTH_ZERO_POINT_FIVE))).setDataSource(
 				createFourColumnDataSource(createStudyInfoValues(dcf)));
 		return report;
 	}
@@ -179,35 +179,82 @@ public class DcfReportBuilder {
 		JasperReportBuilder report = report();
 		report.columns(
 				col.column("", "column_1", type.stringType()).setStyle(
-						DRTemplates.getHeaderColumnStyle(ZERO_POINT_FIVE, 0)),
+						DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0)),
 				col.column("", "column_2", type.stringType()).setStyle(
-						DRTemplates.getNormalColumnStyle(0, ZERO_POINT_FIVE)),
+						DRTemplates.getNormalColumnStyle(0, BORDER_WIDTH_ZERO_POINT_FIVE)),
 				col.column("", "column_3", type.stringType()).setStyle(
-						DRTemplates.getHeaderColumnStyle(ZERO_POINT_FIVE, 0)),
+						DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0)),
 				col.column("", "column_4", type.stringType()).setStyle(
-						DRTemplates.getNormalColumnStyle(0, ZERO_POINT_FIVE))).setDataSource(
+						DRTemplates.getNormalColumnStyle(0, BORDER_WIDTH_ZERO_POINT_FIVE))).setDataSource(
 				createFourColumnDataSource(createNoteInfoValues(dcf)));
 		return report;
 	}
 
-	private JasperReportBuilder createCrfInfoTable(DiscrepancyCorrectionForm dcf) {
+	private JasperReportBuilder createCrfOrStudyEventOrSubjectInfoTable(DiscrepancyCorrectionForm dcf) {
+		if (dcf.getEntityType().equals(entityTypeStudyEvent)) {
+			return createStudyEventDnInfoTable(dcf);
+		} else if (dcf.getEntityType().equals(entityTypeSubject) || dcf.getEntityType().equals(entityTypeStudySubject)) {
+			return createSubjectDnInfoTable(dcf);
+		}
+		return createCrfDnInfoTable(dcf);
+	}
+
+	private JasperReportBuilder createCrfDnInfoTable(DiscrepancyCorrectionForm dcf) {
 		JasperReportBuilder report = report();
 		report.addColumnHeader(
 				cmp.horizontalList().add(
 						cmp.text(resword.getString("dcf_visit").concat(":"))
-								.setStyle(DRTemplates.getHeaderColumnStyle(ZERO_POINT_FIVE, 0))
+								.setStyle(DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0))
 								.setHorizontalAlignment(HorizontalAlignment.RIGHT),
-						cmp.text(dcf.getEventName()).setStyle(DRTemplates.getNormalColumnStyle(0, ZERO_POINT_FIVE))))
+						cmp.text(dcf.getEventName()).setStyle(
+								DRTemplates.getNormalColumnStyle(0, BORDER_WIDTH_ZERO_POINT_FIVE))))
 				.columns(
 						col.column("", "column_1", type.stringType()).setStyle(
-								DRTemplates.getHeaderColumnStyle(ZERO_POINT_FIVE, 0)),
+								DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0)),
 						col.column("", "column_2", type.stringType()).setStyle(
-								DRTemplates.getNormalColumnStyle(0, ZERO_POINT_FIVE)),
+								DRTemplates.getNormalColumnStyle(0, BORDER_WIDTH_ZERO_POINT_FIVE)),
 						col.column("", "column_3", type.stringType()).setStyle(
-								DRTemplates.getHeaderColumnStyle(ZERO_POINT_FIVE, 0)),
+								DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0)),
 						col.column("", "column_4", type.stringType()).setStyle(
-								DRTemplates.getNormalColumnStyle(0, ZERO_POINT_FIVE)))
+								DRTemplates.getNormalColumnStyle(0, BORDER_WIDTH_ZERO_POINT_FIVE)))
 				.setDataSource(createFourColumnDataSource(createCrfInfoValues(dcf)));
+		return report;
+	}
+
+	private JasperReportBuilder createStudyEventDnInfoTable(DiscrepancyCorrectionForm dcf) {
+		JasperReportBuilder report = report();
+		report.addColumnHeader(
+				cmp.horizontalList().add(
+						cmp.text(resword.getString("dcf_visit").concat(":"))
+								.setStyle(DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0))
+								.setHorizontalAlignment(HorizontalAlignment.RIGHT),
+						cmp.text(dcf.getEventName()).setStyle(
+								DRTemplates.getNormalColumnStyle(0, BORDER_WIDTH_ZERO_POINT_FIVE))))
+				.columns(
+						col.column("", "column_1", type.stringType()).setStyle(
+								DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0)),
+						col.column("", "column_2", type.stringType()).setStyle(
+								DRTemplates.getNormalColumnStyle(0, BORDER_WIDTH_ZERO_POINT_FIVE)),
+						col.column("", "column_3", type.stringType()).setStyle(
+								DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0)),
+						col.column("", "column_4", type.stringType()).setStyle(
+								DRTemplates.getNormalColumnStyle(0, BORDER_WIDTH_ZERO_POINT_FIVE)))
+				.setDataSource(createFourColumnDataSource(createStudyEventInfoValues(dcf)));
+		return report;
+	}
+
+	private JasperReportBuilder createSubjectDnInfoTable(DiscrepancyCorrectionForm dcf) {
+		JasperReportBuilder report = report();
+		report.columns(
+				col.column("", "column_1", type.stringType()).setStyle(
+						DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0)),
+				col.column("", "column_2", type.stringType()).setStyle(
+						DRTemplates.getNormalColumnStyle(0, BORDER_WIDTH_ZERO_POINT_FIVE)),
+				col.column("", "column_3", type.stringType()).setStyle(
+						DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0)),
+				col.column("", "column_4", type.stringType()).setStyle(
+						DRTemplates.getNormalColumnStyle(0, BORDER_WIDTH_ZERO_POINT_FIVE))).setDataSource(
+				createFourColumnDataSource(createSubjectDnInfoValues(dcf)));
 		return report;
 	}
 
@@ -225,29 +272,36 @@ public class DcfReportBuilder {
 
 	private JasperReportBuilder createResponseTable() {
 		JasperReportBuilder report = report();
+		final int numberOfLinesInResponseBox = 14;
+		final int widthOfFirstColumn = 150;
+		final int widthOfForthColumn = 142;
 		report.addColumnHeader(
-				cmp.text(resword.getString("response_from_site").concat(":").concat(getNewLines(FOURTEEN))).setStyle(
+				cmp.text(
+						resword.getString("response_from_site").concat(":")
+								.concat(getNewLines(numberOfLinesInResponseBox))).setStyle(
 						DRTemplates.getHeaderColumnStyle()))
 				.columns(
 						col.column("", "column_1", type.stringType())
-								.setStyle(DRTemplates.getHeaderColumnStyle(ZERO_POINT_FIVE, 0)).setWidth(ONE_FIFTY),
+								.setStyle(DRTemplates.getHeaderColumnStyle(BORDER_WIDTH_ZERO_POINT_FIVE, 0))
+								.setWidth(widthOfFirstColumn),
 						col.column("", "column_2", type.stringType()).setStyle(DRTemplates.getNormalColumnStyle(0, 0)),
 						col.column("", "column_3", type.stringType()).setStyle(DRTemplates.getNormalColumnStyle(0, 0)),
 						col.column("", "column_4", type.stringType()).setStyle(DRTemplates.getHeaderColumnStyle())
-								.setWidth(ONE_FORTY_TWO))
+								.setWidth(widthOfForthColumn))
 				.setDataSource(createFourColumnDataSource(createResponseTableValues()));
 		return report;
 	}
 
 	private JasperReportBuilder createOfficialTable() {
 		JasperReportBuilder report = report();
+		final int widthOfLastColumn = 120;
 		report.addColumnHeader(cmp.text(resword.getString("dcf_dm_use_only")))
 				.columns(
 						col.column("", "column_1", type.stringType()).setStyle(DRTemplates.getHeaderColumnStyle()),
 						col.column("", "column_2", type.stringType()).setStyle(DRTemplates.getHeaderColumnStyle(0, 0)),
 						col.column("", "column_3", type.stringType()).setStyle(DRTemplates.getNormalColumnStyle(0, 0)),
 						col.column("", "column_4", type.stringType()).setStyle(DRTemplates.getHeaderColumnStyle())
-								.setWidth(ONE_TWENTY))
+								.setWidth(widthOfLastColumn))
 				.setDataSource(createFourColumnDataSource(createOfficialTableValues()));
 		return report;
 	}
@@ -256,24 +310,23 @@ public class DcfReportBuilder {
 		Map<String, String> values = new LinkedHashMap<String, String>();
 		values.put("study_label", resword.getString("study").concat(":"));
 		values.put("study_value", dcf.getStudyName());
-		values.put("site_label", resword.getString("site").concat(":"));
-		values.put("site_value", dcf.getSiteName());
 		values.put("subject_id_label", resword.getString("subject_ID").concat(":"));
 		values.put("subject_id_value", dcf.getSubjectId());
+		values.put("site_label", resword.getString("site").concat(":"));
+		values.put("site_value", dcf.getSiteName());
 		values.put("investigator_label", resword.getString("investigator").concat(":"));
 		values.put("investigator_value", dcf.getInvestigatorName());
 		return values;
 	}
 
 	private Map<String, String> createNoteInfoValues(DiscrepancyCorrectionForm dcf) {
-		SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
 		Map<String, String> values = new LinkedHashMap<String, String>();
 		values.put("note_label", resword.getString("note_id").concat(":"));
 		values.put("note_value", dcf.getNoteId().toString());
-		values.put("note_date_label", resword.getString("date").concat(":"));
-		values.put("note_date_value", sdf.format(dcf.getNoteDate()));
 		values.put("note_type_label", resword.getString("type").concat(":"));
 		values.put("note_type_value", dcf.getNoteType());
+		values.put("note_date_label", resword.getString("date").concat(":"));
+		values.put("note_date_value", DateUtil.convertDateToString(dcf.getNoteDate()));
 		values.put("note_status_label", resword.getString("status"));
 		values.put("note_status_value", dcf.getResolutionStatus());
 		return values;
@@ -283,18 +336,37 @@ public class DcfReportBuilder {
 		Map<String, String> values = new LinkedHashMap<String, String>();
 		values.put("crf_name_label", resword.getString("CRF_name").concat(":"));
 		values.put("crf_name_value", dcf.getCrfName());
-		values.put("crf_item_name_label", resword.getString("crf_item_name").concat(":"));
-		values.put("crf_item_name_value", dcf.getCrfItemName());
 		values.put("page_label", resword.getString("page").concat(":"));
 		values.put("page_value", dcf.getPage() != null ? dcf.getPage().toString() : "");
+		values.put("crf_item_name_label", resword.getString("crf_item_name").concat(":"));
+		values.put("crf_item_name_value", dcf.getCrfItemName());
 		values.put("crf_item_value_label", resword.getString("crf_value").concat(":"));
 		values.put("crf_item_value", dcf.getCrfItemValue());
 		return values;
 	}
 
-	private Map<String, String> createQuestionValues(DiscrepancyCorrectionForm dcf) {
+	private Map<String, String> createStudyEventInfoValues(DiscrepancyCorrectionForm dcf) {
 		Map<String, String> values = new LinkedHashMap<String, String>();
-		values.put("question", dcf.getQuestionToSite().concat(getNewLines(EIGHT)));
+		values.put("event_item_name_label", resword.getString("dcf_visit_item_name").concat(":"));
+		values.put("event_item_name_value", dcf.getEventItemName());
+		values.put("event_item_value_lable", resword.getString("dcf_visit_item_value").concat(":"));
+		values.put("event_item_value_value", dcf.getEventItemValue());
+		return values;
+	}
+
+	private Map<String, String> createSubjectDnInfoValues(DiscrepancyCorrectionForm dcf) {
+		Map<String, String> values = new LinkedHashMap<String, String>();
+		values.put("subject_item_name_label", resword.getString("dcf_subject_item_name").concat(":"));
+		values.put("subject_item_name_value", dcf.getSubjectItemName());
+		values.put("subject_item_value_lable", resword.getString("dcf_subject_item_value").concat(":"));
+		values.put("subject_item_value", dcf.getSubjectItemValue());
+		return values;
+	}
+
+	private Map<String, String> createQuestionValues(DiscrepancyCorrectionForm dcf) {
+		final int numberOfExtraLinesInQuestionBox = 8;
+		Map<String, String> values = new LinkedHashMap<String, String>();
+		values.put("question", dcf.getQuestionToSite().concat(getNewLines(numberOfExtraLinesInQuestionBox)));
 		return values;
 	}
 
@@ -310,10 +382,10 @@ public class DcfReportBuilder {
 
 	private Map<String, String> createOfficialTableValues() {
 		Map<String, String> values = new LinkedHashMap<String, String>();
-		values.put(
-				"column_1",
-				"[ ] ".concat(resword.getString("dcf_no_db_change").concat("\n\n[ ] ")
-						.concat(resword.getString("dcf_db_change"))));
+		String dbChangeCheckList = CHECKBOX_UNICODE.concat(" ")
+				.concat(resword.getString("dcf_no_db_change").concat(getNewLines(2))).concat(CHECKBOX_UNICODE)
+				.concat(" ").concat(resword.getString("dcf_db_change"));
+		values.put("column_1", dbChangeCheckList);
 		values.put("column_2", resword.getString("dcf_dm_signature"));
 		values.put("column_3", "");
 		values.put("column_4",
@@ -322,27 +394,17 @@ public class DcfReportBuilder {
 	}
 
 	private JRDataSource createFourColumnDataSource(Map<String, String> values) {
+		final int maximumColumnNumber = 4;
 		DRDataSource dataSource = new DRDataSource("column_1", "column_2", "column_3", "column_4");
-		int size = values.size();
-		int rem = size % FOUR;
-		int numberOfSteps = size / FOUR + (rem == 0 ? 0 : rem == THREE ? 2 : 1);
 		Iterator<String> it = values.keySet().iterator();
-		List<String> leftColumn = new ArrayList<String>();
-		List<String> rightColumn = new ArrayList<String>();
-		for (int i = 0; it.hasNext(); i++) {
-			if (i < numberOfSteps) {
-				leftColumn.add(values.get(it.next()));
-				leftColumn.add(it.hasNext() ? values.get(it.next()) : "");
-			} else {
-				rightColumn.add(values.get(it.next()));
-				rightColumn.add(it.hasNext() ? values.get(it.next()) : "");
+		List<String> rowFieldValues = new ArrayList<String>();
+		while (it.hasNext()) {
+			String rowFieldValue = values.get(it.next());
+			rowFieldValues.add(rowFieldValue);
+			if (rowFieldValues.size() == maximumColumnNumber) {
+				dataSource.add(rowFieldValues.toArray());
+				rowFieldValues.clear();
 			}
-		}
-		while (leftColumn.size() > rightColumn.size()) {
-			rightColumn.add("");
-		}
-		for (int i = 0; i < leftColumn.size(); i = i + 2) {
-			dataSource.add(leftColumn.get(i), leftColumn.get(i + 1), rightColumn.get(i), rightColumn.get(i + 1));
 		}
 		return dataSource;
 	}

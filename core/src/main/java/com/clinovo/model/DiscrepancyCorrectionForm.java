@@ -36,9 +36,15 @@ public class DiscrepancyCorrectionForm {
 	private String resolutionStatus;
 	private String eventName;
 	private String crfName;
-	private Integer page;
+	private String page;
 	private String crfItemName;
 	private String crfItemValue;
+	private String subjectItemName;
+	private String subjectItemValue;
+	private String eventItemName;
+	private String eventItemValue;
+	private String entityType;
+	private Integer entityId;
 	private String questionToSite;
 
 	public String getStudyName() {
@@ -137,11 +143,11 @@ public class DiscrepancyCorrectionForm {
 		this.crfName = crfName;
 	}
 
-	public Integer getPage() {
+	public String getPage() {
 		return page;
 	}
 
-	public void setPage(Integer page) {
+	public void setPage(String page) {
 		this.page = page;
 	}
 
@@ -159,6 +165,54 @@ public class DiscrepancyCorrectionForm {
 
 	public void setCrfItemValue(String crfItemValue) {
 		this.crfItemValue = crfItemValue;
+	}
+
+	public String getSubjectItemName() {
+		return subjectItemName;
+	}
+
+	public void setSubjectItemName(String subjectItemName) {
+		this.subjectItemName = subjectItemName;
+	}
+
+	public String getSubjectItemValue() {
+		return subjectItemValue;
+	}
+
+	public void setSubjectItemValue(String subjectItemValue) {
+		this.subjectItemValue = subjectItemValue;
+	}
+
+	public String getEventItemName() {
+		return eventItemName;
+	}
+
+	public void setEventItemName(String eventItemName) {
+		this.eventItemName = eventItemName;
+	}
+
+	public String getEventItemValue() {
+		return eventItemValue;
+	}
+
+	public void setEventItemValue(String eventItemValue) {
+		this.eventItemValue = eventItemValue;
+	}
+
+	public String getEntityType() {
+		return entityType;
+	}
+
+	public void setEntityType(String entityType) {
+		this.entityType = entityType;
+	}
+
+	public Integer getEntityId() {
+		return entityId;
+	}
+
+	public void setEntityId(Integer entityId) {
+		this.entityId = entityId;
 	}
 
 	public String getQuestionToSite() {

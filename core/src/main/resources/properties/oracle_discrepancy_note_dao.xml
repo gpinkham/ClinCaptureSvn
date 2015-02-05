@@ -1454,15 +1454,17 @@
 		<name>findDcfsByNoteIdsForItemDataDNs</name>
 		<sql>
 			SELECT dn.discrepancy_note_id, dn.description, dn.discrepancy_note_type_id, dn.resolution_status_id, dn.detailed_notes,
-			dn.date_created, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
-			sed.name as event_name, c.name as crf_name, i.description as item_name, id.value as item_value, rs.options_text, 
-			rs.options_values, rs.response_type_id, sec.ordinal as page_number
+			dn.date_created, dn.entity_type, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
+			sed.name as event_name, c.name as crf_name, i.description as item_name, id.value as item_value, dnid.item_data_id as entity_id, rs.options_text, 
+			rs.options_values, rs.response_type_id, sec.label as page, sub.unique_identifier, sub.date_of_birth, sub.gender, ss.enrollment_date,
+			ec.date_interviewed, ec.interviewer_name, se.date_start, se.date_end, se.location
 			FROM discrepancy_note dn 
 			INNER JOIN dn_item_data_map dnid ON dn.discrepancy_note_id = dnid.discrepancy_note_id
 			INNER JOIN item_data id ON dnid.item_data_id = id.item_data_id
 			INNER JOIN event_crf ec ON id.event_crf_id = ec.event_crf_id
 			INNER JOIN study_event se ON ec.study_event_id = se.study_event_id
 			INNER JOIN study_subject ss ON se.study_subject_id = ss.study_subject_id
+			INNER JOIN subject sub ON ss.subject_id = sub.subject_id
 			INNER JOIN (
 				SELECT study_id, name as site_name, oc_oid, principal_investigator as investigator, 
 					CASE 
@@ -1488,14 +1490,16 @@
 		<name>findDcfsByNoteIdsForStudyEventDNs</name>
 		<sql>
 			SELECT dn.discrepancy_note_id, dn.description, dn.discrepancy_note_type_id, dn.resolution_status_id, dn.detailed_notes,
-			dn.date_created, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
-			sed.name as event_name, '' as crf_name, '' as item_name, '' as item_value, '' as options_text, '' as options_values, 
-			-1 as response_type_id, -1 as page_number
+			dn.date_created, dn.entity_type, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
+			sed.name as event_name, '' as crf_name, dnse.column_name as item_name, '' as item_value, dnse.study_event_id as entity_id, '' as options_text, '' as options_values, 
+			-1 as response_type_id, '' as page, sub.unique_identifier, sub.date_of_birth, sub.gender, ss.enrollment_date, CURRENT_DATE as date_interviewed, 
+			'' as interviewer_name, se.date_start, se.date_end, se.location 
 			FROM discrepancy_note dn 
 			INNER JOIN dn_study_event_map dnse ON dn.discrepancy_note_id = dnse.discrepancy_note_id
 			INNER JOIN study_event se ON dnse.study_event_id = se.study_event_id
 			INNER JOIN study_event_definition sed ON se.study_event_definition_id = sed.study_event_definition_id
 			INNER JOIN study_subject ss ON se.study_subject_id = ss.study_subject_id
+			INNER JOIN subject sub ON ss.subject_id = sub.subject_id
 			INNER JOIN (
 				SELECT study_id, name as site_name, oc_oid, principal_investigator as investigator, 
 					CASE 
@@ -1514,9 +1518,10 @@
 		<name>findDcfsByNoteIdsForEventCrfDNs</name>
 		<sql>
 			SELECT dn.discrepancy_note_id, dn.description, dn.discrepancy_note_type_id, dn.resolution_status_id, dn.detailed_notes,
-			dn.date_created, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
-			sed.name as event_name, c.name as crf_name, '' as item_name, '' as item_value, '' as options_text, '' as options_values, 
-			-1 as response_type_id, -1 as page_number
+			dn.date_created, dn.entity_type, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
+			sed.name as event_name, c.name as crf_name, dnec.column_name as item_name, '' as item_value, dnec.event_crf_id as entity_id, '' as options_text, '' as options_values, 
+			-1 as response_type_id, '' as page, sub.unique_identifier, sub.date_of_birth, sub.gender, ss.enrollment_date, ec.date_interviewed, ec.interviewer_name,
+			se.date_start, se.date_end, se.location
 			FROM discrepancy_note dn 
 			INNER JOIN dn_event_crf_map dnec ON dn.discrepancy_note_id = dnec.discrepancy_note_id
 			INNER JOIN event_crf ec ON dnec.event_crf_id = ec.event_crf_id
@@ -1525,6 +1530,7 @@
 			INNER JOIN study_event se ON ec.study_event_id = se.study_event_id
 			INNER JOIN study_event_definition sed ON se.study_event_definition_id = sed.study_event_definition_id
 			INNER JOIN study_subject ss ON se.study_subject_id = ss.study_subject_id
+			INNER JOIN subject sub ON ss.subject_id = sub.subject_id
 			INNER JOIN (
 				SELECT study_id, name as site_name, oc_oid, principal_investigator as investigator, 
 					CASE 
@@ -1543,12 +1549,14 @@
 		<name>findDcfsByNoteIdsForStudySubjectDNs</name>
 		<sql>
 			SELECT dn.discrepancy_note_id, dn.description, dn.discrepancy_note_type_id, dn.resolution_status_id, dn.detailed_notes,
-			dn.date_created, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
-			'' as event_name, '' as crf_name, '' as item_name, '' as item_value, '' as options_text, '' as options_values, 
-			-1 as response_type_id, -1 as page_number
+			dn.date_created, dn.entity_type, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
+			'' as event_name, '' as crf_name, dnss.column_name as item_name, '' as item_value, dnss.study_subject_id as entity_id, '' as options_text, '' as options_values, 
+			-1 as response_type_id, '' as page, sub.unique_identifier, sub.date_of_birth, sub.gender, ss.enrollment_date, CURRENT_DATE as date_interviewed,
+			'' as interviewer_name, CURRENT_DATE as date_start, CURRENT_DATE as date_end, '' as location
 			FROM discrepancy_note dn 
 			INNER JOIN dn_study_subject_map dnss ON dn.discrepancy_note_id = dnss.discrepancy_note_id
 			INNER JOIN study_subject ss ON dnss.study_subject_id = ss.study_subject_id
+			INNER JOIN subject sub ON ss.subject_id = sub.subject_id
 			INNER JOIN (
 				SELECT study_id, name as site_name, oc_oid, principal_investigator as investigator, 
 					CASE 
@@ -1560,19 +1568,21 @@
 						ELSE (SELECT unique_identifier FROM study WHERE study_id = s1.parent_study_id)
 					END as study_protocol
 				FROM study s1) s 
-			ON ss.study_id = s.study_id	
+			ON ss.study_id = s.study_id
 		</sql>
 	</query>
 	<query>
 		<name>findDcfsByNoteIdsForSubjectDNs</name>
 		<sql>
 			SELECT dn.discrepancy_note_id, dn.description, dn.discrepancy_note_type_id, dn.resolution_status_id, dn.detailed_notes,
-			dn.date_created, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
-			'' as event_name, '' as crf_name, '' as item_name, '' as item_value, '' as options_text, '' as options_values, 
-			-1 as response_type_id, -1 as page_number
+			dn.date_created, dn.entity_type, s.site_name, s.oc_oid as site_oid, s.study_name, s.study_protocol, s.investigator, ss.label as subject_id, 
+			'' as event_name, '' as crf_name, dns.column_name as item_name, '' as item_value, dns.subject_id as entity_id, '' as options_text, '' as options_values, 
+			-1 as response_type_id, '' as page, sub.unique_identifier, sub.date_of_birth, sub.gender, ss.enrollment_date, CURRENT_DATE as date_interviewed, 
+			'' as interviewer_name, CURRENT_DATE as date_start, CURRENT_DATE as date_end, '' as location
 			FROM discrepancy_note dn 
 			INNER JOIN dn_subject_map dns ON dn.discrepancy_note_id = dns.discrepancy_note_id
-			INNER JOIN study_subject ss ON dns.subject_id = ss.subject_id AND dn.study_id = ss.study_id
+			INNER JOIN study_subject ss ON dns.subject_id = ss.subject_id
+			INNER JOIN subject sub ON ss.subject_id = sub.subject_id
 			INNER JOIN (
 				SELECT study_id, name as site_name, oc_oid, principal_investigator as investigator, 
 					CASE 

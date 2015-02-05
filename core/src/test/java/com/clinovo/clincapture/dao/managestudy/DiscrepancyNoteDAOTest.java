@@ -10,7 +10,13 @@
 
 package com.clinovo.clincapture.dao.managestudy;
 
-import com.clinovo.model.DiscrepancyCorrectionForm;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -22,13 +28,11 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesSort;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.clinovo.model.DiscrepancyCorrectionForm;
 
 public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 
@@ -36,15 +40,15 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 	private UserAccountBean user;
 	private ListNotesFilter notesFilter;
 	private ListNotesSort notesSort;
+	private ResourceBundle resword;
 
 	Map<Integer, DiscrepancyNoteBean> noteBeanMap;
 
 	@Before
 	public void setUp() throws Exception {
-		study = new StudyBean();
-		study.setId(1);
-		study.setParentStudyId(0);
+		study = (StudyBean) studyDAO.findByPK(1);
 		user = (UserAccountBean) userAccountDAO.findByPK(1);
+		resword = ResourceBundleProvider.getWordsBundle(Locale.ENGLISH);
 		notesFilter = new ListNotesFilter();
 		notesSort = new ListNotesSort();
 		noteBeanMap = new HashMap<Integer, DiscrepancyNoteBean>();
@@ -494,85 +498,99 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsCorrectNumberOfDCFs() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals(1, dcfs.size());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectStudyName() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals("Default Study", dcfs.get(0).getStudyName());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectSiteName() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals("Default Study", dcfs.get(0).getSiteName());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectCrfItemName() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals("Start of Agent Administration Period", dcfs.get(0).getCrfItemName());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectCrfName() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals("Agent Administration", dcfs.get(0).getCrfName());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectSubjectID() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals("ssID1", dcfs.get(0).getSubjectId());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectEventName() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals("ED-1-NonRepeating", dcfs.get(0).getEventName());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectQuestion() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals("10:00pm bedtime\n[The input you provided is not an integer.]", dcfs.get(0).getQuestionToSite());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectPageNumber() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
-		assertEquals(1, dcfs.get(0).getPage().intValue());
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
+		assertEquals("AdministrationandDosage", dcfs.get(0).getPage());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectNoteId() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals(1, dcfs.get(0).getNoteId().intValue());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectNoteType() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals("Failed Validation Check", dcfs.get(0).getNoteType());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectResolutionStatus() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals("Closed", dcfs.get(0).getResolutionStatus());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectStudyProtocol() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals("default-study", dcfs.get(0).getStudyProtocolID());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectSiteOID() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
+				resword, 1);
 		assertEquals("S_DEFAULTS1", dcfs.get(0).getSiteOID());
 	}
 
