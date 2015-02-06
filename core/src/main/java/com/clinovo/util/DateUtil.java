@@ -32,12 +32,21 @@ import org.slf4j.LoggerFactory;
  * @author Frank
  * 
  */
-public class DateUtil {
+public final class DateUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DateUtil.class);
 
-	private static ResourceBundle resformat;
-	
+	private static final ResourceBundle RESFORMAT;
+
+	static {
+		Locale locale = new Locale(CoreResources.getSystemLanguage());
+		RESFORMAT = ResourceBundleProvider.getFormatBundle(locale);
+	}
+
+	private DateUtil() {
+
+	}
+
 	/**
 	 * Checks if passed date string is in valid format.
 	 * 
@@ -122,27 +131,18 @@ public class DateUtil {
 	}
 
 	private static String getDateFormat() {
-		return getFormatBundle().getString("date_format_string");
+		return RESFORMAT.getString("date_format_string");
 	}
 
 	private static String getDateTimeFormat() {
-		return getFormatBundle().getString("date_time_format_string");
+		return RESFORMAT.getString("date_time_format_string");
 	}
 
 	private static String getOcDateFormat() {
-		return getFormatBundle().getString("oc_date_format_string");
+		return RESFORMAT.getString("oc_date_format_string");
 	}
 
 	private static String getOcDateTimeFormat() {
-		return getFormatBundle().getString("oc_date_time_format_string");
-	}
-
-	private static ResourceBundle getFormatBundle() {
-		if (resformat == null) {
-			Locale locale = new Locale(CoreResources.getSystemLanguage());
-			ResourceBundleProvider.updateLocale(locale);
-			resformat = ResourceBundleProvider.getFormatBundle();
-		}
-		return resformat;
+		return RESFORMAT.getString("oc_date_time_format_string");
 	}
 }
