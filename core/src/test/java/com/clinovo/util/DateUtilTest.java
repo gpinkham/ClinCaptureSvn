@@ -15,82 +15,96 @@
 package com.clinovo.util;
 
 import java.util.Calendar;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.internal.util.reflection.Whitebox;
 
 public class DateUtilTest extends DefaultAppContextTest {
+
+	@Before
+	public void setUp() {
+		DateUtil dateUtil = Mockito.mock(DateUtil.class);
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
+		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
+		Whitebox.setInternalState(dateUtil, "resformat", resformat);
+	}
 
 	@Test
 	public void testThatStringIsInValidOcDateFormat() {
 		assertTrue(DateUtil.isValidDate("2015-02-02"));
 	}
-	
+
 	@Test
 	public void testThatStringIsInValidDateFormat() {
 		assertTrue(DateUtil.isValidDate("02-Feb-2015"));
 	}
-	
+
 	@Test
 	public void testThatStringIsInValidDateTimeFormat() {
 		assertTrue(DateUtil.isValidDate("02-Feb-2015 15:45:00"));
 	}
-	
+
 	@Test
 	public void testThatStringIsNotInValidDateFormat() {
 		assertFalse(DateUtil.isValidDate("wrong format"));
 	}
-	
+
 	@Test
 	public void testThatStringWithInvalidMonthIsNotInValidDateFormat() {
 		assertFalse(DateUtil.isValidDate("02-Fev-2015"));
 	}
-	
+
 	@Test
 	public void testThatStringWithInvalidDayIsNotInValidDateFormat() {
 		assertFalse(DateUtil.isValidDate("200-Feb-2015"));
 	}
-	
+
 	@Test
 	public void testThatConvertStringInOcFormatToDateReturnsCorrectDate() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(2015, 1, 2, 0, 0, 0);
 		assertEquals(calendar.getTime().toString(), DateUtil.convertStringToDate("2015-02-02").toString());
 	}
-	
+
 	@Test
 	public void testThatConvertStringToDateReturnsCorrectDate() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(2015, 1, 2, 0, 0, 0);
 		assertEquals(calendar.getTime().toString(), DateUtil.convertStringToDate("02-Feb-2015").toString());
 	}
-	
+
 	@Test
 	public void testThatConvertStringToDateTimeReturnsCorrectDate() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(2015, 1, 2, 6, 45, 0);
 		assertEquals(calendar.getTime().toString(), DateUtil.convertStringToDate("02-Feb-2015 06:45:00").toString());
 	}
-	
+
 	@Test
 	public void testThatConvertStringInOcFormatToDateTimeReturnsCorrectDate() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(2015, 1, 1, 6, 45, 0);
 		assertEquals(calendar.getTime().toString(), DateUtil.convertStringToDate("2015-02-01 06:45:00").toString());
 	}
-	
+
 	@Test
 	public void testThatConvertStringToDateReturnsNullForInvalidFormat() {
 		assertNull(DateUtil.convertStringToDate("wrong format"));
 	}
-	
+
 	@Test
 	public void testThatConvertDateToStringReturnsCorrectString() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(2015, 1, 2, 0, 0, 0);
 		assertEquals("02-Feb-2015", DateUtil.convertDateToString(calendar.getTime()));
 	}
-	
+
 	@Test
 	public void testThatConvertDateTimeToStringReturnsCorrectString() {
 		Calendar calendar = Calendar.getInstance();
