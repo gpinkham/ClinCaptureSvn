@@ -1782,10 +1782,14 @@
 		${studyToView.studyParameterConfig.interviewerNameRequired == 'yes' ? "checked" : ""}
 		       name="interviewerNameRequired" value="yes">
 		<fmt:message key="yes" bundle="${resword}"/>
-		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewer"
-		${studyToView.studyParameterConfig.interviewerNameRequired != 'yes' ? "checked" : ""}
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewer"
+		${studyToView.studyParameterConfig.interviewerNameRequired == 'no' ? "checked" : ""}
 		       name="interviewerNameRequired" value="no">
 		<fmt:message key="no" bundle="${resword}"/>
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewer"
+		${studyToView.studyParameterConfig.interviewerNameRequired == 'not_used' ? "checked" : ""}
+		       name="interviewerNameRequired" value="not_used">
+		<fmt:message key="not_used" bundle="${resword}"/>
 	</td>
 </tr>
 
@@ -1834,10 +1838,14 @@
 		${studyToView.studyParameterConfig.interviewDateRequired == 'yes' ? "checked" : ""}
 		       name="interviewDateRequired" value="yes">
 		<fmt:message key="yes" bundle="${resword}"/>
-		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewDate"
-		${studyToView.studyParameterConfig.interviewDateRequired != 'yes' ? "checked" : ""}
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewDate"
+		${studyToView.studyParameterConfig.interviewDateRequired == 'no' ? "checked" : ""}
 		       name="interviewDateRequired" value="no">
 		<fmt:message key="no" bundle="${resword}"/>
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewDate"
+		${studyToView.studyParameterConfig.interviewDateRequired == 'not_used' ? "checked" : ""}
+		       name="interviewDateRequired" value="not_used">
+		<fmt:message key="not_used" bundle="${resword}"/>
 	</td>
 </tr>
 
