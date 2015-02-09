@@ -274,7 +274,7 @@ public class DcfReportBuilder {
 		JasperReportBuilder report = report();
 		final int numberOfLinesInResponseBox = 14;
 		final int widthOfFirstColumn = 150;
-		final int widthOfForthColumn = 142;
+		final int widthOfForthColumn = 132;
 		report.addColumnHeader(
 				cmp.text(
 						resword.getString("response_from_site").concat(":")
@@ -294,14 +294,15 @@ public class DcfReportBuilder {
 
 	private JasperReportBuilder createOfficialTable() {
 		JasperReportBuilder report = report();
-		final int widthOfLastColumn = 120;
+		final int fixedColumnWidth = 120;
 		report.addColumnHeader(cmp.text(resword.getString("dcf_dm_use_only")))
 				.columns(
-						col.column("", "column_1", type.stringType()).setStyle(DRTemplates.getHeaderColumnStyle()),
+						col.column("", "column_1", type.stringType()).setStyle(DRTemplates.getHeaderColumnStyle())
+								.setWidth(fixedColumnWidth),
 						col.column("", "column_2", type.stringType()).setStyle(DRTemplates.getHeaderColumnStyle(0, 0)),
 						col.column("", "column_3", type.stringType()).setStyle(DRTemplates.getNormalColumnStyle(0, 0)),
 						col.column("", "column_4", type.stringType()).setStyle(DRTemplates.getHeaderColumnStyle())
-								.setWidth(widthOfLastColumn))
+								.setWidth(fixedColumnWidth))
 				.setDataSource(createFourColumnDataSource(createOfficialTableValues()));
 		return report;
 	}

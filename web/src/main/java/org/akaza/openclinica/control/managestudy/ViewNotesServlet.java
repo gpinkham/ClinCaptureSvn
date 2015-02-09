@@ -49,6 +49,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListNotesTableFactory;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -140,6 +141,9 @@ public class ViewNotesServlet extends RememberLastPage {
 				|| Boolean.parseBoolean(fp.getString("showMoreLink"));
 		boolean allowDcf = allowDcfForUserInCurrentStudy(currentStudy, ub);
 		request.setAttribute("allowDcf", allowDcf);
+		if(allowDcf) {
+			request.setAttribute("system_lang", CoreResources.getSystemLanguage());
+		}
 		int oneSubjectId = fp.getInt("id");
 		request.getSession().setAttribute("subjectId", oneSubjectId);
 		int discNoteTypeId;

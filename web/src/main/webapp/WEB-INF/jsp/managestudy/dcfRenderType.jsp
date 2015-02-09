@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<c:set var="generate_dcf_button_class" scope="request" value="${system_lang eq 'ru' ? 'button_long': 'button_medium'}" />
 
 <div id="dcfRenderType" title="<fmt:message key="dcf_generate" bundle="${resword}"/>" >
 	<div style="clear: both; margin-top: 2%;">
@@ -16,7 +17,7 @@
 		<input type="button" id="btn_cancel_dcf" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" style="margin-top:20px" />
 		<input type="hidden" id="generateDcf" name="generateDcf" value="" />
 		&nbsp;&nbsp;
-		<input type="button" id="btn_submit_dcf" value="<fmt:message key="dcf_generate" bundle="${resword}"/>" class="button_medium" style="margin-top:20px" />
+		<input type="button" id="btn_submit_dcf" value="<fmt:message key="dcf_generate" bundle="${resword}"/>" class="${generate_dcf_button_class}" style="margin-top:20px" />
 	</div>
 </div>
 
