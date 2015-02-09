@@ -31,9 +31,5 @@ public class ApplicationConstants {
 	public static String getPDateFormatInSavedData() {
 		return "yyyy-MM";
 	}
-	
-	public static String getDateFormatInStudyEvent() {
-		return "yyyy-MM-dd HH:mm:ss";
-	}
 
 }

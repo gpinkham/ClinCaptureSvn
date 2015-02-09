@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
@@ -37,9 +36,12 @@ public final class DateUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DateUtil.class);
 
-	private static ResourceBundle resformat;
+	private static final ResourceBundle RESFORMAT;
 
-	private static Locale locale;
+	static {
+		Locale locale = new Locale(CoreResources.getSystemLanguage());
+		RESFORMAT = ResourceBundleProvider.getFormatBundle(locale);
+	}
 
 	private DateUtil() {
 
@@ -60,7 +62,7 @@ public final class DateUtil {
 	}
 
 	private static boolean dateStringIsInValidFormat(String dateString, String format) {
-		DateFormat dateFormat = new SimpleDateFormat(format, getLocale());
+		DateFormat dateFormat = new SimpleDateFormat(format);
 		dateFormat.setLenient(false);
 		try {
 			dateFormat.parse(dateString);
@@ -78,7 +80,7 @@ public final class DateUtil {
 	 * @return Date
 	 */
 	public static Date convertStringToDate(String dateString) {
-		DateFormat dateFormat = new SimpleDateFormat(getFormatOfDateString(dateString), getLocale());
+		DateFormat dateFormat = new SimpleDateFormat(getFormatOfDateString(dateString));
 		try {
 			dateFormat.setLenient(false);
 			return dateFormat.parse(dateString);
@@ -124,38 +126,23 @@ public final class DateUtil {
 	}
 
 	private static String convertDateToStringInSpecifiedFormat(Date date, String format) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat(format, getLocale());
+		SimpleDateFormat dateFormat = new SimpleDateFormat(format);
 		return dateFormat.format(date);
 	}
 
 	private static String getDateFormat() {
-		return getFormatBundle().getString("date_format_string");
+		return RESFORMAT.getString("date_format_string");
 	}
 
 	private static String getDateTimeFormat() {
-		return getFormatBundle().getString("date_time_format_string");
+		return RESFORMAT.getString("date_time_format_string");
 	}
 
 	private static String getOcDateFormat() {
-		return ApplicationConstants.getDateFormatInItemData();
+		return RESFORMAT.getString("oc_date_format_string");
 	}
 
 	private static String getOcDateTimeFormat() {
-		return ApplicationConstants.getDateFormatInStudyEvent();
-	}
-
-	private static ResourceBundle getFormatBundle() {
-		if (resformat == null) {
-			ResourceBundleProvider.updateLocale(getLocale());
-			resformat = ResourceBundleProvider.getFormatBundle();
-		}
-		return resformat;
-	}
-
-	private static Locale getLocale() {
-		if (locale == null) {
-			locale = new Locale(CoreResources.getSystemLanguage());
-		}
-		return locale;
+		return RESFORMAT.getString("oc_date_time_format_string");
 	}
 }
