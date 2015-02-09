@@ -27,16 +27,6 @@ public class DateUtilTest extends DefaultAppContextTest {
 	}
 	
 	@Test
-	public void testThatStringIsInValidDateFormat() {
-		assertTrue(DateUtil.isValidDate("02-Feb-2015"));
-	}
-	
-	@Test
-	public void testThatStringIsInValidDateTimeFormat() {
-		assertTrue(DateUtil.isValidDate("02-Feb-2015 15:45:00"));
-	}
-	
-	@Test
 	public void testThatStringIsNotInValidDateFormat() {
 		assertFalse(DateUtil.isValidDate("wrong format"));
 	}
@@ -59,20 +49,6 @@ public class DateUtilTest extends DefaultAppContextTest {
 	}
 	
 	@Test
-	public void testThatConvertStringToDateReturnsCorrectDate() {
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(2015, 1, 2, 0, 0, 0);
-		assertEquals(calendar.getTime().toString(), DateUtil.convertStringToDate("02-Feb-2015").toString());
-	}
-	
-	@Test
-	public void testThatConvertStringToDateTimeReturnsCorrectDate() {
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(2015, 1, 2, 6, 45, 0);
-		assertEquals(calendar.getTime().toString(), DateUtil.convertStringToDate("02-Feb-2015 06:45:00").toString());
-	}
-	
-	@Test
 	public void testThatConvertStringInOcFormatToDateTimeReturnsCorrectDate() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(2015, 1, 1, 6, 45, 0);
@@ -82,19 +58,5 @@ public class DateUtilTest extends DefaultAppContextTest {
 	@Test
 	public void testThatConvertStringToDateReturnsNullForInvalidFormat() {
 		assertNull(DateUtil.convertStringToDate("wrong format"));
-	}
-	
-	@Test
-	public void testThatConvertDateToStringReturnsCorrectString() {
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(2015, 1, 2, 0, 0, 0);
-		assertEquals("02-Feb-2015", DateUtil.convertDateToString(calendar.getTime()));
-	}
-	
-	@Test
-	public void testThatConvertDateTimeToStringReturnsCorrectString() {
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(2015, 1, 2, 6, 45, 0);
-		assertEquals("02-Feb-2015 06:45:00", DateUtil.convertDateTimeToString(calendar.getTime()));
 	}
 }
