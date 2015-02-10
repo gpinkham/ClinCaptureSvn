@@ -178,15 +178,17 @@ public class DcfServiceImpl implements DcfService {
 		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 		for (Integer noteId : noteAndEntityIds.keySet()) {
 			DiscrepancyNoteBean note = (DiscrepancyNoteBean) getDiscrepancyNoteDAO().findByPK(noteId);
-			for (Integer entityId : noteAndEntityIds.get(noteId).keySet()) {
-				note.setEntityId(entityId);
-				note.setColumn(noteAndEntityIds.get(noteId).get(entityId));
+			if (note.getResolutionStatusId() == ResolutionStatus.OPEN.getId()) {
+				for (Integer entityId : noteAndEntityIds.get(noteId).keySet()) {
+					note.setEntityId(entityId);
+					note.setColumn(noteAndEntityIds.get(noteId).get(entityId));
+				}
+				note.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
+				createChildDN(note, dndao, resword.getString("dcf_generated_dcf"), currentStudy, currentUser);
+				note.setUpdater(currentUser);
+				note.setUpdatedDate(new Date());
+				dndao.update(note);
 			}
-			note.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
-			createChildDN(note, dndao, resword.getString("dcf_generated_dcf"), currentStudy, currentUser);
-			note.setUpdater(currentUser);
-			note.setUpdatedDate(new Date());
-			dndao.update(note);
 		}
 	}
 

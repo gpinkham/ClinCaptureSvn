@@ -215,7 +215,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn("age"), resword.getString("days_open"), null, null);
 		configureColumn(row.getColumn("days"), resword.getString("days_since_updated"), null, null);
 	}
-	
+
 	private String[] getColumns() {
 		TableColumnBuilder columnBuilder = new TableColumnBuilder();
 		if (enableDcf) {
@@ -275,7 +275,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		toolbar.setListNotesFilter(listNotesFilter);
 		tableFacade.setToolbar(toolbar);
 	}
-	
+
 	@Override
 	public void configureTableFacadeCustomView(TableFacade tableFacade) {
 		if (enableDcf) {
@@ -312,8 +312,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 				getCurrentStudy(), listNotesFilter, listNotesSort, offset, count);
 		if (checkUserRole(Role.STUDY_CODER, getCurrentUserAccount())
 				|| checkUserRole(Role.STUDY_EVALUATOR, getCurrentUserAccount())) {
-			customItems = discrepancyNoteDao.getViewNotesWithFilterAndSort(getCurrentStudy(),
-					getCurrentUserAccount(), listNotesFilter, listNotesSort);
+			customItems = discrepancyNoteDao.getViewNotesWithFilterAndSort(getCurrentStudy(), getCurrentUserAccount(),
+					listNotesFilter, listNotesSort);
 			tableFacade.setTotalRows(customItems.size());
 		}
 		this.setAllNotes(populateRowsWithAttachedData(customItems));
@@ -894,6 +894,18 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 				}
 			}
 
+			if (shouldDnHaveDcfIcon(dnb)) {
+				builder.a().href("#");
+				builder.append("class=\"dcfIcon\"");
+				builder.append("onClick=\"setAccessedObjected(this);\"");
+				builder.append("data-noteid=" + dnb.getId() + "___" + dnb.getEntityId() + "___" + dnb.getColumn());
+				builder.append(" data-site-email=\"" + dnb.getSiteContactEmail() + "\"").close();
+				builder.img().name("bt_Download").src("images/bt_Download.gif").border("0")
+						.alt(resword.getString("dcf_generate")).title(resword.getString("dcf_generate")).align("left")
+						.append("hspace=\"6\"").close();
+				builder.aEnd();
+			}
+
 			StudySubjectBean studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
 			Integer studySubjectId = studySubjectBean.getId();
 			downloadNotesLinkBuilder(studySubjectBean);
@@ -901,7 +913,21 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			return builder.toString();
 		}
 	}
-	
+
+	private boolean shouldDnHaveDcfIcon(DiscrepancyNoteBean discrepancyNote) {
+		if (!enableDcf) {
+			return false;
+		}
+		if (discrepancyNote.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.QUERY.getId()
+				|| discrepancyNote.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.FAILEDVAL.getId()) {
+			if (discrepancyNote.getResolutionStatusId() == ResolutionStatus.OPEN.getId()
+					|| discrepancyNote.getResolutionStatusId() == ResolutionStatus.UPDATED.getId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private class DcfCellEditor implements CellEditor {
 
 		public Object getValue(Object item, String property, int rowcount) {
@@ -909,7 +935,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			HtmlBuilder builder = new HtmlBuilder();
 			if (isEligibleForDCF(dnb)) {
 				builder.append("<center>");
-				builder.input().type("checkbox").value(dnb.getId() + "___" + dnb.getEntityId() + "___" + dnb.getColumn()).name(DCF_CHECKBOX_NAME);
+				builder.input().type("checkbox")
+						.value(dnb.getId() + "___" + dnb.getEntityId() + "___" + dnb.getColumn())
+						.name(DCF_CHECKBOX_NAME);
 				builder.append(" class=\"dcf\" onClick=\"toggleButtonEnable('dcf', 'btn_generate_dcf'); setAccessedObjected(this);\"");
 				builder.append(" data-site-email=\"" + dnb.getSiteContactEmail() + "\"");
 				builder.close().append("</center>");
@@ -995,7 +1023,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			return true;
 		}
 	}
-	
+
 	private class TableColumnBuilder {
 		private List<String> columns;
 
@@ -1213,7 +1241,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	public void setResolutionStatus(Integer resolutionStatus) {
 		this.resolutionStatus = resolutionStatus;
 	}
-	
+
 	public void setEnableDcf(boolean enableDcf) {
 		this.enableDcf = enableDcf;
 	}

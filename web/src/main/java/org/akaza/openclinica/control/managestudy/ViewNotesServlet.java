@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -94,6 +95,7 @@ public class ViewNotesServlet extends RememberLastPage {
 	public static final String DCF_SAVED = "dcfSaved";
 	public static final String DCF_FILE_NAME_ATTRIBUTE = "dcf_file_name";
 	public static final String DCF_RENDER_CHECKBOX_NAME = "dcfRenderType";
+	public static final String DCF_ICON_NAME = "dcfIconId";
 	public static final String RECIPIENT_EMAIL = "email";
 	public static final String RESOLUTION_STATUS = "resolutionStatus";
 	public static final String TYPE = "discNoteType";
@@ -270,7 +272,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		boolean shouldSaveDcf = saveDcf != null && saveDcf.equalsIgnoreCase("yes")
 				&& request.getSession().getAttribute(DCF_SAVED) == null;
 		if (generateDcf != null && generateDcf.equalsIgnoreCase("yes")) {
-			List<String> selectedNoteAndEntityIds = fp.getStringArray(ListNotesTableFactory.DCF_CHECKBOX_NAME);
+			List<String> selectedNoteAndEntityIds =  getSelectedNoteAndEntityIds(fp);
 			List<String> selectedRenderTypes = fp.getStringArray(DCF_RENDER_CHECKBOX_NAME);
 			String recipientEmail = fp.getString(RECIPIENT_EMAIL);
 			if (selectedNoteAndEntityIds.size() > 0) {
@@ -291,6 +293,17 @@ public class ViewNotesServlet extends RememberLastPage {
 			return false;
 		}
 		return true;
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<String> getSelectedNoteAndEntityIds(FormProcessor fp) {
+		List<String> selectedNoteAndEntityIds = new ArrayList<String>();
+		String noteAndEntityIdFromIconSelect = fp.getString(DCF_ICON_NAME).trim();
+		if (noteAndEntityIdFromIconSelect.length() > 0) {
+			selectedNoteAndEntityIds.add(noteAndEntityIdFromIconSelect);
+			return selectedNoteAndEntityIds;
+		}
+		return fp.getStringArray(ListNotesTableFactory.DCF_CHECKBOX_NAME);
 	}
 
 	@Override
