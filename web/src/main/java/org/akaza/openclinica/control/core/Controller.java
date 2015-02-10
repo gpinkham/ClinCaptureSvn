@@ -368,8 +368,6 @@ public abstract class Controller extends BaseController {
 		reloadUserBean(session, getUserAccountDAO());
 		String newThemeColor = CoreResources.getField("themeColor");
 		session.setAttribute("newThemeColor", newThemeColor);
-		String randomizationEnviroment = CoreResources.getField("randomizationEnviroment");
-		session.setAttribute("randomizationEnviroment", randomizationEnviroment);
 		ApplicationContext applicationContext = SpringServletAccess.getApplicationContext(getServletContext());
 		try {
 			session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
@@ -467,6 +465,9 @@ public abstract class Controller extends BaseController {
 					currentStudy.setParentStudyName((sdao.findByPK(currentStudy.getParentStudyId())).getName());
 				}
 			}
+
+			String randomizationEnviroment = currentStudy.getStudyParameterConfig().getRandomizationEnviroment();
+			session.setAttribute("randomizationEnviroment", randomizationEnviroment);
 
 			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
 					.getId();

@@ -1237,6 +1237,22 @@
     </td>
   </tr>
 
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="systemProperty.randomizationEnviroment.label" bundle="${resword}"/>
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.randomizationEnviroment == 'test'}">
+					<fmt:message key="systemProperty.randomizationEnviroment.test.radioLabel" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="systemProperty.randomizationEnviroment.prod.radioLabel" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+
     <tr valign="top">
         <td class="table_header_column">
             <fmt:message key="systemProperty.allowCrfEvaluation.label" bundle="${resword}" />?

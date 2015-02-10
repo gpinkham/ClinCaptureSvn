@@ -187,6 +187,8 @@ public class StudyConfigService {
 				spc.setAnnotatedCrfSasItemNames(spv.getValue());
 			} else if (handle.equalsIgnoreCase("allowDiscrepancyCorrectionForms")) {
 				spc.setAllowDiscrepancyCorrectionForms(spv.getValue());
+			} else if (handle.equalsIgnoreCase("randomizationEnviroment")) {
+				spc.setRandomizationEnviroment(spv.getValue());
 			}
 		} else if (spv.getId() == 0) {
 			setSystemParameterValues(spvdao, spc, handle);

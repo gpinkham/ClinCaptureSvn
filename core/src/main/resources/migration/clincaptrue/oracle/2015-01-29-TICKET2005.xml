@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-01-29-TICKET2005-1" dbms="oracle">
+		<comment>Insert the study parameter flag to control randomization environment.</comment>
+		<insert tableName="study_parameter">
+			<column name="study_parameter_id" valueNumeric="51" />
+			<column name="handle" value="randomizationEnviroment" />
+			<column name="name" value="randomizationEnviroment" />
+			<column name="description" value="Flag to control randomization environment." />
+			<column name="default_value" value="test" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-01-29-TICKET2005-2" dbms="oracle">
+		<comment>Auto-populate value for randomizationEnviroment flag from System properties</comment>
+		<sql>
+			CREATE OR REPLACE PROCEDURE cc_add_study_parameter_from_system
+			IS
+			stids RECORD;
+			BEGIN
+			FOR stids IN (SELECT * FROM study) LOOP
+			IF (SELECT count(*) FROM study_parameter_value WHERE study_id = stids.study_id AND parameter = 'randomizationEnviroment') = 0 THEN
+			EXECUTE 'INSERT INTO study_parameter_value (study_parameter_value_id, study_id, value, parameter) VALUES ((SELECT nextval(''study_parameter_value_study_parameter_value_id_seq'')), '
+			|| stids.study_id || ', (SELECT value FROM system WHERE name = ''randomizationEnviroment''), ''randomizationEnviroment'' )';
+			END IF;
+			END LOOP;
+			RETURN;
+			END;
+
+			EXECUTE cc_add_study_parameter_from_system();
+			DROP PROCEDURE cc_add_study_parameter_from_system();
+		</sql>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-01-29-TICKET2005-3" dbms="oracle">
+		<comment>Remove randomizationEnviroment flag from System properties</comment>
+		<delete tableName="system">
+			<where> name = 'randomizationEnviroment'</where>
+		</delete>
+	</changeSet>
+</databaseChangeLog>

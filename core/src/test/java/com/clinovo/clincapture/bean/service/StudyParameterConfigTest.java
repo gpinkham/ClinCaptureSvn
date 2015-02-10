@@ -76,5 +76,6 @@ public class StudyParameterConfigTest {
 		assertEquals("no", config.getAllowRulesAutoScheduling());
 
 		assertEquals("no", config.getAnnotatedCrfSasItemNames());
+		assertEquals("test", config.getRandomizationEnviroment());
 	}
 }

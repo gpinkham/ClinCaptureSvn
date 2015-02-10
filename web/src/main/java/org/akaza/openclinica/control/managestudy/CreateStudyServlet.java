@@ -775,6 +775,7 @@ public class CreateStudyServlet extends Controller {
 		newStudy.getStudyParameterConfig().setEvaluateWithContext(fp.getString("evaluateWithContext"));
 
 		newStudy.getStudyParameterConfig().setAllowRulesAutoScheduling(fp.getString("allowRulesAutoScheduling"));
+		newStudy.getStudyParameterConfig().setRandomizationEnviroment(fp.getString("randomizationEnviroment"));
 
 		request.getSession().setAttribute("newStudy", newStudy);
 
@@ -986,6 +987,10 @@ public class CreateStudyServlet extends Controller {
 
 		spv.setParameter("allowRulesAutoScheduling");
 		spv.setValue(newStudy.getStudyParameterConfig().getAllowRulesAutoScheduling());
+		spvdao.create(spv);
+
+		spv.setParameter("randomizationEnviroment");
+		spv.setValue(newStudy.getStudyParameterConfig().getRandomizationEnviroment());
 		spvdao.create(spv);
 
 		logger.info("study parameters created done");

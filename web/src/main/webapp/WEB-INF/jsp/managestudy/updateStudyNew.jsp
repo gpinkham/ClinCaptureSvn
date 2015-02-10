@@ -1979,6 +1979,18 @@
 		<input type="text" name="randomizationTrialId" value="${studyToView.studyParameterConfig.randomizationTrialId}" maxlength="255" size="35">
 	</td>
 </tr>
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="systemProperty.randomizationEnviroment.label" bundle="${resword}"/>:
+	</td>
+	<td>
+		<input type="radio" name="randomizationEnviroment" ${studyToView.studyParameterConfig.randomizationEnviroment == 'test' ? "checked" : ""} value="test" onchange="javascript:changeIcon()">
+		<fmt:message key="systemProperty.randomizationEnviroment.test.radioLabel" bundle="${resword}"/>
+
+		<input type="radio" name="randomizationEnviroment" ${studyToView.studyParameterConfig.randomizationEnviroment == 'prod' ? "checked" : ""} value="prod" onchange="javascript:changeIcon()">
+		<fmt:message key="systemProperty.randomizationEnviroment.prod.radioLabel" bundle="${resword}"/>
+	</td>
+</tr>
 <!-- /Randomization Parameters section -->
 
 <!-- Import Parameters section -->

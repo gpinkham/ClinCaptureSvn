@@ -200,7 +200,7 @@ public class RandomizeServlet extends Controller {
 
 		String siteId = getSite(currentStudy);
 		String patientId = request.getParameter("subject");
-		String randomizationEnviroment = (String) request.getSession().getAttribute("randomizationEnviroment");
+		String randomizationEnviroment = currentStudy.getStudyParameterConfig().getRandomizationEnviroment();
 
 		Randomization randomization = new Randomization();
 		// username and password

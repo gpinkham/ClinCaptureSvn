@@ -542,6 +542,7 @@ public class UpdateStudyServletNew extends Controller {
 		// Randomization
 		study.getStudyParameterConfig().setAssignRandomizationResultTo(fp.getString("assignRandomizationResultTo"));
 		study.getStudyParameterConfig().setRandomizationTrialId(fp.getString("randomizationTrialId"));
+		study.getStudyParameterConfig().setRandomizationEnviroment(fp.getString("randomizationEnviroment"));
 
 		// Evaluation
 		study.getStudyParameterConfig().setAllowCrfEvaluation(fp.getString("allowCrfEvaluation"));
@@ -956,9 +957,13 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getAnnotatedCrfSasItemNames());
 		updateParameter(spvdao, spv);
 
+		spv.setParameter("randomizationEnviroment");
+		spv.setValue(study1.getStudyParameterConfig().getRandomizationEnviroment());
+		updateParameter(spvdao, spv);
+
 		try {
 
-			// Create custom dictionary
+			// Create custom dictionary 
 			if (study1.getStudyParameterConfig().getAutoCodeDictionaryName() != null
 					&& !study1.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) {
 				getDictionaryService().createDictionary(study1.getStudyParameterConfig().getAutoCodeDictionaryName(),
@@ -1134,6 +1139,10 @@ public class UpdateStudyServletNew extends Controller {
 
 			childspv.setParameter("randomizationTrialId");
 			childspv.setValue(study1.getStudyParameterConfig().getRandomizationTrialId());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("randomizationEnviroment");
+			childspv.setValue(study1.getStudyParameterConfig().getRandomizationEnviroment());
 			updateParameter(spvdao, childspv);
 
 			childspv.setParameter("annotatedCrfSasItemNames");

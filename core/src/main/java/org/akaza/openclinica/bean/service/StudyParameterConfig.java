@@ -117,6 +117,7 @@ public class StudyParameterConfig {
 	// Randomization
 	private String assignRandomizationResultTo = "none";
 	private String randomizationTrialId = "";
+	private String randomizationEnviroment = "";
 
 	// Evaluation
 	private String allowCrfEvaluation = "no";
@@ -175,6 +176,7 @@ public class StudyParameterConfig {
 		annotatedCrfSasItemNames = "no";
 		allowDynamicGroupsManagement = "yes";
 		allowDiscrepancyCorrectionForms = "yes";
+		randomizationEnviroment = "test";
 	}
 
 	/**
@@ -729,5 +731,13 @@ public class StudyParameterConfig {
 	 */
 	public void setAllowDiscrepancyCorrectionForms(String allowDiscrepancyCorrectionForms) {
 		this.allowDiscrepancyCorrectionForms = allowDiscrepancyCorrectionForms;
+	}
+
+	public void setRandomizationEnviroment(String randomizationEnviroment) {
+		this.randomizationEnviroment = randomizationEnviroment;
+	}
+
+	public String getRandomizationEnviroment() {
+		return this.randomizationEnviroment;
 	}
 }
