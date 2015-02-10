@@ -160,6 +160,20 @@
 		</sql>
 	</query>
 	<query>
+		<name>findForSiteByEventCrfId</name>
+		<sql>
+			SELECT edc.* 
+			FROM event_crf ec INNER JOIN study_event se 
+			ON ec.study_event_id = se.study_event_id INNER JOIN crf_version cv 
+			ON ec.crf_version_id = cv.crf_version_id INNER JOIN study_subject ss 
+			ON ec.study_subject_id = ss.study_subject_id INNER JOIN event_definition_crf edc 
+			ON se.study_event_definition_id = edc.study_event_definition_id 
+			AND cv.crf_id = edc.crf_id
+			AND ss.study_id = edc.study_id
+			WHERE ec.event_crf_id = ?
+		</sql>
+	</query>
+	<query>
 		<name>findByStudyEventIdAndCRFVersionIdAndSiteIdAndParentStudyId</name>
 		<sql>
 			SELECT EDC.*, C.name as crf_name

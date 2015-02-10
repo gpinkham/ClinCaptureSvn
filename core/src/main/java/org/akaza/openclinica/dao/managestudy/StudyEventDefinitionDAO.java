@@ -325,6 +325,33 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
+	/**
+	 * Gets all available Study Event Definitions that contain CRFs that can be evaluated.
+	 * 
+	 * @param studyId
+	 *            Study ID
+	 * @return StudyEventDefinitionBean with CRFs which can be evaluated.
+	 */
+	public List<StudyEventDefinitionBean> findAllAvailableWithEvaluableCRFByStudy(StudyBean study) {
+		List<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
+		String queryName;
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
+		if(study.isSite()){
+			queryName = "findAllAvailableWithEvaluableCRFBySite";
+		} else {
+			queryName = "findAllAvailableWithEvaluableCRFByStudy";
+		}		
+		ArrayList alist = this.select(digester.getQuery(queryName), variables);
+		for (Object anAlist : alist) {
+			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			seds.add(seb);
+		}
+		return seds;
+	}
+
 	public ArrayList findAllWithStudyEvent(StudyBean currentStudy) {
 		ArrayList answer = new ArrayList();
 
@@ -639,7 +666,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
-		
+
 		return al;
 	}
 }

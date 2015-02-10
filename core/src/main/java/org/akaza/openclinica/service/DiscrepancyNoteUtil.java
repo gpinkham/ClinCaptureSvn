@@ -1652,13 +1652,13 @@ public class DiscrepancyNoteUtil {
 			StudyUserRoleBean rootStudyUserRole = createRootUserRole(rootUserAccount, studyId);
 			userAccounts.add(rootStudyUserRole);
 		}
-		removeEvaluatorsBasedOnCrfStage(userAccounts, ecb, eddao);
+		removeEvaluatorsBasedOnCrfStage(userAccounts, ecb, eddao, subjectStudy);
 		return userAccounts;
 	}
 
 	private static void removeEvaluatorsBasedOnCrfStage(List<StudyUserRoleBean> userAccounts, EventCRFBean ecb,
-			EventDefinitionCRFDAO eddao) {
-		if (!shouldRemoveEvaluators(ecb, eddao)) {
+			EventDefinitionCRFDAO eddao, StudyBean subjectStudy) {
+		if (!shouldRemoveEvaluators(ecb, eddao, subjectStudy)) {
 			return;
 		}
 		List<StudyUserRoleBean> evaluators = new ArrayList<StudyUserRoleBean>();
@@ -1670,12 +1670,21 @@ public class DiscrepancyNoteUtil {
 		userAccounts.removeAll(evaluators);
 	}
 
-	private static boolean shouldRemoveEvaluators(EventCRFBean ecb, EventDefinitionCRFDAO eddao) {
+	private static boolean shouldRemoveEvaluators(EventCRFBean ecb, EventDefinitionCRFDAO eddao, StudyBean subjectStudy) {
 		if (ecb == null) {
 			return true;
 		}
-		EventDefinitionCRFBean edcb = eddao.findForStudyByStudyEventIdAndCRFVersionId(ecb.getStudyEventId(),
-				ecb.getCRFVersionId());
+		EventDefinitionCRFBean edcb;
+		if(!subjectStudy.isSite()) {
+			edcb = eddao.findForStudyByStudyEventIdAndCRFVersionId(ecb.getStudyEventId(),
+					ecb.getCRFVersionId());
+		} else {
+			edcb = eddao.findForSiteByEventCrfId(ecb.getId());
+			if(edcb == null) {
+				edcb = eddao.findForStudyByStudyEventIdAndCRFVersionId(ecb.getStudyEventId(),
+						ecb.getCRFVersionId());
+			}
+		}
 		if (!edcb.isEvaluatedCRF()) {
 			return true;
 		}

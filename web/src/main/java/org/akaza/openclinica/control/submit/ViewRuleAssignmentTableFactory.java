@@ -156,7 +156,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		crfNameColumn.getFilterRenderer().setFilterEditor(crfFileter);
 
 		// Configure the drop-down for the study event control
-		StudyEventTableRowFilter studyEventTableRowFilter = new StudyEventTableRowFilter(dataSource, currentStudy);
+		StudyEventTableRowFilter studyEventTableRowFilter = new StudyEventTableRowFilter(dataSource, currentStudy, currentUser);
 
 		HtmlColumn studyEventColumn = ((HtmlRow) row).getColumn(1);
 		studyEventColumn.getFilterRenderer().setFilterEditor(studyEventTableRowFilter);

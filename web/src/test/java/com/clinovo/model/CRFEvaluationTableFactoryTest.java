@@ -47,6 +47,7 @@ public class CRFEvaluationTableFactoryTest extends BaseControllerTest {
 		studyParameter.setParameter("evaluateWithContext");
 		studyParameter.setValue("false");
 		factory = new CRFEvaluationTableFactory(getDataSource(), messageSource, studyParameter, "false");
+		factory.setUserAccountDAO(userAccountDAO);
 	}
 
 	@Test

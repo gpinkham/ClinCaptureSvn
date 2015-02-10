@@ -65,7 +65,6 @@ public class ListNotesFilter implements CriteriaCommand {
 		additionalColumnMapping.put("eventName", "dns.event_name");
 		additionalColumnMapping.put("entityName", "dns.item_name");
 		additionalColumnMapping.put("entityValue", "dns.item_value");
-		additionalColumnMapping.put("evaluationCrf", "evaluationCrf");
 
 		additionalStudyEventColumnMapping.put("eventId", "se.study_event_id");
 	}
@@ -295,33 +294,9 @@ public class ListNotesFilter implements CriteriaCommand {
 					itemDataOrdinal = RegexpUtil.parseGroup(value, "(\\(#\\d*\\))", 1).replaceAll("\\(#|\\)", "");
 					value = RegexpUtil.parseGroup(value, "(\\w*)(\\(#\\d*\\))", 1);
 				}
+				builder.append(" and ").append(additionalColumnMapping.get(property)).append(" like '%").append(value)
+						.append("%' ");
 
-				if (property.equalsIgnoreCase("evaluationCrf")) {
-					builder.append(" and dns.crf_name in (select name from crf where crf.crf_id in (select crf_id from event_definition_crf where event_definition_crf.evaluated_crf = '");
-					if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
-						builder.append(value.equals("true") ? "1" : "0");
-					} else {
-						builder.append(value);
-					}
-					if (!study.isSite()) {
-						builder.append("' and study_id = ").append(study.getId()).append(")) ");
-					} else {
-						builder.append("' and (study_id = ")
-								.append(study.getId())
-								.append(" or study_id = ")
-								.append(study.getParentStudyId())
-								.append(") and crf_id not in (select crf_id from event_definition_crf where event_definition_crf.evaluated_crf = ");
-						if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
-							builder.append("0");
-						} else {
-							builder.append("'").append("false").append("'");
-						}
-						builder.append(" and study_id = ").append(study.getId()).append("))) ");
-					}
-				} else {
-					builder.append(" and ").append(additionalColumnMapping.get(property)).append(" like '%")
-							.append(value).append("%' ");
-				}
 				if (itemDataOrdinal != null) {
 					builder.append(" and ").append("dns.item_data_ordinal").append(" = ").append(itemDataOrdinal)
 							.append(" ");
@@ -340,7 +315,7 @@ public class ListNotesFilter implements CriteriaCommand {
 	 */
 	public String getOwnerOrAssignedFilter(UserAccountBean user) {
 		StringBuilder builder = new StringBuilder(" AND (dns.owner_id = ").append(user.getId())
-				.append("OR dns.assigned_user_id = ").append(user.getId()).append(") ");
+				.append(" OR dns.assigned_user_id = ").append(user.getId()).append(") ");
 		return builder.toString();
 
 	}

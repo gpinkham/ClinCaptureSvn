@@ -188,7 +188,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"), new DateCellEditor(
 				getDateFormat()), null, false, false);
 		configureColumn(row.getColumn(eventName), resword.getString("event_name"), null, new StudyEventTableRowFilter(
-				dataSource, currentStudy), true, false);
+				dataSource, currentStudy, getCurrentUserAccount()), true, false);
 		configureColumn(row.getColumn(crfName), resword.getString("CRF"), null, new CRFFilter(dataSource, currentStudy,
 				getCurrentUserAccount()), true, false);
 		configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, false, false);
@@ -299,9 +299,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		resformat = ResourceBundleProvider.getFormatBundle(getLocale());
 		Limit limit = tableFacade.getLimit();
 		ListNotesFilter listNotesFilter = getListNoteFilter(limit);
-		if (checkUserRole(Role.STUDY_EVALUATOR, getCurrentUserAccount())) {
-			listNotesFilter.addFilter("evaluationCrf", "true");
-		}
 		ListNotesSort listNotesSort = getListSubjectSort(limit);
 		Integer dnCount = discrepancyNoteDao.countViewNotesWithFilter(getCurrentStudy(), listNotesFilter);
 		tableFacade.setTotalRows(dnCount == null ? 0 : dnCount);

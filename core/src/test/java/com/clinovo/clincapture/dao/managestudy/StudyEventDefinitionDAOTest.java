@@ -107,22 +107,27 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 				.findAllAvailableAndOrderedByStudyGroupClassId(studyGroupClassId);
 		assertEquals(expactedSize, result.size());
 	}
-	
+
 	@Test
 	public void testThatFindAllActiveByStudyIdAndCRFIdReturnsNotNull() {
 		int crfId = 3;
 		int studyId = 1;
-		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO
-				.findAllActiveByStudyIdAndCRFId(crfId, studyId);
+		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllActiveByStudyIdAndCRFId(crfId, studyId);
 		assertNotNull(result);
 	}
-	
+
 	@Test
 	public void testThatFindAllActiveByStudyIdAndCRFIdReturnsCorrectValue() {
 		int crfId = 3;
 		int studyId = 1;
-		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO
-				.findAllActiveByStudyIdAndCRFId(crfId, studyId);
+		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllActiveByStudyIdAndCRFId(crfId, studyId);
 		assertEquals(1, result.size());
+	}
+
+	@Test
+	public void testThatFindAllAvailableWithEvaluableCRFByStudyReturnsCorrectValue() {
+		StudyBean study = (StudyBean) studyDAO.findByPK(1);
+		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllAvailableWithEvaluableCRFByStudy(study);
+		assertEquals(2, result.size());
 	}
 }

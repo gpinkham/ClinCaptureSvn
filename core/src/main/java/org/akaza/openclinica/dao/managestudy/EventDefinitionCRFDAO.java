@@ -874,6 +874,26 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
 		return answer;
 	}
+	
+	/***
+	 * Finds the EventDefinitionCRFBean of a site, returns null if site doesn't override Event Definition CRF settings.
+	 * 
+	 * @param eventCrfId
+	 *            EventCrfId
+	 * @return EventDefinitionCRFBean
+	 */
+	public EventDefinitionCRFBean findForSiteByEventCrfId(int eventCrfId) {
+		EventDefinitionCRFBean edcb = null;
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, eventCrfId);
+		String sql = digester.getQuery("findForSiteByEventCrfId");
+		List<HashMap> aList = this.select(sql, variables);
+		for (HashMap anAList : aList) {
+			edcb = (EventDefinitionCRFBean) this.getEntityFromHashMap(anAList);
+		}
+		return edcb;
+	}
 
 	/**
 	 * Method returns event definition crf by studyEventId, crfVersionId, siteId and parentStudyId.

@@ -61,6 +61,46 @@
 		</sql>
 	</query>
 	<query>
+		<name>findAllAvailableWithEvaluableCRFByStudy</name>
+		<sql>
+			SELECT DISTINCT sed.*
+			FROM STUDY_EVENT_DEFINITION sed, study st
+			WHERE (sed.study_id = st.study_id)
+				AND (st.study_id = ?)
+				AND sed.status_id NOT IN (5)
+				AND sed.study_event_definition_id IN 
+				(SELECT study_event_definition_id 
+					FROM event_definition_crf
+					WHERE evaluated_crf = 'true'
+					AND status_id NOT IN (5, 7)
+					AND (study_id = st.study_id
+					OR study_id IN (SELECT study_id FROM study WHERE parent_study_id = ?)))
+				ORDER BY sed.ordinal asc
+		</sql>
+	</query>
+	<query>
+		<name>findAllAvailableWithEvaluableCRFBySite</name>
+		<sql>
+			SELECT sed.*
+			FROM STUDY_EVENT_DEFINITION sed, study st
+			WHERE (sed.study_id = st.parent_study_id)
+				AND st.study_id = ?
+				AND sed.status_id NOT IN (5)
+				AND sed.study_event_definition_id IN 
+				(SELECT study_event_definition_id 
+					FROM event_definition_crf
+					WHERE evaluated_crf = 'true'
+					AND status_id NOT IN (5, 7)
+					AND (study_id = st.study_id OR study_id = st.parent_study_id)
+					AND crf_id NOT IN 
+				(SELECT crf_id 
+					FROM event_definition_crf
+					WHERE evaluated_crf = 'false'
+					AND study_id = ?)) 
+				ORDER BY sed.ordinal asc
+		</sql>
+	</query>
+	<query>
 		<name>findAllActiveByStudy</name>
 		<sql>
 			SELECT sed.*

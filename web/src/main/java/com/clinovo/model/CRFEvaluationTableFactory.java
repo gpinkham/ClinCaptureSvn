@@ -1,8 +1,16 @@
 package com.clinovo.model;
 
-import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
-import com.clinovo.jmesa.evaluation.CRFEvaluationItem;
-import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -19,6 +27,7 @@ import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -36,16 +45,12 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
+import com.clinovo.jmesa.evaluation.CRFEvaluationItem;
+import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
 
 /**
  * CRFEvaluationTableFactory class.
@@ -123,9 +128,8 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 	}
 
 	private DataSource dataSource;
-
 	private StudyBean currentStudy;
-
+	private UserAccountDAO userAccountDAO;
 	private String contextPath;
 	private boolean showMoreLink;
 	private boolean evaluateWithContext;
@@ -173,7 +177,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 				messageSource.getMessage(CRF_EVALUATION_TABLE_STUDY_SUBJECT_ID, null, locale), null, null, true, true);
 		configureColumn(row.getColumn(EVENT_NAME),
 				messageSource.getMessage(CRF_EVALUATION_TABLE_EVENT_NAME, null, locale), null,
-				new StudyEventTableRowFilter(dataSource, currentStudy), true, false);
+				new StudyEventTableRowFilter(dataSource, currentStudy, getCurrentUserAccount()), true, false);
 		configureColumn(row.getColumn(CRF_STATUS),
 				messageSource.getMessage(CRF_EVALUATION_TABLE_CRF_STATUS, null, locale), new CRFStatusCellEditor(),
 				new CrfStatusFilter(), true, false);
@@ -182,6 +186,11 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn(ACTION_COLUMN),
 				messageSource.getMessage(CRF_EVALUATION_TABLE_ACTION_COLUMN, null, locale), new ActionsCellEditor(),
 				new DefaultActionsEditor(locale), true, false);
+	}
+	
+	private UserAccountBean getCurrentUserAccount() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		return (UserAccountBean) userAccountDAO.findByUserName(authentication.getName());
 	}
 
 	private class EvaluableCRFsFilter extends DroplistFilterEditor {
@@ -526,5 +535,13 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 					.getMessage("evaluation_completed", null, locale)));
 			return optionList;
 		}
+	}
+	
+	public UserAccountDAO getUserAccountDAO() {
+		return this.userAccountDAO;
+	}
+
+	public void setUserAccountDAO(UserAccountDAO userAccountDAO) {
+		this.userAccountDAO = userAccountDAO;
 	}
 }

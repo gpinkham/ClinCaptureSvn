@@ -1,12 +1,15 @@
 package com.clinovo.controller;
 
-import com.clinovo.model.CRFEvaluationTableFactory;
-import com.clinovo.util.SessionUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +18,12 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
+import com.clinovo.model.CRFEvaluationTableFactory;
+import com.clinovo.util.SessionUtil;
 
 /**
  * The controller for managing crf evaluation page.
- *
+ * 
  */
 @Controller
 public class CRFEvaluationController extends Redirection {
@@ -45,7 +47,7 @@ public class CRFEvaluationController extends Redirection {
 
 	/**
 	 * Handle requests from the crf evaluation page.
-	 *
+	 * 
 	 * @param request
 	 *            HttpServletRequest
 	 * @param response
@@ -61,16 +63,14 @@ public class CRFEvaluationController extends Redirection {
 		StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession().getAttribute(BaseController.USER_ROLE);
 		UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute(
 				BaseController.USER_BEAN_NAME);
-
 		BaseController.removeLockedCRF(userAccountBean.getId());
-
 		if (userRole.getRole() == Role.SYSTEM_ADMINISTRATOR || userRole.getRole() == Role.STUDY_ADMINISTRATOR
 				|| userRole.getRole() == Role.STUDY_EVALUATOR) {
-			request.setAttribute(
-					CRF_EVALUATION_TABLE,
-					new CRFEvaluationTableFactory(dataSource, messageSource, new StudyParameterValueDAO(dataSource)
-							.findByHandleAndStudy(currentStudy.getId(), EVALUATE_WITH_CONTEXT), request
-							.getParameter(SHOW_MORE_LINK)).createTable(request, response).render());
+			CRFEvaluationTableFactory factory = new CRFEvaluationTableFactory(dataSource, messageSource,
+					new StudyParameterValueDAO(dataSource).findByHandleAndStudy(currentStudy.getId(),
+							EVALUATE_WITH_CONTEXT), request.getParameter(SHOW_MORE_LINK));
+			factory.setUserAccountDAO(new UserAccountDAO(dataSource));
+			request.setAttribute(CRF_EVALUATION_TABLE, factory.createTable(request, response).render());
 		} else {
 			org.akaza.openclinica.control.core.Controller.addPageMessage(
 					messageSource.getMessage(NO_PERMISSION_TO_EVALUATE, null, SessionUtil.getLocale(request)), request,
