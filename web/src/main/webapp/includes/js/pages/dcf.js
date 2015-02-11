@@ -128,9 +128,11 @@ function validateDcfRequest() {
 			.each(
 					function() {
 						if (this.checked && $(this).val() == "email") {
+							var email = $.trim($("#email").val());
+							$("#email").val(email);
 							var emailReg = new RegExp(
 									/^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/);
-							valid = emailReg.test($("#email").val());
+							valid = emailReg.test(email);
 							if (!valid) {
 								return valid;
 							}

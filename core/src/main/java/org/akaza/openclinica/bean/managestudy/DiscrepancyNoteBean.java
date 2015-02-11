@@ -637,7 +637,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 	}
 
 	public void setSiteContactEmail(String siteContactEmail) {
-		this.siteContactEmail = siteContactEmail;
+		this.siteContactEmail = siteContactEmail != null ? siteContactEmail.trim() : "";
 	}
 
 	public String getFieldForDN() {
