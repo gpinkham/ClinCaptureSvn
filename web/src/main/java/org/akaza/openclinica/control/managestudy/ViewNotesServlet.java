@@ -281,7 +281,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		}
 		if (shouldPrintDcf || shouldSaveDcf) {
 			String dcfFileName = request.getSession().getAttribute(DCF_FILE_NAME_ATTRIBUTE).toString();
-			String contentDisposition = shouldPrintDcf ? "inline" : "attachement";
+			String contentDisposition = shouldPrintDcf ? "inline" : "attachment";
 			writeDcfToResponseStream(response, dcfFileName, contentDisposition);
 			if (shouldPrintDcf) {
 				request.removeAttribute(PRINT_DCF);

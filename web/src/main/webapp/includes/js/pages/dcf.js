@@ -188,6 +188,5 @@ function printDcf() {
 }
 
 function saveDcf() {
-	var url = pageContext + "/ViewNotes?module=submit&saveDcf=yes";
-    window.open(url, "_blank");
+	window.location = pageContext + "/ViewNotes?module=submit&saveDcf=yes";
 }
