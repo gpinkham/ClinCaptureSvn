@@ -20,6 +20,12 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -49,11 +55,6 @@ import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * ViewCRFVersionServlet.
@@ -112,7 +113,7 @@ public class ViewCRFVersionServlet extends Controller {
 			boolean dataChanged = false;
 			boolean changeEventCrfs = false;
 			int totalItems = fp.getInt("totalItems");
-			for (int i = 0; i < totalItems; i++) {
+			for (int i = 1; i <= totalItems; i++) {
 				int itemFormMetaId = fp.getInt("itemFormMetaId_".concat(Integer.toString(i)));
 				boolean sdvRequired = fp.getInt("sdvRequired_".concat(Integer.toString(i))) == 1;
 				ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) ifmdao.findByPK(itemFormMetaId);

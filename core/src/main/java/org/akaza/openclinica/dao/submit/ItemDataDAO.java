@@ -20,23 +20,6 @@
  */
 package org.akaza.openclinica.dao.submit;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.ItemDataType;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,6 +29,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.ItemDataType;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
 /**
  * ItemDataDAO.java, the equivalent to AnswerDAO in the original code base. Modified by ywang (12-07-2007) to convert
  * date_format string pattern of item value when item data type is date,
@@ -54,6 +58,8 @@ import java.util.Locale;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ItemDataDAO extends AuditableEntityDAO {
+
+	public static final int INT_13 = 13;
 
 	private void setQueryNames() {
 		getCurrentPKName = "getCurrentPK";
@@ -1175,14 +1181,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return int
 	 */
-	public int getItemsToSDV(int eventCrfId) {
+	public int getCountOfItemsToSDV(int eventCrfId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
 		variables.put(1, eventCrfId);
 
-		ArrayList alist = this.select(digester.getQuery("getItemsToSDV"), variables);
+		ArrayList alist = this.select(digester.getQuery("countOfItemsToSDV"), variables);
 		Iterator it = alist.iterator();
 		if (it.hasNext()) {
 			return (Integer) ((HashMap) it.next()).get("count");
@@ -1231,5 +1237,46 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		execute(digester.getQuery("sdvCrfItems"), variables);
 
 		return isQuerySuccessful();
+	}
+
+	/**
+	 * Returns the item data map of the SDV required items.
+	 * 
+	 * @param eventCrfId
+	 *            int
+	 * @return Map<ItemDataBean, Boolean>
+	 */
+	public List<DisplayItemBean> getMapItemsToSDV(int eventCrfId) {
+		List<DisplayItemBean> result = new ArrayList<DisplayItemBean>();
+		setTypesExpected();
+		int ind = INT_13;
+		setTypeExpected(ind++, TypeNames.INT); // item_form_metadata_id
+		setTypeExpected(ind++, TypeNames.BOOL); // repeating
+		setTypeExpected(ind, TypeNames.INT); // section
+		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+		variables.put(1, eventCrfId);
+		ArrayList rows = select(digester.getQuery("itemsToSDV"), variables);
+		for (Object row : rows) {
+			DisplayItemBean dib = new DisplayItemBean();
+
+			ItemDataBean itemDataBean = (ItemDataBean) this.getEntityFromHashMap((HashMap) row);
+			dib.setData(itemDataBean);
+
+			Integer metadataId = (Integer) ((HashMap) row).get("item_form_metadata_id");
+			Integer sectionId = (Integer) ((HashMap) row).get("section");
+			ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
+			ifmb.setSectionId(sectionId != null ? sectionId : 0);
+			ifmb.setId(metadataId != null ? metadataId : 0);
+			ifmb.setSdvRequired(true);
+			dib.setMetadata(ifmb);
+
+			Boolean repeating = (Boolean) ((HashMap) row).get("repeating");
+			ItemGroupMetadataBean igmb = new ItemGroupMetadataBean();
+			igmb.setRepeatingGroup(repeating != null && repeating);
+			dib.setGroupMetadata(igmb);
+
+			result.add(dib);
+		}
+		return result;
 	}
 }

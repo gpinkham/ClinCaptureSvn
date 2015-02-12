@@ -20,6 +20,17 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -50,6 +61,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
@@ -64,18 +76,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 /**
- * View a CRF version section data entry
+ * View a CRF version section data entry.
  * 
  * @author jxu
  * 
@@ -162,6 +164,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		SectionDAO sdao = new SectionDAO(getDataSource());
+		ItemDataDAO itemDataDao = getItemDataDAO();
 		String age = "";
 		if (crfVersionId == 0 && eventCRFId == 0) {
 			addPageMessage(respage.getString("please_choose_a_CRF_to_view"), request);
@@ -207,17 +210,17 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
 			List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, ifmdao, eventDefinitionCRFId,
-					allSections, noteThreads);
+			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, itemDataDao, ifmdao,
+					eventDefinitionCRFId, allSections, noteThreads);
 
 			DisplayTableOfContentsBean displayBean = getDisplayBean(ecb);
 
 			Date tmpDate = displayBean.getEventCRF().getDateInterviewed();
 			String formattedInterviewerDate;
 			try {
-				DateFormat local_df = new SimpleDateFormat(resformat.getString("date_format_string"),
+				DateFormat localDf = new SimpleDateFormat(resformat.getString("date_format_string"),
 						ResourceBundleProvider.getLocale());
-				formattedInterviewerDate = local_df.format(tmpDate);
+				formattedInterviewerDate = localDf.format(tmpDate);
 			} catch (Exception e) {
 				formattedInterviewerDate = "";
 			}
@@ -240,7 +243,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 				return;
 			}
-		} else if (crfVersionId > 0) {// for viewing blank CRF
+		} else if (crfVersionId > 0) {
+			// for viewing blank CRF
 			DisplayTableOfContentsBean displayBean = getDisplayBeanByCrfVersionId(crfVersionId);
 			request.setAttribute("toc", displayBean);
 			ArrayList sections = displayBean.getSections();
@@ -279,6 +283,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
 			request.setAttribute(INPUT_EVENT_CRF, ecb);
+			request.setAttribute("eventCRF", ecb);
 			request.setAttribute(SECTION_BEAN, sb);
 
 			// This is the StudySubjectBean
@@ -440,10 +445,12 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 	}
 
 	/**
-	 * Current User may access a requested event CRF in the current user's studies
+	 * Current User may access a requested event CRF in the current user's studies.
 	 *
+	 * @param eventCrfNotes
+	 *            List<DiscrepancyNoteBean>
 	 * @param request
-	 *            TODO
+	 *            HttpServletRequest
 	 */
 
 	private void setAttributeForInterviewerDNotes(List<DiscrepancyNoteBean> eventCrfNotes, HttpServletRequest request) {

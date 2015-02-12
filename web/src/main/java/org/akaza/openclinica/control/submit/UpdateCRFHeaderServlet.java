@@ -1,5 +1,11 @@
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -22,20 +28,19 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * UpdateCRFHeaderServlet.
  */
-@SuppressWarnings({ "serial", "unchecked", "unused" })
+@SuppressWarnings({"serial", "unchecked", "unused"})
 @Component
 public class UpdateCRFHeaderServlet extends Controller {
 
 	public static final String EVENT_DEFINITION_CRF_ID = "eventDefinitionCRFId";
+	public static final String INTERVIEW_DATE = "interviewDate";
+	public static final String INTERVIEWER = "interviewer";
 	public static final String EVENT_CRF_ID = "eventCRFId";
+	public static final String SECTION_ID = "sectionId";
+	public static final String SECTION = "section";
 	public static final String TRUE = "true";
 
 	@Override
@@ -59,7 +64,7 @@ public class UpdateCRFHeaderServlet extends Controller {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
 
-		request.setAttribute("section", new SectionDAO(getDataSource()).findByPK(fp.getInt("sectionId")));
+		request.setAttribute(SECTION, new SectionDAO(getDataSource()).findByPK(fp.getInt(SECTION_ID)));
 
 		EventCRFBean ecb = new EventCRFBean();
 		int eventCRFId = fp.getInt(EVENT_CRF_ID);
@@ -82,6 +87,7 @@ public class UpdateCRFHeaderServlet extends Controller {
 		if (eventCRFId > 0) {
 			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 			allNotes.addAll(dndao.findAllTopNotesByEventCRF(eventCRFId));
+			allNotes.addAll(dndao.findEventCRFDNotesFromEventCRF(ecb));
 			allNotes = filterNotesByUserRole(allNotes, request);
 			allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 		}
@@ -89,10 +95,10 @@ public class UpdateCRFHeaderServlet extends Controller {
 		List<DiscrepancyNoteThread> noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(),
 				currentStudy, null, -1, true);
 
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, ifmdao, eventDefinitionCRFId, allSections,
-				noteThreads);
-		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = (DiscrepancyShortcutsAnalyzer) request
-				.getAttribute(DiscrepancyShortcutsAnalyzer.DISCREPANCY_SHORTCUTS_ANALYZER);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, iddao, ifmdao, eventDefinitionCRFId,
+				allSections, noteThreads);
+		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = DiscrepancyShortcutsAnalyzer
+				.getDiscrepancyShortcutsAnalyzer(request);
 
 		JSONArray jsonArray = new JSONArray();
 		int totalItems = fp.getInt("totalItems");
@@ -103,19 +109,29 @@ public class UpdateCRFHeaderServlet extends Controller {
 			int itemId = fp.getInt("itemId_".concat(Integer.toString(i)));
 			String field = fp.getString("field_".concat(Integer.toString(i)));
 
+			DisplayItemBean dib = new DisplayItemBean();
+			dib.setField(field);
 			ItemDataBean itemDataBean = new ItemDataBean();
 			itemDataBean.setItemId(itemId);
 			itemDataBean.setOrdinal(rowCount + 1);
 			itemDataBean.setEventCRFId(eventCRFId);
-			DisplayItemBean dib = new DisplayItemBean();
-			dib.setField(field);
+			if (field.equalsIgnoreCase(INTERVIEWER)) {
+				dib = discrepancyShortcutsAnalyzer.getInterviewerDisplayItemBean();
+				itemDataBean.setOrdinal(0);
+			} else if (field.equalsIgnoreCase(INTERVIEW_DATE)) {
+				dib = discrepancyShortcutsAnalyzer.getInterviewDateDisplayItemBean();
+				itemDataBean.setOrdinal(0);
+			}
 			dib.setDbData(itemDataBean);
 
 			DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads, true);
 
 			JSONObject jsonObj = new JSONObject();
 			jsonObj.put("rowCount", rowCountValue);
-			jsonObj.put("itemId", itemDataBean.getItemId());
+			jsonObj.put("itemId",
+					field.equalsIgnoreCase(INTERVIEWER) ? INTERVIEWER : (field.equalsIgnoreCase(INTERVIEW_DATE)
+							? INTERVIEW_DATE
+							: itemDataBean.getItemId()));
 			jsonObj.put("field", field);
 			jsonObj.put("newDn", dib.getNewDn());
 			jsonObj.put("updatedDn", dib.getUpdatedDn());

@@ -5,7 +5,7 @@ var firstFormState;
 var currentHighlightedShortcutAnchor;
 var currentHighlightedShortcutAnchorInd;
 var currentHighlightedShortcutAnchorCounter;
-var dnShortcutAnchors = ["newDn_", "updatedDn_", "resolutionProposedDn_", "closedDn_", "annotationDn_"];
+var dnShortcutAnchors = ["newDn_", "updatedDn_", "resolutionProposedDn_", "closedDn_", "annotationDn_", "itemToSDV_"];
 var rowHighlightTypes = {NORMAL: 0, ROWSPAN: 1, MULTIPLE: 2};
 
 var pageTitle_SMForAllOfEvents = "/ListStudySubjects";
@@ -3135,6 +3135,9 @@ function initCrfMoreInfo() {
     $('img[id=moreInfoCollapsedImg]').css('display', 'none');
   }
   $("#dnShortcutsTable").css("top", topVal + "px");
+  adjustDnShortcutsTable();
+  $("table.aka_form_table tr[repeat=template] a.sdvItemLink").remove();
+  $("table.aka_form_table tr[repeat=template] div[id^=dnShortcutAnchors_]").remove();
 }
 
 function processCrfMoreInfo() {
@@ -3475,7 +3478,8 @@ function enableDNBoxFeatures() {
     if ($("#dnShortcutsTable").length > 0 && $("#dnShortcutsTable").css("position") == "absolute") {
         $("#dnShortcutsTable").css("position", "fixed");
         $("#dnShortcutsTable").draggable({
-            containment: "parent",
+            containment: "window",
+            scroll: false,
             start: function (event, ui) {
                 $("#dnShortcutsTable").css("position", "absolute");
             }, drag: function (event, ui) {
@@ -3538,25 +3542,66 @@ function isElementOutViewport(element) {
     return result;
 }
 
-function itemLevelUnSDV(contextPath, itemDataId, sdvItemIconSrc, sdvImgSrc, sdvItemTitle, sdvCrfTitle) {
-    sdvItem(contextPath, itemDataId, sdvItemIconSrc, sdvImgSrc, sdvItemTitle, sdvCrfTitle, "unsdv");
+function adjustDnShortcutsTable() {
+    var dnShortcutsSpan = parseInt($("#dnShortcutsSpan").text());
+    var dnShortcutsWidth = parseInt($("#dnShortcutsWidth").text());
+    var allowSdvWithOpenQueries = $("#dnShortcutsAllowSdvWithOpenQueries").text() == "yes";
+
+    var itemsToSDVAreHidden = false;
+    var userIsAbleToSDVItems = ($("#userIsAbleToSDVItems").text() == "true");
+    var hasDNs = !(parseInt($("#dnShortcutTotalNew").text()) == 0 && parseInt($("#dnShortcutTotalUpdated").text()) == 0 && ($("#dnShortcutTotalResolutionProposed").length == 0 || parseInt($("#dnShortcutTotalResolutionProposed").text()) == 0) && parseInt($("#dnShortcutTotalClosed").text()) == 0 && parseInt($("#dnShortcutTotalAnnotations").text()) == 0);
+    var hasOutstandingDNs = !(parseInt($("#dnShortcutTotalNew").text()) == 0 && parseInt($("#dnShortcutTotalUpdated").text()) == 0 && ($("#dnShortcutTotalResolutionProposed").length == 0 || parseInt($("#dnShortcutTotalResolutionProposed").text()) == 0));
+    var hasItemsToSDV = parseInt($("#dnShortcutTotalItemsToSDV").text()) > 0;
+
+    if (!hasItemsToSDV || (!allowSdvWithOpenQueries && hasOutstandingDNs) || !userIsAbleToSDVItems) {
+        if ((!allowSdvWithOpenQueries && hasOutstandingDNs) || !userIsAbleToSDVItems) {
+            $("a.sdvItemLink").addClass("hidden");
+        }
+        itemsToSDVAreHidden = true;
+        $("#dnShortcutsSubTable tr:eq(1) td:eq(" + (dnShortcutsSpan - 1) + ")").addClass("hidden");
+        $("#dnShortcutsSubTable tr:eq(2) td:eq(" + (dnShortcutsSpan - 1) + ")").addClass("hidden");
+        dnShortcutsSpan--;
+    } else {
+        $("a.sdvItemLink").removeClass("hidden");
+        $("#dnShortcutsSubTable tr:eq(1) td:eq(" + (dnShortcutsSpan - 1) + ")").removeClass("hidden");
+        $("#dnShortcutsSubTable tr:eq(2) td:eq(" + (dnShortcutsSpan - 1) + ")").removeClass("hidden");
+    }
+
+    var endWidth = dnShortcutsSpan * dnShortcutsWidth;
+    $("#dnShortcutsSubTable").attr("width", endWidth + "px");
+    $("#dnShortcutsSubTable tr:eq(0) td").attr("colspan", dnShortcutsSpan);
+    $("#dnShortcutsSubTable tr:eq(1) td").attr("width", ((dnShortcutsWidth / endWidth) * 100) + "%");
+
+    if (!hasDNs && itemsToSDVAreHidden) {
+        $("#dnShortcutsTable").addClass("hidden");
+        $("#crfSectionTabsTable").attr("style", "");
+    } else if ($("#dnShortcutsTable").hasClass("hidden")) {
+        $("#dnShortcutsTable").removeClass("hidden");
+        $("#crfSectionTabsTable").attr("style", "padding-top: 80px;");
+    }
 }
 
-function itemLevelSDV(contextPath, itemDataId, sdvItemIconSrc, sdvImgSrc, sdvItemTitle, sdvCrfTitle) {
-    sdvItem(contextPath, itemDataId, sdvItemIconSrc, sdvImgSrc, sdvItemTitle, sdvCrfTitle, "sdv");
+function itemLevelUnSDV(contextPath, itemDataId, sectionId, eventDefinitionCrfId, sdvItemIconSrc, sdvImgSrc, sdvItemTitle, sdvCrfTitle) {
+    sdvItem(contextPath, itemDataId, sectionId, eventDefinitionCrfId, sdvItemIconSrc, sdvImgSrc, sdvItemTitle, sdvCrfTitle, "unsdv");
 }
 
-function sdvItem(contextPath, itemDataId, sdvItemIconSrc, sdvImgSrc, sdvItemTitle, sdvCrfTitle, action) {
+function itemLevelSDV(contextPath, itemDataId, sectionId, eventDefinitionCrfId, sdvItemIconSrc, sdvImgSrc, sdvItemTitle, sdvCrfTitle) {
+    sdvItem(contextPath, itemDataId, sectionId, eventDefinitionCrfId, sdvItemIconSrc, sdvImgSrc, sdvItemTitle, sdvCrfTitle, "sdv");
+}
+
+function sdvItem(contextPath, itemDataId, sectionId, eventDefinitionCrfId, sdvItemIconSrc, sdvImgSrc, sdvItemTitle, sdvCrfTitle, action) {
     gfAddOverlay();
     try {
         jQuery.ajax({
             url: contextPath + "/pages/sdvItem",
             type: "GET",
-            data: {itemDataId: itemDataId, action: action},
+            data: {itemDataId: itemDataId, sectionId: sectionId, eventDefinitionCrfId: eventDefinitionCrfId, action: action},
             cache: false,
             success: function (data) {
                 jsonData = eval("(" + data + ")");
+                resetHighlightedFieldsForDNShortcutAnchors();
                 var sdvItem = $("#sdv_itemData_" + itemDataId);
+                $("a[id^=itemToSDV_]").remove();
                 sdvItem.attr("onclick", "");
                 sdvItem.unbind("click");
                 if (action == "sdv") {
@@ -3572,7 +3617,8 @@ function sdvItem(contextPath, itemDataId, sdvItemIconSrc, sdvImgSrc, sdvItemTitl
                 sdvItem.mouseover(function () {
                     callTip(sdvItemTitle)
                 });
-                $("#dnShortcutItemsToSDV").text(" " + jsonData.itemsToSDV + " ");
+                $("#dnShortcutTotalItemsToSDV").text(" " + jsonData.totalItemsToSDV + " ");
+                $("#dnShortcutTotalItemsToSDV").parent("a.dnShortcut").attr("sectiontotal", jsonData.totalSectionItemsToSDV);
                 if (jsonData.crf == "sdv" || jsonData.crf == "completed") {
                     var crfName = $("#crfNameId > img");
                     crfName.attr("src", sdvImgSrc);
@@ -3580,6 +3626,13 @@ function sdvItem(contextPath, itemDataId, sdvItemIconSrc, sdvImgSrc, sdvItemTitl
                     crfName.attr("title", sdvCrfTitle);
                     refreshSdvPageAfterItemSDV();
                 }
+                for (var n = 0; n < jsonData.itemDataItems.length; n++) {
+                    var itemData = jsonData.itemDataItems[n];
+                    var holder = $("#sdv_itemData_" + itemData.itemDataId).closest(".itemHolderClass").find("div[id^=dnShortcutAnchors_]");
+                    var data = "<a id=\"itemToSDV_" + (n + 1) + "\" rel=\"" + itemData.itemId + "\" alt=\"" + itemData.rowCount + "\">";
+                    holder.append(data);
+                }
+                adjustDnShortcutsTable();
                 gfRemoveOverlay();
             }
         });
@@ -3589,16 +3642,27 @@ function sdvItem(contextPath, itemDataId, sdvItemIconSrc, sdvImgSrc, sdvItemTitl
 }
 
 function highlightDn(id, color, delay) {
+    var moreInfo = false;
     var element = $("#" + id);
-    var inputHolderElement = $("#itemHolderId_" + element.attr("alt") + "input" + element.attr("rel"));
-    var inputElement = inputHolderElement.find("input[id*=" + element.attr("alt") + "input" + element.attr("rel") + "]");
-    inputElement = inputElement.length == 0 ? inputHolderElement.find("select[id*=" + element.attr("alt") + "input" + element.attr("rel") + "]") : inputElement;
-    inputElement = inputElement.length == 0 ? inputHolderElement.find("textarea[id*=" + element.attr("alt") + "input" + element.attr("rel") + "]") : inputElement;
+    var inputId = "input" + element.attr("rel");
+    if (element.attr("rel") == "interviewer" || element.attr("rel") == "interviewDate") {
+        inputId = element.attr("rel");
+        if (color == "yellow" && $("#CRF_infobox_open").css("display") == "none") {
+            moreInfo = true;
+        }
+    }
+    var inputHolderElement = $("#itemHolderId_" + element.attr("alt") + inputId);
+    var inputElement = inputHolderElement.find("input[id*=" + element.attr("alt") + inputId + "]");
+    inputElement = inputElement.length == 0 ? inputHolderElement.find("select[id*=" + element.attr("alt") + inputId + "]") : inputElement;
+    inputElement = inputElement.length == 0 ? inputHolderElement.find("textarea[id*=" + element.attr("alt") + inputId + "]") : inputElement;
     if (inputElement.attr("type") != undefined && (inputElement.attr("type").toLowerCase() == "radio" || inputElement.attr("type").toLowerCase() == "checkbox")) {
         inputElement = inputElement.parent();
     }
     setTimeout(function () {
         inputElement.css("background-color", color);
+        if (moreInfo) {
+            processCrfMoreInfo();
+        }
         if (color == "yellow" && isElementOutViewport(inputHolderElement.get(0))) {
             var newTop = inputHolderElement.offset().top - $("#dnShortcutsTable").outerHeight() - 20;
             var newLeft = inputHolderElement.offset().left - 20;
@@ -3661,6 +3725,10 @@ function highlightFieldForDNShortcutAnchor(ind, currentElement) {
         }
         delay = 100;
     }
+    if ($("#" + newCurrentHighlightedShortcutAnchor).parents(".itemHolderClass:first").parents("tr:first").css("display") == "none" || $("#" + newCurrentHighlightedShortcutAnchor).parents("div[id^=dnShortcutAnchors_]:first").parents("td:first").css("display") == "none") {
+        highlightFieldForDNShortcutAnchor(ind, currentElement);
+        return;
+    }
     currentHighlightedShortcutAnchor = newCurrentHighlightedShortcutAnchor;
     highlightDn(currentHighlightedShortcutAnchor, "yellow", delay);
 }
@@ -3670,7 +3738,8 @@ function updateCRFHeaderFunction(parametersHolder) {
         parametersHolder.totalItems = 0;
         $("div[id^=dnShortcutAnchors_]").each(function() {
             var rowCount = $(this).attr("id").replace("dnShortcutAnchors_", "").replace(/item_.*/, "");
-            var itemId = parseInt($(this).attr("id").replace(/dnShortcutAnchors_.*item_/, ""));
+            var itemId = $(this).attr("id").replace(/dnShortcutAnchors_.*item_/, "");
+            itemId = itemId == "interviewer" || itemId == "interviewDate" ? itemId : parseInt(itemId);
             var field = $(this).attr("field");
             if ($(this).parent().parent().attr("repeat") != "template") {
                 parametersHolder.totalItems++;
@@ -3678,7 +3747,11 @@ function updateCRFHeaderFunction(parametersHolder) {
                 parametersHolder["itemId_" + parametersHolder.totalItems] = itemId;
                 parametersHolder["field_" + parametersHolder.totalItems] = field;
             }
-            $("#dnShortcutAnchors_" + rowCount + "item_" + itemId).remove();
+            $("#dnShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=newDn_]").remove();
+            $("#dnShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=updatedDn_]").remove();
+            $("#dnShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=closedDn_]").remove();
+            $("#dnShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=annotationDn_]").remove();
+            $("#dnShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=resolutionProposedDn_]").remove();
         });
         parametersHolder.sectionId = $("input[name=sectionId]").val();
         jQuery.ajax({
@@ -3710,39 +3783,29 @@ function updateCRFHeaderFunction(parametersHolder) {
                 $("#dnShortcutTotalAnnotations").parent().attr("sectiontotal", jsonObject.sectionTotalAnnotations);
                 $("#dnShortcutTotalAnnotations").parent().attr("nextdnlink", jsonObject.nextAnnotationDnLink);
 
-                if (parseInt(jsonObject.totalNew) > 0 || parseInt(jsonObject.totalUpdated) > 0 || parseInt(jsonObject.totalResolutionProposed) > 0) {
-                    $("a.sdvItemLink").addClass("hidden");
-                } else {
-                    $("a.sdvItemLink").removeClass("hidden");
-                }
-
-                if (parseInt(jsonObject.totalNew) > 0 || parseInt(jsonObject.totalUpdated) > 0 || parseInt(jsonObject.totalResolutionProposed) > 0 || parseInt(jsonObject.totalClosed) > 0 || parseInt(jsonObject.totalAnnotations) > 0) {
-                    $("#dnShortcutsTable").removeClass("hidden");
-                    $("#crfSectionTabsTable").attr("style", "padding-top: 80px;");
-                }
+                adjustDnShortcutsTable();
 
                 for (var n = 0; n < jsonObject.items.length; n++) {
                     var p;
+                    var dnShortcutsData = "";
                     var item = jsonObject.items[n];
-                    var data = "<div id=\"dnShortcutAnchors_" + item.rowCount + "item_" + item.itemId + "\" field=\"" + item.field + "\" class=\"hidden\">";
-                    var inputHolderElement = $("#itemHolderId_" + item.rowCount + "input" + item.itemId);
+                    var inputHolderElement = $("#dnShortcutAnchors_" + item.rowCount + "item_" + (item.itemId == "interviewer" || item.itemId == "interviewDate" ? item.itemId : item.itemId));
                     for (p = 0; p < item.newDn.length; p++) {
-                        data += "<a id=\"" + item.newDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                        dnShortcutsData += "<a id=\"" + item.newDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
                     }
                     for (p = 0; p < item.updatedDn.length; p++) {
-                        data += "<a id=\"" + item.updatedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                        dnShortcutsData += "<a id=\"" + item.updatedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
                     }
                     for (p = 0; p < item.resolutionProposedDn.length; p++) {
-                        data += "<a id=\"" + item.resolutionProposedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                        dnShortcutsData += "<a id=\"" + item.resolutionProposedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
                     }
                     for (p = 0; p < item.closedDn.length; p++) {
-                        data += "<a id=\"" + item.closedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                        dnShortcutsData += "<a id=\"" + item.closedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
                     }
                     for (p = 0; p < item.annotationDn.length; p++) {
-                        data += "<a id=\"" + item.annotationDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                        dnShortcutsData += "<a id=\"" + item.annotationDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
                     }
-                    data += "</div>";
-                    inputHolderElement.prepend(data);
+                    inputHolderElement.prepend(dnShortcutsData);
                 }
 
                 gfRemoveOverlay();

@@ -14,6 +14,10 @@
  *******************************************************************************/
 package org.akaza.openclinica.util;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -29,10 +33,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 
 	public static final int THREE = 3;
@@ -40,6 +40,7 @@ public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 	public static final int FIVE = 5;
 	public static final int SIX = 6;
 	private MockHttpServletRequest request;
+	private EventCRFBean eventCRFBean;
 	private DisplayItemBean displayItemBean;
 	private DiscrepancyNoteBean discrepancyNoteBean;
 	private List<DiscrepancyNoteThread> noteThreads;
@@ -47,6 +48,9 @@ public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 	@Before
 	public void setUp() throws Exception {
 		request = new MockHttpServletRequest();
+		eventCRFBean = new EventCRFBean();
+		eventCRFBean.setId(1);
+		eventCRFBean.setCRFVersionId(1);
 		ItemDataBean itemDataBean = Mockito.mock(ItemDataBean.class);
 		itemDataBean.setId(1);
 		displayItemBean = new DisplayItemBean();
@@ -55,12 +59,14 @@ public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 		ItemBean itemBean = new ItemBean();
 		itemBean.setId(1);
 		displayItemBean.setItem(itemBean);
+		displayItemBean.setField("input1");
 		noteThreads = new ArrayList<DiscrepancyNoteThread>();
 		ArrayList<DiscrepancyNoteBean> discrepancyNotes = new ArrayList<DiscrepancyNoteBean>();
 		discrepancyNoteBean = new DiscrepancyNoteBean();
 		discrepancyNoteBean.setItemId(1);
 		discrepancyNoteBean.setEntityType("itemData");
 		discrepancyNoteBean.setParentDnId(0);
+		discrepancyNoteBean.setField("input1");
 		discrepancyNotes.add(discrepancyNoteBean);
 		DiscrepancyNoteThread discrepancyNoteThread = new DiscrepancyNoteThread();
 		discrepancyNoteThread.setLinkedNoteList(new LinkedList<DiscrepancyNoteBean>(discrepancyNotes));
@@ -72,36 +78,42 @@ public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 	@Test
 	public void testThatIsFirstNewDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(1);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getNewDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstUpdatedDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(2);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getUpdatedDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstResolutionProposedReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(THREE);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getResolutionProposedDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstClosedDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(FOUR);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getClosedDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstAnnotationReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(FIVE);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getAnnotationDn().size(), 1);
+	}
+
+	@Test
+	public void testThatIsFirstItemToSDVReturnsCorrectValue() throws Exception {
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads, true);
+		assertEquals(displayItemBean.getItemToSDV().size(), 0);
 	}
 
 	@Test
@@ -140,7 +152,7 @@ public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 		}
 		request.setParameter("tabId", "3");
 		request.getSession().setAttribute("domain_name", "clincapture.com");
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, eventCRFBean, itemFormMetadataDAO, SIX,
-				sectionBeans, noteThreads);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, eventCRFBean, itemDataDAO, itemFormMetadataDAO,
+				SIX, sectionBeans, noteThreads);
 	}
 }

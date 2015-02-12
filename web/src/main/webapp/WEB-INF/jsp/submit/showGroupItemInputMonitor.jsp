@@ -481,13 +481,11 @@
     </c:otherwise>
   </c:choose>
 
-  <div id="dnShortcutAnchors_${rowCount}item_${displayItem.item.id}" field="${inputName}" class="hidden">
-      <c:forEach items="${displayItem.newDn}" var="value"><a id="${value}" rel="${itemId}" alt="${rowCount}"></a></c:forEach>
-      <c:forEach items="${displayItem.updatedDn}" var="value"><a id="${value}" rel="${itemId}" alt="${rowCount}"></a></c:forEach>
-      <c:forEach items="${displayItem.resolutionProposedDn}" var="value"><a id="${value}" rel="${itemId}" alt="${rowCount}"></a></c:forEach>
-      <c:forEach items="${displayItem.closedDn}" var="value"><a id="${value}" rel="${itemId}" alt="${rowCount}"></a></c:forEach>
-      <c:forEach items="${displayItem.annotationDn}" var="value"><a id="${value}" rel="${itemId}" alt="${rowCount}"></a></c:forEach>
-  </div>
+  <c:import url="../submit/dnShortcutAnchors.jsp">
+      <c:param name="itemId" value="${itemId}" />
+      <c:param name="rowCount" value="${rowCount}"/>
+      <c:param name="inputName" value="${inputName}"/>
+  </c:import>
 
   <c:choose>
     <c:when test="${displayItem.numDiscrepancyNotes > 0}">
@@ -517,7 +515,11 @@
     </c:otherwise>
   </c:choose>
 
-  <c:import url="../submit/itemSDV.jsp"/>
+  <c:import url="../submit/itemSDV.jsp">
+      <c:param name="itemId" value="${itemId}" />
+      <c:param name="rowCount" value="${rowCount}"/>
+      <c:param name="inputName" value="${inputName}"/>
+  </c:import>
 
 </c:if>
 <%-- we won't need this if we're not embedding error messages

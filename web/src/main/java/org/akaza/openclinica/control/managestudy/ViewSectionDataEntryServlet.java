@@ -20,6 +20,18 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
@@ -57,6 +69,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
@@ -67,17 +80,6 @@ import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * View a CRF version section data entry.
@@ -203,6 +205,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+		ItemDataDAO itemDataDao = getItemDataDAO();
 		SectionDAO sdao = getSectionDAO();
 		String age = "";
 
@@ -250,8 +253,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			List<SectionBean> allSections = ecb != null
 					? sdao.findAllByCRFVersionId(ecb.getCRFVersionId())
 					: new ArrayList<SectionBean>();
-			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, ifmdao, eventDefinitionCRFId,
-					allSections, noteThreads);
+			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, itemDataDao, ifmdao,
+					eventDefinitionCRFId, allSections, noteThreads);
 
 			DisplayTableOfContentsBean displayBean = getDisplayBean(ecb);
 

@@ -421,13 +421,11 @@ form element in red --%>
     </c:otherwise>
   </c:choose>
 
-  <div id="dnShortcutAnchors_item_${displayItem.item.id}" field="${inputName}" class="hidden">
-      <c:forEach items="${displayItem.newDn}" var="value"><a id="${value}" rel="${itemId}" alt=""></a></c:forEach>
-      <c:forEach items="${displayItem.updatedDn}" var="value"><a id="${value}" rel="${itemId}" alt=""></a></c:forEach>
-      <c:forEach items="${displayItem.resolutionProposedDn}" var="value"><a id="${value}" rel="${itemId}" alt=""></a></c:forEach>
-      <c:forEach items="${displayItem.closedDn}" var="value"><a id="${value}" rel="${itemId}" alt=""></a></c:forEach>
-      <c:forEach items="${displayItem.annotationDn}" var="value"><a id="${value}" rel="${itemId}" alt=""></a></c:forEach>
-  </div>
+  <c:import url="../submit/dnShortcutAnchors.jsp">
+      <c:param name="rowCount" value=""/>
+      <c:param name="itemId" value="${itemId}" />
+      <c:param name="inputName" value="${inputName}"/>
+  </c:import>
 
   <td valign="top">
 
@@ -452,7 +450,11 @@ form element in red --%>
           </c:otherwise>
       </c:choose>
 
-      <c:import url="../submit/itemSDV.jsp"/>
+      <c:import url="../submit/itemSDV.jsp">
+          <c:param name="rowCount" value=""/>
+          <c:param name="itemId" value="${itemId}" />
+          <c:param name="inputName" value="${inputName}"/>
+      </c:import>
 
   </td>
 

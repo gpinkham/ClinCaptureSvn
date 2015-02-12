@@ -14,10 +14,19 @@
  *******************************************************************************/
 package com.clinovo.controller;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -27,8 +36,11 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.util.DAOWrapper;
+import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -37,14 +49,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
 /**
  * SDVItemController.
  */
 @Controller
 @RequestMapping("/sdvItem")
+@SuppressWarnings("unchecked")
 public class SDVItemController {
 
 	public static final String CRF = "crf";
@@ -52,9 +62,15 @@ public class SDVItemController {
 	public static final String ITEM = "item";
 	public static final String UN_SDV = "unsdv";
 	public static final String ACTION = "action";
+	public static final String ITEM_ID = "itemId";
+	public static final String ROW_COUNT = "rowCount";
 	public static final String COMPLETED = "completed";
+	public static final String SECTION_ID = "sectionId";
 	public static final String ITEM_DATA_ID = "itemDataId";
-	public static final String ITEMS_TO_SDV = "itemsToSDV";
+	public static final String ITEM_DATA_ITEMS = "itemDataItems";
+	public static final String TOTAL_ITEMS_TO_SDV = "totalItemsToSDV";
+	public static final String EVENT_DEFINITION_CRF_ID = "eventDefinitionCrfId";
+	public static final String TOTAL_SECTION_ITEMS_TO_SDV = "totalSectionItemsToSDV";
 
 	@Autowired
 	private DataSource dataSource;
@@ -75,23 +91,44 @@ public class SDVItemController {
 				BaseController.USER_BEAN_NAME);
 
 		String action = request.getParameter(ACTION);
+		int sectionId = Integer.parseInt(request.getParameter(SECTION_ID));
 		int itemDataId = Integer.parseInt(request.getParameter(ITEM_DATA_ID));
+		int eventDefinitionCrfId = Integer.parseInt(request.getParameter(EVENT_DEFINITION_CRF_ID));
 
+		SectionDAO sectionDao = new SectionDAO(dataSource);
 		ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
 		ItemDataBean itemDataBean = (ItemDataBean) itemDataDao.findByPK(itemDataId);
 		itemDataBean.setSdv(action.equalsIgnoreCase(SDV));
 		itemDataDao.update(itemDataBean);
 
 		String crf = "";
-		int eventCrfId = itemDataBean.getEventCRFId();
-		int itemsToSDV = itemDataDao.getItemsToSDV(eventCrfId);
+		EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
+		EventCRFBean eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(itemDataBean.getEventCRFId());
 
-		if (action.contentEquals(UN_SDV) || (action.contentEquals(SDV) && itemsToSDV == 0)) {
-			EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
-			EventCRFBean eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfId);
+		JSONArray jsonArray = new JSONArray();
+		List<SectionBean> sections = sectionDao.findAllByCRFVersionId(eventCrfBean.getId());
+		List<DisplayItemBean> displayItemBeanList = itemDataDao.getMapItemsToSDV(eventCrfBean.getId());
+		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = DiscrepancyShortcutsAnalyzer
+				.getDiscrepancyShortcutsAnalyzer(request);
+		Map<String, Integer> deltaMap = new HashMap<String, Integer>();
+		for (DisplayItemBean dib : displayItemBeanList) {
+			DiscrepancyShortcutsAnalyzer.prepareItemsToSDVShortcutLink(request, dib, eventCrfBean,
+					eventDefinitionCrfId, sections, deltaMap);
+			if (sectionId == dib.getMetadata().getSectionId()) {
+				boolean repeating = dib.getGroupMetadata().isRepeatingGroup();
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put(ITEM_ID, dib.getData().getItemId());
+				jsonObj.put(ITEM_DATA_ID, dib.getData().getId());
+				jsonObj.put(ROW_COUNT, repeating ? dib.getData().getOrdinal() - 1 : "");
+				jsonArray.put(jsonObj);
+				discrepancyShortcutsAnalyzer.incSectionTotalItemsToSDV();
+			}
+		}
 
-			crf = action.contentEquals(SDV) && itemsToSDV == 0 ? SDV : (action.contentEquals(UN_SDV)
-					&& eventCrfBean.isSdvStatus() ? COMPLETED : crf);
+		if (action.contentEquals(UN_SDV)
+				|| (action.contentEquals(SDV) && discrepancyShortcutsAnalyzer.getTotalItemsToSDV() == 0)) {
+			crf = action.contentEquals(SDV) && discrepancyShortcutsAnalyzer.getTotalItemsToSDV() == 0 ? SDV : (action
+					.contentEquals(UN_SDV) && eventCrfBean.isSdvStatus() ? COMPLETED : crf);
 			eventCrfBean.setSdvStatus(action.contentEquals(SDV));
 			eventCrfDao.update(eventCrfBean);
 
@@ -107,7 +144,10 @@ public class SDVItemController {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put(ITEM, SDV);
 		jsonObject.put(CRF, crf);
-		jsonObject.put(ITEMS_TO_SDV, Integer.toString(itemsToSDV));
+		jsonObject.put(TOTAL_ITEMS_TO_SDV, Integer.toString(discrepancyShortcutsAnalyzer.getTotalItemsToSDV()));
+		jsonObject.put(TOTAL_SECTION_ITEMS_TO_SDV,
+				Integer.toString(discrepancyShortcutsAnalyzer.getSectionTotalItemsToSDV()));
+		jsonObject.put(ITEM_DATA_ITEMS, jsonArray);
 
 		return jsonObject.toString();
 	}

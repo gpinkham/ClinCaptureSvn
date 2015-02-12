@@ -1,3 +1,4 @@
+<%@ page import="org.akaza.openclinica.bean.submit.EventCRFBean" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -381,7 +382,12 @@
     </c:if>
 </c:forEach>
 <tr id="preDnShortcutsTr">
-    <td class="header_crf_cell">
+    <td class="header_crf_cell" id="itemHolderId_interviewer">
+        <c:import url="../submit/dnShortcutAnchors.jsp">
+            <c:param name="rowCount" value=""/>
+            <c:param name="itemId" value="interviewer" />
+            <c:param name="inputName" value="interviewer"/>
+        </c:import>
         <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
             <c:set var="showPreDnShortcutsTr" value="true"/>
             <c:choose>
@@ -406,7 +412,7 @@
                         </c:when>
                         <c:otherwise>
                             <span class="formfieldM_BG" style="display:inline-block;height:22px;">
-                                <input type="text" name="interviewer" size="15"
+                                <input type="text" id="interviewer" name="interviewer" size="15"
                                        value="<c:out value="${interviewer}" />" class="formfieldM">
                             </span>
                         </c:otherwise>
@@ -416,7 +422,7 @@
                     <span class="formfieldM_BG" style="display:inline-block;height:22px;">
                         <input type="text" disabled size="15"
                                value="<c:out value="${interviewer}" />" class="formfieldM">
-                        <input type="hidden" name="interviewer"
+                        <input type="hidden" id="interviewer" name="interviewer"
                                value="<c:out value="${interviewer}" />">
                     </span>
                 </c:otherwise>
@@ -465,7 +471,12 @@
         </c:if>
     </td>
 
-    <td class="header_crf_cell">
+    <td class="header_crf_cell" id="itemHolderId_interviewDate">
+        <c:import url="../submit/dnShortcutAnchors.jsp">
+            <c:param name="rowCount" value=""/>
+            <c:param name="itemId" value="interviewDate" />
+            <c:param name="inputName" value="interviewDate"/>
+        </c:import>
         <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
             <c:set var="showPreDnShortcutsTr" value="true"/>
             <c:choose>
@@ -535,19 +546,19 @@
                 </c:otherwise>
                 </c:choose>
                 <c:choose>
-                <c:when test="${hasDateNote eq 'yes'}">
-                <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') );" onmouseout="UnTip();"
-                   onClick="openDNoteWindow('<c:out value="${contextPath}" />/ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerDateNote.eventCRFId}&name=${InterviewerDateNote.entityType}&field=interviewDate&column=${InterviewerDateNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
-                    <img style="vertical-align: middle;" id="flag_interviewDate" name="flag_interviewDate" src="<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
-                </a>
-                </c:when>
-                <c:otherwise>
-                <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') );" onmouseout="UnTip();"
-                   onClick="openDNoteWindow('<c:out value="${contextPath}" />/CreateDiscrepancyNote?stSubjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate', undefined, event); return false;">
-                    <img style="vertical-align: middle;" id="flag_interviewDate" name="flag_interviewDate"src="<c:out value="${contextPath}" />/images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
-                    <input type="hidden" value="<c:out value="${contextPath}" />/ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySubject.id}&itemId=${itemId}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&enterData=${enterData}&monitor=${monitor}&blank=${blank}"/>
-                </a>
-                </c:otherwise>
+                    <c:when test="${hasDateNote eq 'yes'}">
+                        <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') );" onmouseout="UnTip();"
+                           onClick="openDNoteWindow('<c:out value="${contextPath}" />/ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerDateNote.eventCRFId}&name=${InterviewerDateNote.entityType}&field=interviewDate&column=${InterviewerDateNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
+                            <img style="vertical-align: middle;" id="flag_interviewDate" name="flag_interviewDate" src="<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
+                        </a>
+                    </c:when>
+                    <c:otherwise>
+                        <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') );" onmouseout="UnTip();"
+                           onClick="openDNoteWindow('<c:out value="${contextPath}" />/CreateDiscrepancyNote?stSubjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate', undefined, event); return false;">
+                            <img style="vertical-align: middle;" id="flag_interviewDate" name="flag_interviewDate"src="<c:out value="${contextPath}" />/images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
+                            <input type="hidden" value="<c:out value="${contextPath}" />/ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySubject.id}&itemId=${itemId}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&enterData=${enterData}&monitor=${monitor}&blank=${blank}"/>
+                        </a>
+                    </c:otherwise>
                 </c:choose>
                 </c:if>
                 <span ID="spanAlert-interviewDate" class="alert"></span>
@@ -574,11 +585,15 @@
     <c:set var="tdPercentWidth" value="20%"/>
     <c:set var="dnShortcutsSpan" value="${dnShortcutsSpan - 1}"/>
 </c:if>
+<span class="hidden" id="dnShortcutsSpan">${dnShortcutsSpan}</span>
+<span class="hidden" id="dnShortcutsWidth">${dnShortcutsWidth}</span>
+<span class="hidden" id="dnShortcutsAllowSdvWithOpenQueries">${study.studyParameterConfig.allowSdvWithOpenQueries}</span>
+<span class="hidden" id="userIsAbleToSDVItems">${discrepancyShortcutsAnalyzer.userIsAbleToSDVItems}</span>
 <table id="dnShortcutsTable" border="0" cellspacing="0" cellpadding="0" style="cursor: default;position: absolute;left: 0px;top: 0px;" class="notSelectable">
     <tr>
         <td>
             <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR"><div class="tablebox_center">
-                <table border="0" cellspacing="0" cellpadding="0" width="${dnShortcutsSpan * dnShortcutsWidth}px">
+                <table id="dnShortcutsSubTable" border="0" cellspacing="0" cellpadding="0" width="${dnShortcutsSpan * dnShortcutsWidth}px">
                     <tr>
                         <td colspan="${dnShortcutsSpan}" valign="top" class="table_cell_left_header" style="padding-left: 6px; padding-right: 6px;"><b><fmt:message key="crf_shortcuts_header" bundle="${resword}"/>:</b><a class="closeLink" onclick="resetDnShortcutsTable();">x</a></td>
                     </tr>
@@ -587,20 +602,20 @@
                         <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:#D4A718;text-align: center;"><fmt:message key="updatedDn" bundle="${resword}"/></td>
                         <c:if test="${discrepancyShortcutsAnalyzer.totalResolutionProposed != 0}"><td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;"> <fmt:message key="resolved" bundle="${resword}"/></td></c:if>
                         <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:#7CB98F;text-align: center;"><fmt:message key="closedDn" bundle="${resword}"/></td>
-                        <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left"  style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;"> <fmt:message key="annotations" bundle="${resword}"/></td>
-                        <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left hidden"  style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;"> <fmt:message key="itemsToSDV" bundle="${resword}"/></td>
+                        <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;"> <fmt:message key="annotations" bundle="${resword}"/></td>
+                        <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;"> <fmt:message key="itemsToSDV" bundle="${resword}"/></td>
                     </tr>
                     <tr>
                         <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#CC0000;"><a class="dnShortcut" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalNew}" nextdnlink="${discrepancyShortcutsAnalyzer.nextNewDnLink}" onclick="highlightFieldForDNShortcutAnchor(0, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalNew">&nbsp;${discrepancyShortcutsAnalyzer.totalNew}&nbsp;</div></a></td>
                         <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#D4A718;"><a class="dnShortcut" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalUpdated}" nextdnlink="${discrepancyShortcutsAnalyzer.nextUpdatedDnLink}" onclick="highlightFieldForDNShortcutAnchor(1, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalUpdated">&nbsp;${discrepancyShortcutsAnalyzer.totalUpdated}&nbsp;</div></a></td>
                         <c:if test="${discrepancyShortcutsAnalyzer.totalResolutionProposed != 0}"><td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black;"><a class="dnShortcut" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalResolutionProposed}" nextdnlink="${discrepancyShortcutsAnalyzer.nextResolutionProposedLink}" onclick="highlightFieldForDNShortcutAnchor(2, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalResolutionProposed">&nbsp;${discrepancyShortcutsAnalyzer.totalResolutionProposed}&nbsp;</div></a></td></c:if>
                         <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#7CB98F;"><a class="dnShortcut" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalClosed}" nextdnlink="${discrepancyShortcutsAnalyzer.nextClosedDnLink}" onclick="highlightFieldForDNShortcutAnchor(3, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalClosed">&nbsp;${discrepancyShortcutsAnalyzer.totalClosed}&nbsp;</div></a></td>
-                        <td valign="top" align="center" class="table_cell_left"  style="border-right:1px solid #E6E6E6;color:black"><a class="dnShortcut" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalAnnotations}" nextdnlink="${discrepancyShortcutsAnalyzer.nextAnnotationLink}" onclick="highlightFieldForDNShortcutAnchor(4, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalAnnotations">&nbsp;${discrepancyShortcutsAnalyzer.totalAnnotations}&nbsp;</div></a></td>
-                        <td valign="top" align="center" class="table_cell_left hidden"  style="border-right:1px solid #E6E6E6;color:black"><a class="dnShortcut"><div style="width: 100%; text-align: center;" id="dnShortcutItemsToSDV">&nbsp;0&nbsp;</div></a></td>
+                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black"><a class="dnShortcut" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalAnnotations}" nextdnlink="${discrepancyShortcutsAnalyzer.nextAnnotationLink}" onclick="highlightFieldForDNShortcutAnchor(4, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalAnnotations">&nbsp;${discrepancyShortcutsAnalyzer.totalAnnotations}&nbsp;</div></a></td>
+                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black"><a class="dnShortcut" sectiontotal="${discrepancyShortcutsAnalyzer.sectionTotalItemsToSDV}" nextdnlink="${discrepancyShortcutsAnalyzer.nextItemToSDVLink}" onclick="highlightFieldForDNShortcutAnchor(5, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalItemsToSDV">&nbsp;${discrepancyShortcutsAnalyzer.totalItemsToSDV}&nbsp;</div></a></td>
                     </tr>
                 </table>
             </div></div></div></div></div></div></div></div></div>
-            <c:if test="${discrepancyShortcutsAnalyzer eq null || (discrepancyShortcutsAnalyzer.totalNew == 0 && discrepancyShortcutsAnalyzer.totalUpdated == 0 && discrepancyShortcutsAnalyzer.totalResolutionProposed == 0 && discrepancyShortcutsAnalyzer.totalClosed == 0 && discrepancyShortcutsAnalyzer.totalAnnotations == 0)}">
+            <c:if test="${discrepancyShortcutsAnalyzer eq null || (discrepancyShortcutsAnalyzer.totalNew == 0 && discrepancyShortcutsAnalyzer.totalUpdated == 0 && discrepancyShortcutsAnalyzer.totalResolutionProposed == 0 && discrepancyShortcutsAnalyzer.totalClosed == 0 && discrepancyShortcutsAnalyzer.totalAnnotations == 0 && discrepancyShortcutsAnalyzer.totalItemsToSDV == 0)}">
                 <script>
                     $("#dnShortcutsTable").addClass("hidden");
                 </script>
@@ -654,7 +669,7 @@
             field: field,
             rowCount: rowCount,
             resolutionStatusId: parseInt(resolutionStatusId),
-            eventCRFId: parseInt("<%=request.getParameter("eventCRFId") == null ? request.getAttribute("eventCRFId") : request.getParameter("eventCRFId")%>"),
+            eventCRFId: parseInt("${eventCRF.id}"),
             eventDefinitionCRFId: parseInt("<%=request.getParameter("eventDefinitionCRFId") == null ? request.getAttribute("eventDefinitionCRFId") : request.getParameter("eventDefinitionCRFId")%>"),
             studyEventId: parseInt("<%=request.getParameter("studyEventId") == null ? request.getAttribute("studyEventId") : request.getParameter("studyEventId")%>"),
             subjectId: parseInt("<%=request.getParameter("subjectId") == null ? request.getAttribute("subjectId") : request.getParameter("subjectId")%>"),

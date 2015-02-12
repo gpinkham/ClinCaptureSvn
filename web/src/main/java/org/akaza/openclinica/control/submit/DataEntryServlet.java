@@ -20,12 +20,28 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.model.CodedItemElement;
-import com.clinovo.service.DataEntryService;
-import com.clinovo.service.ReportCRFService;
-import com.clinovo.util.SessionUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.io.File;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -126,26 +142,12 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.impl.StdScheduler;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.CodedItemElement;
+import com.clinovo.service.DataEntryService;
+import com.clinovo.service.ReportCRFService;
+import com.clinovo.util.SessionUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * @author ssachs
@@ -260,7 +262,6 @@ public abstract class DataEntryServlet extends Controller {
 
 	public static final String DN_ADDITIONAL_CR_PARAMS = "dnAdditionalCreatingParameters";
 
-	public static final String SECTION_CHANGED = "sectionChanged";
 	public static final int INT_3800 = 3800;
 	public static final int INT_255 = 255;
 	public static final int INT_3 = 3;
@@ -479,8 +480,8 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, ifmdao, eventDefinitionCRFId, allSections,
-				noteThreads);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, iddao, ifmdao, eventDefinitionCRFId,
+				allSections, noteThreads);
 		logMe("Entering DataEntry Create disc note threads out of the various notes DONE" + System.currentTimeMillis());
 
 		logMe("Entering some EVENT DEF CRF CHECK DONE " + System.currentTimeMillis());
@@ -495,6 +496,8 @@ public abstract class DataEntryServlet extends Controller {
 		edcBean.setId(eventDefinitionCRFId);
 
 		request.setAttribute("studyEvent", studyEventBean);
+		request.setAttribute("studyEventId", studyEventBean.getId());
+		request.setAttribute("eventDefinitionCRFId", eventDefinitionCRFId);
 
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
 		StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) seddao.findByPK(edcBean
@@ -1779,7 +1782,6 @@ public abstract class DataEntryServlet extends Controller {
 								forwardingSucceeded = true;
 								request.setAttribute(INPUT_EVENT_CRF, ecb);
 								request.setAttribute(INPUT_SECTION, previousSec);
-								request.setAttribute(SECTION_CHANGED, true);
 								request.setAttribute(INPUT_SECTION_ID, Integer.toString(previousSec.getId()));
 								request.setAttribute("tabId", Integer.toString(DiscrepancyShortcutsAnalyzer.getTabNum(
 										allSections, previousSec.getId())));
@@ -1790,7 +1792,6 @@ public abstract class DataEntryServlet extends Controller {
 								forwardingSucceeded = true;
 								request.setAttribute(INPUT_EVENT_CRF, ecb);
 								request.setAttribute(INPUT_SECTION, nextSec);
-								request.setAttribute(SECTION_CHANGED, true);
 								request.setAttribute(INPUT_SECTION_ID, Integer.toString(nextSec.getId()));
 								request.setAttribute(
 										"tabId",
@@ -1826,7 +1827,6 @@ public abstract class DataEntryServlet extends Controller {
 								// is not the last section
 								if (!section.isLastSection()) {
 									request.setAttribute(INPUT_SECTION, nextSec);
-									request.setAttribute(SECTION_CHANGED, true);
 									request.setAttribute(INPUT_SECTION_ID, Integer.toString(nextSec.getId()));
 									request.setAttribute("tabId", Integer.toString(DiscrepancyShortcutsAnalyzer
 											.getTabNum(allSections, nextSec.getId())));
@@ -3275,6 +3275,7 @@ public abstract class DataEntryServlet extends Controller {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(STUDY);
 		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
+		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
 		List<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesFromEventCRF(ecb);
@@ -3303,6 +3304,22 @@ public abstract class DataEntryServlet extends Controller {
 				}
 			}
 		}
+
+		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = DiscrepancyShortcutsAnalyzer
+				.getDiscrepancyShortcutsAnalyzer(request);
+		discrepancyShortcutsAnalyzer.setSectionTotalItemsToSDV(0);
+
+		ArrayList notes = new ArrayList(discNotes.getNotes(INPUT_INTERVIEWER));
+		notes.addAll(existingNameNotes);
+		noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request,
+				discrepancyShortcutsAnalyzer.getInterviewerDisplayItemBean(), noteThreads, false);
+
+		notes = new ArrayList(discNotes.getNotes(INPUT_INTERVIEW_DATE));
+		notes.addAll(existingIntrvDateNotes);
+		noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request,
+				discrepancyShortcutsAnalyzer.getInterviewDateDisplayItemBean(), noteThreads, false);
 
 		setToolTipEventNotes(request);
 
@@ -3376,7 +3393,7 @@ public abstract class DataEntryServlet extends Controller {
 
 						dbNotes = filterNotesByUserRole(dbNotes, request);
 
-						ArrayList notes = new ArrayList(discNotes.getNotes(inputName));
+						notes = new ArrayList(discNotes.getNotes(inputName));
 						notes.addAll(dbNotes);
 						noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1,
 								true);
@@ -3385,7 +3402,7 @@ public abstract class DataEntryServlet extends Controller {
 						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(request, dndao, itemDataId,
 								discNotes.getNotes(inputName)));
 						dib = setTotals(dib, itemDataId, toolTipDNotes, parentNotes, notes, ecb.getId(), request);
-						DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
+						DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads, false);
 						logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId()
 								+ " " + inputName);
 						items.set(j, dib);
@@ -3409,7 +3426,7 @@ public abstract class DataEntryServlet extends Controller {
 				List parentNotes = dbNotes == null ? new ArrayList() : new ArrayList(dbNotes);
 				dbNotes = dbNotes == null ? new ArrayList() : new ArrayList(dbNotes);
 
-				ArrayList notes = new ArrayList(discNotes.getNotes(inputFieldName));
+				notes = new ArrayList(discNotes.getNotes(inputFieldName));
 
 				dbNotes = filterNotesByUserRole(dbNotes, request);
 
@@ -3421,7 +3438,7 @@ public abstract class DataEntryServlet extends Controller {
 				dib = setTotals(dib, itemDataId, toolTipDNotes, parentNotes, discNotes.getNotes(inputFieldName),
 						ecb.getId(), request);
 				noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
-				DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
+				DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads, false);
 
 				ArrayList childItems = dib.getChildren();
 
@@ -3453,7 +3470,7 @@ public abstract class DataEntryServlet extends Controller {
 							discNotes.getNotes(childInputFieldName)));
 					child = setTotals(child, childItemDataId, toolTipChildDNotes, parentChildNotes,
 							discNotes.getNotes(childInputFieldName), ecb.getId(), request);
-					DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, child, noteThreads);
+					DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, child, noteThreads, false);
 					childItems.set(j, child);
 				}
 				dib.setChildren(childItems);
@@ -3958,13 +3975,17 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	/**
-	 * Constructs a list of DisplayItemWithGroupBean, which is used for display a section of items on the UI
+	 * Constructs a list of DisplayItemWithGroupBean, which is used for display a section of items on the UI.
 	 * 
 	 * @param dsb
+	 *            DisplaySectionBean
 	 * @param hasItemGroup
+	 *            boolean
+	 * @param eventCRFDefId
+	 *            int
 	 * @param request
-	 *            TODO
-	 * @return
+	 *            HttpServletRequest
+	 * @return List<DisplayItemWithGroupBean>
 	 */
 	protected List<DisplayItemWithGroupBean> createItemWithGroups(DisplaySectionBean dsb, boolean hasItemGroup,
 			int eventCRFDefId, HttpServletRequest request) {
@@ -4515,11 +4536,14 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	/**
-	 * Customized validation for item input
+	 * Customized validation for item input.
 	 * 
 	 * @param v
+	 *            DiscrepancyValidator
 	 * @param dib
+	 *            DisplayItemBean
 	 * @param inputName
+	 *            String
 	 */
 	private void customValidation(DiscrepancyValidator v, DisplayItemBean dib, String inputName) {
 		String customValidationString = dib.getMetadata().getRegexp();

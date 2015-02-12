@@ -255,7 +255,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%><d
     </div>
 </div>
 <!-- section tabs here -->
-<table id="crfSectionTabsTable" border="0" cellpadding="0" cellspacing="0" style="${!(discrepancyShortcutsAnalyzer eq null || (discrepancyShortcutsAnalyzer.totalNew == 0 && discrepancyShortcutsAnalyzer.totalUpdated == 0 && discrepancyShortcutsAnalyzer.totalResolutionProposed == 0 && discrepancyShortcutsAnalyzer.totalClosed == 0 && discrepancyShortcutsAnalyzer.totalAnnotations == 0)) ? 'padding-top: 80px;' : 'padding-top: 0px;'}">
+<table id="crfSectionTabsTable" border="0" cellpadding="0" cellspacing="0" style="${!(discrepancyShortcutsAnalyzer eq null || (discrepancyShortcutsAnalyzer.totalNew == 0 && discrepancyShortcutsAnalyzer.totalUpdated == 0 && discrepancyShortcutsAnalyzer.totalResolutionProposed == 0 && discrepancyShortcutsAnalyzer.totalClosed == 0 && discrepancyShortcutsAnalyzer.totalAnnotations == 0 && discrepancyShortcutsAnalyzer.totalItemsToSDV == 0)) ? 'padding-top: 80px;' : 'padding-top: 0px;'}">
 <tr><td>
     <c:if test="${!empty pageMessages}">
         <div class="alert">

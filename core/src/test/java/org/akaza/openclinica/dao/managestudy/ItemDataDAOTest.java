@@ -1,5 +1,9 @@
 package org.akaza.openclinica.dao.managestudy;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -13,10 +17,6 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class ItemDataDAOTest extends DefaultAppContextTest {
 
@@ -415,8 +415,13 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatGetItemsToSDVReturnsTrue() {
-		assertEquals(itemDataDAO.getItemsToSDV(1), 0);
+	public void testThatGetCountOfItemsToSDVReturnsTrue() {
+		assertEquals(itemDataDAO.getCountOfItemsToSDV(1), 0);
+	}
+
+	@Test
+	public void testThatGetMapItemsToSDVReturnsCorrectSize() {
+		assertEquals(itemDataDAO.getMapItemsToSDV(1).size(), 0);
 	}
 
 	@Test

@@ -19,22 +19,28 @@
  */
 package org.akaza.openclinica.bean.submit;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.service.crfdata.SCDData;
 import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-@SuppressWarnings({ "rawtypes" })
+/**
+ * DisplayItemBean.
+ */
+@SuppressWarnings({"rawtypes"})
 public class DisplayItemBean implements Comparable {
+	public static final int INT_1231 = 1231;
+	public static final int INT_1237 = 1237;
 	private ItemDataBean data;
 	private ItemBean item;
 	private ItemFormMetadataBean metadata;
-	private String editFlag = "";// used for items in a group
+	private ItemGroupMetadataBean groupMetadata;
+	private String editFlag = ""; // used for items in a group
 	private ItemDataBean dbData; // used for DDE, items in a group
 	private boolean autoAdded; // used for data import
 
@@ -92,6 +98,7 @@ public class DisplayItemBean implements Comparable {
 	private List<String> resolutionProposedDn = new ArrayList<String>();
 	private List<String> closedDn = new ArrayList<String>();
 	private List<String> annotationDn = new ArrayList<String>();
+	private List<String> itemToSDV = new ArrayList<String>();
 
 	/**
 	 * It is true if a scd item will display because of chosen options.
@@ -130,6 +137,9 @@ public class DisplayItemBean implements Comparable {
 		instantFrontStrGroup = new InstantOnChangeFrontStrGroup();
 	}
 
+	/**
+	 * DisplayItemBean constructor.
+	 */
 	public DisplayItemBean() {
 		this.eventDefinitionCRF = new EventDefinitionCRFBean();
 		setProperties();
@@ -262,9 +272,10 @@ public class DisplayItemBean implements Comparable {
 
 	/**
 	 * Loads a set of values from the form into the bean. This means that the selected property of the
-	 * ResponseOptionBean objects metadata.responseSet.opresponseOption value is set properly, and
+	 * ResponseOptionBean objects metadata.responseSet.opresponseOption value is set properly, and.
 	 * 
 	 * @param values
+	 *            ArrayList
 	 */
 	public void loadFormValue(ArrayList values) {
 		ResponseSetBean rsb = metadata.getResponseSet();
@@ -290,6 +301,12 @@ public class DisplayItemBean implements Comparable {
 		data.setValue(valueForDB);
 	}
 
+	/**
+	 * Method loads form value.
+	 * 
+	 * @param value
+	 *            String
+	 */
 	public void loadFormValue(String value) {
 		ResponseSetBean rsb = metadata.getResponseSet();
 		org.akaza.openclinica.bean.core.ResponseType rt = rsb.getResponseType();
@@ -312,19 +329,19 @@ public class DisplayItemBean implements Comparable {
 		data.setValue(value);
 	}
 
+	/**
+	 * Method loads DB value.
+	 */
 	public void loadDBValue() {
 		ResponseSetBean rsb = metadata.getResponseSet();
 		org.akaza.openclinica.bean.core.ResponseType rt = rsb.getResponseType();
 		String dbValue = data.getValue();
 		if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX)
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
-			String dbValues[] = dbValue.split(",");
-
-			if (dbValues != null) {
-				for (String element : dbValues) {
-					if (element != null) {
-						rsb.setSelected(element.trim(), true);
-					}
+			String[] dbValues = dbValue.split(",");
+			for (String element : dbValues) {
+				if (element != null) {
+					rsb.setSelected(element.trim(), true);
 				}
 			}
 		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT)
@@ -363,7 +380,7 @@ public class DisplayItemBean implements Comparable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (blankDwelt ? 1231 : 1237);
+		result = prime * result + (blankDwelt ? INT_1231 : INT_1237);
 		result = prime * result + (children == null ? 0 : children.hashCode());
 		result = prime * result + (data == null ? 0 : data.hashCode());
 		result = prime * result + (dbData == null ? 0 : dbData.hashCode());
@@ -372,7 +389,7 @@ public class DisplayItemBean implements Comparable {
 		result = prime * result + (editFlag == null ? 0 : editFlag.hashCode());
 		result = prime * result + (eventDefinitionCRF == null ? 0 : eventDefinitionCRF.hashCode());
 		result = prime * result + (instantFrontStrGroup == null ? 0 : instantFrontStrGroup.hashCode());
-		result = prime * result + (isSCDtoBeShown ? 1231 : 1237);
+		result = prime * result + (isSCDtoBeShown ? INT_1231 : INT_1237);
 		result = prime * result + (item == null ? 0 : item.hashCode());
 		result = prime * result + (metadata == null ? 0 : metadata.hashCode());
 		result = prime * result + numChildren;
@@ -389,85 +406,119 @@ public class DisplayItemBean implements Comparable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		DisplayItemBean other = (DisplayItemBean) obj;
-		if (blankDwelt != other.blankDwelt)
+		if (blankDwelt != other.blankDwelt) {
 			return false;
+		}
 		if (children == null) {
-			if (other.children != null)
+			if (other.children != null) {
 				return false;
-		} else if (!children.equals(other.children))
+			}
+		} else if (!children.equals(other.children)) {
 			return false;
+		}
 		if (data == null) {
-			if (other.data != null)
+			if (other.data != null) {
 				return false;
-		} else if (!data.equals(other.data))
+			}
+		} else if (!data.equals(other.data)) {
 			return false;
+		}
 		if (dbData == null) {
-			if (other.dbData != null)
+			if (other.dbData != null) {
 				return false;
-		} else if (!dbData.equals(other.dbData))
+			}
+		} else if (!dbData.equals(other.dbData)) {
 			return false;
-		if (discrepancyNoteStatus != other.discrepancyNoteStatus)
+		}
+		if (discrepancyNoteStatus != other.discrepancyNoteStatus) {
 			return false;
+		}
 		if (discrepancyNotes == null) {
-			if (other.discrepancyNotes != null)
+			if (other.discrepancyNotes != null) {
 				return false;
-		} else if (!discrepancyNotes.equals(other.discrepancyNotes))
+			}
+		} else if (!discrepancyNotes.equals(other.discrepancyNotes)) {
 			return false;
+		}
 		if (editFlag == null) {
-			if (other.editFlag != null)
+			if (other.editFlag != null) {
 				return false;
-		} else if (!editFlag.equals(other.editFlag))
+			}
+		} else if (!editFlag.equals(other.editFlag)) {
 			return false;
+		}
 		if (eventDefinitionCRF == null) {
-			if (other.eventDefinitionCRF != null)
+			if (other.eventDefinitionCRF != null) {
 				return false;
-		} else if (!eventDefinitionCRF.equals(other.eventDefinitionCRF))
+			}
+		} else if (!eventDefinitionCRF.equals(other.eventDefinitionCRF)) {
 			return false;
+		}
 		if (instantFrontStrGroup == null) {
-			if (other.instantFrontStrGroup != null)
+			if (other.instantFrontStrGroup != null) {
 				return false;
-		} else if (!instantFrontStrGroup.equals(other.instantFrontStrGroup))
+			}
+		} else if (!instantFrontStrGroup.equals(other.instantFrontStrGroup)) {
 			return false;
-		if (isSCDtoBeShown != other.isSCDtoBeShown)
+		}
+		if (isSCDtoBeShown != other.isSCDtoBeShown) {
 			return false;
+		}
 		if (item == null) {
-			if (other.item != null)
+			if (other.item != null) {
 				return false;
-		} else if (!item.equals(other.item))
+			}
+		} else if (!item.equals(other.item)) {
 			return false;
+		}
 		if (metadata == null) {
-			if (other.metadata != null)
+			if (other.metadata != null) {
 				return false;
-		} else if (!metadata.equals(other.metadata))
+			}
+		} else if (!metadata.equals(other.metadata)) {
 			return false;
-		if (numChildren != other.numChildren)
+		}
+		if (numChildren != other.numChildren) {
 			return false;
-		if (numColumns != other.numColumns)
+		}
+		if (numColumns != other.numColumns) {
 			return false;
-		if (numDiscrepancyNotes != other.numDiscrepancyNotes)
+		}
+		if (numDiscrepancyNotes != other.numDiscrepancyNotes) {
 			return false;
+		}
 		if (scdData == null) {
-			if (other.scdData != null)
+			if (other.scdData != null) {
 				return false;
-		} else if (!scdData.equals(other.scdData))
+			}
+		} else if (!scdData.equals(other.scdData)) {
 			return false;
-		if (totClosed != other.totClosed)
+		}
+		if (totClosed != other.totClosed) {
 			return false;
-		if (totNA != other.totNA)
+		}
+		if (totNA != other.totNA) {
 			return false;
-		if (totNew != other.totNew)
+		}
+		if (totNew != other.totNew) {
 			return false;
-		if (totRes != other.totRes)
+		}
+		if (totRes != other.totRes) {
 			return false;
-		if (totUpdated != other.totUpdated)
+		}
+		if (totUpdated != other.totUpdated) {
 			return false;
+		}
 		return true;
 	}
 
@@ -667,6 +718,13 @@ public class DisplayItemBean implements Comparable {
 		this.annotationDn = annotationDn;
 	}
 
+	public List<String> getItemToSDV() {
+		return itemToSDV;
+	}
+
+	public void setItemToSDV(List<String> itemToSDV) {
+		this.itemToSDV = itemToSDV;
+	}
 	/**
 	 * @return the autoAdded
 	 */
@@ -680,5 +738,13 @@ public class DisplayItemBean implements Comparable {
 	 */
 	public void setAutoAdded(boolean autoAdded) {
 		this.autoAdded = autoAdded;
+	}
+
+	public ItemGroupMetadataBean getGroupMetadata() {
+		return groupMetadata;
+	}
+
+	public void setGroupMetadata(ItemGroupMetadataBean groupMetadata) {
+		this.groupMetadata = groupMetadata;
 	}
 }
