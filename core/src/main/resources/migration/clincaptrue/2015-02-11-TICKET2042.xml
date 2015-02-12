@@ -1,0 +1,12 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="skirpichenok" id="2015-02-11-TICKET2042-01">
+		<comment>SAS extract folder must be greyed-out for Study Admins.</comment>
+		<update tableName="system">
+			<column name="admin"  value="READ"/>
+			<where>name = 'sas.dir'</where>
+		</update>
+	</changeSet>
+</databaseChangeLog>
