@@ -55,6 +55,7 @@ public final class DcfEmailer implements DcfRenderType {
 	private JavaMailSender mailSender;
 	private StudyBean currentStudy;
 	private UserAccountBean currentUser;
+	private final String emailActionResourceBundleKey = "dcf_emailed";
 
 	private DcfEmailer(DcfEmailerBuilder builder) {
 		this.dcfFilePath = builder.dcfFilePath;
@@ -115,7 +116,7 @@ public final class DcfEmailer implements DcfRenderType {
 			messageBody.append(" ").append(currentStudy.getName()).append(listItemEndTag);
 		}
 		messageBody.append(resword.getString("job_error_mail.serverUrl"));
-		messageBody.append(" ").append(CoreResources.getDomainName()).append(listItemEndTag);
+		messageBody.append(" ").append(CoreResources.getSystemURL()).append(listItemEndTag);
 		messageBody.append("</ul>");
 		messageBody.append(respage.getString("dcf_email_please_review"));
 		messageBody.append(respage.getString("email_body_simple_separator"));
@@ -266,5 +267,12 @@ public final class DcfEmailer implements DcfRenderType {
 		public DcfEmailer build() {
 			return new DcfEmailer(this);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getResourceBundleKeyForAction() {
+		return emailActionResourceBundleKey;
 	}
 }

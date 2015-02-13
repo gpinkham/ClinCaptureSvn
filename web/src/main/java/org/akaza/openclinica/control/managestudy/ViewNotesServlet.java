@@ -143,7 +143,7 @@ public class ViewNotesServlet extends RememberLastPage {
 				|| Boolean.parseBoolean(fp.getString("showMoreLink"));
 		boolean allowDcf = allowDcfForUserInCurrentStudy(currentStudy, ub);
 		request.setAttribute("allowDcf", allowDcf);
-		if(allowDcf) {
+		if (allowDcf) {
 			request.setAttribute("system_lang", CoreResources.getSystemLanguage());
 		}
 		int oneSubjectId = fp.getInt("id");
@@ -272,7 +272,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		boolean shouldSaveDcf = saveDcf != null && saveDcf.equalsIgnoreCase("yes")
 				&& request.getSession().getAttribute(DCF_SAVED) == null;
 		if (generateDcf != null && generateDcf.equalsIgnoreCase("yes")) {
-			List<String> selectedNoteAndEntityIds =  getSelectedNoteAndEntityIds(fp);
+			List<String> selectedNoteAndEntityIds = getSelectedNoteAndEntityIds(fp);
 			List<String> selectedRenderTypes = fp.getStringArray(DCF_RENDER_CHECKBOX_NAME);
 			String recipientEmail = fp.getString(RECIPIENT_EMAIL);
 			if (selectedNoteAndEntityIds.size() > 0) {
@@ -429,10 +429,10 @@ public class ViewNotesServlet extends RememberLastPage {
 					getEmailRenderType(dcfFile, recipientEmail, multipleDcfs, currentStudy, currentUser));
 		}
 		if (selectedRenderTypes.contains("print")) {
-			getDcfService().addDcfRenderType(getPrintOrSaveRenderType(PRINT_DCF, dcfFile, request));
+			getDcfService().addDcfRenderType(getPrintOrSaveRenderType(PRINT_DCF, dcfFile, "dcf_printed", request));
 		}
 		if (selectedRenderTypes.contains("save")) {
-			getDcfService().addDcfRenderType(getPrintOrSaveRenderType(SAVE_DCF, dcfFile, request));
+			getDcfService().addDcfRenderType(getPrintOrSaveRenderType(SAVE_DCF, dcfFile, "dcf_saved", request));
 		}
 	}
 
@@ -448,12 +448,16 @@ public class ViewNotesServlet extends RememberLastPage {
 	}
 
 	private DcfRenderType getPrintOrSaveRenderType(final String printOrSave, final String dcfFile,
-			final HttpServletRequest request) {
+			final String actionKey, final HttpServletRequest request) {
 		return new DcfRenderType() {
 			public boolean render() {
 				request.getSession().setAttribute(DCF_FILE_NAME_ATTRIBUTE, dcfFile);
 				request.getSession().setAttribute(printOrSave, "yes");
 				return true;
+			}
+
+			public String getResourceBundleKeyForAction() {
+				return actionKey;
 			}
 		};
 	}

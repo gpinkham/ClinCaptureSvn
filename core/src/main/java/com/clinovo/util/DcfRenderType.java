@@ -28,4 +28,11 @@ public interface DcfRenderType {
 	 * @return true if successful, false otherwise
 	 */
 	boolean render();
+
+	/**
+	 * Gets the ResourceBundle key for the action that was taken.
+	 * 
+	 * @return String
+	 */
+	String getResourceBundleKeyForAction();
 }
