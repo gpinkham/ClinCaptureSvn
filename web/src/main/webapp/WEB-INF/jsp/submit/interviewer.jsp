@@ -163,6 +163,16 @@
 
 </script>
 
+<c:set var="hideAditionalInfoPanel"
+       value="${study.studyParameterConfig.interviewerNameRequired == 'not_used' and
+		study.studyParameterConfig.interviewDateRequired == 'not_used' and
+		study.studyParameterConfig.secondaryIdRequired == 'not_used' and
+		study.studyParameterConfig.secondaryLabelViewable == 'false' and
+		study.studyParameterConfig.genderRequired == 'false' and
+		!toc.studyEventDefinition.repeating and
+		study.studyParameterConfig.collectDob == '3' and
+		study.studyParameterConfig.personIdShownOnCRF == 'false'}" />
+
 <c:forEach var="presetValue" items="${presetValues}">
     <c:if test='${presetValue.key == "interviewer"}'>
         <c:set var="interviewer" value="${presetValue.value}"/>
@@ -197,14 +207,15 @@
                     <fmt:message key="study" bundle="${resword}"/>: ${studyTitle}
                 </div>
             </div>
-
-            <div class="crfInfoDiv">
-                <a href="javascript: processCrfMoreInfo();" id="showMoreInfo">
-                    <img id="moreInfoExpandedImg" src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" style="margin-right: 5px;">
-                    <img id="moreInfoCollapsedImg" src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" style="margin-right: 5px;">
-                    <b><fmt:message key="More_info" bundle="${resword}"/></b>
-                </a>
-            </div>
+			<c:if test="${!hideAditionalInfoPanel}">
+				<div class="crfInfoDiv">
+					<a href="javascript: processCrfMoreInfo();" id="showMoreInfo">
+						<img id="moreInfoExpandedImg" src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" style="margin-right: 5px;">
+						<img id="moreInfoCollapsedImg" src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" style="margin-right: 5px;">
+						<b><fmt:message key="More_info" bundle="${resword}"/></b>
+					</a>
+				</div>
+			</c:if>
         </div>
         </div>
     </td>
@@ -251,15 +262,17 @@
                     <fmt:message key="study" bundle="${resword}"/>: ${studyTitle}
                 </div>
             </div>
-            <div class="crfInfoBlock">
-                <div class="crfInfoDiv">
-                    <a href="javascript: processCrfMoreInfo();" id="showMoreInfo">
-                        <img id="moreInfoExpandedImg" src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" style="margin-right: 5px;">
-                        <img id="moreInfoCollapsedImg" src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" style="margin-right: 5px;">
-                        <b><fmt:message key="More_info" bundle="${resword}"/></b>
-                    </a>
-                </div>
-            </div>
+			<c:if test="${!hideAditionalInfoPanel}">
+				<div class="crfInfoBlock">
+					<div class="crfInfoDiv">
+						<a href="javascript: processCrfMoreInfo();" id="showMoreInfo">
+							<img id="moreInfoExpandedImg" src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" style="margin-right: 5px;">
+							<img id="moreInfoCollapsedImg" src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" style="margin-right: 5px;">
+							<b><fmt:message key="More_info" bundle="${resword}"/></b>
+						</a>
+					</div>
+				</div>
+			</c:if>
         </div>
     </td>
 </tr>
