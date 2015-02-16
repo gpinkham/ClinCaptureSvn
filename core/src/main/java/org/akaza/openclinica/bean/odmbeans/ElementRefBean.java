@@ -1,13 +1,13 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
+ * ClinCapture, Copyright (C) 2009-2015 Clinovo Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
- * You should have received a copy of the Lesser GNU General Public License along with this program.  
+ *
+ * You should have received a copy of the Lesser GNU General Public License along with this program.
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
@@ -22,38 +22,51 @@
 
 package org.akaza.openclinica.bean.odmbeans;
 
-/**
- * 
- * @author ywang (May, 2008)
- * 
- */
-
 public class ElementRefBean {
-	private String elementDefOID;
-	private String mandatory;
-	private int orderNumber;
 
-	public void setElementDefOID(String oid) {
-		this.elementDefOID = oid;
-	}
+    private String elementDefOID;
+    private String mandatory;
+    private int orderNumber;
+    private String userName = "";
+    private String fullName = "";
 
-	public String getElementDefOID() {
-		return this.elementDefOID;
-	}
+    public void setElementDefOID(String oid) {
+        this.elementDefOID = oid;
+    }
 
-	public void setMandatory(String yesOrNo) {
-		this.mandatory = yesOrNo;
-	}
+    public String getElementDefOID() {
+        return this.elementDefOID;
+    }
 
-	public String getMandatory() {
-		return this.mandatory;
-	}
+    public void setMandatory(String yesOrNo) {
+        this.mandatory = yesOrNo;
+    }
 
-	public void setOrderNumber(int order) {
-		this.orderNumber = order;
-	}
+    public String getMandatory() {
+        return this.mandatory;
+    }
 
-	public int getOrderNumber() {
-		return this.orderNumber;
-	}
+    public void setOrderNumber(int order) {
+        this.orderNumber = order;
+    }
+
+    public int getOrderNumber() {
+        return this.orderNumber;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 }

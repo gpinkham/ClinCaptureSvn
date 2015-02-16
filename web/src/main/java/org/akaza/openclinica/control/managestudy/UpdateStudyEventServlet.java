@@ -140,6 +140,12 @@ public class UpdateStudyEventServlet extends Controller {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
+		if (currentStudy.getParentStudyId() > 0) {
+			StudyBean parentStudyBean = (StudyBean) getStudyDAO().findByPK(currentStudy.getParentStudyId());
+			request.setAttribute("parentStudyOid", parentStudyBean.getOid());
+		} else {
+			request.setAttribute("parentStudyOid", currentStudy.getOid());
+		}
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		HttpSession session = request.getSession();

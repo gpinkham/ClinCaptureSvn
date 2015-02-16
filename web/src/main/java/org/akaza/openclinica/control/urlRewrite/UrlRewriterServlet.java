@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2015 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -49,19 +49,25 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 
 /**
- * Servlet to call appropriate application pages corresponding to supported RESTful URLs
+ * Servlet to call appropriate application pages corresponding to supported RESTful URLs.
  * 
  */
 @SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class UrlRewriterServlet extends Controller {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private static final int STUDY_KEY = 0;
+	private static final int STUDY_SUBJECT_KEY = 1;
+	private static final int EVENT_REPEAT_KEY = 2;
+	private static final int FORM_OID_KEY = 3;
+	private static final int ITEM_GROUP_OID_KEY = 4;
+
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		//
+
 	}
 
 	@Override
@@ -86,9 +92,9 @@ public class UrlRewriterServlet extends Controller {
 
 			OpenClinicaResource ocResource = null;
 			String requestOIDStr = null;
-			String RESTUrlStart = "/ClinicalData/html/view/";
+			String restUrlStart = "/ClinicalData/html/view/";
 			if ((null != requestURI) && (requestURI.contains("/ClinicalData/html/view/"))) {
-				requestOIDStr = requestURI.substring(requestURI.indexOf(RESTUrlStart) + RESTUrlStart.length(),
+				requestOIDStr = requestURI.substring(requestURI.indexOf(restUrlStart) + restUrlStart.length(),
 						requestURI.length());
 			}
 
@@ -102,14 +108,9 @@ public class UrlRewriterServlet extends Controller {
 					request.setAttribute("formMessages", errors);
 				}
 
-				// If the form OID in the request uri is not null, it will be
-				// interpretted as a request to
-				// view form data and hence will be forwarded to servlet path
-				// "/ViewSectionDataEntry"
 				if ((null != ocResource) && (ocResource.getFormVersionOID() != null)) {
 					HashMap<String, String> mapQueryParams = getQueryStringParameters(requestQueryStr);
 
-					// set the required parameters into request
 					if (null != ocResource.getEventDefinitionCrfId()) {
 						request.setAttribute("eventDefinitionCRFId", ocResource.getEventDefinitionCrfId());
 					}
@@ -152,7 +153,7 @@ public class UrlRewriterServlet extends Controller {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Error: " + e.getMessage());
 		}
 	}
 
@@ -186,11 +187,8 @@ public class UrlRewriterServlet extends Controller {
 	}
 
 	/**
-	 * Method to parse the request URL parameters and get the respective database identifiers
-	 * 
-	 * @param URLPath
-	 *            - example "S_CPCS/320999/SE_CPCS%5B1%5D/F_CPCS_1"
-	 * @return
+	 * Method to parse the request URL parameters and get the respective database identifiers.
+	 *
 	 */
 	public OpenClinicaResource getOpenClinicaResourceFromURL(String URLPath, ResourceBundle resexception)
 			throws UnsupportedEncodingException {
@@ -200,7 +198,7 @@ public class UrlRewriterServlet extends Controller {
 			if (URLPath.contains("/")) {
 				String[] tokens = URLPath.split("/");
 				if (tokens.length != 0) {
-					String URLParamValue = "";
+					String urlParamValue = "";
 					StudyDAO stdao = getStudyDAO();
 					StudySubjectDAO ssubdao = getStudySubjectDAO();
 					StudyEventDefinitionDAO sedefdao = getStudyEventDefinitionDAO();
@@ -221,180 +219,177 @@ public class UrlRewriterServlet extends Controller {
 
 					for (int i = 0; i < tokens.length; i++) {
 
-						URLParamValue = URLDecoder.decode(tokens[i].trim(), "UTF-8").trim();
-						logger.info("URLPAramValue::" + URLParamValue);
-						if ((null != URLParamValue) && (!URLParamValue.equals(""))) {
+						urlParamValue = URLDecoder.decode(tokens[i].trim(), "UTF-8").trim();
+						logger.info("URLPAramValue::" + urlParamValue);
+						if ((null != urlParamValue) && (!urlParamValue.equals(""))) {
 							switch (i) {
-							case 0: {// study OID
-								study = stdao.findByOid(URLParamValue);
-								// validate study OID
-								if (study == null) {
-									openClinicaResource.setInValid(true);
-									openClinicaResource.getMessages().add(resexception.getString("invalid_study_oid"));
-									return openClinicaResource;
-								} else {
-									openClinicaResource.setStudyOID(URLParamValue);
-									if (null != study) {
-										openClinicaResource.setStudyID(study.getId());
-									}
-								}
-								break;
-							}
-
-							case 1: {// StudySubjectKey
-								subject = ssubdao.findByOidAndStudy(URLParamValue, study.getId());
-								// validate subject OID
-								if (subject == null) {
-									openClinicaResource.setInValid(true);
-									openClinicaResource.getMessages()
-											.add(resexception.getString("invalid_subject_oid"));
-									return openClinicaResource;
-								} else {
-									openClinicaResource.setStudySubjectOID(URLParamValue);
-									if (null != subject) {
-										studySubjectId = subject.getId();
-										openClinicaResource.setStudySubjectID(studySubjectId);
-									}
-								}
-								break;
-							}
-
-							case 2: {// study event definition OID
-								// separate study event OID and study event
-								// repeat key
-								String seoid = "";
-								eventRepeatKey = null;
-								String eventOrdinal = "";
-								if (URLParamValue.contains("%5B") && URLParamValue.contains("%5D")) {
-									seoid = URLParamValue.substring(0, URLParamValue.indexOf("%5B"));
-									openClinicaResource.setStudyEventDefOID(seoid);
-									eventOrdinal = URLParamValue.substring(URLParamValue.indexOf("%5B") + 3,
-											URLParamValue.indexOf("%5D"));
-									eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
-								} else if (URLParamValue.contains("[") && URLParamValue.contains("]")) {
-									seoid = URLParamValue.substring(0, URLParamValue.indexOf("["));
-									logger.info("seoid" + seoid);
-									openClinicaResource.setStudyEventDefOID(seoid);
-									eventOrdinal = URLParamValue.substring(URLParamValue.indexOf("[") + 1,
-											URLParamValue.indexOf("]"));
-									logger.info("eventOrdinal::" + eventOrdinal);
-									eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
-								} else {
-									seoid = URLParamValue;
-									openClinicaResource.setStudyEventDefOID(seoid);
-									logger.info("seoid" + seoid);
-								}
-								if ((null != seoid) && (null != study)) {
-									sed = sedefdao.findByOidAndStudy(seoid, study.getId(), study.getParentStudyId());
-									// validate study event oid
-									if (null == sed) {
+								case STUDY_KEY: {
+									study = stdao.findByOid(urlParamValue);
+									if (study == null) {
 										openClinicaResource.setInValid(true);
-										openClinicaResource.getMessages().add(
-												resexception.getString("invalid_event_oid"));
+										openClinicaResource.getMessages().add(resexception.getString("invalid_study_oid"));
 										return openClinicaResource;
 									} else {
-										eventDefId = sed.getId();
-										openClinicaResource.setStudyEventDefID(eventDefId);
+										openClinicaResource.setStudyOID(urlParamValue);
+										if (null != study) {
+											openClinicaResource.setStudyID(study.getId());
+										}
 									}
+									break;
 								}
-								if (null != eventRepeatKey) {
-									// validate the event ordinal specified exists in database
-									studyEvent = (StudyEventBean) sedao.findByStudySubjectIdAndDefinitionIdAndOrdinal(
-											subject.getId(), sed.getId(), eventRepeatKey);
-									// this method return new StudyEvent (not null) even if no studyEvent can be found
-									if (null == studyEvent || studyEvent.getId() == 0) {
+
+								case STUDY_SUBJECT_KEY: { // StudySubjectKey
+									subject = ssubdao.findByOidAndStudy(urlParamValue, study.getId());
+									if (subject == null) {
 										openClinicaResource.setInValid(true);
-										openClinicaResource.getMessages().add(
-												resexception.getString("invalid_event_ordinal"));
+										openClinicaResource.getMessages()
+												.add(resexception.getString("invalid_subject_oid"));
 										return openClinicaResource;
 									} else {
+										openClinicaResource.setStudySubjectOID(urlParamValue);
+										if (null != subject) {
+											studySubjectId = subject.getId();
+											openClinicaResource.setStudySubjectID(studySubjectId);
+										}
+									}
+									break;
+								}
+
+								case EVENT_REPEAT_KEY: {
+									// repeat key
+									String seoid = "";
+									eventRepeatKey = null;
+									String eventOrdinal = "";
+									if (urlParamValue.contains("%5B") && urlParamValue.contains("%5D")) {
+										seoid = urlParamValue.substring(0, urlParamValue.indexOf("%5B"));
+										openClinicaResource.setStudyEventDefOID(seoid);
+										eventOrdinal = urlParamValue.substring(urlParamValue.indexOf("%5B") + 3,
+												urlParamValue.indexOf("%5D"));
+										eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
+									} else if (urlParamValue.contains("[") && urlParamValue.contains("]")) {
+										seoid = urlParamValue.substring(0, urlParamValue.indexOf("["));
+										logger.info("seoid" + seoid);
+										openClinicaResource.setStudyEventDefOID(seoid);
+										eventOrdinal = urlParamValue.substring(urlParamValue.indexOf("[") + 1,
+												urlParamValue.indexOf("]"));
+										logger.info("eventOrdinal::" + eventOrdinal);
+										eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
+									} else {
+										seoid = urlParamValue;
+										openClinicaResource.setStudyEventDefOID(seoid);
+										logger.info("seoid" + seoid);
+									}
+									if ((null != seoid) && (null != study)) {
+										sed = sedefdao.findByOidAndStudy(seoid, study.getId(), study.getParentStudyId());
+										// validate study event oid
+										if (null == sed) {
+											openClinicaResource.setInValid(true);
+											openClinicaResource.getMessages().add(
+													resexception.getString("invalid_event_oid"));
+											return openClinicaResource;
+										} else {
+											eventDefId = sed.getId();
+											openClinicaResource.setStudyEventDefID(eventDefId);
+										}
+									}
+									if (null != eventRepeatKey) {
+										// validate the event ordinal specified exists in database
+										studyEvent = (StudyEventBean) sedao.findByStudySubjectIdAndDefinitionIdAndOrdinal(
+												subject.getId(), sed.getId(), eventRepeatKey);
+										// this method return new StudyEvent (not null) even if no studyEvent can be found
+										if (null == studyEvent || studyEvent.getId() == 0) {
+											openClinicaResource.setInValid(true);
+											openClinicaResource.getMessages().add(
+													resexception.getString("invalid_event_ordinal"));
+											return openClinicaResource;
+										} else {
+											openClinicaResource.setStudyEventRepeatKey(eventRepeatKey);
+										}
+									} else {
+										eventRepeatKey = 1;
 										openClinicaResource.setStudyEventRepeatKey(eventRepeatKey);
 									}
-								} else {
-									eventRepeatKey = 1;
-									openClinicaResource.setStudyEventRepeatKey(eventRepeatKey);
+									break;
 								}
-								break;
-							}
 
-							case 3: {// form OID
-								openClinicaResource.setFormVersionOID(URLParamValue);
-								// validate the crf version oid
-								cv = crfvdao.findByOid(URLParamValue);
-								if (cv == null) {
-									openClinicaResource.setInValid(true);
-									openClinicaResource.getMessages().add(resexception.getString("invalid_crf_oid"));
-									return openClinicaResource;
-								} else {
-									openClinicaResource.setFormVersionID(cv.getId());
-									// validate if crf is removed
-									if (cv.getStatus().equals(Status.DELETED)) {
+								case FORM_OID_KEY: { // form OID
+
+									openClinicaResource.setFormVersionOID(urlParamValue);
+
+									cv = crfvdao.findByOid(urlParamValue);
+									if (cv == null) {
 										openClinicaResource.setInValid(true);
-										openClinicaResource.getMessages().add(resexception.getString("removed_crf"));
+										openClinicaResource.getMessages().add(resexception.getString("invalid_crf_oid"));
 										return openClinicaResource;
 									} else {
-										if (null != study) {
-											HashMap studySubjectCRFDataDetails = sedao.getStudySubjectCRFData(study,
-													studySubjectId, eventDefId, URLParamValue, eventRepeatKey);
-											if ((null != studySubjectCRFDataDetails)
-													&& (studySubjectCRFDataDetails.size() != 0)) {
-												if (studySubjectCRFDataDetails.containsKey("event_crf_id")) {
-													openClinicaResource
-															.setEventCrfId((Integer) studySubjectCRFDataDetails
-																	.get("event_crf_id"));
-												}
+										openClinicaResource.setFormVersionID(cv.getId());
+										// validate if crf is removed
+										if (cv.getStatus().equals(Status.DELETED)) {
+											openClinicaResource.setInValid(true);
+											openClinicaResource.getMessages().add(resexception.getString("removed_crf"));
+											return openClinicaResource;
+										} else {
+											if (null != study) {
+												HashMap studySubjectCRFDataDetails = sedao.getStudySubjectCRFData(study,
+														studySubjectId, eventDefId, urlParamValue, eventRepeatKey);
+												if ((null != studySubjectCRFDataDetails)
+														&& (studySubjectCRFDataDetails.size() != 0)) {
+													if (studySubjectCRFDataDetails.containsKey("event_crf_id")) {
+														openClinicaResource
+																.setEventCrfId((Integer) studySubjectCRFDataDetails
+																		.get("event_crf_id"));
+													}
 
-												if (studySubjectCRFDataDetails.containsKey("event_definition_crf_id")) {
-													openClinicaResource
-															.setEventDefinitionCrfId((Integer) studySubjectCRFDataDetails
-																	.get("event_definition_crf_id"));
-												}
+													if (studySubjectCRFDataDetails.containsKey("event_definition_crf_id")) {
+														openClinicaResource
+																.setEventDefinitionCrfId((Integer) studySubjectCRFDataDetails
+																		.get("event_definition_crf_id"));
+													}
 
-												if (studySubjectCRFDataDetails.containsKey("study_event_id")) {
+													if (studySubjectCRFDataDetails.containsKey("study_event_id")) {
+														openClinicaResource
+																.setStudyEventId((Integer) studySubjectCRFDataDetails
+																		.get("study_event_id"));
+													}
+												} else {
+													openClinicaResource.setInValid(true);
 													openClinicaResource
-															.setStudyEventId((Integer) studySubjectCRFDataDetails
-																	.get("study_event_id"));
+															.getMessages()
+															.add(resexception
+																	.getString("either_no_data_for_crf_or_data_entry_not_started"));
+													return openClinicaResource;
 												}
-											} else {
-												openClinicaResource.setInValid(true);
-												openClinicaResource
-														.getMessages()
-														.add(resexception
-																.getString("either_no_data_for_crf_or_data_entry_not_started"));
-												return openClinicaResource;
 											}
 										}
 									}
+									break;
 								}
-								break;
-							}
 
-							case 4: {
-								String igoid = "";
-								String igRepeatKey = "";
-								if (URLParamValue.contains("[")) {
-									igoid = URLParamValue.substring(1, URLParamValue.indexOf("["));
-									igRepeatKey = URLParamValue.substring(URLParamValue.indexOf("["),
-											URLParamValue.indexOf("}]"));
-								}
-								if ((null != igoid) && (null != cv)) {
-									ig = igdao.findByOidAndCrf(URLParamValue, cv.getCrfId());
-
-									if (null != ig) {
-										openClinicaResource.setItemGroupID(ig.getId());
+								case ITEM_GROUP_OID_KEY: {
+									String igoid = "";
+									String igRepeatKey = "";
+									if (urlParamValue.contains("[")) {
+										igoid = urlParamValue.substring(1, urlParamValue.indexOf("["));
+										igRepeatKey = urlParamValue.substring(urlParamValue.indexOf("["),
+												urlParamValue.indexOf("}]"));
 									}
-								}
-								if (null != igRepeatKey) {
-									openClinicaResource.setItemGroupRepeatKey(Integer.parseInt(igRepeatKey));
-								}
-								break;
-							}
+									if ((null != igoid) && (null != cv)) {
+										ig = igdao.findByOidAndCrf(urlParamValue, cv.getCrfId());
 
-							case 5: {// item OID
-								// item = idao.find
-								break;
+										if (null != ig) {
+											openClinicaResource.setItemGroupID(ig.getId());
+										}
+									}
+									if (null != igRepeatKey) {
+										openClinicaResource.setItemGroupRepeatKey(Integer.parseInt(igRepeatKey));
+									}
+									break;
+								}
+
+								default: {
+									break;
+								}
 							}
-							}// switch end
 						}
 					}
 				}

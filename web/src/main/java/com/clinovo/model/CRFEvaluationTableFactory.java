@@ -19,6 +19,9 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
@@ -29,6 +32,9 @@ import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.web.table.filter.StudyEventTableRowFilter;
@@ -187,7 +193,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 				messageSource.getMessage(CRF_EVALUATION_TABLE_ACTION_COLUMN, null, locale), new ActionsCellEditor(),
 				new DefaultActionsEditor(locale), true, false);
 	}
-	
+
 	private UserAccountBean getCurrentUserAccount() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		return (UserAccountBean) userAccountDAO.findByUserName(authentication.getName());
@@ -333,14 +339,31 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 					.append("><img name=\"bt_View\" src=\"../images/bt_View.gif\" border=\"0\" alt=\""
 							.concat(viewMessage).concat("\" title=\"").concat(viewMessage)
 							.concat("\" align=\"left\" hspace=\"4\"></a>"));
-			builder.append("<a href=\"#\" onclick=\"setAccessedObjected(this); openDocWindow('../PrintDataEntry?ecId="
-					.concat(Integer.toString(crfEvaluationItem.getEventCrfId())).concat("')\"").concat(additionalAttr)
-					.concat("><img name=\"bt_Print\" src=\"../images/bt_Print.gif\" border=\"0\" alt=\"")
-					.concat(printMessage).concat("\" title=\"").concat(printMessage)
-					.concat("\" align=\"left\" hspace=\"4\"></a>"));
+			builder.append(buildPrintIcon(crfEvaluationItem, printMessage));
 
 			return builder.toString();
 		}
+	}
+
+	private String buildPrintIcon(CRFEvaluationItem crfEvaluationItem, String printMessage) {
+		StringBuilder stringBuilder = new StringBuilder();
+		StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(crfEvaluationItem.getStudyEventDefinitionId());
+		StudyEventDAO studyEventDao = new StudyEventDAO(dataSource);
+		StudyEventBean studyEventBean = (StudyEventBean) studyEventDao.findByPK(crfEvaluationItem.getStudyEventId());
+		StudySubjectDAO studySubjectDao = new StudySubjectDAO(dataSource);
+		StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDao.findByPK(crfEvaluationItem.getStudySubjectId());
+
+		stringBuilder.append("<a href=\"#\" onclick=\"setAccessedObjected(this); openPrintCRFWindow('../print/clinicaldata/html/print/")
+				.append(currentStudy.getOid()).append("/").append(studySubjectBean.getOid()).append("/").append(studyEventDefinitionBean.getOid());
+
+		if (studyEventDefinitionBean.isRepeating()) {
+			stringBuilder.append("[" + studyEventBean.getSampleOrdinal() + "]");
+		}
+		stringBuilder.append("/").append(crfEvaluationItem.getCrfVersionBean().getOid()).append("')\">")
+				.append("<img name=\"bt_Print\" src=\"../images/bt_Print.gif\" border=\"0\" alt=\"")
+				.append(printMessage).append("\" align=\"left\" hspace=\"4\"/></a>");
+		return stringBuilder.toString();
 	}
 
 	private class CrfStatusFilter extends DroplistFilterEditor {
@@ -536,7 +559,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 			return optionList;
 		}
 	}
-	
+
 	public UserAccountDAO getUserAccountDAO() {
 		return this.userAccountDAO;
 	}

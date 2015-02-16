@@ -2004,7 +2004,7 @@
 
     <servlet-mapping>
         <servlet-name>urlRewriterServlet</servlet-name>
-        <url-pattern>/ClinicalData/*</url-pattern>
+        <url-pattern>/ClinicalData/html/view/*</url-pattern>
     </servlet-mapping>
 
     <servlet>
@@ -2027,4 +2027,13 @@
         <url-pattern>/rules</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>print</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>print</servlet-name>
+        <url-pattern>/print/*</url-pattern>
+    </servlet-mapping>
 </web-app>

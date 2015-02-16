@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2015 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -60,7 +60,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 	}
 
 	public void addNodeClinicalData(boolean header, boolean footer) {
-		String ODMVersion = this.getODMVersion();
+		String odmVersion = this.getODMVersion();
 		// when collecting data, only item with value has been collected.
 		StringBuffer xml = this.getXmlOutput();
 		String indent = this.getIndent();
@@ -76,7 +76,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 		for (ExportSubjectDataBean sub : subs) {
 			xml.append(indent + indent + "<SubjectData SubjectKey=\""
 					+ StringEscapeUtils.escapeXml(sub.getSubjectOID()));
-			if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+			if ("oc1.2".equalsIgnoreCase(odmVersion) || "oc1.3".equalsIgnoreCase(odmVersion)) {
 				xml.append("\" OpenClinica:StudySubjectID=\"" + StringEscapeUtils.escapeXml(sub.getStudySubjectId()));
 				String uniqueIdentifier = sub.getUniqueIdentifier();
 				if (uniqueIdentifier != null && uniqueIdentifier.length() > 0) {
@@ -111,7 +111,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 			for (ExportStudyEventDataBean se : ses) {
 				xml.append(indent + indent + indent + "<StudyEventData StudyEventOID=\""
 						+ StringEscapeUtils.escapeXml(se.getStudyEventOID()));
-				if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+				if ("oc1.2".equalsIgnoreCase(odmVersion) || "oc1.3".equalsIgnoreCase(odmVersion)) {
 					String location = se.getLocation();
 					if (location != null && location.length() > 0) {
 						xml.append("\" OpenClinica:StudyEventLocation=\"" + StringEscapeUtils.escapeXml(location));
@@ -143,7 +143,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 				for (ExportFormDataBean form : forms) {
 					xml.append(indent + indent + indent + indent + "<FormData FormOID=\""
 							+ StringEscapeUtils.escapeXml(form.getFormOID()));
-					if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+					if ("oc1.2".equalsIgnoreCase(odmVersion) || "oc1.3".equalsIgnoreCase(odmVersion)) {
 						String crfVersion = form.getCrfVersion();
 						if (crfVersion != null && crfVersion.length() > 0) {
 							xml.append("\" OpenClinica:Version=\"" + StringEscapeUtils.escapeXml(crfVersion));
@@ -183,7 +183,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 								if (!item.isHasValueWithNull()) {
 									printValue = false;
 								}
-								if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+								if ("oc1.2".equalsIgnoreCase(odmVersion) || "oc1.3".equalsIgnoreCase(odmVersion)) {
 									xml.append(" OpenClinica:ReasonForNull=\""
 											+ StringEscapeUtils.escapeXml(item.getReasonForNull()) + "\" ");
 									if (!printValue) {
@@ -209,9 +209,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 											+ StringEscapeUtils.escapeXml(muRefOid) + "\"/>");
 									xml.append(nls);
 								}
-								//
 
-								if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+								if ("oc1.2".equalsIgnoreCase(odmVersion) || "oc1.3".equalsIgnoreCase(odmVersion)) {
 									if (item.getAuditLogs() != null && item.getAuditLogs().getAuditLogs().size() > 0) {
 										if (hasElm) {
 										} else {
@@ -225,8 +224,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 									//
 									if (item.getDiscrepancyNotes() != null
 											&& item.getDiscrepancyNotes().getDiscrepancyNotes().size() > 0) {
-										if (hasElm) {
-										} else {
+										if (!hasElm) {
 											xml.append(">");
 											xml.append(nls);
 											hasElm = true;
@@ -249,7 +247,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 						xml.append(nls);
 					}
 					//
-					if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+					if ("oc1.2".equalsIgnoreCase(odmVersion) || "oc1.3".equalsIgnoreCase(odmVersion)) {
 						if (form.getAuditLogs() != null && form.getAuditLogs().getAuditLogs().size() > 0) {
 							this.addAuditLogs(form.getAuditLogs(), indent + indent + indent + indent + indent);
 						}
@@ -264,7 +262,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 					xml.append(nls);
 				}
 				//
-				if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+				if ("oc1.2".equalsIgnoreCase(odmVersion) || "oc1.3".equalsIgnoreCase(odmVersion)) {
 					if (se.getAuditLogs() != null && se.getAuditLogs().getAuditLogs().size() > 0) {
 						this.addAuditLogs(se.getAuditLogs(), indent + indent + indent + indent);
 					}
@@ -276,7 +274,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 				xml.append(indent + indent + indent + "</StudyEventData>");
 				xml.append(nls);
 			}
-			if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+			if ("oc1.2".equalsIgnoreCase(odmVersion) || "oc1.3".equalsIgnoreCase(odmVersion)) {
 				ArrayList<SubjectGroupDataBean> sgddata = (ArrayList<SubjectGroupDataBean>) sub.getSubjectGroupData();
 				if (sgddata.size() > 0) {
 					for (SubjectGroupDataBean sgd : sgddata) {
@@ -335,11 +333,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 			String nls = "\n";
 			String i = audit.getOid();
 			String u = audit.getUserId();
+			String userName = audit.getUserName();
+			String name = audit.getName();
 			Date d = audit.getDatetimeStamp();
 			String t = audit.getType();
 			String r = audit.getReasonForChange();
 			String o = audit.getOldValue();
 			String n = audit.getNewValue();
+			String vt = audit.getValueType();
 			Boolean p = i.length() > 0 || u.length() > 0 || d != null || t.length() > 0 || r.length() > 0
 					|| o.length() > 0 || n.length() > 0 ? true : false;
 			if (p) {
@@ -350,12 +351,18 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 				if (u.length() > 0) {
 					xml.append("UserID=\"" + StringEscapeUtils.escapeXml(u) + "\" ");
 				}
+				if (userName.length() > 0) {
+					xml.append("UserName=\"" + StringEscapeUtils.escapeXml(userName) + "\" ");
+				}
+				if (name.length() > 0) {
+					xml.append("Name=\"" + StringEscapeUtils.escapeXml(name) + "\" ");
+				}
 				if (d != null) {
 					xml.append("DateTimeStamp=\"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(d) + "\" ");
 				}
 				if (t.length() > 0) {
 					xml.append(nls);
-					xml.append(currentIndent + "                      Type=\"" + t + "\" ");
+					xml.append(currentIndent + "                      AuditType=\"" + t + "\" ");
 				}
 				if (r.length() > 0) {
 					xml.append(nls);
@@ -372,20 +379,24 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 					xml.append(currentIndent + "                      NewValue=\"" + StringEscapeUtils.escapeXml(n)
 							+ "\"");
 				}
+				if (vt.length() > 0) {
+					xml.append(nls);
+					xml.append(currentIndent + "                      ValueType=\"" + StringEscapeUtils.escapeXml(vt) + "\"");
+				}
 				xml.append("/>");
 				xml.append(nls);
 			}
 		}
 	}
 
-	protected void addDiscrepancyNotes(DiscrepancyNotesBean DNs, String currentIndent) {
-		if (DNs != null) {
-			ArrayList<DiscrepancyNoteBean> dns = DNs.getDiscrepancyNotes();
+	protected void addDiscrepancyNotes(DiscrepancyNotesBean discrepancyNotesBean, String currentIndent) {
+		if (discrepancyNotesBean != null) {
+			ArrayList<DiscrepancyNoteBean> dns = discrepancyNotesBean.getDiscrepancyNotes();
 			if (dns != null && dns.size() > 0) {
 				StringBuffer xml = this.getXmlOutput();
 				String indent = this.getIndent();
 				String nls = "\n";
-				xml.append(currentIndent + "<OpenClinica:DiscrepancyNotes EntityID=\"" + DNs.getEntityID() + "\">");
+				xml.append(currentIndent + "<OpenClinica:DiscrepancyNotes EntityID=\"" + discrepancyNotesBean.getEntityID() + "\">");
 				xml.append(nls);
 				for (DiscrepancyNoteBean dn : dns) {
 					this.addOneDN(dn, currentIndent + indent);
@@ -425,6 +436,12 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 				xml.append("DateUpdated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(d) + "\" ");
 			}
 		}
+		if (dn.getEntityName() != null) {
+			String s = dn.getEntityName();
+			if (s.length() > 0) {
+				xml.append("EntityName=\"" + s + "\" ");
+			}
+		}
 		int n = dn.getNumberOfChildNotes();
 		if (n > 0) {
 			xml.append("NumberOfChildNotes=\"" + dn.getNumberOfChildNotes() + "\"");
@@ -434,6 +451,12 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 		if (dn.getChildNotes() != null && dn.getChildNotes().size() > 0) {
 			for (ChildNoteBean cn : dn.getChildNotes()) {
 				xml.append(currentIndent + indent + "<OpenClinica:ChildNote ");
+				if (cn.getOid() != null) {
+					String s = cn.getOid();
+					if (s.length() > 0) {
+						xml.append("ID=\"" + s + "\" ");
+					}
+				}
 				if (cn.getStatus() != null) {
 					String s = cn.getStatus();
 					if (s.length() > 0) {
@@ -443,8 +466,23 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 				if (cn.getDateCreated() != null) {
 					Date d = cn.getDateCreated();
 					if (d.toString().length() > 0) {
-						xml.append("DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(d) + "\"");
+						xml.append("DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(d) + "\" ");
 					}
+				}
+				if (cn.getOwnerUserName() != "") {
+					String ownerUserName = cn.getOwnerUserName();
+					if (ownerUserName.length() > 0) {
+						xml.append("UserName=\"" + ownerUserName + "\" ");
+					}
+
+				}
+				if (cn.getOwnerFirstName() != "" || cn.getOwnerLastName() != "") {
+					String ownerLastName = cn.getOwnerLastName();
+					String ownerFirstName = cn.getOwnerFirstName();
+					if (ownerLastName.length() > 0 || ownerFirstName.length() > 0) {
+						xml.append("Name=\"" + ownerFirstName + " " + ownerLastName + "\"");
+					}
+
 				}
 				xml.append(">");
 				xml.append(nls);
@@ -466,9 +504,18 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 				}
 				if (cn.getUserRef() != null) {
 					String uid = cn.getUserRef().getElementDefOID();
+					String userName = cn.getUserRef().getUserName();
+					String fullName = cn.getUserRef().getFullName();
+					String temp = "";
+					if (userName.length() > 0) {
+						temp += " OpenClinica:UserName=\"" + StringEscapeUtils.escapeXml(userName) + "\"";
+					}
+					if (fullName.length() > 0) {
+						temp += " OpenClinica:FullName=\"" + StringEscapeUtils.escapeXml(fullName) + "\"";
+					}
 					if (uid.length() > 0) {
-						xml.append(currentIndent + indent + indent + "<UserRef UserOID=\""
-								+ StringEscapeUtils.escapeXml(uid) + "\"/>");
+						xml.append(currentIndent + indent + indent + "<UserRef UserOID=\"" + StringEscapeUtils.escapeXml(uid)
+								+ " \"" + temp + "/>");
 						xml.append(nls);
 					}
 				}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2015 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -34,17 +34,12 @@ import javax.sql.DataSource;
 
 /**
  * Gather information about an odm study.
- * 
- * @author ywang
  */
 public class OdmStudyBase {
 	private StudyBean study;
 	private List<StudyEventDefinitionBean> sedBeansInStudy;
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
-	public OdmStudyBase() {
-	}
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	/**
 	 * In this constructor, study, sedBeansInStudy has been initialized.
@@ -62,16 +57,13 @@ public class OdmStudyBase {
 		this.sedBeansInStudy = new StudyEventDefinitionDAO(ds).findAllActiveByParentStudyId(parentStudyId);
 	}
 
-	public OdmStudyBase setOdmStudyBean(DataSource ds, StudyBean study) {
-		OdmStudyBase studyBase = new OdmStudyBase();
+	public OdmStudyBase(StudyBean study, List<StudyEventDefinitionBean> seds) {
 		if (study == null) {
 			logger.info("Study is null!");
-		} else {
-			this.study = study;
-			int parentStudyId = this.study.getParentStudyId() > 0 ? this.study.getParentStudyId() : this.study.getId();
-			this.sedBeansInStudy = new StudyEventDefinitionDAO(ds).findAllActiveByParentStudyId(parentStudyId);
+			return;
 		}
-		return studyBase;
+		this.study = study;
+		this.sedBeansInStudy = seds;
 	}
 
 	public void setStudy(StudyBean study) {

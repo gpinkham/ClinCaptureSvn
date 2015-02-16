@@ -247,7 +247,11 @@
 
                     <%--<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.edc.defaultVersionId}"/>">--%>
                   <c:set var="versionCount" value="0"/>
+                  <c:set var="versionOid" value="*"/>
                   <c:forEach var="version" items="${dedc.edc.versions}">
+                      <c:if test="${versionCount == 0}">
+                          <c:set var="versionOid" value="${version.oid}"/>
+                      </c:if>
                     <c:set var="versionCount" value="${versionCount+1}"/>
                   </c:forEach>
 
@@ -352,13 +356,13 @@
                       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                       onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                       name="bt_View1" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="2"></a>
-                    
-					
-                     <a href="javascript:openDocWindow('PrintCRF?id=${dedc.edc.defaultVersionId}')"
-                      onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
-                      onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
-                      name="bt_Print1" align="left" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>"  hspace="2"></a>
-  
+
+
+                    <a href="javascript:processPrintCRFRequest('print/metadata/html/print/*/*/<c:out value="${versionOid}"/>')"
+                       onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
+                       onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
+                            name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
+
                 </td>
 
                </tr>
@@ -457,10 +461,12 @@
                                 onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                 ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" hspace="2"></a>
 
-                            <a href="javascript:openDocWindow('PrintDataEntry?ecId=dec.eventCRF.id')"
-                                onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-                                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-                                ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" hspace="2"></a>
+                            <a href="javascript:openPrintCRFWindow('print/clinicaldata/html/print/${parentStudyOid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
+                               onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
+                               onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"
+                               onclick="setAccessedObjected(this)"><img
+                                    name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>" align="left" hspace="6">
+                            </a>
 
                             <c:if test="${(studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed') && (study.status.available)}">
                             <a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
@@ -476,11 +482,12 @@
                                 onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
                                 ><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></a>
 
-                            <a href="javascript:openDocWindow('PrintDataEntry?ecId=${dec.eventCRF.id}')"
-                                onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-                                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-                                ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></a>
-                            <%-- added above 112007, tbh --%>
+                            <a href="javascript:openPrintCRFWindow('print/clinicaldata/html/print/${parentStudyOid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
+                               onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
+                               onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"
+                               onclick="setAccessedObjected(this)"><img
+                                    name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>" align="left" hspace="6">
+                            </a>
                         </c:when>
                         <c:otherwise>
                             <c:if test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
@@ -493,15 +500,16 @@
                                 onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                 onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                 ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="1"></a>
-							
-                            <a href="javascript:openDocWindow('PrintDataEntry?ecId=${dec.eventCRF.id}')"
-                                onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-                                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-                                ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="1"></a>
+
+                            <a href="javascript:openPrintCRFWindow('print/clinicaldata/html/print/${parentStudyOid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
+                               onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
+                               onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"
+                               onclick="setAccessedObjected(this)"><img
+                                    name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>" align="left" hspace="6">
+                            </a>
 
                             <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available)}">
-                            <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
-                                onMouseDown="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
+                            <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"                                onMouseDown="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
                                 onMouseUp="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
                                 ><img name="bt_Remove<c:out value="${rowCount}"/>" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>"  hspace="2"></a>
                             </c:if>

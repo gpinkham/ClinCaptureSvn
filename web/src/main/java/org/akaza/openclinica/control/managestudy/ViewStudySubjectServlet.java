@@ -78,32 +78,32 @@ import java.util.List;
 @Component
 public class ViewStudySubjectServlet extends RememberLastPage {
 
-	public static final Logger logger = LoggerFactory.getLogger(ViewStudySubjectServlet.class);
+	public static final Logger LOGGER = LoggerFactory.getLogger(ViewStudySubjectServlet.class);
 
 	// The study subject has an existing discrepancy note related to their
 	// unique identifier; this
 	// value will be saved as a request attribute
-	public final static String HAS_UNIQUE_ID_NOTE = "hasUniqueIDNote";
+	public static final String HAS_UNIQUE_ID_NOTE = "hasUniqueIDNote";
 	// The study subject has an existing discrepancy note related to their date
 	// of birth; this
 	// value will be saved as a request attribute
-	public final static String HAS_DOB_NOTE = "hasDOBNote";
+	public static final String HAS_DOB_NOTE = "hasDOBNote";
 	// The study subject has an existing discrepancy note related to their
 	// Gender; this
 	// value will be saved as a request attribute
-	public final static String HAS_GENDER_NOTE = "hasGenderNote";
+	public static final String HAS_GENDER_NOTE = "hasGenderNote";
 	// The study subject has an existing discrepancy note related to their
 	// Enrollment Date; this
 	// value will be saved as a request attribute
-	public final static String HAS_ENROLLMENT_NOTE = "hasEnrollmentNote";
+	public static final String HAS_ENROLLMENT_NOTE = "hasEnrollmentNote";
 	// request attribute for a discrepancy note
-	public final static String UNIQUE_ID_NOTE = "uniqueIDNote";
+	public static final String UNIQUE_ID_NOTE = "uniqueIDNote";
 	// request attribute for a discrepancy note
-	public final static String DOB_NOTE = "dOBNote";
+	public static final String DOB_NOTE = "dOBNote";
 	// request attribute for a discrepancy note
-	public final static String GENDER_NOTE = "genderNote";
+	public static final String GENDER_NOTE = "genderNote";
 	// request attribute for a discrepancy note
-	public final static String ENROLLMENT_NOTE = "enrollmentNote";
+	public static final String ENROLLMENT_NOTE = "enrollmentNote";
 	public static final String SAVED_VIEW_STUDY_SUBJECT_URL = "savedViewStudySubjectUrl";
 
 	/**
@@ -148,7 +148,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 		StudySubjectDAO subdao = getStudySubjectDAO();
 		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
 		FormProcessor fp = new FormProcessor(request);
-		int studySubId = fp.getInt("id", true);// studySubjectId
+		int studySubId = fp.getInt("id", true); // studySubjectId
 		studySubId = studySubId == 0 ? fp.getInt("ssId") : studySubId;
 		String from = fp.getString("from");
 
@@ -214,6 +214,12 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 				}
 			}
 
+			if (currentStudy.getParentStudyId() > 0) {
+				StudyBean parentStudyBean = (StudyBean) getStudyDAO().findByPK(currentStudy.getParentStudyId());
+				request.setAttribute("parentStudyOid", parentStudyBean.getOid());
+			} else {
+				request.setAttribute("parentStudyOid", currentStudy.getOid());
+			}
 			request.setAttribute("studySub", studySub);
 
 			int subjectId = studySub.getSubjectId();
@@ -314,7 +320,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 					spvdao.findByHandleAndStudy(studyId, "subjectPersonIdRequired").getValue());
 			request.setAttribute("subjectStudy", study);
 
-			if (study.getParentStudyId() > 0) {// this is a site,find parent
+			if (study.getParentStudyId() > 0) { // this is a site,find parent
 				StudyBean parentStudy2 = (StudyBean) studydao.findByPK(study.getParentStudyId());
 				request.setAttribute("parentStudy", parentStudy2);
 			} else {
@@ -409,7 +415,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 					}
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
-					logger.error(e.getMessage());
+					LOGGER.error(e.getMessage());
 				}
 				UserAccountBean updater = (UserAccountBean) udao.findByPK(avb.getUserId());
 				sea.setUpdater(updater);
@@ -433,7 +439,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 	}
 
 	/**
-	 * Current User may access a requested study subject in the current user's studies
+	 * Current User may access a requested study subject in the current user's studies.
 	 * 
 	 */
 	@SuppressWarnings("unused")

@@ -1,13 +1,13 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
+ * ClinCapture, Copyright (C) 2009-2015 Clinovo Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
- * You should have received a copy of the Lesser GNU General Public License along with this program.  
+ *
+ * You should have received a copy of the Lesser GNU General Public License along with this program.
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
@@ -26,55 +26,60 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * 
- * @author ywang (March, 2010)
- * 
- */
 public class DiscrepancyNoteBean extends ElementOIDBean {
-	private String status;
-	private String noteType;
-	private Date dateUpdated;
-	private int numberOfChildNotes;
-	private List<ChildNoteBean> childNotes = new ArrayList<ChildNoteBean>();
 
-	public String getStatus() {
-		return status;
-	}
+    private String status;
+    private String noteType;
+    private Date dateUpdated;
+    private int numberOfChildNotes;
+    private List<ChildNoteBean> childNotes = new ArrayList<ChildNoteBean>();
+    private String entityName;
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public String getNoteType() {
-		return noteType;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public void setNoteType(String noteType) {
-		this.noteType = noteType;
-	}
+    public String getNoteType() {
+        return noteType;
+    }
 
-	public Date getDateUpdated() {
-		return dateUpdated;
-	}
+    public void setNoteType(String noteType) {
+        this.noteType = noteType;
+    }
 
-	public void setDateUpdated(Date dateUpdated) {
-		this.dateUpdated = dateUpdated;
-	}
+    public Date getDateUpdated() {
+        return dateUpdated;
+    }
 
-	public int getNumberOfChildNotes() {
-		return numberOfChildNotes;
-	}
+    public void setDateUpdated(Date dateUpdated) {
+        this.dateUpdated = dateUpdated;
+    }
 
-	public void setNumberOfChildNotes(int numberOfChildNotes) {
-		this.numberOfChildNotes = numberOfChildNotes;
-	}
+    public int getNumberOfChildNotes() {
+        return numberOfChildNotes;
+    }
 
-	public List<ChildNoteBean> getChildNotes() {
-		return childNotes;
-	}
+    public void setNumberOfChildNotes(int numberOfChildNotes) {
+        this.numberOfChildNotes = numberOfChildNotes;
+    }
 
-	public void setChildNotes(ArrayList<ChildNoteBean> childNotes) {
-		this.childNotes = childNotes;
-	}
+    public List<ChildNoteBean> getChildNotes() {
+        return childNotes;
+    }
+
+    public void setChildNotes(ArrayList<ChildNoteBean> childNotes) {
+        this.childNotes = childNotes;
+    }
+
+    public String getEntityName() {
+        return entityName;
+    }
+
+    public void setEntityName(String attribute) {
+        this.entityName = attribute;
+    }
 }

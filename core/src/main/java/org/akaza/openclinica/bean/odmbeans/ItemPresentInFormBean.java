@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2015 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -15,22 +15,21 @@
  * OpenClinica is distributed under the GNU Lesser General Public License (GNU
  * LGPL).
  *
- * For details see: http://www.openclinica.org/license copyright 
+ * For details see: http://www.openclinica.org/license copyright
  *
  */
 
 package org.akaza.openclinica.bean.odmbeans;
 
 public class ItemPresentInFormBean {
-	// attributes
+
 	private String formOid;
 	private String parentItemOid;
-	private Integer ColumnNumber;
+	private Integer columnNumber;
 	private String pageNumber;
 	private String defaultValue;
 	private String phi;
 	private String showItem;
-	// elements (since they're simple now, not set classes for them)
 	private String leftItemText;
 	private String rightItemText;
 	private String itemHeader;
@@ -38,10 +37,19 @@ public class ItemPresentInFormBean {
 	private String sectionLabel;
 	private ItemResponseBean itemResponse;
 	private SimpleConditionalDisplayBean simpleConditionalDisplay;
+	private Integer orderInForm;
 
 	public ItemPresentInFormBean() {
 		itemResponse = new ItemResponseBean();
 		simpleConditionalDisplay = new SimpleConditionalDisplayBean();
+	}
+
+	public Integer getOrderInForm() {
+		return orderInForm;
+	}
+
+	public void setOrderInForm(Integer orderInForm) {
+		this.orderInForm = orderInForm;
 	}
 
 	public String getFormOid() {
@@ -61,11 +69,11 @@ public class ItemPresentInFormBean {
 	}
 
 	public Integer getColumnNumber() {
-		return ColumnNumber;
+		return columnNumber;
 	}
 
 	public void setColumnNumber(Integer columnNumber) {
-		ColumnNumber = columnNumber;
+		this.columnNumber = columnNumber;
 	}
 
 	public String getPageNumber() {

@@ -139,8 +139,10 @@
 
                 <c:set var="versionCount" value="0"/>
                 <c:set var="firstVersionId" value="0"/>
+                <c:set var="versionOid" value="*"/>
                 <c:forEach var="version" items="${dedc.edc.versions}">
                     <c:if test="${versionCount == 0}">
+                        <c:set var="versionOid" value="${version.oid}"/>
                         <c:set var="firstVersionId" value="${version.id}"/>
                     </c:if>
                     <c:set var="versionCount" value="${versionCount+1}"/>
@@ -280,12 +282,10 @@
                         </td>
 
                         <td>
-                            <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${dedc.edc.defaultVersionId}"/>')"
+                            <a href="javascript:processPrintCRFRequest('print/metadata/html/print/*/*/<c:out value="${versionOid}"/>')"
                                onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
-                               onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"
-                               onclick="setAccessedObjected(this)"><img name="bt_Print1" src="images/bt_Print.gif" border="0"
-                                    alt="<fmt:message key="print" bundle="${resword}"/>"
-                                    title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
+                               onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
+                               name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
                         </td>
                         <c:if test="${dedc.eventCRF.id == 0 and dedc.eventCRF.notStarted && (userRole.id == 9 || userRole.id == 6 || userRole.id == 4 || userRole.id == 2  || userRole.id == 1)}">
                             <td><img src="images/bt_Transparent.gif" border="0" hspace="6"></td>
@@ -419,12 +419,12 @@
 
                     </td>
                     <td>
-                        <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
+                        <a href="javascript:openPrintCRFWindow('print/clinicaldata/html/print/${parentStudyOid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
                            onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
                            onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"
-                           onclick="setAccessedObjected(this)"><img name="bt_Print1" src="images/bt_Print.gif" border="0"
-                                alt="<fmt:message key="print" bundle="${resword}"/>"
-                                title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
+                           onclick="setAccessedObjected(this)"><img
+                                name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>" align="left" hspace="6">
+                        </a>
                     </td>
 
                     <c:choose>

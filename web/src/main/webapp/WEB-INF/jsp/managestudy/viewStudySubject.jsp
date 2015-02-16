@@ -25,8 +25,13 @@
     </c:otherwise>
 </c:choose>
 
-<!--script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script-->
+
 <script type="text/javascript" language="javascript">
+
+	function studySubjectResource() {
+		return "${parentStudyOid}/${studySub.oid}";
+	}
+
     function checkCRFLocked(ecId, url){
         jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
             if(data == 'true'){
@@ -461,6 +466,8 @@
 </c:if>
 <!-- Group table end -->
 
+<jsp:include page="studySubject/casebookGenerationForm.jsp"/>
+
 <div class="table_title_Admin">
 	<a name="events" href="javascript:leftnavExpand('subjectEvents',true);">
 		<img id="excl_subjectEvents" src="images/bt_Collapse.gif" border="0"> <fmt:message key="events" bundle="${resword}"/>
@@ -486,9 +493,6 @@
 			<input id="ViewAuditLog" class="button_long" type="submit" name="BTN_View" value="<fmt:message key="subjects_audit_log" bundle="${resword}"/>" onclick="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>');"/>
 		</td>
 		</c:if>
-		<td>
-			<input class="button_long" type="submit" name="CaseBook" value="<fmt:message key="subjects_case_book" bundle="${resword}"/>" onclick="javascript:openDocWindow('PrintSubjectCaseBook?subjectId=<c:out value="${studySub.id}"/>');"/>
-		</td>
 	</tr>
 </table> 
 
@@ -496,3 +500,5 @@
 
 <input id="accessAttributeName" type="hidden" value="data-cc-subjectStudyEventId" />
 <jsp:include page="../include/footer.jsp"/>
+
+<script type="text/javascript" src="includes/print/studySubject/viewStudySubject.js"></script>

@@ -5,6 +5,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
+<jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
 
 
 <c:choose>
@@ -17,14 +18,13 @@
 </c:choose>
 
 <link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
-<!--script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script-->
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
 
 <script type="text/javascript">
     function onInvokeAction(id,action) {
         if(id.indexOf('studies') == -1)  {
-        setExportToLimit(id, '');
+            setExportToLimit(id, '');
         }
         createHiddenInputFieldsForLimitAndSubmit(id);
     }
@@ -108,43 +108,44 @@
                     <td class="table_header_row"><fmt:message key="action" bundle="${resword}"/></td>
                 </tr>
                 <c:forEach var ="version" items="${crf.versions}">
-                <tr valign="top">
-                    <td class="table_cell_left"><c:out value="${version.name}"/></td>
-                    <td class="table_cell"><c:out value="${version.oid}"/></td>
-                    <td class="table_cell"><c:out value="${version.description}"/></td>
-                    <td class="table_cell"><c:out value="${version.status.name}"/></td>
-                    <td class="table_cell"><c:out value="${version.revisionNotes}"/></td>
-                    <td class="table_cell">
-                        <table border="0" cellpadding="0" cellspacing="0">
-                            <tr>
-                                <td>
-                                    <a href="ViewSectionDataEntry?crfId=<c:out value="${crf.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1"
-                                       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-                                            name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-                                </td>
-                                <td>
-                                    <a href="javascript:openDocWindow('PrintCRF?id=${version.id}')"
-                                       onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
-                                            name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
+                    <tr valign="top">
+                        <td class="table_cell_left"><c:out value="${version.name}"/></td>
+                        <td class="table_cell"><c:out value="${version.oid}"/></td>
+                        <td class="table_cell"><c:out value="${version.description}"/></td>
+                        <td class="table_cell"><c:out value="${version.status.name}"/></td>
+                        <td class="table_cell"><c:out value="${version.revisionNotes}"/></td>
+                        <td class="table_cell">
+                            <table border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <a href="ViewSectionDataEntry?crfId=<c:out value="${crf.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1"
+                                           onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
+                                           onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
+                                                name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:processPrintCRFRequest('print/metadata/html/print/*/*/<c:out value="${version.oid}"/>')"
+                                           onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
+                                           onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
+                                                name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
 
-                                </td>
-                                <td>
-                                    <a href="ViewCRFVersion?id=<c:out value="${version.id}"/>"><img
-                                            name="bt_Metadata" src="images/bt_Metadata.gif" border="0" alt="Metadata" title="Metadata" align="left" hspace="6"></a>
+                                    </td>
 
-                                </td>
-								<td>
-									<a href="ViewSectionDataEntry?crfId=<c:out value="${currRow.bean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&annotated=1"
-											onclick="setAccessedObjectWithRowspans(this)">
-										<img name="bt_Annotate" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="annotate_crf" bundle="${resword}"/>" align="left" hspace="6">
-									</a>
-								</td>
-                            </tr>
-                        </table>
-					</td>
-				</tr>
+                                    <td>
+                                        <a href="ViewCRFVersion?id=<c:out value="${version.id}"/>"><img
+                                                name="bt_Metadata" src="images/bt_Metadata.gif" border="0" alt="Metadata" title="Metadata" align="left" hspace="6"></a>
+
+                                    </td>
+                                    <td>
+                                        <a href="ViewSectionDataEntry?crfId=<c:out value="${currRow.bean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&annotated=1"
+                                           onclick="setAccessedObjectWithRowspans(this)">
+                                            <img name="bt_Annotate" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="annotate_crf" bundle="${resword}"/>" align="left" hspace="6">
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
                 </c:forEach>
             </table>
         </div>
@@ -200,9 +201,8 @@
 </div>
 
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+       value="<fmt:message key="back" bundle="${resword}"/>"
+       class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" name="<fmt:message key="view_crf_rules" bundle="${resword}"/>" value="<fmt:message key="view_crf_rules" bundle="${resword}"/>" class="button_long" onClick="window.location.href='ViewRuleAssignment?ruleAssignments_f_crfName=<c:out value="${crfName}"/>'"/>
 <input type="button" name="<fmt:message key="run_crf_rules" bundle="${resword}"/>" value="<fmt:message key="run_crf_rules" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRule?crfId=<c:out value="${crf.id}"/>&action=dryRun'"/>
-
 <jsp:include page="../include/footer.jsp"/>
