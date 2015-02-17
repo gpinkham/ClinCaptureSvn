@@ -78,7 +78,7 @@
 </script>
 
 <jsp:useBean scope='session' id='tableFacadeRestore' class='java.lang.String' />
-<c:set var="restore" value="true"/>
+<c:set var="restore" value="true" scope="request"/>
 <c:if test="${tableFacadeRestore=='false'}"><c:set var="restore" value="false"/></c:if>
 <c:set var="profilePage" value="${param.profilePage}"/>
 <!--  If Controller Spring based append ../ to urls -->
