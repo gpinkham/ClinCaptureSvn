@@ -20,6 +20,12 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -51,18 +57,13 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
-
 /**
  * Processes request of 'restore an event CRF from a event.
  * 
  * @author jxu
  * 
  */
-@SuppressWarnings({ "serial", "unchecked" })
+@SuppressWarnings({"serial", "unchecked"})
 @Component
 public class RestoreEventCRFServlet extends Controller {
 
@@ -185,7 +186,8 @@ public class RestoreEventCRFServlet extends Controller {
 
 				boolean hasStarted = hasStarted(event, ecdao);
 
-				event.setSubjectEventStatus(!hasStarted ? SubjectEventStatus.SCHEDULED
+				event.setSubjectEventStatus(!hasStarted
+						? SubjectEventStatus.SCHEDULED
 						: SubjectEventStatus.DATA_ENTRY_STARTED);
 				event.setStatus(Status.AVAILABLE);
 				event.setUpdater(currentUser);
@@ -198,12 +200,12 @@ public class RestoreEventCRFServlet extends Controller {
 
 				addPageMessage(emailBody, request);
 				sendEmail(emailBody, request);
-				request.setAttribute("id", Integer.toString(studySubId));
-				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
+				storePageMessages(request);
+				response.sendRedirect(request.getContextPath().concat(Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName())
+						.concat("?id=").concat(Integer.toString(studySubId)));
 			}
 		}
 	}
-
 	private boolean hasStarted(StudyEventBean event, EventCRFDAO ecdao) {
 
 		boolean hasStarted = false;

@@ -20,6 +20,11 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -49,17 +54,13 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-
 /**
  * Removes an Event CRF.
  * 
  * @author jxu
  * 
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings({"serial"})
 @Component
 public class RemoveEventCRFServlet extends Controller {
 
@@ -177,12 +178,12 @@ public class RemoveEventCRFServlet extends Controller {
 
 				addPageMessage(emailBody, request);
 				sendEmail(emailBody, request);
-				request.setAttribute("id", Integer.toString(studySubId));
-				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
+				storePageMessages(request);
+				response.sendRedirect(request.getContextPath().concat(Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName())
+						.concat("?id=").concat(Integer.toString(studySubId)));
 			}
 		}
 	}
-
 	/**
 	 * Send email to director and administrator.
 	 * 
