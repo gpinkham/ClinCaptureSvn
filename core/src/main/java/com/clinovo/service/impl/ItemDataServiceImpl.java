@@ -85,7 +85,7 @@ public class ItemDataServiceImpl implements ItemDataService {
 		for (ItemDataBean item : itemDataList) {
 
 			if (item.getStatus().equals(Status.AUTO_DELETED)) {
-				item.setStatus(Status.AVAILABLE);
+				item.setStatus(Status.UNAVAILABLE);
 				item.setUpdater(updater);
 				item.setUpdatedDate(new Date());
 				getItemDataDAO().update(item);

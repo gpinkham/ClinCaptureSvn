@@ -117,7 +117,7 @@ public class ItemDataServiceTest {
 		verify(mockItemDataDAO, never()).update(ItemDataList.get(1));
 		verify(mockCodedItemService).findCodedItem(ItemDataList.get(1).getId());
 
-		assertTrue(ItemDataList.get(2).getStatus().equals(Status.AVAILABLE));
+		assertTrue(ItemDataList.get(2).getStatus().equals(Status.UNAVAILABLE));
 		assertTrue(ItemDataList.get(2).getUpdater().equals(updater));
 		assertTrue(ItemDataList.get(2).getUpdatedDate().after(new Date(0)));
 		verify(mockItemDataDAO).update(ItemDataList.get(2));
