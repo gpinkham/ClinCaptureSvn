@@ -230,7 +230,7 @@ public class CreateCRFVersionServlet extends Controller {
 				crfBean.setUpdatedDate(version.getCreatedDate());
 				crfBean.setUpdater(ub);
 				cdao.update(crfBean);
-
+				request.setAttribute("crfId", crfBean.getId());
 				request.setAttribute("crfVersionId", cfvID);
 				request.getSession().removeAttribute("version");
 				request.getSession().removeAttribute("crfName");
