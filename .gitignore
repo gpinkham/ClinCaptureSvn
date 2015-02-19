@@ -29,3 +29,4 @@ medical-coding/.settings/
 medical-coding/.classpath
 medical-coding/test.log
 core/Agent_Administration_v2.0_ssID1.pdf
+automated-regression-tests/target/
