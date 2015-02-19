@@ -1244,7 +1244,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	 * 
 	 * @param eventCrfId
 	 *            int
-	 * @return Map<ItemDataBean, Boolean>
+	 * @return Map
 	 */
 	public List<DisplayItemBean> getMapItemsToSDV(int eventCrfId) {
 		List<DisplayItemBean> result = new ArrayList<DisplayItemBean>();
@@ -1278,5 +1278,27 @@ public class ItemDataDAO extends AuditableEntityDAO {
 			result.add(dib);
 		}
 		return result;
+	}
+
+	/**
+	 * Set sdv status for item data id list.
+	 * 
+	 * @param itemDataIds
+	 *            List<Integer>
+	 * @param sdv
+	 *            boolean
+	 * @return boolean
+	 */
+	public boolean sdvItems(List<Integer> itemDataIds, boolean sdv) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+
+		HashMap variables = new HashMap();
+		variables.put(1, sdv);
+
+		execute(digester.getQuery("sdvItems").concat(" ")
+				.concat(itemDataIds.toString().replace("[", "(").replace("]", ")")), variables);
+
+		return isQuerySuccessful();
 	}
 }

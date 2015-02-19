@@ -195,4 +195,10 @@
             ORDER by section, id.ordinal, id.item_id
         </sql>
     </query>
+    <query>
+        <name>sdvItems</name>
+        <sql>
+            update item_data set sdv = ? where item_data_id in
+        </sql>
+    </query>
 </queries>

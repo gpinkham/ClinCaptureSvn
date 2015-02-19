@@ -1363,6 +1363,8 @@ public abstract class DataEntryServlet extends Controller {
 					ssb.setUpdatedDate(new Date());
 					studySubjectDao.update(ssb);
 				}
+
+				boolean resetItemsToSDV = false;
 				if (ecb.isSdvStatus() && changedItemsList.size() > 0) {
 					logger.debug("Status of Study Subject is SDV we are updating");
 					StudySubjectDAO studySubjectDao = new StudySubjectDAO(getDataSource());
@@ -1372,6 +1374,7 @@ public abstract class DataEntryServlet extends Controller {
 					studySubjectDao.update(ssb);
 					ecb.setSdvStatus(false);
 					ecb.setSdvUpdateId(ub.getId());
+					resetItemsToSDV = true;
 				}
 
 				ecb = (EventCRFBean) ecdao.update(ecb);
@@ -1416,6 +1419,7 @@ public abstract class DataEntryServlet extends Controller {
 				logger.debug("all items before saving into DB" + allItems.size());
 
 				resetCodedItemTerms(allItems, iddao, ecb, changedItemsList);
+				resetSDVForItems(resetItemsToSDV ? changedItemsList : new ArrayList<DisplayItemBean>(), iddao);
 
 				for (int i = 0; i < allItems.size(); i++) {
 
@@ -2036,6 +2040,18 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		request.getSession().setAttribute(CreateDiscrepancyNoteServlet.TRANSFORMED_SUBMITTED_DNS, transformedDNs);
+	}
+
+	private void resetSDVForItems(ArrayList<DisplayItemBean> changedItemsList, ItemDataDAO iddao) {
+		List<Integer> itemDataList = new ArrayList<Integer>();
+		for (DisplayItemBean dib : changedItemsList) {
+			if (dib.getData() != null && dib.getData().getId() > 0 && dib.getData().isSdv()) {
+				itemDataList.add(dib.getData().getId());
+			}
+		}
+		if (itemDataList.size() > 0) {
+			iddao.sdvItems(itemDataList, false);
+		}
 	}
 
 	private void resetCodedItemTerms(List<DisplayItemWithGroupBean> allItems, ItemDataDAO iddao, EventCRFBean ecrfBean,

@@ -1,6 +1,7 @@
 package org.akaza.openclinica.dao.managestudy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,7 +29,6 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 	private UserAccountBean ub;
 	private StudyBean sb;
 	private EventCRFBean ecBean;
-	private SectionBean secBean;
 	private ItemBean itemBean;
 
 	@Before
@@ -43,7 +43,7 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 		ecBean = new EventCRFBean();
 		ecBean.setId(1);
 
-		secBean = new SectionBean();
+		SectionBean secBean = new SectionBean();
 		secBean.setId(1);
 
 		itemBean = new ItemBean();
@@ -286,15 +286,14 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindAllBySectionIdAndEventCRFIdReturnsCorrectNumber() {
 
-		ArrayList<ItemDataBean> items = (ArrayList<ItemDataBean>) itemDataDAO.findAllBySectionIdAndEventCRFId(1, 1);
+		ArrayList<ItemDataBean> items = itemDataDAO.findAllBySectionIdAndEventCRFId(1, 1);
 		assertEquals(true, items.size() > 0);
 	}
 
 	@Test
 	public void thatFindAllActiveBySectionIdAndEventCRFIdReturnsCorrectNumber() {
 
-		ArrayList<ItemDataBean> items = (ArrayList<ItemDataBean>) itemDataDAO.findAllActiveBySectionIdAndEventCRFId(1,
-				1);
+		ArrayList<ItemDataBean> items = itemDataDAO.findAllActiveBySectionIdAndEventCRFId(1, 1);
 		assertEquals(true, items.size() > 0);
 	}
 
@@ -326,7 +325,7 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 	public void testThatUpdateStatusByEventCRFUpdatesAllItemDataRows() {
 
 		itemDataDAO.updateStatusByEventCRF(ecBean, Status.AUTO_DELETED);
-		ArrayList<ItemDataBean> items = (ArrayList<ItemDataBean>) itemDataDAO.findAllByEventCRFId(EVENT_CRF_ID);
+		ArrayList<ItemDataBean> items = itemDataDAO.findAllByEventCRFId(EVENT_CRF_ID);
 
 		assertEquals(Status.AUTO_DELETED, items.get(0).getStatus());
 
@@ -337,7 +336,7 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 	public void testThatUpdateStatusByEventCRFWithConnectionUpdatesAllItemDataRows() {
 
 		itemDataDAO.updateStatusByEventCRF(ecBean, Status.AUTO_DELETED, null);
-		ArrayList<ItemDataBean> items = (ArrayList<ItemDataBean>) itemDataDAO.findAllByEventCRFId(EVENT_CRF_ID);
+		ArrayList<ItemDataBean> items = itemDataDAO.findAllByEventCRFId(EVENT_CRF_ID);
 
 		assertEquals(Status.AUTO_DELETED, items.get(0).getStatus());
 
@@ -432,5 +431,10 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatUpdateItemDataSDVWhenCRFMetadataWasChangedReturnsTrue() {
 		assertTrue(itemDataDAO.updateItemDataSDVWhenCRFMetadataWasChanged(1));
+	}
+
+	@Test
+	public void testThatSDVItemsReturnsTrue() {
+		assertTrue(itemDataDAO.sdvItems(Arrays.asList(new Integer[]{1, 2, 3}), true));
 	}
 }
