@@ -22,6 +22,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,15 +33,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * EventCRFServiceImpl class provides service implementation for EventCRFService interface.
+ */
 @Service("eventCRFService")
 @SuppressWarnings("unchecked")
 public class EventCRFServiceImpl implements EventCRFService {
 
-	@Autowired private DataSource dataSource;
+	@Autowired
+	private DataSource dataSource;
 
-	@Autowired ItemDataService itemDataService;
-
-	private EventCRFDAO eventCRFDAO;
+	@Autowired
+	private ItemDataService itemDataService;
 
 	private DataSource getDataSource() {
 		return dataSource;
@@ -51,12 +55,11 @@ public class EventCRFServiceImpl implements EventCRFService {
 	}
 
 	private EventCRFDAO getEventCRFDAO() {
+		return new EventCRFDAO(getDataSource());
+	}
 
-		if (eventCRFDAO == null) {
-			return eventCRFDAO = new EventCRFDAO(getDataSource());
-		} else {
-			return eventCRFDAO;
-		}
+	private StudyEventDAO getStudyEventDAO() {
+		return new StudyEventDAO(getDataSource());
 	}
 
 	private void remove(EventCRFBean eventCRF, Status crfStatusToSet, UserAccountBean updater) throws Exception {
@@ -84,13 +87,25 @@ public class EventCRFServiceImpl implements EventCRFService {
 
 		List<EventCRFBean> eventCRFs = (ArrayList<EventCRFBean>) getEventCRFDAO().findAllByStudyEvent(studyEvent);
 		setEventCRFsToAutoRemovedState(eventCRFs, updater);
-
 	}
 
 	public void setEventCRFsToAutoRemovedState(List<EventCRFBean> eventCRFs, UserAccountBean updater) throws Exception {
 
 		for (EventCRFBean eventCRF : eventCRFs) {
 			remove(eventCRF, Status.AUTO_DELETED, updater);
+		}
+	}
+
+	public void removeEventCRFsByEventDefinitionCRF(String studyEventDefinitionOID, String crfOID,
+			UserAccountBean updater) throws Exception {
+
+		List<StudyEventBean> studyEventsToUpdate =
+				getStudyEventDAO().findAllByStudyEventDefinitionAndCrfOids(studyEventDefinitionOID, crfOID);
+
+		for (StudyEventBean studyEvent : studyEventsToUpdate) {
+			List<EventCRFBean> eventCRFsToRemove =
+					getEventCRFDAO().findAllByStudyEventAndCrfOrCrfVersionOid(studyEvent, crfOID);
+			setEventCRFsToAutoRemovedState(eventCRFsToRemove, updater);
 		}
 	}
 
@@ -126,6 +141,19 @@ public class EventCRFServiceImpl implements EventCRFService {
 			if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
 				restore(eventCRF, updater);
 			}
+		}
+	}
+
+	public void restoreEventCRFsByEventDefinitionCRF(String studyEventDefinitionOID, String crfOID,
+			UserAccountBean updater) throws Exception {
+
+		List<StudyEventBean> studyEventsToUpdate =
+				getStudyEventDAO().findAllByStudyEventDefinitionAndCrfOids(studyEventDefinitionOID, crfOID);
+
+		for (StudyEventBean studyEvent : studyEventsToUpdate) {
+			List<EventCRFBean> eventCRFsToRestore =
+					getEventCRFDAO().findAllByStudyEventAndCrfOrCrfVersionOid(studyEvent, crfOID);
+			restoreEventCRFsFromAutoRemovedState(eventCRFsToRestore, updater);
 		}
 	}
 }
