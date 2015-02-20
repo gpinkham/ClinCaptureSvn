@@ -94,7 +94,7 @@ public class EventCRFSDVFilter implements CriteriaCommand {
 					criteria += " ) ";
 				}
 			} else if (property.equals("crfStatus")) {
-				if (value.toString().toLowerCase().equals(ResourceBundleProvider.getResWord("complete"))) {
+				if (value.toString().toLowerCase().equals(ResourceBundleProvider.getResWord("completed").toLowerCase())) {
 					criteria = criteria + " and ";
 					criteria = criteria
 							+ " ( "
