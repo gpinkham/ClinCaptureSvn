@@ -152,7 +152,7 @@ import com.clinovo.util.ValidatorHelper;
 /**
  * @author ssachs
  */
-@SuppressWarnings({"all"})
+@SuppressWarnings({ "all" })
 public abstract class DataEntryServlet extends Controller {
 
 	public static final String DATA_ENTRY_CURRENT_CRF_VERSION_OID = "dataEntryCurrentCrfVersionOid";
@@ -469,7 +469,7 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		StudyDAO studydao = new StudyDAO(getDataSource());
-		StudyBean study = (StudyBean) session.getAttribute("study");
+		StudyBean subjectsStudy = (StudyBean) studydao.findByPK(ssb.getStudyId());
 
 		if (eventDefinitionCRFId <= 0) {
 			// TODO we have to get that id before we can continue
@@ -556,13 +556,13 @@ public abstract class DataEntryServlet extends Controller {
 
 		// Get the study then the parent study
 		logMe("Entering  Get the study then the parent study   " + System.currentTimeMillis());
-		if (study.getParentStudyId() > 0) {
+		if (subjectsStudy.getParentStudyId() > 0) {
 			// this is a site,find parent
-			StudyBean parentStudy = (StudyBean) studydao.findByPK(study.getParentStudyId());
+			StudyBean parentStudy = (StudyBean) studydao.findByPK(subjectsStudy.getParentStudyId());
 			request.setAttribute("studyTitle", parentStudy.getName());
-			request.setAttribute("siteTitle", study.getName());
+			request.setAttribute("siteTitle", subjectsStudy.getName());
 		} else {
-			request.setAttribute("studyTitle", study.getName());
+			request.setAttribute("studyTitle", subjectsStudy.getName());
 		}
 
 		provideRandomizationStatisticsForSite(request);

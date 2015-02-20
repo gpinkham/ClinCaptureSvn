@@ -195,12 +195,9 @@
                     <fmt:message key="event" bundle="${resword}"/>: </b><c:out value="${toc.studyEventDefinition.name}" />
                     (<fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}"/>)
                     &emsp;
-                    <fmt:message key="site" bundle="${resword}"/>:
-                    <c:if test="${study.parentStudyId > '0'}">
+	                <c:if test="${not empty siteTitle}">
+                        <fmt:message key="site" bundle="${resword}"/>:
                         <c:out value="${siteTitle}"/>
-                    </c:if>
-                    <c:if test="${study.parentStudyId == '0'}">
-                        <fmt:message key="na" bundle="${resword}"/>
                     </c:if>
                 </div>
                 <div class="table_title_Admin">
@@ -250,12 +247,9 @@
                     <fmt:message key="event" bundle="${resword}"/>: </b><c:out value="${toc.studyEventDefinition.name}" />
                     (<fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}"/>)
                     &emsp;
-                    <fmt:message key="site" bundle="${resword}"/>:
-                    <c:if test="${study.parentStudyId > '0'}">
+	                <c:if test="${not empty siteTitle}">
+                        <fmt:message key="site" bundle="${resword}"/>:
                         <c:out value="${siteTitle}"/>
-                    </c:if>
-                    <c:if test="${study.parentStudyId == '0'}">
-                        <fmt:message key="na" bundle="${resword}"/>
                     </c:if>
                 </div>
                 <div class="table_title_Admin">
