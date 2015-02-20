@@ -16,6 +16,7 @@ public class SpreadSheetTableRepeatingTest {
 	public void setUp() throws OpenClinicaException {
 		spreadSheetTableRepeating = Mockito.mock(SpreadSheetTableRepeating.class);
 		Mockito.when(spreadSheetTableRepeating.stripQuotes(Mockito.anyString())).thenCallRealMethod();
+		Mockito.when(spreadSheetTableRepeating.stripQuotes(Mockito.anyString(), Mockito.anyBoolean())).thenCallRealMethod();
 	}
 
 	@Test

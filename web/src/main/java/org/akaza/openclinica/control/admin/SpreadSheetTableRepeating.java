@@ -1265,14 +1265,14 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 						if (dbName.equals("oracle")) {
 							sql = "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, "
 									+ "RESPONSE_TYPE_ID, VERSION_ID)" + " VALUES ('" + stripQuotes(responseLabel)
-									+ "', '" + stripQuotes(resOptions.replaceAll("\\\\,", "\\,")) + "','"
+									+ "', '" + stripQuotes(resOptions.replaceAll("\\\\,", "\\,"), false) + "','"
 									+ stripQuotes(resValues.replace("\\\\", "\\")) + "',"
 									+ "(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME='"
 									+ stripQuotes(responseType.toLowerCase()) + "')," + versionIdString + ")";
 						} else {
 							sql = "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, "
 									+ "RESPONSE_TYPE_ID, VERSION_ID)" + " VALUES ('" + stripQuotes(responseLabel)
-									+ "', E'" + stripQuotes(resOptions) + "','" + stripQuotes(resValues) + "',"
+									+ "', E'" + stripQuotes(resOptions, false) + "','" + stripQuotes(resValues) + "',"
 									+ "(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME='"
 									+ stripQuotes(responseType.toLowerCase()) + "')," + versionIdString + ")";
 						}
@@ -1388,7 +1388,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 									+ "','"
 									+ stripQuotes(questionNum)
 									+ "','"
-									+ stripQuotes(regexp1)
+									+ stripQuotes(regexp1, false)
 									+ "','"
 									+ stripQuotes(regexpError)
 									+ "', "
@@ -1445,7 +1445,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 									+ "','"
 									+ stripQuotes(questionNum)
 									+ "','"
-									+ stripQuotes(regexp1)
+									+ stripQuotes(regexp1, false)
 									+ "','"
 									+ stripQuotes(regexpError)
 									+ "', "
@@ -2328,7 +2328,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 	 *            the subject line
 	 * @return A string with all the quotes escaped.
 	 */
-	public String stripQuotes(String subj) {
+	public String stripQuotes(String subj, boolean replaceSlashes) {
 		if (subj == null) {
 			return null;
 		}
@@ -2343,10 +2343,14 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 			}
 			returnme += subjarray[subjarray.length - 1];
 		}
-		returnme = returnme.replaceAll("\\\\", "\\\\\\\\");
+		if (replaceSlashes) returnme = returnme.replaceAll("\\\\", "\\\\\\\\");
 		return returnme;
 	}
 
+	public String stripQuotes(String subj) {
+		return stripQuotes(subj, true);
+	}
+	
 	public String getValue(Cell cell) {
 		String val = null;
 		int cellType = 0;
