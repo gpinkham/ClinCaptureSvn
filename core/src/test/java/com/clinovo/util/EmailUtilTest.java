@@ -26,17 +26,17 @@ public class EmailUtilTest {
 
 	@Test
 	public void testThatGetEmailFooterReturnsFooter() {
-		assertTrue(EmailUtil.getEmailFooter(Locale.ENGLISH).contains("https://clincapture.clinovo.com"));
+		assertTrue(EmailUtil.getEmailFooter(Locale.ENGLISH).contains("href='https://www.clinovo.com/Privacy-Policy"));
 	}
 
 	@Test
 	public void testThatGetEmailBodyStartReturnsCorrectText() {
 		assertTrue(EmailUtil.getEmailBodyStart().contains(
-				"style='font-family:helvetica,trebuchet ms,arial,times new roman;"));
+				"font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:normal;color:#333;"));
 	}
 
 	@Test
 	public void testThatGetEmailBodyEndReturnsCorrectText() {
-		assertTrue(EmailUtil.getEmailBodyEnd().equals("</td></tr></table>"));
+		assertTrue(EmailUtil.getEmailBodyEnd().contains("https://www.facebook.com/Clinovo"));
 	}
 }
