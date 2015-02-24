@@ -3556,6 +3556,8 @@ function adjustDnShortcutsTable() {
     if (!hasItemsToSDV || (!allowSdvWithOpenQueries && hasOutstandingDNs) || !userIsAbleToSDVItems) {
         if ((!allowSdvWithOpenQueries && hasOutstandingDNs) || !userIsAbleToSDVItems) {
             $("a.sdvItemLink").addClass("hidden");
+        } else {
+            $("a.sdvItemLink").removeClass("hidden");
         }
         itemsToSDVAreHidden = true;
         $("#dnShortcutsSubTable tr:eq(1) td:eq(" + (dnShortcutsSpan - 1) + ")").addClass("hidden");
