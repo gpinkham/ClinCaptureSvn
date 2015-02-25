@@ -13,9 +13,12 @@
 
 package com.clinovo.controller;
 
-import com.clinovo.service.CodedItemService;
-import com.clinovo.util.PageMessagesUtil;
-import com.clinovo.util.SessionUtil;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.Role;
@@ -41,17 +44,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
+import com.clinovo.service.CodedItemService;
+import com.clinovo.util.PageMessagesUtil;
+import com.clinovo.util.SessionUtil;
 
 /**
  * CompleteCRFDeleteController that handles requests from the delete crf page.
  */
 @Controller
 @RequestMapping("/deleteCRFVersion")
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class DeleteCRFVersionController {
 
 	@Autowired
@@ -103,7 +105,8 @@ public class DeleteCRFVersionController {
 
 			List<RuleSetBean> ruleSetBeanList = ruleSetListFilter(crfVersionId);
 			List<EventCRFBean> eventCrfBeanList = eventCrfDAO.findAllStartedByCrfVersion(crfVersionId);
-			List<StudyEventDefinitionBean> eventDefinitionListAvailable = crfVersionsQuantity > 1 ? new ArrayList<StudyEventDefinitionBean>()
+			List<StudyEventDefinitionBean> eventDefinitionListAvailable = crfVersionsQuantity > 1
+					? new ArrayList<StudyEventDefinitionBean>()
 					: StudyEventDefinitionUtil.studyEventDefinitionListFilter(dataSource,
 							eventDefinitionCrfDao.findAllByCRF(crfBean.getId()));
 			List<StudyEventDefinitionBean> eventDefinitionListFull = StudyEventDefinitionUtil
@@ -166,10 +169,11 @@ public class DeleteCRFVersionController {
 
 		List<RuleSetBean> ruleSetBeanList = ruleSetListFilter(crfVersionId);
 		List<EventCRFBean> eventCrfBeanList = eventCrfDAO.findAllStartedByCrfVersion(crfVersionId);
-		List<StudyEventDefinitionBean> eventDefinitionListAvailable = crfVersionQuantity > 1 ? new ArrayList<StudyEventDefinitionBean>()
+		List<StudyEventDefinitionBean> eventDefinitionListAvailable = crfVersionQuantity > 1
+				? new ArrayList<StudyEventDefinitionBean>()
 				: StudyEventDefinitionUtil.studyEventDefinitionListFilter(dataSource,
 						eventDefinitionCrfDao.findAllByCRF(crfBean.getId()));
-		List<DiscrepancyNoteBean> crfDiscrepancyNotes = discrepancyNoteDao.findAllByCRFId(crfBean.getId());
+		List<DiscrepancyNoteBean> crfDiscrepancyNotes = discrepancyNoteDao.findAllByCrfVersionId(crfVersionId);
 
 		if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0 || eventDefinitionListAvailable.size() > 0
 				|| ruleSetBeanList.size() > 0) {
