@@ -765,9 +765,43 @@
         </sql>
     </query>
     <query>
-        <name>updateEventCRFSDVWhenCRFMetadataWasChanged</name>
+        <name>unsdvEventCRFsWhenCRFMetadataWasChanged</name>
         <sql>
             update event_crf set sdv_status = false where crf_version_id = ? and sdv_status = true
+        </sql>
+    </query>
+    <query>
+        <name>sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV</name>
+        <sql>
+            update event_crf set sdv_status = true where sdv_status = false and status_id = 2 and event_crf_id in (select ec.event_crf_id from
+            event_crf ec
+            join (select id.item_data_id, id.event_crf_id from item_data id where id.sdv = true) id on id.event_crf_id = ec.event_crf_id
+            join (select ifm.item_form_metadata_id, ifm.crf_version_id from item_form_metadata ifm where ifm.sdv_required = true) ifm on ifm.crf_version_id = ec.crf_version_id
+            where ec.crf_version_id = ?
+            group by ec.event_crf_id
+            having count(distinct id.item_data_id) = count(distinct ifm.item_form_metadata_id))
+        </sql>
+    </query>
+    <query>
+        <name>sdvEventCRFsWithoutOutstandingDNsWhenCRFMetadataWasChangedAndAllItemsAreSDV</name>
+        <sql>
+            update event_crf set sdv_status = true where sdv_status = false and status_id = 2 and event_crf_id in (select ec.event_crf_id from
+            event_crf ec
+            join (select id.item_data_id, id.event_crf_id from item_data id where id.sdv = true) id on id.event_crf_id = ec.event_crf_id
+            join (select ifm.item_form_metadata_id, ifm.crf_version_id from item_form_metadata ifm where ifm.sdv_required = true) ifm on ifm.crf_version_id = ec.crf_version_id
+            left join (select dn.discrepancy_note_id, dnecm.event_crf_id from discrepancy_note dn, dn_event_crf_map dnecm
+            where dnecm.discrepancy_note_id = dn.discrepancy_note_id
+            and dn.parent_dn_id is null
+            and dn.resolution_status_id in (0,1,2,3)
+            union
+            select dn.discrepancy_note_id, id.event_crf_id from discrepancy_note dn, dn_item_data_map dnidm, item_data id
+            where dnidm.item_data_id = id.item_data_id
+            and dnidm.discrepancy_note_id = dn.discrepancy_note_id
+            and dn.parent_dn_id is null
+            and dn.resolution_status_id in (0,1,2,3)) dns on dns.event_crf_id = ec.event_crf_id
+            where ec.crf_version_id = ?
+            group by ec.event_crf_id
+            having count(distinct id.item_data_id) = count(distinct ifm.item_form_metadata_id) and count(distinct dns.discrepancy_note_id) = 0)
         </sql>
     </query>
 </queries>

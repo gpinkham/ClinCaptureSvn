@@ -20,23 +20,6 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.util.SignedData;
-
-import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -53,6 +36,24 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.util.SignedData;
 
 /**
  * StudyEventDAO.
@@ -1451,15 +1452,19 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method returns all study events that were SDVed.
+	 * Method returns all study events by crf version and subject event status.
 	 * 
 	 * @param crfVersionId
 	 *            int
+	 * @param subjectEventStatus
+	 *            SubjectEventStatus
 	 * @return List<StudyEventBean>
 	 */
-	public List<StudyEventBean> findAllSDVStudyEvents(int crfVersionId) {
+	public List<StudyEventBean> findStudyEventsByCrfVersionAndSubjectEventStatus(int crfVersionId,
+			SubjectEventStatus subjectEventStatus) {
 		HashMap variables = new HashMap();
 		variables.put(1, crfVersionId);
-		return executeFindAllQuery("findAllSDVStudyEvents", variables);
+		variables.put(2, subjectEventStatus.getId());
+		return executeFindAllQuery("findStudyEventsByCrfVersionAndSubjectEventStatus", variables);
 	}
 }

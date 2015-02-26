@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -111,7 +112,7 @@ public class ViewCRFVersionServlet extends Controller {
 
 		if (request.getMethod().equalsIgnoreCase("post")) {
 			boolean dataChanged = false;
-			boolean changeEventCrfs = false;
+			boolean unsdvEventCrfs = false;
 			int totalItems = fp.getInt("totalItems");
 			for (int i = 1; i <= totalItems; i++) {
 				int itemFormMetaId = fp.getInt("itemFormMetaId_".concat(Integer.toString(i)));
@@ -120,7 +121,7 @@ public class ViewCRFVersionServlet extends Controller {
 				if (itemFormMetadataBean.isSdvRequired() != sdvRequired) {
 					dataChanged = true;
 					if (!itemFormMetadataBean.isSdvRequired()) {
-						changeEventCrfs = true;
+						unsdvEventCrfs = true;
 					}
 				}
 				itemFormMetadataBean.setSdvRequired(sdvRequired);
@@ -130,13 +131,19 @@ public class ViewCRFVersionServlet extends Controller {
 				int crfVersionId = fp.getInt("crfVersionId");
 				eventDefinitionCrfDao.updateEDCThatHasItemsToSDV(crfVersionId, SourceDataVerification.PARTIALREQUIRED);
 				itemDataDao.updateItemDataSDVWhenCRFMetadataWasChanged(crfVersionId);
-				if (changeEventCrfs) {
-					eventCrfDao.updateEventCRFSDVWhenCRFMetadataWasChanged(crfVersionId);
-					SubjectEventStatusUtil.determineSubjectEventStates(studyEventDao
-							.findAllSDVStudyEvents(crfVersionId), new DAOWrapper(getStudyDAO(), crfVersionDao,
-							studyEventDao, getStudySubjectDAO(), getEventCRFDAO(), getEventDefinitionCRFDAO(),
-							getDiscrepancyNoteDAO()), null);
+				if (unsdvEventCrfs) {
+					eventCrfDao.unsdvEventCRFsWhenCRFMetadataWasChanged(crfVersionId);
+				} else {
+					eventCrfDao.sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV(crfVersionId,
+							getCurrentStudy(request).getStudyParameterConfig().getAllowSdvWithOpenQueries()
+									.equalsIgnoreCase("yes"));
 				}
+				SubjectEventStatusUtil.determineSubjectEventStates(studyEventDao
+						.findStudyEventsByCrfVersionAndSubjectEventStatus(crfVersionId, unsdvEventCrfs
+								? SubjectEventStatus.SOURCE_DATA_VERIFIED
+								: SubjectEventStatus.COMPLETED), new DAOWrapper(getStudyDAO(), crfVersionDao,
+						studyEventDao, getStudySubjectDAO(), getEventCRFDAO(), getEventDefinitionCRFDAO(),
+						getDiscrepancyNoteDAO()), null);
 			}
 			addPageMessage(respage.getString("data_was_saved_successfully"), request);
 			storePageMessages(request);

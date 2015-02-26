@@ -21,26 +21,6 @@
 
 package org.akaza.openclinica.dao.submit;
 
-import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
-import com.clinovo.jmesa.evaluation.CRFEvaluationItem;
-import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.dao.EventCRFSDVFilter;
-import org.akaza.openclinica.dao.EventCRFSDVSort;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -57,6 +37,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.dao.EventCRFSDVFilter;
+import org.akaza.openclinica.dao.EventCRFSDVSort;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+
+import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
+import com.clinovo.jmesa.evaluation.CRFEvaluationItem;
+import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
 
 /**
  * <p/>
@@ -1986,20 +1988,42 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method updates the sdv status for event crfs when crf metadata was changed.
+	 * Method unsdvs event crfs when crf metadata was changed.
 	 *
 	 * @param crfVersionId
 	 *            int
 	 * @return boolean
 	 */
-	public boolean updateEventCRFSDVWhenCRFMetadataWasChanged(int crfVersionId) {
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
+	public boolean unsdvEventCRFsWhenCRFMetadataWasChanged(int crfVersionId) {
+		unsetTypeExpected();
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
 		variables.put(1, crfVersionId);
 
-		execute(digester.getQuery("updateEventCRFSDVWhenCRFMetadataWasChanged"), variables);
+		execute(digester.getQuery("unsdvEventCRFsWhenCRFMetadataWasChanged"), variables);
+
+		return isQuerySuccessful();
+	}
+
+	/**
+	 * Method sdvs event crfs when crf metadata was changed and al items are sdv.
+	 *
+	 * @param crfVersionId
+	 *            int
+	 * @param ignoreOutstandingQueries
+	 *            boolean
+	 * @return boolean
+	 */
+	public boolean sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV(int crfVersionId,
+			boolean ignoreOutstandingQueries) {
+		unsetTypeExpected();
+
+		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+		variables.put(1, crfVersionId);
+
+		execute(digester.getQuery(ignoreOutstandingQueries
+				? "sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV"
+				: "sdvEventCRFsWithoutOutstandingDNsWhenCRFMetadataWasChangedAndAllItemsAreSDV"), variables);
 
 		return isQuerySuccessful();
 	}

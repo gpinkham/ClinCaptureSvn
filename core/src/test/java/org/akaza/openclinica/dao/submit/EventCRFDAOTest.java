@@ -13,8 +13,9 @@
 
 package org.akaza.openclinica.dao.submit;
 
-import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
-import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
+import java.util.HashMap;
+import java.util.Locale;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -25,8 +26,8 @@ import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Locale;
+import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
+import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
 
 @SuppressWarnings("rawtypes")
 public class EventCRFDAOTest extends DefaultAppContextTest {
@@ -116,7 +117,12 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatUpdateEventCRFSDVWhenCRFMetadataWasChangedReturnsTrue() {
-		assertTrue(eventCRFDAO.updateEventCRFSDVWhenCRFMetadataWasChanged(1));
+	public void testThatUnsdvEventCRFsWhenCRFMetadataWasChangedReturnsTrue() {
+		assertTrue(eventCRFDAO.unsdvEventCRFsWhenCRFMetadataWasChanged(1));
+	}
+
+	@Test
+	public void sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV() {
+		assertTrue(eventCRFDAO.sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV(1, true));
 	}
 }
