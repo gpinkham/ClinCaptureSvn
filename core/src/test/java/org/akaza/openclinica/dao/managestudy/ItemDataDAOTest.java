@@ -1,5 +1,6 @@
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -421,6 +422,14 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatGetMapItemsToSDVReturnsCorrectSize() {
 		assertEquals(itemDataDAO.getMapItemsToSDV(1).size(), 0);
+	}
+
+	@Test
+	public void testThatTransactionalSDVCrfItemsDoesNotThrowAnException() throws Exception {
+		Connection con = getDataSource().getConnection();
+		con.setAutoCommit(false);
+		itemDataDAO.sdvCrfItems(1, true, con);
+		con.commit();
 	}
 
 	@Test

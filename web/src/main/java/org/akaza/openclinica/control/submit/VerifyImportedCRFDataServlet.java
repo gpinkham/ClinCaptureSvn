@@ -20,6 +20,20 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -61,29 +75,19 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * View the uploaded data and verify what is going to be saved into the system and what is not.
  * 
  * @author Krikor Krumlian
  */
-@SuppressWarnings({ "rawtypes" })
+@SuppressWarnings({"rawtypes"})
 @Component
 public class VerifyImportedCRFDataServlet extends Controller {
 
 	private static final long serialVersionUID = 1L;
+	public static final int INT_3600 = 3600;
+	public static final int INT_10800 = 10800;
+	public static final int INT_52 = 52;
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -107,6 +111,29 @@ public class VerifyImportedCRFDataServlet extends Controller {
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
+	/**
+	 * Creates a disc note.
+	 * 
+	 * @param itemBean
+	 *            ItemBean
+	 * @param message
+	 *            String
+	 * @param eventCrfBean
+	 *            EventCRFBean
+	 * @param displayItemBean
+	 *            DisplayItemBean
+	 * @param parentId
+	 *            Integer
+	 * @param uab
+	 *            UserAccountBean
+	 * @param ds
+	 *            DataSource
+	 * @param study
+	 *            StudyBean
+	 * @param con
+	 *            Connection
+	 * @return DiscrepancyNoteBean
+	 */
 	public static DiscrepancyNoteBean createDiscrepancyNote(ItemBean itemBean, String message,
 			EventCRFBean eventCrfBean, DisplayItemBean displayItemBean, Integer parentId, UserAccountBean uab,
 			DataSource ds, StudyBean study, Connection con) {
@@ -167,7 +194,7 @@ public class VerifyImportedCRFDataServlet extends Controller {
 		ecdao.delete(eventCrfId);
 	}
 
-	private EventCRFBean createEventCRFBean(UserAccountBean ub, StudyBean studyBean, int StudySubjectId,
+	private EventCRFBean createEventCRFBean(UserAccountBean ub, StudyBean studyBean, int studySubjectId,
 			int crfVersionId, int studyEventId, StudyEventDAO studyEventDAO, EventCRFDAO eventCRFDAO) {
 		EventCRFBean eventCRFBean = new EventCRFBean();
 		eventCRFBean.setAnnotations("");
@@ -193,7 +220,7 @@ public class VerifyImportedCRFDataServlet extends Controller {
 		eventCRFBean.setNotStarted(true);
 		eventCRFBean.setStatus(Status.AVAILABLE);
 		eventCRFBean.setCompletionStatusId(1);
-		eventCRFBean.setStudySubjectId(StudySubjectId);
+		eventCRFBean.setStudySubjectId(studySubjectId);
 		eventCRFBean.setStudyEventId(studyEventId);
 		eventCRFBean.setValidateString("");
 		eventCRFBean.setValidatorAnnotations("");
@@ -202,7 +229,7 @@ public class VerifyImportedCRFDataServlet extends Controller {
 	}
 
 	@Override
-	@SuppressWarnings(value = { "unchecked", "deprecation" })
+	@SuppressWarnings(value = {"unchecked", "deprecation"})
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection con = null;
 		try {
@@ -211,7 +238,7 @@ public class VerifyImportedCRFDataServlet extends Controller {
 			StudyBean currentStudy = getCurrentStudy(request);
 
 			ImportSummaryInfo summary = new ImportSummaryInfo();
-			request.getSession().setMaxInactiveInterval(10800);
+			request.getSession().setMaxInactiveInterval(INT_10800);
 			con = getDataSource().getConnection();
 			con.setAutoCommit(false);
 			System.out.println("JDBC open connection for transaction");
@@ -342,7 +369,7 @@ public class VerifyImportedCRFDataServlet extends Controller {
 							} else {
 								skippedItemIds.add(displayItemBean.getItem().getId());
 								Map<String, Object> auditItemMap = new HashMap<String, Object>();
-								auditItemMap.put("audit_log_event_type_id", 52);
+								auditItemMap.put("audit_log_event_type_id", INT_52);
 								auditItemMap.put("user_id", ub.getId());
 								auditItemMap.put("audit_table", "item_data");
 								auditItemMap.put("entity_id", itemDataBean.getId());
@@ -371,12 +398,14 @@ public class VerifyImportedCRFDataServlet extends Controller {
 								eventCrfBean.setDateCompleted(new Date());
 								eventCrfBean.setDateValidateCompleted(new Date());
 								eventCrfBean.setStatus(Status.UNAVAILABLE);
-								eventCrfBean.setStage(edcb.isDoubleEntry() ? DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
+								eventCrfBean.setStage(edcb.isDoubleEntry()
+										? DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
 										: DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE);
 								itemDataDao.updateStatusByEventCRF(eventCrfBean, Status.UNAVAILABLE, con);
 							}
 
 							ecdao.update(eventCrfBean, con);
+							itemDataDao.sdvCrfItems(eventCrfBean.getId(), false, con);
 						}
 
 						for (int studyEventId : studyEventIds) {
@@ -427,7 +456,7 @@ public class VerifyImportedCRFDataServlet extends Controller {
 					con.rollback();
 					con.close();
 				}
-				request.getSession().setMaxInactiveInterval(3600);
+				request.getSession().setMaxInactiveInterval(INT_3600);
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			}
 
@@ -498,9 +527,9 @@ public class VerifyImportedCRFDataServlet extends Controller {
 	}
 
 	private String ruleActionWarnings(List<String> warnings) {
-		if (warnings.isEmpty())
+		if (warnings.isEmpty()) {
 			return "";
-		else {
+		} else {
 			StringBuilder mesg = new StringBuilder(respage.getString("rule_action_warnings"));
 			for (String s : warnings) {
 				mesg.append(s).append("; ");

@@ -1218,7 +1218,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 	/**
 	 * SDV crf items.
-	 * 
+	 *
 	 * @param eventCrfId
 	 *            int
 	 * @param sdv
@@ -1226,15 +1226,31 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	 * @return boolean
 	 */
 	public boolean sdvCrfItems(int eventCrfId, boolean sdv) {
+		return sdvCrfItems(eventCrfId, sdv, null);
+	}
+
+	/**
+	 * SDV crf items.
+	 * 
+	 * @param eventCrfId
+	 *            int
+	 * @param sdv
+	 *            boolean
+	 * @param con
+	 *            Connection
+	 * @return boolean
+	 */
+	public boolean sdvCrfItems(int eventCrfId, boolean sdv, Connection con) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 
+		HashMap nullVars = new HashMap();
 		HashMap variables = new HashMap();
 		int ind = 1;
 		variables.put(ind++, sdv);
 		variables.put(ind, eventCrfId);
 
-		execute(digester.getQuery("sdvCrfItems"), variables);
+		execute(digester.getQuery("sdvCrfItems"), variables, nullVars, con);
 
 		return isQuerySuccessful();
 	}

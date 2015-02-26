@@ -13,10 +13,29 @@
 
 package org.akaza.openclinica.web.job;
 
-import com.clinovo.service.StudySubjectIdService;
-import com.clinovo.util.EmailUtil;
-import com.clinovo.util.RuleSetServiceUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Connection;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.sql.DataSource;
+import javax.xml.bind.JAXBContext;
+import javax.xml.transform.sax.SAXSource;
+
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -83,27 +102,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import javax.sql.DataSource;
-import javax.xml.bind.JAXBContext;
-import javax.xml.transform.sax.SAXSource;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.sql.Connection;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.util.EmailUtil;
+import com.clinovo.util.RuleSetServiceUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * Import Spring Job, a job running asynchronously on the Tomcat server using Spring and Quartz.
@@ -111,9 +113,11 @@ import java.util.Set;
  * @author thickerson, 04/2009
  * 
  */
-@SuppressWarnings({ "rawtypes" })
+@SuppressWarnings({"rawtypes"})
 public class ImportSpringJob extends QuartzJobBean {
 
+	public static final int INT_52 = 52;
+	public static final int INT_1024 = 1024;
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private ResourceBundle respage;
@@ -160,9 +164,9 @@ public class ImportSpringJob extends QuartzJobBean {
 	private StudySubjectIdService studySubjectIdService;
 
 	private class ProcessDataResult {
-		String msg;
-		String auditMsg;
-		List<Map<String, Object>> auditItemList;
+		private String msg;
+		private String auditMsg;
+		private List<Map<String, Object>> auditItemList;
 	}
 
 	@Override
@@ -271,8 +275,7 @@ public class ImportSpringJob extends QuartzJobBean {
 								+ message
 								+ "<br/>"
 								+ respage.getString("best_system_administrator").replace("{0}",
-										emailParentStudy.getName())
-								+ EmailUtil.getEmailBodyEnd()
+										emailParentStudy.getName()) + EmailUtil.getEmailBodyEnd()
 								+ EmailUtil.getEmailFooter(locale);
 						mailSender.sendEmail(contactEmail,
 								respage.getString("job_ran_for") + " " + triggerBean.getFullName(), body, true);
@@ -355,24 +358,15 @@ public class ImportSpringJob extends QuartzJobBean {
 			e.printStackTrace();
 			auditEventDAO.createRowForExtractDataJobFailure(triggerBean, e.getMessage());
 			try {
-				String msg = EmailUtil.getEmailBodyStart()
-						+ respage.getString("html_email_header_1")
-						+ " "
-						+ contactEmail
-						+ ",<br>";
+				String msg = EmailUtil.getEmailBodyStart() + respage.getString("html_email_header_1") + " "
+						+ contactEmail + ",<br>";
 				// Add information about error
-				msg += respage.getString("your_job_ran_html")
-						+ "<br/><ul>"
-						+ resword.getString("job_error_mail.error")
-						+ e.getMessage()
-						+ "</li>";
+				msg += respage.getString("your_job_ran_html") + "<br/><ul>" + resword.getString("job_error_mail.error")
+						+ e.getMessage() + "</li>";
 				// Add information about server where this error was thrown
-				msg += resword.getString("job_error_mail.serverUrl")
-						+ CoreResources.getDomainName()
-						+ "</li></ul>";
+				msg += resword.getString("job_error_mail.serverUrl") + CoreResources.getDomainName() + "</li></ul>";
 				if (emailParentStudy != null) {
-					msg += respage.getString("best_system_administrator").replace("{0}",
-							emailParentStudy.getName());
+					msg += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
 				}
 				msg += EmailUtil.getEmailBodyEnd()
 						+ EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
@@ -392,8 +386,7 @@ public class ImportSpringJob extends QuartzJobBean {
 	}
 
 	private String generateMsg(String msg, String contactEmail, String studyName) {
-		return EmailUtil.getEmailBodyStart()
-				+ respage.getString("html_email_header_1") + " " + contactEmail + ",<br>"
+		return EmailUtil.getEmailBodyStart() + respage.getString("html_email_header_1") + " " + contactEmail + ",<br>"
 				+ respage.getString("your_job_ran_success_html") + "  "
 				+ respage.getString("please_review_the_data_html") + msg + "<br/>"
 				+ respage.getString("best_system_administrator").replace("{0}", studyName)
@@ -459,7 +452,7 @@ public class ImportSpringJob extends QuartzJobBean {
 
 				MessageFormat mf = new MessageFormat("");
 				mf.applyPattern(respage.getString("your_xml_is_not_well_formed"));
-				Object[] arguments = { me1.getMessage() };
+				Object[] arguments = {me1.getMessage()};
 				msg.append(mf.format(arguments) + "<br/>");
 				auditMsg.append(mf.format(arguments) + "<br/>");
 				logger.error("found an error with XML: " + msg.toString());
@@ -482,7 +475,7 @@ public class ImportSpringJob extends QuartzJobBean {
 					out.write("</P>");
 					MessageFormat mf = new MessageFormat("");
 					mf.applyPattern(respage.getString("your_xml_in_the_file"));
-					Object[] arguments = { f.getName(), errors.size() };
+					Object[] arguments = {f.getName(), errors.size()};
 					auditMsg.append(mf.format(arguments) + "<br/>");
 					msg.append(mf.format(arguments) + "<br/>");
 					auditMsg.append(respage.getString("you_can_see_the_log_file") + " <a href='"
@@ -527,7 +520,7 @@ public class ImportSpringJob extends QuartzJobBean {
 					} else {
 						MessageFormat mf = new MessageFormat("");
 						mf.applyPattern(respage.getString("your_listed_crf_in_the_file"));
-						Object[] arguments = { f.getName() };
+						Object[] arguments = {f.getName()};
 						msg.append(mf.format(arguments) + "<br/>");
 						auditMsg.append(mf.format(arguments) + "<br/>");
 						out.write(mf.format(arguments) + "<br/>");
@@ -595,7 +588,7 @@ public class ImportSpringJob extends QuartzJobBean {
 			if (fail) {
 				MessageFormat mf = new MessageFormat("");
 				mf.applyPattern(respage.getString("problems_encountered_with_file"));
-				Object[] arguments = { f.getName(), msg.toString() };
+				Object[] arguments = {f.getName(), msg.toString()};
 				msg = new StringBuilder();
 				msg.append(mf.format(arguments) + "<br/>");
 				continue;
@@ -680,7 +673,7 @@ public class ImportSpringJob extends QuartzJobBean {
 							} else {
 								skippedItemIds.add(displayItemBean.getItem().getId());
 								Map<String, Object> auditItemMap = new HashMap<String, Object>();
-								auditItemMap.put("audit_log_event_type_id", 52);
+								auditItemMap.put("audit_log_event_type_id", INT_52);
 								auditItemMap.put("user_id", ub.getId());
 								auditItemMap.put("audit_table", "item_data");
 								auditItemMap.put("entity_id", itemDataBean.getId());
@@ -709,12 +702,14 @@ public class ImportSpringJob extends QuartzJobBean {
 								eventCrfBean.setDateCompleted(new Date());
 								eventCrfBean.setDateValidateCompleted(new Date());
 								eventCrfBean.setStatus(Status.UNAVAILABLE);
-								eventCrfBean.setStage(edcb.isDoubleEntry() ? DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
+								eventCrfBean.setStage(edcb.isDoubleEntry()
+										? DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
 										: DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE);
 								itemDataDao.updateStatusByEventCRF(eventCrfBean, Status.UNAVAILABLE);
 							}
 
 							ecdao.update(eventCrfBean);
+							itemDataDao.sdvCrfItems(eventCrfBean.getId(), false);
 						}
 
 						for (int studyEventId : studyEventIds) {
@@ -782,6 +777,27 @@ public class ImportSpringJob extends QuartzJobBean {
 
 	}
 
+	/**
+	 * Creates a disc note.
+	 *
+	 * @param itemBean
+	 *            ItemBean
+	 * @param message
+	 *            String
+	 * @param eventCrfBean
+	 *            EventCRFBean
+	 * @param displayItemBean
+	 *            DisplayItemBean
+	 * @param parentId
+	 *            Integer
+	 * @param uab
+	 *            UserAccountBean
+	 * @param ds
+	 *            DataSource
+	 * @param study
+	 *            StudyBean
+	 * @return DiscrepancyNoteBean
+	 */
 	public static DiscrepancyNoteBean createDiscrepancyNote(ItemBean itemBean, String message,
 			EventCRFBean eventCrfBean, DisplayItemBean displayItemBean, Integer parentId, UserAccountBean uab,
 			DataSource ds, StudyBean study) {
@@ -825,7 +841,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				java.io.InputStream in = new FileInputStream(tar[j]);
 				java.io.OutputStream out = new FileOutputStream(dest[j]);
 
-				byte[] buf = new byte[1024];
+				byte[] buf = new byte[INT_1024];
 				int len;
 
 				while ((len = in.read(buf)) > 0) {
