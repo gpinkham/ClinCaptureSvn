@@ -56,6 +56,8 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -85,7 +87,7 @@ import java.util.Locale;
  * This controller was created to gather data from database and send it to widgets.
  */
 @Controller
-@SuppressWarnings({"unused", "rawtypes", "unchecked"})
+@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
 public class WidgetsLayoutController {
 
 	private static final int FILTER_START = 0;
@@ -99,6 +101,7 @@ public class WidgetsLayoutController {
 
 	private static final String STATUS_NOT_CODED = "items to be coded";
 	private static final String STATUS_CODED = "coded items";
+	private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
 
 	@Autowired
 	private DataSource datasource;
@@ -530,19 +533,14 @@ public class WidgetsLayoutController {
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
 
 		EventCRFDAO eCrfdao = new EventCRFDAO(datasource);
-
 		ArrayList<EventCRFBean> previousYear = (ArrayList<EventCRFBean>) eCrfdao.findSDVedEventCRFsByStudyAndYear(sb,
 				sdvProgressYear - 1);
 		boolean previousDataExists = previousYear.size() > 0;
-
 		ArrayList<EventCRFBean> nextYear = (ArrayList<EventCRFBean>) eCrfdao.findSDVedEventCRFsByStudyAndYear(sb,
 				sdvProgressYear + 1);
-
 		Calendar sdvCal = Calendar.getInstance();
 		int currentYear = sdvCal.get(Calendar.YEAR);
-
 		boolean nextDataExists = sdvProgressYear < currentYear || nextYear.size() > 0;
-
 		EventCRFSDVFilter sdvFilterDone = new EventCRFSDVFilter(sb.getId());
 		sdvFilterDone.addFilter("sdvStatus", messageSource.getMessage("complete", null, SessionUtil.getLocale(request))
 				.toLowerCase());
@@ -553,75 +551,68 @@ public class WidgetsLayoutController {
 				: sb.getId(), sdvFilterDone, sdvSortDone, sdvWithOpenQueries, 0, FILTER_END);
 
 		List<Integer> countValues = new ArrayList<Integer>(Collections.nCopies(NUMBER_OF_MONTHS + 1, 0));
-
 		int currentMonth = sdvCal.get(Calendar.MONTH);
 
 		for (EventCRFBean ecrf : ecrfs) {
+			if (ecrf.getUpdatedDate() != null) {
+				sdvCal.setTime(ecrf.getUpdatedDate());
+				int ecrfYear = sdvCal.get(Calendar.YEAR);
 
-			sdvCal.setTime(ecrf.getUpdatedDate());
-			int ecrfYear = sdvCal.get(Calendar.YEAR);
+				if (ecrfYear <= sdvProgressYear) {
+					int month = sdvCal.get(Calendar.MONTH);
+					int eStartMonth = (ecrfYear == sdvProgressYear) ? month : 0;
+					int eEndMonth = (sdvProgressYear != currentYear) ? NUMBER_OF_MONTHS : currentMonth;
 
-			if (ecrfYear <= sdvProgressYear) {
-
-				int month = sdvCal.get(Calendar.MONTH);
-				int eStartMonth = (ecrfYear == sdvProgressYear) ? month : 0;
-				int eEndMonth = (sdvProgressYear != currentYear) ? NUMBER_OF_MONTHS : currentMonth;
-
-				for (int i = eStartMonth; i <= eEndMonth; i++) {
-
-					countValues.set(i, countValues.get(i) + 1);
+					for (int i = eStartMonth; i <= eEndMonth; i++) {
+						countValues.set(i, countValues.get(i) + 1);
+					}
 				}
+			} else {
+				LOGGER.error("Warning, event CRF with id=" + ecrf.getId() + " was updated, but updated date is NULL.");
 			}
 		}
-
 		LinkedHashMap<String, Integer> valuesAndSigns = new LinkedHashMap<String, Integer>();
-
 		int counter = 1;
 
 		for (int currentValue : countValues) {
 			String currentMonthName = messageSource.getMessage("short.month." + counter, null,
 					SessionUtil.getLocale(request));
 			valuesAndSigns.put(currentMonthName, currentValue);
-
 			counter++;
 		}
-
 		EventCRFSDVFilter sdvFilter = new EventCRFSDVFilter(sb.getId());
 		sdvFilter.addFilter("sdvStatus", messageSource.getMessage("not_done", null, SessionUtil.getLocale(request)));
 		EventCRFSDVSort sdvSort = new EventCRFSDVSort();
 		ArrayList<EventCRFBean> availableForSDV = eCrfdao.getAvailableWithFilterAndSort(sb.getId(),
 				sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries,
 				0, FILTER_END);
-
 		List<Integer> countAvailableCRFs = new ArrayList<Integer>(Collections.nCopies(NUMBER_OF_MONTHS + 1, 0));
 
 		for (EventCRFBean avCRF : availableForSDV) {
-
 			Calendar avCal = Calendar.getInstance();
 
-			avCal.setTime(avCRF.getUpdatedDate());
-			int avYear = avCal.get(Calendar.YEAR);
+			if (avCRF.getUpdatedDate() != null) {
+				avCal.setTime(avCRF.getUpdatedDate());
+				int avYear = avCal.get(Calendar.YEAR);
 
-			if (avYear <= sdvProgressYear) {
+				if (avYear <= sdvProgressYear) {
+					int avMonth = avCal.get(Calendar.MONTH);
+					int startMonth = (avYear == sdvProgressYear) ? avMonth : 0;
+					int endMonth = (sdvProgressYear != currentYear) ? NUMBER_OF_MONTHS : currentMonth;
 
-				int avMonth = avCal.get(Calendar.MONTH);
-				int startMonth = (avYear == sdvProgressYear) ? avMonth : 0;
-				int endMonth = (sdvProgressYear != currentYear) ? NUMBER_OF_MONTHS : currentMonth;
-
-				for (int i = startMonth; i <= endMonth; i++) {
-
-					countAvailableCRFs.set(i, countAvailableCRFs.get(i) + 1);
+					for (int i = startMonth; i <= endMonth; i++) {
+						countAvailableCRFs.set(i, countAvailableCRFs.get(i) + 1);
+					}
 				}
+			} else {
+				LOGGER.error("Warning, event CRF with id=" + avCRF.getId() + " was updated, but updated date is NULL.");
 			}
-
 		}
-
 		model.addAttribute("sdvAvailableECRFs", countAvailableCRFs);
 		model.addAttribute("sdvProgressYear", sdvProgressYear);
 		model.addAttribute("sdvValuesByMonth", valuesAndSigns);
 		model.addAttribute("sdvNextYearExists", nextDataExists);
 		model.addAttribute("sdvPreviousYearExists", previousDataExists);
-
 		return "widgets/includes/sdvProgressChart";
 	}
 
@@ -931,11 +922,9 @@ public class WidgetsLayoutController {
 
 		// Create an empty data rows with months names.
 		for (String month : months) {
-
 			LinkedHashMap<String, Integer> blankStatuses = new LinkedHashMap<String, Integer>();
 			blankStatuses.put(STATUS_CODED, 0);
 			blankStatuses.put(STATUS_NOT_CODED, 0);
-
 			cpDataRows.put(month, blankStatuses);
 		}
 
