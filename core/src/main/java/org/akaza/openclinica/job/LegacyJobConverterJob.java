@@ -15,18 +15,31 @@ package org.akaza.openclinica.job;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.service.extract.ExtractUtils;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
-import org.quartz.*;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
@@ -36,15 +49,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
- * Converts all old jobs created under DEFAULT group, to make it use new XSLT transformation code
- * 
- * @author: sshamim Date: Apr 1, 2011
+ * Converts all old jobs created under DEFAULT group, to make it use new XSLT transformation code.
+ *
  */
 public class LegacyJobConverterJob extends QuartzJobBean {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
-	private DataSource dataSource = null;
-	private CoreResources coreResources = null;
 
 	public static final String USER_ID = "user_id";
 	public static final String DATASET_ID = "dsId";
@@ -61,13 +70,13 @@ public class LegacyJobConverterJob extends QuartzJobBean {
 			String triggerGroup = "DEFAULT";
 			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
 			ExtractUtils extractUtils = new ExtractUtils();
-			if (legacyTriggers == null && legacyTriggers.size() == 0) {
+			if (legacyTriggers == null || legacyTriggers.size() == 0) {
 				logger.info("No legacy jobs to convert");
 				return;
 			}
 
-			dataSource = (DataSource) getApplicationContext(context).getBean("dataSource");
-			coreResources = (CoreResources) getApplicationContext(context).getBean("coreResources");
+			DataSource dataSource = (DataSource) getApplicationContext(context).getBean("dataSource");
+			CoreResources coreResources = (CoreResources) getApplicationContext(context).getBean("coreResources");
 
 			for (TriggerKey triggerKey : legacyTriggers) {
 				Trigger trigger = scheduler.getTrigger(triggerKey);
@@ -88,8 +97,7 @@ public class LegacyJobConverterJob extends QuartzJobBean {
 				userBean.setId(userId);
 				Map<String, Integer> exportingFormats = getExportingformats(dataMap);
 
-				for (Iterator<String> iterator = exportingFormats.keySet().iterator(); iterator.hasNext();) {
-					String exportFormat = iterator.next();
+				for (String exportFormat : exportingFormats.keySet()) {
 					Integer exportFormatId = exportingFormats.get(exportFormat);
 					ExtractPropertyBean epBean = coreResources.findExtractPropertyBeanById(exportFormatId, ""
 							+ datasetId);
@@ -114,9 +122,6 @@ public class LegacyJobConverterJob extends QuartzJobBean {
 					epBean.setDoNotDelFiles(temp);
 					epBean.setExportFileName(temp);
 
-					String generalFileDir = getFilePath(context);
-					generalFileDir = generalFileDir + "datasets" + File.separator + dsBean.getId() + File.separator
-							+ sdfDir.format(new java.util.Date());
 					exportFileName = epBean.getExportFileName()[cnt];
 
 					String xsltPath = getFilePath(context) + "xslt" + File.separator + files[0];
@@ -134,15 +139,16 @@ public class LegacyJobConverterJob extends QuartzJobBean {
 						epBean.setPostProcLocation(prePocLoc);
 					}
 
+					StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByPK(userBean.getActiveStudyId());
+					if (studyBean.getParentStudyId() > 0) {
+						studyBean = (StudyBean) new StudyDAO(dataSource).findByPK(studyBean.getParentStudyId());
+					}
 					extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
 					XsltTriggerService xsltService = new XsltTriggerService();
-					SimpleTriggerImpl newTrigger = null;
-					newTrigger = xsltService.generateXsltTrigger(
-							xsltPath,
-							generalFileDir, // xml_file_path
-							endFilePath + File.separator, exportFileName, dsBean.getId(), epBean, userBean,
-							Locale.US.getLanguage(), cnt, getFilePath(context) + "xslt",
-							XsltTriggerService.TRIGGER_GROUP_NAME);
+					SimpleTriggerImpl newTrigger;
+					newTrigger = xsltService.generateXsltTrigger(xsltPath, studyBean, endFilePath + File.separator,
+							exportFileName, dsBean.getId(), epBean, userBean, Locale.US.getLanguage(), cnt,
+							getFilePath(context) + "xslt", XsltTriggerService.TRIGGER_GROUP_NAME);
 					// Updating the original trigger with user given inputs
 					newTrigger.setRepeatCount(64000);
 					newTrigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
@@ -160,7 +166,7 @@ public class LegacyJobConverterJob extends QuartzJobBean {
 					JobDetailImpl jobDetailBean = new JobDetailImpl();
 					jobDetailBean.setGroup(XsltTriggerService.TRIGGER_GROUP_NAME);
 					jobDetailBean.setName(newTrigger.getName());
-					jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
+					jobDetailBean.setJobClass(XsltStatefulJob.class);
 					jobDetailBean.setJobDataMap(newTrigger.getJobDataMap());
 					jobDetailBean.setDurability(true); // need durability?
 					// jobDetailBean.setVolatility(false);

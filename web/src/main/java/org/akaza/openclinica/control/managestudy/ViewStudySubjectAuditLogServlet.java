@@ -21,6 +21,13 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -49,16 +56,10 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 /**
  * ViewStudySubjectAuditLogServlet class.
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ViewStudySubjectAuditLogServlet extends Controller {
 
@@ -117,7 +118,7 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 		ArrayList eventCRFAudits = new ArrayList();
 		ArrayList studyEventAudits = new ArrayList();
 		ArrayList allDeletedEventCRFs = new ArrayList();
-		String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
+		String attachedFilePath = Utils.getAttachedFilePath(getParentStudy());
 
 		int studySubId = fp.getInt("id", true);
 		request.setAttribute("id", studySubId);

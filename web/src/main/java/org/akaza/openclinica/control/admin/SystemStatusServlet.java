@@ -20,25 +20,30 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.stereotype.Component;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.PrintWriter;
-import java.util.List;
+import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
-// allows both deletion and restoration of a study user role
+import com.clinovo.bean.SystemStatusBean;
+import com.clinovo.util.SystemStatusUtil;
 
+/**
+ * SystemStatusServlet allows both deletion and restoration of a study user role.
+ */
+@SuppressWarnings("unchecked")
 @Component
 public class SystemStatusServlet extends Controller {
 
 	private static final long serialVersionUID = 1722670001851393612L;
+
+	public static final String OK = "OK";
+	public static final String ID = "id";
+	public static final String OME = "ome";
+	public static final String FILE_PATH = "filePath";
+	public static final String OUT_OF_MEMORY = "OutOfMemory";
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -47,26 +52,19 @@ public class SystemStatusServlet extends Controller {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Long databaseChangelLogCount = getDatabaseChangeLogDao().count();
-		String applicationStatus = "OK";
-		if (request.getSession().getAttribute("ome") != null) {
-			applicationStatus = "OutOfMemory.";
-		}
-
-		PrintWriter out = response.getWriter();
-		out.println(applicationStatus);
-		out.println(String.valueOf(databaseChangelLogCount));
-		out.println("");
-
-		for (StudyBean studyBean : (List<StudyBean>) getStudyDAO().findAllParents()) {
-			out.println("Study: " + studyBean.getName());
-			out.println("      - Users Assigned: "
-					+ new UserAccountDAO(getDataSource()).getUsersAssignedMetric(studyBean.getId()));
-			out.println("      - CRF Sections: "
-					+ new ItemFormMetadataDAO(getDataSource()).getCrfSectionsMetric(studyBean.getId()));
-			out.println("");
-		}
+		String id = request.getParameter(ID);
+		StringBuilder htmlContent = new StringBuilder();
+		SystemStatusBean systemStatusBean = new SystemStatusBean(id, getStudyDAO(), getUserAccountDAO(),
+				getItemFormMetadataDAO());
+		htmlContent.append("<html><body>");
+		htmlContent.append("<script type=\"application/xml\">")
+				.append(SystemStatusUtil.getXmlStatisticsForStudy(systemStatusBean)).append("</script>");
+		htmlContent.append("<pre>").append(request.getSession().getAttribute(OME) != null ? OUT_OF_MEMORY : OK)
+				.append("\n");
+		htmlContent.append(String.valueOf(getDatabaseChangeLogDao().count())).append("\n\n");
+		htmlContent.append(SystemStatusUtil.getStatisticsForStudy(systemStatusBean)).append("</pre></body></html>");
+		response.getWriter().println(htmlContent.toString());
 	}
+
 }

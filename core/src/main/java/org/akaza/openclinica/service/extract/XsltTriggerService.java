@@ -13,11 +13,13 @@
 
 package org.akaza.openclinica.service.extract;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.quartz.JobDataMap;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 
@@ -55,9 +57,9 @@ public class XsltTriggerService {
 	public static final String POST_PROC_EXPORT_NAME = "postProcExportName";
 	public static final String COUNT = "count";
 
-	public SimpleTriggerImpl generateXsltTrigger(String xslFile, String xmlFile, String endFilePath, String endFile,
-			int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale, int cnt,
-			String xsltPath, String triggerGroupName) {
+	public SimpleTriggerImpl generateXsltTrigger(String xslFile, StudyBean studyBean, String endFilePath,
+			String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,
+			int cnt, String xsltPath, String triggerGroupName) {
 		Date startDateTime = new Date(System.currentTimeMillis());
 		String jobName = datasetId + "_" + epBean.getExportFileName()[0];
 
@@ -75,8 +77,8 @@ public class XsltTriggerService {
 		JobDataMap jobDataMap = new JobDataMap();
 
 		jobDataMap.put(XSL_FILE_PATH, xslFile);
-		jobDataMap.put(XML_FILE_PATH, endFilePath);
-		jobDataMap.put(POST_FILE_PATH, endFilePath);
+		jobDataMap.put(XML_FILE_PATH, getCorrectPath(endFilePath, studyBean.getOid()));
+		jobDataMap.put(POST_FILE_PATH, getCorrectPath(endFilePath, studyBean.getOid()));
 		jobDataMap.put(POST_FILE_NAME, endFile);
 
 		jobDataMap.put(EXTRACT_PROPERTY, epBean.getId());
@@ -107,7 +109,7 @@ public class XsltTriggerService {
 	}
 
 	public static long getIntervalTime(String period) {
-		BigInteger interval = new BigInteger("0");
+		BigInteger interval;
 		if ("monthly".equalsIgnoreCase(period)) {
 			interval = new BigInteger("2419200000"); // how many
 			// milliseconds in
@@ -124,5 +126,16 @@ public class XsltTriggerService {
 			// day?
 		}
 		return interval.longValue();
+	}
+
+	public static String getCorrectPath(String fileDir, String studyOid) {
+		if (fileDir != null && studyOid != null && fileDir.split("datasets[^\\w]".concat(studyOid)).length == 1) {
+			String[] strArr = fileDir.split("datasets[^\\w]");
+			if (strArr.length == 2) {
+				fileDir = strArr[0].concat("datasets").concat(File.separator).concat(studyOid).concat(File.separator)
+						.concat(strArr[1]);
+			}
+		}
+		return fileDir;
 	}
 }

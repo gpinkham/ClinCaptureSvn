@@ -13,8 +13,20 @@
 
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.SessionUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -36,25 +48,15 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.clinovo.util.SessionUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * 
  * @author thickerson
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class CreateJobExportServlet extends Controller {
 
@@ -186,10 +188,6 @@ public class CreateJobExportServlet extends Controller {
 				epBean.setExportFileName(temp);
 
 				XsltTriggerService xsltService = new XsltTriggerService();
-				String generalFileDir = SQLInitServlet.getField("filePath");
-
-				generalFileDir = generalFileDir + DATASETS + File.separator + dsBean.getId() + File.separator
-						+ sdfDir.format(new java.util.Date());
 
 				exportFileName = epBean.getExportFileName()[cnt];
 
@@ -216,11 +214,9 @@ public class CreateJobExportServlet extends Controller {
 				extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
 				SimpleTriggerImpl trigger;
 
-				trigger = xsltService.generateXsltTrigger(xsltPath,
-						generalFileDir, // xml_file_path
-						endFilePath + File.separator, exportFileName, dsBean.getId(), epBean, userBean, SessionUtil
-								.getLocale(request).getLanguage(), cnt, SQLInitServlet.getField("filePath") + "xslt",
-						XsltTriggerService.TRIGGER_GROUP_NAME);
+				trigger = xsltService.generateXsltTrigger(xsltPath, getParentStudy(), endFilePath + File.separator,
+						exportFileName, dsBean.getId(), epBean, userBean, SessionUtil.getLocale(request).getLanguage(),
+						cnt, SQLInitServlet.getField("filePath") + "xslt", XsltTriggerService.TRIGGER_GROUP_NAME);
 
 				trigger.setName(jobName);
 				trigger.setJobName(jobName);
@@ -260,8 +256,8 @@ public class CreateJobExportServlet extends Controller {
 					return;
 				}
 				setUpServlet(request);
-				addPageMessage(respage.getString("you_have_successfully_created_a_new_job") + " " + jobName
-						+ " " + respage.getString("which_is_now_set_to_run"), request);
+				addPageMessage(respage.getString("you_have_successfully_created_a_new_job") + " " + jobName + " "
+						+ respage.getString("which_is_now_set_to_run"), request);
 				forwardPage(Page.VIEW_JOB_SERVLET, request, response);
 			}
 		} else {
@@ -293,7 +289,8 @@ public class CreateJobExportServlet extends Controller {
 		}
 		for (TriggerKey triggerKey : triggerKeys) {
 			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
-				Validator.addError(errors, JOB_NAME, respage.getString("a_job_with_that_name_already_exist_please_pick"));
+				Validator.addError(errors, JOB_NAME,
+						respage.getString("a_job_with_that_name_already_exist_please_pick"));
 			}
 		}
 		if (jobDate.before(new Date())) {

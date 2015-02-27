@@ -20,6 +20,15 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -31,15 +40,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-
-@SuppressWarnings({ "unchecked", "serial" })
+@SuppressWarnings({"unchecked", "serial"})
 @Component
 public class DownloadAttachedFileServlet extends Controller {
 
@@ -98,18 +99,18 @@ public class DownloadAttachedFileServlet extends Controller {
 		String fileName = fp.getString("fileName");
 		File f = new File(fileName);
 		if (fileName.length() > 0) {
-			int parentStudyId = currentStudy.getParentStudyId();
+			StudyBean parentStudy = getParentStudy();
 			String testPath = Utils.getAttachedFileRootPath();
 			String tail = File.separator + f.getName();
-			String testName = testPath + currentStudy.getOid() + tail;
+			String testName = testPath + parentStudy.getOid() + tail;
 			File temp = new File(testName);
 			if (temp.exists()) {
 				filePathName = testName;
 				logger.info(currentStudy.getName() + " existing filePathName=" + filePathName);
 				fileNameOid = currentStudy.getOid();
 			} else {
-				if (currentStudy.isSite(parentStudyId)) {
-					String testOid = ((StudyBean) getStudyDAO().findByPK(parentStudyId)).getOid();
+				if (currentStudy.isSite()) {
+					String testOid = currentStudy.getOid();
 					testName = testPath + testOid + tail;
 					temp = new File(testName);
 					if (temp.exists()) {
@@ -123,7 +124,7 @@ public class DownloadAttachedFileServlet extends Controller {
 							currentStudy.getId());
 					for (StudyBean s : sites) {
 						testPath = Utils.getAttachedFilePath(s);
-						testName = testPath + tail; // + s.getIdentifier() + tail;
+						testName = testPath + tail;
 						File test = new File(testName);
 						if (test.exists()) {
 							filePathName = testName;
@@ -140,7 +141,9 @@ public class DownloadAttachedFileServlet extends Controller {
 		String realName = file.getName();
 		logger.info("realName = " + realName);
 		if (!file.exists() || file.length() <= 0) {
-			addPageMessage(resterm.getString("file_upper_case") + " " + filePathName + " " + respage.getString("not_exist"), request);
+			addPageMessage(
+					resterm.getString("file_upper_case") + " " + filePathName + " " + respage.getString("not_exist"),
+					request);
 		} else {
 			// response.setContentType("application/octet-stream");
 			response.setHeader("Content-disposition", "attachment; filename=\"" + fileNameOid + realName + "\";");

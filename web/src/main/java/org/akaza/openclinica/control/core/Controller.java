@@ -13,7 +13,37 @@
 
 package org.akaza.openclinica.control.core;
 
-import com.clinovo.util.StudyParameterPriorityUtil;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -96,35 +126,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.StringTokenizer;
+import com.clinovo.util.StudyParameterPriorityUtil;
 
 /**
  * Abstract class for creating a controller servlet and extending capabilities of Controller. However, not using the
@@ -435,10 +437,11 @@ public abstract class Controller extends BaseController {
 
 			StudyDAO sdao = getStudyDAO();
 			if (currentStudy == null || currentStudy.getId() <= 0) {
+				StudyBean parentStudy = null;
 				if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
 					StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 					currentStudy = (StudyBean) sdao.findByPK(ub.getActiveStudyId());
-
+					parentStudy = currentStudy;
 					ArrayList studyParameters = spvdao.findParamConfigByStudy(currentStudy);
 
 					currentStudy.setStudyParameters(studyParameters);
@@ -449,7 +452,9 @@ public abstract class Controller extends BaseController {
 						scs.setParametersForStudy(currentStudy);
 
 					} else {
-						currentStudy.setParentStudyName((sdao.findByPK(currentStudy.getParentStudyId())).getName());
+						parentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
+						currentStudy.setParentStudyName(parentStudy.getName());
+						currentStudy.setParentStudyOid(parentStudy.getOid());
 						scs.setParametersForSite(currentStudy);
 					}
 
@@ -459,11 +464,9 @@ public abstract class Controller extends BaseController {
 				} else {
 					currentStudy = new StudyBean();
 				}
-				session.setAttribute("study", currentStudy);
-			} else if (currentStudy.getId() > 0) {
-				if (currentStudy.getParentStudyId() > 0) {
-					currentStudy.setParentStudyName((sdao.findByPK(currentStudy.getParentStudyId())).getName());
-				}
+				session.setAttribute(STUDY, currentStudy);
+				session.setAttribute(PARENT_STUDY, parentStudy);
+
 			}
 
 			String randomizationEnviroment = currentStudy.getStudyParameterConfig().getRandomizationEnviroment();
@@ -581,6 +584,7 @@ public abstract class Controller extends BaseController {
 		StudyBean currentStudy = getCurrentStudy(request);
 		if (currentStudy != null) {
 			currentStudy = (StudyBean) getStudyDAO().findByPK(currentStudy.getId());
+			StudyBean parentStudy = currentStudy;
 			StudyDAO sdao = getStudyDAO();
 			StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 			ArrayList studyParameters = spvdao.findParamConfigByStudy(currentStudy);
@@ -589,10 +593,13 @@ public abstract class Controller extends BaseController {
 			if (currentStudy.getParentStudyId() <= 0) {
 				scs.setParametersForStudy(currentStudy);
 			} else {
-				currentStudy.setParentStudyName((sdao.findByPK(currentStudy.getParentStudyId())).getName());
+				parentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
+				currentStudy.setParentStudyName(parentStudy.getName());
+				currentStudy.setParentStudyOid(parentStudy.getOid());
 				scs.setParametersForSite(currentStudy);
 			}
-			request.getSession().setAttribute("study", currentStudy);
+			request.getSession().setAttribute(STUDY, currentStudy);
+			request.getSession().setAttribute(PARENT_STUDY, parentStudy);
 		}
 		return currentStudy;
 	}

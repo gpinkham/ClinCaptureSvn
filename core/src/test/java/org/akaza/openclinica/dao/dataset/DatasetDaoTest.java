@@ -1,22 +1,31 @@
 package org.akaza.openclinica.dao.dataset;
 
-import org.akaza.openclinica.DefaultAppContextTest;
-import org.akaza.openclinica.bean.core.DatasetItemStatus;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.exception.OpenClinicaException;
-import org.junit.Test;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.core.DatasetItemStatus;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.exception.OpenClinicaException;
+import org.junit.Before;
+import org.junit.Test;
+
 @SuppressWarnings("unchecked")
 public class DatasetDaoTest extends DefaultAppContextTest {
 
 	public static final String TEST_DATASET_NAME = "xx";
+
+	private StudyBean studyBean;
+
+	@Before
+	public void setUp() {
+		studyBean = new StudyBean();
+	}
 
 	private DatasetBean createDateset() {
 		DatasetBean dataset = new DatasetBean();
@@ -102,4 +111,9 @@ public class DatasetDaoTest extends DefaultAppContextTest {
 		assertTrue(dataset.getItemIds().size() > 0);
 	}
 
+	@Test
+	public void testThatFindByNameAndStudyCannotFindAnObject() throws OpenClinicaException {
+		DatasetBean datasetBean = (DatasetBean) datasetDAO.findByNameAndStudy(TEST_DATASET_NAME, studyBean);
+		assertTrue(datasetBean.getId() == 0);
+	}
 }

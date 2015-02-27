@@ -20,18 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.rule.FileProperties;
-import org.akaza.openclinica.bean.rule.FileUploadHelper;
-import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -42,24 +30,35 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@SuppressWarnings({ "unchecked", "serial" })
+import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.rule.FileProperties;
+import org.akaza.openclinica.bean.rule.FileUploadHelper;
+import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
+
+@SuppressWarnings({"unchecked", "serial"})
 @Component
 public class UploadFileServlet extends Controller {
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		if ("false".equals(request.getSession().getAttribute("mayProcessUploading"))) {
 			addPageMessage(respage.getString("you_not_have_permission_upload_file"), request);
 			request.setAttribute("uploadFileStauts", "noPermission");
 		}
-		return;
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        StudyBean currentStudy = getCurrentStudy(request);
 		FormProcessor fp = new FormProcessor(request);
-		HashMap<String, String> newUploadedFiles = (HashMap<String, String>) request.getSession().getAttribute("newUploadedFiles");
+		HashMap<String, String> newUploadedFiles = (HashMap<String, String>) request.getSession().getAttribute(
+				"newUploadedFiles");
 		if (newUploadedFiles == null) {
 			newUploadedFiles = new HashMap<String, String>();
 		}
@@ -69,7 +68,7 @@ public class UploadFileServlet extends Controller {
 			request.setAttribute("inputName", fp.getString("inputName"));
 			forwardPage(Page.FILE_UPLOAD, request, response);
 		} else {
-			String dir = Utils.getAttachedFilePath(currentStudy);
+			String dir = Utils.getAttachedFilePath(getParentStudy());
 			if (dir == null || dir.length() <= 0) {
 				request.setAttribute("uploadFileStauts", "failed");
 				this.forwardPage(Page.FILE_UPLOAD, request, response);
@@ -80,8 +79,9 @@ public class UploadFileServlet extends Controller {
 				}
 				request.setAttribute("attachedFilePath", dir);
 				try {
-                    FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties(
-                            CoreResources.getField("crf.file.extensions"), CoreResources.getField("crf.file.extensionSettings")));
+					FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties(
+							CoreResources.getField("crf.file.extensions"),
+							CoreResources.getField("crf.file.extensionSettings")));
 					List<File> files = uploadHelper.returnFiles(request, getServletContext(), dir, new OCFileRename());
 					String fileName = "";
 					for (File temp : files) {
@@ -91,7 +91,7 @@ public class UploadFileServlet extends Controller {
 
 						// if (files.hasMoreElements()) {
 						// File temp = multi.getFile((String) files.nextElement());
-						if (temp == null || temp.getName() == null) {
+						if (temp == null) {
 							fileName = "";
 						} else {
 							fileName = temp.getName();
@@ -101,7 +101,7 @@ public class UploadFileServlet extends Controller {
 					logger.info("===== fileName=" + fileName);
 					request.setAttribute("fileName", fileName);
 					request.setAttribute("uploadFileStatus", "successed");
-					String key = "";
+					String key;
 					String inputName = (String) request.getAttribute("inputName");
 					String itemId = (String) request.getAttribute("itemId");
 					request.setAttribute("fileItemId", itemId + "");
@@ -113,10 +113,12 @@ public class UploadFileServlet extends Controller {
 					}
 					if (fileName.length() > 0) {
 						newUploadedFiles.put(key, dir + File.separator + fileName);
-						addPageMessage(fileName
-								+ " "
-								+ respage
-										.getString("uploaded_successfully_go_to_data_entry_page_to_save_into_database"), request);
+						addPageMessage(
+								fileName
+										+ " "
+										+ respage
+												.getString("uploaded_successfully_go_to_data_entry_page_to_save_into_database"),
+								request);
 					} else {
 						request.setAttribute("uploadFileStatus", "empty");
 						addPageMessage(respage.getString("no_file_uploaded_please_specify_file"), request);
@@ -130,8 +132,9 @@ public class UploadFileServlet extends Controller {
 					MessageFormat mf = new MessageFormat("");
 					mf.applyPattern(respage.getString(e.getErrorCode()));
 					Object[] arguments = e.getErrorParams();
-					addPageMessage(respage.getString("file_uploading_failed_please_check_logs_and_upload_again")
-							+ mf.format(arguments), request);
+					addPageMessage(
+							respage.getString("file_uploading_failed_please_check_logs_and_upload_again")
+									+ mf.format(arguments), request);
 					e.printStackTrace();
 				}
 				forwardPage(Page.FILE_UPLOAD, request, response);

@@ -7,8 +7,8 @@
         </query>
         <query>
                 <name>findByNameAndStudy</name>
-                <sql>SELECT * FROM DATASET WHERE
-                name = ? and study_id=?</sql>
+                <sql>select ds.* from dataset ds, study s WHERE
+                ds.name = ? and s.study_id = ? and (ds.study_id = s.study_id or ds.study_id = s.parent_study_id)</sql>
         </query>
         <query>
                 <name>findAll</name>

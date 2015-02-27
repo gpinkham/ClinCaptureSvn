@@ -71,6 +71,7 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.clinovo.dao.SystemDAO;
+import com.clinovo.rest.util.RequestUtil;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DcfService;
 import com.clinovo.service.DictionaryService;
@@ -83,7 +84,7 @@ import com.clinovo.service.WidgetsLayoutService;
 import com.clinovo.util.RuleSetServiceUtil;
 import com.clinovo.util.SessionUtil;
 
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
 
 	public static final String REFERER = "referer";
@@ -96,6 +97,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public static final String STUDY = "study";
 	public static final String USER_ROLE = "userRole";
+	public static final String PARENT_STUDY = "parentStudy";
 	public static final String USER_BEAN_NAME = "userBean";
 	public static final String ERRORS_HOLDER = "errors_holder";
 	public static final String SESSION_MANAGER = "sessionManager";
@@ -104,7 +106,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
 
 	public static final String STORED_ATTRIBUTES = "RememberLastPage_storedAttributes";
-	public static final String SCHEDULER = "schedulerFactoryBean";
 	public static final String JOB_HOUR = "jobHour";
 	public static final String JOB_MINUTE = "jobMinute";
 
@@ -120,8 +121,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	// preset values
 
 	public static final String ADMIN_SERVLET_CODE = "admin";
-
-	public static final String BEAN_TABLE = "table";
 
 	public static final String STUDY_INFO_PANEL = "panel"; // for setting the
 	// side panel
@@ -294,12 +293,32 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return (StudyBean) request.getSession().getAttribute(STUDY);
 	}
 
+	public StudyBean getCurrentStudy() {
+		return getCurrentStudy(RequestUtil.getRequest());
+	}
+
+	public StudyBean getParentStudy(HttpServletRequest request) {
+		return (StudyBean) request.getSession().getAttribute(PARENT_STUDY);
+	}
+
+	public StudyBean getParentStudy() {
+		return getParentStudy(RequestUtil.getRequest());
+	}
+
 	public UserAccountBean getUserAccountBean(HttpServletRequest request) {
 		return (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 	}
 
+	public UserAccountBean getUserAccountBean() {
+		return getUserAccountBean(RequestUtil.getRequest());
+	}
+
 	public StudyUserRoleBean getCurrentRole(HttpServletRequest request) {
 		return (StudyUserRoleBean) request.getSession().getAttribute(USER_ROLE);
+	}
+
+	public StudyUserRoleBean getCurrentRole() {
+		return getCurrentRole(RequestUtil.getRequest());
 	}
 
 	public DynamicsMetadataService getDynamicsMetadataService() {
@@ -525,7 +544,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public EventCRFService getEventCRFService() {
 		return eventCRFService;
 	}
-	
+
 	public DcfService getDcfService() {
 		return dcfService;
 	}

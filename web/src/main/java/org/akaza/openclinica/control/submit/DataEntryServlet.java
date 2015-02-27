@@ -152,7 +152,7 @@ import com.clinovo.util.ValidatorHelper;
 /**
  * @author ssachs
  */
-@SuppressWarnings({ "all" })
+@SuppressWarnings({"all"})
 public abstract class DataEntryServlet extends Controller {
 
 	public static final String DATA_ENTRY_CURRENT_CRF_VERSION_OID = "dataEntryCurrentCrfVersionOid";
@@ -684,7 +684,7 @@ public abstract class DataEntryServlet extends Controller {
 
 			// all items- include items in item groups and other single items
 			List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
-			String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
+			String attachedFilePath = Utils.getAttachedFilePath(getParentStudy());
 
 			DiscrepancyValidator v = new DiscrepancyValidator(validatorHelper, discNotes);
 			RuleValidator ruleValidator = new RuleValidator(validatorHelper);

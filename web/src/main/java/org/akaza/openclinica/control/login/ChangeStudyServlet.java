@@ -20,8 +20,12 @@
  */
 package org.akaza.openclinica.control.login;
 
-import com.clinovo.util.StudyParameterPriorityUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -45,16 +49,14 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.clinovo.util.StudyParameterPriorityUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * Processes the request of changing current study.
  *
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ChangeStudyServlet extends Controller {
 
@@ -151,7 +153,7 @@ public class ChangeStudyServlet extends Controller {
 
 		StudyDAO sdao = getStudyDAO();
 		StudyBean current = (StudyBean) sdao.findByPK(studyId);
-
+		StudyBean parent = current;
 		StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 
 		ArrayList studyParameters = spvdao.findParamConfigByStudy(current);
@@ -172,7 +174,9 @@ public class ChangeStudyServlet extends Controller {
 
 		} else {
 			if (current.getParentStudyId() > 0) {
-				current.setParentStudyName(sdao.findByPK(current.getParentStudyId()).getName());
+				parent = (StudyBean) sdao.findByPK(current.getParentStudyId());
+				current.setParentStudyName(parent.getName());
+				current.setParentStudyOid(parent.getOid());
 			}
 			scs.setParametersForSite(current);
 		}
@@ -180,7 +184,8 @@ public class ChangeStudyServlet extends Controller {
 			request.getSession().removeAttribute("studyWithRole");
 			addPageMessage(restext.getString("study_choosed_removed_restore_first"), request);
 		} else {
-			request.getSession().setAttribute("study", current);
+			request.getSession().setAttribute(STUDY, current);
+			request.getSession().setAttribute(PARENT_STUDY, parent);
 			currentStudy = current;
 			UserAccountDAO udao = getUserAccountDAO();
 			ub.setActiveStudyId(current.getId());

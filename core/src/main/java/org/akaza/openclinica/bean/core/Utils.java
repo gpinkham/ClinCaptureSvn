@@ -21,11 +21,6 @@
 
 package org.akaza.openclinica.bean.core;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,7 +35,13 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class Utils {
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
+@SuppressWarnings("unused")
+public final class Utils {
 
 	private static Utils ref;
 
@@ -61,13 +62,12 @@ public class Utils {
 
 	/**
 	 * This Method will compare the two Dates and return a String with number of years , weeks and days.
-	 * 
-	 * @author Krikor Krumlian 10/20/2006
+	 *
 	 * @param eventStartDate
 	 *            The event start date
 	 * @param subjectDOB
 	 *            the Subject's date of birth
-	 * @return
+	 * @return String
 	 */
 	public String processAge(Date eventStartDate, Date subjectDOB) {
 		int years = 0, months = 0, days = 0;
@@ -135,12 +135,15 @@ public class Utils {
 	 * Convert string with from_pattern to string with to_pattern. Browser locale.
 	 * 
 	 * @param itemValue
+	 *            String
 	 * @param from_pattern
+	 *            String
 	 * @param to_pattern
+	 *            String
+	 * @param locale
+	 *            Locale
 	 * 
-	 * @return
-	 * 
-	 * @author ywang 12-06-2007
+	 * @return String
 	 */
 	public static String convertedItemDateValue(String itemValue, String from_pattern, String to_pattern, Locale locale) {
 		if (itemValue != null && !StringUtil.isFormatDate(itemValue, to_pattern)) {
@@ -165,19 +168,22 @@ public class Utils {
 	}
 
 	/**
-	 * Zip StringBuffer to a file
+	 * Zip StringBuffer to a file.
 	 * 
 	 * @param fileName
+	 *            String
 	 * @param filePath
+	 *            String
 	 * @param content
-	 * 
-	 * @author ywang (07-2008)
-	 * @throws IOException 
+	 *            StringBuffer
+	 * @throws IOException
+	 *             the IOException
+	 * @return boolean
 	 */
 	public static boolean createZipFile(String fileName, String filePath, StringBuffer content) throws IOException {
-		
+
 		ZipOutputStream z = null;
-		
+
 		try {
 			File dir = new File(filePath);
 			if (!dir.isDirectory()) {
@@ -194,16 +200,20 @@ public class Utils {
 			e.printStackTrace();
 			return false;
 		} finally {
-			z.close();
+			if (z != null) {
+				z.close();
+			}
 		}
 	}
 
 	/**
-	 * age = the_year_of_controlDate - the_year_of_birthDate
+	 * age = the_year_of_controlDate - the_year_of_birthDate.
 	 * 
 	 * @param birthDate
+	 *            Date
 	 * @param controlDate
-	 * @return
+	 *            Date
+	 * @return Integer
 	 */
 	public static Integer getAge(Date birthDate, Date controlDate) {
 		Integer age = -1;
@@ -231,11 +241,11 @@ public class Utils {
 			// attachedFilePath = CoreResources.getField("filePath") +
 			// "attached_files" + File.separator + study.getIdentifier() +
 			// File.separator;
-			attachedFilePath = CoreResources.getField("filePath") + "attached_files" + File.separator + study.getOid()
-					+ File.separator;
+			attachedFilePath = CoreResources.getField("filePath") + File.separator + "attached_files" + File.separator
+					+ study.getOid() + File.separator;
 		} else {
 			// attachedFilePath += study.getIdentifier() + File.separator;
-			attachedFilePath += study.getOid() + File.separator;
+			attachedFilePath += File.separator + study.getOid() + File.separator;
 		}
 		return attachedFilePath;
 	}
