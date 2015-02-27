@@ -2754,7 +2754,7 @@ codeItem = function(item) {
             }
             //append error to the alert box
             $("#sidebar_Alerts_open .sidebar_tab_content").html('')
-                .append("<div class='alert'>Dictionary is not available. Please contact yous system administrator.</div>");
+                .append("<div class='alert'>Dictionary is not available. Please contact your system administrator.</div>");
 
             console.log("Error:" + e);
         }
@@ -2820,7 +2820,7 @@ saveCodedItem = function(item) {
             }
             //append error to the alert box
             $("#sidebar_Alerts_open .sidebar_tab_content").html('')
-                .append("<div class='alert'>Dictionary is not available. Please contact yous system administrator.</div>");
+                .append("<div class='alert'>Dictionary is not available. Please contact your system administrator.</div>");
             console.log("Error:" + e);
         }
     });
@@ -2935,7 +2935,7 @@ codeAndAlias = function(item) {
             }
             //append error to the alert box
             $("#sidebar_Alerts_open .sidebar_tab_content").html('')
-                .append("<div class='alert'>Dictionary is not available. Please contact yous system administrator.</div>");
+                .append("<div class='alert'>Dictionary is not available. Please contact your system administrator.</div>");
             console.log("Error:" + e);
         }
     });
