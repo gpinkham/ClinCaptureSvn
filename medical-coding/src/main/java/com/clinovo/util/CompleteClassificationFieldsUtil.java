@@ -35,6 +35,12 @@ public final class CompleteClassificationFieldsUtil {
 	private enum WHOD_SECOND_PART { ATC7, ATC6, ATC5, ATC4, ATC3, ATC2, ATC1, CNTR }
 	private enum CTCAE { SOC, AEN }
 
+	private static final String ICD9CM = "ICD9CM";
+	private static final String ICD10 = "ICD10";
+	private static final String WHOD = "WHOD";
+	private static final String MEDDRAC = "MEDDRA";
+	private static final String CTCAEC = "CTCAE";
+
 	/**
 	 * Sets elements name for term dictionary.
 	 *
@@ -46,11 +52,11 @@ public final class CompleteClassificationFieldsUtil {
 
 		ArrayList dictionaryValuesList;
 
-		if (dictionary.equals("ICD9CM") || dictionary.equals("ICD10")) {
+		if (dictionary.equals(ICD9CM) || dictionary.equals(ICD10)) {
 			dictionaryValuesList = new ArrayList<ICD910>(Arrays.asList(ICD910.values()));
-		} else if (dictionary.equals("MEDDRA")) {
+		} else if (dictionary.equals(MEDDRAC)) {
 			dictionaryValuesList = new ArrayList<MEDDRA>(Arrays.asList(MEDDRA.values()));
-		} else if (dictionary.equals("WHOD")) {
+		} else if (dictionary.equals(WHOD)) {
 			//remove VA uniq key
 			classificationElements.remove(0);
 			dictionaryValuesList = new ArrayList<WHOD_SECOND_PART>(Arrays.asList(WHOD_SECOND_PART.values()));
@@ -58,7 +64,7 @@ public final class CompleteClassificationFieldsUtil {
 				String classificationElement = whodClassificationElement.getCodeName().replaceAll("_", " ").replaceAll(" and ", " & ");
 				whodClassificationElement.setCodeName(classificationElement.substring(0, classificationElement.indexOf("@")));
 			}
-		} else if (dictionary.equals("CTCAE")) {
+		} else if (dictionary.equals(CTCAEC)) {
 			dictionaryValuesList = new ArrayList<CTCAE>(Arrays.asList(CTCAE.values()));
 		} else {
 			throw new SearchException("Unknown dictionary type specified");
@@ -96,7 +102,7 @@ public final class CompleteClassificationFieldsUtil {
 	public static List<Classification> firstResponse(List<Classification> classificationResponse, String dictionary, String prefLabel, String codeHttpPath) throws SearchException {
 		List dictionaryValuesList = new ArrayList<WHOD_FIRST_PART>(Arrays.asList(WHOD_FIRST_PART.values()));
 
-		if (dictionary.equals("WHOD")) {
+		if (dictionary.equals(WHOD)) {
 			List<String> elements = Arrays.asList(prefLabel.split("@"));
 			Classification classification = new Classification();
 			classification.setHttpPath(codeHttpPath);
@@ -132,13 +138,32 @@ public final class CompleteClassificationFieldsUtil {
 
 
 	private static String getFirstElementName(String termDictionary) throws SearchException {
-		if ("meddra".equalsIgnoreCase(termDictionary)) {
+		if (MEDDRAC.equalsIgnoreCase(termDictionary)) {
 			return "LLT";
-		} else if ("icd10".equalsIgnoreCase(termDictionary) || "icd9cm".equalsIgnoreCase(termDictionary)) {
+		} else if (ICD10.equalsIgnoreCase(termDictionary) || ICD9CM.equalsIgnoreCase(termDictionary)) {
 			return "EXT";
-		} else if ("ctcae".equalsIgnoreCase(termDictionary)) {
+		} else if (CTCAEC.equalsIgnoreCase(termDictionary)) {
 			return "AEG";
 		}
 		throw new SearchException("Unknown dictionary type specified");
+	}
+
+	/**
+	 * Returns list of ontology elements.
+	 *
+	 * @param ontologyName ontology for search.
+	 * @return the list with ontology elements or null.
+	 */
+	public static List getEnumAsList(String ontologyName) {
+		if (ontologyName.equals(MEDDRAC)) {
+			return Arrays.asList(MEDDRA.values());
+		} else if (ontologyName.equals("ICD_10") || ontologyName.equals("ICD_9CM")) {
+			return Arrays.asList(ICD910.values());
+		} else if (ontologyName.equals(WHOD)) {
+			return Arrays.asList(WHOD_FIRST_PART.values());
+		} else if (ontologyName.equals(CTCAEC)) {
+			return Arrays.asList(CTCAE.values());
+		}
+		return null;
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2015 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.CompleteClassificationFieldsUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -47,6 +48,7 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -62,6 +64,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -1001,6 +1004,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 						++cellIndex;
 						// default is true
 						cell = sheet.getRow(k).getCell(cellIndex);
+						validateMedicalCodingRow(sheet, j, k, cell, errors, htmlErrors, resPageMsg);
 						String codeRef = getValue(cell);
 
 						if (!StringUtil.isBlank(display)) {
@@ -2318,6 +2322,49 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 		}
 		ncrf.setHtmlTable(buf.toString());
 		return ncrf;
+	}
+
+
+	private void validateMedicalCodingRow(Sheet sheet, int j, int k, Cell cell, ArrayList errors, HashMap htmlErrors, ResourceBundle resPageMsg) {
+
+		final int itemTypeIndex = 19;
+		String codeRef = getValue(cell);
+		String itemType = getValue(sheet.getRow(k).getCell(itemTypeIndex));
+		String itemName = getValue(sheet.getRow(k).getCell(0));
+		List<String> codingRefItemNames = getRefItemNames(sheet);
+		if (!codeRef.isEmpty()) {
+			if (CompleteClassificationFieldsUtil.getEnumAsList(codeRef) == null && !codingRefItemNames.contains(codeRef)) {
+				errors.add(resPageMsg.getString("please_specify_correct_ontology_name"));
+				htmlErrors.put(j + "," + k + "," + cell.getColumnIndex(), resPageMsg.getString("please_specify_correct_ontology_name"));
+			} else {
+				if (CompleteClassificationFieldsUtil.getEnumAsList(codeRef) == null && !itemType.equalsIgnoreCase("CODE") && itemName.indexOf("_GR") < 0) {
+					errors.add(resPageMsg.getString("please_update_coding_item_type_to_code"));
+					htmlErrors.put(j + "," + k + "," + itemTypeIndex, resPageMsg.getString("please_update_coding_item_type_to_code"));
+				}
+				if (CompleteClassificationFieldsUtil.getEnumAsList(codeRef) != null && !itemType.equalsIgnoreCase("ST")) {
+					errors.add(resPageMsg.getString("please_update_medical_coding_reference_item_type"));
+					htmlErrors.put(j + "," + k + "," + itemTypeIndex, resPageMsg.getString("please_update_medical_coding_reference_item_type"));
+				}
+			}
+		}
+	}
+
+	private List<String> getRefItemNames(Sheet sheet) {
+		final int itemReferenceIndex = 27;
+		List refItemNames = new ArrayList();
+		int numRows = sheet.getPhysicalNumberOfRows();
+		for (int i = 0; i < numRows; i++) {
+			if (sheet.getRow(i) == null) {
+				continue;
+			}
+			Row currentRow = sheet.getRow(i);
+			String itemCodeRef = getValue(currentRow.getCell(itemReferenceIndex));
+			if (CompleteClassificationFieldsUtil.getEnumAsList(itemCodeRef) != null) {
+				refItemNames.add(getValue(currentRow.getCell(0)));
+			}
+		}
+
+		return refItemNames;
 	}
 
 	/**

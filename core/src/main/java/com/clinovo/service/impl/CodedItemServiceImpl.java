@@ -213,7 +213,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 			CodedItem codedItem = codeItemDAO.findByItemId(refItemData.getId());
 
 			if (codedItem != null) {
-				CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(), StringUtils.substringAfter(item.getName(), "_"));
+				CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(), StringUtils.substringAfterLast(item.getName(), "_"));
 				codedItem.addCodedItemElements(codedItemElement);
 				codeItemDAO.saveOrUpdate(codedItem);
 
@@ -224,7 +224,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 			ItemDataBean refItemData = getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), eventCRF.getId(), itemData.getOrdinal());
 			CodedItem codedItem = codeItemDAO.findByItemId(refItemData.getId());
 			if (codedItem != null) {
-				CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(), StringUtils.substringAfter(item.getName(), "_"));
+				CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(), StringUtils.substringAfterLast(item.getName(), "_"));
 				codedItemElement.setItemCode(itemData.getValue());
 				codedItem.addCodedItemElements(codedItemElement);
 				codeItemDAO.saveOrUpdate(codedItem);
