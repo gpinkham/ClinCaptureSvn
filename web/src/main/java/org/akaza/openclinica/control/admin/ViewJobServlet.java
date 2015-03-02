@@ -13,6 +13,14 @@
 
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -34,19 +42,12 @@ import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
-
 /**
  * Generates the list of jobs and allow us to view them.
  * 
  * @author thickerson
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ViewJobServlet extends RememberLastPage {
 
@@ -74,7 +75,7 @@ public class ViewJobServlet extends RememberLastPage {
 		if (shouldRedirect(request, response)) {
 			return;
 		}
-
+		StudyBean currentStudy = getCurrentStudy(request);
 		FormProcessor fp = new FormProcessor(request);
 		// First we must get a reference to a scheduler
 		StdScheduler scheduler = getStdScheduler();
@@ -124,15 +125,18 @@ public class ViewJobServlet extends RememberLastPage {
 				triggerBean.setActive(true);
 				logger.debug("setting active to TRUE for trigger: " + trigger.getKey().getName());
 			}
-			triggerBeans.add(triggerBean);
+			StudyBean jobStudyBean = (StudyBean) studyDao.findByPK((Integer) trigger.getJobDataMap().get("studyId"));
+			if (jobStudyBean.getId() == currentStudy.getId() || jobStudyBean.getParentStudyId() == currentStudy.getId()) {
+				triggerBeans.add(triggerBean);
+			}
 		}
 
 		ArrayList allRows = TriggerRow.generateRowsFromBeans(triggerBeans);
 
 		EntityBeanTable table = fp.getEntityBeanTable();
-		String[] columns = { resword.getString("name"), resword.getString("previous_fire_time"),
+		String[] columns = {resword.getString("name"), resword.getString("previous_fire_time"),
 				resword.getString("next_fire_time"), resword.getString("description"), resword.getString("study"),
-				resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("actions") };
+				resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(DESCRIPTION_COL);
 		table.hideColumnLink(ACTION_COL);

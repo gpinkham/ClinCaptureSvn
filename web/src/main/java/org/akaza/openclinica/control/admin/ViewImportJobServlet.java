@@ -13,10 +13,20 @@
 
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
@@ -29,17 +39,10 @@ import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
-
 /**
  * The servlet for managing import jobs.
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ViewImportJobServlet extends RememberLastPage {
 
@@ -71,7 +74,8 @@ public class ViewImportJobServlet extends RememberLastPage {
 		if (shouldRedirect(request, response)) {
 			return;
 		}
-
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyDAO studyDao = getStudyDAO();
 		FormProcessor fp = new FormProcessor(request);
 		// First we must get a reference to a scheduler
 		StdScheduler scheduler = getStdScheduler();
@@ -109,7 +113,10 @@ public class ViewImportJobServlet extends RememberLastPage {
 				triggerBean.setActive(true);
 				logger.debug("setting active to TRUE for trigger: " + trigger.getKey().getName());
 			}
-			triggerBeans.add(triggerBean);
+			StudyBean jobStudyBean = studyDao.findByOid((String) trigger.getJobDataMap().get("study_oid"));
+			if (jobStudyBean.getId() == currentStudy.getId() || jobStudyBean.getParentStudyId() == currentStudy.getId()) {
+				triggerBeans.add(triggerBean);
+			}
 			// our wrapper to show triggers
 		}
 
@@ -117,8 +124,9 @@ public class ViewImportJobServlet extends RememberLastPage {
 		ArrayList allRows = TriggerRow.generateRowsFromBeans(triggerBeans);
 
 		EntityBeanTable table = fp.getEntityBeanTable();
-		String[] columns = { resword.getString("name"), resword.getString("previous_fire_time"),
-				resword.getString("next_fire_time"), resword.getString("description"), resword.getString("study"), resword.getString("actions") };
+		String[] columns = {resword.getString("name"), resword.getString("previous_fire_time"),
+				resword.getString("next_fire_time"), resword.getString("description"), resword.getString("study"),
+				resword.getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(DESCRIPTION_COL);
 		table.hideColumnLink(ACTION_COL);
