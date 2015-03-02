@@ -9,13 +9,14 @@
 <c:choose>
     <c:when test="${study.status.name != 'removed' && study.status.name != 'auto-removed'}">
     <c:url var="viewStudy" value="/ViewStudy"/>
+	<c:url var="viewSite" value="/ViewSite"/>
     <c:choose>
     <c:when test="${study.parentStudyId>0}">
     <b><fmt:message key="study" bundle="${resword}"/>:</b>&nbsp;
      <a href="${viewStudy}?id=<c:out value="${study.parentStudyId}"/>&viewFull=yes"><c:out value="${study.parentStudyName}"/></a>
      <br><br>
-    <b>Site:</b>&nbsp;
-     <a href="${viewStudy}?id=<c:out value="${study.id}"/>">
+    <b><fmt:message key="site" bundle="${resword}"/>:</b>&nbsp;
+     <a href="${viewSite}?id=<c:out value="${study.id}"/>">
     </c:when>
     <c:otherwise>
     <b><fmt:message key="study" bundle="${resword}"/>:</b>&nbsp;
