@@ -509,7 +509,7 @@
 
 
 <div class="tablebox_center">
-<table border="0" cellpadding="0" cellspacing="0" width="900px">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
 	<tr valign="top">
 		<td width="90px" class="table_header_row"><fmt:message key="name" bundle="${resword}"/></td>
 		<td valign="top" class="table_header_row"><fmt:message key="required" bundle="${resword}"/></td>
