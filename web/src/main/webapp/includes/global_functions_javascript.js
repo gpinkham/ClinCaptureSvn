@@ -1509,6 +1509,10 @@ function openNewWindow(inURL, name, features, windowSize) {
         height = 350;
         width = 450;
     }
+    if (windowSize == 'print') {
+        height = 700;
+        width = 900;
+    }
 
 
 
@@ -4638,75 +4642,10 @@ function processPrintCRFRequest(url) {
     openPrintCRFWindow(url);
 }
 
-//-------------------------------------------------------------------------
-// Function: openNewWindow
-//
-// Pops up a new browser window containing the definitions page, and scrolls
-//     to the correct spot
-//-------------------------------------------------------------------------
-function openNewWindow(inURL, name, features, windowSize) {
-
-    // Add check for browser capability
-    var old_browser = true;
-    if (window.screen != null) old_browser = false;
-    if (inURL && inURL.indexOf("Print") != -1) {
-        if (detectIEWindows(navigator.userAgent)) {
-            if (inURL.indexOf("?") == -1) {
-                inURL = inURL + "?ie=y";
-            } else {
-                inURL = inURL + "&ie=y";
-            }
-        }
-    }
-
-    if (features == "") {
-        features = "toolbar=yes,directories=yes,location=1,status=yes,menubar=yes,scrollbars=yes,resizable=yes";
-    }
-
-    var height = 250;
-    var width = 350;
-    var screenHeight = 480;
-    var screenWidth = 640;
-
-    if (windowSize == 'small') {
-        height = 150;
-        width = 200;
-    } else if (windowSize == 'medium') {
-        height = 300;
-        width = 500;
-    } else if (windowSize == 'dnote') {
-        height = 350;
-        width = 450;
-    } else if (windowSize == 'dsnote') {
-        height = 350;
-        width = 450;
-    } else if (windowSize == 'dn') {
-        height = 350;
-        width = 450;
-    } else if (windowSize == 'print') {
-        height = 700;
-        width = 900;
-    }
-
-    if (window.screen != null) {
-        screenHeight = window.screen.height;
-        screenWidth = window.screen.width;
-    } else if (screenWidth > 640) {
-        width = width + (screenWidth - 640) * .50;
-    }
-
-    if (screenHeight > 480) {
-        height = height + (screenHeight - 480) * .50;
-    }
-
-    features += ",width=" + width + ",height=" + height;
-
-    var docView = window.open(inURL, name, features);
-    docView.focus();
-}
 
 function checkOrUncheckAllByClass(className, check) {
-	var selector = "input[type=checkbox][class=" + className + "]";
-	$(selector).each(function() {		this.checked = check;
+	var selector = "input[type=checkbox][class=" + className + "]";	
+	$(selector).each(function() {		
+		this.checked = check;
 	});
 }
