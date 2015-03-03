@@ -19,7 +19,7 @@
  <c:when test="${userBean != null && userBean.id>0}">
  <%-- begin standard study info --%>
  	<c:if test="${panel.studyInfoShown}">
-	<b><fmt:message key="study" bundle="${resword}"/></b>&nbsp;  
+	<b><fmt:message key="study" bundle="${resword}"/>:</b>&nbsp;
 	<c:choose>
 	<c:when test="${study.parentStudyId>0}">
 	 <a href="ViewSite?id=<c:out value="${study.id}"/>">
@@ -55,7 +55,7 @@
 
 	<%--<br><br>--%>
 
-	<b><fmt:message key="start_date" bundle="${resword}"/></b>&nbsp; 
+	<b><fmt:message key="start_date" bundle="${resword}"/>:</b>&nbsp;
 	 <c:choose>
 	  <c:when test="${study.datePlannedStart != null}">
         <fmt:formatDate value="${study.datePlannedStart}" pattern="${dteFormat}" />
@@ -66,7 +66,7 @@
 	 </c:choose>
 	<br><br>
 
-	<b><fmt:message key="end_date" bundle="${resword}"/></b>&nbsp; 
+	<b><fmt:message key="end_date" bundle="${resword}"/>:</b>&nbsp;
 	<c:choose>
 	  <c:when test="${study.datePlannedEnd != null}">
 	   <fmt:formatDate value="${study.datePlannedEnd}" pattern="${dteFormat}"/>
@@ -77,7 +77,7 @@
     </c:choose>
 	<br><br>
 
-	<b><fmt:message key="pi" bundle="${resword}"/></b>&nbsp; <c:out value="${study.principalInvestigator}"/>
+	<b><fmt:message key="pi" bundle="${resword}"/>:</b>&nbsp; <c:out value="${study.principalInvestigator}"/>
 
 	<br><br>
 
@@ -97,7 +97,7 @@
    </c:choose>--%>
    
   	
-	<b><fmt:message key="collect_subject" bundle="${resword}"/></b>&nbsp; 
+	<b><fmt:message key="collect_subject" bundle="${resword}"/>:</b>&nbsp;
 	<c:choose>
     <c:when test="${study.studyParameterConfig.collectDob == '1'}">
     <fmt:message key="yes" bundle="${resword}"/>
