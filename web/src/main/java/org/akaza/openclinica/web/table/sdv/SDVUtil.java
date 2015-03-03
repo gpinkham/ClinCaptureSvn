@@ -568,6 +568,9 @@ public class SDVUtil {
 		HtmlColumn crfNameVersion = row.getColumn("crfNameVersion");
 		crfNameVersion.getFilterRenderer().setFilterEditor(new SDVSimpleListFilter(crfNames));
 
+		HtmlColumn actionsColumn = row.getColumn("sdvStatusActions");
+		actionsColumn.getHeaderRenderer().setStyle("min-width:140px");
+
 		// fix HTML in columns
 		setHtmlCellEditors(tableFacade, columnsInfo.allColumns, true);
 
