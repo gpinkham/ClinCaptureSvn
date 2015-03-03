@@ -9,6 +9,22 @@
     <shortname>UI Module JSP tag library</shortname>
 
     <tag>
+        <name>escape</name>
+        <tagclass>com.clinovo.tag.EscapeTag</tagclass>
+        <bodycontent>empty</bodycontent>
+        <attribute>
+            <name>content</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>tagNames</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
         <name>calendar</name>
         <tagclass>com.clinovo.tag.CalendarTag</tagclass>
         <bodycontent>empty</bodycontent>

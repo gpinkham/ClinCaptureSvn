@@ -13,11 +13,6 @@
 
 package org.akaza.openclinica.view.display;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -32,12 +27,17 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This class handles the responsibility for generating a List of DisplaySectionBeans for a form, such as for a CRF that
  * will be printed. The class is used by PrintCRFServlet and PrintDataEntryServlet.
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked", "unused"})
 public class DisplaySectionBeanHandler {
+
 	private boolean hasStoredData = false;
 	private int crfVersionId;
 	private int eventCRFId;
@@ -45,11 +45,28 @@ public class DisplaySectionBeanHandler {
 	private DynamicsMetadataService itemMetadataService;
 	private DataSource dataSource;
 
+	/**
+	 * DisplaySectionBeanHandler constructor.
+	 * 
+	 * @param dataEntry
+	 *            boolean
+	 */
 	public DisplaySectionBeanHandler(boolean dataEntry) {
 		this.hasStoredData = dataEntry;
 	}
 
-	public DisplaySectionBeanHandler(boolean dataEntry, DataSource dataSource, DynamicsMetadataService itemMetadataService) {
+	/**
+	 * DisplaySectionBeanHandler constructor.
+	 * 
+	 * @param dataEntry
+	 *            boolean
+	 * @param dataSource
+	 *            DataSource
+	 * @param itemMetadataService
+	 *            DynamicsMetadataService
+	 */
+	public DisplaySectionBeanHandler(boolean dataEntry, DataSource dataSource,
+			DynamicsMetadataService itemMetadataService) {
 		this(dataEntry);
 		if (dataSource != null) {
 			this.setDataSource(dataSource);
@@ -80,8 +97,6 @@ public class DisplaySectionBeanHandler {
 	 * This List is "lazily" initialized the first time it is requested.
 	 * 
 	 * @return A List of DisplaySectionBeans.
-	 * @see org.akaza.openclinica.control.managestudy.PrintCRFServlet
-	 * @see org.akaza.openclinica.control.managestudy.PrintDataEntryServlet
 	 */
 	public List<DisplaySectionBean> getDisplaySectionBeans() {
 		FormBeanUtil formBeanUtil;
@@ -91,8 +106,6 @@ public class DisplaySectionBeanHandler {
 		if (displaySectionBeans == null) {
 			displaySectionBeans = new ArrayList<DisplaySectionBean>();
 			formBeanUtil = new FormBeanUtil();
-			if (hasStoredData) {
-			}
 
 			// We need a CRF version id to populate the form display
 			if (this.crfVersionId == 0) {
@@ -119,6 +132,7 @@ public class DisplaySectionBeanHandler {
 						this.crfVersionId);
 			}
 			eventDefBean = eventDefBean == null ? new EventDefinitionCRFBean() : eventDefBean;
+			eventCRFBean.setCRFVersionId(crfVersionId);
 			// Create an array or List of DisplaySectionBeans representing each
 			// section
 			// for printing

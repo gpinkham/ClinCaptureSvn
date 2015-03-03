@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -30,9 +31,9 @@
 									<td width="75%" style="padding-left: 12px;">
 										<b>
 										<c:if test="${se.section.parent.active}">
-											<c:out value="${se.section.parent.title}" escapeXml="false"/> &gt;
+											<ui:escape content="${se.section.parent.title}" tagNames="script"/> &gt;
 										</c:if>
-										<c:out value="${se.section.title}" escapeXml="false"/>
+										<ui:escape content="${se.section.title}" tagNames="script"/>
 										</b>
 									</td>
 									<c:if test="${not empty displayItem.metadata.pageNumberLabel}">
@@ -44,13 +45,13 @@
 								<c:if test='${se.section.subtitle != ""}'>
 			   						<tr>
 										<td width="5%" nowrap><b><fmt:message key="subtitle" bundle="${resword}"/>:</b></td>
-										<td width="75%" style="padding-left: 12px;"> <c:out value="${se.section.subtitle}" escapeXml="false"/> </td>
+										<td width="75%" style="padding-left: 12px;"> <ui:escape content="${se.section.subtitle}" tagNames="script"/> </td>
 									</tr>
 								</c:if>
 								<c:if test='${se.section.instructions != ""}'>
 									<tr>
 										<td width="5%" nowrap><b><fmt:message key="instructions" bundle="${resword}"/>:</b></td>
-										<td width="75%" style="padding-left: 12px;"> <c:out value="${se.section.instructions}" escapeXml="false"/> </td>
+										<td width="75%" style="padding-left: 12px;"> <ui:escape content="${se.section.instructions}" tagNames="script"/> </td>
 									</tr>
 								</c:if>
 							</table>
@@ -65,13 +66,13 @@
 	
 	  		<c:if test="${!empty displayItem.metadata.header}">
 	     		<tr style="background-color: #ECECEC;">
-		    		<td class="table_cell_left"><c:out value="${displayItem.metadata.header}" escapeXml="false" /></td>
+		    		<td class="table_cell_left"><ui:escape content="${displayItem.metadata.header}" tagNames="script"/></td>
 	      		</tr>
 	  		</c:if>
 	  		
 	  		<c:if test="${!empty displayItem.metadata.subHeader}">
 	   			<tr style="background-color: #ECECEC;">
-		  			<td class="table_cell_left"><c:out value="${displayItem.metadata.subHeader}" escapeXml="false" /></td>
+		  			<td class="table_cell_left"><ui:escape content="${displayItem.metadata.subHeader}" tagNames="script"/></td>
 	   			</tr>
 	  		</c:if>
 
@@ -94,7 +95,7 @@
 			<table border="0">
 				<tr>
 					<td valign="top"><c:out value="${displayItem.metadata.questionNumberLabel}" escapeXml="false"/></td>
-					<td valign="top"><c:out value="${displayItem.metadata.leftItemText}" escapeXml="false"/></td>
+					<td valign="top"><ui:escape content="${displayItem.metadata.leftItemText}" tagNames="script"/></td>
 					<td valign="top">
 						<%-- display the HTML input tag --%>
 						<c:set var="displayItem" scope="request" value="${displayItem}" />
@@ -106,7 +107,7 @@
 						<c:out value="(${displayItem.item.units})" />
 					</td>
 					</c:if>
-					<td valign="top"><c:out value="${displayItem.metadata.rightItemText}" escapeXml="false"/></td>
+					<td valign="top"><ui:escape content="${displayItem.metadata.rightItemText}" tagNames="script"/></td>
 				</tr>
 			</table>
 		
@@ -144,7 +145,7 @@
 									<table border="0">
 										<tr>
 											<td valign="top"><c:out value="${childItem.metadata.questionNumberLabel}" escapeXml="false"/></td>
-											<td valign="top"><c:out value="${childItem.metadata.leftItemText}" escapeXml="false"/></td>
+											<td valign="top"><ui:escape content="${displayItem.metadata.leftItemText}" tagNames="script"/></td>
 											<td valign="top">
 												<%-- display the HTML input tag --%>
 												<c:set var="displayItem" scope="request" value="${childItem}" />
@@ -154,7 +155,7 @@
 								<c:if test='${childItem.item.units != ""}'>
 									<td valign="top"> <c:out value="(${childItem.item.units})" /> </td>
 								</c:if>
-								<td valign="top"> <c:out value="${childItem.metadata.rightItemText}" escapeXml="false"/> </td>
+								<td valign="top"> <ui:escape content="${displayItem.metadata.rightItemText}" tagNames="script"/> </td>
 								</tr>
 								</table>
 								</td>
