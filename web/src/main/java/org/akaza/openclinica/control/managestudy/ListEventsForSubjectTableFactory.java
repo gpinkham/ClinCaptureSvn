@@ -13,6 +13,17 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -50,8 +61,6 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.util.DAOWrapper;
-import org.akaza.openclinica.util.SignUtil;
 import org.akaza.openclinica.util.SubjectLabelNormalizer;
 import org.akaza.openclinica.view.Page;
 import org.apache.commons.lang.StringUtils;
@@ -72,20 +81,13 @@ import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SignUtil;
 
 /**
  * ListEventsForSubjectTableFactory class.
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+@SuppressWarnings({"rawtypes", "unchecked", "unused"})
 public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 	public static final int TEN = 7;
@@ -109,7 +111,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	private CRFVersionDAO crfVersionDAO;
 	private DiscrepancyNoteDAO discrepancyNoteDAO;
 	private StudyBean studyBean;
-	private String[] columnNames = new String[] {};
+	private String[] columnNames = new String[]{};
 	private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
 	private ArrayList<CRFBean> crfBeans;
 	private ArrayList<StudyGroupClassBean> studyGroupClasses;
@@ -171,7 +173,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		Row row = tableFacade.getTable().getRow();
 		int index = 0;
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
-		configureColumn(row.getColumn(columnNames[index]), currentStudy == null ? resword.getString("study_subject_ID")
+		configureColumn(row.getColumn(columnNames[index]), currentStudy == null
+				? resword.getString("study_subject_ID")
 				: currentStudy.getStudyParameterConfig().getStudySubjectIdLabel(), null, null);
 		++index;
 		configureColumn(row.getColumn(columnNames[index]), resword.getString("subject_status"), new StatusCellEditor(),
@@ -180,7 +183,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn(columnNames[index]), resword.getString("site_id"), null, null);
 		++index;
 		if (currentStudy == null || currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
-			configureColumn(row.getColumn(columnNames[index]), currentStudy == null ? resword.getString("gender")
+			configureColumn(row.getColumn(columnNames[index]), currentStudy == null
+					? resword.getString("gender")
 					: currentStudy.getStudyParameterConfig().getGenderLabel(), null, null, true, false);
 			++index;
 		}
@@ -1117,7 +1121,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		String occurrenceXOf = resword.getString("ocurrence");
 		String status = resword.getString("status");
 
-		SubjectEventStatus eventStatus = eventDivBuilderWrapper.studyEvents.size() == 0 ? SubjectEventStatus.NOT_SCHEDULED
+		SubjectEventStatus eventStatus = eventDivBuilderWrapper.studyEvents.size() == 0
+				? SubjectEventStatus.NOT_SCHEDULED
 				: eventDivBuilderWrapper.studyEvents.get(0).getSubjectEventStatus();
 
 		String studyEventId = eventDivBuilderWrapper.studyEvents.size() == 0 ? "" : String
@@ -1276,8 +1281,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			} else if (studySubjectBean.getStatus().isDeleted()) {
 				eventCRFStatusId = Status.DELETED.getId();
 			} else {
-				eventCRFStatusId = !getCRFVersionDAO().findAllActiveByCRF(crfBean.getId()).isEmpty() ? Status.NOT_STARTED
-						.getId() : Status.LOCKED.getId();
+				eventCRFStatusId = !getCRFVersionDAO().findAllActiveByCRF(crfBean.getId()).isEmpty()
+						? Status.NOT_STARTED.getId()
+						: Status.LOCKED.getId();
 			}
 
 		} else {
@@ -1289,8 +1295,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			} else if (subjectEventStatus.isLocked()) {
 				eventCRFStatusId = Status.LOCKED.getId();
 			} else if (eventCrf.isNotStarted()) {
-				eventCRFStatusId = !getCRFVersionDAO().findAllActiveByCRF(crfBean.getId()).isEmpty() ? Status.NOT_STARTED
-						.getId() : Status.LOCKED.getId();
+				eventCRFStatusId = !getCRFVersionDAO().findAllActiveByCRF(crfBean.getId()).isEmpty()
+						? Status.NOT_STARTED.getId()
+						: Status.LOCKED.getId();
 			} else if (eventCrf.getStage().isInitialDE()) {
 				eventCRFStatusId = Status.DATA_ENTRY_STARTED.getId();
 			} else if (eventCrf.getStage().isInitialDE_Complete()) {
@@ -1298,8 +1305,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			} else if (eventCrf.getStage().isDoubleDE()) {
 				eventCRFStatusId = Status.DOUBLE_DATA_ENTRY.getId();
 			} else if (eventCrf.getStage().isDoubleDE_Complete()) {
-				eventCRFStatusId = subjectEventStatus.isSigned() ? Status.SIGNED.getId()
-						: eventCrf.isSdvStatus() ? Status.SOURCE_DATA_VERIFIED.getId() : Status.COMPLETED.getId();
+				eventCRFStatusId = subjectEventStatus.isSigned() ? Status.SIGNED.getId() : eventCrf.isSdvStatus()
+						? Status.SOURCE_DATA_VERIFIED.getId()
+						: Status.COMPLETED.getId();
 			} else {
 				eventCRFStatusId = Status.DELETED.getId();
 			}

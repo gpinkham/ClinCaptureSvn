@@ -13,7 +13,20 @@
 
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.util.SessionUtil;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -47,10 +60,6 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.util.DAOWrapper;
-import org.akaza.openclinica.util.SDVUtil;
-import org.akaza.openclinica.util.SignUtil;
-import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.util.SubjectLabelNormalizer;
 import org.akaza.openclinica.view.Page;
 import org.apache.commons.lang.StringUtils;
@@ -74,18 +83,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SDVUtil;
+import com.clinovo.util.SessionUtil;
+import com.clinovo.util.SignUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * ListStudySubjectTableFactory class.

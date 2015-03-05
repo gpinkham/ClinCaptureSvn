@@ -22,11 +22,12 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
+
+import com.clinovo.util.CrfShortcutsAnalyzer;
 
 /**
  * UpdateCRFHeaderServlet.
@@ -95,10 +96,8 @@ public class UpdateCRFHeaderServlet extends Controller {
 		List<DiscrepancyNoteThread> noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(),
 				currentStudy, null, -1, true);
 
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, iddao, ifmdao, eventDefinitionCRFId,
-				allSections, noteThreads);
-		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = DiscrepancyShortcutsAnalyzer
-				.getDiscrepancyShortcutsAnalyzer(request);
+		CrfShortcutsAnalyzer crfShortcutsAnalyzer = getCrfShortcutsAnalyzer(request, getItemSDVService(), true);
+		crfShortcutsAnalyzer.prepareDnShortcutLinks(ecb, ifmdao, eventDefinitionCRFId, allSections, noteThreads);
 
 		JSONArray jsonArray = new JSONArray();
 		int totalItems = fp.getInt("totalItems");
@@ -116,15 +115,15 @@ public class UpdateCRFHeaderServlet extends Controller {
 			itemDataBean.setOrdinal(rowCount + 1);
 			itemDataBean.setEventCRFId(eventCRFId);
 			if (field.equalsIgnoreCase(INTERVIEWER)) {
-				dib = discrepancyShortcutsAnalyzer.getInterviewerDisplayItemBean();
+				dib = crfShortcutsAnalyzer.getInterviewerDisplayItemBean();
 				itemDataBean.setOrdinal(0);
 			} else if (field.equalsIgnoreCase(INTERVIEW_DATE)) {
-				dib = discrepancyShortcutsAnalyzer.getInterviewDateDisplayItemBean();
+				dib = crfShortcutsAnalyzer.getInterviewDateDisplayItemBean();
 				itemDataBean.setOrdinal(0);
 			}
 			dib.setDbData(itemDataBean);
 
-			DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads, true);
+			crfShortcutsAnalyzer.prepareDnShortcutAnchors(dib, noteThreads, true);
 
 			JSONObject jsonObj = new JSONObject();
 			jsonObj.put("rowCount", rowCountValue);
@@ -143,27 +142,26 @@ public class UpdateCRFHeaderServlet extends Controller {
 
 		JSONObject jsonObject = new JSONObject();
 
-		jsonObject.put("totalNew", discrepancyShortcutsAnalyzer.getTotalNew());
-		jsonObject.put("totalUpdated", discrepancyShortcutsAnalyzer.getTotalUpdated());
-		jsonObject.put("totalResolutionProposed", discrepancyShortcutsAnalyzer.getTotalResolutionProposed());
-		jsonObject.put("totalClosed", discrepancyShortcutsAnalyzer.getTotalClosed());
-		jsonObject.put("totalAnnotations", discrepancyShortcutsAnalyzer.getTotalAnnotations());
+		jsonObject.put("totalNew", crfShortcutsAnalyzer.getTotalNew());
+		jsonObject.put("totalUpdated", crfShortcutsAnalyzer.getTotalUpdated());
+		jsonObject.put("totalResolutionProposed", crfShortcutsAnalyzer.getTotalResolutionProposed());
+		jsonObject.put("totalClosed", crfShortcutsAnalyzer.getTotalClosed());
+		jsonObject.put("totalAnnotations", crfShortcutsAnalyzer.getTotalAnnotations());
 
-		jsonObject.put("sectionTotalNew", discrepancyShortcutsAnalyzer.getSectionTotalNew());
-		jsonObject.put("nextNewDnLink", discrepancyShortcutsAnalyzer.getNextNewDnLink());
+		jsonObject.put("sectionTotalNew", crfShortcutsAnalyzer.getSectionTotalNew());
+		jsonObject.put("nextNewDnLink", crfShortcutsAnalyzer.getNextNewDnLink());
 
-		jsonObject.put("sectionTotalUpdated", discrepancyShortcutsAnalyzer.getSectionTotalUpdated());
-		jsonObject.put("nextUpdatedDnLink", discrepancyShortcutsAnalyzer.getNextUpdatedDnLink());
+		jsonObject.put("sectionTotalUpdated", crfShortcutsAnalyzer.getSectionTotalUpdated());
+		jsonObject.put("nextUpdatedDnLink", crfShortcutsAnalyzer.getNextUpdatedDnLink());
 
-		jsonObject.put("sectionTotalResolutionProposed",
-				discrepancyShortcutsAnalyzer.getSectionTotalResolutionProposed());
-		jsonObject.put("nextResolutionProposedDnLink", discrepancyShortcutsAnalyzer.getNextResolutionProposedLink());
+		jsonObject.put("sectionTotalResolutionProposed", crfShortcutsAnalyzer.getSectionTotalResolutionProposed());
+		jsonObject.put("nextResolutionProposedDnLink", crfShortcutsAnalyzer.getNextResolutionProposedLink());
 
-		jsonObject.put("sectionTotalClosed", discrepancyShortcutsAnalyzer.getSectionTotalClosed());
-		jsonObject.put("nextClosedDnLink", discrepancyShortcutsAnalyzer.getNextClosedDnLink());
+		jsonObject.put("sectionTotalClosed", crfShortcutsAnalyzer.getSectionTotalClosed());
+		jsonObject.put("nextClosedDnLink", crfShortcutsAnalyzer.getNextClosedDnLink());
 
-		jsonObject.put("sectionTotalAnnotations", discrepancyShortcutsAnalyzer.getSectionTotalAnnotations());
-		jsonObject.put("nextAnnotationDnLink", discrepancyShortcutsAnalyzer.getNextAnnotationLink());
+		jsonObject.put("sectionTotalAnnotations", crfShortcutsAnalyzer.getSectionTotalAnnotations());
+		jsonObject.put("nextAnnotationDnLink", crfShortcutsAnalyzer.getNextAnnotationLink());
 
 		jsonObject.put("items", jsonArray);
 

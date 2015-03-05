@@ -20,6 +20,12 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -45,11 +51,6 @@ import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 
 /**
  * InitUpdateSubStudyServlet.
@@ -189,7 +190,7 @@ public class InitUpdateSubStudyServlet extends Controller {
 					}
 					edcBean.setSelectedVersionIdList(idList);
 					SourceDataVerification.fillSDVStatuses(edcBean.getSdvOptions(),
-							itemFormMetadataDao.hasItemsToSDV(crf.getId()));
+							getItemSDVService().hasItemsToSDV(crf.getId()));
 					defCrfs.add(edcBean);
 				}
 			}

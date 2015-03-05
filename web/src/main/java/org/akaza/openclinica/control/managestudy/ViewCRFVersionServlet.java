@@ -22,13 +22,13 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -40,19 +40,12 @@ import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
-import org.akaza.openclinica.domain.SourceDataVerification;
-import org.akaza.openclinica.util.DAOWrapper;
-import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -97,12 +90,8 @@ public class ViewCRFVersionServlet extends Controller {
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ItemDAO idao = getItemDAO();
-		EventCRFDAO eventCrfDao = getEventCRFDAO();
-		ItemDataDAO itemDataDao = getItemDataDAO();
-		StudyEventDAO studyEventDao = getStudyEventDAO();
 		CRFVersionDAO crfVersionDao = getCRFVersionDAO();
 		ItemFormMetadataDAO ifmdao = getItemFormMetadataDAO();
-		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
 
 		FormProcessor fp = new FormProcessor(request);
 
@@ -111,40 +100,13 @@ public class ViewCRFVersionServlet extends Controller {
 		request.setAttribute(MODULE, module);
 
 		if (request.getMethod().equalsIgnoreCase("post")) {
-			boolean dataChanged = false;
-			boolean unsdvEventCrfs = false;
-			int totalItems = fp.getInt("totalItems");
-			for (int i = 1; i <= totalItems; i++) {
-				int itemFormMetaId = fp.getInt("itemFormMetaId_".concat(Integer.toString(i)));
-				boolean sdvRequired = fp.getInt("sdvRequired_".concat(Integer.toString(i))) == 1;
-				ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) ifmdao.findByPK(itemFormMetaId);
-				if (itemFormMetadataBean.isSdvRequired() != sdvRequired) {
-					dataChanged = true;
-					if (!itemFormMetadataBean.isSdvRequired()) {
-						unsdvEventCrfs = true;
-					}
-				}
-				itemFormMetadataBean.setSdvRequired(sdvRequired);
-				ifmdao.update(itemFormMetadataBean);
+			Map<Integer, Boolean> metadata = new HashMap<Integer, Boolean>();
+			for (int i = 1; i <= fp.getInt("totalItems"); i++) {
+				metadata.put(fp.getInt("itemFormMetaId_".concat(Integer.toString(i))),
+						fp.getInt("sdvRequired_".concat(Integer.toString(i))) == 1);
 			}
-			if (dataChanged) {
-				int crfVersionId = fp.getInt("crfVersionId");
-				eventDefinitionCrfDao.updateEDCThatHasItemsToSDV(crfVersionId, SourceDataVerification.PARTIALREQUIRED);
-				itemDataDao.updateItemDataSDVWhenCRFMetadataWasChanged(crfVersionId);
-				if (unsdvEventCrfs) {
-					eventCrfDao.unsdvEventCRFsWhenCRFMetadataWasChanged(crfVersionId);
-				} else {
-					eventCrfDao.sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV(crfVersionId,
-							getCurrentStudy(request).getStudyParameterConfig().getAllowSdvWithOpenQueries()
-									.equalsIgnoreCase("yes"));
-				}
-				SubjectEventStatusUtil.determineSubjectEventStates(studyEventDao
-						.findStudyEventsByCrfVersionAndSubjectEventStatus(crfVersionId, unsdvEventCrfs
-								? SubjectEventStatus.SOURCE_DATA_VERIFIED
-								: SubjectEventStatus.COMPLETED), new DAOWrapper(getStudyDAO(), crfVersionDao,
-						studyEventDao, getStudySubjectDAO(), getEventCRFDAO(), getEventDefinitionCRFDAO(),
-						getDiscrepancyNoteDAO()), null);
-			}
+			getItemSDVService().processChangedCrfVersionMetadata(getCurrentStudy(request), getUserAccountBean(request),
+					fp.getInt("crfVersionId"), metadata);
 			addPageMessage(respage.getString("data_was_saved_successfully"), request);
 			storePageMessages(request);
 			response.sendRedirect(request.getContextPath().concat("/ViewCRF?crfId=")

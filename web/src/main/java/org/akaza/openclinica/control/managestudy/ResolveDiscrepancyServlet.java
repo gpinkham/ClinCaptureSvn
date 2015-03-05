@@ -22,6 +22,16 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
@@ -56,26 +66,18 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import com.clinovo.util.CrfShortcutsAnalyzer;
 
 /**
  * ResolveDiscrepancyServlet that handles request when user click on "view within record"-button on "Notes &
  * Discrepancies"-page.
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 @Component
 public class ResolveDiscrepancyServlet extends Controller {
 
@@ -223,7 +225,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 
 			ItemFormMetadataBean ifmb = ifmdao.findByItemIdAndCRFVersionId(idb.getItemId(), ecb.getCRFVersionId());
 			List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-			int tabNum = DiscrepancyShortcutsAnalyzer.getTabNum(allSections, ifmb.getSectionId());
+			int tabNum = CrfShortcutsAnalyzer.getTabNum(allSections, ifmb.getSectionId());
 			request.setAttribute(TAB_ID, "" + tabNum);
 			request.setAttribute(SECTION_ID, "" + ifmb.getSectionId());
 

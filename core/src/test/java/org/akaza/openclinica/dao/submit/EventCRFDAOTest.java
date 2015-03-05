@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
 import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
@@ -31,6 +32,14 @@ import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
 
 @SuppressWarnings("rawtypes")
 public class EventCRFDAOTest extends DefaultAppContextTest {
+
+	private UserAccountBean ub;
+
+	@Before
+	public void setUp() {
+		ub = new UserAccountBean();
+		ub.setId(1);
+	}
 
 	@Test
 	public void testFindAllNotReturnNull() throws OpenClinicaException {
@@ -118,11 +127,11 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatUnsdvEventCRFsWhenCRFMetadataWasChangedReturnsTrue() {
-		assertTrue(eventCRFDAO.unsdvEventCRFsWhenCRFMetadataWasChanged(1));
+		assertTrue(eventCRFDAO.unsdvEventCRFsWhenCRFMetadataWasChanged(1, ub.getId()));
 	}
 
 	@Test
 	public void sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV() {
-		assertTrue(eventCRFDAO.sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV(1, true));
+		assertTrue(eventCRFDAO.sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV(1, ub.getId(), true));
 	}
 }

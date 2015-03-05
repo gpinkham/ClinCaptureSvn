@@ -20,7 +20,15 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.ValidatorHelper;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -43,27 +51,21 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
-import org.akaza.openclinica.util.DAOWrapper;
-import org.akaza.openclinica.util.SignStateRestorer;
-import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SignStateRestorer;
+import com.clinovo.util.SubjectEventStatusUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
- * Servlet handles update requests on study event definition bean properties
- * and update/remove/restore requests on event definition CRF beans, owned by study event definition bean.
+ * Servlet handles update requests on study event definition bean properties and update/remove/restore requests on event
+ * definition CRF beans, owned by study event definition bean.
  *
  */
-@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@SuppressWarnings({"rawtypes", "serial", "unchecked"})
 @Component
 public class UpdateEventDefinitionServlet extends Controller {
 
@@ -80,7 +82,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition") + "<br>"
+		addPageMessage(
+				respage.getString("no_have_permission_to_update_study_event_definition") + "<br>"
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
@@ -100,7 +103,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 				submitDefinition(request, response);
 			} else if ("addCrfs".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute(
+						"definition");
 				saveEventDefinitionToSession(sed, fp);
 				saveEventDefinitionCRFsToSession(fp);
 				response.sendRedirect(request.getContextPath() + "/AddCRFToDefinition");
@@ -215,12 +219,13 @@ public class UpdateEventDefinitionServlet extends Controller {
 	private void submitDefinition(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		UserAccountBean updater = getUserAccountBean(request);
-		List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate =
-				(List<EventDefinitionCRFBean>) request.getSession().getAttribute("eventDefinitionCRFs");
-		List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate =
-				(List<EventDefinitionCRFBean>) request.getSession().getAttribute("childEventDefCRFs");
+		List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate = (List<EventDefinitionCRFBean>) request.getSession()
+				.getAttribute("eventDefinitionCRFs");
+		List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate = (List<EventDefinitionCRFBean>) request
+				.getSession().getAttribute("childEventDefCRFs");
 
-		SignStateRestorer signStateRestorer = (SignStateRestorer) request.getSession().getAttribute("signStateRestorer");
+		SignStateRestorer signStateRestorer = (SignStateRestorer) request.getSession()
+				.getAttribute("signStateRestorer");
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 
 		StudyDAO studyDAO = getStudyDAO();
@@ -242,10 +247,12 @@ public class UpdateEventDefinitionServlet extends Controller {
 				eventDefinitionCrfDAO.update(edc);
 
 				if (edc.getStatus().isDeleted()) {
-					getEventCRFService().removeEventCRFsByEventDefinitionCRF(sed.getOid(), edc.getCrf().getOid(), updater);
+					getEventCRFService().removeEventCRFsByEventDefinitionCRF(sed.getOid(), edc.getCrf().getOid(),
+							updater);
 				}
 				if (edc.getOldStatus() != null && edc.getOldStatus().equals(Status.DELETED)) {
-					getEventCRFService().restoreEventCRFsByEventDefinitionCRF(sed.getOid(), edc.getCrf().getOid(), updater);
+					getEventCRFService().restoreEventCRFsByEventDefinitionCRF(sed.getOid(), edc.getCrf().getOid(),
+							updater);
 				}
 			} else {
 				edc.setOwner(updater);
@@ -260,7 +267,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 		StudyBean study = (StudyBean) studyDAO.findByPK(sed.getStudyId());
 		List<StudyEventBean> studyEventList = (ArrayList<StudyEventBean>) studyEventDAO
 				.findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved(study, sed.getId());
-		SubjectEventStatusUtil.determineSubjectEventStates(studyEventList, daoWrapper, signStateRestorer);
+		SubjectEventStatusUtil.determineSubjectEventStates(studyEventList, updater, daoWrapper, signStateRestorer);
 
 		clearSession(request.getSession());
 		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"), request);
@@ -379,10 +386,11 @@ public class UpdateEventDefinitionServlet extends Controller {
 					}
 
 				}
-				nullString = (nullString != "") ? nullString.substring(0, nullString.length() - 1) : "";
+				nullString = (!nullString.equals("")) ? nullString.substring(0, nullString.length() - 1) : "";
 
-				if (sdvId > 0 && (edcBean.getSourceDataVerification() == null || sdvId != edcBean.getSourceDataVerification()
-						.getCode())) {
+				if (sdvId > 0
+						&& (edcBean.getSourceDataVerification() == null || sdvId != edcBean.getSourceDataVerification()
+								.getCode())) {
 					edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
 				}
 
@@ -435,7 +443,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 	/**
 	 * Clears session bean after study event definition bean update is finished.
 	 *
-	 * @param session HttpSession current user session bean.
+	 * @param session
+	 *            HttpSession current user session bean.
 	 */
 	public static void clearSession(HttpSession session) {
 

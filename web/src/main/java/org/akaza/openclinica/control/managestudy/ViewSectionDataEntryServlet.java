@@ -69,14 +69,12 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -205,7 +203,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-		ItemDataDAO itemDataDao = getItemDataDAO();
 		SectionDAO sdao = getSectionDAO();
 		String age = "";
 
@@ -253,7 +250,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			List<SectionBean> allSections = ecb != null
 					? sdao.findAllByCRFVersionId(ecb.getCRFVersionId())
 					: new ArrayList<SectionBean>();
-			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, itemDataDao, ifmdao,
+
+			getCrfShortcutsAnalyzer(request, getItemSDVService(), true).prepareDnShortcutLinks(ecb, ifmdao,
 					eventDefinitionCRFId, allSections, noteThreads);
 
 			DisplayTableOfContentsBean displayBean = getDisplayBean(ecb);

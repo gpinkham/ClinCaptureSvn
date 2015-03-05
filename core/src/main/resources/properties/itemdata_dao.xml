@@ -223,7 +223,7 @@
 	<query>
 		<name>sdvCrfItems</name>
 		<sql>
-			update item_data set sdv = ? where item_data_id in (select id.item_data_id from item_data id, event_crf ec, item_form_metadata ifm where ec.event_crf_id = ? and ifm.crf_version_id = ec.crf_version_id and ifm.item_id = id.item_id and id.event_crf_id = ec.event_crf_id and ifm.sdv_required = true)
+			update item_data set sdv = ?, update_id = ?, date_updated = NOW() where item_data_id in (select id.item_data_id from item_data id, event_crf ec, item_form_metadata ifm where ec.event_crf_id = ? and ifm.crf_version_id = ec.crf_version_id and ifm.item_id = id.item_id and id.event_crf_id = ec.event_crf_id and ifm.sdv_required = true)
 		</sql>
 	</query>
     <query>
@@ -237,7 +237,7 @@
     <query>
         <name>sdvItems</name>
         <sql>
-            update item_data set sdv = ? where item_data_id in
+            update item_data set sdv = ?, update_id = ?, date_updated = NOW() where item_data_id in
         </sql>
     </query>
 </queries>

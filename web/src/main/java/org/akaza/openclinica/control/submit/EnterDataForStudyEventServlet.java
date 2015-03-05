@@ -20,6 +20,16 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -52,25 +62,17 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.util.CrfComparator;
-import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * @author ssachs
  */
-@SuppressWarnings({ "unchecked", "serial", "rawtypes" })
+@SuppressWarnings({"unchecked", "serial", "rawtypes"})
 @Component
 public class EnterDataForStudyEventServlet extends Controller {
 
@@ -114,8 +116,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
 		seb.setStudyEventDefinition(sedb);
-		if (!(currentRole.isSysAdmin() || currentRole.isStudyAdministrator())
-				&& seb.getSubjectEventStatus().isLocked()) {
+		if (!(currentRole.isSysAdmin() || currentRole.isStudyAdministrator()) && seb.getSubjectEventStatus().isLocked()) {
 			seb.setEditable(false);
 		}
 		return seb;

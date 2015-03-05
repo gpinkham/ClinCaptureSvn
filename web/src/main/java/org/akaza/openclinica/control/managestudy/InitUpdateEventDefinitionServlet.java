@@ -20,6 +20,15 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.Role;
@@ -41,18 +50,11 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.util.EventDefinitionInfo;
-import org.akaza.openclinica.util.SignStateRestorer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.clinovo.util.SignStateRestorer;
 
 /**
  * Prepares to update study event definition.
@@ -183,7 +185,7 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 				edc.setDefaultVersionName(defaultVersion.getName());
 
 				SourceDataVerification.fillSDVStatuses(edc.getSdvOptions(),
-						itemFormMetadataDao.hasItemsToSDV(crf.getId()));
+						getItemSDVService().hasItemsToSDV(crf.getId()));
 
 				newEventDefinitionCRFs.add(edc);
 			}

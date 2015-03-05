@@ -20,7 +20,16 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.ValidatorHelper;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -48,14 +57,7 @@ import org.akaza.openclinica.web.bean.CRFRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * The servlet for creating event definition of user's current active study.
@@ -512,8 +514,8 @@ public class DefineStudyEventServlet extends Controller {
 				// only find active versions
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
-				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(),
-						itemFormMetadataDao.hasItemsToSDV(cb.getId()));
+				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(), getItemSDVService()
+						.hasItemsToSDV(cb.getId()));
 				crfArray.add(cb);
 			} else {
 				if (tmpCRFIdMap.containsKey(id)) {
@@ -540,8 +542,8 @@ public class DefineStudyEventServlet extends Controller {
 
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
-				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(),
-						itemFormMetadataDao.hasItemsToSDV(cb.getId()));
+				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(), getItemSDVService()
+						.hasItemsToSDV(cb.getId()));
 				crfArray.add(cb);
 			}
 		}

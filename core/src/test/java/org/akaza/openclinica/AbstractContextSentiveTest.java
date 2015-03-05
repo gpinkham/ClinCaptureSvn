@@ -13,25 +13,11 @@
 
 package org.akaza.openclinica;
 
-import com.clinovo.dao.CodedItemDAO;
-import com.clinovo.dao.DictionaryDAO;
-import com.clinovo.dao.DiscrepancyDescriptionDAO;
-import com.clinovo.dao.StudySubjectIdDAO;
-import com.clinovo.dao.SystemDAO;
-import com.clinovo.dao.TermDAO;
-import com.clinovo.dao.WidgetDAO;
-import com.clinovo.dao.WidgetsLayoutDAO;
-import com.clinovo.service.CodedItemService;
-import com.clinovo.service.DataEntryService;
-import com.clinovo.service.DcfService;
-import com.clinovo.service.DictionaryService;
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.service.ReportCRFService;
-import com.clinovo.service.StudySubjectIdService;
-import com.clinovo.service.SystemService;
-import com.clinovo.service.TermService;
-import com.clinovo.service.WidgetService;
-import com.clinovo.service.WidgetsLayoutService;
+import java.io.InputStream;
+import java.util.Locale;
+import java.util.Properties;
+
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
@@ -93,22 +79,37 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import javax.sql.DataSource;
-
-import java.io.InputStream;
-import java.util.Locale;
-import java.util.Properties;
+import com.clinovo.dao.CodedItemDAO;
+import com.clinovo.dao.DictionaryDAO;
+import com.clinovo.dao.DiscrepancyDescriptionDAO;
+import com.clinovo.dao.StudySubjectIdDAO;
+import com.clinovo.dao.SystemDAO;
+import com.clinovo.dao.TermDAO;
+import com.clinovo.dao.WidgetDAO;
+import com.clinovo.dao.WidgetsLayoutDAO;
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DataEntryService;
+import com.clinovo.service.DcfService;
+import com.clinovo.service.DictionaryService;
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.service.ItemSDVService;
+import com.clinovo.service.ReportCRFService;
+import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.service.SystemService;
+import com.clinovo.service.TermService;
+import com.clinovo.service.WidgetService;
+import com.clinovo.service.WidgetsLayoutService;
 
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
 @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
-@ContextConfiguration(locations = { "classpath*:applicationContext-core-spring.xml",
+@ContextConfiguration(locations = {"classpath*:applicationContext-core-spring.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-scheduler.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
-		"classpath*:org/akaza/openclinica/applicationContext-security.xml" })
+		"classpath*:org/akaza/openclinica/applicationContext-security.xml"})
 @SuppressWarnings("rawtypes")
 public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCase {
 
@@ -228,6 +229,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected ReportCRFService reportCRFService;
 	@Autowired
 	protected DcfService dcfService;
+	@Autowired
+	protected ItemSDVService itemSDVService;
 	@Autowired
 	protected MessageSource messageSource;
 

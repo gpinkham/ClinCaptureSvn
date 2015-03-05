@@ -1991,14 +1991,18 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	 * Method unsdvs event crfs when crf metadata was changed.
 	 *
 	 * @param crfVersionId
-	 *            int
+	 *            crf version id
+	 * @param userId
+	 *            user id
 	 * @return boolean
 	 */
-	public boolean unsdvEventCRFsWhenCRFMetadataWasChanged(int crfVersionId) {
+	public boolean unsdvEventCRFsWhenCRFMetadataWasChanged(int crfVersionId, int userId) {
 		unsetTypeExpected();
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, crfVersionId);
+		int ind = 1;
+		variables.put(ind++, userId);
+		variables.put(ind, crfVersionId);
 
 		execute(digester.getQuery("unsdvEventCRFsWhenCRFMetadataWasChanged"), variables);
 
@@ -2009,17 +2013,21 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	 * Method sdvs event crfs when crf metadata was changed and al items are sdv.
 	 *
 	 * @param crfVersionId
-	 *            int
+	 *            crf version id
+	 * @param userId
+	 *            user id
 	 * @param ignoreOutstandingQueries
 	 *            boolean
 	 * @return boolean
 	 */
-	public boolean sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV(int crfVersionId,
+	public boolean sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV(int crfVersionId, int userId,
 			boolean ignoreOutstandingQueries) {
 		unsetTypeExpected();
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, crfVersionId);
+		int ind = 1;
+		variables.put(ind++, userId);
+		variables.put(ind, crfVersionId);
 
 		execute(digester.getQuery(ignoreOutstandingQueries
 				? "sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV"

@@ -13,10 +13,31 @@
 
 package org.akaza.openclinica.web.table.sdv;
 
-import com.clinovo.util.SessionUtil;
+import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -44,9 +65,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.StudyEventUtil;
-import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
@@ -66,25 +85,10 @@ import org.jmesa.view.html.editor.HtmlCellEditor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
+import com.clinovo.service.ItemSDVService;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SessionUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * A utility class that implements the details of the Source Data Verification (SDV) Jmesa tables.
@@ -1027,16 +1031,18 @@ public class SDVUtil {
 	 * 
 	 * @param studySubjectIds
 	 *            List<Integer>
-	 * @param userId
-	 *            int
+	 * @param userAccountBean
+	 *            UserAccountBean
 	 * @param isSdvWithOpenQueriesAllowed
 	 *            boolean
 	 * @param setVerification
 	 *            boolean
+	 * @param itemSDVService
+	 *            ItemSDVService
 	 * @return boolean
 	 */
-	public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, int userId,
-			boolean isSdvWithOpenQueriesAllowed, boolean setVerification) {
+	public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, UserAccountBean userAccountBean,
+			boolean isSdvWithOpenQueriesAllowed, boolean setVerification, ItemSDVService itemSDVService) {
 
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
@@ -1079,8 +1085,8 @@ public class SDVUtil {
 					continue;
 				}
 				try {
-					itemDataDao.sdvCrfItems(eventCRFBean.getId(), setVerification);
-					eventCRFDAO.setSDVStatus(setVerification, userId, eventCRFBean.getId());
+					itemSDVService.sdvCrfItems(eventCRFBean.getId(), userAccountBean.getId(), setVerification);
+					eventCRFDAO.setSDVStatus(setVerification, userAccountBean.getId(), eventCRFBean.getId());
 				} catch (Exception exc) {
 					System.out.println(exc.getMessage());
 					return false;
@@ -1089,7 +1095,7 @@ public class SDVUtil {
 			}
 			studySubjectDAO.update(studySubject);
 
-			SubjectEventStatusUtil.determineSubjectEventStates(studyEvents, daoWrapper, null);
+			SubjectEventStatusUtil.determineSubjectEventStates(studyEvents, userAccountBean, daoWrapper, null);
 		}
 
 		return true;
@@ -1100,13 +1106,16 @@ public class SDVUtil {
 	 * 
 	 * @param eventCRFIds
 	 *            List<Integer>
-	 * @param userId
-	 *            int
+	 * @param userAccountBean
+	 *            UserAccountBean
 	 * @param setVerification
 	 *            boolean
+	 * @param itemSDVService
+	 *            ItemSDVService
 	 * @return boolean
 	 */
-	public boolean setSDVerified(List<Integer> eventCRFIds, int userId, boolean setVerification) {
+	public boolean setSDVerified(List<Integer> eventCRFIds, UserAccountBean userAccountBean, boolean setVerification,
+			ItemSDVService itemSDVService) {
 
 		// If no event CRFs are offered to SDV, then the transaction has not
 		// caused a problem, so return true
@@ -1128,14 +1137,14 @@ public class SDVUtil {
 
 		for (Integer eventCrfId : eventCRFIds) {
 			try {
-				itemDataDao.sdvCrfItems(eventCrfId, setVerification);
-				eventCRFDAO.setSDVStatus(setVerification, userId, eventCrfId);
+				itemSDVService.sdvCrfItems(eventCrfId, userAccountBean.getId(), setVerification);
+				eventCRFDAO.setSDVStatus(setVerification, userAccountBean.getId(), eventCrfId);
 				EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(eventCrfId);
 				StudyEventBean se = (StudyEventBean) studyEventDAO.findByPK(ec.getStudyEventId());
 				StudySubjectBean ss = (StudySubjectBean) studySubjectDAO.findByPK(se.getStudySubjectId());
 				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(se
 						.getStudyEventDefinitionId());
-				SubjectEventStatusUtil.determineSubjectEventStates(sed, ss, daoWrapper);
+				SubjectEventStatusUtil.determineSubjectEventStates(sed, ss, userAccountBean, daoWrapper);
 			} catch (Exception exc) {
 				System.out.println(exc.getMessage());
 				return false;

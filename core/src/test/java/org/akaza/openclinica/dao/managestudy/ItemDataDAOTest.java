@@ -420,21 +420,21 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatGetMapItemsToSDVReturnsCorrectSize() {
-		assertEquals(itemDataDAO.getMapItemsToSDV(1).size(), 0);
+	public void testThatGetListOfItemsToSDVReturnsCorrectSize() {
+		assertEquals(itemDataDAO.getListOfItemsToSDV(1).size(), 0);
 	}
 
 	@Test
 	public void testThatTransactionalSDVCrfItemsDoesNotThrowAnException() throws Exception {
 		Connection con = getDataSource().getConnection();
 		con.setAutoCommit(false);
-		itemDataDAO.sdvCrfItems(1, true, con);
+		itemDataDAO.sdvCrfItems(1, ub.getId(), true, con);
 		con.commit();
 	}
 
 	@Test
 	public void testThatSDVCrfItemsReturnsTrue() {
-		assertTrue(itemDataDAO.sdvCrfItems(1, true));
+		assertTrue(itemDataDAO.sdvCrfItems(1, ub.getId(), true));
 	}
 
 	@Test
@@ -444,6 +444,6 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatSDVItemsReturnsTrue() {
-		assertTrue(itemDataDAO.sdvItems(Arrays.asList(new Integer[]{1, 2, 3}), true));
+		assertTrue(itemDataDAO.sdvItems(Arrays.asList(1, 2, 3), ub.getId(), true));
 	}
 }

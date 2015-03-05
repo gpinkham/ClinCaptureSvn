@@ -12,11 +12,13 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package org.akaza.openclinica.util;
+package com.clinovo.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -33,22 +35,22 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
+public class CrfShortcutsAnalyzerTest extends DefaultAppContextTest {
 
 	public static final int THREE = 3;
 	public static final int FOUR = 4;
 	public static final int FIVE = 5;
 	public static final int SIX = 6;
 	private MockHttpServletRequest request;
-	private EventCRFBean eventCRFBean;
 	private DisplayItemBean displayItemBean;
 	private DiscrepancyNoteBean discrepancyNoteBean;
 	private List<DiscrepancyNoteThread> noteThreads;
+	private CrfShortcutsAnalyzer crfShortcutsAnalyzer;
 
 	@Before
 	public void setUp() throws Exception {
 		request = new MockHttpServletRequest();
-		eventCRFBean = new EventCRFBean();
+		EventCRFBean eventCRFBean = new EventCRFBean();
 		eventCRFBean.setId(1);
 		eventCRFBean.setCRFVersionId(1);
 		ItemDataBean itemDataBean = Mockito.mock(ItemDataBean.class);
@@ -72,65 +74,65 @@ public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 		discrepancyNoteThread.setLinkedNoteList(new LinkedList<DiscrepancyNoteBean>(discrepancyNotes));
 		displayItemBean.setDiscrepancyNotes(discrepancyNotes);
 		noteThreads.add(discrepancyNoteThread);
-		request.setAttribute("discrepancyShortcutsAnalyzer", new DiscrepancyShortcutsAnalyzer());
+		Map<String, Object> attributes = new HashMap<String, Object>();
+		attributes.put(CrfShortcutsAnalyzer.SECTION_ID, 0);
+		attributes.put(CrfShortcutsAnalyzer.SERVLET_PATH, "");
+		crfShortcutsAnalyzer = new CrfShortcutsAnalyzer(request.getScheme(), request.getMethod(),
+				request.getRequestURI(), request.getServletPath(), "http", attributes, itemSDVService);
 	}
 
 	@Test
 	public void testThatIsFirstNewDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(1);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads, true);
+		crfShortcutsAnalyzer.prepareDnShortcutAnchors(displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getNewDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstUpdatedDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(2);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads, true);
+		crfShortcutsAnalyzer.prepareDnShortcutAnchors(displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getUpdatedDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstResolutionProposedReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(THREE);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads, true);
+		crfShortcutsAnalyzer.prepareDnShortcutAnchors(displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getResolutionProposedDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstClosedDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(FOUR);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads, true);
+		crfShortcutsAnalyzer.prepareDnShortcutAnchors(displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getClosedDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstAnnotationReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(FIVE);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads, true);
+		crfShortcutsAnalyzer.prepareDnShortcutAnchors(displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getAnnotationDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstItemToSDVReturnsCorrectValue() throws Exception {
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads, true);
+		crfShortcutsAnalyzer.prepareDnShortcutAnchors(displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getItemToSDV().size(), 0);
 	}
 
 	@Test
 	public void testThatPrepareDnShortcutLinksBuildCorrectUrlForNonPopupPage() throws Exception {
 		buildAnalyzerUrl(false);
-		DiscrepancyShortcutsAnalyzer analyzer = (DiscrepancyShortcutsAnalyzer) request
-				.getAttribute("discrepancyShortcutsAnalyzer");
-		assertEquals("#newDn_1", analyzer.getNextNewDnLink());
+		assertEquals("#newDn_1", crfShortcutsAnalyzer.getNextNewDnLink());
 
 	}
 
 	@Test
 	public void testThatPrepareDnShortcutLinksBuildCorrectUrlForPopupPage() throws Exception {
 		buildAnalyzerUrl(true);
-		DiscrepancyShortcutsAnalyzer analyzer = (DiscrepancyShortcutsAnalyzer) request
-				.getAttribute("discrepancyShortcutsAnalyzer");
-		assertEquals("#newDn_1", analyzer.getNextNewDnLink());
+		assertEquals("#newDn_1", crfShortcutsAnalyzer.getNextNewDnLink());
 
 	}
 
@@ -152,7 +154,6 @@ public class DiscrepancyShortcutsAnalyzerTest extends DefaultAppContextTest {
 		}
 		request.setParameter("tabId", "3");
 		request.getSession().setAttribute("domain_name", "clincapture.com");
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, eventCRFBean, itemDataDAO, itemFormMetadataDAO,
-				SIX, sectionBeans, noteThreads);
+		crfShortcutsAnalyzer.prepareDnShortcutLinks(eventCRFBean, itemFormMetadataDAO, SIX, sectionBeans, noteThreads);
 	}
 }

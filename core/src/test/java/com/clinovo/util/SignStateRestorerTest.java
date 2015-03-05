@@ -1,15 +1,18 @@
-package org.akaza.openclinica.util;
+package com.clinovo.util;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.util.EventCrfInfo;
+import org.akaza.openclinica.util.EventDefinitionInfo;
+import org.akaza.openclinica.util.SignedData;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 public class SignStateRestorerTest {
 

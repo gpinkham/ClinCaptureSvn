@@ -14,6 +14,7 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.admin.AuditDAO;
@@ -77,10 +78,12 @@ import com.clinovo.service.DcfService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.EventCRFService;
+import com.clinovo.service.ItemSDVService;
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.service.UserAccountService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
+import com.clinovo.util.CrfShortcutsAnalyzer;
 import com.clinovo.util.RuleSetServiceUtil;
 import com.clinovo.util.SessionUtil;
 
@@ -231,6 +234,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private EventCRFService eventCRFService;
 	@Autowired
 	private DcfService dcfService;
+	@Autowired
+	private ItemSDVService itemSDVService;
 
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
@@ -549,6 +554,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return dcfService;
 	}
 
+	public ItemSDVService getItemSDVService() {
+		return itemSDVService;
+	}
+
 	public SessionLocaleResolver getLocaleResolver() {
 		return localeResolver;
 	}
@@ -559,5 +568,38 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
 		return dynamicsItemFormMetadataDao;
+	}
+
+	public static CrfShortcutsAnalyzer getCrfShortcutsAnalyzer(HttpServletRequest request, ItemSDVService itemSDVService) {
+		return getCrfShortcutsAnalyzer(request, itemSDVService, false);
+	}
+
+	public static CrfShortcutsAnalyzer getCrfShortcutsAnalyzer(HttpServletRequest request,
+			ItemSDVService itemSDVService, boolean recreate) {
+		CrfShortcutsAnalyzer crfShortcutsAnalyzer = (CrfShortcutsAnalyzer) request
+				.getAttribute(CrfShortcutsAnalyzer.CRF_SHORTCUTS_ANALYZER);
+		if (crfShortcutsAnalyzer == null || recreate) {
+			FormProcessor fp = new FormProcessor(request);
+			Map<String, Object> attributes = new HashMap<String, Object>();
+			attributes.put(CrfShortcutsAnalyzer.EXIT_TO, fp.getString(CrfShortcutsAnalyzer.EXIT_TO, true));
+			attributes.put(CrfShortcutsAnalyzer.CW, fp.getRequest().getParameter(CrfShortcutsAnalyzer.CW));
+			attributes.put(CrfShortcutsAnalyzer.SECTION_ID, fp.getInt(CrfShortcutsAnalyzer.SECTION_ID, true));
+			attributes.put(CrfShortcutsAnalyzer.SECTION, fp.getRequest().getAttribute(CrfShortcutsAnalyzer.SECTION));
+			attributes.put(CrfShortcutsAnalyzer.USER_ROLE,
+					request.getSession().getAttribute(CrfShortcutsAnalyzer.USER_ROLE));
+			attributes.put(CrfShortcutsAnalyzer.SERVLET_PATH, fp.getString(CrfShortcutsAnalyzer.SERVLET_PATH).isEmpty()
+					? fp.getRequest().getServletPath()
+					: fp.getString(CrfShortcutsAnalyzer.SERVLET_PATH));
+
+			crfShortcutsAnalyzer = new CrfShortcutsAnalyzer(request.getScheme(), request.getMethod(),
+					request.getRequestURI(), request.getServletPath(), (String) request.getSession().getAttribute(
+							DOMAIN_NAME), attributes, itemSDVService);
+
+			crfShortcutsAnalyzer.getInterviewerDisplayItemBean().setField(CrfShortcutsAnalyzer.INTERVIEWER_NAME);
+			crfShortcutsAnalyzer.getInterviewDateDisplayItemBean().setField(CrfShortcutsAnalyzer.DATE_INTERVIEWED);
+
+			request.setAttribute(CrfShortcutsAnalyzer.CRF_SHORTCUTS_ANALYZER, crfShortcutsAnalyzer);
+		}
+		return crfShortcutsAnalyzer;
 	}
 }

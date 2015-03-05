@@ -10,8 +10,9 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
+package com.clinovo.util;
 
-package org.akaza.openclinica.util;
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -21,8 +22,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-
-import javax.sql.DataSource;
 
 /**
  * DAOWrapper class.
@@ -40,7 +39,9 @@ public class DAOWrapper {
 
 	/**
 	 * DAOWrapper constructor.
-	 * @param ds DataSource
+	 * 
+	 * @param ds
+	 *            DataSource
 	 */
 	public DAOWrapper(DataSource ds) {
 		this.sdao = new StudyDAO(ds);
@@ -53,13 +54,21 @@ public class DAOWrapper {
 
 	/**
 	 * DAOWrapper constructor.
-	 * @param sdao StudyDAO
-	 * @param cvdao CRFVersionDAO
-	 * @param sedao StudyEventDAO
-	 * @param ssdao StudySubjectDAO
-	 * @param ecdao EventCRFDAO
-	 * @param edcdao EventDefinitionCRFDAO
-	 * @param discDao DiscrepancyNoteDAO
+	 * 
+	 * @param sdao
+	 *            StudyDAO
+	 * @param cvdao
+	 *            CRFVersionDAO
+	 * @param sedao
+	 *            StudyEventDAO
+	 * @param ssdao
+	 *            StudySubjectDAO
+	 * @param ecdao
+	 *            EventCRFDAO
+	 * @param edcdao
+	 *            EventDefinitionCRFDAO
+	 * @param discDao
+	 *            DiscrepancyNoteDAO
 	 */
 	public DAOWrapper(StudyDAO sdao, CRFVersionDAO cvdao, StudyEventDAO sedao, StudySubjectDAO ssdao,
 			EventCRFDAO ecdao, EventDefinitionCRFDAO edcdao, DiscrepancyNoteDAO discDao) {

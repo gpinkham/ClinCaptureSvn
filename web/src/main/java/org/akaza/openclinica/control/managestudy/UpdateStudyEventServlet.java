@@ -75,26 +75,26 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.calendar.CalendarLogic;
-import org.akaza.openclinica.util.DAOWrapper;
-import org.akaza.openclinica.util.SignUtil;
 import org.akaza.openclinica.util.StudyEventDefinitionUtil;
-import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.quartz.impl.StdScheduler;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SignUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
 import com.clinovo.util.ValidatorHelper;
 
 /**
  * Performs updating study event action.
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class UpdateStudyEventServlet extends Controller {
-	
+
 	private static final long serialVersionUID = -6029524999558420563L;
-	
+
 	public static final String EVENT_ID = "event_id";
 	public static final String STUDY_SUBJECT_ID = "ss_id";
 	public static final String EVENT_BEAN = "studyEvent";
@@ -251,8 +251,8 @@ public class UpdateStudyEventServlet extends Controller {
 			}
 			for (Object getECRF : getECRFs) {
 				EventCRFBean existingBean = (EventCRFBean) getECRF;
-				logger.info("Found: " + existingBean.getCRFVersionId() + " " + existingBean.getCrf().getId()
-						+ " " + existingBean.getCrfVersion().getName() + " " + existingBean.getStatus().getName() + " "
+				logger.info("Found: " + existingBean.getCRFVersionId() + " " + existingBean.getCrf().getId() + " "
+						+ existingBean.getCrfVersion().getName() + " " + existingBean.getStatus().getName() + " "
 						+ existingBean.getStage().getName());
 
 				logger.info("Comparing above to ecrfBean.DefaultVersionID: " + ecrfBean.getDefaultVersionId());
@@ -349,11 +349,12 @@ public class UpdateStudyEventServlet extends Controller {
 
 			if (!errors.isEmpty()) {
 				StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
-				List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil.getAllNotesforSubjectAndEvent(
-						studySubjectBean, currentStudy, sm);
-				EnterDataForStudyEventServlet.setRequestAttributesForNotes(allNotesforSubjectAndEvent, studyEvent, sm, request);
+				List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil
+						.getAllNotesforSubjectAndEvent(studySubjectBean, currentStudy, sm);
+				EnterDataForStudyEventServlet.setRequestAttributesForNotes(allNotesforSubjectAndEvent, studyEvent, sm,
+						request);
 				setInputMessages(errors, request);
-				String[] prefixes = { INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX };
+				String[] prefixes = {INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX};
 				fp.setCurrentDateTimeValuesAsPreset(prefixes);
 				setPresetValues(fp.getPresetValues(), request);
 
@@ -590,15 +591,15 @@ public class UpdateStudyEventServlet extends Controller {
 				// Later it could be put to somewhere as a static method if
 				// necessary.
 				switch (c.get(Calendar.AM_PM)) {
-				case 0:
-					presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "am");
-					break;
-				case 1:
-					presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "pm");
-					break;
-				default:
-					presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
-					break;
+					case 0 :
+						presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "am");
+						break;
+					case 1 :
+						presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "pm");
+						break;
+					default :
+						presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
+						break;
 				}
 			} else {
 				presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", -1);
@@ -622,15 +623,15 @@ public class UpdateStudyEventServlet extends Controller {
 					// Later it could be put to somewhere as a static method if
 					// necessary.
 					switch (c.get(Calendar.AM_PM)) {
-					case 0:
-						presetValues.put(INPUT_ENDDATE_PREFIX + "Half", "am");
-						break;
-					case 1:
-						presetValues.put(INPUT_ENDDATE_PREFIX + "Half", "pm");
-						break;
-					default:
-						presetValues.put(INPUT_ENDDATE_PREFIX + "Half", "");
-						break;
+						case 0 :
+							presetValues.put(INPUT_ENDDATE_PREFIX + "Half", "am");
+							break;
+						case 1 :
+							presetValues.put(INPUT_ENDDATE_PREFIX + "Half", "pm");
+							break;
+						default :
+							presetValues.put(INPUT_ENDDATE_PREFIX + "Half", "");
+							break;
 					}
 				}
 				presetValues.put(INPUT_ENDDATE_PREFIX + "Date", localDf.format(studyEvent.getDateEnded()));

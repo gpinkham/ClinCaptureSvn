@@ -12,13 +12,11 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package org.akaza.openclinica.util;
+package com.clinovo.util;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -27,17 +25,17 @@ import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
+
+import com.clinovo.service.ItemSDVService;
 
 /**
  * Class for building and containing discrepancy notes analyzing objects that will be placed on data entry UX.
  */
-public class DiscrepancyShortcutsAnalyzer {
+public class CrfShortcutsAnalyzer {
 
-	public static final String DISCREPANCY_SHORTCUTS_ANALYZER = "discrepancyShortcutsAnalyzer";
+	public static final String CRF_SHORTCUTS_ANALYZER = "crfShortcutsAnalyzer";
 	public static final String INTERVIEWER_NAME = "interviewer_name";
 	public static final String DATE_INTERVIEWED = "date_interviewed";
 	public static final String FIRST_NEW_DN = "#newDn_1";
@@ -47,17 +45,30 @@ public class DiscrepancyShortcutsAnalyzer {
 	public static final String FIRST_ANNOTATION = "#annotationDn_1";
 	public static final String FIRST_ITEM_TO_SDV = "#itemToSDV_1";
 	public static final String SERVLET_PATH = "servletPath";
+	public static final String SECTION = "section";
+	public static final String POST = "POST";
+	public static final String CW = "cw";
+	public static final String EXIT_TO = "exitTo";
 	public static final String SECTION_ID = "sectionId";
 	public static final String TAB_ID = "tabId";
 	public static final String DOMAIN_NAME = "domain_name";
+	public static final String MIN_LEFT_D = "_minLeftD";
+	public static final String MIN_RIGHT_D = "_minRightD";
+	public static final String USER_ROLE = "userRole";
+	public static final String ITEM_DATA = "itemData";
+	public static final String EVENT_CRF = "eventCrf";
+	public static final String ITEM_TO_SDV = "itemToSDV_";
+	public static final String NEW_DN = "newDn_";
+	public static final String UPDATED_DN = "updatedDn_";
+	public static final String RESOLUTION_PROPOSED_DN = "resolutionProposedDn_";
+	public static final String CLOSED_DN = "closedDn_";
+	public static final String ANNOTATION_DN = "annotationDn_";
 
 	public static final int RES_STATUS_OPEN = 1;
 	public static final int RES_STATUS_UPDATED = 2;
 	public static final int RES_STATUS_RESOLVED = 3;
 	public static final int RES_STATUS_CLOSED = 4;
 	public static final int RES_STATUS_NOT_APPLICABLE = 5;
-	public static final String MIN_LEFT_D = "_minLeftD";
-	public static final String MIN_RIGHT_D = "_minRightD";
 
 	private boolean hasNotes;
 
@@ -75,6 +86,8 @@ public class DiscrepancyShortcutsAnalyzer {
 	private int sectionTotalAnnotations;
 	private int sectionTotalItemsToSDV;
 
+	private int itemsToSDVAnchorCounter;
+
 	private String nextNewDnLink = FIRST_NEW_DN;
 	private String nextUpdatedDnLink = FIRST_UPDATED_DN;
 	private String nextResolutionProposedLink = FIRST_RESOLUTION_PROPOSED;
@@ -83,6 +96,26 @@ public class DiscrepancyShortcutsAnalyzer {
 	private String nextItemToSDVLink = FIRST_ITEM_TO_SDV;
 
 	private boolean userIsAbleToSDVItems;
+
+	private String scheme;
+	private String requestURI;
+	private String domainName;
+	private String servletPath;
+	private String requestMethod;
+	private Map<String, Object> attributes;
+
+	private ItemSDVService itemSDVService;
+
+	public CrfShortcutsAnalyzer(String scheme, String requestMethod, String requestURI, String servletPath,
+			String domainName, Map<String, Object> attributes, ItemSDVService itemSDVService) {
+		this.scheme = scheme;
+		this.requestURI = requestURI;
+		this.domainName = domainName;
+		this.attributes = attributes;
+		this.servletPath = servletPath;
+		this.requestMethod = requestMethod;
+		this.itemSDVService = itemSDVService;
+	}
 
 	private DisplayItemBean interviewerDisplayItemBean = new DisplayItemBean();
 
@@ -292,6 +325,17 @@ public class DiscrepancyShortcutsAnalyzer {
 		sectionTotalItemsToSDV++;
 	}
 
+	/**
+	 * Increases the items to SDV anchor counter.
+	 */
+	public void incItemsToSDVAnchorCounter() {
+		itemsToSDVAnchorCounter++;
+	}
+
+	public int getItemsToSDVAnchorCounter() {
+		return itemsToSDVAnchorCounter;
+	}
+
 	public String getNextNewDnLink() {
 		return nextNewDnLink;
 	}
@@ -370,69 +414,65 @@ public class DiscrepancyShortcutsAnalyzer {
 		return tabNum;
 	}
 
-	private static final class CurrentSectionInfo {
-
+	private final class CurrentSectionInfo {
 		private int currentTabId;
 		private int currentSectionId;
-
-		private CurrentSectionInfo(FormProcessor fp, List<SectionBean> sections) {
-			SectionBean currentSection = (SectionBean) fp.getRequest().getAttribute("section");
-			if (fp.getRequest().getMethod().equalsIgnoreCase("POST")) {
+		public CurrentSectionInfo(List<SectionBean> sections) {
+			SectionBean currentSection = (SectionBean) attributes.get(SECTION);
+			if (requestMethod.equalsIgnoreCase(POST)) {
 				currentSectionId = currentSection.getId();
 			} else {
-				currentSectionId = fp.getInt(SECTION_ID, true) == 0 ? (sections != null && sections.size() > 0
+				currentSectionId = (Integer) attributes.get(SECTION_ID) == 0 ? (sections != null && sections.size() > 0
 						? sections.get(0).getId()
-						: 0) : fp.getInt(SECTION_ID, true);
+						: 0) : (Integer) attributes.get(SECTION_ID);
 			}
 			currentTabId = getTabNum(sections, currentSectionId);
 		}
 	}
 
-	private static String buildLink(FormProcessor fp, int sectionId, EventCRFBean eventCrfBean,
-			int eventDefinitionCRFId, List<SectionBean> sections) {
+	private String buildLink(int sectionId, EventCRFBean eventCrfBean, int eventDefinitionCRFId,
+			List<SectionBean> sections) {
 		String link;
 		int tabNum = getTabNum(sections, sectionId);
-		String servletPath = fp.getString(SERVLET_PATH).isEmpty() ? fp.getRequest().getServletPath() : fp
-				.getString("servletPath");
-		CurrentSectionInfo currentSectionInfo = new CurrentSectionInfo(fp, sections);
-		String cw = fp.getRequest().getParameter("cw");
+		String exitTo = (String) attributes.get(EXIT_TO);
+		String servletPathAttr = (String) attributes.get(SERVLET_PATH);
+		CurrentSectionInfo currentSectionInfo = new CurrentSectionInfo(sections);
+		String cw = (String) attributes.get(CW);
 		String closeWindowParameter = cw != null ? "&cw=1" : "";
-		if (servletPath.equalsIgnoreCase("/ResolveDiscrepancy")
-				|| servletPath.equalsIgnoreCase("/ViewSectionDataEntry")
-				|| servletPath.equalsIgnoreCase("/ViewSectionDataEntryRESTUrlServlet")) {
-			link = currentSectionInfo.currentSectionId == sectionId ? "" : fp.getRequest().getScheme()
-					+ "://"
-					+ fp.getRequest().getSession().getAttribute(DOMAIN_NAME)
-					+ fp.getRequest().getRequestURI()
-							.replaceAll(fp.getRequest().getServletPath(), "/ViewSectionDataEntry") + "?eventCRFId="
-					+ eventCrfBean.getId() + closeWindowParameter + "&crfVersionId=" + eventCrfBean.getCRFVersionId()
-					+ "&sectionId=" + sectionId + "&tabId=" + tabNum + "&studySubjectId="
-					+ eventCrfBean.getStudySubjectId() + "&eventDefinitionCRFId=" + eventDefinitionCRFId
-					+ (fp.getString("exitTo", true).isEmpty() ? "" : "&exitTo=" + fp.getString("exitTo", true));
+		if (servletPathAttr.equalsIgnoreCase("/ResolveDiscrepancy")
+				|| servletPathAttr.equalsIgnoreCase("/ViewSectionDataEntry")
+				|| servletPathAttr.equalsIgnoreCase("/ViewSectionDataEntryRESTUrlServlet")) {
+			link = currentSectionInfo.currentSectionId == sectionId ? "" : scheme.concat("://").concat(domainName)
+					.concat(requestURI.replaceAll(servletPath, "/ViewSectionDataEntry")).concat("?eventCRFId=")
+					.concat(Integer.toString(eventCrfBean.getId())).concat(closeWindowParameter)
+					.concat("&crfVersionId=").concat(Integer.toString(eventCrfBean.getCRFVersionId()))
+					.concat("&sectionId=").concat(Integer.toString(sectionId)).concat("&tabId=")
+					.concat(Integer.toString(tabNum)).concat("&studySubjectId=")
+					.concat(Integer.toString(eventCrfBean.getStudySubjectId())).concat("&eventDefinitionCRFId=")
+					.concat(Integer.toString(eventDefinitionCRFId))
+					.concat(exitTo.isEmpty() ? "" : "&exitTo=".concat(exitTo));
 		} else {
-			link = currentSectionInfo.currentTabId == tabNum ? "" : fp.getRequest().getScheme() + "://"
-					+ fp.getRequest().getSession().getAttribute(DOMAIN_NAME)
-					+ fp.getRequest().getRequestURI().replaceAll(fp.getRequest().getServletPath(), servletPath)
-					+ "?eventCRFId=" + eventCrfBean.getId() + closeWindowParameter + "&sectionId=" + sectionId
-					+ "&tabId=" + tabNum
-					+ (fp.getString("exitTo", true).isEmpty() ? "" : "&exitTo=" + fp.getString("exitTo", true));
+			link = currentSectionInfo.currentTabId == tabNum ? "" : scheme.concat("://").concat(domainName)
+					.concat(requestURI.replaceAll(servletPath, servletPathAttr)).concat("?eventCRFId=")
+					.concat(Integer.toString(eventCrfBean.getId())).concat(closeWindowParameter).concat("&sectionId=")
+					.concat(Integer.toString(sectionId)).concat("&tabId=").concat(Integer.toString(tabNum))
+					.concat(exitTo.isEmpty() ? "" : "&exitTo=".concat(exitTo));
 		}
 		return link;
 	}
-	private static void prepareItemsToSDVShortcutLink(HttpServletRequest request, EventCRFBean eventCrfBean,
-			int eventDefinitionCRFId, List<SectionBean> allSections, ItemDataDAO itemDataDao) {
-		List<DisplayItemBean> displayItemBeanList = itemDataDao.getMapItemsToSDV(eventCrfBean.getId());
+
+	private void prepareItemsToSDVShortcutLink(EventCRFBean eventCrfBean, int eventDefinitionCRFId,
+			List<SectionBean> allSections) {
+		List<DisplayItemBean> displayItemBeanList = itemSDVService.getListOfItemsToSDV(eventCrfBean.getId());
 		Map<String, Integer> deltaMap = new HashMap<String, Integer>();
 		for (DisplayItemBean dib : displayItemBeanList) {
-			prepareItemsToSDVShortcutLink(request, dib, eventCrfBean, eventDefinitionCRFId, allSections, deltaMap);
+			prepareItemsToSDVShortcutLink(dib, eventCrfBean, eventDefinitionCRFId, allSections, deltaMap);
 		}
 	}
 
 	/**
 	 * Method that generates itemToSDV urls for jumping between sections.
 	 * 
-	 * @param request
-	 *            HttpServletRequest
 	 * @param dib
 	 *            DisplayItemBean
 	 * @param eventCrfBean
@@ -444,32 +484,24 @@ public class DiscrepancyShortcutsAnalyzer {
 	 * @param deltaMap
 	 *            Map<String, Integer>
 	 */
-	public static void prepareItemsToSDVShortcutLink(HttpServletRequest request, DisplayItemBean dib,
-			EventCRFBean eventCrfBean, int eventDefinitionCRFId, List<SectionBean> sections,
-			Map<String, Integer> deltaMap) {
+	public void prepareItemsToSDVShortcutLink(DisplayItemBean dib, EventCRFBean eventCrfBean, int eventDefinitionCRFId,
+			List<SectionBean> sections, Map<String, Integer> deltaMap) {
 		if (dib.getMetadata() != null && dib.getMetadata().getId() > 0 && dib.getMetadata().isSdvRequired()) {
-			FormProcessor fp = new FormProcessor(request);
-			DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = getDiscrepancyShortcutsAnalyzer(request);
-			if (request.getMethod().equalsIgnoreCase("POST") && request.getAttribute("section") == null) {
-				return;
+			CurrentSectionInfo currentSectionInfo = new CurrentSectionInfo(sections);
+			String link = buildLink(dib.getMetadata().getSectionId(), eventCrfBean, eventDefinitionCRFId, sections);
+			analyze(currentSectionInfo, deltaMap, link, FIRST_ITEM_TO_SDV, dib.getMetadata().getSectionId());
+			incTotalItemsToSDV();
+			if (currentSectionInfo.currentSectionId == dib.getMetadata().getSectionId()) {
+				incSectionTotalItemsToSDV();
 			}
-			CurrentSectionInfo currentSectionInfo = new CurrentSectionInfo(fp, sections);
-			String link = buildLink(fp, dib.getMetadata().getSectionId(), eventCrfBean, eventDefinitionCRFId, sections);
-			analyze(discrepancyShortcutsAnalyzer, currentSectionInfo, deltaMap, link, FIRST_ITEM_TO_SDV, dib
-					.getMetadata().getSectionId());
-			discrepancyShortcutsAnalyzer.incTotalItemsToSDV();
 		}
 	}
 
 	/**
 	 * Method that generates discrepancy note urls for jumping between sections.
 	 * 
-	 * @param request
-	 *            the incoming request.
 	 * @param eventCrfBean
 	 *            the event crf bean for current crf.
-	 * @param itemDataDao
-	 *            ItemDataDAO
 	 * @param ifmdao
 	 *            the item metadata bean for current crf.
 	 * @param eventDefinitionCRFId
@@ -479,52 +511,47 @@ public class DiscrepancyShortcutsAnalyzer {
 	 * @param noteThreads
 	 *            the list of discrepancy notes group.
 	 */
-	public static void prepareDnShortcutLinks(HttpServletRequest request, EventCRFBean eventCrfBean,
-			ItemDataDAO itemDataDao, ItemFormMetadataDAO ifmdao, int eventDefinitionCRFId, List<SectionBean> sections,
-			List<DiscrepancyNoteThread> noteThreads) {
+	public void prepareDnShortcutLinks(EventCRFBean eventCrfBean, ItemFormMetadataDAO ifmdao, int eventDefinitionCRFId,
+			List<SectionBean> sections, List<DiscrepancyNoteThread> noteThreads) {
 		DiscrepancyNoteBean tempBean;
-		FormProcessor fp = new FormProcessor(request);
 		Map<String, Integer> deltaMap = new HashMap<String, Integer>();
-		request.removeAttribute(DISCREPANCY_SHORTCUTS_ANALYZER);
-		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = getDiscrepancyShortcutsAnalyzer(request);
-		if (request.getMethod().equalsIgnoreCase("POST") && request.getAttribute("section") == null) {
+		if (requestMethod.equalsIgnoreCase(POST) && attributes.get(SECTION) == null) {
 			return;
 		}
-		CurrentSectionInfo currentSectionInfo = new CurrentSectionInfo(fp, sections);
-		StudyUserRoleBean studyUserRoleBean = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
-		discrepancyShortcutsAnalyzer.setUserIsAbleToSDVItems(eventCrfBean.getStage().isDoubleDE_Complete()
+		CurrentSectionInfo currentSectionInfo = new CurrentSectionInfo(sections);
+		StudyUserRoleBean studyUserRoleBean = (StudyUserRoleBean) attributes.get(USER_ROLE);
+		setUserIsAbleToSDVItems(eventCrfBean.getStage().isDoubleDE_Complete()
 				&& (studyUserRoleBean.isStudyAdministrator() || studyUserRoleBean.isMonitor()));
-		prepareItemsToSDVShortcutLink(request, eventCrfBean, eventDefinitionCRFId, sections, itemDataDao);
+		prepareItemsToSDVShortcutLink(eventCrfBean, eventDefinitionCRFId, sections);
 		for (DiscrepancyNoteThread dnThread : noteThreads) {
 			tempBean = dnThread.getLinkedNoteList().getLast();
 			if (tempBean != null
-					&& (tempBean.getEntityType().equalsIgnoreCase("itemData") || tempBean.getEntityType()
-							.equalsIgnoreCase("eventCrf")) && tempBean.getParentDnId() == 0) {
-				discrepancyShortcutsAnalyzer.setHasNotes(true);
+					&& (tempBean.getEntityType().equalsIgnoreCase(ITEM_DATA) || tempBean.getEntityType()
+							.equalsIgnoreCase(EVENT_CRF)) && tempBean.getParentDnId() == 0) {
+				setHasNotes(true);
 				ItemFormMetadataBean ifmbean = ifmdao.findByItemIdAndCRFVersionId(tempBean.getItemId(),
 						eventCrfBean.getCRFVersionId());
-				String link = tempBean.getEntityType().equalsIgnoreCase("eventCrf") ? "" : buildLink(fp,
+				String link = tempBean.getEntityType().equalsIgnoreCase(EVENT_CRF) ? "" : buildLink(
 						ifmbean.getSectionId(), eventCrfBean, eventDefinitionCRFId, sections);
 				String key = null;
 				if (ResolutionStatus.UPDATED.equals(tempBean.getResStatus())) {
-					discrepancyShortcutsAnalyzer.incTotalUpdated();
+					incTotalUpdated();
 					key = FIRST_UPDATED_DN;
 				} else if (ResolutionStatus.OPEN.equals(tempBean.getResStatus())) {
 					key = FIRST_NEW_DN;
-					discrepancyShortcutsAnalyzer.incTotalNew();
+					incTotalNew();
 				} else if (ResolutionStatus.CLOSED.equals(tempBean.getResStatus())) {
 					key = FIRST_CLOSED_DN;
-					discrepancyShortcutsAnalyzer.incTotalClosed();
+					incTotalClosed();
 				} else if (ResolutionStatus.RESOLVED.equals(tempBean.getResStatus())) {
 					key = FIRST_RESOLUTION_PROPOSED;
-					discrepancyShortcutsAnalyzer.incTotalResolutionProposed();
+					incTotalResolutionProposed();
 				} else if (ResolutionStatus.NOT_APPLICABLE.equals(tempBean.getResStatus())) {
 					key = FIRST_ANNOTATION;
-					discrepancyShortcutsAnalyzer.incTotalAnnotations();
+					incTotalAnnotations();
 				}
-				if (key != null && !tempBean.getEntityType().equalsIgnoreCase("eventCrf")) {
-					analyze(discrepancyShortcutsAnalyzer, currentSectionInfo, deltaMap, link, key,
-							ifmbean.getSectionId());
+				if (key != null && !tempBean.getEntityType().equalsIgnoreCase(EVENT_CRF)) {
+					analyze(currentSectionInfo, deltaMap, link, key, ifmbean.getSectionId());
 				}
 			}
 		}
@@ -533,8 +560,6 @@ public class DiscrepancyShortcutsAnalyzer {
 	/**
 	 * Method that analyzes data to build dn shortcut link.
 	 * 
-	 * @param discrepancyShortcutsAnalyzer
-	 *            DiscrepancyShortcutsAnalyzer
 	 * @param currentSectionInfo
 	 *            CurrentSectionInfo
 	 * @param deltaMap
@@ -546,8 +571,7 @@ public class DiscrepancyShortcutsAnalyzer {
 	 * @param itemSectionId
 	 *            int
 	 */
-	public static void analyze(DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer,
-			CurrentSectionInfo currentSectionInfo, Map<String, Integer> deltaMap, String link, String key,
+	public void analyze(CurrentSectionInfo currentSectionInfo, Map<String, Integer> deltaMap, String link, String key,
 			int itemSectionId) {
 		int d = itemSectionId - currentSectionInfo.currentSectionId;
 		Integer minLeftD = deltaMap.get(key.concat(MIN_LEFT_D));
@@ -556,13 +580,13 @@ public class DiscrepancyShortcutsAnalyzer {
 			minLeftD = minLeftD == null ? d : Math.min(d, minLeftD);
 			if (minLeftD == d) {
 				deltaMap.put(key.concat(MIN_LEFT_D), minLeftD);
-				setNextLink(discrepancyShortcutsAnalyzer, link, key);
+				setNextLink(link, key);
 			}
 		} else if (d > 0) {
 			minRightD = minRightD == null ? d : Math.min(d, minRightD);
 			if (minRightD == d) {
 				deltaMap.put(key.concat(MIN_RIGHT_D), minRightD);
-				setNextLink(discrepancyShortcutsAnalyzer, link, key);
+				setNextLink(link, key);
 			}
 		}
 	}
@@ -570,34 +594,30 @@ public class DiscrepancyShortcutsAnalyzer {
 	/**
 	 * Method that sets next dn link for certain resolution.
 	 *
-	 * @param discrepancyShortcutsAnalyzer
-	 *            DiscrepancyShortcutsAnalyzer
 	 * @param link
 	 *            String
 	 * @param key
 	 *            String
 	 */
-	public static void setNextLink(DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer, String link, String key) {
+	public void setNextLink(String link, String key) {
 		if (key.equals(FIRST_UPDATED_DN)) {
-			discrepancyShortcutsAnalyzer.setNextUpdatedDnLink(link + FIRST_UPDATED_DN);
+			setNextUpdatedDnLink(link.concat(FIRST_UPDATED_DN));
 		} else if (key.equals(FIRST_NEW_DN)) {
-			discrepancyShortcutsAnalyzer.setNextNewDnLink(link + FIRST_NEW_DN);
+			setNextNewDnLink(link.concat(FIRST_NEW_DN));
 		} else if (key.equals(FIRST_CLOSED_DN)) {
-			discrepancyShortcutsAnalyzer.setNextClosedDnLink(link + FIRST_CLOSED_DN);
+			setNextClosedDnLink(link.concat(FIRST_CLOSED_DN));
 		} else if (key.equals(FIRST_RESOLUTION_PROPOSED)) {
-			discrepancyShortcutsAnalyzer.setNextResolutionProposedLink(link + FIRST_RESOLUTION_PROPOSED);
+			setNextResolutionProposedLink(link.concat(FIRST_RESOLUTION_PROPOSED));
 		} else if (key.equals(FIRST_ANNOTATION)) {
-			discrepancyShortcutsAnalyzer.setNextAnnotationLink(link + FIRST_ANNOTATION);
+			setNextAnnotationLink(link.concat(FIRST_ANNOTATION));
 		} else if (key.equals(FIRST_ITEM_TO_SDV)) {
-			discrepancyShortcutsAnalyzer.setNextItemToSDVLink(link + FIRST_ITEM_TO_SDV);
+			setNextItemToSDVLink(link.concat(FIRST_ITEM_TO_SDV));
 		}
 	}
 
 	/**
 	 * Generates url anchors suffixes for current note threads.
-	 * 
-	 * @param request
-	 *            the incoming request.
+	 *
 	 * @param dib
 	 *            the crf item that should be highlighted.
 	 * @param additionalCheck
@@ -605,86 +625,57 @@ public class DiscrepancyShortcutsAnalyzer {
 	 * @param noteThreads
 	 *            the list of discrepancy notes threads.
 	 */
-	public static void prepareDnShortcutAnchors(HttpServletRequest request, DisplayItemBean dib,
-			List<DiscrepancyNoteThread> noteThreads, boolean additionalCheck) {
-		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = getDiscrepancyShortcutsAnalyzer(request);
+	public void prepareDnShortcutAnchors(DisplayItemBean dib, List<DiscrepancyNoteThread> noteThreads,
+			boolean additionalCheck) {
 		if (dib.getMetadata() != null && dib.getData() != null && dib.getData().getId() > 0
 				&& dib.getMetadata().getId() > 0 && dib.getMetadata().isSdvRequired() && !dib.getData().isSdv()) {
-			discrepancyShortcutsAnalyzer.incSectionTotalItemsToSDV();
-			dib.getItemToSDV().add(
-					"itemToSDV_".concat(Integer.toString(discrepancyShortcutsAnalyzer.getSectionTotalItemsToSDV())));
+			incItemsToSDVAnchorCounter();
+			dib.getItemToSDV().add(ITEM_TO_SDV.concat(Integer.toString(getItemsToSDVAnchorCounter())));
 		}
 		for (DiscrepancyNoteThread dnThread : noteThreads) {
 			DiscrepancyNoteBean tempBean = dnThread.getLinkedNoteList().getLast();
 			if (tempBean != null
 					&& tempBean.getParentDnId() == 0
-					&& (tempBean.getEntityType().equalsIgnoreCase("itemData") || tempBean.getEntityType()
-							.equalsIgnoreCase("eventCrf"))) {
+					&& (tempBean.getEntityType().equalsIgnoreCase(ITEM_DATA) || tempBean.getEntityType()
+							.equalsIgnoreCase(EVENT_CRF))) {
 				if (additionalCheck) {
-					if (tempBean.getEntityType().equalsIgnoreCase("itemData")
+					if (tempBean.getEntityType().equalsIgnoreCase(ITEM_DATA)
 							&& !(((tempBean.getId() > 0 && tempBean.getItemId() == dib.getDbData().getItemId() && tempBean
 									.getItemDataOrdinal() == dib.getDbData().getOrdinal()) || (tempBean.getId() == 0 && tempBean
 									.getField().equalsIgnoreCase(dib.getField()))))) {
 						continue;
 					}
-					if (tempBean.getEntityType().equalsIgnoreCase("eventCrf")
+					if (tempBean.getEntityType().equalsIgnoreCase(EVENT_CRF)
 							&& !tempBean.getColumn().equalsIgnoreCase(dib.getField())) {
 						continue;
 					}
 				}
 				switch (tempBean.getResolutionStatusId()) {
 					case RES_STATUS_OPEN :
-						discrepancyShortcutsAnalyzer.incSectionTotalNew();
-						dib.getNewDn().add(
-								"newDn_".concat(Integer.toString(discrepancyShortcutsAnalyzer.getSectionTotalNew())));
+						incSectionTotalNew();
+						dib.getNewDn().add(NEW_DN.concat(Integer.toString(getSectionTotalNew())));
 						break;
 					case RES_STATUS_UPDATED :
-						discrepancyShortcutsAnalyzer.incSectionTotalUpdated();
-						dib.getUpdatedDn().add(
-								"updatedDn_".concat(Integer.toString(discrepancyShortcutsAnalyzer
-										.getSectionTotalUpdated())));
+						incSectionTotalUpdated();
+						dib.getUpdatedDn().add(UPDATED_DN.concat(Integer.toString(getSectionTotalUpdated())));
 						break;
 					case RES_STATUS_RESOLVED :
-						discrepancyShortcutsAnalyzer.incSectionTotalResolutionProposed();
+						incSectionTotalResolutionProposed();
 						dib.getResolutionProposedDn().add(
-								"resolutionProposedDn_".concat(Integer.toString(discrepancyShortcutsAnalyzer
-										.getSectionTotalResolutionProposed())));
+								RESOLUTION_PROPOSED_DN.concat(Integer.toString(getSectionTotalResolutionProposed())));
 						break;
 					case RES_STATUS_CLOSED :
-						discrepancyShortcutsAnalyzer.incSectionTotalClosed();
-						dib.getClosedDn().add(
-								"closedDn_".concat(Integer.toString(discrepancyShortcutsAnalyzer
-										.getSectionTotalClosed())));
+						incSectionTotalClosed();
+						dib.getClosedDn().add(CLOSED_DN.concat(Integer.toString(getSectionTotalClosed())));
 						break;
 					case RES_STATUS_NOT_APPLICABLE :
-						discrepancyShortcutsAnalyzer.incSectionTotalAnnotations();
-						dib.getAnnotationDn().add(
-								"annotationDn_".concat(Integer.toString(discrepancyShortcutsAnalyzer
-										.getSectionTotalAnnotations())));
+						incSectionTotalAnnotations();
+						dib.getAnnotationDn().add(ANNOTATION_DN.concat(Integer.toString(getSectionTotalAnnotations())));
 						break;
 					default :
 						break;
 				}
 			}
 		}
-	}
-
-	/**
-	 * Returns DiscrepancyShortcutsAnalyzer (it's unique per request).
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return DiscrepancyShortcutsAnalyzer
-	 */
-	public static DiscrepancyShortcutsAnalyzer getDiscrepancyShortcutsAnalyzer(HttpServletRequest request) {
-		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = (DiscrepancyShortcutsAnalyzer) request
-				.getAttribute(DISCREPANCY_SHORTCUTS_ANALYZER);
-		if (discrepancyShortcutsAnalyzer == null) {
-			discrepancyShortcutsAnalyzer = new DiscrepancyShortcutsAnalyzer();
-			discrepancyShortcutsAnalyzer.getInterviewerDisplayItemBean().setField(INTERVIEWER_NAME);
-			discrepancyShortcutsAnalyzer.getInterviewDateDisplayItemBean().setField(DATE_INTERVIEWED);
-			request.setAttribute(DISCREPANCY_SHORTCUTS_ANALYZER, discrepancyShortcutsAnalyzer);
-		}
-		return discrepancyShortcutsAnalyzer;
 	}
 }

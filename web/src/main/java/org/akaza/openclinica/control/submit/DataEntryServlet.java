@@ -131,9 +131,6 @@ import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
 import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrParcel;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.RuleSetService;
-import org.akaza.openclinica.util.DAOWrapper;
-import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
-import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.form.FormBeanUtil;
@@ -146,7 +143,10 @@ import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemElement;
 import com.clinovo.service.DataEntryService;
 import com.clinovo.service.ReportCRFService;
+import com.clinovo.util.CrfShortcutsAnalyzer;
+import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.SessionUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
 import com.clinovo.util.ValidatorHelper;
 
 /**
@@ -480,8 +480,8 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, iddao, ifmdao, eventDefinitionCRFId,
-				allSections, noteThreads);
+		CrfShortcutsAnalyzer crfShortcutsAnalyzer = getCrfShortcutsAnalyzer(request, getItemSDVService(), true);
+		crfShortcutsAnalyzer.prepareDnShortcutLinks(ecb, ifmdao, eventDefinitionCRFId, allSections, noteThreads);
 		logMe("Entering DataEntry Create disc note threads out of the various notes DONE" + System.currentTimeMillis());
 
 		logMe("Entering some EVENT DEF CRF CHECK DONE " + System.currentTimeMillis());
@@ -1364,7 +1364,7 @@ public abstract class DataEntryServlet extends Controller {
 					studySubjectDao.update(ssb);
 				}
 
-				boolean resetItemsToSDV = false;
+				boolean resetSDVForItems = false;
 				if (ecb.isSdvStatus() && changedItemsList.size() > 0) {
 					logger.debug("Status of Study Subject is SDV we are updating");
 					StudySubjectDAO studySubjectDao = new StudySubjectDAO(getDataSource());
@@ -1374,7 +1374,7 @@ public abstract class DataEntryServlet extends Controller {
 					studySubjectDao.update(ssb);
 					ecb.setSdvStatus(false);
 					ecb.setSdvUpdateId(ub.getId());
-					resetItemsToSDV = true;
+					resetSDVForItems = true;
 				}
 
 				ecb = (EventCRFBean) ecdao.update(ecb);
@@ -1419,7 +1419,9 @@ public abstract class DataEntryServlet extends Controller {
 				logger.debug("all items before saving into DB" + allItems.size());
 
 				resetCodedItemTerms(allItems, iddao, ecb, changedItemsList);
-				resetSDVForItems(resetItemsToSDV ? changedItemsList : new ArrayList<DisplayItemBean>(), iddao);
+				if (resetSDVForItems) {
+					getItemSDVService().resetSDVForItems(changedItemsList, ub);
+				}
 
 				for (int i = 0; i < allItems.size(); i++) {
 
@@ -1787,8 +1789,10 @@ public abstract class DataEntryServlet extends Controller {
 								request.setAttribute(INPUT_EVENT_CRF, ecb);
 								request.setAttribute(INPUT_SECTION, previousSec);
 								request.setAttribute(INPUT_SECTION_ID, Integer.toString(previousSec.getId()));
-								request.setAttribute("tabId", Integer.toString(DiscrepancyShortcutsAnalyzer.getTabNum(
-										allSections, previousSec.getId())));
+								request.setAttribute(
+										"tabId",
+										Integer.toString(CrfShortcutsAnalyzer.getTabNum(allSections,
+												previousSec.getId())));
 								forwardPage(getServletPage(request), request, response);
 							}
 						} else if (!fp.getString(GO_NEXT).equals("")) {
@@ -1797,10 +1801,8 @@ public abstract class DataEntryServlet extends Controller {
 								request.setAttribute(INPUT_EVENT_CRF, ecb);
 								request.setAttribute(INPUT_SECTION, nextSec);
 								request.setAttribute(INPUT_SECTION_ID, Integer.toString(nextSec.getId()));
-								request.setAttribute(
-										"tabId",
-										Integer.toString(DiscrepancyShortcutsAnalyzer.getTabNum(allSections,
-												nextSec.getId())));
+								request.setAttribute("tabId",
+										Integer.toString(CrfShortcutsAnalyzer.getTabNum(allSections, nextSec.getId())));
 								forwardPage(getServletPage(request), request, response);
 							}
 						}
@@ -1832,8 +1834,10 @@ public abstract class DataEntryServlet extends Controller {
 								if (!section.isLastSection()) {
 									request.setAttribute(INPUT_SECTION, nextSec);
 									request.setAttribute(INPUT_SECTION_ID, Integer.toString(nextSec.getId()));
-									request.setAttribute("tabId", Integer.toString(DiscrepancyShortcutsAnalyzer
-											.getTabNum(allSections, nextSec.getId())));
+									request.setAttribute(
+											"tabId",
+											Integer.toString(CrfShortcutsAnalyzer.getTabNum(allSections,
+													nextSec.getId())));
 									session.removeAttribute("mayProcessUploading");
 								} else if (section.isLastSection()) {
 									// already the last section, should go back to
@@ -1872,8 +1876,8 @@ public abstract class DataEntryServlet extends Controller {
 					}
 				}
 
-				SubjectEventStatusUtil.determineSubjectEventStates(sedb, ssb, new DAOWrapper(studydao, cvdao, seDao,
-						ssdao, ecdao, edcdao, dndao));
+				SubjectEventStatusUtil.determineSubjectEventStates(sedb, ssb, ub, new DAOWrapper(studydao, cvdao,
+						seDao, ssdao, ecdao, edcdao, dndao));
 			}
 		}
 	}
@@ -2040,18 +2044,6 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		request.getSession().setAttribute(CreateDiscrepancyNoteServlet.TRANSFORMED_SUBMITTED_DNS, transformedDNs);
-	}
-
-	private void resetSDVForItems(ArrayList<DisplayItemBean> changedItemsList, ItemDataDAO iddao) {
-		List<Integer> itemDataList = new ArrayList<Integer>();
-		for (DisplayItemBean dib : changedItemsList) {
-			if (dib.getData() != null && dib.getData().getId() > 0 && dib.getData().isSdv()) {
-				itemDataList.add(dib.getData().getId());
-			}
-		}
-		if (itemDataList.size() > 0) {
-			iddao.sdvItems(itemDataList, false);
-		}
 	}
 
 	private void resetCodedItemTerms(List<DisplayItemWithGroupBean> allItems, ItemDataDAO iddao, EventCRFBean ecrfBean,
@@ -3321,21 +3313,19 @@ public abstract class DataEntryServlet extends Controller {
 			}
 		}
 
-		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = DiscrepancyShortcutsAnalyzer
-				.getDiscrepancyShortcutsAnalyzer(request);
-		discrepancyShortcutsAnalyzer.setSectionTotalItemsToSDV(0);
+		CrfShortcutsAnalyzer crfShortcutsAnalyzer = getCrfShortcutsAnalyzer(request, getItemSDVService());
 
 		ArrayList notes = new ArrayList(discNotes.getNotes(INPUT_INTERVIEWER));
 		notes.addAll(existingNameNotes);
 		noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request,
-				discrepancyShortcutsAnalyzer.getInterviewerDisplayItemBean(), noteThreads, false);
+		crfShortcutsAnalyzer.prepareDnShortcutAnchors(crfShortcutsAnalyzer.getInterviewerDisplayItemBean(),
+				noteThreads, false);
 
 		notes = new ArrayList(discNotes.getNotes(INPUT_INTERVIEW_DATE));
 		notes.addAll(existingIntrvDateNotes);
 		noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request,
-				discrepancyShortcutsAnalyzer.getInterviewDateDisplayItemBean(), noteThreads, false);
+		crfShortcutsAnalyzer.prepareDnShortcutAnchors(crfShortcutsAnalyzer.getInterviewDateDisplayItemBean(),
+				noteThreads, false);
 
 		setToolTipEventNotes(request);
 
@@ -3418,7 +3408,7 @@ public abstract class DataEntryServlet extends Controller {
 						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(request, dndao, itemDataId,
 								discNotes.getNotes(inputName)));
 						dib = setTotals(dib, itemDataId, toolTipDNotes, parentNotes, notes, ecb.getId(), request);
-						DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads, false);
+						crfShortcutsAnalyzer.prepareDnShortcutAnchors(dib, noteThreads, false);
 						logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId()
 								+ " " + inputName);
 						items.set(j, dib);
@@ -3454,7 +3444,7 @@ public abstract class DataEntryServlet extends Controller {
 				dib = setTotals(dib, itemDataId, toolTipDNotes, parentNotes, discNotes.getNotes(inputFieldName),
 						ecb.getId(), request);
 				noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
-				DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads, false);
+				crfShortcutsAnalyzer.prepareDnShortcutAnchors(dib, noteThreads, false);
 
 				ArrayList childItems = dib.getChildren();
 
@@ -3486,7 +3476,7 @@ public abstract class DataEntryServlet extends Controller {
 							discNotes.getNotes(childInputFieldName)));
 					child = setTotals(child, childItemDataId, toolTipChildDNotes, parentChildNotes,
 							discNotes.getNotes(childInputFieldName), ecb.getId(), request);
-					DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, child, noteThreads, false);
+					crfShortcutsAnalyzer.prepareDnShortcutAnchors(child, noteThreads, false);
 					childItems.set(j, child);
 				}
 				dib.setChildren(childItems);

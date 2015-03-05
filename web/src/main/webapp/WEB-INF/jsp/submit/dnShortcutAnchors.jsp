@@ -4,7 +4,7 @@
 <c:set var="itemId" value="${param.itemId}" />
 <c:set var="rowCount" value="${param.rowCount}" />
 <c:set var="inputName" value="${param.inputName}" />
-<c:set var="di" value="${inputName == 'interviewer' ? discrepancyShortcutsAnalyzer.interviewerDisplayItemBean : (inputName == 'interviewDate' ? discrepancyShortcutsAnalyzer.interviewDateDisplayItemBean : displayItem)}" />
+<c:set var="di" value="${inputName == 'interviewer' ? crfShortcutsAnalyzer.interviewerDisplayItemBean : (inputName == 'interviewDate' ? crfShortcutsAnalyzer.interviewDateDisplayItemBean : displayItem)}" />
 
 <c:set var="dnShortcutAnchorsId" value="${inputName == 'interviewer' || inputName == 'interviewDate' ? inputName : displayItem.item.id}"/>
 

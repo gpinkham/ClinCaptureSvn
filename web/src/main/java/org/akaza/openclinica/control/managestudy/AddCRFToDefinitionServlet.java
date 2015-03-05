@@ -20,6 +20,14 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -40,13 +48,6 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.CRFRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Processes request to add new CRFs info study event definition.
@@ -231,7 +232,7 @@ public class AddCRFToDefinitionServlet extends Controller {
 				edcBean.setOrdinal(++ordinalForNewCRF);
 				edcBean.setVersions(crf.getVersions());
 				SourceDataVerification.fillSDVStatuses(edcBean.getSdvOptions(),
-						itemFormMetadataDao.hasItemsToSDV(crf.getId()));
+						getItemSDVService().hasItemsToSDV(crf.getId()));
 				CRFVersionBean defaultVersion1 = (CRFVersionBean) vdao.findByPK(edcBean.getDefaultVersionId());
 				edcBean.setDefaultVersionName(defaultVersion1.getName());
 

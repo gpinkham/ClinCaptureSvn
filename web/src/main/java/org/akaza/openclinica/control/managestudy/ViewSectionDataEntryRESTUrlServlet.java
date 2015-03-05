@@ -61,7 +61,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
@@ -69,7 +68,6 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
@@ -164,7 +162,6 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		SectionDAO sdao = new SectionDAO(getDataSource());
-		ItemDataDAO itemDataDao = getItemDataDAO();
 		String age = "";
 		if (crfVersionId == 0 && eventCRFId == 0) {
 			addPageMessage(respage.getString("please_choose_a_CRF_to_view"), request);
@@ -210,7 +207,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
 			List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, itemDataDao, ifmdao,
+
+			getCrfShortcutsAnalyzer(request, getItemSDVService(), true).prepareDnShortcutLinks(ecb, ifmdao,
 					eventDefinitionCRFId, allSections, noteThreads);
 
 			DisplayTableOfContentsBean displayBean = getDisplayBean(ecb);

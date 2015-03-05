@@ -1221,12 +1221,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	 *
 	 * @param eventCrfId
 	 *            int
+	 * @param userId
+	 *            user id
 	 * @param sdv
 	 *            boolean
 	 * @return boolean
 	 */
-	public boolean sdvCrfItems(int eventCrfId, boolean sdv) {
-		return sdvCrfItems(eventCrfId, sdv, null);
+	public boolean sdvCrfItems(int eventCrfId, int userId, boolean sdv) {
+		return sdvCrfItems(eventCrfId, userId, sdv, null);
 	}
 
 	/**
@@ -1234,13 +1236,15 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	 * 
 	 * @param eventCrfId
 	 *            int
+	 * @param userId
+	 *            user id
 	 * @param sdv
 	 *            boolean
 	 * @param con
 	 *            Connection
 	 * @return boolean
 	 */
-	public boolean sdvCrfItems(int eventCrfId, boolean sdv, Connection con) {
+	public boolean sdvCrfItems(int eventCrfId, int userId, boolean sdv, Connection con) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 
@@ -1248,6 +1252,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		HashMap variables = new HashMap();
 		int ind = 1;
 		variables.put(ind++, sdv);
+		variables.put(ind++, userId);
 		variables.put(ind, eventCrfId);
 
 		execute(digester.getQuery("sdvCrfItems"), variables, nullVars, con);
@@ -1256,13 +1261,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Returns the item data map of the SDV required items.
+	 * Returns list of items that are required to be SDV.
 	 * 
 	 * @param eventCrfId
 	 *            int
 	 * @return Map
 	 */
-	public List<DisplayItemBean> getMapItemsToSDV(int eventCrfId) {
+	public List<DisplayItemBean> getListOfItemsToSDV(int eventCrfId) {
 		List<DisplayItemBean> result = new ArrayList<DisplayItemBean>();
 		setTypesExpected();
 		int ind = INT_13;
@@ -1301,16 +1306,20 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	 * 
 	 * @param itemDataIds
 	 *            List<Integer>
+	 * @param userId
+	 *            user id
 	 * @param sdv
 	 *            boolean
 	 * @return boolean
 	 */
-	public boolean sdvItems(List<Integer> itemDataIds, boolean sdv) {
+	public boolean sdvItems(List<Integer> itemDataIds, int userId, boolean sdv) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(1, sdv);
+		int ind = 1;
+		variables.put(ind++, sdv);
+		variables.put(ind, userId);
 
 		execute(digester.getQuery("sdvItems").concat(" ")
 				.concat(itemDataIds.toString().replace("[", "(").replace("]", ")")), variables);

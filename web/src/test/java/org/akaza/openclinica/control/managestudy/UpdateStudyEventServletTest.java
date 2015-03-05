@@ -1,6 +1,13 @@
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.SessionUtil;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -23,8 +30,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.util.DAOWrapper;
-import org.akaza.openclinica.util.SignUtil;
 import org.akaza.openclinica.util.StudyEventDefinitionUtil;
 import org.akaza.openclinica.view.Page;
 import org.junit.Before;
@@ -41,18 +46,14 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SessionUtil;
+import com.clinovo.util.SignUtil;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ Status.class, ResourceBundleProvider.class, UpdateStudyEventServlet.class, FormProcessor.class,
+@PrepareForTest({Status.class, ResourceBundleProvider.class, UpdateStudyEventServlet.class, FormProcessor.class,
 		StudySubjectDAO.class, SignUtil.class, DAOWrapper.class, StudyEventDefinitionDAO.class, EventCRFDAO.class,
-		StudyEventDefinitionUtil.class })
+		StudyEventDefinitionUtil.class})
 public class UpdateStudyEventServletTest {
 
 	@Mock

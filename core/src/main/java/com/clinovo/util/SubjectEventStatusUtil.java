@@ -10,8 +10,14 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
+package com.clinovo.util;
 
-package org.akaza.openclinica.util;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -26,17 +32,12 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import org.akaza.openclinica.util.SignedData;
 
 /**
  * SubjectEventStatusUtil class.
  */
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({"unchecked", "unused"})
 public final class SubjectEventStatusUtil {
 
 	private static HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>();
@@ -120,12 +121,13 @@ public final class SubjectEventStatusUtil {
 					url.append("<img src='")
 							.append(imageIconPaths.get(subjectEventStatus.getId()))
 							.append("' border='0' style='position: relative;' title=\"")
-							.append(currentStudy.getStatus() != Status.AVAILABLE && subjectEventStatus.isNotScheduled() ? resword
-									.getString("message_for_not_scheduled_event_if_study_is_not_available") : "")
+							.append(currentStudy.getStatus() != Status.AVAILABLE && subjectEventStatus.isNotScheduled()
+									? resword.getString("message_for_not_scheduled_event_if_study_is_not_available")
+									: "")
 							.append("\" alt=\"")
-							.append(currentStudy.getStatus() != Status.AVAILABLE && subjectEventStatus.isNotScheduled() ? resword
-									.getString("message_for_not_scheduled_event_if_study_is_not_available") : "")
-							.append("\">");
+							.append(currentStudy.getStatus() != Status.AVAILABLE && subjectEventStatus.isNotScheduled()
+									? resword.getString("message_for_not_scheduled_event_if_study_is_not_available")
+									: "").append("\">");
 				} else {
 					url.delete(0, url.length());
 					url.append("<img src='' border='0' style='position: relative; display: none;'>");
@@ -244,13 +246,15 @@ public final class SubjectEventStatusUtil {
 	 *            StudyEventDefinitionBean
 	 * @param ss
 	 *            StudySubjectBean
+	 * @param userAccountBean
+	 *            UserAccountBean
 	 * @param daoWrapper
 	 *            DAOWrapper
 	 */
 	public static void determineSubjectEventStates(StudyEventDefinitionBean sed, StudySubjectBean ss,
-			DAOWrapper daoWrapper) {
+			UserAccountBean userAccountBean, DAOWrapper daoWrapper) {
 		List<StudyEventBean> studyEvents = daoWrapper.getSedao().findAllByDefinitionAndSubject(sed, ss);
-		determineSubjectEventStates(studyEvents, daoWrapper, null);
+		determineSubjectEventStates(studyEvents, userAccountBean, daoWrapper, null);
 	}
 
 	/**
@@ -258,15 +262,19 @@ public final class SubjectEventStatusUtil {
 	 * 
 	 * @param studyEvents
 	 *            List<StudyEventBean>
+	 * @param userAccountBean
+	 *            UserAccountBean
 	 * @param daoWrapper
 	 *            DAOWrapper
 	 * @param signStateRestorer
 	 *            SignStateRestorer
 	 */
-	public static void determineSubjectEventStates(List<StudyEventBean> studyEvents, DAOWrapper daoWrapper,
-			SignStateRestorer signStateRestorer) {
+	public static void determineSubjectEventStates(List<StudyEventBean> studyEvents, UserAccountBean userAccountBean,
+			DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
 		for (StudyEventBean studyEventBean : studyEvents) {
 			determineSubjectEventState(studyEventBean, daoWrapper, signStateRestorer);
+			studyEventBean.setUpdater(userAccountBean);
+			studyEventBean.setUpdatedDate(new Date());
 			daoWrapper.getSedao().update(studyEventBean);
 		}
 	}
@@ -310,29 +318,31 @@ public final class SubjectEventStatusUtil {
 	private static void setSubjectEventState(StudyEventBean studyEventBean, StudyBean studyBean, DAOWrapper daoWrapper,
 			State state) {
 		switch (state) {
-		case DES:
-			studyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
-			break;
-		case DEC:
-			SubjectEventStatus status = SubjectEventStatus.COMPLETED;
-			if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SIGNED) {
-				status = SignUtil.permitSign(studyEventBean, studyBean, daoWrapper) ? SubjectEventStatus.SIGNED
-						: status;
-			}
-			studyEventBean.setSubjectEventStatus(status);
-			break;
-		case SDV:
-			status = SubjectEventStatus.SOURCE_DATA_VERIFIED;
-			if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SIGNED) {
-				status = SignUtil.permitSign(studyEventBean, studyBean, daoWrapper) ? SubjectEventStatus.SIGNED
-						: status;
-			}
-			studyEventBean.setSubjectEventStatus(status);
-			break;
-		case DENS:
-			studyEventBean.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
-			break;
-		default:
+			case DES :
+				studyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+				break;
+			case DEC :
+				SubjectEventStatus status = SubjectEventStatus.COMPLETED;
+				if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SIGNED) {
+					status = SignUtil.permitSign(studyEventBean, studyBean, daoWrapper)
+							? SubjectEventStatus.SIGNED
+							: status;
+				}
+				studyEventBean.setSubjectEventStatus(status);
+				break;
+			case SDV :
+				status = SubjectEventStatus.SOURCE_DATA_VERIFIED;
+				if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SIGNED) {
+					status = SignUtil.permitSign(studyEventBean, studyBean, daoWrapper)
+							? SubjectEventStatus.SIGNED
+							: status;
+				}
+				studyEventBean.setSubjectEventStatus(status);
+				break;
+			case DENS :
+				studyEventBean.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+				break;
+			default :
 		}
 	}
 

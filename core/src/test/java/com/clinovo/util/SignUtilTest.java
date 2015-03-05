@@ -1,4 +1,9 @@
-package org.akaza.openclinica.util;
+package com.clinovo.util;
+
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -18,11 +23,6 @@ import org.akaza.openclinica.domain.SourceDataVerification;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * SignUtilTest class.

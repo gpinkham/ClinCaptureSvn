@@ -13,7 +13,11 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.service.impl.EventCRFServiceImpl;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -25,9 +29,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.util.DAOWrapper;
-import org.akaza.openclinica.util.SignStateRestorer;
-import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,12 +47,12 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockRequestDispatcher;
 import org.springframework.mock.web.MockServletContext;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.service.impl.EventCRFServiceImpl;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SignStateRestorer;
+import com.clinovo.util.SubjectEventStatusUtil;
 
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({"unchecked"})
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SubjectEventStatusUtil.class, ResourceBundleProvider.class})
 public class UpdateEventDefinitionServletTest {
@@ -94,7 +95,8 @@ public class UpdateEventDefinitionServletTest {
 	public void beforeTestCaseRun() throws Exception {
 
 		// setting up servlet context
-		Mockito.when(mockedServletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(mockedRequestDispatcher);
+		Mockito.when(mockedServletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(
+				mockedRequestDispatcher);
 		request = new MockHttpServletRequest();
 		MockHttpSession session = new MockHttpSession();
 		request.setSession(session);
@@ -122,14 +124,15 @@ public class UpdateEventDefinitionServletTest {
 		ResourceBundle workflowBundle = ResourceBundleProvider.getWorkflowBundle(locale);
 		ResourceBundle resFormat = ResourceBundleProvider.getFormatBundle();
 		PowerMockito.mockStatic(ResourceBundleProvider.class);
-		PowerMockito.when(ResourceBundleProvider.getWorkflowBundle(Mockito.any(Locale.class))).thenReturn(workflowBundle);
+		PowerMockito.when(ResourceBundleProvider.getWorkflowBundle(Mockito.any(Locale.class))).thenReturn(
+				workflowBundle);
 		PowerMockito.when(ResourceBundleProvider.getFormatBundle(Mockito.any(Locale.class))).thenReturn(resFormat);
 
 		PowerMockito.mockStatic(SubjectEventStatusUtil.class);
 
 		// setting up DAO mocks
-		Mockito.when(mockedStudyEventDefinitionDAO.findReferenceVisitBeans())
-				.thenReturn(new ArrayList<StudyEventDefinitionBean>());
+		Mockito.when(mockedStudyEventDefinitionDAO.findReferenceVisitBeans()).thenReturn(
+				new ArrayList<StudyEventDefinitionBean>());
 
 		// setting up spied UpdateEventDefinitionServlet
 		Whitebox.setInternalState(spyUpdateEventDefinitionServlet, "respage", resPage);
@@ -137,7 +140,8 @@ public class UpdateEventDefinitionServletTest {
 		Mockito.doReturn(currentUser).when(spyUpdateEventDefinitionServlet).getUserAccountBean(request);
 		Mockito.doReturn(mockedStudyDAO).when(spyUpdateEventDefinitionServlet).getStudyDAO();
 		Mockito.doReturn(mockedStudyEventDAO).when(spyUpdateEventDefinitionServlet).getStudyEventDAO();
-		Mockito.doReturn(mockedStudyEventDefinitionDAO).when(spyUpdateEventDefinitionServlet).getStudyEventDefinitionDAO();
+		Mockito.doReturn(mockedStudyEventDefinitionDAO).when(spyUpdateEventDefinitionServlet)
+				.getStudyEventDefinitionDAO();
 		Mockito.doReturn(mockedEventDefinitionCRFDAO).when(spyUpdateEventDefinitionServlet).getEventDefinitionCRFDAO();
 		Mockito.doReturn(mockedEventCRFService).when(spyUpdateEventDefinitionServlet).getEventCRFService();
 	}
@@ -179,13 +183,14 @@ public class UpdateEventDefinitionServletTest {
 		Mockito.verify(mockedEventDefinitionCRFDAO).update(parentEventDefinitionCRF);
 		Mockito.verify(mockedEventCRFService).removeEventCRFsByEventDefinitionCRF(testStudyEventDefinition.getOid(),
 				testCRF.getOid(), currentUser);
-		Mockito.verify(mockedEventCRFService, Mockito.never()).restoreEventCRFsByEventDefinitionCRF(testStudyEventDefinition.getOid(),
-				testCRF.getOid(), currentUser);
+		Mockito.verify(mockedEventCRFService, Mockito.never()).restoreEventCRFsByEventDefinitionCRF(
+				testStudyEventDefinition.getOid(), testCRF.getOid(), currentUser);
 		Mockito.verify(mockedEventDefinitionCRFDAO).update(childEventDefinitionCRF);
 
 		PowerMockito.verifyStatic();
-		SubjectEventStatusUtil.determineSubjectEventStates(Mockito.any(ArrayList.class), Mockito.any(DAOWrapper.class),
-				Mockito.any(SignStateRestorer.class));
+		SubjectEventStatusUtil
+				.determineSubjectEventStates(Mockito.any(ArrayList.class), Mockito.any(UserAccountBean.class),
+						Mockito.any(DAOWrapper.class), Mockito.any(SignStateRestorer.class));
 
 		List<String> pageMessages = (List<String>) request.getAttribute("pageMessages");
 		Assert.assertTrue(pageMessages.contains(resPage.getString("the_ED_has_been_updated_succesfully")));
@@ -231,13 +236,14 @@ public class UpdateEventDefinitionServletTest {
 		Mockito.verify(mockedEventDefinitionCRFDAO).update(parentEventDefinitionCRF);
 		Mockito.verify(mockedEventCRFService).restoreEventCRFsByEventDefinitionCRF(testStudyEventDefinition.getOid(),
 				testCRF.getOid(), currentUser);
-		Mockito.verify(mockedEventCRFService, Mockito.never()).removeEventCRFsByEventDefinitionCRF(testStudyEventDefinition.getOid(),
-				testCRF.getOid(), currentUser);
+		Mockito.verify(mockedEventCRFService, Mockito.never()).removeEventCRFsByEventDefinitionCRF(
+				testStudyEventDefinition.getOid(), testCRF.getOid(), currentUser);
 		Mockito.verify(mockedEventDefinitionCRFDAO).update(childEventDefinitionCRF);
 
 		PowerMockito.verifyStatic();
-		SubjectEventStatusUtil.determineSubjectEventStates(Mockito.any(ArrayList.class), Mockito.any(DAOWrapper.class),
-				Mockito.any(SignStateRestorer.class));
+		SubjectEventStatusUtil
+				.determineSubjectEventStates(Mockito.any(ArrayList.class), Mockito.any(UserAccountBean.class),
+						Mockito.any(DAOWrapper.class), Mockito.any(SignStateRestorer.class));
 
 		List<String> pageMessages = (List<String>) request.getAttribute("pageMessages");
 		Assert.assertTrue(pageMessages.contains(resPage.getString("the_ED_has_been_updated_succesfully")));

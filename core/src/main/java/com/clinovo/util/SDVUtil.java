@@ -10,8 +10,10 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
+package com.clinovo.util;
 
-package org.akaza.openclinica.util;
+import java.util.ArrayList;
+import java.util.Map;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -21,9 +23,6 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * SDVUtil.

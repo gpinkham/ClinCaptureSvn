@@ -67,13 +67,14 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.service.rule.RuleSetService;
-import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.ImportSummaryInfo;
-import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system and what is not.
@@ -405,7 +406,7 @@ public class VerifyImportedCRFDataServlet extends Controller {
 							}
 
 							ecdao.update(eventCrfBean, con);
-							itemDataDao.sdvCrfItems(eventCrfBean.getId(), false, con);
+							getItemSDVService().sdvCrfItems(eventCrfBean.getId(), ub.getId(), false, con);
 						}
 
 						for (int studyEventId : studyEventIds) {

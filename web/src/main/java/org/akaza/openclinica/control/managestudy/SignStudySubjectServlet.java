@@ -13,6 +13,18 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.StudyEventAuditBean;
@@ -54,29 +66,19 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import org.akaza.openclinica.util.DAOWrapper;
-import org.akaza.openclinica.util.SignUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SignUtil;
 
 /**
  * Handles signing of subject casebook.
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class SignStudySubjectServlet extends Controller {
 
@@ -279,9 +281,9 @@ public class SignStudySubjectServlet extends Controller {
 		table.setSortingIfNotExplicitlySet(1, false); // sort by start date,
 		// desc
 		ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
-		String[] columns = { resword.getString("event") + " (" + resword.getString("occurrence_number") + ")",
+		String[] columns = {resword.getString("event") + " (" + resword.getString("occurrence_number") + ")",
 				resword.getString("start_date1"), resword.getString("location"), resword.getString("status"),
-				resword.getString("actions"), resword.getString("CRFs_atrib") };
+				resword.getString("actions"), resword.getString("CRFs_atrib")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(four);
 		table.hideColumnLink(five);

@@ -13,7 +13,16 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.ValidatorHelper;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -43,14 +52,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * The servlet for creating sub study of user's current active study.
@@ -721,7 +723,7 @@ public class CreateSubStudyServlet extends Controller {
 					}
 					edcBean.setSelectedVersionIdList(idList);
 					SourceDataVerification.fillSDVStatuses(edcBean.getSdvOptions(),
-							itemFormMetadataDao.hasItemsToSDV(crf.getId()));
+							getItemSDVService().hasItemsToSDV(crf.getId()));
 					defCrfs.add(edcBean);
 				}
 			}

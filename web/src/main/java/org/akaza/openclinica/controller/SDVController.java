@@ -13,7 +13,17 @@
 
 package org.akaza.openclinica.controller;
 
-import com.clinovo.util.SessionUtil;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -30,15 +40,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import com.clinovo.service.ItemSDVService;
+import com.clinovo.util.SessionUtil;
 
 /**
  * Implement the functionality for displaying a table of Event CRFs for Source Data Verification. This is an autowired,
@@ -55,6 +58,9 @@ public class SDVController {
 
 	@Autowired
 	private SubjectIdSDVFactory sdvFactory;
+
+	@Autowired
+	private ItemSDVService itemSDVService;
 
 	/**
 	 * Method that handles requests to viewSubjectAggregate url.
@@ -228,7 +234,7 @@ public class SDVController {
 			request.setAttribute("pageMessages", pageMessages);
 		} else {
 			List<Integer> eventCRFIds = sdvUtil.getListOfSdvEventCRFIds(parameterMap.keySet());
-			boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), true);
+			boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request), true, itemSDVService);
 
 			if (updateCRFs) {
 				pageMessages.add(resPageMessages.getString("event_crf_sdved"));
@@ -273,7 +279,7 @@ public class SDVController {
 
 		List<Integer> eventCRFIds = new ArrayList<Integer>();
 		eventCRFIds.add(crfId);
-		boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), true);
+		boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request), true, itemSDVService);
 
 		if (updateCRFs) {
 			pageMessages.add(resPageMessages.getString("event_crf_sdved"));
@@ -312,7 +318,7 @@ public class SDVController {
 
 		List<Integer> eventCRFIds = new ArrayList<Integer>();
 		eventCRFIds.add(crfId);
-		boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), false);
+		boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request), false, itemSDVService);
 
 		if (updateCRFs) {
 			pageMessages.add(resPageMessages.getString("unset_event_crf_sdv"));
@@ -350,8 +356,8 @@ public class SDVController {
 
 		List<Integer> studySubjectIds = new ArrayList<Integer>();
 		studySubjectIds.add(studySubjectId);
-		boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(),
-				isSdvWithOpenQueriesAllowed(request), true);
+		boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request),
+				isSdvWithOpenQueriesAllowed(request), true, itemSDVService);
 
 		if (updateCRFs) {
 			pageMessages.add(resPageMessages.getString("subject_sdved"));
@@ -388,8 +394,8 @@ public class SDVController {
 		List<Integer> studySubjectIds = new ArrayList<Integer>();
 
 		studySubjectIds.add(studySubjectId);
-		boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(),
-				true, false);
+		boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request), true,
+				false, itemSDVService);
 
 		if (updateCRFs) {
 			pageMessages.add(resPageMessages.getString("unset_event_crf_sdv"));
@@ -445,8 +451,8 @@ public class SDVController {
 		} else {
 
 			List<Integer> studySubjectIds = sdvUtil.getListOfStudySubjectIds(parameterMap.keySet());
-			boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(),
-					isSdvWithOpenQueriesAllowed(request), true);
+			boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request),
+					isSdvWithOpenQueriesAllowed(request), true, itemSDVService);
 
 			if (updateCRFs) {
 				pageMessages.add(resPageMessages.getString("event_crf_sdved"));
