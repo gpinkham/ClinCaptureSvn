@@ -93,7 +93,12 @@
           <br/><img src="<c:url value='${systemProperty.value}'/>"/>
         </c:when>
         <c:when test="${systemProperty.type eq 'COMBOBOX'}">
-            <form:select multiple="false" style="width: ${systemProperty.size}px;" path="${paramPath}.systemProperties['${spStatus.index}'].value" items="${fn:split(systemProperty.typeValues, ',')}" class="formfieldXL" cssErrorClass="inputError" disabled="${access ne 'WRITE' ? 'true' : 'false'}"/>
+            <form:select multiple="false" style="width: ${systemProperty.size}px;" path="${paramPath}.systemProperties['${spStatus.index}'].value" class="formfieldXL" cssErrorClass="inputError" disabled="${access ne 'WRITE' ? 'true' : 'false'}">
+                <c:forEach items="${fn:split(systemProperty.typeValues, ',')}" var="itemValue">
+                    <spring:message code="${systemProperty.name}.${itemValue}.translation" var="itemLabel" text="${itemValue}"/>
+                    <option value="${itemValue}" ${itemValue == systemProperty.value ? "selected" : ""}>${itemLabel}</option>
+                </c:forEach>
+            </form:select>
         </c:when>
       </c:choose>
     </div>

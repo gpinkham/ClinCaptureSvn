@@ -26,8 +26,12 @@
         <c:when test="${systemProperty.type eq 'PASSWORD'}">
           <td>********************</td>
         </c:when>
-        <c:when test="${systemProperty.type eq 'TEXT' || systemProperty.type eq 'COMBOBOX' || systemProperty.type eq 'DYNAMIC_INPUT'}">
+        <c:when test="${systemProperty.type eq 'TEXT' || systemProperty.type eq 'DYNAMIC_INPUT'}">
           <td>${systemProperty.value}</td>
+        </c:when>
+        <c:when test="${systemProperty.type eq 'COMBOBOX'}">
+            <spring:message code="${systemProperty.name}.${systemProperty.value}.translation" var="systemPropertyValue" text="${systemProperty.value}"/>
+            <td>${systemPropertyValue}</td>
         </c:when>
         <c:when test="${(systemProperty.type eq 'RADIO' || systemProperty.type eq 'DYNAMIC_RADIO') && (systemProperty.value ne null and not empty systemProperty.value)}">
           <td><fmt:message key="systemProperty.${systemProperty.name}.${systemProperty.value}.radioLabel"
