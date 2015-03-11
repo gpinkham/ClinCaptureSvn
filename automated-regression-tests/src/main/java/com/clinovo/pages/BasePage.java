@@ -20,6 +20,15 @@ public class BasePage extends AbstractPage {
 	@FindBy(jquery = "a[href$='ListUserAccounts']")
     private WebElementFacade lUsers;
 	
+	@FindBy(jquery = "a[href$='ChangeStudy']")
+    private WebElementFacade lChangeStudy;
+	
+	@FindBy(jquery = "a[href*='ViewSite']")
+    private WebElementFacade lCurrentSite;
+	
+	@FindBy(jquery = "a[href*='ViewStudy']")
+    private WebElementFacade lCurrentStudy;
+	
     @FindBy(linkText="Rules")
     private WebElementFacade lRules;
 
@@ -118,5 +127,17 @@ public class BasePage extends AbstractPage {
 	@Override
 	public boolean isOnPage(WebDriver driver) {
 		return false;
+	}
+
+	public void clickChangeStudy() {
+		lChangeStudy.click();
+	}
+
+	public String getCurrentStudyName() {
+		if (lCurrentSite.isCurrentlyVisible()) {
+			return lCurrentSite.getText();
+		} else {
+			return lCurrentStudy.getText();
+		}
 	}
 }

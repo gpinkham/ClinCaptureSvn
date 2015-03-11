@@ -18,7 +18,7 @@ public class CreateStudyEventDefinitionPage extends BasePage {
 	public static final String PAGE_NAME = "Create Study Event Definition page";
 	public static final String PAGE_URL = "DefineStudyEvent?actionName=init";
 	
-	@FindBy(jquery = "form")
+	@FindBy(jquery = "form[action='DefineStudyEvent']")
     private WebElementFacade formWithData;
 	
 	@FindBy(name = "name")
@@ -45,10 +45,10 @@ public class CreateStudyEventDefinitionPage extends BasePage {
 	@FindBy(name = "emailUser")
     private WebElementFacade iUserName;
 	
-	@FindBy(id = "isReference")
+	@FindBy(name = "isReference")
     private WebElementFacade chReferenceEvent; 
 	
-	@FindBy(id = "type")
+	@FindBy(name = "type")
     private WebElementFacade sType;
 	
     private RadioButtonGroup rRepeating;
@@ -59,7 +59,8 @@ public class CreateStudyEventDefinitionPage extends BasePage {
 
     @Override
 	public boolean isOnPage(WebDriver driver) {
-    	return (driver.getCurrentUrl().indexOf(PAGE_URL) > -1);
+    	return ((driver.getCurrentUrl().indexOf(PAGE_URL) > -1) || 
+    			(driver.getCurrentUrl().indexOf("DefineStudyEvent") > -1 && formWithData.isCurrentlyVisible()));
 	} 
     
     private void fillReferenceEvent(String string) {
@@ -68,7 +69,11 @@ public class CreateStudyEventDefinitionPage extends BasePage {
 
 	private void fillRepeating(String value) {
 		rRepeating = new RadioButtonGroup(formWithData.findElements(By.name("repeating")));
-		rRepeating.selectByValue(value);
+		if ("Yes".equalsIgnoreCase(value)) {		
+			rRepeating.selectByValue("1");
+		} else {
+			rRepeating.selectByValue("0");
+		}
 	}
 
 	public void fillInStudyEventDefinitionPage(StudyEventDefinition event) {
@@ -76,23 +81,26 @@ public class CreateStudyEventDefinitionPage extends BasePage {
 		iStEventDefName.type(event.getName());
 
 		iDescription.type(event.getDescription());
-
-		iCategory.type(event.getCategory());
-		
-		iDaySchedule.type(event.getDaySchedule());
-
-		iDayMax.type(event.getDayMax());
-
-		iDayMin.type(event.getDayMin());
-		
-		iDayEmail.type(event.getDayEmail());
-
-		iUserName.type(event.getUserName());
-		
-		fillReferenceEvent(event.getReferenceEvent());
 		
 		sType.selectByValue(StudyEventDefinition.convertTypeNameToTypeValue(event.getType()));
+		
+		iCategory.type(event.getCategory());	
 
 		fillRepeating(event.getRepeating());
+		
+		if (event.getType().equals("Calendared")) { 
+			
+			fillReferenceEvent(event.getReferenceEvent());
+		
+			iDaySchedule.type(event.getDaySchedule());
+
+			iDayMax.type(event.getDayMax());
+
+			iDayMin.type(event.getDayMin());
+		
+			iDayEmail.type(event.getDayEmail());
+
+			iUserName.type(event.getUserName());
+		}
 	}
 }

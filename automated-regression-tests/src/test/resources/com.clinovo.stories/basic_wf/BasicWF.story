@@ -179,4 +179,19 @@ When User changes old password to new
 Then User is on Home page
 
 
+Scenario: 11. Root uploads CRFs
 
+Given User logs in as Root
+And User goes to Build Study page
+And User clicks 'Add CRF' button
+And User browses file on Create a New CRF page: <filepath>
+And User clicks 'Continue' button on Create a New CRF page
+And User is on Preview CRF page
+When User clicks 'Submit' button
+Then User is on Create a New CRF Version - Data Committed Successfully page
+Examples:
+{scope=Scenario}
+|filepath                                                |
+|.\\src\\test\\resources\\eCRFs\\CRF_w_basic_fields_1.xls|
+|.\\src\\test\\resources\\eCRFs\\CRF_w_file_1.xls        |
+|.\\src\\test\\resources\\eCRFs\\CRF_w_group_1.xlsx       |

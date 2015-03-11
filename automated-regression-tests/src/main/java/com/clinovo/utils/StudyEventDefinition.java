@@ -30,7 +30,7 @@ public class StudyEventDefinition {
     
     private String repeating = "";
     
-    private List<String> aCRFList = new ArrayList<String>();
+    private List<String> eCRFs = new ArrayList<String>();
 
     public static StudyEventDefinition fillStudyEventDefinitionFromTableRow(
 			Map<String, String> row) {
@@ -66,19 +66,19 @@ public class StudyEventDefinition {
     	}
     	
     	if (row.get("Day Max") != null) {
-			event.setType(row.get("Day Max"));
+			event.setDayMax(row.get("Day Max"));
     	}
 		
     	if (row.get("Day Min") != null) {
-			event.setCategory(row.get("Day Min"));
+			event.setDayMin(row.get("Day Min"));
     	}
     	
     	if (row.get("Day Email") != null) {
-    		event.setRepeating(row.get("Day Email"));
+    		event.setDayEmail(row.get("Day Email"));
     	}
     	
     	if (row.get("User Name") != null) {
-    		event.setRepeating(row.get("User Name"));
+    		event.setUserName(row.get("User Name"));
     	}
     	
     	if (row.get("CRFs") != null) {
@@ -177,11 +177,11 @@ public class StudyEventDefinition {
 	}
 
 	public List<String> getCRFList() {
-		return aCRFList;
+		return eCRFs;
 	}
 
-	public void setCRFList(List<String> aCRFList) {
-		this.aCRFList = aCRFList;
+	public void setCRFList(List<String> eCRFs) {
+		this.eCRFs = eCRFs;
 	}
 	
 	public static String convertTypeNameToTypeValue(String typeName) {
@@ -200,9 +200,9 @@ public class StudyEventDefinition {
 		}		
 	}
 	
-	public static List<String> generateCRFList(String str) {
+	public static List<String> generateCRFList(String eCRFs) {
 		List<String> result = new ArrayList<String>();
-		for (String crf: str.split(", ")){
+		for (String crf: eCRFs.split(", ")){
 			result.add(crf);
 		}
 		

@@ -14,6 +14,9 @@ import net.thucydides.core.pages.Pages;
 import net.thucydides.core.steps.ScenarioSteps;
 import static org.fest.assertions.Assertions.assertThat;
 
+/**
+ * Created by Anton on 01.07.2014.
+ */
 public class CommonSteps extends ScenarioSteps {
 
     /**
@@ -43,6 +46,8 @@ public class CommonSteps extends ScenarioSteps {
 	protected DefineStudyEventSelectCRFsPage aDefineStudyEventSelectCRFsPage = getPages().get(DefineStudyEventSelectCRFsPage.class);
 	protected DefineStudyEventSelectedCRFsPage aDefineStudyEventSelectedCRFsPage = getPages().get(DefineStudyEventSelectedCRFsPage.class);
 	protected ConfirmEventDefinitionCreationPage aConfirmEventDefinitionCreationPage = getPages().get(ConfirmEventDefinitionCreationPage.class);
+	protected ChangeStudyPage aChangeStudyPage = getPages().get(ChangeStudyPage.class);
+	protected ConfirmChangeStudyPage aConfirmChangeStudyPage = getPages().get(ConfirmChangeStudyPage.class);
 
 	
     private LoginPage aLoginPage = getPages().get(LoginPage.class);
@@ -164,6 +169,10 @@ public class CommonSteps extends ScenarioSteps {
 			return aDefineStudyEventSelectedCRFsPage;	
 		case ConfirmEventDefinitionCreationPage.PAGE_NAME: 
 			return aConfirmEventDefinitionCreationPage;		
+		case ChangeStudyPage.PAGE_NAME: 
+			return aChangeStudyPage;	
+		case ConfirmChangeStudyPage.PAGE_NAME: 
+			return aConfirmChangeStudyPage;
 			
 		default: ;
     	}
@@ -242,16 +251,21 @@ public class CommonSteps extends ScenarioSteps {
 				go_to_configure_system_properties_page();
 				break;
 			case UpdateStudyDetailsPage.PAGE_NAME: 
-				go_to_update_study_details();
+				go_to_update_study_details_page();
 				break;
-			case ConfirmSystemPropertiesPage.PAGE_NAME: 
+			case ChangeStudyPage.PAGE_NAME: 
+				go_to_change_study_page();
 				break;
-			
+				
 			default: ;
 		}		
 	}
 
-	private void go_to_update_study_details() {
+	private void go_to_change_study_page() {
+		aBasePage.clickChangeStudy();
+	}
+	
+	private void go_to_update_study_details_page() {
 		aBuildStudyPage.clickUpdateStudy();
 	}
 
@@ -287,14 +301,17 @@ public class CommonSteps extends ScenarioSteps {
 	}
 
 	@Step
+	public void click_submit_button(String page) {
+		getPageByPageName(page).clickSubmit();
+	}
+	
+	@Step
 	public void fill_in_study_event_definition(StudyEventDefinition event) {
 		aCreateStudyEventDefinitionPage.fillInStudyEventDefinitionPage(event);
-		
 	}
 
 	@Step
-	public void select_CRFs_for_study_event_definition(
-			StudyEventDefinition event) {
+	public void select_CRFs_for_study_event_definition(StudyEventDefinition event) {
 		aDefineStudyEventSelectCRFsPage.selectCRFs(event.getCRFList());
 	}
 	
@@ -306,5 +323,21 @@ public class CommonSteps extends ScenarioSteps {
     @Step
 	public void fill_data_on_create_user_page(User createdUser) {
 		aCreateUserAccountPage.fillInCreateUserAccountPage(createdUser);
+	}
+
+    @Step
+	public void click_add_event_definition_button() {
+		aBuildStudyPage.clickAddStudyEventDefinition();
+	}
+
+    @Step
+	public void select_study_on_change_study_page(String studyName) {
+		aChangeStudyPage.selectStudy(studyName);
+	}
+    
+    @Step
+	public void current_study_is(String studyName) {
+		assert(studyName.equals(aBasePage.getCurrentStudyName()));
+		
 	}
 }

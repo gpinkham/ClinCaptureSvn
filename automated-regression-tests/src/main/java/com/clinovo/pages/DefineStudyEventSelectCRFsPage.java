@@ -8,8 +8,6 @@ import net.thucydides.core.annotations.findby.By;
 import net.thucydides.core.annotations.findby.FindBy;
 import net.thucydides.core.pages.WebElementFacade;
 import net.thucydides.core.webelements.Checkbox;
-import net.thucydides.core.webelements.RadioButtonGroup;
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -20,19 +18,19 @@ public class DefineStudyEventSelectCRFsPage extends BasePage {
 	public static final String PAGE_NAME = "Define Study Event - Select CRF(s) page";
 	public static final String PAGE_URL = "DefineStudyEvent";
 	
-	@FindBy(jquery = "form")
+	@FindBy(jquery = "form[name='crfForm']")
     private WebElementFacade formWithData;
 	
-	@FindBy(jquery = "img[src$='/arrow_next.gif'].parent()")
+	@FindBy(jquery = "img[src$='/arrow_next.gif']")
     private WebElementFacade lNextPage;
 	
-	@FindBy(jquery = "img[src$='/arrow_back.gif'].parent()")
+	@FindBy(jquery = "img[src$='/arrow_back.gif']")
     private WebElementFacade lPreviousPage;
 	
-	@FindBy(jquery = "img[src$='/arrow_last.gif'].parent()")
+	@FindBy(jquery = "img[src$='/arrow_last.gif']")
     private WebElementFacade lLastPage;
 	
-	@FindBy(jquery = "img[src$='/arrow_first.gif'].parent()")
+	@FindBy(jquery = "img[src$='/arrow_first.gif']")
     private WebElementFacade lFirstPage;
 	
     public DefineStudyEventSelectCRFsPage (WebDriver driver) {
@@ -41,25 +39,35 @@ public class DefineStudyEventSelectCRFsPage extends BasePage {
 
     public void selectCRFs(List<String> listCRFs) {
     	Map<String, Boolean> nameCRFToSelectedMap = new HashMap<String, Boolean>();
-    	for (String aCRF: listCRFs) {
-    		nameCRFToSelectedMap.put(aCRF, false);
+    	for (String eCRF: listCRFs) {
+    		nameCRFToSelectedMap.put(eCRF, false);
     	}
     	
-    	do {
-    		for (String aCRF: listCRFs) {
-        		if (!nameCRFToSelectedMap.get(aCRF)) selectCRFIfPresentInTable(aCRF, nameCRFToSelectedMap);
+    	for (int numOfLeftCRFs = listCRFs.size(); numOfLeftCRFs > 0;) {
+    		for (String eCRF: listCRFs) {
+        		if (!nameCRFToSelectedMap.get(eCRF)) {
+        			numOfLeftCRFs = numOfLeftCRFs - selectCRFIfPresentInTable(eCRF, nameCRFToSelectedMap);
+        		}
         	}
     		
     		if (lNextPage.isCurrentlyVisible()) {
     			lNextPage.click();
+    		} else {
+    			assert(numOfLeftCRFs == 0);
+    			break;
     		}
-    	} while (lNextPage.isCurrentlyVisible());
+    	} 
     }
     
-    private void selectCRFIfPresentInTable(String aCRF, Map<String, Boolean> nameCRFToSelectedMap) {
-    	WebElement chbox = formWithData.findElement(By.jquery("td.filter(function(){ return $(this).text() === '" + 
-    			aCRF + "';}).parent()")).findElement(By.jquery("input[type='checkbox']"));
-    	if (chbox != null) ItemsUtil.fillCheckbox(new Checkbox(chbox), "true");
+    private int selectCRFIfPresentInTable(String eCRF, Map<String, Boolean> nameCRFToSelectedMap) {
+    	if (isElementVisible(By.xpath(".//td[text()='"+eCRF+"']/..//input[@type='checkbox']"))) {
+    		WebElement chbox = formWithData.findBy(By.xpath(".//td[text()='"+eCRF+"']/..//input[@type='checkbox']"));
+    		ItemsUtil.fillCheckbox(new Checkbox(chbox), "true");
+    		nameCRFToSelectedMap.put(eCRF, true);
+    		return 1;
+    	}
+    	
+		return 0;
 	}
 
 	@Override

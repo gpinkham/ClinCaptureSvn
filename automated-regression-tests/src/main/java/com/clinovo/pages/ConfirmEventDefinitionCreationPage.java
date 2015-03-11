@@ -10,7 +10,7 @@ import org.openqa.selenium.WebDriver;
  */
 public class ConfirmEventDefinitionCreationPage extends BasePage {
 
-	public static final String PAGE_NAME = "Confirm Event Def Creation page";
+	public static final String PAGE_NAME = "Confirm Event Definition Creation page";
 	public static final String PAGE_URL = "DefineStudyEvent";
 	
    

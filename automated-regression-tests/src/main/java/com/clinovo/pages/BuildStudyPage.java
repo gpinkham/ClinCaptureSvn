@@ -28,6 +28,9 @@ public class BuildStudyPage extends BasePage {
     
     @FindBy(jquery = "a[href$='CreateCRFVersion']")
     private WebElementFacade bCreateCRFVersion;
+    
+    @FindBy(jquery = "a[href$='DefineStudyEvent?actionName=init']")
+    private WebElementFacade bCreateStudyEventDefinition;
 
     @FindBy(name = "studyStatus")
     private WebElementFacade sStudyStatus;
@@ -51,6 +54,11 @@ public class BuildStudyPage extends BasePage {
     public void clickAddCRF() {
     	bCreateCRFVersion.click();
     }
+    
+    public void clickAddStudyEventDefinition() {
+    	bCreateStudyEventDefinition.click();
+    }
+    
     public void clickUpdateStudy() {
     	bUpdateStudy.click();
     }

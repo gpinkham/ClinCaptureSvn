@@ -3,7 +3,10 @@ package com.clinovo.jbehave;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.clinovo.pages.ChangeStudyPage;
+import com.clinovo.pages.ConfirmChangeStudyPage;
 import com.clinovo.steps.CommonSteps;
+import com.clinovo.utils.Common;
 import com.clinovo.utils.Study;
 import com.clinovo.utils.StudyEventDefinition;
 import com.clinovo.utils.SystemProperties;
@@ -19,6 +22,9 @@ import org.jbehave.core.annotations.When;
 import org.jbehave.core.model.ExamplesTable;
 import org.jbehave.core.steps.Parameters;
 
+/**
+ * Created by Anton on 17.07.2014.
+ */
 public class ClinovoJBehave extends BaseJBehave {
     
     @Steps
@@ -207,6 +213,12 @@ public class ClinovoJBehave extends BaseJBehave {
     	commonSteps.browse_file_with_crf(filepath);
     }
     
+    @When("User clicks 'Add Event Definitions' button")
+    @Given("User clicks 'Add Event Definitions' button")
+	public void userClicksAddEventDefenitionButton() {
+    	commonSteps.click_add_event_definition_button();
+    }
+    
     @Given("User fills in data to create study event definition: $activityTable")
     public void userFillsInCreateStudyEventDefinitionPage(ExamplesTable table) {
     	boolean replaceNamedParameters = true;
@@ -216,11 +228,33 @@ public class ClinovoJBehave extends BaseJBehave {
     	commonSteps.fill_in_study_event_definition(event);
     }
     
-    @Given("User selects CRFs on Define Study Event page: $CRFs")
-    public void userSelectsCRFsPage(String CRFs) {
+    @Given("User selects CRFs on Define Study Event page: $eCRFsTable")
+    public void userSelectsCRFsPage(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams = table.getRowAsParameters(0, replaceNamedParameters);
     	StudyEventDefinition event = (StudyEventDefinition) Thucydides.getCurrentSession().get(StudyEventDefinition.NEW_CREATED_EVENT);
-    	event.setCRFList(StudyEventDefinition.generateCRFList(CRFs));    	
+    	event.setCRFList(StudyEventDefinition.generateCRFList(rowParams.values().get("eCRFs")));    	
     	commonSteps.select_CRFs_for_study_event_definition(event);
+    }
+    
+    @Given("User selects Study/Site $studyName on Change Study/Site page")
+    public void userSelectsStudyOnChangeStudyPage(String studyName) {
+    	commonSteps.select_study_on_change_study_page(Common.removeQuotes(studyName));
+    }
+    
+    @When("User changes Study/Site to $studyName")
+    @Given("User changes Study/Site to $studyName")
+    public void userSelectsStudyOgeStudyPage(String studyName) {
+    	userSelectsStudyOnChangeStudyPage(Common.removeQuotes(studyName));
+    	userClicksContinueButton(ChangeStudyPage.PAGE_NAME);
+    	userIsOnPage(ConfirmChangeStudyPage.PAGE_NAME);
+    	userClicksSubmitButton();
+    }
+    
+    @Then("Current Study is $studyName")
+    @Given("Current Study is $studyName")
+    public void currentStudyIs(String studyName) {
+    	commonSteps.current_study_is(Common.removeQuotes(studyName));
     }
     
     private User getCurrentUser() {
