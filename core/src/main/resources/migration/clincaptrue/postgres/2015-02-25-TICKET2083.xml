@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-02-25-TICKET2083-1" dbms="postgresql">
+		<comment>Create trigger function to auto-update date_updated in the event_crf table, if status was updated.</comment>
+		<sql splitStatements="false">
+			CREATE OR REPLACE FUNCTION update_event_crf_status()
+			RETURNS TRIGGER AS
+			'
+				DECLARE pk INTEGER;
+				BEGIN
+					SELECT INTO pk OLD.event_crf_id;
+					RAISE NOTICE ''Event CRF % was updated.'', pk;
+
+					IF (OLD.status_id != NEW.status_id) THEN
+						UPDATE event_crf SET date_updated = NOW() WHERE event_crf_id = pk;
+					END IF;
+					RETURN NULL;
+				END;
+			' LANGUAGE plpgsql;
+		</sql>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-02-25-TICKET2083-2" dbms="postgresql">
+		<comment>Create trigger to auto-update date_updated in the event_crf table, if status was updated.</comment>
+		<sql splitStatements="false">
+			CREATE TRIGGER update_event_crf_status_trigger AFTER UPDATE ON event_crf
+			FOR EACH ROW
+			EXECUTE PROCEDURE update_event_crf_status();
+		</sql>
+	</changeSet>
+</databaseChangeLog>
