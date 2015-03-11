@@ -284,76 +284,73 @@ Parser.prototype.createNextDroppable = function(params) {
 		}
 		params.element.removeClass("bordered");
 	} else if (params.element.is(".value")) {
-		var destination = null;
+		var destination = Object.create(null), 
+			id = params.element.parents(".row").attr("id");
+		destination.id = id;
 		if (this.getInsertAction().destinations.length > 0) {
 			for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
-				destination = this.getInsertAction().destinations[x];
-				if (destination.id === params.element.parents(".row").attr("id")) {
+				if (this.getInsertAction().destinations[x].id === id) {
+					destination = this.getInsertAction().destinations[x];
 					break;
 				}
 			}
 		} else {
-			destination = Object.create(null);
-			destination.id = params.element.parents(".row").attr("id");
 			this.getInsertAction().destinations.push(destination);
 		}
-		if (destination) {
-			if (!params.existingValue) {
-				var index = this.getInsertAction().destinations.indexOf(destination);
-				if (index > -1) {
-					this.getInsertAction().destinations.splice(index, 1);
-				}
-				if (destination.oid && destination.oid.length > 0) {
-					this.addNewInsertActionInputs();
-				}
-				this.getInsertAction().destinations.push(destination);
+		if (!params.existingValue) {
+			var index = this.getInsertAction().destinations.indexOf(destination);
+			if (index > -1) {
+				this.getInsertAction().destinations.splice(index, 1);
 			}
-
-			if (params.ui.draggable.is("td.group")) {
-				destination.item = true;
-				destination.value = selectedItem.oid;
-				params.element.val(params.ui.draggable.attr("item-name"));
-			} else {
-				destination.item = false;
-				if (this.isText(params.ui.draggable)) {
-					params.element.focus();
-				} else if (this.isDate(params.ui.draggable)) {
-					params.element.attr("type", "date");
-					params.element.val($(this).text());
-					$.fn.datepicker.defaults.format = getCookie('bootstrapDateFormat');
-					params.element.data({
-						date: new Date(params.element.val())
-					}).datepicker('update').children("input").val(new Date(params.element.val()));
-					params.element.datepicker({
-						orientation: 'bottom left'
-					}).on("hide", function() {
-						if ($(this).val()) {
-							params.element.val($(this).val());
-						} else {
-							params.element.val("Select Date");
-						}
-					});
-				} else if (this.isNumber(params.ui.draggable)) {
-					params.element.attr("type", "number");
-					params.element.blur(function() {
-						if ($(this).val() && /[0-9]|\./.test($(this).val())) {
-							params.element.text($(this).val());
-							params.element.removeClass("invalid");
-						} else {
-							params.element.val();
-							params.element.select();
-							params.element.addClass("invalid");
-						}
-					});
-				} else if (parser.isEmpty(params.ui.draggable)) {
-					params.element.removeAttr("type");
-					params.element.val('""');
-				} else {
-					destination.value = params.element.val();
-				}
+			if (destination.oid && destination.oid.length > 0) {
+				this.addNewInsertActionInputs();
 			}
-			params.element.focus();
+			this.getInsertAction().destinations.push(destination);
 		}
+		if (params.ui.draggable.is("td.group")) {
+			destination.item = true;
+			destination.value = selectedItem.oid;
+			params.element.val(params.ui.draggable.attr("item-name"));
+		} else {
+			destination.item = false;
+			if (this.isText(params.ui.draggable)) {
+				params.element.focus();
+			} else if (this.isDate(params.ui.draggable)) {
+				params.element.attr("type", "date");
+				params.element.val($(this).text());
+				$.fn.datepicker.defaults.format = getCookie('bootstrapDateFormat');
+				params.element.data({
+					date: new Date(params.element.val())
+				}).datepicker('update').children("input").val(new Date(params.element.val()));
+				params.element.datepicker({
+					orientation: 'bottom left'
+				}).on("hide", function() {
+					if ($(this).val()) {
+						params.element.val($(this).val());
+					} else {
+						params.element.val("Select Date");
+					}
+				});
+			} else if (this.isNumber(params.ui.draggable)) {
+				params.element.attr("type", "number");
+				params.element.blur(function() {
+					if ($(this).val() && /[0-9]|\./.test($(this).val())) {
+						params.element.text($(this).val());
+						params.element.removeClass("invalid");
+					} else {
+						params.element.val();
+						params.element.select();
+						params.element.addClass("invalid");
+					}
+				});
+			} else if (parser.isEmpty(params.ui.draggable)) {
+				params.element.removeAttr("type");
+				params.element.val('""');
+			} else {
+				destination.value = params.element.val();
+			}
+		}
+		params.element.focus();
 		params.element.removeClass("bordered");
 	} else {
 		if (params.element.is(".comp")) {
