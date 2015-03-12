@@ -585,6 +585,7 @@
 </tr>
 </table></table>
 
+<script>tabbingMode = "${study.studyParameterConfig.crfTabbingMode}";</script>
 <c:set var="tdPercentWidth" value="16.7%"/>
 <c:set var="dnShortcutsSpan" value="${6}"/>
 <c:set var="dnShortcutsWidth" value="${110}"/>

@@ -418,6 +418,15 @@ function updateThis(multiSelEle, count) {
             </td>
         </tr>
     </c:when>
+    <c:when test="${config.parameter.handle=='crfTabbingMode'}">
+        <tr valign="top">
+            <td class="formlabel"><fmt:message key="crfTabbingMode" bundle="${resword}"/></td>
+            <td>
+                <input type="radio" <c:if test="${config.value.value== 'leftToRight'}">checked</c:if> name="crfTabbingMode" value="leftToRight"><fmt:message key="leftToRight" bundle="${resword}"/>
+                <input type="radio" <c:if test="${config.value.value== 'topToBottom'}">checked</c:if> name="crfTabbingMode" value="topToBottom"><fmt:message key="topToBottom" bundle="${resword}"/>
+            </td>
+        </tr>
+    </c:when>
    <c:when test="${config.parameter.handle=='replaceExisitingDataDuringImport'}">
        <tr valign="top">
            <td class="formlabel"><fmt:message key="replaceExisitingDataDuringImport" bundle="${resword}"/></td>

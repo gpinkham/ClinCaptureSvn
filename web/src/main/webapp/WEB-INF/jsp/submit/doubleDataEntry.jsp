@@ -27,6 +27,7 @@
     </script>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui.min.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/tabbing.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
@@ -645,7 +646,7 @@ function setParameterForDN(field, parameterName, value) {
         <strong><c:out value="${displayItem.itemGroup.groupMetaBean.header}"/></strong>
     </div>
 </c:if>
-<table border="0" cellspacing="0" cellpadding="0" class="aka_form_table" width="100%">
+<table border="0" cellspacing="0" cellpadding="0" class="aka_form_table repeatingGroupTable" width="100%">
 <thead>
 <tr>
         <%-- if there are horizontal checkboxes or radios anywhere in the group...--%>
@@ -757,7 +758,6 @@ function setParameterForDN(field, parameterName, value) {
 <tbody>
 
 <c:set var="uniqueId" value="${0}"/>
-
 <c:set var="dbItemGroupsSize" value="${fn:length(displayItem.dbItemGroups)}"/>
 
 <c:forEach var="bodyItemGroup" items="${displayItem.itemGroups}"  varStatus="status">
@@ -768,7 +768,7 @@ function setParameterForDN(field, parameterName, value) {
     <c:set var="savedIntoDB" value="true"/>
 </c:if>
 
-<tr repeat="0">
+<tr repeat="${uniqueId}" class="repeatingTableRow">
 <c:set var="columnNum"  value="1"/>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
 <c:choose>
@@ -955,7 +955,7 @@ function setParameterForDN(field, parameterName, value) {
 </tr>
 <c:if test="${status.last}">
 <!-- for the last but not the only first row, we need to use [] so the repetition javascript can copy it to create new row-->
-<tr id="<c:out value="${repeatParentId}"/>" repeat="template" repeat-start="<c:out value="${repeatNumber}"/>" repeat-max="<c:out value="${repeatMax}"/>">
+<tr id="<c:out value="${repeatParentId}"/>" class="repeatingTableRow" repeat="template" repeat-start="<c:out value="${repeatNumber}"/>" repeat-max="<c:out value="${repeatMax}"/>">
 
     <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
     <c:choose>
@@ -1549,6 +1549,7 @@ table-->
 <div id="testdiv1" style=
   "position:absolute;visibility:hidden;background-color:white"></div>
 </div>
+<script>initCustomTabbing();</script>
 <jsp:include page="../include/changeTheme.jsp"/>
 <script>
     window.onbeforeunload = function(){

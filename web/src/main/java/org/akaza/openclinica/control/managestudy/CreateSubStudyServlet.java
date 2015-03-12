@@ -164,6 +164,8 @@ public class CreateSubStudyServlet extends Controller {
 								scg.getValue().setValue(fp.getString("assignRandomizationResultTo"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("randomizationTrialId")) {
 								scg.getValue().setValue(fp.getString("randomizationTrialId"));
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("crfTabbingMode")) {
+								scg.getValue().setValue(fp.getString("crfTabbingMode"));
 							}
 							configs.add(scg);
 						}
@@ -456,6 +458,10 @@ public class CreateSubStudyServlet extends Controller {
 						&& !fp.getString("randomizationTrialId").isEmpty()) {
 					scg.getValue().setValue(fp.getString("randomizationTrialId"));
 					study.getStudyParameterConfig().setSubjectPersonIdRequired(fp.getString("randomizationTrialId"));
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("crfTabbingMode")
+						&& !fp.getString("crfTabbingMode").isEmpty()) {
+					scg.getValue().setValue(fp.getString("crfTabbingMode"));
+					study.getStudyParameterConfig().setCrfTabbingMode(fp.getString("crfTabbingMode"));
 				}
 			}
 		}

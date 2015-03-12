@@ -360,6 +360,15 @@ function myCancel(objButtonText) {
  */
 function giveFirstElementFocus(){
 
+    if ($("b[id=crfNameId]").length == 1) {
+        try {
+            focusFirstElement();
+            return;
+        } catch (e) {
+            //
+        }
+    }
+
     var element = document.getElementById("hasPopUp");
     if (element != null) {
         var hasPopUp = element.value;

@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * StudyConfigService class.
  */
-@SuppressWarnings({ "rawtypes" })
+@SuppressWarnings({"rawtypes"})
 public class StudyConfigService {
 
 	private DataSource ds;
@@ -42,7 +42,9 @@ public class StudyConfigService {
 
 	/**
 	 * This method is used to initialize Study Config Service.
-	 * @param ds The data source to set.
+	 * 
+	 * @param ds
+	 *            The data source to set.
 	 */
 	public StudyConfigService(DataSource ds) {
 		this.ds = ds;
@@ -56,7 +58,8 @@ public class StudyConfigService {
 	}
 
 	/**
-	 * @param ds The ds to set.
+	 * @param ds
+	 *            The ds to set.
 	 */
 	public void setDs(DataSource ds) {
 		this.ds = ds;
@@ -65,7 +68,8 @@ public class StudyConfigService {
 	/**
 	 * This method construct an object which has all the study parameter values.
 	 *
-	 * @param study StudyBean
+	 * @param study
+	 *            StudyBean
 	 * @return StudyBean
 	 */
 	public StudyBean setParametersForStudy(StudyBean study) {
@@ -189,6 +193,8 @@ public class StudyConfigService {
 				spc.setAllowDiscrepancyCorrectionForms(spv.getValue());
 			} else if (handle.equalsIgnoreCase("randomizationEnviroment")) {
 				spc.setRandomizationEnviroment(spv.getValue());
+			} else if (handle.equalsIgnoreCase("crfTabbingMode")) {
+				spc.setCrfTabbingMode(spv.getValue());
 			}
 		} else if (spv.getId() == 0) {
 			setSystemParameterValues(spvdao, spc, handle);
@@ -202,7 +208,7 @@ public class StudyConfigService {
 	}
 
 	private void setSystemParameterValues(StudyParameterValueDAO spvdao, StudyParameterConfig spc, String handle) {
-		
+
 		com.clinovo.model.System systemProp = spvdao.findSystemPropertyByName(handle);
 		String value;
 		if (systemProp != null) {
@@ -211,17 +217,17 @@ public class StudyConfigService {
 				spc.setMarkImportedCRFAsCompleted(value);
 			} else if (handle.equalsIgnoreCase("autoScheduleEventDuringImport")) {
 				spc.setAutoScheduleEventDuringImport(value);
-		    } else if (handle.equalsIgnoreCase("autoCreateSubjectDuringImport")) {
-		        spc.setAutoCreateSubjectDuringImport(value);
-		    } else if (handle.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
-		        spc.setReplaceExisitingDataDuringImport(value);
+			} else if (handle.equalsIgnoreCase("autoCreateSubjectDuringImport")) {
+				spc.setAutoCreateSubjectDuringImport(value);
+			} else if (handle.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
+				spc.setReplaceExisitingDataDuringImport(value);
 			} else if (handle.equalsIgnoreCase("defaultBioontologyURL")) {
 				spc.setDefaultBioontologyURL(value);
 			} else if (handle.equalsIgnoreCase("autoCodeDictionaryName")) {
 				spc.setAutoCodeDictionaryName(value);
 			} else if (handle.equalsIgnoreCase("medicalCodingApiKey")) {
-		        spc.setMedicalCodingApiKey(value);
-		    } else if (handle.equalsIgnoreCase("allowCrfEvaluation")) {
+				spc.setMedicalCodingApiKey(value);
+			} else if (handle.equalsIgnoreCase("allowCrfEvaluation")) {
 				spc.setAllowCrfEvaluation(value);
 			} else if (handle.equalsIgnoreCase("evaluateWithContext")) {
 				spc.setEvaluateWithContext(value);
@@ -232,7 +238,8 @@ public class StudyConfigService {
 	/**
 	 * This method is used to set all study parameters to site.
 	 *
-	 * @param site The <code>StudyBean</code> for which all site parameters should be set.
+	 * @param site
+	 *            The <code>StudyBean</code> for which all site parameters should be set.
 	 * @return The <code>StudyBean</code> for which all site parameters had been set
 	 */
 	public StudyBean setParametersForSite(StudyBean site) {

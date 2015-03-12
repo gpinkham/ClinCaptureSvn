@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css" media="screen">
     <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/print.css" type="text/css" media="print">
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/jmesa/jquery-1.3.2.min.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/tabbing.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/global_functions_javascript.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/Tabs.js"></script>
     <script type="text/javascript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/repetition-model/repetition-model.js"></script>
@@ -525,7 +526,7 @@
 																								</div>
 																							</c:if>
 																							<table border="0" cellspacing="0" cellpadding="0"
-																								class="aka_form_table" width="100%">
+																								class="aka_form_table repeatingGroupTable" width="100%">
 																								<thead>
 																									<tr>
 																										<%-- if there are horizontal checkboxes or radios anywhere in the group...--%>
@@ -676,7 +677,6 @@
 
 																									<c:set var="uniqueId" value="${0}" />
 																									<c:set var="repeatRowCount" value="0" />
-
 																									<c:forEach var="bodyItemGroup"
 																										items="${displayItem.itemGroups}">
 																										<c:set var="repeatRowCount"
@@ -696,6 +696,7 @@
 																											<c:when test="${status.last && !status.first}">
 																												<!-- for the last but not the first row and only row, we need to use [] so the repetition javascript can copy it to create new row-->
 																												<tr id="<c:out value="${repeatParentId}"/>"
+                                                                                                                    class="repeatingTableRow"
 																													repeat="template"
 																													repeat-start="<c:out value="${repeatNumber}"/>"
 																													repeat-max="<c:out value="${repeatMax}"/>">
@@ -869,7 +870,7 @@
 																											</c:when>
 																											<c:otherwise>
 																												<!--  not the last row -->
-																												<tr repeat="0" />
+																												<tr repeat="${uniqueId}" class="repeatingTableRow"/>
 																												<c:set var="columnNum" value="1" />
 																												<c:forEach var="bodyItem"
 																													items="${bodyItemGroup.items}">
@@ -956,7 +957,8 @@
 																															<td id="itemHolderId_${uniqueId}input${bodyItem.item.id}"
                                                                                                                                 class="itemHolderClass aka_padding_norm aka_cellBorders_dark">
 																																<c:set var="displayItem" scope="request"
-																																	value="${bodyItem}" /> <c:import
+																																	value="${bodyItem}" />
+                                                                                                                                <c:import
 																																	url="../submit/showGroupItemInputMonitor.jsp">
 																																	<c:param name="repeatParentId"
 																																		value="${displayItem.itemGroup.itemGroupBean.oid}" />
@@ -981,7 +983,8 @@
 																															<td id="itemHolderId_${uniqueId}input${bodyItem.item.id}"
                                                                                                                                 class="itemHolderClass aka_padding_norm aka_cellBorders">
 																																<c:set var="displayItem" scope="request"
-																																	value="${bodyItem}" /> <c:import
+																																	value="${bodyItem}" />
+                                                                                                                                <c:import
 																																	url="../submit/showGroupItemInputMonitor.jsp">
 																																	<c:param name="repeatParentId"
 																																		value="${displayItem.itemGroup.itemGroupBean.oid}" />

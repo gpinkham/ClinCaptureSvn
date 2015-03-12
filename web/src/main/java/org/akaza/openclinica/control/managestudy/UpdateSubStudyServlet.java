@@ -20,7 +20,16 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.ValidatorHelper;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -45,16 +54,9 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import com.clinovo.util.ValidatorHelper;
 
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class UpdateSubStudyServlet extends Controller {
 
@@ -342,6 +344,7 @@ public class UpdateSubStudyServlet extends Controller {
 				fp.getString("replaceExisitingDataDuringImport"));
 		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
 		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
+		study.getStudyParameterConfig().setCrfTabbingMode(fp.getString("crfTabbingMode"));
 
 		ArrayList parameters = study.getStudyParameters();
 
@@ -575,6 +578,6 @@ public class UpdateSubStudyServlet extends Controller {
 			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
-	}
+		}
 	}
 }
