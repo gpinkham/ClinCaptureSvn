@@ -638,24 +638,6 @@
 
   <tr valign="top">
       <td class="formlabel">
-          <fmt:message key="crfTabbingMode" bundle="${resword}"/>
-      </td>
-      <td>
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.crfTabbingMode == 'leftToRight'}">
-                  <input type="radio" checked name="crfTabbingMode" value="leftToRight"><fmt:message key="leftToRight" bundle="${resword}"/>
-                  <input type="radio" name="crfTabbingMode" value="topToBottom"><fmt:message key="topToBottom" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <input type="radio" name="crfTabbingMode" value="leftToRight"><fmt:message key="leftToRight" bundle="${resword}"/>
-                  <input type="radio" checked name="crfTabbingMode" value="topToBottom"><fmt:message key="topToBottom" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
-
-  <tr valign="top">
-      <td class="formlabel">
           <fmt:message key="replaceExisitingDataDuringImport" bundle="${resword}"/>
       </td>
       <td>

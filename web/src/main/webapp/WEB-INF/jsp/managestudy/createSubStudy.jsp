@@ -256,7 +256,7 @@
    </div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="statusId"/></jsp:include></td><td> *</td></tr>      
      
-  <c:forEach var="config" items="${newStudy.studyParameters}">
+  <c:forEach var="config" items="${newStudy.studyParameters}">   
    <c:choose>
    <c:when test="${config.parameter.handle=='collectDob'}">
      <tr valign="top"><td class="formlabel"><fmt:message key="collect_subject_date_of_birth" bundle="${resword}"/>:</td><td>
@@ -417,15 +417,6 @@
             <td>
                 <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowSdvWithOpenQueries== 'yes'}">checked</c:if> name="allowSdvWithOpenQueries" value="yes"><fmt:message key="yes" bundle="${resword}"/>
                 <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowSdvWithOpenQueries== 'no'}">checked</c:if> name="allowSdvWithOpenQueries" value="no"><fmt:message key="no" bundle="${resword}"/>
-            </td>
-        </tr>
-    </c:when>
-    <c:when test="${config.parameter.handle=='crfTabbingMode'}">
-        <tr valign="top">
-            <td class="formlabel"><fmt:message key="crfTabbingMode" bundle="${resword}"/></td>
-            <td>
-                <input type="radio" <c:if test="${newStudy.studyParameterConfig.crfTabbingMode== 'leftToRight'}">checked</c:if> name="crfTabbingMode" value="leftToRight"><fmt:message key="leftToRight" bundle="${resword}"/>
-                <input type="radio" <c:if test="${newStudy.studyParameterConfig.crfTabbingMode== 'topToBottom'}">checked</c:if> name="crfTabbingMode" value="topToBottom"><fmt:message key="topToBottom" bundle="${resword}"/>
             </td>
         </tr>
     </c:when>

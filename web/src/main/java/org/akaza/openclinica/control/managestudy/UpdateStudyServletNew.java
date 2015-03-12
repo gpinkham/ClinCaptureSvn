@@ -20,19 +20,11 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.exception.CodeException;
+import com.clinovo.model.DiscrepancyDescription;
+import com.clinovo.model.DiscrepancyDescriptionType;
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -54,16 +46,22 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.exception.CodeException;
-import com.clinovo.model.DiscrepancyDescription;
-import com.clinovo.model.DiscrepancyDescriptionType;
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.util.ValidatorHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 
 /**
  * Processes request to update study.
  **/
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class UpdateStudyServletNew extends Controller {
 
@@ -456,14 +454,14 @@ public class UpdateStudyServletNew extends Controller {
 				dDescription.setTypeId(typeId);
 				dDescription.setName(fp.getString(descriptionName + i));
 				switch (fp.getInt(visibilityLevel + i)) {
-					case 1 :
-						dDescription.setVisibilityLevel("Study");
-						break;
-					case 2 :
-						dDescription.setVisibilityLevel("Site");
-						break;
-					default :
-						dDescription.setVisibilityLevel("Study and Site");
+				case 1:
+					dDescription.setVisibilityLevel("Study");
+					break;
+				case 2:
+					dDescription.setVisibilityLevel("Site");
+					break;
+				default:
+					dDescription.setVisibilityLevel("Study and Site");
 				}
 				if (fp.getInt(descriptionId + i) != 0) {
 					dDescription.setId(fp.getInt(descriptionId + i));
@@ -554,8 +552,6 @@ public class UpdateStudyServletNew extends Controller {
 
 		// SAS Item Names
 		study.getStudyParameterConfig().setAnnotatedCrfSasItemNames(fp.getString("annotatedCrfSasItemNames"));
-
-		study.getStudyParameterConfig().setCrfTabbingMode(fp.getString("crfTabbingMode"));
 
 		try {
 
@@ -965,13 +961,9 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getRandomizationEnviroment());
 		updateParameter(spvdao, spv);
 
-		spv.setParameter("crfTabbingMode");
-		spv.setValue(study1.getStudyParameterConfig().getCrfTabbingMode());
-		updateParameter(spvdao, spv);
-
 		try {
 
-			// Create custom dictionary
+			// Create custom dictionary 
 			if (study1.getStudyParameterConfig().getAutoCodeDictionaryName() != null
 					&& !study1.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) {
 				getDictionaryService().createDictionary(study1.getStudyParameterConfig().getAutoCodeDictionaryName(),
@@ -1112,7 +1104,7 @@ public class UpdateStudyServletNew extends Controller {
 			childspv.setParameter("allowDynamicGroupsManagement");
 			childspv.setValue(study1.getStudyParameterConfig().getAllowDynamicGroupsManagement());
 			updateParameter(spvdao, childspv);
-
+			
 			childspv.setParameter("allowDiscrepancyCorrectionForms");
 			childspv.setValue(study1.getStudyParameterConfig().getAllowDiscrepancyCorrectionForms());
 			updateParameter(spvdao, childspv);
@@ -1155,10 +1147,6 @@ public class UpdateStudyServletNew extends Controller {
 
 			childspv.setParameter("annotatedCrfSasItemNames");
 			childspv.setValue(study1.getStudyParameterConfig().getAnnotatedCrfSasItemNames());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("crfTabbingMode");
-			childspv.setValue(study1.getStudyParameterConfig().getCrfTabbingMode());
 			updateParameter(spvdao, childspv);
 		}
 	}

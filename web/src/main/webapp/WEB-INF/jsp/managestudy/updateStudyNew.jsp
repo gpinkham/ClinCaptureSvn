@@ -1368,7 +1368,7 @@
 		       name="allowSdvWithOpenQueries" value="yes"><fmt:message key="yes" bundle="${resword}"/>
 
 		<input type="radio" onchange="javascript:changeIcon()"
-		${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'no' ? "" : "checked"}
+		${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'yes' ? "" : "checked"}
 		       name="allowSdvWithOpenQueries" value="no"><fmt:message key="no" bundle="${resword}"/>
 	</td>
 </tr>
@@ -1884,21 +1884,6 @@
 			</c:otherwise>
 		</c:choose>
 	</td>
-</tr>
-
-<tr valign="top">
-    <td class="formlabel">
-        <fmt:message key="crfTabbingMode" bundle="${resword}"/>
-    </td>
-    <td>
-        <input type="radio" onchange="javascript:changeIcon()"
-        ${studyToView.studyParameterConfig.crfTabbingMode == 'leftToRight' ? "checked" : ""}
-               name="crfTabbingMode" value="leftToRight"><fmt:message key="leftToRight" bundle="${resword}"/>
-
-        <input type="radio" onchange="javascript:changeIcon()"
-        ${studyToView.studyParameterConfig.crfTabbingMode == 'topToBottom' ? "checked" : ""}
-               name="crfTabbingMode" value="topToBottom"><fmt:message key="topToBottom" bundle="${resword}"/>
-    </td>
 </tr>
 <!-- /Data Entry Parameters section -->
 

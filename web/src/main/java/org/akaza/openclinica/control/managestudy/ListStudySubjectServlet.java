@@ -12,15 +12,6 @@
  ******************************************************************************/
 package org.akaza.openclinica.control.managestudy;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.DisplayStudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -49,10 +40,18 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.bean.DisplayStudySubjectRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * ListStudySubjectServlet that handles user request of "Subject Matrix".
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public abstract class ListStudySubjectServlet extends Controller {
 
 	public static final String SUBJECT_PAGE_NUMBER = "ebl_page";
@@ -361,9 +360,6 @@ public abstract class ListStudySubjectServlet extends Controller {
 
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "allowRulesAutoScheduling");
 		currentStudy.getStudyParameterConfig().setAllowRulesAutoScheduling(parentSPV.getValue());
-
-		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "crfTabbingMode");
-		currentStudy.getStudyParameterConfig().setCrfTabbingMode(parentSPV.getValue());
 
 		// for all the study groups for each group class
 		for (Object studyGroupClass1 : studyGroupClasses) {
