@@ -124,7 +124,10 @@ function saveRule(rule) {
 			try {
 				// Context
 				var ctx = Object.create(null);
-
+				// Clean-up old destinations
+				$(rule.actions).each(function(){
+					this.destinations = [];
+				});
 				ctx.ae = rule.ae;
 				ctx.di = rule.di;
 				ctx.dde = rule.dde;
