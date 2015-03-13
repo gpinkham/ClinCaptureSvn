@@ -566,8 +566,10 @@ Parser.prototype.createRule = function() {
         var target = parser.rule.targets[x];
         if (target.linefy) {
             target.name = this.constructRepeatItemPath(target);
-        } else if (target.versionify) {
+        } else if (target.versionify && !target.eventify) {
             target.name = this.constructCRFVersionPath(target);
+        } else if(target.versionify && target.eventify) {
+        	target.name = target.evt + "."+ this.constructCRFVersionPath(target);
         } else {
             var formPath = target.crf + "." + target.group + "." + target.oid;
             target.name = target.eventify ? (target.evt + "." + formPath) : formPath;
