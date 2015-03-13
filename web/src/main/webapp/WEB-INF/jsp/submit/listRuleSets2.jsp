@@ -87,7 +87,7 @@
 </div>
 
 <script>
-	$("img[title*='PDF']").attr('title', '<fmt:message key="view_rules_download_xml" bundle="${resword}"/>' ).attr('src', '/clincapture/images/table/csv.gif');
+	$("img[title*='PDF']").attr('title', '<fmt:message key="view_rules_download_xml" bundle="${resword}"/>' ).attr('src', 'images/table/csv.gif');
 </script>
 <br>
     <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />

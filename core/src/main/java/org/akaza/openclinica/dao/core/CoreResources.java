@@ -419,12 +419,12 @@ public class CoreResources implements ResourceLoaderAware {
 	private void copyImportRulesFiles() throws IOException {
 		ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[3];
 		String[] fileNames = { "rules.xsd", "rules_template.xml", "rules_template_with_notes.xml" };
-		listSrcFiles[0] = new ByteArrayInputStream(resourceLoader
-				.getResource("classpath:properties" + File.separator + fileNames[0]).getURL().getFile().getBytes());
-		listSrcFiles[1] = new ByteArrayInputStream(resourceLoader
-				.getResource("classpath:properties" + File.separator + fileNames[1]).getURL().getFile().getBytes());
-		listSrcFiles[2] = new ByteArrayInputStream(resourceLoader
-				.getResource("classpath:properties" + File.separator + fileNames[2]).getURL().getFile().getBytes());
+		listSrcFiles[0] = (ByteArrayInputStream) resourceLoader
+				.getResource("classpath:properties" + File.separator + fileNames[0]).getInputStream();
+		listSrcFiles[1] = (ByteArrayInputStream) resourceLoader
+				.getResource("classpath:properties" + File.separator + fileNames[1]).getInputStream();
+		listSrcFiles[2] = (ByteArrayInputStream) resourceLoader
+				.getResource("classpath:properties" + File.separator + fileNames[2]).getInputStream();
 		File dest = new File(getField("filePath") + "rules");
 		if (!dest.exists()) {
 			if (!dest.mkdirs()) {
