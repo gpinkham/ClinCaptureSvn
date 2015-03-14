@@ -1,12 +1,12 @@
 package org.akaza.openclinica.dao.submit;
 
-import java.util.ArrayList;
-
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 public class CRFVersionDAOTest extends DefaultAppContextTest {
 
@@ -116,5 +116,12 @@ public class CRFVersionDAOTest extends DefaultAppContextTest {
 		crfVer = (CRFVersionBean) crfVersionDao.findByPK(crfVerPK);
 		assertNull(crfVer.getOid());
 	}
-	
+
+	@Test
+	public void TestThatFind() throws OpenClinicaException {
+		int oldVersionId = 5;
+		int newVersionId = 6;
+
+		assertEquals(newVersionId, crfVersionDao.findLatestAfterDeleted(oldVersionId).getId());
+	}
 }

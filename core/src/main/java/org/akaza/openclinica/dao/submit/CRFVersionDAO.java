@@ -434,4 +434,30 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 		}
 	}
 
+	/**
+	 * Find new CRF Version instead of deleted.
+	 * @param deletedCRFVersionId int
+	 * @return CRFVersionBean to be set instead of deleted
+	 */
+	public CRFVersionBean findLatestAfterDeleted(int deletedCRFVersionId) {
+
+		CRFVersionBean crfVersionBean;
+		this.unsetTypeExpected();
+		setTypesExpected();
+
+		HashMap variables = new HashMap();
+		variables.put(1, deletedCRFVersionId);
+		variables.put(2, deletedCRFVersionId);
+		String sql = digester.getQuery("findLatestAfterDeleted");
+
+		ArrayList rows = this.select(sql, variables);
+		Iterator it = rows.iterator();
+
+		if (it.hasNext()) {
+			crfVersionBean = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+			return crfVersionBean;
+		} else {
+			return null;
+		}
+	}
 }

@@ -79,7 +79,7 @@ public class DeleteCRFVersionControllerTest extends BaseControllerTest {
 
 	@Test
 	public void testThatDeleteCRFVersionConfirmAllowToDeleteCrfVersion() throws Exception {
-		this.mockMvc.perform(post(DELETE_CRF_VERSION).param("crfVersionId", "5").param("confirm", "confirm"))
+		this.mockMvc.perform(post(DELETE_CRF_VERSION).param("crfVersionId", "6").param("confirm", "confirm"))
 				.andExpect(
 						MockMvcResultMatchers.request().sessionAttribute("controllerMessage",
 								messageSource.getMessage("the_crf_version_has_been_removed", null, new Locale("en"))));

@@ -35,6 +35,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.util.EventDefinitionCRFUtil;
 import org.akaza.openclinica.util.StudyEventDefinitionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -47,6 +48,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.util.PageMessagesUtil;
 import com.clinovo.util.SessionUtil;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * CompleteCRFDeleteController that handles requests from the delete crf page.
@@ -184,6 +191,7 @@ public class DeleteCRFVersionController {
 		} else {
 			ArrayList items = crfVersionDao.findNotSharedItemsByVersion(crfVersionBean.getId());
 			NewCRFBean nib = new NewCRFBean(dataSource, crfVersionBean.getCrfId());
+			EventDefinitionCRFUtil.setDefaultCRFVersionInsteadOfDeleted(dataSource, crfVersionBean.getId());
 			nib.setDeleteQueries(crfVersionDao.generateDeleteQueries(crfVersionBean.getId(), items));
 			nib.deleteFromDB();
 

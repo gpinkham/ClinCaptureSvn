@@ -146,4 +146,19 @@
 		<name>findCRFVersionId</name>
 		<sql>SELECT CRF_VERSION_ID FROM CRF_VERSION WHERE CRF_ID=? AND NAME =? </sql>
 	</query>
+	<query>
+		<name>findLatestAfterDeleted</name>
+		<sql>
+			SELECT *
+			FROM crf_version
+			WHERE crf_id = (
+				SELECT crf_id
+				FROM crf_version
+				WHERE crf_version_id = ?)
+			AND crf_version_id != ?
+			AND status_id NOT IN (5, 7)
+			ORDER BY crf_version_id DESC
+			LIMIT 1
+		</sql>
+	</query>
 </queries>
