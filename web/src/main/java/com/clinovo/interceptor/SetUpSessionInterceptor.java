@@ -22,28 +22,43 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * SetUpSessionInterceptor that able to manage controller requests.
  */
 public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 
+	@Autowired
+	public DataSource ds;
+
 	public static final String PREV_URL = "_PrevUrl";
 	public static final String FIRST_URL_PARAMETER = "?";
 	public static final String INCLUDE_REPORTING = "includeReporting";
+	private static Set<String> methodList = new HashSet<String>(Arrays.asList("getPrintCRFController"));
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		boolean ok = true;
+		setupDefaultParameters(request, handler);
 		if (SecurityContextHolder.getContext().getAuthentication() != null) {
 			Controller.restorePageMessages(request);
 			Navigation.addToNavigationStack(request);
@@ -66,6 +81,54 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 			}
 		}
 		return ok;
+	}
+
+	private void setupDefaultParameters(HttpServletRequest request, Object handler) {
+		if (handler instanceof HandlerMethod) {
+			HandlerMethod method = (HandlerMethod) handler;
+			Method classMethod = method.getMethod();
+			if (methodList.contains(classMethod.getName())) {
+				UserAccountDAO userAccountDAO = getUserAccountDAO(getDataSource());
+				StudyDAO studyDAO = getStudyDAO(getDataSource());
+				String userName = request.getRemoteUser();
+				if (userName != null) {
+					UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
+					StudyBean currentStudy = (StudyBean) studyDAO.findByPK(userAccountBean.getActiveStudyId());
+					StudyUserRoleBean currentRole = userAccountBean.getRoleByStudy(currentStudy.getId());
+					request.getSession().setAttribute(BaseController.THEME_COLOR, CoreResources.getField("themeColor"));
+					request.getSession().setAttribute(BaseController.USER_ROLE, currentRole);
+					request.getSession().setAttribute(BaseController.STUDY, currentStudy);
+					request.getSession().setAttribute(BaseController.USER_BEAN_NAME, userAccountBean);
+				}
+			}
+
+		}
+	}
+
+	/**
+	 * Returns study dao object for study table.
+	 * @param ds the data source object.
+	 * @return StudyDAO object.
+	 */
+	public StudyDAO getStudyDAO(DataSource ds) {
+		return new StudyDAO(ds);
+	}
+
+	/**
+	 * Returns user account dao object for user account table.
+	 * @param ds the data source object.
+	 * @return StudyDAO object.
+	 */
+	public UserAccountDAO getUserAccountDAO(DataSource ds) {
+		return new UserAccountDAO(ds);
+	}
+
+	/**
+	 * Returns data source object with database connection properties.
+	 * @return the DataSource object.
+	 */
+	public DataSource getDataSource() {
+		return ds;
 	}
 
 	private boolean checkForRedirection(HttpServletRequest request, HttpServletResponse response, Object handler)

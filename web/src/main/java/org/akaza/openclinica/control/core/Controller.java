@@ -369,7 +369,7 @@ public abstract class Controller extends BaseController {
 		HttpSession session = request.getSession();
 		reloadUserBean(session, getUserAccountDAO());
 		String newThemeColor = CoreResources.getField("themeColor");
-		session.setAttribute("newThemeColor", newThemeColor);
+		session.setAttribute(BaseController.THEME_COLOR, newThemeColor);
 		ApplicationContext applicationContext = SpringServletAccess.getApplicationContext(getServletContext());
 		try {
 			session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));

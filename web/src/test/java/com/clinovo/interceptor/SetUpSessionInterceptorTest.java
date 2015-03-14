@@ -7,12 +7,15 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.navigation.Navigation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -22,10 +25,14 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.method.HandlerMethod;
 
+import javax.sql.DataSource;
+import java.lang.reflect.Method;
 import java.util.Locale;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SecurityContextHolder.class, Navigation.class })
@@ -86,5 +93,32 @@ public class SetUpSessionInterceptorTest {
 		setUpSessionInterceptor.preHandle(request, response, crfEvaluationController);
 		assertTrue(response.getHeader("Location").equals(
 				CLINCAPTURE.concat(CRFEvaluationController.PAGE_CRF_EVALUATION).concat("?").concat(PREV_QUERY_STRING)));
+	}
+
+	@Test
+	public void testThatInterceptorSetupsDefaultParameters() throws Exception {
+
+		request.setRemoteUser("root");
+		HandlerMethod method = PowerMockito.mock(HandlerMethod.class);
+		Method m = PowerMockito.mock(Method.class);
+		Whitebox.setInternalState(m, "name", "getPrintCRFController");
+		StudyUserRoleBean role = Mockito.mock(StudyUserRoleBean.class);
+		UserAccountBean userAccountBean = Mockito.mock(UserAccountBean.class);
+
+		DataSource ds = Mockito.mock(DataSource.class);
+		StudyDAO studyDAO = Mockito.mock(StudyDAO.class);
+		UserAccountDAO userAccountDAO = Mockito.mock(UserAccountDAO.class);
+
+		Mockito.when(studyDAO.findByPK(Mockito.anyInt())).thenReturn(studyBean);
+		Mockito.when(userAccountDAO.findByUserName(Mockito.anyString())).thenReturn(userAccountBean);
+		Mockito.when(setUpSessionInterceptor.getDataSource()).thenReturn(ds);
+		Mockito.when(setUpSessionInterceptor.getUserAccountDAO(ds)).thenReturn(userAccountDAO);
+		Mockito.when(setUpSessionInterceptor.getStudyDAO(ds)).thenReturn(studyDAO);
+		Mockito.when(userAccountBean.getRoleByStudy(studyBean.getId())).thenReturn(role);
+		PowerMockito.when(method.getMethod()).thenReturn(m);
+		PowerMockito.doCallRealMethod().when(setUpSessionInterceptor).preHandle(request, response, method);
+		setUpSessionInterceptor.preHandle(request, response, method);
+		StudyBean study = (StudyBean) request.getSession().getAttribute(BaseController.STUDY);
+		assertEquals(1, study.getId());
 	}
 }

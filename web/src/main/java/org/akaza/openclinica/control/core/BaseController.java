@@ -104,6 +104,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public static final String USER_BEAN_NAME = "userBean";
 	public static final String ERRORS_HOLDER = "errors_holder";
 	public static final String SESSION_MANAGER = "sessionManager";
+	public static final String THEME_COLOR = "newThemeColor";
 
 	public static final String BR = "<br/>";
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
