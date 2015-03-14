@@ -289,7 +289,7 @@ Parser.prototype.createNextDroppable = function(params) {
 		destination.id = id;
 		if (this.getInsertAction().destinations.length > 0) {
 			for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
-				if (this.getInsertAction().destinations[x].id === id) {
+				if (this.getInsertAction().destinations[x].id == id) {
 					destination = this.getInsertAction().destinations[x];
 					break;
 				}

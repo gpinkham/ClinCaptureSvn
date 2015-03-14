@@ -220,7 +220,7 @@ public class RulesServlet extends HttpServlet {
 						for (int x = 0; x < insertAction.getProperties().size(); x++) {
 							JSONObject dest = new JSONObject();
 							PropertyBean bean = insertAction.getProperties().get(x);
-							dest.put("id", bean.getId());
+							dest.put("id", x + 1);
 							dest.put("oid", bean.getOid());
 							if (bean.getValue() == null && bean.getValueExpression() != null) {
 								dest.put("item", true);
