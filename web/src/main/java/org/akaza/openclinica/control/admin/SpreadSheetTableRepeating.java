@@ -2027,7 +2027,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
 						cell = sheet.getRow(k).getCell(2);
 						String subtitle = getValue(cell);
-						if (subtitle != null && subtitle.length() > 2000) {
+						if (subtitle != null && subtitle.length() > 10000) {
 							errors.add(resPageMsg.getString("section_subtitle_length_error"));
 						}
 
