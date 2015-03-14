@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2015 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -10,14 +10,6 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
-/*
- * OpenClinica is distributed under the GNU Lesser General Public License (GNU
- * LGPL).
- *
- * For details see: http://www.openclinica.org/license copyright 2003-2010 Akaza
- * Research
- */
 
 package org.akaza.openclinica.bean.extract;
 
@@ -36,24 +28,31 @@ package org.akaza.openclinica.bean.extract;
  * <li>If a name is longer than 8 characters, it will be truncated to 8 characters. If it results in non-unique name in
  * a data file, sequential numbers are used to replace its letters at the end. By default, the size of sequential
  * numbers is 3.
- * 
- * 
- * @auther ywang
  */
 
 public class SasNameValidator extends NameValidator {
-	private int nameMaxLength = 8; // 8;// 32;
+
+	private int nameMaxLength;
+
+	private static final int DEFAULT_NAME_MAX_LENGTH = 8;
+
+	private static final int RADIX = 36;
+
+	public SasNameValidator() {
+
+		nameMaxLength = DEFAULT_NAME_MAX_LENGTH;
+	}
 
 	/**
-	 * Get unique SAS name using 36 radix
-	 * 
-	 * @param String
-	 * 
+	 * Get unique SAS name using 36 radix.
+	 *
+	 * @param variableName String
 	 * @return String
 	 */
 	@Override
 	public String getValidName(String variableName) {
-		int maxValue = this.computeMaxValue(36, this.digitSize);
+
+		int maxValue = this.computeMaxValue(RADIX, this.digitSize);
 		// if variableName is null, automatically generate
 		if (variableName == null || variableName.trim().length() == 0) {
 			return getNextSequentialString(maxValue);
@@ -62,8 +61,8 @@ public class SasNameValidator extends NameValidator {
 
 		// get all chars from the string first
 		String temp = variableName.trim();
-		char c[] = temp.length() > this.nameMaxLength ? temp.substring(0, this.nameMaxLength).toCharArray() : temp
-				.toCharArray();
+		char[] c = temp.length() > getNameMaxLength()
+				? temp.substring(0, getNameMaxLength()).toCharArray() : temp.toCharArray();
 
 		// replacing every invalid character with the replacingChar
 		for (i = 0; i < c.length; ++i) {
@@ -75,13 +74,13 @@ public class SasNameValidator extends NameValidator {
 		// if the first one is a digit
 		if (c[0] >= '0' && c[0] <= '9') {
 			// if there is already 32 characters
-			if (c.length >= this.nameMaxLength) {
+			if (c.length >= getNameMaxLength()) {
 				for (i = c.length - 1; i >= 1; --i) {
 					c[i] = c[i - 1];
 				}
 				c[0] = replacingChar;
 			} else {
-				char cc[] = new char[c.length + 1];
+				char[] cc = new char[c.length + 1];
 				cc[0] = replacingChar;
 				for (i = 1; i < cc.length; ++i) {
 					cc[i] = c[i - 1];
@@ -89,47 +88,44 @@ public class SasNameValidator extends NameValidator {
 				c = cc;
 			}
 		}
-		String s = new String(c);
-		String s2 = s;
-		int mysize = this.nameMaxLength - digitSize;
+
+		String originalItemName = new String(c);
+		String resultSasItemName = originalItemName;
 		// if not unique
-		while (uniqueNameTable.contains(s2)) {
-			if (s.length() > mysize) {
-				s2 = s.substring(0, mysize) + this.getNextSequentialString(maxValue);
+		while (uniqueNameTable.contains(resultSasItemName)) {
+			String nextSequential = getNextSequentialString(maxValue);
+			int originalItemNameLengthToBePreserved = getNameMaxLength() - nextSequential.length();
+			if (originalItemName.length() > originalItemNameLengthToBePreserved) {
+				resultSasItemName = originalItemName.substring(0, originalItemNameLengthToBePreserved) + nextSequential;
 			} else {
-				s2 = s + this.getNextSequentialString(maxValue);
+				resultSasItemName = originalItemName + nextSequential;
 			}
 		}
-		uniqueNameTable.add(s2);
-		return s2;
+		uniqueNameTable.add(resultSasItemName);
+		return resultSasItemName;
 	}
 
 	// only alphabets, digits, and _ are valid
 	@Override
 	protected boolean isValid(char c) {
+
 		return c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_';
 	}
 
 	/**
-	 * Get next sequential String using 36 radix. This sequential string should be smaller than maxValue
+	 * Get next sequential String using 36 radix. This sequential string should be smaller than maxValue.
 	 * 
 	 * @return String
 	 */
 	@Override
 	public String getNextSequentialString(int maxValue) {
+
 		if (this.sequential >= maxValue) {
-			// System.out.println("Cannot generate sequential string because sequential="+sequential+" >= maxValue="+maxValue+".");
 			System.exit(1);
 		}
-		String s = "" + Integer.toString(sequential, 36);
-		int len = s.length();
-		if (len < this.digitSize) {
-			for (int i = len; i < this.digitSize; ++i) {
-				s = "0" + s;
-			}
-		}
+		String nextSequential = Integer.toString(sequential, RADIX);
 		++this.sequential;
-		return s;
+		return nextSequential.toUpperCase();
 	}
 
 	private int computeMaxValue(int base, int digitSize) {
