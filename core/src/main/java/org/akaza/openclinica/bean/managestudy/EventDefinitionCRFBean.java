@@ -20,13 +20,13 @@
  */
 package org.akaza.openclinica.bean.managestudy;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.AuditableEntityBean;
-import org.akaza.openclinica.domain.SourceDataVerification;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.domain.SourceDataVerification;
 
 /**
  * The bean for event definition crf parameters.
@@ -64,6 +64,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	private ArrayList<Integer> selectedVersionIdList = new ArrayList<Integer>(); // not in DB
 	private HashMap nullFlags = new LinkedHashMap(); // not in DB
 	private ArrayList<SourceDataVerification> sdvOptions = new ArrayList<SourceDataVerification>();
+	private String tabbingMode;
 
 	@Override
 	public int hashCode() {
@@ -97,6 +98,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		result = prime * result + ((emailTo == null) ? 0 : emailTo.hashCode());
 		result = prime * result + ((emailStep == null) ? 0 : emailStep.hashCode());
 		result = prime * result + (evaluatedCRF ? INT_1231 : INT_1237);
+		result = prime * result + ((tabbingMode == null) ? 0 : tabbingMode.hashCode());
 		return result;
 	}
 
@@ -246,6 +248,13 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 				return false;
 			}
 		} else if (!versions.equals(other.versions)) {
+			return false;
+		}
+		if (tabbingMode == null) {
+			if (other.tabbingMode != null) {
+				return false;
+			}
+		} else if (!tabbingMode.equals(other.tabbingMode)) {
 			return false;
 		}
 		return true;
@@ -533,5 +542,13 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	public void setSdvOptions(ArrayList<SourceDataVerification> sdvOptions) {
 		this.sdvOptions = sdvOptions;
+	}
+
+	public String getTabbingMode() {
+		return tabbingMode;
+	}
+
+	public void setTabbingMode(String tabbingMode) {
+		this.tabbingMode = tabbingMode;
 	}
 }

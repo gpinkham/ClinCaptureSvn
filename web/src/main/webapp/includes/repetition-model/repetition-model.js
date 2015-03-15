@@ -945,7 +945,7 @@ if(!window.RepetitionElement || (
       }
 
       block = _cloneNode(this);
-      _updateTabindex(this);
+      //_updateTabindex(this);
       block._initialized = false;
 
       //6. If this algorithm was invoked via the addRepetitionBlockByIndex()  method, the new repetition block

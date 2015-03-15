@@ -20,6 +20,16 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -29,15 +39,6 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.domain.SourceDataVerification;
-
-import javax.sql.DataSource;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * EventDefinitionCRFDAO class.
@@ -111,7 +112,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT); // parent_id
 		this.setTypeExpected(index++, TypeNames.STRING); // email_step
 		this.setTypeExpected(index++, TypeNames.STRING); // email_to
-		this.setTypeExpected(index, TypeNames.BOOL); // evaluated_crf
+		this.setTypeExpected(index++, TypeNames.BOOL); // evaluated_crf
+		this.setTypeExpected(index, TypeNames.STRING); // tabbing_mode
 	}
 
 	/**
@@ -158,6 +160,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		String emailStep = (String) hm.get("email_step");
 		eb.setEmailStep(emailStep != null ? emailStep : "");
 		eb.setEvaluatedCRF(((Boolean) hm.get("evaluated_crf")));
+		eb.setTabbingMode(((String) hm.get("tabbing_mode")));
 		return eb;
 	}
 
@@ -451,7 +454,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		}
 		variables.put(index++, sb.getEmailStep());
 		variables.put(index++, sb.getEmailTo());
-		variables.put(index, sb.isEvaluatedCRF());
+		variables.put(index++, sb.isEvaluatedCRF());
+		variables.put(index, sb.getTabbingMode());
 		this.execute(digester.getQuery("create"), variables, nullVars);
 
 		if (isQuerySuccessful()) {
@@ -507,6 +511,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		variables.put(index++, sb.getEmailStep());
 		variables.put(index++, sb.getEmailTo());
 		variables.put(index++, sb.isEvaluatedCRF());
+		variables.put(index++, sb.getTabbingMode());
 		variables.put(index, sb.getId());
 
 		String sql = digester.getQuery("update");
@@ -874,7 +879,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
 		return answer;
 	}
-	
+
 	/***
 	 * Finds the EventDefinitionCRFBean of a site, returns null if site doesn't override Event Definition CRF settings.
 	 * 

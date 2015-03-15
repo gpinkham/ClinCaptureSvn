@@ -505,6 +505,20 @@ $(document).ready(function() {
 			</tr>
 
             <tr>
+                <td class="table_cell" colspan="4">
+                    <fmt:message key="crfTabbingMode" bundle="${resword}"/>:
+                    <c:set var="leftToRightTabbingMode" value="checked"/>
+                    <c:set var="topToBottomTabbingMode" value=""/>
+                    <c:if test='${edc.tabbingMode == "topToBottom"}'>
+                        <c:set var="leftToRightTabbingMode" value=""/>
+                        <c:set var="topToBottomTabbingMode" value="checked"/>
+                    </c:if>
+                    <input type="radio" name="tabbingMode${count}" onchange="javascript:changeIcon();" value="leftToRight" ${leftToRightTabbingMode}/> <fmt:message key="leftToRight" bundle="${resword}"/>
+                    <input type="radio" name="tabbingMode${count}" onchange="javascript:changeIcon();" value="topToBottom" ${topToBottomTabbingMode}/> <fmt:message key="topToBottom" bundle="${resword}"/>
+                </td>
+            </tr>
+
+            <tr>
                 <td class="table_cell" colspan="4">&nbsp;</td>
             </tr>
 

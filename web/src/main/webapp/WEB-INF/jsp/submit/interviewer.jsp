@@ -414,14 +414,16 @@
                     <c:choose>
                         <c:when test="${isInError_Int}">
                             <span class="aka_input_error" style="display:inline-block;height:22px;">
-                                <label for="interviewer"></label><input id="interviewer" type="text" name="interviewer" size="15" value="<c:out value="${interviewer}" />" class="aka_input_error">
+                                <label for="interviewer"></label><input tabindex="${crfTabIndex}" id="interviewer" type="text" name="interviewer" size="15" value="<c:out value="${interviewer}" />" class="aka_input_error">
                             </span>
+                            <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
                         </c:when>
                         <c:otherwise>
                             <span class="formfieldM_BG" style="display:inline-block;height:22px;">
-                                <input type="text" id="interviewer" name="interviewer" size="15"
+                                <input tabindex="${crfTabIndex}" type="text" id="interviewer" name="interviewer" size="15"
                                        value="<c:out value="${interviewer}" />" class="formfieldM">
                             </span>
+                            <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
                         </c:otherwise>
                     </c:choose>
                 </c:when>
@@ -499,31 +501,33 @@
             </c:choose>
         </c:if>
         <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
-        <c:set var="showPreDnShortcutsTr" value="true"/>
-        <c:choose>
-        <c:when test="${study.studyParameterConfig.interviewDateEditable=='true'}">
-        <c:choose>
-        <c:when test="${isInError_Dat}">
-        <span class="aka_input_error" style="display:inline-block;height:22px;">
-            <label for="interviewDate"></label>
-            <input id="interviewDate" type="text" name="interviewDate" size="15"
-                   value="<c:out value="${interviewDate}" />" class="aka_input_error">
-            </c:when>
-            <c:otherwise>
-            <span class="formfieldM_BG" style="display:inline-block;height:22px;">
-                <input id="interviewDate" type="text" name="interviewDate" size="15"
-                       value="<c:out value="${interviewDate}" />" class="formfieldM">
-                </c:otherwise>
-                </c:choose>
-                </c:when>
-                <c:otherwise>
-                <span class="formfieldM_BG" style="display:inline-block;height:22px;">
-                    <input id="interviewDate" type="text" disabled size="15"
-                           value="<c:out value="${interviewDate}" />" class="formfieldM">
-                    <input type="hidden" name="interviewDate"
-                           value="<c:out value="${interviewDate}" />">
+                <c:set var="showPreDnShortcutsTr" value="true"/>
+                <c:choose>
+                    <c:when test="${study.studyParameterConfig.interviewDateEditable=='true'}">
+                        <c:choose>
+                            <c:when test="${isInError_Dat}">
+                                <span class="aka_input_error" style="display:inline-block;height:22px;">
+                                <label for="interviewDate"></label>
+                                <input tabindex="${crfTabIndex}" id="interviewDate" type="text" name="interviewDate" size="15"
+                                       value="<c:out value="${interviewDate}" />" class="aka_input_error">
+                                <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="formfieldM_BG" style="display:inline-block;height:22px;">
+                                <input tabindex="${crfTabIndex}" id="interviewDate" type="text" name="interviewDate" size="15"
+                                       value="<c:out value="${interviewDate}" />" class="formfieldM">
+                                <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:when>
+                    <c:otherwise>
+                        <span class="formfieldM_BG" style="display:inline-block;height:22px;">
+                        <input id="interviewDate" type="text" disabled size="15"
+                               value="<c:out value="${interviewDate}" />" class="formfieldM">
+                        <input type="hidden" name="interviewDate"
+                               value="<c:out value="${interviewDate}" />">
                     </c:otherwise>
-                    </c:choose>
+                </c:choose>
                 </span>
                 <a href="#!" onclick="$('#interviewDate').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
                     <img style="vertical-align: middle;" src="<c:out value="${contextPath}" />/images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
@@ -585,6 +589,7 @@
 </tr>
 </table></table>
 
+<script>tabbingMode = "${event_def_crf_bean.tabbingMode}";</script>
 <c:set var="tdPercentWidth" value="16.7%"/>
 <c:set var="dnShortcutsSpan" value="${6}"/>
 <c:set var="dnShortcutsWidth" value="${110}"/>

@@ -20,7 +20,16 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.ValidatorHelper;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -45,16 +54,9 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import com.clinovo.util.ValidatorHelper;
 
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class UpdateSubStudyServlet extends Controller {
 
@@ -141,7 +143,8 @@ public class UpdateSubStudyServlet extends Controller {
 	 *            the map with previous action errors
 	 * @param parentStudy
 	 *            the parent study bean for parent study status validation
-	 * @throws <code>Exception</code> for all exceptions
+	 * @throws Exception
+	 *             an Exception
 	 */
 	private void confirmStudy(HttpServletRequest request, HttpServletResponse response, HashMap errors,
 			StudyBean parentStudy) throws Exception {
@@ -375,6 +378,7 @@ public class UpdateSubStudyServlet extends Controller {
 					String requiredCRF = fp.getString("requiredCRF" + order);
 					String deQuality = fp.getString("deQuality" + order);
 					String emailCRFTo = fp.getString("mailTo" + order);
+					String tabbingMode = fp.getString("tabbingMode" + order);
 					String emailOnStep = fp.getString("emailOnStep" + order);
 					String electronicSignature = fp.getString("electronicSignature" + order);
 					String hideCRF = fp.getString("hideCRF" + order);
@@ -389,6 +393,8 @@ public class UpdateSubStudyServlet extends Controller {
 						selectedVersionIds = selectedVersionIds.substring(0, selectedVersionIds.length() - 1);
 					}
 					boolean changed = false;
+					tabbingMode = tabbingMode.equalsIgnoreCase("topToBottom")
+							|| tabbingMode.equalsIgnoreCase("leftToRight") ? tabbingMode : "leftToRight";
 					boolean isRequired = !StringUtil.isBlank(requiredCRF) && YES.equalsIgnoreCase(requiredCRF.trim());
 					boolean isDouble = !StringUtil.isBlank(deQuality) && DDE.equalsIgnoreCase(deQuality.trim());
 					boolean hasPassword = !StringUtil.isBlank(electronicSignature)
@@ -404,6 +410,10 @@ public class UpdateSubStudyServlet extends Controller {
 							CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultVersionId);
 							edcBean.setDefaultVersionId(defaultVersionId);
 							edcBean.setDefaultVersionName(defaultVersion.getName());
+						}
+						if (!tabbingMode.equals(edcBean.getTabbingMode())) {
+							changed = true;
+							edcBean.setTabbingMode(tabbingMode);
 						}
 						if (isRequired != edcBean.isRequiredCRF()) {
 							changed = true;
@@ -458,7 +468,7 @@ public class UpdateSubStudyServlet extends Controller {
 						int defaultId = defaultVersionId > 0 ? defaultVersionId : edcBean.getDefaultVersionId();
 						int dbDefaultVersionId = edcBean.getDefaultVersionId();
 						if (defaultId == dbDefaultVersionId && isRequired == edcBean.isRequiredCRF()
-								&& isDouble == edcBean.isDoubleEntry()
+								&& isDouble == edcBean.isDoubleEntry() && tabbingMode.equals(edcBean.getTabbingMode())
 								&& hasPassword == edcBean.isElectronicSignature() && isHide == edcBean.isHideCrf()) {
 							if (selectedVersionIdListSize > 0) {
 								if (selectedVersionIdListSize == edcBean.getVersions().size()
@@ -488,6 +498,7 @@ public class UpdateSubStudyServlet extends Controller {
 							edcBean.setHideCrf(isHide);
 							edcBean.setEmailStep(emailOnStep);
 							edcBean.setEvaluatedCRF(isEvaluatedCRF);
+							edcBean.setTabbingMode(tabbingMode);
 							if (StringUtil.isBlank(emailOnStep)) {
 								edcBean.setEmailTo("");
 							} else {
@@ -575,6 +586,6 @@ public class UpdateSubStudyServlet extends Controller {
 			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
-	}
+		}
 	}
 }

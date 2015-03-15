@@ -340,6 +340,15 @@ public class UpdateEventDefinitionServlet extends Controller {
 				int sdvId = fp.getInt("sdvOption" + i);
 				String emailStep = fp.getString("emailOnStep" + i);
 				String emailTo = fp.getString("mailTo" + i);
+				String tabbingMode = fp.getString("tabbingMode" + i);
+
+				if (!StringUtil.isBlank(tabbingMode)
+						&& ("leftToRight".equalsIgnoreCase(tabbingMode.trim()) || "topToBottom"
+								.equalsIgnoreCase(tabbingMode.trim()))) {
+					edcBean.setTabbingMode(tabbingMode);
+				} else {
+					edcBean.setTabbingMode("leftToRight");
+				}
 
 				if (!StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim())) {
 					edcBean.setHideCrf(true);

@@ -799,6 +799,19 @@ function updateThis(multiSelEle, count) {
 				<span class="alert" style="display:none"><fmt:message key="enter_valid_email" bundle="${resnotes}"/></span>
 			</td>
 		</tr>
+        <tr valign="top">
+            <td class="table_cell" colspan="4">
+                <fmt:message key="crfTabbingMode" bundle="${resword}"/>:
+                <c:set var="leftToRightTabbingMode" value="checked"/>
+                <c:set var="topToBottomTabbingMode" value=""/>
+                <c:if test='${edc.tabbingMode == "topToBottom"}'>
+                    <c:set var="leftToRightTabbingMode" value=""/>
+                    <c:set var="topToBottomTabbingMode" value="checked"/>
+                </c:if>
+                <input type="radio" name="tabbingMode${num}" onchange="javascript:changeIcon();" value="leftToRight" ${leftToRightTabbingMode}/> <fmt:message key="leftToRight" bundle="${resword}"/>
+                <input type="radio" name="tabbingMode${num}" onchange="javascript:changeIcon();" value="topToBottom" ${topToBottomTabbingMode}/> <fmt:message key="topToBottom" bundle="${resword}"/>
+            </td>
+        </tr>
 		<c:set var="count" value="${count+1}"/>
 		</c:if>
 		<tr><td class="table_divider" colspan="8">&nbsp;</td></tr>

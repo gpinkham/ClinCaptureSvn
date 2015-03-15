@@ -172,6 +172,8 @@
     }
 </script>
 
+<c:set var="crfTabIndex" value="${1}" scope="request"/>
+
 <c:import url="interviewer.jsp">
   <c:param name="hasNameNote" value="${hasNameNote}"/>
   <c:param name="hasDateNote" value="${hasDateNote}"/>
@@ -463,7 +465,6 @@ function setParameterForDN(field, parameterName, value) {
 
 <table border="0" cellpadding="0" cellspacing="0">
 <c:set var="displayItemNum" value="${0}" />
-<c:set var="itemNum" value="${0}" />
 <c:set var="numOfTr" value="0"/>
 <c:set var="numOfDate" value="1"/>
 <c:if test='${section.section.title != ""}'>
@@ -645,7 +646,7 @@ function setParameterForDN(field, parameterName, value) {
         <strong><c:out value="${displayItem.itemGroup.groupMetaBean.header}"/></strong>
     </div>
 </c:if>
-<table border="0" cellspacing="0" cellpadding="0" class="aka_form_table" width="100%">
+<table border="0" cellspacing="0" cellpadding="0" class="aka_form_table repeatingGroupTable" width="100%">
 <thead>
 <tr>
         <%-- if there are horizontal checkboxes or radios anywhere in the group...--%>
@@ -757,8 +758,10 @@ function setParameterForDN(field, parameterName, value) {
 <tbody>
 
 <c:set var="uniqueId" value="${0}"/>
-
 <c:set var="dbItemGroupsSize" value="${fn:length(displayItem.dbItemGroups)}"/>
+<c:set var="itemGroupsSize" value="${fn:length(displayItem.itemGroups)}"/>
+<c:set var="tabbingMode" value="${event_def_crf_bean.tabbingMode}"/>
+<c:set var="itemNum" value="${crfTabIndex}"/>
 
 <c:forEach var="bodyItemGroup" items="${displayItem.itemGroups}"  varStatus="status">
 <c:set var="columnNum"  value="1"/>
@@ -768,9 +771,17 @@ function setParameterForDN(field, parameterName, value) {
     <c:set var="savedIntoDB" value="true"/>
 </c:if>
 
-<tr repeat="0">
+<tr repeat="${uniqueId}" class="repeatingTableRow">
 <c:set var="columnNum"  value="1"/>
-<c:forEach var="bodyItem" items="${bodyItemGroup.items}">
+<c:forEach var="bodyItem" items="${bodyItemGroup.items}" varStatus="bodyItemStatus">
+<c:choose>
+    <c:when test='${tabbingMode eq "leftToRight"}'>
+        <c:set var="itemNum" value="${crfTabIndex}"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="itemNum" value="${crfTabIndex + bodyItemStatus.index}"/>
+    </c:otherwise>
+</c:choose>
 <c:choose>
 <c:when test="${bodyItem.metadata.showItem}">
 	<%-- adding more highlighting here, tbh 05/2010 --%>
@@ -791,7 +802,6 @@ function setParameterForDN(field, parameterName, value) {
             	<%-- do nothing here ? --%>
             </c:otherwise>
         </c:choose>
-    <c:set var="itemNum" value="${itemNum + 1}" />
     <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
     <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
       bodyItem.metadata.responseLayout eq 'Horizontal'}">
@@ -955,9 +965,17 @@ function setParameterForDN(field, parameterName, value) {
 </tr>
 <c:if test="${status.last}">
 <!-- for the last but not the only first row, we need to use [] so the repetition javascript can copy it to create new row-->
-<tr id="<c:out value="${repeatParentId}"/>" repeat="template" repeat-start="<c:out value="${repeatNumber}"/>" repeat-max="<c:out value="${repeatMax}"/>">
+<tr id="<c:out value="${repeatParentId}"/>" class="repeatingTableRow" repeat="template" repeat-start="<c:out value="${repeatNumber}"/>" repeat-max="<c:out value="${repeatMax}"/>">
 
-    <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
+    <c:forEach var="bodyItem" items="${bodyItemGroup.items}" varStatus="bodyItemState">
+    <c:choose>
+        <c:when test='${tabbingMode eq "leftToRight"}'>
+            <c:set var="itemNum" value="${crfTabIndex}"/>
+        </c:when>
+        <c:otherwise>
+            <c:set var="itemNum" value="${crfTabIndex + bodyItemState.index}"/>
+        </c:otherwise>
+    </c:choose>
     <c:choose>
     <c:when test="${bodyItem.metadata.showItem}">
 	<%-- set up highlighting here, tbh 05/2010 --%>
@@ -982,7 +1000,6 @@ function setParameterForDN(field, parameterName, value) {
                 <%-- do nothing here ? --%>
             </c:otherwise>
         </c:choose>
-        <c:set var="itemNum" value="${itemNum + 1}" />
         <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
         <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
       bodyItem.metadata.responseLayout eq 'Horizontal'}">
@@ -1130,8 +1147,10 @@ function setParameterForDN(field, parameterName, value) {
     </c:if>
 </tr>
 
+<c:if test="${itemGroupsSize ne null && itemGroupsSize > 0}">
+    <c:set var="crfTabIndex" value="${crfTabIndex + fn:length(displayItem.itemGroups[0].items)}" scope="request"/>
 </c:if>
-
+</c:if>
 
 <c:set var="uniqueId" value="${uniqueId +1}"/>
 </c:forEach>
@@ -1422,7 +1441,6 @@ function setParameterForDN(field, parameterName, value) {
                                 <td valign="top" nowrap="nowrap">
 
                                         <%-- display the HTML input tag --%>
-                                    <c:set var="itemNum" value="${itemNum + 1}" />
                                     <c:set var="displayItem" scope="request" value="${childItem}" />
                                     <c:import url="../submit/showItemInput.jsp" >
                                         <c:param name="key" value="${numOfDate}" />
@@ -1475,7 +1493,6 @@ function setParameterForDN(field, parameterName, value) {
 </c:choose>
 
 <c:set var="displayItemNum" value="${displayItemNum + 1}" />
-<c:set var="itemNum" value="${itemNum + 1}" />
 </c:if>
 </c:forEach>
 </table>
@@ -1549,6 +1566,7 @@ table-->
 <div id="testdiv1" style=
   "position:absolute;visibility:hidden;background-color:white"></div>
 </div>
+<script>initCustomTabbing();</script>
 <jsp:include page="../include/changeTheme.jsp"/>
 <script>
     window.onbeforeunload = function(){

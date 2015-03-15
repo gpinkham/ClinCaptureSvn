@@ -139,6 +139,7 @@
 			<td valign="top" class="table_header_row"><fmt:message key="send_email_when" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="email_crf_to" bundle="${resword}"/></td>
             <td valign="top" class="table_header_row"><fmt:message key="evaluated_crf" bundle="${resword}"/></td>
+            <td valign="top" class="table_header_row"><fmt:message key="crfTabbingMode" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>
 		</tr>
 
@@ -232,6 +233,13 @@
                 <c:choose>
                     <c:when test="${crf.evaluatedCRF == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
                     <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+                </c:choose>
+            </td>
+
+            <td class="table_cell">
+                <c:choose>
+                    <c:when test='${crf.tabbingMode == "leftToRight"}'> <fmt:message key="leftToRight" bundle="${resword}"/> </c:when>
+                    <c:otherwise> <fmt:message key="topToBottom" bundle="${resword}"/> </c:otherwise>
                 </c:choose>
             </td>
 
