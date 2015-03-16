@@ -28,12 +28,17 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.service.crfdata.SCDData;
 import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DisplayItemBean.
  */
 @SuppressWarnings({"rawtypes"})
 public class DisplayItemBean implements Comparable {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DisplayItemBean.class);
+
 	public static final int INT_1231 = 1231;
 	public static final int INT_1237 = 1237;
 	private ItemDataBean data;
@@ -43,7 +48,7 @@ public class DisplayItemBean implements Comparable {
 	private String editFlag = ""; // used for items in a group
 	private ItemDataBean dbData; // used for DDE, items in a group
 	private boolean autoAdded; // used for data import
-
+	private String maxLength;
 	// adding totals here for display purposes
 
 	private int totNew;
@@ -746,5 +751,38 @@ public class DisplayItemBean implements Comparable {
 
 	public void setGroupMetadata(ItemGroupMetadataBean groupMetadata) {
 		this.groupMetadata = groupMetadata;
+	}
+
+	private int parseWidth(String widthDecimal) {
+		String w;
+		widthDecimal = widthDecimal.trim();
+		if (widthDecimal.contains("(")) {
+			w = widthDecimal.split("\\(")[0];
+		} else {
+			w = widthDecimal;
+		}
+		if (w.length() > 0) {
+			return "w".equalsIgnoreCase(w) ? 0 : Integer.parseInt(w);
+		}
+		return 0;
+	}
+
+	public String getMaxLength() {
+		maxLength = "";
+		try {
+			int width = parseWidth(metadata.getWidthDecimal());
+			if (width > 0) {
+				maxLength = Integer.toString(width);
+			} else if ("ST".equalsIgnoreCase(item.getDataType().getName())) {
+				maxLength = "4000";
+			} else if ("INT".equalsIgnoreCase(item.getDataType().getName())) {
+				maxLength = "11";
+			} else if ("REAL".equalsIgnoreCase(item.getDataType().getName())) {
+				maxLength = "27";
+			}
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+		return maxLength;
 	}
 }

@@ -409,6 +409,7 @@
         </c:if>
         <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
             <c:set var="showPreDnShortcutsTr" value="true"/>
+            <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
             <c:choose>
                 <c:when test="${study.studyParameterConfig.interviewerNameEditable=='true'}">
                     <c:choose>
@@ -416,14 +417,12 @@
                             <span class="aka_input_error" style="display:inline-block;height:22px;">
                                 <label for="interviewer"></label><input tabindex="${crfTabIndex}" id="interviewer" type="text" name="interviewer" size="15" value="<c:out value="${interviewer}" />" class="aka_input_error">
                             </span>
-                            <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
                         </c:when>
                         <c:otherwise>
                             <span class="formfieldM_BG" style="display:inline-block;height:22px;">
                                 <input tabindex="${crfTabIndex}" type="text" id="interviewer" name="interviewer" size="15"
                                        value="<c:out value="${interviewer}" />" class="formfieldM">
                             </span>
-                            <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
                         </c:otherwise>
                     </c:choose>
                 </c:when>
@@ -502,6 +501,7 @@
         </c:if>
         <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
                 <c:set var="showPreDnShortcutsTr" value="true"/>
+                <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
                 <c:choose>
                     <c:when test="${study.studyParameterConfig.interviewDateEditable=='true'}">
                         <c:choose>
@@ -510,13 +510,11 @@
                                 <label for="interviewDate"></label>
                                 <input tabindex="${crfTabIndex}" id="interviewDate" type="text" name="interviewDate" size="15"
                                        value="<c:out value="${interviewDate}" />" class="aka_input_error">
-                                <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
                             </c:when>
                             <c:otherwise>
                                 <span class="formfieldM_BG" style="display:inline-block;height:22px;">
                                 <input tabindex="${crfTabIndex}" id="interviewDate" type="text" name="interviewDate" size="15"
                                        value="<c:out value="${interviewDate}" />" class="formfieldM">
-                                <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
                             </c:otherwise>
                         </c:choose>
                     </c:when>

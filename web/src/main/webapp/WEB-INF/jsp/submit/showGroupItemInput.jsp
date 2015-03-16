@@ -399,12 +399,12 @@ function changeImage(obj) {
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span>
-      <input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-             onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
+      <input datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
+             autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
     </c:when>
     <c:otherwise>
-      <input id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-             onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
+      <input datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
+             autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
@@ -419,12 +419,12 @@ function changeImage(obj) {
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span>
-      <textarea class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-                onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+      <textarea datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
+                autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:when>
     <c:otherwise>
-      <textarea id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-                onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');  changeImage(this);" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+      <textarea datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
+                autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');  changeImage(this);" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:otherwise>
   </c:choose>
 </c:if>

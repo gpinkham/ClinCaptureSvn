@@ -224,7 +224,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%><d
 
 </script>
 
-<c:set var="crfTabIndex" value="${1}" scope="request"/>
+<c:set var="crfTabIndex" value="${0}" scope="request"/>
 
 <c:import url="interviewer.jsp">
   <c:param name="hasNameNote" value="${hasNameNote}"/>
@@ -731,6 +731,7 @@ but the custom tag uses that, not this jstl code--%>
         <strong><c:out value="${displayItem.itemGroup.groupMetaBean.header}" escapeXml="false"/></strong>
     </div>
 </c:if>
+<c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
 <table border="0" cellspacing="0" cellpadding="0" class="aka_form_table repeatingGroupTable" width="100%">
 <thead>
 <tr>
@@ -1259,8 +1260,8 @@ but the custom tag uses that, not this jstl code--%>
     </c:if>
 </tr>
 
-<c:if test="${itemGroupsSize ne null && itemGroupsSize > 0}">
-    <c:set var="crfTabIndex" value="${crfTabIndex + fn:length(displayItem.itemGroups[0].items)}" scope="request"/>
+<c:if test='${tabbingMode eq "topToBottom" && itemGroupsSize ne null && itemGroupsSize > 0}'>
+    <c:set var="crfTabIndex" value="${crfTabIndex + fn:length(displayItem.itemGroups[0].items) - 1}" scope="request"/>
 </c:if>
 </c:if>
 
@@ -1693,6 +1694,7 @@ table-->
 <div id="testdiv1" style=
   "position:absolute;visibility:hidden;background-color:white"></div>
 </div>
+<script>initAutotabbing();</script>
 <jsp:include page="../include/changeTheme.jsp"/>
 <script>
     window.onbeforeunload = function(){

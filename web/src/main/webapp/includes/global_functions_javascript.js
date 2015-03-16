@@ -15,6 +15,8 @@ var windowScrollLeft = 0;
 var dnShortcutsTableDefTop = 174;
 var dnShortcutsTableDefLeft = 78;
 
+var autotabbingCurrentElementName = "";
+
 function selectAllChecks(formObj,value){
     if(formObj) {
         var allChecks = formObj.getElementsByTagName("input");
@@ -4648,4 +4650,59 @@ function checkOrUncheckAllByClass(className, check) {
 	$(selector).each(function() {		
 		this.checked = check;
 	});
+}
+
+function focusNextIfExceedMaxLength(element, maxLength, value, event) {
+    if (value.length >= maxLength) {
+        var tabIndex = parseInt($(element).attr("tabindex"));
+        var allElements = $("[tabindex=" + tabIndex + "]").not("[name*=]input]");
+        var index = allElements.index($(element));
+        if (allElements.length > 1 && index < allElements.length - 1) {
+            $(allElements.get(index + 1)).focus();
+        } else {
+            var nextElement = $("[tabindex=" + (tabIndex + 1) + "]:first");
+            if (nextElement.length != 0) {
+                nextElement.focus();
+            } else {
+                $("[tabindex]:visible:first").focus();
+            }
+        }
+    }
+}
+
+function checkMaxLength(element, event) {
+    try {
+        var ev = event || window.event;
+        var keyCode = String.fromCharCode(ev.which || ev.keyCode);
+        if (keyCode.match(/\w/) || keyCode.match(/\d/)) {
+            var type = $(element).attr("type");
+            var tagName = $(element).get(0).nodeName;
+            var dataType = $(element).attr("datatype");
+            var maxLength = $(element).attr("maxlength");
+            if (maxLength != "") {
+                if (tagName.toLowerCase() == "input" && type.toLowerCase() == "text") {
+                    focusNextIfExceedMaxLength(element, parseInt(maxLength), $(element).val(),event);
+                } else if (tagName.toLowerCase() == "textarea") {
+                    focusNextIfExceedMaxLength(element, parseInt(maxLength), $(element).text(), event);
+                }
+            }
+        }
+    } catch (e) {}
+}
+
+function initAutotabbing() {
+    $(document).keydown(function(event) {
+        var ev = event || window.event;
+        var element = ev.target || ev.srcElement;
+        if (element != undefined && $(element).attr("autotabbing") != undefined) {
+            autotabbingCurrentElementName = $(element).attr("name");
+        }
+    });
+    $(document).keyup(function(event) {
+        var ev = event || window.event;
+        var element = ev.target || ev.srcElement;
+        if (element != undefined && $(element).attr("autotabbing") != undefined && autotabbingCurrentElementName == $(element).attr("name")) {
+            checkMaxLength(element, event);
+        }
+    });
 }

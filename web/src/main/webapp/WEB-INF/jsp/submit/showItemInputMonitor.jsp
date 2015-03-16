@@ -173,11 +173,11 @@ form element in red --%>
   <label for="input<c:out value="${itemId}"/>"></label>
   <c:choose>
     <c:when test="${isInError}">
-      <span class="aka_exclaim_error">! </span><input tabbed rowcount="" class="aka_input_error" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange=
+      <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange=
       "this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="input<c:out value="${itemId}" />" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
     </c:when>
     <c:otherwise>
-      <input tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange=
+      <input id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange=
         "this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="input<c:out value="${itemId}" />" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
     </c:otherwise>
   </c:choose>
@@ -192,10 +192,10 @@ form element in red --%>
   <label for="input<c:out value="${itemId}"/>"></label>
   <c:choose>
     <c:when test="${isInError}">
-      <span class="aka_exclaim_error">! </span><textarea tabbed rowcount="" class="aka_input_error" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+      <span class="aka_exclaim_error">! </span><textarea class="aka_input_error" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:when>
     <c:otherwise>
-      <textarea tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+      <textarea id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:otherwise>
   </c:choose>
 </c:if>
@@ -216,10 +216,10 @@ form element in red --%>
     <label for="input<c:out value="${itemId}"/>"></label>
     <c:choose>
       <c:when test="${isInError}">
-        <span class="aka_exclaim_error">! </span><input tabbed rowcount="" class="aka_input_error" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+        <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
       </c:when>
       <c:otherwise>
-        <input tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+        <input id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
       </c:otherwise>
     </c:choose>
   </c:forEach>
@@ -235,9 +235,9 @@ form element in red --%>
     <label for="input<c:out value="${itemId}"/>"></label>
     <c:choose>
       <c:when test="${isInError}">
-        <span class="aka_exclaim_error">! </span><input tabbed rowcount="" class="aka_input_error" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+        <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
       </c:when><c:otherwise>
-      <input tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+      <input id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
     </c:otherwise>
     </c:choose>
   </c:forEach>
@@ -253,7 +253,7 @@ form element in red --%>
 
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span>
-      <select tabbed rowcount="" class="aka_input_error formfield" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>">
+      <select class="aka_input_error formfield" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>">
 
       <%-- taken from lines 195-203 below --%>
 
@@ -318,7 +318,7 @@ form element in red --%>
       <c:set var="count" value="${count+1}"/>
     </c:forEach>
 
-    <select tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>" class="formfield">
+    <select id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>" class="formfield">
 
       <c:choose>
 
@@ -361,9 +361,9 @@ form element in red --%>
   <label for="input<c:out value="${itemId}"/>"></label>
   <c:choose>
     <c:when test="${isInError}">
-      <span class="aka_exclaim_error">! </span><select tabbed rowcount="" class="aka_input_error" id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
+      <span class="aka_exclaim_error">! </span><select class="aka_input_error" id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
     </c:when><c:otherwise>
-    <select tabbed rowcount="" id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
+    <select id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
   </c:otherwise>
   </c:choose>
   <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">

@@ -552,12 +552,12 @@ function changeImage(obj) {
   <c:choose>
     <c:when test="${isInError && !hasShown}">
       <span class="<c:out value="${exclaim}"/>">! </span>
-      <input tabbed rowcount="" class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
-             onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="text" name="input<c:out value="${itemId}" />" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
+      <input datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
+             autotabbing="" onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="text" name="input<c:out value="${itemId}" />" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
     </c:when>
     <c:otherwise>
-      <input tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
-             onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:changeImage(this);" type="text" name="input<c:out value="${itemId}" />" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
+      <input datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
+             autotabbing="" onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="text" name="input<c:out value="${itemId}" />" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
@@ -572,12 +572,12 @@ function changeImage(obj) {
   <c:choose>
     <c:when test="${isInError && !hasShown}">
       <span class="<c:out value="${exclaim}"/>">! </span>
-      <textarea tabbed rowcount="" class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
-                onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+      <textarea datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
+                autotabbing="" onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:when>
     <c:otherwise>
-      <textarea tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
-                onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+      <textarea datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
+                autotabbing="" onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:otherwise>
   </c:choose>
 </c:if>
@@ -606,11 +606,11 @@ function changeImage(obj) {
 			<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 	    	</c:forEach>
-	    	<input tabbed rowcount="" class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onClick="javascript:checkControlShow(this, '<c:out value="${scdPairStr}"/>');"
+	    	<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onClick="javascript:checkControlShow(this, '<c:out value="${scdPairStr}"/>');"
                    onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
        	</c:when>
 		<c:otherwise>
-			<input tabbed rowcount="" class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
+			<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
                    onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
       	</c:otherwise>
 		</c:choose>
@@ -622,11 +622,11 @@ function changeImage(obj) {
 			<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 	    	</c:forEach>
-    		<input tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onClick="javascript:checkControlShow(this, '<c:out value="${scdPairStr}"/>');"
+    		<input id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onClick="javascript:checkControlShow(this, '<c:out value="${scdPairStr}"/>');"
                    onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:out value="${isChecked}"/> <c:if test="${! isHorizontal}"><br/></c:if>
       	</c:when>
 		<c:otherwise>
-			<input tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
+			<input id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
                    onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
       	</c:otherwise>
 		</c:choose>
@@ -652,11 +652,11 @@ function changeImage(obj) {
 					<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 						<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 	    			</c:forEach>
-	    			<input tabbed rowcount="" class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onClick="javascript:radioControlShow(this, '<c:out value="${scdPairStr}"/>');"
+	    			<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onClick="javascript:radioControlShow(this, '<c:out value="${scdPairStr}"/>');"
                            onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
 		        </c:when>
 		        <c:otherwise>
-		        	<input tabbed rowcount="" class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
+		        	<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
                            onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
 		        </c:otherwise>
 	        	</c:choose>
@@ -668,11 +668,11 @@ function changeImage(obj) {
 					<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 						<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 	    			</c:forEach>
-		            <input tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"  onClick="javascript:radioControlShow(this, '<c:out value="${scdPairStr}"/>');"
+		            <input id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"  onClick="javascript:radioControlShow(this, '<c:out value="${scdPairStr}"/>');"
                            onChange="this.className='changedField'; javascript:destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
 		        </c:when>
 		        <c:otherwise>
-		        	<input tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
+		        	<input id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
                            onChange="this.className='changedField'; javascript:destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
 		        </c:otherwise>
 	        	</c:choose>
@@ -714,11 +714,11 @@ include the default value first in the select list --%>
 			<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 			</c:forEach>
-			<select tabbed rowcount="" class="<c:out value="${input}"/> formfield" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
+			<select class="<c:out value="${input}"/> formfield" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
                     onChange="destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); changeImage(this);" name="input<c:out value="${itemId}"/>">
 		</c:when>
 		<c:otherwise>
-			<select tabbed rowcount="" class="<c:out value="${input}"/> formfield" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
+			<select class="<c:out value="${input}"/> formfield" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
                     onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" name="input<c:out value="${itemId}"/>">
 		</c:otherwise>
 		</c:choose>
@@ -761,11 +761,11 @@ include the default value first in the select list --%>
 		<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 			<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
     	</c:forEach>
-    	<select tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
+    	<select id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
                 onChange="destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); this.className='changedField'; changeImage(this);" name="input<c:out value="${itemId}"/>" class="formfield">
     </c:when>
 	<c:otherwise>
-		<select tabbed rowcount="" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
+		<select id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
                 onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" name="input<c:out value="${itemId}"/>" class="formfield">
 	</c:otherwise>
 	</c:choose>
@@ -814,11 +814,11 @@ include the default value first in the select list --%>
 			<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 			</c:forEach>
-      		<select tabbed rowcount="" class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>"
+      		<select class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>"
                     onChange="destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); changeImage(this);">
 		</c:when>
 		<c:otherwise>
-      		<select tabbed rowcount="" class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>"
+      		<select class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>"
                     onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);">
   		</c:otherwise>
 		</c:choose>
@@ -830,11 +830,11 @@ include the default value first in the select list --%>
 			<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 	    	</c:forEach>
-    		<select tabbed rowcount="" id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>"
+    		<select id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>"
                     onChange="destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); this.className='changedField'; changeImage(this);">
   		</c:when>
   		<c:otherwise>
-  			<select tabbed rowcount="" id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>"
+  			<select id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>"
                     onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage(this);">
   		</c:otherwise>
   		</c:choose>
