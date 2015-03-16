@@ -24,6 +24,7 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.EventCRFUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -37,7 +38,6 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
@@ -147,6 +147,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		imageIconPaths.put(index++, "images/icon_DoubleCheck.gif");
 		imageIconPaths.put(index, "images/icon_Invalid.gif");
 
+		crfColumnImageIconPaths.put(Status.INVALID.getId(), "images/icon_Invalid.gif");
 		crfColumnImageIconPaths.put(Status.NOT_STARTED.getId(), "images/icon_NotStarted.gif");
 		crfColumnImageIconPaths.put(Status.DATA_ENTRY_STARTED.getId(), "images/icon_InitialDE.gif");
 		crfColumnImageIconPaths.put(Status.INITIAL_DATA_ENTRY_COMPLETED.getId(), "images/icon_InitialDEcomplete.gif");
@@ -320,11 +321,14 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				d.getProps().put("studySubject.createdDate", null);
 				for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
 					CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
-					d.getProps().put("crf_" + crf.getId(), getCRFStatusId(studySubjectBean, null, null, null, null));
+					EventDefinitionCRFBean eventDefinitionCRFBean =
+							getEventDefinitionCRFBean(selectedStudyEventDefinition.getId(), crf, studySubjectBean);
+					d.getProps().put("crf_" + crf.getId(),
+							EventCRFUtil.getEventCRFCurrentStatus(studySubjectBean, null, eventDefinitionCRFBean,
+									null, getCRFVersionDAO(), getEventDefintionCRFDAO()));
 					d.getProps().put("crf_" + crf.getId() + "_eventCrf", null);
 					d.getProps().put("crf_" + crf.getId() + "_crf", crf);
-					d.getProps().put("crf_" + crf.getId() + "_eventDefinitionCrf",
-							getEventDefinitionCRFBean(selectedStudyEventDefinition.getId(), crf, studySubjectBean));
+					d.getProps().put("crf_" + crf.getId() + "_eventDefinitionCrf", eventDefinitionCRFBean);
 					theItem.put("crf_" + crf.getId(), "");
 				}
 				events.add(d);
@@ -337,19 +341,19 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				d.getProps().put("studySubject.createdDate", studyEventBean.getDateStarted());
 				for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
 					CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
+					EventDefinitionCRFBean eventDefinitionCRFBean =
+							getEventDefinitionCRFBean(selectedStudyEventDefinition.getId(), crf, studySubjectBean);
 					EventCRFBean eventCRFBean = crfAsKeyEventCrfAsValue.get(crf.getId() + "_" + studyEventBean.getId());
-					d.getProps().put(
-							"crf_" + crf.getId(),
-							getCRFStatusId(studySubjectBean, studyEventBean, studyEventBean.getSubjectEventStatus(),
-									crf, eventCRFBean));
+					d.getProps().put("crf_" + crf.getId(),
+							EventCRFUtil.getEventCRFCurrentStatus(studySubjectBean, studyEventBean,
+									eventDefinitionCRFBean, eventCRFBean, getCRFVersionDAO(), getEventDefintionCRFDAO()));
 					if (eventCRFBean != null) {
 						d.getProps().put("crf_" + crf.getId() + "_eventCrf", eventCRFBean);
 					} else {
 						d.getProps().put("crf_" + crf.getId() + "_eventCrf", null);
 					}
 					d.getProps().put("crf_" + crf.getId() + "_crf", crf);
-					d.getProps().put("crf_" + crf.getId() + "_eventDefinitionCrf",
-							getEventDefinitionCRFBean(selectedStudyEventDefinition.getId(), crf, studySubjectBean));
+					d.getProps().put("crf_" + crf.getId() + "_eventDefinitionCrf", eventDefinitionCRFBean);
 
 					theItem.put("crf_" + crf.getId(), "");
 				}
@@ -900,7 +904,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 					url.append("<div class=\"newLine\"></div>");
 				}
 				DisplayBean display = events.get(i);
-				eventCRFStatusId = (Integer) display.getProps().get(property);
+				eventCRFStatusId = ((Status) display.getProps().get(property)).getId();
 				eventDefintionCrf = (EventDefinitionCRFBean) display.getProps().get(property + "_eventDefinitionCrf");
 				eventCrf = (EventCRFBean) display.getProps().get(property + "_eventCrf");
 				studyEvent = (StudyEventBean) display.getProps().get("event");
@@ -1255,66 +1259,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		builder.onmouseout("clearInterval(popupInterval);");
 		builder.append(" onclick=\"justShowPopup(eval(" + params.toString().replaceAll("\"", "'") + "), event);\"");
 		builder.close();
-	}
-
-	private int getCRFStatusId(StudySubjectBean studySubjectBean, StudyEventBean studyEvent,
-			SubjectEventStatus subjectEventStatus, CRFBean crfBean, EventCRFBean eventCrf) {
-
-		int eventCRFStatusId;
-
-		if (studyEvent == null) {
-			// if study event not scheduled yet
-
-			if (studySubjectBean.getStatus().isDeleted()) {
-				eventCRFStatusId = Status.DELETED.getId();
-			} else if (studySubjectBean.getStatus().isLocked()) {
-				eventCRFStatusId = Status.LOCKED.getId();
-			} else {
-				eventCRFStatusId = Status.NOT_STARTED.getId();
-			}
-
-		} else if (eventCrf == null) {
-			// if study event already scheduled, but event CRF not started yet
-
-			if (subjectEventStatus.isLocked()) {
-				eventCRFStatusId = Status.LOCKED.getId();
-			} else if (studySubjectBean.getStatus().isDeleted()) {
-				eventCRFStatusId = Status.DELETED.getId();
-			} else {
-				eventCRFStatusId = !getCRFVersionDAO().findAllActiveByCRF(crfBean.getId()).isEmpty()
-						? Status.NOT_STARTED.getId()
-						: Status.LOCKED.getId();
-			}
-
-		} else {
-			// if study event already scheduled and event CRF already started
-
-			if ((subjectEventStatus.isStopped() || subjectEventStatus.isSkipped() || !((CRFVersionBean) getCRFVersionDAO()
-					.findByPK(eventCrf.getCRFVersionId())).getStatus().isAvailable()) && !eventCrf.isNotStarted()) {
-				eventCRFStatusId = Status.LOCKED.getId();
-			} else if (subjectEventStatus.isLocked()) {
-				eventCRFStatusId = Status.LOCKED.getId();
-			} else if (eventCrf.isNotStarted()) {
-				eventCRFStatusId = !getCRFVersionDAO().findAllActiveByCRF(crfBean.getId()).isEmpty()
-						? Status.NOT_STARTED.getId()
-						: Status.LOCKED.getId();
-			} else if (eventCrf.getStage().isInitialDE()) {
-				eventCRFStatusId = Status.DATA_ENTRY_STARTED.getId();
-			} else if (eventCrf.getStage().isInitialDE_Complete()) {
-				eventCRFStatusId = Status.INITIAL_DATA_ENTRY_COMPLETED.getId();
-			} else if (eventCrf.getStage().isDoubleDE()) {
-				eventCRFStatusId = Status.DOUBLE_DATA_ENTRY.getId();
-			} else if (eventCrf.getStage().isDoubleDE_Complete()) {
-				eventCRFStatusId = subjectEventStatus.isSigned() ? Status.SIGNED.getId() : eventCrf.isSdvStatus()
-						? Status.SOURCE_DATA_VERIFIED.getId()
-						: Status.COMPLETED.getId();
-			} else {
-				eventCRFStatusId = Status.DELETED.getId();
-			}
-
-		}
-
-		return eventCRFStatusId;
 	}
 
 	private String formatDate(Date date) {

@@ -75,6 +75,7 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -401,6 +402,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		if ("saveNotes".equalsIgnoreCase(action)) {
 
+			DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
 			// let's save notes for the blank items
 			discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
@@ -417,8 +419,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 							String inputName = getGroupItemInputName(displayGroup, j, displayItem);
 							logger.info("inputName:" + inputName);
 							logger.info("item data id:" + displayItem.getData().getId());
-							AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, discrepancyNoteDao, displayItem
-									.getData().getId(), "itemData", currentStudy);
+							dnService.saveFieldNotes(inputName, discNotes, displayItem.getData().getId(), "itemData",
+									currentStudy);
 						}
 					}
 
@@ -427,15 +429,13 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 					// TODO work on this line
 
 					String inputName = getInputName(dib);
-					AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, discrepancyNoteDao,
-							dib.getData().getId(), "ItemData", currentStudy);
+					dnService.saveFieldNotes(inputName, discNotes, dib.getData().getId(), "ItemData", currentStudy);
 
 					ArrayList childItems = dib.getChildren();
 					for (Object childItem : childItems) {
 						DisplayItemBean child = (DisplayItemBean) childItem;
 						inputName = getInputName(child);
-						AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, discrepancyNoteDao, dib.getData()
-								.getId(), "ItemData", currentStudy);
+						dnService.saveFieldNotes(inputName, discNotes, dib.getData().getId(), "ItemData", currentStudy);
 					}
 				}
 			}

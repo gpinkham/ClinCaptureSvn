@@ -45,6 +45,7 @@ import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -370,7 +371,6 @@ public class UpdateStudySubjectServlet extends Controller {
 
 		StudySubjectDAO subdao = getStudySubjectDAO();
 		SubjectGroupMapDAO sgmdao = getSubjectGroupMapDAO();
-		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 		UserAccountBean currentUser = getUserAccountBean(request);
 		StudySubjectBean subjectToUpdate = (StudySubjectBean) request.getSession().getAttribute("studySub");
 
@@ -385,10 +385,10 @@ public class UpdateStudySubjectServlet extends Controller {
 		subdao.update(subjectToUpdate);
 
 		// save discrepancy notes into DB
+		DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
 		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
 				AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-		AddNewSubjectServlet.saveFieldNotes("enrollmentDate", fdn, dndao, subjectToUpdate.getId(), "studySub",
-				getCurrentStudy(request));
+		dnService.saveFieldNotes("enrollmentDate", fdn, subjectToUpdate.getId(), "studySub", getCurrentStudy(request));
 
 		List<StudyGroupClassBean> groups = (List<StudyGroupClassBean>) request.getSession().getAttribute("groups");
 		if (!groups.isEmpty()) {

@@ -48,6 +48,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.util.SubjectLabelNormalizer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
@@ -634,13 +635,13 @@ public class CreateNewStudyEventServlet extends Controller {
 								+ respage.getString("X_was_created_succesfully"), request);
 
 				// save discrepancy notes into DB
+				DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
 						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-				DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 
 				for (String element : EVENT_FIELDS) {
-					AddNewSubjectServlet.saveFieldNotes(element, fdn, dndao, studyEvent.getId(), "studyEvent",
-							currentStudy);
+					dnService
+							.saveFieldNotes(element, fdn, studyEvent.getId(), "studyEvent", currentStudy);
 				}
 
 				if (popupQuery) {
@@ -708,11 +709,11 @@ public class CreateNewStudyEventServlet extends Controller {
 											restext.getString("scheduled_event_not_created_in_database"), "2");
 								}
 
-								AddNewSubjectServlet.saveFieldNotes(INPUT_SCHEDULED_LOCATION[i], fdn, dndao,
+								dnService.saveFieldNotes(INPUT_SCHEDULED_LOCATION[i], fdn,
 										studyEventScheduled.getId(), "studyEvent", currentStudy);
-								AddNewSubjectServlet.saveFieldNotes(INPUT_STARTDATE_PREFIX_SCHEDULED[i], fdn, dndao,
+								dnService.saveFieldNotes(INPUT_STARTDATE_PREFIX_SCHEDULED[i], fdn,
 										studyEventScheduled.getId(), "studyEvent", currentStudy);
-								AddNewSubjectServlet.saveFieldNotes(INPUT_ENDDATE_PREFIX_SCHEDULED[i], fdn, dndao,
+								dnService.saveFieldNotes(INPUT_ENDDATE_PREFIX_SCHEDULED[i], fdn,
 										studyEventScheduled.getId(), "studyEvent", currentStudy);
 
 								if (popupQuery) {

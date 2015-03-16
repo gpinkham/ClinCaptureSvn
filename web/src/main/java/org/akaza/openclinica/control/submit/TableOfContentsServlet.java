@@ -50,6 +50,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -386,14 +387,12 @@ public class TableOfContentsServlet extends Controller {
                 objectPairs.ecb = (EventCRFBean) ecdao.update(objectPairs.ecb);
 
 				// save discrepancy notes into DB
+				DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession()
 						.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-				DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 
-				AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEWER, fdn, dndao, objectPairs.ecb.getId(), "EventCRF",
-						currentStudy);
-				AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEW_DATE, fdn, dndao, objectPairs.ecb.getId(), "EventCRF",
-						currentStudy);
+				dnService.saveFieldNotes(INPUT_INTERVIEWER, fdn, objectPairs.ecb.getId(), "EventCRF", currentStudy);
+				dnService.saveFieldNotes(INPUT_INTERVIEW_DATE, fdn, objectPairs.ecb.getId(), "EventCRF", currentStudy);
 
 				if (ecdao.isQuerySuccessful()) {
 					updatePresetValues(fp, objectPairs.ecb);

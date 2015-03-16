@@ -36,6 +36,7 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.apache.commons.lang.StringUtils;
@@ -61,6 +62,64 @@ public class DiscrepancyNoteService implements IDiscrepancyNoteService {
 	 */
 	public DiscrepancyNoteService(DataSource ds) {
 		this.ds = ds;
+	}
+
+	public DiscrepancyNoteDAO getDiscrepancyNoteDAO() {
+		return new DiscrepancyNoteDAO(ds);
+	}
+
+	/**
+	 * Saves the discrepancy notes of specific entity's property to the data base.
+	 *
+	 * @param field      String
+	 * @param notes      FormDiscrepancyNotes
+	 * @param entityId   int
+	 * @param entityType String
+	 * @param sb         StudyBean
+	 */
+	public void saveFieldNotes(String field, FormDiscrepancyNotes notes, int entityId, String entityType, StudyBean sb) {
+
+		if (notes == null || sb == null) {
+			return;
+		}
+		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
+		ArrayList fieldNotes = notes.getNotes(field);
+		for (Object fieldNote : fieldNotes) {
+			DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) fieldNote;
+			dnb.setEntityId(entityId);
+			dnb.setStudyId(sb.getId());
+			dnb.setEntityType(entityType);
+
+			// updating exsiting note if necessary
+			if (dnb.getResolutionStatusId() == 0) {
+				dnb.setResStatus(ResolutionStatus.NOT_APPLICABLE);
+				dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
+				if (!dnb.getDisType().equals(DiscrepancyNoteType.REASON_FOR_CHANGE)) {
+					dnb.setResStatus(ResolutionStatus.OPEN);
+					dnb.setResolutionStatusId(ResolutionStatus.OPEN.getId());
+				}
+			}
+
+			if (dndao.findByPK(dnb.getId()).getId() == 0) {
+				dnb = (DiscrepancyNoteBean) dndao.create(dnb);
+				dndao.createMapping(dnb);
+			}
+
+			if (dnb.getParentDnId() == 0) {
+
+				dnb.setParentDnId(dnb.getId());
+				dnb = (DiscrepancyNoteBean) dndao.create(dnb);
+				dndao.createMapping(dnb);
+			} else if (dnb.getParentDnId() > 0) {
+				DiscrepancyNoteBean parentNote = (DiscrepancyNoteBean) dndao.findByPK(dnb.getParentDnId());
+				if (dnb.getDiscrepancyNoteTypeId() == parentNote.getDiscrepancyNoteTypeId()
+						&& dnb.getResolutionStatusId() != parentNote.getResolutionStatusId()
+						&& parentNote.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
+					parentNote.setResolutionStatusId(dnb.getResolutionStatusId());
+					dndao.update(parentNote);
+				}
+			}
+		}
 	}
 
 	/**

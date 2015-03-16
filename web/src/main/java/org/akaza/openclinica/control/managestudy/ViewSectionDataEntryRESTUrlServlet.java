@@ -68,6 +68,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
@@ -368,7 +369,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 
 		if ("saveNotes".equalsIgnoreCase(action)) {
 			LOGGER.info("33333how many group rows:" + dsb.getDisplayItemGroups().size());
-
+			DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
 			// let's save notes for the blank items
 			discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
@@ -386,8 +387,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 							String inputName = getGroupItemInputName(displayGroup, j, displayItem);
 							LOGGER.info("inputName:" + inputName);
 							LOGGER.info("item data id:" + displayItem.getData().getId());
-							AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, discrepancyNoteDao, displayItem
-									.getData().getId(), "itemData", currentStudy);
+							dnService.saveFieldNotes(inputName, discNotes, displayItem.getData().getId(), "itemData",
+									currentStudy);
 
 						}
 					}
@@ -397,16 +398,15 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 					// TODO work on this line
 
 					String inputName = getInputName(dib);
-					AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, discrepancyNoteDao,
-							dib.getData().getId(), DiscrepancyNoteBean.ITEM_DATA, currentStudy);
+					dnService.saveFieldNotes(inputName, discNotes, dib.getData().getId(), DiscrepancyNoteBean.ITEM_DATA,
+							currentStudy);
 
 					ArrayList childItems = dib.getChildren();
 					for (Object childItem : childItems) {
 						DisplayItemBean child = (DisplayItemBean) childItem;
 						inputName = getInputName(child);
-						AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, discrepancyNoteDao, dib.getData()
-								.getId(), DiscrepancyNoteBean.ITEM_DATA, currentStudy);
-
+						dnService.saveFieldNotes(inputName, discNotes, dib.getData().getId(),
+								DiscrepancyNoteBean.ITEM_DATA, currentStudy);
 					}
 				}
 			}

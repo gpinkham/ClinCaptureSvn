@@ -21,15 +21,12 @@
 package org.akaza.openclinica.control.submit;
 
 import com.clinovo.util.ValidatorHelper;
-import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -44,7 +41,6 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -54,6 +50,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -773,15 +770,15 @@ public class AddNewSubjectServlet extends Controller {
 				}
 
 				// save discrepancy notes into DB
+				DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
 						FORM_DISCREPANCY_NOTES_NAME);
-				DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 
 				String[] subjectFields = { INPUT_DOB, INPUT_YOB, INPUT_GENDER };
 				for (String element : subjectFields) {
-					saveFieldNotes(element, fdn, dndao, subject.getId(), "subject", currentStudy);
+					dnService.saveFieldNotes(element, fdn, subject.getId(), "subject", currentStudy);
 				}
-				saveFieldNotes(INPUT_ENROLLMENT_DATE, fdn, dndao, studySubject.getId(), "studySub", currentStudy);
+				dnService.saveFieldNotes(INPUT_ENROLLMENT_DATE, fdn, studySubject.getId(), "studySub", currentStudy);
 
 				request.removeAttribute(FormProcessor.FIELD_SUBMITTED);
 				request.setAttribute(CreateNewStudyEventServlet.INPUT_STUDY_SUBJECT, studySubject);
@@ -960,70 +957,6 @@ public class AddNewSubjectServlet extends Controller {
 		}
 
 		request.setAttribute(BEAN_GROUPS, classes);
-	}
-
-	/**
-	 * Save the discrepancy notes of each field into session in the form.
-	 * 
-	 * @param field
-	 *            String
-	 * @param notes
-	 *            FormDiscrepancyNotes
-	 * @param dndao
-	 *            DiscrepancyNoteDAO
-	 * @param entityId
-	 *            int
-	 * @param entityType
-	 *            String
-	 * @param sb
-	 *            StudyBean
-	 */
-	public static void saveFieldNotes(String field, FormDiscrepancyNotes notes, DiscrepancyNoteDAO dndao, int entityId,
-			String entityType, StudyBean sb) {
-		if (notes == null || dndao == null || sb == null) {
-			return;
-		}
-		ArrayList fieldNotes = notes.getNotes(field);
-		for (Object fieldNote : fieldNotes) {
-			DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) fieldNote;
-			dnb.setEntityId(entityId);
-			dnb.setStudyId(sb.getId());
-			dnb.setEntityType(entityType);
-
-			// updating exsiting note if necessary
-			if (dnb.getResolutionStatusId() == 0) {
-				dnb.setResStatus(ResolutionStatus.NOT_APPLICABLE);
-				dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
-				if (!dnb.getDisType().equals(DiscrepancyNoteType.REASON_FOR_CHANGE)) {
-					dnb.setResStatus(ResolutionStatus.OPEN);
-					dnb.setResolutionStatusId(ResolutionStatus.OPEN.getId());
-				}
-			}
-			// << tbh 05/2010 second fix to try out queries
-			// ClinCapture #42
-			if (dndao.findByPK(dnb.getId()).getId() == 0) {
-				dnb = (DiscrepancyNoteBean) dndao.create(dnb);
-				dndao.createMapping(dnb);
-			}
-
-			if (dnb.getParentDnId() == 0) {
-				// see issue 2659 this is a new thread, we will create two notes
-				// in this case,
-				// This way one can be the parent that updates as the status
-				// changes, but one also stays as New.
-				dnb.setParentDnId(dnb.getId());
-				dnb = (DiscrepancyNoteBean) dndao.create(dnb);
-				dndao.createMapping(dnb);
-			} else if (dnb.getParentDnId() > 0) {
-				DiscrepancyNoteBean parentNote = (DiscrepancyNoteBean) dndao.findByPK(dnb.getParentDnId());
-				if (dnb.getDiscrepancyNoteTypeId() == parentNote.getDiscrepancyNoteTypeId()
-						&& dnb.getResolutionStatusId() != parentNote.getResolutionStatusId()
-						&& parentNote.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
-					parentNote.setResolutionStatusId(dnb.getResolutionStatusId());
-					dndao.update(parentNote);
-				}
-			}
-		}
 	}
 
 	/**

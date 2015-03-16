@@ -180,4 +180,13 @@ public class ResourceBundleProvider {
 		return value;
 	}
 
+	public static String getResNotes(String key) {
+		String value;
+		try {
+			value = getResBundle("org.akaza.openclinica.i18n.notes").getString(key);
+		} catch (MissingResourceException mre) {
+			value = key;
+		}
+		return value;
+	}
 }

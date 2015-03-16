@@ -14,6 +14,7 @@
 package org.akaza.openclinica.dao.managestudy;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.junit.Test;
 
@@ -32,5 +33,19 @@ public class EventDefinitionCRFDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindForSiteByEventCrfIdReturnsTheCorrectEventDefinitionCRFBean() {
 		assertEquals(2, eventDefinitionCRFDAO.findForSiteByEventCrfId(13).getId());
+	}
+
+	@Test public void testThatDoesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntryReturnsTrue() {
+
+		EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(4);
+
+		assertTrue(eventDefinitionCRFDAO.doesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntry(edc));
+	}
+
+	@Test public void testThatDoesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntryReturnsFalse() {
+
+		EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(5);
+
+		assertFalse(eventDefinitionCRFDAO.doesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntry(edc));
 	}
 }

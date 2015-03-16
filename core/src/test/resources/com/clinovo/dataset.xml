@@ -47,7 +47,7 @@
     <crf_version crf_version_id="2" crf_id="2" name="v2.0" description="Test" revision_notes="agoodwin 10.16.2007"
                  status_id="1" date_created="2008-07-02" owner_id="1" oc_oid="F_CONC_V20"/>
     <crf_version crf_version_id="3" crf_id="2" name="v3.0" description="Test delete query"
-                 revision_notes="agoodwin 10.16.2007" status_id="1" date_created="2008-07-02" owner_id="1"
+                 revision_notes="agoodwin 10.16.2007" status_id="5" date_created="2008-07-02" owner_id="1"
                  oc_oid="F_CONC_V30"/>
     <crf_version crf_version_id="4" crf_id="3" name="v1.0" description="Medical coding first version"
                  revision_notes="demo ecrf" status_id="1" date_created="2014-05-05" owner_id="1"
@@ -173,35 +173,43 @@
     <event_definition_crf event_definition_crf_id="1" study_event_definition_id="1" study_id="1" crf_id="1"
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="1" status_id="1" owner_id="1"
-                          date_created="2008-07-02" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="true"/>
+                          date_created="2008-07-02" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="true"
+						  selected_version_ids=""/>
     <event_definition_crf event_definition_crf_id="2" study_event_definition_id="1" study_id="1" crf_id="2"
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="2" status_id="1" owner_id="1"
-                          date_created="2008-07-02" ordinal="2" electronic_signature="false" hide_crf="false" evaluated_crf="true"/>
+                          date_created="2008-07-02" ordinal="2" electronic_signature="false" hide_crf="false" evaluated_crf="true"
+						  selected_version_ids=""/>
     <event_definition_crf event_definition_crf_id="3" study_event_definition_id="2" study_id="1" crf_id="1"
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="1" status_id="1" owner_id="1"
-                          date_created="2008-07-02" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="true"/>
+                          date_created="2008-07-02" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="true"
+						  selected_version_ids=""/>
     <event_definition_crf event_definition_crf_id="4" study_event_definition_id="2" study_id="1" crf_id="2"
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="2" status_id="1" owner_id="1"
-                          date_created="2008-07-02" ordinal="2" electronic_signature="false" hide_crf="false" evaluated_crf="false"/>
+                          date_created="2008-07-02" ordinal="2" electronic_signature="false" hide_crf="false" evaluated_crf="false"
+						  selected_version_ids=""/>
     <event_definition_crf event_definition_crf_id="5" study_event_definition_id="3" study_id="1" crf_id="2"
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="2" status_id="1" owner_id="1"
-                          date_created="2008-07-02" ordinal="2" electronic_signature="false" hide_crf="false" evaluated_crf="false"/>
+                          date_created="2008-07-02" ordinal="2" electronic_signature="false" hide_crf="false" evaluated_crf="false"
+						  selected_version_ids="3"/>
     <event_definition_crf event_definition_crf_id="6" study_event_definition_id="3" study_id="1" crf_id="3"
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="2" status_id="1" owner_id="1"
-                          date_created="2014-05-05" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="false"/>
+                          date_created="2014-05-05" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="false"
+						  selected_version_ids=""/>
     <event_definition_crf event_definition_crf_id="7" study_event_definition_id="9" study_id="1" crf_id="4"
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="5" status_id="1" owner_id="1"
-                          date_created="2014-05-05" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="false"/>
+                          date_created="2014-05-05" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="false"
+						  selected_version_ids=""/>
     <event_definition_crf event_definition_crf_id="8" study_event_definition_id="9" study_id="1" crf_id="5"
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="7" status_id="1" owner_id="1"
-                          date_created="2014-05-05" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="false"/>
+                          date_created="2014-05-05" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="false"
+						  selected_version_ids=""/>
 
     <item item_id="1" name="periodStart" description="Start of Agent Administration Period" units="" phi_status="false"
           item_data_type_id="9" item_reference_type_id="1" status_id="1" owner_id="1" date_created="2008-07-02"

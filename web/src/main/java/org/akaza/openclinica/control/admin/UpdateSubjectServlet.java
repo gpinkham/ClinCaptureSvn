@@ -39,6 +39,7 @@ import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -262,13 +263,13 @@ public class UpdateSubjectServlet extends Controller {
 				subjdao.update(subject);
 
 				// save discrepancy notes into DB
+				DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
 						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-				AddNewSubjectServlet.saveFieldNotes("uniqueIdentifier", fdn, dndao, subject.getId(), "subject",
-						currentStudy);
-				AddNewSubjectServlet.saveFieldNotes("gender", fdn, dndao, subject.getId(), "subject", currentStudy);
-				AddNewSubjectServlet.saveFieldNotes(YEAR_DOB, fdn, dndao, subject.getId(), "subject", currentStudy);
-				AddNewSubjectServlet.saveFieldNotes(DATE_DOB, fdn, dndao, subject.getId(), "subject", currentStudy);
+				dnService.saveFieldNotes("uniqueIdentifier", fdn, subject.getId(), "subject", currentStudy);
+				dnService.saveFieldNotes("gender", fdn, subject.getId(), "subject", currentStudy);
+				dnService.saveFieldNotes(YEAR_DOB, fdn, subject.getId(), "subject", currentStudy);
+				dnService.saveFieldNotes(DATE_DOB, fdn, subject.getId(), "subject", currentStudy);
 
 				addPageMessage(respage.getString("subject_updated_succcesfully"), request);
 				clearSession(request);

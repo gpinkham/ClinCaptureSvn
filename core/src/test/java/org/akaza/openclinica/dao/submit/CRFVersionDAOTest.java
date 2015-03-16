@@ -27,7 +27,7 @@ public class CRFVersionDAOTest extends DefaultAppContextTest {
 		int cfrId = 2;
 
 		all = (ArrayList<CRFVersionBean>) crfVersionDao.findAllActiveByCRF(cfrId);
-		assertEquals(2, all.size());
+		assertEquals(1, all.size());
 	}
 	
 	@Test

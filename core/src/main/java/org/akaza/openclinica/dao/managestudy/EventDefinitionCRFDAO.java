@@ -24,6 +24,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -1121,5 +1122,36 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		execute(digester.getQuery("updateEDCThatHasItemsToSDV"), variables);
 
 		return isQuerySuccessful();
+	}
+
+	/**
+	 * Discovers if a study/site level Event Definition CRF record has at least one available CRF version for data entry.
+	 *
+	 * @param eventDefCRFBean EventDefinitionCRFBean
+	 * @return boolean
+	 */
+	public boolean doesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntry(EventDefinitionCRFBean eventDefCRFBean) {
+
+		unsetTypeExpected();
+		setTypeExpected(1, TypeNames.STRING);
+
+		Map<Integer, Object> variables = new HashMap<Integer, Object>();
+		int index = 1;
+		variables.put(index++, eventDefCRFBean.getStudyEventDefinitionId());
+		variables.put(index++, eventDefCRFBean.getStudyId());
+		variables.put(index++, eventDefCRFBean.getCrfId());
+		variables.put(index++, eventDefCRFBean.getStudyEventDefinitionId());
+		variables.put(index++, eventDefCRFBean.getStudyId());
+		variables.put(index++, eventDefCRFBean.getCrfId());
+		variables.put(index++, eventDefCRFBean.getCrfId());
+		variables.put(index++, eventDefCRFBean.getCrfId());
+		variables.put(index++, eventDefCRFBean.getStudyEventDefinitionId());
+		variables.put(index++, eventDefCRFBean.getStudyId());
+		variables.put(index, eventDefCRFBean.getCrfId());
+
+		String sql = digester.getQuery("doesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntry");
+		List<Map<String, Object>> resultRows = (List<Map<String, Object>>) this.select(sql, variables);
+		Iterator<Map<String, Object>> iterator = resultRows.listIterator();
+		return iterator.hasNext() && ((String) iterator.next().get("result")).equalsIgnoreCase("Y");
 	}
 }

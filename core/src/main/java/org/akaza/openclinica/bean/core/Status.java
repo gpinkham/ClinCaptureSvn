@@ -174,11 +174,23 @@ public class Status extends Term implements Comparable {
 		return this == Status.LOCKED;
 	}
 
+	public boolean isCompleted() {
+		return this == Status.COMPLETED;
+	}
+
+	public boolean isSDVed() {
+		return this == Status.SOURCE_DATA_VERIFIED;
+	}
+
 	public boolean isSigned() {
 		return this == Status.SIGNED;
 	}
 
 	public boolean isFrozen() {
 		return this == Status.FROZEN;
+	}
+
+	public boolean isNotStarted() {
+		return this == Status.NOT_STARTED;
 	}
 }

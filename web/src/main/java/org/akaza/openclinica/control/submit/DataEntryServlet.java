@@ -1394,6 +1394,7 @@ public abstract class DataEntryServlet extends Controller {
 				studyEventBean = (StudyEventBean) seDao.update(studyEventBean);
 
 				// save discrepancy notes into DB
+				DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session
 						.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
@@ -1409,10 +1410,8 @@ public abstract class DataEntryServlet extends Controller {
 
 				dndao = new DiscrepancyNoteDAO(getDataSource());
 
-				AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEWER, fdn, dndao, ecb.getId(), "EventCRF",
-						currentStudy);
-				AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEW_DATE, fdn, dndao, ecb.getId(), "EventCRF",
-						currentStudy);
+				dnService.saveFieldNotes(INPUT_INTERVIEWER, fdn, ecb.getId(), "EventCRF", currentStudy);
+				dnService.saveFieldNotes(INPUT_INTERVIEW_DATE, fdn, ecb.getId(), "EventCRF", currentStudy);
 				transformSubmittedDNsToFVC(ub, dndao, request);
 				allItems = section.getDisplayItemGroups();
 
@@ -1459,8 +1458,8 @@ public abstract class DataEntryServlet extends Controller {
 											displayGroup.getFormInputOrdinal(), displayItem);
 								}
 
-								AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, displayItem.getData()
-										.getId(), "itemData", currentStudy);
+								dnService.saveFieldNotes(inputName, fdn, displayItem.getData().getId(), "itemData",
+										currentStudy);
 								success = success && temp;
 							}
 						}
@@ -1502,8 +1501,7 @@ public abstract class DataEntryServlet extends Controller {
 
 						String inputName = getInputName(dib);
 						logger.trace("3 - found input name: " + inputName);
-						AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, dib.getData().getId(), "itemData",
-								currentStudy);
+						dnService.saveFieldNotes(inputName, fdn, dib.getData().getId(), "itemData", currentStudy);
 
 						success = success && temp;
 
@@ -1519,8 +1517,7 @@ public abstract class DataEntryServlet extends Controller {
 								newUploadedFiles.remove(child.getItem().getId() + "");
 							}
 							inputName = getInputName(child);
-							AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, child.getData().getId(),
-									"itemData", currentStudy);
+							dnService.saveFieldNotes(inputName, fdn, child.getData().getId(), "itemData", currentStudy);
 							success = success && temp;
 						}
 					}

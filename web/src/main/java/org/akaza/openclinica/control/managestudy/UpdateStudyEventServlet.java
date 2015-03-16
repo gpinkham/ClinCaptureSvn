@@ -75,6 +75,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.calendar.CalendarLogic;
+import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.util.StudyEventDefinitionUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -151,6 +152,7 @@ public class UpdateStudyEventServlet extends Controller {
 		HttpSession session = request.getSession();
 		SessionManager sm = getSessionManager(request);
 		FormDiscrepancyNotes discNotes;
+		DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
 		FormProcessor fp = new FormProcessor(request);
 		int studyEventId = fp.getInt(EVENT_ID, true);
 		int studySubjectId = fp.getInt(STUDY_SUBJECT_ID, true);
@@ -483,14 +485,10 @@ public class UpdateStudyEventServlet extends Controller {
 				// save discrepancy notes into DB
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
 						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-				DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 
-				AddNewSubjectServlet.saveFieldNotes(INPUT_LOCATION, fdn, dndao, studyEvent.getId(), "studyEvent",
-						currentStudy);
-				AddNewSubjectServlet.saveFieldNotes(INPUT_STARTDATE_PREFIX, fdn, dndao, studyEvent.getId(),
-						"studyEvent", currentStudy);
-				AddNewSubjectServlet.saveFieldNotes(INPUT_ENDDATE_PREFIX, fdn, dndao, studyEvent.getId(), "studyEvent",
-						currentStudy);
+				dnService.saveFieldNotes(INPUT_LOCATION, fdn, studyEvent.getId(), "studyEvent", currentStudy);
+				dnService.saveFieldNotes(INPUT_STARTDATE_PREFIX, fdn, studyEvent.getId(), "studyEvent", currentStudy);
+				dnService.saveFieldNotes(INPUT_ENDDATE_PREFIX, fdn, studyEvent.getId(), "studyEvent", currentStudy);
 
 				addPageMessage(respage.getString("study_event_updated"), request);
 				request.setAttribute("id", Integer.toString(studySubjectId));
@@ -533,14 +531,10 @@ public class UpdateStudyEventServlet extends Controller {
 				// save discrepancy notes into DB
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
 						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-				DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 
-				AddNewSubjectServlet.saveFieldNotes(INPUT_LOCATION, fdn, dndao, studyEvent.getId(), "studyEvent",
-						currentStudy);
-				AddNewSubjectServlet.saveFieldNotes(INPUT_STARTDATE_PREFIX, fdn, dndao, studyEvent.getId(),
-						"studyEvent", currentStudy);
-				AddNewSubjectServlet.saveFieldNotes(INPUT_ENDDATE_PREFIX, fdn, dndao, studyEvent.getId(), "studyEvent",
-						currentStudy);
+				dnService.saveFieldNotes(INPUT_LOCATION, fdn, studyEvent.getId(), "studyEvent", currentStudy);
+				dnService.saveFieldNotes(INPUT_STARTDATE_PREFIX, fdn, studyEvent.getId(), "studyEvent", currentStudy);
+				dnService.saveFieldNotes(INPUT_ENDDATE_PREFIX, fdn, studyEvent.getId(), "studyEvent", currentStudy);
 
 				session.removeAttribute("eventSigned");
 				request.setAttribute("id", Integer.toString(studySubjectId));

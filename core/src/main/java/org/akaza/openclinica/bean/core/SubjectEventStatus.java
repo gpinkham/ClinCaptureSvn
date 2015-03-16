@@ -115,6 +115,10 @@ public class SubjectEventStatus extends Term implements Comparable {
 		return this == SubjectEventStatus.SIGNED;
 	}
 
+	public boolean isRemoved() {
+		return this == SubjectEventStatus.REMOVED;
+	}
+
 	private SubjectEventStatus(int id, String name) {
 		super(id, name);
 	}
