@@ -204,15 +204,13 @@
                     <fmt:message key="study" bundle="${resword}"/>: ${studyTitle}
                 </div>
             </div>
-			<c:if test="${!hideAditionalInfoPanel}">
-				<div class="crfInfoDiv">
-					<a href="javascript: processCrfMoreInfo();" id="showMoreInfo">
-						<img id="moreInfoExpandedImg" src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" style="margin-right: 5px;">
-						<img id="moreInfoCollapsedImg" src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" style="margin-right: 5px;">
-						<b><fmt:message key="More_info" bundle="${resword}"/></b>
-					</a>
-				</div>
-			</c:if>
+            <div class="crfInfoDiv">
+                <a href="javascript: processCrfMoreInfo();" id="showMoreInfo" style="visibility: ${!hideAditionalInfoPanel ? 'visible' : 'hidden'};">
+                    <img id="moreInfoExpandedImg" src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" style="margin-right: 5px;">
+                    <img id="moreInfoCollapsedImg" src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" style="margin-right: 5px;">
+                    <b><fmt:message key="More_info" bundle="${resword}"/></b>
+                </a>
+            </div>
         </div>
         </div>
     </td>
@@ -256,17 +254,15 @@
                     <fmt:message key="study" bundle="${resword}"/>: ${studyTitle}
                 </div>
             </div>
-			<c:if test="${!hideAditionalInfoPanel}">
-				<div class="crfInfoBlock">
-					<div class="crfInfoDiv">
-						<a href="javascript: processCrfMoreInfo();" id="showMoreInfo">
-							<img id="moreInfoExpandedImg" src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" style="margin-right: 5px;">
-							<img id="moreInfoCollapsedImg" src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" style="margin-right: 5px;">
-							<b><fmt:message key="More_info" bundle="${resword}"/></b>
-						</a>
-					</div>
-				</div>
-			</c:if>
+            <div class="crfInfoBlock">
+                <div class="crfInfoDiv">
+                    <a href="javascript: processCrfMoreInfo();" id="showMoreInfo" style="visibility: ${!hideAditionalInfoPanel ? 'visible' : 'hidden'};">
+                        <img id="moreInfoExpandedImg" src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" style="margin-right: 5px;">
+                        <img id="moreInfoCollapsedImg" src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" style="margin-right: 5px;">
+                        <b><fmt:message key="More_info" bundle="${resword}"/></b>
+                    </a>
+                </div>
+            </div>
         </div>
     </td>
 </tr>
@@ -605,7 +601,10 @@
             <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR"><div class="tablebox_center">
                 <table id="dnShortcutsSubTable" border="0" cellspacing="0" cellpadding="0" width="${dnShortcutsSpan * dnShortcutsWidth}px">
                     <tr>
-                        <td colspan="${dnShortcutsSpan}" valign="top" class="table_cell_left_header" style="padding-left: 6px; padding-right: 6px;"><b><fmt:message key="crf_shortcuts_header" bundle="${resword}"/>:</b><a class="closeLink" onclick="resetDnShortcutsTable();">x</a></td>
+                        <td colspan="${dnShortcutsSpan}" valign="top" class="table_cell_left_header" style="padding-left: 6px; padding-right: 6px;">
+                            <b><fmt:message key="crf_shortcuts_header" bundle="${resword}"/>:</b>
+                            <a onclick="processPushpin($(this));" type="image" id="pushpin" class="ui-icon ui-icon-bullet" title="<fmt:message key="unlock" bundle="${resword}"/>" unlocktitle="<fmt:message key="unlock" bundle="${resword}"/>" locktitle="<fmt:message key="lock" bundle="${resword}"/>">&nbsp;</a>
+                        </td>
                     </tr>
                     <tr>
                         <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:#CC0000;text-align: center;"><fmt:message key="openDn" bundle="${resword}"/></td>

@@ -2,6 +2,7 @@ var currentPopupUid;
 var subjectMatrixPopupStick;
 var popupInterval;
 var firstFormState;
+var dnShortcutsBoxState = 0;
 var currentHighlightedShortcutAnchor;
 var currentHighlightedShortcutAnchorInd;
 var currentHighlightedShortcutAnchorCounter;
@@ -3481,7 +3482,7 @@ function getBrowserClientHeight() {
 }
 
 function enableDNBoxFeatures() {
-    if ($("#dnShortcutsTable").length > 0 && $("#dnShortcutsTable").css("position") == "absolute") {
+    if (dnShortcutsBoxState == 1 && $("#dnShortcutsTable").length > 0 && $("#dnShortcutsTable").css("position") == "absolute") {
         $("#dnShortcutsTable").css("position", "fixed");
         $("#dnShortcutsTable").draggable({
             containment: "window",
@@ -3509,19 +3510,37 @@ function resetDnShortcutsTable() {
         $("#dnShortcutsTable").css("position", "absolute");
         $("#dnShortcutsTable").css("top", dnShortcutsTableTop + 'px');
         $("#dnShortcutsTable").css("left", dnShortcutsTableDefLeft + 'px');
-        $(window).scrollTop(0)
-        $(window).scrollLeft(0);
         $("#dnShortcutsTable").draggable("destroy");
-        resetHighlightedFieldsForDNShortcutAnchors();
     }
 }
 
+function processPushpin(element) {
+    if (element.hasClass("ui-icon-pin-w")) {
+        dnShortcutsBoxState = 0;
+        resetDnShortcutsTable();
+        element.removeClass("ui-icon-pin-w");
+        element.addClass("ui-icon-bullet");
+        element.attr("title", element.attr("unlocktitle"));
+    } else {
+        dnShortcutsBoxState = 1;
+        enableDNBoxFeatures();
+        element.removeClass("ui-icon-bullet");
+        element.addClass("ui-icon-pin-w");
+        element.attr("title", element.attr("locktitle"));
+    }
+    return false;
+}
+
 $(window).scroll(function() {
-    enableDNBoxFeatures();
+    if (dnShortcutsBoxState == 1) {
+        enableDNBoxFeatures();
+    }
 })
 
 $(window).resize(function() {
-    resetDnShortcutsTable();
+    if (dnShortcutsBoxState == 1) {
+        resetDnShortcutsTable();
+    }
 })
 
 function isElementOutViewport(element) {
