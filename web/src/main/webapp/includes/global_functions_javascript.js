@@ -4657,6 +4657,8 @@ function focusNextIfExceedMaxLength(element, maxLength, value, event) {
         var tabIndex = parseInt($(element).attr("tabindex"));
         var allElements = $("[tabindex=" + tabIndex + "]").not("[name*=]input]");
         var index = allElements.index($(element));
+        $(element).trigger("change");
+        $(element).trigger("blur");
         if (allElements.length > 1 && index < allElements.length - 1) {
             $(allElements.get(index + 1)).focus();
         } else {
