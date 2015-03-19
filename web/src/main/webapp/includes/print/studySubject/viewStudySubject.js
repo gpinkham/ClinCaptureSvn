@@ -5,6 +5,7 @@
  */
 function buildCasebookUrl() {
     var casebookType = $("[name='casebookType']:checked").val();
+    var casebookPdf = $("#casebookTypePdf").is(':checked');
 
     var casebookParams = [];
     $("[name='casebookParam']:checked").each(function () {
@@ -19,9 +20,15 @@ function buildCasebookUrl() {
     if (casebookParams.length > 0) {
         baseUrl += "?" + (casebookParams.join("&"));
     }
+    if (casebookPdf) {
+        if (baseUrl.indexOf('?') > 0) {
+            baseUrl += "&convertToPdf=yes";
+        } else {
+            baseUrl += "?convertToPdf=yes";
+        }
+    }
 
-    return baseUrl;
-}
+    return baseUrl;}
 /**
  * Updates casebook link text field, reflecting the user's selection
  */

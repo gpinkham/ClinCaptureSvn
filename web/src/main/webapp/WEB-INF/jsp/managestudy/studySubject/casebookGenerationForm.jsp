@@ -17,12 +17,13 @@
     <div style="width: 750px">
         <div class="tablebox_center">
             <form name="casebookLink">
-                <br>
                 <div style="margin-top:0;margin-bottom:10px;" class="connect-widget">
                     <b><fmt:message key="viewStudySubject.casebookGenerationForm.casebookFormat" bundle="${resword}"/></b>
                     <br>
                     <input type="radio" checked="" value="html/print" id="casebookTypeHtml" name="casebookType">
                     <fmt:message key="viewStudySubject.casebookGenerationForm.format.html" bundle="${resword}"/><br>
+                    <input type="radio" value="html/print" id="casebookTypePdf" name="casebookType">
+                    <fmt:message key="viewStudySubject.casebookGenerationForm.format.pdf" bundle="${resword}"/><br>
                     <input type="radio" value="json/view" id="casebookTypeJson" name="casebookType">
                     <fmt:message key="viewStudySubject.casebookGenerationForm.format.json" bundle="${resword}"/><br>
                     <input type="radio" value="xml/view" id="casebookTypeXml" name="casebookType">

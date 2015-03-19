@@ -141,7 +141,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>ClinCapture - Printable Forms</title>
+    <title>ClinCapture - <fmt:message key="printable_forms" bundle="${resword}"/></title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/includes/css/normalize.css" type="text/css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/includes/css/app.css" type="text/css"/>
     <script src="${pageContext.request.contextPath}/includes/print/lib/head.min.js"></script>
@@ -149,9 +149,11 @@
 </head>
 
 <body>
+<form method="POST" id="subForm" action="../../../../../../getPdf">
+    <input id="hiddenInput" type="hidden" name="htmlCode" value=""/>
+    <input id="subjectOid" type="hidden" name="subjectOid" value=""/>
+</form>
 <div id="loading_msg"> ${app_print_CRF_Message_at_Loading}</div>
-
 <img id="loading" src="${pageContext.request.contextPath}/images/ajax-loader-blue.gif" class="spinner"/>
-
 </body>
 </html>

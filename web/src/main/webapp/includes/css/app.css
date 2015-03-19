@@ -1,5 +1,29 @@
+@page {
+  margin-right: 1cm;
+}
+
+@media print {
+  table {
+    page-break-after: auto
+  }
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto
+  }
+  td {
+    page-break-inside: avoid;
+    page-break-after: avoid
+  }
+  thead {
+    display: table-header-group
+  }
+  tfoot {
+    display: table-footer-group
+  }
+}
+
 body {
-  font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+  font-family: Arial Unicode MS, Tahoma, Arial, Helvetica, Sans-Serif;
   margin-left:10px;
 }
 
@@ -95,7 +119,7 @@ a:active {
 #MetadataBackgroundColorForHeaders {
    background-color : #B6C4CF;
    text-decoration:underline;
-   font-size: 90%;
+
 }
 
 #ALBackgroundColorForHeaders {
@@ -425,10 +449,16 @@ td {
 }
 
 .eventTable, .itemTable, .metadataTable {
-	padding-left: 5px;
-	margin-top: 20px;
-	width: 100%;
-	border-collapse:collapse;
+  padding-left: 5px;
+  margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-left-color: #000000;
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-right-color: #000000;
 }
 
 .itemTable {
@@ -439,15 +469,11 @@ td {
 .eventTable td, .itemTable td, .metadataTable td {
 	border-top: 1px solid black;
 	border-bottom: 1px solid black;
+    border-right: 1px solid black;
 	padding-left: 5px;
 }
 
-.provenance .right, .DNParentRowColor .right {
-	border-right: 0;
-}
-
-#crfList {
-	margin: 50px 0 50px 0;
+#crfList {	margin: 50px 0 50px 0;
 }
 
 #crfList p {

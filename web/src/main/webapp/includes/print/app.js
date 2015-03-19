@@ -90,7 +90,6 @@ function getPrintableContent() {
         url = app_contextPath + '/print/clinicaldata/json/view/' + app_studyOID + '/' + app_studySubjectOID + '/' + app_eventOID + '/' + app_formVersionOID + '?includeAudits=' + app_displayAudits + '&includeDNs=' + app_displayDNs;
     }
     $.get(url, {}, function (data) {
-        $('.spinner').css({display: "none"});
         app_pagesArray = new Array();
         setRenderMode();
         app_renderMode = renderMode;
@@ -103,13 +102,19 @@ function getPrintableContent() {
         catch (error) {
             alert(app_error_print_CRF_Message_at_Loading + "   " + error.message);
         }
-        $('body').html(renderString);
+        $('#loading_msg').hide();
+        $('.spinner').hide();
+        if (window.location.search.indexOf('convertToPdf=yes') > 0) {
+            $('#hiddenInput').val(renderString);
+            $('#subjectOid').val(app_studySubjectOID);
+            $("#subForm").submit();
+        } else {
+            $('#subForm').append(renderString);
+        }
     });
 }
 
 function setRenderMode() {
-
-
     renderMode = 'UNPOPULATED_FORM_CRF';
     if (app_studySubjectOID.length < 1) {
         if (app_studyOID != "*" && app_eventOID == "*" && app_formVersionOID == "*") {
