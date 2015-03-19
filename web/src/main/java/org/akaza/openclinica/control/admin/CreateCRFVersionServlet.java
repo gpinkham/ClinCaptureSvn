@@ -696,6 +696,8 @@ public class CreateCRFVersionServlet extends Controller {
 				ResponseOptionBean rob = (ResponseOptionBean) oldOptions.get(i);
 				String text = rob.getText();
 				String value = rob.getValue();
+				text = text.replace(",", "\\,");
+				value = value.indexOf("func:") == 0 ? value.replace(",", "\\,") : value;
 				// noinspection LoopStatementThatDoesntLoop
 				for (int j = i; j < newOptions.size(); j++) { // from
 					// spreadsheet
