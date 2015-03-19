@@ -127,6 +127,8 @@ public class StudyParameterConfig {
 	// Annotated CRF SAS Item Names
 	private String annotatedCrfSasItemNames = "no";
 
+	private String autoTabbing = "yes";
+
 	/**
 	 * This is base constructor to set all default values.
 	 */
@@ -177,6 +179,8 @@ public class StudyParameterConfig {
 		allowDynamicGroupsManagement = "yes";
 		allowDiscrepancyCorrectionForms = "yes";
 		randomizationEnviroment = "test";
+
+		autoTabbing = "yes";
 	}
 
 	/**
@@ -739,5 +743,13 @@ public class StudyParameterConfig {
 
 	public String getRandomizationEnviroment() {
 		return this.randomizationEnviroment;
+	}
+
+	public String getAutoTabbing() {
+		return autoTabbing;
+	}
+
+	public void setAutoTabbing(String autoTabbing) {
+		this.autoTabbing = autoTabbing;
 	}
 }

@@ -1368,7 +1368,7 @@
 		       name="allowSdvWithOpenQueries" value="yes"><fmt:message key="yes" bundle="${resword}"/>
 
 		<input type="radio" onchange="javascript:changeIcon()"
-		${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'yes' ? "" : "checked"}
+		${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'no' ? "" : "checked"}
 		       name="allowSdvWithOpenQueries" value="no"><fmt:message key="no" bundle="${resword}"/>
 	</td>
 </tr>
@@ -1884,6 +1884,21 @@
 			</c:otherwise>
 		</c:choose>
 	</td>
+</tr>
+
+<tr valign="top">
+    <td class="formlabel">
+        <fmt:message key="useAutoTabbing" bundle="${resword}"/>
+    </td>
+    <td>
+        <input type="radio" onchange="javascript:changeIcon()"
+        ${studyToView.studyParameterConfig.autoTabbing == 'yes' ? "checked" : ""}
+               name="autoTabbing" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+
+        <input type="radio" onchange="javascript:changeIcon()"
+        ${studyToView.studyParameterConfig.autoTabbing == 'no' ? "checked" : ""}
+               name="autoTabbing" value="no"><fmt:message key="no" bundle="${resword}"/>
+    </td>
 </tr>
 <!-- /Data Entry Parameters section -->
 

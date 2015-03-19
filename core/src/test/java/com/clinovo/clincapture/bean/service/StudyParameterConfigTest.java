@@ -10,7 +10,7 @@
 
 package com.clinovo.clincapture.bean.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.junit.After;
@@ -77,5 +77,7 @@ public class StudyParameterConfigTest {
 
 		assertEquals("no", config.getAnnotatedCrfSasItemNames());
 		assertEquals("test", config.getRandomizationEnviroment());
+
+		assertEquals("yes", config.getAutoTabbing());
 	}
 }

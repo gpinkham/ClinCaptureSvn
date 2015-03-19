@@ -638,6 +638,24 @@
 
   <tr valign="top">
       <td class="formlabel">
+          <fmt:message key="useAutoTabbing" bundle="${resword}"/>
+      </td>
+      <td>
+          <c:choose>
+              <c:when test="${studyToView.studyParameterConfig.autoTabbing == 'yes'}">
+                  <input type="radio" checked name="autoTabbing" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                  <input type="radio" name="autoTabbing" value="no"><fmt:message key="no" bundle="${resword}"/>
+              </c:when>
+              <c:otherwise>
+                  <input type="radio" name="autoTabbing" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                  <input type="radio" checked name="autoTabbing" value="no"><fmt:message key="no" bundle="${resword}"/>
+              </c:otherwise>
+          </c:choose>
+      </td>
+  </tr>
+
+  <tr valign="top">
+      <td class="formlabel">
           <fmt:message key="replaceExisitingDataDuringImport" bundle="${resword}"/>
       </td>
       <td>

@@ -418,6 +418,15 @@ function updateThis(multiSelEle, count) {
             </td>
         </tr>
     </c:when>
+    <c:when test="${config.parameter.handle=='autoTabbing'}">
+        <tr valign="top">
+            <td class="formlabel"><fmt:message key="useAutoTabbing" bundle="${resword}"/></td>
+            <td>
+                <input type="radio" <c:if test="${config.value.value== 'yes'}">checked</c:if> name="autoTabbing" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="autoTabbing" value="no"><fmt:message key="no" bundle="${resword}"/>
+            </td>
+        </tr>
+    </c:when>
    <c:when test="${config.parameter.handle=='replaceExisitingDataDuringImport'}">
        <tr valign="top">
            <td class="formlabel"><fmt:message key="replaceExisitingDataDuringImport" bundle="${resword}"/></td>

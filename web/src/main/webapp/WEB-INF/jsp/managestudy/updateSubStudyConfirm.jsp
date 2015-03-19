@@ -301,6 +301,21 @@
             </td>
         </tr>
     </c:when>
+    <c:when test="${config.parameter.handle=='autoTabbing'}">
+        <tr valign="top">
+            <td class="table_header_column"><fmt:message key="useAutoTabbing" bundle="${resword}"/></td>
+            <td class="table_cell">
+                <c:choose>
+                    <c:when test="${config.value.value== 'yes'}">
+                        <fmt:message key="yes" bundle="${resword}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <fmt:message key="no" bundle="${resword}"/>
+                    </c:otherwise>
+                </c:choose>
+            </td>
+        </tr>
+    </c:when>
    <c:when test="${config.parameter.handle=='replaceExisitingDataDuringImport'}">
        <tr valign="top">
            <td class="table_header_column"><fmt:message key="replaceExisitingDataDuringImport" bundle="${resword}"/></td>

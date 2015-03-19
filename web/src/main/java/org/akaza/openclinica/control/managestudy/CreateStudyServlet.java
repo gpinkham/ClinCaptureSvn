@@ -20,9 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.model.DiscrepancyDescription;
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.util.ValidatorHelper;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,8 +27,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -42,7 +41,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.Controller;
-
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -55,10 +53,14 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.model.DiscrepancyDescription;
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.util.ValidatorHelper;
+
 /**
  * Processes request to create a new study.
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class CreateStudyServlet extends Controller {
 
@@ -255,7 +257,7 @@ public class CreateStudyServlet extends Controller {
 			if (fp.getString("name").trim().equals(thisBean.getName())) {
 				MessageFormat mf = new MessageFormat("");
 				mf.applyPattern(respage.getString("brief_title_existed"));
-				Object[] arguments = { fp.getString("name").trim() };
+				Object[] arguments = {fp.getString("name").trim()};
 
 				Validator.addError(errors, "name", mf.format(arguments));
 			}
@@ -380,34 +382,37 @@ public class CreateStudyServlet extends Controller {
 		final int dnQueryTypeId = 3;
 
 		// create default update discrepancy descriptions
-		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("corrected_CRF_data"), "", studyId, "Study and Site", dnFailedValidationCheckTypeId));
-		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("CRF_data_was_correctly_entered"), "", studyId, "Study and Site", dnFailedValidationCheckTypeId));
-		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("need_additional_clarification"), "", studyId, "Study and Site", dnFailedValidationCheckTypeId));
-		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("requested_information_is_provided"), "", studyId, "Study and Site", dnFailedValidationCheckTypeId));
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+				.getString("corrected_CRF_data"), "", studyId, "Study and Site", dnFailedValidationCheckTypeId));
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+				.getString("CRF_data_was_correctly_entered"), "", studyId, "Study and Site",
+				dnFailedValidationCheckTypeId));
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+				.getString("need_additional_clarification"), "", studyId, "Study and Site",
+				dnFailedValidationCheckTypeId));
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+				.getString("requested_information_is_provided"), "", studyId, "Study and Site",
+				dnFailedValidationCheckTypeId));
 
 		// create default close discrepancy descriptions
-		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("query_response_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
-		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("CRF_data_change_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
-		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("calendared_event_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
-		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("failed_edit_check_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+				.getString("query_response_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+				.getString("CRF_data_change_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+				.getString("calendared_event_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+				.getString("failed_edit_check_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
 
 		// create default RFC discrepancy descriptions
-		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("corrected_CRF_data_entry_error"), "", studyId, "Study and Site", dnQueryTypeId));
-		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("source_data_was_missing"), "", studyId, "Study and Site", dnQueryTypeId));
-		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("source_data_was_incorrect"), "", studyId, "Study and Site", dnQueryTypeId));
-		dDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(respage.getString("information_was_not_available"), "", studyId, "Study and Site", dnQueryTypeId));
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+				.getString("corrected_CRF_data_entry_error"), "", studyId, "Study and Site", dnQueryTypeId));
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+				.getString("source_data_was_missing"), "", studyId, "Study and Site", dnQueryTypeId));
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+				.getString("source_data_was_incorrect"), "", studyId, "Study and Site", dnQueryTypeId));
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+				.getString("information_was_not_available"), "", studyId, "Study and Site", dnQueryTypeId));
 	}
 
 	private void addValidatorIfParamPresented(HttpServletRequest request, String paramName, Validator v,
@@ -755,12 +760,12 @@ public class CreateStudyServlet extends Controller {
 		newStudy.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
 		newStudy.getStudyParameterConfig().setAutoScheduleEventDuringImport(
 				fp.getString("autoScheduleEventDuringImport"));
-        newStudy.getStudyParameterConfig().setAutoCreateSubjectDuringImport(
-                fp.getString("autoCreateSubjectDuringImport"));
+		newStudy.getStudyParameterConfig().setAutoCreateSubjectDuringImport(
+				fp.getString("autoCreateSubjectDuringImport"));
 		newStudy.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 		newStudy.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
 				fp.getString("replaceExisitingDataDuringImport"));
-		
+
 		// Medical coding
 		newStudy.getStudyParameterConfig().setMedicalCodingApiKey(fp.getString("medicalCodingApiKey"));
 		newStudy.getStudyParameterConfig().setDefaultBioontologyURL(fp.getString("defaultBioontologyURL"));
@@ -776,6 +781,8 @@ public class CreateStudyServlet extends Controller {
 
 		newStudy.getStudyParameterConfig().setAllowRulesAutoScheduling(fp.getString("allowRulesAutoScheduling"));
 		newStudy.getStudyParameterConfig().setRandomizationEnviroment(fp.getString("randomizationEnviroment"));
+
+		newStudy.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
 
 		request.getSession().setAttribute("newStudy", newStudy);
 
@@ -933,9 +940,9 @@ public class CreateStudyServlet extends Controller {
 		spv.setValue(newStudy.getStudyParameterConfig().getAutoScheduleEventDuringImport());
 		spvdao.create(spv);
 
-        spv.setParameter("autoCreateSubjectDuringImport");
-        spv.setValue(newStudy.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
-        spvdao.create(spv);
+		spv.setParameter("autoCreateSubjectDuringImport");
+		spv.setValue(newStudy.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
+		spvdao.create(spv);
 
 		spv.setParameter("markImportedCRFAsCompleted");
 		spv.setValue(newStudy.getStudyParameterConfig().getMarkImportedCRFAsCompleted());
@@ -957,13 +964,13 @@ public class CreateStudyServlet extends Controller {
 		spv.setValue(newStudy.getStudyParameterConfig().getDefaultBioontologyURL());
 		spvdao.create(spv);
 
-        spv.setParameter("medicalCodingApiKey");
-        spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingApiKey());
-        spvdao.create(spv);
+		spv.setParameter("medicalCodingApiKey");
+		spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingApiKey());
+		spvdao.create(spv);
 
-        spv.setParameter("medicalCodingApiKey");
-        spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingApiKey());
-        spvdao.create(spv);
+		spv.setParameter("medicalCodingApiKey");
+		spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingApiKey());
+		spvdao.create(spv);
 
 		spv.setParameter("autoCodeDictionaryName");
 		spv.setValue(newStudy.getStudyParameterConfig().getAutoCodeDictionaryName());
@@ -973,9 +980,9 @@ public class CreateStudyServlet extends Controller {
 		spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingApprovalNeeded());
 		spvdao.create(spv);
 
-        spv.setParameter("medicalCodingContextNeeded");
-        spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingContextNeeded());
-        spvdao.create(spv);
+		spv.setParameter("medicalCodingContextNeeded");
+		spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingContextNeeded());
+		spvdao.create(spv);
 
 		spv.setParameter("allowCrfEvaluation");
 		spv.setValue(newStudy.getStudyParameterConfig().getAllowCrfEvaluation());
@@ -991,6 +998,10 @@ public class CreateStudyServlet extends Controller {
 
 		spv.setParameter("randomizationEnviroment");
 		spv.setValue(newStudy.getStudyParameterConfig().getRandomizationEnviroment());
+		spvdao.create(spv);
+
+		spv.setParameter("autoTabbing");
+		spv.setValue(newStudy.getStudyParameterConfig().getAutoTabbing());
 		spvdao.create(spv);
 
 		logger.info("study parameters created done");

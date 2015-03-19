@@ -1450,7 +1450,9 @@ table-->
 <div id="testdiv1" style=
   "position:absolute;visibility:hidden;background-color:white"></div>
 </div>
-<script>initAutotabbing();</script>
+<c:if test="${study.studyParameterConfig.autoTabbing == 'yes'}">
+    <script>initAutotabbing();</script>
+</c:if>
 <jsp:include page="../include/changeTheme.jsp"/>
 <script>
     window.onbeforeunload = function(){

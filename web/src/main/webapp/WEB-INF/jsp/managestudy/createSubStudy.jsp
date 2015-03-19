@@ -256,7 +256,7 @@
    </div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="statusId"/></jsp:include></td><td> *</td></tr>      
      
-  <c:forEach var="config" items="${newStudy.studyParameters}">   
+  <c:forEach var="config" items="${newStudy.studyParameters}">
    <c:choose>
    <c:when test="${config.parameter.handle=='collectDob'}">
      <tr valign="top"><td class="formlabel"><fmt:message key="collect_subject_date_of_birth" bundle="${resword}"/>:</td><td>
@@ -417,6 +417,15 @@
             <td>
                 <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowSdvWithOpenQueries== 'yes'}">checked</c:if> name="allowSdvWithOpenQueries" value="yes"><fmt:message key="yes" bundle="${resword}"/>
                 <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowSdvWithOpenQueries== 'no'}">checked</c:if> name="allowSdvWithOpenQueries" value="no"><fmt:message key="no" bundle="${resword}"/>
+            </td>
+        </tr>
+    </c:when>
+    <c:when test="${config.parameter.handle=='autoTabbing'}">
+        <tr valign="top">
+            <td class="formlabel"><fmt:message key="useAutoTabbing" bundle="${resword}"/></td>
+            <td>
+                <input type="radio" <c:if test="${newStudy.studyParameterConfig.autoTabbing== 'yes'}">checked</c:if> name="autoTabbing" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                <input type="radio" <c:if test="${newStudy.studyParameterConfig.autoTabbing== 'no'}">checked</c:if> name="autoTabbing" value="no"><fmt:message key="no" bundle="${resword}"/>
             </td>
         </tr>
     </c:when>
