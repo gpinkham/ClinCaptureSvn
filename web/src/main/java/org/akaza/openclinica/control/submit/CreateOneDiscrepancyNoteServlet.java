@@ -151,7 +151,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		if (isRFC && typeId == DiscrepancyNoteType.ANNOTATION.getId()) {
 			typeId = DiscrepancyNoteType.REASON_FOR_CHANGE.getId();
 			dn.setDisType(DiscrepancyNoteType.REASON_FOR_CHANGE);
-			description = fp.getString("description");
+			description = fp.getString("description" + parentId);
 		} else {
 			if (isInFVCError) {
 				typeId = DiscrepancyNoteType.FAILEDVAL.getId();
