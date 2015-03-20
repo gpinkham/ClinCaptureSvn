@@ -427,6 +427,11 @@ a:hover, a:active { color: #789EC5;
     z-index: 2
 }
 
+.logo img {
+	margin-top: 10px;
+	width: 140px;
+}
+
 .nav {
     background-image: url(../images/dots.gif);
     background-repeat: repeat-x;
