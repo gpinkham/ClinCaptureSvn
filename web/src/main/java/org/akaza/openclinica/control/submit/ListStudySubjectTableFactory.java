@@ -1143,7 +1143,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		// Event Div
 		eventDiv.div().id("Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
 				.styleClass("eventDivWrapper ViewSubjectsPopup").style("width:" + divWidth + "px;")
-				.rel("" + studySubject.getId()).close();
+				.rel("" + studySubject.getId()).append("event_name='" + sed.getName()+ "'").close();
 
 		eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").close();
 
