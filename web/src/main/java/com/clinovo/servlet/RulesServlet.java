@@ -367,7 +367,7 @@ public class RulesServlet extends HttpServlet {
 	private JSONArray getCRFVersions(CRFBean cf, DataSource datasource) throws Exception {
 		JSONArray versions = new JSONArray();
 		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(datasource);
-		List<CRFVersionBean> vers = (List<CRFVersionBean>) crfVersionDAO.findAllByCRFId(cf.getId());
+		List<CRFVersionBean> vers = (List<CRFVersionBean>) crfVersionDAO.findAllActiveByCRF(cf.getId());
 		for (CRFVersionBean ver : vers) {
 			if (!ver.getStatus().equals(Status.DELETED)) {
 				JSONObject obj = new JSONObject();
