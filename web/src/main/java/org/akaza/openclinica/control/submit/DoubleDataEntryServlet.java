@@ -35,6 +35,7 @@ import org.akaza.openclinica.control.form.RuleValidator;
 import org.akaza.openclinica.control.form.ScoreItemValidator;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
@@ -45,6 +46,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -392,6 +394,11 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 		String tabId = fp.getString("tab", true);
 		String sectionId = fp.getString(DataEntryServlet.INPUT_SECTION_ID, true);
 		String eventCRFId = fp.getString(INPUT_EVENT_CRF_ID, true);
+		String hideSaveAndNextButton = fp.getString("hsnb", true);
+		if (hideSaveAndNextButton.equals("1")) {
+			request.setAttribute("hideSaveAndNextButton", true);
+		}
+		request.setAttribute("system_lang", CoreResources.getSystemLanguage());
 		if (StringUtil.isBlank(sectionId) || StringUtil.isBlank(tabId)) {
 			return Page.DOUBLE_DATA_ENTRY_SERVLET;
 		} else {

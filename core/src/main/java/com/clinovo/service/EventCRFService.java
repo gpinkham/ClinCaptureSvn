@@ -15,95 +15,143 @@
 
 package com.clinovo.service;
 
+import java.util.List;
+
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 
-import java.util.List;
-
 /**
  * Defines event CRF bean service interface.
- *
+ * 
  */
 public interface EventCRFService {
 
 	/**
 	 * Updates status of the given EventCRFBean to REMOVED.
-	 *
-	 * @param eventCRF EventCRFBean to be removed.
-	 * @param updater  user, that initiated action.
-	 * @throws Exception exception
+	 * 
+	 * @param eventCRF
+	 *            EventCRFBean to be removed.
+	 * @param updater
+	 *            user, that initiated action.
+	 * @throws Exception
+	 *             exception
 	 */
 	void removeEventCRF(EventCRFBean eventCRF, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Updates status of the EventCRFBeans, which are contained inside given StudyEventBean, to AUTO_REMOVED.
-	 *
-	 * @param studyEvent StudyEventBean, whose EventCRFBeans are intended to be removed.
-	 * @param updater    user, that initiated action.
-	 * @throws Exception exception
+	 * 
+	 * @param studyEvent
+	 *            StudyEventBean, whose EventCRFBeans are intended to be removed.
+	 * @param updater
+	 *            user, that initiated action.
+	 * @throws Exception
+	 *             exception
 	 */
 	void removeEventCRFsByStudyEvent(StudyEventBean studyEvent, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Updates status of the EventCRFBeans from given list to AUTO_REMOVED.
-	 *
-	 * @param eventCRFs list of EventCRFBeans, which are intended to be removed.
-	 * @param updater   user, that initiated action.
-	 * @throws Exception exception
+	 * 
+	 * @param eventCRFs
+	 *            list of EventCRFBeans, which are intended to be removed.
+	 * @param updater
+	 *            user, that initiated action.
+	 * @throws Exception
+	 *             exception
 	 */
 	void setEventCRFsToAutoRemovedState(List<EventCRFBean> eventCRFs, UserAccountBean updater) throws Exception;
 
 	/**
-	 * Removes event CRF beans by event definition CRF bean. Target event definition CRF bean is determined
-	 * by its study event definition OID and by CRF bean OID, it owns. Event CRF beans status will be set to AUTO_REMOVED.
-	 *
-	 * @param studyEventDefinitionOID OID of the study event definition, which owns the target event definition CRF bean.
-	 * @param crfOID                  OID of the CRF bean, which is owned by the target event definition CRF bean.
-	 * @param updater                 user, that initiated action.
-	 * @throws Exception exception
+	 * Removes event CRF beans by event definition CRF bean. Target event definition CRF bean is determined by its study
+	 * event definition OID and by CRF bean OID, it owns. Event CRF beans status will be set to AUTO_REMOVED.
+	 * 
+	 * @param studyEventDefinitionOID
+	 *            OID of the study event definition, which owns the target event definition CRF bean.
+	 * @param crfOID
+	 *            OID of the CRF bean, which is owned by the target event definition CRF bean.
+	 * @param updater
+	 *            user, that initiated action.
+	 * @throws Exception
+	 *             exception
 	 */
 	void removeEventCRFsByEventDefinitionCRF(String studyEventDefinitionOID, String crfOID, UserAccountBean updater)
 			throws Exception;
 
 	/**
 	 * Restores given EventCRFBean with previous status.
-	 *
-	 * @param eventCRF EventCRFBean to be restored.
-	 * @param updater  user, that initiated action.
-	 * @throws Exception exception
+	 * 
+	 * @param eventCRF
+	 *            EventCRFBean to be restored.
+	 * @param updater
+	 *            user, that initiated action.
+	 * @throws Exception
+	 *             exception
 	 */
 	void restoreEventCRF(EventCRFBean eventCRF, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Restores EventCRFBeans, which are contained inside given StudyEventBean, with previous statuses.
-	 *
-	 * @param studyEvent StudyEventBean, whose EventCRFBeans are intended to be restored.
-	 * @param updater    user, that initiated action.
-	 * @throws Exception exception
+	 * 
+	 * @param studyEvent
+	 *            StudyEventBean, whose EventCRFBeans are intended to be restored.
+	 * @param updater
+	 *            user, that initiated action.
+	 * @throws Exception
+	 *             exception
 	 */
 	void restoreEventCRFsByStudyEvent(StudyEventBean studyEvent, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Restores EventCRFBeans with current status AUTO_REMOVED to their previous statuses.
-	 *
-	 * @param eventCRFs list of EventCRFBeans, which are intended to be restored.
-	 * @param updater   user, that initiated action.
-	 * @throws Exception exception
+	 * 
+	 * @param eventCRFs
+	 *            list of EventCRFBeans, which are intended to be restored.
+	 * @param updater
+	 *            user, that initiated action.
+	 * @throws Exception
+	 *             exception
 	 */
-	void restoreEventCRFsFromAutoRemovedState(List<EventCRFBean> eventCRFs, UserAccountBean updater)
-			throws Exception;
+	void restoreEventCRFsFromAutoRemovedState(List<EventCRFBean> eventCRFs, UserAccountBean updater) throws Exception;
 
 	/**
-	 * Restores event CRF beans by event definition CRF bean. Target event definition CRF bean is determined
-	 * by its study event definition OID and by CRF bean OID, it owns.
-	 * Restores EventCRFBeans with current status AUTO_REMOVED only.
-	 *
-	 * @param studyEventDefinitionOID OID of the study event definition, which owns the target event definition CRF bean.
-	 * @param crfOID                  OID of the CRF bean, which is owned by the target event definition CRF bean.
-	 * @param updater                 user, that initiated action.
-	 * @throws Exception exception
+	 * Restores event CRF beans by event definition CRF bean. Target event definition CRF bean is determined by its
+	 * study event definition OID and by CRF bean OID, it owns. Restores EventCRFBeans with current status AUTO_REMOVED
+	 * only.
+	 * 
+	 * @param studyEventDefinitionOID
+	 *            OID of the study event definition, which owns the target event definition CRF bean.
+	 * @param crfOID
+	 *            OID of the CRF bean, which is owned by the target event definition CRF bean.
+	 * @param updater
+	 *            user, that initiated action.
+	 * @throws Exception
+	 *             exception
 	 */
 	void restoreEventCRFsByEventDefinitionCRF(String studyEventDefinitionOID, String crfOID, UserAccountBean updater)
 			throws Exception;
+
+	/**
+	 * Gets the next crf that the current users can enter data for. If there is no next crf for data entry, it returns
+	 * null.
+	 * 
+	 * @param currentStudyEventBean
+	 *            Current study event
+	 * @param currentEventDefCRF
+	 *            Current Event Definition CRF
+	 * @param currentUser
+	 *            Current user
+	 * @param currentUserRole
+	 *            Current user's role in current study
+	 * @param currentStudy
+	 *            Current study
+	 * @return EventCRFBean for next crf
+	 */
+	EventCRFBean getNextEventCRFForDataEntry(StudyEventBean currentStudyEventBean,
+			EventDefinitionCRFBean currentEventDefCRF, UserAccountBean currentUser, StudyUserRoleBean currentUserRole,
+			StudyBean currentStudy);
 }

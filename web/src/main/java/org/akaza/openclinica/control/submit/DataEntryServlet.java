@@ -21,6 +21,8 @@
 package org.akaza.openclinica.control.submit;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -203,6 +205,8 @@ public abstract class DataEntryServlet extends Controller {
 	public static final String GO_PREVIOUS = "submittedPrev";
 
 	public static final String GO_NEXT = "submittedNext";
+
+	public static final String SAVE_NEXT = "saveAndNext";
 
 	public static final String BEAN_DISPLAY = "section";
 
@@ -1819,7 +1823,11 @@ public abstract class DataEntryServlet extends Controller {
 								if (autoCloseDataEntryPage) {
 									forwardPage(Page.AUTO_CLOSE_PAGE, request, response);
 								} else {
-									response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+									if (!fp.getString(SAVE_NEXT).equals("")) {
+										goToNextCRF(request, response, ecb, currentRole, ub, edcb, studyEventBean);
+									} else {
+										response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+									}
 								}
 							} else {
 								// user clicked 'save'
@@ -1862,7 +1870,11 @@ public abstract class DataEntryServlet extends Controller {
 									if (autoCloseDataEntryPage) {
 										forwardPage(Page.AUTO_CLOSE_PAGE, request, response);
 									} else {
-										response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+										if (!fp.getString(SAVE_NEXT).equals("")) {
+											goToNextCRF(request, response, ecb, currentRole, ub, edcb, studyEventBean);
+										} else {
+											response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+										}
 									}
 									return;
 								}
@@ -1877,6 +1889,65 @@ public abstract class DataEntryServlet extends Controller {
 						seDao, ssdao, ecdao, edcdao, dndao));
 			}
 		}
+	}
+
+	private void goToNextCRF(HttpServletRequest request, HttpServletResponse response, EventCRFBean ecb,
+			StudyUserRoleBean currentRole, UserAccountBean ub, EventDefinitionCRFBean edcb,
+			StudyEventBean studyEventBean) throws IOException {
+		HttpSession session = request.getSession();
+		StudyBean currentStudy = (StudyBean) session.getAttribute("study");
+		EventDefinitionCRFBean currentEdcb = edcb;
+		EventCRFBean eventCrf = getEventCRFService().getNextEventCRFForDataEntry(studyEventBean, currentEdcb, ub,
+				currentRole, currentStudy);
+		String redirectPath = null;
+		try {
+			redirectPath = getRedirectPathForNextCRF(request, eventCrf);
+		} catch (Exception e) {
+			logger.error("An error has occured during generation of URL for next crf for data entry.", e);
+		}
+		if (redirectPath != null) {
+			response.sendRedirect(redirectPath);
+		} else {
+			response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+		}
+	}
+
+	private String getRedirectPathForNextCRF(HttpServletRequest request, EventCRFBean eventCrf)
+			throws UnsupportedEncodingException {
+		if (eventCrf != null) {
+			if (eventCrf.getId() > 0
+					&& (eventCrf.getEventDefinitionCrf().isDoubleEntry() || eventCrf.getEventDefinitionCrf()
+							.isEvaluatedCRF())) {
+				if (eventCrf.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY
+						|| eventCrf.getStage() == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) {
+					String ddeUrl = request.getContextPath() + Page.DOUBLE_DATA_ENTRY_SERVLET.getFileName();
+					ddeUrl += "?eventCRFId=" + eventCrf.getId();
+					return ddeUrl;
+				}
+			}
+			return buildIdeUrlForNextCRF(request, eventCrf);
+		}
+		return null;
+	}
+
+	private String buildIdeUrlForNextCRF(HttpServletRequest request, EventCRFBean eventCrf) {
+		StringBuilder ideUrl = new StringBuilder("");
+		if (eventCrf.getId() > 0) {
+			ideUrl.append(request.getContextPath()).append(Page.INITIAL_DATA_ENTRY_SERVLET.getFileName());
+			ideUrl.append("?eventCRFId=").append(eventCrf.getId());
+		} else {
+			StudySubjectBean ssb = (StudySubjectBean) getStudySubjectDAO().findByPK(
+					eventCrf.getStudyEventBean().getStudySubjectId());
+			ideUrl.append(request.getContextPath()).append(Page.INITIAL_DATA_ENTRY_SERVLET.getFileName());
+			ideUrl.append("?action=ide_s&eventDefinitionCRFId=").append(eventCrf.getEventDefinitionCrf().getId());
+			ideUrl.append("&studyEventId=").append(eventCrf.getStudyEventBean().getId());
+			ideUrl.append("&subjectId=").append(ssb.getSubjectId());
+			ideUrl.append("&eventCRFId=").append(eventCrf.getId());
+			ideUrl.append("&crfVersionId=").append(eventCrf.getEventDefinitionCrf().getDefaultVersionId());
+			ideUrl.append("&exitTo=").append(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName().replace("/", ""))
+					.append("?eventId=").append(eventCrf.getStudyEventBean().getId());
+		}
+		return ideUrl.toString();
 	}
 
 	private void sendEmailWithCRFReport(CRFVersionBean crfVersionBean, CRFBean crfBean, StudySubjectBean ssb,

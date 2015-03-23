@@ -20,13 +20,15 @@
  */
 package org.akaza.openclinica.bean.submit;
 
+import java.util.Date;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-
-import java.util.Date;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 
 /**
  * <P>
@@ -68,6 +70,8 @@ public class EventCRFBean extends AuditableEntityBean {
 	private CRFBean crf = new CRFBean();
 	private CRFVersionBean crfVersion = new CRFVersionBean();
 	private DataEntryStage stage;
+	private EventDefinitionCRFBean eventDefinitionCrf = new EventDefinitionCRFBean();
+	private StudyEventBean studyEventBean = new StudyEventBean();
 
 	public EventCRFBean() {
 		stage = DataEntryStage.INVALID;
@@ -523,5 +527,21 @@ public class EventCRFBean extends AuditableEntityBean {
 
 	public void setDoubleDataOwner(UserAccountBean doubleDataOwner) {
 		this.doubleDataOwner = doubleDataOwner;
+	}
+
+	public EventDefinitionCRFBean getEventDefinitionCrf() {
+		return eventDefinitionCrf;
+	}
+
+	public void setEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCrf) {
+		this.eventDefinitionCrf = eventDefinitionCrf;
+	}
+
+	public StudyEventBean getStudyEventBean() {
+		return studyEventBean;
+	}
+
+	public void setStudyEventBean(StudyEventBean studyEventBean) {
+		this.studyEventBean = studyEventBean;
 	}
 }

@@ -37,6 +37,7 @@ import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.RuleValidator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
@@ -238,6 +239,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 		String tabId = fp.getString("tab", true);
 		String sectionId = fp.getString(DataEntryServlet.INPUT_SECTION_ID, true);
 		String eventCRFId = fp.getString(INPUT_EVENT_CRF_ID, true);
+		request.setAttribute("system_lang", CoreResources.getSystemLanguage());
 		if (StringUtil.isBlank(sectionId) || StringUtil.isBlank(tabId)) {
 			return Page.INITIAL_DATA_ENTRY_SERVLET;
 		} else {

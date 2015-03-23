@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm" %>
+<%@ taglib uri="com.akazaresearch.viewtags" prefix="view" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
@@ -53,6 +54,8 @@
         <c:set var="checkInputsValue" value="0" />
     </c:otherwise>
 </c:choose>
+<c:set var="save_and_next_button_caption" scope="request"><fmt:message key="save_and_next" bundle="${resword}"/></c:set>
+<c:set var="save_and_next_button_class" scope="request" value="${view:getHtmlButtonCssClass(save_and_next_button_caption)}" />
 <table width="75%"><tr><td>
 <span class="first_level_header"> <b id="crfNameId"> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
          <c:choose>            <c:when test="${eventCRF.stage.initialDE}">
@@ -526,6 +529,10 @@ function setParameterForDN(field, parameterName, value) {
 
                                 <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                                   "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
+                                <c:if test="${section.lastSection and hideSaveAndNextButton eq null }">
+			                     	<td><input type="submit" id="snl" name="saveAndNext" value="${save_and_next_button_caption}" class=
+			           			  		"${save_and_next_button_class}" onclick="disableSubmit(); this.form.submit();"/></td>
+			                    </c:if>
                                 <td>
                                     <input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" />
                                 </td>
@@ -1536,6 +1543,10 @@ table-->
                     </c:choose>
                     <td><input type="submit" id="srl" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                       "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
+                    <c:if test="${section.lastSection and hideSaveAndNextButton eq null }">
+                   		<td><input type="submit" id="snl" name="saveAndNext" value="${save_and_next_button_caption}" class=
+           			  		"${save_and_next_button_class}" onclick="disableSubmit(); this.form.submit();"/></td>
+                    </c:if>
                     <td>
                         <input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom', this);" />
                     </td>

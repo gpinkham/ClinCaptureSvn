@@ -117,7 +117,7 @@ public class FormProcessor {
 		String result = DEFAULT_STRING;
 
 		if (searchAttributes) {
-			result = (String) request.getAttribute(fieldName);
+			result = request.getAttribute(fieldName) != null ? request.getAttribute(fieldName).toString() : null;
 
 			if (result == null) {
 				result = request.getParameter(fieldName);

@@ -58,7 +58,7 @@ import org.akaza.openclinica.util.SignedData;
 /**
  * StudyEventDAO.
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked" })
 public class StudyEventDAO extends AuditableEntityDAO {
 
 	private void setQueryNames() {
@@ -644,7 +644,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		return answer;
 	}
-
+	
 	/**
 	 * method returns list of all study events by definition & subject.
 	 * 
@@ -656,13 +656,26 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	 */
 	public ArrayList findAllByDefinitionAndSubjectOrderByOrdinal(StudyEventDefinitionBean definition,
 			StudySubjectBean subject) {
+		return findAllByDefinitionAndSubjectOrderByOrdinal(definition.getId(), subject.getId());
+	}
+
+	/**
+	 * method returns list of all study events by definition id & study subject id.
+	 * 
+	 * @param definitionId
+	 *            study event definition id
+	 * @param studySubjectId
+	 *            stud subject id
+	 * @return ArrayList
+	 */
+	public ArrayList findAllByDefinitionAndSubjectOrderByOrdinal(int definitionId, int studySubjectId) {
 		ArrayList answer = new ArrayList();
 
 		setTypesExpected();
-		int ind = 1;
+		int index = 1;
 		HashMap variables = new HashMap();
-		variables.put(ind++, definition.getId());
-		variables.put(ind, subject.getId());
+		variables.put(index++, definitionId);
+		variables.put(index, studySubjectId);
 
 		String sql = digester.getQuery("findAllByDefinitionAndSubjectOrderByOrdinal");
 

@@ -307,7 +307,7 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 			String aLink = "<a href=\"#\" onclick=\"setAccessedObjected(this); checkCRFLocked('"
 					.concat(Integer.toString(crfEvaluationItem.getEventCrfId())).concat("', '../")
 					.concat(dataEntryPage).concat("?eventCRFId=")
-					.concat(Integer.toString(crfEvaluationItem.getEventCrfId())).concat("&cw=1');\"")
+					.concat(Integer.toString(crfEvaluationItem.getEventCrfId())).concat("&cw=1&hsnb=1');\"")
 					.concat(additionalAttr).concat(">");
 
 			boolean allowDataEntry = (currentStudy.getStatus().isAvailable() && crfEvaluationItem

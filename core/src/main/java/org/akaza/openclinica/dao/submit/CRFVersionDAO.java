@@ -118,6 +118,7 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 		eb.setCrfId((Integer) hm.get("crf_id"));
 		eb.setRevisionNotes((String) hm.get("revision_notes"));
 		eb.setOid((String) hm.get("oc_oid"));
+		eb.setStatusId((Integer) hm.get("status_id"));
 		return eb;
 	}
 

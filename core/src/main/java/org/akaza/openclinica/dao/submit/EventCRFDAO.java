@@ -69,7 +69,7 @@ import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
  *         <p/>
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked" })
 public class EventCRFDAO extends AuditableEntityDAO {
 
 	public static final int INT_25 = 25;
@@ -701,6 +701,23 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(ind, studySubject.getId());
 
 		return executeFindAllQuery("findByEventSubjectVersion", variables);
+	}
+	
+	/**
+	 * Finds all active event crfs by study event id and crf id.
+	 * 
+	 * @param studyEventId
+	 *            Study Event ID
+	 * @param crfId
+	 *            CRF ID
+	 * @return List of active EventCRFs filtered by Study Event ID and CRF ID
+	 */
+	public ArrayList findAllActiveByStudyEventIdAndCrfId(int studyEventId, int crfId) {
+		HashMap variables = new HashMap();
+		variables.put(1, studyEventId);
+		variables.put(2, crfId);
+
+		return executeFindAllQuery("findAllActiveByStudyEventIdAndCrfId", variables);
 	}
 
 	/**
