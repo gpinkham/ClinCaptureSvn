@@ -135,6 +135,12 @@ public class DeleteCRFVersionController {
 						request,
 						messageSource.getMessage("this_crf_version_has_associated_data", null,
 								SessionUtil.getLocale(request)));
+				if (crfVersionsQuantity == 1) {
+					PageMessagesUtil.addPageMessage(
+							request,
+							messageSource.getMessage("you_are_trying_to_delete_last_version", null,
+									SessionUtil.getLocale(request)));
+				}
 			} else {
 				PageMessagesUtil.addPageMessage(
 						request,
@@ -192,6 +198,7 @@ public class DeleteCRFVersionController {
 			ArrayList items = crfVersionDao.findNotSharedItemsByVersion(crfVersionBean.getId());
 			NewCRFBean nib = new NewCRFBean(dataSource, crfVersionBean.getCrfId());
 			EventDefinitionCRFUtil.setDefaultCRFVersionInsteadOfDeleted(dataSource, crfVersionBean.getId());
+			ruleSetDao.deleteRuleStudioMetadataByCRFVersionOID(crfVersionBean.getOid());
 			nib.setDeleteQueries(crfVersionDao.generateDeleteQueries(crfVersionBean.getId(), items));
 			nib.deleteFromDB();
 
@@ -215,8 +222,6 @@ public class DeleteCRFVersionController {
 		for (RuleSetBean ruleSetRule : studyRuleSetBeanList) {
 			ruleSetBeanList.add(ruleSetRule);
 		}
-
 		return ruleSetBeanList;
 	}
-
 }

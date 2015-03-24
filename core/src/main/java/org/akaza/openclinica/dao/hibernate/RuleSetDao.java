@@ -154,12 +154,15 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 
 	@SuppressWarnings("unchecked")
 	public ArrayList<RuleSetBean> findByCrfVersionIdAndCrfVersionOid(CRFVersionBean crfVersionBean) {
-		String query = "select distinct rs.* from rule_set_rule rsr, rule_set rs, rule r, rule_expression re where rsr.rule_set_id = rs.id and rsr.rule_id = r.id and (rs.rule_expression_id = re.id or r.rule_expression_id = re.id)\n"
-				+ "and (rs.item_id in (select distinct(item_id) from item_form_metadata ifm where ifm.crf_version_id = :crfVersionId) or re.value like '%." + crfVersionBean.getOid() + ".%' or re.target_version_oid in (select cv.oc_oid from crf_version cv where cv.crf_version_id = :crfVersionId))";
+		String query = "select distinct rs.* from rule_set_rule rsr, rule_set rs, rule r, rule_expression re " +
+				"where rsr.rule_set_id = rs.id " +
+				"and rsr.rule_id = r.id " +
+				"and (rs.rule_expression_id = re.id or r.rule_expression_id = re.id) " +
+				"and (re.value like '%" + crfVersionBean.getOid() + ".%'" +
+				"or ((re.target_version_oid = '" + crfVersionBean.getOid() + "') " +
+				"and (select count(*) from item_form_metadata ifm, rule_set rs where rs.item_id = ifm.item_id) = 1));";
 		// Using a sql query because we are referencing objects not managed by hibernate
 		org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
-		q.setInteger("crfVersionId", crfVersionBean.getId());
-		q.setInteger("crfVersionId", crfVersionBean.getId());
 		return (ArrayList<RuleSetBean>) q.list();
 	}
 
@@ -190,5 +193,16 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		q.setInteger("studyId", currentStudy.getId());
 		q.setParameter("status", org.akaza.openclinica.domain.Status.AVAILABLE);
 		return (Long) q.uniqueResult();
+	}
+
+	/**
+	 * Cleanup RS metadata on deletion of CRF version.
+	 *
+	 * @param oid of version that will be deleted
+	 */
+	public void deleteRuleStudioMetadataByCRFVersionOID(String oid) {
+		String query = "UPDATE rule_expression SET target_version_oid = NULL WHERE target_version_oid = '" + oid + "'";
+		org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
+		q.executeUpdate();
 	}
 }
