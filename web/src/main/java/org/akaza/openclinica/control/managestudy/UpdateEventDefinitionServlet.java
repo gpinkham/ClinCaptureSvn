@@ -21,7 +21,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -219,7 +218,6 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 	private void submitDefinition(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		StudyBean currentStudy = getCurrentStudy(request);
 		UserAccountBean updater = getUserAccountBean(request);
 		List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate = (List<EventDefinitionCRFBean>) request.getSession()
 				.getAttribute("eventDefinitionCRFs");
@@ -260,8 +258,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 				edc.setOwner(updater);
 				edc.setCreatedDate(new Date());
 				edc.setStatus(Status.AVAILABLE);
-				EventDefinitionCRFBean createdEdc = (EventDefinitionCRFBean) eventDefinitionCrfDAO.create(edc);
-				createChildEdcs(createdEdc, currentStudy);
+				eventDefinitionCrfDAO.create(edc);
 			}
 		}
 
@@ -275,23 +272,6 @@ public class UpdateEventDefinitionServlet extends Controller {
 		clearSession(request.getSession());
 		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"), request);
 		forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
-	}
-
-	private void createChildEdcs(EventDefinitionCRFBean createdEdc,
-			StudyBean currentStudy) {
-
-		StudyDAO studyDao = new StudyDAO(getDataSource());
-		EventDefinitionCRFDAO cdao = new EventDefinitionCRFDAO(getDataSource());
-		Collection<Integer> siteIds = studyDao.findAllSiteIdsByStudy(currentStudy);
-		siteIds.remove(currentStudy.getId());
-		int parentId = createdEdc.getId();
-
-		for (int siteId : siteIds) {
-			EventDefinitionCRFBean childEdc = createdEdc;
-			childEdc.setStudyId(siteId);
-			childEdc.setParentId(parentId);
-			cdao.create(childEdc);
-		}
 	}
 
 	private void updateChildEventDefinitionCRFs(List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate,

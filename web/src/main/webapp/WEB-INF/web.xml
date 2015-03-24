@@ -438,6 +438,11 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>editUserAccountServlet</servlet-name>
+        <display-name>EditUserAccount</display-name>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>listUserAccountsServlet</servlet-name>
         <display-name>ListUserAccounts</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -1442,6 +1447,10 @@
     <servlet-mapping>
         <servlet-name>createUserAccountServlet</servlet-name>
         <url-pattern>/CreateUserAccount</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>editUserAccountServlet</servlet-name>
+        <url-pattern>/EditUserAccount</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>createStudyServlet</servlet-name>

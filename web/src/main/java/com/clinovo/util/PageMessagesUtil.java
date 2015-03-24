@@ -16,7 +16,6 @@
 package com.clinovo.util;
 
 import org.akaza.openclinica.control.core.BaseController;
-import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -35,15 +34,5 @@ public final class PageMessagesUtil {
 			request.setAttribute(BaseController.PAGE_MESSAGE, pageMessages);
 		}
 		pageMessages.add(pageMessage);
-	}
-
-	public static void addPageMessage(Model model, String pageMessage) {
-		List<String> pageMessages = (List<String>) model.asMap().get(BaseController.PAGE_MESSAGE);
-		if (pageMessages == null) {
-			pageMessages = new ArrayList<String>();
-			model.addAttribute(BaseController.PAGE_MESSAGE, pageMessages);
-		}
-		pageMessages.add(pageMessage);
-		model.addAttribute(BaseController.PAGE_MESSAGE, pageMessages);
 	}
 }

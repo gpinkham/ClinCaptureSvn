@@ -15,8 +15,6 @@
 
 package com.clinovo.util;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +32,8 @@ import java.util.Locale;
 @SuppressWarnings("unused")
 public final class SessionUtil {
 
-	public static final String STUDY = "study";
-	public static final String CURRENT_USER = "userBean";
 	private static final Logger LOGGER = LoggerFactory.getLogger(SessionUtil.class);
+
 	public static final String CURRENT_SESSION_LOCALE = "current.session.locale";
 
 	private SessionUtil() {
@@ -133,13 +130,5 @@ public final class SessionUtil {
 	 */
 	public static Locale getLocale(HttpSession session) {
 		return (Locale) session.getAttribute(CURRENT_SESSION_LOCALE);
-	}
-
-	public static StudyBean getCurrentStudy(HttpServletRequest request) {
-		return (StudyBean) request.getSession().getAttribute(STUDY);
-	}
-
-	public static UserAccountBean getCurrentUser(HttpServletRequest request) {
-		return (UserAccountBean) request.getSession().getAttribute(CURRENT_USER);
 	}
 }

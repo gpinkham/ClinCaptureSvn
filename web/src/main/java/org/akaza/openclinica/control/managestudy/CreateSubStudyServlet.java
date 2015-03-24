@@ -548,6 +548,7 @@ public class CreateSubStudyServlet extends Controller {
 			seds = sedDao.findAllAvailableByStudy(parentStudy);
 		}
 		CRFVersionDAO cvdao = getCRFVersionDAO();
+		HashMap<String, Boolean> changes = new HashMap<String, Boolean>();
 		for (StudyEventDefinitionBean sed : seds) {
 			ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
 			int start = 0;
@@ -573,6 +574,7 @@ public class CreateSubStudyServlet extends Controller {
 						selectedVersionIds = selectedVersionIds.substring(0, selectedVersionIds.length() - 1);
 					}
 
+					boolean changed = false;
 					boolean isRequired = !StringUtil.isBlank(requiredCRF) && YES.equalsIgnoreCase(requiredCRF.trim());
 					boolean isDouble = !StringUtil.isBlank(deQuality) && DDE.equalsIgnoreCase(deQuality.trim());
 					boolean hasPassword = !StringUtil.isBlank(electronicSignature)
@@ -583,25 +585,31 @@ public class CreateSubStudyServlet extends Controller {
 
 					int dbDefaultVersionId = edcBean.getDefaultVersionId();
 					if (defaultVersionId != dbDefaultVersionId) {
+						changed = true;
 						CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultVersionId);
 						edcBean.setDefaultVersionId(defaultVersionId);
 						edcBean.setDefaultVersionName(defaultVersion.getName());
 					}
 					if (isRequired != edcBean.isRequiredCRF()) {
+						changed = true;
 						edcBean.setRequiredCRF(isRequired);
 					}
 					if (isDouble != edcBean.isDoubleEntry()) {
+						changed = true;
 						edcBean.setDoubleEntry(isDouble);
 					}
 					if (hasPassword != edcBean.isElectronicSignature()) {
+						changed = true;
 						edcBean.setElectronicSignature(hasPassword);
 					}
 					if (isHide != edcBean.isHideCrf()) {
+						changed = true;
 						edcBean.setHideCrf(isHide);
 					}
 					if ((!StringUtil.isBlank(selectedVersionIds)
 							&& !selectedVersionIds.equals(edcBean.getSelectedVersionIds()) && (edcBean.getParentId() > 0))
 							|| (selectedVersionIdListSize != edcBean.getVersions().size() && !(edcBean.getParentId() > 0))) {
+						changed = true;
 						String[] ids = selectedVersionIds.split(",");
 						ArrayList<Integer> idList = new ArrayList<Integer>();
 						for (String id : ids) {
@@ -611,12 +619,15 @@ public class CreateSubStudyServlet extends Controller {
 						edcBean.setSelectedVersionIds(selectedVersionIds);
 					}
 					if (sdvId > 0 && sdvId != edcBean.getSourceDataVerification().getCode()) {
+						changed = true;
 						edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
 					}
 					if (!emailOnStep.equals(edcBean.getEmailStep())) {
+						changed = true;
 						edcBean.setEmailStep(emailOnStep);
 					}
 					if (!emailCRFTo.equals(edcBean.getEmailTo())) {
+						changed = true;
 						if (StringUtil.isBlank(emailOnStep)) {
 							edcBean.setEmailTo("");
 						} else {
@@ -624,13 +635,16 @@ public class CreateSubStudyServlet extends Controller {
 						}
 					}
 					if (isEvaluatedCRF != edcBean.isEvaluatedCRF()) {
+						changed = true;
 						edcBean.setEvaluatedCRF(isEvaluatedCRF);
 					}
 
+					changes.put(sed.getId() + "-" + edcBean.getId(), changed);
 					++start;
 				}
 			}
 		}
+		request.getSession().setAttribute("changed", changes);
 		return seds;
 	}
 
@@ -646,22 +660,27 @@ public class CreateSubStudyServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		ArrayList<StudyEventDefinitionBean> seds = (ArrayList<StudyEventDefinitionBean>) request.getSession()
 				.getAttribute("definitions");
+		HashMap<String, Boolean> changes = (HashMap<String, Boolean>) request.getSession().getAttribute("changed");
 		for (StudyEventDefinitionBean sed : seds) {
 			EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 			ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
 			for (EventDefinitionCRFBean edcBean : edcs) {
 				int edcStatusId = edcBean.getStatus().getId();
 				if (!(edcStatusId == Status.DELETED.getId() || edcStatusId == Status.AUTO_DELETED.getId())) {
-					edcBean.setParentId(edcBean.getId());
-					edcBean.setStudyId(site.getId());
-					edcBean.setUpdater(ub);
-					edcBean.setUpdatedDate(new Date());
-					logger.debug("create for the site");
-					edcdao.create(edcBean);
+					boolean changed = changes.get(sed.getId() + "-" + edcBean.getId());
+					if (changed) {
+						edcBean.setParentId(edcBean.getId());
+						edcBean.setStudyId(site.getId());
+						edcBean.setUpdater(ub);
+						edcBean.setUpdatedDate(new Date());
+						logger.debug("create for the site");
+						edcdao.create(edcBean);
+					}
 				}
 			}
 		}
 		request.getSession().removeAttribute("definitions");
+		request.getSession().removeAttribute("changed");
 		request.getSession().removeAttribute("sdvOptions");
 	}
 
