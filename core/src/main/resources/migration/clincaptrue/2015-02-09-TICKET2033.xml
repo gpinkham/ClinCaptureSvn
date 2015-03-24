@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-02-09-TICKET2033-CREATE-1">
+		<comment>Add primary key to study_user_role table</comment>
+		<addColumn tableName="study_user_role" >
+			<column name="study_user_role_id" autoIncrement="true" type="int">
+				<constraints nullable="false"  primaryKey="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-02-09-TICKET2033-CREATE-2">
+		<comment>Create table crfs_masking</comment>
+		<createTable tableName="crfs_masking">
+			<column autoIncrement="true" name="id" type="int">
+				<constraints nullable="false" primaryKey="true"/>
+			</column>
+			<column name="version" type="int"/>
+			<column name="study_id" type="int"/>
+			<column name="study_event_definition_id" type="int"/>
+			<column name="event_definition_crf_id" type="int"/>
+			<column name="user_id" type="int"/>
+			<column name="study_user_role_id" type="int"/>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-02-09-TICKET2033-3">
+		<comment>Add foreign keys for crf_masking</comment>
+		<addForeignKeyConstraint constraintName="crfs_masking_fk_study_id"
+								 baseColumnNames="study_id"
+								 baseTableName="crfs_masking"
+								 onDelete="CASCADE"
+								 referencedColumnNames="study_id"
+								 referencedTableName="study"/>
+		<addForeignKeyConstraint constraintName="crfs_masking_fk_study_event_definition_id"
+								 baseColumnNames="study_event_definition_id"
+								 baseTableName="crfs_masking"
+								 onDelete="CASCADE"
+								 referencedColumnNames="study_event_definition_id"
+								 referencedTableName="study_event_definition"/>
+		<addForeignKeyConstraint constraintName="crfs_masking_fk_event_definition_crf_id"
+								 baseColumnNames="event_definition_crf_id"
+								 baseTableName="crfs_masking"
+								 onDelete="CASCADE"
+								 referencedColumnNames="event_definition_crf_id"
+								 referencedTableName="event_definition_crf"/>
+		<addForeignKeyConstraint constraintName="crfs_masking_fk_user_id"
+								 baseColumnNames="user_id"
+								 baseTableName="crfs_masking"
+								 onDelete="CASCADE"
+								 referencedColumnNames="user_id"
+								 referencedTableName="user_account"/>
+		<addForeignKeyConstraint constraintName="crfs_masking_fk_study_user_role_id"
+								 baseColumnNames="study_user_role_id"
+								 baseTableName="crfs_masking"
+								 onDelete="CASCADE"
+								 referencedColumnNames="study_user_role_id"
+								 referencedTableName="study_user_role"/>
+	</changeSet>
+</databaseChangeLog>
+
+
+

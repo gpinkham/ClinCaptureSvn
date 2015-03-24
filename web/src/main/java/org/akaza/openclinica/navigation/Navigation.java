@@ -33,7 +33,7 @@ public final class Navigation {
 			"/InitUpdateSubStudy", "/UpdateSubStudy", "/DeleteStudyEvent", "/EditStudyUserRole",
 			"/CreateSubjectGroupClass", "/SetStudyUserRole", "/UpdateProfile", "/DoubleDataEntry", "/SectionPreview",
 			"/DefineStudyEvent", "/InitUpdateEventDefinition", "/UpdateEventDefinition", "/RemoveEventDefinition",
-			"/RemoveSubject", "/RemoveStudy", "/ViewUserAccount", "/EditUserAccount", "/SetUserRole",
+			"/RemoveSubject", "/RemoveStudy", "/ViewUserAccount", "pages/EditUserAccount", "/SetUserRole",
 			"/ViewUserAccount", "/Configure", "/CreateUserAccount", "/UpdateJobImport", "/CreateJobExport",
 			"/CreateJobImport", "/UpdateProfile", "/RemoveDataset", "/LockStudySubject", "/pages/extract",
 			"/CreateNewStudyEvent", "/UpdateSubject", "/UpdateSubjectGroupClass", "/ViewSubjectGroupClass",
@@ -43,7 +43,7 @@ public final class Navigation {
 			"/pages/managestudy/changeCRFVersion", "/CreateCRFVersion", "/RemoveCRF", "/RemoveCRFVersion",
 			"/RestoreCRF", "/RestoreCRFVersion", "/pages/deleteCRFVersion", "/LockCRFVersion", "/UnlockCRFVersion",
 			"/CreateSubStudy", "/RemoveCRFFromDefinition", "/RestoreCRFFromDefinition", "/AddCRFToDefinition",
-			"/InitialDataEntry", "/AdministrativeEditing", "/pages/completeCRFDelete"));
+			"/InitialDataEntry", "/AdministrativeEditing", "/pages/completeCRFDelete", "/pages/CRFsMasking"));
 	// ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintAllEventCRF", "/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
