@@ -43,12 +43,12 @@
 	
 <script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script>
 <script language="JavaScript" type="text/javascript">
-		dnShortcutsTableDefTop += 56;
+		crfShortcutsTableDefTop += 56;
 		jQuery(document).ready(function() {
             jQuery("table > tbody  tr").attr("repeat", "0");
             jQuery("table > tbody  button").attr("disabled", "true");
             jQuery("table > tbody  input").attr("disabled", "disabled");
-            jQuery("table > tbody a").not('[tabindex]').not('.dnShortcut').not('.closeLink').removeAttr("onclick");
+            jQuery("table > tbody a").not('[tabindex]').not('.crfShortcut').not('.closeLink').removeAttr("onclick");
             jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
             jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
             jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");

@@ -486,7 +486,8 @@ public class CrfShortcutsAnalyzer {
 	 */
 	public void prepareItemsToSDVShortcutLink(DisplayItemBean dib, EventCRFBean eventCrfBean, int eventDefinitionCRFId,
 			List<SectionBean> sections, Map<String, Integer> deltaMap) {
-		if (dib.getMetadata() != null && dib.getMetadata().getId() > 0 && dib.getMetadata().isSdvRequired()) {
+		if (dib.getMetadata() != null && dib.getMetadata().getId() > 0 && dib.getMetadata().isShowItem()
+				&& dib.getMetadata().isSdvRequired()) {
 			CurrentSectionInfo currentSectionInfo = new CurrentSectionInfo(sections);
 			String link = buildLink(dib.getMetadata().getSectionId(), eventCrfBean, eventDefinitionCRFId, sections);
 			analyze(currentSectionInfo, deltaMap, link, FIRST_ITEM_TO_SDV, dib.getMetadata().getSectionId());
@@ -498,7 +499,7 @@ public class CrfShortcutsAnalyzer {
 	}
 
 	/**
-	 * Method that generates discrepancy note urls for jumping between sections.
+	 * Method that generates crf shortcut urls for jumping between sections.
 	 * 
 	 * @param eventCrfBean
 	 *            the event crf bean for current crf.
@@ -511,8 +512,8 @@ public class CrfShortcutsAnalyzer {
 	 * @param noteThreads
 	 *            the list of discrepancy notes group.
 	 */
-	public void prepareDnShortcutLinks(EventCRFBean eventCrfBean, ItemFormMetadataDAO ifmdao, int eventDefinitionCRFId,
-			List<SectionBean> sections, List<DiscrepancyNoteThread> noteThreads) {
+	public void prepareCrfShortcutLinks(EventCRFBean eventCrfBean, ItemFormMetadataDAO ifmdao,
+			int eventDefinitionCRFId, List<SectionBean> sections, List<DiscrepancyNoteThread> noteThreads) {
 		DiscrepancyNoteBean tempBean;
 		Map<String, Integer> deltaMap = new HashMap<String, Integer>();
 		if (requestMethod.equalsIgnoreCase(POST) && attributes.get(SECTION) == null) {
@@ -625,10 +626,11 @@ public class CrfShortcutsAnalyzer {
 	 * @param noteThreads
 	 *            the list of discrepancy notes threads.
 	 */
-	public void prepareDnShortcutAnchors(DisplayItemBean dib, List<DiscrepancyNoteThread> noteThreads,
+	public void prepareCrfShortcutAnchors(DisplayItemBean dib, List<DiscrepancyNoteThread> noteThreads,
 			boolean additionalCheck) {
 		if (dib.getMetadata() != null && dib.getData() != null && dib.getData().getId() > 0
-				&& dib.getMetadata().getId() > 0 && dib.getMetadata().isSdvRequired() && !dib.getData().isSdv()) {
+				&& dib.getMetadata().getId() > 0 && dib.getMetadata().isShowItem() && dib.getMetadata().isSdvRequired()
+				&& !dib.getData().isSdv()) {
 			incItemsToSDVAnchorCounter();
 			dib.getItemToSDV().add(ITEM_TO_SDV.concat(Integer.toString(getItemsToSDVAnchorCounter())));
 		}

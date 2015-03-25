@@ -2,19 +2,19 @@ var currentPopupUid;
 var subjectMatrixPopupStick;
 var popupInterval;
 var firstFormState;
-var dnShortcutsBoxState = 0;
+var crfShortcutsBoxState = 0;
 var currentHighlightedShortcutAnchor;
 var currentHighlightedShortcutAnchorInd;
 var currentHighlightedShortcutAnchorCounter;
-var dnShortcutAnchors = ["newDn_", "updatedDn_", "resolutionProposedDn_", "closedDn_", "annotationDn_", "itemToSDV_"];
+var crfShortcutAnchors = ["newDn_", "updatedDn_", "resolutionProposedDn_", "closedDn_", "annotationDn_", "itemToSDV_"];
 var rowHighlightTypes = {NORMAL: 0, ROWSPAN: 1, MULTIPLE: 2};
 
 var pageTitle_SMForAllOfEvents = "/ListStudySubjects";
 var pageTitle_SMForSelectedEvent = "/ListEventsForSubjects";
 
 var windowScrollLeft = 0;
-var dnShortcutsTableDefTop = 174;
-var dnShortcutsTableDefLeft = 78;
+var crfShortcutsTableDefTop = 174;
+var crfShortcutsTableDefLeft = 78;
 
 var autotabbingCurrentElementName = "";
 
@@ -3128,7 +3128,7 @@ autoCode = function() {
 };
 
 function initCrfMoreInfo() {
-  var topVal = dnShortcutsTableDefTop;
+  var topVal = crfShortcutsTableDefTop;
   if (window.expandCrfInfo != undefined && window.expandCrfInfo == 'true' && $('#CRF_infobox_open').css('display') == 'none') {
     $('#CRF_infobox_closed').css('display', '');
     $('#CRF_infobox_open').css('display', '');
@@ -3140,14 +3140,14 @@ function initCrfMoreInfo() {
     $('img[id=moreInfoExpandedImg]').css('display', '');
     $('img[id=moreInfoCollapsedImg]').css('display', 'none');
   }
-  $("#dnShortcutsTable").css("top", topVal + "px");
-  adjustDnShortcutsTable();
+  $("#crfShortcutsTable").css("top", topVal + "px");
+  adjustCrfShortcutsTable();
   $("table.aka_form_table tr[repeat=template] a.sdvItemLink").remove();
-  $("table.aka_form_table tr[repeat=template] div[id^=dnShortcutAnchors_]").remove();
+  $("table.aka_form_table tr[repeat=template] div[id^=crfShortcutAnchors_]").remove();
 }
 
 function processCrfMoreInfo() {
-  var topVal = dnShortcutsTableDefTop;
+  var topVal = crfShortcutsTableDefTop;
   var displayValue = $('#CRF_infobox_open').css('display');
   $('#CRF_infobox_open').css('display', displayValue == 'none' ? '' : 'none');
   if (displayValue == 'none') {
@@ -3158,7 +3158,7 @@ function processCrfMoreInfo() {
     $('img[id=moreInfoExpandedImg]').css('display', '');
     $('img[id=moreInfoCollapsedImg]').css('display', 'none');
   }
-  $("#dnShortcutsTable").css("top", topVal + "px");
+  $("#crfShortcutsTable").css("top", topVal + "px");
 }
 
 function Pager(tableName, itemsPerPage) {
@@ -3481,47 +3481,47 @@ function getBrowserClientHeight() {
 }
 
 function enableDNBoxFeatures() {
-    if (dnShortcutsBoxState == 1 && $("#dnShortcutsTable").length > 0 && $("#dnShortcutsTable").css("position") == "absolute") {
-        $("#dnShortcutsTable").css("position", "fixed");
-        $("#dnShortcutsTable").draggable({
+    if (crfShortcutsBoxState == 1 && $("#crfShortcutsTable").length > 0 && $("#crfShortcutsTable").css("position") == "absolute") {
+        $("#crfShortcutsTable").css("position", "fixed");
+        $("#crfShortcutsTable").draggable({
             containment: "window",
             scroll: false,
             start: function (event, ui) {
-                $("#dnShortcutsTable").css("position", "absolute");
+                $("#crfShortcutsTable").css("position", "absolute");
             }, drag: function (event, ui) {
                 if (ui.offset != undefined && ui.position != undefined && ui.offset.top != ui.position.top) ui.position.top = ui.offset.top;
                 if (ui.offset != undefined && ui.position != undefined && ui.offset.left != ui.position.left) ui.position.left = ui.offset.left;
             }, stop: function (event, ui) {
-                $("#dnShortcutsTable").css("position", "fixed");
-                $("#dnShortcutsTable").css("top", (parseInt($("#dnShortcutsTable").css("top")) - $(window).scrollTop()) + 'px');
-                $("#dnShortcutsTable").css("left", (parseInt($("#dnShortcutsTable").css("left")) - $(window).scrollLeft()) + 'px');
+                $("#crfShortcutsTable").css("position", "fixed");
+                $("#crfShortcutsTable").css("top", (parseInt($("#crfShortcutsTable").css("top")) - $(window).scrollTop()) + 'px');
+                $("#crfShortcutsTable").css("left", (parseInt($("#crfShortcutsTable").css("left")) - $(window).scrollLeft()) + 'px');
             }
         });
     }
 }
 
-function resetDnShortcutsTable() {
-    if ($("#dnShortcutsTable").length > 0) {
-        var dnShortcutsTableTop = dnShortcutsTableDefTop;
+function resetCrfShortcutsTable() {
+    if ($("#crfShortcutsTable").length > 0) {
+        var crfShortcutsTableTop = crfShortcutsTableDefTop;
         if ($('#CRF_infobox_open').css('display') != "none") {
-            dnShortcutsTableTop += $("#CRF_infobox_open").outerHeight();
+            crfShortcutsTableTop += $("#CRF_infobox_open").outerHeight();
         }
-        $("#dnShortcutsTable").css("position", "absolute");
-        $("#dnShortcutsTable").css("top", dnShortcutsTableTop + 'px');
-        $("#dnShortcutsTable").css("left", dnShortcutsTableDefLeft + 'px');
-        $("#dnShortcutsTable").draggable("destroy");
+        $("#crfShortcutsTable").css("position", "absolute");
+        $("#crfShortcutsTable").css("top", crfShortcutsTableTop + 'px');
+        $("#crfShortcutsTable").css("left", crfShortcutsTableDefLeft + 'px');
+        $("#crfShortcutsTable").draggable("destroy");
     }
 }
 
 function processPushpin(element) {
     if (element.hasClass("ui-icon-pin-w")) {
-        dnShortcutsBoxState = 0;
-        resetDnShortcutsTable();
+        crfShortcutsBoxState = 0;
+        resetCrfShortcutsTable();
         element.removeClass("ui-icon-pin-w");
         element.addClass("ui-icon-bullet");
         element.attr("title", element.attr("unlocktitle"));
     } else {
-        dnShortcutsBoxState = 1;
+        crfShortcutsBoxState = 1;
         enableDNBoxFeatures();
         element.removeClass("ui-icon-bullet");
         element.addClass("ui-icon-pin-w");
@@ -3531,14 +3531,14 @@ function processPushpin(element) {
 }
 
 $(window).scroll(function() {
-    if (dnShortcutsBoxState == 1) {
+    if (crfShortcutsBoxState == 1) {
         enableDNBoxFeatures();
     }
 })
 
 $(window).resize(function() {
-    if (dnShortcutsBoxState == 1) {
-        resetDnShortcutsTable();
+    if (crfShortcutsBoxState == 1) {
+        resetCrfShortcutsTable();
     }
 })
 
@@ -3566,16 +3566,16 @@ function isElementOutViewport(element) {
     return result;
 }
 
-function adjustDnShortcutsTable() {
-    var dnShortcutsSpan = parseInt($("#dnShortcutsSpan").text());
-    var dnShortcutsWidth = parseInt($("#dnShortcutsWidth").text());
-    var allowSdvWithOpenQueries = $("#dnShortcutsAllowSdvWithOpenQueries").text() == "yes";
+function adjustCrfShortcutsTable() {
+    var crfShortcutsSpan = parseInt($("#crfShortcutsSpan").text());
+    var crfShortcutsWidth = parseInt($("#crfShortcutsWidth").text());
+    var allowSdvWithOpenQueries = $("#crfShortcutsAllowSdvWithOpenQueries").text() == "yes";
 
     var itemsToSDVAreHidden = false;
     var userIsAbleToSDVItems = ($("#userIsAbleToSDVItems").text() == "true");
-    var hasDNs = !(parseInt($("#dnShortcutTotalNew").text()) == 0 && parseInt($("#dnShortcutTotalUpdated").text()) == 0 && ($("#dnShortcutTotalResolutionProposed").length == 0 || parseInt($("#dnShortcutTotalResolutionProposed").text()) == 0) && parseInt($("#dnShortcutTotalClosed").text()) == 0 && parseInt($("#dnShortcutTotalAnnotations").text()) == 0);
-    var hasOutstandingDNs = !(parseInt($("#dnShortcutTotalNew").text()) == 0 && parseInt($("#dnShortcutTotalUpdated").text()) == 0 && ($("#dnShortcutTotalResolutionProposed").length == 0 || parseInt($("#dnShortcutTotalResolutionProposed").text()) == 0));
-    var hasItemsToSDV = parseInt($("#dnShortcutTotalItemsToSDV").text()) > 0;
+    var hasDNs = !(parseInt($("#crfShortcutTotalNew").text()) == 0 && parseInt($("#crfShortcutTotalUpdated").text()) == 0 && ($("#crfShortcutTotalResolutionProposed").length == 0 || parseInt($("#crfShortcutTotalResolutionProposed").text()) == 0) && parseInt($("#crfShortcutTotalClosed").text()) == 0 && parseInt($("#crfShortcutTotalAnnotations").text()) == 0);
+    var hasOutstandingDNs = !(parseInt($("#crfShortcutTotalNew").text()) == 0 && parseInt($("#crfShortcutTotalUpdated").text()) == 0 && ($("#crfShortcutTotalResolutionProposed").length == 0 || parseInt($("#crfShortcutTotalResolutionProposed").text()) == 0));
+    var hasItemsToSDV = parseInt($("#crfShortcutTotalItemsToSDV").text()) > 0;
 
     if (!hasItemsToSDV || (!allowSdvWithOpenQueries && hasOutstandingDNs) || !userIsAbleToSDVItems) {
         if ((!allowSdvWithOpenQueries && hasOutstandingDNs) || !userIsAbleToSDVItems) {
@@ -3584,25 +3584,25 @@ function adjustDnShortcutsTable() {
             $("a.sdvItemLink").removeClass("hidden");
         }
         itemsToSDVAreHidden = true;
-        $("#dnShortcutsSubTable tr:eq(1) td:eq(" + (dnShortcutsSpan - 1) + ")").addClass("hidden");
-        $("#dnShortcutsSubTable tr:eq(2) td:eq(" + (dnShortcutsSpan - 1) + ")").addClass("hidden");
-        dnShortcutsSpan--;
+        $("#crfShortcutsSubTable tr:eq(1) td:eq(" + (crfShortcutsSpan - 1) + ")").addClass("hidden");
+        $("#crfShortcutsSubTable tr:eq(2) td:eq(" + (crfShortcutsSpan - 1) + ")").addClass("hidden");
+        crfShortcutsSpan--;
     } else {
         $("a.sdvItemLink").removeClass("hidden");
-        $("#dnShortcutsSubTable tr:eq(1) td:eq(" + (dnShortcutsSpan - 1) + ")").removeClass("hidden");
-        $("#dnShortcutsSubTable tr:eq(2) td:eq(" + (dnShortcutsSpan - 1) + ")").removeClass("hidden");
+        $("#crfShortcutsSubTable tr:eq(1) td:eq(" + (crfShortcutsSpan - 1) + ")").removeClass("hidden");
+        $("#crfShortcutsSubTable tr:eq(2) td:eq(" + (crfShortcutsSpan - 1) + ")").removeClass("hidden");
     }
 
-    var endWidth = dnShortcutsSpan * dnShortcutsWidth;
-    $("#dnShortcutsSubTable").attr("width", endWidth + "px");
-    $("#dnShortcutsSubTable tr:eq(0) td").attr("colspan", dnShortcutsSpan);
-    $("#dnShortcutsSubTable tr:eq(1) td").attr("width", ((dnShortcutsWidth / endWidth) * 100) + "%");
+    var endWidth = crfShortcutsSpan * crfShortcutsWidth;
+    $("#crfShortcutsSubTable").attr("width", endWidth + "px");
+    $("#crfShortcutsSubTable tr:eq(0) td").attr("colspan", crfShortcutsSpan);
+    $("#crfShortcutsSubTable tr:eq(1) td").attr("width", ((crfShortcutsWidth / endWidth) * 100) + "%");
 
     if (!hasDNs && itemsToSDVAreHidden) {
-        $("#dnShortcutsTable").addClass("hidden");
+        $("#crfShortcutsTable").addClass("hidden");
         $("#crfSectionTabsTable").attr("style", "");
-    } else if ($("#dnShortcutsTable").hasClass("hidden")) {
-        $("#dnShortcutsTable").removeClass("hidden");
+    } else if ($("#crfShortcutsTable").hasClass("hidden")) {
+        $("#crfShortcutsTable").removeClass("hidden");
         $("#crfSectionTabsTable").attr("style", "padding-top: 80px;");
     }
 }
@@ -3625,7 +3625,7 @@ function sdvItem(contextPath, itemDataId, sectionId, eventDefinitionCrfId, sdvIt
             cache: false,
             success: function (data) {
                 jsonData = eval("(" + data + ")");
-                resetHighlightedFieldsForDNShortcutAnchors();
+                resetHighlightedFieldsForCRFShortcutAnchors();
                 var sdvItem = $("#sdv_itemData_" + itemDataId);
                 $("a[id^=itemToSDV_]").remove();
                 sdvItem.attr("onclick", "");
@@ -3643,8 +3643,8 @@ function sdvItem(contextPath, itemDataId, sectionId, eventDefinitionCrfId, sdvIt
                 sdvItem.mouseover(function () {
                     callTip(sdvItemTitle)
                 });
-                $("#dnShortcutTotalItemsToSDV").text(" " + jsonData.totalItemsToSDV + " ");
-                $("#dnShortcutTotalItemsToSDV").parent("a.dnShortcut").attr("sectiontotal", jsonData.totalSectionItemsToSDV);
+                $("#crfShortcutTotalItemsToSDV").text(" " + jsonData.totalItemsToSDV + " ");
+                $("#crfShortcutTotalItemsToSDV").parent("a.crfShortcut").attr("sectiontotal", jsonData.totalSectionItemsToSDV);
                 if (jsonData.crf == "sdv" || jsonData.crf == "completed") {
                     var crfName = $("#crfNameId > img");
                     crfName.attr("src", sdvImgSrc);
@@ -3654,11 +3654,11 @@ function sdvItem(contextPath, itemDataId, sectionId, eventDefinitionCrfId, sdvIt
                 }
                 for (var n = 0; n < jsonData.itemDataItems.length; n++) {
                     var itemData = jsonData.itemDataItems[n];
-                    var holder = $("#sdv_itemData_" + itemData.itemDataId).closest(".itemHolderClass").find("div[id^=dnShortcutAnchors_]");
+                    var holder = $("#sdv_itemData_" + itemData.itemDataId).closest(".itemHolderClass").find("div[id^=crfShortcutAnchors_]");
                     var data = "<a id=\"itemToSDV_" + (n + 1) + "\" rel=\"" + itemData.itemId + "\" alt=\"" + itemData.rowCount + "\">";
                     holder.append(data);
                 }
-                adjustDnShortcutsTable();
+                adjustCrfShortcutsTable();
                 gfRemoveOverlay();
             }
         });
@@ -3690,7 +3690,7 @@ function highlightDn(id, color, delay) {
             processCrfMoreInfo();
         }
         if (color == "yellow" && isElementOutViewport(inputHolderElement.get(0))) {
-            var newTop = inputHolderElement.offset().top - $("#dnShortcutsTable").outerHeight() - 20;
+            var newTop = inputHolderElement.offset().top - $("#crfShortcutsTable").outerHeight() - 20;
             var newLeft = inputHolderElement.offset().left - 20;
             $(window).scrollTop(newTop < 0 ? 0 : newTop);
             $(window).scrollLeft(newLeft < 0 ? 0 : newLeft);
@@ -3698,7 +3698,7 @@ function highlightDn(id, color, delay) {
     }, delay == undefined ? 0 : parseInt(delay));
 }
 
-function resetHighlightedFieldsForDNShortcutAnchors() {
+function resetHighlightedFieldsForCRFShortcutAnchors() {
     if (currentHighlightedShortcutAnchor != undefined) {
         highlightDn(currentHighlightedShortcutAnchor, "");
     }
@@ -3707,10 +3707,10 @@ function resetHighlightedFieldsForDNShortcutAnchors() {
     currentHighlightedShortcutAnchorInd = undefined;
 }
 
-function highlightFirstFieldForDNShortcutAnchors(idToHighlight) {
-    resetHighlightedFieldsForDNShortcutAnchors();
-    for (var i = 0; i < dnShortcutAnchors.length; i++) {
-        if (idToHighlight.startsWith(dnShortcutAnchors[i])) {
+function highlightFirstFieldForCRFShortcutAnchors(idToHighlight) {
+    resetHighlightedFieldsForCRFShortcutAnchors();
+    for (var i = 0; i < crfShortcutAnchors.length; i++) {
+        if (idToHighlight.startsWith(crfShortcutAnchors[i])) {
             currentHighlightedShortcutAnchorInd = i;
             currentHighlightedShortcutAnchorCounter = parseInt(idToHighlight.replace(/.*_/g, ""));
         }
@@ -3721,7 +3721,7 @@ function highlightFirstFieldForDNShortcutAnchors(idToHighlight) {
     }
 }
 
-function highlightFieldForDNShortcutAnchor(ind, currentElement) {
+function highlightFieldForCRFShortcutAnchor(ind, currentElement) {
     var delay = 0;
     enableDNBoxFeatures();
     var nextDnLink = $(currentElement).attr("nextdnlink");
@@ -3743,16 +3743,16 @@ function highlightFieldForDNShortcutAnchor(ind, currentElement) {
         }
     }
     currentHighlightedShortcutAnchorInd = ind;
-    var newCurrentHighlightedShortcutAnchor = dnShortcutAnchors[currentHighlightedShortcutAnchorInd] + currentHighlightedShortcutAnchorCounter;
+    var newCurrentHighlightedShortcutAnchor = crfShortcutAnchors[currentHighlightedShortcutAnchorInd] + currentHighlightedShortcutAnchorCounter;
     if (currentHighlightedShortcutAnchor != undefined && currentHighlightedShortcutAnchor != newCurrentHighlightedShortcutAnchor && $("#" + currentHighlightedShortcutAnchor).parent()[0] == $("#" + newCurrentHighlightedShortcutAnchor).parent()[0]) {
         if (currentHighlightedShortcutAnchor.replace(/_.*/g,"") == newCurrentHighlightedShortcutAnchor.replace(/_.*/g,"") && $("#" + currentHighlightedShortcutAnchor).parent()[0] == $("#" + newCurrentHighlightedShortcutAnchor).parent()[0]) {
-            highlightFieldForDNShortcutAnchor(ind, currentElement);
+            highlightFieldForCRFShortcutAnchor(ind, currentElement);
             return;
         }
         delay = 100;
     }
-    if ($("#" + newCurrentHighlightedShortcutAnchor).parents(".itemHolderClass:first").parents("tr:first").css("display") == "none" || $("#" + newCurrentHighlightedShortcutAnchor).parents("div[id^=dnShortcutAnchors_]:first").parents("td:first").css("display") == "none") {
-        highlightFieldForDNShortcutAnchor(ind, currentElement);
+    if ($("#" + newCurrentHighlightedShortcutAnchor).parents(".itemHolderClass:first").parents("tr:first").css("display") == "none" || $("#" + newCurrentHighlightedShortcutAnchor).parents("div[id^=crfShortcutAnchors_]:first").parents("td:first").css("display") == "none") {
+        highlightFieldForCRFShortcutAnchor(ind, currentElement);
         return;
     }
     currentHighlightedShortcutAnchor = newCurrentHighlightedShortcutAnchor;
@@ -3762,9 +3762,9 @@ function highlightFieldForDNShortcutAnchor(ind, currentElement) {
 function updateCRFHeaderFunction(parametersHolder) {
     try {
         parametersHolder.totalItems = 0;
-        $("div[id^=dnShortcutAnchors_]").each(function() {
-            var rowCount = $(this).attr("id").replace("dnShortcutAnchors_", "").replace(/item_.*/, "");
-            var itemId = $(this).attr("id").replace(/dnShortcutAnchors_.*item_/, "");
+        $("div[id^=crfShortcutAnchors_]").each(function() {
+            var rowCount = $(this).attr("id").replace("crfShortcutAnchors_", "").replace(/item_.*/, "");
+            var itemId = $(this).attr("id").replace(/crfShortcutAnchors_.*item_/, "");
             itemId = itemId == "interviewer" || itemId == "interviewDate" ? itemId : parseInt(itemId);
             var field = $(this).attr("field");
             if ($(this).parent().parent().attr("repeat") != "template") {
@@ -3773,11 +3773,11 @@ function updateCRFHeaderFunction(parametersHolder) {
                 parametersHolder["itemId_" + parametersHolder.totalItems] = itemId;
                 parametersHolder["field_" + parametersHolder.totalItems] = field;
             }
-            $("#dnShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=newDn_]").remove();
-            $("#dnShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=updatedDn_]").remove();
-            $("#dnShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=closedDn_]").remove();
-            $("#dnShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=annotationDn_]").remove();
-            $("#dnShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=resolutionProposedDn_]").remove();
+            $("#crfShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=newDn_]").remove();
+            $("#crfShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=updatedDn_]").remove();
+            $("#crfShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=closedDn_]").remove();
+            $("#crfShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=annotationDn_]").remove();
+            $("#crfShortcutAnchors_" + rowCount + "item_" + itemId + " a[id^=resolutionProposedDn_]").remove();
         });
         parametersHolder.sectionId = $("input[name=sectionId]").val();
         jQuery.ajax({
@@ -3788,50 +3788,50 @@ function updateCRFHeaderFunction(parametersHolder) {
             success : function(data) {
                 var jsonObject = eval("(" + data + ")");
 
-                $("#dnShortcutTotalNew").text(" " + jsonObject.totalNew + " ");
-                $("#dnShortcutTotalUpdated").text(" " + jsonObject.totalUpdated + " ");
-                $("#dnShortcutTotalResolutionProposed").text(" " + jsonObject.totalResolutionProposed + " ");
-                $("#dnShortcutTotalClosed").text(" " + jsonObject.totalClosed + " ");
-                $("#dnShortcutTotalAnnotations").text(" " + jsonObject.totalAnnotations + " ");
+                $("#crfShortcutTotalNew").text(" " + jsonObject.totalNew + " ");
+                $("#crfShortcutTotalUpdated").text(" " + jsonObject.totalUpdated + " ");
+                $("#crfShortcutTotalResolutionProposed").text(" " + jsonObject.totalResolutionProposed + " ");
+                $("#crfShortcutTotalClosed").text(" " + jsonObject.totalClosed + " ");
+                $("#crfShortcutTotalAnnotations").text(" " + jsonObject.totalAnnotations + " ");
 
-                $("#dnShortcutTotalNew").parent().attr("sectiontotal", jsonObject.sectionTotalNew);
-                $("#dnShortcutTotalNew").parent().attr("nextdnlink", jsonObject.nextNewDnLink);
+                $("#crfShortcutTotalNew").parent().attr("sectiontotal", jsonObject.sectionTotalNew);
+                $("#crfShortcutTotalNew").parent().attr("nextdnlink", jsonObject.nextNewDnLink);
 
-                $("#dnShortcutTotalUpdated").parent().attr("sectiontotal", jsonObject.sectionTotalUpdated);
-                $("#dnShortcutTotalUpdated").parent().attr("nextdnlink", jsonObject.nextUpdatedDnLink);
+                $("#crfShortcutTotalUpdated").parent().attr("sectiontotal", jsonObject.sectionTotalUpdated);
+                $("#crfShortcutTotalUpdated").parent().attr("nextdnlink", jsonObject.nextUpdatedDnLink);
 
-                $("#dnShortcutTotalResolutionProposed").parent().attr("sectiontotal", jsonObject.sectionTotalResolutionProposed);
-                $("#dnShortcutTotalResolutionProposed").parent().attr("nextdnlink", jsonObject.nextResolutionProposedDnLink);
+                $("#crfShortcutTotalResolutionProposed").parent().attr("sectiontotal", jsonObject.sectionTotalResolutionProposed);
+                $("#crfShortcutTotalResolutionProposed").parent().attr("nextdnlink", jsonObject.nextResolutionProposedDnLink);
 
-                $("#dnShortcutTotalClosed").parent().attr("sectiontotal", jsonObject.sectionTotalClosed);
-                $("#dnShortcutTotalClosed").parent().attr("nextdnlink", jsonObject.nextClosedDnLink);
+                $("#crfShortcutTotalClosed").parent().attr("sectiontotal", jsonObject.sectionTotalClosed);
+                $("#crfShortcutTotalClosed").parent().attr("nextdnlink", jsonObject.nextClosedDnLink);
 
-                $("#dnShortcutTotalAnnotations").parent().attr("sectiontotal", jsonObject.sectionTotalAnnotations);
-                $("#dnShortcutTotalAnnotations").parent().attr("nextdnlink", jsonObject.nextAnnotationDnLink);
+                $("#crfShortcutTotalAnnotations").parent().attr("sectiontotal", jsonObject.sectionTotalAnnotations);
+                $("#crfShortcutTotalAnnotations").parent().attr("nextdnlink", jsonObject.nextAnnotationDnLink);
 
-                adjustDnShortcutsTable();
+                adjustCrfShortcutsTable();
 
                 for (var n = 0; n < jsonObject.items.length; n++) {
                     var p;
-                    var dnShortcutsData = "";
+                    var crfShortcutsData = "";
                     var item = jsonObject.items[n];
-                    var inputHolderElement = $("#dnShortcutAnchors_" + item.rowCount + "item_" + (item.itemId == "interviewer" || item.itemId == "interviewDate" ? item.itemId : item.itemId));
+                    var inputHolderElement = $("#crfShortcutAnchors_" + item.rowCount + "item_" + (item.itemId == "interviewer" || item.itemId == "interviewDate" ? item.itemId : item.itemId));
                     for (p = 0; p < item.newDn.length; p++) {
-                        dnShortcutsData += "<a id=\"" + item.newDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                        crfShortcutsData += "<a id=\"" + item.newDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
                     }
                     for (p = 0; p < item.updatedDn.length; p++) {
-                        dnShortcutsData += "<a id=\"" + item.updatedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                        crfShortcutsData += "<a id=\"" + item.updatedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
                     }
                     for (p = 0; p < item.resolutionProposedDn.length; p++) {
-                        dnShortcutsData += "<a id=\"" + item.resolutionProposedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                        crfShortcutsData += "<a id=\"" + item.resolutionProposedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
                     }
                     for (p = 0; p < item.closedDn.length; p++) {
-                        dnShortcutsData += "<a id=\"" + item.closedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                        crfShortcutsData += "<a id=\"" + item.closedDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
                     }
                     for (p = 0; p < item.annotationDn.length; p++) {
-                        dnShortcutsData += "<a id=\"" + item.annotationDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
+                        crfShortcutsData += "<a id=\"" + item.annotationDn[p] + "\" rel=\"" + item.itemId + "\" alt=\"" + item.rowCount + "\"></a>";
                     }
-                    inputHolderElement.prepend(dnShortcutsData);
+                    inputHolderElement.prepend(crfShortcutsData);
                 }
 
                 gfRemoveOverlay();

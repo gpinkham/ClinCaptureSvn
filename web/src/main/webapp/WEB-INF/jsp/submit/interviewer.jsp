@@ -385,15 +385,15 @@
         <c:set var="isInError_Dat" value="${true}"/>
     </c:if>
 </c:forEach>
-<tr id="preDnShortcutsTr">
+<tr id="preCrfShortcutsTr">
     <td class="header_crf_cell" id="itemHolderId_interviewer">
-        <c:import url="../submit/dnShortcutAnchors.jsp">
+        <c:import url="../submit/crfShortcutAnchors.jsp">
             <c:param name="rowCount" value=""/>
             <c:param name="itemId" value="interviewer" />
             <c:param name="inputName" value="interviewer"/>
         </c:import>
         <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
-            <c:set var="showPreDnShortcutsTr" value="true"/>
+            <c:set var="showPreCrfShortcutsTr" value="true"/>
             <c:choose>
                 <c:when test="${isInError_Int}">
                     <fmt:message key="interviewer_name" bundle="${resword}"/>: <span class="aka_exclaim_error">! </span> &nbsp;
@@ -405,7 +405,7 @@
             </c:choose>
         </c:if>
         <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
-            <c:set var="showPreDnShortcutsTr" value="true"/>
+            <c:set var="showPreCrfShortcutsTr" value="true"/>
             <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
             <c:choose>
                 <c:when test="${study.studyParameterConfig.interviewerNameEditable=='true'}">
@@ -477,13 +477,13 @@
     </td>
 
     <td class="header_crf_cell" id="itemHolderId_interviewDate">
-        <c:import url="../submit/dnShortcutAnchors.jsp">
+        <c:import url="../submit/crfShortcutAnchors.jsp">
             <c:param name="rowCount" value=""/>
             <c:param name="itemId" value="interviewDate" />
             <c:param name="inputName" value="interviewDate"/>
         </c:import>
         <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
-            <c:set var="showPreDnShortcutsTr" value="true"/>
+            <c:set var="showPreCrfShortcutsTr" value="true"/>
             <c:choose>
                 <c:when test="${isInError_Dat}">
                     <fmt:message key="interview_date" bundle="${resword}"/>: <span class="aka_exclaim_error">! </span>
@@ -497,7 +497,7 @@
             </c:choose>
         </c:if>
         <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
-                <c:set var="showPreDnShortcutsTr" value="true"/>
+                <c:set var="showPreCrfShortcutsTr" value="true"/>
                 <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
                 <c:choose>
                     <c:when test="${study.studyParameterConfig.interviewDateEditable=='true'}">
@@ -571,9 +571,9 @@
 </tr>
 </table>
 
-<c:if test="${showPreDnShortcutsTr ne 'true'}">
+<c:if test="${showPreCrfShortcutsTr ne 'true'}">
     <script>
-        $("#preDnShortcutsTr").addClass("hidden");
+        $("#preCrfShortcutsTr").addClass("hidden");
     </script>
 </c:if>
 
@@ -584,23 +584,23 @@
 
 <script>tabbingMode = "${event_def_crf_bean.tabbingMode}";</script>
 <c:set var="tdPercentWidth" value="16.7%"/>
-<c:set var="dnShortcutsSpan" value="${6}"/>
-<c:set var="dnShortcutsWidth" value="${110}"/>
+<c:set var="crfShortcutsSpan" value="${6}"/>
+<c:set var="crfShortcutsWidth" value="${110}"/>
 <c:if test="${crfShortcutsAnalyzer.totalResolutionProposed == 0}">
     <c:set var="tdPercentWidth" value="20%"/>
-    <c:set var="dnShortcutsSpan" value="${dnShortcutsSpan - 1}"/>
+    <c:set var="crfShortcutsSpan" value="${crfShortcutsSpan - 1}"/>
 </c:if>
-<span class="hidden" id="dnShortcutsSpan">${dnShortcutsSpan}</span>
-<span class="hidden" id="dnShortcutsWidth">${dnShortcutsWidth}</span>
-<span class="hidden" id="dnShortcutsAllowSdvWithOpenQueries">${study.studyParameterConfig.allowSdvWithOpenQueries}</span>
+<span class="hidden" id="crfShortcutsSpan">${crfShortcutsSpan}</span>
+<span class="hidden" id="crfShortcutsWidth">${crfShortcutsWidth}</span>
+<span class="hidden" id="crfShortcutsAllowSdvWithOpenQueries">${study.studyParameterConfig.allowSdvWithOpenQueries}</span>
 <span class="hidden" id="userIsAbleToSDVItems">${crfShortcutsAnalyzer.userIsAbleToSDVItems}</span>
-<table id="dnShortcutsTable" border="0" cellspacing="0" cellpadding="0" style="cursor: default;position: absolute;left: 0px;top: 0px;" class="notSelectable">
+<table id="crfShortcutsTable" border="0" cellspacing="0" cellpadding="0" style="cursor: default;position: absolute;left: 0px;top: 0px;" class="notSelectable">
     <tr>
         <td>
             <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR"><div class="tablebox_center">
-                <table id="dnShortcutsSubTable" border="0" cellspacing="0" cellpadding="0" width="${dnShortcutsSpan * dnShortcutsWidth}px">
+                <table id="crfShortcutsSubTable" border="0" cellspacing="0" cellpadding="0" width="${crfShortcutsSpan * crfShortcutsWidth}px">
                     <tr>
-                        <td colspan="${dnShortcutsSpan}" valign="top" class="table_cell_left_header" style="padding-left: 6px; padding-right: 6px;">
+                        <td colspan="${crfShortcutsSpan}" valign="top" class="table_cell_left_header" style="padding-left: 6px; padding-right: 6px;">
                             <b><fmt:message key="crf_shortcuts_header" bundle="${resword}"/>:</b>
                             <a onclick="processPushpin($(this));" type="image" id="pushpin" class="ui-icon ui-icon-bullet" title="<fmt:message key="unlock" bundle="${resword}"/>" unlocktitle="<fmt:message key="unlock" bundle="${resword}"/>" locktitle="<fmt:message key="lock" bundle="${resword}"/>">&nbsp;</a>
                         </td>
@@ -614,56 +614,56 @@
                         <td valign="top" width="${tdPercentWidth}" align="center" class="table_cell_left" style="white-space: nowrap;border-right:1px solid #E6E6E6;color:black;text-align: center;"> <fmt:message key="itemsToSDV" bundle="${resword}"/></td>
                     </tr>
                     <tr>
-                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#CC0000;"><a class="dnShortcut" sectiontotal="${crfShortcutsAnalyzer.sectionTotalNew}" nextdnlink="${crfShortcutsAnalyzer.nextNewDnLink}" onclick="highlightFieldForDNShortcutAnchor(0, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalNew">&nbsp;${crfShortcutsAnalyzer.totalNew}&nbsp;</div></a></td>
-                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#D4A718;"><a class="dnShortcut" sectiontotal="${crfShortcutsAnalyzer.sectionTotalUpdated}" nextdnlink="${crfShortcutsAnalyzer.nextUpdatedDnLink}" onclick="highlightFieldForDNShortcutAnchor(1, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalUpdated">&nbsp;${crfShortcutsAnalyzer.totalUpdated}&nbsp;</div></a></td>
-                        <c:if test="${crfShortcutsAnalyzer.totalResolutionProposed != 0}"><td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black;"><a class="dnShortcut" sectiontotal="${crfShortcutsAnalyzer.sectionTotalResolutionProposed}" nextdnlink="${crfShortcutsAnalyzer.nextResolutionProposedLink}" onclick="highlightFieldForDNShortcutAnchor(2, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalResolutionProposed">&nbsp;${crfShortcutsAnalyzer.totalResolutionProposed}&nbsp;</div></a></td></c:if>
-                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#7CB98F;"><a class="dnShortcut" sectiontotal="${crfShortcutsAnalyzer.sectionTotalClosed}" nextdnlink="${crfShortcutsAnalyzer.nextClosedDnLink}" onclick="highlightFieldForDNShortcutAnchor(3, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalClosed">&nbsp;${crfShortcutsAnalyzer.totalClosed}&nbsp;</div></a></td>
-                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black"><a class="dnShortcut" sectiontotal="${crfShortcutsAnalyzer.sectionTotalAnnotations}" nextdnlink="${crfShortcutsAnalyzer.nextAnnotationLink}" onclick="highlightFieldForDNShortcutAnchor(4, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalAnnotations">&nbsp;${crfShortcutsAnalyzer.totalAnnotations}&nbsp;</div></a></td>
-                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black"><a class="dnShortcut" sectiontotal="${crfShortcutsAnalyzer.sectionTotalItemsToSDV}" nextdnlink="${crfShortcutsAnalyzer.nextItemToSDVLink}" onclick="highlightFieldForDNShortcutAnchor(5, this);"><div style="width: 100%; text-align: center;" id="dnShortcutTotalItemsToSDV">&nbsp;${crfShortcutsAnalyzer.totalItemsToSDV}&nbsp;</div></a></td>
+                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#CC0000;"><a class="crfShortcut" sectiontotal="${crfShortcutsAnalyzer.sectionTotalNew}" nextdnlink="${crfShortcutsAnalyzer.nextNewDnLink}" onclick="highlightFieldForCRFShortcutAnchor(0, this);"><div style="width: 100%; text-align: center;" id="crfShortcutTotalNew">&nbsp;${crfShortcutsAnalyzer.totalNew}&nbsp;</div></a></td>
+                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#D4A718;"><a class="crfShortcut" sectiontotal="${crfShortcutsAnalyzer.sectionTotalUpdated}" nextdnlink="${crfShortcutsAnalyzer.nextUpdatedDnLink}" onclick="highlightFieldForCRFShortcutAnchor(1, this);"><div style="width: 100%; text-align: center;" id="crfShortcutTotalUpdated">&nbsp;${crfShortcutsAnalyzer.totalUpdated}&nbsp;</div></a></td>
+                        <c:if test="${crfShortcutsAnalyzer.totalResolutionProposed != 0}"><td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black;"><a class="crfShortcut" sectiontotal="${crfShortcutsAnalyzer.sectionTotalResolutionProposed}" nextdnlink="${crfShortcutsAnalyzer.nextResolutionProposedLink}" onclick="highlightFieldForCRFShortcutAnchor(2, this);"><div style="width: 100%; text-align: center;" id="crfShortcutTotalResolutionProposed">&nbsp;${crfShortcutsAnalyzer.totalResolutionProposed}&nbsp;</div></a></td></c:if>
+                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#7CB98F;"><a class="crfShortcut" sectiontotal="${crfShortcutsAnalyzer.sectionTotalClosed}" nextdnlink="${crfShortcutsAnalyzer.nextClosedDnLink}" onclick="highlightFieldForCRFShortcutAnchor(3, this);"><div style="width: 100%; text-align: center;" id="crfShortcutTotalClosed">&nbsp;${crfShortcutsAnalyzer.totalClosed}&nbsp;</div></a></td>
+                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black"><a class="crfShortcut" sectiontotal="${crfShortcutsAnalyzer.sectionTotalAnnotations}" nextdnlink="${crfShortcutsAnalyzer.nextAnnotationLink}" onclick="highlightFieldForCRFShortcutAnchor(4, this);"><div style="width: 100%; text-align: center;" id="crfShortcutTotalAnnotations">&nbsp;${crfShortcutsAnalyzer.totalAnnotations}&nbsp;</div></a></td>
+                        <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black"><a class="crfShortcut" sectiontotal="${crfShortcutsAnalyzer.sectionTotalItemsToSDV}" nextdnlink="${crfShortcutsAnalyzer.nextItemToSDVLink}" onclick="highlightFieldForCRFShortcutAnchor(5, this);"><div style="width: 100%; text-align: center;" id="crfShortcutTotalItemsToSDV">&nbsp;${crfShortcutsAnalyzer.totalItemsToSDV}&nbsp;</div></a></td>
                     </tr>
                 </table>
             </div></div></div></div></div></div></div></div></div>
             <c:if test="${crfShortcutsAnalyzer eq null || (crfShortcutsAnalyzer.totalNew == 0 && crfShortcutsAnalyzer.totalUpdated == 0 && crfShortcutsAnalyzer.totalResolutionProposed == 0 && crfShortcutsAnalyzer.totalClosed == 0 && crfShortcutsAnalyzer.totalAnnotations == 0 && crfShortcutsAnalyzer.totalItemsToSDV == 0)}">
                 <script>
-                    $("#dnShortcutsTable").addClass("hidden");
+                    $("#crfShortcutsTable").addClass("hidden");
                 </script>
             </c:if>
         </td></tr>
 </table>
 
 <script>
-    $("#dnShortcutsTable").css("top", dnShortcutsTableDefTop + "px");
-    $("#dnShortcutsTable").css("left", dnShortcutsTableDefLeft + "px");
+    $("#crfShortcutsTable").css("top", crfShortcutsTableDefTop + "px");
+    $("#crfShortcutsTable").css("left", crfShortcutsTableDefLeft + "px");
     initCrfMoreInfo();
-    var dnShortcutInterval;
-    var dnShortcutFunction = function() {
+    var crfShortcutInterval;
+    var crfShortcutFunction = function() {
         try {
             var end = document.location.href.length;
             var start = document.location.href.indexOf("#");
             if (start > 0) {
-                var dnShortcutId = document.location.href.substring(start, end);
-                if (dnShortcutId == "#" || $(dnShortcutId).length == 0) {
-                    clearInterval(dnShortcutInterval);
+                var crfShortcutId = document.location.href.substring(start, end);
+                if (crfShortcutId == "#" || $(crfShortcutId).length == 0) {
+                    clearInterval(crfShortcutInterval);
                 } else {
-                    var positionTop = parseInt($(dnShortcutId).position().top);
+                    var positionTop = parseInt($(crfShortcutId).position().top);
                     var browserClientHeight = getBrowserClientHeight();
                     if (positionTop >= 0) {
                         if (positionTop > browserClientHeight) {
                             document.location.href = document.location.href;
                         }
-                        highlightFirstFieldForDNShortcutAnchors(dnShortcutId.replace("#", ""));
-                        clearInterval(dnShortcutInterval);
+                        highlightFirstFieldForCRFShortcutAnchors(crfShortcutId.replace("#", ""));
+                        clearInterval(crfShortcutInterval);
                     }
                 }
             } else {
-                clearInterval(dnShortcutInterval);
+                clearInterval(crfShortcutInterval);
             }
         } catch (e) {
             console.log("Error: " + e);
         }
     }
     $(document).ready(function () {
-        dnShortcutInterval = setInterval(dnShortcutFunction, 1);
+        crfShortcutInterval = setInterval(crfShortcutFunction, 1);
     });
     window.updateCRFHeader = function(field, itemId, rowCount, resolutionStatusId) {
         gfAddOverlay();
@@ -688,7 +688,7 @@
         if (parametersHolder.exitTo.toLowerCase() == "null") {
             parametersHolder.exitTo = "";
         }
-        resetHighlightedFieldsForDNShortcutAnchors();
+        resetHighlightedFieldsForCRFShortcutAnchors();
         updateCRFHeaderFunction(parametersHolder);
     };
 
@@ -704,6 +704,6 @@
                 table.append(currentTr);
             }
         });
-        table.append($('#preDnShortcutsTr'));
+        table.append($('#preCrfShortcutsTr'));
     });
 </script>

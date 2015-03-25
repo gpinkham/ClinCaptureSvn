@@ -2406,7 +2406,7 @@ span.asterisk {
     padding-right: 3px;
 }
 
-#dnShortcutsTable a.closeLink{
+#crfShortcutsTable a.closeLink{
     float: right;
     cursor: pointer;
     color: #789EC5;
@@ -2414,23 +2414,23 @@ span.asterisk {
     font-weight: bold;
 }
 
-a.dnShortcut {
+a.crfShortcut {
     color: #789EC5;
     cursor: pointer;
 }
 
-a.dnShortcut:active {
+a.crfShortcut:active {
     text-decoration: none !important;
 }
 
-a.dnShortcut:hover {
+a.crfShortcut:hover {
     text-decoration: underline !important;
 }
-a.dnShortcut:active {
+a.crfShortcut:active {
     text-decoration: none !important;
 }
 
-a.dnShortcut:hover {
+a.crfShortcut:hover {
     text-decoration: underline !important;
 }
 

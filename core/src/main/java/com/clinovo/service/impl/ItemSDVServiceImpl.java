@@ -83,7 +83,7 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 			boolean sdvRequired = metadata.get(itemFormMetaId);
 			ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) itemFormMetadataDao
 					.findByPK(itemFormMetaId);
-			if (itemFormMetadataBean.isSdvRequired() != sdvRequired) {
+			if (itemFormMetadataBean.isShowItem() && itemFormMetadataBean.isSdvRequired() != sdvRequired) {
 				dataChanged = true;
 				if (!itemFormMetadataBean.isSdvRequired()) {
 					unSdvEventCrfBeans = true;
@@ -94,7 +94,7 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 		}
 		if (dataChanged) {
 			eventDefinitionCrfDao.updateEDCThatHasItemsToSDV(crfVersionId, SourceDataVerification.PARTIALREQUIRED);
-			itemDataDao.updateItemDataSDVWhenCRFMetadataWasChanged(crfVersionId);
+			itemDataDao.unsdvItemDataWhenCRFMetadataWasChanged(crfVersionId);
 			if (unSdvEventCrfBeans) {
 				eventCrfDao.unsdvEventCRFsWhenCRFMetadataWasChanged(crfVersionId, userAccountBean.getId());
 			} else {

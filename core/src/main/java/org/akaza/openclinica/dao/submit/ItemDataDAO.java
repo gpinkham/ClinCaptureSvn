@@ -1198,20 +1198,20 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method updates the sdv fields in the item_data table when crf metadata was changed.
+	 * Method unsdv fields in the item_data table when crf metadata was changed.
 	 *
 	 * @param crfVersionId
 	 *            int
 	 * @return boolean
 	 */
-	public boolean updateItemDataSDVWhenCRFMetadataWasChanged(int crfVersionId) {
+	public boolean unsdvItemDataWhenCRFMetadataWasChanged(int crfVersionId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
 		variables.put(1, crfVersionId);
 
-		execute(digester.getQuery("updateItemDataSDVWhenCRFMetadataWasChanged"), variables);
+		execute(digester.getQuery("unsdvItemDataWhenCRFMetadataWasChanged"), variables);
 
 		return isQuerySuccessful();
 	}

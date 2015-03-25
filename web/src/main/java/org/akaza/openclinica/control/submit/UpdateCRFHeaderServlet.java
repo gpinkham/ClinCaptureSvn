@@ -97,7 +97,7 @@ public class UpdateCRFHeaderServlet extends Controller {
 				currentStudy, null, -1, true);
 
 		CrfShortcutsAnalyzer crfShortcutsAnalyzer = getCrfShortcutsAnalyzer(request, getItemSDVService(), true);
-		crfShortcutsAnalyzer.prepareDnShortcutLinks(ecb, ifmdao, eventDefinitionCRFId, allSections, noteThreads);
+		crfShortcutsAnalyzer.prepareCrfShortcutLinks(ecb, ifmdao, eventDefinitionCRFId, allSections, noteThreads);
 
 		JSONArray jsonArray = new JSONArray();
 		int totalItems = fp.getInt("totalItems");
@@ -123,7 +123,7 @@ public class UpdateCRFHeaderServlet extends Controller {
 			}
 			dib.setDbData(itemDataBean);
 
-			crfShortcutsAnalyzer.prepareDnShortcutAnchors(dib, noteThreads, true);
+			crfShortcutsAnalyzer.prepareCrfShortcutAnchors(dib, noteThreads, true);
 
 			JSONObject jsonObj = new JSONObject();
 			jsonObj.put("rowCount", rowCountValue);

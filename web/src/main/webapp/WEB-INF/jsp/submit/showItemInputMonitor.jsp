@@ -420,7 +420,7 @@ form element in red --%>
     </c:otherwise>
   </c:choose>
 
-  <c:import url="../submit/dnShortcutAnchors.jsp">
+  <c:import url="../submit/crfShortcutAnchors.jsp">
       <c:param name="rowCount" value=""/>
       <c:param name="itemId" value="${itemId}" />
       <c:param name="inputName" value="${inputName}"/>

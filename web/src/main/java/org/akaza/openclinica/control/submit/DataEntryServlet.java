@@ -485,7 +485,7 @@ public abstract class DataEntryServlet extends Controller {
 
 		List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 		CrfShortcutsAnalyzer crfShortcutsAnalyzer = getCrfShortcutsAnalyzer(request, getItemSDVService(), true);
-		crfShortcutsAnalyzer.prepareDnShortcutLinks(ecb, ifmdao, eventDefinitionCRFId, allSections, noteThreads);
+		crfShortcutsAnalyzer.prepareCrfShortcutLinks(ecb, ifmdao, eventDefinitionCRFId, allSections, noteThreads);
 		logMe("Entering DataEntry Create disc note threads out of the various notes DONE" + System.currentTimeMillis());
 
 		logMe("Entering some EVENT DEF CRF CHECK DONE " + System.currentTimeMillis());
@@ -3386,13 +3386,13 @@ public abstract class DataEntryServlet extends Controller {
 		ArrayList notes = new ArrayList(discNotes.getNotes(INPUT_INTERVIEWER));
 		notes.addAll(existingNameNotes);
 		noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
-		crfShortcutsAnalyzer.prepareDnShortcutAnchors(crfShortcutsAnalyzer.getInterviewerDisplayItemBean(),
+		crfShortcutsAnalyzer.prepareCrfShortcutAnchors(crfShortcutsAnalyzer.getInterviewerDisplayItemBean(),
 				noteThreads, false);
 
 		notes = new ArrayList(discNotes.getNotes(INPUT_INTERVIEW_DATE));
 		notes.addAll(existingIntrvDateNotes);
 		noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
-		crfShortcutsAnalyzer.prepareDnShortcutAnchors(crfShortcutsAnalyzer.getInterviewDateDisplayItemBean(),
+		crfShortcutsAnalyzer.prepareCrfShortcutAnchors(crfShortcutsAnalyzer.getInterviewDateDisplayItemBean(),
 				noteThreads, false);
 
 		setToolTipEventNotes(request);
@@ -3476,7 +3476,7 @@ public abstract class DataEntryServlet extends Controller {
 						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(request, dndao, itemDataId,
 								discNotes.getNotes(inputName)));
 						dib = setTotals(dib, itemDataId, toolTipDNotes, parentNotes, notes, ecb.getId(), request);
-						crfShortcutsAnalyzer.prepareDnShortcutAnchors(dib, noteThreads, false);
+						crfShortcutsAnalyzer.prepareCrfShortcutAnchors(dib, noteThreads, false);
 						logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId()
 								+ " " + inputName);
 						items.set(j, dib);
@@ -3512,7 +3512,7 @@ public abstract class DataEntryServlet extends Controller {
 				dib = setTotals(dib, itemDataId, toolTipDNotes, parentNotes, discNotes.getNotes(inputFieldName),
 						ecb.getId(), request);
 				noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
-				crfShortcutsAnalyzer.prepareDnShortcutAnchors(dib, noteThreads, false);
+				crfShortcutsAnalyzer.prepareCrfShortcutAnchors(dib, noteThreads, false);
 
 				ArrayList childItems = dib.getChildren();
 
@@ -3544,7 +3544,7 @@ public abstract class DataEntryServlet extends Controller {
 							discNotes.getNotes(childInputFieldName)));
 					child = setTotals(child, childItemDataId, toolTipChildDNotes, parentChildNotes,
 							discNotes.getNotes(childInputFieldName), ecb.getId(), request);
-					crfShortcutsAnalyzer.prepareDnShortcutAnchors(child, noteThreads, false);
+					crfShortcutsAnalyzer.prepareCrfShortcutAnchors(child, noteThreads, false);
 					childItems.set(j, child);
 				}
 				dib.setChildren(childItems);

@@ -84,53 +84,53 @@ public class CrfShortcutsAnalyzerTest extends DefaultAppContextTest {
 	@Test
 	public void testThatIsFirstNewDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(1);
-		crfShortcutsAnalyzer.prepareDnShortcutAnchors(displayItemBean, noteThreads, true);
+		crfShortcutsAnalyzer.prepareCrfShortcutAnchors(displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getNewDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstUpdatedDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(2);
-		crfShortcutsAnalyzer.prepareDnShortcutAnchors(displayItemBean, noteThreads, true);
+		crfShortcutsAnalyzer.prepareCrfShortcutAnchors(displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getUpdatedDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstResolutionProposedReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(THREE);
-		crfShortcutsAnalyzer.prepareDnShortcutAnchors(displayItemBean, noteThreads, true);
+		crfShortcutsAnalyzer.prepareCrfShortcutAnchors(displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getResolutionProposedDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstClosedDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(FOUR);
-		crfShortcutsAnalyzer.prepareDnShortcutAnchors(displayItemBean, noteThreads, true);
+		crfShortcutsAnalyzer.prepareCrfShortcutAnchors(displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getClosedDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstAnnotationReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(FIVE);
-		crfShortcutsAnalyzer.prepareDnShortcutAnchors(displayItemBean, noteThreads, true);
+		crfShortcutsAnalyzer.prepareCrfShortcutAnchors(displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getAnnotationDn().size(), 1);
 	}
 
 	@Test
 	public void testThatIsFirstItemToSDVReturnsCorrectValue() throws Exception {
-		crfShortcutsAnalyzer.prepareDnShortcutAnchors(displayItemBean, noteThreads, true);
+		crfShortcutsAnalyzer.prepareCrfShortcutAnchors(displayItemBean, noteThreads, true);
 		assertEquals(displayItemBean.getItemToSDV().size(), 0);
 	}
 
 	@Test
-	public void testThatPrepareDnShortcutLinksBuildCorrectUrlForNonPopupPage() throws Exception {
+	public void testThatPrepareCrfShortcutLinksBuildCorrectUrlForNonPopupPage() throws Exception {
 		buildAnalyzerUrl(false);
 		assertEquals("#newDn_1", crfShortcutsAnalyzer.getNextNewDnLink());
 
 	}
 
 	@Test
-	public void testThatPrepareDnShortcutLinksBuildCorrectUrlForPopupPage() throws Exception {
+	public void testThatPrepareCrfShortcutLinksBuildCorrectUrlForPopupPage() throws Exception {
 		buildAnalyzerUrl(true);
 		assertEquals("#newDn_1", crfShortcutsAnalyzer.getNextNewDnLink());
 
@@ -154,6 +154,6 @@ public class CrfShortcutsAnalyzerTest extends DefaultAppContextTest {
 		}
 		request.setParameter("tabId", "3");
 		request.getSession().setAttribute("domain_name", "clincapture.com");
-		crfShortcutsAnalyzer.prepareDnShortcutLinks(eventCRFBean, itemFormMetadataDAO, SIX, sectionBeans, noteThreads);
+		crfShortcutsAnalyzer.prepareCrfShortcutLinks(eventCRFBean, itemFormMetadataDAO, SIX, sectionBeans, noteThreads);
 	}
 }

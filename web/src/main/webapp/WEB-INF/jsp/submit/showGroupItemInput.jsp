@@ -760,7 +760,7 @@ function changeImage(obj) {
 		</c:otherwise>
 	</c:choose>
 
-    <c:import url="../submit/dnShortcutAnchors.jsp">
+    <c:import url="../submit/crfShortcutAnchors.jsp">
         <c:param name="itemId" value="${itemId}" />
         <c:param name="rowCount" value="${rowCount}"/>
         <c:param name="inputName" value="${inputName}"/>
