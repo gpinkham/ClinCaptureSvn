@@ -438,8 +438,8 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatUpdateItemDataSDVWhenCRFMetadataWasChangedReturnsTrue() {
-		assertTrue(itemDataDAO.updateItemDataSDVWhenCRFMetadataWasChanged(1));
+	public void testThatUnsdvItemDataWhenCRFMetadataWasChangedReturnsTrue() {
+		assertTrue(itemDataDAO.unsdvItemDataWhenCRFMetadataWasChanged(1));
 	}
 
 	@Test
