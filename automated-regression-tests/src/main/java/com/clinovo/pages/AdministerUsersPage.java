@@ -8,6 +8,7 @@ import org.openqa.selenium.WebDriver;
 public class AdministerUsersPage extends BasePage {
 
 	public static final String PAGE_NAME = "Administer Users page";
+	public static final String PAGE_URL = "ListUserAccounts";
 	
     @FindBy(id = "CreateUser")
     private WebElementFacade bCreateUser;

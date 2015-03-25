@@ -5,7 +5,7 @@ import net.thucydides.core.pages.WebElementFacade;
 
 import org.openqa.selenium.WebDriver;
 
-import com.clinovo.utils.User;
+import com.clinovo.pages.beans.User;
 
 /**
  * Created by Igor.

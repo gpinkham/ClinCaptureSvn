@@ -194,4 +194,37 @@ Examples:
 |filepath                                                |
 |.\\src\\test\\resources\\eCRFs\\CRF_w_basic_fields_1.xls|
 |.\\src\\test\\resources\\eCRFs\\CRF_w_file_1.xls        |
-|.\\src\\test\\resources\\eCRFs\\CRF_w_group_1.xlsx       |
+|.\\src\\test\\resources\\eCRFs\\CRF_w_group_1.xlsx      |
+
+
+Scenario: 12. Root creates Study Event Definitions
+
+Given User logs in as Root
+And User goes to Build Study page
+And User is on Build Study page
+And User clicks 'Add Event Definitions' button
+And User is on Create Study Event Definition page
+And User fills in data to create study event definition:
+| Name | Description | Type | Category | Repeating | Reference Event | Day Schedule | Day Max | Day Min | Day Email | User Name |
+|<Name>|<Description>|<Type>|<Category>|<Repeating>|<Reference Event>|<Day Schedule>|<Day Max>|<Day Min>|<Day Email>|<User Name>|
+And User clicks 'Continue' button
+And User is on Define Study Event - Select CRF(s) page
+And User selects CRFs on Define Study Event page: 
+| eCRFs |
+|<eCRFs>|
+And User clicks 'Continue' button
+And User is on Define Study Event - Selected CRF(s) page
+And User clicks 'Continue' button
+And User is on Confirm Event Definition Creation page
+When User clicks 'Submit' button
+Then User is on Manage All Event Definitions in Study page
+
+Examples:
+{scope=Scenario}
+|<Name>      |<Description>|<Type>     |<Category>|<Repeating>|<eCRFs>                            |
+|Event      A|             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_file_1 |
+|Event      B|             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_group_1|
+|Event      C|             |Unscheduled|          |No         |CRF_w_group_1, CRF_w_file_1        |
+
+
+

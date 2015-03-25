@@ -7,7 +7,7 @@ import net.thucydides.core.webelements.RadioButtonGroup;
 
 import org.openqa.selenium.WebDriver;
 
-import com.clinovo.utils.Study;
+import com.clinovo.pages.beans.Study;
 
 public class UpdateStudyDetailsPage extends BasePage {
 

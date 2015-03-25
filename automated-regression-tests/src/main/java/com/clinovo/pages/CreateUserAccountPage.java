@@ -12,7 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import com.clinovo.utils.ItemsUtil;
-import com.clinovo.utils.User;
+import com.clinovo.pages.beans.User;
 
 public class CreateUserAccountPage extends BasePage {
 

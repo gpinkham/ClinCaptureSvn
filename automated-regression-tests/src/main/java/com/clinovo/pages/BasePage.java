@@ -32,8 +32,8 @@ public class BasePage extends AbstractPage {
     @FindBy(linkText="Rules")
     private WebElementFacade lRules;
 
-    @FindBy(linkText = "Add Subject")
-    private WebElementFacade lAddSubject;
+	@FindBy(jquery = "a[href$='AddNewSubject']")
+	private WebElementFacade lAddSubject;
 
     @FindBy(jquery = "a[href$='studymodule']")
     private WebElementFacade lBuildStudy;
@@ -63,11 +63,6 @@ public class BasePage extends AbstractPage {
     public void goToManageRulesPage() {
         lTasksMenu.click();
         lRules.click();
-    }
-
-    public void goToAddSubjectPage() {
-        lTasksMenu.click();
-        lAddSubject.click();
     }
 
     public void goToBuildStudyPage() {
@@ -129,7 +124,7 @@ public class BasePage extends AbstractPage {
 		return false;
 	}
 
-	public void clickChangeStudy() {
+	public void clickChangeStudyLink() {
 		lChangeStudy.click();
 	}
 
@@ -139,5 +134,17 @@ public class BasePage extends AbstractPage {
 		} else {
 			return lCurrentStudy.getText();
 		}
+	}
+	
+	public String getCurrentParentStudyName() {
+		return lCurrentStudy.getText();
+	}
+
+	public void isOnStudyLevel() {
+		assert(!lCurrentSite.isCurrentlyVisible());
+	}
+
+	public void clickAddSubjectLink() {
+		lAddSubject.click();	
 	}
 }

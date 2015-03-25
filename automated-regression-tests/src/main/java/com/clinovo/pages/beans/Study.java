@@ -1,4 +1,4 @@
-package com.clinovo.utils;
+package com.clinovo.pages.beans;
 
 import java.util.Map;
 
@@ -374,8 +374,8 @@ public class Study {
     		study.setCollectPersonID(row.get("Collect Person ID"));
     	}
 		return study;
-		
 	}
+	
 	public static Study fillStudyDetailsFromTableRow(Map<String, String> row) {
 		Study study = fillCommonDetailsFromTableRow(row, new Study());
 		if (row.get("Study Name") != null) {

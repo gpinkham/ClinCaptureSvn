@@ -3,10 +3,11 @@ package com.clinovo.steps;
 import java.util.List;
 
 import com.clinovo.pages.*;
-import com.clinovo.utils.Study;
-import com.clinovo.utils.StudyEventDefinition;
-import com.clinovo.utils.SystemProperties;
-import com.clinovo.utils.User;
+import com.clinovo.pages.beans.Study;
+import com.clinovo.pages.beans.StudyEventDefinition;
+import com.clinovo.pages.beans.StudySubject;
+import com.clinovo.pages.beans.SystemProperties;
+import com.clinovo.pages.beans.User;
 
 import net.thucydides.core.Thucydides;
 import net.thucydides.core.annotations.Step;
@@ -28,43 +29,46 @@ public class CommonSteps extends ScenarioSteps {
         super(pages);
     }
     
-	protected BasePage aBasePage = getPages().get(BasePage.class);
-	protected AdministerUsersPage anAdministerUsersPage = getPages().get(AdministerUsersPage.class);
-	protected CreateUserAccountPage aCreateUserAccountPage = getPages().get(CreateUserAccountPage.class);
-	protected ViewUserAccountPage aViewUserAccountPage = getPages().get(ViewUserAccountPage.class);
-	protected BuildStudyPage aBuildStudyPage = getPages().get(BuildStudyPage.class);
-	protected CreateNewSitePage aCreateNewSitePage = getPages().get(CreateNewSitePage.class);
-	protected ConfirmCreateSitePage aConfirmCreateSitePage = getPages().get(ConfirmCreateSitePage.class);
-	protected ManageSitesPage aManageSitesPage = getPages().get(ManageSitesPage.class);
-	protected ConfigureSystemPropertiesPage aConfigureSystemPropertiesPage = getPages().get(ConfigureSystemPropertiesPage.class);
-	protected ConfirmSystemPropertiesPage aConfirmSystemPropertiesPage = getPages().get(ConfirmSystemPropertiesPage.class);
-	protected UpdateStudyDetailsPage anUpdateStudyDetailsPage = getPages().get(UpdateStudyDetailsPage.class);
-	protected CreateCRFVersionPage aCreateCRFVersionPage = getPages().get(CreateCRFVersionPage.class);
-	protected PreviewCRFPage aPreviewCRFPage = getPages().get(PreviewCRFPage.class);
-	protected CreateCRFDataCommitedPage aCreateCRFDataCommitedPage = getPages().get(CreateCRFDataCommitedPage.class);
-	protected CreateStudyEventDefinitionPage aCreateStudyEventDefinitionPage = getPages().get(CreateStudyEventDefinitionPage.class);
-	protected DefineStudyEventSelectCRFsPage aDefineStudyEventSelectCRFsPage = getPages().get(DefineStudyEventSelectCRFsPage.class);
-	protected DefineStudyEventSelectedCRFsPage aDefineStudyEventSelectedCRFsPage = getPages().get(DefineStudyEventSelectedCRFsPage.class);
-	protected ConfirmEventDefinitionCreationPage aConfirmEventDefinitionCreationPage = getPages().get(ConfirmEventDefinitionCreationPage.class);
-	protected ChangeStudyPage aChangeStudyPage = getPages().get(ChangeStudyPage.class);
-	protected ConfirmChangeStudyPage aConfirmChangeStudyPage = getPages().get(ConfirmChangeStudyPage.class);
+	protected BasePage basePage = getPages().get(BasePage.class);
+	protected AdministerUsersPage administerUsersPage = getPages().get(AdministerUsersPage.class);
+	protected CreateUserAccountPage createUserAccountPage = getPages().get(CreateUserAccountPage.class);
+	protected ViewUserAccountPage viewUserAccountPage = getPages().get(ViewUserAccountPage.class);
+	protected BuildStudyPage buildStudyPage = getPages().get(BuildStudyPage.class);
+	protected CreateNewSitePage createNewSitePage = getPages().get(CreateNewSitePage.class);
+	protected ConfirmCreateSitePage confirmCreateSitePage = getPages().get(ConfirmCreateSitePage.class);
+	protected ManageSitesPage manageSitesPage = getPages().get(ManageSitesPage.class);
+	protected ConfigureSystemPropertiesPage configureSystemPropertiesPage = getPages().get(ConfigureSystemPropertiesPage.class);
+	protected ConfirmSystemPropertiesPage confirmSystemPropertiesPage = getPages().get(ConfirmSystemPropertiesPage.class);
+	protected UpdateStudyDetailsPage updateStudyDetailsPage = getPages().get(UpdateStudyDetailsPage.class);
+	protected CreateCRFVersionPage createCRFVersionPage = getPages().get(CreateCRFVersionPage.class);
+	protected PreviewCRFPage previewCRFPage = getPages().get(PreviewCRFPage.class);
+	protected CreateCRFDataCommitedPage createCRFDataCommitedPage = getPages().get(CreateCRFDataCommitedPage.class);
+	protected CreateStudyEventDefinitionPage createStudyEventDefinitionPage = getPages().get(CreateStudyEventDefinitionPage.class);
+	protected DefineStudyEventSelectCRFsPage defineStudyEventSelectCRFsPage = getPages().get(DefineStudyEventSelectCRFsPage.class);
+	protected DefineStudyEventSelectedCRFsPage defineStudyEventSelectedCRFsPage = getPages().get(DefineStudyEventSelectedCRFsPage.class);
+	protected ConfirmEventDefinitionCreationPage confirmEventDefinitionCreationPage = getPages().get(ConfirmEventDefinitionCreationPage.class);
+	protected ChangeStudyPage changeStudyPage = getPages().get(ChangeStudyPage.class);
+	protected ConfirmChangeStudyPage confirmChangeStudyPage = getPages().get(ConfirmChangeStudyPage.class);
+	protected AddSubjectPage addSubjectPage = getPages().get(AddSubjectPage.class);
+	protected SubjectMatrixPage subjectMatrixPage = getPages().get(SubjectMatrixPage.class);
+	protected ManageEventDefinitionsPage manageEventDefinitionsPage = getPages().get(ManageEventDefinitionsPage.class);
+	
 
 	
-    private LoginPage aLoginPage = getPages().get(LoginPage.class);
-    private HomePage aHomePage = getPages().get(HomePage.class);
-    private SubjectMatrixPage aSubjectMatrixPage = getPages().get(SubjectMatrixPage.class);
-    private ViewEventPage aViewEventPage = getPages().get(ViewEventPage.class);
-    private ResetPasswordPage aResetPasswordPage = getPages().get(ResetPasswordPage.class);
+    private LoginPage loginPage = getPages().get(LoginPage.class);
+    private HomePage homePage = getPages().get(HomePage.class);
+    private ViewEventPage viewEventPage = getPages().get(ViewEventPage.class);
+    private ResetPasswordPage resetPasswordPage = getPages().get(ResetPasswordPage.class);
 
     @Step
     public void enters_credentials(String login, String password) {
-        aLoginPage.enterLoginName(login);
-        aLoginPage.enterPassword(password);
+        loginPage.enterLoginName(login);
+        loginPage.enterPassword(password);
     }
 
 	@Step
     public void clicks_login_button() {
-        aLoginPage.clickLoginBtn();
+        loginPage.clickLoginBtn();
     }
 
     @Step
@@ -78,7 +82,7 @@ public class CommonSteps extends ScenarioSteps {
 	}
 
     public void cc_login(User user) {
-        aLoginPage.open();
+        loginPage.open();
         maximize();
         enters_credentials(user.getUserName(), user.getPassword());
         clicks_login_button();
@@ -92,92 +96,96 @@ public class CommonSteps extends ScenarioSteps {
 
     @Step
     public void should_see_reset_password_page() {
-        assertThat(aResetPasswordPage.isOnPage()).isTrue();
+        assertThat(resetPasswordPage.isOnPage()).isTrue();
     }
     
     @Step
     public void should_see_task_menu() {
-        assertThat(aHomePage.taskMenuIsVisible()).isTrue();
+        assertThat(homePage.taskMenuIsVisible()).isTrue();
     }
 
     @Step
     public void go_to_subject_matrix_page() {
-        aHomePage.goToSubjectMatrix();
+        homePage.goToSubjectMatrix();
     }
 
     @Step
     public void log_out() {
-        aBasePage.logOut();
+        basePage.logOut();
     }
 
     @Step
     public void open_browser_window() {
-        aLoginPage.open();
+        loginPage.open();
         getDriver().manage().window().maximize();
     }
     
     @Step
 	public void change_old_password_to_new(User currentUser) {
-		aResetPasswordPage.fillInResetPasswordPage(currentUser);
-		aResetPasswordPage.clickSubmit();
+		resetPasswordPage.fillInResetPasswordPage(currentUser);
+		resetPasswordPage.clickSubmit();
 		should_see_task_menu();
 	}
     
     public BasePage getPageByPageName(String page) {
     	switch (page){
 		case LoginPage.PAGE_NAME: 
-			return aLoginPage;
+			return loginPage;
 		case HomePage.PAGE_NAME: 
-			return aHomePage;
+			return homePage;
 		case SubjectMatrixPage.PAGE_NAME: 
-			return aSubjectMatrixPage;
+			return subjectMatrixPage;
 		case ViewEventPage.PAGE_NAME: 
-			return aViewEventPage;
+			return viewEventPage;
 		case ResetPasswordPage.PAGE_NAME: 
-			return aResetPasswordPage;
+			return resetPasswordPage;
 		case AdministerUsersPage.PAGE_NAME: 
-			return anAdministerUsersPage;
+			return administerUsersPage;
 		case ViewUserAccountPage.PAGE_NAME: 
-			return aViewUserAccountPage;
+			return viewUserAccountPage;
 		case BuildStudyPage.PAGE_NAME: 
-			return aBuildStudyPage;
+			return buildStudyPage;
 		case CreateNewSitePage.PAGE_NAME: 
-			return aCreateNewSitePage;
+			return createNewSitePage;
 		case ConfirmCreateSitePage.PAGE_NAME: 
-			return aConfirmCreateSitePage;
+			return confirmCreateSitePage;
 		case ManageSitesPage.PAGE_NAME: 
-			return aManageSitesPage;
+			return manageSitesPage;
 		case CreateUserAccountPage.PAGE_NAME: 
-			return aCreateUserAccountPage;
+			return createUserAccountPage;
 		case ConfigureSystemPropertiesPage.PAGE_NAME: 
-			return aConfigureSystemPropertiesPage;
+			return configureSystemPropertiesPage;
 		case ConfirmSystemPropertiesPage.PAGE_NAME: 
-			return aConfirmSystemPropertiesPage;
+			return configureSystemPropertiesPage;
 		case UpdateStudyDetailsPage.PAGE_NAME: 
-			return anUpdateStudyDetailsPage;
+			return updateStudyDetailsPage;
 		case CreateCRFVersionPage.PAGE_NAME: 
-			return aCreateCRFVersionPage;
+			return createCRFVersionPage;
 		case PreviewCRFPage.PAGE_NAME: 
-			return aPreviewCRFPage;	
+			return previewCRFPage;	
 		case CreateCRFDataCommitedPage.PAGE_NAME: 
-			return aCreateCRFDataCommitedPage;		
+			return createCRFDataCommitedPage;		
 		case CreateStudyEventDefinitionPage.PAGE_NAME: 
-			return aCreateStudyEventDefinitionPage;	
+			return createStudyEventDefinitionPage;	
 		case DefineStudyEventSelectCRFsPage.PAGE_NAME: 
-			return aDefineStudyEventSelectCRFsPage;	
+			return defineStudyEventSelectCRFsPage;	
 		case DefineStudyEventSelectedCRFsPage.PAGE_NAME: 
-			return aDefineStudyEventSelectedCRFsPage;	
+			return defineStudyEventSelectedCRFsPage;	
 		case ConfirmEventDefinitionCreationPage.PAGE_NAME: 
-			return aConfirmEventDefinitionCreationPage;		
+			return confirmEventDefinitionCreationPage;		
 		case ChangeStudyPage.PAGE_NAME: 
-			return aChangeStudyPage;	
+			return changeStudyPage;	
 		case ConfirmChangeStudyPage.PAGE_NAME: 
-			return aConfirmChangeStudyPage;
+			return confirmChangeStudyPage;
+		case AddSubjectPage.PAGE_NAME: 
+			return addSubjectPage;	
+		case ManageEventDefinitionsPage.PAGE_NAME: 
+			return manageEventDefinitionsPage;
 			
 		default: ;
     	}
     	
-		return aBasePage;
+		return basePage;
 	}
     
     @Step
@@ -190,51 +198,51 @@ public class CommonSteps extends ScenarioSteps {
 
     @Step
 	public void click_submit_button() {
-		aBasePage.clickSubmit();
+		basePage.clickSubmit();
 	}
 
 	@Step
 	public void remember_pass_of_created_user() {
 		User createdUser = (User) Thucydides.getCurrentSession().get(User.NEW_CREATED_USER);
-		String pass = aViewUserAccountPage.getPasswordFromAlertsAndMessages();
+		String pass = viewUserAccountPage.getPasswordFromAlertsAndMessages();
 		createdUser.setOldPassword(pass);
 	}
 
 	@Step
 	public void go_to_build_study_page() {
-		aBasePage.goToBuildStudyPage();
+		basePage.goToBuildStudyPage();
 	}
 
 	@Step
 	public void click_add_site_button() {
-		aBuildStudyPage.clickAddSite();
+		buildStudyPage.clickAddSite();
 	}
 
 	@Step
 	public void fill_in_data_to_create_site(List<Study> studies) {
 		if (!studies.isEmpty()) {
-			aCreateNewSitePage.fillInCreateNewSitePage(studies.get(0));
+			createNewSitePage.fillInCreateNewSitePage(studies.get(0));
 		}
 	}
 
 	@Step
 	public void click_confirm_button() {
-		aBasePage.clickSubmit();
+		basePage.clickSubmit();
 	}
 
 	@Step
 	public void fill_in_system_properties(SystemProperties prop) {
-		aConfigureSystemPropertiesPage.fillInConfigureSystemPropertiesPage(prop);
+		configureSystemPropertiesPage.fillInConfigureSystemPropertiesPage(prop);
 	}
 
 	@Step
 	public void go_to_administer_users_page() {
-		aBasePage.goToAdministerUsersPage();
+		basePage.goToAdministerUsersPage();
 	}
 	
 	@Step
 	public void go_to_configure_system_properties_page() {
-		aBasePage.goToConfigureSystemPropertiesPage();
+		basePage.goToConfigureSystemPropertiesPage();
 	}
 	
 	@Step
@@ -256,43 +264,50 @@ public class CommonSteps extends ScenarioSteps {
 			case ChangeStudyPage.PAGE_NAME: 
 				go_to_change_study_page();
 				break;
+			case AddSubjectPage.PAGE_NAME: 
+				go_to_add_subject_page();
+				break;
 				
 			default: ;
 		}		
 	}
 
+	private void go_to_add_subject_page() {
+		basePage.clickAddSubjectLink();
+	}
+
 	private void go_to_change_study_page() {
-		aBasePage.clickChangeStudy();
+		basePage.clickChangeStudyLink();
 	}
 	
 	private void go_to_update_study_details_page() {
-		aBuildStudyPage.clickUpdateStudy();
+		buildStudyPage.clickUpdateStudy();
 	}
 
 	@Step
 	public void set_study_status(String status) {
-		aBuildStudyPage.setStudyStatus(BuildStudyPage.convertStatusNameToStatusValue(status));
-		aBuildStudyPage.clickSaveStudyStatusButton();
+		buildStudyPage.setStudyStatus(BuildStudyPage.convertStatusNameToStatusValue(status));
+		buildStudyPage.clickSaveStudyStatusButton();
 	}
 
 	@Step
 	public void click_update_study() {
-		aBuildStudyPage.clickUpdateStudy();
+		buildStudyPage.clickUpdateStudy();
 	}
 
 	@Step
 	public void fill_in_study_details(Study study) {
-		anUpdateStudyDetailsPage.fillInStudyDetailsPage(study);
+		updateStudyDetailsPage.fillInStudyDetailsPage(study);
 	}
 
 	@Step
 	public void click_add_crf_button() {
-		aBuildStudyPage.clickAddCRF();
+		buildStudyPage.clickAddCRF();
 	}
 
 	@Step
 	public void browse_file_with_crf(String filepath) {
-		aCreateCRFVersionPage.browseCRFFile(filepath);
+		createCRFVersionPage.browseCRFFile(filepath);
 	}
 
 	@Step
@@ -307,37 +322,57 @@ public class CommonSteps extends ScenarioSteps {
 	
 	@Step
 	public void fill_in_study_event_definition(StudyEventDefinition event) {
-		aCreateStudyEventDefinitionPage.fillInStudyEventDefinitionPage(event);
+		createStudyEventDefinitionPage.fillInStudyEventDefinitionPage(event);
 	}
 
 	@Step
 	public void select_CRFs_for_study_event_definition(StudyEventDefinition event) {
-		aDefineStudyEventSelectCRFsPage.selectCRFs(event.getCRFList());
+		defineStudyEventSelectCRFsPage.selectCRFs(event.getCRFList());
 	}
 	
     @Step
 	public void click_create_user_button(User currentUser) {
-    	anAdministerUsersPage.clickCreateUserButton();
+    	administerUsersPage.clickCreateUserButton();
 	}
 
     @Step
 	public void fill_data_on_create_user_page(User createdUser) {
-		aCreateUserAccountPage.fillInCreateUserAccountPage(createdUser);
+		createUserAccountPage.fillInCreateUserAccountPage(createdUser);
 	}
 
     @Step
 	public void click_add_event_definition_button() {
-		aBuildStudyPage.clickAddStudyEventDefinition();
+		buildStudyPage.clickAddStudyEventDefinition();
 	}
 
     @Step
 	public void select_study_on_change_study_page(String studyName) {
-		aChangeStudyPage.selectStudy(studyName);
+		changeStudyPage.selectStudy(studyName);
 	}
     
     @Step
 	public void current_study_is(String studyName) {
-		assert(studyName.equals(aBasePage.getCurrentStudyName()));
+		assert(studyName.equals(basePage.getCurrentStudyName()));
 		
+	}
+    
+    @Step
+	public String get_study_name_from_page() {
+		return basePage.getCurrentParentStudyName();
+	}
+    
+    @Step
+	public void is_on_study_level() {
+		basePage.isOnStudyLevel();
+	}
+
+    @Step
+	public void fill_in_study_subject_page(StudySubject ssubj) {
+		addSubjectPage.fillInAddSubjectPage(ssubj);
+	}
+    
+    @Step
+	public void call_popup_for_subject_and_event(String studySubjectID, String eventName) {
+		subjectMatrixPage.callPopupForSubjectAndEvent(studySubjectID, eventName);
 	}
 }

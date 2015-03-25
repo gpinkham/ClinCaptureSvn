@@ -1,4 +1,4 @@
-package com.clinovo.utils;
+package com.clinovo.pages.beans;
 
 import java.util.Map;
 

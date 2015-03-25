@@ -8,7 +8,7 @@ import net.thucydides.core.webelements.RadioButtonGroup;
 
 import org.openqa.selenium.WebDriver;
 import com.clinovo.utils.ItemsUtil;
-import com.clinovo.utils.StudyEventDefinition;
+import com.clinovo.pages.beans.StudyEventDefinition;
 
 /**
  * 

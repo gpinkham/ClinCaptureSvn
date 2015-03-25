@@ -3,6 +3,7 @@ package com.clinovo.pages;
 import net.thucydides.core.annotations.findby.By;
 import net.thucydides.core.annotations.findby.FindBy;
 import net.thucydides.core.pages.WebElementFacade;
+import net.thucydides.core.webelements.RadioButtonGroup;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -16,13 +17,16 @@ import java.util.List;
 public class SubjectMatrixPage extends BasePage {
 
 	public static final String PAGE_NAME = "SM page";
+	public static final String PAGE_URL = "ListStudySubjects";
 	
     public SubjectMatrixPage (WebDriver driver) {
         super(driver);
     }
-
+    
     @FindBy(id = "findSubjects")
     private WebElementFacade tblFindSubjects;
+    
+    
 
     @FindBy(css = "div.dynFilter")
     private WebElementFacade divFindSubjects;
@@ -116,5 +120,12 @@ public class SubjectMatrixPage extends BasePage {
     @Override
 	public boolean isOnPage(WebDriver driver) {
     	return tblFindSubjects.isDisplayed();
+	}
+
+	public void callPopupForSubjectAndEvent(String studySubjectID, String eventName) {
+		WebElement trWithSubjectData = tblFindSubjects.findElement(By.xpath(".//td[text()='" + studySubjectID + "']]/.."));
+		WebElement eventIcon = trWithSubjectData.findElement(By.xpath("//div[@event_name='" + eventName + "']/..//a"));
+		
+    	eventIcon.click();
 	}
 }

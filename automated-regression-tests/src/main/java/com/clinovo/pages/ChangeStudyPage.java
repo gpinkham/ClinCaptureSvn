@@ -39,6 +39,9 @@ public class ChangeStudyPage extends BasePage {
     
 	public void selectStudy(String studyName) {
     	List<WebElement> listOfTds = formWithData.findElements(By.xpath(".//td[text()[contains(.,'"+studyName+"')]]"));
+    	if (listOfTds.isEmpty()) {
+        	listOfTds = formWithData.findElements(By.xpath(".//b[text()[contains(.,'"+studyName+"')]]/.."));
+    	}
     	
     	for (WebElement td: listOfTds) {
     		String text = td.getText().replaceFirst(studyName, "");

@@ -7,10 +7,11 @@ import com.clinovo.pages.ChangeStudyPage;
 import com.clinovo.pages.ConfirmChangeStudyPage;
 import com.clinovo.steps.CommonSteps;
 import com.clinovo.utils.Common;
-import com.clinovo.utils.Study;
-import com.clinovo.utils.StudyEventDefinition;
-import com.clinovo.utils.SystemProperties;
-import com.clinovo.utils.User;
+import com.clinovo.pages.beans.Study;
+import com.clinovo.pages.beans.StudyEventDefinition;
+import com.clinovo.pages.beans.StudySubject;
+import com.clinovo.pages.beans.SystemProperties;
+import com.clinovo.pages.beans.User;
 
 import net.thucydides.core.Thucydides;
 import net.thucydides.core.annotations.Steps;
@@ -146,6 +147,12 @@ public class ClinovoJBehave extends BaseJBehave {
         commonSteps.click_continue_button(page);
     }
     
+    @Given("User clicks 'Submit' button on $page")
+    @When("User clicks 'Submit' button on $page")
+    public void userClicksSubmitButton(String page) {
+        commonSteps.click_submit_button(page);
+    }
+    
     @Given("User remembers password of created user")
     public void userRemembersPasswordOfCreatedUser() {
         commonSteps.remember_pass_of_created_user();
@@ -244,7 +251,8 @@ public class ClinovoJBehave extends BaseJBehave {
     
     @When("User changes Study/Site to $studyName")
     @Given("User changes Study/Site to $studyName")
-    public void userSelectsStudyOgeStudyPage(String studyName) {
+    public void userSelectsStudyOnStudyPage(String studyName) {
+    	userGoesToPage(ChangeStudyPage.PAGE_NAME);
     	userSelectsStudyOnChangeStudyPage(Common.removeQuotes(studyName));
     	userClicksContinueButton(ChangeStudyPage.PAGE_NAME);
     	userIsOnPage(ConfirmChangeStudyPage.PAGE_NAME);
@@ -255,6 +263,35 @@ public class ClinovoJBehave extends BaseJBehave {
     @Given("Current Study is $studyName")
     public void currentStudyIs(String studyName) {
     	commonSteps.current_study_is(Common.removeQuotes(studyName));
+    }
+    
+    @When("User changes scope to Study")
+    @Given("User changes scope to Study")
+    public void userChangesScopeToStudy() {
+    	userGoesToPage(ChangeStudyPage.PAGE_NAME);
+    	userSelectsStudyOnChangeStudyPage(commonSteps.get_study_name_from_page());
+    	userClicksContinueButton(ChangeStudyPage.PAGE_NAME);
+    	userIsOnPage(ConfirmChangeStudyPage.PAGE_NAME);
+    	userClicksSubmitButton();
+    }
+    
+    @Then("User is on Study level")
+    public void isOnStudyLevel() {
+    	commonSteps.is_on_study_level();
+    }
+    
+    @Given("User fills in data on Add Subject page to create subject: $activityTable")
+    public void userFillsInAddSubjectPage(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams = table.getRowAsParameters(0, replaceNamedParameters);
+    	StudySubject ssubj = StudySubject.fillStudySubjectFromTableRow(rowParams.values());
+    	commonSteps.fill_in_study_subject_page(ssubj);
+    }
+    
+    @Then("User calls a popup for $studySubjectID, $eventName")
+    @Given("User calls a popup for $studySubjectID, $eventName")
+    public void userCallsPopupOnSM(String studySubjectID, String eventName) {
+        commonSteps.call_popup_for_subject_and_event(studySubjectID, eventName);
     }
     
     private User getCurrentUser() {

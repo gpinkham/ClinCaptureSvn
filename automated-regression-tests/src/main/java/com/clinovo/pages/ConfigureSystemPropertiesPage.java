@@ -7,7 +7,7 @@ import net.thucydides.core.webelements.RadioButtonGroup;
 
 import org.openqa.selenium.WebDriver;
 
-import com.clinovo.utils.SystemProperties;
+import com.clinovo.pages.beans.SystemProperties;
 
 public class ConfigureSystemPropertiesPage extends BasePage {
 
