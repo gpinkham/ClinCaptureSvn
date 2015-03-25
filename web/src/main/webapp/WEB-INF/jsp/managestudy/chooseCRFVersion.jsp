@@ -71,7 +71,7 @@ $.noConflict();
 <input type="hidden" name="eventName" value="${eventName}">
 <input type="hidden" name="eventCreateDate" value="${eventCreateDate}">
 <input type="hidden" name="eventOrdinal" value="${eventOrdinal}">
-<input type="hidden" id="formWithStateFlag" value=""/>
+<input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag}"/>
 
 <table cellpadding="2" cellspacing="2" border="0" class="dataTable" >
 
@@ -192,15 +192,9 @@ href="#" onclick="window.location.href='../../ViewCRFVersion?id=<c:out value="${
  <td VALIGN="top">
     <input type="button" name="customCancel" id="customCancel"
            value="<fmt:message key="cancel" bundle="${resword}"/>"
-           class="button_long" onClick="$('#fr_cancel_button #cancel').click();"/>
+           class="button_long" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
  </td>
 </tr></table>
-</form>
-<form id="fr_cancel_button" method="get" style="display: none;">
-  <input type="hidden" name="id" value="<c:out value="${studySubjectId}"/>" />
-  <input type="button" name="Cancel" id="cancel"
-         value="<fmt:message key="cancel" bundle="${resword}"/>"
-         class="button_long" onClick="formWithStateConfirmGoTo('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${pageContext.request.contextPath}/ViewStudySubject?id=<c:out value="${studySubjectId}"/>');" />
 </form>
 <jsp:include page="../include/footer.jsp"/>
 

@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -1889,6 +1891,18 @@ public abstract class Controller extends BaseController {
 
 			if (edc != null) {
 				DisplayEventCRFBean dec = new DisplayEventCRFBean();
+				edc.setVersions((ArrayList) cvdao.findAllActiveByCRF(edc.getCrfId()));
+				String selectedIds = edc.getSelectedVersionIds();
+				if (edc.getParentId() > 0 && selectedIds != null && !selectedIds.trim().equals("")) {
+					List<String> idList = Arrays.asList(selectedIds.split(","));
+					Iterator<CRFVersionBean> iterator = edc.getVersions().iterator();
+					while (iterator.hasNext()) {
+						CRFVersionBean crfVersionBean = iterator.next();
+						if (!idList.contains(Integer.toString(crfVersionBean.getId()))) {
+							iterator.remove();
+						}
+					}
+				}
 				dec.setEventDefinitionCRF(edc);
 				dec.setFlags(ecb, ub, currentRole, edc);
 

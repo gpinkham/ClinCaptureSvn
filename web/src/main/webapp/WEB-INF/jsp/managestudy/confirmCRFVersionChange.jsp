@@ -169,7 +169,6 @@
 <table border="0" colspan="2"><tr><td>
 <form method="POST" action="${pageContext.request.contextPath}/pages/managestudy/changeCRFVersion" >
 <input type="hidden" name="newCRFVersionId" value="${selectedVersionId}">
-
 <input type="hidden" name="studySubjectId" value="${studySubjectId}">
 <input type="hidden" name="eventDefinitionCRFId" value="${eventDefinitionCRFId}">
 <input type="hidden" name="studySubjectLabel" value="${studySubjectLabel}">
@@ -181,6 +180,7 @@
 <input type="hidden" name="eventName" value="${eventName}">
 <input type="hidden" name="eventCreateDate" value="${eventCreateDate}">
 <input type="hidden" name="eventOrdinal" value="${eventOrdinal}">
+<input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag}"/>
 
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
        value="<fmt:message key="back" bundle="${resword}"/>"
@@ -192,7 +192,7 @@
 
 <form id="fr_cancel_button" method="get">
 <input type="hidden" name="id" value="<c:out value="${studySubjectId}"/>" />
-<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onClick="confirmGoTo('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${pageContext.request.contextPath}/ViewStudySubject?id=<c:out value="${studySubjectId}"/>');" >
+<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onClick="confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" >
 
 
 </form>

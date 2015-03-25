@@ -15,8 +15,15 @@
 
 package com.clinovo.interceptor;
 
-import com.clinovo.controller.Redirection;
-import com.clinovo.util.SessionUtil;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -34,13 +41,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import com.clinovo.controller.Redirection;
+import com.clinovo.util.SessionUtil;
 
 /**
  * SetUpSessionInterceptor that able to manage controller requests.
@@ -53,6 +55,8 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 	public static final String PREV_URL = "_PrevUrl";
 	public static final String FIRST_URL_PARAMETER = "?";
 	public static final String INCLUDE_REPORTING = "includeReporting";
+	public static final String FORM_WITH_STATE_FLAG = "formWithStateFlag";
+
 	private static Set<String> methodList = new HashSet<String>(Arrays.asList("getPrintCRFController"));
 
 	@Override
@@ -62,6 +66,7 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 		if (SecurityContextHolder.getContext().getAuthentication() != null) {
 			Controller.restorePageMessages(request);
 			Navigation.addToNavigationStack(request);
+			request.setAttribute(FORM_WITH_STATE_FLAG, request.getParameter(FORM_WITH_STATE_FLAG));
 			StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession()
 					.getAttribute(BaseController.USER_ROLE);
 			UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute(
@@ -107,7 +112,9 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 
 	/**
 	 * Returns study dao object for study table.
-	 * @param ds the data source object.
+	 *
+	 * @param ds
+	 *            the data source object.
 	 * @return StudyDAO object.
 	 */
 	public StudyDAO getStudyDAO(DataSource ds) {
@@ -116,7 +123,9 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 
 	/**
 	 * Returns user account dao object for user account table.
-	 * @param ds the data source object.
+	 *
+	 * @param ds
+	 *            the data source object.
 	 * @return StudyDAO object.
 	 */
 	public UserAccountDAO getUserAccountDAO(DataSource ds) {
@@ -125,6 +134,7 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 
 	/**
 	 * Returns data source object with database connection properties.
+	 *
 	 * @return the DataSource object.
 	 */
 	public DataSource getDataSource() {

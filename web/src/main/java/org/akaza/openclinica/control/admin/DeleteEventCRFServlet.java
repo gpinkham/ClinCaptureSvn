@@ -50,7 +50,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.navigation.HelpNavigationServlet;
+import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -87,7 +87,7 @@ public class DeleteEventCRFServlet extends Controller {
 
 	private void smartForward(Page page, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+		response.sendRedirect(Navigation.getSavedUrl(request));
 	}
 
 	@Override

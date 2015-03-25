@@ -13,16 +13,16 @@
 
 package org.akaza.openclinica.navigation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.Stack;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
-
-import java.util.Stack;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class HelpNavigationServletTest {
 
@@ -44,12 +44,12 @@ public class HelpNavigationServletTest {
 
 	@Test
 	public void testThatGetSavedUrlReturnsNotNull() {
-		assertNotNull(HelpNavigationServlet.getSavedUrl(request));
+		assertNotNull(Navigation.getSavedUrl(request));
 	}
 
 	@Test
 	public void testThatGetSavedUrlReturnsCorrectURL() {
-		assertEquals(HelpNavigationServlet.getSavedUrl(request), "/ClinCapture-SNAPSHOT/testURL1?abc=144&cde=53");
+		assertEquals(Navigation.getSavedUrl(request), "/ClinCapture-SNAPSHOT/testURL1?abc=144&cde=53");
 	}
 
 	@Test
@@ -57,6 +57,6 @@ public class HelpNavigationServletTest {
 		Stack<String> visitedURLs = new Stack<String>();
 		visitedURLs.push("/testURL2");
 		session.setAttribute("visitedURLs", visitedURLs);
-		assertEquals(HelpNavigationServlet.getSavedUrl(request), "/ClinCapture-SNAPSHOT/MainMenu");
+		assertEquals(Navigation.getSavedUrl(request), "/ClinCapture-SNAPSHOT/MainMenu");
 	}
 }

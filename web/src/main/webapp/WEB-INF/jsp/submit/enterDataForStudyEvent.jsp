@@ -1,7 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <jsp:useBean scope="session" id="userRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean" />
 <jsp:useBean scope='request' id='eventId' class='java.lang.String'/>
@@ -420,19 +421,6 @@
                    onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
                    name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
 
-        <!-- added clinovo 12/2012 #121 -->
-        	<c:if test="${ 
-        (study.status.available || study.status.pending)  && 
-        (userBean.sysAdmin || (userRole.studyDirector || userRole.studyAdministrator))
-        && !(studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped)
-        && (dedc.eventCRF.id>0 and !dedc.eventCRF.notStarted)}">
-		<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
-		<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
-    	<a href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dedc.eventCRF.crf.id}" />&crfName=<c:out value="${dedc.eventCRF.crf.name}" />&crfversionId=<c:out value="${dedc.eventCRF.crfVersion.id}" />&crfVersionName=<c:out value="${dedc.eventCRF.crfVersion.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCRFId=<c:out value="${dedc.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dedc.edc.id}" />"
-   			onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
-   			onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><img
-      		name="Reassign" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="4"></a>
-            </c:if>
 </td>
 
 </tr>
@@ -593,17 +581,12 @@
                    onMouseUp="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                   ><img name="bt_Remove<c:out value="${rowCount}"/>" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="4"></a>
             </c:if>
-            <!--  reasign crf version -->
-          	<!-- added clinovo #121 12/2012 --> 	
- 			<c:if test="${(userBean.sysAdmin || (userRole.studyDirector || userRole.studyAdministrator)) &&
- 				(study.status.available || study.status.pending) 
- 				&& !(studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped)}">
-   
-  			  <a href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&crfversionId=<c:out value="${dec.eventCRF.crfVersion.id}" />&crfVersionName=<c:out value="${dec.eventCRF.crfVersion.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>"
-   				onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
-   				onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><img
-      			name="Reassign" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="4"></a>
-   			
+
+            <c:if test="${dec.eventCRF.id > 0 && !dec.eventCRF.notStarted && !dec.locked && !dec.stage.locked && (userRole.sysAdmin || userRole.studyAdministrator) && (study.status.available || study.status.pending) && !(studyEvent.subjectEventStatus.removed || studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.stopped || studyEvent.subjectEventStatus.skipped) && dec.eventDefinitionCRF.versions != null && fn:length(dec.eventDefinitionCRF.versions) > 1}">
+                <a href="pages/managestudy/chooseCRFVersion?crfId=${dec.eventCRF.crf.id}&crfName=${dec.eventCRF.crf.name}&crfversionId=${dec.eventCRF.crfVersion.id}&crfVersionName=${dec.eventCRF.crfVersion.name}&studySubjectLabel=${studySubject.label}&studySubjectId=${studySubject.id}&eventCRFId=${dec.eventCRF.id}&eventDefinitionCRFId=${dec.eventDefinitionCRF.id}"
+                onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
+                onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');">
+                <img name="Reassign" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="4"></a>
    			</c:if>
 
         </c:otherwise>

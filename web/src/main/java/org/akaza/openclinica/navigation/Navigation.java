@@ -13,16 +13,17 @@
 
 package org.akaza.openclinica.navigation;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Navigation class.
  */
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({"unchecked"})
 public final class Navigation {
 
 	// "skip!"-set of pages, non pop-ups
@@ -54,12 +55,11 @@ public final class Navigation {
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc", "/help",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
 			"/ChangeDefinitionCRFOrdinal", "/CreateOneDiscrepancyNote", "/MatchPassword", "/pages/handleSDVPost",
-			"/pages/handleSDVRemove", "/pages/sdvStudySubjects", "/UploadFile",
-			"/DownloadAttachedFile"));
+			"/pages/handleSDVRemove", "/pages/sdvStudySubjects", "/UploadFile", "/DownloadAttachedFile"));
 	// set of pages with special processing
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
 			"/ListStudySubjects", "/EnterDataForStudyEvent", "/ViewSectionDataEntry", "/pages/crfEvaluation"));
-	private static String defaultShortURL = "/MainMenu";	
+	private static String defaultShortURL = "/MainMenu";
 	private static Set<String> queryParameterRequiredURLs = new HashSet<String>(Arrays.asList("/ViewStudySubject"));
 
 	private Navigation() {
@@ -158,7 +158,7 @@ public final class Navigation {
 			return;
 		}
 		if (!visitedURLs.isEmpty() && "/ViewStudySubject".equals(requestShortURI) && requestShortURL.contains("ref=sm")) {
-			//remove subject matrix url
+			// remove subject matrix url
 			if (visitedURLs.peek().contains("&fromSearch=true")) {
 				visitedURLs.pop();
 			}
@@ -195,5 +195,29 @@ public final class Navigation {
 		}
 
 		visitedURLs.push(requestShortURL);
+	}
+
+	/**
+	 * Returns first URL from stack of saved URLs.
+	 *
+	 * @param request
+	 *            HttpServletRequest
+	 * @return String Saved URL from the stack
+	 */
+	public static String getSavedUrl(HttpServletRequest request) {
+		Stack<String> visitedURLs = (Stack<String>) request.getSession().getAttribute("visitedURLs");
+		String defaultUrl = "/MainMenu";
+
+		if (visitedURLs == null) {
+			visitedURLs = new Stack<String>();
+		}
+
+		if (!visitedURLs.isEmpty()) {
+			visitedURLs.pop();
+		} else {
+			visitedURLs.push(defaultUrl);
+		}
+
+		return request.getContextPath() + (visitedURLs.isEmpty() ? defaultUrl : visitedURLs.peek());
 	}
 }

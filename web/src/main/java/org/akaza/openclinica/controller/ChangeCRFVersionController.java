@@ -13,7 +13,19 @@
 
 package org.akaza.openclinica.controller;
 
-import com.clinovo.util.SessionUtil;
+import java.sql.Connection;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -42,6 +54,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,24 +68,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.util.SessionUtil;
 
 /**
  * Implement the functionality for displaying a table of Event CRFs for Source Data Verification. This is an autowired,
  * multiaction Controller.
  */
 @Controller("changeCRFVersionController")
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({"unchecked"})
 public class ChangeCRFVersionController {
 	@Autowired
 	@Qualifier("dataSource")
@@ -528,7 +531,9 @@ public class ChangeCRFVersionController {
 			con.close();
 			pageMessages.add(resword.getString("confirm_crf_version_ms"));
 			String msg = resword.getString("confirm_crf_version_ms");
-			redirect(request, response, "/ViewStudySubject?isFromCRFVersionChange=" + msg + "&id=" + studySubjectId);
+			org.akaza.openclinica.control.core.Controller.addPageMessage(msg, request, logger);
+			org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+			response.sendRedirect(Navigation.getSavedUrl(request));
 		} catch (Exception e) {
 
 			pageMessages.add(resword.getString("error_message_cannot_update_crf_version"));

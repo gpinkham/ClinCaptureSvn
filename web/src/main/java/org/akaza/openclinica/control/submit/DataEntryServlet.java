@@ -122,7 +122,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.akaza.openclinica.logic.score.ScoreCalculator;
-import org.akaza.openclinica.navigation.HelpNavigationServlet;
+import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.calendar.CalendarLogic;
@@ -457,7 +457,7 @@ public abstract class DataEntryServlet extends Controller {
 			if (autoCloseDataEntryPage) {
 				forwardPage(Page.AUTO_CLOSE_PAGE, request, response);
 			} else {
-				response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+				response.sendRedirect(Navigation.getSavedUrl(request));
 			}
 			return;
 		}
@@ -1826,7 +1826,7 @@ public abstract class DataEntryServlet extends Controller {
 									if (!fp.getString(SAVE_NEXT).equals("")) {
 										goToNextCRF(request, response, ecb, currentRole, ub, edcb, studyEventBean);
 									} else {
-										response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+										response.sendRedirect(Navigation.getSavedUrl(request));
 									}
 								}
 							} else {
@@ -1873,7 +1873,7 @@ public abstract class DataEntryServlet extends Controller {
 										if (!fp.getString(SAVE_NEXT).equals("")) {
 											goToNextCRF(request, response, ecb, currentRole, ub, edcb, studyEventBean);
 										} else {
-											response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+											response.sendRedirect(Navigation.getSavedUrl(request));
 										}
 									}
 									return;
@@ -1908,7 +1908,7 @@ public abstract class DataEntryServlet extends Controller {
 		if (redirectPath != null) {
 			response.sendRedirect(redirectPath);
 		} else {
-			response.sendRedirect(HelpNavigationServlet.getSavedUrl(request));
+			response.sendRedirect(Navigation.getSavedUrl(request));
 		}
 	}
 
