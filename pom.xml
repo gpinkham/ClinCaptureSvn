@@ -702,7 +702,7 @@
 							</goals>
 							<configuration>
 								<files>
-									<file>${main.basedir}/build.properties</file>
+									<file>${project.parent.basedir}/build.properties</file>
 								</files>
 							</configuration>
 						</execution>

@@ -84,22 +84,54 @@
                                 <td colspan="2"></td>
                                 <td></td>
                                 <td>
-                                    <input type="hidden" id="autoCode" />
+                                    <input type="hidden" id="autoCode"/>
                                 </td>
                             </c:when>
                             <c:otherwise>
                                 <td></td>
-                                <td>
-                                    <c:if test="${configuredDictionaryIsAvailable}">
-                                        <input type="button" id="<c:out value="${counter}"/>" name="codeAndAliasBtn" class="button" value="Code & Alias" style="background-image: url(<c:out value="${codeButtonColor}"/>); float: right; visibility:hidden;" onclick="codeAndAlias($(this))" />
-                                    </c:if>
-                                </td>
-                                <td>
-                                    <input type="button" id="<c:out value="${counter}"/>" name="codeItemBtn" class="button" value="Code" style="background-image: url(<c:out value="${codeButtonColor}"/>); visibility:hidden;" onclick="saveCodedItem($(this))" />
-                                </td>
-                                <td>
-                                    <input type="button" id="<c:out value="${counter}"/>" name="getInfoItemBtn" class="button" value="Get full info" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="codeItemFields($(this))" />
-                                </td>
+
+                                <c:choose>
+                                    <c:when test="${itemDictionary == 'WHOD'}">
+                                        <td>
+                                            <c:if test="${configuredDictionaryIsAvailable}">
+                                                <input type="button" id="<c:out value="${counter}"/>" name="codeAndAliasBtn"
+                                                       class="button" value="Code & Alias" style="background-image: url(<c:out
+                                                        value="${codeButtonColor}"/>); float: right;"
+                                                       onclick="codeAndAlias($(this))"/>
+                                            </c:if>
+                                        </td>
+                                        <td>
+                                            <input type="button" id="<c:out value="${counter}"/>" name="codeItemBtn"
+                                                   class="button" value="Code"
+                                                   style="background-image: url(<c:out value="${codeButtonColor}"/>);"
+                                                   onclick="saveCodedItem($(this))"/>
+                                        </td>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <td>
+                                            <c:if test="${configuredDictionaryIsAvailable}">
+                                                <input type="button" id="<c:out value="${counter}"/>" name="codeAndAliasBtn"
+                                                       class="button" value="Code & Alias" style="background-image: url(<c:out
+                                                        value="${codeButtonColor}"/>); float: right; visibility:hidden;"
+                                                       onclick="codeAndAlias($(this))"/>
+                                            </c:if>
+                                        </td>
+                                        <td>
+                                            <input type="button" id="<c:out value="${counter}"/>" name="codeItemBtn"
+                                                   class="button" value="Code" style="background-image: url(<c:out
+                                                    value="${codeButtonColor}"/>); visibility:hidden;"
+                                                   onclick="saveCodedItem($(this))"/>
+                                        </td>
+                                        <td>
+                                            <input type="button" id="<c:out value="${counter}"/>" name="getInfoItemBtn"
+                                                   class="button" value="Get full info"
+                                                   style="background-image: url(<c:out value="${codeButtonColor}"/>);"
+                                                   onclick="codeItemFields($(this))"/>
+                                        </td>
+                                    </c:otherwise>
+                                </c:choose>
+
+
                             </c:otherwise>
                         </c:choose>
                     </tr>

@@ -18,14 +18,18 @@ import com.clinovo.coding.Search;
 import com.clinovo.coding.model.Classification;
 import com.clinovo.coding.model.ClassificationElement;
 import com.clinovo.coding.source.impl.BioPortalSearchInterface;
+import com.clinovo.dao.MedicalProductDAO;
 import com.clinovo.dao.SystemDAO;
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemElement;
 import com.clinovo.model.CodedItemsTableFactory;
 import com.clinovo.model.Dictionary;
+import com.clinovo.model.Ingredient;
+import com.clinovo.model.MedicalProduct;
 import com.clinovo.model.Status.CodeStatus;
 import com.clinovo.model.Term;
 import com.clinovo.model.TermElement;
+import com.clinovo.model.Therapgroup;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.TermService;
@@ -63,6 +67,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -263,8 +269,12 @@ public class CodedItemsController {
 			if (!codedItem.isCoded()) {
 				search.setSearchInterface(new BioPortalSearchInterface());
 				try {
-					classifications = search.getClassifications(prefLabel, dictionary, bioontologyUrl.getValue(),
-							bioontologyApiKey.getValue());
+					if (dictionary.equalsIgnoreCase("WHOD")) {
+						classifications = medicalProductListToClassificationList(getMedicalProductDAO().findByMedicalProductName(prefLabel));
+					} else {
+						classifications = search.getClassifications(prefLabel.toLowerCase(), dictionary, bioontologyUrl.getValue(),
+								bioontologyApiKey.getValue());
+					}
 					if (classifications.size() == 0) {
 						codedItem.setStatus(String.valueOf(CodeStatus.CODE_NOT_FOUND));
 						codedItemService.saveCodedItem(codedItem);
@@ -419,7 +429,6 @@ public class CodedItemsController {
 		}
 
 		if (codedItem.isAutoCoded()) {
-
 			codedItem.setAutoCoded(false);
 		}
 
@@ -460,12 +469,6 @@ public class CodedItemsController {
 			ptElement.setCodeName(term);
 			ptElement.setElementName(ResourceBundleProvider.getResWord("pt"));
 			classificationWithTerms.addClassificationElement(ptElement);
-		} else if (codedItemUrl.indexOf("whod") > 0) {
-			for (ClassificationElement classification : classificationWithTerms.getClassificationElement()) {
-				String classificationCodeName = classification.getCodeName();
-				classification.setCodeName(classificationCodeName.substring(0, classificationCodeName.indexOf("@"))
-						.replaceAll("_", " ").replaceAll(" and ", " & "));
-			}
 		}
 
 		ModelMap model = new ModelMap();
@@ -588,24 +591,14 @@ public class CodedItemsController {
 		codedItem.setPreferredTerm(codeSearchTerm);
 
 		Classification classificationResult = getClassificationFromCategoryString(categoryList);
-		search.setSearchInterface(new BioPortalSearchInterface());
-
 		if (codedItem.getDictionary().equals("WHOD")) {
-
-			String whodKey = getWhodKey(classificationResult);
-
-			for (ClassificationElement whodClassElement : classificationResult.getClassificationElement()) {
-				whodClassElement.setCodeName(whodClassElement.getCodeName().replaceAll(" &amp; ", " and ")
-						.replaceAll(" ", "_")
-						+ whodKey);
-			}
-
-			addClassificationResultSufix(classificationResult);
+			MedicalProduct mpBean = getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()));
+			classificationResult = medicalProductToClassification(mpBean);
+		} else {
+			search.setSearchInterface(new BioPortalSearchInterface());
+			search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "),
+					bioontologyUrl, bioontologyApiKey);
 		}
-
-		// get codes for all verb terms & save it in classification
-		search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "),
-				bioontologyUrl, bioontologyApiKey);
 
 		// replace all terms & codes from classification to coded elements
 		generateCodedItemFields(codedItem.getCodedItemElements(), classificationResult.getClassificationElement());
@@ -637,20 +630,6 @@ public class CodedItemsController {
 		return codedItem;
 	}
 
-	private void addClassificationResultSufix(Classification classificationResult) {
-
-		int countryIndex = classificationResult.getClassificationElement().size() - COUNTRY_INDEX;
-		String countryField = classificationResult.getClassificationElement().get(countryIndex).getCodeName() + "_con";
-		classificationResult.getClassificationElement().get(countryIndex).setCodeName(countryField);
-
-		for (int index = 0; index < classificationResult.getClassificationElement().size(); index++) {
-			if (index < countryIndex && index > 2) {
-				String actField = classificationResult.getClassificationElement().get(index).getCodeName() + "_act";
-				classificationResult.getClassificationElement().get(index).setCodeName(actField);
-			}
-		}
-	}
-
 	private Classification getClassificationFromCategoryString(String categoryList) {
 
 		Classification classification = new Classification();
@@ -672,26 +651,10 @@ public class CodedItemsController {
 		return classification;
 	}
 
-	private String getWhodKey(Classification classification) {
-		String codeNum = "";
-		String generic = "";
-		for (ClassificationElement classificationElement : classification.getClassificationElement()) {
-			if (classificationElement.getElementName().equalsIgnoreCase("MPNC")) {
-				codeNum = classificationElement.getCodeName();
-			} else if (classificationElement.getElementName().equalsIgnoreCase("generic")) {
-				generic = classificationElement.getCodeName().replace("Yes", "Y").replace("No", "N");
-			}
-		}
-
-		return "@" + codeNum + generic;
-	}
-
 	private List<TermElement> generateTermElementList(List<ClassificationElement> classificationElementList) {
 
 		List<TermElement> termElementList = new ArrayList<TermElement>();
-
 		for (ClassificationElement classElement : classificationElementList) {
-
 			TermElement newTermElement = new TermElement(classElement.getCodeName(), classElement.getCodeValue(),
 					classElement.getElementName());
 			termElementList.add(newTermElement);
@@ -705,18 +668,100 @@ public class CodedItemsController {
 
 		for (CodedItemElement codedItemElement : codedItemElements) {
 			for (ClassificationElement classificationElement : classificationElements) {
-
 				String name = codedItemElement.getItemName();
-
 				if (name.equals(classificationElement.getElementName())) {
-
 					codedItemElement.setItemCode(classificationElement.getCodeName().replaceAll(
 							classificationElement.getCodeValue(), ""));
 				} else if (name.equals(classificationElement.getElementName() + "C")) {
-
 					codedItemElement.setItemCode(classificationElement.getCodeValue());
 				}
 			}
 		}
+	}
+
+	private List<Classification> medicalProductListToClassificationList(List<MedicalProduct> mpList) {
+		List<Classification> classifications = new ArrayList<Classification>();
+		for (MedicalProduct mp : mpList) {
+			classifications.add(medicalProductToClassification(mp));
+		}
+		Collections.sort(classifications, new ClassificationSortByReference());
+		return classifications;
+	}
+
+	private Classification medicalProductToClassification(MedicalProduct mp) {
+
+		Classification classification = new Classification();
+		classification.setHttpPath(String.valueOf(mp.getMedicinalprodId()));
+		ClassificationElement medicalProductName = new ClassificationElement();
+		medicalProductName.setElementName("MPN");
+		medicalProductName.setCodeName(mp.getDrugName());
+		classification.addClassificationElement(medicalProductName);
+		ClassificationElement medicalProductCode = new ClassificationElement();
+		medicalProductCode.setElementName("MPNC");
+		medicalProductCode.setCodeName(mp.getDrugRecordNumber() + mp.getSequenceNumber1() + mp.getSequenceNumber2());
+		classification.addClassificationElement(medicalProductCode);
+		ClassificationElement component = new ClassificationElement();
+		component.setElementName("CMP");
+		String ingList = String.valueOf(mp.getDrugRecordNumber());
+		for (Ingredient ing : mp.getIngList()) {
+			ingList = ingList.concat(", ").concat(ing.getSun().getSubstanceName());
+		}
+		component.setCodeName(ingList);
+		classification.addClassificationElement(component);
+		int counter = 1;
+		for (Therapgroup thg : mp.getThgList()) {
+			ClassificationElement atcElement = new ClassificationElement();
+			atcElement.setElementName("ATC" + counter);
+			atcElement.setCodeName(thg.getAtc().getAtcText());
+			atcElement.setCodeValue(thg.getAtc().getAtcCode());
+			classification.addClassificationElement(atcElement);
+			counter++;
+		}
+		ClassificationElement country = new ClassificationElement();
+		country.setElementName("CNTR");
+		country.setCodeName(mp.getSourceCountryBean().getCountryName());
+		classification.addClassificationElement(country);
+
+		ClassificationElement generic = new ClassificationElement();
+		generic.setElementName("GENERIC");
+		generic.setCodeName(mp.getGeneric().equals("Y") ? "Yes" : "No");
+		classification.addClassificationElement(generic);
+		ClassificationElement umbrella = new ClassificationElement();
+		umbrella.setElementName("UMBRELLA");
+		int firstDigit = mp.getDrugRecordNumber();
+		final int number = 9;
+		final int divider = 10;
+		while (firstDigit > number) {
+			firstDigit = firstDigit / divider;
+		}
+		umbrella.setCodeName(mp.getDrugName().indexOf(" nos") > 0 || firstDigit == number ? "Yes" : "No");
+		classification.addClassificationElement(umbrella);
+		ClassificationElement preferred = new ClassificationElement();
+		preferred.setElementName("PREFERRED");
+		preferred.setCodeName(Integer.valueOf(mp.getSequenceNumber1()) > 1 && Integer.valueOf(mp.getSequenceNumber2()) == 1 ? "Yes" : "No");
+		classification.addClassificationElement(preferred);
+
+		return classification;
+	}
+
+	private class ClassificationSortByReference implements Comparator<Classification> {
+		public int compare(Classification o1, Classification o2) {
+			for (ClassificationElement classification : o1.getClassificationElement()) {
+				for (ClassificationElement classification2 : o2.getClassificationElement()) {
+					if (classification.getElementName().equals("PREFERRED") && classification.getElementName().equals(classification2.getElementName())) {
+						if ((classification.getCodeName().equals("No") && classification2.getCodeName().equals("Yes"))) {
+							return 1;
+						} else if (classification.getCodeName().equals("Yes") && classification2.getCodeName().equals("No")) {
+							return -1;
+						}
+					}
+				}
+			}
+			return 0;
+		}
+	}
+
+	private MedicalProductDAO getMedicalProductDAO() {
+		return new MedicalProductDAO();
 	}
 }

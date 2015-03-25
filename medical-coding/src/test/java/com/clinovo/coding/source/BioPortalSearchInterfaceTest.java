@@ -37,7 +37,6 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 	public void setUp() throws Exception {
 
 		Mockito.doReturn(searchResult).when(searchInterface).termListRequest(Mockito.eq("Leukaemia plasmacytic (in remission)"), Mockito.anyString(), Mockito.anyString());
-		Mockito.doReturn(whodSearchResult).when(searchInterface).termListRequest(Mockito.eq("Benzalkonium"), Mockito.anyString(), Mockito.anyString());
 		Mockito.doReturn(ctcaeSearchResult).when(searchInterface).termListRequest(Mockito.eq("Leg Pain"), Mockito.anyString(), Mockito.anyString());
 		Mockito.doReturn(treeResult).when(searchInterface).getPageDataRequest(Mockito.anyString(), Mockito.anyString());
 		Mockito.doReturn(termCodeResult).when(searchInterface).getTermCodeRequest(Mockito.any(ClassificationElement.class), Mockito.eq("MEDDRA"), Mockito.anyString());
@@ -144,34 +143,6 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 		assertEquals("10033371", classification.getClassificationElement().get(1).getCodeValue());
 	}
 
-	@Test
-	public void testThatWHODSearchDoesNotReturnNull() throws Exception {
-
-		assertNotNull(searchInterface.search("Benzalkonium", "WHOD", "http://1.1.1.1", "api key"));
-	}
-
-	@Test
-	public void testThatWHODSearchReturnsExpectedNumberOfTerms() throws Exception {
-
-		assertEquals(2, searchInterface.search("Benzalkonium", "WHOD", "http://1.1.1.1", "api key").size());
-	}
-
-	@Test
-	public void testThatWhodSearchReturnsCorrectTermNames() throws Exception {
-
-		List<Classification> classifications = searchInterface.search("Benzalkonium", "WHOD", "http://1.1.1.1", "api key");
-		assertEquals("Benzalkonium", classifications.get(0).getClassificationElement().get(0).getCodeName());
-		assertEquals("Benzalkonium chloride", classifications.get(1).getClassificationElement().get(0).getCodeName());
-	}
-
-	@Test
-	public void testThatWhodSearchReturnsClassificationEachHavingElementNames() throws Exception {
-
-		List<Classification> classifications = searchInterface.search("Benzalkonium", "WHOD", "http://1.1.1.1", "api key");
-
-		assertEquals("MPN", classifications.get(0).getClassificationElement().get(0).getElementName());
-		assertEquals("MPN", classifications.get(1).getClassificationElement().get(0).getElementName());
-	}
 
 	@Test
 	public void testThatCTCAESearchReturnsExpectedNumberOfTerms() throws Exception {

@@ -2660,10 +2660,9 @@ codeItem = function(item) {
         data: {
 
             item: $(item).attr("itemid"),
-            prefLabel: $.trim($(item).parent().siblings("td").find("input").val().toLowerCase()),
+            prefLabel: $.trim($(item).parent().siblings("td").find("input").val()),
             dictionary: $(item).parent().siblings("td").find("div[name='termDictionary']").text()
         },
-
         success: function(data) {
 
             hideMedicalCodingAlertBox(ajaxRequest);

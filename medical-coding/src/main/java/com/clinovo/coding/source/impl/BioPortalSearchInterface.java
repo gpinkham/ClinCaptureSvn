@@ -33,8 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,7 +48,6 @@ public class BioPortalSearchInterface implements SearchInterface {
 	private static final String MEDDRA = "MEDDRA";
 	private static final String ICD9CM = "ICD9CM";
 	private static final String ICD10 = "ICD10";
-	private static final String WHOD = "WHOD";
 	private static final String CTCAE = "CTCAE";
 	private static final int THREAD_LIVE_TIME = 30;
 
@@ -68,7 +65,6 @@ public class BioPortalSearchInterface implements SearchInterface {
 
 		Logger logger = LoggerFactory.getLogger(getClass().getName());
 		dictionary = getDictionary(termDictionary);
-		term = dictionary.equals(WHOD) ? term.replaceAll(" & ", "_and_").replaceAll(" ", "_") : term;
 		String gradeNumber = dictionary.equals(CTCAE) && term.contains("(") && term.contains(")")
 				? term.substring(term.indexOf("(") + 1, term.indexOf(")")).toLowerCase() : "grade";
 		term = dictionary.equals(CTCAE) && term.contains("(") && term.contains(")")
@@ -86,9 +82,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 			String codeHttpPath = jsonObjectElement.get("@id").getAsString();
 			String prefLabel = jsonObjectElement.get("prefLabel").getAsString();
 			boolean isPrefLabel = true;
-			if (dictionary.equals(WHOD)) {
-				isPrefLabel = prefLabel.indexOf("_act") < 0 && prefLabel.indexOf("_key") < 0 && prefLabel.indexOf("_con") < 0;
-			} else if (dictionary.equals(CTCAE)) {
+			if (dictionary.equals(CTCAE)) {
 				isPrefLabel = prefLabel.toLowerCase().contains(gradeNumber);
 			}
 			if (isPrefLabel) {
@@ -97,7 +91,6 @@ public class BioPortalSearchInterface implements SearchInterface {
 				classifications.addAll(classificationResponse);
 			}
 		}
-		Collections.sort(classifications, new ClassificationSortByReference());
 		return classifications;
 	}
 
@@ -154,15 +147,6 @@ public class BioPortalSearchInterface implements SearchInterface {
 		} catch (InterruptedException e) {
 			logger.error("Get code threads didn't finish in 30 seconds");
 			throw new SearchException(e.getMessage());
-		}
-
-		if (dictionary.equals(WHOD)) {
-			for (ClassificationElement classificationElement : classification.getClassificationElement()) {
-				String codeName = classificationElement.getCodeName();
-				String codeValue = classificationElement.getCodeValue();
-				classificationElement.setCodeName(!codeName.isEmpty() ? codeName.substring(0, codeName.indexOf("@")).replaceAll("_and_", "_&_").replaceAll("_", " ") : "");
-				classificationElement.setCodeValue(!codeValue.isEmpty() ? codeValue.substring(0, codeValue.indexOf("@")).replaceAll("_and_", "_&_").replaceAll("_", " ") : "");
-			}
 		}
 	}
 
@@ -311,30 +295,10 @@ public class BioPortalSearchInterface implements SearchInterface {
 			return ICD10;
 		} else if (term.contains("icd9") || term.contains("icd 9")) {
 			return ICD9CM;
-		} else if (term.contains("whod")) {
-			return WHOD;
 		} else if (term.contains("ctcae")) {
 			return CTCAE;
 		}
 
 		throw new SearchException("Unknown dictionary type specified");
 	}
-
-	private class ClassificationSortByReference implements Comparator<Classification> {
-		public int compare(Classification o1, Classification o2) {
-			for (ClassificationElement classification : o1.getClassificationElement()) {
-				for (ClassificationElement classification2 : o2.getClassificationElement()) {
-					if (classification.getElementName().equals("PREFERRED") && classification.getElementName().equals(classification2.getElementName())) {
-						if ((classification.getCodeName().equals("No") && classification2.getCodeName().equals("Yes"))) {
-							return 1;
-						} else if (classification.getCodeName().equals("Yes") && classification2.getCodeName().equals("No")) {
-							return -1;
-						}
-					}
-				}
-			}
-			return 0;
-		}
-	}
-
 }
