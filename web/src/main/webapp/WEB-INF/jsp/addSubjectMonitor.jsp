@@ -7,6 +7,7 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -189,9 +190,7 @@
                             </div>
                         </td>
                         <td>
-                            <a href="#!" onclick="$('#enrollmentDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                            <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" />
-                        </a>
+							<ui:calendarIcon onClickSelector="'#enrollmentDateField'" imageId="enrollmentDateTrigger" />
                             *
                         </td>
                     </tr>
@@ -265,9 +264,7 @@
                         </div>
                     </td>
                     <td>
-                        <a href="#!" onclick="$('#dobField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                            <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
-                        </a>
+						<ui:calendarIcon onClickSelector="'#dobField'" imageId="dobTrigger"/>
                     </td>
                     <td>* </td>
                 </tr>
@@ -372,9 +369,8 @@
                         </div>
                     </td>
                     <td>
-                        <a href="#!" onclick="$('#enrollmentDateField2').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                            <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger2"/>
-                        </a>*
+						<ui:calendarIcon onClickSelector="'#enrollmentDateField2'" imageId="enrollmentDateTrigger2"/>
+                        *
                     </td>
                 </tr>
                 <tr>

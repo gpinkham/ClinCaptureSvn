@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <html>
 <head><title>SDV Subject</title>
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
@@ -150,17 +151,13 @@
                                 <td>
                                     <div class="formfieldS_BG" style="width:157px" style="margin-right:10px">
                                         <input type="text" name="startUpdatedDate" value="<c:out value="${startUpdatedDate}"/>" class="formfieldS" id="startUpdatedDateField">
-                                        <a href="#!" onclick="$('#startUpdatedDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                                            <img src="../images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
-                                        </a>
+										<ui:calendarIcon onClickSelector="'#startUpdatedDateField'"/>
                                     </div>
                                 </td>
                                 <td><div><fmt:message key="To" bundle="${resword}"/></div></td>
                                 <td><div class="formfieldS_BG" style="width:157px">
-                                    <input type="text" name="endDate" value="<c:out value="${endDate}"/>" class="formfieldS" id="endDateField">
-                                    <a href="#!" onclick="$('#endDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                                    <img src="../images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
-                                    </a>
+										<input type="text" name="endDate" value="<c:out value="${endDate}"/>" class="formfieldS" id="endDateField">
+										<ui:calendarIcon onClickSelector="'#endDateField'" />
                                     </div>
                                 </td>
                             </tr>

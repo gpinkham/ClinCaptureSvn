@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
@@ -523,9 +524,7 @@
                     </c:otherwise>
                 </c:choose>
                 </span>
-                <a href="#!" onclick="$('#interviewDate').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                    <img style="vertical-align: middle;" src="<c:out value="${contextPath}" />/images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
-                </a>
+				<ui:calendarIcon onClickSelector="'#interviewDate'" />
                 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
                     <c:set var="isNewDNDate" value="${hasDateNote eq 'yes' ? 0 : 1}"/>
                 <c:choose>

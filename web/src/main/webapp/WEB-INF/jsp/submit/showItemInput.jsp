@@ -2,6 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
  
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -561,9 +563,7 @@ function changeImage(obj) {
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
-      <a href="#!" onclick="$(getSib(this.previousSibling)).datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');" NAME="anchor<c:out value="${itemId}"/>" ID="anchor<c:out value="${itemId}"/>">
-        <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" ID="anchor<c:out value="${itemId}"/>"/>
-      </a>
+	  <ui:calendarIcon onClickSelector="getSib(this.previousSibling)" linkName="anchor${itemId}" linkId="anchor${itemId}" imageId="anchor${itemId}"/>
     <c:set var="numOfDate" value="${numOfDate+1}"/>
   </c:if>
 </c:if>

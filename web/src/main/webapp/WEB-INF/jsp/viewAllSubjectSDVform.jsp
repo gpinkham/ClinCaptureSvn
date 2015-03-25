@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -180,17 +181,13 @@
                             <td>
                                 <div class="formfieldS_BG" style="width:157px">
                                     <input type="text" name="startUpdatedDateField" value="${startUpdatedDate}" class="formfieldS" id="startUpdatedDateField">
-                                    <a href="#!" onclick="$('#startUpdatedDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                                        <img src="../images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
-                                    </a>
+									<ui:calendarIcon onClickSelector="'#startUpdatedDateField'"/>
                                 </div>
                             </td>
                             <td><div><b><fmt:message key="To" bundle="${resword}"/></b></div></td>
                             <td><div class="formfieldS_BG" style="width:157px">
                                 <input type="text" name="endDate" value="${endDate}" class="formfieldS" id="endDateField">
-                                <a href="#!" onclick="$('#endDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                                    <img src="../images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
-                                </a>
+								<ui:calendarIcon onClickSelector="'#endDateField'" />
                             </div>
                             </td>
                         </tr>

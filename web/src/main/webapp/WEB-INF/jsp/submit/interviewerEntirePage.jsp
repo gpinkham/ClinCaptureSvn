@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -222,9 +223,6 @@
     <td class="table_cell_top" style="color: #789EC5">
         <b><fmt:message key="date_of_birth" bundle="${resword}"/>:</b><br />
     </td>
-
-    <%-- BWP>>5/24/07 : moved Gender in span tag to next to DOB --%>
-
     <td class="table_cell_noborder" style="color: #789EC5">
         <fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}" />
         <c:if test="${genderShow}">
@@ -241,17 +239,9 @@
     </td>
 
     <td class="table_cell_noborder" style="color: #789EC5">
-        <!--<b>Gender:</b>-->
     </td>
 
     <td class="table_cell_noborder" style="color: #789EC5;padding-left:3px">
-        <%--<c:choose>
-          <c:when test="${subject.gender==109}">M</c:when>
-          <c:when test="${subject.gender==102}">F</c:when>
-          <c:otherwise>
-            <c:out value="${subject.gender}" />
-          </c:otherwise>
-        </c:choose>--%>
     </td>
 </tr>
 <c:if test="${toc.studyEventDefinition.repeating}">
@@ -270,27 +260,6 @@
 
     </tr>
 </c:if>
-<%--<tr>
-  <td class="table_cell_noborder" style="color: #789EC5">
-
-  </td>
-  <td class="table_cell_noborder" style="color: #789EC5">
-  </td>
-  <td class="table_cell_top" style="color: #789EC5">
-    <b>${genderLabel}:</b>
-  </td>
-  <td class="table_cell_noborder" style="color: #789EC5">
-    <c:choose>
-      <c:when test="${subject.gender==109}">M</c:when>
-      <c:when test="${subject.gender==102}">F</c:when>
-      <c:otherwise>
-        <c:out value="${subject.gender}" />
-      </c:otherwise>
-    </c:choose>
-  </td>
-</tr>--%>
-<%-- find out whether the item is involved with an error message, and if so, outline the
-form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
 <c:forEach var="frmMsg" items="${formMessages}">
     <c:if test="${frmMsg.key eq 'interviewer'}">
@@ -348,9 +317,6 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                                    value="<c:out value="${interviewer}" />">
                             </c:otherwise>
                             </c:choose></div>
-                        <%--BWP>>new error message design:  <jsp:include page="../showMessage.jsp">
-                          <jsp:param name="key" value="interviewer" />
-                        </jsp:include>--%>
             </td>
             <td valign="top" nowrap>
                 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
@@ -381,14 +347,12 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
     <c:choose>
         <c:when test="${isInError_Dat}">
             <fmt:message key="interview_date" bundle="${resword}"/>: <span class="aka_exclaim_error">! </span>&nbsp;<br />
-            <%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%>
         </c:when>
         <c:otherwise>
             <fmt:message key="interview_date" bundle="${resword}"/>:
             <c:if test="${study.studyParameterConfig.interviewDateRequired=='yes'}">
                 *
             </c:if>&nbsp;<br />
-            <%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%>
         </c:otherwise>
     </c:choose>
 </td><!--</a>-->
@@ -425,15 +389,9 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                             </c:choose>
 
                         </div>
-                        <%-- BWP>>new error message design: <jsp:include page="../showMessage.jsp">
-                          <jsp:param name="key" value="interviewDate" />
-                        </jsp:include>--%>
             </td>
-            <%--        document.getElementById('testdiv1').style.top=(parseInt(document.getElementById('testdiv1').style.top) - 10)+'px'; --%>
             <td valign="top" nowrap>
-
-                <a href="#!" onclick="$('#interviewDate').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" /></a>
+				<ui:calendarIcon onClickSelector="'#interviewDate'"/>
                 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
                     <%--BWP: 2808 related>> --%>
                     <c:if test="${! (enclosingPage eq 'viewSectionData')}">

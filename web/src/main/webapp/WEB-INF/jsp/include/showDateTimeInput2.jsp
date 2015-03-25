@@ -5,6 +5,7 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -54,9 +55,7 @@
     </div>
 </td>
 <td valign="top" style="width: 30px;">
-    <a href="#!" onclick="$('#${prefix}dateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-        <img class="showCalendar" src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
-    </a>
+	<ui:calendarIcon onClickSelector="'#${prefix}dateField'" />
 </td>
 
 <td valign="top" style="${timeAdditionalStyle}">

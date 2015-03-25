@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -53,10 +54,7 @@
 	<input tabindex="<c:out value="${tabNum}"/>" style="background:white;color:#4D4D4D;" onChange=
     "this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="input<c:out value="${itemId}" />" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
 	<c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
-        <a href="#!" onclick="$(getSib(this.previousSibling)).datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');" NAME="anchor<c:out value="${itemId}"/>" ID="anchor<c:out value="${itemId}"/>">
-            <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" />
-        </a>
-	 <%-- TODO l10n for the above line? --%>
+		<ui:calendarIcon onClickSelector="getSib(this.previousSibling)" linkName="anchor${itemId}" linkId="anchor${itemId}"/>
 	 <c:set var="numOfDate" value="${numOfDate+1}" />
 	</c:if>
 </c:if>

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -337,9 +338,7 @@
 		</jsp:include>
 	</td>
 	<td>
-        <a href="#!" onclick="$('#protocolDateVerificationField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-            <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
-		</a>
+		<ui:calendarIcon onClickSelector="'#protocolDateVerificationField'"/>
 	</td>
 </tr>
 
@@ -353,9 +352,7 @@
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDate"/></jsp:include>
 	</td>
 	<td>
-        <a href="#!" onclick="$('#startDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-        <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
-		</a>
+		<ui:calendarIcon onClickSelector="'#startDateField'"/>
 		*
 	</td>
 </tr>
@@ -370,9 +367,7 @@
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="endDate"/></jsp:include>
 	</td>
 	<td>
-        <a href="#!" onclick="$('#endDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-            <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
-		</a>
+		<ui:calendarIcon onClickSelector="'#endDateField'"/>
 	</td>
 </tr>
 

@@ -2,9 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
-
-
-
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -261,11 +259,8 @@
                     ><script>spliceAndReturn('${mapEntry.key}')</script></a>:</td>
                 <td style="color: #789EC5;"><input name="${mapEntry.key}" value="${mapEntry.value}" id="${mapEntry.key}"/>
                 <c:if test="${dibItemDataType == 9 }">
-                    <a href="#!" onclick="$('[id=${mapEntry.key}]').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                        <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" />
-                    </a>
-                </td>     
-                
+					<ui:calendarIcon onClickSelector="'[id=${mapEntry.key}]'"/>
+                </td>
                 </c:if>
             </tr>
             <tr>
@@ -273,9 +268,6 @@
                <td colspan="2">&nbsp;<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${mapEntry.key}" /></jsp:include></td>
            </tr>
         </c:forEach>
-
-
-
     </table>
     </div>
     </div>

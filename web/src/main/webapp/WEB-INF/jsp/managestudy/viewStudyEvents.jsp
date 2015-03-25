@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -169,12 +170,7 @@
                                                         </jsp:include>
                                                     </td>
                                                     <td>
-                                                        <a href="#!" onclick="$('#startDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                                                        <img src="images/bt_Calendar.gif"
-                                                             alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
-                                                             title="<fmt:message key="show_calendar" bundle="${resword}"/>"
-                                                             border="0"/>
-                                                    </a>
+														<ui:calendarIcon onClickSelector="'#startDateField'"/>
                                                         (<fmt:message key="date_format" bundle="${resformat}"/>)
                                                     </td>
                                                     <td>&nbsp;&nbsp;<fmt:message key="date_ended"
@@ -190,13 +186,7 @@
                                                         </jsp:include>
                                                     </td>
                                                     <td>
-                                                        <a href="#!" onclick="$('#endDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                                                        <img src="images/bt_Calendar.gif"
-                                                             alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
-                                                             title="<fmt:message key="show_calendar" bundle="${resword}"/>"
-                                                             border="0"/>
-
-                                                    </a> (<fmt:message key="date_format" bundle="${resformat}"/>)
+														<ui:calendarIcon onClickSelector="'#endDateField'"/> (<fmt:message key="date_format" bundle="${resformat}"/>)
                                                     </td>
                                                 </tr>
                                                 <tr>

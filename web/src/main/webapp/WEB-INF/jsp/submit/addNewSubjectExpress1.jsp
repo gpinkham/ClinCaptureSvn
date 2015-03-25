@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -92,10 +93,7 @@
 					<span class="formlabel">*</span></td>
 					 <c:set var="tabCount" value="${tabCount+1}"/>
 				     <td valign="top">
-                         <a href="#!" onclick="$('#enrollmentDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                         <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
-                         </a>
-
+						 <ui:calendarIcon onClickSelector="'#enrollmentDateField'"/>
                     </td>
 				</tr>
 			</table>
@@ -137,10 +135,7 @@
 						&nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="DOB" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="dob" size="20" value="<fmt:message key="DOB" bundle="${resword}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield" id="dobField" ><span class="formlabel">*</span>
 						</td>
 						 <td valign="top" align="left">
-                             <a href="#!" onclick="$('#dobField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                             <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" />
-                             </a>
-
+							 <ui:calendarIcon onClickSelector="'#dobField'"/>
                         </c:when>
 					    <c:when test="${study.studyParameterConfig.collectDob == '2'}">
 					     &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="YOB" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="yob" size="15" value="YOB: YYYY" class="formfield" tabindex="<c:out value="${tabCount}"/>"/><span class="formlabel">*</span>
@@ -163,40 +158,20 @@
 			  <span class="formlabel">*</span></td>
 					 <c:set var="tabCount" value="${tabCount+1}"/>
 				     <td valign="top">
-                         <a href="#!" onclick="$('#enrollmentDateField2').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                            <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" />
-                         </a>
-                      </td>
+						 <ui:calendarIcon onClickSelector="'#enrollmentDateField2'"/>
+                     </td>
               </tr>
             </table>
              </td>
 			<td valign="top" nowrap align="right" colspan="8" class="table_cell"><a href="AddNewSubject"><fmt:message key="enter_full_record_details" bundle="${resword}"/></a></td>
 		</tr>
 	    </form>
-
-
-
-
 		<!-- End Data -->
-
-
-
-
 		</table>
-
 		<!-- End Table Contents -->
 		</td>
-
 	</tr>
-
-
-
-
-
   </table>
-
-
-
  <!-- End Table 0 -->
 </div>
 </div></div></div></div></div></div></div></div>

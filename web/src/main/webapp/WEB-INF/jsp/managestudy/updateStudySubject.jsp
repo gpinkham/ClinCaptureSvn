@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 
@@ -160,10 +161,7 @@
 																	</td>
 																	
 																	<td valign="top">
-                                                                        <a href="#!" onclick="$('#enrollmentDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
-                                                                        <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
-																					title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
-																		</a> 
+																		<ui:calendarIcon onClickSelector="'#enrollmentDateField'"/>
 																		<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 																			<c:choose>
 																				<c:when test="${hasNotes}">
