@@ -90,7 +90,8 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
 
     }
 
-    @Transactional
+	@Transactional
+	@SuppressWarnings("unchecked")
     public T findByColumnName(Object id, String key) {
         String query = "from " + getDomainClassName() + " do where do." + key + "= ?";
         org.hibernate.Query q = getCurrentSession().createQuery(query);

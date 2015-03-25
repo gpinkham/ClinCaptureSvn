@@ -13,12 +13,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
 import java.util.List;
 
 /**
  * ResolutionStatus.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "resolution_status")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "resolution_status_resolution_status_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)

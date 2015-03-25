@@ -16,6 +16,7 @@ import javax.persistence.Table;
  * DnEventCrfMap.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "dn_event_crf_map")
 public class DnEventCrfMap extends DataMapDomainObject {
 

@@ -14,12 +14,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
 import java.io.Serializable;
 
 /**
  * DnStudyEventMap.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "dn_study_event_map")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DnStudyEventMap implements MutableDomainObject, Serializable {

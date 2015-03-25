@@ -11,12 +11,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
 import java.util.List;
 
 /**
  * ItemDataType.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "item_data_type")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "item_data_type_item_data_type_id_seq")})
 public class ItemDataType extends DataMapDomainObject {

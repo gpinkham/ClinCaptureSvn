@@ -8,7 +8,8 @@ import org.junit.Test;
 
 public class EditUserTest extends BaseTest {
 
-    @Test
+    @SuppressWarnings("deprecation")
+	@Test
     public void testPhoneNumberChange() throws Exception {
         login(ROOT, ROOT_PASSWORD);
 

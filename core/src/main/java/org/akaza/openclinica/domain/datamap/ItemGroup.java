@@ -21,6 +21,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import java.util.List;
  * ItemGroup.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "item_group", uniqueConstraints = @UniqueConstraint(columnNames = "oc_oid"))
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "item_group_item_group_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)

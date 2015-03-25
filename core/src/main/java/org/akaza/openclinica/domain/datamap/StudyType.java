@@ -9,13 +9,14 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * StudyType.
  */
-
+@SuppressWarnings("serial")
 @Table(name = "study_type")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StudyType extends DataMapDomainObject {
@@ -58,7 +59,7 @@ public class StudyType extends DataMapDomainObject {
         return this.studies;
     }
 
-    public void setStudies(Set studies) {
+    public void setStudies(Set<Study> studies) {
         this.studies = studies;
     }
 

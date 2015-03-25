@@ -19,12 +19,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
 import java.util.Date;
 
 /**
  * EventDefinitionCrf.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "event_definition_crf")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "event_definition_crf_event_definition_crf_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)

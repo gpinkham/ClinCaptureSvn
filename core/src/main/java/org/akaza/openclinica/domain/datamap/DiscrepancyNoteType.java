@@ -13,12 +13,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
 import java.util.List;
 
 /**
  * DiscrepancyNoteType bean.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "discrepancy_note_type")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "discrepancy_note_type_discrepancy_note_type_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)

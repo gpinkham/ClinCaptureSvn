@@ -22,7 +22,7 @@ import org.openqa.selenium.server.SeleniumServer;
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.SeleneseTestBase;
 import com.thoughtworks.selenium.Selenium;
-
+@SuppressWarnings("deprecation")
 public class BaseTest extends SeleneseTestBase {
 
 	public static final int DELAY = 100;

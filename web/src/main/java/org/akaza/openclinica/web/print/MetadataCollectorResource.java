@@ -25,8 +25,6 @@ public class MetadataCollectorResource {
     private static final int INDENT_LEVEL = 2;
     private DataSource dataSource;
 
-    private StudyDAO studyDao;
-
     private RuleSetRuleDao ruleSetRuleDao;
 
     private CoreResources coreResources;
@@ -58,7 +56,6 @@ public class MetadataCollectorResource {
 
 
     public void setStudyDao(StudyDAO studyDao) {
-        this.studyDao = studyDao;
     }
 
 

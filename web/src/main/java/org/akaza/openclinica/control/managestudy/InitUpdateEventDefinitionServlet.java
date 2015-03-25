@@ -47,7 +47,6 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.util.EventDefinitionInfo;
 import org.akaza.openclinica.view.Page;
@@ -167,7 +166,6 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 			// Get list of child EventDefinitionCRFs for cascading actions
 			ArrayList<EventDefinitionCRFBean> childEventDefCRFs = edao.findAllChildrenByDefinition(defId);
 
-			ItemFormMetadataDAO itemFormMetadataDao = getItemFormMetadataDAO();
 			CRFVersionDAO cvdao = getCRFVersionDAO();
 			CRFDAO cdao = getCRFDAO();
 			ArrayList newEventDefinitionCRFs = new ArrayList();

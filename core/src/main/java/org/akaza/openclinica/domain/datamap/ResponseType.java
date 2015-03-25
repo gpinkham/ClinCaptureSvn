@@ -10,12 +10,14 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
 import java.util.List;
 
 /**
  * ResponseType.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "response_type")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ResponseType extends DataMapDomainObject {

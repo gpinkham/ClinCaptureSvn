@@ -21,16 +21,15 @@
 
 package org.akaza.openclinica.domain.datamap;
 
-import org.akaza.openclinica.domain.AbstractMutableDomainObject;
-import org.hibernate.annotations.*;
-import org.hibernate.annotations.Cache;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+
+import org.akaza.openclinica.domain.AbstractMutableDomainObject;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  * MeasurementUnit.

@@ -31,7 +31,6 @@ import com.clinovo.util.CrfShortcutsAnalyzer;
  * @author Sergey Kirpichenok
  *
  */
-@SuppressWarnings({"unused"})
 public interface ItemSDVService {
 
 	public static final String YES = "yes";

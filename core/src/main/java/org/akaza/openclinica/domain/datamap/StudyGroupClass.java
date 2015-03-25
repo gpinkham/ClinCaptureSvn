@@ -1,7 +1,6 @@
 package org.akaza.openclinica.domain.datamap;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
-import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -15,12 +14,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
 import java.util.Date;
 
 /**
  * StudyGroupClass.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "study_group_class")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "study_group_class_study_group_class_id_seq")})
 public class StudyGroupClass extends DataMapDomainObject {
@@ -28,7 +29,6 @@ public class StudyGroupClass extends DataMapDomainObject {
     private int studyGroupClassId;
     private UserAccount userAccount;
     private GroupClassTypes groupClassTypes;
-    private Status status;
     private String name;
     private Integer studyId;
     private Date dateCreated;

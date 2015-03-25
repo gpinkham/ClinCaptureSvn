@@ -37,7 +37,7 @@ import org.akaza.openclinica.util.SignedData;
 /**
  * SubjectEventStatusUtil class.
  */
-@SuppressWarnings({"unchecked", "unused"})
+@SuppressWarnings({"unchecked"})
 public final class SubjectEventStatusUtil {
 
 	private static HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>();

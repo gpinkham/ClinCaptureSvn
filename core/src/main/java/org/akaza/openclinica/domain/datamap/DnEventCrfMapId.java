@@ -9,6 +9,7 @@ import javax.persistence.Embeddable;
  * DnEventCrfMapId.
  */
 @Embeddable
+@SuppressWarnings("serial")
 public class DnEventCrfMapId extends DataMapDomainObject {
 
     private Integer eventCrfId;

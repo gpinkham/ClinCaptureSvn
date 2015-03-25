@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ import java.util.Set;
  * StudyGroup.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "study_group")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "study_group_study_group_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -30,7 +32,7 @@ public class StudyGroup extends DataMapDomainObject {
     private StudyGroupClass studyGroupClass;
     private String name;
     private String description;
-    private Set<SubjectGroupMap> subjectGroupMaps = new HashSet(0);
+    private Set<SubjectGroupMap> subjectGroupMaps = new HashSet<SubjectGroupMap>(0);
 
     @Id
     @Column(name = "study_group_id", unique = true, nullable = false)

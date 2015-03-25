@@ -17,22 +17,8 @@ import org.junit.Test;
 
 import com.clinovo.clincapture.selenium.base.BaseTest;
 
-/**
- * User: Pavel Date: 11.11.12
- */
+@SuppressWarnings("deprecation")
 public class CrcLoginTest extends BaseTest {
-
-	// commented because apni_crc1 locked
-	/**
-	 * ticket #80, #97 Login as apni_crc1 gives the Oops page
-	 * 
-	 * @throws Exception
-	 */
-	// @Test
-	// public void testCrcLogin() throws Exception {
-	// login(CRC, CRC_PASSWORD);
-	// assertTextPresented("Welcome to");
-	// }
 
 	/**
 	 * ticket #115 Entering invalid user name causes stack dump

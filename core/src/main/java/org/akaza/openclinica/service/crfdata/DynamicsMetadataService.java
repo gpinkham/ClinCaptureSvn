@@ -16,6 +16,7 @@ package org.akaza.openclinica.service.crfdata;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.EventCRFUtil;
 import com.clinovo.util.SubjectEventStatusUtil;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -68,6 +69,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
+
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,7 +77,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
 public class DynamicsMetadataService implements MetadataServiceInterface {
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private static final String ESCAPED_SEPERATOR = "\\.";

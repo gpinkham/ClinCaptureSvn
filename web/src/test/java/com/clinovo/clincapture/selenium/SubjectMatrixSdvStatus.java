@@ -14,11 +14,10 @@
 package com.clinovo.clincapture.selenium;
 
 import com.clinovo.clincapture.selenium.base.BaseTest;
+
 import org.junit.Test;
 
-/**
- * User: Pavel Date: 01.12.12
- */
+@SuppressWarnings("deprecation")
 public class SubjectMatrixSdvStatus extends BaseTest {
 
 	public static final String EVENT_NAME = "First Office Visit/Screening";

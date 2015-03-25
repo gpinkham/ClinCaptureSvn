@@ -12,7 +12,7 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
 		return StudySubject.class;
 	}
 
-	@SuppressWarnings({"rawtypes", "unchecked"})
+	@SuppressWarnings("unchecked")
 	public ArrayList<StudyEvent> fetchListSEs(String id) {
 		String query = " from StudyEvent se where se.studySubject.ocOid = :id order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
 		org.hibernate.Query q = getCurrentSession().createQuery(query);

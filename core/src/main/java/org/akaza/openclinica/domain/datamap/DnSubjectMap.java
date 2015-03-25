@@ -18,6 +18,7 @@ import javax.persistence.Table;
  * DnSubjectMap.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "dn_subject_map")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DnSubjectMap extends DataMapDomainObject {

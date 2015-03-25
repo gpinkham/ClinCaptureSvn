@@ -14,8 +14,9 @@
 package com.clinovo.clincapture.selenium;
 
 import org.junit.Test;
-import com.clinovo.clincapture.selenium.base.BaseTest;
 
+import com.clinovo.clincapture.selenium.base.BaseTest;
+@SuppressWarnings("deprecation")
 public class ReasonForChangeTest extends BaseTest {
 
 	@Test

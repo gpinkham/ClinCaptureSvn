@@ -49,11 +49,6 @@ import com.clinovo.service.CodedItemService;
 import com.clinovo.util.PageMessagesUtil;
 import com.clinovo.util.SessionUtil;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  * CompleteCRFDeleteController that handles requests from the delete crf page.

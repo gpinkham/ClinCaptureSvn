@@ -16,7 +16,7 @@ package com.clinovo.clincapture.selenium;
 import org.junit.Test;
 
 import com.clinovo.clincapture.selenium.base.BaseTest;
-
+@SuppressWarnings("deprecation")
 public class NewStudyParameterTest extends BaseTest {
 
 	@Test

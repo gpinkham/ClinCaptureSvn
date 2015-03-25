@@ -25,7 +25,7 @@ public class UserType  extends DataMapDomainObject implements java.io.Serializab
 	private static final long serialVersionUID = 1L;
 	private int userTypeId;
 	private String userType;
-	private Set<UserAccount> userAccounts = new HashSet(0);
+	private Set<UserAccount> userAccounts = new HashSet<UserAccount>(0);
 
 	@Id
 	@Column(name = "user_type_id", unique = true, nullable = false)

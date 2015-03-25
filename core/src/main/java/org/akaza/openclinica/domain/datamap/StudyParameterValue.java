@@ -21,7 +21,6 @@ import javax.persistence.Table;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StudyParameterValue extends AbstractMutableDomainObject {
 
-    private StudyParameterValueId id;
     private Study study;
     private StudyParameter studyParameter;
 

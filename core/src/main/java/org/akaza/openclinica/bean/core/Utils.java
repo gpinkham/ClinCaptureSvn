@@ -40,7 +40,6 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
-@SuppressWarnings("unused")
 public final class Utils {
 
 	private static Utils ref;

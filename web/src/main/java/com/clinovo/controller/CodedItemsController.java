@@ -101,7 +101,6 @@ public class CodedItemsController {
 
 	private static final String BIOONTOLOGY_URL = "http://bioportal.bioontology.org";
 	private static final String BIOONTOLOGY_WS_URL = "http://data.bioontology.org";
-	private static final int COUNTRY_INDEX = 4;
 
 	/**
 	 * Handle for retrieving all the coded items.

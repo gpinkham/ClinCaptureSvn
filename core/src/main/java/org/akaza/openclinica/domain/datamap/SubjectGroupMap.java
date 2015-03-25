@@ -1,7 +1,6 @@
 package org.akaza.openclinica.domain.datamap;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
-import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -30,7 +29,6 @@ public class SubjectGroupMap extends DataMapDomainObject {
     private UserAccount userAccount;
     private StudySubject studySubject;
     private StudyGroupClass studyGroupClass;
-    private Status status;
     private StudyGroup studyGroup;
     private Date dateCreated;
     private Date dateUpdated;

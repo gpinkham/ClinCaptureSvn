@@ -1,6 +1,7 @@
 package com.clinovo.tag;
 
 import com.clinovo.util.SessionUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -12,11 +13,13 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
+
 import java.util.Locale;
 
 /**
  * Tag that will generate icon for calendar.
  */
+@SuppressWarnings("serial")
 public class CalendarIconTag extends TagSupport {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarTag.class);

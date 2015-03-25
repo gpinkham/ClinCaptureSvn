@@ -6,6 +6,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 
 import javax.sql.DataSource;
+
 import java.util.ArrayList;
 
 /**
@@ -20,6 +21,7 @@ public final class EventDefinitionCRFUtil {
 	 * @param ds DataSource
 	 * @param deletedCRFVersionId int
 	 */
+	@SuppressWarnings("unchecked")
 	public static void setDefaultCRFVersionInsteadOfDeleted(DataSource ds, int deletedCRFVersionId) {
 
 		EventDefinitionCRFDAO eventCRFDAO = new EventDefinitionCRFDAO(ds);

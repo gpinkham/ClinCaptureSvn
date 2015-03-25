@@ -17,9 +17,7 @@ import org.junit.Test;
 
 import com.clinovo.clincapture.selenium.base.BaseTest;
 
-/**
- * User: Pavel Date: 11.11.12
- */
+@SuppressWarnings("deprecation")
 public class InterviewerNameDNTest extends BaseTest {
 
 	/**

@@ -60,7 +60,7 @@ import com.clinovo.util.SubjectEventStatusUtil;
  *
  */
 @Service
-@SuppressWarnings({"unchecked", "unused"})
+@SuppressWarnings({"unchecked"})
 public class ItemSDVServiceImpl implements ItemSDVService {
 
 	@Autowired

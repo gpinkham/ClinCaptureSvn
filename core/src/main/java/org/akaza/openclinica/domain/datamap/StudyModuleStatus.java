@@ -3,7 +3,6 @@ package org.akaza.openclinica.domain.datamap;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -14,7 +13,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
-import org.akaza.openclinica.domain.datamap.Study;
 
 /**
  * StudyModuleStatus.

@@ -2,6 +2,7 @@ package com.clinovo.dao;
 
 import com.clinovo.model.MedicalProduct;
 import com.clinovo.util.HibernateUtil;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -18,7 +19,8 @@ public class MedicalProductDAO {
      * @param mpn the medical product name for search.
      * @return the list of medical product information.
      */
-    public List<MedicalProduct> findByMedicalProductName(String mpn) {
+    @SuppressWarnings("unchecked")
+	public List<MedicalProduct> findByMedicalProductName(String mpn) {
 
             Query q = getCurrentSession().createQuery(
                     "from MedicalProduct p where p.drugName like :mpn or p.drugName = :mpnFull");

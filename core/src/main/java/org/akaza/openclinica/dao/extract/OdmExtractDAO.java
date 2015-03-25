@@ -1236,7 +1236,6 @@ public class OdmExtractDAO extends DatasetDAO {
         logger.debug("getStudyEventAndFormMetaOC1_3SQl= " + this.getStudyEventAndFormMetaOC1_3Sql(parentStudyId, studyId, isIncludedSite));
         ArrayList rows = this.select(this.getStudyEventAndFormMetaOC1_3Sql(parentStudyId, studyId, isIncludedSite));
         Iterator iter = rows.iterator();
-        String sedOIDs = "";
         while (iter.hasNext()) {
             HashMap row = (HashMap) iter.next();
             Integer cvId = (Integer) row.get("crf_version_id");

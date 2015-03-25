@@ -1,13 +1,7 @@
 package org.akaza.openclinica.domain.datamap;
 
-import org.akaza.openclinica.domain.DataMapDomainObject;
-import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.user.UserAccount;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
+import java.util.Date;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,18 +12,25 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import java.util.Date;
-import java.util.List;
+
+import org.akaza.openclinica.domain.DataMapDomainObject;
+import org.akaza.openclinica.domain.Status;
+import org.akaza.openclinica.domain.user.UserAccount;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
 
 /**
  * ItemData.
  */
 @Entity
 @Table(name = "item_data")
+@SuppressWarnings("serial")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "event_definition_crf_event_definition_crf_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ItemData extends DataMapDomainObject {

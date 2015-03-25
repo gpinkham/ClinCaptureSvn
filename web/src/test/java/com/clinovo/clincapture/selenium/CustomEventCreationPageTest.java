@@ -14,24 +14,17 @@
 package com.clinovo.clincapture.selenium;
 
 import com.clinovo.clincapture.selenium.base.BaseTest;
+
 import org.junit.After;
 import org.junit.Test;
 
-/**
- * User: Pavel Date: 20.11.12
- */
+@SuppressWarnings("deprecation")
 public class CustomEventCreationPageTest extends BaseTest {
 
 	private static String START_DATE_TIME_LABEL = "Start Date/Time";
 	private static String END_DATE_TIME_LABEL = "End Date/Time";
 
 	public static String POSTFIX = " modified";
-
-	/**
-	 * ClinCapture #12 Customizing the Event Creation page/panel
-	 * 
-	 * @throws Exception
-	 */
 
 	@Test
 	public void testLabels() throws Exception {

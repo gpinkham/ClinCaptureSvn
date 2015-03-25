@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * EscapeTag.
  */
+@SuppressWarnings("serial")
 public class EscapeTag extends TagSupport {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EscapeTag.class);

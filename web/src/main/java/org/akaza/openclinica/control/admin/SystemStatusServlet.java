@@ -33,7 +33,6 @@ import com.clinovo.util.SystemStatusUtil;
 /**
  * SystemStatusServlet allows both deletion and restoration of a study user role.
  */
-@SuppressWarnings("unchecked")
 @Component
 public class SystemStatusServlet extends Controller {
 

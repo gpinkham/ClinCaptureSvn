@@ -46,7 +46,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -157,7 +156,6 @@ public class InitUpdateSubStudyServlet extends Controller {
 	private void createEventDefinitions(HttpServletRequest request, StudyBean parentStudy) {
 		int siteId = Integer.parseInt(request.getParameter("id").trim());
 		ArrayList<StudyEventDefinitionBean> seds;
-		ItemFormMetadataDAO itemFormMetadataDao = getItemFormMetadataDAO();
 		StudyEventDefinitionDAO sedDao = getStudyEventDefinitionDAO();
 		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 		CRFVersionDAO cvdao = getCRFVersionDAO();

@@ -8,12 +8,14 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
 import java.util.List;
 
 /**
  * GroupClassTypes.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "group_class_types")
 public class GroupClassTypes extends DataMapDomainObject {
 

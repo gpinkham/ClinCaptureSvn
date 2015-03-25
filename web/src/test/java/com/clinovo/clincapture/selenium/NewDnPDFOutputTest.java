@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import com.clinovo.clincapture.selenium.base.BaseTest;
 
+@SuppressWarnings("deprecation")
 public class NewDnPDFOutputTest extends BaseTest {
 
 	@Test

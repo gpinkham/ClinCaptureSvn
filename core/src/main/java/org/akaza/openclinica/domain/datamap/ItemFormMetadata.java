@@ -19,6 +19,7 @@ import javax.persistence.Table;
  * ItemFormMetadata.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "item_form_metadata")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "item_form_metadata_item_form_metadata_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)

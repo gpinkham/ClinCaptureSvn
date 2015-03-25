@@ -33,7 +33,6 @@ import com.clinovo.util.CrfShortcutsAnalyzer;
  */
 @Controller
 @RequestMapping("/sdvItem")
-@SuppressWarnings("unchecked")
 public class SDVItemController {
 
 	public static final String ACTION = "action";

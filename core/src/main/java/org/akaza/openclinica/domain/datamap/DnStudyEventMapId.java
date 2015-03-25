@@ -9,6 +9,7 @@ import javax.persistence.Embeddable;
  * DnStudyEventMapId.
  */
 @Embeddable
+@SuppressWarnings("serial")
 public class DnStudyEventMapId extends DataMapDomainObject {
 
     private Integer studyEventId;

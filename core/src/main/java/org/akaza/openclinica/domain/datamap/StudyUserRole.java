@@ -18,11 +18,11 @@ import javax.persistence.Table;
 /**
  * StudyUserRole.
  */
+@SuppressWarnings("serial")
 @Table(name = "study_user_role")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StudyUserRole extends DataMapDomainObject {
 
-    private StudyUserRoleId id;
     private UserAccount userAccount;
 
     private Study study;

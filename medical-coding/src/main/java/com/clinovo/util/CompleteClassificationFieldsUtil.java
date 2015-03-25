@@ -48,7 +48,7 @@ public final class CompleteClassificationFieldsUtil {
 	 */
 	public static void completeClassificationNameFields(ArrayList<ClassificationElement> classificationElements, String dictionary) throws SearchException {
 
-		ArrayList dictionaryValuesList;
+		ArrayList<?> dictionaryValuesList;
 
 		if (dictionary.equals(ICD9CM) || dictionary.equals(ICD10)) {
 			dictionaryValuesList = new ArrayList<ICD910>(Arrays.asList(ICD910.values()));
@@ -122,7 +122,7 @@ public final class CompleteClassificationFieldsUtil {
 	 * @param ontologyName ontology for search.
 	 * @return the list with ontology elements or null.
 	 */
-	public static List getEnumAsList(String ontologyName) {
+	public static List<?> getEnumAsList(String ontologyName) {
 		if (ontologyName.equals(MEDDRAC)) {
 			return Arrays.asList(MEDDRA.values());
 		} else if (ontologyName.equals("ICD_10") || ontologyName.equals("ICD_9CM")) {

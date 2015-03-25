@@ -62,7 +62,6 @@ public class LegacyJobConverterJob extends QuartzJobBean {
 	public static final String JOB_DESC = "jobDesc";
 	public static final String PERIOD = "periodToRun";
 
-	@SuppressWarnings("null")
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		try {
 			// Pulling all the trigger under the DEFAULT group

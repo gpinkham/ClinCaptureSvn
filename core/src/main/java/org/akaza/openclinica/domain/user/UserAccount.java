@@ -31,10 +31,7 @@ import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudyGroupClass;
 import org.akaza.openclinica.domain.datamap.StudySubject;
-import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.Subject;
-import org.akaza.openclinica.domain.datamap.SubjectGroupMap;
-import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -73,7 +70,6 @@ public class UserAccount extends DataMapDomainObject {
     private boolean accountNonLocked;
     private int lockCounter;
     private boolean runWebservices;
-    private List userRoleAccesses;
     private List<Item> items;
     private List<Section> sections;
     private List<ItemGroup> itemGroups;
@@ -85,20 +81,12 @@ public class UserAccount extends DataMapDomainObject {
     private List<StudyGroupClass> studyGroupClasses;
     private List<StudyEventDefinition> studyEventDefinitions;
     private List<Subject> subjects;
-    private List<SubjectGroupMap> subjectGroupMaps;
-    private List<AuditUserLoginBean> auditUserLogins;
     private List<DiscrepancyNote> discrepancyNotesForOwnerId;
-    private List<StudyUserRole> studyUserRoles;
-    private List decisionConditions;
     private List<ItemData> itemDatas;
-    private List filters;
     private List<Study> studies;
-    private List datasets;
     private List<EventCrf> eventCrfs;
     private List<StudyEvent> studyEvents;
     private List<CrfVersion> crfVersions;
-    private Integer version;
-
     @Id
     @Column(name = "user_id", unique = true, nullable = false)
     public int getUserId() {
@@ -367,7 +355,7 @@ public class UserAccount extends DataMapDomainObject {
     }
 
     public void setDiscrepancyNotesForAssignedUserId(
-            List discrepancyNotesForAssignedUserId) {
+            List<DiscrepancyNote> discrepancyNotesForAssignedUserId) {
         this.discrepancyNotesForAssignedUserId = discrepancyNotesForAssignedUserId;
     }
 

@@ -21,6 +21,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +30,7 @@ import java.util.Set;
  * CrfVersion.
  */
 @Entity
+@SuppressWarnings("serial")
 @Table(name = "crf_version", uniqueConstraints = @UniqueConstraint(columnNames = "oc_oid"))
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "crf_version_crf_version_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)

@@ -41,7 +41,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -155,7 +154,6 @@ public class AddCRFToDefinitionServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 
 		FormProcessor fp = new FormProcessor(request);
-		ItemFormMetadataDAO itemFormMetadataDao = getItemFormMetadataDAO();
 		CRFVersionDAO vdao = getCRFVersionDAO();
 		ArrayList crfArray = new ArrayList();
 		Map tmpCRFIdMap = (HashMap) request.getSession().getAttribute("tmpCRFIdMap");

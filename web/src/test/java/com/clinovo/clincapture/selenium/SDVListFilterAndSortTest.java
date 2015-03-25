@@ -14,15 +14,14 @@
 package com.clinovo.clincapture.selenium;
 
 import com.clinovo.clincapture.selenium.base.BaseTest;
+
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * User: Pavel Date: 02.12.12
- */
+@SuppressWarnings("deprecation")
 public class SDVListFilterAndSortTest extends BaseTest {
 
 	public static final String REQUIRED_PARTIAL_REQUIRED = "100% Required & Partial Required";

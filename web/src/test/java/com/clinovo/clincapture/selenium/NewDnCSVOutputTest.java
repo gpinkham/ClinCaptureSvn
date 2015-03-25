@@ -14,8 +14,10 @@
 package com.clinovo.clincapture.selenium;
 
 import com.clinovo.clincapture.selenium.base.BaseTest;
+
 import org.junit.Test;
 
+@SuppressWarnings("deprecation")
 public class NewDnCSVOutputTest extends BaseTest {
 
 	@Test

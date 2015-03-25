@@ -10,8 +10,7 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +19,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "section")
+@SuppressWarnings("serial")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "section_section_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Section extends DataMapDomainObject {
