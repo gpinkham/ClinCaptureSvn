@@ -65,11 +65,15 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * The controller for managing coded items. Acts as the glue between the service layer and the UI.
@@ -269,7 +273,16 @@ public class CodedItemsController {
 				search.setSearchInterface(new BioPortalSearchInterface());
 				try {
 					if (dictionary.equalsIgnoreCase("WHOD")) {
-						classifications = medicalProductListToClassificationList(getMedicalProductDAO().findByMedicalProductName(prefLabel));
+						final int minCodeLength = 5;
+						final int firstCodeLength = 3;
+						if (prefLabel.matches("\\d+") && prefLabel.length() > minCodeLength) {
+							String drugRecordNum = prefLabel.substring(0, prefLabel.length() - minCodeLength);
+							String seq1 = prefLabel.substring(prefLabel.length() - minCodeLength, prefLabel.length() - firstCodeLength);
+							String seq2 = prefLabel.substring(prefLabel.length() - firstCodeLength, prefLabel.length());
+							classifications = medicalProductListToClassificationList((getMedicalProductDAO().findByMedicalProductUniqueKeys(drugRecordNum, seq1, seq2)), SessionUtil.getLocale(request));
+						} else {
+							classifications = medicalProductListToClassificationList(getMedicalProductDAO().findByMedicalProductName(prefLabel), SessionUtil.getLocale(request));
+						}
 					} else {
 						classifications = search.getClassifications(prefLabel.toLowerCase(), dictionary, bioontologyUrl.getValue(),
 								bioontologyApiKey.getValue());
@@ -293,7 +306,6 @@ public class CodedItemsController {
 		model.addAttribute("configuredDictionaryIsAvailable", configuredDictionaryIsAvailable);
 
 		return model;
-
 	}
 
 	private String normalizeUrl(String bioontologyUrl, String dictionary) throws MalformedURLException {
@@ -392,7 +404,7 @@ public class CodedItemsController {
 
 		try {
 			provideCoding(verbatimTerm, false, categoryList, codeSearchTerm, bioontologyUrl.getValue(),
-					bioontologyApiKey.getValue(), codedItem.getItemId());
+					bioontologyApiKey.getValue(), codedItem.getItemId(), SessionUtil.getLocale(request));
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY);
@@ -512,7 +524,7 @@ public class CodedItemsController {
 			try {
 
 				provideCoding(verbatimTerm, isAlias, categoryList, codeSearchTerm, bioontologyUrl.getValue(),
-						bioontologyApiKey.getValue(), codedItem.getItemId());
+						bioontologyApiKey.getValue(), codedItem.getItemId(), SessionUtil.getLocale(request));
 			} catch (Exception ex) {
 
 				logger.error(ex.getMessage());
@@ -582,7 +594,7 @@ public class CodedItemsController {
 	}
 
 	private CodedItem provideCoding(String verbatimTerm, boolean isAlias, String categoryList, String codeSearchTerm,
-			String bioontologyUrl, String bioontologyApiKey, int codedItemId) throws Exception {
+			String bioontologyUrl, String bioontologyApiKey, int codedItemId, Locale locale) throws Exception {
 
 		StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(datasource);
 
@@ -592,7 +604,7 @@ public class CodedItemsController {
 		Classification classificationResult = getClassificationFromCategoryString(categoryList);
 		if (codedItem.getDictionary().equals("WHOD")) {
 			MedicalProduct mpBean = getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()));
-			classificationResult = medicalProductToClassification(mpBean);
+			classificationResult = medicalProductToClassification(mpBean, locale);
 		} else {
 			search.setSearchInterface(new BioPortalSearchInterface());
 			search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "),
@@ -678,16 +690,16 @@ public class CodedItemsController {
 		}
 	}
 
-	private List<Classification> medicalProductListToClassificationList(List<MedicalProduct> mpList) {
+	private List<Classification> medicalProductListToClassificationList(List<MedicalProduct> mpList, Locale locale) throws ParseException {
 		List<Classification> classifications = new ArrayList<Classification>();
 		for (MedicalProduct mp : mpList) {
-			classifications.add(medicalProductToClassification(mp));
+			classifications.add(medicalProductToClassification(mp, locale));
 		}
 		Collections.sort(classifications, new ClassificationSortByReference());
 		return classifications;
 	}
 
-	private Classification medicalProductToClassification(MedicalProduct mp) {
+	private Classification medicalProductToClassification(MedicalProduct mp, Locale locale) throws ParseException {
 
 		Classification classification = new Classification();
 		classification.setHttpPath(String.valueOf(mp.getMedicinalprodId()));
@@ -720,6 +732,15 @@ public class CodedItemsController {
 		country.setElementName("CNTR");
 		country.setCodeName(mp.getSourceCountryBean().getCountryName());
 		classification.addClassificationElement(country);
+
+		ClassificationElement dateCreate = new ClassificationElement();
+		dateCreate.setElementName("date_created");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", locale);
+		Date d = sdf.parse(mp.getCreateDate());
+		sdf.applyPattern("dd-MMM-yyyy");
+		String formattedDate = sdf.format(d);
+		dateCreate.setCodeName(formattedDate);
+		classification.addClassificationElement(dateCreate);
 
 		ClassificationElement generic = new ClassificationElement();
 		generic.setElementName("GENERIC");
