@@ -3,8 +3,6 @@ package com.clinovo.pages;
 import net.thucydides.core.annotations.findby.By;
 import net.thucydides.core.annotations.findby.FindBy;
 import net.thucydides.core.pages.WebElementFacade;
-import net.thucydides.core.webelements.RadioButtonGroup;
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 

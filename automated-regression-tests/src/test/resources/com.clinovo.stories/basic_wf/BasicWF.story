@@ -222,9 +222,24 @@ Then User is on Manage All Event Definitions in Study page
 Examples:
 {scope=Scenario}
 |<Name>      |<Description>|<Type>     |<Category>|<Repeating>|<eCRFs>                            |
-|Event      A|             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_file_1 |
-|Event      B|             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_group_1|
-|Event      C|             |Unscheduled|          |No         |CRF_w_group_1, CRF_w_file_1        |
+|Event A     |             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_file_1 |
+|Event B     |             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_group_1|
+|Event C     |             |Unscheduled|          |No         |CRF_w_group_1, CRF_w_file_1        |
 
 
+Scenario: 13. CRC creates subjects
 
+Given User logs in as CRC
+And User goes to Add Subject page
+And User fills in data on Add Subject page to create subject:
+| Study Subject ID | Person ID | Secondary ID | Date of Enrollment for Study | Gender | Date of Birth | Dynamic Group | 
+|<Study Subject ID>|<Person ID>|<Secondary ID>|<Date of Enrollment for Study>|<Gender>|<Date of Birth>|<Dynamic Group>|
+When User clicks 'Submit' button on Add Subject page
+Then User is on SM page
+
+Examples:
+{scope=Scenario}
+|<Study Subject ID>|<Person ID>|<Secondary ID>|<Date of Enrollment for Study>|<Gender>|<Date of Birth>|<Dynamic Group>|
+|StSubj_1          |ss_1       |              |                              |Male    |03-Mar-1985    |               |
+|StSubj_2          |ss_2       |              |                              |Female  |04-Mar-1987    |               |
+|StSubj_3          |ss_3       |              |                              |Male    |16-Mar-1983    |               |
