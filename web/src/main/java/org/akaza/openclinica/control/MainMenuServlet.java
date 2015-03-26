@@ -172,6 +172,11 @@ public class MainMenuServlet extends Controller {
 						addPageMessage(respage.getString("current_study_frozen"), request);
 					}
 				}
+				String casebookMessage = (String) request.getSession().getAttribute("casebook_exception");
+				if (casebookMessage != null && !casebookMessage.isEmpty()) {
+					addPageMessage(casebookMessage, request);
+					request.getSession().removeAttribute("casebook_exception");
+				}
 
 				Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(
 						" AND dn.assigned_user_id = " + ub.getId() + " AND dn.resolution_status_id IN (1,2,3)",
