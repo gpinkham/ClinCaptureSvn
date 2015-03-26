@@ -374,6 +374,7 @@ public class DefineStudyEventServlet extends Controller {
 			String electronicSignature = fp.getString("electronicSignature" + i);
 			String emailCRFTo = fp.getString("mailTo" + i);
 			String emailOnStep = fp.getString("emailOnStep" + i);
+			String tabbingMode = fp.getString("tabbingMode" + i);
 
 			String hiddenCrf = fp.getString("hiddenCrf" + i);
 			// hideCRF is false by default in the bean
@@ -420,6 +421,12 @@ public class DefineStudyEventServlet extends Controller {
 				edcBean.setEvaluatedCRF(true);
 			} else {
 				edcBean.setEvaluatedCRF(false);
+			}
+			if (!StringUtil.isBlank(tabbingMode) && ("leftToRight".equalsIgnoreCase(tabbingMode.trim()) || "topToBottom"
+					.equalsIgnoreCase(tabbingMode.trim()))) {
+				edcBean.setTabbingMode(tabbingMode);
+			} else {
+				edcBean.setTabbingMode("leftToRight");
 			}
 
 			String nullString = "";
