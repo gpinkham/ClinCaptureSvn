@@ -129,12 +129,12 @@
 				<div class="input-group parent-target">
 					<input type="text" class="target form-control">
 					<input type="text" class="linefy form-control input-group hidden">
-              <span class="input-group-addon hidden">
-                <input class="eventify" type="checkbox">
-              </span>
-              <span class="input-group-addon hidden">
-                <input class="versionify" type="checkbox">
-              </span>
+					<span class="input-group-addon hidden">
+						<input class="eventify" type="checkbox">
+					</span>
+					<span class="input-group-addon hidden">
+						<input class="versionify" type="checkbox">
+					</span>
 					<span class="glyphicon glyphicon-remove input-group-addon"></span>
 				</div>
 				<span class="glyphicon glyphicon-wrench opt"></span>

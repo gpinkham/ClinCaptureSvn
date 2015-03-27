@@ -1730,7 +1730,7 @@ Parser.prototype.setExpression = function(expression, attrMap) {
 				} else {
 					var droppable = createStartExpressionDroppable();
 					if (itm) {
-						var itm = this.getItem(expression[e], attrMap);
+						var itm = this.getItem(this.extractItemFromExpression(expression[e]), attrMap);
 						var preds = expression[e].split(".");
 						if (preds.length == 4) {
 							droppable.attr("event-oid", preds[0]);
@@ -1790,25 +1790,14 @@ Parser.prototype.setTargets = function(targets) {
 	if (targets.length > 0) {
 		var targetDiv = $(".parent-target");
 		for (var x = 0; x < targets.length; x++) {
-			var tar = this.extractTarget({
-				target: targets[x],
-				name: targets[x].name
-			});
+			var tar = this.extractTarget(targets[x]);
 			var div = targetDiv.clone();
 			div.find(".target").val("");
 			createDroppable({
 				element: div.find(".target"),
 				accept: "div[id='items'] td"
 			});
-			div.find(".target").val(tar.name);
-			// Item attributes
-			div.find(".target").css('font-weight', 'bold');
-			div.find(".target").attr("item-oid", tar.oid);
-			div.find(".target").attr("group-oid", tar.group);
-			div.find(".target").attr("crf-oid", tar.crf);
-			div.find(".target").attr("event-oid", tar.evt);
-			div.find(".target").attr("version-oid", tar.version);
-			div.find(".target").attr("study-oid", this.extractStudy(this.getStudy()).oid);
+			this.addAttributesToTargetElement(tar, div);
 			createToolTip({
 				element: div.find(".eventify"),
 				title: messageSource.tooltips.eventify
@@ -1845,14 +1834,14 @@ Parser.prototype.setTargets = function(targets) {
 			if (!versionDuplex) {
 				tar.versionify = false;
 				div.find(".versionify").parent().removeClass("hidden");
-				if (targets[x].versionify) {
+				if (this.isVersionified(targets[x].name)) {
 					tar.versionify = true;
 					div.find(".versionify").parent().removeClass("hidden");
 					div.find(".versionify").prop("checked", tar.versionify);
 				}
 			}
 			// linefy
-			if (targets[x].linefy) {
+			if (tar.linefy) {
 				tar.linefy = true;
 				tar.line = targets[x].line;
 				div.find(".linefy").removeClass("hidden");
@@ -1863,23 +1852,27 @@ Parser.prototype.setTargets = function(targets) {
 		}
 	}
 };
-
-Parser.prototype.extractTarget = function(params) {
+Parser.prototype.addAttributesToTargetElement = function(target, div) {
+	div.find(".target").val(target.name);
+	// Item attributes
+	div.find(".target").css('font-weight', 'bold');
+	div.find(".target").attr("item-oid", target.oid);
+	div.find(".target").attr("group-oid", target.group);
+	div.find(".target").attr("crf-oid", target.crf);
+	div.find(".target").attr("event-oid", target.evt);
+	div.find(".target").attr("version-oid", target.version);
+	div.find(".target").attr("study-oid", this.extractStudy(this.getStudy()).oid);
+}
+Parser.prototype.extractTarget = function(candidate) {
 	var target = Object.create(null);
-	var tt = this.getItem(params.name, this.createTargetAttrMap(params.target));
+	var tt = this.getItem(candidate.name, this.createTargetAttrMap(candidate));
 	if (tt) {
 		target.oid = tt.oid;
 		target.name = tt.name;
 		target.crf = tt.crfOid;
+		target.group = tt.group;
 		target.evt = tt.eventOid;
-		target.group = params.target.group;
-		target.version = params.target.versionify ? params.target.version : tt.crfVersionOid;
-		if (params.target.versionify) {
-			target.crf = this.getVersionCRF({
-				ver: target.version,
-				study: this.extractStudy(this.getStudy())
-			}).oid;
-		}
+		target.version = tt.crfVersionOid;
 	}
 	return target;
 };

@@ -717,6 +717,13 @@ function handleDropEvent(params) {
 		existingValue: existingValue
 	});
 	if (params.ui.draggable.is("td.group")) {
+		if (params.element.is('.target')) {
+			var parent = params.element.parent();
+			parent.find('.linefy').val('');
+			parent.find('.linefy').addClass('hidden');
+			parent.find('.eventify').prop('checked', false);
+			parent.find('.versionify').prop('checked', false);
+		}
 		// Persist attrinutes
 		params.element.attr("item-oid", params.ui.draggable.attr("oid"));
 		params.element.attr("crf-oid", params.ui.draggable.attr("crf-oid"));
