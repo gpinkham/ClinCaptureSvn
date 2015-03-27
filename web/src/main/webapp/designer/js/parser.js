@@ -1785,13 +1785,11 @@ Parser.prototype.setExpression = function(expression, attrMap) {
 		createSortable();
 	}
 };
-
 Parser.prototype.setTargets = function(targets) {
 	if (targets.length > 0) {
 		var targetDiv = $(".parent-target");
 		for (var x = 0; x < targets.length; x++) {
-			var tar = this.extractTarget(targets[x]);
-			var div = targetDiv.clone();
+			var tar = this.extractTarget(targets[x]), div = targetDiv.clone();
 			div.find(".target").val("");
 			createDroppable({
 				element: div.find(".target"),
@@ -2093,35 +2091,34 @@ Parser.prototype.constructRepeatItemPath = function(target) {
 	}
 	return name + "." + target.group + "[" + target.line + "]" + "." + target.oid;
 };
-
-Parser.prototype.eventify = function(targetEvent) {
-	var targetName = $(targetEvent).parent().siblings(".target").val();
-	for (var x = 0; x < this.rule.targets.length; x++) {
-		var tar = this.rule.targets[x];
-		if (tar.name === targetName) {
-			tar.eventify = $(targetEvent).is(":checked");
-			break;
-		}
-	}
-};
-
 Parser.prototype.isEventified = function(expression) {
 	return expression.slice(0, "SE_".length) == "SE_";
 };
 Parser.prototype.isVersionified = function(expression) {
 	return /(F_\w+\d+)(?=\.)/ig.test(expression);
 };
-Parser.prototype.versionify = function(targetEvent) {
-	var targetName = $(targetEvent).parent().siblings(".target").val();
-	for (var x = 0; x < this.rule.targets.length; x++) {
-		var tar = this.rule.targets[x];
-		if (tar.name === targetName) {
-			tar.versionify = $(targetEvent).is(":checked");
-			break;
+Parser.prototype.eventify = function(targetEvent) {
+	var element = $(targetEvent).parent().siblings(".target"), name = element.val();;
+	this.rule.targets.map(function(target) {
+		if (target.name === name) {
+			if (target.evt == element[0].getAttribute('event-oid') && 
+				target.version == element[0].getAttribute('version-oid'))
+				target.eventify = $(targetEvent).is(":checked");
+			return;
 		}
-	}
+	});
 };
-
+Parser.prototype.versionify = function(targetEvent) {
+	var element = $(targetEvent).parent().siblings(".target"), name = element.val();;
+	this.rule.targets.map(function(target) {
+		if (target.name === name) {
+			if (target.evt == element[0].getAttribute('event-oid') && 
+				target.version == element[0].getAttribute('version-oid'))
+				target.versionify = $(targetEvent).is(":checked");
+			return;
+		}
+	});
+};
 Parser.prototype.linefy = function(targetEvent) {
 	var targetName = $(targetEvent).siblings(".target").val();
 	for (var x = 0; x < this.rule.targets.length; x++) {
