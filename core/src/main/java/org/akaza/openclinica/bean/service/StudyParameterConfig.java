@@ -128,6 +128,7 @@ public class StudyParameterConfig {
 	private String annotatedCrfSasItemNames = "no";
 
 	private String autoTabbing = "yes";
+	private String showYearsInCalendar = "no";
 
 	/**
 	 * This is base constructor to set all default values.
@@ -181,6 +182,7 @@ public class StudyParameterConfig {
 		randomizationEnviroment = "test";
 
 		autoTabbing = "yes";
+		showYearsInCalendar = "no";
 	}
 
 	/**
@@ -751,5 +753,13 @@ public class StudyParameterConfig {
 
 	public void setAutoTabbing(String autoTabbing) {
 		this.autoTabbing = autoTabbing;
+	}
+
+	public String getShowYearsInCalendar() {
+		return showYearsInCalendar;
+	}
+
+	public void setShowYearsInCalendar(String showYearsInCalendar) {
+		this.showYearsInCalendar = showYearsInCalendar;
 	}
 }

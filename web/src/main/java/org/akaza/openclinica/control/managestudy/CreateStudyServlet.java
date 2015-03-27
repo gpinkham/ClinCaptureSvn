@@ -783,6 +783,7 @@ public class CreateStudyServlet extends Controller {
 		newStudy.getStudyParameterConfig().setRandomizationEnviroment(fp.getString("randomizationEnviroment"));
 
 		newStudy.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
+		newStudy.getStudyParameterConfig().setShowYearsInCalendar(fp.getString("showYearsInCalendar"));
 
 		request.getSession().setAttribute("newStudy", newStudy);
 
@@ -1002,6 +1003,10 @@ public class CreateStudyServlet extends Controller {
 
 		spv.setParameter("autoTabbing");
 		spv.setValue(newStudy.getStudyParameterConfig().getAutoTabbing());
+		spvdao.create(spv);
+
+		spv.setParameter("showYearsInCalendar");
+		spv.setValue(newStudy.getStudyParameterConfig().getShowYearsInCalendar());
 		spvdao.create(spv);
 
 		logger.info("study parameters created done");

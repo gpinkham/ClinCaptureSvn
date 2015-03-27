@@ -1951,6 +1951,16 @@
 		<input type="radio" ${studyToView.studyParameterConfig.annotatedCrfSasItemNames == 'no' ? 'checked' : ''} name="annotatedCrfSasItemNames" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
 	</td>
 </tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="show_years_in_calendar" bundle="${resword}"/>?
+	</td>
+	<td>
+		<input type="radio" ${studyToView.studyParameterConfig.showYearsInCalendar == 'yes' ? 'checked' : ''} name="showYearsInCalendar" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+		<input type="radio" ${studyToView.studyParameterConfig.showYearsInCalendar == 'no' ? 'checked' : ''} name="showYearsInCalendar" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+	</td>
+</tr>
 <!-- / CRFs Parameters section -->
 
 <!-- Randomization Parameters section -->

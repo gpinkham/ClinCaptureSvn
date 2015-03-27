@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-03-26-TICKET2178">
+		<comment>Insert the study parameter flag to control Calendar Style.</comment>
+		<insert tableName="study_parameter">
+			<column name="study_parameter_id" valueNumeric="53"/>
+			<column name="handle" value="showYearsInCalendar"/>
+			<column name="name" value="showYearsInCalendar"/>
+			<column name="description" value="Flag to check calendar style."/>
+			<column name="default_value" value="no"/>
+			<column name="inheritable" valueBoolean="true"/>
+			<column name="overridable" valueBoolean="false"/>
+		</insert>
+	</changeSet>
+
+</databaseChangeLog>

@@ -54,7 +54,7 @@
 	<input tabindex="<c:out value="${tabNum}"/>" style="background:white;color:#4D4D4D;" onChange=
     "this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="input<c:out value="${itemId}" />" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
 	<c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
-		<ui:calendarIcon onClickSelector="getSib(this.previousSibling)" linkName="anchor${itemId}" linkId="anchor${itemId}"/>
+		<ui:calendarIcon onClickSelector="getSib(this.previousSibling)" linkName="anchor${itemId}" linkId="anchor${itemId}" checkIfShowYear="true"/>
 	 <c:set var="numOfDate" value="${numOfDate+1}" />
 	</c:if>
 </c:if>

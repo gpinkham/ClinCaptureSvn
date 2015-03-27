@@ -79,5 +79,6 @@ public class StudyParameterConfigTest {
 		assertEquals("test", config.getRandomizationEnviroment());
 
 		assertEquals("yes", config.getAutoTabbing());
+		assertEquals("no", config.getShowYearsInCalendar());
 	}
 }

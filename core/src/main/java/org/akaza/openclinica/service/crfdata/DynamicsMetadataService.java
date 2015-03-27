@@ -592,10 +592,17 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 					? destinationCrfVersion.getId() : destinationEventDefinitionCRFBean.getDefaultVersionId();
 		}
 		SubjectEventStatus destinationStudyEventStatus = destinationStudyEventBean.getSubjectEventStatus();
+		destinationCrfVersion = (CRFVersionBean) crfVersionDAO.findByPK(destinationCrfVersionId);
+		boolean isDestinationEventDefinitionCRFBeanAvailable = destinationEventDefinitionCRFBean.isActive()
+				&& destinationEventDefinitionCRFBean.getStatus().isAvailable();
+		boolean isDestinationCrfVersionAvailable = destinationCrfVersion.isActive()
+				&& destinationCrfVersion.getStatus().isAvailable();
+		boolean isDestinationStudyEventBeanAvailable = !(destinationStudyEventStatus.isRemoved()
+				|| destinationStudyEventStatus.isLocked() || destinationStudyEventStatus.isStopped()
+				|| destinationStudyEventStatus.isSkipped());
 
-		if (!(destinationStudyEventStatus.isRemoved() || destinationStudyEventStatus.isLocked()
-				|| destinationStudyEventStatus.isStopped() || destinationStudyEventStatus.isSkipped()
-				|| (!((CRFVersionBean) crfVersionDAO.findByPK(destinationCrfVersionId)).getStatus().isAvailable()))) {
+		if (isDestinationEventDefinitionCRFBeanAvailable && isDestinationCrfVersionAvailable
+				&& isDestinationStudyEventBeanAvailable) {
 
 			EventCRFBean destinationEventCrfBean = new EventCRFBean();
 			destinationEventCrfBean.setStudyEventId(destinationStudyEventBean.getId());

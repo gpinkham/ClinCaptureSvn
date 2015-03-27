@@ -556,6 +556,7 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setAnnotatedCrfSasItemNames(fp.getString("annotatedCrfSasItemNames"));
 
 		study.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
+		study.getStudyParameterConfig().setShowYearsInCalendar(fp.getString("showYearsInCalendar"));
 
 		try {
 
@@ -969,6 +970,10 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getAutoTabbing());
 		updateParameter(spvdao, spv);
 
+		spv.setParameter("showYearsInCalendar");
+		spv.setValue(study1.getStudyParameterConfig().getShowYearsInCalendar());
+		updateParameter(spvdao, spv);
+
 		try {
 
 			// Create custom dictionary
@@ -1159,6 +1164,10 @@ public class UpdateStudyServletNew extends Controller {
 
 			childspv.setParameter("autoTabbing");
 			childspv.setValue(study1.getStudyParameterConfig().getAutoTabbing());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("showYearsInCalendar");
+			childspv.setValue(study1.getStudyParameterConfig().getShowYearsInCalendar());
 			updateParameter(spvdao, childspv);
 		}
 	}
