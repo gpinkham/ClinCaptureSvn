@@ -51,32 +51,32 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 	@Test
 	public void testThatSearchDoesNotReturnNull() throws Exception {
 
-		assertNotNull(searchInterface.search("Leukaemia plasmacytic (in remission)", "MEDDRA", "http://1.1.1.1", "api key"));
+		assertNotNull(searchInterface.search("Leukaemia plasmacytic (in remission)", "ICD9", "http://1.1.1.1", "api key"));
 	}
 
 	@Test
 	public void testThatSearchReturnsExpectedNumberOfTerms() throws Exception {
 
-		assertEquals(3, searchInterface.search("Leukaemia plasmacytic (in remission)", "MEDDRA", "http://1.1.1.1", "api key").size());
+		assertEquals(3, searchInterface.search("Leukaemia plasmacytic (in remission)", "ICD9", "http://1.1.1.1", "api key").size());
 	}
 
 	@Test
 	public void testThatSearchReturnsClassificationEachHavingHttpPath() throws Exception {
 
-		Classification classification = searchInterface.search("Leukaemia plasmacytic (in remission)", "MEDDRA", "http://1.1.1.1", "api key").get(0);
+		Classification classification = searchInterface.search("Leukaemia plasmacytic (in remission)", "ICD9", "http://1.1.1.1", "api key").get(0);
 		assertEquals("http://purl.bioontology.org/ontology/MDR/10024319", classification.getHttpPath());
 	}
 
 	@Test
 	public void testThatSearchReturnsExpectedNumberOfClassificationElements() throws Exception {
 
-		assertEquals(1, searchInterface.search("Leukaemia plasmacytic (in remission)", "MEDDRA", "http://1.1.1.1", "api key").get(0).getClassificationElement().size());
+		assertEquals(1, searchInterface.search("Leukaemia plasmacytic (in remission)", "ICD9", "http://1.1.1.1", "api key").get(0).getClassificationElement().size());
 	}
 
 	@Test
 	public void testThatSearchReturnsClassificationElementsHavingCodeNames() throws Exception {
 
-		List<Classification> classifications = searchInterface.search("Leukaemia plasmacytic (in remission)", "MEDDRA", "http://1.1.1.1", "api key");
+		List<Classification> classifications = searchInterface.search("Leukaemia plasmacytic (in remission)", "ICD9", "http://1.1.1.1", "api key");
 
 		assertEquals("Leukaemia plasmacytic (in remission)", classifications.get(0).getClassificationElement().get(0).getCodeName());
 		assertEquals("Leukaemia", classifications.get(1).getClassificationElement().get(0).getCodeName());
@@ -86,42 +86,40 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 	@Test
 	public void testThatSearchReturnsClassificationEachHavingElementNames() throws Exception {
 
-		List<Classification> classifications = searchInterface.search("Leukaemia plasmacytic (in remission)", "MEDDRA", "http://1.1.1.1", "api key");
+		List<Classification> classifications = searchInterface.search("Leukaemia plasmacytic (in remission)", "ICD9", "http://1.1.1.1", "api key");
 
-		assertEquals("LLT", classifications.get(0).getClassificationElement().get(0).getElementName());
-		assertEquals("LLT", classifications.get(1).getClassificationElement().get(0).getElementName());
+		assertEquals("EXT", classifications.get(0).getClassificationElement().get(0).getElementName());
+		assertEquals("EXT", classifications.get(1).getClassificationElement().get(0).getElementName());
 	}
 
 	@Test
 	public void testThatGetClassificationTermsDoesNotReturnNull() throws Exception {
 
-		assertNotNull(searchInterface.getClassificationTerms("http://purl.bioontology.org/ontology/MDR/10024319", "http://1.1.1.1", "api key"));
+		assertNotNull(searchInterface.getClassificationTerms("http://purl.bioontology.org/ontology/ICD9/10024319", "http://1.1.1.1", "api key"));
 	}
 
 	@Test
 	public void testThatGetClassificationTermsReturnsExpectedNumberOfElements() throws Exception {
 
-		assertEquals(3, searchInterface.getClassificationTerms("http://purl.bioontology.org/ontology/MDR/10024319", "http://1.1.1.1", "api key").getClassificationElement().size());
+		assertEquals(2, searchInterface.getClassificationTerms("http://purl.bioontology.org/ontology/ICD9/10024319", "http://1.1.1.1", "api key").getClassificationElement().size());
 	}
 
 	@Test
 	public void testThatGetClassificationTermsElementsHavingElementNames() throws Exception {
 
-		Classification classification = searchInterface.getClassificationTerms("http://purl.bioontology.org/ontology/MDR/10024319", "http://1.1.1.1", "api key");
+		Classification classification = searchInterface.getClassificationTerms("http://purl.bioontology.org/ontology/ICD9/10024319", "http://1.1.1.1", "api key");
 
-		assertEquals("SOC", classification.getClassificationElement().get(0).getElementName());
-		assertEquals("HLGT", classification.getClassificationElement().get(1).getElementName());
-		assertEquals("HLT", classification.getClassificationElement().get(2).getElementName());
+		assertEquals("CAT", classification.getClassificationElement().get(0).getElementName());
+		assertEquals("GRP", classification.getClassificationElement().get(1).getElementName());
 	}
 
 	@Test
 	public void testThatGetClassificationTermsElementsHavingCodeNames() throws Exception {
 
-		Classification classification = searchInterface.getClassificationTerms("http://purl.bioontology.org/ontology/MDR/10024319", "http://1.1.1.1", "api key");
+		Classification classification = searchInterface.getClassificationTerms("http://purl.bioontology.org/ontology/ICD9/10024319", "http://1.1.1.1", "api key");
 
-		assertEquals("Neoplasms benign", classification.getClassificationElement().get(0).getCodeName());
-		assertEquals("Plasma cell neoplasms", classification.getClassificationElement().get(1).getCodeName());
-		assertEquals("Multiple myelomas", classification.getClassificationElement().get(2).getCodeName());
+		assertEquals("Plasma cell neoplasms", classification.getClassificationElement().get(0).getCodeName());
+		assertEquals("Multiple myelomas", classification.getClassificationElement().get(1).getCodeName());
 	}
 
 	@Test
@@ -137,7 +135,7 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 		classification.addClassificationElement(classificationElement);
 		classification.addClassificationElement(classificationElement1);
 
-		searchInterface.getClassificationCodes(classification, "MEDDRA", "MEDDRA", "api key");
+		searchInterface.getClassificationCodes(classification, "ICD9", "MEDDRA", "api key");
 
 		assertEquals("10033371", classification.getClassificationElement().get(0).getCodeValue());
 		assertEquals("10033371", classification.getClassificationElement().get(1).getCodeValue());

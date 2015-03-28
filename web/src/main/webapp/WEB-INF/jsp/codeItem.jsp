@@ -5,7 +5,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <c:set var="color" scope="session" value="${newThemeColor}"/>
-<c:if test="${itemDictionary == 'WHOD'}">
+<c:if test="${itemDictionary == 'WHOD' || itemDictionary == 'MedDRA'}">
     <c:set var="displayHttp" value="style=display:none"/>
 </c:if>
 
@@ -39,7 +39,7 @@
                         <c:set var="hyperlinkColor" value="#2c6caf"/>
                     </c:if>
                     <td>
-                        <c:set var="objectHttpPath" value="${fn:replace(fn:replace(obj.httpPath, '/MDR/', '/MEDDRA/'), '#', '%23')}"/>
+                        <c:set var="objectHttpPath" value="${fn:replace(obj.httpPath, '#', '%23')}"/>
                         <a target="_blank" style="color:<c:out value="${hyperlinkColor}"/>"
                            href="${bioontologyUrl}/ontologies/<c:out value="${fn:toUpperCase(fn:replace(itemDictionary, ' ', ''))}"/>?p=classes&conceptid=<c:out value="${objectHttpPath}"/>">
                             <c:out value="${obj.httpPath}"/>
@@ -91,7 +91,7 @@
                                 <td></td>
 
                                 <c:choose>
-                                    <c:when test="${itemDictionary == 'WHOD'}">
+                                    <c:when test="${itemDictionary == 'WHOD' || itemDictionary == 'MedDRA'}">
                                         <td>
                                             <c:if test="${configuredDictionaryIsAvailable}">
                                                 <input type="button" id="<c:out value="${counter}"/>" name="codeAndAliasBtn"

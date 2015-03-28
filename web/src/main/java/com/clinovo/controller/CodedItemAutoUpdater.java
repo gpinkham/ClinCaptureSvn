@@ -126,7 +126,7 @@ public class CodedItemAutoUpdater {
 		String termToAppend = "";
 		String prefToAppend = "";
 		String displayStyle = "display:none;";
-		String httpPathDisplay = codedItem.getDictionary().equals("WHOD") ? "display:none;" : "";
+		String httpPathDisplay = codedItem.getDictionary().equals("WHOD") || codedItem.getDictionary().equals("MEDDRA") ? "display:none;" : "";
 		if (!alise.isEmpty() && !prefTerm.isEmpty()) {
 			termToAppend = alise;
 			prefToAppend = prefTerm;
@@ -143,7 +143,7 @@ public class CodedItemAutoUpdater {
 				.tdEnd().td(2).close().a().style("color:" + getThemeColor() + "")
 				.append(" target=\"_blank\" ").href(normalizeUrl(bioontologyUrl.getValue(), codedItem.getDictionary()) + "/ontologies/"
 						+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid="
-						+ codedItem.getHttpPath().replace("#", "%23").replace("/MDR/", "/MEDDRA/")).close().append(codedItem.getHttpPath()).aEnd().tdEnd().td(2)
+						+ codedItem.getHttpPath().replace("#", "%23")).close().append(codedItem.getHttpPath()).aEnd().tdEnd().td(2)
 				.width("360px").colspan("2").close().tdEnd().td(2).close().tdEnd().trEnd(1);
 
 		for (CodedItemElement codedItemElement : codedItemElementsFilter(codedItem).getCodedItemElements()) {
@@ -159,7 +159,7 @@ public class CodedItemAutoUpdater {
 	}
 
 	private String normalizeUrl(String bioontologyUrl, String dictionary) throws MalformedURLException {
-		if (bioontologyUrl.equals(bioontologyWsUrl) || "MEDDRA".equals(dictionary)) {
+		if (bioontologyUrl.equals(bioontologyWsUrl)) {
 			return bioontologyUrlDefault;
 		} else {
 			URL url = new URL(bioontologyUrl);

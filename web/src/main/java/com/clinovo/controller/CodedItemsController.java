@@ -24,15 +24,15 @@ import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemElement;
 import com.clinovo.model.CodedItemsTableFactory;
 import com.clinovo.model.Dictionary;
-import com.clinovo.model.Ingredient;
+import com.clinovo.model.MedicalHierarchy;
 import com.clinovo.model.MedicalProduct;
 import com.clinovo.model.Status.CodeStatus;
 import com.clinovo.model.Term;
 import com.clinovo.model.TermElement;
-import com.clinovo.model.Therapgroup;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.TermService;
+import com.clinovo.util.CompleteClassificationFieldsUtil;
 import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -65,13 +65,8 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -275,15 +270,25 @@ public class CodedItemsController {
 					if (dictionary.equalsIgnoreCase("WHOD")) {
 						final int minCodeLength = 5;
 						final int firstCodeLength = 3;
+						//search using code
 						if (prefLabel.matches("\\d+") && prefLabel.length() > minCodeLength) {
 							String drugRecordNum = prefLabel.substring(0, prefLabel.length() - minCodeLength);
 							String seq1 = prefLabel.substring(prefLabel.length() - minCodeLength, prefLabel.length() - firstCodeLength);
 							String seq2 = prefLabel.substring(prefLabel.length() - firstCodeLength, prefLabel.length());
-							classifications = medicalProductListToClassificationList((getMedicalProductDAO().findByMedicalProductUniqueKeys(drugRecordNum, seq1, seq2)), SessionUtil.getLocale(request));
+							List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductUniqueKeys(drugRecordNum, seq1, seq2);
+							classifications = CompleteClassificationFieldsUtil.medicalProductListToClassificationList(medicalProducts, SessionUtil.getLocale(request));
 						} else {
-							classifications = medicalProductListToClassificationList(getMedicalProductDAO().findByMedicalProductName(prefLabel), SessionUtil.getLocale(request));
+							//search by name
+							List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductName(prefLabel, codedItem.getDictionary());
+							classifications = CompleteClassificationFieldsUtil.medicalProductListToClassificationList(medicalProducts, SessionUtil.getLocale(request));
 						}
+					} else if (dictionary.equalsIgnoreCase("MEDDRA")) {
+						//search preferred terms
+						List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductName(prefLabel, codedItem.getDictionary());
+						classifications = CompleteClassificationFieldsUtil.medicalHierarchyToClassificationList(medicalProducts);
+
 					} else {
+						//search using VA.
 						classifications = search.getClassifications(prefLabel.toLowerCase(), dictionary, bioontologyUrl.getValue(),
 								bioontologyApiKey.getValue());
 					}
@@ -603,8 +608,11 @@ public class CodedItemsController {
 
 		Classification classificationResult = getClassificationFromCategoryString(categoryList);
 		if (codedItem.getDictionary().equals("WHOD")) {
-			MedicalProduct mpBean = getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()));
-			classificationResult = medicalProductToClassification(mpBean, locale);
+			MedicalProduct mpBean = (MedicalProduct) getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()), codedItem.getDictionary());
+			classificationResult = CompleteClassificationFieldsUtil.medicalProductToClassification(mpBean, locale);
+		} else if (codedItem.getDictionary().equals("MEDDRA")) {
+			MedicalHierarchy medicalHierarchy = (MedicalHierarchy) getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()), codedItem.getDictionary());
+			classificationResult = CompleteClassificationFieldsUtil.medicalHierarchyToClassification(medicalHierarchy);
 		} else {
 			search.setSearchInterface(new BioPortalSearchInterface());
 			search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "),
@@ -690,96 +698,6 @@ public class CodedItemsController {
 		}
 	}
 
-	private List<Classification> medicalProductListToClassificationList(List<MedicalProduct> mpList, Locale locale) throws ParseException {
-		List<Classification> classifications = new ArrayList<Classification>();
-		for (MedicalProduct mp : mpList) {
-			classifications.add(medicalProductToClassification(mp, locale));
-		}
-		Collections.sort(classifications, new ClassificationSortByReference());
-		return classifications;
-	}
-
-	private Classification medicalProductToClassification(MedicalProduct mp, Locale locale) throws ParseException {
-
-		Classification classification = new Classification();
-		classification.setHttpPath(String.valueOf(mp.getMedicinalprodId()));
-		ClassificationElement medicalProductName = new ClassificationElement();
-		medicalProductName.setElementName("MPN");
-		medicalProductName.setCodeName(mp.getDrugName());
-		classification.addClassificationElement(medicalProductName);
-		ClassificationElement medicalProductCode = new ClassificationElement();
-		medicalProductCode.setElementName("MPNC");
-		medicalProductCode.setCodeName(mp.getDrugRecordNumber() + mp.getSequenceNumber1() + mp.getSequenceNumber2());
-		classification.addClassificationElement(medicalProductCode);
-		ClassificationElement component = new ClassificationElement();
-		component.setElementName("CMP");
-		String ingList = String.valueOf(mp.getDrugRecordNumber());
-		for (Ingredient ing : mp.getIngList()) {
-			ingList = ingList.concat(", ").concat(ing.getSun().getSubstanceName());
-		}
-		component.setCodeName(ingList);
-		classification.addClassificationElement(component);
-		int counter = 1;
-		for (Therapgroup thg : mp.getThgList()) {
-			ClassificationElement atcElement = new ClassificationElement();
-			atcElement.setElementName("ATC" + counter);
-			atcElement.setCodeName(thg.getAtc().getAtcText());
-			atcElement.setCodeValue(thg.getAtc().getAtcCode());
-			classification.addClassificationElement(atcElement);
-			counter++;
-		}
-		ClassificationElement country = new ClassificationElement();
-		country.setElementName("CNTR");
-		country.setCodeName(mp.getSourceCountryBean().getCountryName());
-		classification.addClassificationElement(country);
-
-		ClassificationElement dateCreate = new ClassificationElement();
-		dateCreate.setElementName("date_created");
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", locale);
-		Date d = sdf.parse(mp.getCreateDate());
-		sdf.applyPattern("dd-MMM-yyyy");
-		String formattedDate = sdf.format(d);
-		dateCreate.setCodeName(formattedDate);
-		classification.addClassificationElement(dateCreate);
-
-		ClassificationElement generic = new ClassificationElement();
-		generic.setElementName("GENERIC");
-		generic.setCodeName(mp.getGeneric().equals("Y") ? "Yes" : "No");
-		classification.addClassificationElement(generic);
-		ClassificationElement umbrella = new ClassificationElement();
-		umbrella.setElementName("UMBRELLA");
-		int firstDigit = mp.getDrugRecordNumber();
-		final int number = 9;
-		final int divider = 10;
-		while (firstDigit > number) {
-			firstDigit = firstDigit / divider;
-		}
-		umbrella.setCodeName(mp.getDrugName().indexOf(" nos") > 0 || firstDigit == number ? "Yes" : "No");
-		classification.addClassificationElement(umbrella);
-		ClassificationElement preferred = new ClassificationElement();
-		preferred.setElementName("PREFERRED");
-		preferred.setCodeName(Integer.valueOf(mp.getSequenceNumber1()) > 1 && Integer.valueOf(mp.getSequenceNumber2()) == 1 ? "Yes" : "No");
-		classification.addClassificationElement(preferred);
-
-		return classification;
-	}
-
-	private class ClassificationSortByReference implements Comparator<Classification> {
-		public int compare(Classification o1, Classification o2) {
-			for (ClassificationElement classification : o1.getClassificationElement()) {
-				for (ClassificationElement classification2 : o2.getClassificationElement()) {
-					if (classification.getElementName().equals("PREFERRED") && classification.getElementName().equals(classification2.getElementName())) {
-						if ((classification.getCodeName().equals("No") && classification2.getCodeName().equals("Yes"))) {
-							return 1;
-						} else if (classification.getCodeName().equals("Yes") && classification2.getCodeName().equals("No")) {
-							return -1;
-						}
-					}
-				}
-			}
-			return 0;
-		}
-	}
 
 	private MedicalProductDAO getMedicalProductDAO() {
 		return new MedicalProductDAO();

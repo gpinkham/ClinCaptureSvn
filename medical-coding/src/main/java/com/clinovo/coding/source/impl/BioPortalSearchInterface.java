@@ -45,7 +45,6 @@ public class BioPortalSearchInterface implements SearchInterface {
 
 	private String dictionary = "";
 
-	private static final String MEDDRA = "MEDDRA";
 	private static final String ICD9CM = "ICD9CM";
 	private static final String ICD10 = "ICD10";
 	private static final String CTCAE = "CTCAE";
@@ -289,9 +288,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 
 	private String getDictionary(String term) throws SearchException {
 		term = term.toLowerCase();
-		if (term.contains("meddra") || term.contains("mdr")) {
-			return MEDDRA;
-		} else if (term.contains("icd10") || term.contains("icd 10")) {
+		if (term.contains("icd10") || term.contains("icd 10")) {
 			return ICD10;
 		} else if (term.contains("icd9") || term.contains("icd 9")) {
 			return ICD9CM;

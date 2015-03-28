@@ -3279,7 +3279,7 @@ codeItemFields = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
     var term = $(item).closest('tbody').find('td').filter(function () {
-        return $.trim($(this).attr('id')) == "EXT" || $.trim($(this).attr('id')) == "LLT" || $.trim($(this).attr('id')) == "MPN" || $.trim($(this).attr('id')) == "AEG";
+        return $.trim($(this).attr('id')) == "EXT" || $.trim($(this).attr('id')) == "AEG";
     }).next().text();
 
     $("<div class='ui-widget-overlay' style='width:" + $(document).width() + "px; height:" + $(document).height() + "px; z-index: 1005;' />").appendTo('body');
@@ -3296,18 +3296,13 @@ codeItemFields = function(item) {
 
         success: function(data) {
 
-            $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () { return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());}).closest('tbody').find('input').css('visibility', 'visible');
-            if ($("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='termDictionary']").text() == 'WHOD') {
-                $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () {
-                    return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());
-                }).closest('tbody').find('tr > td').filter(function () {
-                    return $.trim($(this).attr('id')) === 'CMP';
-                }).parent('tr').after(data);
-            } else {
-                $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () {
-                    return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());
-                }).parent('tr').after(data);
-            }
+            $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () {
+                return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());
+            }).closest('tbody').find('input').css('visibility', 'visible');
+            $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () {
+                return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());
+            }).parent('tr').after(data);
+
             $(item).css('visibility', 'hidden');
             $('.ui-widget-overlay').remove();
         },
