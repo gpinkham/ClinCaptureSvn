@@ -1146,12 +1146,32 @@ public class UpdateStudyServletNew extends Controller {
 			childspv.setValue(study1.getStudyParameterConfig().getAutoCodeDictionaryName());
 			updateParameter(spvdao, childspv);
 
+			childspv.setParameter("medicalCodingApprovalNeeded");
+			childspv.setValue(study1.getStudyParameterConfig().getMedicalCodingApprovalNeeded());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("medicalCodingContextNeeded");
+			childspv.setValue(study1.getStudyParameterConfig().getMedicalCodingContextNeeded());
+			updateParameter(spvdao, childspv);
+
 			childspv.setParameter("assignRandomizationResultTo");
 			childspv.setValue(study1.getStudyParameterConfig().getAssignRandomizationResultTo());
 			updateParameter(spvdao, childspv);
 
 			childspv.setParameter("randomizationTrialId");
 			childspv.setValue(study1.getStudyParameterConfig().getRandomizationTrialId());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("allowCrfEvaluation");
+			childspv.setValue(study1.getStudyParameterConfig().getAllowCrfEvaluation());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("evaluateWithContext");
+			childspv.setValue(study1.getStudyParameterConfig().getEvaluateWithContext());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("allowRulesAutoScheduling");
+			childspv.setValue(study1.getStudyParameterConfig().getAllowRulesAutoScheduling());
 			updateParameter(spvdao, childspv);
 
 			childspv.setParameter("randomizationEnviroment");

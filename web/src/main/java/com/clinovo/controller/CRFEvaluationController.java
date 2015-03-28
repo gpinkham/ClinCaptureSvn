@@ -36,6 +36,7 @@ public class CRFEvaluationController extends Redirection {
 	public static final String CRF_EVALUATION_TABLE = "crfEvaluationTable";
 	public static final String PAGE_CRF_EVALUATION = "/pages/crfEvaluation";
 	public static final String EVALUATE_WITH_CONTEXT = "evaluateWithContext";
+	public static final String CRF_EVALUATION_STORED_URL = "crfEvaluationStoredUrl";
 	public static final String EVALUATION_CRF_EVALUATION = "evaluation/crfEvaluation";
 	public static final String NO_PERMISSION_TO_EVALUATE = "no_permission_to_evaluate";
 
@@ -58,6 +59,15 @@ public class CRFEvaluationController extends Redirection {
 	 */
 	@RequestMapping("/crfEvaluation")
 	public String crfEvaluation(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		String httpPath = (String) request.getSession().getAttribute(CRF_EVALUATION_STORED_URL);
+		String queryString = request.getQueryString();
+		if (queryString == null && httpPath != null) {
+			response.sendRedirect("crfEvaluation?" + httpPath);
+		} else {
+			request.getSession().setAttribute(CRF_EVALUATION_STORED_URL, queryString);
+		}
+
 		String page = EVALUATION_CRF_EVALUATION;
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(STUDY);
 		StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession().getAttribute(BaseController.USER_ROLE);
