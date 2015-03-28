@@ -2173,7 +2173,8 @@ public abstract class DataEntryServlet extends Controller {
 							getCodedItemService().saveCodedItem(codedItem);
 						}
 						item.getData().setValue("");
-					} else if (gradeItemData.getId() == displayItemBean.getData().getId()) {
+					} else if (gradeItemData.getId() == displayItemBean.getData().getId() &&
+							displayItemBean.getData().getId() != 0) {
 						ItemDataBean refItemDataBean = iddao.findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(),
 								ecrfBean.getId(), item.getData().getOrdinal());
 						for (DisplayItemBean changedItem : changedItemsList) {
