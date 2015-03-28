@@ -1232,7 +1232,7 @@ function createPrompt(params) {
 					var crfItems = parser.getRuleCRFItems();
 					if (crfItems) {
 						for (var x = 0; x < crfItems.length; x++) {
-							var item = parser.getItem(crfItems[x].itemName);
+							var item = parser.getItem(crfItems[x].itemName, {});
 							if (!item) {
 								crfItems[x].holder.addClass("invalid");
 							} else {

@@ -494,18 +494,18 @@ Parser.prototype.isRepeatItem = function(itemName) {
 
 Parser.prototype.getRuleCRFItems = function() {
 	var items = [];
-	var itemHolders = $(".dotted-border, .target, .item, .value, .dest");
-	for (var x = 0; x < itemHolders.size(); x++) {
-		if ($(itemHolders[x]).text().length > 0) {
-			var item = this.findItem($(itemHolders[x]).text(), {});
-			if (item && typeof(item) !== "function") {
-				var pred = Object.create(null);
-				pred.holder = $(itemHolders[x]);
-				pred.itemName = $(itemHolders[x]).text();
-				items.push(pred);
-			}
+	var itemHolders = $(".dotted-border, .target, .item, .value, .dest").each(function() {
+		var element = $(this), attributes = Object.create(null);
+		attributes['version-oid'] = element[0].getAttribute('version-oid');
+		var item = parser.findItem(element.text(), attributes);
+		if (item && typeof(item) !== "function") {
+			var pred = Object.create(null);
+			parser.addAttributesToElement(parser.extractTarget(item), element);
+			pred.holder = element;
+			pred.itemName = element.text();
+			items.push(pred);
 		}
-	}
+	});
 	return items;
 };
 Parser.prototype.createAttributes = function(expression) {
@@ -521,14 +521,12 @@ Parser.prototype.createAttrMap = function(attributes) {
     });
     return map;
 }
-
 Parser.prototype.createTargetAttrMap = function(target) {
     return {
         'event-oid' : target['target-event-oid'] ? target['target-event-oid'] : target.evt,
         'version-oid' : target['target-version-oid'] ? target['target-version-oid'] : target.version
     }
 }
-
 /* ==============================================================================
  * Creates a rule based on what the user has dropped on the drop surfaces and the
  * entered details.
@@ -557,17 +555,12 @@ Parser.prototype.createRule = function() {
 	var oids = $(".dotted-border:not(:empty), .target:not(:empty)").toArray().map(function(x) {
 		if ($(x).is(".group") || $(x).is(".target")) {
 			var tar = parser.getItem($(x).text(), parser.createAttrMap($(x).get(0).attributes));
-			if (tar && typeof(tar) !== "function") {
+			if (tar && typeof(tar) !== "function")
 				return tar.eventOid;
-			}
 		}
-	}).filter(function(x) {
-		if (x) {
-			return x;
-		}
-	});
-
-    for (var x = 0; x < parser.rule.targets.length; x++) {
+	}).filter(function(x) { if (x) return x; });
+	// Process targets
+	for (var x = 0; x < parser.rule.targets.length; x++) {
         var target = parser.rule.targets[x];
         if (target.linefy) {
             target.name = this.constructRepeatItemPath(target);
@@ -579,19 +572,16 @@ Parser.prototype.createRule = function() {
             var formPath = target.crf + "." + target.group + "." + target.oid;
             target.name = target.eventify ? (target.evt + "." + formPath) : formPath;
         }
-        var expression = [];
-        $(".dotted-border").each(function(index) {
+		var expression = [];
+		$(".dotted-border").each(function(index) {
             var ctx = $(this), pred = ctx.text();
             if (parser.isOp(pred)) {
                 pred = parser.getOp(pred);
             } else {
-				var attrMap = parser.createAttrMap(ctx.get(0).attributes);
-	            var item = parser.getItem(pred, attrMap);
+				var attrMap = parser.createAttrMap(ctx.get(0).attributes), item = parser.getItem(pred, attrMap);
 	            if (item) {
-	                pred = parser.constructExpressionPath({
-						ele: ctx,
-	                    quantified: !(attrMap['crf-oid'] == target.crf && attrMap['version-oid'] == target.version && attrMap['event-oid'] == target.evt) ? false : true
-	                });
+					var sameTargetAttributes = !(attrMap['crf-oid'] == target.crf && attrMap['version-oid'] == target.version && attrMap['event-oid'] == target.evt) ? false : true;
+					pred = parser.constructExpressionPath(ctx, sameTargetAttributes);
 	            }
 	            // check dates
 	            if (parser.isDateValue(pred)) {
@@ -608,13 +598,11 @@ Parser.prototype.createRule = function() {
         }
     }
 };
-
-Parser.prototype.constructExpressionPath = function(params) {
-	if (params.quantified) {
-		return  $(params.ele).attr("crf-oid") + "." + $(params.ele).attr("group-oid") + "." + $(params.ele).attr("item-oid");
-	} else {
-		return $(params.ele).attr("event-oid") + "." + $(params.ele).attr("crf-oid") + "." + $(params.ele).attr("group-oid") + "." + $(params.ele).attr("item-oid");
-	}
+Parser.prototype.constructExpressionPath = function(element, sameTargetAttributes) {
+	if (sameTargetAttributes)
+		return  element.attr("crf-oid") + "." + element.attr("group-oid") + "." + element.attr("item-oid");
+	else
+		return element.attr("event-oid") + "." + element.attr("crf-oid") + "." + element.attr("group-oid") + "." + element.attr("item-oid");
 };
 
 Parser.prototype.getRule = function() {
@@ -1795,7 +1783,9 @@ Parser.prototype.setTargets = function(targets) {
 				element: div.find(".target"),
 				accept: "div[id='items'] td"
 			});
-			this.addAttributesToTargetElement(tar, div);
+			div.find(".target").val(tar.name);
+			div.find(".target").css('font-weight', 'bold');
+			this.addAttributesToElement(tar, div.find(".target"));
 			createToolTip({
 				element: div.find(".eventify"),
 				title: messageSource.tooltips.eventify
@@ -1850,16 +1840,13 @@ Parser.prototype.setTargets = function(targets) {
 		}
 	}
 };
-Parser.prototype.addAttributesToTargetElement = function(target, div) {
-	div.find(".target").val(target.name);
-	// Item attributes
-	div.find(".target").css('font-weight', 'bold');
-	div.find(".target").attr("item-oid", target.oid);
-	div.find(".target").attr("group-oid", target.group);
-	div.find(".target").attr("crf-oid", target.crf);
-	div.find(".target").attr("event-oid", target.evt);
-	div.find(".target").attr("version-oid", target.version);
-	div.find(".target").attr("study-oid", this.extractStudy(this.getStudy()).oid);
+Parser.prototype.addAttributesToElement = function(attributeMap, element) {
+	element.attr("item-oid", attributeMap.oid);
+	element.attr("group-oid", attributeMap.group);
+	element.attr("crf-oid", attributeMap.crf);
+	element.attr("event-oid", attributeMap.evt);
+	element.attr("version-oid", attributeMap.version);
+	element.attr("study-oid", this.extractStudy(this.getStudy()).oid);
 }
 Parser.prototype.extractTarget = function(candidate) {
 	var target = Object.create(null);
