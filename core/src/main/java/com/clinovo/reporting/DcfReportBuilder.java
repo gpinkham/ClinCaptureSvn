@@ -95,7 +95,7 @@ public class DcfReportBuilder {
 	}
 
 	private void initResourceBundles() {
-		Locale locale = new Locale(CoreResources.getSystemLanguage());
+		Locale locale = CoreResources.getSystemLocale();
 		this.resword = ResourceBundleProvider.getWordsBundle(locale);
 		this.resformat = ResourceBundleProvider.getFormatBundle(locale);
 	}

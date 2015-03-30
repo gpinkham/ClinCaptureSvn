@@ -154,7 +154,7 @@ public final class DateUtil {
 
 	private static Locale getLocale() {
 		if (locale == null) {
-			locale = new Locale(CoreResources.getSystemLanguage());
+			locale = CoreResources.getSystemLocale();
 		}
 		return locale;
 	}

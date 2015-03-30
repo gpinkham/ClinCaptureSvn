@@ -1,6 +1,12 @@
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.SessionUtil;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -21,14 +27,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.i18n.LocaleResolver;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ ResourceBundleProvider.class, ViewStudyEventsServlet.class })
+@PrepareForTest({ResourceBundleProvider.class, ViewStudyEventsServlet.class})
 @SuppressWarnings("rawtypes")
 public class ViewStudyEventsServletTest {
 
@@ -61,11 +63,11 @@ public class ViewStudyEventsServletTest {
 
 	@Test
 	public void testThatSavedUrlIsChangedIfRequestLocaleWasChanged() {
-		SessionUtil.updateLocale(session, Locale.ENGLISH);
+		LocaleResolver.updateLocale(session, Locale.ENGLISH);
 		String key = viewStudyEventsServlet.getUrlKey(request);
 		viewStudyEventsServlet.getDefaultUrl(request);
 		String savedUrl = (String) request.getSession().getAttribute(key);
-		SessionUtil.updateLocale(session, Locale.JAPAN);
+		LocaleResolver.updateLocale(session, Locale.JAPAN);
 		viewStudyEventsServlet.getDefaultUrl(request);
 		Assert.assertFalse(request.getSession().getAttribute(key).equals(savedUrl));
 	}
@@ -76,7 +78,7 @@ public class ViewStudyEventsServletTest {
 		viewStudyEventsServlet = PowerMockito.mock(ViewStudyEventsServlet.class);
 		Mockito.doCallRealMethod().when(viewStudyEventsServlet).processRequest(request, response);
 		Mockito.doCallRealMethod().when(viewStudyEventsServlet).getLocalDf(request);
-		SessionUtil.updateLocale(session, Locale.ENGLISH);
+		LocaleResolver.updateLocale(session, Locale.ENGLISH);
 		Validator validator = PowerMockito.mock(Validator.class);
 		PowerMockito
 				.when(viewStudyEventsServlet,
@@ -96,7 +98,7 @@ public class ViewStudyEventsServletTest {
 
 	@Test
 	public void testThatUrlWithPrintParameterOpensCorrectPage() {
-		SessionUtil.updateLocale(session, Locale.ENGLISH);
+		LocaleResolver.updateLocale(session, Locale.ENGLISH);
 		String key = viewStudyEventsServlet.getUrlKey(request);
 		viewStudyEventsServlet.getDefaultUrl(request);
 		String savedUrl = (String) request.getSession().getAttribute(key);

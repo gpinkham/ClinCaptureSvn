@@ -128,6 +128,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.StudyParameterPriorityUtil;
 
 /**
@@ -397,17 +398,16 @@ public abstract class Controller extends BaseController {
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		// Set current language preferences
-		Locale locale = getLocaleResolver().resolveLocale(request);
-		ResourceBundleProvider.updateLocale(locale);
-		resadmin = ResourceBundleProvider.getAdminBundle(locale);
-		resaudit = ResourceBundleProvider.getAuditEventsBundle(locale);
-		resexception = ResourceBundleProvider.getExceptionsBundle(locale);
-		resformat = ResourceBundleProvider.getFormatBundle(locale);
-		restext = ResourceBundleProvider.getTextsBundle(locale);
-		resterm = ResourceBundleProvider.getTermsBundle(locale);
-		resword = ResourceBundleProvider.getWordsBundle(locale);
-		respage = ResourceBundleProvider.getPageMessagesBundle(locale);
-		resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
+		LocaleResolver.resolveLocale();
+		resadmin = ResourceBundleProvider.getAdminBundle();
+		resaudit = ResourceBundleProvider.getAuditEventsBundle();
+		resexception = ResourceBundleProvider.getExceptionsBundle();
+		resformat = ResourceBundleProvider.getFormatBundle();
+		restext = ResourceBundleProvider.getTextsBundle();
+		resterm = ResourceBundleProvider.getTermsBundle();
+		resword = ResourceBundleProvider.getWordsBundle();
+		respage = ResourceBundleProvider.getPageMessagesBundle();
+		resworkflow = ResourceBundleProvider.getWorkflowBundle();
 
 		response.addCookie(new Cookie(BOOSTRAP_DATE_FORMAT, resformat.getString(BOOTSTRAP_DATAPICKER_DATE_FORMAT)));
 		response.addCookie(new Cookie(CC_DATE_FORMAT, resformat.getString(DATE_FORMAT_STRING)));
@@ -2218,5 +2218,9 @@ public abstract class Controller extends BaseController {
 				return new Integer(ec1.getId()).compareTo(ec2.getId());
 			}
 		});
+	}
+
+	public Locale getLocale() {
+		return LocaleResolver.getLocale();
 	}
 }

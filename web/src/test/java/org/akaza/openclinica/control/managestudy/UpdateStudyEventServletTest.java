@@ -46,8 +46,8 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SessionUtil;
 import com.clinovo.util.SignUtil;
 
 @RunWith(PowerMockRunner.class)
@@ -117,7 +117,7 @@ public class UpdateStudyEventServletTest {
 		PowerMockito.doReturn(0).when(studyBean).getParentStudyId();
 		PowerMockito.doReturn(1).when(studySubjectBean).getStudyId();
 		currentStudyLocked = "current study locked";
-		PowerMockito.doReturn(Locale.ENGLISH).when(session).getAttribute(SessionUtil.CURRENT_SESSION_LOCALE);
+		PowerMockito.doReturn(Locale.ENGLISH).when(session).getAttribute(LocaleResolver.CURRENT_SESSION_LOCALE);
 		PowerMockito.mockStatic(Status.class);
 		PowerMockito.mockStatic(SignUtil.class);
 		PowerMockito.mockStatic(ResourceBundleProvider.class);

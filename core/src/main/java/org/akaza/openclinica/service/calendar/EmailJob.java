@@ -5,7 +5,6 @@ import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
-import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
@@ -22,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+
+import com.clinovo.util.EmailUtil;
 
 /**
  * EmailJob.
@@ -43,7 +44,7 @@ public class EmailJob extends QuartzJobBean {
 
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-		Locale locale = new Locale(CoreResources.getSystemLanguage());
+		Locale locale = CoreResources.getSystemLocale();
 		ResourceBundleProvider.updateLocale(locale);
 		reswords = ResourceBundleProvider.getWordsBundle();
 		JobDetailImpl jobDetail = (JobDetailImpl) context.getJobDetail();
@@ -86,14 +87,16 @@ public class EmailJob extends QuartzJobBean {
 		}
 	}
 
-	private String emailTextMessage(UserAccountBean ub, String eventName, String subjectLabel, String daysBetween, String studyName) {
+	private String emailTextMessage(UserAccountBean ub, String eventName, String subjectLabel, String daysBetween,
+			String studyName) {
 		String emailTestMessage = "";
 		emailTestMessage = EmailUtil.getEmailBodyStart();
 		emailTestMessage += reswords.getString("day_email_message_htm");
 		emailTestMessage = emailTestMessage.replace("{0}", ub.getFirstName() + " " + ub.getLastName())
-				.replace("{1}", eventName).replace("{2}", subjectLabel).replace("{3}", studyName).replace("{4}", daysBetween).replace("{5}", studyName);
+				.replace("{1}", eventName).replace("{2}", subjectLabel).replace("{3}", studyName)
+				.replace("{4}", daysBetween).replace("{5}", studyName);
 		emailTestMessage += EmailUtil.getEmailBodyEnd();
-		emailTestMessage += EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
+		emailTestMessage += EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
 		return emailTestMessage;
 	}
 

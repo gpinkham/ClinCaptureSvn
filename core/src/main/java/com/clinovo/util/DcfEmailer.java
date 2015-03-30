@@ -78,7 +78,7 @@ public final class DcfEmailer implements DcfRenderType {
 	}
 
 	private void initResourceBundles() {
-		this.locale = new Locale(CoreResources.getSystemLanguage());
+		this.locale = CoreResources.getSystemLocale();
 		this.respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		this.resword = ResourceBundleProvider.getWordsBundle(locale);
 	}

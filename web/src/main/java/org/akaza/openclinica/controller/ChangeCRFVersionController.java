@@ -68,7 +68,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.clinovo.util.SessionUtil;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * Implement the functionality for displaying a table of Event CRFs for Source Data Verification. This is an autowired,
@@ -85,8 +85,6 @@ public class ChangeCRFVersionController {
 	CoreResources coreResources;
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
-	ResourceBundle resword, resformat;
 
 	public ChangeCRFVersionController() {
 
@@ -140,7 +138,6 @@ public class ChangeCRFVersionController {
 		// get CRF by ID with all versions
 		// create List of all versions (label + value)
 		// set default CRF version label
-		setupResource(request);
 
 		// from event_crf get
 		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
@@ -236,14 +233,14 @@ public class ChangeCRFVersionController {
 		request.setAttribute("eventCreateDate", eventCreateDate);
 		request.setAttribute("eventOrdinal", eventOrdinal);
 
+		ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
+
 		ModelMap gridMap = new ModelMap();
 		ArrayList<String> pageMessages = (ArrayList<String>) request.getAttribute("pageMessages");
 		if (pageMessages == null) {
 			pageMessages = new ArrayList<String>();
 		}
-		setupResource(request);
 		if (selectedVersionId == -1) {
-
 			String errorMessage = resword.getString("confirm_crf_version_em_select_version");// "Please select CRF version";
 			// pageMessages.add(errorMessage);
 			// request.setAttribute("pageMessages",pageMessages);
@@ -479,12 +476,13 @@ public class ChangeCRFVersionController {
 				return null;
 		}
 
+		ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
+
 		ArrayList<String> pageMessages = (ArrayList<String>) request.getAttribute("pageMessages");
 		if (pageMessages == null) {
 			pageMessages = new ArrayList<String>();
 		}
 		request.setAttribute("pageMessages", pageMessages);
-		setupResource(request);
 		// update event_crf_id table
 		try {
 			EventCRFDAO event_crf_dao = new EventCRFDAO(dataSource);
@@ -590,14 +588,8 @@ public class ChangeCRFVersionController {
 		request.getSession().setAttribute("panel", panel);
 	}
 
-	private void setupResource(HttpServletRequest request) {
-		Locale locale = SessionUtil.getLocale(request);
-		ResourceBundleProvider.updateLocale(locale);
-		resword = ResourceBundleProvider.getWordsBundle(locale);
-		resformat = ResourceBundleProvider.getFormatBundle(locale);
-	}
-
 	private String formatDate(Date date) {
+		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
 		String dateFormat = resformat.getString("date_format_string");
 		SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 		String s = formatter.format(date);

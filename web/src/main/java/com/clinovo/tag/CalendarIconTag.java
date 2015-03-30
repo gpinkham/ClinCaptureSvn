@@ -1,6 +1,12 @@
 package com.clinovo.tag;
 
-import com.clinovo.util.SessionUtil;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.tagext.TagSupport;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.slf4j.Logger;
@@ -9,13 +15,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.TagSupport;
-
-import java.util.Locale;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * Tag that will generate icon for calendar.
@@ -34,6 +34,17 @@ public class CalendarIconTag extends TagSupport {
 	private String imageId = "";
 	private boolean checkIfShowYear = false;
 
+	private void reset() {
+		alt = "";
+		title = "";
+		linkId = "";
+		imageId = "";
+		linkName = "";
+		dateFormat = "";
+		onClickSelector = null;
+		checkIfShowYear = false;
+	}
+
 	@Override
 	public int doStartTag() throws JspException {
 
@@ -43,29 +54,29 @@ public class CalendarIconTag extends TagSupport {
 							.getAttribute("javax.servlet.jsp.jspPageContext")).getServletContext());
 			StudyBean currentStudy = (StudyBean) pageContext.getSession().getAttribute("study");
 			MessageSource messageSource = (MessageSource) webApplicationContext.getBean("messageSource");
-			Locale locale = SessionUtil.getLocale((HttpServletRequest) pageContext.getRequest());
+			Locale locale = LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest());
 
 			alt = alt.isEmpty() ? messageSource.getMessage("show_calendar", null, locale) : alt;
 			title = title.isEmpty() ? messageSource.getMessage("show_calendar", null, locale) : title;
-			dateFormat = dateFormat.isEmpty() ? messageSource.getMessage("date_format_calender", null, locale) : dateFormat;
+			dateFormat = dateFormat.isEmpty()
+					? messageSource.getMessage("date_format_calender", null, locale)
+					: dateFormat;
 
 			String html = "";
 
-
 			html = html.concat("<a href='#!' onclick=\"$(" + onClickSelector + ")")
-					.concat(".datepicker({ dateFormat: '" + dateFormat + "', ")
-					.concat("showOn: 'none'");
+					.concat(".datepicker({ dateFormat: '" + dateFormat + "', ").concat("showOn: 'none'");
 
-			boolean showYears = checkIfShowYear ? currentStudy.getStudyParameterConfig().getShowYearsInCalendar().equalsIgnoreCase("yes") : true;
+			boolean showYears = checkIfShowYear ? currentStudy.getStudyParameterConfig().getShowYearsInCalendar()
+					.equalsIgnoreCase("yes") : true;
 
 			if (showYears) {
-				html = html.concat(", changeYear: true,changeMonth : true,\n")
-						.concat("onChangeMonthYear: function (year, month, inst) {\n"
-								+ "\t var date = $(this).val();\n"
+				html = html.concat(", changeYear: true,changeMonth : true,\n").concat(
+						"onChangeMonthYear: function (year, month, inst) {\n" + "\t var date = $(this).val();\n"
 								+ "\t if ($.trim(date) != '') {\n"
 								+ "\t\t var newDate = month + '/' + inst.currentDay + '/' + year;\n"
-								+ "\t\t $(this).val($.datepicker.formatDate('" + dateFormat + "', new Date(newDate)));\n"
-								+ "\t}\n},\n yearRange: 'c-20:c+10'");
+								+ "\t\t $(this).val($.datepicker.formatDate('" + dateFormat
+								+ "', new Date(newDate)));\n" + "\t}\n},\n yearRange: 'c-20:c+10'");
 			}
 			html = html.concat("}).datepicker('show');\" ");
 			if (!linkId.isEmpty()) {
@@ -74,8 +85,8 @@ public class CalendarIconTag extends TagSupport {
 			if (!linkName.isEmpty()) {
 				html = html.concat("name='" + linkName + "'");
 			}
-			html = html.concat(">\n \t<img src='images/bt_Calendar.gif' alt='" + alt + "' ")
-					.concat("title='" + title + "' border='0'");
+			html = html.concat(">\n \t<img src='images/bt_Calendar.gif' alt='" + alt + "' ").concat(
+					"title='" + title + "' border='0'");
 			if (!imageId.isEmpty()) {
 				html = html.concat("id='" + imageId + "'");
 			}
@@ -88,6 +99,7 @@ public class CalendarIconTag extends TagSupport {
 				LOGGER.error("Error has occurred.", ex);
 			}
 		}
+		reset();
 		return SKIP_BODY;
 	}
 
@@ -153,5 +165,11 @@ public class CalendarIconTag extends TagSupport {
 
 	public void setCheckIfShowYear(boolean checkIfShowYear) {
 		this.checkIfShowYear = checkIfShowYear;
+	}
+
+	@Override
+	public void release() {
+		reset();
+		super.release();
 	}
 }

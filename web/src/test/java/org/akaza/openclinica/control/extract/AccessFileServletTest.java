@@ -1,5 +1,8 @@
 package org.akaza.openclinica.control.extract;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -16,10 +19,7 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.clinovo.util.SessionUtil;
-
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import com.clinovo.i18n.LocaleResolver;
 
 public class AccessFileServletTest {
 
@@ -43,9 +43,9 @@ public class AccessFileServletTest {
 		Mockito.doCallRealMethod().when(accessFileServlet).mayProceed(request, response);
 		Mockito.when(accessFileServlet.getCurrentRole(request)).thenReturn(currentRole);
 		Mockito.when(accessFileServlet.getUserAccountBean(request)).thenReturn(currentUser);
-		
+
 		Locale locale = new Locale("en");
-		SessionUtil.updateLocale(request, locale);
+		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
@@ -58,7 +58,7 @@ public class AccessFileServletTest {
 		accessFileServlet.processRequest(request, response);
 		assertTrue(response.getHeader("Location").equals("/MainMenu"));
 	}
-	
+
 	@Test
 	public void testThatSysAdminCanProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.SYSADMIN);
@@ -81,7 +81,7 @@ public class AccessFileServletTest {
 		accessFileServlet.mayProceed(request, response);
 		assertNull(request.getAttribute("pageMessages"));
 	}
-	
+
 	@Test
 	public void testThatInvestigatorCanProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);
@@ -89,7 +89,7 @@ public class AccessFileServletTest {
 		accessFileServlet.mayProceed(request, response);
 		assertNull(request.getAttribute("pageMessages"));
 	}
-	
+
 	@Test
 	public void testThatStudyMonitorCanProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);
@@ -97,7 +97,7 @@ public class AccessFileServletTest {
 		accessFileServlet.mayProceed(request, response);
 		assertNull(request.getAttribute("pageMessages"));
 	}
-	
+
 	@Test
 	public void testThatSiteMonitorCanProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);

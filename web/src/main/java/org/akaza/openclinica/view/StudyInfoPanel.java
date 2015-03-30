@@ -20,7 +20,18 @@
  */
 package org.akaza.openclinica.view;
 
-import com.clinovo.util.SessionUtil;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.TreeMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -39,16 +50,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.TreeMap;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * To create a flexible panel of information that will change while the user manages his or her session.
@@ -56,7 +58,7 @@ import java.util.TreeMap;
  * @author thickerson
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class StudyInfoPanel {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -192,7 +194,7 @@ public class StudyInfoPanel {
 	 */
 	public void setData(Page page, HttpSession session, HttpServletRequest request) {
 
-		Locale locale = SessionUtil.getLocale(request);
+		Locale locale = LocaleResolver.getLocale(request);
 		resword = ResourceBundleProvider.getWordsBundle(locale);
 		local_sdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string"));
 

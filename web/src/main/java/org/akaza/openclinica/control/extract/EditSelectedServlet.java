@@ -20,7 +20,15 @@
  */
 package org.akaza.openclinica.control.extract;
 
-import com.clinovo.util.SessionUtil;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -41,15 +49,9 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import com.clinovo.i18n.LocaleResolver;
 
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class EditSelectedServlet extends Controller {
 
@@ -95,8 +97,9 @@ public class EditSelectedServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 
-		request.setAttribute("subjectAgeAtEvent",
-				currentStudy.getStudyParameterConfig().getCollectDob().equals("3") ? "0" : "1");
+		request.setAttribute("subjectAgeAtEvent", currentStudy.getStudyParameterConfig().getCollectDob().equals("3")
+				? "0"
+				: "1");
 
 		FormProcessor fp = new FormProcessor(request);
 		boolean selectAll = fp.getBoolean("all");
@@ -112,9 +115,9 @@ public class EditSelectedServlet extends Controller {
 			db = selectAll(db, null, request);
 
 			MessageFormat msg = new MessageFormat("");
-			msg.setLocale(SessionUtil.getLocale(request));
+			msg.setLocale(LocaleResolver.getLocale(request));
 			msg.applyPattern(respage.getString("choose_include_all_items_dataset"));
-			Object[] arguments = { db.getItemIds().size() };
+			Object[] arguments = {db.getItemIds().size()};
 			addPageMessage(msg.format(arguments), request);
 		}
 

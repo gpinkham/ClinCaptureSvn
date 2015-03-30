@@ -20,7 +20,23 @@
  */
 package org.akaza.openclinica.control.extract;
 
-import com.clinovo.util.SessionUtil;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.CommaReportBean;
@@ -53,21 +69,7 @@ import org.quartz.impl.StdScheduler;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * Take a dataset and show it in different formats,<BR/>
@@ -81,7 +83,7 @@ import java.util.zip.ZipFile;
  * 
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ExportDatasetServlet extends Controller {
 
@@ -100,7 +102,7 @@ public class ExportDatasetServlet extends Controller {
 		ArchivedDatasetFileDAO asdfdao = getArchivedDatasetFileDAO();
 		FormProcessor fp = new FormProcessor(request);
 
-		Locale locale = SessionUtil.getLocale(request);
+		Locale locale = LocaleResolver.getLocale(request);
 		GenerateExtractFileService generateFileService = new GenerateExtractFileService(getDataSource(), locale, ub,
 				getCoreResources(), getRuleSetRuleDao());
 		String action = fp.getString("action");
@@ -321,9 +323,9 @@ public class ExportDatasetServlet extends Controller {
 				ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(newFileList);
 				EntityBeanTable table = fp.getEntityBeanTable();
 				table.setSortingIfNotExplicitlySet(3, false);// sort by date
-				String[] columns = { resword.getString("file_name"), resword.getString("run_time"),
+				String[] columns = {resword.getString("file_name"), resword.getString("run_time"),
 						resword.getString("file_size"), resword.getString("created_date"),
-						resword.getString("created_by") };
+						resword.getString("created_by")};
 
 				table.setColumns(new ArrayList(Arrays.asList(columns)));
 				table.hideColumnLink(0);
@@ -428,9 +430,9 @@ public class ExportDatasetServlet extends Controller {
 		ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(fileList);
 		EntityBeanTable table = fp.getEntityBeanTable();
 		table.setSortingIfNotExplicitlySet(3, false);// sort by date
-		String[] columns = { resword.getString("file_name"), resword.getString("run_time"),
+		String[] columns = {resword.getString("file_name"), resword.getString("run_time"),
 				resword.getString("file_size"), resword.getString("created_date"), resword.getString("created_by"),
-				resword.getString("action") };
+				resword.getString("action")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(0);
 		table.hideColumnLink(1);

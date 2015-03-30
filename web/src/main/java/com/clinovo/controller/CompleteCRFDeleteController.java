@@ -13,8 +13,12 @@
 
 package com.clinovo.controller;
 
-import com.clinovo.util.PageMessagesUtil;
-import com.clinovo.util.SessionUtil;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -37,10 +41,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.PageMessagesUtil;
 
 /**
  * CompleteCRFDeleteController that handles requests from the delete crf page.
@@ -109,13 +111,10 @@ public class CompleteCRFDeleteController {
 			if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0
 					|| eventDefinitionListAvailable.size() > 0 || ruleSetBeanList.size() > 0) {
 				PageMessagesUtil.addPageMessage(request,
-						messageSource.getMessage("this_crf_has_associated_data", null, SessionUtil.getLocale(request)));
+						messageSource.getMessage("this_crf_has_associated_data", null, LocaleResolver.getLocale()));
 			} else {
-				PageMessagesUtil
-						.addPageMessage(
-								request,
-								messageSource.getMessage("this_crf_has_no_conflict_data", null,
-										SessionUtil.getLocale(request)));
+				PageMessagesUtil.addPageMessage(request,
+						messageSource.getMessage("this_crf_has_no_conflict_data", null, LocaleResolver.getLocale()));
 			}
 
 		} else {
@@ -154,11 +153,11 @@ public class CompleteCRFDeleteController {
 		if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0 || eventDefinitionListAvailable.size() > 0
 				|| ruleSetBeanList.size() > 0) {
 			request.getSession().setAttribute("controllerMessage",
-					messageSource.getMessage("this_crf_has_associated_data", null, SessionUtil.getLocale(request)));
+					messageSource.getMessage("this_crf_has_associated_data", null, LocaleResolver.getLocale()));
 		} else {
 			crfDao.deleteCrfById(crfId);
 			request.getSession().setAttribute("controllerMessage",
-					messageSource.getMessage("the_crf_has_been_removed", null, SessionUtil.getLocale(request)));
+					messageSource.getMessage("the_crf_has_been_removed", null, LocaleResolver.getLocale()));
 		}
 
 		return CRF_LIST;

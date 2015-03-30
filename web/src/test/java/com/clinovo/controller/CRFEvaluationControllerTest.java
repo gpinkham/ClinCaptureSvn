@@ -1,7 +1,8 @@
 package com.clinovo.controller;
 
-import com.clinovo.BaseControllerTest;
-import com.clinovo.util.SessionUtil;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -13,8 +14,8 @@ import org.junit.Test;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.clinovo.BaseControllerTest;
+import com.clinovo.i18n.LocaleResolver;
 
 public class CRFEvaluationControllerTest extends BaseControllerTest {
 
@@ -38,7 +39,7 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 	public void testThatForSystemAdministratorRoleCRFEvaluationControllerReturnsCode200() throws Exception {
 		userRole.setRole(Role.SYSTEM_ADMINISTRATOR);
 		this.mockMvc.perform(
-				get(CRF_EVALUATION).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(CRF_EVALUATION).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.sessionAttr(BaseController.STUDY, currentStudy)
 						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
 						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(status().isOk());
@@ -48,7 +49,7 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 	public void testThatForStudyAdministratorRoleCRFEvaluationControllerReturnsCode200() throws Exception {
 		userRole.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
-				get(CRF_EVALUATION).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(CRF_EVALUATION).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.sessionAttr(BaseController.STUDY, currentStudy)
 						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
 						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(status().isOk());
@@ -58,7 +59,7 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 	public void testThatForEvaluatorRoleCRFEvaluationControllerReturnsCode200() throws Exception {
 		userRole.setRole(Role.STUDY_EVALUATOR);
 		this.mockMvc.perform(
-				get(CRF_EVALUATION).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(CRF_EVALUATION).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.sessionAttr(BaseController.STUDY, currentStudy)
 						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
 						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(status().isOk());
@@ -68,7 +69,7 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 	public void testThatCRFEvaluationControllerBlocksNonAdministrativeRoles() throws Exception {
 		userRole.setRole(Role.INVESTIGATOR);
 		this.mockMvc.perform(
-				MockMvcRequestBuilders.get(CRF_EVALUATION).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				MockMvcRequestBuilders.get(CRF_EVALUATION).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.sessionAttr(BaseController.STUDY, currentStudy)
 						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
 						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(
@@ -85,7 +86,7 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 		assertEquals(BaseController.getUnavailableCRFList().size(), 2);
 		userRole.setRole(Role.STUDY_EVALUATOR);
 		this.mockMvc.perform(
-				get(CRF_EVALUATION).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(CRF_EVALUATION).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.sessionAttr(BaseController.STUDY, currentStudy)
 						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
 						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(status().isOk());

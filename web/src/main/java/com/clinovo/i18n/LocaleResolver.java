@@ -13,46 +13,41 @@
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
 
-package com.clinovo.util;
+package com.clinovo.i18n;
 
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.jstl.core.Config;
-import java.util.Locale;
+
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
- * SessionUtil.
+ * LocaleResolver.
  */
 @SuppressWarnings("unused")
-public final class SessionUtil {
+public class LocaleResolver implements org.springframework.web.servlet.LocaleResolver {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SessionUtil.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LocaleResolver.class);
 
 	public static final String CURRENT_SESSION_LOCALE = "current.session.locale";
-
-	private SessionUtil() {
-	}
 
 	/**
 	 * Method that updates session attributes.
 	 * 
-	 * @param coreResources
-	 *            CoreResources
-	 * @param localeResolver
-	 *            SessionLocaleResolver
 	 * @param request
 	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
+	 * @param coreResources
+	 *            CoreResources
 	 */
-	public static void updateSession(CoreResources coreResources, SessionLocaleResolver localeResolver,
-			HttpServletRequest request, HttpServletResponse response) {
+	public static void updateSession(HttpServletRequest request, CoreResources coreResources) {
 		HttpSession session = request.getSession();
 		for (Object key : coreResources.getDataInfo().keySet()) {
 			if (key instanceof String) {
@@ -63,25 +58,7 @@ public final class SessionUtil {
 			}
 		}
 		session.setAttribute("newThemeColor", CoreResources.getField("themeColor"));
-		updateLocale(request, response, localeResolver, new Locale(CoreResources.getSystemLanguage()));
-	}
-
-	/**
-	 * Method that updates locale.
-	 *
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 * @param localeResolver
-	 *            SessionLocaleResolver
-	 * @param locale
-	 *            Locale
-	 */
-	public static void updateLocale(HttpServletRequest request, HttpServletResponse response,
-			SessionLocaleResolver localeResolver, Locale locale) {
-		updateLocale(request.getSession(), locale);
-		localeResolver.setLocale(request, response, locale);
+		updateLocale(request, CoreResources.getSystemLocale());
 	}
 
 	/**
@@ -93,8 +70,7 @@ public final class SessionUtil {
 	 *            Locale
 	 */
 	public static void updateLocale(HttpServletRequest request, Locale locale) {
-		request.getSession().setAttribute(CURRENT_SESSION_LOCALE, locale);
-		Config.set(request.getSession(), Config.FMT_LOCALE, locale);
+		updateLocale(request.getSession(), locale);
 	}
 
 	/**
@@ -118,17 +94,43 @@ public final class SessionUtil {
 	 * @return Locale
 	 */
 	public static Locale getLocale(HttpServletRequest request) {
-		return (Locale) request.getSession().getAttribute(CURRENT_SESSION_LOCALE);
+		Locale locale = (Locale) request.getSession().getAttribute(CURRENT_SESSION_LOCALE);
+		if (locale == null) {
+			locale = CoreResources.getSystemLocale();
+			updateLocale(request, locale);
+		}
+		ResourceBundleProvider.updateLocale(locale);
+		return locale;
 	}
 
 	/**
 	 * Method return locale.
-	 * 
-	 * @param session
-	 *            HttpSession
+	 *
 	 * @return Locale
 	 */
-	public static Locale getLocale(HttpSession session) {
-		return (Locale) session.getAttribute(CURRENT_SESSION_LOCALE);
+	public static Locale getLocale() {
+		return getLocale(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
+	}
+
+	/**
+	 * Method resolves locale.
+	 *
+	 */
+	public static void resolveLocale() {
+		getLocale();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Locale resolveLocale(HttpServletRequest request) {
+		return getLocale();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setLocale(HttpServletRequest request, HttpServletResponse response, Locale locale) {
+		updateLocale(request, locale);
 	}
 }

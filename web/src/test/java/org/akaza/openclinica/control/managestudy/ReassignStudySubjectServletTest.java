@@ -13,7 +13,9 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.SessionUtil;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.admin.DisplayStudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -37,11 +39,10 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockRequestDispatcher;
 import org.springframework.mock.web.MockServletContext;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.i18n.LocaleResolver;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ ReassignStudySubjectServlet.class, StudySubjectDAO.class, SubjectDAO.class, StudyDAO.class })
+@PrepareForTest({ReassignStudySubjectServlet.class, StudySubjectDAO.class, SubjectDAO.class, StudyDAO.class})
 public class ReassignStudySubjectServletTest {
 
 	@Mock
@@ -61,7 +62,7 @@ public class ReassignStudySubjectServletTest {
 		requestDispatcher = Mockito.mock(MockRequestDispatcher.class);
 
 		Locale locale = new Locale("en");
-		SessionUtil.updateLocale(request, locale);
+		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);

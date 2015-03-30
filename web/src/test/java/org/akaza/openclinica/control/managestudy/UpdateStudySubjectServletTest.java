@@ -1,6 +1,11 @@
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.SessionUtil;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -32,11 +37,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockRequestDispatcher;
 import org.springframework.mock.web.MockServletContext;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.i18n.LocaleResolver;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ResourceBundleProvider.class)
@@ -84,7 +85,7 @@ public class UpdateStudySubjectServletTest {
 				resExceptions);
 
 		request = new MockHttpServletRequest();
-		SessionUtil.updateLocale(request, locale);
+		LocaleResolver.updateLocale(request, locale);
 
 		subjectToUpdate = new StudySubjectBean();
 

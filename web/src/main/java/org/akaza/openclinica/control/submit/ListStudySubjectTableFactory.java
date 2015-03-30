@@ -83,9 +83,9 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.SDVUtil;
-import com.clinovo.util.SessionUtil;
 import com.clinovo.util.SignUtil;
 import com.clinovo.util.SubjectEventStatusUtil;
 
@@ -136,7 +136,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	// To avoid showing title in other pages, the request element is used to determine where the request came from.
 	@Override
 	public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
-		locale = SessionUtil.getLocale(request);
+		locale = LocaleResolver.getLocale(request);
 		TableFacade tableFacade = getTableFacadeImpl(request, response);
 		tableFacade.setStateAttr("restore");
 		setDataAndLimitVariables(tableFacade);
@@ -1143,7 +1143,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		// Event Div
 		eventDiv.div().id("Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
 				.styleClass("eventDivWrapper ViewSubjectsPopup").style("width:" + divWidth + "px;")
-				.rel("" + studySubject.getId()).append("event_name='" + sed.getName()+ "'").close();
+				.rel("" + studySubject.getId()).append("event_name='" + sed.getName() + "'").close();
 
 		eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").close();
 

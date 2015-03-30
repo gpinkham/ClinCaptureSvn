@@ -16,7 +16,15 @@
  */
 package org.akaza.openclinica.control.urlRewrite;
 
-import com.clinovo.util.SessionUtil;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.ResourceBundle;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -40,19 +48,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.ResourceBundle;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * Servlet to call appropriate application pages corresponding to supported RESTful URLs.
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 @Component
 public class UrlRewriterServlet extends Controller {
 
@@ -62,7 +64,6 @@ public class UrlRewriterServlet extends Controller {
 	private static final int EVENT_REPEAT_KEY = 2;
 	private static final int FORM_OID_KEY = 3;
 	private static final int ITEM_GROUP_OID_KEY = 4;
-
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -98,7 +99,7 @@ public class UrlRewriterServlet extends Controller {
 						requestURI.length());
 			}
 
-			ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(SessionUtil.getLocale(request));
+			ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(LocaleResolver.getLocale(request));
 			ocResource = getOpenClinicaResourceFromURL(requestOIDStr, resexception);
 			if (null != ocResource) {
 				if (ocResource.isInValid()) {
@@ -223,11 +224,12 @@ public class UrlRewriterServlet extends Controller {
 						logger.info("URLPAramValue::" + urlParamValue);
 						if ((null != urlParamValue) && (!urlParamValue.equals(""))) {
 							switch (i) {
-								case STUDY_KEY: {
+								case STUDY_KEY : {
 									study = stdao.findByOid(urlParamValue);
 									if (study == null) {
 										openClinicaResource.setInValid(true);
-										openClinicaResource.getMessages().add(resexception.getString("invalid_study_oid"));
+										openClinicaResource.getMessages().add(
+												resexception.getString("invalid_study_oid"));
 										return openClinicaResource;
 									} else {
 										openClinicaResource.setStudyOID(urlParamValue);
@@ -238,12 +240,12 @@ public class UrlRewriterServlet extends Controller {
 									break;
 								}
 
-								case STUDY_SUBJECT_KEY: { // StudySubjectKey
+								case STUDY_SUBJECT_KEY : { // StudySubjectKey
 									subject = ssubdao.findByOidAndStudy(urlParamValue, study.getId());
 									if (subject == null) {
 										openClinicaResource.setInValid(true);
-										openClinicaResource.getMessages()
-												.add(resexception.getString("invalid_subject_oid"));
+										openClinicaResource.getMessages().add(
+												resexception.getString("invalid_subject_oid"));
 										return openClinicaResource;
 									} else {
 										openClinicaResource.setStudySubjectOID(urlParamValue);
@@ -255,7 +257,7 @@ public class UrlRewriterServlet extends Controller {
 									break;
 								}
 
-								case EVENT_REPEAT_KEY: {
+								case EVENT_REPEAT_KEY : {
 									// repeat key
 									String seoid = "";
 									eventRepeatKey = null;
@@ -280,7 +282,8 @@ public class UrlRewriterServlet extends Controller {
 										logger.info("seoid" + seoid);
 									}
 									if ((null != seoid) && (null != study)) {
-										sed = sedefdao.findByOidAndStudy(seoid, study.getId(), study.getParentStudyId());
+										sed = sedefdao
+												.findByOidAndStudy(seoid, study.getId(), study.getParentStudyId());
 										// validate study event oid
 										if (null == sed) {
 											openClinicaResource.setInValid(true);
@@ -294,9 +297,11 @@ public class UrlRewriterServlet extends Controller {
 									}
 									if (null != eventRepeatKey) {
 										// validate the event ordinal specified exists in database
-										studyEvent = (StudyEventBean) sedao.findByStudySubjectIdAndDefinitionIdAndOrdinal(
-												subject.getId(), sed.getId(), eventRepeatKey);
-										// this method return new StudyEvent (not null) even if no studyEvent can be found
+										studyEvent = (StudyEventBean) sedao
+												.findByStudySubjectIdAndDefinitionIdAndOrdinal(subject.getId(),
+														sed.getId(), eventRepeatKey);
+										// this method return new StudyEvent (not null) even if no studyEvent can be
+										// found
 										if (null == studyEvent || studyEvent.getId() == 0) {
 											openClinicaResource.setInValid(true);
 											openClinicaResource.getMessages().add(
@@ -312,26 +317,29 @@ public class UrlRewriterServlet extends Controller {
 									break;
 								}
 
-								case FORM_OID_KEY: { // form OID
+								case FORM_OID_KEY : { // form OID
 
 									openClinicaResource.setFormVersionOID(urlParamValue);
 
 									cv = crfvdao.findByOid(urlParamValue);
 									if (cv == null) {
 										openClinicaResource.setInValid(true);
-										openClinicaResource.getMessages().add(resexception.getString("invalid_crf_oid"));
+										openClinicaResource.getMessages()
+												.add(resexception.getString("invalid_crf_oid"));
 										return openClinicaResource;
 									} else {
 										openClinicaResource.setFormVersionID(cv.getId());
 										// validate if crf is removed
 										if (cv.getStatus().equals(Status.DELETED)) {
 											openClinicaResource.setInValid(true);
-											openClinicaResource.getMessages().add(resexception.getString("removed_crf"));
+											openClinicaResource.getMessages()
+													.add(resexception.getString("removed_crf"));
 											return openClinicaResource;
 										} else {
 											if (null != study) {
-												HashMap studySubjectCRFDataDetails = sedao.getStudySubjectCRFData(study,
-														studySubjectId, eventDefId, urlParamValue, eventRepeatKey);
+												HashMap studySubjectCRFDataDetails = sedao.getStudySubjectCRFData(
+														study, studySubjectId, eventDefId, urlParamValue,
+														eventRepeatKey);
 												if ((null != studySubjectCRFDataDetails)
 														&& (studySubjectCRFDataDetails.size() != 0)) {
 													if (studySubjectCRFDataDetails.containsKey("event_crf_id")) {
@@ -340,7 +348,8 @@ public class UrlRewriterServlet extends Controller {
 																		.get("event_crf_id"));
 													}
 
-													if (studySubjectCRFDataDetails.containsKey("event_definition_crf_id")) {
+													if (studySubjectCRFDataDetails
+															.containsKey("event_definition_crf_id")) {
 														openClinicaResource
 																.setEventDefinitionCrfId((Integer) studySubjectCRFDataDetails
 																		.get("event_definition_crf_id"));
@@ -365,7 +374,7 @@ public class UrlRewriterServlet extends Controller {
 									break;
 								}
 
-								case ITEM_GROUP_OID_KEY: {
+								case ITEM_GROUP_OID_KEY : {
 									String igoid = "";
 									String igRepeatKey = "";
 									if (urlParamValue.contains("[")) {
@@ -386,7 +395,7 @@ public class UrlRewriterServlet extends Controller {
 									break;
 								}
 
-								default: {
+								default : {
 									break;
 								}
 							}

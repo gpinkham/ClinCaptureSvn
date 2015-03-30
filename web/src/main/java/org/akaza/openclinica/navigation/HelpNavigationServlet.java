@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author igor
  */
-@SuppressWarnings({"unchecked", "serial"})
+@SuppressWarnings({"serial"})
 public class HelpNavigationServlet extends HttpServlet {
 
 	@Override

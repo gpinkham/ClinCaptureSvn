@@ -20,6 +20,7 @@ import com.clinovo.coding.model.ClassificationElement;
 import com.clinovo.coding.source.impl.BioPortalSearchInterface;
 import com.clinovo.dao.MedicalProductDAO;
 import com.clinovo.dao.SystemDAO;
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemElement;
 import com.clinovo.model.CodedItemsTableFactory;
@@ -33,7 +34,6 @@ import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.TermService;
 import com.clinovo.util.CompleteClassificationFieldsUtil;
-import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -76,7 +76,8 @@ import java.util.Locale;
 @Controller
 public class CodedItemsController {
 
-	private StudyDAO studyDAO;
+	private Logger logger = LoggerFactory.getLogger(getClass().getName());
+
 	@Autowired
 	private SystemDAO systemDAO;
 
@@ -91,12 +92,6 @@ public class CodedItemsController {
 
 	@Autowired
 	private CodedItemService codedItemService;
-
-	private Search search = new Search();
-	private Logger logger = LoggerFactory.getLogger(getClass().getName());
-
-	private ItemDataDAO itemDataDAO;
-	private StudyParameterValueDAO studyParamDAO;
 
 	private static final String BIOONTOLOGY_URL = "http://bioportal.bioontology.org";
 	private static final String BIOONTOLOGY_WS_URL = "http://data.bioontology.org";
@@ -121,15 +116,12 @@ public class CodedItemsController {
 		String queryString = request.getQueryString();
 
 		if (queryString == null && httpPath != null) {
-
 			response.sendRedirect("codedItems?" + httpPath);
 		} else {
-
 			request.getSession().setAttribute("codedItemUrl", queryString);
 		}
 
 		ModelMap model = new ModelMap();
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		String showMoreLink = request.getParameter("showMoreLink");
 		String showContext = request.getParameter("showContext");
@@ -139,18 +131,19 @@ public class CodedItemsController {
 		themeColor = themeColor == null ? "blue" : themeColor;
 
 		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
-		StudyParameterValueBean mcApprovalNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(),
+		StudyParameterValueDAO studyParameterValueDao = new StudyParameterValueDAO(datasource);
+		StudyParameterValueBean mcApprovalNeeded = studyParameterValueDao.findByHandleAndStudy(study.getId(),
 				"medicalCodingApprovalNeeded");
-		StudyParameterValueBean medicalCodingContextNeeded = getStudyParameterValueDAO().findByHandleAndStudy(
-				study.getId(), "medicalCodingContextNeeded");
-		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(),
+		StudyParameterValueBean medicalCodingContextNeeded = studyParameterValueDao.findByHandleAndStudy(study.getId(),
+				"medicalCodingContextNeeded");
+		StudyParameterValueBean configuredDictionary = studyParameterValueDao.findByHandleAndStudy(study.getId(),
 				"autoCodeDictionaryName");
 		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
 
-		boolean configuredDictionaryIsAvailable = configuredDictionary.getValue() != null
-				&& !configuredDictionary.getValue().isEmpty() ? true : false;
+		boolean configuredDictionaryIsAvailable =
+				configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty();
 
-		List<CodedItem> items = new ArrayList<CodedItem>();
+		List<CodedItem> items;
 
 		// Scope the items
 		if (study.isSite(study.getParentStudyId())) {
@@ -170,9 +163,9 @@ public class CodedItemsController {
 		factory.setCodedItems(items);
 		factory.setDataSource(datasource);
 		factory.setThemeColor(themeColor);
-		factory.setStudyDAO(getStudyDAO());
 		factory.setTerms(termService.findAll());
 		factory.setCrfDAO(new CRFDAO(datasource));
+		factory.setStudyDAO(new StudyDAO(datasource));
 		factory.setEventCRFDAO(new EventCRFDAO(datasource));
 		factory.setCrfVersionDAO(new CRFVersionDAO(datasource));
 		factory.setItemDataDAO(new ItemDataDAO(datasource));
@@ -216,7 +209,6 @@ public class CodedItemsController {
 
 		Term term = null;
 		ModelMap model = new ModelMap();
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		String itemId = request.getParameter("item");
 		String dictionary = request.getParameter("dictionary");
@@ -224,11 +216,11 @@ public class CodedItemsController {
 
 		List<Classification> classifications = new ArrayList<Classification>();
 		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(itemId));
-		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(
+		StudyParameterValueBean configuredDictionary = new StudyParameterValueDAO(datasource).findByHandleAndStudy(
 				codedItem.getStudyId(), "autoCodeDictionaryName");
 
-		boolean configuredDictionaryIsAvailable = configuredDictionary.getValue() != null
-				&& !configuredDictionary.getValue().isEmpty() ? true : false;
+		boolean configuredDictionaryIsAvailable =
+				configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty();
 
 		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
 		com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
@@ -236,7 +228,7 @@ public class CodedItemsController {
 		if (configuredDictionaryIsAvailable) {
 			ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
 			ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
-			String dataValue = "";
+			String dataValue;
 			if (codedItem.getCodedItemElementByItemName("GR").getItemDataId() > 0) {
 				dataValue = data.getValue() + " (Grade " + codedItem.getCodedItemElementByItemName("GR").getItemCode() + ")";
 			} else {
@@ -265,6 +257,7 @@ public class CodedItemsController {
 
 		} else {
 			if (!codedItem.isCoded()) {
+				Search search = getSearch();
 				search.setSearchInterface(new BioPortalSearchInterface());
 				try {
 					if (dictionary.equalsIgnoreCase("WHOD")) {
@@ -276,16 +269,17 @@ public class CodedItemsController {
 							String seq1 = prefLabel.substring(prefLabel.length() - minCodeLength, prefLabel.length() - firstCodeLength);
 							String seq2 = prefLabel.substring(prefLabel.length() - firstCodeLength, prefLabel.length());
 							List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductUniqueKeys(drugRecordNum, seq1, seq2);
-							classifications = CompleteClassificationFieldsUtil.medicalProductListToClassificationList(medicalProducts, SessionUtil.getLocale(request));
+							classifications = CompleteClassificationFieldsUtil.medicalProductListToClassificationList(medicalProducts, LocaleResolver.getLocale());
 						} else {
 							//search by name
 							List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductName(prefLabel, codedItem.getDictionary());
-							classifications = CompleteClassificationFieldsUtil.medicalProductListToClassificationList(medicalProducts, SessionUtil.getLocale(request));
+							classifications = CompleteClassificationFieldsUtil.medicalProductListToClassificationList(medicalProducts, LocaleResolver.getLocale());
 						}
 					} else if (dictionary.equalsIgnoreCase("MEDDRA")) {
 						//search preferred terms
 						List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductName(prefLabel, codedItem.getDictionary());
-						classifications = CompleteClassificationFieldsUtil.medicalHierarchyToClassificationList(medicalProducts);
+						classifications = CompleteClassificationFieldsUtil.medicalHierarchyToClassificationList(
+								medicalProducts);
 
 					} else {
 						//search using VA.
@@ -353,7 +347,7 @@ public class CodedItemsController {
 
 			if (!crfIsLocked) {
 				ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(item.getItemId());
-				String dataValue = "";
+				String dataValue;
 				if (item.getCodedItemElementByItemName("GR").getItemDataId() > 0) {
 					dataValue = data.getValue() + " (Grade " + item.getCodedItemElementByItemName("GR").getItemCode() + ")";
 				} else {
@@ -397,7 +391,6 @@ public class CodedItemsController {
 	@RequestMapping("/saveCodedItem")
 	public String saveCodedItemHandler(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		String itemId = request.getParameter("item");
 		String categoryList = request.getParameter("categoryList");
 		String verbatimTerm = request.getParameter("verbatimTerm");
@@ -409,7 +402,7 @@ public class CodedItemsController {
 
 		try {
 			provideCoding(verbatimTerm, false, categoryList, codeSearchTerm, bioontologyUrl.getValue(),
-					bioontologyApiKey.getValue(), codedItem.getItemId(), SessionUtil.getLocale(request));
+					bioontologyApiKey.getValue(), codedItem.getItemId(), LocaleResolver.getLocale());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY);
@@ -427,13 +420,11 @@ public class CodedItemsController {
 	@RequestMapping("/uncodeCodedItem")
 	public String unCodeCodedItemHandler(HttpServletRequest request) throws Exception {
 
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
-
 		String codedItemItemDataId = request.getParameter("item");
 
 		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
-		ItemDataBean itemData = (ItemDataBean) getItemDataDAO().findByPK(codedItem.getItemId());
-		boolean isGradeTerm = codedItem.getCodedItemElementByItemName("GR").getItemDataId() > 0 ? true : false;
+		ItemDataBean itemData = (ItemDataBean) new ItemDataDAO(datasource).findByPK(codedItem.getItemId());
+		boolean isGradeTerm = codedItem.getCodedItemElementByItemName("GR").getItemDataId() > 0;
 		for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
 			if (isGradeTerm) {
 				if (!codedItemElement.getItemName().equals("GR")) {
@@ -467,11 +458,10 @@ public class CodedItemsController {
 	@RequestMapping("/codeItemFields")
 	public ModelMap termAdditionalFieldsHandler(HttpServletRequest request) throws Exception {
 
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
-
 		String codedItemUrl = request.getParameter("codedItemUrl");
 		String term = request.getParameter("term");
 
+		Search search = getSearch();
 		search.setSearchInterface(new BioPortalSearchInterface());
 
 		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
@@ -503,8 +493,6 @@ public class CodedItemsController {
 	@RequestMapping("/codeAndAlias")
 	public String codeAndAliasHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
-
 		boolean isAlias = false;
 		String item = request.getParameter("item");
 		String categoryList = request.getParameter("categoryList");
@@ -513,7 +501,7 @@ public class CodedItemsController {
 
 		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
 
-		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(),
+		StudyParameterValueBean configuredDictionary = new StudyParameterValueDAO(datasource).findByHandleAndStudy(study.getId(),
 				"autoCodeDictionaryName");
 		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
 		com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
@@ -529,7 +517,7 @@ public class CodedItemsController {
 			try {
 
 				provideCoding(verbatimTerm, isAlias, categoryList, codeSearchTerm, bioontologyUrl.getValue(),
-						bioontologyApiKey.getValue(), codedItem.getItemId(), SessionUtil.getLocale(request));
+						bioontologyApiKey.getValue(), codedItem.getItemId(), LocaleResolver.getLocale());
 			} catch (Exception ex) {
 
 				logger.error(ex.getMessage());
@@ -552,32 +540,6 @@ public class CodedItemsController {
 		}
 
 		return matchingItems;
-	}
-
-	private StudyDAO getStudyDAO() {
-
-		if (studyDAO == null) {
-			studyDAO = new StudyDAO(datasource);
-		}
-
-		return studyDAO;
-	}
-
-	private StudyParameterValueDAO getStudyParameterValueDAO() {
-		if (studyParamDAO == null) {
-			studyParamDAO = new StudyParameterValueDAO(datasource);
-		}
-
-		return studyParamDAO;
-	}
-
-	private ItemDataDAO getItemDataDAO() {
-
-		if (itemDataDAO == null) {
-			itemDataDAO = new ItemDataDAO(datasource);
-		}
-
-		return itemDataDAO;
 	}
 
 	private ArrayList<ClassificationElement> generateClassificationElements(List<TermElement> termElementList) {
@@ -614,6 +576,7 @@ public class CodedItemsController {
 			MedicalHierarchy medicalHierarchy = (MedicalHierarchy) getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()), codedItem.getDictionary());
 			classificationResult = CompleteClassificationFieldsUtil.medicalHierarchyToClassification(medicalHierarchy);
 		} else {
+			Search search = getSearch();
 			search.setSearchInterface(new BioPortalSearchInterface());
 			search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "),
 					bioontologyUrl, bioontologyApiKey);
@@ -698,6 +661,9 @@ public class CodedItemsController {
 		}
 	}
 
+	public Search getSearch() {
+		return new Search();
+	}
 
 	private MedicalProductDAO getMedicalProductDAO() {
 		return new MedicalProductDAO();

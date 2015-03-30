@@ -20,8 +20,12 @@
  */
 package org.akaza.openclinica.control.login;
 
-import com.clinovo.util.EmailUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.TermType;
@@ -40,25 +44,21 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.clinovo.util.EmailUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * Processes request of 'request a user account'.
  * 
  * @author jxu
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 public class RequestAccountServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        //
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		//
 	}
 
 	@Override
@@ -125,8 +125,8 @@ public class RequestAccountServlet extends Controller {
 		} else {
 			logger.info("after processing form,no errors");
 
-            SessionManager sm = new SessionManager(null, ubForm.getName());
-            request.setAttribute(SESSION_MANAGER, sm);
+			SessionManager sm = new SessionManager(null, ubForm.getName());
+			request.setAttribute(SESSION_MANAGER, sm);
 			// see whether this user already in the DB
 			UserAccountBean ubDB = sm.getUserBean();
 
@@ -175,7 +175,7 @@ public class RequestAccountServlet extends Controller {
 				+ ubForm.getActiveStudyId());
 		email.append("<br>" + resword.getString("other_study") + otherStudy);
 		email.append("<br>" + resword.getString("user_role_requested") + ubForm.getActiveStudyRoleName());
-		email.append(EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage())));
+		email.append(EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(CoreResources.getSystemLocale()));
 		String emailBody = email.toString();
 		// YW >>
 		logger.info("Sending email...begin" + emailBody);

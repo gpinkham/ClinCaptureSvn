@@ -20,7 +20,11 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.EmailUtil;
+import java.text.MessageFormat;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -35,10 +39,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.MessageFormat;
-import java.util.Locale;
+import com.clinovo.util.EmailUtil;
 
 /**
  * Allows both deletion and restoration of a study user role.
@@ -53,8 +54,11 @@ public class DeleteUserServlet extends Controller {
 
 	/**
 	 * Get link to the current page.
-	 * @param u UserAccountBean.
-	 * @param action EntryAction.
+	 * 
+	 * @param u
+	 *            UserAccountBean.
+	 * @param action
+	 *            EntryAction.
 	 * @return String
 	 */
 	public static String getLink(UserAccountBean u, EntityAction action) {
@@ -93,7 +97,7 @@ public class DeleteUserServlet extends Controller {
 		if (!u.isActive()) {
 
 			messageFormat.applyPattern(respage.getString("the_specified_user_not_exits"));
-			message = messageFormat.format(new Object[] { userId });
+			message = messageFormat.format(new Object[]{userId});
 
 		} else if (!EntityAction.contains(action)) {
 			message = respage.getString("the_specified_action_on_the_user_is_invalid");
@@ -166,19 +170,18 @@ public class DeleteUserServlet extends Controller {
 			logger.info("Sending remove account notification to " + u.getName());
 			subject = restext.getString("your_clin_capture_account_has_been_removed");
 			msg.applyPattern(restext.getString("your_account_has_been_removed_email_message_html"));
-			arguments = new Object[] { u.getFirstName() + " " + u.getLastName(), u.getName(),
-					emailParentStudy.getName() };
+			arguments = new Object[]{u.getFirstName() + " " + u.getLastName(), u.getName(), emailParentStudy.getName()};
 		} else if (desiredAction.equals(EntityAction.RESTORE)) {
 			logger.info("Sending restore and password reset notification to " + u.getName());
 			subject = restext.getString("your_new_openclinica_account_has_been_restored");
 			msg.applyPattern(restext.getString("your_account_has_been_restored_and_password_reset_email_message_html"));
-			arguments = new Object[] { u.getFirstName() + " " + u.getLastName(), u.getName(), password,
-					SQLInitServlet.getSystemURL(), emailParentStudy.getName() };
+			arguments = new Object[]{u.getFirstName() + " " + u.getLastName(), u.getName(), password,
+					SQLInitServlet.getSystemURL(), emailParentStudy.getName()};
 		}
 		body = EmailUtil.getEmailBodyStart();
 		body += msg.format(arguments);
 		body += EmailUtil.getEmailBodyEnd();
-		body += EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
+		body += EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
 		logger.info("Sending email...begin");
 		sendEmail(u.getEmail().trim(), subject, body, false, request);
 		logger.info("Sending email...done");

@@ -18,8 +18,8 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.CrfShortcutsAnalyzer;
-import com.clinovo.util.SessionUtil;
 
 public class UpdateCRFHeaderServletTest extends AbstractContextSentiveTest {
 
@@ -34,8 +34,8 @@ public class UpdateCRFHeaderServletTest extends AbstractContextSentiveTest {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		request.setParameter("sectionId", "1");
-		SessionUtil.updateLocale(request.getSession(), Locale.ENGLISH);
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
+		LocaleResolver.updateLocale(request.getSession(), Locale.ENGLISH);
+		ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
 		FormDiscrepancyNotes formDiscrepancyNotes = new FormDiscrepancyNotes();
 		request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, formDiscrepancyNotes);
 		Whitebox.setInternalState(servlet, "dataSource", dataSource);

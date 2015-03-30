@@ -17,7 +17,7 @@ public class ResourceBundleProvider {
 	 */
 	static HashMap<Locale, HashMap<String, ResourceBundle>> resBundleSetMap = new HashMap<Locale, HashMap<String, ResourceBundle>>();
 
-	public static void updateLocale(Locale locale) {
+	public static synchronized void updateLocale(Locale locale) {
 		localeMap.put(Thread.currentThread(), locale);
 		if (!resBundleSetMap.containsKey(locale)) {
 			HashMap<String, ResourceBundle> resBundleSet = new HashMap<String, ResourceBundle>();
@@ -39,7 +39,8 @@ public class ResourceBundleProvider {
 					ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", locale));
 			resBundleSet.put("org.akaza.openclinica.i18n.workflow",
 					ResourceBundle.getBundle("org.akaza.openclinica.i18n.workflow", locale));
-
+			resBundleSet.put("org.akaza.openclinica.i18n.buildNumber",
+					ResourceBundle.getBundle("org.akaza.openclinica.i18n.buildNumber", locale));
 			resBundleSetMap.put(locale, resBundleSet);
 		}
 	}
@@ -116,6 +117,18 @@ public class ResourceBundleProvider {
 		return getResBundle("org.akaza.openclinica.i18n.workflow", locale);
 	}
 
+	public static ResourceBundle getWorkflowBundle() {
+		return getResBundle("org.akaza.openclinica.i18n.workflow");
+	}
+
+	public static ResourceBundle getBuildNumberBundle(Locale locale) {
+		return getResBundle("org.akaza.openclinica.i18n.buildNumber", locale);
+	}
+
+	public static ResourceBundle getBuildNumberBundle() {
+		return getResBundle("org.akaza.openclinica.i18n.buildNumber");
+	}
+
 	/**
 	 * Returns the required bundle, using the current thread to determine the appropiate locale.
 	 * 
@@ -136,7 +149,7 @@ public class ResourceBundleProvider {
 	 *            Required locale
 	 * @return The corresponding ResourceBundle
 	 */
-	private static ResourceBundle getResBundle(String name, Locale locale) {
+	public static ResourceBundle getResBundle(String name, Locale locale) {
 		return resBundleSetMap.get(locale).get(name);
 	}
 

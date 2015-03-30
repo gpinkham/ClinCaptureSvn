@@ -66,13 +66,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.SessionUtil;
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.ValidatorHelper;
 
 /**
  * CreateNewStudyEventServlet servlet.
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class CreateNewStudyEventServlet extends Controller {
 
@@ -104,17 +104,17 @@ public class CreateNewStudyEventServlet extends Controller {
 
 	public static final String INPUT_LOCATION = "location";
 
-	public static final String[] INPUT_STUDY_EVENT_DEFINITION_SCHEDULED = { "studyEventDefinitionScheduled0",
-			"studyEventDefinitionScheduled1", "studyEventDefinitionScheduled2", "studyEventDefinitionScheduled3" };
-	public static final String[] INPUT_SCHEDULED_LOCATION = { "locationScheduled0", "locationScheduled1",
-			"locationScheduled2", "locationScheduled3" };
-	public static final String[] INPUT_STARTDATE_PREFIX_SCHEDULED = { "startScheduled0", "startScheduled1",
-			"startScheduled2", "startScheduled3" };
-	public static final String[] INPUT_ENDDATE_PREFIX_SCHEDULED = { "endScheduled0", "endScheduled1", "endScheduled2",
-			"endScheduled3" };
-	public static final String[] DISPLAY_SCHEDULED = { "display0", "display1", "display2", "display3" };
+	public static final String[] INPUT_STUDY_EVENT_DEFINITION_SCHEDULED = {"studyEventDefinitionScheduled0",
+			"studyEventDefinitionScheduled1", "studyEventDefinitionScheduled2", "studyEventDefinitionScheduled3"};
+	public static final String[] INPUT_SCHEDULED_LOCATION = {"locationScheduled0", "locationScheduled1",
+			"locationScheduled2", "locationScheduled3"};
+	public static final String[] INPUT_STARTDATE_PREFIX_SCHEDULED = {"startScheduled0", "startScheduled1",
+			"startScheduled2", "startScheduled3"};
+	public static final String[] INPUT_ENDDATE_PREFIX_SCHEDULED = {"endScheduled0", "endScheduled1", "endScheduled2",
+			"endScheduled3"};
+	public static final String[] DISPLAY_SCHEDULED = {"display0", "display1", "display2", "display3"};
 
-	public static final String[] EVENT_FIELDS = { INPUT_LOCATION, INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX };
+	public static final String[] EVENT_FIELDS = {INPUT_LOCATION, INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX};
 
 	public static final int ADDITIONAL_SCHEDULED_NUM = 4;
 
@@ -502,7 +502,8 @@ public class CreateNewStudyEventServlet extends Controller {
 						&& !errors.containsKey(INPUT_ENDDATE_PREFIX_SCHEDULED[i])) {
 					if (scheduledSeds.containsKey(scheduledDefinitionIds[i])) {
 						int prevStart = scheduledSeds.get(scheduledDefinitionIds[i]);
-						prevStartPrefix = prevStart == -1 ? INPUT_STARTDATE_PREFIX
+						prevStartPrefix = prevStart == -1
+								? INPUT_STARTDATE_PREFIX
 								: INPUT_STARTDATE_PREFIX_SCHEDULED[prevStart];
 						Date prevStartDate = prevStart == -1 ? this.getInputStartDate(fp) : this
 								.getInputStartDateScheduled(fp,
@@ -641,8 +642,7 @@ public class CreateNewStudyEventServlet extends Controller {
 						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
 				for (String element : EVENT_FIELDS) {
-					dnService
-							.saveFieldNotes(element, fdn, studyEvent.getId(), "studyEvent", currentStudy);
+					dnService.saveFieldNotes(element, fdn, studyEvent.getId(), "studyEvent", currentStudy);
 				}
 
 				if (popupQuery) {
@@ -650,7 +650,8 @@ public class CreateNewStudyEventServlet extends Controller {
 							+ SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel)
 							+ "_"
 							+ definition.getId()
-							+ (pageToShowPopup.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET.getFileName()) ? "ev"
+							+ (pageToShowPopup.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET.getFileName())
+									? "ev"
 									: "") + "_";
 					ProcessEventsWrapper processEventsWrapper = new ProcessEventsWrapper();
 					processEventsWrapper.eventDefs = eventDefs;
@@ -710,8 +711,8 @@ public class CreateNewStudyEventServlet extends Controller {
 											restext.getString("scheduled_event_not_created_in_database"), "2");
 								}
 
-								dnService.saveFieldNotes(INPUT_SCHEDULED_LOCATION[i], fdn,
-										studyEventScheduled.getId(), "studyEvent", currentStudy);
+								dnService.saveFieldNotes(INPUT_SCHEDULED_LOCATION[i], fdn, studyEventScheduled.getId(),
+										"studyEvent", currentStudy);
 								dnService.saveFieldNotes(INPUT_STARTDATE_PREFIX_SCHEDULED[i], fdn,
 										studyEventScheduled.getId(), "studyEvent", currentStudy);
 								dnService.saveFieldNotes(INPUT_ENDDATE_PREFIX_SCHEDULED[i], fdn,
@@ -819,7 +820,7 @@ public class CreateNewStudyEventServlet extends Controller {
 			factory.setStudyBean(currentStudy);
 			factory.setCurrentRole(currentRole);
 			factory.setCurrentUser(ub);
-			factory.setLocale(SessionUtil.getLocale(request));
+			factory.setLocale(LocaleResolver.getLocale(request));
 
 			sed = (StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(selectedEventDefId);
 			studyEvents = getStudyEventDAO().findAllByStudySubjectAndDefinition(studySubject, sed);
@@ -867,7 +868,7 @@ public class CreateNewStudyEventServlet extends Controller {
 			Collections.reverse(studyEvents);
 
 			return factory.eventDivBuilder(subject, rowCount, studyEvents, sed, studySubject,
-					SessionUtil.getLocale(request));
+					LocaleResolver.getLocale(request));
 		}
 	}
 

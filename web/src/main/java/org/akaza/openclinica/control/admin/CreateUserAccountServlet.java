@@ -20,9 +20,15 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.EmailUtil;
-import com.clinovo.util.StudyParameterPriorityUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -47,20 +53,15 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import com.clinovo.util.EmailUtil;
+import com.clinovo.util.StudyParameterPriorityUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * Servlet for creating a user account.
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@SuppressWarnings({"rawtypes", "serial", "unchecked"})
 @Component
 public class CreateUserAccountServlet extends Controller {
 
@@ -133,11 +134,11 @@ public class CreateUserAccountServlet extends Controller {
 		request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
 
 		if (!fp.isSubmitted() || changeRoles) {
-			String[] textFields = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
-					INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
+			String[] textFields = {INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
+					INPUT_INSTITUTION, INPUT_DISPLAY_PWD};
 			fp.setCurrentStringValuesAsPreset(textFields);
 
-			String[] ddlbFields = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES };
+			String[] ddlbFields = {INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES};
 			fp.setCurrentIntValuesAsPreset(ddlbFields);
 
 			HashMap presetValues = fp.getPresetValues();
@@ -225,11 +226,11 @@ public class CreateUserAccountServlet extends Controller {
 					forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 				}
 			} else {
-				String[] textFields = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
-						INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
+				String[] textFields = {INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
+						INPUT_INSTITUTION, INPUT_DISPLAY_PWD};
 				fp.setCurrentStringValuesAsPreset(textFields);
 
-				String[] ddlbFields = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES };
+				String[] ddlbFields = {INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES};
 				fp.setCurrentIntValuesAsPreset(ddlbFields);
 
 				HashMap presetValues = fp.getPresetValues();
@@ -256,7 +257,8 @@ public class CreateUserAccountServlet extends Controller {
 		}
 
 		StudyBean selectedStudyBean = (StudyBean) sdao.findByPK(selectedStudy);
-		int parentStudyId = selectedStudyBean.getParentStudyId() > 0 ? selectedStudyBean.getParentStudyId()
+		int parentStudyId = selectedStudyBean.getParentStudyId() > 0
+				? selectedStudyBean.getParentStudyId()
 				: selectedStudyBean.getId();
 		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
 				parentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
@@ -321,7 +323,8 @@ public class CreateUserAccountServlet extends Controller {
 				.append(restext.getString("please_test_your_login_information_and_let")).append("<br>")
 				.append(SQLInitServlet.getSystemURL()).append(" . <br><br> ")
 				.append(respage.getString("best_system_administrator").replace("{0}", studyName))
-				.append(EmailUtil.getEmailBodyEnd()).append(EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()))).toString();
+				.append(EmailUtil.getEmailBodyEnd()).append(EmailUtil.getEmailFooter(CoreResources.getSystemLocale()))
+				.toString();
 
 		sendEmail(createdUserAccountBean.getEmail().trim(), restext.getString("your_new_openclinica_account"), body,
 				false, request);

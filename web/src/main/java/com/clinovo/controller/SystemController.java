@@ -15,13 +15,9 @@
 
 package com.clinovo.controller;
 
-import com.clinovo.command.SystemCommand;
-import com.clinovo.service.SystemService;
-import com.clinovo.util.FileUtil;
-import com.clinovo.util.MayProceedUtil;
-import com.clinovo.util.PageMessagesUtil;
-import com.clinovo.util.SessionUtil;
-import com.clinovo.validation.SystemValidator;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.control.core.BaseController;
@@ -37,10 +33,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.clinovo.command.SystemCommand;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.SystemService;
+import com.clinovo.util.FileUtil;
+import com.clinovo.util.MayProceedUtil;
+import com.clinovo.util.PageMessagesUtil;
+import com.clinovo.validation.SystemValidator;
 
 @Controller
 @RequestMapping("/system")
@@ -51,9 +51,6 @@ public class SystemController {
 	public static final String SYSTEM_COMMAND_RESULT = "systemCommandResult";
 	public static final String SYSTEM_COMMAND_ERROR = "systemCommandError";
 	public static final String SYSTEM_COMMAND = "systemCommand";
-
-	@Autowired
-	private SessionLocaleResolver localeResolver;
 
 	@Autowired
 	private SystemValidator validator;
@@ -94,7 +91,7 @@ public class SystemController {
 			request.getSession().removeAttribute(SYSTEM_COMMAND_RESULT);
 			if (messageCode != null) {
 				PageMessagesUtil.addPageMessage(request,
-						messageSource.getMessage(messageCode, null, SessionUtil.getLocale(request)));
+						messageSource.getMessage(messageCode, null, LocaleResolver.getLocale()));
 			}
 		}
 		return page;
@@ -114,7 +111,7 @@ public class SystemController {
 		if (!MayProceedUtil.mayProceed(request, Role.SYSTEM_ADMINISTRATOR, Role.STUDY_ADMINISTRATOR)) {
 			page = "redirect:/MainMenu?message=system_no_permission";
 		} else {
-			validator.validate(command, result, SessionUtil.getLocale(request));
+			validator.validate(command, result, LocaleResolver.getLocale());
 			if (result.hasErrors()) {
 				page = "system/system";
 			} else {
@@ -142,7 +139,7 @@ public class SystemController {
 		} else {
 			try {
 				systemService.updateSystemProperties(systemCommand);
-				SessionUtil.updateSession(coreResources, localeResolver, request, response);
+				LocaleResolver.updateSession(request, coreResources);
 				SQLInitServlet.updateParams(coreResources.getDataInfo());
 				request.getSession().setAttribute(SYSTEM_COMMAND_RESULT, "systemCommand.dataWasSuccessfullySaved");
 			} catch (Exception ex) {

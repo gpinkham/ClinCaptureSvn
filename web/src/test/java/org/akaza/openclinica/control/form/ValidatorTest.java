@@ -1,7 +1,10 @@
 package org.akaza.openclinica.control.form;
 
-import com.clinovo.util.SessionUtil;
-import com.clinovo.util.ValidatorHelper;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Locale;
+
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
@@ -9,10 +12,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import java.util.Locale;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.ValidatorHelper;
 
 public class ValidatorTest {
 
@@ -23,8 +24,8 @@ public class ValidatorTest {
 		Locale locale = new Locale("en");
 
 		MockHttpServletRequest request = new MockHttpServletRequest();
-		SessionUtil.updateLocale(request, locale);
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
+		LocaleResolver.updateLocale(request, locale);
+		ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
 
 		ConfigurationDao configurationDao = Mockito.mock(ConfigurationDao.class);
 

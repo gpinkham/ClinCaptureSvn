@@ -18,8 +18,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.CRFEvaluationTableFactory;
-import com.clinovo.util.SessionUtil;
 
 /**
  * The controller for managing crf evaluation page.
@@ -83,8 +83,8 @@ public class CRFEvaluationController extends Redirection {
 			request.setAttribute(CRF_EVALUATION_TABLE, factory.createTable(request, response).render());
 		} else {
 			org.akaza.openclinica.control.core.Controller.addPageMessage(
-					messageSource.getMessage(NO_PERMISSION_TO_EVALUATE, null, SessionUtil.getLocale(request)), request,
-					LOGGER);
+					messageSource.getMessage(NO_PERMISSION_TO_EVALUATE, null, LocaleResolver.getLocale(request)),
+					request, LOGGER);
 			org.akaza.openclinica.control.core.Controller.storePageMessages(request);
 			page = MAIN_MENU_REDIRECT;
 		}

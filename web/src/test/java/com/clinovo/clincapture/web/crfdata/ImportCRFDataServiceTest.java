@@ -1,8 +1,15 @@
 package com.clinovo.clincapture.web.crfdata;
 
-import com.clinovo.service.StudySubjectIdService;
-import com.clinovo.util.SessionUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.sax.SAXSource;
+
 import org.akaza.openclinica.AbstractContextSentiveTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -16,14 +23,9 @@ import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.xml.sax.InputSource;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.sax.SAXSource;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.util.ValidatorHelper;
 
 public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 
@@ -51,7 +53,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 			permittedEventCRFIds.add(12);
 			permittedEventCRFIds.add(13);
 
-			SessionUtil.updateLocale(request, new Locale(locale));
+			LocaleResolver.updateLocale(request, new Locale(locale));
 			validatorHelper = new ValidatorHelper(request, configurationDao);
 		}
 	}

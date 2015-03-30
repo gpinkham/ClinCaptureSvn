@@ -1,7 +1,5 @@
 package com.clinovo.model;
 
-import com.clinovo.BaseControllerTest;
-import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -15,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import com.clinovo.BaseControllerTest;
+import com.clinovo.i18n.LocaleResolver;
 
 public class CRFEvaluationTableFactoryTest extends BaseControllerTest {
 
@@ -31,7 +32,7 @@ public class CRFEvaluationTableFactoryTest extends BaseControllerTest {
 		request = new MockHttpServletRequest();
 		response = new MockHttpServletResponse();
 
-		SessionUtil.updateLocale(request, LOCALE);
+		LocaleResolver.updateLocale(request, LOCALE);
 		StudyBean currentStudy = new StudyBean();
 		currentStudy.setId(1);
 		currentStudy.setStatus(org.akaza.openclinica.bean.core.Status.AVAILABLE);

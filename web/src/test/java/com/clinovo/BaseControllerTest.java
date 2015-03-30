@@ -1,6 +1,7 @@
 package com.clinovo;
 
-import com.clinovo.util.SessionUtil;
+import java.util.Locale;
+
 import org.akaza.openclinica.AbstractContextSentiveTest;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
@@ -18,7 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Locale;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * BaseControllerTest class.
@@ -71,7 +72,7 @@ public class BaseControllerTest extends AbstractContextSentiveTest {
 		SecurityContextHolder.getContext().setAuthentication(
 				new UsernamePasswordAuthenticationToken("BB", "is dreaming about halle berry"));
 
-		SessionUtil.updateLocale(session, LOCALE);
+		LocaleResolver.updateLocale(session, LOCALE);
 		ResourceBundleProvider.updateLocale(LOCALE);
 	}
 }

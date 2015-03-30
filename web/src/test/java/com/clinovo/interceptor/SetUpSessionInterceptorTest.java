@@ -1,7 +1,13 @@
 package com.clinovo.interceptor;
 
-import com.clinovo.controller.CRFEvaluationController;
-import com.clinovo.util.SessionUtil;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.lang.reflect.Method;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -25,17 +31,15 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.HandlerMethod;
 
-import javax.sql.DataSource;
-import java.lang.reflect.Method;
-import java.util.Locale;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
+import com.clinovo.controller.CRFEvaluationController;
+import com.clinovo.i18n.LocaleResolver;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ SecurityContextHolder.class, Navigation.class })
+@PrepareForTest({SecurityContextHolder.class, Navigation.class, RequestContextHolder.class})
 public class SetUpSessionInterceptorTest {
 
 	public static final String CLINCAPTURE = "/clincapture";
@@ -51,6 +55,8 @@ public class SetUpSessionInterceptorTest {
 	private Authentication authentication;
 	@Mock
 	private MockHttpSession session;
+	@Mock
+	private ServletRequestAttributes servletRequestAttributes;
 
 	private MockHttpServletRequest request;
 
@@ -82,7 +88,10 @@ public class SetUpSessionInterceptorTest {
 		Mockito.when(session.getAttribute(BaseController.STUDY)).thenReturn(studyBean);
 		Mockito.when(session.getAttribute(BaseController.USER_BEAN_NAME)).thenReturn(userBean);
 		Mockito.when(session.getAttribute(BaseController.USER_ROLE)).thenReturn(userRole);
-		Mockito.when(session.getAttribute(SessionUtil.CURRENT_SESSION_LOCALE)).thenReturn(Locale.ENGLISH);
+		Mockito.when(session.getAttribute(LocaleResolver.CURRENT_SESSION_LOCALE)).thenReturn(Locale.ENGLISH);
+		PowerMockito.mockStatic(RequestContextHolder.class);
+		Whitebox.setInternalState(servletRequestAttributes, "request", request);
+		PowerMockito.when(RequestContextHolder.currentRequestAttributes()).thenReturn(servletRequestAttributes);
 	}
 
 	@Test

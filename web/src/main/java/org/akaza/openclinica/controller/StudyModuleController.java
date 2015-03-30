@@ -13,8 +13,15 @@
 
 package org.akaza.openclinica.controller;
 
-import com.clinovo.util.RuleSetServiceUtil;
-import com.clinovo.util.SessionUtil;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -29,7 +36,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.slf4j.Logger;
@@ -46,18 +52,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.clinovo.util.RuleSetServiceUtil;
 
 @Controller("studyModuleController")
 @RequestMapping("/studymodule")
 @SessionAttributes("studyModuleStatus")
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class StudyModuleController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -72,7 +72,7 @@ public class StudyModuleController {
 	private BasicDataSource dataSource;
 
 	@Autowired
-	CoreResources coreResources;
+	private CoreResources coreResources;
 
 	@SuppressWarnings("deprecation")
 	@RequestMapping(method = RequestMethod.GET)
@@ -91,8 +91,6 @@ public class StudyModuleController {
 		}
 		panel.reset();
 		request.getSession().setAttribute("panel", panel);
-
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 

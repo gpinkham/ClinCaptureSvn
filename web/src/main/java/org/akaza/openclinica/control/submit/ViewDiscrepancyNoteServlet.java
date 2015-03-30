@@ -83,15 +83,15 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.util.SessionUtil;
 
 /**
  * @author jxu
  * 
  *         View the detail of a discrepancy note on the data entry page
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ViewDiscrepancyNoteServlet extends Controller {
 
@@ -122,7 +122,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 	public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
 	public static final String CAN_MONITOR = "canMonitor";
 	public static final String FROM_BOX = "fromBox";
-	
+
 	private static final int THREE = 3;
 	private static final int FOUR = 4;
 
@@ -203,7 +203,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			request.setAttribute(LOCKED_FLAG, "no");
 		}
 
-		Locale locale = SessionUtil.getLocale(request);
+		Locale locale = LocaleResolver.getLocale(request);
 		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
 
 		int stSubjectId = fp.getInt(CreateDiscrepancyNoteServlet.ST_SUBJECT_ID, true);

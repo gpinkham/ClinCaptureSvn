@@ -1,7 +1,10 @@
 package com.clinovo.clincapture.web.crfdata;
 
-import com.clinovo.util.SessionUtil;
-import com.clinovo.util.ValidatorHelper;
+import static org.junit.Assert.assertEquals;
+
+import java.util.HashMap;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -17,10 +20,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import java.util.HashMap;
-import java.util.Locale;
-
-import static org.junit.Assert.assertEquals;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.ValidatorHelper;
 
 public class ImportHelperTest {
 
@@ -36,8 +37,8 @@ public class ImportHelperTest {
 	@Before
 	public void setUp() throws Exception {
 		request = new MockHttpServletRequest();
-		SessionUtil.updateLocale(request.getSession(), Locale.ENGLISH);
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
+		LocaleResolver.updateLocale(request.getSession(), Locale.ENGLISH);
+		ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
 
 		configurationDao = Mockito.mock(ConfigurationDao.class);
 

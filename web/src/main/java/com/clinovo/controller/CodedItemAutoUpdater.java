@@ -21,7 +21,6 @@ import com.clinovo.model.CodedItemElement;
 import com.clinovo.model.Term;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.TermService;
-import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -85,8 +84,6 @@ public class CodedItemAutoUpdater {
 		String showContext = request.getParameter("showContext");
 		themeColor = themeColor == null ? "blue" : themeColor;
 		showContext = showContext == null ? "false" : showContext;
-
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		response.getWriter().println(buildResponseBox(codedItemIdListInt, showContext));
 	}

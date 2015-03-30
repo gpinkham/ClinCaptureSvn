@@ -20,8 +20,17 @@
  */
 package org.akaza.openclinica.control.login;
 
-import com.clinovo.util.SessionUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -46,15 +55,8 @@ import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * @author jxu
@@ -86,7 +88,8 @@ public class UpdateProfileServlet extends Controller {
 		UserAccountDAO udao = new UserAccountDAO(getDataSource());
 		UserAccountBean userBean1 = (UserAccountBean) udao.findByUserName(ub.getName());
 
-		ArrayList studies = currentRole.getRole() == Role.SYSTEM_ADMINISTRATOR ? (ArrayList) sdao.findAllParents()
+		ArrayList studies = currentRole.getRole() == Role.SYSTEM_ADMINISTRATOR
+				? (ArrayList) sdao.findAllParents()
 				: (ArrayList) sdao.findAllByUser(ub.getName());
 
 		if (StringUtils.isBlank(action)) {
@@ -144,7 +147,7 @@ public class UpdateProfileServlet extends Controller {
 			// password
 
 			PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
-			Locale locale = SessionUtil.getLocale(request);
+			Locale locale = LocaleResolver.getLocale(request);
 			ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
 
 			pwdErrors = PasswordValidator.validatePassword(passwordRequirementsDao, udao, userBean1.getId(), password,

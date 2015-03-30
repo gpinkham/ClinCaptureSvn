@@ -32,6 +32,11 @@ public class EscapeTag extends TagSupport {
 
 	private String content;
 
+	private void reset() {
+		content = null;
+		tagNames = null;
+	}
+
 	@Override
 	public int doStartTag() throws JspException {
 		try {
@@ -47,6 +52,7 @@ public class EscapeTag extends TagSupport {
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
 		}
+		reset();
 		return SKIP_BODY;
 	}
 
@@ -64,5 +70,11 @@ public class EscapeTag extends TagSupport {
 
 	public void setTagNames(String tagNames) {
 		this.tagNames = tagNames;
+	}
+
+	@Override
+	public void release() {
+		reset();
+		super.release();
 	}
 }

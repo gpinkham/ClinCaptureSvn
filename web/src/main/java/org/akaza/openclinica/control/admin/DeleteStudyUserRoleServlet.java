@@ -20,7 +20,12 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.EmailUtil;
+import java.text.MessageFormat;
+import java.util.Stack;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -34,17 +39,12 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.text.MessageFormat;
-import java.util.Locale;
-import java.util.Stack;
+import com.clinovo.util.EmailUtil;
 
 /**
  * Allows both deletion and remove/restore of a study user role.
  */
-@SuppressWarnings({ "unchecked", "serial" })
+@SuppressWarnings({"unchecked", "serial"})
 @Component
 public class DeleteStudyUserRoleServlet extends Controller {
 	public static final String PATH = "DeleteStudyUserRole";
@@ -54,9 +54,13 @@ public class DeleteStudyUserRoleServlet extends Controller {
 
 	/**
 	 * Get link to the current page.
-	 * @param userId int.
-	 * @param studyId int.
-	 * @param action EntryAction.
+	 * 
+	 * @param userId
+	 *            int.
+	 * @param studyId
+	 *            int.
+	 * @param action
+	 *            EntryAction.
 	 * @return String
 	 */
 	public static String getLink(int userId, int studyId, EntityAction action) {
@@ -74,7 +78,8 @@ public class DeleteStudyUserRoleServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("you_may_not_perform_administrative_functions"), "1");
@@ -141,10 +146,10 @@ public class DeleteStudyUserRoleServlet extends Controller {
 		}
 
 		body = EmailUtil.getEmailBodyStart();
-		body += msg.format(new Object[] { user.getFirstName() + " " + user.getLastName(),
-				CoreResources.getField("sysURL.base"), study.getName(), user.getName(), studyUserRole.getRoleName() });
+		body += msg.format(new Object[]{user.getFirstName() + " " + user.getLastName(),
+				CoreResources.getField("sysURL.base"), study.getName(), user.getName(), studyUserRole.getRoleName()});
 		body += EmailUtil.getEmailBodyEnd();
-		body += EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
+		body += EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
 		sendEmail(user.getEmail().trim(), subject, body, false, request);
 
 	}

@@ -15,7 +15,16 @@
 
 package com.clinovo.service.impl;
 
-import com.clinovo.service.UserAccountService;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.mail.internet.MimeMessage;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -36,14 +45,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import javax.mail.internet.MimeMessage;
-import javax.sql.DataSource;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.service.UserAccountService;
 
 /**
  * UserAccountServiceImpl.
@@ -157,8 +159,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 					updateUserAcocunt(user.getId());
 				}
 
-				Object[] argsForMessageFormat = { studyUserRole.getRoleName(), user.getName(),
-						(getStudyDAO().findByPK(studyId)).getName() };
+				Object[] argsForMessageFormat = {studyUserRole.getRoleName(), user.getName(),
+						(getStudyDAO().findByPK(studyId)).getName()};
 
 				getMessageFormat().applyPattern(respage.getString("the_study_user_role_deleted"));
 				message.append(getMessageFormat().format(argsForMessageFormat));
@@ -185,8 +187,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 				if (removeRole(studyUserRole, currentUser, false)) {
 
-					Object[] argsForMessageFormat = { studyUserRole.getRoleName(), user.getName(),
-							(getStudyDAO().findByPK(studyId)).getName() };
+					Object[] argsForMessageFormat = {studyUserRole.getRoleName(), user.getName(),
+							(getStudyDAO().findByPK(studyId)).getName()};
 
 					getMessageFormat().applyPattern(respage.getString("the_study_user_role_removed"));
 					message.append(getMessageFormat().format(argsForMessageFormat));
@@ -249,8 +251,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 				if (restoreRole(studyUserRole, currentUser, message, respage, false)) {
 
-					Object[] argsForMessageFormat = { studyUserRole.getRoleName(), user.getName(),
-							(getStudyDAO().findByPK(studyId)).getName() };
+					Object[] argsForMessageFormat = {studyUserRole.getRoleName(), user.getName(),
+							(getStudyDAO().findByPK(studyId)).getName()};
 
 					getMessageFormat().applyPattern(respage.getString("the_study_user_role_restored"));
 					message.append(getMessageFormat().format(argsForMessageFormat));
@@ -284,7 +286,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 				if (!autoRestore && message != null && respage != null) {
 					messageFormat.applyPattern(respage.getString("the_role_cannot_be_restored_since_study_deleted"));
-					message.append(messageFormat.format(new Object[] { study.getName() }));
+					message.append(messageFormat.format(new Object[]{study.getName()}));
 				}
 
 			} else {
@@ -348,7 +350,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 	private void sendEmail(UserAccountBean userAccountBean, String password, String studyName) {
 		try {
-			Locale locale = new Locale(CoreResources.getSystemLanguage());
+			Locale locale = CoreResources.getSystemLocale();
 			MimeMessage mimeMessage = mailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
 			helper.setFrom(EmailEngine.getAdminEmail());

@@ -13,7 +13,15 @@
 
 package org.akaza.openclinica.control;
 
-import com.clinovo.util.SessionUtil;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.jmesa.facade.TableFacade;
 import org.jmesa.facade.TableFacadeImpl;
 import org.jmesa.limit.ExportType;
@@ -29,15 +37,9 @@ import org.jmesa.view.html.component.HtmlTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+import com.clinovo.i18n.LocaleResolver;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class AbstractTableFactory {
 
 	protected Locale locale;
@@ -63,7 +65,7 @@ public abstract class AbstractTableFactory {
 	public abstract void setDataAndLimitVariables(TableFacade tableFacade);
 
 	public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
-		locale = SessionUtil.getLocale(request);
+		locale = LocaleResolver.getLocale(request);
 		TableFacade tableFacade = getTableFacadeImpl(request, response);
 		setStateAttr(tableFacade);
 		setDataAndLimitVariables(tableFacade);
@@ -90,7 +92,7 @@ public abstract class AbstractTableFactory {
 	 * @see filter & sort methods in implementations
 	 */
 	public void exportCSVTable(HttpServletRequest request, HttpServletResponse response, String path) {
-		locale = SessionUtil.getLocale(request);
+		locale = LocaleResolver.getLocale(request);
 		String DATE_FORMAT = "yyyyMMddHHmmss";
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 		String fileName = getTableName() + "_" + sdf.format(new Date());
@@ -144,7 +146,7 @@ public abstract class AbstractTableFactory {
 	}
 
 	public int[] getMaxRowIncrements() {
-		return new int[] { 15, 25, 50 };
+		return new int[]{15, 25, 50};
 	}
 
 	/**
@@ -208,27 +210,27 @@ public abstract class AbstractTableFactory {
 	public static String getDNFlagIconName(int dnResolutionStatusId) {
 		String name = "";
 		switch (dnResolutionStatusId) {
-		case 0:
-			name = "icon_noNote";
-			break;
-		case 1:
-			name = "icon_Note";
-			break;
-		case 2:
-			name = "icon_flagYellow";
-			break;
-		case 3:
-			name = "icon_flagBlack";
-			break;
-		case 4:
-			name = "icon_flagGreen";
-			break;
-		case 5:
-			name = "icon_flagWhite";
-			break;
-		default:
-			name = "icon_noNote";
-			break;
+			case 0 :
+				name = "icon_noNote";
+				break;
+			case 1 :
+				name = "icon_Note";
+				break;
+			case 2 :
+				name = "icon_flagYellow";
+				break;
+			case 3 :
+				name = "icon_flagBlack";
+				break;
+			case 4 :
+				name = "icon_flagGreen";
+				break;
+			case 5 :
+				name = "icon_flagWhite";
+				break;
+			default :
+				name = "icon_noNote";
+				break;
 		}
 
 		return name;

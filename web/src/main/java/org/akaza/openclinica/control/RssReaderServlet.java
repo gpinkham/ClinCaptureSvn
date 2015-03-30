@@ -13,22 +13,6 @@
 
 package org.akaza.openclinica.control;
 
-import com.clinovo.util.SessionUtil;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.fetcher.FeedFetcher;
-import com.sun.syndication.fetcher.FetcherException;
-import com.sun.syndication.fetcher.impl.HashMapFeedInfoCache;
-import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
-import com.sun.syndication.io.FeedException;
-import org.akaza.openclinica.web.SQLInitServlet;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.jmesa.view.html.HtmlBuilder;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -36,7 +20,25 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ResourceBundle;
 
-@SuppressWarnings({ "unchecked" })
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.akaza.openclinica.web.SQLInitServlet;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.jmesa.view.html.HtmlBuilder;
+
+import com.clinovo.i18n.LocaleResolver;
+import com.sun.syndication.feed.synd.SyndEntryImpl;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.fetcher.FeedFetcher;
+import com.sun.syndication.fetcher.FetcherException;
+import com.sun.syndication.fetcher.impl.HashMapFeedInfoCache;
+import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
+import com.sun.syndication.io.FeedException;
+
+@SuppressWarnings({"unchecked"})
 public class RssReaderServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -45,9 +47,9 @@ public class RssReaderServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String rssUrl = SQLInitServlet.getField("rss.url");
 		ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",
-				SessionUtil.getLocale(req));
+				LocaleResolver.getLocale(req));
 		ResourceBundle resformat = ResourceBundle.getBundle("org.akaza.openclinica.i18n.format",
-				SessionUtil.getLocale(req));
+				LocaleResolver.getLocale(req));
 		PrintWriter pw = new PrintWriter(resp.getOutputStream());
 		if (rssUrl == null || rssUrl.length() == 0) {
 			about(resword, pw);

@@ -16,15 +16,8 @@
  */
 package org.akaza.openclinica.control.core;
 
-import com.clinovo.util.SessionUtil;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.log.LoggingConstants;
-import org.slf4j.MDC;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import java.io.IOException;
+import java.security.Principal;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -32,19 +25,25 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.security.Principal;
-import java.util.Locale;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.log.LoggingConstants;
+import org.slf4j.MDC;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * @author pgawade
  * 
  */
+@SuppressWarnings("unused")
 public class OCServletFilter implements javax.servlet.Filter {
 
 	public static final String USER_BEAN_NAME = "userBean";
-
+	
 	private WebApplicationContext springContext;
 
 	/**
@@ -80,10 +79,7 @@ public class OCServletFilter implements javax.servlet.Filter {
 
 		CoreResources.setField("remoteIp", request.getRemoteAddr());
 
-		Locale locale = new Locale(CoreResources.getSystemLanguage());
-		SessionUtil.updateLocale((HttpServletRequest) request, (HttpServletResponse) response,
-				(SessionLocaleResolver) springContext.getBean("localeResolver"), locale);
-		ResourceBundleProvider.updateLocale(locale);
+		LocaleResolver.resolveLocale();
 
 		((HttpServletRequest) request).getSession().setAttribute("logoUrl", CoreResources.getField("logo"));
 		((HttpServletRequest) request).getSession()

@@ -20,7 +20,12 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.EmailUtil;
+import java.text.MessageFormat;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -36,16 +41,12 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.MessageFormat;
-import java.util.Date;
-import java.util.Locale;
+import com.clinovo.util.EmailUtil;
 
 /**
  * Allows both - locking and unlocking of a study user role.
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings({"serial"})
 @Component
 public class UnLockUserServlet extends Controller {
 
@@ -55,8 +56,11 @@ public class UnLockUserServlet extends Controller {
 
 	/**
 	 * Get link to the current page.
-	 * @param u UserAccountBean.
-	 * @param action EntryAction.
+	 * 
+	 * @param u
+	 *            UserAccountBean.
+	 * @param action
+	 *            EntryAction.
 	 * @return String
 	 */
 	public static String getLink(UserAccountBean u, EntityAction action) {
@@ -83,14 +87,14 @@ public class UnLockUserServlet extends Controller {
 		UserAccountBean user = (UserAccountBean) udao.findByPK(userId);
 
 		MessageFormat messageFormat = new MessageFormat("");
-		Object[] argsForMessage = { user.getName() };
+		Object[] argsForMessage = {user.getName()};
 
 		String message;
 
 		if (!user.isActive()) {
 
 			messageFormat.applyPattern(respage.getString("the_specified_user_not_exits"));
-			message = messageFormat.format(new Object[] { userId });
+			message = messageFormat.format(new Object[]{userId});
 
 		} else if (user.getAccountNonLocked()) {
 
@@ -167,7 +171,7 @@ public class UnLockUserServlet extends Controller {
 		}
 		body += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
 		body += EmailUtil.getEmailBodyEnd();
-		body += EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
+		body += EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
 		logger.info("Sending email...begin");
 		sendEmail(u.getEmail().trim(), restext.getString("your_new_openclinica_account_has_been_restored"), body,
 				false, request);

@@ -1,7 +1,10 @@
 package com.clinovo.controller;
 
-import com.clinovo.BaseControllerTest;
-import com.clinovo.util.SessionUtil;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -11,10 +14,8 @@ import org.junit.Test;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.clinovo.BaseControllerTest;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * Tests for WidgetLayoutController.
@@ -63,7 +64,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatConfigureHomePageReturnsCode200() throws Exception {
 
 		this.mockMvc.perform(
-				get(CONFIGURE_HOME_PAGE).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(CONFIGURE_HOME_PAGE).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.sessionAttr("userBean", ub).sessionAttr("study", sb)).andExpect(status().isOk());
 	}
 
@@ -77,7 +78,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatSaveHomePageLayoutReturnsCode204() throws Exception {
 
 		this.mockMvc.perform(
-				get(SAVE_HOME_PAGE).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(SAVE_HOME_PAGE).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.param("orderInColumn1", "1,2").param("orderInColumn2", "").param("unusedWidgets", "")
 						.param("bigWidgets", "").param("userId", "1").param("studyId", "1")).andExpect(
 				status().isNoContent());
@@ -93,7 +94,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitNDSWidgetReturnsCode200() throws Exception {
 
 		this.mockMvc.perform(
-				get(NDS_ASSIGNED_TO_ME_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(NDS_ASSIGNED_TO_ME_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.param("userId", "1").sessionAttr("study", sb)).andExpect(status().isOk());
 	}
 
@@ -107,7 +108,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitEventsCompletionReturnsCode200() throws Exception {
 
 		this.mockMvc.perform(
-				get(EVENTS_COMPLETION_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(EVENTS_COMPLETION_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.param("action", "init").param("lastElement", "0").param("studyId", "0")
 						.sessionAttr("study", sb)).andExpect(status().isOk());
 	}
@@ -122,8 +123,8 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitSubjectStatusCountReturnsCode200() throws Exception {
 
 		this.mockMvc.perform(
-				get(SUBJECTS_STATUS_COUNT_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr(
-						"study", sb)).andExpect(status().isOk());
+				get(SUBJECTS_STATUS_COUNT_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
+						.sessionAttr("study", sb)).andExpect(status().isOk());
 	}
 
 	/**
@@ -136,7 +137,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitStudyProgressReturnsCode200() throws Exception {
 
 		this.mockMvc.perform(
-				get(STUDY_PROGRESS_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(STUDY_PROGRESS_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.param("action", "init").param("lastElement", "0").param("studyId", "0")
 						.sessionAttr("study", sb)).andExpect(status().isOk());
 	}
@@ -151,7 +152,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitSDVProgressReturnsCode200() throws Exception {
 
 		this.mockMvc.perform(
-				get(SDV_PROGRESS_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(SDV_PROGRESS_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.param("sdvProgressYear", "0").sessionAttr("study", sb)).andExpect(status().isOk());
 	}
 
@@ -165,7 +166,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitNdsPerCrfReturnsCode200() throws Exception {
 
 		this.mockMvc.perform(
-				get(NDS_PER_CRF_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("start", "0")
+				get(NDS_PER_CRF_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("start", "0")
 						.param("action", "init").sessionAttr("study", sb)).andExpect(status().isOk());
 	}
 
@@ -173,7 +174,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitEvaluationProgressReturnsCode200() throws Exception {
 
 		this.mockMvc.perform(
-				get(EVALUATION_PROGRESS_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(EVALUATION_PROGRESS_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.param("evaluationProgressYear", "0").sessionAttr("userBean", ub).sessionAttr("study", sb))
 				.andExpect(status().isOk());
 	}
@@ -188,7 +189,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitCodingProgressReturnsCode200() throws Exception {
 
 		this.mockMvc.perform(
-				get(CODING_PROGRESS_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(CODING_PROGRESS_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.param("codingProgressYear", "0").sessionAttr("study", sb).sessionAttr("userBean", ub))
 				.andExpect(status().isOk());
 	}
@@ -197,7 +198,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitEnrollStatusPerSiteReturnsCode200() throws Exception {
 
 		this.mockMvc.perform(
-				get(ENROLL_STATUS_PER_SITE).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(ENROLL_STATUS_PER_SITE).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.param("epPerSiteDisplay", "0").param("action", "init").sessionAttr("study", sb)
 						.sessionAttr("userBean", ub)).andExpect(status().isOk());
 	}
@@ -206,7 +207,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatGetESPSLegendValuesReturnsCode200() throws Exception {
 
 		this.mockMvc.perform(
-				get(ESPS_LEGEND).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("userId", "1")
+				get(ESPS_LEGEND).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("userId", "1")
 						.sessionAttr("study", sb)).andExpect(status().isOk());
 	}
 
@@ -221,7 +222,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(CONFIGURE_HOME_PAGE)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr("userBean", ub)
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr("userBean", ub)
 						.sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.model().attributeExists("dispayWidgetsLayout"));
 	}
@@ -237,7 +238,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(CONFIGURE_HOME_PAGE)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr("userBean", ub)
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr("userBean", ub)
 						.sessionAttr("study", sb)).andExpect(MockMvcResultMatchers.model().size(1));
 	}
 
@@ -252,7 +253,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(EVENTS_COMPLETION_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("action", "init")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("action", "init")
 						.param("lastElement", "0").param("studyId", "0").sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.model().size(EVENT_COMPL_ATTRIBUTES));
 	}
@@ -268,7 +269,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(EVENTS_COMPLETION_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("action", "init")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("action", "init")
 						.param("lastElement", "0").param("studyId", "0").sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.model().attributeExists("eventCompletionRows", "eventCompletionHasNext",
 						"eventCompletionHasPrevious", "eventCompletionLastElement"));
@@ -285,7 +286,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(EVENTS_COMPLETION_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("action", "init")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("action", "init")
 						.param("lastElement", "0").param("studyId", "0").sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/eventsCompletionChart"));
 	}
@@ -301,8 +302,8 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(SUBJECTS_STATUS_COUNT_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr("study", sb)).andExpect(
-				MockMvcResultMatchers.model().size(SUBJECT_STAT_ATTRIBUTES));
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr("study", sb))
+				.andExpect(MockMvcResultMatchers.model().size(SUBJECT_STAT_ATTRIBUTES));
 	}
 
 	/**
@@ -316,9 +317,10 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(SUBJECTS_STATUS_COUNT_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr("study", sb)).andExpect(
-				MockMvcResultMatchers.model().attributeExists("countOfAvailableSubjects", "countOfRemovedSubjects",
-						"countOfLockedSubjects", "countOfSignedSubjects"));
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr("study", sb))
+				.andExpect(MockMvcResultMatchers.model()
+								.attributeExists("countOfAvailableSubjects", "countOfRemovedSubjects",
+										"countOfLockedSubjects", "countOfSignedSubjects"));
 	}
 
 	/**
@@ -332,7 +334,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(SUBJECTS_STATUS_COUNT_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("action", "init")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("action", "init")
 						.param("lastElement", "0").param("studyId", "0").sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/subjectStatusCountChart"));
 	}
@@ -348,8 +350,8 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(STUDY_PROGRESS_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr("study", sb)).andExpect(
-				MockMvcResultMatchers.model().size(1));
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr("study", sb))
+				.andExpect(MockMvcResultMatchers.model().size(1));
 	}
 
 	/**
@@ -363,8 +365,8 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(STUDY_PROGRESS_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr("study", sb)).andExpect(
-				MockMvcResultMatchers.model().attributeExists("studyProgressMap"));
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).sessionAttr("study", sb))
+				.andExpect(MockMvcResultMatchers.model().attributeExists("studyProgressMap"));
 	}
 
 	/**
@@ -378,7 +380,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(STUDY_PROGRESS_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("action", "init")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("action", "init")
 						.param("lastElement", "0").param("studyId", "0").sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/studyProgressChart"));
 	}
@@ -394,7 +396,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(SDV_PROGRESS_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("sdvProgressYear", "0")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("sdvProgressYear", "0")
 						.sessionAttr("study", sb)).andExpect(MockMvcResultMatchers.model().size(SDV_PROG_ATTRIBUTES));
 	}
 
@@ -409,7 +411,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(SDV_PROGRESS_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("sdvProgressYear", "0")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("sdvProgressYear", "0")
 						.sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.model().attributeExists("sdvAvailableECRFs", "sdvProgressYear",
 						"sdvValuesByMonth", "sdvNextYearExists", "sdvPreviousYearExists"));
@@ -426,7 +428,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(SDV_PROGRESS_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("sdvProgressYear", "0")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("sdvProgressYear", "0")
 						.sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/sdvProgressChart"));
 	}
@@ -441,8 +443,9 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitNdsPerCrfWidgetReturnsModelWithAlAttribures() throws Exception {
 
 		this.mockMvc.perform(
-				MockMvcRequestBuilders.post(NDS_PER_CRF_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
-						.param("start", "0").param("action", "init").sessionAttr("study", sb)).andExpect(
+				MockMvcRequestBuilders.post(NDS_PER_CRF_WIDGET)
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("start", "0")
+						.param("action", "init").sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.model().attributeExists("ndsCrfHasPrevious", "ndsCrfHasNext", "ndsCrfStart",
 						"ndsCrfDataColumns"));
 	}
@@ -457,8 +460,9 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitNdsPerCrfWidgetReturnsCorrectNumberOfAttributes() throws Exception {
 
 		this.mockMvc.perform(
-				MockMvcRequestBuilders.post(NDS_PER_CRF_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
-						.param("start", "0").param("action", "init").sessionAttr("study", sb)).andExpect(
+				MockMvcRequestBuilders.post(NDS_PER_CRF_WIDGET)
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("start", "0")
+						.param("action", "init").sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.model().size(NDS_PER_CRF_ATTRIBUTES));
 	}
 
@@ -472,8 +476,9 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitNdsPerCrfWidgetReturnsCorrectUrl() throws Exception {
 
 		this.mockMvc.perform(
-				MockMvcRequestBuilders.post(NDS_PER_CRF_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
-						.param("start", "0").param("action", "init").sessionAttr("study", sb)).andExpect(
+				MockMvcRequestBuilders.post(NDS_PER_CRF_WIDGET)
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("start", "0")
+						.param("action", "init").sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/ndsPerCrfChart"));
 	}
 
@@ -488,7 +493,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(ENROLLMENT_PROGRESS_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("currentYear", "0")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("currentYear", "0")
 						.sessionAttr("study", sb))
 				.andExpect(MockMvcResultMatchers.model().size(ENROLL_PROG_ATTRIBUTES));
 	}
@@ -504,7 +509,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(ENROLLMENT_PROGRESS_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("currentYear", "0")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("currentYear", "0")
 						.sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.model().attributeExists("epYear", "epDataRows", "epPreviousYearExists",
 						"epNextYearExists"));
@@ -521,7 +526,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(ENROLLMENT_PROGRESS_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("currentYear", "0")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("currentYear", "0")
 						.sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/enrollmentProgressChart"));
 	}
@@ -537,7 +542,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(CODING_PROGRESS_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("codingProgressYear", "0")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("codingProgressYear", "0")
 						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
 				MockMvcResultMatchers.model().size(CODING_PROG_ATTRIBUTES));
 	}
@@ -553,7 +558,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(CODING_PROGRESS_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("codingProgressYear", "0")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("codingProgressYear", "0")
 						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
 				MockMvcResultMatchers.model().attributeExists("cpYear", "cpDataRows", "cpPreviousYearExists",
 						"cpNextYearExists", "cpActivateLegend"));
@@ -570,7 +575,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(CODING_PROGRESS_WIDGET)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("codingProgressYear", "0")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("codingProgressYear", "0")
 						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/codingProgressChart"));
 	}
@@ -579,7 +584,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitEvaluationProgressReturnsCorrectNumberOfAttributes() throws Exception {
 
 		this.mockMvc.perform(
-				get(EVALUATION_PROGRESS_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(EVALUATION_PROGRESS_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.param("evaluationProgressYear", "0").sessionAttr("userBean", ub).sessionAttr("study", sb))
 				.andExpect(MockMvcResultMatchers.model().size(EVALUATION_PROG_ATTRIBUTES));
 	}
@@ -588,7 +593,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitEvaluationProgressReturnsModelWithAllAttributes() throws Exception {
 
 		this.mockMvc.perform(
-				get(EVALUATION_PROGRESS_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(EVALUATION_PROGRESS_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.param("evaluationProgressYear", "0").sessionAttr("userBean", ub).sessionAttr("study", sb))
 				.andExpect(
 						MockMvcResultMatchers.model().attributeExists("evaluationProgressYear",
@@ -600,7 +605,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void testThatInitEvaluationProgressReturnsCorrectUrl() throws Exception {
 
 		this.mockMvc.perform(
-				get(EVALUATION_PROGRESS_WIDGET).sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE)
+				get(EVALUATION_PROGRESS_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
 						.param("evaluationProgressYear", "0").sessionAttr("userBean", ub).sessionAttr("study", sb))
 				.andExpect(MockMvcResultMatchers.view().name("widgets/includes/evaluationProgressChart"));
 	}
@@ -610,7 +615,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(ENROLL_STATUS_PER_SITE)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("epPerSiteDisplay", "0")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("epPerSiteDisplay", "0")
 						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
 				MockMvcResultMatchers.model().size(ENROLL_STAT_PER_SITE_ATTRIBUTES));
 	}
@@ -620,7 +625,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(ENROLL_STATUS_PER_SITE)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("epPerSiteDisplay", "0")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("epPerSiteDisplay", "0")
 						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
 				MockMvcResultMatchers.model().attributeExists("espsDisplay", "espsDataRows", "espsPreviousPageExists",
 						"espsNextPageExists"));
@@ -631,7 +636,8 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(ENROLL_STATUS_PER_SITE)
-						.sessionAttr(SessionUtil.CURRENT_SESSION_LOCALE, LOCALE).param("epPerSiteDisplay", "0")
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("epPerSiteDisplay", "0")
 						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/enrollStatusPerSiteChart"));
-	}}
+	}
+}

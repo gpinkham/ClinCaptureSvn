@@ -13,7 +13,11 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.SessionUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -35,12 +39,9 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockRequestDispatcher;
 import org.springframework.mock.web.MockServletContext;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.i18n.LocaleResolver;
 
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({"unchecked"})
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ResourceBundleProvider.class)
 public class ChangeDefinitionCRFOrdinalServletTest {
@@ -82,7 +83,7 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 		PowerMockito.when(ResourceBundleProvider.getFormatBundle(Mockito.any(Locale.class))).thenReturn(resFormat);
 
 		request = new MockHttpServletRequest();
-		SessionUtil.updateLocale(request, locale);
+		LocaleResolver.updateLocale(request, locale);
 
 		// setting up Servlet Context mock
 		Mockito.when(mockedServletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(

@@ -20,8 +20,12 @@
  */
 package org.akaza.openclinica.control.login;
 
-import com.clinovo.util.EmailUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.util.Date;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.PwdChallengeQuestion;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -42,11 +46,8 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
+import com.clinovo.util.EmailUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * @author jxu
@@ -54,7 +55,7 @@ import java.util.Locale;
  * 
  *          Servlet of requesting password
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 @Component
 public class RequestPasswordServlet extends Controller {
 
@@ -182,14 +183,14 @@ public class RequestPasswordServlet extends Controller {
 		} else {
 			emailParentStudy = sBean;
 		}
-		String emailBody = EmailUtil.getEmailBodyStart() + "Dear " + ubDB.getFirstName() + " " + ubDB.getLastName() + ", <br><br>"
-				+ restext.getString("this_email_is_from_openclinica_admin") + "<br>"
+		String emailBody = EmailUtil.getEmailBodyStart() + "Dear " + ubDB.getFirstName() + " " + ubDB.getLastName()
+				+ ", <br><br>" + restext.getString("this_email_is_from_openclinica_admin") + "<br>"
 				+ restext.getString("your_password_has_been_reset_as") + ": " + passwd + "<br><br>"
 				+ restext.getString("you_will_be_required_to_change") + " "
 				+ restext.getString("time_you_login_to_the_system") + " "
 				+ restext.getString("use_the_following_link_to_log") + ":<br>" + SQLInitServlet.getSystemURL()
 				+ "<br><br>" + respage.getString("best_system_administrator") + EmailUtil.getEmailBodyEnd()
-				+ EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
+				+ EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
 		emailBody = emailBody.replace("{0}", emailParentStudy.getName());
 		sendEmail(ubDB.getEmail().trim(), EmailEngine.getAdminEmail(), restext.getString("your_openclinica_password"),
 				emailBody, true, respage.getString("your_password_reset_new_password_emailed"),

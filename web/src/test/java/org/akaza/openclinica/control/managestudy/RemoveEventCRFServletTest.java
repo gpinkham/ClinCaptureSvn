@@ -25,7 +25,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockRequestDispatcher;
 import org.springframework.mock.web.MockServletContext;
 
-import com.clinovo.util.SessionUtil;
+import com.clinovo.i18n.LocaleResolver;
 
 @RunWith(PowerMockRunner.class)
 public class RemoveEventCRFServletTest {
@@ -55,7 +55,7 @@ public class RemoveEventCRFServletTest {
 		userAccountBean.setId(1);
 
 		Locale locale = new Locale("en");
-		SessionUtil.updateLocale(request, locale);
+		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);

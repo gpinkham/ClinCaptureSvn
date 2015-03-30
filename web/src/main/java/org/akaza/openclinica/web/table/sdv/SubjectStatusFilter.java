@@ -13,13 +13,12 @@
 
 package org.akaza.openclinica.web.table.sdv;
 
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.jmesa.view.html.editor.DroplistFilterEditor;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.jmesa.view.html.editor.DroplistFilterEditor;
 
 public class SubjectStatusFilter extends DroplistFilterEditor {
 
@@ -27,7 +26,6 @@ public class SubjectStatusFilter extends DroplistFilterEditor {
 
 	@Override
 	protected List<Option> getOptions() {
-		ResourceBundleProvider.updateLocale(getWebContext().getLocale());
 		List<Option> options = new ArrayList<Option>();
 		options.add(new Option("available", reswords.getString("available")));
 		options.add(new Option("pending", reswords.getString("pending")));

@@ -19,8 +19,15 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.util.EmailUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -47,20 +54,14 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import com.clinovo.util.EmailUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * Create a discrepancy note
  * 
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class CreateOneDiscrepancyNoteServlet extends Controller {
 
@@ -108,7 +109,8 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 
 		HashMap errors = getErrorsHolder(request);
 		int parentId = fp.getInt(PARENT_ID);
-		DiscrepancyNoteBean parent = parentId > 0 ? (DiscrepancyNoteBean) dndao.findByPK(parentId)
+		DiscrepancyNoteBean parent = parentId > 0
+				? (DiscrepancyNoteBean) dndao.findByPK(parentId)
 				: new DiscrepancyNoteBean();
 		HashMap<Integer, DiscrepancyNoteBean> boxDNMap = (HashMap<Integer, DiscrepancyNoteBean>) request.getSession()
 				.getAttribute(BOX_DN_MAP);
@@ -440,7 +442,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		message.append(respage.getString("disclaimer"));
 		message.append(respage.getString("email_body_separator"));
 		message.append(EmailUtil.getEmailBodyEnd());
-		message.append(EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage())));
+		message.append(EmailUtil.getEmailFooter(CoreResources.getSystemLocale()));
 
 		/*
 		 * 

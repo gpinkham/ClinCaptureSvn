@@ -85,9 +85,9 @@ import org.jmesa.view.html.editor.HtmlCellEditor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.ItemSDVService;
 import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SessionUtil;
 import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
@@ -388,9 +388,9 @@ public class SDVUtil {
 
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
-		resformat = ResourceBundleProvider.getFormatBundle(SessionUtil.getLocale(request));
+		resformat = ResourceBundleProvider.getFormatBundle(LocaleResolver.getLocale(request));
 		ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",
-				SessionUtil.getLocale(request));
+				LocaleResolver.getLocale(request));
 
 		String[] allTitles = new String[]{
 				resword.getString("SDV_status"),
@@ -541,7 +541,7 @@ public class SDVUtil {
 		crfStatus.getFilterRenderer().setFilterEditor(new CrfStatusFilter());
 
 		HtmlColumn actions = row.getColumn("sdvStatusActions");
-		actions.getFilterRenderer().setFilterEditor(new DefaultActionsEditor(SessionUtil.getLocale(request)));
+		actions.getFilterRenderer().setFilterEditor(new DefaultActionsEditor(LocaleResolver.getLocale(request)));
 
 		HtmlColumn sdvStatus = row.getColumn("sdvStatus");
 		sdvStatus.getFilterRenderer().setFilterEditor(new SdvStatusFilter());
@@ -589,7 +589,7 @@ public class SDVUtil {
 		// if(totalRowCount > 0){
 		sDVToolbar.setMaxRowsIncrements(new int[]{FIFTEEN, TWENTY_FIVE, FIFTY});
 		tableFacade.setToolbar(sDVToolbar);
-		tableFacade.setView(new SDVView(SessionUtil.getLocale(request), request));
+		tableFacade.setView(new SDVView(LocaleResolver.getLocale(request), request));
 
 		// Fix column titles
 		HtmlTable table = (HtmlTable) tableFacade.getTable();
@@ -692,7 +692,7 @@ public class SDVUtil {
 
 		Locale locale = ResourceBundleProvider.localeMap.get(Thread.currentThread());
 		if (locale == null) {
-			ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
+			ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
 		}
 		ResourceBundle bundle = ResourceBundleProvider.getFormatBundle();
 		String format = bundle.getString("date_time_format_string");
@@ -783,7 +783,7 @@ public class SDVUtil {
 			tempSDVBean.setStudyEventStatus(studyEventBean.getStatus().getName());
 
 			String pattern = getDateFormat();
-			SimpleDateFormat sdformat = new SimpleDateFormat(pattern, SessionUtil.getLocale(request));
+			SimpleDateFormat sdformat = new SimpleDateFormat(pattern, LocaleResolver.getLocale(request));
 
 			if (studySubjectBean.getEnrollmentDate() != null) {
 				tempSDVBean.setEnrollmentDate(sdformat.format(studySubjectBean.getEnrollmentDate()));

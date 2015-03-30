@@ -13,7 +13,14 @@
 
 package org.akaza.openclinica.web.table.scheduledjobs;
 
-import com.clinovo.util.SessionUtil;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.dao.ScheduledJobSort;
@@ -31,12 +38,7 @@ import org.jmesa.view.html.component.HtmlTable;
 import org.jmesa.web.WebContext;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * View builder for the list of scheduled jobs with an ability to cancel the job.
@@ -45,7 +47,7 @@ import java.util.ResourceBundle;
  * 
  */
 @Component
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({"unchecked"})
 public class ScheduledJobTableFactory extends AbstractTableFactory {
 	@Override
 	protected String getTableName() {
@@ -63,28 +65,31 @@ public class ScheduledJobTableFactory extends AbstractTableFactory {
 		ResourceBundleProvider.getWordsBundle(locale);
 		Row row = tableFacade.getTable().getRow();
 
-		String[] allTitles = new String[] { ResourceBundleProvider.getResWord("dataset_name"), ResourceBundleProvider.getResWord("fire_time"),
-				ResourceBundleProvider.getResWord("export_file"), ResourceBundleProvider.getResWord("job_status"), ResourceBundleProvider.getResWord("actions") };
+		String[] allTitles = new String[]{ResourceBundleProvider.getResWord("dataset_name"),
+				ResourceBundleProvider.getResWord("fire_time"), ResourceBundleProvider.getResWord("export_file"),
+				ResourceBundleProvider.getResWord("job_status"), ResourceBundleProvider.getResWord("actions")};
 		SDVUtil sdvUtil = new SDVUtil(); // TODO check if this is viable
 		sdvUtil.setTitles(allTitles, (HtmlTable) tableFacade.getTable());
 
-		sdvUtil.setHtmlCellEditors(tableFacade, new String[] { "action" }, false);
+		sdvUtil.setHtmlCellEditors(tableFacade, new String[]{"action"}, false);
 
-		configureColumn(row.getColumn("action"), ResourceBundleProvider.getResWord("actions"), sdvUtil.getCellEditorNoEscapes(), new DefaultActionsEditor(
-				locale), true, false);
+		configureColumn(row.getColumn("action"), ResourceBundleProvider.getResWord("actions"),
+				sdvUtil.getCellEditorNoEscapes(), new DefaultActionsEditor(locale), true, false);
 
 	}
 
 	/**
 	 * Methods creates table.
 	 *
-	 * @param request The incoming request.
-	 * @param response The response to redirect to.
+	 * @param request
+	 *            The incoming request.
+	 * @param response
+	 *            The response to redirect to.
 	 * @return the object with data required.
 	 */
 	@Override
 	public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
-		locale = SessionUtil.getLocale(request);
+		locale = LocaleResolver.getLocale(request);
 		TableFacade tableFacade = getTableFacadeImpl(request, response);
 		tableFacade.setStateAttr("restore");
 		int maxJobs = (Integer) request.getAttribute("totalJobs");

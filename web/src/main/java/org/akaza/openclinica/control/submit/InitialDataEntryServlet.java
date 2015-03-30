@@ -52,9 +52,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping(value = "/InitialDataEntry")
 @SuppressWarnings({"serial"})
 public class InitialDataEntryServlet extends DataEntryServlet {
-	
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -129,7 +128,8 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 					inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
 				} else {
 
-					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
+					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(),
+							displayItem);
 				}
 
 				if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
@@ -195,7 +195,8 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 				if (displayGroup.isAuto()) {
 					inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
 				} else {
-					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
+					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(),
+							displayItem);
 				}
 				validateDisplayItemBean(v, displayItem, inputName, request);
 			}
@@ -239,7 +240,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 		String tabId = fp.getString("tab", true);
 		String sectionId = fp.getString(DataEntryServlet.INPUT_SECTION_ID, true);
 		String eventCRFId = fp.getString(INPUT_EVENT_CRF_ID, true);
-		request.setAttribute("system_lang", CoreResources.getSystemLanguage());
+		request.setAttribute("system_lang", CoreResources.getSystemLocale().toString());
 		if (StringUtil.isBlank(sectionId) || StringUtil.isBlank(tabId)) {
 			return Page.INITIAL_DATA_ENTRY_SERVLET;
 		} else {

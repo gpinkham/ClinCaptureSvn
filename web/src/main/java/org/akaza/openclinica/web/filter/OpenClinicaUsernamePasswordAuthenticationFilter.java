@@ -13,7 +13,14 @@
 
 package org.akaza.openclinica.web.filter;
 
-import com.clinovo.util.SessionUtil;
+import java.util.Date;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -35,15 +42,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.TextEscapeUtils;
 import org.springframework.util.Assert;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-import java.util.Date;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * Processes an authentication form submission. Called {@code AuthenticationProcessingFilter} prior to Spring Security
@@ -61,7 +61,7 @@ import java.util.ResourceBundle;
  * @author Luke Taylor
  * @since 3.0
  */
-@SuppressWarnings({ "serial", "static-access" })
+@SuppressWarnings({"serial", "static-access"})
 public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
 	public static final String SPRING_SECURITY_FORM_USERNAME_KEY = "j_username";
@@ -75,9 +75,6 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	private AuditUserLoginDao auditUserLoginDao;
 	private ConfigurationDao configurationDao;
 	private DataSource dataSource;
-
-	@Autowired
-	private SessionLocaleResolver localeResolver;
 
 	@Autowired
 	private CoreResources coreResources;
@@ -138,13 +135,8 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 		Authentication authentication;
 		UserAccountBean userAccountBean = null;
 
-		Locale locale = SessionUtil.getLocale(request);
-		if (locale == null) {
-			locale = new Locale(CoreResources.getSystemLanguage());
-			SessionUtil.updateLocale(request, response, localeResolver, locale);
-		}
-		ResourceBundleProvider.updateLocale(locale);
-		ResourceBundle restext = ResourceBundleProvider.getTextsBundle(locale);
+		LocaleResolver.resolveLocale();
+		ResourceBundle restext = ResourceBundleProvider.getTextsBundle();
 
 		try {
 			EntityBean eb = getUserAccountDao().findByUserName(username);

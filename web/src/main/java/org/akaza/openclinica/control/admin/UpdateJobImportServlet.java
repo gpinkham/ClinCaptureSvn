@@ -13,8 +13,15 @@
 
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.SessionUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -36,15 +43,10 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.ValidatorHelper;
 
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class UpdateJobImportServlet extends Controller {
 
@@ -168,7 +170,7 @@ public class UpdateJobImportServlet extends Controller {
 				int studyId = fp.getInt(ImportSpringJob.STUDY_ID);
 				StudyBean study = (StudyBean) studyDAO.findByPK(studyId);
 				SimpleTriggerImpl newTrigger = triggerService.generateImportTrigger(fp, getUserAccountBean(request),
-						study, startTime, SessionUtil.getLocale(request).getLanguage());
+						study, startTime, LocaleResolver.getLocale(request).toString());
 				JobDetailImpl jobDetailBean = new JobDetailImpl();
 				jobDetailBean.setGroup(TRIGGER_IMPORT_GROUP);
 				jobDetailBean.setName(newTrigger.getKey().getName());

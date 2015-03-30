@@ -19,8 +19,6 @@
 		<context:exclude-filter type="regex" expression="org.akaza.openclinica.ws.*" />
 	</context:component-scan>
 
-    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
-
 	<util:properties id="dataInfo" location="classpath:datainfo.properties" />
 	<util:properties id="extractInfo" location="classpath:extract.properties" />
 	<util:properties id="oracle" location="classpath:oracle.properties" />

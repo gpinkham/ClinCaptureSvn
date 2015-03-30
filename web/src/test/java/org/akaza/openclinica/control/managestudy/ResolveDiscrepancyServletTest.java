@@ -49,7 +49,7 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.clinovo.util.SessionUtil;
+import com.clinovo.i18n.LocaleResolver;
 
 public class ResolveDiscrepancyServletTest {
 
@@ -116,7 +116,7 @@ public class ResolveDiscrepancyServletTest {
 		Mockito.doCallRealMethod().when(servlet).getPageForForwarding(request, note);
 
 		Locale locale = new Locale("en");
-		SessionUtil.updateLocale(request, locale);
+		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
@@ -384,7 +384,7 @@ public class ResolveDiscrepancyServletTest {
 		Page page = servlet.getPageForForwarding(request, note);
 		assertEquals(Page.VIEW_SECTION_DATA_ENTRY_SERVLET, page);
 	}
-	
+
 	@Test
 	public void testThatSiteMonitorGetsViewPage() {
 		currentRole.setRole(Role.SITE_MONITOR);
@@ -395,7 +395,7 @@ public class ResolveDiscrepancyServletTest {
 		Page page = servlet.getPageForForwarding(request, note);
 		assertEquals(Page.VIEW_SECTION_DATA_ENTRY_SERVLET, page);
 	}
-	
+
 	@Test
 	public void testThatClinicalResearchCoordinatorGetsAdminEditPageWhenCrfIsIDECompleted() {
 		currentRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
@@ -427,7 +427,7 @@ public class ResolveDiscrepancyServletTest {
 		Page page = servlet.getPageForForwarding(request, note);
 		assertEquals(Page.INITIAL_DATA_ENTRY_SERVLET, page);
 	}
-	
+
 	@Test
 	public void testThatInvestigatorGetsAdminEditPageWhenCrfIsIDECompleted() {
 		currentRole.setRole(Role.INVESTIGATOR);
@@ -460,4 +460,3 @@ public class ResolveDiscrepancyServletTest {
 		assertEquals(Page.INITIAL_DATA_ENTRY_SERVLET, page);
 	}
 }
-

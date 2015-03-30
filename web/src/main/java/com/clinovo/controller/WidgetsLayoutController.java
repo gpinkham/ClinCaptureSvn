@@ -15,19 +15,22 @@
 
 package com.clinovo.controller;
 
-import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
-import com.clinovo.bean.display.DisplayWidgetsRowWithExtraField;
-import com.clinovo.bean.display.DisplayWidgetsRowWithName;
-import com.clinovo.dao.CodedItemDAO;
-import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
-import com.clinovo.jmesa.evaluation.CRFEvaluationItem;
-import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
-import com.clinovo.model.CodedItem;
-import com.clinovo.model.Widget;
-import com.clinovo.model.WidgetsLayout;
-import com.clinovo.service.WidgetService;
-import com.clinovo.service.WidgetsLayoutService;
-import com.clinovo.util.SessionUtil;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
@@ -55,7 +58,6 @@ import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,26 +70,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
+import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
+import com.clinovo.bean.display.DisplayWidgetsRowWithExtraField;
+import com.clinovo.bean.display.DisplayWidgetsRowWithName;
+import com.clinovo.dao.CodedItemDAO;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
+import com.clinovo.jmesa.evaluation.CRFEvaluationItem;
+import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.Widget;
+import com.clinovo.model.WidgetsLayout;
+import com.clinovo.service.WidgetService;
+import com.clinovo.service.WidgetsLayoutService;
 
 /**
  * This controller was created to gather data from database and send it to widgets.
  */
 @Controller
-@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
+@SuppressWarnings({"unused", "rawtypes", "unchecked"})
 public class WidgetsLayoutController {
 
 	private static final int FILTER_START = 0;
@@ -542,7 +543,7 @@ public class WidgetsLayoutController {
 		int currentYear = sdvCal.get(Calendar.YEAR);
 		boolean nextDataExists = sdvProgressYear < currentYear || nextYear.size() > 0;
 		EventCRFSDVFilter sdvFilterDone = new EventCRFSDVFilter(sb.getId());
-		sdvFilterDone.addFilter("sdvStatus", messageSource.getMessage("complete", null, SessionUtil.getLocale(request))
+		sdvFilterDone.addFilter("sdvStatus", messageSource.getMessage("complete", null, LocaleResolver.getLocale())
 				.toLowerCase());
 		EventCRFSDVSort sdvSortDone = new EventCRFSDVSort();
 		boolean sdvWithOpenQueries = sb.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes");
@@ -576,12 +577,12 @@ public class WidgetsLayoutController {
 
 		for (int currentValue : countValues) {
 			String currentMonthName = messageSource.getMessage("short.month." + counter, null,
-					SessionUtil.getLocale(request));
+					LocaleResolver.getLocale());
 			valuesAndSigns.put(currentMonthName, currentValue);
 			counter++;
 		}
 		EventCRFSDVFilter sdvFilter = new EventCRFSDVFilter(sb.getId());
-		sdvFilter.addFilter("sdvStatus", messageSource.getMessage("not_done", null, SessionUtil.getLocale(request)));
+		sdvFilter.addFilter("sdvStatus", messageSource.getMessage("not_done", null, LocaleResolver.getLocale()));
 		EventCRFSDVSort sdvSort = new EventCRFSDVSort();
 		ArrayList<EventCRFBean> availableForSDV = eCrfdao.getAvailableWithFilterAndSort(sb.getId(),
 				sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries,
@@ -1143,7 +1144,7 @@ public class WidgetsLayoutController {
 
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(datasource);
 		setRequestHeadersAndUpdateLocale(response, request);
-		Locale locale = SessionUtil.getLocale(request);
+		Locale locale = LocaleResolver.getLocale();
 		String page = "widgets/includes/evaluationProgressChart";
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -1164,7 +1165,7 @@ public class WidgetsLayoutController {
 			blankStatuses.put(messageSource.getMessage("ready_for_evaluation", null, locale), 0);
 			dataRows.put(month, blankStatuses);
 		}
-		CRFEvaluationFilter filter = new CRFEvaluationFilter(null, messageSource, SessionUtil.getLocale(request));
+		CRFEvaluationFilter filter = new CRFEvaluationFilter(null, messageSource, LocaleResolver.getLocale());
 		CRFEvaluationSort sort = new CRFEvaluationSort();
 		List<CRFEvaluationItem> evaluationItems = eventCRFDAO.findAllEventCrfsForEvaluation(sb, filter, sort,
 				FILTER_START, FILTER_END);
@@ -1287,7 +1288,7 @@ public class WidgetsLayoutController {
 
 		ArrayList<String> monthsList = new ArrayList<String>();
 		for (int i = 1; i <= NUMBER_OF_MONTHS + 1; i++) {
-			monthsList.add(messageSource.getMessage("short.month." + i, null, SessionUtil.getLocale(request)));
+			monthsList.add(messageSource.getMessage("short.month." + i, null, LocaleResolver.getLocale()));
 		}
 		return monthsList;
 	}
@@ -1298,7 +1299,6 @@ public class WidgetsLayoutController {
 		response.setHeader("Pragma", "no-cache");
 		response.setDateHeader("Expires", -1);
 		response.setHeader("Cache-Control", "no-store");
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 	}
 
 	private String getPercentOfEnrollmentForSite(StudyBean site) {

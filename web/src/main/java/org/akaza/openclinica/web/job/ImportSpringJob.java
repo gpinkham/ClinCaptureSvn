@@ -376,8 +376,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				if (emailParentStudy != null) {
 					msg += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
 				}
-				msg += EmailUtil.getEmailBodyEnd()
-						+ EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
+				msg += EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
 				mailSender.sendEmail(contactEmail,
 						respage.getString("job_failure_for") + " " + triggerBean.getFullName(), msg, true);
 			} catch (OpenClinicaSystemException ose) {
@@ -398,7 +397,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				+ respage.getString("your_job_ran_success_html") + "  "
 				+ respage.getString("please_review_the_data_html") + msg + "<br/>"
 				+ respage.getString("best_system_administrator").replace("{0}", studyName)
-				+ EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
+				+ EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
 	}
 
 	/*

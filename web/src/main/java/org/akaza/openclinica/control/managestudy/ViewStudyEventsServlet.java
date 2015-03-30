@@ -12,8 +12,21 @@
  ******************************************************************************/
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.SessionUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -35,24 +48,13 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyEventRow;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * Handles user request of "view study events".
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ViewStudyEventsServlet extends RememberLastPage {
 
@@ -104,7 +106,6 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		StudyBean currentStudy = getCurrentStudy(request);
 		SimpleDateFormat localDf = getLocalDf(request);
 
-
 		// checks which module requests are from
 		String module = fp.getString(MODULE);
 		request.setAttribute(MODULE, module);
@@ -133,8 +134,9 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 					.getSession().getAttribute(VIEW_STUDY_EVENTS_SED_ID) : sedId;
 			statusId = request.getSession().getAttribute(VIEW_STUDY_EVENTS_STATUS_ID) != null ? (Integer) request
 					.getSession().getAttribute(VIEW_STUDY_EVENTS_STATUS_ID) : statusId;
-			definitionId = request.getSession().getAttribute(VIEW_STUDY_EVENTS_DEFINITION_ID) != null ? (Integer) request
-					.getSession().getAttribute(VIEW_STUDY_EVENTS_DEFINITION_ID) : definitionId;
+			definitionId = request.getSession().getAttribute(VIEW_STUDY_EVENTS_DEFINITION_ID) != null
+					? (Integer) request.getSession().getAttribute(VIEW_STUDY_EVENTS_DEFINITION_ID)
+					: definitionId;
 			startDate = request.getSession().getAttribute(VIEW_STUDY_EVENTS_START_DATE) != null ? (Date) request
 					.getSession().getAttribute(VIEW_STUDY_EVENTS_START_DATE) : defaultStartDate;
 			endDate = request.getSession().getAttribute(VIEW_STUDY_EVENTS_END_DATE) != null ? (Date) request
@@ -297,7 +299,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 					currentStudy == null ? resword.getString("study_subject_ID") : currentStudy
 							.getStudyParameterConfig().getStudySubjectIdLabel(),
 					resword.getString("event_date_started"), resword.getString("subject_event_status"),
-					resword.getString("actions") };
+					resword.getString("actions")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(columnThree);
 			HashMap args = new HashMap();
@@ -500,9 +502,8 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 				.append((!eblFiltered.isEmpty() ? eblFiltered : "0")).append("&ebl_filterKeyword=")
 				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1");
 		Locale locale = (Locale) request.getSession().getAttribute("viewStudyEventsServletPreviousLocale");
-		boolean localeChanged = locale != null
-				&& !SessionUtil.getLocale(request).getLanguage().equalsIgnoreCase(locale.getLanguage());
-		request.getSession().setAttribute("viewStudyEventsServletPreviousLocale", SessionUtil.getLocale(request));
+		boolean localeChanged = locale != null && !LocaleResolver.getLocale(request).equals(locale);
+		request.getSession().setAttribute("viewStudyEventsServletPreviousLocale", LocaleResolver.getLocale(request));
 		if (request.getParameter("refreshPage") != null || localeChanged) {
 			saveUrl(getUrlKey(request), request.getRequestURL() + sb.toString(), request);
 		}

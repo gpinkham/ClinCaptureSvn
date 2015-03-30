@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * Medical product data access object.
  */
+@SuppressWarnings("unchecked")
 public class MedicalProductDAO {
 
     private static final String WHOD = "WHOD";
@@ -24,8 +25,8 @@ public class MedicalProductDAO {
      * @param mpn          the medical product name for search.
      * @param ontologyName the name of term's ontology.
      * @return the list of medical product information.
-     */
-    public List<Object> findByMedicalProductName(String mpn, String ontologyName) {
+     */    
+	public List<Object> findByMedicalProductName(String mpn, String ontologyName) {
         String sql = "";
         if (ontologyName.contains(WHOD)) {
             sql = "from MedicalProduct p where p.drugName like :mpn or p.drugName = :mpnFull";

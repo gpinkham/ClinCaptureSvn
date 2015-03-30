@@ -1,6 +1,10 @@
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.SessionUtil;
+import static junit.framework.Assert.assertEquals;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,10 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import static junit.framework.Assert.assertEquals;
+import com.clinovo.i18n.LocaleResolver;
 
 @SuppressWarnings("deprecation")
 public class InitCreateCRFVersionServletTest {
@@ -32,7 +33,7 @@ public class InitCreateCRFVersionServletTest {
 		request.setParameter("crfId", "1");
 
 		Locale locale = Locale.ENGLISH;
-		SessionUtil.updateLocale(request, locale);
+		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(locale);

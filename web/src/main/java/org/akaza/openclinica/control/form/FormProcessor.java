@@ -28,7 +28,6 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.clinovo.util.SessionUtil;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -37,23 +36,23 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.clinovo.i18n.LocaleResolver;
+
 /**
  * @author ssachs
  * 
- * This class does two things: retrieve input from a form, and prepare to set
- * default values
+ *         This class does two things: retrieve input from a form, and prepare to set default values
  * 
- * three dimensions:
- * <ul>
- * <li> do we throw an exception when the key isn't present?</li>
- * <li> do we look in the attributes and parameters, or just the parameters?</li>
- * <li> do we look in an HttpServletRequest, or a MultipartRequest?</li>
- * </ul>
+ *         three dimensions:
+ *         <ul>
+ *         <li>do we throw an exception when the key isn't present?</li>
+ *         <li>do we look in the attributes and parameters, or just the parameters?</li>
+ *         <li>do we look in an HttpServletRequest, or a MultipartRequest?</li>
+ *         </ul>
  * 
- * TODO handle MultiPartRequests - is this a priority, since we don't have many
- * file uploads?
+ *         TODO handle MultiPartRequests - is this a priority, since we don't have many file uploads?
  */
-@SuppressWarnings({"rawtypes","unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class FormProcessor {
 	private HttpServletRequest request;
 	private HashMap presetValues;
@@ -365,7 +364,7 @@ public class FormProcessor {
 		try {
 			logger.info("trying to parse " + fieldValue + " on the pattern "
 					+ resformat.getString("date_time_format_string"));
-			if(date.isEmpty()) {
+			if (date.isEmpty()) {
 				result = DEFAULT_DATE;
 			} else {
 				result = sdf.parse(fieldValue);
@@ -469,7 +468,7 @@ public class FormProcessor {
 
 	public EntityBeanTable getEntityBeanTable() {
 		EntityBeanTable answer = new EntityBeanTable();
-		answer.setLocale(SessionUtil.getLocale(request));
+		answer.setLocale(LocaleResolver.getLocale(request));
 		String sortingColumn = request.getParameter(EBL_SORT_COLUMN);
 		if (sortingColumn != null && !"".equals(sortingColumn)) {
 			answer.setSortingColumnExplicitlySet(true);
@@ -483,7 +482,7 @@ public class FormProcessor {
 		// if no value was specified on the form or in the GET query, then
 		// keep the default value for that bit
 		// otherwise, the bits will just be forced to false
-		String blnFields[] = { EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED };
+		String blnFields[] = {EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED};
 
 		for (int i = 0; i < blnFields.length; i++) {
 			String value = getString(blnFields[i]);
@@ -518,7 +517,7 @@ public class FormProcessor {
 		// if no value was specified on the form or in the GET query, then
 		// keep the default value for that bit
 		// otherwise, the bits will just be forced to false
-		String blnFields[] = { EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED };
+		String blnFields[] = {EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED};
 
 		for (int i = 0; i < blnFields.length; i++) {
 			String value = getString(blnFields[i]);

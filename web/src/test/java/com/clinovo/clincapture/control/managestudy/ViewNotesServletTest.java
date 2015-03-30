@@ -27,13 +27,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.DcfService;
 import com.clinovo.service.impl.DcfServiceImpl;
 import com.clinovo.util.DcfRenderType;
-import com.clinovo.util.SessionUtil;
 import com.google.common.collect.Iterables;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ViewNotesServletTest extends DefaultAppContextTest {
 
 	public static final int FIVE = 5;
@@ -67,8 +67,8 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		request.setParameter("module", "admin");
 		request.setParameter("showMoreLink", "true");
 		request.setParameter("oneSubjectId", "1");
-		SessionUtil.updateLocale(request.getSession(), Locale.ENGLISH);
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
+		LocaleResolver.updateLocale(request.getSession(), Locale.ENGLISH);
+		ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
 		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("root", "root"));
 		request.getSession().setAttribute("study", currentStudy);
 		currentUser = new UserAccountBean();
@@ -208,7 +208,7 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		assertEquals("Total", Iterables.get(statusItems.entrySet(), 0).getKey());
 		assertEquals("0", Iterables.get(statusItems.entrySet(), 0).getValue());
 	}
-	
+
 	@Test
 	public void testThatPrintDcfOptionStoresVariableInSession() throws Exception {
 		request.setParameter(ViewNotesServlet.GENERATE_DCF, "yes");
@@ -223,7 +223,7 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		viewNotesServlet.processRequest(request, response);
 		assertNotNull(request.getAttribute(ViewNotesServlet.PRINT_DCF));
 	}
-	
+
 	@Test
 	public void testThatSavDcfOptionStoresVariableInSession() throws Exception {
 		request.setParameter(ViewNotesServlet.GENERATE_DCF, "yes");

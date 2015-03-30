@@ -13,9 +13,13 @@
 
 package com.clinovo.tag;
 
-import com.clinovo.dao.SystemDAO;
-import com.clinovo.util.SessionUtil;
-import com.clinovo.util.StudyParameterPriorityUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.tagext.TagSupport;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
@@ -28,17 +32,14 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.TagSupport;
-import javax.sql.DataSource;
+import com.clinovo.dao.SystemDAO;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.StudyParameterPriorityUtil;
 
 /**
  * Custom tag for building the data entry link.
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings({"serial"})
 public class DataEntryLinkTag extends TagSupport {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DataEntryLinkTag.class);
@@ -58,12 +59,29 @@ public class DataEntryLinkTag extends TagSupport {
 	private String imgPrefix = "bt_EnterData";
 	private String onClickFunction = "checkCRFLocked";
 
+	private void reset() {
+		alt = "";
+		border = 0;
+		title = "";
+		rowCount = 1;
+		object = null;
+		imgHSpace = "4";
+		actionQuery = "";
+		imgAlign = "left";
+		imgPostfix = "_d";
+		actionQueryTail = "";
+		imgExtension = ".gif";
+		imgSrcPrefix = "images/";
+		imgPrefix = "bt_EnterData";
+		onClickFunction = "checkCRFLocked";
+	}
+
 	@Override
 	public int doStartTag() throws JspException {
 		if (object != null) {
 			WebApplicationContext webApplicationContext = WebApplicationContextUtils
-					.getRequiredWebApplicationContext(((PageContext) pageContext
-							.getAttribute("javax.servlet.jsp.jspPageContext")).getServletContext());
+					.getRequiredWebApplicationContext(((PageContext) pageContext.getAttribute(PageContext.PAGECONTEXT))
+							.getServletContext());
 			SystemDAO systemDAO = (SystemDAO) webApplicationContext.getBean("systemDAO");
 			DataSource dataSource = (DataSource) webApplicationContext.getBean("dataSource");
 			MessageSource messageSource = (MessageSource) webApplicationContext.getBean("messageSource");
@@ -85,7 +103,7 @@ public class DataEntryLinkTag extends TagSupport {
 					if (dec.isContinueInitialDataEntryPermitted()) {
 						eventCrfBean = dec.getEventCRF();
 						dynamicAlt = messageSource.getMessage("continue_entering_data", null,
-								SessionUtil.getLocale((HttpServletRequest) pageContext.getRequest()));
+								LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest()));
 						if (dynamicActionQuery.isEmpty()) {
 							dynamicActionQuery = "'InitialDataEntry".concat(actionQueryTail).concat("'");
 						}
@@ -93,8 +111,9 @@ public class DataEntryLinkTag extends TagSupport {
 						eventCrfBean = dec.getEventCRF();
 						dynamicAlt = messageSource.getMessage(eventCrfBean.getValidatorId() == 0 ? (allowCrfEvaluation
 								&& dec.getEventDefinitionCRF().isEvaluatedCRF()
-								&& !dec.getEventDefinitionCRF().isDoubleEntry() ? "begin_crf_evaluation"
-								: "begin_double_data_entry") : "continue_entering_data", null, SessionUtil
+								&& !dec.getEventDefinitionCRF().isDoubleEntry()
+								? "begin_crf_evaluation"
+								: "begin_double_data_entry") : "continue_entering_data", null, LocaleResolver
 								.getLocale((HttpServletRequest) pageContext.getRequest()));
 						if (dynamicActionQuery.isEmpty()) {
 							dynamicActionQuery = "'DoubleDataEntry".concat(actionQueryTail).concat("'");
@@ -102,7 +121,7 @@ public class DataEntryLinkTag extends TagSupport {
 					} else if (dec.isPerformAdministrativeEditingPermitted()) {
 						eventCrfBean = dec.getEventCRF();
 						dynamicAlt = messageSource.getMessage("administrative_editing", null,
-								SessionUtil.getLocale((HttpServletRequest) pageContext.getRequest()));
+								LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest()));
 						if (dynamicActionQuery.isEmpty()) {
 							dynamicActionQuery = "'AdministrativeEditing".concat(actionQueryTail).concat("'");
 						}
@@ -113,7 +132,7 @@ public class DataEntryLinkTag extends TagSupport {
 				eventCrfBean = dedc.getEventCRF();
 				if (dynamicAlt.isEmpty()) {
 					dynamicAlt = messageSource.getMessage("enter_data", null,
-							SessionUtil.getLocale((HttpServletRequest) pageContext.getRequest()));
+							LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest()));
 				}
 				if (dynamicActionQuery.isEmpty()) {
 					dynamicActionQuery = "document.startForm".concat(actionQueryTail);
@@ -141,7 +160,7 @@ public class DataEntryLinkTag extends TagSupport {
 				LOGGER.error("Error has occurred.", ex);
 			}
 		}
-
+		reset();
 		return SKIP_BODY;
 	}
 
@@ -255,5 +274,11 @@ public class DataEntryLinkTag extends TagSupport {
 
 	public void setActionQueryTail(String actionQueryTail) {
 		this.actionQueryTail = actionQueryTail;
+	}
+
+	@Override
+	public void release() {
+		reset();
+		super.release();
 	}
 }

@@ -9,6 +9,7 @@ import com.clinovo.pages.ChangeStudyPage;
 import com.clinovo.pages.ConfigureSystemPropertiesPage;
 import com.clinovo.pages.UpdateStudyDetailsPage;
 
+@SuppressWarnings("unused")
 public class StudySubject {
 	
 	private String studySubjectID = "";

@@ -32,7 +32,6 @@ import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -42,7 +41,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.clinovo.controller.Redirection;
-import com.clinovo.util.SessionUtil;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * SetUpSessionInterceptor that able to manage controller requests.
@@ -63,6 +62,7 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		boolean ok = true;
 		setupDefaultParameters(request, handler);
+		LocaleResolver.resolveLocale();
 		if (SecurityContextHolder.getContext().getAuthentication() != null) {
 			Controller.restorePageMessages(request);
 			Navigation.addToNavigationStack(request);
@@ -73,7 +73,6 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 					BaseController.USER_BEAN_NAME);
 			StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(BaseController.STUDY);
 			ok = userBean != null && userRole != null && currentStudy != null;
-			ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 			request.setAttribute(BaseController.USER_ROLE, userRole);
 			request.setAttribute(BaseController.STUDY, currentStudy);
 			request.setAttribute(BaseController.USER_BEAN_NAME, userBean);

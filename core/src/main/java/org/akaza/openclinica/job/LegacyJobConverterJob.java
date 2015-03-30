@@ -146,7 +146,7 @@ public class LegacyJobConverterJob extends QuartzJobBean {
 					XsltTriggerService xsltService = new XsltTriggerService();
 					SimpleTriggerImpl newTrigger;
 					newTrigger = xsltService.generateXsltTrigger(xsltPath, studyBean, endFilePath + File.separator,
-							exportFileName, dsBean.getId(), epBean, userBean, Locale.US.getLanguage(), cnt,
+							exportFileName, dsBean.getId(), epBean, userBean, Locale.US.toString(), cnt,
 							getFilePath(context) + "xslt", XsltTriggerService.TRIGGER_GROUP_NAME);
 					// Updating the original trigger with user given inputs
 					newTrigger.setRepeatCount(64000);

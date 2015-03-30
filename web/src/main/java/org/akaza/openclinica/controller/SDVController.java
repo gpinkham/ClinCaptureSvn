@@ -40,8 +40,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.ItemSDVService;
-import com.clinovo.util.SessionUtil;
 
 /**
  * Implement the functionality for displaying a table of Event CRFs for Source Data Verification. This is an autowired,
@@ -84,7 +84,6 @@ public class SDVController {
 			}
 			return null;
 		}
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		ModelMap gridMap = new ModelMap();
 		HttpSession session = request.getSession();
 		boolean showMoreLink;
@@ -143,7 +142,6 @@ public class SDVController {
 			}
 			return null;
 		}
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		// Reseting the side info panel set by SecureControler Mantis Issue: 8680.
 		// Todo need something to reset panel from all the Spring Controllers
 		StudyInfoPanel panel = new StudyInfoPanel();
@@ -212,7 +210,7 @@ public class SDVController {
 		// The application is POSTing parameters with the name "sdvCheck_" plus the
 		// Event CRF id, so the parameter is sdvCheck_534.
 
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(LocaleResolver.getLocale());
 
 		Enumeration paramNames = request.getParameterNames();
 		Map<String, String> parameterMap = new HashMap<String, String>();
@@ -264,7 +262,7 @@ public class SDVController {
 	public void sdvOneCRFFormHandler(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("crfId") int crfId) throws Exception {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(LocaleResolver.getLocale());
 
 		if (!mayProceed(request)) {
 			try {
@@ -311,7 +309,7 @@ public class SDVController {
 	public void changeSDVHandler(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("crfId") int crfId) throws Exception {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(LocaleResolver.getLocale());
 
 		// For the messages that appear in the left column of the results page
 		ArrayList<String> pageMessages = new ArrayList<String>();
@@ -349,7 +347,7 @@ public class SDVController {
 	public void sdvStudySubjectHandler(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("theStudySubjectId") int studySubjectId) throws Exception {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(LocaleResolver.getLocale());
 
 		// For the messages that appear in the left column of the results page
 		ArrayList<String> pageMessages = new ArrayList<String>();
@@ -388,7 +386,7 @@ public class SDVController {
 	public void unSdvStudySubjectHandler(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("theStudySubjectId") int studySubjectId) throws Exception {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(LocaleResolver.getLocale());
 
 		ArrayList<String> pageMessages = new ArrayList<String>();
 		List<Integer> studySubjectIds = new ArrayList<Integer>();
@@ -428,7 +426,7 @@ public class SDVController {
 		// The application is POSTing parameters with the name "sdvCheck_" plus the
 		// Event CRF id, so the parameter is sdvCheck_534.
 
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(LocaleResolver.getLocale());
 
 		Enumeration paramNames = request.getParameterNames();
 		Map<String, String> parameterMap = new HashMap<String, String>();

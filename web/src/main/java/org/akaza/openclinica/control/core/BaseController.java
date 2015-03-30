@@ -69,9 +69,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.ServletContextAware;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.clinovo.dao.SystemDAO;
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.util.RequestUtil;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DcfService;
@@ -85,7 +85,6 @@ import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
 import com.clinovo.util.CrfShortcutsAnalyzer;
 import com.clinovo.util.RuleSetServiceUtil;
-import com.clinovo.util.SessionUtil;
 
 @SuppressWarnings({"rawtypes", "serial"})
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
@@ -175,8 +174,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
 	@Autowired
 	private DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
-	@Autowired
-	private SessionLocaleResolver localeResolver;
 	@Autowired
 	private DataSource dataSource;
 	@Autowired
@@ -269,7 +266,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	}
 
 	public SimpleDateFormat getLocalDf(HttpServletRequest request) {
-		return new SimpleDateFormat(resformat.getString("date_format_string"), SessionUtil.getLocale(request));
+		return new SimpleDateFormat(resformat.getString("date_format_string"), LocaleResolver.getLocale(request));
 	}
 
 	public SessionManager getSessionManager(HttpServletRequest request) {
@@ -557,10 +554,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public ItemSDVService getItemSDVService() {
 		return itemSDVService;
-	}
-
-	public SessionLocaleResolver getLocaleResolver() {
-		return localeResolver;
 	}
 
 	public DynamicsItemGroupMetadataDao getDynamicsItemGroupMetadataDao() {

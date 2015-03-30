@@ -48,7 +48,7 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.SessionUtil;
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.ValidatorHelper;
 
 /**
@@ -215,7 +215,7 @@ public class CreateJobExportServlet extends Controller {
 				SimpleTriggerImpl trigger;
 
 				trigger = xsltService.generateXsltTrigger(xsltPath, getParentStudy(), endFilePath + File.separator,
-						exportFileName, dsBean.getId(), epBean, userBean, SessionUtil.getLocale(request).getLanguage(),
+						exportFileName, dsBean.getId(), epBean, userBean, LocaleResolver.getLocale(request).toString(),
 						cnt, SQLInitServlet.getField("filePath") + "xslt", XsltTriggerService.TRIGGER_GROUP_NAME);
 
 				trigger.setName(jobName);

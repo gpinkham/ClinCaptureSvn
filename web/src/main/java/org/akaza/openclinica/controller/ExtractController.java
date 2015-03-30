@@ -29,7 +29,6 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.ExtractUtils;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -46,7 +45,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.clinovo.util.SessionUtil;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * ExtractController.
@@ -59,8 +58,6 @@ public class ExtractController {
 
 	@Autowired
 	private BasicDataSource dataSource;
-
-	private StdScheduler scheduler;
 
 	public static final String TRIGGER_GROUP_NAME = "XsltTriggers";
 
@@ -87,7 +84,6 @@ public class ExtractController {
 	public ModelMap processSubmit(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("id") String id, @RequestParam("datasetId") String datasetId) throws IOException {
 		ModelMap map = new ModelMap();
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		// String datasetId = (String)request.getAttribute("datasetId");
 		// String id = (String)request.getAttribute("id");
 		System.out.println("found both id " + id + " and dataset " + datasetId);
@@ -125,7 +121,7 @@ public class ExtractController {
 		}
 		epBean.setDoNotDelFiles(temp);
 		epBean.setExportFileName(temp);
-		scheduler = getScheduler(request);
+		StdScheduler scheduler = (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(SCHEDULER);
 		// while(cnt < fileSize)
 
 		XsltTriggerService xsltService = new XsltTriggerService();
@@ -172,7 +168,7 @@ public class ExtractController {
 
 		// String xmlFilePath = generalFileDir + ODMXMLFileName;
 		simpleTrigger = xsltService.generateXsltTrigger(xsltPath, studyBean, endFilePath + File.separator,
-				exportFileName, dsBean.getId(), epBean, userBean, SessionUtil.getLocale(request).getLanguage(), cnt,
+				exportFileName, dsBean.getId(), epBean, userBean, LocaleResolver.getLocale().toString(), cnt,
 				SQLInitServlet.getField("filePath") + "xslt", ExtractController.TRIGGER_GROUP_NAME);
 
 		String jobName = simpleTrigger.getName() + System.currentTimeMillis();
@@ -224,12 +220,6 @@ public class ExtractController {
 			ExtractUtils extractUtils) {
 		return extractUtils.resolveVars(endFilePath, dsBean, sdfDir, filePath);
 
-	}
-
-	private StdScheduler getScheduler(HttpServletRequest request) {
-		scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(
-				request.getSession().getServletContext()).getBean(SCHEDULER);
-		return scheduler;
 	}
 
 	/**

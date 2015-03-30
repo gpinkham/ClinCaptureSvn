@@ -22,7 +22,6 @@ import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
-import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractBean;
@@ -49,7 +48,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-@SuppressWarnings({ "rawtypes" })
+import com.clinovo.util.EmailUtil;
+
+@SuppressWarnings({"rawtypes"})
 public class ExampleSpringJob extends QuartzJobBean {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -82,7 +83,7 @@ public class ExampleSpringJob extends QuartzJobBean {
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		// need to generate a Locale so that user beans and other things will
 		// generate normally
-		Locale locale = new Locale(CoreResources.getSystemLanguage());
+		Locale locale = CoreResources.getSystemLocale();
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
 		ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();

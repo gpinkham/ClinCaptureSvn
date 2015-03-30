@@ -12,7 +12,16 @@
  ******************************************************************************/
 package org.akaza.openclinica.control.extract;
 
-import com.clinovo.util.SessionUtil;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote;
@@ -47,14 +56,7 @@ import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * A servlet that sends via HTTP a file containing Discrepancy-Note related data.
@@ -63,7 +65,7 @@ import java.util.Set;
  * @see ChooseDownloadFormat
  * @see org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class DiscrepancyNoteOutputServlet extends Controller {
 	// These are the headers that must appear in the HTTP response, when sending a
@@ -100,7 +102,7 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 		String format = request.getParameter("fmt");
 
 		int discNoteType = fp.getInt("discNoteType");
-		DownloadDiscrepancyNote downLoader = new DownloadDiscrepancyNote(SessionUtil.getLocale(request));
+		DownloadDiscrepancyNote downLoader = new DownloadDiscrepancyNote(LocaleResolver.getLocale(request));
 		if ("csv".equalsIgnoreCase(format)) {
 			fileName = fileName + ".csv";
 			response.setContentType(DownloadDiscrepancyNote.CSV);
@@ -169,7 +171,7 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 	private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList<DiscrepancyNoteBean> noteRows,
 			HttpServletRequest request) {
 		StudyBean currentStudy = getCurrentStudy(request);
-		Locale l = SessionUtil.getLocale(request);
+		Locale l = LocaleResolver.getLocale(request);
 		resword = ResourceBundleProvider.getWordsBundle(l);
 		resformat = ResourceBundleProvider.getFormatBundle(l);
 		SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"),

@@ -13,35 +13,36 @@
 
 package com.clinovo.tag;
 
-import com.clinovo.util.SessionUtil;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.clinovo.i18n.LocaleResolver;
+
 /**
  * Custom tag for adding calendar js scripts.
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings({"serial"})
 public class CalendarTag extends TagSupport {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarTag.class);
 
 	@Override
 	public int doStartTag() throws JspException {
-		String language = SessionUtil.getLocale((HttpServletRequest) pageContext.getRequest()).getLanguage();
-		language = CoreResources.CALENDAR_LANGS.contains(language) ? language : "";
+		String locale = LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest()).toString();
+		locale = CoreResources.CALENDAR_LOCALES.contains(locale) ? locale : "";
 		String contextPath = pageContext.getServletContext().getContextPath();
 		String html = "";
-		if (!language.isEmpty()) {
+		if (!locale.isEmpty()) {
 			html = html.concat("<script type=\"text/javascript\" src=\"").concat(contextPath)
-					.concat("/includes/calendar/locales/datepicker-").concat(language).concat(".js\"></script>");
+					.concat("/includes/calendar/locales/datepicker-").concat(locale).concat(".js\"></script>");
 		}
-		html = html.concat("<script>$.datepicker.regional['" + language + "']</script>");
+		html = html.concat("<script>$.datepicker.regional['" + locale + "']</script>");
 
 		String color = (String) pageContext.getSession().getAttribute("newThemeColor");
 		color = color == null ? "blue" : color;

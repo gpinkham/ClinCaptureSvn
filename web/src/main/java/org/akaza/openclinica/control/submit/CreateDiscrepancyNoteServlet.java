@@ -20,10 +20,21 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.util.EmailUtil;
-import com.clinovo.util.SessionUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -63,20 +74,10 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.util.EmailUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * Create a discrepancy note for a data entity.
@@ -84,7 +85,7 @@ import java.util.Map;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class CreateDiscrepancyNoteServlet extends Controller {
 
@@ -265,7 +266,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			request.setAttribute("enterItemData", "yes");
 		}
 
-		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, SessionUtil.getLocale(request));
+		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, LocaleResolver.getLocale(request));
 		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 		StudySubjectBean ssub = (StudySubjectBean) ssdao.findByPK(stSubjectId);
 		int preUserId = 0;
@@ -365,9 +366,9 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 				if (!StringUtil.isBlank(column)) {
 					if ("location".equalsIgnoreCase(column)) {
-						request.setAttribute("entityValue",
-								(se.getLocation().equals("") || se.getLocation() == null) ? resword.getString("N/A")
-										: se.getLocation());
+						request.setAttribute("entityValue", (se.getLocation().equals("") || se.getLocation() == null)
+								? resword.getString("N/A")
+								: se.getLocation());
 						request.setAttribute("entityName", resword.getString("location"));
 					} else if ("date_start".equalsIgnoreCase(column)) {
 						if (se.getDateStarted() != null) {
@@ -940,7 +941,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		Map<String, HashMap<String, String>> dnAdditionalCreatingParameters = (Map<String, HashMap<String, String>>) request
 				.getSession().getAttribute("dnAdditionalCreatingParameters");
 		if (dnAdditionalCreatingParameters != null) {
-			return dnAdditionalCreatingParameters.containsKey(field) ? dnAdditionalCreatingParameters.get(field)
+			return dnAdditionalCreatingParameters.containsKey(field)
+					? dnAdditionalCreatingParameters.get(field)
 					: new HashMap<String, String>();
 		} else {
 			return new HashMap<String, String>();
@@ -1035,7 +1037,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			if (itemDataId > 0) {
 				if (field.contains("_0input") || field.contains("manual")) {
 					// get ordinal
-					ItemDataDAO iddao = new ItemDataDAO(getDataSource(), SessionUtil.getLocale(request));
+					ItemDataDAO iddao = new ItemDataDAO(getDataSource(), LocaleResolver.getLocale(request));
 
 					boolean isExistInDB = iddao.isItemExists(itemId, ordinalForRepeatingGroupField, ecId);
 					return (isExistInDB) ? 1 : -1;
@@ -1083,7 +1085,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 			} else {
 				// get max ordinal from DB
-				ItemDataDAO iddao = new ItemDataDAO(getDataSource(), SessionUtil.getLocale(request));
+				ItemDataDAO iddao = new ItemDataDAO(getDataSource(), LocaleResolver.getLocale(request));
 				String[] fieldNameItems = fieldName.split("_");
 
 				String groupOid = fieldName.substring(0,
@@ -1213,7 +1215,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		message.append(respage.getString("email_body_separator"));
 		message.append(respage.getString("disclaimer"));
 		message.append(respage.getString("email_body_separator"));
-		message.append(EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage())));
+		message.append(EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(CoreResources.getSystemLocale()));
 
 		String emailBodyString = message.toString();
 		sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(),

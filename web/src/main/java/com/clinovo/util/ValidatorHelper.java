@@ -15,12 +15,15 @@
 
 package com.clinovo.util;
 
+import java.util.HashMap;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Locale;
+import com.clinovo.i18n.LocaleResolver;
 
 public class ValidatorHelper {
 
@@ -40,7 +43,7 @@ public class ValidatorHelper {
 
 	public ValidatorHelper(HttpServletRequest request, ConfigurationDao configurationDao) {
 		this.request = request;
-		this.locale = SessionUtil.getLocale(request);
+		this.locale = LocaleResolver.getLocale(request);
 		this.configurationDao = configurationDao;
 		formProcessor = new FormProcessor(request);
 		attributes = new HashMap<String, Object>();
@@ -72,7 +75,7 @@ public class ValidatorHelper {
 	}
 
 	public String[] getParameterValues(String key) {
-		return request != null ? request.getParameterValues(key) : new String[] { parameters.get(key) };
+		return request != null ? request.getParameterValues(key) : new String[]{parameters.get(key)};
 	}
 
 	public FormProcessor getFormProcessor() {

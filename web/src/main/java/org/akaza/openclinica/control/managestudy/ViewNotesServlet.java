@@ -109,7 +109,7 @@ public class ViewNotesServlet extends RememberLastPage {
 	public static final int DN_STATUS_NEW = 1;
 	public static final int DN_STATUS_NOT_APPLICABLE = 5;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
@@ -144,7 +144,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		boolean allowDcf = allowDcfForUserInCurrentStudy(currentStudy, ub);
 		request.setAttribute("allowDcf", allowDcf);
 		if (allowDcf) {
-			request.setAttribute("system_lang", CoreResources.getSystemLanguage());
+			request.setAttribute("system_lang", CoreResources.getSystemLocale().toString());
 		}
 		int oneSubjectId = fp.getInt("id");
 		request.getSession().setAttribute("subjectId", oneSubjectId);

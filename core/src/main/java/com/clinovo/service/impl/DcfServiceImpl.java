@@ -21,7 +21,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -80,7 +79,7 @@ public class DcfServiceImpl implements DcfService {
 	 * {@inheritDoc}
 	 */
 	public String generateDcf(StudyBean study, Set<Integer> noteIds, String username) throws FileNotFoundException {
-		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(new Locale(CoreResources.getSystemLanguage()));
+		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(CoreResources.getSystemLocale());
 		List<DiscrepancyCorrectionForm> dcfs = getDiscrepancyNoteDAO().getDiscrepancyCorrectionFormsByNoteIds(study,
 				resword, noteIds.toArray(new Integer[0]));
 		String fileName = null;
@@ -106,8 +105,7 @@ public class DcfServiceImpl implements DcfService {
 		String dcfUserDirName = "";
 		String ccRepoPath = systemDAO.findByName("filePath").getValue().trim();
 		File ccRepoDir = new File(ccRepoPath);
-		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(new Locale(CoreResources
-				.getSystemLanguage()));
+		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(CoreResources.getSystemLocale());
 		if (ccRepoPath.length() > 0 && !ccRepoDir.exists()) {
 			String exceptionMessage = MessageFormat.format(resexception.getString("cc_repo_directory_not_found"),
 					ccRepoPath);
@@ -213,7 +211,7 @@ public class DcfServiceImpl implements DcfService {
 	}
 
 	private String buildChildNoteDescription() {
-		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(new Locale(CoreResources.getSystemLanguage()));
+		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(CoreResources.getSystemLocale());
 		StringBuilder descriptionBuilder = new StringBuilder("");
 		descriptionBuilder.append(resword.getString("dcf_generated_dcf")).append(" (");
 		for (DcfRenderType renderType : renderTypes) {

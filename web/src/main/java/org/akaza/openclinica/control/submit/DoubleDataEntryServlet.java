@@ -20,6 +20,14 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -43,15 +51,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 @Component
 public class DoubleDataEntryServlet extends DataEntryServlet {
 
@@ -398,7 +398,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 		if (hideSaveAndNextButton.equals("1")) {
 			request.setAttribute("hideSaveAndNextButton", true);
 		}
-		request.setAttribute("system_lang", CoreResources.getSystemLanguage());
+		request.setAttribute("system_lang", CoreResources.getSystemLocale().toString());
 		if (StringUtil.isBlank(sectionId) || StringUtil.isBlank(tabId)) {
 			return Page.DOUBLE_DATA_ENTRY_SERVLET;
 		} else {

@@ -13,8 +13,14 @@
 
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.SessionUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -33,12 +39,8 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * Create Job Import Servlet, by Tom Hickerson, 2009
@@ -46,7 +48,7 @@ import java.util.HashMap;
  * @author thickerson Purpose: to create jobs in the 'importTrigger' group, which will be meant to run the
  *         ImportStatefulJob.
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class CreateJobImportServlet extends Controller {
 
@@ -139,8 +141,8 @@ public class CreateJobImportServlet extends Controller {
 				int studyId = fp.getInt(ImportSpringJob.STUDY_ID);
 				StudyDAO studyDAO = getStudyDAO();
 				StudyBean studyBean = (StudyBean) studyDAO.findByPK(studyId);
-				SimpleTriggerImpl trigger = triggerService.generateImportTrigger(fp, ub, studyBean, SessionUtil
-						.getLocale(request).getLanguage(), startTime);
+				SimpleTriggerImpl trigger = triggerService.generateImportTrigger(fp, ub, studyBean, LocaleResolver
+						.getLocale(request).toString(), startTime);
 
 				JobDetailImpl jobDetailBean = new JobDetailImpl();
 				jobDetailBean.setGroup(IMPORT_TRIGGER);
@@ -155,8 +157,9 @@ public class CreateJobImportServlet extends Controller {
 					Date dateStart = getStdScheduler().scheduleJob(jobDetailBean, trigger);
 					System.out.println("== found job date: " + dateStart.toString());
 					// set a success message here
-					addPageMessage(respage.getString("you_have_successfully_created_a_new_job") + " " + trigger.getName()
-							+ " " + respage.getString("which_is_now_set_to_run"), request);
+					addPageMessage(
+							respage.getString("you_have_successfully_created_a_new_job") + " " + trigger.getName()
+									+ " " + respage.getString("which_is_now_set_to_run"), request);
 					forwardPage(Page.VIEW_IMPORT_JOB_SERVLET, request, response);
 				} catch (SchedulerException se) {
 					se.printStackTrace();

@@ -19,6 +19,8 @@
 	<context:component-scan base-package="com.clinovo" />
 	<context:component-scan base-package="org.akaza.openclinica" />
 
+	<bean id="localeResolver" class="com.clinovo.i18n.LocaleResolver"/>
+
 	<oauth:client-details-service id="clientDetails">
 		<oauth:client client-id="trusted-client"
 			authorized-grant-types="password,authorization_code,refresh_token" />

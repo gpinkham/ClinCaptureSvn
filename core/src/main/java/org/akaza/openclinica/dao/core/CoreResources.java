@@ -13,25 +13,6 @@
 
 package org.akaza.openclinica.dao.core;
 
-import liquibase.spring.SpringLiquibase;
-import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
-import org.akaza.openclinica.bean.service.PdfProcessingFunction;
-import org.akaza.openclinica.bean.service.SasProcessingFunction;
-import org.akaza.openclinica.bean.service.SqlProcessingFunction;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.apache.commons.io.IOUtils;
-import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ResourceLoaderAware;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.stereotype.Component;
-import org.springframework.util.FileCopyUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,16 +26,38 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
+import liquibase.spring.SpringLiquibase;
+
+import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import org.akaza.openclinica.bean.service.PdfProcessingFunction;
+import org.akaza.openclinica.bean.service.SasProcessingFunction;
+import org.akaza.openclinica.bean.service.SqlProcessingFunction;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.LocaleUtils;
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ResourceLoaderAware;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.stereotype.Component;
+import org.springframework.util.FileCopyUtils;
+
 @Component
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class CoreResources implements ResourceLoaderAware {
 
 	private final static Logger logger = LoggerFactory.getLogger(CoreResources.class);
 
-	public static final Set<String> CALENDAR_LANGS = new HashSet<String>();
+	public static final Set<String> CALENDAR_LOCALES = new HashSet<String>();
 
 	public static final String UTF_8 = "utf-8";
 
@@ -128,7 +131,8 @@ public class CoreResources implements ResourceLoaderAware {
 		BasicDataSource dataSource = null;
 		try {
 
-			String path = resourceLoader.getResource("/").exists() ? resourceLoader.getResource("/").getURI().getPath()
+			String path = resourceLoader.getResource("/").exists()
+					? resourceLoader.getResource("/").getURI().getPath()
 					: "";
 			webapp = getWebAppName(path);
 			String logDir = System.getProperty("log.dir") == null ? "" : System.getProperty("log.dir");
@@ -207,7 +211,7 @@ public class CoreResources implements ResourceLoaderAware {
 					.concat(File.separator).concat("locales"));
 			if (resource.exists()) {
 				for (String fileName : resource.getFile().list()) {
-					CALENDAR_LANGS.add(fileName.replaceAll(".*-", "").replaceAll("\\..*", ""));
+					CALENDAR_LOCALES.add(fileName.replaceAll(".*-", "").replaceAll("\\..*", ""));
 				}
 			}
 		} catch (Exception ex) {
@@ -418,13 +422,13 @@ public class CoreResources implements ResourceLoaderAware {
 
 	private void copyImportRulesFiles() throws IOException {
 		ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[3];
-		String[] fileNames = { "rules.xsd", "rules_template.xml", "rules_template_with_notes.xml" };
-		listSrcFiles[0] = (ByteArrayInputStream) resourceLoader
-				.getResource("classpath:properties" + File.separator + fileNames[0]).getInputStream();
-		listSrcFiles[1] = (ByteArrayInputStream) resourceLoader
-				.getResource("classpath:properties" + File.separator + fileNames[1]).getInputStream();
-		listSrcFiles[2] = (ByteArrayInputStream) resourceLoader
-				.getResource("classpath:properties" + File.separator + fileNames[2]).getInputStream();
+		String[] fileNames = {"rules.xsd", "rules_template.xml", "rules_template_with_notes.xml"};
+		listSrcFiles[0] = (ByteArrayInputStream) resourceLoader.getResource(
+				"classpath:properties" + File.separator + fileNames[0]).getInputStream();
+		listSrcFiles[1] = (ByteArrayInputStream) resourceLoader.getResource(
+				"classpath:properties" + File.separator + fileNames[1]).getInputStream();
+		listSrcFiles[2] = (ByteArrayInputStream) resourceLoader.getResource(
+				"classpath:properties" + File.separator + fileNames[2]).getInputStream();
 		File dest = new File(getField("filePath") + "rules");
 		if (!dest.exists()) {
 			if (!dest.mkdirs()) {
@@ -500,7 +504,7 @@ public class CoreResources implements ResourceLoaderAware {
 	private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
 
 		ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
-		String[] fileNames = { "cd_odm_mapping.xml" };
+		String[] fileNames = {"cd_odm_mapping.xml"};
 		try {
 			listSrcFiles[0] = new ByteArrayInputStream(resourceLoader
 					.getResource("classpath:properties" + File.separator + "cd_odm_mapping.xml").getURL().getFile()
@@ -749,13 +753,17 @@ public class CoreResources implements ResourceLoaderAware {
 		return dataInfo.getProperty("dbType");
 	}
 
-	public static String getSystemLanguage() {
+	private static String getSystemLanguage() {
 		String language = CoreResources.getField("system.language");
 		if (language == null || language.trim().isEmpty()) {
 			language = "en";
 			CoreResources.setField("system.language", language);
 		}
 		return language;
+	}
+
+	public static Locale getSystemLocale() {
+		return LocaleUtils.toLocale(getSystemLanguage());
 	}
 
 	public static String getField(String key) {

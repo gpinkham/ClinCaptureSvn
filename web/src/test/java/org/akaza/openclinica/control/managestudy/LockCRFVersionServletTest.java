@@ -37,7 +37,7 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.clinovo.util.SessionUtil;
+import com.clinovo.i18n.LocaleResolver;
 
 public class LockCRFVersionServletTest {
 
@@ -67,7 +67,7 @@ public class LockCRFVersionServletTest {
 		Mockito.doCallRealMethod().when(servlet).processRequest(request, response);
 
 		Locale locale = new Locale("en");
-		SessionUtil.updateLocale(request, locale);
+		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);

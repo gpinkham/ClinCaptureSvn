@@ -141,13 +141,13 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.impl.StdScheduler;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemElement;
 import com.clinovo.service.DataEntryService;
 import com.clinovo.service.ReportCRFService;
 import com.clinovo.util.CrfShortcutsAnalyzer;
 import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SessionUtil;
 import com.clinovo.util.SubjectEventStatusUtil;
 import com.clinovo.util.ValidatorHelper;
 
@@ -313,7 +313,7 @@ public abstract class DataEntryServlet extends Controller {
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Locale locale = SessionUtil.getLocale(request);
+		Locale locale = LocaleResolver.getLocale(request);
 		FormProcessor fp = new FormProcessor(request);
 		String action = fp.getString(ACTION);
 		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
@@ -1952,7 +1952,7 @@ public abstract class DataEntryServlet extends Controller {
 
 	private void sendEmailWithCRFReport(CRFVersionBean crfVersionBean, CRFBean crfBean, StudySubjectBean ssb,
 			EventDefinitionCRFBean edcb, EventCRFBean ecb, StudyBean currentStudy, HttpServletRequest request) {
-		Locale locale = SessionUtil.getLocale(request);
+		Locale locale = LocaleResolver.getLocale(request);
 		ReportCRFService reportCRFService = (ReportCRFService) SpringServletAccess.getApplicationContext(
 				getServletContext()).getBean("reportCRFService");
 		try {

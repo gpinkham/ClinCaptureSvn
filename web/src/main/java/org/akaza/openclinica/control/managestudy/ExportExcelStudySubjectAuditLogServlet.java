@@ -8,7 +8,15 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.SessionUtil;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import jxl.CellView;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
@@ -19,6 +27,7 @@ import jxl.write.WritableCellFormat;
 import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
@@ -47,18 +56,12 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * ExportExcelStudySubjectAuditLogServlet class.
  */
-@SuppressWarnings({ "serial", "unchecked", "rawtypes" })
+@SuppressWarnings({"serial", "unchecked", "rawtypes"})
 @Component
 public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 
@@ -123,8 +126,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 
 		int studySubId = fp.getInt("id", true);
-
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 
 		if (studySubId == 0) {
 			addPageMessage(respage.getString("please_choose_a_subject_to_view"), request);
@@ -225,7 +226,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 		response.setHeader("Content-Disposition", "attachment; filename=export.xls");
 
 		WorkbookSettings wbSettings = new WorkbookSettings();
-		wbSettings.setLocale(SessionUtil.getLocale(request));
+		wbSettings.setLocale(LocaleResolver.getLocale(request));
 		WritableWorkbook workbook = Workbook.createWorkbook(response.getOutputStream(), wbSettings);
 
 		int row = 0;
@@ -234,20 +235,20 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 		workbook.createSheet("Subject Information", 0);
 		WritableSheet excelSheet = workbook.getSheet(0);
 		// Subject Summary
-		String[] excelRow = new String[] { "study_subject_ID", "secondary_subject_ID", "date_of_birth", "person_ID",
-				"created_by", "status" };
+		String[] excelRow = new String[]{"study_subject_ID", "secondary_subject_ID", "date_of_birth", "person_ID",
+				"created_by", "status"};
 		for (int i = 0; i < excelRow.length; i++) {
 			Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 			excelSheet.addCell(label);
 		}
 		row++;
 
-		excelRow = new String[] { studySubject != null ? studySubject.getLabel() : null,
+		excelRow = new String[]{studySubject != null ? studySubject.getLabel() : null,
 				studySubject != null ? studySubject.getSecondaryLabel() : null,
 				dateFormat(studySubject != null ? studySubject.getDateOfBirth() : null),
 				studySubject != null ? studySubject.getUniqueIdentifier() : null,
 				studySubject != null ? studySubject.getOwner().getName() : null,
-				studySubject != null ? studySubject.getStatus().getName() : null };
+				studySubject != null ? studySubject.getStatus().getName() : null};
 		for (int i = 0; i < excelRow.length; i++) {
 			Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]));
 			excelSheet.addCell(label);
@@ -256,7 +257,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 		row++;
 
 		// Subject Audit Events
-		excelRow = new String[] { "audit_event", "date_time_of_server", "user", "value_type", "old", "new" };
+		excelRow = new String[]{"audit_event", "date_time_of_server", "user", "value_type", "old", "new"};
 		for (int i = 0; i < excelRow.length; i++) {
 			Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 			excelSheet.addCell(label);
@@ -265,10 +266,10 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 
 		for (Object studySubjectAudit : studySubjectAudits) {
 			AuditBean audit = (AuditBean) studySubjectAudit;
-			excelRow = new String[] {
+			excelRow = new String[]{
 					ResourceBundleProvider.getAuditEventsBundle().getString(audit.getAuditEventTypeName()),
 					dateTimeFormat(audit.getAuditDate()), audit.getUserName(), audit.getEntityName(),
-					audit.getOldValue(), audit.getNewValue() };
+					audit.getOldValue(), audit.getNewValue()};
 			for (int i = 0; i < excelRow.length; i++) {
 				Label label = new Label(i, row, excelRow[i]);
 				excelSheet.addCell(label);
@@ -278,7 +279,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 		row++;
 
 		// Study Events
-		excelRow = new String[] { "study_events", "location", "date", "occurrence_number" };
+		excelRow = new String[]{"study_events", "location", "date", "occurrence_number"};
 		for (int i = 0; i < excelRow.length; i++) {
 			Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 			excelSheet.addCell(label);
@@ -289,11 +290,11 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 			for (Object event1 : events) {
 				StudyEventBean event = (StudyEventBean) event1;
 				if (event.getStartTimeFlag()) {
-					excelRow = new String[] { event.getStudyEventDefinition().getName(), event.getLocation(),
-							dateTimeFormat(event.getDateStarted()), Integer.toString(event.getSampleOrdinal()) };
+					excelRow = new String[]{event.getStudyEventDefinition().getName(), event.getLocation(),
+							dateTimeFormat(event.getDateStarted()), Integer.toString(event.getSampleOrdinal())};
 				} else {
-					excelRow = new String[] { event.getStudyEventDefinition().getName(), event.getLocation(),
-							dateFormat(event.getDateStarted()), Integer.toString(event.getSampleOrdinal()) };
+					excelRow = new String[]{event.getStudyEventDefinition().getName(), event.getLocation(),
+							dateFormat(event.getDateStarted()), Integer.toString(event.getSampleOrdinal())};
 				}
 				for (int i = 0; i < excelRow.length; i++) {
 					Label label = new Label(i, row, excelRow[i]);
@@ -353,7 +354,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 				// End Header
 
 				// Audit for Deleted Event CRFs
-				excelRow = new String[] { "name", "version", "deleted_by", "delete_date" };
+				excelRow = new String[]{"name", "version", "deleted_by", "delete_date"};
 				for (int i = 0; i < excelRow.length; i++) {
 					label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 					excelSheet.addCell(label);
@@ -363,8 +364,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 				for (Object allDeletedEventCRF : allDeletedEventCRFs) {
 					DeletedEventCRFBean deletedEventCRF = (DeletedEventCRFBean) allDeletedEventCRF;
 					if (deletedEventCRF.getStudyEventId() == event.getId()) {
-						excelRow = new String[] { deletedEventCRF.getCrfName(), deletedEventCRF.getCrfVersion(),
-								deletedEventCRF.getDeletedBy(), dateFormat(deletedEventCRF.getDeletedDate()) };
+						excelRow = new String[]{deletedEventCRF.getCrfName(), deletedEventCRF.getCrfVersion(),
+								deletedEventCRF.getDeletedBy(), dateFormat(deletedEventCRF.getDeletedDate())};
 						for (int i = 0; i < excelRow.length; i++) {
 							label = new Label(i, row, excelRow[i]);
 							excelSheet.addCell(label);
@@ -376,7 +377,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 				row++;
 
 				// Audit Events for Study Event
-				excelRow = new String[] { "audit_event", "date_time_of_server", "user", "value_type", "old", "new" };
+				excelRow = new String[]{"audit_event", "date_time_of_server", "user", "value_type", "old", "new"};
 				for (int i = 0; i < excelRow.length; i++) {
 					label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 					excelSheet.addCell(label);
@@ -442,14 +443,14 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 							newValue = studyEvent.getNewValue();
 						}
 
-						excelRow = new String[] {
+						excelRow = new String[]{
 								ResourceBundleProvider.getAuditEventsBundle().getString(
 										studyEvent.getAuditEventTypeName()),
 								dateTimeFormat(studyEvent.getAuditDate()),
 								studyEvent.getUserName(),
 								studyEvent.getEntityName()
 										+ (event.getStudyEventDefinition().isRepeating() ? "("
-												+ studyEvent.getOrdinal() + ")" : ""), oldValue, newValue };
+												+ studyEvent.getOrdinal() + ")" : ""), oldValue, newValue};
 						for (int i = 0; i < excelRow.length; i++) {
 							label = new Label(i, row, excelRow[i]);
 							excelSheet.addCell(label);
@@ -464,16 +465,16 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 					EventCRFBean eventCrf = (EventCRFBean) event.getEventCRFs().get(j);
 
 					// Audit Events for Study Event
-					excelRow = new String[] { "name", "version", "date_interviewed", "interviewer_name", "owner" };
+					excelRow = new String[]{"name", "version", "date_interviewed", "interviewer_name", "owner"};
 					for (int i = 0; i < excelRow.length; i++) {
 						label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 						excelSheet.addCell(label);
 					}
 					row++;
 
-					excelRow = new String[] { eventCrf.getCrf().getName(), eventCrf.getCrfVersion().getName(),
+					excelRow = new String[]{eventCrf.getCrf().getName(), eventCrf.getCrfVersion().getName(),
 							dateTimeFormat(eventCrf.getDateInterviewed()), eventCrf.getInterviewerName(),
-							eventCrf.getOwner().getName() };
+							eventCrf.getOwner().getName()};
 					for (int i = 0; i < excelRow.length; i++) {
 						label = new Label(i, row, excelRow[i]);
 						excelSheet.addCell(label);
@@ -481,7 +482,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 					row++;
 					row++;
 
-					excelRow = new String[] { "audit_event", "date_time_of_server", "user", "value_type", "old", "new" };
+					excelRow = new String[]{"audit_event", "date_time_of_server", "user", "value_type", "old", "new"};
 					for (int i = 0; i < excelRow.length; i++) {
 						label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 						excelSheet.addCell(label);
@@ -555,12 +556,12 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 								newValue = eventCrfAudit.getNewValue();
 							}
 
-							excelRow = new String[] {
+							excelRow = new String[]{
 									ResourceBundleProvider.getAuditEventsBundle().getString(
 											eventCrfAudit.getAuditEventTypeName()),
 									dateTimeFormat(eventCrfAudit.getAuditDate()), eventCrfAudit.getUserName(),
 									eventCrfAudit.getEntityName() + "(" + eventCrfAudit.getOrdinal() + ")", oldValue,
-									newValue };
+									newValue};
 							for (int i = 0; i < excelRow.length; i++) {
 								label = new Label(i, row, excelRow[i]);
 								excelSheet.addCell(label);

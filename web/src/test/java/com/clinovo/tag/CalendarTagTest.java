@@ -13,7 +13,13 @@
 
 package com.clinovo.tag;
 
-import com.clinovo.util.SessionUtil;
+import java.util.Locale;
+
+import javax.servlet.ServletContext;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,11 +32,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
 
-import javax.servlet.ServletContext;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
-import java.util.Locale;
+import com.clinovo.i18n.LocaleResolver;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(CalendarTag.class)
@@ -54,12 +56,12 @@ public class CalendarTagTest {
 	@Before
 	public void setUp() throws Exception {
 		MockHttpSession session = new MockHttpSession();
-		CoreResources.CALENDAR_LANGS.add(Locale.ENGLISH.getLanguage());
+		CoreResources.CALENDAR_LOCALES.add(Locale.ENGLISH.toString());
 		Mockito.when(pageContext.getOut()).thenReturn(jspWriter);
 		Mockito.when(pageContext.getRequest()).thenReturn(request);
 		Mockito.when(request.getSession()).thenReturn(session);
 		Mockito.when(pageContext.getSession()).thenReturn(session);
-		SessionUtil.updateLocale(session, Locale.ENGLISH);
+		LocaleResolver.updateLocale(session, Locale.ENGLISH);
 		Mockito.when(pageContext.getServletContext()).thenReturn(servletContext);
 		Mockito.when(servletContext.getContextPath()).thenReturn("/clincapture");
 		Whitebox.setInternalState(calendarTag, "pageContext", pageContext);

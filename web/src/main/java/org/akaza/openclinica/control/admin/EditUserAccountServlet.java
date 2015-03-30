@@ -20,8 +20,13 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.EmailUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -46,12 +51,8 @@ import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Set;
+import com.clinovo.util.EmailUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * Servlet for creating a user account.
@@ -59,7 +60,7 @@ import java.util.Set;
  * @author ssachs
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 @Component
 public class EditUserAccountServlet extends Controller {
 	public static final String INPUT_FIRST_NAME = "firstName";
@@ -109,8 +110,9 @@ public class EditUserAccountServlet extends Controller {
 
 	/**
 	 * Get link to the current page.
-	 * @param userId int.
-\	 * @return String
+	 * 
+	 * @param userId
+	 *            int. \ * @return String
 	 */
 	public static String getLink(int userId) {
 		return PATH + '?' + ARG_USERID + '=' + userId;
@@ -311,11 +313,11 @@ public class EditUserAccountServlet extends Controller {
 	private void loadPresetValuesFromForm(FormProcessor fp) {
 		fp.clearPresetValues();
 
-		String textFields[] = { ARG_USERID, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
-				INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
+		String textFields[] = {ARG_USERID, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
+				INPUT_INSTITUTION, INPUT_DISPLAY_PWD};
 		fp.setCurrentStringValuesAsPreset(textFields);
 
-		String ddlbFields[] = { INPUT_USER_TYPE, INPUT_RESET_PASSWORD, INPUT_RUN_WEBSERVICES };
+		String ddlbFields[] = {INPUT_USER_TYPE, INPUT_RESET_PASSWORD, INPUT_RUN_WEBSERVICES};
 		fp.setCurrentIntValuesAsPreset(ddlbFields);
 	}
 
@@ -335,8 +337,7 @@ public class EditUserAccountServlet extends Controller {
 		logger.info("Sending password reset notification to " + user.getName());
 
 		String body = EmailUtil.getEmailBodyStart();
-		body += resword.getString("dear") + " " + user.getFirstName() + " " + user.getLastName()
-				+ ",<br/><br/>\n\n";
+		body += resword.getString("dear") + " " + user.getFirstName() + " " + user.getLastName() + ",<br/><br/>\n\n";
 		body += restext.getString("your_password_has_been_reset_on_openclinica") + ":<br/><br/>\n\n";
 		body += resword.getString("user_name") + ": " + user.getName() + "<br/>\n";
 		body += resword.getString("password") + ": " + password + "<br/><br/>\n\n";
@@ -352,7 +353,7 @@ public class EditUserAccountServlet extends Controller {
 		}
 		body += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
 		body += EmailUtil.getEmailBodyEnd();
-		body += EmailUtil.getEmailFooter(new Locale(CoreResources.getSystemLanguage()));
+		body += EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
 		sendEmail(user.getEmail().trim(), restext.getString("your_openclinica_account_password_reset"), body, false,
 				request);
 	}

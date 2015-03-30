@@ -20,16 +20,18 @@
  */
 package org.akaza.openclinica.view;
 
-import com.clinovo.util.SessionUtil;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * Maintain the breadcrumbs on the page, remain seamless, for example, it gets set when the Page gets set in the
@@ -39,7 +41,7 @@ import java.util.ResourceBundle;
  * @author thickerson
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class BreadcrumbTrail {
 	private ArrayList trail = new ArrayList();
 
@@ -81,7 +83,7 @@ public class BreadcrumbTrail {
 	 */
 	public ArrayList generateTrail(Page jspPage, HttpServletRequest request) {
 
-		Locale locale = SessionUtil.getLocale(request);
+		Locale locale = LocaleResolver.getLocale(request);
 		ResourceBundle resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
 		try {

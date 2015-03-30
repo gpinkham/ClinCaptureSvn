@@ -37,7 +37,7 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.clinovo.util.SessionUtil;
+import com.clinovo.i18n.LocaleResolver;
 
 public class UpdateCRFServletTest {
 
@@ -67,7 +67,7 @@ public class UpdateCRFServletTest {
 		Mockito.doCallRealMethod().when(servlet).processRequest(request, response);
 
 		Locale locale = new Locale("en");
-		SessionUtil.updateLocale(request, locale);
+		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
@@ -148,7 +148,7 @@ public class UpdateCRFServletTest {
 		currentRole.setRole(Role.INVESTIGATOR);
 		servlet.mayProceed(request, response);
 	}
-	
+
 	@Test(expected = InsufficientPermissionException.class)
 	public void testThatSiteMonitorCannotProceed() throws InsufficientPermissionException {
 		currentUser.addUserType(UserType.USER);

@@ -187,7 +187,7 @@ public class XsltTransformJob extends QuartzJobBean {
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		boolean reportAboutException = true;
-		Locale locale = new Locale(CoreResources.getSystemLanguage());
+		Locale locale = CoreResources.getSystemLocale();
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
 		words = ResourceBundleProvider.getWordsBundle();
@@ -1174,7 +1174,7 @@ public class XsltTransformJob extends QuartzJobBean {
 	private void sendErrorEmail(String message, String additionalBody, JobExecutionContext context) {
 		String emailText = "";
 		JobDataMap dataMap = context.getMergedJobDataMap();
-		Locale locale = new Locale(CoreResources.getSystemLanguage());
+		Locale locale = CoreResources.getSystemLocale();
 		// Daos initialization
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);

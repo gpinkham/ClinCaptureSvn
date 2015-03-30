@@ -15,11 +15,10 @@
 
 package com.clinovo.rest.exception;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.springframework.context.MessageSource;
-
-import javax.servlet.http.HttpServletResponse;
-import java.util.Locale;
 
 /**
  * RestException.
@@ -38,7 +37,7 @@ public class RestException extends Exception {
 	 *            String
 	 */
 	public RestException(MessageSource messageSource, String messageCode) {
-		super(messageSource.getMessage(messageCode, null, new Locale(CoreResources.getSystemLanguage())));
+		super(messageSource.getMessage(messageCode, null, CoreResources.getSystemLocale()));
 		this.code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 	}
 
@@ -53,7 +52,7 @@ public class RestException extends Exception {
 	 *            integer
 	 */
 	public RestException(MessageSource messageSource, String messageCode, int code) {
-		super(messageSource.getMessage(messageCode, null, new Locale(CoreResources.getSystemLanguage())));
+		super(messageSource.getMessage(messageCode, null, CoreResources.getSystemLocale()));
 		this.code = code;
 	}
 
@@ -70,7 +69,7 @@ public class RestException extends Exception {
 	 *            integer
 	 */
 	public RestException(MessageSource messageSource, String messageCode, Object[] args, int code) {
-		super(messageSource.getMessage(messageCode, args, new Locale(CoreResources.getSystemLanguage())));
+		super(messageSource.getMessage(messageCode, args, CoreResources.getSystemLocale()));
 		this.code = code;
 	}
 

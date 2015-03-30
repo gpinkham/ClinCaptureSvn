@@ -1,6 +1,9 @@
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.util.SessionUtil;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -20,8 +23,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
-import javax.sql.DataSource;
-import java.util.Locale;
+import com.clinovo.i18n.LocaleResolver;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ResourceBundleProvider.class)
@@ -47,7 +49,7 @@ public class AddNewSubjectServletTest {
 		MockHttpSession session = new MockHttpSession();
 		PowerMockito.when(request.getSession()).thenReturn(session);
 		Locale locale = Locale.ENGLISH;
-		SessionUtil.updateLocale(session, locale);
+		LocaleResolver.updateLocale(session, locale);
 		ResourceBundleProvider.updateLocale(locale);
 		Whitebox.setInternalState(addNewSubjectServlet, "restext", ResourceBundleProvider.getTextsBundle());
 		PowerMockito.doReturn(userAccountBean).when(addNewSubjectServlet).getUserAccountBean(request);

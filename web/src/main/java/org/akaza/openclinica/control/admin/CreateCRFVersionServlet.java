@@ -20,7 +20,20 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.SessionUtil;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.Role;
@@ -54,25 +67,14 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * Create a new CRF version by uploading excel file.
  *
  * @author jxu, ywang
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class CreateCRFVersionServlet extends Controller {
 
@@ -435,12 +437,12 @@ public class CreateCRFVersionServlet extends Controller {
 					inStream = new FileInputStream(theDir + tempFile);
 
 					htab = new SpreadSheetTableRepeating(inStream, ub, version.getName(),
-							SessionUtil.getLocale(request), currentStudy.getId(), isXlsx);
+							LocaleResolver.getLocale(request), currentStudy.getId(), isXlsx);
 					htab.setMeasurementUnitDao(getMeasurementUnitDao());
 					if (!htab.isRepeating()) {
 						inStreamClassic = new FileInputStream(theDir + tempFile);
 						sstc = new SpreadSheetTableClassic(inStreamClassic, ub, version.getName(),
-								SessionUtil.getLocale(request), currentStudy.getId(), isXlsx);
+								LocaleResolver.getLocale(request), currentStudy.getId(), isXlsx);
 						sstc.setMeasurementUnitDao(getMeasurementUnitDao());
 					}
 					if (htab.isRepeating()) {

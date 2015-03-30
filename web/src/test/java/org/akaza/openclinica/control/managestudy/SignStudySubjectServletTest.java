@@ -1,6 +1,12 @@
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.SessionUtil;
+import static org.junit.Assert.assertNull;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.core.SecurityManager;
@@ -21,11 +27,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.sql.DataSource;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import static org.junit.Assert.assertNull;
+import com.clinovo.i18n.LocaleResolver;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ResourceBundleProvider.class)
@@ -54,7 +56,7 @@ public class SignStudySubjectServletTest {
 		request.setAttribute("id", "1");
 		Locale locale = new Locale("en");
 		PowerMockito.when(request.getSession()).thenReturn(session);
-		SessionUtil.updateLocale(session, locale);
+		LocaleResolver.updateLocale(session, locale);
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle respage = ResourceBundleProvider.getExceptionsBundle(locale);
 		ResourceBundle resexception = ResourceBundleProvider.getPageMessagesBundle();

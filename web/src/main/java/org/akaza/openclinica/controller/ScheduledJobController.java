@@ -13,7 +13,19 @@
 
 package org.akaza.openclinica.controller;
 
-import com.clinovo.util.SessionUtil;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -42,23 +54,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
+import com.clinovo.i18n.LocaleResolver;
 
 /**
  * @author jnyayapathi Controller for listing all the scheduled jobs. Also an interface for canceling the jobs which are
  *         running.
  */
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({"unchecked"})
 @Controller("ScheduledJobController")
 public class ScheduledJobController {
 
@@ -86,15 +88,17 @@ public class ScheduledJobController {
 	/**
 	 *
 	 *
-	 * @param request The incoming request.
-	 * @param response The response to redirect to.
-	 * @return  The map with job attributes that will be placed on the UX.
-	 * @throws SchedulerException for job schedule exceptions.
+	 * @param request
+	 *            The incoming request.
+	 * @param response
+	 *            The response to redirect to.
+	 * @return The map with job attributes that will be placed on the UX.
+	 * @throws SchedulerException
+	 *             for job schedule exceptions.
 	 */
 	@RequestMapping("/listCurrentScheduledJobs")
 	public ModelMap listScheduledJobs(HttpServletRequest request, HttpServletResponse response)
 			throws SchedulerException {
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		if (!mayProceed(request)) {
 			try {
 				response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
@@ -104,7 +108,6 @@ public class ScheduledJobController {
 			return null;
 		}
 
-		ResourceBundleProvider.updateLocale(SessionUtil.getLocale(request));
 		ModelMap gridMap = new ModelMap();
 		StdScheduler scheduler = getScheduler(request);
 		boolean showMoreLink = request.getParameter("showMoreLink") == null
@@ -180,21 +183,22 @@ public class ScheduledJobController {
 						.append("this.form.theTriggerGroupName.value='").append(st.getGroup()).append("';")
 						.append("this.form.submit();").append("setAccessedObjected(this);");
 
-				actions.append("<td><input type=\"button\" class=\"button_medium\" value=\"").append(ResourceBundleProvider.getResWord("skip_next_run"))
-						.append("\" name=\"skipNextRun\" ").append("onclick=\"").append(jsCodeString.toString()).append("\" />")
+				actions.append("<td><input type=\"button\" class=\"button_medium\" value=\"")
+						.append(ResourceBundleProvider.getResWord("skip_next_run")).append("\" name=\"skipNextRun\" ")
+						.append("onclick=\"").append(jsCodeString.toString()).append("\" />")
 						.append("<a href='#' data-cc-runningJobId='").append(st.getName())
 						.append("' style='display: none;'></a>").append("</td></tr></table>");
 
 				jobs.setCheckbox(checkbox.toString());
 				jobs.setDatasetId(epBean.getDatasetName());
-				jobs.setFireTime(dateTimeFormat(st.getStartTime(), SessionUtil.getLocale(request)) + "");
+				jobs.setFireTime(dateTimeFormat(st.getStartTime(), LocaleResolver.getLocale()) + "");
 				if (st.getNextFireTime() != null) {
-					jobs.setScheduledFireTime(dateTimeFormat(st.getNextFireTime(), SessionUtil.getLocale(request)) + "");
+					jobs.setScheduledFireTime(dateTimeFormat(st.getNextFireTime(), LocaleResolver.getLocale()) + "");
 				}
 				jobs.setExportFileName(epBean.getExportFileName()[0]);
 				jobs.setAction(actions.toString());
-				jobs.setJobStatus(currentJobList.contains(st.getJobName() + st.getGroup()) ? ResourceBundleProvider.getResWord("currently_executing")
-						: ResourceBundleProvider.getResWord("scheduled"));
+				jobs.setJobStatus(currentJobList.contains(st.getJobName() + st.getGroup()) ? ResourceBundleProvider
+						.getResWord("currently_executing") : ResourceBundleProvider.getResWord("scheduled"));
 
 				jobsScheduled.add(jobs);
 			}
@@ -215,16 +219,25 @@ public class ScheduledJobController {
 	/**
 	 * Method cancels job run.
 	 *
-	 * @param request The incoming request.
-	 * @param response The response to redirect to.
-	 * @param theJobName The job name.
-	 * @param theJobGroupName The selected job group name.
-	 * @param triggerName the job trigger name.
-	 * @param triggerGroupName the job trigger group name.
-	 * @param redirection the page for redirection.
-	 * @param model Map The map with job attributes.
+	 * @param request
+	 *            The incoming request.
+	 * @param response
+	 *            The response to redirect to.
+	 * @param theJobName
+	 *            The job name.
+	 * @param theJobGroupName
+	 *            The selected job group name.
+	 * @param triggerName
+	 *            the job trigger name.
+	 * @param triggerGroupName
+	 *            the job trigger group name.
+	 * @param redirection
+	 *            the page for redirection.
+	 * @param model
+	 *            Map The map with job attributes.
 	 * @return The page for redirection.
-	 * @throws SchedulerException for job schedule exceptions.
+	 * @throws SchedulerException
+	 *             for job schedule exceptions.
 	 */
 	@RequestMapping("/cancelScheduledJob")
 	public String cancelScheduledJob(HttpServletRequest request, HttpServletResponse response,
@@ -233,7 +246,7 @@ public class ScheduledJobController {
 			@RequestParam("theTriggerGroupName") String triggerGroupName,
 			@RequestParam("redirection") String redirection, ModelMap model) throws SchedulerException {
 
-		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(SessionUtil.getLocale(request));
+		ResourceBundle resPageMessages = ResourceBundleProvider.getPageMessagesBundle(LocaleResolver.getLocale());
 		MessageFormat messageFormat = new MessageFormat("");
 
 		if (!mayProceed(request)) {
@@ -282,7 +295,7 @@ public class ScheduledJobController {
 				scheduler.rescheduleJob(TriggerKey.triggerKey(triggerName, triggerGroupName), newTrigger);
 
 				messageFormat.applyPattern(resPageMessages.getString("job_has_been_cancelled"));
-				Object[] arguments = { theJobName };
+				Object[] arguments = {theJobName};
 				pageMessages.add(messageFormat.format(arguments));
 			} else if (triggerGroupName.equals(XsltTriggerService.TRIGGER_GROUP_NAME)) {
 
@@ -298,7 +311,7 @@ public class ScheduledJobController {
 				scheduler.scheduleJob(jobDetailBean, newTrigger);
 
 				messageFormat.applyPattern(resPageMessages.getString("job_has_been_rescheduled"));
-				Object[] arguments = { theJobName };
+				Object[] arguments = {theJobName};
 				pageMessages.add(messageFormat.format(arguments));
 
 			}
@@ -348,7 +361,8 @@ public class ScheduledJobController {
 		if (date == null) {
 			return "";
 		} else {
-			SimpleDateFormat dateFormat = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString("date_time_format_string"), locale);
+			SimpleDateFormat dateFormat = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString(
+					"date_time_format_string"), locale);
 			return dateFormat.format(date);
 		}
 	}

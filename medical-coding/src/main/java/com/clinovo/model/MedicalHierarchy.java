@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
 import java.io.Serializable;
 
 /**
@@ -11,6 +12,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "term_hierarchy")
+@SuppressWarnings("serial")
 public class MedicalHierarchy implements Serializable {
 
     private long id;

@@ -45,10 +45,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.util.PageMessagesUtil;
-import com.clinovo.util.SessionUtil;
-
 
 /**
  * CompleteCRFDeleteController that handles requests from the delete crf page.
@@ -129,18 +128,18 @@ public class DeleteCRFVersionController {
 				PageMessagesUtil.addPageMessage(
 						request,
 						messageSource.getMessage("this_crf_version_has_associated_data", null,
-								SessionUtil.getLocale(request)));
+								LocaleResolver.getLocale()));
 				if (crfVersionsQuantity == 1) {
 					PageMessagesUtil.addPageMessage(
 							request,
 							messageSource.getMessage("you_are_trying_to_delete_last_version", null,
-									SessionUtil.getLocale(request)));
+									LocaleResolver.getLocale()));
 				}
 			} else {
 				PageMessagesUtil.addPageMessage(
 						request,
 						messageSource.getMessage("this_crf_version_has_no_conflict_data", null,
-								SessionUtil.getLocale(request)));
+								LocaleResolver.getLocale()));
 			}
 
 		} else {
@@ -185,10 +184,8 @@ public class DeleteCRFVersionController {
 
 		if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0 || eventDefinitionListAvailable.size() > 0
 				|| ruleSetBeanList.size() > 0) {
-			request.getSession().setAttribute(
-					"controllerMessage",
-					messageSource.getMessage("this_crf_version_has_associated_data", null,
-							SessionUtil.getLocale(request)));
+			request.getSession().setAttribute("controllerMessage",
+					messageSource.getMessage("this_crf_version_has_associated_data", null, LocaleResolver.getLocale()));
 		} else {
 			ArrayList items = crfVersionDao.findNotSharedItemsByVersion(crfVersionBean.getId());
 			NewCRFBean nib = new NewCRFBean(dataSource, crfVersionBean.getCrfId());
@@ -201,7 +198,7 @@ public class DeleteCRFVersionController {
 			codedItemService.deleteByCRFVersion(crfVersionBean.getId());
 
 			request.getSession().setAttribute("controllerMessage",
-					messageSource.getMessage("the_crf_version_has_been_removed", null, SessionUtil.getLocale(request)));
+					messageSource.getMessage("the_crf_version_has_been_removed", null, LocaleResolver.getLocale()));
 		}
 
 		return CRF_LIST;
