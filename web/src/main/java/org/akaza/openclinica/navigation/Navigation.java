@@ -34,7 +34,7 @@ public final class Navigation {
 			"/InitUpdateSubStudy", "/UpdateSubStudy", "/DeleteStudyEvent", "/EditStudyUserRole",
 			"/CreateSubjectGroupClass", "/SetStudyUserRole", "/UpdateProfile", "/DoubleDataEntry", "/SectionPreview",
 			"/DefineStudyEvent", "/InitUpdateEventDefinition", "/UpdateEventDefinition", "/RemoveEventDefinition",
-			"/RemoveSubject", "/RemoveStudy", "/ViewUserAccount", "pages/EditUserAccount", "/SetUserRole",
+			"/RemoveSubject", "/RemoveStudy", "/ViewUserAccount", "/EditUserAccount", "/SetUserRole",
 			"/ViewUserAccount", "/Configure", "/CreateUserAccount", "/UpdateJobImport", "/CreateJobExport",
 			"/CreateJobImport", "/UpdateProfile", "/RemoveDataset", "/LockStudySubject", "/pages/extract",
 			"/CreateNewStudyEvent", "/UpdateSubject", "/UpdateSubjectGroupClass", "/ViewSubjectGroupClass",
@@ -55,7 +55,7 @@ public final class Navigation {
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc", "/help",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
 			"/ChangeDefinitionCRFOrdinal", "/CreateOneDiscrepancyNote", "/MatchPassword", "/pages/handleSDVPost",
-			"/pages/handleSDVRemove", "/pages/sdvStudySubjects", "/UploadFile", "/DownloadAttachedFile", "/pages/CRFsMasking"));
+			"/pages/handleSDVRemove", "/pages/sdvStudySubjects", "/UploadFile", "/DownloadAttachedFile"));
 	// set of pages with special processing
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
 			"/ListStudySubjects", "/EnterDataForStudyEvent", "/ViewSectionDataEntry", "/pages/crfEvaluation"));

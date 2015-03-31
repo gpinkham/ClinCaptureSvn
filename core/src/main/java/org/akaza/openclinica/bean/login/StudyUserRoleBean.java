@@ -48,7 +48,6 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	private boolean canCode;
 	private boolean canEvaluate;
 	private boolean canGenerateDCF;
-	private int primaryKey;
 
 	/**
 	 * Default study user role bean constructor.
@@ -306,13 +305,5 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 			return surb;
 		}
 		return currentUser.getRoleByStudy(currentStudy.getParentStudyId());
-	}
-
-	public int getPrimaryKey() {
-		return primaryKey;
-	}
-
-	public void setPrimaryKey(int primaryKey) {
-		this.primaryKey = primaryKey;
 	}
 }

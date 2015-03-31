@@ -154,8 +154,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.DATE);
 		this.setTypeExpected(index++, TypeNames.DATE);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index, TypeNames.INT);
+		this.setTypeExpected(index, TypeNames.STRING);
 	}
 
 	/**
@@ -454,7 +453,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		surb.setUserName((String) hm.get("user_name"));
 		surb.setName((String) hm.get("role_name"));
 		surb.setRoleName((String) hm.get("role_name"));
-		surb.setPrimaryKey((Integer) hm.get("study_user_role_id"));
 		surb.setCreatedDate(dateCreated);
 		surb.setUpdatedDate(dateUpdated);
 		surb.setStatus(Status.get(statusId));
@@ -1304,12 +1302,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
-	/**
-	 * getUsersAssignedMetric.
-	 *
-	 * @param studyId int
-	 * @return int
-	 */
 	public int getUsersAssignedMetric(int studyId) {
 		int usersAssigned = 0;
 		unsetTypeExpected();
