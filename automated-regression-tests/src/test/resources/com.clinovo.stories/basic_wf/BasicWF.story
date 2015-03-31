@@ -217,7 +217,7 @@ And User is on Define Study Event - Selected CRF(s) page
 And User clicks 'Continue' button
 And User is on Confirm Event Definition Creation page
 When User clicks 'Submit' button
-Then User is on Manage All Event Definitions in Study page
+Then User is on Create Study Event Definition page
 
 Examples:
 {scope=Scenario}
