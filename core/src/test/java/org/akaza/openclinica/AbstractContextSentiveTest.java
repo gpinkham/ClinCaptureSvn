@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.CRFMaskingService;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -79,6 +80,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import com.clinovo.dao.CRFMaskingDAO;
 import com.clinovo.dao.CodedItemDAO;
 import com.clinovo.dao.DictionaryDAO;
 import com.clinovo.dao.DiscrepancyDescriptionDAO;
@@ -187,6 +189,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected DatabaseChangeLogDao databaseChangeLogDao;
 	@Autowired
 	protected DiscrepancyDescriptionDAO discrepancyDescriptionDAO;
+	@Autowired
+	protected CRFMaskingDAO maskingDAO;
 
 	@Autowired
 	protected TermDAO termDAO;
@@ -238,6 +242,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected EventCRFService eventCRFService;
 	@Autowired
 	protected SessionFactory sessionFactory;
+	@Autowired
+	protected CRFMaskingService maskingService;
 
 	protected static PlatformTransactionManager transactionManager;
 

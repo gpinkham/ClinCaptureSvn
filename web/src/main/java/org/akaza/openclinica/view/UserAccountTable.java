@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.view;
 
+import com.clinovo.controller.EditUserAccountController;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -28,7 +29,6 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.admin.DeleteStudyUserRoleServlet;
 import org.akaza.openclinica.control.admin.DeleteUserServlet;
 import org.akaza.openclinica.control.admin.EditStudyUserRoleServlet;
-import org.akaza.openclinica.control.admin.EditUserAccountServlet;
 import org.akaza.openclinica.control.admin.ViewUserAccountServlet;
 
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class UserAccountTable extends Table {
 			String confirmQuestion = "Are you sure you want to delete " + u.getName() + "?";
 			String onClick = "onClick=\"return confirm('" + confirmQuestion + "');\"";
 			row += "<a href='" + ViewUserAccountServlet.getLink(u.getId()) + "'>view</a>";
-			row += " <a href='" + EditUserAccountServlet.getLink(u.getId()) + "'>edit</a>";
+			row += " <a href='" + EditUserAccountController.getLink(u.getId()) + "'>edit</a>";
 			row += " <a href='" + DeleteUserServlet.getLink(u, EntityAction.DELETE) + "'" + onClick + ">delete</a>";
 		} else {
 			String confirmQuestion = "Are you sure you want to restore " + u.getName() + "?";
