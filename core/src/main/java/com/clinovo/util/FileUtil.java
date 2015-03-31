@@ -70,7 +70,7 @@ public final class FileUtil {
 						.getAbsolutePath()
 						+ File.separator + new File(CoreResources.getField("logo")).getName());
 				if (prevLogoFile.exists()) {
-					prevLogoFile.delete();
+					//prevLogoFile.delete(); do not remove previous logo cuz of the #1939
 				}
 			}
 		} catch (Exception ex) {
