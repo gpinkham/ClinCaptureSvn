@@ -64,7 +64,7 @@
             <tr>
                 <td valign="top">
 					<!-- *JSP* ${pageContext.page['class'].simpleName} -->
-					<div class="logo"><img src="../images/Logo.gif"></div>
+					<div class="logo"><img src="../images/Logo_upper.gif"></div>
 					<!-- Main Navigation -->
    					<jsp:include page="../include/navBar.jsp">
      				   <jsp:param name="isSpringController" value="true" />
