@@ -65,7 +65,7 @@
 					onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
 					onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
 					onclick="setAccessedObjectWithMultipleRows(this)"><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a></td>
-				<td><a href="EditUserAccount?userId=<c:out value="${currRow.bean.id}"/>"
+				<td><a href="pages/EditUserAccount?userId=<c:out value="${currRow.bean.id}"/>"
 					onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
 					onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
 					data-cc-userId="${currRow.bean.id}"

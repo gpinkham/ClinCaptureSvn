@@ -20,16 +20,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -47,6 +38,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
@@ -56,7 +48,15 @@ import org.akaza.openclinica.web.bean.CRFRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.ValidatorHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The servlet for creating event definition of user's current active study.
@@ -614,6 +614,7 @@ public class DefineStudyEventServlet extends Controller {
 			edc.setStudyEventDefinitionId(sed1.getId());
 			edc.setOrdinal(i + 1);
 			cdao.create(edc);
+			createChildEdcs(edc, currentStudy);
 		}
 
 		request.getSession().removeAttribute("definition");
@@ -630,6 +631,22 @@ public class DefineStudyEventServlet extends Controller {
 		checkReferenceVisit(request);
 		addPageMessage(respage.getString("the_new_event_definition_created_succesfully"), request);
 
+	}
+
+	private void createChildEdcs(EventDefinitionCRFBean createdEdc,
+								 StudyBean currentStudy) {
+		StudyDAO studyDao = new StudyDAO(getDataSource());
+		EventDefinitionCRFDAO cdao = new EventDefinitionCRFDAO(getDataSource());
+		Collection<Integer> siteIds = studyDao.findAllSiteIdsByStudy(currentStudy);
+		siteIds.remove(currentStudy.getId());
+		int parentId = createdEdc.getId();
+
+		for (int siteId : siteIds) {
+			EventDefinitionCRFBean childEdc = createdEdc;
+			childEdc.setStudyId(siteId);
+			childEdc.setParentId(parentId);
+			cdao.create(childEdc);
+		}
 	}
 
 	private void checkReferenceVisit(HttpServletRequest request) {

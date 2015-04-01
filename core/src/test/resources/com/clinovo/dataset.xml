@@ -1021,4 +1021,6 @@
 	<widgets_layout id="1" user_id="1" study_id="1" widget_id="1" ordinal="0" version="0"/>
 	<widgets_layout id="2" user_id="1" study_id="1" widget_id="2" ordinal="1" version="0"/>
 	<widgets_layout id="3" user_id="1" study_id="1" widget_id="3" ordinal="2" version="0"/>
+
+	<crfs_masking id="1" version="0"  study_id="1" study_event_definition_id="1" event_definition_crf_id="1" user_id="1" study_user_role_id="1"/>
 </dataset>

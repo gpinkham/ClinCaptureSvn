@@ -51,11 +51,6 @@
 	</span>
 </h1>
 
-
-<%--<p><a href="EditUserAccount?userId=<c:out value="${user.id}" />">Edit this user account</a>
-&nbsp;<br>
-<a href="AuditLogUser?userLogId=<c:out value="${user.id}" />">View Audit Logs for this user</a>--%>
-
 <div style="width: 400px">
 
 <!-- These DIVs define shaded box borders -->
@@ -182,21 +177,6 @@ for each study user is in, show:
            </c:otherwise>
        </c:choose>
    </td>
-   <%--td>
-   <form action='EditUserAccount?userId=<c:out value="${user.id}" />' method="POST">
-    <input type="submit" name="submit" value="<fmt:message key="edit_this_user_account" bundle="${resword}"/>" class="button_long">
-   </form>
-   </td>
-   <td>
-   <form action='CreateUserAccount' method="POST">
-    <input type="submit" name="submit" value="<fmt:message key="create_a_new_user" bundle="${resword}"/>" class="button_long">
-   </form>
-   </td--%>
-   <%-- <td>
-   <form action='ListUserAccounts' method="POST">
-    <input type="submit" name="submit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button">
-   </form>
-   </td>--%>
    <td>
    </td>
   </tr>

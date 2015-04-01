@@ -154,7 +154,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.DATE);
 		this.setTypeExpected(index++, TypeNames.DATE);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index, TypeNames.INT);
 	}
 
 	/**
@@ -453,6 +454,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		surb.setUserName((String) hm.get("user_name"));
 		surb.setName((String) hm.get("role_name"));
 		surb.setRoleName((String) hm.get("role_name"));
+		surb.setPrimaryKey((Integer) hm.get("study_user_role_id"));
 		surb.setCreatedDate(dateCreated);
 		surb.setUpdatedDate(dateUpdated);
 		surb.setStatus(Status.get(statusId));

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -271,9 +271,8 @@ public class UpdateSubStudyServlet extends Controller {
 
 	/**
 	 * Constructs study bean from request
-	 * 
-	 * @param request
-	 *            the incoming request
+	 *
+	 * @param request the incoming request
 	 * @return <code>StudyBean</code> bean that will be displayed on UX
 	 */
 	private StudyBean createStudyBean(HttpServletRequest request) {
@@ -294,7 +293,6 @@ public class UpdateSubStudyServlet extends Controller {
 		try {
 			localDf.setLenient(false);
 			startDate = localDf.parse(fp.getString("startDate"));
-
 		} catch (ParseException fe) {
 			startDate = study.getDatePlannedStart();
 			logger.info(fe.getMessage());
@@ -313,7 +311,6 @@ public class UpdateSubStudyServlet extends Controller {
 		try {
 			localDf.setLenient(false);
 			protocolDate = localDf.parse(fp.getString(INPUT_VER_DATE));
-
 		} catch (ParseException fe) {
 			protocolDate = study.getProtocolDateVerification();
 		}
@@ -393,7 +390,6 @@ public class UpdateSubStudyServlet extends Controller {
 						}
 						selectedVersionIds = selectedVersionIds.substring(0, selectedVersionIds.length() - 1);
 					}
-					boolean changed = false;
 					tabbingMode = tabbingMode.equalsIgnoreCase("topToBottom")
 							|| tabbingMode.equalsIgnoreCase("leftToRight") ? tabbingMode : "leftToRight";
 					boolean isRequired = !StringUtil.isBlank(requiredCRF) && YES.equalsIgnoreCase(requiredCRF.trim());
@@ -406,47 +402,37 @@ public class UpdateSubStudyServlet extends Controller {
 					if (edcBean.getParentId() > 0) {
 						int dbDefaultVersionId = edcBean.getDefaultVersionId();
 						if (defaultVersionId != dbDefaultVersionId) {
-							changed = true;
 							CRFVersionDAO cvdao = getCRFVersionDAO();
 							CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultVersionId);
 							edcBean.setDefaultVersionId(defaultVersionId);
 							edcBean.setDefaultVersionName(defaultVersion.getName());
 						}
 						if (!tabbingMode.equals(edcBean.getTabbingMode())) {
-							changed = true;
 							edcBean.setTabbingMode(tabbingMode);
 						}
 						if (isRequired != edcBean.isRequiredCRF()) {
-							changed = true;
 							edcBean.setRequiredCRF(isRequired);
 						}
 						if (isDouble != edcBean.isDoubleEntry()) {
-							changed = true;
 							edcBean.setDoubleEntry(isDouble);
 						}
 						if (hasPassword != edcBean.isElectronicSignature()) {
-							changed = true;
 							edcBean.setElectronicSignature(hasPassword);
 						}
 						if (isHide != edcBean.isHideCrf()) {
-							changed = true;
 							edcBean.setHideCrf(isHide);
 						}
 						if (!StringUtil.isBlank(selectedVersionIds)
 								&& !selectedVersionIds.equals(edcBean.getSelectedVersionIds())) {
-							changed = true;
 							setSelectedVersionList(edcBean, selectedVersionIds);
 						}
 						if (sdvId > 0 && sdvId != edcBean.getSourceDataVerification().getCode()) {
-							changed = true;
 							edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
 						}
 						if (!emailOnStep.equals(edcBean.getEmailStep())) {
-							changed = true;
 							edcBean.setEmailStep(emailOnStep);
 						}
 						if (!emailCRFTo.equals(edcBean.getEmailTo())) {
-							changed = true;
 
 							if (StringUtil.isBlank(emailOnStep)) {
 								edcBean.setEmailTo("");
@@ -455,71 +441,45 @@ public class UpdateSubStudyServlet extends Controller {
 							}
 						}
 						if (isEvaluatedCRF != edcBean.isEvaluatedCRF()) {
-							changed = true;
 							edcBean.setEvaluatedCRF(isEvaluatedCRF);
 						}
-						if (changed) {
-							edcBean.setUpdater(ub);
-							edcBean.setUpdatedDate(new Date());
-							logger.debug("update for site");
-							edcdao.update(edcBean);
-						}
-					} else {
-						// only if definition-crf has been modified, will it be saved for the site
-						int defaultId = defaultVersionId > 0 ? defaultVersionId : edcBean.getDefaultVersionId();
-						int dbDefaultVersionId = edcBean.getDefaultVersionId();
-						if (defaultId == dbDefaultVersionId && isRequired == edcBean.isRequiredCRF()
-								&& isDouble == edcBean.isDoubleEntry() && tabbingMode.equals(edcBean.getTabbingMode())
-								&& hasPassword == edcBean.isElectronicSignature() && isHide == edcBean.isHideCrf()) {
-							if (selectedVersionIdListSize > 0) {
-								if (selectedVersionIdListSize == edcBean.getVersions().size()
-										&& emailOnStep.equals(edcBean.getEmailStep())
-										&& emailCRFTo.equals(edcBean.getEmailTo())
-										&& isEvaluatedCRF == edcBean.isEvaluatedCRF()) {
-									if (sdvId > 0) {
-										if (sdvId != edcBean.getSourceDataVerification().getCode()) {
-											changed = true;
-										}
-									}
-								} else {
-									changed = true;
-								}
-							}
-						} else {
-							changed = true;
-						}
-						if (changed) {
-							CRFVersionDAO cvdao = getCRFVersionDAO();
-							CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultId);
-							edcBean.setDefaultVersionId(defaultId);
-							edcBean.setDefaultVersionName(defaultVersion.getName());
-							edcBean.setRequiredCRF(isRequired);
-							edcBean.setDoubleEntry(isDouble);
-							edcBean.setElectronicSignature(hasPassword);
-							edcBean.setHideCrf(isHide);
-							edcBean.setEmailStep(emailOnStep);
-							edcBean.setEvaluatedCRF(isEvaluatedCRF);
-							edcBean.setTabbingMode(tabbingMode);
-							if (StringUtil.isBlank(emailOnStep)) {
-								edcBean.setEmailTo("");
-							} else {
-								edcBean.setEmailTo(emailCRFTo);
-							}
-							if (selectedVersionIdListSize > 0
-									&& selectedVersionIdListSize != edcBean.getVersions().size()) {
-								setSelectedVersionList(edcBean, selectedVersionIds);
+						edcBean.setUpdater(ub);
+						edcBean.setUpdatedDate(new Date());
+						logger.debug("update for site");
+						edcdao.update(edcBean);
 
-							}
-							if (sdvId > 0 && sdvId != edcBean.getSourceDataVerification().getCode()) {
-								edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
-							}
-							edcBean.setParentId(edcBean.getId());
-							edcBean.setStudyId(site.getId());
-							edcBean.setUpdater(ub);
-							edcBean.setUpdatedDate(new Date());
-							logger.debug("create for the site");
-							edcdao.create(edcBean);
+					} else {
+						// if definition-crf not exists, it will be saved for the site
+						int defaultId = defaultVersionId > 0 ? defaultVersionId : edcBean.getDefaultVersionId();
+						CRFVersionDAO cvdao = getCRFVersionDAO();
+						CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultId);
+						edcBean.setDefaultVersionId(defaultId);
+						edcBean.setDefaultVersionName(defaultVersion.getName());
+						edcBean.setRequiredCRF(isRequired);
+						edcBean.setDoubleEntry(isDouble);
+						edcBean.setElectronicSignature(hasPassword);
+						edcBean.setHideCrf(isHide);
+						edcBean.setEmailStep(emailOnStep);
+						edcBean.setEvaluatedCRF(isEvaluatedCRF);
+						edcBean.setTabbingMode(tabbingMode);
+						if (StringUtil.isBlank(emailOnStep)) {
+							edcBean.setEmailTo("");
+						} else {
+							edcBean.setEmailTo(emailCRFTo);
 						}
+						if (selectedVersionIdListSize > 0
+								&& selectedVersionIdListSize != edcBean.getVersions().size()) {
+							setSelectedVersionList(edcBean, selectedVersionIds);
+						}
+						if (sdvId > 0 && sdvId != edcBean.getSourceDataVerification().getCode()) {
+							edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
+						}
+						edcBean.setParentId(edcBean.getId());
+						edcBean.setStudyId(site.getId());
+						edcBean.setUpdater(ub);
+						edcBean.setUpdatedDate(new Date());
+						logger.debug("create for the site");
+						edcdao.create(edcBean);
 					}
 					++start;
 				}
@@ -539,9 +499,8 @@ public class UpdateSubStudyServlet extends Controller {
 
 	/**
 	 * Saves study bean from session
-	 * 
-	 * @param request
-	 *            the incoming request
+	 *
+	 * @param request the incoming request
 	 */
 	public void submitStudy(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
