@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 
 <link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
@@ -22,7 +23,7 @@
     }
 </script>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 
 <jsp:include page="../include/admin-header.jsp"/>

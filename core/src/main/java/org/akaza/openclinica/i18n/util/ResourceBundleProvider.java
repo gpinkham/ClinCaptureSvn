@@ -5,6 +5,8 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import com.clinovo.i18n.ClinCaptureResourceBundle;
+
 public class ResourceBundleProvider {
 	/**
 	 * A Map of the locales corresponding to each Thread.
@@ -21,26 +23,26 @@ public class ResourceBundleProvider {
 		localeMap.put(Thread.currentThread(), locale);
 		if (!resBundleSetMap.containsKey(locale)) {
 			HashMap<String, ResourceBundle> resBundleSet = new HashMap<String, ResourceBundle>();
-			resBundleSet.put("org.akaza.openclinica.i18n.admin",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.admin", locale));
-			resBundleSet.put("org.akaza.openclinica.i18n.audit_events",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.audit_events", locale));
-			resBundleSet.put("org.akaza.openclinica.i18n.exceptions",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions", locale));
-			resBundleSet.put("org.akaza.openclinica.i18n.format",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.format", locale));
-			resBundleSet.put("org.akaza.openclinica.i18n.page_messages",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages", locale));
-			resBundleSet.put("org.akaza.openclinica.i18n.notes",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes", locale));
-			resBundleSet.put("org.akaza.openclinica.i18n.terms",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.terms", locale));
-			resBundleSet.put("org.akaza.openclinica.i18n.words",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", locale));
-			resBundleSet.put("org.akaza.openclinica.i18n.workflow",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.workflow", locale));
-			resBundleSet.put("org.akaza.openclinica.i18n.buildNumber",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.buildNumber", locale));
+			resBundleSet.put("org.akaza.openclinica.i18n.admin", new ClinCaptureResourceBundle(
+					"org.akaza.openclinica.i18n.admin", locale));
+			resBundleSet.put("org.akaza.openclinica.i18n.audit_events", new ClinCaptureResourceBundle(
+					"org.akaza.openclinica.i18n.audit_events", locale));
+			resBundleSet.put("org.akaza.openclinica.i18n.exceptions", new ClinCaptureResourceBundle(
+					"org.akaza.openclinica.i18n.exceptions", locale));
+			resBundleSet.put("org.akaza.openclinica.i18n.format", new ClinCaptureResourceBundle(
+					"org.akaza.openclinica.i18n.format", locale));
+			resBundleSet.put("org.akaza.openclinica.i18n.page_messages", new ClinCaptureResourceBundle(
+					"org.akaza.openclinica.i18n.page_messages", locale));
+			resBundleSet.put("org.akaza.openclinica.i18n.notes", new ClinCaptureResourceBundle(
+					"org.akaza.openclinica.i18n.notes", locale));
+			resBundleSet.put("org.akaza.openclinica.i18n.terms", new ClinCaptureResourceBundle(
+					"org.akaza.openclinica.i18n.terms", locale));
+			resBundleSet.put("org.akaza.openclinica.i18n.words", new ClinCaptureResourceBundle(
+					"org.akaza.openclinica.i18n.words", locale));
+			resBundleSet.put("org.akaza.openclinica.i18n.workflow", new ClinCaptureResourceBundle(
+					"org.akaza.openclinica.i18n.workflow", locale));
+			resBundleSet.put("org.akaza.openclinica.i18n.buildNumber", new ClinCaptureResourceBundle(
+					"org.akaza.openclinica.i18n.buildNumber", locale));
 			resBundleSetMap.put(locale, resBundleSet);
 		}
 	}

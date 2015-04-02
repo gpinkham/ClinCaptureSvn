@@ -1,10 +1,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <script language="JavaScript">
     function reportBug() {
         var bugtrack = "https://www.openclinica.com/ClinCapture/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";

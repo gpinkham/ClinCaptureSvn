@@ -3,8 +3,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
   <fmt:message key="study_subject_ID" bundle="${resword}" var="studySubjectLabel"/>
   <c:if test="${study ne null}">

@@ -10,25 +10,26 @@
 
 package com.clinovo.clincapture.bean.admin;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Date;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Date;
-import java.util.Locale;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({"unchecked"})
 public class AuditEventBeanTest {
 
 	private AuditEventBean auditEvent;
 	private static final String EMPTY = "";
+	private static final String QQQ = "???";
 	private static final String NULL_STRING = "NULL";
 	private static final String AUDIT_MESSAGE_KEY = "__added_a_study_event";
 	private static final String AUDIT_MESSAGE_VAL = "Added a Study Event";
@@ -50,8 +51,8 @@ public class AuditEventBeanTest {
 		assertEquals(EMPTY, auditEvent.getAuditTable());
 		assertEquals(0, auditEvent.getUserId());
 		assertEquals(0, auditEvent.getEntityId());
-		assertEquals(EMPTY, auditEvent.getReasonForChange());
-		assertEquals(EMPTY, auditEvent.getActionMessage());
+		assertEquals(QQQ.concat(EMPTY).concat(QQQ), auditEvent.getReasonForChange());
+		assertEquals(QQQ.concat(EMPTY).concat(QQQ), auditEvent.getActionMessage());
 		assertEquals(EMPTY, auditEvent.getColumnName());
 		assertEquals(EMPTY, auditEvent.getOldValue());
 		assertEquals(EMPTY, auditEvent.getNewValue());
@@ -108,7 +109,7 @@ public class AuditEventBeanTest {
 		AuditEventBean customAuditEvent = new AuditEventBean();
 		customAuditEvent.setReasonForChange(WRONG_MESSAGE_KEY);
 		assertEquals(WRONG_MESSAGE_KEY, customAuditEvent.getReasonForChangeKey());
-		assertEquals(WRONG_MESSAGE_KEY, customAuditEvent.getReasonForChange());
+		assertEquals(QQQ.concat(WRONG_MESSAGE_KEY).concat(QQQ), customAuditEvent.getReasonForChange());
 	}
 
 	@Test
@@ -124,6 +125,6 @@ public class AuditEventBeanTest {
 		AuditEventBean customAuditEvent = new AuditEventBean();
 		customAuditEvent.setActionMessage(WRONG_MESSAGE_KEY);
 		assertEquals(WRONG_MESSAGE_KEY, customAuditEvent.getActionMessageKey());
-		assertEquals(WRONG_MESSAGE_KEY, customAuditEvent.getActionMessage());
+		assertEquals(QQQ.concat(WRONG_MESSAGE_KEY).concat(QQQ), customAuditEvent.getActionMessage());
 	}
 }

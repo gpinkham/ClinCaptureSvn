@@ -1,8 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <c:choose>
 <c:when test="${userBean.sysAdmin}">
  <c:import url="../include/admin-header.jsp"/>

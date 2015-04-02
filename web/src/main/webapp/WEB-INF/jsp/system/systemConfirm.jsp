@@ -1,14 +1,15 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="pagemessage" />
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext" />
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
+<ui:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="pagemessage" />
+<ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext" />
+<ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
 
 <jsp:include page="../include/managestudy_top_pages.jsp" />
 

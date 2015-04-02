@@ -67,8 +67,8 @@ public class CalendarIconTag extends TagSupport {
 			html = html.concat("<a href='#!' onclick=\"$(" + onClickSelector + ")")
 					.concat(".datepicker({ dateFormat: '" + dateFormat + "', ").concat("showOn: 'none'");
 
-			boolean showYears = checkIfShowYear ? currentStudy.getStudyParameterConfig().getShowYearsInCalendar()
-					.equalsIgnoreCase("yes") : true;
+			boolean showYears = !checkIfShowYear
+					|| currentStudy.getStudyParameterConfig().getShowYearsInCalendar().equalsIgnoreCase("yes");
 
 			if (showYears) {
 				html = html.concat(", changeYear: true,changeMonth : true,\n").concat(

@@ -1,16 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm"%>
-<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow" />
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext" />
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat" />
+<ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
+<ui:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow" />
+<ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext" />
+<ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat" />
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">

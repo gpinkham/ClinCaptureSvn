@@ -1,10 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.ListCRFRow" />
 <c:set var="count" value="${currRow.bean.versionNumber}"/>

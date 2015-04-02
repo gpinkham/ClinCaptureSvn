@@ -9,6 +9,27 @@
     <shortname>UI Module JSP tag library</shortname>
 
     <tag>
+        <name>setBundle</name>
+        <tagclass>com.clinovo.tag.SetBundleTag</tagclass>
+        <bodycontent>empty</bodycontent>
+        <attribute>
+            <name>basename</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>var</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>scope</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
         <name>escape</name>
         <tagclass>com.clinovo.tag.EscapeTag</tagclass>
         <bodycontent>empty</bodycontent>

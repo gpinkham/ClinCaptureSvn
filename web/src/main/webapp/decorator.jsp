@@ -1,9 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator" %>
 <%@ taglib uri="com.akazaresearch.viewtags" prefix="view" %>
-<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
@@ -29,7 +29,7 @@
 </head>
 <body>
 <div id="headerDiv">
-    <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+    <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
     <div id="logoDiv"><img src="<c:url value='/images/Logo.gif'/>" alt="Clinovo logo"/></div>
     <!-- the sub-menu, or alternative menu, displays if JavaScript is disabled-->
     <div id="menuContainer">

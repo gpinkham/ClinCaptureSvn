@@ -4,7 +4,7 @@
 <%@page import="org.akaza.openclinica.web.SQLInitServlet"%>
 
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
+<ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <script language="JavaScript">
 function reportBug(versionNumber) {

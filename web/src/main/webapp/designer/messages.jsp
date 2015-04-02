@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <script>
 	/* ============================================
 	 * When page is opened this function will gather all messages

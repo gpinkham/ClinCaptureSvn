@@ -1,8 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <!-- Alert Box -->
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/> 
+<ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 <% 
     String action = request.getParameter("action");

@@ -2,13 +2,14 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <%@ taglib uri="/logic" prefix="logic" %>
 <%@ taglib uri="/bean" prefix="bean" %>
 <%@ taglib uri="/template" prefix="template" %>
 
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 	
 

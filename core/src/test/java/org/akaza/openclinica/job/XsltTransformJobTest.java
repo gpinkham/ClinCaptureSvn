@@ -1,10 +1,15 @@
 package org.akaza.openclinica.job;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.mail.internet.MimeMessage;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -21,12 +26,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import javax.mail.internet.MimeMessage;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class XsltTransformJobTest extends DefaultAppContextTest {
 
 	private JobDataMap dataMap;
@@ -52,7 +52,7 @@ public class XsltTransformJobTest extends DefaultAppContextTest {
 		JobDetail jobDetail = Mockito.mock(JobDetail.class);
 		dataMap = Mockito.mock(JobDataMap.class);
 		xsltTransformJob = Mockito.mock(XsltTransformJob.class);
-		trigger = Mockito.mock(SimpleTriggerImpl.class);		
+		trigger = Mockito.mock(SimpleTriggerImpl.class);
 		Map lookup = new HashMap();
 		lookup.put("date_time_format_string", "dd-MM-yyyy");
 		lookup.put("date_format_string", "dd-MM-yyyy");
@@ -79,7 +79,6 @@ public class XsltTransformJobTest extends DefaultAppContextTest {
 		Whitebox.setInternalState(xsltTransformJob, "logger", logger);
 		Whitebox.setInternalState(openClinicaMailSender, "logger", logger);
 		Whitebox.setInternalState(openClinicaMailSender, "mailSender", mailSender);
-		Whitebox.setInternalState(ResourceBundleProvider.getFormatBundle(), "lookup", lookup);
 	}
 
 	@Test
@@ -96,7 +95,7 @@ public class XsltTransformJobTest extends DefaultAppContextTest {
 				Mockito.contains(errorMessage), Mockito.anyString(), Mockito.anyBoolean()).thenCallRealMethod();
 		PowerMockito.when(messageSource.getMessage(errorMessage, null, new Locale("en-US"))).thenReturn(errorMessage);
 		xsltTransformJob.executeInternal(context);
-		Mockito.verify(openClinicaMailSender).sendEmail(Mockito.anyString(), Mockito.anyString(),
-				Mockito.anyString(), Mockito.contains(errorMessage), Mockito.anyBoolean());
+		Mockito.verify(openClinicaMailSender).sendEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+				Mockito.contains(errorMessage), Mockito.anyBoolean());
 	}
 }

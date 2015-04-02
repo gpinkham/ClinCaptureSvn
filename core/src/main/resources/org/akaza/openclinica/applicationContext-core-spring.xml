@@ -37,7 +37,7 @@
 
 	<!-- ENABLING THIS WILL ACTIVATE I18N VIA SPRING -->
 	<bean id="messageSource"
-		class="org.springframework.context.support.ResourceBundleMessageSource">
+		class="com.clinovo.i18n.ClinCaptureResourceBundleMessageSource">
 		<property name="basenames">
 			<list>
 				<value>org.akaza.openclinica.i18n.admin</value>

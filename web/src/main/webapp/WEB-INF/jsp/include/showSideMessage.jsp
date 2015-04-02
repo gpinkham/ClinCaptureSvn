@@ -2,9 +2,10 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.exceptions" var="exceptions"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.exceptions" var="exceptions"/>
 
 <jsp:useBean scope='request' id='pageMessages' class='java.util.ArrayList'/>
 <%--<jsp:useBean scope='request' id='message' class='java.lang.String'/>--%>

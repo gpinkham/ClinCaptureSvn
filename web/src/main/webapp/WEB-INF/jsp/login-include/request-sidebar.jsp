@@ -2,9 +2,10 @@
 <%@page import="org.akaza.openclinica.bean.core.Status"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <script language="JavaScript">
 function reportBug(versionNumber) {
  var bugtrack = "http://dev.openclinica.org/ClinCapture/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&url=";

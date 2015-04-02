@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <style>
 
@@ -40,7 +41,7 @@ padding-top:4px;
 width:160px;
 }
 </style>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
+<ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 
 <%--<jsp:useBean scope="session" id="panel" class="org.akaza.openclinica.view.StudyInfoPanel" />--%>
