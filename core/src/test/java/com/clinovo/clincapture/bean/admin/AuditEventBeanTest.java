@@ -51,8 +51,8 @@ public class AuditEventBeanTest {
 		assertEquals(EMPTY, auditEvent.getAuditTable());
 		assertEquals(0, auditEvent.getUserId());
 		assertEquals(0, auditEvent.getEntityId());
-		assertEquals(QQQ.concat(EMPTY).concat(QQQ), auditEvent.getReasonForChange());
-		assertEquals(QQQ.concat(EMPTY).concat(QQQ), auditEvent.getActionMessage());
+		assertEquals(EMPTY, auditEvent.getReasonForChange());
+		assertEquals(EMPTY, auditEvent.getActionMessage());
 		assertEquals(EMPTY, auditEvent.getColumnName());
 		assertEquals(EMPTY, auditEvent.getOldValue());
 		assertEquals(EMPTY, auditEvent.getNewValue());
@@ -109,7 +109,7 @@ public class AuditEventBeanTest {
 		AuditEventBean customAuditEvent = new AuditEventBean();
 		customAuditEvent.setReasonForChange(WRONG_MESSAGE_KEY);
 		assertEquals(WRONG_MESSAGE_KEY, customAuditEvent.getReasonForChangeKey());
-		assertEquals(QQQ.concat(WRONG_MESSAGE_KEY).concat(QQQ), customAuditEvent.getReasonForChange());
+		assertEquals(WRONG_MESSAGE_KEY, customAuditEvent.getReasonForChange());
 	}
 
 	@Test
@@ -125,6 +125,6 @@ public class AuditEventBeanTest {
 		AuditEventBean customAuditEvent = new AuditEventBean();
 		customAuditEvent.setActionMessage(WRONG_MESSAGE_KEY);
 		assertEquals(WRONG_MESSAGE_KEY, customAuditEvent.getActionMessageKey());
-		assertEquals(QQQ.concat(WRONG_MESSAGE_KEY).concat(QQQ), customAuditEvent.getActionMessage());
+		assertEquals(WRONG_MESSAGE_KEY, customAuditEvent.getActionMessage());
 	}
 }

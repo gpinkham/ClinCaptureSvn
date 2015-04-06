@@ -12,11 +12,15 @@
  ******************************************************************************/
 package com.clinovo.i18n;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -35,6 +39,24 @@ public class ClinCaptureResourceBundle extends ResourceBundle {
 	private Set<String> keys;
 	private Properties properties;
 
+	private class UTF8Control extends Control {
+		public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader,
+				boolean reload) throws IllegalAccessException, InstantiationException, IOException {
+			ResourceBundle bundle = null;
+			String bundleName = toBundleName(baseName, locale);
+			String resourceName = toResourceName(bundleName, "properties");
+			InputStream stream = loader.getResourceAsStream(resourceName);
+			if (stream != null) {
+				try {
+					bundle = new PropertyResourceBundle(new InputStreamReader(stream, "UTF-8"));
+				} finally {
+					stream.close();
+				}
+			}
+			return bundle;
+		}
+	}
+
 	private boolean wasCalledFromResourceBundleMessageSource() {
 		boolean found = false;
 		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
@@ -51,7 +73,7 @@ public class ClinCaptureResourceBundle extends ResourceBundle {
 		keys = new HashSet<String>();
 		properties = new Properties();
 		Enumeration<String> enumeration;
-		ResourceBundle resourceBundle = ResourceBundle.getBundle(baseName, locale);
+		ResourceBundle resourceBundle = ResourceBundle.getBundle(baseName, locale, new UTF8Control());
 		if (resourceBundle.getLocale().equals(locale)) {
 			enumeration = resourceBundle.getKeys();
 			while (enumeration.hasMoreElements()) {
@@ -60,7 +82,7 @@ public class ClinCaptureResourceBundle extends ResourceBundle {
 				properties.setProperty(key, resourceBundle.getString(key));
 			}
 		}
-		ResourceBundle defaultResourceBundle = ResourceBundle.getBundle(baseName, DEFAULT_LOCALE);
+		ResourceBundle defaultResourceBundle = ResourceBundle.getBundle(baseName, DEFAULT_LOCALE, new UTF8Control());
 		enumeration = defaultResourceBundle.getKeys();
 		while (enumeration.hasMoreElements()) {
 			String key = enumeration.nextElement();

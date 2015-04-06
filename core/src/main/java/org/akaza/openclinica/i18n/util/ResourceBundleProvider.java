@@ -2,16 +2,17 @@ package org.akaza.openclinica.i18n.util;
 
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import com.clinovo.i18n.ClinCaptureResourceBundle;
 
+/**
+ * ResourceBundleProvider.
+ */
 public class ResourceBundleProvider {
+
 	/**
 	 * A Map of the locales corresponding to each Thread.
-	 * 
-	 * @author Nacho M. Castejon and Jose Martinez Garcia, BAP Health
 	 */
 	public static HashMap<Thread, Locale> localeMap = new HashMap<Thread, Locale>();
 	/**
@@ -136,7 +137,7 @@ public class ResourceBundleProvider {
 	 * 
 	 * @param name
 	 *            requested bundle name.
-	 * @return
+	 * @return ResourceBundle
 	 */
 	private static ResourceBundle getResBundle(String name) {
 
@@ -156,52 +157,46 @@ public class ResourceBundleProvider {
 	}
 
 	/**
+	 * Method returns property value from admin bundle.
 	 * 
 	 * @param key
-	 * @return If found, the value associated with the key in the Admin ResourceBundle else, the key.
+	 *            String
+	 * @return String
 	 */
 	public static String getResAdmin(String key) {
-		String value;
-		try {
-			value = getAdminBundle().getString(key);
-		} catch (MissingResourceException mre) {
-			value = key;
-		}
-		return value;
+		return getAdminBundle().containsKey(key) ? getAdminBundle().getString(key) : key;
 	}
 
 	/**
+	 * Method returns property value from terms bundle.
 	 * 
 	 * @param key
-	 * @return If found, the value associated with the key in the Term ResourceBundle else, the key.
+	 *            String
+	 * @return String
 	 */
 	public static String getResTerm(String key) {
-		String value;
-		try {
-			value = getResBundle("org.akaza.openclinica.i18n.terms").getString(key);
-		} catch (MissingResourceException mre) {
-			value = key;
-		}
-		return value;
+		return getTermsBundle().containsKey(key) ? getTermsBundle().getString(key) : key;
 	}
 
+	/**
+	 * Method returns property value from words bundle.
+	 * 
+	 * @param key
+	 *            String
+	 * @return String
+	 */
 	public static String getResWord(String key) {
-		String value;
-		try {
-			value = getResBundle("org.akaza.openclinica.i18n.words").getString(key);
-		} catch (MissingResourceException mre) {
-			value = key;
-		}
-		return value;
+		return getWordsBundle().containsKey(key) ? getWordsBundle().getString(key) : key;
 	}
 
+	/**
+	 * Method returns property value from notes bundle.
+	 * 
+	 * @param key
+	 *            String
+	 * @return String
+	 */
 	public static String getResNotes(String key) {
-		String value;
-		try {
-			value = getResBundle("org.akaza.openclinica.i18n.notes").getString(key);
-		} catch (MissingResourceException mre) {
-			value = key;
-		}
-		return value;
+		return getTextsBundle().containsKey(key) ? getTextsBundle().getString(key) : key;
 	}
 }

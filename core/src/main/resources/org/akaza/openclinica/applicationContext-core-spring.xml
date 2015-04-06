@@ -36,8 +36,8 @@
 		factory-method="getDataInfo" />
 
 	<!-- ENABLING THIS WILL ACTIVATE I18N VIA SPRING -->
-	<bean id="messageSource"
-		class="com.clinovo.i18n.ClinCaptureResourceBundleMessageSource">
+	<bean id="messageSource" class="com.clinovo.i18n.ClinCaptureResourceBundleMessageSource">
+		<property name="defaultEncoding" value="UTF-8"/>
 		<property name="basenames">
 			<list>
 				<value>org.akaza.openclinica.i18n.admin</value>

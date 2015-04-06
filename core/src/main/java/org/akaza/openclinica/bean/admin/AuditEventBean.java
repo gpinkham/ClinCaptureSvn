@@ -25,15 +25,14 @@
  */
 package org.akaza.openclinica.bean.admin;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 public class AuditEventBean extends AuditableEntityBean {
 	// AUDIT_ID AUDIT_DATE AUDIT_TABLE USER_ID
 	// ENTITY_ID REASON_FOR_CHANGE ACTION_MESSAGE
@@ -154,13 +153,7 @@ public class AuditEventBean extends AuditableEntityBean {
 	 * @return Returns the internationalized reasonForChange.
 	 */
 	public String getReasonForChange() {
-		String rfc;
-		try {
-			rfc = resaudit.getString(reasonForChange);
-		} catch (MissingResourceException mre) {
-			rfc = reasonForChange;
-		}
-		return rfc;
+		return resaudit.containsKey(reasonForChange) ? resaudit.getString(reasonForChange) : reasonForChange;
 	}
 
 	/**
@@ -241,13 +234,7 @@ public class AuditEventBean extends AuditableEntityBean {
 	 * @return Returns the internationalized actionMessage.
 	 */
 	public String getActionMessage() {
-		String am;
-		try {
-			am = resaudit.getString(actionMessage);
-		} catch (MissingResourceException mre) {
-			am = actionMessage;
-		}
-		return am;
+		return resaudit.containsKey(actionMessage) ? resaudit.getString(actionMessage) : actionMessage;
 	}
 
 	/**

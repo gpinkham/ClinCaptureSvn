@@ -19,8 +19,8 @@
 
     <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean" p:favorPathExtension="false"/>
 
-    <bean id="messageSource"
-          class="com.clinovo.i18n.ClinCaptureResourceBundleMessageSource">
+    <bean id="messageSource" class="com.clinovo.i18n.ClinCaptureResourceBundleMessageSource">
+        <property name="defaultEncoding" value="UTF-8"/>
         <property name="basenames">
             <list>
                 <value>org.akaza.openclinica.i18n.admin</value>
