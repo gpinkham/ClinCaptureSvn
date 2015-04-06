@@ -47,24 +47,28 @@ public class RestODMFilter extends HandlerInterceptorAdapter {
 		}
 		StudySubjectDAO studySubjectDAO = getStudySubjectDAO();
 		StudyDAO studyDAO = getStudyDAO();
-
-		StudySubjectBean studySubjectBean = studySubjectDAO.findByOid(studySubject);
-		StudyBean siteBean = studyDAO.findByStudySubjectId(studySubjectBean.getId());
-		UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute(
-				BaseController.USER_BEAN_NAME);
-		StudyUserRoleBean currentUserRole = userAccountBean.getRoleByStudy(siteBean);
-		if (siteBean.isSite(siteBean.getParentStudyId()) && currentUserRole.getId() == 0) {
-			StudyBean parentStudy = (StudyBean) studyDAO.findByPK(siteBean.getParentStudyId());
-			currentUserRole = userAccountBean.getRoleByStudy(parentStudy);
-		}
-		if (currentUserRole.getId() == 0) {
-			request.getSession().setAttribute("casebook_exception",
-					respage.getString("does_not_have_access_for_subject_casebook"));
-			response.sendRedirect(request.getContextPath() + "/MainMenu");
-			return false;
+		if (!studySubject.isEmpty()) {
+			StudySubjectBean studySubjectBean = studySubjectDAO.findByOid(studySubject);
+			StudyBean siteBean = studyDAO.findByStudySubjectId(studySubjectBean.getId());
+			UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute(
+					BaseController.USER_BEAN_NAME);
+			StudyUserRoleBean currentUserRole = userAccountBean.getRoleByStudy(siteBean);
+			if (siteBean.isSite(siteBean.getParentStudyId()) && currentUserRole.getId() == 0) {
+				StudyBean parentStudy = (StudyBean) studyDAO.findByPK(siteBean.getParentStudyId());
+				currentUserRole = userAccountBean.getRoleByStudy(parentStudy);
+			}
+			if (currentUserRole.getId() == 0) {
+				request.getSession().setAttribute("casebook_exception",
+						respage.getString("does_not_have_access_for_subject_casebook"));
+				response.sendRedirect(request.getContextPath() + "/MainMenu");
+				return false;
+			} else {
+				return true;
+			}
 		} else {
 			return true;
 		}
+
 	}
 
 	/**
