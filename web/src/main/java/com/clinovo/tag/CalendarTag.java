@@ -35,7 +35,9 @@ public class CalendarTag extends TagSupport {
 	@Override
 	public int doStartTag() throws JspException {
 		String locale = LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest()).toString();
-		locale = CoreResources.CALENDAR_LOCALES.contains(locale) ? locale : "";
+		String language = LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest()).getLanguage();
+		locale = CoreResources.CALENDAR_LOCALES.contains(locale) ? locale : (CoreResources.CALENDAR_LOCALES
+				.contains(language) ? language : "");
 		String contextPath = pageContext.getServletContext().getContextPath();
 		String html = "";
 		if (!locale.isEmpty()) {

@@ -16,11 +16,11 @@ package com.clinovo.tag;
 import java.util.Locale;
 
 import javax.servlet.ServletContext;
-import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.apache.commons.lang3.LocaleUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,9 +53,11 @@ public class CalendarTagTest {
 	@Mock
 	private JspWriter jspWriter;
 
+	private MockHttpSession session;
+
 	@Before
 	public void setUp() throws Exception {
-		MockHttpSession session = new MockHttpSession();
+		session = new MockHttpSession();
 		CoreResources.CALENDAR_LOCALES.add(Locale.ENGLISH.toString());
 		Mockito.when(pageContext.getOut()).thenReturn(jspWriter);
 		Mockito.when(pageContext.getRequest()).thenReturn(request);
@@ -69,7 +71,36 @@ public class CalendarTagTest {
 	}
 
 	@Test
-	public void testThatDoStartTagDoesNotThrowAnExceptionIfSessionIsEmpty() throws JspException {
+	public void testThatDoStartTagDoesNotThrowAnExceptionIfSessionIsEmpty() throws Exception {
 		calendarTag.doStartTag();
+	}
+
+	@Test
+	public void testThatForESMXLocaleTheDatepickerESWillBeChosen() throws Exception {
+		CoreResources.CALENDAR_LOCALES.add(LocaleUtils.toLocale("es").toString());
+		LocaleResolver.updateLocale(session, LocaleUtils.toLocale("es_MX"));
+		calendarTag.doStartTag();
+		Mockito.verify(jspWriter)
+				.write("<script type=\"text/javascript\" src=\"/clincapture/includes/calendar/locales/datepicker-es.js\"></script><script>$.datepicker.regional['es']</script><link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"/clincapture/includes/calendar/css/calendar_blue.css\"/>");
+	}
+
+	@Test
+	public void testThatForESMXLocaleTheDatepickerESMXWillBeChosen() throws Exception {
+		CoreResources.CALENDAR_LOCALES.add(LocaleUtils.toLocale("es").toString());
+		CoreResources.CALENDAR_LOCALES.add(LocaleUtils.toLocale("es_MX").toString());
+		LocaleResolver.updateLocale(session, LocaleUtils.toLocale("es_MX"));
+		calendarTag.doStartTag();
+		Mockito.verify(jspWriter)
+				.write("<script type=\"text/javascript\" src=\"/clincapture/includes/calendar/locales/datepicker-es_MX.js\"></script><script>$.datepicker.regional['es_MX']</script><link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"/clincapture/includes/calendar/css/calendar_blue.css\"/>");
+	}
+
+	@Test
+	public void testThatForESLocaleTheDatepickerESWillBeChosen() throws Exception {
+		CoreResources.CALENDAR_LOCALES.add(LocaleUtils.toLocale("es").toString());
+		CoreResources.CALENDAR_LOCALES.add(LocaleUtils.toLocale("es_MX").toString());
+		LocaleResolver.updateLocale(session, LocaleUtils.toLocale("es"));
+		calendarTag.doStartTag();
+		Mockito.verify(jspWriter)
+				.write("<script type=\"text/javascript\" src=\"/clincapture/includes/calendar/locales/datepicker-es.js\"></script><script>$.datepicker.regional['es']</script><link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"/clincapture/includes/calendar/css/calendar_blue.css\"/>");
 	}
 }
