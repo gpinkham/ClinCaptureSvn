@@ -28,6 +28,7 @@ import com.clinovo.i18n.LocaleResolver;
 /**
  * SetBundleTag.
  */
+@SuppressWarnings("serial")
 public class SetBundleTag extends TagSupport {
 
 	private static final String REQUEST = "request";

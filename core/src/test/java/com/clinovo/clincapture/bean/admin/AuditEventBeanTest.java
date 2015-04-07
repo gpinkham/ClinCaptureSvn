@@ -24,7 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "unused"})
 public class AuditEventBeanTest {
 
 	private AuditEventBean auditEvent;

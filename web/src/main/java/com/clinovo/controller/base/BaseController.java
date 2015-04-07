@@ -13,10 +13,12 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 @Component
+@SuppressWarnings("rawtypes")
 public class BaseController {
 
 	@Autowired
@@ -35,7 +37,7 @@ public class BaseController {
 	private OpenClinicaSchedulerFactoryBean scheduler;
 
 	public static final String INPUT_MESSAGES = "formMessages";
-
+	
 	public ArrayList getAllStudies() {
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		return (ArrayList) studyDAO.findAll();

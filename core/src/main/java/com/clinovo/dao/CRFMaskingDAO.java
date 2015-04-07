@@ -1,6 +1,7 @@
 package com.clinovo.dao;
 
 import com.clinovo.model.CRFMask;
+
 import org.akaza.openclinica.dao.hibernate.AbstractDomainDao;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,7 @@ import java.util.List;
  * CRF Masking DAO class.
  */
 @Repository
+@SuppressWarnings("unchecked")
 public class CRFMaskingDAO extends AbstractDomainDao<CRFMask> {
 
 	@Override
@@ -22,7 +24,7 @@ public class CRFMaskingDAO extends AbstractDomainDao<CRFMask> {
 	 * Retrieves all the masks from the database.
 	 *
 	 * @return List of all masks
-	 */
+	 */	
 	public List<CRFMask> findAll() {
 		String query = "from  " + this.getDomainClassName();
 		Query q = this.getCurrentSession().createQuery(query);

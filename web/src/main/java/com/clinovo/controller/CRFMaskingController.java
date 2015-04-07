@@ -4,6 +4,7 @@ import com.clinovo.controller.base.BaseController;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.CRFMask;
 import com.clinovo.service.CRFMaskingService;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -35,6 +37,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/CRFsMasking")
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class CRFMaskingController extends BaseController {
 
 	@Autowired
@@ -249,7 +252,7 @@ public class CRFMaskingController extends BaseController {
 		HashMap<Integer, ArrayList<StudyEventDefinitionBean>> eventsMap = new HashMap<Integer, ArrayList<StudyEventDefinitionBean>>();
 		StudyEventDefinitionDAO eventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 		for (StudyBean study : studies) {
-			int studyId = study.getId();
+			int studyId = study.getId();			
 			ArrayList<StudyEventDefinitionBean> events = eventDefinitionDAO.findAllActiveByStudy(study);
 			eventsMap.put(studyId, events);
 		}

@@ -6,6 +6,7 @@ import com.clinovo.service.EmailService;
 import com.clinovo.util.EmailUtil;
 import com.clinovo.util.PageMessagesUtil;
 import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +44,7 @@ import java.util.Set;
  */
 @Controller
 @RequestMapping("/EditUserAccount")
+@SuppressWarnings("rawtypes")
 public class EditUserAccountController extends BaseController {
 
 	@Autowired
