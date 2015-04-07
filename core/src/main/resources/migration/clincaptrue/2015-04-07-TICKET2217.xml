@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="vitaly" id="2015-04-07-TICKET2217.xml">
+        <comment>Insert row in system table for bioontology username</comment>
+        <insert tableName="system">
+            <column name="id" value="78"/>
+            <column name="name" value="bioontologyUsername"/>
+            <column name="required" valueBoolean="false"/>
+            <column name="value" value=""/>
+            <column name="size" value="40"/>
+            <column name="show_measurements" value="FALSE"/>
+            <column name="show_description" value="FALSE"/>
+            <column name="show_note" value="FALSE"/>
+            <column name="group_id" value="10"/>
+            <column name="crc" value="READ"/>
+            <column name="investigator" value="READ"/>
+            <column name="monitor" value="READ"/>
+            <column name="admin" value="READ"/>
+            <column name="root" value="WRITE"/>
+            <column name="order_id" value="2"/>
+            <column name="version" value="1"/>
+        </insert>
+        <update tableName="system">
+            <column name="order_id" value="3"/>
+            <where>name='medicalCodingApiKey'</where>
+        </update>
+        <update tableName="system">
+            <column name="order_id" value="4"/>
+            <where>name='autoCodeDictionaryName'</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>
