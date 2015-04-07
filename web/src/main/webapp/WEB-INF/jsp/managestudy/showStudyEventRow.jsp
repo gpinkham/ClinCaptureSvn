@@ -272,14 +272,7 @@
                         </td>
 
                         <td>
-                            <a href="#"
-                               onclick="setAccessedObjected(this); viewCrfByVersion('${dedc.edc.id}', '${studySub.id}', $('#${dynamicCrfVersionId}').val(), '${currRow.bean.studyEvent.id}', 1, 'ViewStudySubject?id=${studySub.id}');"
-                               onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                               onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');">
-                                <img name="bt_View1" src="images/bt_View.gif" border="0"
-                                     alt="<fmt:message key="view_data" bundle="${resword}"/>"
-                                     title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="6">
-                            </a>
+							<ui:viewDataEntryLink object="${dedc}" onClick="setAccessedObjected(this); viewCrfByVersion('${dedc.edc.id}', '${studySub.id}', $('#${dynamicCrfVersionId}').val(), '${currRow.bean.studyEvent.id}', 1, 'ViewStudySubject?id=${studySub.id}');"/>
                         </td>
 
                         <td>
@@ -394,13 +387,7 @@
                         </c:choose>
                     </td>
                     <td>
-                        <a href="ViewSectionDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&tabId=1&studySubjectId=<c:out value="${studySub.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}"
-                           onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                           onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
-                           onclick="setAccessedObjected(this)"><img name="bt_View1" src="images/bt_View.gif" border="0"
-                                alt="<fmt:message key="view" bundle="${resword}"/>"
-                                title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-
+						<ui:viewDataEntryLink object="${dec}" queryTail="&studySubjectId=${studySub.id}&exitTo=ViewStudySubject?id=${studySub.id}" onClick="setAccessedObjected(this)" hspace="6" />
                     </td>
                     <td>
                         <a href="javascript:openPrintCRFWindow('print/clinicaldata/html/print/${parentStudyOid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"

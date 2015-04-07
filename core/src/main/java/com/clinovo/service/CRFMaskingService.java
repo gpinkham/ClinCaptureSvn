@@ -34,9 +34,9 @@ public interface CRFMaskingService {
 	/**
 	 * Find CRF Mask by user ID, site ID, crf ID.
 	 *
-	 * @param userId int
-	 * @param siteId int
-	 * @param crfId  int
+	 * @param userId UserAccountBean ID
+	 * @param siteId StudyBean ID
+	 * @param crfId  EventDefinitionCRF ID
 	 * @return CRF Mask
 	 */
 	CRFMask findByUserIdSiteIdAndCRFId(int userId, int siteId, int crfId);
@@ -47,4 +47,14 @@ public interface CRFMaskingService {
 	 * @param mask CRF Mask to be deleted
 	 */
 	void delete(CRFMask mask);
+
+	/**
+	 * Check if current eventCRF is masked.
+	 *
+	 * @param crfId EventDefinitionCRF ID
+	 * @param userId UserAccountBean ID
+	 * @param studyId StudyBean ID
+	 * @return boolean
+	 */
+	boolean isEventDefinitionCRFMasked(int crfId, int userId, int studyId);
 }

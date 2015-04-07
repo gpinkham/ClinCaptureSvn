@@ -444,11 +444,7 @@
                                         </c:otherwise>
                                     </c:choose>
 
-                                    <a href="#" onclick="viewCrfByVersion('${dedc.edc.id}', '${studySubject.id}', $('#${crfVersionInputId}').val(), '${eventId}', 1);"
-                                       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');">
-                                           <img name="bt_View" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="4">
-                                    </a>
+									<ui:viewDataEntryLink object="${dedc}" onClick="viewCrfByVersion('${dedc.edc.id}', '${studySubject.id}', $('#${crfVersionInputId}').val(), '${eventId}', 1);"/>
 
                                     <c:if test="${not empty crfNDsMap[dedc.edc.crf.id]}">
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
@@ -558,10 +554,7 @@
                                         <c:set var="hideCol2" value="false"/>
                                         <c:set var="crfSpacersCount" value="5"/>
                                         <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
-                                        <a href="ViewSectionDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
-                                           onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-                                           onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-                                          ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="4"></a>
+										<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}" name="bt_Print${rowCount}"/>
 
                                         <c:if test="${userRole.id ne 4 && userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and (!studySubject.status.deleted) && (study.status.available)}">
                                             <c:set var="hideCol3" value="false"/>
@@ -582,11 +575,7 @@
                                         <c:set var="hideCol2" value="false"/>
                                         <c:set var="crfSpacersCount" value="5"/>
                                         <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
-                                        <a href="ViewSectionDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
-                                           onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                                           onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
-                                          ><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="4"></a>
-
+										<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}"/>
                                     </c:when>
                                     <c:otherwise>
                                         <c:set var="enterDataWasInserted" value="false"/>
@@ -602,11 +591,7 @@
 
                                         <c:set var="hideCol2" value="false"/>
                                         <c:set var="crfSpacersCount" value="5"/>
-                                        <a href="ViewSectionDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
-                                           onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-                                           onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-                                          ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="4"></a>
-
+										<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}" name="bt_Pring${rowCount}"/>
                                         <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available)}">
                                             <c:set var="hideCol3" value="false"/>
                                             <c:set var="crfSpacersCount" value="4"/>

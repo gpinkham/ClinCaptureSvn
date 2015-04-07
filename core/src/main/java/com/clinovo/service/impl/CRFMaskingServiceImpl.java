@@ -9,9 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * Masking Service implementation.
+ */
 @Transactional
 @Service("crfMaskingService")
-public class CRFMaskingServiceImpl implements CRFMaskingService{
+public class CRFMaskingServiceImpl implements CRFMaskingService {
 
 	@Autowired
 	private CRFMaskingDAO maskingDAO;
@@ -28,11 +31,15 @@ public class CRFMaskingServiceImpl implements CRFMaskingService{
 		maskingDAO.saveOrUpdate(mask);
 	}
 
-	public CRFMask findByUserIdSiteIdAndCRFId(int userId, int roleId, int crfId) {
-		return maskingDAO.findByUserIdSiteIdAndCRFId(userId, roleId, crfId);
+	public CRFMask findByUserIdSiteIdAndCRFId(int userId, int siteId, int crfId) {
+		return maskingDAO.findByUserIdSiteIdAndCRFId(userId, siteId, crfId);
 	}
 
-	public void delete (CRFMask mask) {
+	public void delete(CRFMask mask) {
 		maskingDAO.delete(mask);
+	}
+
+	public boolean isEventDefinitionCRFMasked(int crfId, int userId, int studyId) {
+		return findByUserIdSiteIdAndCRFId(userId, studyId, crfId) != null;
 	}
 }

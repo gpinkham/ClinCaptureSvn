@@ -412,10 +412,7 @@
 					<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
 				</c:otherwise>
             </c:choose>
-                <a href="#" onclick="viewCrfByVersion('${dedc.edc.id}', '${studySubject.id}', $('#${crfVersionInputId}').val(), '${eventId}', 1);"
-                   onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                   onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');">
-                       <img name="bt_View1" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" align="left" hspace="4"></a>
+				<ui:viewDataEntryLink object="${dedc}" onClick="viewCrfByVersion('${dedc.edc.id}', '${studySubject.id}', $('#${crfVersionInputId}').val(), '${eventId}', 1);"/>
                 <a href="javascript:processPrintCRFRequest('print/metadata/html/print/*/*/<c:out value="${versionOid}"/>')"
                    onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
                    onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
@@ -507,12 +504,7 @@
     <c:choose>
         <c:when test='${!allowDataEntry && dec.stage.name == "invalid" }'>
 			<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
-            <a href="ViewSectionDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
-               onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-               onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');">
-                <img name="bt_View<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="4">
-            </a>
-
+			<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}" name="bt_View${rowCount}"/>
             <a href="javascript:openPrintCRFWindow('print/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
                onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
                onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
@@ -534,11 +526,7 @@
 
         <c:when test='${!allowDataEntry}'>
 			<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
-            <a href="ViewSectionDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
-               onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-               onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
-              ><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="4"></a>
-
+			<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}"/>
             <a href="javascript:openPrintCRFWindow('print/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
                onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
                onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
@@ -558,10 +546,7 @@
 			</c:otherwise>
 			</c:choose>
 
-            <a href="ViewSectionDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
-               onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-               onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-              ><img name="bt_View<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="4"></a>
+			<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}" name="bt_View${rowCount}"/>
 
             <a href="javascript:openPrintCRFWindow('print/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
             onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
