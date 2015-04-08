@@ -361,7 +361,7 @@
                                                         <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${currRow.bean.studyEvent.id}&subjectId=${studySub.subjectId}" />
 
                                                         <c:choose>
-                                                            <c:when test="${(dedc.edc.defaultVersionId == version.id && dedc.eventCRF.id == 0) || (dedc.eventCRF.CRFVersionId == version.id && dedc.eventCRF.notStarted)}">
+                                                            <c:when test="${dedc.edc.defaultVersionId == version.id}">
                                                                 <script>$('#${crfVersionInputId}').val('${version.id}');</script>
                                                                 <option value="<c:out value="${version.id}"/>" selected>
                                                                     <c:out value="${version.name}"/>

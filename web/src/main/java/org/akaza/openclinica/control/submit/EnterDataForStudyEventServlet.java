@@ -228,6 +228,13 @@ public class EnterDataForStudyEventServlet extends Controller {
 		if (fp.getString(OPEN_FIRST_CRF).equalsIgnoreCase(TRUE)) {
 			try {
 				DisplayEventDefinitionCRFBean dedcb = (DisplayEventDefinitionCRFBean) fullCrfList.get(0);
+				CRFVersionBean defaultCRFVerBean = new CRFVersionBean();
+				for (int i = 0; i < dedcb.getEdc().getVersions().size(); i++) {
+					defaultCRFVerBean = (CRFVersionBean) dedcb.getEdc().getVersions().get(i);
+					if (defaultCRFVerBean.getId() == dedcb.getEdc().getDefaultVersionId()) {
+						break;
+					}
+				}
 				response.sendRedirect(request.getContextPath()
 						+ Page.INITIAL_DATA_ENTRY_SERVLET.getFileName()
 						+ "?studyEventId="
@@ -237,7 +244,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 						+ "&eventDefinitionCRFId="
 						+ dedcb.getEdc().getId()
 						+ "&crfVersionId="
-						+ ((CRFVersionBean) dedcb.getEdc().getVersions().get(0)).getId()
+						+ defaultCRFVerBean.getId()
 						+ "&action=ide_s&exitTo="
 						+ URLEncoder.encode(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName().replace("/", "")
 								+ "?eventId=" + ecb.getStudyEventId(), "UTF-8"));
@@ -250,6 +257,13 @@ public class EnterDataForStudyEventServlet extends Controller {
 		forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT, request, response);
 	}
 
+	/**
+	 * prepareCRFVersionForLockedCRFs.
+	 *
+	 * @param fullCrfList List<Object>
+	 * @param crfvdao CRFVersionDAO
+	 * @param logger Logger
+	 */
 	public static void prepareCRFVersionForLockedCRFs(List<Object> fullCrfList, CRFVersionDAO crfvdao, Logger logger) {
 		try {
 			for (Object object : fullCrfList) {
@@ -324,9 +338,9 @@ public class EnterDataForStudyEventServlet extends Controller {
 			EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
 			int crfId = cvdao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
 			ArrayList idata = iddao.findAllByEventCRFId(ecrf.getId());
-			if (!idata.isEmpty()) {// this crf has data already
+			if (!idata.isEmpty()) { // this crf has data already
 				completed.put(crfId, Boolean.TRUE);
-			} else {// event crf got created, but no data entered
+			} else { // event crf got created, but no data entered
 				startedButIncompleted.put(crfId, ecrf);
 			}
 		}
@@ -346,6 +360,12 @@ public class EnterDataForStudyEventServlet extends Controller {
 		return answer;
 	}
 
+	/**
+	 * populateUncompletedCRFsWithAnOwner.
+	 *
+	 * @param ds DataSource
+	 * @param displayEventDefinitionCRFBeans List<DisplayEventDefinitionCRFBean>
+	 */
 	public static void populateUncompletedCRFsWithAnOwner(DataSource ds,
 			List<DisplayEventDefinitionCRFBean> displayEventDefinitionCRFBeans) {
 		if (displayEventDefinitionCRFBeans == null || displayEventDefinitionCRFBeans.isEmpty()) {
@@ -376,6 +396,13 @@ public class EnterDataForStudyEventServlet extends Controller {
 		}
 	}
 
+	/**
+	 * populateUncompletedCRFsWithCRFAndVersions.
+	 *
+	 * @param ds DataSource
+	 * @param logger Logger
+	 * @param uncompletedEventDefinitionCRFs ArrayList
+	 */
 	public static void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, Logger logger,
 			ArrayList uncompletedEventDefinitionCRFs) {
 		CRFDAO cdao = new CRFDAO(ds);
@@ -455,9 +482,11 @@ public class EnterDataForStudyEventServlet extends Controller {
 	/**
 	 * If DiscrepancyNoteBeans have a certain column value, then set flags that a JSP will check in the request
 	 * attribute. This is a convenience method called by the processRequest() method.
-	 * 
-	 * @param discBeans
-	 *            A List of DiscrepancyNoteBeans.
+	 *
+	 * @param discBeans List<DiscrepancyNoteBean>
+	 * @param seb StudyEventBean
+	 * @param sm SessionManager
+	 * @param request HttpServletRequest
 	 */
 	public static void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans, StudyEventBean seb,
 			SessionManager sm, HttpServletRequest request) {
