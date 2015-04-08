@@ -130,6 +130,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 		if (studySubId == 0) {
 			addPageMessage(respage.getString("please_choose_a_subject_to_view"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
+			return;
 		} else {
 			studySubject = (StudySubjectBean) subdao.findByPK(studySubId);
 			StudyBean study = (StudyBean) studydao.findByPK(studySubject.getStudyId());
@@ -250,7 +251,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 				studySubject != null ? studySubject.getOwner().getName() : null,
 				studySubject != null ? studySubject.getStatus().getName() : null};
 		for (int i = 0; i < excelRow.length; i++) {
-			Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]));
+			Label label = new Label(i, row, excelRow[i]);
 			excelSheet.addCell(label);
 		}
 		row++;
@@ -603,7 +604,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 			return "";
 		} else {
 			SimpleDateFormat dteFormat = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString(
-					"date_format_string"));
+					"date_format_string"), LocaleResolver.getLocale());
 			return dteFormat.format(date);
 		}
 	}
@@ -613,7 +614,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 			return "";
 		} else {
 			SimpleDateFormat dtetmeFormat = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString(
-					"date_time_format_string"));
+					"date_time_format_string"), LocaleResolver.getLocale());
 			return dtetmeFormat.format(date);
 		}
 	}
