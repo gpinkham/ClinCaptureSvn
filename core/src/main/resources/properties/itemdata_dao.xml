@@ -210,8 +210,11 @@
 	<query>
 		<name>countOfItemsToSDV</name>
 		<sql>
-			SELECT count(id.item_data_id) FROM item_data id, event_crf ec, item_form_metadata ifm
-			WHERE ec.event_crf_id = ? AND ifm.crf_version_id = ec.crf_version_id AND ifm.item_id = id.item_id AND id.event_crf_id = ec.event_crf_id AND ifm.show_item = true AND ifm.sdv_required = true AND not id.sdv
+			SELECT count(id.item_data_id) FROM item_data id
+			join event_crf ec on ec.event_crf_id = ?
+			join item_form_metadata ifm on ifm.crf_version_id = ec.crf_version_id AND ifm.item_id = id.item_id AND ifm.sdv_required = true
+			left join dyn_item_form_metadata difm on difm.item_form_metadata_id = ifm.item_form_metadata_id and difm.event_crf_id = ec.event_crf_id and difm.item_id = ifm.item_id and difm.crf_version_id = ifm.crf_version_id
+			WHERE id.event_crf_id = ec.event_crf_id AND not id.sdv AND ((difm.id is null and ifm.show_item = true) or (not(difm.id is null) and difm.show_item = true))
 		</sql>
 	</query>
 	<query>
@@ -223,21 +226,32 @@
 	<query>
 		<name>sdvCrfItems</name>
 		<sql>
-			update item_data set sdv = ?, update_id = ?, date_updated = NOW() where item_data_id in (select id.item_data_id from item_data id, event_crf ec, item_form_metadata ifm where ec.event_crf_id = ? and ifm.crf_version_id = ec.crf_version_id and ifm.item_id = id.item_id and id.event_crf_id = ec.event_crf_id and ifm.show_item = true and ifm.sdv_required = true)
+			update item_data set sdv = ?, update_id = ?, date_updated = NOW() where item_data_id in
+			(select id.item_data_id from item_data id
+			join event_crf ec on ec.event_crf_id = ?
+			join item_form_metadata ifm on ifm.crf_version_id = ec.crf_version_id AND ifm.item_id = id.item_id AND ifm.sdv_required = true
+			left join dyn_item_form_metadata difm on difm.item_form_metadata_id = ifm.item_form_metadata_id and difm.event_crf_id = ec.event_crf_id and difm.item_id = ifm.item_id and difm.crf_version_id = ifm.crf_version_id
+			where id.event_crf_id = ec.event_crf_id and ((difm.id is null and ifm.show_item = true) or (not(difm.id is null) and difm.show_item = true)))
 		</sql>
 	</query>
     <query>
         <name>itemsToSDV</name>
         <sql>
-            SELECT distinct id.*, ifm.item_form_metadata_id as item_form_metadata_id, igm.repeating_group as repeating, s.section_id as section FROM item_data id, event_crf ec, item_form_metadata ifm, item_group_metadata igm, section s
-            WHERE ec.event_crf_id = ? AND ifm.crf_version_id = ec.crf_version_id AND ifm.item_id = id.item_id AND ifm.section_id = s.section_id AND igm.crf_version_id = ec.crf_version_id AND igm.item_id = id.item_id AND id.event_crf_id = ec.event_crf_id AND ifm.show_item = true AND ifm.sdv_required = true AND not id.sdv
-            ORDER by section, id.ordinal, id.item_id
+			SELECT distinct id.*, ifm.item_form_metadata_id as item_form_metadata_id, igm.repeating_group as repeating, s.section_id as section FROM item_data id
+			join event_crf ec on ec.event_crf_id = ?
+			join item_form_metadata ifm on ifm.crf_version_id = ec.crf_version_id AND ifm.item_id = id.item_id AND ifm.sdv_required = true
+			join item_group_metadata igm on igm.item_id = id.item_id AND igm.crf_version_id = ec.crf_version_id
+			join section s on s.section_id = ifm.section_id
+			left join dyn_item_form_metadata difm on difm.item_form_metadata_id = ifm.item_form_metadata_id and difm.event_crf_id = ec.event_crf_id and difm.item_id = ifm.item_id and difm.crf_version_id = ifm.crf_version_id
+			WHERE id.event_crf_id = ec.event_crf_id AND not id.sdv
+			AND ((difm.id is null and ifm.show_item = true) or (not(difm.id is null) and difm.show_item = true))
+			ORDER by section, id.ordinal, id.item_id
         </sql>
     </query>
     <query>
         <name>sdvItems</name>
         <sql>
-            update item_data set sdv = ?, update_id = ?, date_updated = NOW() where item_data_id in
+            update item_data set sdv = ?, update_id = ?, date_updated = NOW() where sdv != ? and item_data_id in
         </sql>
     </query>
 </queries>

@@ -33,18 +33,18 @@ import com.clinovo.util.CrfShortcutsAnalyzer;
  */
 public interface ItemSDVService {
 
-	public static final String YES = "yes";
-	public static final String CRF = "crf";
-	public static final String SDV = "sdv";
-	public static final String ITEM = "item";
-	public static final String UN_SDV = "unsdv";
-	public static final String ITEM_ID = "itemId";
-	public static final String ROW_COUNT = "rowCount";
-	public static final String COMPLETED = "completed";
-	public static final String ITEM_DATA_ID = "itemDataId";
-	public static final String ITEM_DATA_ITEMS = "itemDataItems";
-	public static final String TOTAL_ITEMS_TO_SDV = "totalItemsToSDV";
-	public static final String TOTAL_SECTION_ITEMS_TO_SDV = "totalSectionItemsToSDV";
+	String YES = "yes";
+	String CRF = "crf";
+	String SDV = "sdv";
+	String ITEM = "item";
+	String UN_SDV = "unsdv";
+	String ITEM_ID = "itemId";
+	String ROW_COUNT = "rowCount";
+	String COMPLETED = "completed";
+	String ITEM_DATA_ID = "itemDataId";
+	String ITEM_DATA_ITEMS = "itemDataItems";
+	String TOTAL_ITEMS_TO_SDV = "totalItemsToSDV";
+	String TOTAL_SECTION_ITEMS_TO_SDV = "totalSectionItemsToSDV";
 
 	/**
 	 * Method processes the changed crf version metadata.

@@ -13,6 +13,17 @@
 
 package org.akaza.openclinica.view.form;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -39,21 +50,11 @@ import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 /**
  * This class builds DisplayFormGroupBeans and DisplayItemBeans in preparation for displaying a form. The
  * DisplayFormGroupBean contains the DisplayItemBeans, and is itself contained by a DisplaySectionBean.
  */
-@SuppressWarnings({ "unchecked", "unused" })
+@SuppressWarnings({"unchecked", "unused"})
 public class FormBeanUtil {
 
 	private static Logger logger = null;
@@ -119,7 +120,8 @@ public class FormBeanUtil {
 			if (meta.getSectionId() == sectionId) {
 				displayBean.setItem(iBean);
 				List<ItemDataBean> itemDataBeanList = itemDataCache.get(iBean.getId());
-				ItemDataBean itemDataBean = itemDataBeanList == null || itemDataBeanList.size() == 0 ? new ItemDataBean()
+				ItemDataBean itemDataBean = itemDataBeanList == null || itemDataBeanList.size() == 0
+						? new ItemDataBean()
 						: itemDataBeanList.get(0).copy();
 				// null values is set by adding the event def. crf bean, but
 				// here we have taken a different approach, tbh
@@ -187,7 +189,8 @@ public class FormBeanUtil {
 			if (meta.getSectionId() == sectionId) {
 				displayBean.setItem(iBean);
 				List<ItemDataBean> itemDataBeanList = itemDataCache.get(iBean.getId());
-				ItemDataBean itemDataBean = itemDataBeanList == null || itemDataBeanList.size() == 0 ? new ItemDataBean()
+				ItemDataBean itemDataBean = itemDataBeanList == null || itemDataBeanList.size() == 0
+						? new ItemDataBean()
 						: itemDataBeanList.get(0).copy();
 				// null values is set by adding the event def. crf bean, but
 				// here we have taken a different approach, tbh
@@ -245,7 +248,9 @@ public class FormBeanUtil {
 			meta = itemFormMetadataCache.get(iBean.getId()).copy();
 
 			List<ItemDataBean> itemDataBeanList = itemDataCache.get(iBean.getId());
-			ItemDataBean itemDataBean = itemDataBeanList.get(ordinal - 1).copy();
+			ItemDataBean itemDataBean = itemDataBeanList == null || itemDataBeanList.size() == 0
+					? new ItemDataBean()
+					: itemDataBeanList.get(ordinal - 1).copy();
 
 			if (meta.getSectionId() == sectionId) {
 				displayBean.setItem(iBean);
@@ -301,7 +306,8 @@ public class FormBeanUtil {
 		// Only include Items that belong to the associated section
 		if (itemFBean.getSectionId() == sectionId) {
 			List<ItemDataBean> itemDataBeanList = itemDataCache.get(itemBean.getId());
-			ItemDataBean itemDataBean = itemDataBeanList == null || itemDataBeanList.size() == 0 ? new ItemDataBean()
+			ItemDataBean itemDataBean = itemDataBeanList == null || itemDataBeanList.size() == 0
+					? new ItemDataBean()
 					: itemDataBeanList.get(0).copy();
 			disBean.setItem(itemBean);
 			disBean.setMetadata(runDynamicsCheck(itemFBean, eventCrfBean, itemDataBean, dynamicsMetadataService));
@@ -1133,7 +1139,7 @@ public class FormBeanUtil {
 
 	private void incrementOrdinal(ItemFormMetadataBean itemFormBean, List<DisplayItemGroupBean> displayFormBeans,
 			int ordinalTracker) {
-		outer: for (DisplayItemGroupBean digBean : displayFormBeans) {
+		outer : for (DisplayItemGroupBean digBean : displayFormBeans) {
 			for (DisplayItemBean diBean : digBean.getItems()) {
 				if (itemFormBean.getItemId() == diBean.getItem().getId()) {
 					// int tmp = digBean.getOrdinal();
@@ -1153,7 +1159,7 @@ public class FormBeanUtil {
 
 	private boolean isGrouped(ItemFormMetadataBean itemFormBean, List<DisplayItemGroupBean> displayFormBeans) {
 		boolean grouped = false;
-		outer: for (DisplayItemGroupBean digBean : displayFormBeans) {
+		outer : for (DisplayItemGroupBean digBean : displayFormBeans) {
 			for (DisplayItemBean diBean : digBean.getItems()) {
 				if (itemFormBean.getItemId() == diBean.getItem().getId()) {
 					grouped = true;
@@ -1178,7 +1184,7 @@ public class FormBeanUtil {
 	 */
 	private int getGroupOrdinal(ItemFormMetadataBean itemFBean, List<DisplayItemGroupBean> displayFormBeans) {
 		int ordinal = 0;
-		outer: for (DisplayItemGroupBean digBean : displayFormBeans) {
+		outer : for (DisplayItemGroupBean digBean : displayFormBeans) {
 			for (DisplayItemBean diBean : digBean.getItems()) {
 				if (itemFBean.getItemId() == diBean.getItem().getId()) {
 					ordinal = digBean.getOrdinal();

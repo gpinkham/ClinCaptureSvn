@@ -1319,7 +1319,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		HashMap variables = new HashMap();
 		int ind = 1;
 		variables.put(ind++, sdv);
-		variables.put(ind, userId);
+		variables.put(ind++, userId);
+		variables.put(ind, sdv);
 
 		execute(digester.getQuery("sdvItems").concat(" ")
 				.concat(itemDataIds.toString().replace("[", "(").replace("]", ")")), variables);

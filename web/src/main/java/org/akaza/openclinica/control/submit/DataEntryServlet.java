@@ -1535,6 +1535,13 @@ public abstract class DataEntryServlet extends Controller {
 				HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false,
 						shouldRunRules, MessageType.WARNING, phase2, ecb, request);
 
+				if (getItemSDVService().getCountOfItemsToSDV(ecb.getId()) > 0 && ecb.isSdvStatus()) {
+					ecb.setUpdater(ub);
+					ecb.setSdvStatus(false);
+					ecb.setUpdatedDate(new Date());
+					ecdao.update(ecb);
+				}
+
 				HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
 				// additional step needed, run rules and see if any items are 'shown' AFTER saving data
 				logMe("DisplayItemWithGroupBean dryrun  end" + System.currentTimeMillis());
@@ -2173,8 +2180,8 @@ public abstract class DataEntryServlet extends Controller {
 							getCodedItemService().saveCodedItem(codedItem);
 						}
 						item.getData().setValue("");
-					} else if (gradeItemData.getId() == displayItemBean.getData().getId() &&
-							displayItemBean.getData().getId() != 0) {
+					} else if (gradeItemData.getId() == displayItemBean.getData().getId()
+							&& displayItemBean.getData().getId() != 0) {
 						ItemDataBean refItemDataBean = iddao.findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(),
 								ecrfBean.getId(), item.getData().getOrdinal());
 						for (DisplayItemBean changedItem : changedItemsList) {
@@ -4591,17 +4598,19 @@ public abstract class DataEntryServlet extends Controller {
 					String editFlag = displayGroup.getEditFlag();
 					for (DisplayItemBean displayItem : oItems) {
 						int itemId = displayItem.getItem().getId();
-						nextOrdinal = nextOrdinals.get(itemId);
-						int ordinal = 0;
-						String editflag = "add".equalsIgnoreCase(editFlag) ? editFlag : editFlags.get(displayItem
-								.getData().getId());
-						if (editflag.length() > 0) {
-							if ("add".equalsIgnoreCase(editflag)) {
-								ordinal = nextOrdinals.get(itemId);
-								displayItem.getData().setOrdinal(ordinal);
-								nextOrdinals.put(itemId, nextOrdinal + 1);
-							} else if ("edit".equalsIgnoreCase(editflag)) {
-								displayItem.getData().setOrdinal(displayItem.getDbData().getOrdinal());
+						if (nextOrdinals.get(itemId) != null) {
+							nextOrdinal = nextOrdinals.get(itemId);
+							int ordinal = 0;
+							String editflag = "add".equalsIgnoreCase(editFlag) ? editFlag : editFlags.get(displayItem
+									.getData().getId());
+							if (editflag.length() > 0) {
+								if ("add".equalsIgnoreCase(editflag)) {
+									ordinal = nextOrdinals.get(itemId);
+									displayItem.getData().setOrdinal(ordinal);
+									nextOrdinals.put(itemId, nextOrdinal + 1);
+								} else if ("edit".equalsIgnoreCase(editflag)) {
+									displayItem.getData().setOrdinal(displayItem.getDbData().getOrdinal());
+								}
 							}
 						}
 					}
