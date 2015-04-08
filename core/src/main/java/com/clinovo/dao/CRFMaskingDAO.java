@@ -2,6 +2,7 @@ package com.clinovo.dao;
 
 import com.clinovo.model.CRFMask;
 
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.dao.hibernate.AbstractDomainDao;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
@@ -70,5 +71,64 @@ public class CRFMaskingDAO extends AbstractDomainDao<CRFMask> {
 	 */
 	public void delete(CRFMask mask) {
 		getCurrentSession().delete(mask);
+	}
+
+	/**
+	 * Find Active CRF Mask by UserAccountBean ID, StudyBean ID and EventDefinitionCRF ID.
+	 *
+	 * @param userId UserAccountBeanID
+	 * @param siteId StudyBeanID
+	 * @param crfId EventDefinitionCRFID
+	 * @return CRF Mask
+	 */
+	public CRFMask findActiveByUserIdSiteIdAndCRFId(int userId, int siteId, int crfId) {
+		String query = "from " + getDomainClassName()
+				+ " cm where cm.userId = :userId and "
+				+ "cm.eventDefinitionCrfId = :crfId and "
+				+ "cm.studyId = :siteId and "
+				+ "cm.statusId != " + Status.DELETED.getId();
+		Query q = getCurrentSession().createQuery(query);
+		q.setInteger("userId", userId);
+		q.setInteger("crfId", crfId);
+		q.setInteger("siteId", siteId);
+		return (CRFMask) q.uniqueResult();
+	}
+
+	/**
+	 * Restore Masks for site.
+	 *
+	 * @param userId int UserAccountBean Id
+	 * @param studyId int StudyBean Id
+	 */
+	public void restoreMasksBySiteAndUserIds(int userId, int studyId) {
+		setStatusBySiteAndUserIds(userId, studyId, Status.AVAILABLE.getId());
+	}
+
+	/**
+	 * Remove Masks for site.
+	 *
+	 * @param userId int UserAccountBean Id
+	 * @param studyId int StudyBean Id
+	 */
+	public void removeMasksBySiteAndUserIds(int userId, int studyId) {
+		setStatusBySiteAndUserIds(userId, studyId, Status.DELETED.getId());
+	}
+
+	/**
+	 * Set status by StudyBean and UserAccountBean Ids.
+	 *
+	 * @param userId UserAccountBean Id.
+	 * @param studyId Study Id.
+	 * @param statusId Status Id.
+	 */
+	public void setStatusBySiteAndUserIds(int userId, int studyId, int statusId) {
+		String query = "update " + getDomainClassName() + " set statusId = :statusId "
+				+ "where userId = :userId and "
+				+ "studyId = :studyId";
+		Query q = getCurrentSession().createQuery(query);
+		q.setInteger("statusId", statusId);
+		q.setInteger("userId", userId);
+		q.setInteger("studyId", studyId);
+		q.executeUpdate();
 	}
 }

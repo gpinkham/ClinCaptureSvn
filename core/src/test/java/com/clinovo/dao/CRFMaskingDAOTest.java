@@ -2,6 +2,8 @@ package com.clinovo.dao;
 
 import com.clinovo.model.CRFMask;
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.junit.Test;
 
 public class CRFMaskingDAOTest extends DefaultAppContextTest {
@@ -13,7 +15,7 @@ public class CRFMaskingDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatFindAllReturnsAllWidgetsFromTheDB() {
-		assertEquals(maskingDAO.findAll().size(), 1);
+		assertEquals(maskingDAO.findAll().size(), 2);
 	}
 
 	@Test
@@ -23,7 +25,7 @@ public class CRFMaskingDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatFindByUserIdReturnsMaskWithCorrectStudyID() {
-		assertEquals(maskingDAO.findByUserId(1).size(), 1);
+		assertEquals(maskingDAO.findByUserId(1).size(), 2);
 	}
 
 	@Test
@@ -35,6 +37,24 @@ public class CRFMaskingDAOTest extends DefaultAppContextTest {
 	public void testThatDeleteCompletelyRemovesCRFMask() {
 		CRFMask mask = maskingDAO.findByUserIdSiteIdAndCRFId(1, 1, 1);
 		maskingDAO.delete(mask);
-		assertEquals(maskingDAO.findAll().size(), 0);
+		assertEquals(maskingDAO.findAll().size(), 1);
+	}
+
+	@Test
+	public void testThatFindAllActiveReturnsAllActiveMasks() {
+		assertNull(maskingDAO.findActiveByUserIdSiteIdAndCRFId(1, 1, 4));
+		assertNotNull(maskingDAO.findActiveByUserIdSiteIdAndCRFId(1, 1, 1));
+	}
+
+	@Test
+	public void testThatRemoveMasksBySiteAndUserIdsRemovesMask() {
+		maskingDAO.removeMasksBySiteAndUserIds(1, 1);
+		assertNull(maskingDAO.findActiveByUserIdSiteIdAndCRFId(1, 1, 1));
+	}
+
+	@Test
+	public void testThatRestoreMasksBySiteAndUserIdsRemovesMask() {
+		maskingDAO.restoreMasksBySiteAndUserIds(1, 1);
+		assertNotNull(maskingDAO.findActiveByUserIdSiteIdAndCRFId(1, 1, 4));
 	}
 }

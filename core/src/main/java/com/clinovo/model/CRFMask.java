@@ -21,6 +21,7 @@ public class CRFMask extends AbstractMutableDomainObject {
 	private int eventDefinitionCrfId;
 	private int userId;
 	private int studyUserRoleId;
+	private int statusId;
 
 	public int getStudyId() {
 		return studyId;
@@ -60,5 +61,13 @@ public class CRFMask extends AbstractMutableDomainObject {
 
 	public void setStudyUserRoleId(int studyUserRoleId) {
 		this.studyUserRoleId = studyUserRoleId;
+	}
+
+	public int getStatusId() {
+		return statusId;
+	}
+
+	public void setStatusId(int statusId) {
+		this.statusId = statusId;
 	}
 }

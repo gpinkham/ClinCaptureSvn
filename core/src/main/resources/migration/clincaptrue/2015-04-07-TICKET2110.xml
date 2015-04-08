@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-04-07-TICKET2110-01">
+		<comment>Add status column to crfs_masking table.</comment>
+		<addColumn tableName="crfs_masking">
+			<column name="status_id" type="integer" defaultValue="1"/>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-04-07-TICKET2110-02">
+		<comment>Add foreign key for status_id column.</comment>
+		<addForeignKeyConstraint baseColumnNames="status_id"
+								 baseTableName="crfs_masking"
+								 constraintName="fk_crfs_masking_status_id"
+								 onDelete="RESTRICT"
+								 onUpdate="RESTRICT"
+								 referencedColumnNames="status_id"
+								 referencedTableName="status" />
+	</changeSet>
+
+	<changeSet author="denis" id="2015-04-07-TICKET2110-03">
+		<comment>Set status "removed" for all Masks for Investigator roles.</comment>
+		<update tableName="crfs_masking">
+			<column name="status_id"  value="5"/>
+			<where>study_user_role_id IN (SELECT study_user_role_id FROM study_user_role WHERE role_name = 'investigator')</where>
+		</update>
+	</changeSet>
+
+</databaseChangeLog>

@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.service.CRFMaskingService;
 import com.clinovo.util.StudyParameterPriorityUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.Role;
@@ -91,6 +92,7 @@ public class EditStudyUserRoleServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		int studyId = fp.getInt(ARG_STUDY_ID);
 		String uName = fp.getString(ARG_USER_NAME);
+		UserAccountBean user = (UserAccountBean) udao.findByUserName(uName);
 		StudyUserRoleBean studyUserRole = udao.findRoleByUserNameAndStudyId(uName, studyId);
 		StudyDAO sdao = getStudyDAO();
 		StudyBean sb = (StudyBean) sdao.findByPK(studyUserRole.getStudyId());
@@ -117,9 +119,11 @@ public class EditStudyUserRoleServlet extends Controller {
 				HashMap errors = v.validate();
 
 				if (errors.isEmpty()) {
+					CRFMaskingService maskingService = getMaskingService();
 					Page forwardTo = Page.LIST_USER_ACCOUNTS_SERVLET;
 					int roleId = fp.getInt(INPUT_ROLE);
 					Role r = Role.get(roleId);
+					maskingService.updateMasksOnUserRoleUpdate(studyUserRole.getRole(), r, sb, user.getId());
 					studyUserRole.setRoleName(r.getCode());
 					studyUserRole.setUpdater(ub);
 					udao.updateStudyUserRole(studyUserRole, uName);

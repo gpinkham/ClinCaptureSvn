@@ -6,6 +6,7 @@ import com.clinovo.model.CRFMask;
 import com.clinovo.service.CRFMaskingService;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -155,6 +156,7 @@ public class CRFMaskingController extends BaseController {
 						mask.setStudyEventDefinitionId(eventId);
 						mask.setEventDefinitionCrfId(crfId);
 						mask.setStudyUserRoleId(sur.getPrimaryKey());
+						mask.setStatusId(Status.AVAILABLE.getId());
 						maskingService.saveCRFMask(mask);
 					}
 				} else {

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import com.clinovo.service.CRFMaskingService;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -234,6 +235,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private DcfService dcfService;
 	@Autowired
 	private ItemSDVService itemSDVService;
+	@Autowired
+	private CRFMaskingService maskingService;
 
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
@@ -595,5 +598,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 			request.setAttribute(CrfShortcutsAnalyzer.CRF_SHORTCUTS_ANALYZER, crfShortcutsAnalyzer);
 		}
 		return crfShortcutsAnalyzer;
+	}
+
+	public CRFMaskingService getMaskingService() {
+		return maskingService;
 	}
 }

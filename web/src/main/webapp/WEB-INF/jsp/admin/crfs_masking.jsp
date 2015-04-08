@@ -72,43 +72,54 @@
 						</a>
 					</div>
 					<div id="site${site.id}">
-						<c:forEach var="event" items="${eventsByStudies[site.parentStudyId]}" varStatus="eventNum">
-							<div style="padding-left:20px">
-								<a href="javascript:leftnavExpand('e${eventNum.count}s${site.id}');">
-									<img id="excl_e${eventNum.count}s${site.id}" src="../images/bt_Expand.gif" border="0"/>
-									<b>${event.name}</b>
-								</a>
-								<div id="e${eventNum.count}s${site.id}">
-									<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-										<div class="tablebox_center" style="width: 600px">
-											<table width="100%" class="table_horizontal">
-												<tr style="background-color:#F5F5F5">
-													<td><fmt:message bundle="${resword}" key="CRF_name"/></td>
-													<td style="width: 100px"><fmt:message bundle="${resword}" key="mask_this_crf"/></td>
-												</tr>
-												<c:set var="crfsId" value="S${site.id}_E${event.id}"/>
-												<c:forEach var="crf" items="${crfsByEvents[crfsId]}" varStatus="crfNum">
-													<tr>
-														<td>${crf.name}</td>
-														<td>
-															<c:set value="" var="masked" />
-															<c:set value="checked" var="notMasked" />
-															<c:set value="C${crf.id}" var="maskKey"/>
-															<c:if test="${not empty maskedCRFs[maskKey]}">
-																<c:set value="" var="notMasked" />
-																<c:set value="checked" var="masked" />
-															</c:if>
-															<input type="radio" ${masked} value="masked" name="crf_mask_c${crf.id}_e${event.id}_s${site.id}"> Yes
-															<input type="radio" ${notMasked} value="notMasked" name="crf_mask_c${crf.id}_e${event.id}_s${site.id}"> No
-														</td>
-													</tr>
-												</c:forEach>
-											</table>
-										</div>
-									</div></div></div></div></div></div></div></div>
+						<!-- Events block start -->
+						<c:choose>
+							<c:when test="${not empty rolesBySite[site.id] && rolesBySite[site.id].role.code == 'investigator'}">
+								<div style="padding:20px">
+									<fmt:message bundle="${resword}" key="masking_disabled_for_investigator"/>
 								</div>
-							</div>
-						</c:forEach>
+							</c:when>
+							<c:otherwise>
+								<c:forEach var="event" items="${eventsByStudies[site.parentStudyId]}" varStatus="eventNum">
+									<div style="padding-left:20px">
+										<a href="javascript:leftnavExpand('e${eventNum.count}s${site.id}');">
+											<img id="excl_e${eventNum.count}s${site.id}" src="../images/bt_Expand.gif" border="0"/>
+											<b>${event.name}</b>
+										</a>
+										<div id="e${eventNum.count}s${site.id}">
+											<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+												<div class="tablebox_center">
+													<table width="100%" class="table_horizontal">
+														<tr style="background-color:#F5F5F5">
+															<td style="min-width:500px"><fmt:message bundle="${resword}" key="CRF_name"/></td>
+															<td style="width: 100px"><fmt:message bundle="${resword}" key="mask_this_crf"/></td>
+														</tr>
+														<c:set var="crfsId" value="S${site.id}_E${event.id}"/>
+														<c:forEach var="crf" items="${crfsByEvents[crfsId]}" varStatus="crfNum">
+															<tr>
+																<td>${crf.name}</td>
+																<td>
+																	<c:set value="" var="masked" />
+																	<c:set value="checked" var="notMasked" />
+																	<c:set value="C${crf.id}" var="maskKey"/>
+																	<c:if test="${not empty maskedCRFs[maskKey]}">
+																		<c:set value="" var="notMasked" />
+																		<c:set value="checked" var="masked" />
+																	</c:if>
+																	<input type="radio" ${masked} value="masked" name="crf_mask_c${crf.id}_e${event.id}_s${site.id}"> Yes
+																	<input type="radio" ${notMasked} value="notMasked" name="crf_mask_c${crf.id}_e${event.id}_s${site.id}"> No
+																</td>
+															</tr>
+														</c:forEach>
+													</table>
+												</div>
+											</div></div></div></div></div></div></div></div>
+										</div>
+									</div>
+								</c:forEach>
+							</c:otherwise>
+						</c:choose>
+						<!-- Events block end -->
 					</div>
 				</div>
 			</c:forEach>
