@@ -4617,12 +4617,14 @@ function highlightRow(row, cssClass) {
 }
 
 function changeDefinitionOrdinal(params) {
-    jQuery.ajax({
+    jQuery('img[src$=bt_sort_descending.gif], img[src$=bt_sort_ascending.gif]').parent('a[href=#]').removeAttr("onclick");
+
+	jQuery.ajax({
         url: params.context + '/pages/' + params.servlet,
         type: 'POST',
         data: { current: params.current, previous: params.previous },
         success: function () {
-            location.reload();
+            window.location.href = 'ListEventDefinition';
         }
     });
 }
