@@ -272,7 +272,7 @@
                         </td>
 
                         <td>
-							<ui:viewDataEntryLink object="${dedc}" onClick="setAccessedObjected(this); viewCrfByVersion('${dedc.edc.id}', '${studySub.id}', $('#${dynamicCrfVersionId}').val(), '${currRow.bean.studyEvent.id}', 1, 'ViewStudySubject?id=${studySub.id}');"/>
+							<ui:viewDataEntryLink hspace="6" object="${dedc}" onClick="setAccessedObjected(this); viewCrfByVersion('${dedc.edc.id}', '${studySub.id}', $('#${dynamicCrfVersionId}').val(), '${currRow.bean.studyEvent.id}', 1, 'ViewStudySubject?id=${studySub.id}');"/>
                         </td>
 
                         <td>

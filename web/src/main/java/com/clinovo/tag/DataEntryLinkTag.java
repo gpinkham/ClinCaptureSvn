@@ -20,7 +20,10 @@ import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.sql.DataSource;
 
+import com.clinovo.service.CRFMaskingService;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -85,9 +88,12 @@ public class DataEntryLinkTag extends TagSupport {
 			SystemDAO systemDAO = (SystemDAO) webApplicationContext.getBean("systemDAO");
 			DataSource dataSource = (DataSource) webApplicationContext.getBean("dataSource");
 			MessageSource messageSource = (MessageSource) webApplicationContext.getBean("messageSource");
+			CRFMaskingService maskingService = (CRFMaskingService) webApplicationContext.getBean("crfMaskingService");
 			StudyBean currentStudy = (StudyBean) pageContext.getSession().getAttribute("study");
+			UserAccountBean user = (UserAccountBean) pageContext.getSession().getAttribute("userBean");
 			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
 					.getId();
+			EventDefinitionCRFBean edcBean = new EventDefinitionCRFBean();
 			boolean allowCrfEvaluation = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
 					currentStudyId, systemDAO, new StudyParameterValueDAO(dataSource), new StudyDAO(dataSource));
 			String link = "<img src=\"".concat(imgSrcPrefix)
@@ -99,6 +105,7 @@ public class DataEntryLinkTag extends TagSupport {
 			EventCRFBean eventCrfBean = null;
 			if (object instanceof DisplayEventCRFBean) {
 				DisplayEventCRFBean dec = (DisplayEventCRFBean) object;
+				edcBean = dec.getEventDefinitionCRF();
 				if (dynamicAlt.isEmpty()) {
 					if (dec.isContinueInitialDataEntryPermitted()) {
 						eventCrfBean = dec.getEventCRF();
@@ -129,6 +136,7 @@ public class DataEntryLinkTag extends TagSupport {
 				}
 			} else if (object instanceof DisplayEventDefinitionCRFBean) {
 				DisplayEventDefinitionCRFBean dedc = (DisplayEventDefinitionCRFBean) object;
+				edcBean = dedc.getEdc();
 				eventCrfBean = dedc.getEventCRF();
 				if (dynamicAlt.isEmpty()) {
 					dynamicAlt = messageSource.getMessage("enter_data", null,
@@ -139,7 +147,7 @@ public class DataEntryLinkTag extends TagSupport {
 				}
 			}
 			String dynamicTitle = !title.isEmpty() ? title : dynamicAlt;
-			if (eventCrfBean != null) {
+			if (eventCrfBean != null && !maskingService.isEventDefinitionCRFMasked(edcBean.getId(), user.getId(), edcBean.getStudyId())) {
 				link = "<a class=\"dataEntryLink\" onclick=\"".concat(onClickFunction).concat("('")
 						.concat(Integer.toString(eventCrfBean.getId())).concat("',").concat(dynamicActionQuery)
 						.concat(");\"").concat("onMouseDown=\"setImage('").concat(imgPrefix)
