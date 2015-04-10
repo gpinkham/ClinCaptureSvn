@@ -272,11 +272,21 @@ public class CoreResources implements ResourceLoaderAware {
 		return vals;
 	}
 
+	private static void replaceWebappIfItsPresent() {
+		String sysURL = dataInfo.getProperty("sysURL");
+		if (sysURL.contains("${WEBAPP}")) {
+			dataInfo.setProperty("sysURL", sysURL.replace("${WEBAPP}", webapp));
+		} else if (sysURL.contains("${webapp}")) {
+			dataInfo.setProperty("sysURL", sysURL.replace("${webapp}", webapp));
+		}
+	}
+
 	public static void prepareDataInfoProperties() {
 		String dbType = dataInfo.getProperty("dbType");
 
 		dataInfo.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
 		// sysURL.base
+		replaceWebappIfItsPresent();
 		String sysURLBase = dataInfo.getProperty("sysURL").replace("/MainMenu", "");
 		dataInfo.setProperty("sysURL.base", sysURLBase);
 
