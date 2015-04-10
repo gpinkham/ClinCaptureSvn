@@ -274,10 +274,11 @@ public class CoreResources implements ResourceLoaderAware {
 
 	private static void replaceWebappIfItsPresent() {
 		String sysURL = dataInfo.getProperty("sysURL");
+		String currentWebAppName = dataInfo.getProperty("currentWebAppName");
 		if (sysURL.contains("${WEBAPP}")) {
-			dataInfo.setProperty("sysURL", sysURL.replace("${WEBAPP}", webapp));
+			dataInfo.setProperty("sysURL", sysURL.replace("${WEBAPP}", currentWebAppName));
 		} else if (sysURL.contains("${webapp}")) {
-			dataInfo.setProperty("sysURL", sysURL.replace("${webapp}", webapp));
+			dataInfo.setProperty("sysURL", sysURL.replace("${webapp}", currentWebAppName));
 		}
 	}
 
