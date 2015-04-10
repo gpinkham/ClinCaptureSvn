@@ -224,6 +224,7 @@ public class CodedItemsController {
 
 		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
 		com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
+		com.clinovo.model.System bioontologyUser = systemDAO.findByName("bioontologyUsername");
 
 		if (configuredDictionaryIsAvailable) {
 			ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
@@ -268,16 +269,16 @@ public class CodedItemsController {
 							String drugRecordNum = prefLabel.substring(0, prefLabel.length() - minCodeLength);
 							String seq1 = prefLabel.substring(prefLabel.length() - minCodeLength, prefLabel.length() - firstCodeLength);
 							String seq2 = prefLabel.substring(prefLabel.length() - firstCodeLength, prefLabel.length());
-							List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductUniqueKeys(drugRecordNum, seq1, seq2);
+							List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductUniqueKeys(drugRecordNum, seq1, seq2, bioontologyUrl.getValue(), bioontologyUser.getValue());
 							classifications = CompleteClassificationFieldsUtil.medicalProductListToClassificationList(medicalProducts, LocaleResolver.getLocale());
 						} else {
 							//search by name
-							List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductName(prefLabel, codedItem.getDictionary());
+							List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductName(prefLabel, codedItem.getDictionary(), bioontologyUrl.getValue(), bioontologyUser.getValue());
 							classifications = CompleteClassificationFieldsUtil.medicalProductListToClassificationList(medicalProducts, LocaleResolver.getLocale());
 						}
 					} else if (dictionary.equalsIgnoreCase("MEDDRA")) {
 						//search preferred terms
-						List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductName(prefLabel, codedItem.getDictionary());
+						List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductName(prefLabel, codedItem.getDictionary(), bioontologyUrl.getValue(), bioontologyUser.getValue());
 						classifications = CompleteClassificationFieldsUtil.medicalHierarchyToClassificationList(
 								medicalProducts);
 
@@ -567,13 +568,15 @@ public class CodedItemsController {
 
 		CodedItem codedItem = codedItemService.findCodedItem(codedItemId);
 		codedItem.setPreferredTerm(codeSearchTerm);
+		com.clinovo.model.System bioontologyUsername = systemDAO.findByName("bioontologyUsername");
+		com.clinovo.model.System bioontologyURL = systemDAO.findByName("defaultBioontologyURL");
 
 		Classification classificationResult = getClassificationFromCategoryString(categoryList);
 		if (codedItem.getDictionary().equals("WHOD")) {
-			MedicalProduct mpBean = (MedicalProduct) getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()), codedItem.getDictionary());
+			MedicalProduct mpBean = (MedicalProduct) getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()), codedItem.getDictionary(), bioontologyURL.getValue(), bioontologyUsername.getValue());
 			classificationResult = CompleteClassificationFieldsUtil.medicalProductToClassification(mpBean, locale);
 		} else if (codedItem.getDictionary().equals("MEDDRA")) {
-			MedicalHierarchy medicalHierarchy = (MedicalHierarchy) getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()), codedItem.getDictionary());
+			MedicalHierarchy medicalHierarchy = (MedicalHierarchy) getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()), codedItem.getDictionary(), bioontologyURL.getValue(), bioontologyUsername.getValue());
 			classificationResult = CompleteClassificationFieldsUtil.medicalHierarchyToClassification(medicalHierarchy);
 		} else {
 			Search search = getSearch();
