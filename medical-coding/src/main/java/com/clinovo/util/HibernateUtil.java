@@ -21,6 +21,7 @@ import com.clinovo.model.MedicalHierarchy;
 import com.clinovo.model.MedicalProduct;
 import com.clinovo.model.Substance;
 import com.clinovo.model.Therapgroup;
+
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -31,6 +32,7 @@ import org.springframework.orm.hibernate3.AbstractSessionFactoryBean;
 import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
 
 import javax.sql.DataSource;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
@@ -38,6 +40,7 @@ import java.util.Properties;
 /**
  * WHOD/MEDDRA hibernate session util.
  */
+@SuppressWarnings("rawtypes")
 public final class HibernateUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
@@ -59,8 +62,8 @@ public final class HibernateUtil {
         sessionFactory = sessionFactory(ontologyName, bioontologyUrl, bioontologyUser).getObject();
         return sessionFactory.openSession();
     }
-
-    private static AbstractSessionFactoryBean sessionFactory(String ontologyName, String bioontologyUrl, String bioontologyUser) throws Exception {
+    
+	private static AbstractSessionFactoryBean sessionFactory(String ontologyName, String bioontologyUrl, String bioontologyUser) throws Exception {
             AnnotationSessionFactoryBean lsfb = new AnnotationSessionFactoryBean();
             Properties properties = new Properties();
             properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");

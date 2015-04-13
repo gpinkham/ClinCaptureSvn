@@ -2,8 +2,6 @@ package com.clinovo.dao;
 
 import com.clinovo.model.CRFMask;
 import org.akaza.openclinica.DefaultAppContextTest;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.junit.Test;
 
 public class CRFMaskingDAOTest extends DefaultAppContextTest {

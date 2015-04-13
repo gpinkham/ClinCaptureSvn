@@ -38,7 +38,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.clinovo.i18n.LocaleResolver;
 
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({})
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({CoreResources.class, RequestContextHolder.class})
 public class ExportExcelStudySubjectAuditLogServletTest {

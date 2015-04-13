@@ -2,6 +2,7 @@ package com.clinovo.tag;
 
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.CRFMaskingService;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -18,11 +19,13 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
+
 import java.util.Locale;
 
 /**
  * Custom tag for building view data entry link.
  */
+@SuppressWarnings("serial")
 public class ViewDataEntryLinkTag extends TagSupport {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ViewDataEntryLinkTag.class);
