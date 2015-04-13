@@ -1019,8 +1019,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 							}
 
 							String pvKey = secName + "---";
-							String d = display.replaceAll("\\\\,", "##");
-							String[] par = d.split(",");
+							String d = display;
+							String[] par = d.split(",", 3);
 							// validate availability of item_label
 							if (par.length == 3) {
 								String p0 = par[0].trim();
