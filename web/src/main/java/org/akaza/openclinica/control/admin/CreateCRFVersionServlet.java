@@ -224,8 +224,10 @@ public class CreateCRFVersionServlet extends Controller {
 					cfvID = cvdao.findCRFVersionId(nib1.getCrfId(), nib1.getVersionName());
 				}
 				CRFVersionBean finalVersion = (CRFVersionBean) cvdao.findByPK(cfvID);
-				version.setCrfId(nib1.getCrfId());
 
+				getEventDefinitionCrfService().updateChildEventDefinitionCrfsForNewCrfVersion(finalVersion, ub);
+
+				version.setCrfId(nib1.getCrfId());
 				version.setOid(finalVersion.getOid());
 
 				CRFBean crfBean = (CRFBean) cdao.findByPK(version.getCrfId());

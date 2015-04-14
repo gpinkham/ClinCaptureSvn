@@ -124,6 +124,16 @@
 
                         <tr valign="top">
                             <td class="table_cell" colspan="4">
+                                <fmt:message key="acceptNewCrfVersions" bundle="${resword}"/> :
+                                <c:choose>
+                                    <c:when test="${!edc.acceptNewCrfVersions}"><input type="checkbox" name="acceptNewCrfVersions<c:out value="${count}"/>" value="yes"></c:when>
+                                    <c:otherwise><input checked="checked" type="checkbox" name="acceptNewCrfVersions<c:out value="${count}"/>" value="yes"></c:otherwise>
+                                </c:choose>
+                            </td>
+                        </tr>
+
+                        <tr valign="top">
+                            <td class="table_cell" colspan="4">
                                 <fmt:message key="data_entry_quality" bundle="${resword}"/>:
                                 <c:set var="deQualityDE" value=""/>
                                 <c:set var="deQualityEvaluatedCRF" value=""/>

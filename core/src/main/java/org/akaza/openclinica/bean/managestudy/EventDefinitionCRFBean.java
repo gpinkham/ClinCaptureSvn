@@ -65,6 +65,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	private HashMap nullFlags = new LinkedHashMap(); // not in DB
 	private ArrayList<SourceDataVerification> sdvOptions = new ArrayList<SourceDataVerification>();
 	private String tabbingMode;
+	private boolean acceptNewCrfVersions;
 
 	@Override
 	public int hashCode() {
@@ -99,6 +100,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		result = prime * result + ((emailStep == null) ? 0 : emailStep.hashCode());
 		result = prime * result + (evaluatedCRF ? INT_1231 : INT_1237);
 		result = prime * result + ((tabbingMode == null) ? 0 : tabbingMode.hashCode());
+		result = prime * result + (acceptNewCrfVersions ? INT_1231 : INT_1237);
 		return result;
 	}
 
@@ -255,6 +257,8 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 				return false;
 			}
 		} else if (!tabbingMode.equals(other.tabbingMode)) {
+			return false;
+		} else if (acceptNewCrfVersions != other.acceptNewCrfVersions) {
 			return false;
 		}
 		return true;
@@ -550,5 +554,13 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	public void setTabbingMode(String tabbingMode) {
 		this.tabbingMode = tabbingMode;
+	}
+
+	public boolean isAcceptNewCrfVersions() {
+		return acceptNewCrfVersions;
+	}
+
+	public void setAcceptNewCrfVersions(boolean acceptNewCrfVersions) {
+		this.acceptNewCrfVersions = acceptNewCrfVersions;
 	}
 }

@@ -34,6 +34,7 @@ public class EventDefinitionCRFBeanTest {
 		assertEquals(0, edc.getStudyEventDefinitionId());
 		assertEquals(false, edc.isHideCrf());
 		assertEquals(false, edc.isHidden());
+		assertEquals(false, edc.isAcceptNewCrfVersions());
 		assertEquals(0, edc.getStudyId());
 		assertEquals(0, edc.getCrfId());
 		assertEquals(true, edc.isRequiredCRF());
@@ -64,7 +65,7 @@ public class EventDefinitionCRFBeanTest {
 	public void testInequalityOfClasses() {
 		edc.setCrfId(1);
 		edc.setDefaultVersionId(1);
-	
+
 		assertNotSame(edc, new EventDefinitionCRFBean());
 		assertFalse(edc.equals(new EventDefinitionCRFBean()));
 		assertFalse(edc.getDefaultVersionId() == new EventDefinitionCRFBean().getDefaultVersionId());

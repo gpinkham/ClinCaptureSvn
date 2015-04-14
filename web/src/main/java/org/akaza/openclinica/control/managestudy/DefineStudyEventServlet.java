@@ -20,7 +20,17 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.ValidatorHelper;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -48,15 +58,7 @@ import org.akaza.openclinica.web.bean.CRFRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * The servlet for creating event definition of user's current active study.
@@ -369,6 +371,7 @@ public class DefineStudyEventServlet extends Controller {
 			edcBean.setCrfName(crfName);
 
 			String requiredCRF = fp.getString("requiredCRF" + i);
+			String acceptNewCrfVersions = fp.getString("acceptNewCrfVersions" + i);
 			String deQuality = fp.getString("deQuality" + i);
 			String decisionCondition = fp.getString("decisionCondition" + i);
 			String electronicSignature = fp.getString("electronicSignature" + i);
@@ -386,6 +389,11 @@ public class DefineStudyEventServlet extends Controller {
 			if (!StringUtil.isBlank(sdvOption)) {
 				int id = Integer.valueOf(sdvOption);
 				edcBean.setSourceDataVerification(SourceDataVerification.getByCode(id));
+			}
+			if (!StringUtil.isBlank(acceptNewCrfVersions) && "yes".equalsIgnoreCase(acceptNewCrfVersions.trim())) {
+				edcBean.setAcceptNewCrfVersions(true);
+			} else {
+				edcBean.setAcceptNewCrfVersions(false);
 			}
 			if (!StringUtil.isBlank(requiredCRF) && "yes".equalsIgnoreCase(requiredCRF.trim())) {
 				edcBean.setRequiredCRF(true);
@@ -422,8 +430,9 @@ public class DefineStudyEventServlet extends Controller {
 			} else {
 				edcBean.setEvaluatedCRF(false);
 			}
-			if (!StringUtil.isBlank(tabbingMode) && ("leftToRight".equalsIgnoreCase(tabbingMode.trim()) || "topToBottom"
-					.equalsIgnoreCase(tabbingMode.trim()))) {
+			if (!StringUtil.isBlank(tabbingMode)
+					&& ("leftToRight".equalsIgnoreCase(tabbingMode.trim()) || "topToBottom"
+							.equalsIgnoreCase(tabbingMode.trim()))) {
 				edcBean.setTabbingMode(tabbingMode);
 			} else {
 				edcBean.setTabbingMode("leftToRight");
@@ -633,8 +642,7 @@ public class DefineStudyEventServlet extends Controller {
 
 	}
 
-	private void createChildEdcs(EventDefinitionCRFBean createdEdc,
-								 StudyBean currentStudy) {
+	private void createChildEdcs(EventDefinitionCRFBean createdEdc, StudyBean currentStudy) {
 		StudyDAO studyDao = new StudyDAO(getDataSource());
 		EventDefinitionCRFDAO cdao = new EventDefinitionCRFDAO(getDataSource());
 		Collection<Integer> siteIds = studyDao.findAllSiteIdsByStudy(currentStudy);

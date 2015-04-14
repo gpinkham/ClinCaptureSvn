@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -242,7 +243,9 @@ public class UpdateEventDefinitionServlet extends Controller {
 		sed.setStatus(Status.AVAILABLE);
 		studyEventDefinitionDAO.update(sed);
 
+		Map<Integer, EventDefinitionCRFBean> parentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
 		for (EventDefinitionCRFBean edc : eventDefinitionCRFsToUpdate) {
+			parentsMap.put(edc.getId(), edc);
 			if (edc.getId() > 0) {
 				edc.setUpdater(updater);
 				edc.setUpdatedDate(new Date());
@@ -265,7 +268,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 			}
 		}
 
-		updateChildEventDefinitionCRFs(childEventDefinitionCRFsToUpdate, updater, eventDefinitionCrfDAO);
+		getEventDefinitionCrfService().updateChildEventDefinitionCRFs(childEventDefinitionCRFsToUpdate, parentsMap,
+				updater);
 
 		StudyBean study = (StudyBean) studyDAO.findByPK(sed.getStudyId());
 		List<StudyEventBean> studyEventList = (ArrayList<StudyEventBean>) studyEventDAO
@@ -277,8 +281,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 		forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 	}
 
-	private void createChildEdcs(EventDefinitionCRFBean createdEdc,
-			StudyBean currentStudy) {
+	private void createChildEdcs(EventDefinitionCRFBean createdEdc, StudyBean currentStudy) {
 
 		StudyDAO studyDao = new StudyDAO(getDataSource());
 		EventDefinitionCRFDAO cdao = new EventDefinitionCRFDAO(getDataSource());
@@ -291,18 +294,6 @@ public class UpdateEventDefinitionServlet extends Controller {
 			childEdc.setStudyId(siteId);
 			childEdc.setParentId(parentId);
 			cdao.create(childEdc);
-		}
-	}
-
-	private void updateChildEventDefinitionCRFs(List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate,
-			UserAccountBean updater, EventDefinitionCRFDAO eventDefinitionCRFDAO) {
-
-		for (EventDefinitionCRFBean childEdc : childEventDefinitionCRFsToUpdate) {
-			if (childEdc.getId() > 0) {
-				childEdc.setUpdater(updater);
-				childEdc.setUpdatedDate(new Date());
-				eventDefinitionCRFDAO.update(childEdc);
-			}
 		}
 	}
 
@@ -357,6 +348,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 				String decisionCondition = fp.getString("decisionCondition" + i);
 				String electronicSignature = fp.getString("electronicSignature" + i);
 				String hideCRF = fp.getString("hideCRF" + i);
+				String acceptNewCrfVersions = fp.getString("acceptNewCrfVersions" + i);
 				int sdvId = fp.getInt("sdvOption" + i);
 				String emailStep = fp.getString("emailOnStep" + i);
 				String emailTo = fp.getString("mailTo" + i);
@@ -370,6 +362,11 @@ public class UpdateEventDefinitionServlet extends Controller {
 					edcBean.setTabbingMode("leftToRight");
 				}
 
+				if (!StringUtil.isBlank(acceptNewCrfVersions) && "yes".equalsIgnoreCase(acceptNewCrfVersions.trim())) {
+					edcBean.setAcceptNewCrfVersions(true);
+				} else {
+					edcBean.setAcceptNewCrfVersions(false);
+				}
 				if (!StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim())) {
 					edcBean.setHideCrf(true);
 				} else {

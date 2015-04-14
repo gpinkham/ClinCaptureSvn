@@ -24,10 +24,10 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -114,7 +114,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING); // email_step
 		this.setTypeExpected(index++, TypeNames.STRING); // email_to
 		this.setTypeExpected(index++, TypeNames.BOOL); // evaluated_crf
-		this.setTypeExpected(index, TypeNames.STRING); // tabbing_mode
+		this.setTypeExpected(index++, TypeNames.STRING); // tabbing_mode
+		this.setTypeExpected(index, TypeNames.BOOL); // accept_new_crf_versions
 	}
 
 	/**
@@ -162,6 +163,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		eb.setEmailStep(emailStep != null ? emailStep : "");
 		eb.setEvaluatedCRF(((Boolean) hm.get("evaluated_crf")));
 		eb.setTabbingMode(((String) hm.get("tabbing_mode")));
+		eb.setAcceptNewCrfVersions(((Boolean) hm.get("accept_new_crf_versions")));
 		return eb;
 	}
 
@@ -456,7 +458,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		variables.put(index++, sb.getEmailStep());
 		variables.put(index++, sb.getEmailTo());
 		variables.put(index++, sb.isEvaluatedCRF());
-		variables.put(index, sb.getTabbingMode());
+		variables.put(index++, sb.getTabbingMode());
+		variables.put(index, sb.isAcceptNewCrfVersions());
 		this.execute(digester.getQuery("create"), variables, nullVars);
 
 		if (isQuerySuccessful()) {
@@ -513,6 +516,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		variables.put(index++, sb.getEmailTo());
 		variables.put(index++, sb.isEvaluatedCRF());
 		variables.put(index++, sb.getTabbingMode());
+		variables.put(index++, sb.isAcceptNewCrfVersions());
 		variables.put(index, sb.getId());
 
 		String sql = digester.getQuery("update");
@@ -1125,9 +1129,11 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Discovers if a study/site level Event Definition CRF record has at least one available CRF version for data entry.
+	 * Discovers if a study/site level Event Definition CRF record has at least one available CRF version for data
+	 * entry.
 	 *
-	 * @param eventDefCRFBean EventDefinitionCRFBean
+	 * @param eventDefCRFBean
+	 *            EventDefinitionCRFBean
 	 * @return boolean
 	 */
 	public boolean doesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntry(EventDefinitionCRFBean eventDefCRFBean) {

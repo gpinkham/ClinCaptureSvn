@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
-import com.clinovo.service.CRFMaskingService;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -74,11 +73,13 @@ import org.springframework.web.context.ServletContextAware;
 import com.clinovo.dao.SystemDAO;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.util.RequestUtil;
+import com.clinovo.service.CRFMaskingService;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DcfService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.EventCRFService;
+import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.ItemSDVService;
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.service.UserAccountService;
@@ -237,6 +238,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private ItemSDVService itemSDVService;
 	@Autowired
 	private CRFMaskingService maskingService;
+	@Autowired
+	private EventDefinitionCrfService eventDefinitionCrfService;
 
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
@@ -565,6 +568,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
 		return dynamicsItemFormMetadataDao;
+	}
+
+	public EventDefinitionCrfService getEventDefinitionCrfService() {
+		return eventDefinitionCrfService;
 	}
 
 	public static CrfShortcutsAnalyzer getCrfShortcutsAnalyzer(HttpServletRequest request, ItemSDVService itemSDVService) {

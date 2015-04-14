@@ -13,6 +13,8 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -28,6 +30,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.junit.Assert;
@@ -47,14 +50,16 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockRequestDispatcher;
 import org.springframework.mock.web.MockServletContext;
 
+import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.impl.EventCRFServiceImpl;
+import com.clinovo.service.impl.EventDefinitionCrfServiceImpl;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.SignStateRestorer;
 import com.clinovo.util.SubjectEventStatusUtil;
 
 @SuppressWarnings({"unchecked"})
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({SubjectEventStatusUtil.class, ResourceBundleProvider.class})
+@PrepareForTest({SubjectEventStatusUtil.class, ResourceBundleProvider.class, EventDefinitionCrfServiceImpl.class})
 public class UpdateEventDefinitionServletTest {
 
 	@Spy
@@ -81,6 +86,8 @@ public class UpdateEventDefinitionServletTest {
 	@Mock
 	private MockRequestDispatcher mockedRequestDispatcher;
 
+	private EventDefinitionCrfService eventDefinitionCrfService;
+
 	private MockHttpServletResponse response = new MockHttpServletResponse();
 
 	private MockHttpServletRequest request;
@@ -93,6 +100,8 @@ public class UpdateEventDefinitionServletTest {
 
 	@Before
 	public void beforeTestCaseRun() throws Exception {
+		eventDefinitionCrfService = PowerMockito.spy(new EventDefinitionCrfServiceImpl());
+		PowerMockito.whenNew(EventDefinitionCRFDAO.class).withAnyArguments().thenReturn(mockedEventDefinitionCRFDAO);
 
 		// setting up servlet context
 		Mockito.when(mockedServletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(
@@ -144,6 +153,8 @@ public class UpdateEventDefinitionServletTest {
 				.getStudyEventDefinitionDAO();
 		Mockito.doReturn(mockedEventDefinitionCRFDAO).when(spyUpdateEventDefinitionServlet).getEventDefinitionCRFDAO();
 		Mockito.doReturn(mockedEventCRFService).when(spyUpdateEventDefinitionServlet).getEventCRFService();
+		Mockito.doReturn(eventDefinitionCrfService).when(spyUpdateEventDefinitionServlet)
+				.getEventDefinitionCrfService();
 	}
 
 	@Test
@@ -170,6 +181,8 @@ public class UpdateEventDefinitionServletTest {
 		EventDefinitionCRFBean childEventDefinitionCRF = new EventDefinitionCRFBean();
 		childEventDefinitionCRF.setId(90);
 		childEventDefinitionCRF.setParentId(parentEventDefinitionCRF.getId());
+		childEventDefinitionCRF.setStatus(Status.AVAILABLE);
+		childEventDefinitionCRF.setSourceDataVerification(SourceDataVerification.NOTREQUIRED);
 		List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate = new ArrayList<EventDefinitionCRFBean>();
 		childEventDefinitionCRFsToUpdate.add(childEventDefinitionCRF);
 		request.getSession().setAttribute("childEventDefCRFs", childEventDefinitionCRFsToUpdate);
@@ -223,6 +236,8 @@ public class UpdateEventDefinitionServletTest {
 		EventDefinitionCRFBean childEventDefinitionCRF = new EventDefinitionCRFBean();
 		childEventDefinitionCRF.setId(90);
 		childEventDefinitionCRF.setParentId(parentEventDefinitionCRF.getId());
+		childEventDefinitionCRF.setStatus(Status.AVAILABLE);
+		childEventDefinitionCRF.setSourceDataVerification(SourceDataVerification.NOTREQUIRED);
 		List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate = new ArrayList<EventDefinitionCRFBean>();
 		childEventDefinitionCRFsToUpdate.add(childEventDefinitionCRF);
 		request.getSession().setAttribute("childEventDefCRFs", childEventDefinitionCRFsToUpdate);
@@ -250,5 +265,42 @@ public class UpdateEventDefinitionServletTest {
 
 		Mockito.verify(mockedServletContext).getRequestDispatcher(Page.LIST_DEFINITION_SERVLET.getFileName());
 		Mockito.verify(mockedRequestDispatcher).forward(request, response);
+	}
+
+	@Test
+	public void testThatUpdatingTheDefaultCrfVersionIdInEventDefinitionCRFFromStudyEventDefinitionAffectsTheDefaultCrfVersionIdInChildEventDefinitionCRF()
+			throws Exception {
+		String action = "submit";
+		request.setParameter("action", action);
+
+		CRFBean testCRF = new CRFBean();
+		testCRF.setId(15);
+		testCRF.setOid("testCRF15");
+
+		EventDefinitionCRFBean parentEventDefinitionCRF = new EventDefinitionCRFBean();
+		parentEventDefinitionCRF.setId(34);
+		parentEventDefinitionCRF.setStatus(Status.AVAILABLE);
+		parentEventDefinitionCRF.setOldStatus(Status.DELETED);
+		parentEventDefinitionCRF.setCrf(testCRF);
+		parentEventDefinitionCRF.setDefaultVersionId(1);
+		List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate = new ArrayList<EventDefinitionCRFBean>();
+		eventDefinitionCRFsToUpdate.add(parentEventDefinitionCRF);
+		request.getSession().setAttribute("eventDefinitionCRFs", eventDefinitionCRFsToUpdate);
+
+		EventDefinitionCRFBean childEventDefinitionCRF = new EventDefinitionCRFBean();
+		childEventDefinitionCRF.setId(90);
+		childEventDefinitionCRF.setSelectedVersionIds("2");
+		childEventDefinitionCRF.setDefaultVersionId(2);
+		childEventDefinitionCRF.setParentId(parentEventDefinitionCRF.getId());
+		childEventDefinitionCRF.setStatus(Status.AVAILABLE);
+		childEventDefinitionCRF.setSourceDataVerification(SourceDataVerification.NOTREQUIRED);
+		List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate = new ArrayList<EventDefinitionCRFBean>();
+		childEventDefinitionCRFsToUpdate.add(childEventDefinitionCRF);
+		request.getSession().setAttribute("childEventDefCRFs", childEventDefinitionCRFsToUpdate);
+
+		spyUpdateEventDefinitionServlet.processRequest(request, response);
+
+		assertTrue(childEventDefinitionCRF.getDefaultVersionId() == 1);
+		assertTrue(childEventDefinitionCRF.getSelectedVersionIds().equals("2,1"));
 	}
 }

@@ -133,6 +133,7 @@
 			<td valign="top" class="table_header_row"><fmt:message key="double_data_entry" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="password_required" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="default_version" bundle="${resword}"/></td>
+			<td valign="top" class="table_header_row"><fmt:message key="acceptNewCrfVersions" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="hidden_crf" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="null_values" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="sdv_option" bundle="${resword}"/></td>
@@ -204,6 +205,10 @@
 
 			<td class="table_cell">
 				<c:out value="${crf.defaultVersionName}"/>
+			</td>
+
+			<td class="table_cell">
+				<c:out value="${crf.acceptNewCrfVersions}"/>
 			</td>
 
 			<td class="table_cell">

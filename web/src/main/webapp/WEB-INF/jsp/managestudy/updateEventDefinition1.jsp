@@ -427,12 +427,22 @@ $(document).ready(function() {
 					</c:choose>
 				</td>
 
-				<td class="table_cell" colspan="6"><fmt:message key="sdv_option" bundle="${resword}"/>:
+				<td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
 					<select onchange="javascript:changeIcon();" name="sdvOption<c:out value="${count}"/>">
 						<c:forEach var="sdv" items="${edc.sdvOptions}">
 							<option value="${sdv.code}" ${edc.sourceDataVerification.code == sdv.code ? "selected" : ""}><fmt:message key="${sdv.description}" bundle="${resterms}"/></option>
 						</c:forEach>
 					</select>
+				</td>
+			</tr>
+
+			<tr valign="top">
+				<td class="table_cell" colspan="4">
+					<fmt:message key="acceptNewCrfVersions" bundle="${resword}"/> :
+					<c:choose>
+						<c:when test="${!edc.acceptNewCrfVersions}"><input type="checkbox" name="acceptNewCrfVersions<c:out value="${count}"/>" value="yes"></c:when>
+						<c:otherwise><input checked="checked" type="checkbox" name="acceptNewCrfVersions<c:out value="${count}"/>" value="yes"></c:otherwise>
+					</c:choose>
 				</td>
 			</tr>
 
