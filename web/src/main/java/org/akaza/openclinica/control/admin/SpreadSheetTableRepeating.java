@@ -13,7 +13,7 @@
 
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.CompleteClassificationFieldsUtil;
+import com.clinovo.util.CodingFieldsUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -2330,15 +2330,15 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 		String itemName = getValue(sheet.getRow(k).getCell(0));
 		List<String> codingRefItemNames = getRefItemNames(sheet);
 		if (!codeRef.isEmpty()) {
-			if (CompleteClassificationFieldsUtil.getEnumAsList(codeRef) == null && !codingRefItemNames.contains(codeRef)) {
+			if (CodingFieldsUtil.getEnumAsList(codeRef) == null && !codingRefItemNames.contains(codeRef)) {
 				errors.add(resPageMsg.getString("please_specify_correct_ontology_name"));
 				htmlErrors.put(j + "," + k + "," + cell.getColumnIndex(), resPageMsg.getString("please_specify_correct_ontology_name"));
 			} else {
-				if (CompleteClassificationFieldsUtil.getEnumAsList(codeRef) == null && !itemType.equalsIgnoreCase("CODE") && itemName.indexOf("_GR") < 0) {
+				if (CodingFieldsUtil.getEnumAsList(codeRef) == null && !itemType.equalsIgnoreCase("CODE") && itemName.indexOf("_GR") < 0) {
 					errors.add(resPageMsg.getString("please_update_coding_item_type_to_code"));
 					htmlErrors.put(j + "," + k + "," + itemTypeIndex, resPageMsg.getString("please_update_coding_item_type_to_code"));
 				}
-				if (CompleteClassificationFieldsUtil.getEnumAsList(codeRef) != null && !itemType.equalsIgnoreCase("ST")) {
+				if (CodingFieldsUtil.getEnumAsList(codeRef) != null && !itemType.equalsIgnoreCase("ST")) {
 					errors.add(resPageMsg.getString("please_update_medical_coding_reference_item_type"));
 					htmlErrors.put(j + "," + k + "," + itemTypeIndex, resPageMsg.getString("please_update_medical_coding_reference_item_type"));
 				}
@@ -2356,7 +2356,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 			}
 			Row currentRow = sheet.getRow(i);
 			String itemCodeRef = getValue(currentRow.getCell(itemReferenceIndex));
-			if (CompleteClassificationFieldsUtil.getEnumAsList(itemCodeRef) != null) {
+			if (CodingFieldsUtil.getEnumAsList(itemCodeRef) != null) {
 				refItemNames.add(getValue(currentRow.getCell(0)));
 			}
 		}

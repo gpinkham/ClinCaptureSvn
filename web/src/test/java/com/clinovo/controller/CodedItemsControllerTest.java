@@ -39,7 +39,7 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 	public void testThatSearchCodeItemReturnsCode200() throws Exception {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.get("/codeItem").sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
-						.param("item", "2")).andExpect(status().isOk());
+						.param("item", "2").param("dictionary", "WHODrug Nov14")).andExpect(status().isOk());
 	}
 
 	@Test

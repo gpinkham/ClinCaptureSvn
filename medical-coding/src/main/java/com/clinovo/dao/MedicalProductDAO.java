@@ -64,10 +64,11 @@ public class MedicalProductDAO {
      * @param seq2            the seq2 code.
      * @param bioontologyUrl  the bioontology URL path.
      * @param bioontologyUser the bioontologyUser user for auth.
+     * @param dictionary the dictionary for search.
      * @return the list of medical products.
      */
-    public List<Object> findByMedicalProductUniqueKeys(String drugRecordNum, String seq1, String seq2, String bioontologyUrl, String bioontologyUser) throws Exception {
-        Query q = getCurrentSession("WHOD", bioontologyUrl, bioontologyUser).createQuery(
+    public List<Object> findByMedicalProductUniqueKeys(String drugRecordNum, String seq1, String seq2, String bioontologyUrl, String bioontologyUser, String dictionary) throws Exception {
+        Query q = getCurrentSession(dictionary, bioontologyUrl, bioontologyUser).createQuery(
                 "from MedicalProduct p where p.drugRecordNumber = :drn and p.sequenceNumber1 = :seq1 and p.sequenceNumber2 = :seq2");
         q.setParameter("drn", Integer.valueOf(drugRecordNum));
         q.setParameter("seq1", seq1);

@@ -6,7 +6,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <c:set var="color" scope="session" value="${newThemeColor}"/>
-<c:if test="${itemDictionary == 'WHOD' || itemDictionary == 'MedDRA'}">
+<c:if test="${fn:contains(itemDictionary, 'WHODrug') || fn:contains(itemDictionary, 'MedDRA')}">
     <c:set var="displayHttp" value="style=display:none"/>
 </c:if>
 
@@ -51,7 +51,7 @@
                 </tr>
                 <c:forEach items="${obj.classificationElement}" var="classElement" varStatus="status">
                     <c:choose>
-                        <c:when test="${itemDictionary == 'WHOD' and status.last}">
+                        <c:when test="${fn:contains(itemDictionary, 'WHODrug') and status.last}">
                             <tr style="font-weight:bold;">
                         </c:when>
                         <c:otherwise>
@@ -92,7 +92,7 @@
                                 <td></td>
 
                                 <c:choose>
-                                    <c:when test="${itemDictionary == 'WHOD' || itemDictionary == 'MedDRA'}">
+                                    <c:when test="${fn:contains(itemDictionary, 'WHODrug') || fn:contains(itemDictionary, 'MedDRA')}">
                                         <td>
                                             <c:if test="${configuredDictionaryIsAvailable}">
                                                 <input type="button" id="<c:out value="${counter}"/>" name="codeAndAliasBtn"

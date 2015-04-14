@@ -23,10 +23,12 @@ import com.clinovo.model.MedicalHierarchy;
 import com.clinovo.model.MedicalProduct;
 import com.clinovo.model.Therapgroup;
 
+import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -36,7 +38,7 @@ import java.util.Locale;
 /**
  * Util adds additional fields for the coded item elements.
  */
-public final class CompleteClassificationFieldsUtil {
+public final class CodingFieldsUtil {
 
 
 	private enum ICD910 { CAT, GRP }
@@ -130,19 +132,26 @@ public final class CompleteClassificationFieldsUtil {
 	 * @return the list with ontology elements or null.
 	 */
 	public static List<?> getEnumAsList(String ontologyName) {
-		if (ontologyName.equals(MEDDRAC)) {
+		if (ontologyName.contains(MEDDRAC)) {
 			return Arrays.asList(MEDDRA.values());
 		} else if (ontologyName.equals("ICD_10") || ontologyName.equals("ICD_9CM")) {
 			return Arrays.asList(ICD910.values());
 		} else if (ontologyName.equals(CTCAEC)) {
 			return Arrays.asList(CTCAE.values());
-		} else if (ontologyName.equals(WHODC)) {
+		} else if (ontologyName.contains(WHODC)) {
 			return Arrays.asList(WHOD.values());
 		}
 		return null;
 	}
 
-
+	/**
+	 * Returns classification list from medical product list.
+	 *
+	 * @param mpList the medical product list.
+	 * @param locale the system locale.
+	 * @return the list of medical products.
+	 * @throws ParseException for parsing exception.
+	 */
 	public static List<Classification> medicalProductListToClassificationList(List<Object> mpList, Locale locale) throws ParseException {
 		List<Classification> classifications = new ArrayList<Classification>();
 		for (Object mp : mpList) {
@@ -152,6 +161,14 @@ public final class CompleteClassificationFieldsUtil {
 		return classifications;
 	}
 
+	/**
+	 * Returns classification object from medical product object.
+	 *
+	 * @param mp the medical product bean.
+	 * @param locale the system locale.
+	 * @return the classification object with element name, code and code name.
+	 * @throws ParseException for all parse exceptions.
+	 */
 	public static Classification medicalProductToClassification(MedicalProduct mp, Locale locale) throws ParseException {
 
 		Classification classification = new Classification();
@@ -217,7 +234,17 @@ public final class CompleteClassificationFieldsUtil {
 		return classification;
 	}
 
+	/**
+	 * Comparator class that sort list using preferred value.
+	 */
 	public static class ClassificationSortByReference implements Comparator<Classification> {
+		/**
+		 * @param o1 the first object to be compared.
+		 * @param o2 the second object to be compared.
+		 * @return a negative integer, zero, or a positive integer as the
+		 * first argument is less than, equal to, or greater than the
+		 * second.
+		 */
 		public int compare(Classification o1, Classification o2) {
 			for (ClassificationElement classification : o1.getClassificationElement()) {
 				for (ClassificationElement classification2 : o2.getClassificationElement()) {
@@ -234,6 +261,12 @@ public final class CompleteClassificationFieldsUtil {
 		}
 	}
 
+	/**
+	 * Returns classification object from medical hierarchy object.
+	 *
+	 * @param medicalProducts the list of medical hierarchy beans.
+	 * @return the list of classifications.
+	 */
 	public static List<Classification> medicalHierarchyToClassificationList(List<Object> medicalProducts) {
 		List<Classification> classifications = new ArrayList<Classification>();
 		for (Object mp : medicalProducts) {
@@ -242,6 +275,12 @@ public final class CompleteClassificationFieldsUtil {
 		return classifications;
 	}
 
+	/**
+	 * Returns classification object from medical hierarchy object.
+	 *
+	 * @param medicalHierarchy the medical hierarchy bean.
+	 * @return the classification object.
+	 */
 	public static Classification medicalHierarchyToClassification(MedicalHierarchy medicalHierarchy) {
 		Classification classification = new Classification();
 		classification.setHttpPath(String.valueOf(medicalHierarchy.getId()));
@@ -272,5 +311,76 @@ public final class CompleteClassificationFieldsUtil {
 		classification.addClassificationElement(lltElement);
 
 		return classification;
+	}
+
+	/**
+	 * Returns valid ontology name for UI.
+	 *
+	 * @param ontologyName the name of ontology in the db required format.
+	 * @return the valid ontology name for UI.
+	 */
+	public static String getValidUiOntologyName(String ontologyName) {
+		final int ontologyNameWithVersionLength = 4;
+		final int ontologyMonthS = 1;
+		final int ontologyMonthE = 3;
+		final int ontologyYearS = 2;
+		if (ontologyName.contains(WHODC)) {
+			String whod = "WHODrug";
+			if (ontologyName.length() > ontologyNameWithVersionLength) {
+
+				String monthNum = ontologyName.substring(ontologyName.indexOf("-") + ontologyMonthS, ontologyName.indexOf("-") + ontologyMonthE);
+				String yearNum = ontologyName.substring(ontologyName.length() - ontologyYearS, ontologyName.length());
+				String monthName = new DateFormatSymbols().getMonths()[Integer.valueOf(monthNum) - 1];
+				return whod + " " + monthName.substring(0, ontologyMonthE) + yearNum;
+			} else {
+				return whod;
+			}
+
+		} else if (ontologyName.contains(MEDDRAC)) {
+			final int versionSIndex = 1;
+			final int versionEIndex = 3;
+			final int simpleNameLength = 6;
+			final int nameWithSubversionLength = 9;
+			String meddra = "MedDRA";
+			if (ontologyName.length() > simpleNameLength) {
+
+				String version = ontologyName.substring(ontologyName.indexOf("-") + versionSIndex, ontologyName.indexOf("-") + versionEIndex);
+				String subversion = "";
+				if (ontologyName.length() > nameWithSubversionLength) {
+					subversion = ontologyName.substring(ontologyName.indexOf("-") + versionEIndex, ontologyName.length());
+				}
+				subversion = !subversion.isEmpty() ? "." + subversion : "";
+				return meddra + " v" + version + subversion;
+			} else {
+				return meddra;
+			}
+		}
+		return ontologyName;
+	}
+
+	/**
+	 * Returns the valid ontology name for db connection.
+	 *
+	 * @param ontologyName the UI ontology name.
+	 * @return the ontology name for db connection.
+	 * @throws ParseException for all parsing exceptions.
+	 */
+	public static String getValidDbOntologyName(String ontologyName) throws ParseException {
+		String ontologyNumber = ontologyName.replaceAll("\\D+", "");
+		if (ontologyName.toUpperCase().contains(WHODC) && !ontologyNumber.isEmpty()) {
+			final int monthNumE = 4;
+			final int monthCounter = 9;
+			Date date = new SimpleDateFormat("MMM").parse(ontologyName.substring(ontologyName.indexOf(" ") + 1, ontologyName.indexOf(" ") + monthNumE));
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			int monthNumber = cal.get(Calendar.MONTH) + 1;
+			String monthNumFormatted = monthNumber > monthCounter ? String.valueOf(monthNumber) : "0" + String.valueOf(monthNumber);
+			ontologyName = "WHOD-" + monthNumFormatted + ontologyNumber;
+		} else if (ontologyName.toUpperCase().contains(MEDDRAC) && !ontologyNumber.isEmpty()) {
+			ontologyName = "MEDDRA-" + ontologyNumber;
+		} else {
+			ontologyName = ontologyName.contains(WHODC) ? "WHOD" : ontologyName.toUpperCase();
+		}
+		return ontologyName;
 	}
 }

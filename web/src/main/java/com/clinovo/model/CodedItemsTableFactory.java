@@ -27,6 +27,7 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import com.clinovo.util.CodingFieldsUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -123,7 +124,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 		Row row = tableFacade.getTable().getRow();
 
 		configureColumn(row.getColumn("itemDataValue"), ResourceBundleProvider.getResWord("verbatim_term"), new ItemDataValueCellEditor(), null);
-		configureColumn(row.getColumn("dictionary"), ResourceBundleProvider.getResWord("dictionary"), new DictionaryCellEditor(), new DictionaryDroplistFilterEditor());
+		configureColumn(row.getColumn("dictionary"), ResourceBundleProvider.getResWord("dictionary"), new DictionaryCellEditor(), new DictionaryDroplistFilterEditor(codedItems));
 		configureColumn(row.getColumn("status"), ResourceBundleProvider.getResWord("coding_status"), new StatusCellEditor(), new StatusDroplistFilterEditor());
 		configureColumn(row.getColumn("subjectName"), ResourceBundleProvider.getResWord("study_subject_ID"), new SubjectCellEditor(), null, true, true);
 		configureColumn(row.getColumn("eventName"), ResourceBundleProvider.getResWord("study_event"), new EventCellEditor(), null, true, true);
@@ -202,14 +203,15 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 	}
 
 	private String getCorrectDictionaryName(String codedItemDictionary) {
+
 		if (codedItemDictionary.equalsIgnoreCase("ICD_9CM")) {
 			return "ICD 9CM";
 		} else if (codedItemDictionary.equalsIgnoreCase("ICD_10")) {
 			return "ICD 10";
-		} else if (codedItemDictionary.equalsIgnoreCase("MEDDRA")) {
-			return "MedDRA";
-		} else if (codedItemDictionary.equalsIgnoreCase("WHOD")) {
-			return "WHOD";
+		} else if (codedItemDictionary.contains("MEDDRA")) {
+			return CodingFieldsUtil.getValidUiOntologyName(codedItemDictionary);
+		} else if (codedItemDictionary.contains("WHOD")) {
+			return CodingFieldsUtil.getValidUiOntologyName(codedItemDictionary);
 		} else if (codedItemDictionary.equalsIgnoreCase("CTCAE")) {
 			return "CTCAE";
 		}
@@ -262,7 +264,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 			}
             if (codedItem.isCoded()) {
 				builder.table(1).id("tablepaging").styleClass("itemsTable").style("display:" + showContextValue + ";").close()
-						.tr(1).style(codedItem.getDictionary().equals("WHOD") || codedItem.getDictionary().equals("MEDDRA") ? "display:none;" : "").close()
+						.tr(1).style(codedItem.getDictionary().toUpperCase().contains("WHOD") || codedItem.getDictionary().toUpperCase().contains("MEDDRA") ? "display:none;" : "").close()
 						.td(1).close().append(ResourceBundleProvider.getResWord("http") + ": ").tdEnd()
 						.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href(normalizeUrl(getBioontologyUrl(), codedItem.getDictionary())
 						+ "/ontologies/" + codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid=" + codedItem.getHttpPath().replace("#", "%23").replace("/MDR/", "/MEDDRA/")).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
@@ -283,7 +285,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         }
 
 		private String normalizeUrl(String bioontologyUrl, String dictionary) throws MalformedURLException {
-			if (bioontologyUrl.equals(bioontologyUrlWs) || "MEDDRA".equals(dictionary)) {
+			if (bioontologyUrl.equals(bioontologyUrlWs)) {
 				return bioontologyUrlDefault;
 			} else {
 				URL url = new URL(bioontologyUrl);
@@ -530,21 +532,24 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         }
     }
 
-    private class DictionaryDroplistFilterEditor extends DroplistFilterEditor {
+	private class DictionaryDroplistFilterEditor extends DroplistFilterEditor {
+		private List<CodedItem> codedItems = new ArrayList<CodedItem>();
 
-        protected List<Option> getOptions() {
+		public DictionaryDroplistFilterEditor(List<CodedItem> codedItems) {
+			this.codedItems = codedItems;
+		}
 
-            List<Option> options = new ArrayList<Option>();
-
-            options.add(new Option("ICD 9CM", "ICD 9CM"));
-            options.add(new Option("ICD 10", " ICD 10"));
-            options.add(new Option("MedDRA", "MedDRA"));
-            options.add(new Option("WHOD", "WHOD"));
-			options.add(new Option("CTCAE", "CTCAE"));
-
-            return options;
-        }
-    }
+		protected List<Option> getOptions() {
+			List<Option> options = new ArrayList<Option>();
+			for (CodedItem codedItem : codedItems) {
+				String ontologyName = getCorrectDictionaryName(codedItem.getDictionary());
+				if (!options.contains(new Option(ontologyName, ontologyName))) {
+					options.add(new Option(ontologyName, ontologyName));
+				}
+			}
+			return options;
+		}
+	}
 
     public void setStudyDAO(StudyDAO studyDAO) {
         this.studyDAO = studyDAO;
@@ -562,17 +567,21 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 		this.crfVersionDAO = crfVersionDAO;
 	}
 
-    public void setEventDefinitionCRFDAO(EventDefinitionCRFDAO eventDefenitionCRFDAO) {
-        this.eventDefCRFDAO = eventDefenitionCRFDAO;
-    }
+	public void setEventDefinitionCRFDAO(EventDefinitionCRFDAO eventDefenitionCRFDAO) {
+		this.eventDefCRFDAO = eventDefenitionCRFDAO;
+	}
 
-    public void setTerms(List<Term> terms) {
-        this.terms = terms;
-    }
+	public void setTerms(List<Term> terms) {
+		this.terms = terms;
+	}
 
-    public void setThemeColor(String themeColor) { this.themeColor = themeColor; }
+	public void setThemeColor(String themeColor) {
+		this.themeColor = themeColor;
+	}
 
-    public void setStudyId(int studyId) { this.studyId = studyId; }
+	public void setStudyId(int studyId) {
+		this.studyId = studyId;
+	}
 
 	public void setDataSource(DataSource datasource) {
 		this.datasource = datasource;
@@ -584,16 +593,26 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 		UserAccountBean loggedInUser = (UserAccountBean) userDAO.findByUserName(authentication.getName());
 		return loggedInUser.getRoleByStudy(studyId).getRoleCode().equalsIgnoreCase("study_monitor");
 	}
-	
-	public void setStudySubjectDAO(StudySubjectDAO studySubjectDAO) { this.studySubjectDAO = studySubjectDAO; }
 
-    public void setCrfDAO(CRFDAO crfDao) { this.crfDAO = crfDao; }
+	public void setStudySubjectDAO(StudySubjectDAO studySubjectDAO) {
+		this.studySubjectDAO = studySubjectDAO;
+	}
 
-	public void setStudyEventDefinitionDAO(StudyEventDefinitionDAO studyEventDefDao) { this.studyEventDefDao = studyEventDefDao; }
+	public void setCrfDAO(CRFDAO crfDao) {
+		this.crfDAO = crfDao;
+	}
 
-    public void setItemDataDAO(ItemDataDAO itemDataDAO) { this.itemDataDAO = itemDataDAO; }
+	public void setStudyEventDefinitionDAO(StudyEventDefinitionDAO studyEventDefDao) {
+		this.studyEventDefDao = studyEventDefDao;
+	}
 
-    public void setStudyEventDAO(StudyEventDAO studyEventDAO) { this.studyEventDAO = studyEventDAO; }
+	public void setItemDataDAO(ItemDataDAO itemDataDAO) {
+		this.itemDataDAO = itemDataDAO;
+	}
+
+	public void setStudyEventDAO(StudyEventDAO studyEventDAO) {
+		this.studyEventDAO = studyEventDAO;
+	}
 
 	private StudySubjectBean getSubjectBean(int subjectId) {
 		return (StudySubjectBean) studySubjectDAO.findByPK(subjectId);

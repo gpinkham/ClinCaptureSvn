@@ -47,8 +47,8 @@ public final class HibernateUtil {
 
     private static SessionFactory sessionFactory;
 
-    private static final String WHOD = "WHOD-0315";
-    private static final String MEDDRA = "MEDDRA-171";
+    private static final String WHOD_DEFAULT = "WHOD-0315";
+    private static final String MEDDRA_DEFAULT = "MEDDRA-171";
 
     /**
      * Returns session for term search.
@@ -62,20 +62,20 @@ public final class HibernateUtil {
         sessionFactory = sessionFactory(ontologyName, bioontologyUrl, bioontologyUser).getObject();
         return sessionFactory.openSession();
     }
-    
-	private static AbstractSessionFactoryBean sessionFactory(String ontologyName, String bioontologyUrl, String bioontologyUser) throws Exception {
-            AnnotationSessionFactoryBean lsfb = new AnnotationSessionFactoryBean();
-            Properties properties = new Properties();
-            properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-            lsfb.setDataSource(dataSource(ontologyName, bioontologyUrl, bioontologyUser));
-            lsfb.setHibernateProperties(properties);
-            Class[] annotatedClasses = {MedicalHierarchy.class, AtcClassification.class, CountryCode.class,
-                    Ingredient.class, MedicalProduct.class, Substance.class, Therapgroup.class};
-            lsfb.setAnnotatedClasses(annotatedClasses);
-            lsfb.setNamingStrategy(new ImprovedNamingStrategy());
-            lsfb.afterPropertiesSet();
-            LOGGER.info("Session initialized");
-            return lsfb;
+
+    private static AbstractSessionFactoryBean sessionFactory(String ontologyName, String bioontologyUrl, String bioontologyUser) throws Exception {
+        AnnotationSessionFactoryBean lsfb = new AnnotationSessionFactoryBean();
+        Properties properties = new Properties();
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+        lsfb.setDataSource(dataSource(ontologyName, bioontologyUrl, bioontologyUser));
+        lsfb.setHibernateProperties(properties);
+        Class[] annotatedClasses = {MedicalHierarchy.class, AtcClassification.class, CountryCode.class,
+                Ingredient.class, MedicalProduct.class, Substance.class, Therapgroup.class};
+        lsfb.setAnnotatedClasses(annotatedClasses);
+        lsfb.setNamingStrategy(new ImprovedNamingStrategy());
+        lsfb.afterPropertiesSet();
+        LOGGER.info("Session initialized");
+        return lsfb;
     }
 
     private static String getHostName(String bioontologyUrl) throws MalformedURLException {
@@ -84,12 +84,11 @@ public final class HibernateUtil {
     }
 
     private static DataSource dataSource(String ontologyName, String bioontologyUrl, String bioontologyUser) throws MalformedURLException {
-        String dbName = ontologyName.contains("MEDDRA") ? MEDDRA : ontologyName.contains("WHOD") ? WHOD : "";
+        ontologyName = ontologyName.equals("MEDDRA") ? MEDDRA_DEFAULT : ontologyName.equals("WHOD") ? WHOD_DEFAULT : ontologyName;
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://" + getHostName(bioontologyUrl) + ":5432/" + dbName);
+        dataSource.setUrl("jdbc:postgresql://" + getHostName(bioontologyUrl) + ":5432/" + ontologyName);
         dataSource.setUsername(bioontologyUser);
         dataSource.setPassword("");
-        return dataSource;
-    }
+        return dataSource;    }
 }

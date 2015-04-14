@@ -20,7 +20,7 @@ import com.clinovo.coding.model.Classification;
 import com.clinovo.coding.model.ClassificationElement;
 import com.clinovo.coding.source.SearchInterface;
 import com.clinovo.http.HttpTransport;
-import com.clinovo.util.CompleteClassificationFieldsUtil;
+import com.clinovo.util.CodingFieldsUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -86,7 +86,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 			}
 			if (isPrefLabel) {
 				List<Classification> classificationResponse = new ArrayList<Classification>();
-				CompleteClassificationFieldsUtil.firstResponse(classificationResponse, dictionary, prefLabel, codeHttpPath);
+				CodingFieldsUtil.firstResponse(classificationResponse, dictionary, prefLabel, codeHttpPath);
 				classifications.addAll(classificationResponse);
 			}
 		}
@@ -168,7 +168,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 
 		Classification classification = new Classification();
 		recursiveTreeResponseParser(termTree, classification);
-		CompleteClassificationFieldsUtil.completeClassificationNameFields(classification.getClassificationElement(), dictionary);
+		CodingFieldsUtil.completeClassificationNameFields(classification.getClassificationElement(), dictionary);
 
 		return classification;
 	}

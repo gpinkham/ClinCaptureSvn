@@ -123,7 +123,7 @@ public class CodedItemAutoUpdater {
 		String termToAppend = "";
 		String prefToAppend = "";
 		String displayStyle = "display:none;";
-		String httpPathDisplay = codedItem.getDictionary().equals("WHOD") || codedItem.getDictionary().equals("MEDDRA") ? "display:none;" : "";
+		String httpPathDisplay = codedItem.getDictionary().toUpperCase().contains("WHOD") || codedItem.getDictionary().toUpperCase().contains("MEDDRA") ? "display:none;" : "";
 		if (!alise.isEmpty() && !prefTerm.isEmpty()) {
 			termToAppend = alise;
 			prefToAppend = prefTerm;
@@ -138,7 +138,7 @@ public class CodedItemAutoUpdater {
 				.append(" termToAppend=\"" + termToAppend + "\" ").append(" prefToAppend=\"" + prefToAppend + "\" ").close()
 				.tr(1).style(httpPathDisplay).close().td(1).close().append(ResourceBundleProvider.getResWord("http") + ": ")
 				.tdEnd().td(2).close().a().style("color:" + getThemeColor() + "")
-				.append(" target=\"_blank\" ").href(normalizeUrl(bioontologyUrl.getValue(), codedItem.getDictionary()) + "/ontologies/"
+				.append(" target=\"_blank\" ").href(normalizeUrl(bioontologyUrl.getValue()) + "/ontologies/"
 						+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid="
 						+ codedItem.getHttpPath().replace("#", "%23")).close().append(codedItem.getHttpPath()).aEnd().tdEnd().td(2)
 				.width("360px").colspan("2").close().tdEnd().td(2).close().tdEnd().trEnd(1);
@@ -146,8 +146,8 @@ public class CodedItemAutoUpdater {
 		for (CodedItemElement codedItemElement : codedItemElementsFilter(codedItem).getCodedItemElements()) {
 			builder.tr(1).close().td(1).style("white-space: nowrap;").close()
 					.append(" " + ResourceBundleProvider.getResWord(codedItemElement.getItemName().toLowerCase())
-							+ ": ").tdEnd().td(2).close().append(codedItemElement.getItemCode()).tdEnd().tdEnd().td(2)
-					.width("360px").colspan("2").close().tdEnd().td(2).close().tdEnd().trEnd(1).trEnd(1);
+							+ ": ").tdEnd().td(2).width("360px").close().append(codedItemElement.getItemCode()).tdEnd().tdEnd().td(2)
+					.colspan("2").close().tdEnd().td(2).close().tdEnd().trEnd(1).trEnd(1);
 		}
 		builder.tableEnd(1);
 		builder.append("separatorMark");
@@ -155,7 +155,7 @@ public class CodedItemAutoUpdater {
 		return builder.toString();
 	}
 
-	private String normalizeUrl(String bioontologyUrl, String dictionary) throws MalformedURLException {
+	private String normalizeUrl(String bioontologyUrl) throws MalformedURLException {
 		if (bioontologyUrl.equals(bioontologyWsUrl)) {
 			return bioontologyUrlDefault;
 		} else {
