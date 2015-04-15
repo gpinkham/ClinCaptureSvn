@@ -560,10 +560,7 @@
                                             <c:set var="hideCol3" value="false"/>
                                             <c:set var="hideCol4" value="false"/>
                                             <c:set var="crfSpacersCount" value="4"/>
-                                            <a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
-                                               onMouseDown="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
-                                               onMouseUp="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
-                                              ><img name="bt_Restore<c:out value="${rowCount}"/>" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="4"></a>
+											<ui:restoreEventCRFLink object="${dec}" subjectId="${studySubject.id}"/>
                                             <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
                                                onMouseDown="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                                                onMouseUp="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
@@ -595,10 +592,7 @@
                                         <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available)}">
                                             <c:set var="hideCol3" value="false"/>
                                             <c:set var="crfSpacersCount" value="4"/>
-                                            <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
-                                               onMouseDown="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
-                                               onMouseUp="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
-                                              ><img name="bt_Remove<c:out value="${rowCount}"/>" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="4"></a>
+											<ui:removeEventCRFLink object="${dec}" subjectId="${studySubject.id}"/>
                                         </c:if>
 
                                         <c:if test="${userBean.sysAdmin && (study.status.available)}">

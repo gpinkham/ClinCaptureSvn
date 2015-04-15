@@ -150,13 +150,6 @@
      </c:choose>
     </td>
 
-    <%--<td class="table_cell">
-     <c:choose>
-      <c:when test="${crf.decisionCondition == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
-      <c:otherwise> No </c:otherwise>
-     </c:choose>
-   </td>--%>
-  
    <td class="table_cell">   
     <c:out value="${crf.defaultVersionName}"/>     
    </td>
@@ -170,37 +163,17 @@
    <td class="table_cell"><c:out value="${crf.status.name}"/></td> 
    <td class="table_cell">
      <table border="0" cellpadding="0" cellspacing="0">
-	  <tr class="innerTable">       
+	  <tr class="innerTable">
         <td>
-          <!-- <a href="ViewTableOfContent?crfVersionId=<c:out value="${crf.defaultVersionId}"/>&sedId=<c:out value="${definition.id}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img 
-			name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_CRF_version" bundle="${resword}"/>" title="<fmt:message key="view_CRF_version" bundle="${resword}"/>" align="left" hspace="6"></a>-->
-		  <!--<a href="ViewSectionDataEntry?module=<c:out value="${module}"/>&crfId=<c:out value="${crf.crfId}"/>&crfVersionId=<c:out value="${crf.defaultVersionId}"/>&tabId=1"
-               onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-               onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-              name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>-->
             <a href="ViewCRF?crfId=<c:out value="${crf.crfId}"/>"
                  onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                  onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
 				data-cc-eventDefinitionReadonlyCrfId="${crf.crfId}"
 				onclick="setAccessedObjected(this);"><img
                 name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-
         </td>
-		<%--
-		<c:if test="${crf.status.id==1 && crf.owner.id==userBean.id}">
-		<td>
-		 <a href="InitUpdateCRF?crfId=<c:out value="${crf.crfId}"/>"
-			onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-			onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img 
-			name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit_CRF" bundle="${resword}"/>" title="<fmt:message key="edit_CRF" bundle="${resword}"/>" align="left" hspace="6"></a>
-		  
-		</td>
-		</c:if>		
-		--%>
 	  </tr>
-	 </table> 	
+	 </table>
    </td>
    </tr>
    <c:set var="prevCrf" value="${crf}"/>

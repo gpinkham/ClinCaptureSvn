@@ -403,26 +403,14 @@
 
                             <c:if test="${userRole.manageStudy && study.status.available && (!dec.locked) && (!dec.stage.locked)}">
                                 <td>
-                                    <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
-                                       onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
-                                       onclick="setAccessedObjected(this)"><img name="bt_Remove1" src="images/bt_Remove.gif" border="0"
-                                            alt="<fmt:message key="remove" bundle="${resword}"/>"
-                                            title="<fmt:message key="remove" bundle="${resword}"/>" align="left"
-                                            hspace="6"></a>
+									<ui:removeEventCRFLink object="${dec}" subjectId="${studySub.id}" onClick="setAccessedObjected(this)" hspace="6"/>
                                 </td>
                             </c:if>
                         </c:when>
                         <c:otherwise>
                             <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 && (!studySub.status.deleted) && (study.status.available)}">
                                 <td>
-                                    <a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
-                                       onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
-                                       onclick="setAccessedObjected(this)"><img name="bt_Restore3" src="images/bt_Restore.gif" border="0"
-                                            alt="<fmt:message key="restore" bundle="${resword}"/>"
-                                            title="<fmt:message key="restore" bundle="${resword}"/>" align="left"
-                                            hspace="6"></a>
+									<ui:restoreEventCRFLink object="${dec}" subjectId="${studySub.id}" hspace="6" onClick="setAccessedObjected(this)"/>
                                 </td>
                             </c:if>
                             <c:if test="${userRole.manageStudy && dec.eventCRF.status.deleted && (!dec.locked) && (!dec.stage.locked) && userRole.id ne 2 && userRole.id ne 1}">
