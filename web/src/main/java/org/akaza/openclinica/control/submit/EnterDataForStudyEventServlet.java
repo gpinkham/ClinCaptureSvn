@@ -20,16 +20,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
+import com.clinovo.service.CRFMaskingService;
+import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -67,7 +59,14 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.SubjectEventStatusUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author ssachs
@@ -127,6 +126,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
+		CRFMaskingService maskingService = getMaskingService();
 
 		// ClinCapture custom attributes
 		populateCustomElementsConfig(request);
@@ -191,16 +191,16 @@ public class EnterDataForStudyEventServlet extends Controller {
 		ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
 				currentRole, seb.getSubjectEventStatus(), study);
 
-		// Issue 3212 BWP << hide certain CRFs at the site level
 		if (currentStudy.getParentStudyId() > 0) {
 			HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
-
 			uncompletedEventDefinitionCRFs = hideCRFManager
 					.removeHiddenEventDefinitionCRFBeans(uncompletedEventDefinitionCRFs);
-
 			displayEventCRFs = hideCRFManager.removeHiddenEventCRFBeans(displayEventCRFs);
 		}
-		// >>
+
+		// Remove all masked CRFs from the list
+		uncompletedEventDefinitionCRFs = maskingService.removeMaskedDisplayEventDefinitionCRFBeans(uncompletedEventDefinitionCRFs, ub);
+		displayEventCRFs = maskingService.removeMaskedDisplayEventCRFBeans(displayEventCRFs, ub);
 
 		request.setAttribute(BEAN_STUDY_EVENT, seb);
 		request.setAttribute(BEAN_STUDY_SUBJECT, studySubjectBean);
@@ -227,6 +227,11 @@ public class EnterDataForStudyEventServlet extends Controller {
 
 		if (fp.getString(OPEN_FIRST_CRF).equalsIgnoreCase(TRUE)) {
 			try {
+				if (fullCrfList.size() == 0) {
+					addPageMessage(resword.getString("no_crf_available"), request);
+					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
+					return;
+				}
 				DisplayEventDefinitionCRFBean dedcb = (DisplayEventDefinitionCRFBean) fullCrfList.get(0);
 				CRFVersionBean defaultCRFVerBean = new CRFVersionBean();
 				for (int i = 0; i < dedcb.getEdc().getVersions().size(); i++) {
@@ -235,6 +240,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 						break;
 					}
 				}
+
 				response.sendRedirect(request.getContextPath()
 						+ Page.INITIAL_DATA_ENTRY_SERVLET.getFileName()
 						+ "?studyEventId="

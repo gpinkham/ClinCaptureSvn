@@ -846,7 +846,7 @@ public class AddNewSubjectServlet extends Controller {
 							if (studySubject.getEventStartDate() == null) {
 								studySubject.setEventStartDate(new Date());
 							}
-							StudyEventBean seb = createStudyEvent(fp, eventDefinitions.get(0).getId(), studySubject);
+							StudyEventBean seb = createStudyEvent(fp, getMaskingService().returnFirstNotMaskedEvent(eventDefinitions, ub.getId(), currentStudy.getId()).getId(), studySubject);
 
 							if (seb != null && seb.getId() > 0) {
 								response.sendRedirect(request.getContextPath()

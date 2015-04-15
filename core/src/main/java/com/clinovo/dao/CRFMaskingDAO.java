@@ -131,4 +131,23 @@ public class CRFMaskingDAO extends AbstractDomainDao<CRFMask> {
 		q.setInteger("studyId", studyId);
 		q.executeUpdate();
 	}
+
+	/**
+	 * This method will return all masks in the Study Event Definition.
+	 * @param userId UserAccountBean Id.
+	 * @param eventDefinitionId StudyEventDefinitionBean id.
+	 * @param studyId int.
+	 * @return List of CRFMasks.
+	 */
+	public List<CRFMask> findAllActiveByUserStudyAndEventDefinitionIds(int userId, int eventDefinitionId, int studyId) {
+		String query = "from " + getDomainClassName() + " cm where cm.userId = :userId and "
+				+ "studyEventDefinitionId = :eventId and "
+				+ "studyId = :studyId and "
+				+ "statusId = 1";
+		Query q = getCurrentSession().createQuery(query);
+		q.setInteger("userId", userId);
+		q.setInteger("eventId", eventDefinitionId);
+		q.setInteger("studyId", studyId);
+		return (List<CRFMask>) q.list();
+	}
 }

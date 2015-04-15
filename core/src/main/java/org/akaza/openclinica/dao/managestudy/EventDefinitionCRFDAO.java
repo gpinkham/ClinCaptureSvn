@@ -41,6 +41,16 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
+import javax.sql.DataSource;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 /**
  * EventDefinitionCRFDAO class.
  */
@@ -1159,5 +1169,28 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		List<Map<String, Object>> resultRows = (List<Map<String, Object>>) this.select(sql, variables);
 		Iterator<Map<String, Object>> iterator = resultRows.listIterator();
 		return iterator.hasNext() && ((String) iterator.next().get("result")).equalsIgnoreCase("Y");
+	}
+
+	/**
+	 * Find all Event Definition CRFs in the EventDefinition on the Study.
+	 * @param definitionId StudyEventDefinition Id
+	 * @param siteId StudyBean Id
+	 * @return Collection of EventDefinitionCRFBeans
+	 */
+	public Collection findAllActiveByDefinitionAndSiteId(int definitionId, int siteId) {
+		int index = 1;
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(index++, definitionId);
+		variables.put(index, siteId);
+
+		String sql = digester.getQuery("findAllActiveByDefinitionAndSiteId");
+		List<HashMap> aList = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		for (HashMap anAlist : aList) {
+			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap(anAlist);
+			al.add(eb);
+		}
+		return al;
 	}
 }

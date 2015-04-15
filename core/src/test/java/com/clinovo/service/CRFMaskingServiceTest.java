@@ -3,8 +3,16 @@ package com.clinovo.service;
 import com.clinovo.model.CRFMask;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CRFMaskingServiceTest extends DefaultAppContextTest {
 
@@ -70,5 +78,48 @@ public class CRFMaskingServiceTest extends DefaultAppContextTest {
 		maskingService.updateMasksOnUserRoleUpdate(Role.INVESTIGATOR, Role.CLINICAL_RESEARCH_COORDINATOR, studyBean, 1);
 
 		assertTrue(maskingService.isEventDefinitionCRFMasked(1, 1, 1));
+	}
+
+	@Test
+	public void testThatFindAllActiveByUserStudyAndEventDefinitionIdsReturnsAllMasks() {
+		assertEquals(1, maskingService.findAllActiveByUserStudyAndEventDefinitionIds(1, 1, 1).size());
+	}
+
+	@Test
+	 public void testThatRemoveMaskedDisplayEventDefinitionCRFBeansReturnsCorrectResult() {
+		List<DisplayEventDefinitionCRFBean> testList = new ArrayList<DisplayEventDefinitionCRFBean>();
+		EventDefinitionCRFBean edc = new EventDefinitionCRFBean();
+		edc.setId(1);
+		edc.setStudyId(1);
+		DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
+		dedc.setEdc(edc);
+		testList.add(dedc);
+		UserAccountBean user = new UserAccountBean();
+		user.setId(1);
+		assertEquals(0, maskingService.removeMaskedDisplayEventDefinitionCRFBeans(testList, user).size());
+	}
+
+	@Test
+	public void testThatRemoveMaskedDisplayEventCRFBeansReturnsCorrectResult() {
+		List<DisplayEventCRFBean> testList = new ArrayList<DisplayEventCRFBean>();
+		EventDefinitionCRFBean edc = new EventDefinitionCRFBean();
+		edc.setId(1);
+		edc.setStudyId(1);
+		DisplayEventCRFBean dec = new DisplayEventCRFBean();
+		dec.setEventDefinitionCRF(edc);
+		testList.add(dec);
+		UserAccountBean user = new UserAccountBean();
+		user.setId(1);
+		assertEquals(0, maskingService.removeMaskedDisplayEventCRFBeans(testList, user).size());
+	}
+
+	@Test
+	public void testThatReturnFirstNotMaskedEventReturnsCorrectResult() {
+		List<StudyEventDefinitionBean> events = new ArrayList<StudyEventDefinitionBean>();
+		StudyEventDefinitionBean event = new StudyEventDefinitionBean();
+		event.setId(1);
+		event.setStudyId(1);
+		events.add(event);
+		assertEquals(event.getId(), maskingService.returnFirstNotMaskedEvent(events, 1, 1).getId());
 	}
 }

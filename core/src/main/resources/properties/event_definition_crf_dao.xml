@@ -207,6 +207,14 @@
 		</sql>
 	</query>
 	<query>
+		<name>findAllActiveByDefinitionAndSiteId</name>
+		<sql>
+			SELECT * FROM EVENT_DEFINITION_CRF
+			WHERE study_event_definition_id = ? AND study_id = ?
+			AND status_id = 1
+		</sql>
+	</query>
+	<query>
         <name>findByStudyEventDefinitionIdAndCRFIdAndStudyId</name>
         <sql>
             SELECT * FROM EVENT_DEFINITION_CRF

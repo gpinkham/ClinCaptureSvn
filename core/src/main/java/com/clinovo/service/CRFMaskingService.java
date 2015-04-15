@@ -2,8 +2,13 @@ package com.clinovo.service;
 
 import com.clinovo.model.CRFMask;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -80,4 +85,40 @@ public interface CRFMaskingService {
 	 * @param userId user for which Masks should be restored or removed.
 	 */
 	void updateMasksOnUserRoleUpdate(Role oldRole, Role newRole, StudyBean study, int userId);
+
+	/**
+	 * This method will remove all masked dedc Beans from the list.
+	 *
+	 * @param dedcBeans list of DisplayEventDefinitionCRFBean CRF beans.
+	 * @param user UserAccountBean.
+	 * @return List<DisplayEventDefinitionCRFBean>
+	 */
+	ArrayList<DisplayEventDefinitionCRFBean> removeMaskedDisplayEventDefinitionCRFBeans(List<DisplayEventDefinitionCRFBean> dedcBeans, UserAccountBean user);
+
+	/**
+	 * This method will remove all masked dedc Beans from the list.
+	 *
+	 * @param decBeans list of DisplayEventCRFBean CRF beans.
+	 * @param user UserAccountBean.
+	 * @return List<DisplayEventCRFBean>
+	 */
+	ArrayList<DisplayEventCRFBean> removeMaskedDisplayEventCRFBeans(List<DisplayEventCRFBean> decBeans, UserAccountBean user);
+
+	/**
+	 * This method will return all masks in the Study Event Definition.
+	 * @param userId UserAccountBean Id.
+	 * @param eventDefinitionId StudyEventDefinitionBean id.
+	 * @param studyId int
+	 * @return List of CRFMasks.
+	 */
+	List<CRFMask> findAllActiveByUserStudyAndEventDefinitionIds(int userId, int eventDefinitionId, int studyId);
+
+	/**
+	 * Returns first event with at least one not masked StudyEventDefinitionBean.
+	 * @param sedList List<StudyEventDefinitionBean>
+	 * @param userId int
+	 * @param studyId int
+	 * @return first StudyEventDefinitionBean with at least one not masked StudyEventDefinitionBean
+	 */
+	StudyEventDefinitionBean returnFirstNotMaskedEvent(List<StudyEventDefinitionBean> sedList, int userId, int studyId);
 }

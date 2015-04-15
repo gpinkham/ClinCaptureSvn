@@ -35,17 +35,20 @@ public class EventDefinitionCRFDAOTest extends DefaultAppContextTest {
 		assertEquals(2, eventDefinitionCRFDAO.findForSiteByEventCrfId(13).getId());
 	}
 
-	@Test public void testThatDoesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntryReturnsTrue() {
-
+	@Test
+	public void testThatDoesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntryReturnsTrue() {
 		EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(4);
-
 		assertTrue(eventDefinitionCRFDAO.doesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntry(edc));
 	}
 
-	@Test public void testThatDoesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntryReturnsFalse() {
-
+	@Test
+	public void testThatDoesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntryReturnsFalse() {
 		EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(5);
-
 		assertFalse(eventDefinitionCRFDAO.doesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntry(edc));
+	}
+
+	@Test
+	public void testThatFindAllActiveByDefinitionAndSiteIdReturnsCorrectResult() {
+		assertEquals(2, eventDefinitionCRFDAO.findAllActiveByDefinitionAndSiteId(1, 1).size());
 	}
 }

@@ -55,4 +55,9 @@ public class CRFMaskingDAOTest extends DefaultAppContextTest {
 		maskingDAO.restoreMasksBySiteAndUserIds(1, 1);
 		assertNotNull(maskingDAO.findActiveByUserIdSiteIdAndCRFId(1, 1, 4));
 	}
+
+	@Test
+	public void testThatFindAllActiveByUserStudyAndEventDefinitionIdsReturnsAllMasks() {
+		assertEquals(1, maskingDAO.findAllActiveByUserStudyAndEventDefinitionIds(1, 1, 1).size());
+	}
 }
