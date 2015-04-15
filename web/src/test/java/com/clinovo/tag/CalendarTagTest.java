@@ -68,6 +68,7 @@ public class CalendarTagTest {
 		Mockito.when(servletContext.getContextPath()).thenReturn("/clincapture");
 		Whitebox.setInternalState(calendarTag, "pageContext", pageContext);
 		Mockito.when(calendarTag.doStartTag()).thenCallRealMethod();
+		CoreResources.CALENDAR_LOCALES.clear();
 	}
 
 	@Test
