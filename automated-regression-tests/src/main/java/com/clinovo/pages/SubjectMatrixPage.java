@@ -6,7 +6,8 @@ import net.thucydides.core.pages.WebElementFacade;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
+import com.clinovo.pages.beans.StudyEventDefinition;
+
 import java.util.List;
 
 /**
@@ -24,106 +25,81 @@ public class SubjectMatrixPage extends BasePage {
     @FindBy(id = "findSubjects")
     private WebElementFacade tblFindSubjects;
     
+    @FindBy(xpath = ".//div[starts-with(@id, 'eventScheduleWrapper')]//*[@id='startdateField']")
+    private WebElementFacade iStartDate;
+	
+    @FindBy(xpath = ".//div[starts-with(@id, 'eventScheduleWrapper')]//*[@id='enddateField']")
+    private WebElementFacade iEndDate;
     
-
+    @FindBy(xpath = ".//div[starts-with(@id, 'eventScheduleWrapper')]//*[@name='Schedule']")
+    private WebElementFacade bScheduleEvent;
+    
     @FindBy(css = "div.dynFilter")
     private WebElementFacade divFindSubjects;
-
+    
     @FindBy(id = "dynFilterInput")
-    private WebElementFacade eFindSubjects;
+    private WebElementFacade iFindSubjects;
 
-    @FindBy(linkText = " Apply Filter ")
+    @FindBy(xpath = ".//tr[@class='filter']//a[contains(@href,\"onInvokeAction('findSubjects','filter')\")]")
     private WebElementFacade lApplyFilter;
+    
+    @FindBy(xpath = ".//tr[@class='filter']//a[contains(@href,\"onInvokeAction('findSubjects','clear')\")]")
+    private WebElementFacade lClearFilter;
 
-    @FindBy(id = "sedDropDown")
-    private WebElementFacade ddlSelectEvent;
-
-    @FindBy(name = "StartDataEntry")
-    private WebElementFacade bStartDataEntry;
-
-    @FindBy(className = "crfListTable")
-    private WebElementFacade tblSubjectEventCRFs;
-
-    @FindBy(name = "ndIcon")
-    private WebElementFacade iDiscrepancyNoteFlag;
-
-    @FindBy(name = "Schedule")
-    private WebElementFacade bScheduleEvent;
-
-
-    public void clickSubjectEventStatusIcon(String subjectID, String event) {
-        getEventStatusIconElement(subjectID, event).click();
-    }
-
-    public void clickStartDataEntryBtn() {
-        bStartDataEntry.click();
-    }
-
-    public void clickStartDataEntryBtn(String crf) {
-        WebElement iEnterData = tblSubjectEventCRFs.findElement(By.xpath("//*[text()[contains(.,'" + crf + "')]]/../td//img[@alt='Enter Data']"));
-        iEnterData.click();
-    }
-
-    public boolean isEventScheduled(String subjectID, String event) {
-        WebElement eventStatusIcon = getEventStatusIconElement(subjectID, event);
-        WebElement eventStatusIconImage = eventStatusIcon.findElement(By.tagName("img"));
-
-        return eventStatusIconImage.getAttribute("src").contains("icon_Scheduled.gif");
-    }
-
-    private WebElement getEventStatusIconElement(String subjectID, String event) {
-        WebElementFacade eventInDDL = ddlSelectEvent.selectByVisibleText(event);
-        Integer eventIndex = Integer.parseInt(eventInDDL.getAttribute("value"));
-
-        return  getDriver().findElement(By.jquery("[onclick*=" + subjectID + "_" + eventIndex + "]"));
-    }
-
-    public void filterSubjectID(String subjectID) {
-        enterSubjectIDToFilterField(subjectID);
+    @Override
+	public boolean isOnPage(WebDriver driver) {
+    	return tblFindSubjects.isCurrentlyVisible();
+	}
+    
+    public void filterSMByStudySubjectID(String sSubjectID) {
+    	enterStudySubjectIDToFilterField(sSubjectID);
         clickApplyFilterLink();
     }
 
-    public void enterSubjectIDToFilterField(String subjectID) {
+    public void enterStudySubjectIDToFilterField(String sSubjectID) {
         divFindSubjects.click();
-        eFindSubjects.type(subjectID);
+        iFindSubjects.type(sSubjectID);
     }
 
     public void clickApplyFilterLink() {
         lApplyFilter.click();
     }
-
-    public boolean isDiscrepancyNoteFlagDisplayed() {
-        return iDiscrepancyNoteFlag.isDisplayed();
-    }
-
-    public void clickDNIcon() {
-        iDiscrepancyNoteFlag.click();
-    }
-
-    public boolean isSubjectExists(String subjectID) {
-        List<WebElement> subjectIDElements = tblFindSubjects.findElements(By.xpath("./tbody/tr/td[1]"));
-
-        List<String> subjectIDs = new ArrayList<String>();
-
-        for (WebElement w : subjectIDElements)
-            subjectIDs.add(w.getText());
-
-        return subjectIDs.contains(subjectID);
-    }
-
-    public void clickScheduleEventBtn() {
-        bScheduleEvent.click();
+    
+    public void clickClearFilterLink() {
+        lClearFilter.click();
     }
     
-    @Override
-	public boolean isOnPage(WebDriver driver) {
-    	return tblFindSubjects.isDisplayed();
+	public void callPopupForSubjectAndEvent(String studySubjectID, String eventName) {
+		List<WebElement> eventIcons = tblFindSubjects.findElements(By.xpath(".//td[text()='" + studySubjectID + "']"));
+		if (eventIcons.size() == 0) {
+			filterSMByStudySubjectID(studySubjectID);
+		}
+		WebElementFacade eventIcon = tblFindSubjects.findBy(By.xpath(".//td[text()='" + studySubjectID + "']/..//div[@event_name='" + eventName + "']/../a"));		
+    	eventIcon.click();
+	}
+	
+	private void initElementsInPopup() {
+		iStartDate.waitUntilVisible();
+		iEndDate.waitUntilVisible();
+		bScheduleEvent.waitUntilVisible();
 	}
 
-	public void callPopupForSubjectAndEvent(String studySubjectID, String eventName) {
-		WebElement trWithSubjectData = tblFindSubjects.findElement(By.xpath(".//td[text()='" + studySubjectID + "']]/.."));
-		WebElement eventIcon = trWithSubjectData.findElement(By.xpath("//div[@event_name='" + eventName + "']/..//a"));
+	public void fillInPopupToScheduleEvent(StudyEventDefinition event) {
+		initElementsInPopup();
+		if (!event.getStartDateTime().isEmpty()) {
+			iStartDate.type(event.getStartDateTime());
+		}
 		
-    	eventIcon.click();
+		iEndDate.type(event.getEndDateTime());
+	}
+
+	public void clickScheduleEventButtonOnPopup() {
+		bScheduleEvent.waitUntilVisible();
+		bScheduleEvent.click();
+	}
+
+	public void eventIsScheduled(StudyEventDefinition event) {
+		WebElementFacade eventIcon = tblFindSubjects.findBy(By.xpath(".//td[text()='" + event.getStudySubjectID() + "']/..//div[@event_name='" + event.getName() + "']/../a/img"));		
+		assert(eventIcon.getAttribute("src").endsWith("icon_Scheduled.gif"));
 	}
 }

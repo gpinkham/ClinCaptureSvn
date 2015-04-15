@@ -8,6 +8,10 @@ public class StudyEventDefinition {
 	
 	public static final Object NEW_CREATED_EVENT = "new_created_event";
 
+	public static final Object EVENT_TO_SCHEDULE = "event_to_schedule";
+
+	public static final Object EVENTS_TO_SCHEDULE = "events_to_schedule";;
+
 	private String name = "";
     
     private String description = "";
@@ -31,6 +35,14 @@ public class StudyEventDefinition {
     private String repeating = "";
     
     private List<String> eCRFs = new ArrayList<String>();
+    
+    private String startDateTime = "";
+    
+    private String endDateTime = "";
+    
+    private String studySubjectID = "";
+    
+    private String eventOID = "";
 
     public static StudyEventDefinition fillStudyEventDefinitionFromTableRow(
 			Map<String, String> row) {
@@ -83,6 +95,27 @@ public class StudyEventDefinition {
     	
     	if (row.get("CRFs") != null) {
     		event.setCRFList(generateCRFList(row.get("CRFs")));
+    	}
+    	
+    	if (row.get("Start Date/Time") != null) {
+    		event.setStartDateTime(row.get("Start Date/Time"));
+    	}
+    	
+    	if (row.get("End Date/Time") != null) {
+    		event.setEndDateTime(row.get("End Date/Time"));
+    	}
+    	
+    	
+    	if (row.get("Event Name") != null) {
+			event.setName(row.get("Event Name"));
+    	}
+    	
+    	if (row.get("Study Subject ID") != null) {
+			event.setStudySubjectID(row.get("Study Subject ID"));
+    	}
+    	
+    	if (row.get("Event OID") != null) {
+			event.setEventOID(row.get("Event OID"));
     	}
     	
 		return event;
@@ -207,5 +240,37 @@ public class StudyEventDefinition {
 		}
 		
 		return result;
+	}
+
+	public String getStartDateTime() {
+		return startDateTime;
+	}
+
+	public void setStartDateTime(String startDateTime) {
+		this.startDateTime = startDateTime;
+	}
+
+	public String getEndDateTime() {
+		return endDateTime;
+	}
+
+	public void setEndDateTime(String endDateTime) {
+		this.endDateTime = endDateTime;
+	}
+
+	public String getStudySubjectID() {
+		return studySubjectID;
+	}
+
+	public void setStudySubjectID(String studySubjectID) {
+		this.studySubjectID = studySubjectID;
+	}
+
+	public String getEventOID() {
+		return eventOID;
+	}
+
+	public void setEventOID(String eventOID) {
+		this.eventOID = eventOID;
 	}
 }

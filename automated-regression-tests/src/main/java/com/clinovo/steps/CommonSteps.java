@@ -106,7 +106,7 @@ public class CommonSteps extends ScenarioSteps {
 
     @Step
     public void go_to_subject_matrix_page() {
-        homePage.goToSubjectMatrix();
+        basePage.goToSubjectMatrix();
     }
 
     @Step
@@ -267,6 +267,9 @@ public class CommonSteps extends ScenarioSteps {
 			case AddSubjectPage.PAGE_NAME: 
 				go_to_add_subject_page();
 				break;
+			case SubjectMatrixPage.PAGE_NAME: 
+				go_to_subject_matrix_page();
+				break;	
 				
 			default: ;
 		}		
@@ -374,5 +377,30 @@ public class CommonSteps extends ScenarioSteps {
     @Step
 	public void call_popup_for_subject_and_event(String studySubjectID, String eventName) {
 		subjectMatrixPage.callPopupForSubjectAndEvent(studySubjectID, eventName);
+	}
+    
+    @Step
+	public void fill_in_popup_to_schedule_event(StudyEventDefinition event) {
+		subjectMatrixPage.fillInPopupToScheduleEvent(event);
+	}
+
+    @Step
+	public void click_schedule_event_button_on_popup() {
+		subjectMatrixPage.clickScheduleEventButtonOnPopup();
+	}
+
+	@Step
+	public void event_is_scheduled(StudyEventDefinition event) {
+		subjectMatrixPage.eventIsScheduled(event);
+	}
+	
+	@Step
+	public void clear_filter_on_SM() {
+		subjectMatrixPage.clickClearFilterLink();
+	}
+	
+	@Step
+	public void filter_SM_by_study_subject_id(String studySubjectID) {
+		subjectMatrixPage.filterSMByStudySubjectID(studySubjectID);
 	}
 }

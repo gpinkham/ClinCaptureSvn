@@ -243,3 +243,29 @@ Examples:
 |StSubj_1          |ss_1       |              |                              |Male    |03-Mar-1985    |               |
 |StSubj_2          |ss_2       |              |                              |Female  |04-Mar-1987    |               |
 |StSubj_3          |ss_3       |              |                              |Male    |16-Mar-1983    |               |
+
+
+Scenario: 14. CRC schedules event for subject
+
+Given User logs in as CRC
+And User goes to SM page
+And User calls a popup for StSubj_2, Event C
+And User fill in popup to schedule event:
+|Start Date/Time|End Date/Time|
+|               |             |
+When User clicks 'Schedule Event' button on popup
+Then User is on SM page
+And Event is scheduled
+
+
+Scenario: 14.1 CRC schedules events for subjects
+
+Given User logs in as CRC
+And User goes to SM page
+When User schedules events on SM:
+|Study Subject ID|Event Name      |
+|StSubj_1        |Event C, Event B|
+|StSubj_3        |Event C         |
+
+Then User is on SM page
+And Events are scheduled

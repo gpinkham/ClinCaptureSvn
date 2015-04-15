@@ -1,7 +1,9 @@
 package com.clinovo.jbehave;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.clinovo.pages.ChangeStudyPage;
 import com.clinovo.pages.ConfirmChangeStudyPage;
@@ -288,10 +290,92 @@ public class ClinovoJBehave extends BaseJBehave {
     	commonSteps.fill_in_study_subject_page(ssubj);
     }
     
-    @Then("User calls a popup for $studySubjectID, $eventName")
     @Given("User calls a popup for $studySubjectID, $eventName")
+    @When("User calls a popup for $studySubjectID, $eventName")
     public void userCallsPopupOnSM(String studySubjectID, String eventName) {
+    	StudyEventDefinition event = new StudyEventDefinition();
+    	event.setName(eventName);
+    	event.setStudySubjectID(studySubjectID);
+    	Thucydides.getCurrentSession().put(StudyEventDefinition.EVENT_TO_SCHEDULE, event);
         commonSteps.call_popup_for_subject_and_event(studySubjectID, eventName);
+    }
+    
+    @Given("User fill in popup to schedule event: $activityTable")
+    public void userFillInPopupToScheduleEvent(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams = table.getRowAsParameters(0, replaceNamedParameters);
+    	StudyEventDefinition event = StudyEventDefinition.fillStudyEventDefinitionFromTableRow(rowParams.values());
+    	commonSteps.fill_in_popup_to_schedule_event(event);
+    }
+    
+    @Given("User clicks 'Schedule Event' button on popup")
+    @When("User clicks 'Schedule Event' button on popup")
+	public void userClicksScheduleEventButtonOnPopup() {
+    	commonSteps.click_schedule_event_button_on_popup();
+    }
+    
+    @Given("User schedules event using popup: $activityTable")
+    @When("User schedules event using popup: $activityTable")
+    public void userSchedulesEventUsingPopup(ExamplesTable table) {
+    	userFillInPopupToScheduleEvent(table);
+    	userClicksScheduleEventButtonOnPopup();
+    }
+    
+    @Given("Event is scheduled")
+    @Then("Event is scheduled")
+    public void eventIsScheduled() {
+    	StudyEventDefinition event = (StudyEventDefinition) Thucydides.getCurrentSession().get(StudyEventDefinition.EVENT_TO_SCHEDULE);
+    	Thucydides.getCurrentSession().remove(StudyEventDefinition.EVENT_TO_SCHEDULE);
+    	commonSteps.event_is_scheduled(event);
+    }
+    
+    @Given("User schedules events on SM: $activityTable")
+    @When("User schedules events on SM: $activityTable")
+    public void userSchedulesEventsOnSM(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	List<StudyEventDefinition> events = new ArrayList<StudyEventDefinition>();
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		Parameters rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		Map<String, String> values = rowParams.values();
+    		for (String eventName: rowParams.values().get("Event Name").split(",")) {
+    			values.put("Event Name", eventName.trim());
+    			StudyEventDefinition event = StudyEventDefinition.fillStudyEventDefinitionFromTableRow(values);
+    			userCallsPopupOnSM(event.getStudySubjectID(), event.getName());
+    			commonSteps.fill_in_popup_to_schedule_event(event);
+    			userClicksScheduleEventButtonOnPopup();
+    			events.add(event);
+    		}
+    	}
+    	
+    	Thucydides.getCurrentSession().put(StudyEventDefinition.EVENTS_TO_SCHEDULE, events);
+    	commonSteps.clear_filter_on_SM();
+    }
+    
+    @SuppressWarnings("unchecked")
+	@Given("Events are scheduled")
+    @Then("Events are scheduled")
+    public void eventsAreScheduled() {
+    	List<StudyEventDefinition> events = (List<StudyEventDefinition>) Thucydides.getCurrentSession().get(StudyEventDefinition.EVENTS_TO_SCHEDULE);
+    	Thucydides.getCurrentSession().remove(StudyEventDefinition.EVENTS_TO_SCHEDULE);
+    	Map<String, List<StudyEventDefinition>> studySubjectIDToEvents = new HashMap<String, List<StudyEventDefinition>>();
+    	for (StudyEventDefinition event: events) {
+    		if (studySubjectIDToEvents.get(event.getStudySubjectID()) != null) {
+    			studySubjectIDToEvents.get(event.getStudySubjectID()).add(event);
+    		} else {
+    			List<StudyEventDefinition> seds = new ArrayList<StudyEventDefinition>();
+    			seds.add(event);
+    			studySubjectIDToEvents.put(event.getStudySubjectID(), seds);
+    		}
+    	}
+    	
+    	for (String studySubjectID: studySubjectIDToEvents.keySet()) {
+    		commonSteps.filter_SM_by_study_subject_id(studySubjectID);
+    		for (StudyEventDefinition event: studySubjectIDToEvents.get(studySubjectID)) {
+    			commonSteps.event_is_scheduled(event);
+    		}
+    	}
+    	
+    	commonSteps.clear_filter_on_SM();
     }
     
     private User getCurrentUser() {
