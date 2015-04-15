@@ -1,7 +1,12 @@
 package com.clinovo.tag;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.service.CRFMaskingService;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.tagext.TagSupport;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
@@ -14,13 +19,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.TagSupport;
-
-import java.util.Locale;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.CRFMaskingService;
 
 /**
  * Custom tag for building view data entry link.
@@ -57,7 +57,9 @@ public class ViewDataEntryLinkTag extends TagSupport {
 	@Override
 	public int doStartTag() throws JspException {
 		if (object != null) {
-			WebApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(((PageContext) pageContext.getAttribute("javax.servlet.jsp.jspPageContext")).getServletContext());
+			WebApplicationContext appContext = WebApplicationContextUtils
+					.getRequiredWebApplicationContext(((PageContext) pageContext.getAttribute(PageContext.PAGECONTEXT))
+							.getServletContext());
 			CRFMaskingService crfMaskingService = (CRFMaskingService) appContext.getBean("crfMaskingService");
 			MessageSource messageSource = (MessageSource) appContext.getBean("messageSource");
 			Locale locale = LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest());
@@ -89,20 +91,21 @@ public class ViewDataEntryLinkTag extends TagSupport {
 					}
 					align = align.isEmpty() ? "left" : align;
 					name = name.isEmpty() ? "bt_View1" : name;
-					onMouseDown = onMouseDown.isEmpty() ? "setImage(\"bt_View1\",\"images/bt_View_d.gif\");" : onMouseDown;
+					onMouseDown = onMouseDown.isEmpty()
+							? "setImage(\"bt_View1\",\"images/bt_View_d.gif\");"
+							: onMouseDown;
 					onMouseUp = onMouseUp.isEmpty() ? "setImage('bt_View1','images/bt_View.gif');" : onMouseUp;
 
 					link = link.concat("onclick=\"" + onClick.replace("\"", "'") + "\"")
-							.concat("onmousedown='" + onMouseDown + "' ")
-							.concat("onmouseup=\"" + onMouseUp + "\" >")
+							.concat("onmousedown='" + onMouseDown + "' ").concat("onmouseup=\"" + onMouseUp + "\" >")
 							.concat("<img name='" + name + "' ")
 							.concat("src='images/bt_View.gif' border='" + border + "'")
 							.concat("alt='" + messageSource.getMessage("view", null, locale) + "' ")
 							.concat("title='" + messageSource.getMessage("view", null, locale) + "' ")
-							.concat("align='" + align + "' " + "hspace='" + hspace + "'/>")
-							.concat("</a>");
+							.concat("align='" + align + "' " + "hspace='" + hspace + "'/>").concat("</a>");
 				} else {
-					link = link.concat("<img src=\"images/bt_Transparent.gif\" border=\"0\" align=\"left\" hspace=\"" + hspace + "\">");
+					link = link.concat("<img src=\"images/bt_Transparent.gif\" border=\"0\" align=\"left\" hspace=\""
+							+ hspace + "\">");
 				}
 			}
 			JspWriter writer = pageContext.getOut();

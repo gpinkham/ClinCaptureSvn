@@ -23,7 +23,7 @@ import com.clinovo.i18n.LocaleResolver;
 @SuppressWarnings("serial")
 public class CalendarIconTag extends TagSupport {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarTag.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarIconTag.class);
 
 	private String alt = "";
 	private String title = "";
@@ -50,8 +50,8 @@ public class CalendarIconTag extends TagSupport {
 
 		if (onClickSelector != null) {
 			WebApplicationContext webApplicationContext = WebApplicationContextUtils
-					.getRequiredWebApplicationContext(((PageContext) pageContext
-							.getAttribute("javax.servlet.jsp.jspPageContext")).getServletContext());
+					.getRequiredWebApplicationContext(((PageContext) pageContext.getAttribute(PageContext.PAGECONTEXT))
+							.getServletContext());
 			StudyBean currentStudy = (StudyBean) pageContext.getSession().getAttribute("study");
 			MessageSource messageSource = (MessageSource) webApplicationContext.getBean("messageSource");
 			Locale locale = LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest());
