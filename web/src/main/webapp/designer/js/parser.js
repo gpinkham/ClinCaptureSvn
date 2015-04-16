@@ -2038,7 +2038,7 @@ Parser.prototype.extractEventFromExpression = function(predicate) {
 };
 Parser.prototype.extractVersionFromExpression = function(predicate) {
 	if (this.isVersionified(predicate))
-		return /.*\.(F_\w+\d+)(?=\.)/.exec(predicate)[1];
+		return /.*\.(F_\w+_\d+)(?=\.)/.exec(predicate)[1];
 };
 Parser.prototype.extractItemFromExpression = function(predicate) {
 	return /([^\.]+)$/.exec(predicate)[1];
@@ -2082,7 +2082,7 @@ Parser.prototype.isEventified = function(expression) {
 	return expression.slice(0, "SE_".length) == "SE_";
 };
 Parser.prototype.isVersionified = function(expression) {
-	return /(F_\w+\d+)(?=\.)/ig.test(expression);
+	return /(F_\w+_\d+)(?=\.)/ig.test(expression);
 };
 Parser.prototype.eventify = function(targetEvent) {
 	var element = $(targetEvent).parent().siblings(".target"), name = element.val();;
