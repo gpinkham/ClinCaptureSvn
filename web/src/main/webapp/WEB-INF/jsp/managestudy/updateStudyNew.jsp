@@ -1363,7 +1363,7 @@
 		       name="allowSdvWithOpenQueries" value="yes"><fmt:message key="yes" bundle="${resword}"/>
 
 		<input type="radio" onchange="javascript:changeIcon()"
-		${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'no' ? "" : "checked"}
+		${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'no' ? "checked" : ""}
 		       name="allowSdvWithOpenQueries" value="no"><fmt:message key="no" bundle="${resword}"/>
 	</td>
 </tr>
