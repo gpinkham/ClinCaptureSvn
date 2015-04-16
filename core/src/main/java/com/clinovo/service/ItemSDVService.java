@@ -22,6 +22,7 @@ import java.util.Map;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.exception.OpenClinicaException;
 
 import com.clinovo.util.CrfShortcutsAnalyzer;
 
@@ -149,4 +150,16 @@ public interface ItemSDVService {
 	 * @return boolean flag that equals to true if crf has items to SDV, otherwise it's false
 	 */
 	boolean hasItemsToSDV(int crfId);
+
+	/**
+	 * Method copies settings from previous crf version.
+	 * 
+	 * @param previousCrfVersionId
+	 *            int
+	 * @param newCrfVersionId
+	 *            int
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
+	void copySettingsFromPreviousVersion(int previousCrfVersionId, int newCrfVersionId) throws OpenClinicaException;
 }

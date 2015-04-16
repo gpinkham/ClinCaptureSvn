@@ -9,6 +9,7 @@ import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -75,5 +76,18 @@ public class ItemSDVServiceTest extends DefaultAppContextTest {
 	@Test
 	public void testThatProcessChangedCrfVersionMetadataDoesNotThrowAnException() throws Exception {
 		itemSDVService.processChangedCrfVersionMetadata(study, ub, 1, metadata);
+	}
+
+	@Test
+	public void testThatCopySettingsFromPreviousVersionMovesItemLevelSDVSettingsCorrectly() throws Exception {
+		ItemFormMetadataBean imfBean = imfdao.findByItemIdAndCRFVersionId(25, 1);
+		imfBean.setSdvRequired(true);
+		imfdao.update(imfBean);
+		imfBean = imfdao.findByItemIdAndCRFVersionId(33, 2);
+		imfBean.setSdvRequired(false);
+		imfdao.update(imfBean);
+		itemSDVService.copySettingsFromPreviousVersion(1, 2);
+		imfBean = imfdao.findByItemIdAndCRFVersionId(33, 2);
+		assertTrue(imfBean.isSdvRequired());
 	}
 }

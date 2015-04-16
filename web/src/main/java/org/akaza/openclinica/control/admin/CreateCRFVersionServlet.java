@@ -202,9 +202,12 @@ public class CreateCRFVersionServlet extends Controller {
 		NewCRFBean nib1 = (NewCRFBean) request.getSession().getAttribute("nib");
 		if (nib1 != null) {
 			try {
+				CRFVersionDAO cvdao = getCRFVersionDAO();
+				List<CRFVersionBean> crfVersionList = (List<CRFVersionBean>) cvdao.findAllActiveByCRF(version
+						.getCrfId());
 				nib1.insertToDB();
 				request.setAttribute("queries", nib1.getQueries());
-				CRFVersionDAO cvdao = getCRFVersionDAO();
+
 				ArrayList crfvbeans;
 				logger.info("CRF-ID [" + version.getCrfId() + "]");
 				int crfVersionId = 0;
@@ -224,7 +227,10 @@ public class CreateCRFVersionServlet extends Controller {
 					cfvID = cvdao.findCRFVersionId(nib1.getCrfId(), nib1.getVersionName());
 				}
 				CRFVersionBean finalVersion = (CRFVersionBean) cvdao.findByPK(cfvID);
-
+				if (crfVersionList != null && crfVersionList.size() > 0) {
+					getItemSDVService().copySettingsFromPreviousVersion(crfVersionList.get(0).getId(),
+							finalVersion.getId());
+				}
 				getEventDefinitionCrfService().updateChildEventDefinitionCrfsForNewCrfVersion(finalVersion, ub);
 
 				version.setCrfId(nib1.getCrfId());

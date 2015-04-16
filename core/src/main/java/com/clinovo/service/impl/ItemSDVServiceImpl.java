@@ -39,10 +39,12 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -223,5 +225,31 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 	 */
 	public boolean hasItemsToSDV(int crfId) {
 		return new ItemFormMetadataDAO(dataSource).hasItemsToSDV(crfId);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void copySettingsFromPreviousVersion(int previousCrfVersionId, int newCrfVersionId)
+			throws OpenClinicaException {
+		ItemDAO itemDao = new ItemDAO(dataSource);
+		ItemFormMetadataDAO itemFormMetadataDao = new ItemFormMetadataDAO(dataSource);
+		Map<String, ItemFormMetadataBean> itemFormMetadataMap = new HashMap<String, ItemFormMetadataBean>();
+		List<ItemFormMetadataBean> newItemFormMetadataBeanList = itemFormMetadataDao
+				.findAllByCRFVersionId(newCrfVersionId);
+		List<ItemFormMetadataBean> prevItemFormMetadataBeanList = itemFormMetadataDao
+				.findAllByCRFVersionId(previousCrfVersionId);
+		for (ItemFormMetadataBean newItemFormMetadataBean : newItemFormMetadataBeanList) {
+			itemFormMetadataMap.put(itemDao.findByPK(newItemFormMetadataBean.getItemId()).getName(),
+					newItemFormMetadataBean);
+		}
+		for (ItemFormMetadataBean prevItemFormMetadataBean : prevItemFormMetadataBeanList) {
+			ItemFormMetadataBean newItemFormMetadataBean = itemFormMetadataMap.get(itemDao.findByPK(
+					prevItemFormMetadataBean.getItemId()).getName());
+			if (newItemFormMetadataBean != null) {
+				newItemFormMetadataBean.setSdvRequired(prevItemFormMetadataBean.isSdvRequired());
+				itemFormMetadataDao.update(newItemFormMetadataBean);
+			}
+		}
 	}
 }
