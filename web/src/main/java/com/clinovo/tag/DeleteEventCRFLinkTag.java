@@ -1,7 +1,13 @@
 package com.clinovo.tag;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.service.CRFMaskingService;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.tagext.TagSupport;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
@@ -11,19 +17,16 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.TagSupport;
-import java.util.Locale;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.CRFMaskingService;
 
 /**
  * Custom tag for building the delete event CRF link.
  */
+@SuppressWarnings("serial")
 public class DeleteEventCRFLinkTag extends TagSupport {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(PrintEventCRFLinkTag.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DeleteEventCRFLinkTag.class);
 
 	private Object object;
 	private String subjectId = "";
@@ -53,15 +56,14 @@ public class DeleteEventCRFLinkTag extends TagSupport {
 			DisplayEventCRFBean decBean = (DisplayEventCRFBean) object;
 			EventDefinitionCRFBean edcBean = decBean.getEventDefinitionCRF();
 			if (!maskingService.isEventDefinitionCRFMasked(edcBean.getId(), user.getId(), edcBean.getStudyId())) {
-				link = "<a href=\"DeleteEventCRF?action=confirm&ssId="
-						+ subjectId + "&ecId=" + decBean.getEventCRF().getId() + "\" "
+				link = "<a href=\"DeleteEventCRF?action=confirm&ssId=" + subjectId + "&ecId="
+						+ decBean.getEventCRF().getId() + "\" "
 						+ "onMouseDown=\"javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');\" "
-						+ "onMouseUp=\"javascript:setImage('bt_Delete1','images/bt_Delete.gif');\" "
-						+ "onclick=\"" + onClick + "\">"
-						+ "<img name=\"bt_Delete1\" src=\"images/bt_Delete.gif\" border=\"0\" "
-						+ "alt=\"" + messageSource.getMessage("delete", null, locale) + "\" "
-						+ "title=\"" + messageSource.getMessage("delete", null, locale) + "\" "
-						+ " align=\"left\" hspace=\"" + hspace + "\"/></a>";
+						+ "onMouseUp=\"javascript:setImage('bt_Delete1','images/bt_Delete.gif');\" " + "onclick=\""
+						+ onClick + "\">" + "<img name=\"bt_Delete1\" src=\"images/bt_Delete.gif\" border=\"0\" "
+						+ "alt=\"" + messageSource.getMessage("delete", null, locale) + "\" " + "title=\""
+						+ messageSource.getMessage("delete", null, locale) + "\" " + " align=\"left\" hspace=\""
+						+ hspace + "\"/></a>";
 			}
 		}
 
