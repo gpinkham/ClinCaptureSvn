@@ -419,12 +419,7 @@
                     </c:if>
                     <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 and (!studySub.status.deleted) && (study.status.available) && (!dec.locked) && (!dec.stage.locked)}">
                         <td>
-                            <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
-                               onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
-                               onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"
-                               onclick="setAccessedObjected(this)"><img name="bt_Delete1" src="images/bt_Delete.gif" border="0"
-                                    alt="<fmt:message key="delete" bundle="${resword}"/>"
-                                    title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
+							<ui:deleteEventCRFLink object="${dec}" subjectId="${studySub.id}" onClick="setAccessedObjected(this)"/>
                         </td>
                     </c:if>
                     <c:if test="${dec.stage.invalid && (userRole.id == 1 || userRole.id == 2) && (studySub.status.deleted)}">
