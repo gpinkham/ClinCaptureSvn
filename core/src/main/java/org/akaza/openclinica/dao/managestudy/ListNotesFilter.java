@@ -18,10 +18,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
@@ -38,6 +38,8 @@ public class ListNotesFilter implements CriteriaCommand {
 	private HashMap<String, String> additionalColumnMapping = new HashMap<String, String>();
 
 	private HashMap<String, String> additionalStudyEventColumnMapping = new HashMap<String, String>();
+
+	private Map<String, String> dnsEntityNameMap;
 
 	private boolean dateCreatedCorrect = true;
 	private boolean dateUpdatedCorrect = true;
@@ -63,10 +65,21 @@ public class ListNotesFilter implements CriteriaCommand {
 
 		additionalColumnMapping.put("crfName", "dns.crf_name");
 		additionalColumnMapping.put("eventName", "dns.event_name");
-		additionalColumnMapping.put("entityName", "dns.item_name");
+		additionalColumnMapping.put("entityName", "dns.entity_name");
 		additionalColumnMapping.put("entityValue", "dns.item_value");
 
 		additionalStudyEventColumnMapping.put("eventId", "se.study_event_id");
+
+		dnsEntityNameMap = new HashMap<String, String>();
+		dnsEntityNameMap.put(ResourceBundleProvider.getResWord("unique_identifier").toLowerCase(), "unique_identifier");
+		dnsEntityNameMap.put(ResourceBundleProvider.getResWord("gender").toLowerCase(), "gender");
+		dnsEntityNameMap.put(ResourceBundleProvider.getResWord("date_of_birth").toLowerCase(), "date_of_birth");
+		dnsEntityNameMap.put(ResourceBundleProvider.getResWord("enrollment_date").toLowerCase(), "enrollment_date");
+		dnsEntityNameMap.put(ResourceBundleProvider.getResWord("start_date").toLowerCase(), "date_start");
+		dnsEntityNameMap.put(ResourceBundleProvider.getResWord("end_date").toLowerCase(), "date_end");
+		dnsEntityNameMap.put(ResourceBundleProvider.getResWord("location").toLowerCase(), "location");
+		dnsEntityNameMap.put(ResourceBundleProvider.getResWord("interviewer_name").toLowerCase(), "interviewer_name");
+		dnsEntityNameMap.put(ResourceBundleProvider.getResWord("date_interviewed").toLowerCase(), "date_interviewed");
 	}
 
 	/**
@@ -278,28 +291,39 @@ public class ListNotesFilter implements CriteriaCommand {
 
 	/**
 	 * Gets additional filter.
-	 * 
-	 * @param study
-	 *            StudyBean
+	 *
 	 * @return String
 	 */
-	public String getAdditionalFilter(StudyBean study) {
+	public String getAdditionalFilter() {
 		StringBuilder builder = new StringBuilder(" where 1=1 ");
 		for (ListNotesFilter.Filter filter : this.getFilters()) {
 			String property = filter.getProperty();
 			if (additionalColumnMapping.containsKey(property)) {
-				String itemDataOrdinal = null;
-				String value = (String) filter.getValue();
-				if (property.equalsIgnoreCase("entityName") && Pattern.compile("\\(#\\d*\\)").matcher(value).find()) {
-					itemDataOrdinal = RegexpUtil.parseGroup(value, "(\\(#\\d*\\))", 1).replaceAll("\\(#|\\)", "");
-					value = RegexpUtil.parseGroup(value, "(\\w*)(\\(#\\d*\\))", 1);
-				}
-				builder.append(" and ").append(additionalColumnMapping.get(property)).append(" like '%").append(value)
-						.append("%' ");
 
-				if (itemDataOrdinal != null) {
-					builder.append(" and ").append("dns.item_data_ordinal").append(" = ").append(itemDataOrdinal)
-							.append(" ");
+				String value = (String) filter.getValue();
+
+				if (property.equalsIgnoreCase("entityName")) {
+
+					if (dnsEntityNameMap.containsKey(value.toLowerCase())) {
+						builder.append(" and ").append(additionalColumnMapping.get(property)).append(" = '")
+								.append(dnsEntityNameMap.get(value.toLowerCase())).append("' ");
+					} else {
+						String itemDataOrdinal = null;
+						if (Pattern.compile("\\(#\\d*\\)").matcher(value).find()) {
+							itemDataOrdinal = RegexpUtil.parseGroup(value, "(\\(#\\d*\\))", 1).replaceAll("\\(#|\\)", "");
+							value = RegexpUtil.parseGroup(value, "(\\w*)(\\(#\\d*\\))", 1);
+						}
+						builder.append(" and ").append(additionalColumnMapping.get(property)).append(" like '%")
+								.append(value).append("%' ");
+						if (itemDataOrdinal != null) {
+							builder.append(" and ").append("dns.item_data_ordinal").append(" = ")
+									.append(itemDataOrdinal).append(" ");
+						}
+					}
+
+				} else {
+					builder.append(" and ").append(additionalColumnMapping.get(property)).append(" like '%")
+							.append(value).append("%' ");
 				}
 			}
 		}

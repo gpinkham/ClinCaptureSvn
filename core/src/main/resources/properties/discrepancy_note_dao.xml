@@ -13,7 +13,8 @@
     <query>
         <name>findAllSubjectDNByStudy</name>
         <sql>
-            SELECT dn.*, ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, NULL event_name, NULL item_value, 0 item_data_ordinal
+            SELECT dn.*, ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, NULL event_name, NULL item_value,
+			0 item_data_ordinal, ds.column_name AS entity_name
             FROM study_subject ss,
             dn_subject_map ds,
             dn_age_days dad,
@@ -60,7 +61,8 @@
     <query>
         <name>findAllStudySubjectDNByStudy</name>
         <sql>
-            SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, NULL event_name, NULL item_value, 0 item_data_ordinal
+            SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, NULL event_name, NULL item_value,
+			0 item_data_ordinal, dss.column_name AS entity_name
             FROM study_subject ss,
             dn_study_subject_map dss,
             dn_age_days dad,
@@ -107,7 +109,8 @@
     <query>
         <name>findAllStudyEventDNByStudy</name>
         <sql>
-            SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, sed.name event_name, NULL item_value, 0 item_data_ordinal
+            SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, sed.name event_name, NULL item_value,
+			0 item_data_ordinal, dse.column_name AS entity_name
             FROM study_subject ss,
             study_event se left join study_event_definition sed on se.study_event_definition_id =
             sed.study_event_definition_id,
@@ -167,7 +170,7 @@
         <name>findAllEventCrfDNByStudy</name>
         <sql>
             SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, c.name crf_name, sed.name event_name, NULL
-            item_value, 0 item_data_ordinal
+            item_value, 0 item_data_ordinal, dec.column_name AS entity_name
             FROM study_subject ss,
             event_crf ec left join crf_version cv on ec.crf_version_id = cv.crf_version_id
             left join crf c on c.crf_id = cv.crf_id
@@ -232,7 +235,7 @@
         <name>findAllItemDataDNByStudy</name>
         <sql>
             SELECT dn.*,ss.label, dad.age, dad.days, it.name item_name, c.name crf_name, sed.name event_name, itd.value
-            item_value, itd.ordinal item_data_ordinal
+            item_value, itd.ordinal item_data_ordinal, it.name AS entity_name
             FROM study_subject ss,
             event_crf ec left join crf_version cv on ec.crf_version_id = cv.crf_version_id
             left join crf c on c.crf_id = cv.crf_id
@@ -507,7 +510,7 @@
         </sql>
     </query>
     <query>
-        <name>findAllStudySubjectByStudiesAndStudySubjectId</name>
+		<name>findAllStudySubjectByStudiesAndStudySubjectId</name>
         <sql>
             SELECT dn.*, ss.label,dsm.column_name, dsm.study_subject_id
             FROM discrepancy_note dn, dn_study_subject_map dsm ,
@@ -647,95 +650,6 @@
             AND ec.crf_version_id=cv.crf_version_id
             AND cv.crf_id = crf.crf_id
             AND dn.parent_dn_id = ?
-        </sql>
-    </query>
-    <query>
-        <name>findAllEventCRFByPK</name>
-        <sql>
-            SELECT dn.*, ss.label, se.date_start, sed.name as sed_name,
-            crf.name as crf_name,dsm.column_name
-            FROM discrepancy_note dn, dn_event_crf_map dsm ,
-            event_crf ec, study_event se,
-            study_event_definition sed, crf_version cv,
-            study_subject ss, crf
-            WHERE (dn.discrepancy_note_id = ?
-            OR dn.parent_dn_id=?)
-            AND dn.discrepancy_note_id=dsm.discrepancy_note_id
-            AND ec.event_crf_id = dsm.event_crf_id
-            AND ec.study_event_id=se.study_event_id
-            AND sed.study_event_definition_id= se.study_event_definition_id
-            AND se.study_subject_id = ss.study_subject_id
-            AND ec.crf_version_id=cv.crf_version_id
-            AND cv.crf_id = crf.crf_id
-            order by dn.date_created desc
-        </sql>
-    </query>
-    <query>
-        <name>findAllItemDataByPK</name>
-        <sql>
-            SELECT dn.*, ss.label, se.date_start, sed.name as sed_name,
-            crf.name as crf_name,it.name as item_name, id.value, it.item_id, dsm.item_data_id
-            FROM discrepancy_note dn, dn_item_data_map dsm ,
-            item_data id, event_crf ec, study_event se,
-            study_event_definition sed, crf_version cv,
-            study_subject ss, crf, item it
-            WHERE (dn.discrepancy_note_id = ?
-            OR dn.parent_dn_id=?)
-            AND dn.discrepancy_note_id=dsm.discrepancy_note_id
-            AND dsm.item_data_id = id.item_data_id
-            AND id.item_id = it.item_id
-            AND ec.event_crf_id = id.event_crf_id
-            AND ec.study_event_id=se.study_event_id
-            AND sed.study_event_definition_id= se.study_event_definition_id
-            AND se.study_subject_id = ss.study_subject_id
-            AND ec.crf_version_id=cv.crf_version_id
-            AND cv.crf_id = crf.crf_id
-            order by dn.date_created desc
-        </sql>
-    </query>
-    <query>
-        <name>findAllStudySubjectByPK</name>
-        <sql>
-            SELECT dn.*, ss.label,dsm.column_name
-            FROM discrepancy_note dn, dn_study_subject_map dsm ,
-            study_subject ss
-            WHERE (dn.discrepancy_note_id = ?
-            OR dn.parent_dn_id=?)
-            AND dn.discrepancy_note_id=dsm.discrepancy_note_id
-            AND dsm.study_subject_id = ss.study_subject_id
-            order by dn.date_created desc
-        </sql>
-    </query>
-    <query>
-        <name>findAllSubjectByPK</name>
-        <sql>
-            SELECT dn.*, ss.label,dsm.column_name
-            FROM discrepancy_note dn, dn_subject_map dsm ,
-            study_subject ss, subject sub
-            WHERE (dn.discrepancy_note_id = ?
-            OR dn.parent_dn_id=?)
-            AND dn.discrepancy_note_id=dsm.discrepancy_note_id
-            AND dsm.subject_id = sub.subject_id
-            AND ss.subject_id = sub.subject_id
-            order by dn.date_created desc
-        </sql>
-    </query>
-    <query>
-        <name>findAllStudyEventByPK</name>
-        <sql>
-            SELECT dn.*, ss.label, se.date_start, sed.name as sed_name,
-            dsm.column_name
-            FROM discrepancy_note dn, dn_study_event_map dsm ,
-            study_event se,
-            study_event_definition sed,
-            study_subject ss
-            WHERE (dn.discrepancy_note_id = ?
-            OR dn.parent_dn_id=?)
-            AND dn.discrepancy_note_id=dsm.discrepancy_note_id
-            AND dsm.study_event_id =se.study_event_id
-            AND sed.study_event_definition_id= se.study_event_definition_id
-            AND se.study_subject_id = ss.study_subject_id
-            order by dn.date_created desc
         </sql>
     </query>
     <query>
@@ -887,20 +801,6 @@
         </sql>
     </query>
     <query>
-        <name>findByStudyEvent</name>
-        <sql>
-            select dn.resolution_status_id,count(dn.resolution_status_id) from discrepancy_note dn,dn_item_data_map
-            didm,event_crf ec,item_data ed,study_event se
-            where
-            SE.study_event_id = ec.study_event_id
-            AND EC.event_crf_id = ed.event_crf_id
-            AND ed.item_data_id = didm.item_data_id
-            AND didm.discrepancy_note_id = dn.discrepancy_note_id
-            AND se.study_event_id = ?
-            AND dn.parent_dn_id is null
-        </sql>
-    </query>
-    <query>
         <name>findAllDnIdsByStudyEvent</name>
         <sql>
             SELECT dn.discrepancy_note_id as discrepancy_note_id
@@ -974,52 +874,6 @@
             AND se.study_event_id = ?
             AND dn.parent_dn_id is null
             AND dn.resolution_status_id in (0,1,2,3)
-        </sql>
-    </query>
-    <query>
-        <name>countBySubjectTypeAndStudyEvent</name>
-        <sql>
-            select dn.resolution_status_id,count(dn.resolution_status_id)
-            from discrepancy_note dn, dn_subject_map dsm, study_event se, study_subject ss
-            where dsm.subject_id = ss.subject_id
-            and ss.study_subject_id = se.study_subject_id
-            and dsm.discrepancy_note_id = dn.discrepancy_note_id
-            and se.study_event_id = ?
-            and dn.parent_dn_id is null
-        </sql>
-    </query>
-    <query>
-        <name>countByStudySubjectTypeAndStudyEvent</name>
-        <sql>
-            select dn.resolution_status_id,count(dn.resolution_status_id)
-            from discrepancy_note dn, dn_study_subject_map dssm, study_event se
-            where dssm.study_subject_id = se.study_subject_id
-            and dssm.discrepancy_note_id = dn.discrepancy_note_id
-            and se.study_event_id = ?
-            and dn.parent_dn_id is null
-        </sql>
-    </query>
-    <query>
-        <name>countByEventCrfTypeAndStudyEvent</name>
-        <sql>
-            select dn.resolution_status_id,count(dn.resolution_status_id)
-            from discrepancy_note dn, dn_event_crf_map decm, event_crf ec, study_event se
-            where se.study_event_id = ec.study_event_id
-            and ec.event_crf_id = decm.event_crf_id
-            and decm.discrepancy_note_id = dn.discrepancy_note_id
-            and se.study_event_id = ?
-            and dn.parent_dn_id is null
-        </sql>
-    </query>
-    <query>
-        <name>countByStudyEventTypeAndStudyEvent</name>
-        <sql>
-            select dn.resolution_status_id,count(dn.resolution_status_id)
-            from discrepancy_note dn, dn_study_event_map dsem, study_event se
-            where dsem.study_event_id = se.study_event_id
-            and dsem.discrepancy_note_id = dn.discrepancy_note_id
-            and se.study_event_id = ?
-            and dn.parent_dn_id is null
         </sql>
     </query>
     <query>
@@ -1278,8 +1132,6 @@
             dsms.item_data_id = id.item_data_id
 
             ) )
-
-
         </sql>
     </query>
     <query>
