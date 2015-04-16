@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.CRFMaskingService;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -32,6 +33,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -54,6 +56,9 @@ public class EventCRFServiceImpl implements EventCRFService {
 	@Autowired
 	private ItemDataService itemDataService;
 
+	@Autowired
+	private CRFMaskingService maskingService;
+
 	public EventCRFDAO getEventCRFDAO() {
 		return new EventCRFDAO(dataSource);
 	}
@@ -68,6 +73,10 @@ public class EventCRFServiceImpl implements EventCRFService {
 
 	private EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
 		return new EventDefinitionCRFDAO(dataSource);
+	}
+
+	private StudyDAO getStudyDAO() {
+		return new StudyDAO(dataSource);
 	}
 
 	private void remove(EventCRFBean eventCRF, Status crfStatusToSet, UserAccountBean updater) throws Exception {
@@ -265,6 +274,14 @@ public class EventCRFServiceImpl implements EventCRFService {
 				continue;
 			}
 			if (currentStudy.isSite() && edcBean.isHideCrf()) {
+				continue;
+			}
+			int studyId = currentEventDefinitionCRF == null ? getStudyDAO().findByStudySubjectId(currentStudyEvent.getStudySubjectId()).getId() : currentEventDefinitionCRF.getStudyId();
+			int eventDefinitionCRFId = edcBean.getId();
+			if (studyId != currentStudy.getId()) {
+				eventDefinitionCRFId = getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFIdAndStudyId(edcBean.getStudyEventDefinitionId(), edcBean.getCrfId(), studyId).getId();
+			}
+			if (maskingService.isEventDefinitionCRFMasked(eventDefinitionCRFId, currentUser.getId(), studyId)) {
 				continue;
 			}
 			EventCRFBean eventCrf = getExistingOrNewEventCrfForEventDefinition(edcBean, currentStudyEvent, currentUser,
