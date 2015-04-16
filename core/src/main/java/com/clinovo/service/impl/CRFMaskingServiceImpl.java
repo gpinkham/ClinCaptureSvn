@@ -3,6 +3,7 @@ package com.clinovo.service.impl;
 import com.clinovo.dao.CRFMaskingDAO;
 import com.clinovo.model.CRFMask;
 import com.clinovo.service.CRFMaskingService;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,7 @@ import java.util.List;
  */
 @Transactional
 @Service("crfMaskingService")
+@SuppressWarnings("unchecked")
 public class CRFMaskingServiceImpl implements CRFMaskingService {
 
 	@Autowired
@@ -142,7 +145,7 @@ public class CRFMaskingServiceImpl implements CRFMaskingService {
 	public StudyEventDefinitionBean returnFirstNotMaskedEvent(List<StudyEventDefinitionBean> sedList, int userId, int studyId) {
 		EventDefinitionCRFDAO eventCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		for (StudyEventDefinitionBean sed : sedList) {
-			List<CRFMask> masks = findAllActiveByUserStudyAndEventDefinitionIds(userId, sed.getId(), studyId);
+			List<CRFMask> masks = findAllActiveByUserStudyAndEventDefinitionIds(userId, sed.getId(), studyId);			
 			List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eventCRFDAO.findAllActiveByDefinitionAndSiteId(sed.getId(), sed.getStudyId());
 			if (masks == null || masks.size() < eventCRFs.size()) {
 				return sed;
