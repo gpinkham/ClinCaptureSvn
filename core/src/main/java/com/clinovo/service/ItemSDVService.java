@@ -162,4 +162,13 @@ public interface ItemSDVService {
 	 *             the OpenClinicaException
 	 */
 	void copySettingsFromPreviousVersion(int previousCrfVersionId, int newCrfVersionId) throws OpenClinicaException;
+
+	/**
+	 * Method checks that list of the DisplayItemBeans has SDV Required items.
+	 *
+	 * @param changedItemsList
+	 *            List<DisplayItemBean>
+	 * @return boolean flag that equals to true if list of the DisplayItemBeans has SDV Required items
+	 */
+	boolean hasChangedSDVRequiredItems(List<DisplayItemBean> changedItemsList);
 }

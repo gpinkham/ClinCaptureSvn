@@ -1376,9 +1376,11 @@ public abstract class DataEntryServlet extends Controller {
 					ssb.setUpdater(ub);
 					ssb.setUpdatedDate(new Date());
 					studySubjectDao.update(ssb);
-					ecb.setSdvStatus(false);
 					ecb.setSdvUpdateId(ub.getId());
-					resetSDVForItems = true;
+					if (getItemSDVService().hasChangedSDVRequiredItems(changedItemsList)) {
+						ecb.setSdvStatus(false);
+						resetSDVForItems = true;
+					}
 				}
 
 				ecb = (EventCRFBean) ecdao.update(ecb);

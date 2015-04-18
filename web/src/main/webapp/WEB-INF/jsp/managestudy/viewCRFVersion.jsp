@@ -53,9 +53,10 @@
 <input type="hidden" name="crfVersionId" value="${version.id}"/>
 <c:set var="totalItems" value="0"/>
 <c:set var="itemsCounter" value="0"/>
-<c:forEach var="section" items="${sections}" >
+<c:forEach var="sectionBean" items="${sections}" >
 	<br>
-	<c:set var="totalItems" value="${totalItems + fn:length(section.items)}"/>
+	<c:set var="section" value="${sectionBean.section}"/>
+	<c:set var="totalItems" value="${totalItems + fn:length(sectionBean.items)}"/>
 	<c:choose>
 		<c:when test="${userBean.sysAdmin && module=='admin'}">
 			<span class="table_title_Admin">
@@ -254,7 +255,9 @@
 			<td class="table_header_row">Is shown?</td>
 		</tr>
 
-		<c:forEach var="item" items="${section.items}">
+		<c:forEach var="itemBean" items="${sectionBean.items}">
+			<c:set var="item" value="${itemBean.item}"/>
+			<c:set var="hasSCD" value="${itemBean.scdData.scdItemMetadataBean.id ne null && itemBean.scdData.scdItemMetadataBean.id > 0}"/>
             <c:set var="itemsCounter" value="${itemsCounter + 1}"/>
 			<tr valign="top">
 
@@ -373,8 +376,9 @@
 				<td class="table_cell" style="white-space: nowrap;">
 					<input type="hidden" name="itemId_${itemsCounter}" value="${item.id}"/>
 					<input type="hidden" name="itemFormMetaId_${itemsCounter}" value="${item.itemMeta.id}"/>
-					<input type="radio" name="sdvRequired_${itemsCounter}" value="1" ${item.itemMeta.sdvRequired ? "checked" : ""}><fmt:message key="yes" bundle="${resword}" />
-					<input type="radio" name="sdvRequired_${itemsCounter}" value="0" ${!item.itemMeta.sdvRequired ? "checked" : ""}><fmt:message key="no" bundle="${resword}" />
+					<c:if test="${hasSCD}"><input type="hidden" name="sdvRequired_${itemsCounter}" value="0"/></c:if>
+					<input type="radio" name="sdvRequired_${itemsCounter}" value="1" ${item.itemMeta.sdvRequired && !hasSCD ? "checked" : ""} ${hasSCD ? "disabled" : ""}><fmt:message key="yes" bundle="${resword}" />
+					<input type="radio" name="sdvRequired_${itemsCounter}" value="0" ${!item.itemMeta.sdvRequired || hasSCD ? "checked" : ""} ${hasSCD ? "disabled" : ""}><fmt:message key="no" bundle="${resword}" />
 				</td>
 
 				<td class="table_cell">

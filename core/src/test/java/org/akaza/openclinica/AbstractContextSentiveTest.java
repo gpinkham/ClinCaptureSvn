@@ -38,6 +38,7 @@ import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -59,6 +60,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.EventServiceInterface;
+import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
@@ -211,6 +213,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
 	@Autowired
 	protected DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
+	@Autowired
+	protected SCDItemMetadataDao scdItemMetadataDao;
 
 	// Services
 	@Autowired
@@ -247,6 +251,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected SessionFactory sessionFactory;
 	@Autowired
 	protected CRFMaskingService maskingService;
+	@Autowired
+	protected SimpleConditionalDisplayService simpleConditionalDisplayService;
 
 	protected static PlatformTransactionManager transactionManager;
 

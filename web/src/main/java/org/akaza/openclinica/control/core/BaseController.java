@@ -36,6 +36,7 @@ import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -60,6 +61,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
+import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
@@ -217,6 +219,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	@Autowired
 	private CodedItemService codedItemService;
 	@Autowired
+	private SCDItemMetadataDao scdItemMetadataDao;
+	@Autowired
 	private DictionaryService dictionaryService;
 	@Autowired
 	private StudySubjectIdService studySubjectIdService;
@@ -240,6 +244,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private CRFMaskingService maskingService;
 	@Autowired
 	private EventDefinitionCrfService eventDefinitionCrfService;
+	@Autowired
+	private SimpleConditionalDisplayService simpleConditionalDisplayService;
 
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
@@ -572,6 +578,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public EventDefinitionCrfService getEventDefinitionCrfService() {
 		return eventDefinitionCrfService;
+	}
+
+	public SimpleConditionalDisplayService getSimpleConditionalDisplayService() {
+		return simpleConditionalDisplayService;
 	}
 
 	public static CrfShortcutsAnalyzer getCrfShortcutsAnalyzer(HttpServletRequest request, ItemSDVService itemSDVService) {

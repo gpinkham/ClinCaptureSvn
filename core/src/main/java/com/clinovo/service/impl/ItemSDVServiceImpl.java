@@ -32,6 +32,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -67,6 +68,9 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 
 	@Autowired
 	private DataSource dataSource;
+
+	@Autowired
+	private SCDItemMetadataDao scdItemMetadataDao;
 
 	/**
 	 * {@inheritDoc}
@@ -247,9 +251,28 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 			ItemFormMetadataBean newItemFormMetadataBean = itemFormMetadataMap.get(itemDao.findByPK(
 					prevItemFormMetadataBean.getItemId()).getName());
 			if (newItemFormMetadataBean != null) {
-				newItemFormMetadataBean.setSdvRequired(prevItemFormMetadataBean.isSdvRequired());
+				if (prevItemFormMetadataBean.isSdvRequired()
+						&& !scdItemMetadataDao.hasSCD(newItemFormMetadataBean.getId())) {
+					newItemFormMetadataBean.setSdvRequired(true);
+				} else {
+					newItemFormMetadataBean.setSdvRequired(false);
+				}
 				itemFormMetadataDao.update(newItemFormMetadataBean);
 			}
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean hasChangedSDVRequiredItems(List<DisplayItemBean> changedItemsList) {
+		boolean result = false;
+		for (DisplayItemBean displayItemBean : changedItemsList) {
+			if (displayItemBean.getMetadata().isSdvRequired()) {
+				result = true;
+				break;
+			}
+		}
+		return result;
 	}
 }

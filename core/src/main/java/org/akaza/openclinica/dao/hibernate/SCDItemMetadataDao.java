@@ -20,11 +20,16 @@
  */
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean;
-
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean;
+
+/**
+ * SCDItemMetadataDao.
+ */
+@SuppressWarnings("unchecked")
 public class SCDItemMetadataDao extends AbstractDomainDao<SCDItemMetadataBean> {
 
 	@Override
@@ -32,7 +37,6 @@ public class SCDItemMetadataDao extends AbstractDomainDao<SCDItemMetadataBean> {
 		return SCDItemMetadataBean.class;
 	}
 
-	@SuppressWarnings("unchecked")
 	public ArrayList<SCDItemMetadataBean> findAllBySectionId(Integer sectionId) {
 		String query = "select scd.* from scd_item_metadata scd where scd.scd_item_form_metadata_id in ("
 				+ "select ifm.item_form_metadata_id from item_form_metadata ifm where ifm.section_id = :sectionId)";
@@ -41,12 +45,18 @@ public class SCDItemMetadataDao extends AbstractDomainDao<SCDItemMetadataBean> {
 		return (ArrayList<SCDItemMetadataBean>) q.list();
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Integer> findAllSCDItemFormMetadataIdsBySectionId(Integer sectionId) {
 		String query = "select scd.scd_item_form_metadata_id from scd_item_metadata scd where scd.scd_item_form_metadata_id in ("
 				+ "select ifm.item_form_metadata_id from item_form_metadata ifm where ifm.section_id = :sectionId)";
 		org.hibernate.Query q = this.getCurrentSession().createSQLQuery(query);
 		q.setInteger("sectionId", sectionId);
 		return q.list();
+	}
+
+	public boolean hasSCD(Integer itemFormMetadataId) {
+		String query = "select count(distinct scd.id) from scd_item_metadata scd where scd.scd_item_form_metadata_id = :itemFormMetadataId";
+		org.hibernate.Query q = this.getCurrentSession().createSQLQuery(query);
+		q.setInteger("itemFormMetadataId", itemFormMetadataId);
+		return ((BigInteger) q.uniqueResult()).intValue() > 0;
 	}
 }

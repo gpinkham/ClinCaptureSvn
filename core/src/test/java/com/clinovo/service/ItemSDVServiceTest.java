@@ -3,6 +3,7 @@ package com.clinovo.service;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.akaza.openclinica.DefaultAppContextTest;
@@ -89,5 +90,16 @@ public class ItemSDVServiceTest extends DefaultAppContextTest {
 		itemSDVService.copySettingsFromPreviousVersion(1, 2);
 		imfBean = imfdao.findByItemIdAndCRFVersionId(33, 2);
 		assertTrue(imfBean.isSdvRequired());
+	}
+
+	@Test
+	public void testThatHasChangedSDVRequiredItemsReturnsCorrectValue() {
+		List<DisplayItemBean> list = new ArrayList<DisplayItemBean>();
+		DisplayItemBean displayItemBean = new DisplayItemBean();
+		ItemFormMetadataBean itemFormMetadataBean = new ItemFormMetadataBean();
+		itemFormMetadataBean.setSdvRequired(true);
+		displayItemBean.setMetadata(itemFormMetadataBean);
+		list.add(displayItemBean);
+		assertTrue(itemSDVService.hasChangedSDVRequiredItems(list));
 	}
 }

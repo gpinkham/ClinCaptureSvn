@@ -20,21 +20,24 @@
  */
 package org.akaza.openclinica.service.crfdata;
 
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.DisplaySectionBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ResponseOptionBean;
-import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
-import org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
+import org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * For simple conditional display
@@ -50,6 +53,35 @@ public class SimpleConditionalDisplayService {
 
 	public SimpleConditionalDisplayService(DataSource dataSource) {
 		this.dataSource = dataSource;
+	}
+
+	/**
+	 * Method converts SectionBean list to DisplaySectionBean list with scd info.
+	 * 
+	 * @param sections
+	 *            List<SectionBean
+	 * @param versionMap
+	 *            HashMap
+	 * @return List<DisplaySectionBean>
+	 */
+	public List<DisplaySectionBean> convertSectionBeansToDisplaySectionBeansWithSCDInfo(List<SectionBean> sections,
+			HashMap versionMap) {
+		List<DisplaySectionBean> displaySectionBeanList = new ArrayList<DisplaySectionBean>();
+		for (SectionBean section : sections) {
+			ArrayList<DisplayItemBean> displayItemBeanList = new ArrayList<DisplayItemBean>();
+			DisplaySectionBean displaySectionBean = new DisplaySectionBean();
+			for (ItemBean itemBean : (ArrayList<ItemBean>) versionMap.get(new Integer(section.getId()))) {
+				DisplayItemBean displayItemBean = new DisplayItemBean();
+				displayItemBean.setItem(itemBean);
+				displayItemBean.setMetadata(itemBean.getItemMeta());
+				displayItemBeanList.add(displayItemBean);
+			}
+			displaySectionBean.setItems(displayItemBeanList);
+			displaySectionBean.setSection(section);
+			initConditionalDisplays(displaySectionBean);
+			displaySectionBeanList.add(displaySectionBean);
+		}
+		return displaySectionBeanList;
 	}
 
 	/**
@@ -148,7 +180,8 @@ public class SimpleConditionalDisplayService {
 		} else {
 			for (SCDItemMetadataBean scd : scdSets) {
 				Integer conId = scd.getControlItemFormMetadataId();
-				ArrayList<SCDItemMetadataBean> conScds = cdPairMap.containsKey(conId) ? cdPairMap.get(conId)
+				ArrayList<SCDItemMetadataBean> conScds = cdPairMap.containsKey(conId)
+						? cdPairMap.get(conId)
 						: new ArrayList<SCDItemMetadataBean>();
 				conScds.add(scd);
 				cdPairMap.put(conId, conScds);

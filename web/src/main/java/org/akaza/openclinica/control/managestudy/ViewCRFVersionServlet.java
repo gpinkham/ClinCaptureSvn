@@ -178,10 +178,8 @@ public class ViewCRFVersionServlet extends Controller {
 					}
 				}
 
-				for (SectionBean section : sections) {
-					section.setItems((ArrayList) versionMap.get(new Integer(section.getId())));
-				}
-				request.setAttribute("sections", sections);
+				request.setAttribute("sections", getSimpleConditionalDisplayService()
+						.convertSectionBeansToDisplaySectionBeansWithSCDInfo(sections, versionMap));
 				request.setAttribute("version", version);
 				request.setAttribute("crfname", crf.getName());
 				request.setAttribute("crf", crf);
