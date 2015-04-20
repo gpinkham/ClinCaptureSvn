@@ -210,13 +210,12 @@
 	<query>
 		<name>findAllWithItemDataByCRFVersionId</name>
 		<sql>
-			select name, ordinal, oc_oid, item_data_id, i.item_id as item_id,
-			value from item_data id, item i,versioning_map v
-			where
-			v.item_id =i.item_id and v.crf_version_id=? and
-			id.item_id=i.item_id and event_crf_id = ? order by i.item_id,ordinal;
-
-
+			SELECT item.item_id as item_id, name, oc_oid, COALESCE(item_data_id, 0) as item_data_id,
+					COALESCE(value, '') as value, COALESCE(ordinal, 1) as ordinal
+			FROM item LEFT OUTER JOIN versioning_map vm ON item.item_id = vm.item_id
+					LEFT OUTER JOIN item_data ON item.item_id = item_data.item_id AND item_data.event_crf_id = ?
+			WHERE crf_version_id = ?
+			ORDER BY item.item_id, ordinal
 		</sql>
 	</query>
 

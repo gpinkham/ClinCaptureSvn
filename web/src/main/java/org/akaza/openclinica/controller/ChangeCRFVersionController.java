@@ -43,7 +43,6 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -68,8 +67,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * Implement the functionality for displaying a table of Event CRFs for Source Data Verification. This is an autowired,
- * multiaction Controller.
+ * Controller handles requests for item data migration between two CRF versions for specific event CRF.
+ *
  */
 @Controller("changeCRFVersionController")
 @SuppressWarnings({"unchecked"})
@@ -78,19 +77,36 @@ public class ChangeCRFVersionController {
 	@Qualifier("dataSource")
 	private DataSource dataSource;
 
-	@Autowired
-	CoreResources coreResources;
-
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	public ChangeCRFVersionController() {
-
 	}
 
-	/*
-	 * Allows user to select new CRF version
+	/**
+	 * Allows user to select new CRF version.
+	 *
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param crfId
+	 *            int
+	 * @param crfName
+	 *            String
+	 * @param crfVersionId
+	 *            int
+	 * @param crfVersionName
+	 *            String
+	 * @param studySubjectLabel
+	 *            String
+	 * @param studySubjectId
+	 *            int
+	 * @param eventCRFId
+	 *            int
+	 * @param eventDefinitionCRFId
+	 *            int
+	 * @return ModelMap
 	 */
-
 	@RequestMapping(value = "/managestudy/chooseCRFVersion", method = RequestMethod.GET)
 	public ModelMap chooseCRFVersion(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("crfId") int crfId, @RequestParam("crfName") String crfName,
@@ -161,19 +177,19 @@ public class ChangeCRFVersionController {
 			EventDefinitionCRFBean edf = (EventDefinitionCRFBean) edfdao.findByPK(eventDefinitionCRFId);
 
 			if (!edf.getSelectedVersionIds().equals("")) {
-				String[] version_ids = edf.getSelectedVersionIds().split(",");
-				HashMap<String, String> tmp = new HashMap<String, String>(version_ids.length);
-				for (String vs : version_ids) {
+				String[] versionIds = edf.getSelectedVersionIds().split(",");
+				HashMap<String, String> tmp = new HashMap<String, String>(versionIds.length);
+				for (String vs : versionIds) {
 					tmp.put(vs, vs);
 				}
-				ArrayList<CRFVersionBean> site_versions = new ArrayList<CRFVersionBean>(versions.size());
+				ArrayList<CRFVersionBean> siteVersions = new ArrayList<CRFVersionBean>(versions.size());
 
 				for (CRFVersionBean vs : versions) {
 					if (tmp.get(String.valueOf(vs.getId())) != null) {
-						site_versions.add(vs);
+						siteVersions.add(vs);
 					}
 				}
-				versions = site_versions;
+				versions = siteVersions;
 			}
 
 		}
@@ -184,11 +200,44 @@ public class ChangeCRFVersionController {
 		return gridMap;
 	}
 
-	/*
+	/**
 	 * Displays two set of columns for user to confirm his decision to switch to a new version of CRF field name | OID |
-	 * field value
+	 * field value.
+	 *
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param crfId
+	 *            int
+	 * @param crfName
+	 *            String
+	 * @param crfVersionId
+	 *            int
+	 * @param crfVersionName
+	 *            String
+	 * @param studySubjectLabel
+	 *            String
+	 * @param studySubjectId
+	 *            int
+	 * @param eventCRFId
+	 *            int
+	 * @param eventDefinitionCRFId
+	 *            int
+	 * @param selectedVersionId
+	 *            int
+	 * @param selectedVersionName
+	 *            String
+	 * @param eventName
+	 *            String
+	 * @param eventCreateDate
+	 *            String
+	 * @param eventOrdinal
+	 *            String
+	 * @param as
+	 *            String
+	 * @return ModelMap
 	 */
-
 	@RequestMapping(value = "/managestudy/confirmCRFVersionChange", method = RequestMethod.POST)
 	public ModelMap confirmCRFVersionChange(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(value = "crfId", required = false) int crfId,
@@ -238,10 +287,7 @@ public class ChangeCRFVersionController {
 			pageMessages = new ArrayList<String>();
 		}
 		if (selectedVersionId == -1) {
-			String errorMessage = resword.getString("confirm_crf_version_em_select_version");// "Please select CRF version";
-			// pageMessages.add(errorMessage);
-			// request.setAttribute("pageMessages",pageMessages);
-			// request.setAttribute("errorMessage",errorMessage);
+			String errorMessage = resword.getString("confirm_crf_version_em_select_version"); // "Please select CRF version";
 			StringBuffer params = new StringBuffer();
 			params.append("/pages/managestudy/chooseCRFVersion?crfId=" + crfId);
 			params.append("&crfName=" + crfName);
@@ -263,201 +309,234 @@ public class ChangeCRFVersionController {
 		// select name, ordinal, oc_oid, item_data_id, i.item_id, value from item_data id, item i
 		// where id.item_id=i.item_id and event_crf_id = 171 order by i.item_id,ordinal;
 		ArrayList<String[]> rows = new ArrayList<String[]>();
-		int cur_counter = 0;
-		int new_counter = 0;
+		int currentCrfVersionCounter = 0;
+		int newCrfVersionCounter = 0;
 
 		try {
 
-			ItemDAO item_dao = new ItemDAO(dataSource);
+			ItemDAO itemDAO = new ItemDAO(dataSource);
 			// get metadata to find repeat group or not
-			ItemGroupMetadataDAO dao_item_form_mdata = new ItemGroupMetadataDAO(dataSource);
-			List<ItemGroupMetadataBean> beans_item_form_mdata = dao_item_form_mdata.findByCrfVersion(crfVersionId);
-			logger.debug("Size of beans found by version: " + beans_item_form_mdata.size());
-			HashMap<Integer, ItemGroupMetadataBean> hash_item_form_mdata = new HashMap<Integer, ItemGroupMetadataBean>(
-					beans_item_form_mdata.size());
+			ItemGroupMetadataDAO itemGroupMetadataDAO = new ItemGroupMetadataDAO(dataSource);
+			List<ItemGroupMetadataBean> itemFormMetaDataBeansForCurrentCrfVersion = itemGroupMetadataDAO
+					.findByCrfVersion(crfVersionId);
+			logger.debug("Size of beans found by version: " + itemFormMetaDataBeansForCurrentCrfVersion.size());
+			HashMap<Integer, ItemGroupMetadataBean> hashItemFormMetaDataForCurrentVersion = new HashMap<Integer, ItemGroupMetadataBean>(
+					itemFormMetaDataBeansForCurrentCrfVersion.size());
 			// put in hash
 
-			for (ItemGroupMetadataBean bn : beans_item_form_mdata) {
-				hash_item_form_mdata.put(new Integer(bn.getItemId()), bn);
+			for (ItemGroupMetadataBean bn : itemFormMetaDataBeansForCurrentCrfVersion) {
+				hashItemFormMetaDataForCurrentVersion.put(bn.getItemId(), bn);
 			}
-			logger.debug("Current Metadata Size " + hash_item_form_mdata.size());
+			logger.debug("Current Metadata Size " + hashItemFormMetaDataForCurrentVersion.size());
 
-			List<ItemGroupMetadataBean> bn_new_item_form_mdata = dao_item_form_mdata
+			List<ItemGroupMetadataBean> itemFormMetaDataBeansForNewCrfVersion = itemGroupMetadataDAO
 					.findByCrfVersion(selectedVersionId);
-			HashMap<Integer, ItemGroupMetadataBean> hash_new_item_form_mdata = new HashMap<Integer, ItemGroupMetadataBean>(
-					bn_new_item_form_mdata.size());
+			HashMap<Integer, ItemGroupMetadataBean> hashItemFormMetaDataForNewVersion = new HashMap<Integer, ItemGroupMetadataBean>(
+					itemFormMetaDataBeansForNewCrfVersion.size());
 			// put in hash
 
-			for (ItemGroupMetadataBean bn : bn_new_item_form_mdata) {
-				hash_new_item_form_mdata.put(new Integer(bn.getItemId()), bn);
+			for (ItemGroupMetadataBean bn : itemFormMetaDataBeansForNewCrfVersion) {
+				hashItemFormMetaDataForNewVersion.put(bn.getItemId(), bn);
 			}
-			logger.debug("Future Metadata Size " + hash_new_item_form_mdata.size());
+			logger.debug("Future Metadata Size " + hashItemFormMetaDataForNewVersion.size());
 
 			// get items description
-			ArrayList<ItemBean> cur_items = item_dao.findAllWithItemDataByCRFVersionId(crfVersionId, eventCRFId);
-			logger.debug("Found number of current items " + cur_items.size());
-			// ArrayList<ItemBean> new_items = item_dao.findAllItemsByVersionId(selectedVersionId);
-			ArrayList<ItemBean> new_items = item_dao.findAllWithItemDataByCRFVersionId(selectedVersionId, eventCRFId);
-			logger.debug("Found number of new items " + new_items.size());
+			ArrayList<ItemBean> itemsInCurrentCrfVersion = itemDAO.findAllWithItemDataByCRFVersionId(crfVersionId,
+					eventCRFId);
+			logger.debug("Found number of current items " + itemsInCurrentCrfVersion.size());
 
-			ItemBean cur_element = null;
-			ItemBean new_element = null;
-			ItemGroupMetadataBean bn_mdata = null;
-			ItemGroupMetadataBean bn_new_mdata = null;
+			ArrayList<ItemBean> itemsInNewCrfVersion = itemDAO.findAllWithItemDataByCRFVersionId(selectedVersionId,
+					eventCRFId);
+			logger.debug("Found number of new items " + itemsInNewCrfVersion.size());
+
+			ItemBean itemFromCurrentCrfVersion;
+			ItemBean itemFromNewCrfVersion;
+			ItemGroupMetadataBean groupMetaDataBeanForItemFromCurrentCrfVersion;
+			ItemGroupMetadataBean groupMetaDataBeanForItemFromNewCrfVersion;
 			while (true) {
 				// break out of the while loop here
-				if (cur_counter >= (cur_items.size() - 1) && new_counter >= (new_items.size() - 1)) {
+				if (currentCrfVersionCounter >= (itemsInCurrentCrfVersion.size() - 1)
+						&& newCrfVersionCounter >= (itemsInNewCrfVersion.size() - 1)) {
 					break;
 				}
-				cur_element = cur_items.get(cur_counter);
-				bn_mdata = hash_item_form_mdata.get(new Integer(cur_element.getId()));
-				new_element = new_items.get(new_counter);
-				bn_new_mdata = hash_new_item_form_mdata.get(new Integer(new_element.getId()));
+				itemFromCurrentCrfVersion = itemsInCurrentCrfVersion.get(currentCrfVersionCounter);
+				groupMetaDataBeanForItemFromCurrentCrfVersion = hashItemFormMetaDataForCurrentVersion.get(new Integer(
+						itemFromCurrentCrfVersion.getId()));
+				itemFromNewCrfVersion = itemsInNewCrfVersion.get(newCrfVersionCounter);
+				groupMetaDataBeanForItemFromNewCrfVersion = hashItemFormMetaDataForNewVersion.get(new Integer(
+						itemFromNewCrfVersion.getId()));
 
-				if (new_element.getId() == cur_element.getId()) {
-					buildRecord(cur_element, new_element, bn_mdata, bn_new_mdata, rows);
-				} else if (new_element.getId() < cur_element.getId()) {
-					buildRecord(null, new_element, null, bn_new_mdata, rows);
-				} else if (new_element.getId() > cur_element.getId()) {
-					buildRecord(cur_element, null, bn_mdata, null, rows);
+				if (itemFromNewCrfVersion.getId() == itemFromCurrentCrfVersion.getId()) {
+					buildRecord(itemFromCurrentCrfVersion, itemFromNewCrfVersion,
+							groupMetaDataBeanForItemFromCurrentCrfVersion, groupMetaDataBeanForItemFromNewCrfVersion,
+							rows);
+				} else if (itemFromNewCrfVersion.getId() < itemFromCurrentCrfVersion.getId()) {
+					buildRecord(null, itemFromNewCrfVersion, null, groupMetaDataBeanForItemFromNewCrfVersion, rows);
+				} else if (itemFromNewCrfVersion.getId() > itemFromCurrentCrfVersion.getId()) {
+					buildRecord(itemFromCurrentCrfVersion, null, groupMetaDataBeanForItemFromCurrentCrfVersion, null,
+							rows);
 				}
 
-				if (cur_counter >= (cur_items.size() - 1) && new_counter < (new_items.size() - 1)) {
-					while (new_counter < new_items.size() - 1) {
-						new_counter++;
-						new_element = new_items.get(new_counter);
-						bn_new_mdata = hash_new_item_form_mdata.get(new Integer(new_element.getId()));
-						buildRecord(null, new_element, null, bn_new_mdata, rows);
+				if (currentCrfVersionCounter >= (itemsInCurrentCrfVersion.size() - 1)
+						&& newCrfVersionCounter < (itemsInNewCrfVersion.size() - 1)) {
+					while (newCrfVersionCounter < itemsInNewCrfVersion.size() - 1) {
+						newCrfVersionCounter++;
+						itemFromNewCrfVersion = itemsInNewCrfVersion.get(newCrfVersionCounter);
+						groupMetaDataBeanForItemFromNewCrfVersion = hashItemFormMetaDataForNewVersion.get(new Integer(
+								itemFromNewCrfVersion.getId()));
+						buildRecord(null, itemFromNewCrfVersion, null, groupMetaDataBeanForItemFromNewCrfVersion, rows);
 					}
 					break;
 				}
-				if (cur_counter < (cur_items.size() - 1) && new_counter >= (new_items.size() - 1)) {
-					while (cur_counter < cur_items.size() - 1) {
-						cur_counter++;
-						cur_element = cur_items.get(cur_counter);
-						bn_mdata = hash_item_form_mdata.get(new Integer(cur_element.getId()));
-						buildRecord(cur_element, null, bn_mdata, null, rows);
+				if (currentCrfVersionCounter < (itemsInCurrentCrfVersion.size() - 1)
+						&& newCrfVersionCounter >= (itemsInNewCrfVersion.size() - 1)) {
+					while (currentCrfVersionCounter < itemsInCurrentCrfVersion.size() - 1) {
+						currentCrfVersionCounter++;
+						itemFromCurrentCrfVersion = itemsInCurrentCrfVersion.get(currentCrfVersionCounter);
+						groupMetaDataBeanForItemFromCurrentCrfVersion = hashItemFormMetaDataForCurrentVersion
+								.get(new Integer(itemFromCurrentCrfVersion.getId()));
+						buildRecord(itemFromCurrentCrfVersion, null, groupMetaDataBeanForItemFromCurrentCrfVersion,
+								null, rows);
 					}
 					break;
 				}
-				if (new_element.getId() == cur_element.getId()) {
-					cur_counter++;
-					new_counter++;
-					continue;
-				} else if (new_element.getId() < cur_element.getId()) {
-					new_counter++;
-					continue;
-				} else if (new_element.getId() > cur_element.getId()) {
-					cur_counter++;
-					continue;
+				if (itemFromNewCrfVersion.getId() == itemFromCurrentCrfVersion.getId()) {
+					currentCrfVersionCounter++;
+					newCrfVersionCounter++;
+				} else if (itemFromNewCrfVersion.getId() < itemFromCurrentCrfVersion.getId()) {
+					newCrfVersionCounter++;
+				} else if (itemFromNewCrfVersion.getId() > itemFromCurrentCrfVersion.getId()) {
+					currentCrfVersionCounter++;
 				}
-
 			}
 
 		} catch (Exception e) {
-			// logger.debug(cur_counter + " " + new_counter + " " + e.getMessage());
-			// e.printStackTrace();
-			logger.error(cur_counter + " " + new_counter);
+			logger.error(currentCrfVersionCounter + " " + newCrfVersionCounter);
 			pageMessages.add(resword.getString("confirm_crf_version_em_dataextraction"));
 		}
 		request.setAttribute("pageMessages", pageMessages);
-		// logger.debug("Page Messages: " + pageMessages.toString());
 		gridMap.addAttribute("rows", rows);
 
 		return gridMap;
 	}
 
-	private void buildRecord(ItemBean cur_element, ItemBean new_element, ItemGroupMetadataBean cur_bean_mdata,
-			ItemGroupMetadataBean new_bean_mdata, ArrayList<String[]> rows) {
+	private void buildRecord(ItemBean itemFromCurrentCrfVersion, ItemBean itemFromNewCrfVersion,
+			ItemGroupMetadataBean groupMetaDataBeanForItemFromCurrentCrfVersion,
+			ItemGroupMetadataBean groupMetaDataBeanForItemFromNewCrfVersion, ArrayList<String[]> rows) {
 
-		String[] row = new String[8];
-		int cycle_count = 0;
+		String[] row;
+		int cycleCount = 0;
 
-		if (cur_element == null && new_element != null) {
-			for (ItemDataBean data_item : new_element.getItemDataElements()) {
+		if (itemFromCurrentCrfVersion == null && itemFromNewCrfVersion != null) {
+			for (ItemDataBean itemData : itemFromNewCrfVersion.getItemDataElements()) {
 				row = new String[8];
 				row[0] = row[1] = row[2] = row[3] = "";
-				row[4] = (new_bean_mdata.isRepeatingGroup()) ? new_element.getName() + "(1)" : new_element.getName();
-				row[5] = new_element.getOid();
-				row[6] = String.valueOf(new_element.getId());
-				row[7] = data_item.getValue();
+				row[4] = (groupMetaDataBeanForItemFromNewCrfVersion.isRepeatingGroup()) ? itemFromNewCrfVersion
+						.getName() + "(1)" : itemFromNewCrfVersion.getName();
+				row[5] = itemFromNewCrfVersion.getOid();
+				row[6] = String.valueOf(itemFromNewCrfVersion.getId());
+				row[7] = itemData.getValue();
 				rows.add(row);
-				cycle_count++;
-				if (cycle_count > 0 && !new_bean_mdata.isRepeatingGroup()) {
+				cycleCount++;
+				if (cycleCount > 0 && !groupMetaDataBeanForItemFromNewCrfVersion.isRepeatingGroup()) {
 					break;
 				}
 			}
-			return;
 		}
 
-		else if (cur_element != null && new_element == null) {
+		else if (itemFromCurrentCrfVersion != null && itemFromNewCrfVersion == null) {
 
-			for (ItemDataBean data_item : cur_element.getItemDataElements()) {
+			for (ItemDataBean itemData : itemFromCurrentCrfVersion.getItemDataElements()) {
 				row = new String[8];
-				row[0] = (cur_bean_mdata.isRepeatingGroup()) ? cur_element.getName() + " (" + data_item.getOrdinal()
-						+ ")" : cur_element.getName();
-				row[1] = cur_element.getOid();
-				row[2] = String.valueOf(cur_element.getId());
-				row[3] = data_item.getValue();
+				row[0] = (groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup()) ? itemFromCurrentCrfVersion
+						.getName() + " (" + itemData.getOrdinal() + ")" : itemFromCurrentCrfVersion.getName();
+				row[1] = itemFromCurrentCrfVersion.getOid();
+				row[2] = String.valueOf(itemFromCurrentCrfVersion.getId());
+				row[3] = itemData.getValue();
 				row[4] = row[6] = row[7] = row[5] = "";
 				rows.add(row);
-				cycle_count++;
-				if (cycle_count > 0 && !cur_bean_mdata.isRepeatingGroup()) {
+				cycleCount++;
+				if (cycleCount > 0 && !groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup()) {
 					break;
 				}
 			}
-			return;
-		} else if (cur_element != null && new_element != null) {
+		} else if (itemFromCurrentCrfVersion != null && itemFromNewCrfVersion != null) {
 			// for repeating groups: 3 cases
 			// one cycle: repeating group item -> none-repeating group item
 			// second cycle -> back none-repeating to prev repeating
-			for (ItemDataBean data_item : cur_element.getItemDataElements()) {
+			for (ItemDataBean itemData : itemFromCurrentCrfVersion.getItemDataElements()) {
 				row = new String[8];
-				if (!cur_bean_mdata.isRepeatingGroup() && cycle_count > 0) {
+				if (!groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup() && cycleCount > 0) {
 					row[0] = row[1] = row[2] = row[3] = "";
 				} else {
-					row[0] = (cur_bean_mdata.isRepeatingGroup()) ? cur_element.getName() + " ("
-							+ data_item.getOrdinal() + ")" : cur_element.getName();
-					row[1] = cur_element.getOid();
-					row[2] = String.valueOf(cur_element.getId());
-					row[3] = data_item.getValue();
+					row[0] = (groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup())
+							? itemFromCurrentCrfVersion.getName() + " (" + itemData.getOrdinal() + ")"
+							: itemFromCurrentCrfVersion.getName();
+					row[1] = itemFromCurrentCrfVersion.getOid();
+					row[2] = String.valueOf(itemFromCurrentCrfVersion.getId());
+					row[3] = itemData.getValue();
 				}
-				if (new_bean_mdata.isRepeatingGroup()) {
+				if (groupMetaDataBeanForItemFromNewCrfVersion.isRepeatingGroup()) {
 					// case when new one is a repeating group and has data from some previous entry while current does
 					// not have a repeating group
-					if (!cur_bean_mdata.isRepeatingGroup()) {
-						row[4] = cur_element.getName() + " (" + data_item.getOrdinal() + ")";
+					if (!groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup()) {
+						row[4] = itemFromCurrentCrfVersion.getName() + " (" + itemData.getOrdinal() + ")";
 					}
 
 					// new one is repeating & cur is repeating
-					if (cur_bean_mdata.isRepeatingGroup()) {
+					if (groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup()) {
 						row[4] = row[0];
 					}
-					row[5] = new_element.getOid();
-					row[6] = String.valueOf(new_element.getId());
-					row[7] = data_item.getValue();
+					row[5] = itemFromNewCrfVersion.getOid();
+					row[6] = String.valueOf(itemFromNewCrfVersion.getId());
+					row[7] = itemData.getValue();
 				} else {
-					if (cycle_count == 0) {
+					if (cycleCount == 0) {
 
 						row[4] = row[0];
-						row[5] = new_element.getOid();
-						row[6] = String.valueOf(new_element.getId());
-						row[7] = data_item.getValue();
+						row[5] = itemFromNewCrfVersion.getOid();
+						row[6] = String.valueOf(itemFromNewCrfVersion.getId());
+						row[7] = itemData.getValue();
 					} else {
 						row[4] = row[5] = row[6] = row[7] = "";
 					}
 				}
-				cycle_count++;
+				cycleCount++;
 				// do not add row if all items empty -> from data of repeat group to none-rep
 				if (!(row[0].equals("") && row[4].equals(""))) {
 					rows.add(row);
 				}
 			}
-			return;
 		}
-
 	}
 
+	/**
+	 * Change CRF Version action request handler.
+	 *
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param crfId
+	 *            int
+	 * @param crfName
+	 *            String
+	 * @param crfVersionId
+	 *            int
+	 * @param crfVersionName
+	 *            String
+	 * @param studySubjectLabel
+	 *            String
+	 * @param studySubjectId
+	 *            int
+	 * @param eventCRFId
+	 *            int
+	 * @param eventDefinitionCRFId
+	 *            int
+	 * @param newCRFVersionId
+	 *            int
+	 * @return ModelMap
+	 */
 	@RequestMapping("/managestudy/changeCRFVersion")
 	public ModelMap changeCRFVersionAction(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("crfId") int crfId, @RequestParam("crfName") String crfName,
@@ -482,44 +561,44 @@ public class ChangeCRFVersionController {
 		request.setAttribute("pageMessages", pageMessages);
 		// update event_crf_id table
 		try {
-			EventCRFDAO event_crf_dao = new EventCRFDAO(dataSource);
+			EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 			StudyEventDAO sedao = new StudyEventDAO(dataSource);
 
-			EventCRFBean ev_bean = (EventCRFBean) event_crf_dao.findByPK(eventCRFId);
-			StudyEventBean st_event_bean = (StudyEventBean) sedao.findByPK(ev_bean.getStudyEventId());
+			EventCRFBean evBean = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
+			StudyEventBean studyEventBean = (StudyEventBean) sedao.findByPK(evBean.getStudyEventId());
 
 			Connection con = dataSource.getConnection();
 			con.setAutoCommit(false);
-			event_crf_dao.updateCRFVersionID(eventCRFId, newCRFVersionId, getCurrentUser(request).getId(), con);
+			eventCRFDAO.updateCRFVersionID(eventCRFId, newCRFVersionId, getCurrentUser(request).getId(), con);
 
-			String status_before_update = null;
-			SubjectEventStatus eventStatus = null;
-			Status subjectStatus = null;
+			String statusBeforeUpdate;
+			SubjectEventStatus eventStatus;
+			Status subjectStatus;
 			AuditDAO auditDao = new AuditDAO(dataSource);
 
 			// event signed, check if subject is signed as well
 			StudySubjectDAO studySubDao = new StudySubjectDAO(dataSource);
-			StudySubjectBean studySubBean = (StudySubjectBean) studySubDao.findByPK(st_event_bean.getStudySubjectId());
+			StudySubjectBean studySubBean = (StudySubjectBean) studySubDao.findByPK(studyEventBean.getStudySubjectId());
 			if (studySubBean.getStatus().isSigned()) {
-				status_before_update = auditDao.findLastStatus("study_subject", studySubBean.getId(), "8");
-				if (status_before_update != null && status_before_update.length() == 1) {
-					int subject_status = Integer.parseInt(status_before_update);
-					subjectStatus = Status.get(subject_status);
+				statusBeforeUpdate = auditDao.findLastStatus("study_subject", studySubBean.getId(), "8");
+				if (statusBeforeUpdate != null && statusBeforeUpdate.length() == 1) {
+					int subjectStatusId = Integer.parseInt(statusBeforeUpdate);
+					subjectStatus = Status.get(subjectStatusId);
 					studySubBean.setStatus(subjectStatus);
 				}
 				studySubBean.setUpdater(getCurrentUser(request));
 				studySubDao.update(studySubBean, con);
 			}
-			st_event_bean.setUpdater(getCurrentUser(request));
-			st_event_bean.setUpdatedDate(new Date());
+			studyEventBean.setUpdater(getCurrentUser(request));
+			studyEventBean.setUpdatedDate(new Date());
 
-			status_before_update = auditDao.findLastStatus("study_event", st_event_bean.getId(), "8");
-			if (status_before_update != null && status_before_update.length() == 1) {
-				int status = Integer.parseInt(status_before_update);
+			statusBeforeUpdate = auditDao.findLastStatus("study_event", studyEventBean.getId(), "8");
+			if (statusBeforeUpdate != null && statusBeforeUpdate.length() == 1) {
+				int status = Integer.parseInt(statusBeforeUpdate);
 				eventStatus = SubjectEventStatus.get(status);
-				st_event_bean.setSubjectEventStatus(eventStatus);
+				studyEventBean.setSubjectEventStatus(eventStatus);
 			}
-			sedao.update(st_event_bean, con);
+			sedao.update(studyEventBean, con);
 
 			con.commit();
 			con.setAutoCommit(true);
@@ -537,11 +616,31 @@ public class ChangeCRFVersionController {
 		return null;
 	}
 
+	/**
+	 * ExceptionHandler for exceptions of class <code>HttpSessionRequiredException</code>.
+	 *
+	 * @param ex
+	 *            HttpSessionRequiredException
+	 * @param request
+	 *            HttpServletRequest
+	 * @return String
+	 */
 	@ExceptionHandler(HttpSessionRequiredException.class)
 	public String handleSessionRequiredException(HttpSessionRequiredException ex, HttpServletRequest request) {
 		return "redirect:/MainMenu";
 	}
 
+	/**
+	 * ExceptionHandler for exceptions of class <code>NullPointerException</code>.
+	 *
+	 * @param ex
+	 *            NullPointerException
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @return String
+	 */
 	@ExceptionHandler(NullPointerException.class)
 	public String handleNullPointerException(NullPointerException ex, HttpServletRequest request,
 			HttpServletResponse response) {
@@ -558,15 +657,12 @@ public class ChangeCRFVersionController {
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
 		Role r = currentRole.getRole();
 
-		if (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
-			return true;
-		}
-		return false;
+		return r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_DIRECTOR)
+				|| r.equals(Role.STUDY_ADMINISTRATOR);
 	}
 
 	private UserAccountBean getCurrentUser(HttpServletRequest request) {
-		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
-		return ub;
+		return (UserAccountBean) request.getSession().getAttribute("userBean");
 	}
 
 	private Object redirect(HttpServletRequest request, HttpServletResponse response, String location) {
@@ -589,8 +685,7 @@ public class ChangeCRFVersionController {
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
 		String dateFormat = resformat.getString("date_format_string");
 		SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-		String s = formatter.format(date);
-		return s;
+		return formatter.format(date);
 	}
 
 }

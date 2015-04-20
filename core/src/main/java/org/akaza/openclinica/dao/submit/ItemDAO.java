@@ -20,6 +20,21 @@
  */
 package org.akaza.openclinica.dao.submit;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -34,21 +49,7 @@ import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ItemDAO extends AuditableEntityDAO {
 
 	public ItemDAO(DataSource ds) {
@@ -89,7 +90,7 @@ public class ItemDAO extends AuditableEntityDAO {
 		this.setTypeExpected(11, TypeNames.DATE); // updated
 		this.setTypeExpected(12, TypeNames.INT); // update id
 		this.setTypeExpected(13, TypeNames.STRING); // oc_oid
-		this.setTypeExpected(14, TypeNames.STRING); //sas_name
+		this.setTypeExpected(14, TypeNames.STRING); // sas_name
 	}
 
 	public EntityBean update(EntityBean eb) {
@@ -531,20 +532,20 @@ public class ItemDAO extends AuditableEntityDAO {
 	}
 
 	public ArrayList<ItemBean> findAllWithItemDataByCRFVersionId(int crfVersionId, int eventCRFId) {
-		this.unsetTypeExpected();
 
-		this.setTypeExpected(1, TypeNames.STRING);// (item)name
-		this.setTypeExpected(2, TypeNames.INT);// ordinal
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT); // item_id
+		this.setTypeExpected(2, TypeNames.STRING); // item name
 		this.setTypeExpected(3, TypeNames.STRING);// oc_oid
-		this.setTypeExpected(4, TypeNames.INT);// item_data_id
-		this.setTypeExpected(5, TypeNames.INT);// item_id
-		this.setTypeExpected(6, TypeNames.STRING);// (item)value
+		this.setTypeExpected(4, TypeNames.INT); // item_data_id
+		this.setTypeExpected(5, TypeNames.STRING); // (item)value
+		this.setTypeExpected(6, TypeNames.INT); // ordinal
 
 		ArrayList<ItemBean> answer = new ArrayList<ItemBean>();
 
 		HashMap variables = new HashMap();
-		variables.put(1, crfVersionId);
-		variables.put(2, eventCRFId);
+		variables.put(1, eventCRFId);
+		variables.put(2, crfVersionId);
 
 		String sql = digester.getQuery("findAllWithItemDataByCRFVersionId");
 
