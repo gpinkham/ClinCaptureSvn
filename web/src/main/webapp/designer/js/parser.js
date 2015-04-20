@@ -1011,8 +1011,7 @@ Parser.prototype.getItem = function(expression, attrMap) {
 				return this.findItem(this.extractItemFromExpression(expression), {});
 		}
 	}
-};
-
+}
 /* ===========================================================================
  * Finds a CRF item from the original data returns from CC given an item name
  *
@@ -2142,7 +2141,6 @@ Parser.prototype.recursiveSelect = function(params) {
 		$("td[oid=" + params.candidate + "]").parent().trigger('click', [{x:false}]);
 	}
 };
-
 Parser.prototype.resetActions = function(target) {
 	function isShowHideTarget(item) {
 		return $(item).attr("action") == 'show' || $(item).attr("action") == 'hide';
@@ -2158,12 +2156,10 @@ Parser.prototype.resetActions = function(target) {
 	$(".dotted-border-lg").children().hide();
 	$("input[name='action']").not(target).attr("previous-state", false);
 };
-
 Parser.prototype.isDateValue = function(val, expressionFormat) {
     var date = Date.parse(val);
     return date != null && date.toString(expressionFormat ? "yyyy-MM-dd" : getCookie('ccDateFormat')) == val;
 };
-
 Parser.prototype.resetTarget = function(params) {
 	for (var x = 0; x < this.rule.targets.length; x++) {
 		if (this.rule.targets[x].oid == params.oid) {
@@ -2171,7 +2167,6 @@ Parser.prototype.resetTarget = function(params) {
 		}
 	}
 };
-
 /* =================================================================
  * Get crf version from current study if it exists
  *
@@ -2198,7 +2193,6 @@ Parser.prototype.getCrfVersionByOid = function(params) {
 	}
 	return null;
 };
-
 /* =================================================================
  * Get study item by name. Return null if no item exists
  *
@@ -2206,16 +2200,16 @@ Parser.prototype.getCrfVersionByOid = function(params) {
  * - itemName - the target element to be updated
  * - study - the study being changed to
  * ============================================================== */
-Parser.prototype.getStudyItemByName = function(params) {
-	for (var e in params.study.events) {
-		var evt = params.study.events[e];
+Parser.prototype.getStudyItemByName = function(study, identifier) {
+	for (var e in study.events) {
+		var evt = study.events[e];
 		for (var c in evt.crfs) {
 			var crf = evt.crfs[c];
 			for (var v in crf.versions) {
 				var ver = crf.versions[v];
 				for (var i in ver.items) {
 					var itm = ver.items[i];
-					if (itm.name == params.itemName || itm.oid == params.itemName) {
+					if (itm.name == identifier || itm.oid == identifier) {
 						itm.crfOid = crf.oid;
 						itm.eventOid = evt.oid;
 						itm.crfVersionOid = ver.oid;
@@ -2226,4 +2220,20 @@ Parser.prototype.getStudyItemByName = function(params) {
 		}
 	}
 	return null;
-};
+}
+Parser.prototype.updateRuleDestinationProperties = function(study) {
+	if (this.getInsertAction()) {
+		this.getInsertAction().destinations.map(function(x) {
+			if (x.item && parser.isEventified(x.oid)) {
+				var item = parser.getStudyItemByName(study, parser.extractItemFromExpression(x.oid));
+				x.oid = x.oid.replace(/SE_\w+(?=\.)/g, item.eventOid);
+			}
+		});
+	} else if (this.getShowHideAction()) {
+		var destinations = this.getShowHideAction().destinations;
+		destinations.map(function(x) {
+			if (parser.isEventified(x))
+				destinations[destinations.indexOf(x)] = x.replace(/SE_\w+(?=\.)/g, item.eventOid);
+		});
+	}
+}

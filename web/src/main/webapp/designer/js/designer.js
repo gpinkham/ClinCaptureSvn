@@ -150,9 +150,7 @@ function createBreadCrumb(params) {
 	}	
 
 	if (params.version) {
-
 		ol.find(".active").removeClass(".active");
-
 		var versionCrumb = $("<li>");
 		var versionLink = $("<a>");
 		versionLink.text(params.version);
@@ -1439,10 +1437,9 @@ function copyTarget(params) {
 	resetStudy(params);
 	//Get crf version of copied rule from the current study
 	var crfVersion = parser.getCrfVersionByOid({
-			study: params.study,
-			versionOid : $(params.target).attr("version-oid")
-		});
-	
+		study: params.study,
+		versionOid : $(params.target).attr("version-oid")
+	});
 	if(crfVersion !== null) {
 		//If study has crf version, change study oid on target element and perform click
 		$(params.target).attr('study-oid', params.study.oid);
@@ -1453,6 +1450,7 @@ function copyTarget(params) {
 		}
 		//Update in-memory target object
 		updateTargetInRule(params);
+		parser.updateRuleDestinationProperties(params.study);
 		$(params.target).click();
 	} else {
 		//Else find next best alternative (item with same name in any of the study's crfs)
@@ -1469,10 +1467,7 @@ function copyTarget(params) {
  * - study - the study being changed to
  * ============================================================== */
 function findNextBestAlternative(params) {
-	var item = parser.getStudyItemByName({
-		study: params.study,
-		itemName : $(params.target).val()
-	});
+	var item = parser.getStudyItemByName(params.study, $(params.target).val());
 	if(item && item != null) {
 		//If next best item exits, update target element with item params and perform click
 		$(params.target).attr('study-oid', params.study.oid);
@@ -1484,9 +1479,10 @@ function findNextBestAlternative(params) {
 		if($(params.target).hasClass("invalid")) {
 			$(params.target).removeClass("invalid");
 		}
-		//Update in-memory target object
-		updateTargetInRule(params);
 		$(params.target).click();
+		// Update in-memory target object
+		updateTargetInRule(params);
+		parser.updateRuleDestinationProperties(params.study);
 	} else {
 		//Else fail copy with messages
 		$(params.target).addClass('invalid');
