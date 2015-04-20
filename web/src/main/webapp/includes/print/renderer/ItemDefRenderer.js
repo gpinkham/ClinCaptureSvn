@@ -2,11 +2,13 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber,
     this.json = json;
     this.itemDetails = itemDetails;
     this.mandatory = mandatory;
-    this.name = this.itemDetails["OpenClinica:LeftItemText"];
+    this.name =     this.name = this.itemDetails["OpenClinica:LeftItemText"] !== undefined && this.itemDetails["OpenClinica:LeftItemText"].toLowerCase().indexOf("img") > -1 ?
+        window.location.href.indexOf("clinicaldata") > -1 ? this.itemDetails["OpenClinica:LeftItemText"].replace("images/", "../../../../../../../images/")
+            : window.location.href.indexOf("metadata") > -1 ? this.itemDetails["OpenClinica:LeftItemText"].replace("images/", "../../../../../../images/")
+            : this.itemDetails["OpenClinica:LeftItemText"] : this.itemDetails["OpenClinica:LeftItemText"];
     this.rightItemText = this.itemDetails["OpenClinica:RightItemText"];
     this.dataType = json["@DataType"];
-    this.responseType = this.itemDetails["OpenClinica:ItemResponse"]["@ResponseType"];
-    this.responseLayout = this.itemDetails["OpenClinica:ItemResponse"]["@ResponseLayout"];
+    this.responseType = this.itemDetails["OpenClinica:ItemResponse"]["@ResponseType"];    this.responseLayout = this.itemDetails["OpenClinica:ItemResponse"]["@ResponseLayout"];
     this.isInline = this.responseLayout == "Horizontal" ? "inline" : "";
     this.OID = json["@OID"];
     this.itemName = json["@Name"];

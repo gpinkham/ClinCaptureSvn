@@ -11,12 +11,11 @@
     page-break-after: auto
   }
   td {
-    page-break-inside: avoid;
-    page-break-after: avoid
+    page-break-inside: auto;
+    page-break-after: auto
   }
   thead {
-    display: table-header-group
-  }
+    display: table-header-group  }
   tfoot {
     display: table-footer-group
   }

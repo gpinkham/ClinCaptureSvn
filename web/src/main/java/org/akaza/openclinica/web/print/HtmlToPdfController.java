@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Document;
+import org.xhtmlrenderer.layout.SharedContext;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import org.xhtmlrenderer.resource.FSEntityResolver;
 
@@ -70,6 +71,8 @@ public class HtmlToPdfController {
 
         Document document = getDocument(cleanedResult);
         ITextRenderer renderer = new ITextRenderer();
+        SharedContext sharedContext = renderer.getSharedContext();
+        sharedContext.setReplacedElementFactory(new ImageReplaceFactory(renderer.getSharedContext().getReplacedElementFactory()));
 
         renderer.setDocument(document, null);
         renderer.layout();
