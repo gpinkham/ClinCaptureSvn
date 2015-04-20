@@ -21,7 +21,7 @@ import org.akaza.openclinica.bean.submit.SectionBean;
 import org.junit.Before;
 import org.junit.Test;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class SimpleConditionalDisplayServiceTest extends DefaultAppContextTest {
 
 	private int itemId;

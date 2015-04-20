@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author ywang
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class SimpleConditionalDisplayService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
