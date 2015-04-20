@@ -40,6 +40,7 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -540,8 +541,18 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 				List<EventCRFBean> eventCrfs = getEventCRFDAO().findAllByStudyEventAndCrfOrCrfVersionOid(
 						destinationStudyEventBean, getExpressionService().getCrfOid(expression));
 				if (eventCrfs.size() == 0) {
-					createNewEventCRF(propertyBean, subjectStudy, sourceEventCrfBean, destinationStudyEventBean,
-							sourceItemDataBean, destinationItemBean, expression, ruleSet, ub, con);
+					List<EventCRFBean> eventCRFBeanList =  getEventCRFDAO().findAllByStudyEvent(destinationStudyEventBean);
+					List<CRFBean> startedCRFBeanList = new ArrayList<CRFBean>();
+					for (EventCRFBean eventCRFBean : eventCRFBeanList) {
+						CRFBean crfBean = getCRFDAO().findByVersionId(eventCRFBean.getCRFVersionId());
+						startedCRFBeanList.add(crfBean);
+					}
+					CRFVersionBean crfVersionBean = getCRFVersionDAO().findByOid(getExpressionService().getCrfOid(expression));
+					CRFBean destinationCrfBean = getCRFDAO().findByVersionId(crfVersionBean.getId());
+					if (!startedCRFBeanList.contains(destinationCrfBean)) {
+						createNewEventCRF(propertyBean, subjectStudy, sourceEventCrfBean, destinationStudyEventBean,
+								sourceItemDataBean, destinationItemBean, expression, ruleSet, ub, con);
+					}
 				} else {
 					updateDestinationEventCRF(studySubject, propertyBean, subjectStudy, sourceEventCrfBean, eventCrfs.get(0),
 							destinationStudyEventBean, sourceItemDataBean, destinationItemBean, expression, ruleSet, ub, con);
@@ -1158,6 +1169,10 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 	public CRFVersionDAO getCRFVersionDAO() {
 		return new CRFVersionDAO(ds);
+	}
+
+	public CRFDAO getCRFDAO() {
+		return new CRFDAO(ds);
 	}
 
 	public StudySubjectDAO getStudySubjectDAO() {
