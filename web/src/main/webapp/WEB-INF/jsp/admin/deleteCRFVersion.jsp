@@ -120,7 +120,7 @@
                                         <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed;">
                                             <tr valign="top">
                                                 <td class="table_header_row_left">
-                                                    <fmt:message key="study_subject_label" bundle="${resword}"/>
+                                                    <fmt:message key="study_subject_ID" bundle="${resword}"/>
                                                 </td>
                                                 <td class="table_header_row">
                                                     <fmt:message key="type" bundle="${resword}"/>
@@ -249,7 +249,7 @@
                                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                             <tr valign="top">
                                                 <td class="table_header_row_left">
-                                                    <fmt:message key="study_subject_label" bundle="${resword}"/>
+                                                    <fmt:message key="study_subject_ID" bundle="${resword}"/>
                                                 </td>
                                                 <td class="table_header_row">
                                                     <fmt:message key="event_name" bundle="${resword}"/>
@@ -311,7 +311,7 @@
                                             <tr valign="top">
                                                 <td class="table_header_row_left"><fmt:message key="study_event" bundle="${resword}"/></td>
                                                 <td class="table_header_row"><fmt:message key="CRF_status" bundle="${resword}"/></td>
-                                                <td class="table_header_row"><fmt:message key="study_ID" bundle="${resword}"/></td>
+                                                <td class="table_header_row"><fmt:message key="study_name" bundle="${resword}"/></td>
                                                 <td class="table_header_row"><fmt:message key="date_created" bundle="${resword}"/></td>
                                                 <td class="table_header_row"><fmt:message key="owner" bundle="${resword}"/></td>
                                             </tr>
@@ -327,7 +327,7 @@
                                                                 <td class="table_cell" style="color: #ff0000"><c:out value="${eventDefinition.status.name}"/></td>
                                                             </c:otherwise>
                                                         </c:choose>
-                                                        <td class="table_cell"><c:out value="${eventDefinition.studyId}"/></td>
+                                                        <td class="table_cell"><c:out value="${eventDefinition.studyName}"/></td>
                                                         <td class="table_cell"><c:out value="${eventDefinition.createdDate}"/></td>
                                                         <td class="table_cell"><c:out value="${eventDefinition.owner.name}"/></td>
                                                     </tr>

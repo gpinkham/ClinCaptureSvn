@@ -11,10 +11,12 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -120,14 +122,23 @@ public final class StudyEventDefinitionUtil {
 	public static List<StudyEventDefinitionBean> studyEventDefinitionStatusUpdate(DataSource ds, int crfId) {
 		EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(ds);
 		StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(ds);
+		StudyDAO studyDao = new StudyDAO(ds);
 
 		List<StudyEventDefinitionBean> studyEventDefinitionUpdated = new ArrayList<StudyEventDefinitionBean>();
 		List<EventDefinitionCRFBean> eventDefinitionCrfList = (List<EventDefinitionCRFBean>) eventDefinitionCrfDao
 				.findAllByCRF(crfId);
+		
+		HashMap<Integer, String> studyIdName = new HashMap<Integer, String>();
+		ArrayList<Integer> studyIds = studyDao.getStudyIdsByCRF(crfId);
+
+		for (int id : studyIds) {
+			studyIdName.put(id, studyDao.findByPK(id).getName());
+		}
 
 		for (EventDefinitionCRFBean eventDefinitionCrfBean : eventDefinitionCrfList) {
 			StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) studyEventDefinitionDao
 					.findByPK(eventDefinitionCrfBean.getStudyEventDefinitionId());
+			studyEventDefinition.setStudyName(studyIdName.get(studyEventDefinition.getStudyId()));
 			studyEventDefinition.setStatus(eventDefinitionCrfBean.getStatus());
 			studyEventDefinitionUpdated.add(studyEventDefinition);
 		}

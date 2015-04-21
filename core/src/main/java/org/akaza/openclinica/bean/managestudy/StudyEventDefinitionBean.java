@@ -34,6 +34,8 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 
 	private int studyId;// fk for study table
 
+	private String studyName = ""; // not in DB
+
 	private ArrayList crfs = new ArrayList();
 
 	private int crfNum = 0; // number of crfs, not in DB
@@ -312,6 +314,14 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 	
 	public void setReferenceVisit(boolean isRevernseVisit) {
 		referenceVisit = isRevernseVisit;
+	}
+	
+	public String getStudyName() {
+		return studyName;
+	}
+
+	public void setStudyName(String name) {
+		this.studyName = name;
 	}
 
 }

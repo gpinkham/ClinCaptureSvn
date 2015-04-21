@@ -1,6 +1,9 @@
 package com.clinovo.clincapture.bean.managestudy;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 
@@ -53,6 +56,18 @@ public class StudyEventDefinitionBeanTest {
 	@Test
 	public void testRepeatingIsFalseByDefault() {
 		assertFalse(testBean.isRepeating());
+	}
+	
+	@Test
+	public void testNameDefaultValue() {
+		assertEquals("", testBean.getStudyName());
+	}
+
+	@Test
+	public void testSetStudyName() {
+		String beanStudyName = "StudyNameOfBean";
+		testBean.setStudyName(beanStudyName);
+		assertEquals(beanStudyName, testBean.getStudyName());
 	}
 
 }
