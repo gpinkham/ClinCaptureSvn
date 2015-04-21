@@ -2,7 +2,10 @@ package com.clinovo.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import java.io.Serializable;
@@ -26,7 +29,7 @@ public class MedicalHierarchy implements Serializable {
     private String socAbbrev = "";
     private int ptSocCode = 0;
     private String primarySocFg = "";
-    private int ptCode = 0;
+    private LowLevelTerm lowLevelTerm;
 
     @Id
     @Column(name = "id")
@@ -118,11 +121,14 @@ public class MedicalHierarchy implements Serializable {
         this.primarySocFg = primarySocFg;
     }
 
-    public int getPtCode() {
-        return ptCode;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "pt_code", referencedColumnName = "pt_code", nullable = false)
+    public LowLevelTerm getLowLevelTerm() {
+        return lowLevelTerm;
     }
 
-    public void setPtCode(int ptCode) {
-        this.ptCode = ptCode;
+    public void setLowLevelTerm(LowLevelTerm lowLevelTerm) {
+        this.lowLevelTerm = lowLevelTerm;
     }
+
 }

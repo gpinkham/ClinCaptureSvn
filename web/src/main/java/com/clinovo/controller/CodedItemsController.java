@@ -25,7 +25,7 @@ import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemElement;
 import com.clinovo.model.CodedItemsTableFactory;
 import com.clinovo.model.Dictionary;
-import com.clinovo.model.MedicalHierarchy;
+import com.clinovo.model.LowLevelTerm;
 import com.clinovo.model.MedicalProduct;
 import com.clinovo.model.Status.CodeStatus;
 import com.clinovo.model.Term;
@@ -571,7 +571,10 @@ public class CodedItemsController {
 			MedicalProduct mpBean = (MedicalProduct) getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()), codedItem.getDictionary(), bioontologyURL.getValue(), bioontologyUsername.getValue());
 			classificationResult = CodingFieldsUtil.medicalProductToClassification(mpBean, locale);
 		} else if (codedItem.getDictionary().contains("MEDDRA")) {
-			MedicalHierarchy medicalHierarchy = (MedicalHierarchy) getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()), codedItem.getDictionary(), bioontologyURL.getValue(), bioontologyUsername.getValue());
+			int ptCode = Integer.valueOf(Arrays.asList(classificationResult.getHttpPath().split("\\-")).get(0));
+			int lltCode = Integer.valueOf(Arrays.asList(classificationResult.getHttpPath().split("\\-")).get(1));
+
+			LowLevelTerm medicalHierarchy = getMedicalProductDAO().findByLltPKAndPtPK(lltCode, ptCode, codedItem.getDictionary(), bioontologyURL.getValue(), bioontologyUsername.getValue());
 			classificationResult = CodingFieldsUtil.medicalHierarchyToClassification(medicalHierarchy);
 		} else {
 			Search search = getSearch();

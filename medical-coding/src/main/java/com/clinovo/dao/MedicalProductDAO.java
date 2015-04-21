@@ -15,13 +15,15 @@
 package com.clinovo.dao;
 
 import com.clinovo.coding.SearchException;
-import com.clinovo.model.MedicalHierarchy;
+import com.clinovo.model.LowLevelTerm;
 import com.clinovo.model.MedicalProduct;
 import com.clinovo.util.HibernateUtil;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -44,16 +46,20 @@ public class MedicalProductDAO {
      */
     public List<Object> findByMedicalProductName(String mpn, String ontologyName, String bioontologyUrl, String bioontologyUser) throws Exception {
         String sql = "";
+        List<Object> objectList = new ArrayList<Object>();
         if (ontologyName.contains(WHOD)) {
             sql = "from MedicalProduct p where p.drugName like :mpn or p.drugName = :mpnFull";
         } else if (ontologyName.contains(MEDDRA)) {
-            sql = "from MedicalHierarchy mh where mh.ptName like :mpn or mh.ptName = :mpnFull";
+            sql = "from LowLevelTerm llt where llt.lltName like :mpn or llt.lltName = :mpnFull";
         }
         Query q = getCurrentSession(ontologyName, bioontologyUrl, bioontologyUser).createQuery(sql);
         q.setParameter("mpn", "%" + mpn + "%");
         q.setParameter("mpnFull", mpn);
 
-        return q.list();
+        for (Iterator i = q.iterate(); i.hasNext();) {
+            objectList.add(i.next());
+        }
+        return objectList;
     }
 
     /**
@@ -91,12 +97,20 @@ public class MedicalProductDAO {
         if (ontologyName.contains(WHOD)) {
             return getCurrentSession(ontologyName, bioontologyUrl, bioontologyUser).get(MedicalProduct.class, termId);
         } else if (ontologyName.contains(MEDDRA)) {
-            return getCurrentSession(ontologyName, bioontologyUrl, bioontologyUser).get(MedicalHierarchy.class, Long.valueOf(termId));
+            return getCurrentSession(ontologyName, bioontologyUrl, bioontologyUser).get(LowLevelTerm.class, Long.valueOf(termId));
         }
         throw new SearchException("Invalid ontology name");
     }
 
     private Session getCurrentSession(String ontologyName, String bioontologyUrl, String bioontologyUser) throws Exception {
         return HibernateUtil.getSession(ontologyName, bioontologyUrl, bioontologyUser);
+    }
+
+    public LowLevelTerm findByLltPKAndPtPK(int lltCode, int ptCode, String ontologyName, String bioontologyUrl, String bioontologyUser) throws Exception {
+        Query q = getCurrentSession(ontologyName, bioontologyUrl, bioontologyUser).createQuery(
+                "from LowLevelTerm llt where llt.lltCode = :lltCode and llt.ptCode = :ptCode");
+        q.setParameter("lltCode", lltCode);
+        q.setParameter("ptCode", ptCode);
+        return (LowLevelTerm) q.uniqueResult();
     }
 }

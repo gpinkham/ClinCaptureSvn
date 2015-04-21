@@ -21,6 +21,15 @@ public class ClassificationElement {
     private String codeName = "";
     private String codeValue = "";
 
+    public ClassificationElement() {
+    }
+
+    public ClassificationElement(String elementName, String codeName, String codeValue) {
+        this.elementName = elementName;
+        this.codeName = codeName;
+        this.codeValue = codeValue;
+    }
+
     public String getCodeName() {
         return codeName;
     }

@@ -19,6 +19,7 @@ import com.clinovo.coding.SearchException;
 import com.clinovo.coding.model.Classification;
 import com.clinovo.coding.model.ClassificationElement;
 import com.clinovo.model.Ingredient;
+import com.clinovo.model.LowLevelTerm;
 import com.clinovo.model.MedicalHierarchy;
 import com.clinovo.model.MedicalProduct;
 import com.clinovo.model.Therapgroup;
@@ -153,6 +154,7 @@ public final class CodingFieldsUtil {
 	 * @throws ParseException for parsing exception.
 	 */
 	public static List<Classification> medicalProductListToClassificationList(List<Object> mpList, Locale locale) throws ParseException {
+
 		List<Classification> classifications = new ArrayList<Classification>();
 		for (Object mp : mpList) {
 			classifications.add(medicalProductToClassification((MedicalProduct) mp, locale));
@@ -173,35 +175,20 @@ public final class CodingFieldsUtil {
 
 		Classification classification = new Classification();
 		classification.setHttpPath(String.valueOf(mp.getMedicinalprodId()));
-		ClassificationElement medicalProductName = new ClassificationElement();
-		medicalProductName.setElementName("MPN");
-		medicalProductName.setCodeName(mp.getDrugName());
-		classification.addClassificationElement(medicalProductName);
-		ClassificationElement medicalProductCode = new ClassificationElement();
-		medicalProductCode.setElementName("MPNC");
-		medicalProductCode.setCodeName(mp.getDrugRecordNumber() + mp.getSequenceNumber1() + mp.getSequenceNumber2());
-		classification.addClassificationElement(medicalProductCode);
-		ClassificationElement component = new ClassificationElement();
-		component.setElementName("CMP");
+		classification.addClassificationElement(new ClassificationElement("MPN", mp.getDrugName(), ""));
+		classification.addClassificationElement(new ClassificationElement("MPNC", mp.getDrugRecordNumber() + mp.getSequenceNumber1() + mp.getSequenceNumber2(), ""));
 		String ingList = String.valueOf(mp.getDrugRecordNumber());
 		for (Ingredient ing : mp.getIngList()) {
 			ingList = ingList.concat(", ").concat(ing.getSun().getSubstanceName());
 		}
-		component.setCodeName(ingList);
-		classification.addClassificationElement(component);
+		classification.addClassificationElement(new ClassificationElement("CMP", ingList, ""));
 		int counter = 1;
 		for (Therapgroup thg : mp.getThgList()) {
-			ClassificationElement atcElement = new ClassificationElement();
-			atcElement.setElementName("ATC" + counter);
-			atcElement.setCodeName(thg.getAtc().getAtcText());
-			atcElement.setCodeValue(thg.getAtc().getAtcCode());
-			classification.addClassificationElement(atcElement);
+
+			classification.addClassificationElement(new ClassificationElement("ATC" + counter, thg.getAtc().getAtcText(), thg.getAtc().getAtcCode()));
 			counter++;
 		}
-		ClassificationElement country = new ClassificationElement();
-		country.setElementName("CNTR");
-		country.setCodeName(mp.getSourceCountryBean().getCountryName());
-		classification.addClassificationElement(country);
+		classification.addClassificationElement(new ClassificationElement("CNTR", mp.getSourceCountryBean().getCountryName(), ""));
 
 		ClassificationElement dateCreate = new ClassificationElement();
 		dateCreate.setElementName("date_created");
@@ -210,12 +197,10 @@ public final class CodingFieldsUtil {
 		sdf.applyPattern("dd-MMM-yyyy");
 		String formattedDate = sdf.format(d);
 		dateCreate.setCodeName(formattedDate);
-		classification.addClassificationElement(dateCreate);
 
-		ClassificationElement generic = new ClassificationElement();
-		generic.setElementName("GENERIC");
-		generic.setCodeName(mp.getGeneric().equals("Y") ? "Yes" : "No");
-		classification.addClassificationElement(generic);
+		classification.addClassificationElement(new ClassificationElement("date_created", formattedDate, ""));
+		classification.addClassificationElement(new ClassificationElement("GENERIC", mp.getGeneric().equals("Y") ? "Yes" : "No", ""));
+
 		ClassificationElement umbrella = new ClassificationElement();
 		umbrella.setElementName("UMBRELLA");
 		int firstDigit = mp.getDrugRecordNumber();
@@ -224,12 +209,8 @@ public final class CodingFieldsUtil {
 		while (firstDigit > number) {
 			firstDigit = firstDigit / divider;
 		}
-		umbrella.setCodeName(mp.getDrugName().indexOf(" nos") > 0 || firstDigit == number ? "Yes" : "No");
-		classification.addClassificationElement(umbrella);
-		ClassificationElement preferred = new ClassificationElement();
-		preferred.setElementName("PREFERRED");
-		preferred.setCodeName(Integer.valueOf(mp.getSequenceNumber1()) > 1 && Integer.valueOf(mp.getSequenceNumber2()) == 1 ? "Yes" : "No");
-		classification.addClassificationElement(preferred);
+		classification.addClassificationElement(new ClassificationElement("UMBRELLA", mp.getDrugName().indexOf(" nos") > 0 || firstDigit == number ? "Yes" : "No", ""));
+		classification.addClassificationElement(new ClassificationElement("PREFERRED", Integer.valueOf(mp.getSequenceNumber1()) > 1 && Integer.valueOf(mp.getSequenceNumber2()) == 1 ? "Yes" : "No", ""));
 
 		return classification;
 	}
@@ -264,52 +245,59 @@ public final class CodingFieldsUtil {
 	/**
 	 * Returns classification object from medical hierarchy object.
 	 *
-	 * @param medicalProducts the list of medical hierarchy beans.
+	 * @param lowLevelTerm the list of medical hierarchy beans.
 	 * @return the list of classifications.
 	 */
-	public static List<Classification> medicalHierarchyToClassificationList(List<Object> medicalProducts) {
+	public static List<Classification> medicalHierarchyToClassificationList(List<Object> lowLevelTerm) {
 		List<Classification> classifications = new ArrayList<Classification>();
-		for (Object mp : medicalProducts) {
-			classifications.add(medicalHierarchyToClassification((MedicalHierarchy) mp));
+		List<LowLevelTerm> updatedLowLevelTermList = getListWithUniqueMedicalHierarchy(lowLevelTerm);
+		for (LowLevelTerm llt : updatedLowLevelTermList) {
+			classifications.add(medicalHierarchyToClassification(llt));
 		}
+
 		return classifications;
+	}
+
+	private static List<LowLevelTerm> getListWithUniqueMedicalHierarchy(List<Object> lowLevelTerm) {
+		List<LowLevelTerm> finalList = new ArrayList<LowLevelTerm>();
+		for (Object object : lowLevelTerm) {
+			LowLevelTerm llt = (LowLevelTerm) object;
+			if (llt.getMedicalHierarchy().size() > 1) {
+				for (MedicalHierarchy medicalHierarchy : llt.getMedicalHierarchy()) {
+					LowLevelTerm termTerm = new LowLevelTerm();
+					List<MedicalHierarchy> medicalHierarchyList = new ArrayList<MedicalHierarchy>();
+					medicalHierarchyList.add(medicalHierarchy);
+					termTerm.setMedicalHierarchy(medicalHierarchyList);
+					termTerm.setLltCode(llt.getLltCode());
+					termTerm.setLltCurrency(llt.getLltCurrency());
+					termTerm.setLltName(llt.getLltName());
+					termTerm.setPtCode(llt.getPtCode());
+					finalList.add(termTerm);
+				}
+			} else {
+				finalList.add(llt);
+			}
+		}
+		return finalList;
 	}
 
 	/**
 	 * Returns classification object from medical hierarchy object.
 	 *
-	 * @param medicalHierarchy the medical hierarchy bean.
+	 * @param lowLevelTerm the medical low level term bean.
 	 * @return the classification object.
 	 */
-	public static Classification medicalHierarchyToClassification(MedicalHierarchy medicalHierarchy) {
-		Classification classification = new Classification();
-		classification.setHttpPath(String.valueOf(medicalHierarchy.getId()));
-		ClassificationElement socElement = new ClassificationElement();
-		socElement.setElementName("SOC");
-		socElement.setCodeName(medicalHierarchy.getSocName());
-		socElement.setCodeValue(String.valueOf(medicalHierarchy.getSocCode()));
-		classification.addClassificationElement(socElement);
-		ClassificationElement hlgtElement = new ClassificationElement();
-		hlgtElement.setElementName("HLGT");
-		hlgtElement.setCodeName(medicalHierarchy.getHlgtName());
-		hlgtElement.setCodeValue(String.valueOf(medicalHierarchy.getHlgtCode()));
-		classification.addClassificationElement(hlgtElement);
-		ClassificationElement hltElement = new ClassificationElement();
-		hltElement.setElementName("HLT");
-		hltElement.setCodeName(medicalHierarchy.getHltName());
-		hltElement.setCodeValue(String.valueOf(medicalHierarchy.getHltCode()));
-		classification.addClassificationElement(hltElement);
-		ClassificationElement ptElement = new ClassificationElement();
-		ptElement.setElementName("PT");
-		ptElement.setCodeName(medicalHierarchy.getPtName());
-		ptElement.setCodeValue(String.valueOf(medicalHierarchy.getPtCode()));
-		classification.addClassificationElement(ptElement);
-		ClassificationElement lltElement = new ClassificationElement();
-		lltElement.setElementName("LLT");
-		lltElement.setCodeName(medicalHierarchy.getPtName());
-		lltElement.setCodeValue(String.valueOf(medicalHierarchy.getPtCode()));
-		classification.addClassificationElement(lltElement);
+	public static Classification medicalHierarchyToClassification(LowLevelTerm lowLevelTerm) {
 
+		Classification classification = new Classification();
+		for (MedicalHierarchy medicalHierarchy : lowLevelTerm.getMedicalHierarchy()) {
+			classification.setHttpPath(String.valueOf(lowLevelTerm.getPtCode()) + "-" + String.valueOf(lowLevelTerm.getLltCode()));
+			classification.addClassificationElement(new ClassificationElement("SOC", medicalHierarchy.getSocName(), String.valueOf(medicalHierarchy.getSocCode())));
+			classification.addClassificationElement(new ClassificationElement("HLT", medicalHierarchy.getHltName(), String.valueOf(medicalHierarchy.getHltCode())));
+			classification.addClassificationElement(new ClassificationElement("HLGT", medicalHierarchy.getHlgtName(), String.valueOf(medicalHierarchy.getHlgtCode())));
+			classification.addClassificationElement(new ClassificationElement("PT", medicalHierarchy.getPtName(), String.valueOf(lowLevelTerm.getPtCode())));
+			}
+		classification.addClassificationElement(new ClassificationElement("LLT", lowLevelTerm.getLltName(), String.valueOf(lowLevelTerm.getLltCode())));
 		return classification;
 	}
 
@@ -343,7 +331,6 @@ public final class CodingFieldsUtil {
 			final int nameWithSubversionLength = 9;
 			String meddra = "MedDRA";
 			if (ontologyName.length() > simpleNameLength) {
-
 				String version = ontologyName.substring(ontologyName.indexOf("-") + versionSIndex, ontologyName.indexOf("-") + versionEIndex);
 				String subversion = "";
 				if (ontologyName.length() > nameWithSubversionLength) {

@@ -17,6 +17,7 @@ package com.clinovo.util;
 import com.clinovo.model.AtcClassification;
 import com.clinovo.model.CountryCode;
 import com.clinovo.model.Ingredient;
+import com.clinovo.model.LowLevelTerm;
 import com.clinovo.model.MedicalHierarchy;
 import com.clinovo.model.MedicalProduct;
 import com.clinovo.model.Substance;
@@ -70,7 +71,7 @@ public final class HibernateUtil {
         lsfb.setDataSource(dataSource(ontologyName, bioontologyUrl, bioontologyUser));
         lsfb.setHibernateProperties(properties);
         Class[] annotatedClasses = {MedicalHierarchy.class, AtcClassification.class, CountryCode.class,
-                Ingredient.class, MedicalProduct.class, Substance.class, Therapgroup.class};
+                Ingredient.class, MedicalProduct.class, Substance.class, Therapgroup.class, LowLevelTerm.class};
         lsfb.setAnnotatedClasses(annotatedClasses);
         lsfb.setNamingStrategy(new ImprovedNamingStrategy());
         lsfb.afterPropertiesSet();
