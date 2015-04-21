@@ -40,7 +40,7 @@
 	<tr>
 		<td valign="top"><!-- Header Table -->
 
-            <table id="headerInnerTable3" border="0" cellpadding="0" cellspacing="0" width="" class="header">
+            <table id="headerInnerTable3" border="0" cellpadding="0" cellspacing="0" class="header">
 			<tr>				<td valign="top">
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
@@ -49,8 +49,3 @@
 <!-- Main Navigation -->
 	<jsp:include page="../include/navBar.jsp"/>
 <!-- End Main Navigation -->
-<script language="JavaScript">
-    if (document.body != null) {
-        document.getElementById("headerInnerTable3").setAttribute("width", (document.body.clientWidth || document.body.innerWidth));
-    }
-</script>

@@ -18,7 +18,7 @@
 
 <!-- Footer -->
 
-            <table id="footerInnerTable2" border="0" cellpadding="0" cellspacing="0" width="">
+            <table id="footerInnerTable2" border="0" cellpadding="0" cellspacing="0" class="footerInnerTable">
 			<tr>
 				<td class="footer">
 				<!--<a href="#">About ClinCapture</a>
@@ -55,11 +55,6 @@
 	</tr>
 </table>
 
-<script language="JavaScript">
-    if (document.body != null) {
-        document.getElementById("footerInnerTable2").setAttribute("width", (document.body.clientWidth || document.body.innerWidth));
-    }
-</script>
 
 </body>
 

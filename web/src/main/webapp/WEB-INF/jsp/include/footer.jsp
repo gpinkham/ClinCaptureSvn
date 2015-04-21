@@ -20,7 +20,7 @@
 
 <!-- Footer -->
 
-            <table id="footerInnerTable1"  border="0" cellpadding="0" cellspacing="0" width="" style="white-space: nowrap;">
+            <table id="footerInnerTable1"  border="0" cellpadding="0" cellspacing="0" style="white-space: nowrap;" class="footerInnerTable">
             <tr>
                 <td class="footer" style="width: 450px"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                 <td class="footer" align="right">
@@ -53,11 +53,6 @@
 </table>
 <jsp:include page="../include/changeTheme.jsp"/>
 
-<script language="JavaScript">
-    if (document.body != null) {
-        document.getElementById("footerInnerTable1").setAttribute("width", (document.body.clientWidth || document.body.innerWidth));
-    }
-</script>
 
 </body>
 </html>

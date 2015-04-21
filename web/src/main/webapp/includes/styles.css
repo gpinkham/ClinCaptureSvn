@@ -2911,3 +2911,7 @@ a.sdvItemLink {
     padding-right: 5px;
     cursor: pointer;
 }
+
+table.footerInnerTable {
+	width: 1024px;
+}
