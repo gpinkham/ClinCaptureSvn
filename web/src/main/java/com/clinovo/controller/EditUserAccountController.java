@@ -3,6 +3,7 @@ package com.clinovo.controller;
 import com.clinovo.controller.base.BaseController;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.EmailService;
+import com.clinovo.service.UserAccountService;
 import com.clinovo.util.EmailUtil;
 import com.clinovo.util.PageMessagesUtil;
 import com.clinovo.util.ValidatorHelper;
@@ -49,6 +50,9 @@ public class EditUserAccountController extends BaseController {
 
 	@Autowired
 	private EmailService mailer;
+
+	@Autowired
+	private UserAccountService userAccountService;
 
 	private Locale locale;
 	private UserAccountDAO userAccountDAO;
@@ -105,7 +109,7 @@ public class EditUserAccountController extends BaseController {
 			userAccountDAO = new UserAccountDAO(dataSource);
 			UserAccountBean user = (UserAccountBean) userAccountDAO.findByPK(userId);
 			model.addAttribute("editedUser", user);
-
+			model.addAttribute("isSiteLevelUser", userAccountService.isSiteLevelUser(user));
 			if (!fp.isSubmitted()) {
 				model.addAttribute("userTypes", getUserTypes());
 				loadPresetValuesFromBean(fp, user);

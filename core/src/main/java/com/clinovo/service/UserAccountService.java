@@ -190,4 +190,11 @@ public interface UserAccountService {
 	 */
 	UserAccountBean createUser(String ownerUserName, UserAccountBean userAccountBean, Role role,
 			boolean displayPassword, String password);
+
+	/**
+	 * Check if user has site-level roles or study level roles.
+	 * @param ub UserAccountBean
+	 * @return boolean result
+	 */
+	boolean isSiteLevelUser(UserAccountBean ub);
 }

@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.UserAccountService;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -253,6 +254,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected CRFMaskingService maskingService;
 	@Autowired
 	protected SimpleConditionalDisplayService simpleConditionalDisplayService;
+	@Autowired
+	protected UserAccountService userAccountService;
 
 	protected static PlatformTransactionManager transactionManager;
 

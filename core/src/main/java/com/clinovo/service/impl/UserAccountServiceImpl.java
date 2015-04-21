@@ -81,6 +81,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 		return messageFormat;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean doesUserHaveRoleInStudies(UserAccountBean user, List<StudyBean> studyList) throws Exception {
 
 		List<StudyBean> fullStudyList = new ArrayList<StudyBean>();
@@ -111,6 +114,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean performActionOnStudyUserRole(int userId, int studyId, int actionId, UserAccountBean currentUser,
 			StringBuilder message, ResourceBundle respage) throws Exception {
 
@@ -139,6 +145,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 		return operationSucceeded;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean deleteStudyUserRole(int userId, int studyId, UserAccountBean currentUser, StringBuilder message,
 			ResourceBundle respage) throws Exception {
 
@@ -171,6 +180,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 		return operationSucceeded;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean removeStudyUserRole(int userId, int studyId, UserAccountBean currentUser, StringBuilder message,
 			ResourceBundle respage) throws Exception {
 
@@ -201,6 +213,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 		return operationSucceeded;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void autoRemoveStudyUserRole(StudyUserRoleBean studyUserRole, UserAccountBean currentUser) throws Exception {
 
 		removeRole(studyUserRole, currentUser, true);
@@ -235,6 +250,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 		return operationSucceeded;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean restoreStudyUserRole(int userId, int studyId, UserAccountBean currentUser, StringBuilder message,
 			ResourceBundle respage) throws Exception {
 
@@ -265,6 +283,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 		return operationSucceeded;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void autoRestoreStudyUserRole(StudyUserRoleBean studyUserRole, UserAccountBean currentUser) throws Exception {
 
 		restoreRole(studyUserRole, currentUser, null, null, true);
@@ -330,6 +351,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean doesUserHaveAvailableRole(int userId) throws Exception {
 
 		UserAccountBean user = (UserAccountBean) getUserAccountDAO().findByPK(userId);
@@ -342,6 +366,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setActiveStudyId(UserAccountBean user, int studyId) throws Exception {
 
 		user.setActiveStudyId(studyId);
@@ -388,6 +415,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public UserAccountBean createUser(String ownerUserName, UserAccountBean userAccountBean, Role role,
 			boolean displayPassword, String password) {
 		UserAccountDAO userAccountDAO = getUserAccountDAO();
@@ -417,7 +447,25 @@ public class UserAccountServiceImpl implements UserAccountService {
 						new StudyDAO(dataSource).findByPK(userAccountBean.getActiveStudyId()).getName());
 			}
 		}
-
 		return userAccountBean;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isSiteLevelUser(UserAccountBean ub) {
+		StudyDAO studyDAO = getStudyDAO();
+
+		if (ub.getRoles() != null && ub.getRoles().size() != 0) {
+			ArrayList<StudyUserRoleBean> surs = ub.getRoles();
+
+			for (StudyUserRoleBean sur : surs) {
+				StudyBean study = (StudyBean) studyDAO.findByPK(sur.getStudyId());
+				if (study.getParentStudyId() != 0) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

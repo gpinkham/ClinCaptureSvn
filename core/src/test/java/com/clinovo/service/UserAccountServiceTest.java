@@ -572,4 +572,35 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		verify(spyUserAccountDAO).update(user);
 		assertEquals(newActiveSstudyId, user.getActiveStudyId());
 	}
+
+	@Test
+	public void testThatIsSiteLevelUserReturnsCorrectResultForStudyUsers() {
+		UserAccountBean ub = new UserAccountBean();
+		StudyUserRoleBean sur = new StudyUserRoleBean();
+		sur.setStudyId(1);
+		ArrayList<StudyUserRoleBean> roles = new ArrayList<StudyUserRoleBean>();
+		roles.add(sur);
+		ub.setRoles(roles);
+		assertTrue(!userAccountService.isSiteLevelUser(ub));
+	}
+
+	@Test
+	public void testThatIsSiteLevelUserReturnsCorrectResultForSiteUsers() {
+		UserAccountBean ub = new UserAccountBean();
+		StudyUserRoleBean sur = new StudyUserRoleBean();
+		sur.setStudyId(2);
+		ArrayList<StudyUserRoleBean> roles = new ArrayList<StudyUserRoleBean>();
+		roles.add(sur);
+		ub.setRoles(roles);
+		StudyBean study = new StudyBean();
+		study.setParentStudyId(1);
+		doReturn(study).when(spyStudyDAO).findByPK(2);
+		assertTrue(spyUserAccountService.isSiteLevelUser(ub));
+	}
+
+	@Test
+	public void testThatIsSiteLevelUserDoNotThrowsAnExceptionIfThereAreNoRolesForUser() {
+		UserAccountBean ub = new UserAccountBean();
+		assertTrue(!userAccountService.isSiteLevelUser(ub));
+	}
 }
