@@ -344,6 +344,31 @@ public class ListNotesFilter implements CriteriaCommand {
 
 	}
 
+	/**
+	 * Gets filter by masked CRF for assigned user.
+	 * @param activeUserId UserAccountId
+	 * @return Filter
+	 */
+	public String getFilterForMaskedCRFs(int activeUserId) {
+		StringBuilder builder = new StringBuilder("");
+		if (activeUserId != 0) {
+			builder = builder.append("and ((SELECT COUNT (*) ")
+					.append("FROM crfs_masking ")
+					.append("WHERE (event_definition_crf_id = (")
+					.append("SELECT event_definition_crf_id ")
+					.append("FROM event_definition_crf edc ")
+					.append("WHERE crf_id = (")
+					.append("SELECT DISTINCT crf_id ")
+					.append("FROM crf_version ")
+					.append("WHERE crf_version_id = ec.crf_version_id) ")
+					.append("AND study_event_definition_id = sed.study_event_definition_id ")
+					.append("AND study_id = ss.study_id) ")
+					.append("AND study_id = ss.study_id ")
+					.append("AND user_id = ").append(activeUserId).append(")) = 0)");
+		}
+		return builder.toString();
+	}
+
 	public boolean isDateCreatedCorrect() {
 		return dateCreatedCorrect;
 	}

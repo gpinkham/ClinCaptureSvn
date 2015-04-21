@@ -20,15 +20,10 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SDVUtil;
+import com.clinovo.util.SignUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -60,10 +55,13 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SDVUtil;
-import com.clinovo.util.SignUtil;
-import com.clinovo.util.SubjectEventStatusUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * copy of the EnterDataForStudyEventServlet.
@@ -277,9 +275,10 @@ public class CRFListForStudyEventServlet extends Controller {
 		request.setAttribute(BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS, uncompletedEventDefinitionCRFs);
 		request.setAttribute(BEAN_DISPLAY_EVENT_CRFS, displayEventCRFs);
 		request.setAttribute(SES_ICON_URL, SubjectEventStatusUtil.getSESIconUrl(seb.getSubjectEventStatus()));
-		if (discrepancyNoteDAO.doesSubjectHaveUnclosedDNsInStudy(currentStudy, studySubjectBean.getLabel())) {
+
+		if (discrepancyNoteDAO.doesSubjectHaveUnclosedDNsInStudy(currentStudy, studySubjectBean.getLabel(), ub)) {
 			String subjectFlagColor = "yellow";
-			if (discrepancyNoteDAO.doesSubjectHaveNewDNsInStudy(currentStudy, studySubjectBean.getLabel())) {
+			if (discrepancyNoteDAO.doesSubjectHaveNewDNsInStudy(currentStudy, studySubjectBean.getLabel(), ub)) {
 				subjectFlagColor = "red";
 			}
 			request.setAttribute(SUBJECT_FLAG_COLOR, subjectFlagColor);
@@ -287,10 +286,10 @@ public class CRFListForStudyEventServlet extends Controller {
 
 		String eventName = seb.getStudyEventDefinition().getName();
 		if (discrepancyNoteDAO.doesEventHaveUnclosedDNsInStudy(currentStudy, eventName, eventId,
-				studySubjectBean.getLabel())) {
+				studySubjectBean.getLabel(), ub)) {
 			String eventFlagColor = "yellow";
 			if (discrepancyNoteDAO.doesEventHaveNewDNsInStudy(currentStudy, eventName, eventId,
-					studySubjectBean.getLabel())) {
+					studySubjectBean.getLabel(), ub)) {
 				eventFlagColor = "red";
 			}
 			request.setAttribute(EVENT_FLAG_COLOR, eventFlagColor);
@@ -311,14 +310,16 @@ public class CRFListForStudyEventServlet extends Controller {
 				String crfName = displayEventCRFBean.getEventCRF().getCrf().getName();
 				Integer crfId = displayEventCRFBean.getEventCRF().getCrf().getId();
 
-				if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
-						studySubjectBean.getLabel(), crfName)) {
-					String crfFlagColor = "yellow";
-					if (discrepancyNoteDAO.doesCRFHaveNewDNsInStudyForSubject(currentStudy, eventName, eventId,
+				if (!getMaskingService().isEventDefinitionCRFMasked(displayEventCRFBean.getEventDefinitionCRF().getId(), ub.getId(), displayEventCRFBean.getEventDefinitionCRF().getStudyId())) {
+					if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
 							studySubjectBean.getLabel(), crfName)) {
-						crfFlagColor = "red";
+						String crfFlagColor = "yellow";
+						if (discrepancyNoteDAO.doesCRFHaveNewDNsInStudyForSubject(currentStudy, eventName, eventId,
+								studySubjectBean.getLabel(), crfName)) {
+							crfFlagColor = "red";
+						}
+						notedMap.put(crfId, crfFlagColor);
 					}
-					notedMap.put(crfId, crfFlagColor);
 				}
 
 			} else if (bean instanceof DisplayEventDefinitionCRFBean) {
@@ -327,14 +328,16 @@ public class CRFListForStudyEventServlet extends Controller {
 				String crfName = displayEventDefinitionCRFBean.getEdc().getCrf().getName();
 				Integer crfId = displayEventDefinitionCRFBean.getEdc().getCrf().getId();
 
-				if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
-						studySubjectBean.getLabel(), crfName)) {
-					String crfFlagColor = "yellow";
-					if (discrepancyNoteDAO.doesCRFHaveNewDNsInStudyForSubject(currentStudy, eventName, eventId,
+				if (!getMaskingService().isEventDefinitionCRFMasked(displayEventDefinitionCRFBean.getEdc().getId(), ub.getId(), displayEventDefinitionCRFBean.getEdc().getStudyId())) {
+					if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
 							studySubjectBean.getLabel(), crfName)) {
-						crfFlagColor = "red";
+						String crfFlagColor = "yellow";
+						if (discrepancyNoteDAO.doesCRFHaveNewDNsInStudyForSubject(currentStudy, eventName, eventId,
+								studySubjectBean.getLabel(), crfName)) {
+							crfFlagColor = "red";
+						}
+						notedMap.put(crfId, crfFlagColor);
 					}
-					notedMap.put(crfId, crfFlagColor);
 				}
 			}
 		}

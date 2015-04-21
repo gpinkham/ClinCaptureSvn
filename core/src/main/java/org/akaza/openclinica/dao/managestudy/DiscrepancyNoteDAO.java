@@ -1,32 +1,20 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
 package org.akaza.openclinica.dao.managestudy;
 
-import java.sql.Connection;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
+import com.clinovo.model.DiscrepancyCorrectionForm;
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -49,8 +37,18 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 
-import com.clinovo.model.DiscrepancyCorrectionForm;
-import com.clinovo.util.DateUtil;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * <code>DiscrepancyNoteDAO</code> class is a member of DAO layer, extends <code>AuditableEntityDAO</code> class.
@@ -94,17 +92,31 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		getCurrentPKName = "getCurrentPrimaryKey";
 	}
 
+	/**
+	 * Constructor with DataSource.
+	 * @param ds DataSource
+	 */
 	public DiscrepancyNoteDAO(DataSource ds) {
 		super(ds);
 		setQueryNames();
 	}
 
+	/**
+	 * Constructor with DAODigester and DataSource.
+	 * @param ds DataSource
+	 * @param digester DAODigester
+	 */
 	public DiscrepancyNoteDAO(DataSource ds, DAODigester digester) {
 		super(ds);
 		this.digester = digester;
 		setQueryNames();
 	}
 
+	/**
+	 * Constructor with DataSource and Connection.
+	 * @param ds DataSource
+	 * @param connection Connection
+	 */
 	public DiscrepancyNoteDAO(DataSource ds, Connection connection) {
 		super(ds, connection);
 		setQueryNames();
@@ -251,6 +263,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return statisticBean;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Collection findAll() {
 		return this.executeFindAllQuery("findAll");
 	}
@@ -458,11 +473,27 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @param sort ListNotesSort
 	 * @param offset int
 	 * @param limit int
+	 * @param userAccount UserAccountBean
+	 * @return ArrayList<DiscrepancyNoteBean>
+	 */
+	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortLimits(StudyBean currentStudy,
+			ListNotesFilter filter, ListNotesSort sort, int offset, int limit, UserAccountBean userAccount) {
+		return getViewNotesWithFilterAndSortLimits(currentStudy, filter, sort, offset, limit, false, userAccount);
+	}
+
+	/**
+	 * Returns a set of DNs from filtered and sorted list of all the parent DNs by study/site.
+	 *
+	 * @param currentStudy StudyBean
+	 * @param filter ListNotesFilter
+	 * @param sort ListNotesSort
+	 * @param offset int
+	 * @param limit int
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortLimits(StudyBean currentStudy,
 			ListNotesFilter filter, ListNotesSort sort, int offset, int limit) {
-		return getViewNotesWithFilterAndSortLimits(currentStudy, filter, sort, offset, limit, false);
+		return getViewNotesWithFilterAndSortLimits(currentStudy, filter, sort, offset, limit, null);
 	}
 
 	/**
@@ -475,12 +506,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @param limit        int
 	 * @param eventCrfOnly boolean	if <code>true</code>, then sql will search for DNs assigned to event CRFs and
 	 *                     its data only; otherwise - sql will search for all the DNs in a study/site
+	 * @param activeUser   UserAccountBean
 	 * @return String
 	 */
 	public String getSQLViewNotesWithFilterAndSortLimits(StudyBean currentStudy, ListNotesFilter filter,
-			ListNotesSort sort, int offset, int limit, boolean eventCrfOnly) {
+			ListNotesSort sort, int offset, int limit, boolean eventCrfOnly, UserAccountBean activeUser) {
 		StringBuilder sql = new StringBuilder("SELECT dns.* FROM ( ");
-
+		int activeUserId = 0;
+		if (activeUser != null) {
+			activeUserId = activeUser.getId();
+		}
 		String filterPart = filter.execute("");
 		String sortPart = sort.execute("");
 
@@ -493,12 +528,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			sql.append(filterPart).append(filter.getAdditionalStudyEventFilter()).append(UNION_OP);
 		}
 		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
+		sql.append(filter.getFilterForMaskedCRFs(activeUserId));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
 		sql.append(filterPart).append(filter.getAdditionalStudyEventFilter()).append(UNION_OP);
 		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
+		sql.append(filter.getFilterForMaskedCRFs(activeUserId));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
@@ -528,10 +565,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @param limit        int
 	 * @param eventCrfOnly boolean	if <code>true</code>, then sql will search for DNs assigned to event CRFs and
 	 *                     its data only; otherwise - sql will search for all the DNs in a study/site
+	 * @param userAccount  UserAccountBean
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortLimits(StudyBean currentStudy,
-			ListNotesFilter filter, ListNotesSort sort, int offset, int limit, boolean eventCrfOnly) {
+			ListNotesFilter filter, ListNotesSort sort, int offset, int limit, boolean eventCrfOnly, UserAccountBean userAccount) {
 		setTypesExpected();
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING);
@@ -550,7 +588,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 
 		ArrayList rows =
-				select(getSQLViewNotesWithFilterAndSortLimits(currentStudy, filter, sort, offset, limit, eventCrfOnly),
+				select(getSQLViewNotesWithFilterAndSortLimits(currentStudy, filter, sort, offset, limit, eventCrfOnly, userAccount),
 				variables);
 		Iterator it = rows.iterator();
 		ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
@@ -1700,10 +1738,22 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Find all with aditional params. Not Implemented!
+	 * @param strOrderByColumn String
+	 * @param blnAscendingSort boolean
+	 * @param strSearchPhrase String
+	 * @return new ArrayList.
+	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}
 
+	/**
+	 * Find by id.
+	 * @param id int
+	 * @return EntityBean
+	 */
 	public EntityBean findByPK(int id) {
 		DiscrepancyNoteBean eb = new DiscrepancyNoteBean();
 		this.setTypesExpected();
@@ -1724,6 +1774,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * Create Discrepancy Note.
+	 * @param eb EntityBean
+	 * @return EntityBean
+	 */
 	public EntityBean create(EntityBean eb) {
 		return create(eb, null);
 	}
@@ -1807,6 +1862,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	}
 
+	/**
+	 * Update Discrepancy Note.
+	 * @param eb EntityBean
+	 * @return DiscrepancyNoteBean
+	 */
 	public EntityBean update(EntityBean eb) {
 		DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) eb;
 		dnb.setActive(false);
@@ -1882,11 +1942,26 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.execute(digester.getQuery("deleteNotes"), variables);
 	}
 
+	/**
+	 * Find all by permission. Not Implemented!
+	 * @param objCurrentUser Object
+	 * @param intActionType int
+	 * @param strOrderByColumn String
+	 * @param blnAscendingSort boolean
+	 * @param strSearchPhrase String
+	 * @return new ArrayList
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}
 
+	/**
+	 * Find all by permission. Not Implemented!
+	 * @param objCurrentUser Object
+	 * @param intActionType int
+	 * @return new ArrayList
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
 		return new ArrayList();
 	}
@@ -2349,15 +2424,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @param study            StudyBean
 	 * @param subjectLabel     String
 	 * @param resolutionStatus String
+	 * @param userAccount      UserAccountBean
 	 * @return boolean
 	 */
-	public boolean doesSubjectHaveDNsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
+	public boolean doesSubjectHaveDNsInStudy(StudyBean study, String subjectLabel, String resolutionStatus, UserAccountBean userAccount) {
 
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
 		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
-				new ListNotesSort(), 0, DEFAULT_FETCH_UPPER_BOUND, true);
+				new ListNotesSort(), 0, DEFAULT_FETCH_UPPER_BOUND, true, userAccount);
 		return noteBeans.size() > 0;
 	}
 
@@ -2367,10 +2443,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 *
 	 * @param study        StudyBean
 	 * @param subjectLabel String
+	 * @param userAccount  UserAccountBean
 	 * @return boolean
 	 */
-	public boolean doesSubjectHaveNewDNsInStudy(StudyBean study, String subjectLabel) {
-		return doesSubjectHaveDNsInStudy(study, subjectLabel, "1");
+	public boolean doesSubjectHaveNewDNsInStudy(StudyBean study, String subjectLabel, UserAccountBean userAccount) {
+		return doesSubjectHaveDNsInStudy(study, subjectLabel, "1", userAccount);
 	}
 
 	/**
@@ -2379,10 +2456,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 *
 	 * @param study        StudyBean
 	 * @param subjectLabel String
+	 * @param userAccount  UserAccountBean
 	 * @return boolean
 	 */
-	public boolean doesSubjectHaveUnclosedDNsInStudy(StudyBean study, String subjectLabel) {
-		return doesSubjectHaveDNsInStudy(study, subjectLabel, "123");
+	public boolean doesSubjectHaveUnclosedDNsInStudy(StudyBean study, String subjectLabel, UserAccountBean userAccount) {
+		return doesSubjectHaveDNsInStudy(study, subjectLabel, "123", userAccount);
 	}
 
 	/**
@@ -2391,16 +2469,29 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @param study            StudyBean
 	 * @param subjectLabel     String
 	 * @param resolutionStatus String
+	 * @param userAccount      UserAccountBean
 	 * @return boolean
 	 */
-	public boolean doesSubjectHaveAnyDNsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
+	public boolean doesSubjectHaveAnyDNsInStudy(StudyBean study, String subjectLabel, String resolutionStatus, UserAccountBean userAccount) {
 
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
 		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
-				new ListNotesSort(), 0, DEFAULT_FETCH_UPPER_BOUND);
+				new ListNotesSort(), 0, DEFAULT_FETCH_UPPER_BOUND, userAccount);
 		return noteBeans.size() > 0;
+	}
+
+	/**
+	 * Finds out if a certain Study Subject has any DNs in study/site, with certain resolution status New.
+	 *
+	 * @param study        StudyBean
+	 * @param subjectLabel String
+	 * @param userAccount  UserAccountBean
+	 * @return boolean
+	 */
+	public boolean doesSubjectHaveAnyNewDNsInStudy(StudyBean study, String subjectLabel, UserAccountBean userAccount) {
+		return doesSubjectHaveAnyDNsInStudy(study, subjectLabel, "1", userAccount);
 	}
 
 	/**
@@ -2411,7 +2502,19 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return boolean
 	 */
 	public boolean doesSubjectHaveAnyNewDNsInStudy(StudyBean study, String subjectLabel) {
-		return doesSubjectHaveAnyDNsInStudy(study, subjectLabel, "1");
+		return doesSubjectHaveAnyNewDNsInStudy(study, subjectLabel, null);
+	}
+
+	/**
+	 * Finds out if a certain Study Subject has any DNs in study/site, with certain resolution status New/Updated.
+	 *
+	 * @param study        StudyBean
+	 * @param subjectLabel String
+	 * @param userAccount  UserAccountBean
+	 * @return boolean
+	 */
+	public boolean doesSubjectHaveAnyUnclosedDNsInStudy(StudyBean study, String subjectLabel, UserAccountBean userAccount) {
+		return doesSubjectHaveAnyDNsInStudy(study, subjectLabel, "123", userAccount);
 	}
 
 	/**
@@ -2422,7 +2525,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return boolean
 	 */
 	public boolean doesSubjectHaveAnyUnclosedDNsInStudy(StudyBean study, String subjectLabel) {
-		return doesSubjectHaveAnyDNsInStudy(study, subjectLabel, "123");
+		return doesSubjectHaveAnyUnclosedDNsInStudy(study, subjectLabel, null);
 	}
 
 	/**
@@ -2434,18 +2537,34 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @param eventId          int
 	 * @param subjectLabel     String
 	 * @param resolutionStatus String
+	 * @param userAccount      UserAccountBean
 	 * @return boolean
 	 */
 	public boolean doesEventHaveSomeDNsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel,
-			String resolutionStatus) {
+			String resolutionStatus, UserAccountBean userAccount) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("eventId", eventId);
 		listNotesFilter.addFilter("eventName", eventLabel);
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
 		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
-				new ListNotesSort(), 0, DEFAULT_FETCH_UPPER_BOUND);
+				new ListNotesSort(), 0, DEFAULT_FETCH_UPPER_BOUND, userAccount);
 		return noteBeans.size() > 0;
+	}
+
+	/**
+	 * Finds out if a certain Study Subject has DNs with resolution status New,
+	 * associated with a specific Study Event bean.
+	 *
+	 * @param study        StudyBean
+	 * @param eventLabel   String
+	 * @param eventId      int
+	 * @param subjectLabel String
+	 * @param userAccount  UserAccountBean
+	 * @return boolean
+	 */
+	public boolean doesEventHaveNewDNsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel, UserAccountBean userAccount) {
+		return doesEventHaveSomeDNsInStudy(study, eventLabel, eventId, subjectLabel, "1", userAccount);
 	}
 
 	/**
@@ -2459,7 +2578,23 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return boolean
 	 */
 	public boolean doesEventHaveNewDNsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel) {
-		return doesEventHaveSomeDNsInStudy(study, eventLabel, eventId, subjectLabel, "1");
+		return doesEventHaveNewDNsInStudy(study, eventLabel, eventId, subjectLabel, null);
+	}
+
+	/**
+	 * Finds out if a certain Study Subject has DNs with resolution status New/Updated,
+	 * associated with a specific Study Event bean.
+	 *
+	 * @param study        StudyBean
+	 * @param eventLabel   String
+	 * @param eventId      int
+	 * @param subjectLabel String
+	 * @param userAccount  UserAccountBean
+	 * @return boolean
+	 */
+	public boolean doesEventHaveUnclosedDNsInStudy(StudyBean study, String eventLabel, int eventId,
+			String subjectLabel, UserAccountBean userAccount) {
+		return doesEventHaveSomeDNsInStudy(study, eventLabel, eventId, subjectLabel, "123", userAccount);
 	}
 
 	/**
@@ -2473,8 +2608,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return boolean
 	 */
 	public boolean doesEventHaveUnclosedDNsInStudy(StudyBean study, String eventLabel, int eventId,
-			String subjectLabel) {
-		return doesEventHaveSomeDNsInStudy(study, eventLabel, eventId, subjectLabel, "123");
+												   String subjectLabel) {
+		return doesEventHaveUnclosedDNsInStudy(study, eventLabel, eventId, subjectLabel, null);
 	}
 
 	/**
@@ -2487,10 +2622,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @param subjectLabel     String
 	 * @param crfName          String
 	 * @param resolutionStatus String
+	 * @param userAccount      UserAccountBean
 	 * @return boolean
 	 */
 	public boolean doesCRFHaveDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
-			String subjectLabel, String crfName, String resolutionStatus) {
+			String subjectLabel, String crfName, String resolutionStatus, UserAccountBean userAccount) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("eventId", eventId);
 		listNotesFilter.addFilter("crfName", crfName);
@@ -2498,8 +2634,25 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
 		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
-				new ListNotesSort(), 0, DEFAULT_FETCH_UPPER_BOUND, true);
+				new ListNotesSort(), 0, DEFAULT_FETCH_UPPER_BOUND, true, userAccount);
 		return noteBeans.size() > 0;
+	}
+
+	/**
+	 * Finds out if a certain Study Subject has DNs with resolution status New,
+	 * associated with a specific Event CRF inside of a specific Study Event bean.
+	 *
+	 * @param study        StudyBean
+	 * @param eventLabel   String
+	 * @param eventId      int
+	 * @param subjectLabel String
+	 * @param crfName      String
+	 * @param userAccount  UserAccountBean
+	 * @return boolean
+	 */
+	public boolean doesCRFHaveNewDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
+			String subjectLabel, String crfName, UserAccountBean userAccount) {
+		return doesCRFHaveDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "1", userAccount);
 	}
 
 	/**
@@ -2514,8 +2667,25 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return boolean
 	 */
 	public boolean doesCRFHaveNewDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
-			String subjectLabel, String crfName) {
-		return doesCRFHaveDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "1");
+													  String subjectLabel, String crfName) {
+		return doesCRFHaveNewDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, null);
+	}
+
+	/**
+	 * Finds out if a certain Study Subject has DNs with resolution status New/Updated,
+	 * associated with a specific Event CRF inside of a specific Study Event bean.
+	 *
+	 * @param study        StudyBean
+	 * @param eventLabel   String
+	 * @param eventId      int
+	 * @param subjectLabel String
+	 * @param crfName      String
+	 * @param userAccount  UserAccountBean
+	 * @return boolean
+	 */
+	public boolean doesCRFHaveUnclosedDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
+			String subjectLabel, String crfName, UserAccountBean userAccount) {
+		return doesCRFHaveDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "123", userAccount);
 	}
 
 	/**
@@ -2530,8 +2700,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return boolean
 	 */
 	public boolean doesCRFHaveUnclosedDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
-			String subjectLabel, String crfName) {
-		return doesCRFHaveDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "123");
+														   String subjectLabel, String crfName) {
+		return doesCRFHaveUnclosedDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, null);
 	}
 
 	/**

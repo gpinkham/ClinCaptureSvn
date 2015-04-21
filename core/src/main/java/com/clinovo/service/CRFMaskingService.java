@@ -68,12 +68,12 @@ public interface CRFMaskingService {
 	/**
 	 * Check if current eventCRF is masked.
 	 *
-	 * @param crfId EventDefinitionCRF ID
+	 * @param eventDefinitionCRFid EventDefinitionCRF ID
 	 * @param userId UserAccountBean ID
 	 * @param studyId StudyBean ID
 	 * @return boolean
 	 */
-	boolean isEventDefinitionCRFMasked(int crfId, int userId, int studyId);
+	boolean isEventDefinitionCRFMasked(int eventDefinitionCRFid, int userId, int studyId);
 
 	/**
 	 * This method will remove rows in masking table is user role will be set as Investigator,
