@@ -6,6 +6,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "low_level_term")
+@SuppressWarnings("serial")
 public class LowLevelTerm implements Serializable {
     private int lltCode = 0;
     private String lltName;

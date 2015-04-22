@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Medical product data access object.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class MedicalProductDAO {
 
     private static final String WHOD = "WHOD";
