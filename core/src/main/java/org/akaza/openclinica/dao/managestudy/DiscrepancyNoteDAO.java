@@ -791,26 +791,29 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			variables.put(i, currentStudy.getId());
 		}
 		StringBuilder sql = new StringBuilder(
-				"SELECT sum(count), discrepancy_note_type_id, resolution_status_id FROM (");
+				"SELECT sum(count), discrepancy_note_type_id, resolution_status_id, count(id) FROM (");
 		sql.append(digester.getQuery("countAllSubjectDNByStudyForStat"));
+		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllStudySubjectDNByStudyForStat"));
+		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllStudyEventDNByStudyForStat"));
+		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllEventCrfDNByStudyForStat"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
-		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
+		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllItemDataDNByStudyForStat"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
-		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
+		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(") types GROUP BY discrepancy_note_type_id, resolution_status_id");
 		ArrayList rows = select(sql.toString(), variables);
 		Iterator it = rows.iterator();
@@ -840,26 +843,34 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			variables.put(i, currentUser.getId());
 		}
 		StringBuilder sql = new StringBuilder(
-				"SELECT sum(count), discrepancy_note_type_id, resolution_status_id FROM (");
-		sql.append(digester.getQuery("countUserSubjectDNByStudyForStat"));
+				"SELECT sum(count), discrepancy_note_type_id, resolution_status_id, count(id) FROM (");
+		sql.append(digester.getQuery("countAllSubjectDNByStudyForStat"));
+		sql.append(digester.getQuery("countUsersDNForStatFilter"));
+		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
-		sql.append(digester.getQuery("countUserStudySubjectDNByStudyForStat"));
+		sql.append(digester.getQuery("countAllStudySubjectDNByStudyForStat"));
+		sql.append(digester.getQuery("countUsersDNForStatFilter"));
+		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
-		sql.append(digester.getQuery("countUserStudyEventDNByStudyForStat"));
+		sql.append(digester.getQuery("countAllStudyEventDNByStudyForStat"));
+		sql.append(digester.getQuery("countUsersDNForStatFilter"));
+		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
-		sql.append(digester.getQuery("countUserEventCrfDNByStudyForStat"));
+		sql.append(digester.getQuery("countAllEventCrfDNByStudyForStat"));
+		sql.append(digester.getQuery("countUsersDNForStatFilter"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
-		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
+		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
-		sql.append(digester.getQuery("countUserItemDataDNByStudyForStat"));
+		sql.append(digester.getQuery("countAllItemDataDNByStudyForStat"));
+		sql.append(digester.getQuery("countUsersDNForStatFilter"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
-		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
+		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(") types GROUP BY discrepancy_note_type_id, resolution_status_id");
 		ArrayList rows = select(sql.toString(), variables);
 		Iterator it = rows.iterator();
