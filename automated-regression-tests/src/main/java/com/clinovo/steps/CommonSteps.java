@@ -385,8 +385,8 @@ public class CommonSteps extends ScenarioSteps {
 	}
 
     @Step
-	public void click_schedule_event_button_on_popup() {
-		subjectMatrixPage.clickScheduleEventButtonOnPopup();
+	public void click_schedule_event_button_in_popup() {
+		subjectMatrixPage.clickScheduleEventButtonInPopup();
 	}
 
 	@Step
@@ -402,5 +402,11 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void filter_SM_by_study_subject_id(String studySubjectID) {
 		subjectMatrixPage.filterSMByStudySubjectID(studySubjectID);
+	}
+	
+	@Step
+	public void click_enter_data_button_in_popup(String aCRFName) {
+		subjectMatrixPage.clickEnterDataButtonInPopup(aCRFName);
+		
 	}
 }

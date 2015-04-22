@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.clinovo.pages.BuildStudyPage;
 import com.clinovo.pages.ChangeStudyPage;
 import com.clinovo.pages.ConfirmChangeStudyPage;
 import com.clinovo.steps.CommonSteps;
-import com.clinovo.utils.Common;
 import com.clinovo.pages.beans.Study;
 import com.clinovo.pages.beans.StudyEventDefinition;
 import com.clinovo.pages.beans.StudySubject;
@@ -33,7 +33,7 @@ public class ClinovoJBehave extends BaseJBehave {
     @Steps
     CommonSteps commonSteps;
     
-    @Given("User logs in as $user")
+    @Given("User logs in as \"$user\"")
     public void userLogsInAsUser(String user) {
     	User currentUser = User.defineDefaultUser(user);
     	
@@ -61,7 +61,7 @@ public class ClinovoJBehave extends BaseJBehave {
 		return currentUser;
 	}
 
-    @Given("User logs in first time as $user")
+    @Given("User logs in first time as \"$user\"")
     public void userLogsInAsUserFirstTime(String user) {
 		User currentUser = User.defineDefaultUser(user);
 		if (Thucydides.getCurrentSession().get(User.NEW_CREATED_USER) != null) {
@@ -76,7 +76,7 @@ public class ClinovoJBehave extends BaseJBehave {
    		Thucydides.getCurrentSession().remove(User.NEW_CREATED_USER);
     }
     
-	@Given(value="User logs in first time as $userRoleName: $activityTable", priority=1)
+	@Given(value="User logs in first time as \"$userRoleName\": $activityTable", priority=1)
     public void userLogsInAsUserFirstTime(String userRoleName, ExamplesTable table) {
 		User currentUser = defineUserByData(userRoleName, table);
 		if (Thucydides.getCurrentSession().get(User.NEW_CREATED_USER) != null) {
@@ -117,7 +117,7 @@ public class ClinovoJBehave extends BaseJBehave {
     	commonSteps.log_out();
     }
     
-    @Given("User fills in data on Create User Account page to create default $userRoleName")
+    @Given("User fills in data on Create User Account page to create default \"$userRoleName\"")
 	public void userFillsDataToCreateDefaultUser(String userRoleName) {
     	User createdUser = User.defineDefaultUser(userRoleName);
     	Thucydides.getCurrentSession().put(User.NEW_CREATED_USER, createdUser);
@@ -206,7 +206,7 @@ public class ClinovoJBehave extends BaseJBehave {
     }
     
     @Given("User clicks 'Update Study' button")
-    public void userClicksUpdateStudyutton() {
+    public void userClicksUpdateStudyButton() {
         commonSteps.click_update_study();
     }
     
@@ -246,25 +246,25 @@ public class ClinovoJBehave extends BaseJBehave {
     	commonSteps.select_CRFs_for_study_event_definition(event);
     }
     
-    @Given("User selects Study/Site $studyName on Change Study/Site page")
+    @Given("User selects Study/Site \"$studyName\" on Change Study/Site page")
     public void userSelectsStudyOnChangeStudyPage(String studyName) {
-    	commonSteps.select_study_on_change_study_page(Common.removeQuotes(studyName));
+    	commonSteps.select_study_on_change_study_page(studyName);
     }
     
-    @When("User changes Study/Site to $studyName")
-    @Given("User changes Study/Site to $studyName")
+    @When("User changes Study/Site to \"$studyName\"")
+    @Given("User changes Study/Site to \"$studyName\"")
     public void userSelectsStudyOnStudyPage(String studyName) {
     	userGoesToPage(ChangeStudyPage.PAGE_NAME);
-    	userSelectsStudyOnChangeStudyPage(Common.removeQuotes(studyName));
+    	userSelectsStudyOnChangeStudyPage(studyName);
     	userClicksContinueButton(ChangeStudyPage.PAGE_NAME);
     	userIsOnPage(ConfirmChangeStudyPage.PAGE_NAME);
     	userClicksSubmitButton();
     }
     
-    @Then("Current Study is $studyName")
-    @Given("Current Study is $studyName")
+    @Then("Current Study is \"$studyName\"")
+    @Given("Current Study is \"$studyName\"")
     public void currentStudyIs(String studyName) {
-    	commonSteps.current_study_is(Common.removeQuotes(studyName));
+    	commonSteps.current_study_is(studyName);
     }
     
     @When("User changes scope to Study")
@@ -290,8 +290,8 @@ public class ClinovoJBehave extends BaseJBehave {
     	commonSteps.fill_in_study_subject_page(ssubj);
     }
     
-    @Given("User calls a popup for $studySubjectID, $eventName")
-    @When("User calls a popup for $studySubjectID, $eventName")
+    @Given("User calls a popup for \"$studySubjectID\", \"$eventName\"")
+    @When("User calls a popup for \"$studySubjectID\", \"$eventName\"")
     public void userCallsPopupOnSM(String studySubjectID, String eventName) {
     	StudyEventDefinition event = new StudyEventDefinition();
     	event.setName(eventName);
@@ -300,7 +300,7 @@ public class ClinovoJBehave extends BaseJBehave {
         commonSteps.call_popup_for_subject_and_event(studySubjectID, eventName);
     }
     
-    @Given("User fill in popup to schedule event: $activityTable")
+    @Given("User fills in popup to schedule event: $activityTable")
     public void userFillInPopupToScheduleEvent(ExamplesTable table) {
     	boolean replaceNamedParameters = true;
     	Parameters rowParams = table.getRowAsParameters(0, replaceNamedParameters);
@@ -310,15 +310,15 @@ public class ClinovoJBehave extends BaseJBehave {
     
     @Given("User clicks 'Schedule Event' button on popup")
     @When("User clicks 'Schedule Event' button on popup")
-	public void userClicksScheduleEventButtonOnPopup() {
-    	commonSteps.click_schedule_event_button_on_popup();
+	public void userClicksScheduleEventButtonInPopup() {
+    	commonSteps.click_schedule_event_button_in_popup();
     }
     
     @Given("User schedules event using popup: $activityTable")
     @When("User schedules event using popup: $activityTable")
     public void userSchedulesEventUsingPopup(ExamplesTable table) {
     	userFillInPopupToScheduleEvent(table);
-    	userClicksScheduleEventButtonOnPopup();
+    	userClicksScheduleEventButtonInPopup();
     }
     
     @Given("Event is scheduled")
@@ -342,7 +342,7 @@ public class ClinovoJBehave extends BaseJBehave {
     			StudyEventDefinition event = StudyEventDefinition.fillStudyEventDefinitionFromTableRow(values);
     			userCallsPopupOnSM(event.getStudySubjectID(), event.getName());
     			commonSteps.fill_in_popup_to_schedule_event(event);
-    			userClicksScheduleEventButtonOnPopup();
+    			userClicksScheduleEventButtonInPopup();
     			events.add(event);
     		}
     	}
@@ -376,6 +376,20 @@ public class ClinovoJBehave extends BaseJBehave {
     	}
     	
     	commonSteps.clear_filter_on_SM();
+    }
+    
+    @Given("User changes Study properties: $activityTable")
+   	public void userChangesStudyProperties(ExamplesTable table) {
+    	userGoesToPage(BuildStudyPage.PAGE_NAME);
+    	userSetsStudyStatus("Design");
+    	userClicksUpdateStudyButton();
+    	userFillsInUpdateStudyDetailsPage(table);
+    }
+    
+    @Given("User clicks 'Enter Data' button in popup for \"$CRF\"")
+    @When("User clicks 'Enter Data' button in popup for \"$CRF\"")
+	public void userClicksEnterDataButtonInPopup(String aCRF) {
+    	commonSteps.click_enter_data_button_in_popup(aCRF);
     }
     
     private User getCurrentUser() {

@@ -7,7 +7,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import com.clinovo.pages.beans.StudyEventDefinition;
-
 import java.util.List;
 
 /**
@@ -93,7 +92,7 @@ public class SubjectMatrixPage extends BasePage {
 		iEndDate.type(event.getEndDateTime());
 	}
 
-	public void clickScheduleEventButtonOnPopup() {
+	public void clickScheduleEventButtonInPopup() {
 		bScheduleEvent.waitUntilVisible();
 		bScheduleEvent.click();
 	}
@@ -101,5 +100,15 @@ public class SubjectMatrixPage extends BasePage {
 	public void eventIsScheduled(StudyEventDefinition event) {
 		WebElementFacade eventIcon = tblFindSubjects.findBy(By.xpath(".//td[text()='" + event.getStudySubjectID() + "']/..//div[@event_name='" + event.getName() + "']/../a/img"));		
 		assert(eventIcon.getAttribute("src").endsWith("icon_Scheduled.gif"));
+	}
+
+	public void clickEnterDataButtonInPopup(String aCRFName) { 
+		List<WebElement> tds = tblFindSubjects.findElements(By.xpath(".//div[starts-with(@id, 'crfListWrapper')]//td[contains(text(), '"+ aCRFName +"')]"));
+		for (WebElement td: tds) {
+	    	if (td.getText().replaceFirst(aCRFName, "").trim().replace("*", "").isEmpty()) {
+	    		td.findElement(By.xpath("./..//img[contains(@name,'bt_EnterData')]")).click();
+	    		break;
+	    	}
+	    }
 	}
 }

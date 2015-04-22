@@ -139,7 +139,7 @@
                 <!-- "CATALINA_HOME" variable must be specified in the system properties-->
                 <tomcat.existing.home>${CATALINA_HOME}</tomcat.existing.home>
                 <tomcat.standalone.home>${project.build.directory}/tomcat</tomcat.standalone.home>
-                <tomcat.timeout>180000</tomcat.timeout>
+                <tomcat.timeout>360000</tomcat.timeout>
                 <webapp.context.name>clincapture</webapp.context.name>
 
                 <!-- thucydides test framework properties-->

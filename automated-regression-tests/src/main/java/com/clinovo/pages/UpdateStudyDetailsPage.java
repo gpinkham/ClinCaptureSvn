@@ -36,6 +36,24 @@ public class UpdateStudyDetailsPage extends BasePage {
     private WebElementFacade iAutoCodeDictionaryName;
 
 	private RadioButtonGroup rAllowMedicalCoding ;
+	
+	private RadioButtonGroup rCodeWithContext;
+	
+	// Data Entry Parameters:
+	private RadioButtonGroup rCollectInterviewerName;
+	
+	private RadioButtonGroup rInterviewerNameDefault;
+	    
+	private RadioButtonGroup rInterviewerNameEditable;
+		
+	private RadioButtonGroup rCollectInterviewDate;
+		
+	private RadioButtonGroup rInterviewDateDefault;
+	    
+	private RadioButtonGroup rInterviewDateEditable;
+
+	private RadioButtonGroup rUseAutotabbing ;
+	
         
     private RadioButtonGroup rAllowCRFEvaluation;
     
@@ -44,8 +62,6 @@ public class UpdateStudyDetailsPage extends BasePage {
 	private RadioButtonGroup rSASNameAnnotation;
 	
 	private RadioButtonGroup rApprovalNeeded;
-
-	private RadioButtonGroup rCodeWithContext;
 
 	
     public UpdateStudyDetailsPage (WebDriver driver) {
@@ -96,6 +112,15 @@ public class UpdateStudyDetailsPage extends BasePage {
     }
     
     public void defineRadioButtons() {
+    	//Data Entry Parameters: 
+    	rCollectInterviewerName = new RadioButtonGroup(formWithData.findElements(By.name("interviewerNameRequired")));
+    	rInterviewerNameDefault = new RadioButtonGroup(formWithData.findElements(By.name("interviewerNameDefault")));
+    	rInterviewerNameEditable = new RadioButtonGroup(formWithData.findElements(By.name("interviewerNameEditable")));
+    	rCollectInterviewDate = new RadioButtonGroup(formWithData.findElements(By.name("interviewDateRequired")));
+    	rInterviewDateDefault = new RadioButtonGroup(formWithData.findElements(By.name("interviewDateDefault")));
+    	rInterviewDateEditable = new RadioButtonGroup(formWithData.findElements(By.name("interviewDateEditable")));
+    	rUseAutotabbing = new RadioButtonGroup(formWithData.findElements(By.name("autoTabbing")));
+    	
     	rAllowMedicalCoding = new RadioButtonGroup(formWithData.findElements(By.name("allowCodingVerification")));
     	rAllowCRFEvaluation = new RadioButtonGroup(formWithData.findElements(By.name("allowCrfEvaluation")));
     	rEvaluateWithContext = new RadioButtonGroup(formWithData.findElements(By.name("evaluateWithContext")));
@@ -141,5 +166,29 @@ public class UpdateStudyDetailsPage extends BasePage {
 		if (!study.getSASNameAnnotation().equals("")) {
 			rSASNameAnnotation.selectByValue(study.getSASNameAnnotation());
 		}
+		
+		//Data Entry Parameters
+		if (!study.getCollectInterviewerName().equals("")) {
+			rCollectInterviewerName.selectByValue(study.getCollectInterviewerName());
+		}
+		if (!study.getInterviewerNameDefault().equals("")) {
+			rInterviewerNameDefault.selectByValue(study.getInterviewDateDefault());
+		}
+		if (!study.getInterviewerNameEditable().equals("")) {
+			rInterviewerNameEditable.selectByValue(study.getInterviewerNameEditable());
+		}	
+		if (!study.getCollectInterviewDate().equals("")) {
+			rCollectInterviewDate.selectByValue(study.getCollectInterviewDate());
+		}
+		if (!study.getInterviewDateDefault().equals("")) {
+			rInterviewDateDefault.selectByValue(study.getInterviewDateDefault());
+		}
+		if (!study.getInterviewDateEditable().equals("")) {
+			rInterviewDateEditable.selectByValue(study.getInterviewDateEditable());
+		}	
+		if (!study.getUseAutotabbing ().equals("")) {
+			rUseAutotabbing.selectByValue(study.getUseAutotabbing());
+		}
+		    	
 	}
 }

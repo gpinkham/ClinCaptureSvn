@@ -42,16 +42,10 @@ public class Study {
     
 	private String siteStatusForThisStudy = "";
     
-	private String interviewDateDefault = "";
-    
-	private String collectInterviewDate = "";
-    
-	private String interviewerNameDefault = "";
-
-	private String collectInterviewerName = "";
+	
+	
     
 	private String collectPersonID = "";
-	
 	
 	private String briefTitle = "";
     
@@ -82,10 +76,21 @@ public class Study {
 	private String timing = "";
     
 	private String postalCode = "";
-
-	private String interviewDateEditable = "";
-    
+	
+	// Data Entry Parameters:
+	private String collectInterviewerName = "";
+		
+	private String interviewerNameDefault = "";
+	    
 	private String interviewerNameEditable = "";
+		
+	private String collectInterviewDate = "";
+		
+	private String interviewDateDefault = "";
+	    
+	private String interviewDateEditable = "";
+
+	private String useAutotabbing  = "";
 	
 	// CRFs Parameters: 
 	private String allowCRFEvaluation = "";
@@ -657,5 +662,13 @@ public class Study {
 
 	public void setAutoCodeDictionaryName(String autoCodeDictionaryName) {
 		this.autoCodeDictionaryName = autoCodeDictionaryName;
+	}
+
+	public String getUseAutotabbing() {
+		return useAutotabbing;
+	}
+
+	public void setUseAutotabbing(String useAutotabbing) {
+		this.useAutotabbing = useAutotabbing;
 	}
 }
