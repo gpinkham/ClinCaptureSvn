@@ -3,11 +3,8 @@ package com.clinovo.service;
 import com.clinovo.model.CRFMask;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,20 +86,11 @@ public interface CRFMaskingService {
 	/**
 	 * This method will remove all masked dedc Beans from the list.
 	 *
-	 * @param dedcBeans list of DisplayEventDefinitionCRFBean CRF beans.
+	 * @param beansList list of DisplayEventDefinitionCRFBean and DisplayEventCRFBean.
 	 * @param user UserAccountBean.
-	 * @return List<DisplayEventDefinitionCRFBean>
+	 * @return List<Object>
 	 */
-	ArrayList<DisplayEventDefinitionCRFBean> removeMaskedDisplayEventDefinitionCRFBeans(List<DisplayEventDefinitionCRFBean> dedcBeans, UserAccountBean user);
-
-	/**
-	 * This method will remove all masked dedc Beans from the list.
-	 *
-	 * @param decBeans list of DisplayEventCRFBean CRF beans.
-	 * @param user UserAccountBean.
-	 * @return List<DisplayEventCRFBean>
-	 */
-	ArrayList<DisplayEventCRFBean> removeMaskedDisplayEventCRFBeans(List<DisplayEventCRFBean> decBeans, UserAccountBean user);
+	ArrayList<Object> removeMaskedDisplayEventDefinitionAndEventCRFBeans(List<Object> beansList, UserAccountBean user);
 
 	/**
 	 * This method will return all masks in the Study Event Definition.

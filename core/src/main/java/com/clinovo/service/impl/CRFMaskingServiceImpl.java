@@ -103,30 +103,23 @@ public class CRFMaskingServiceImpl implements CRFMaskingService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public ArrayList<DisplayEventDefinitionCRFBean> removeMaskedDisplayEventDefinitionCRFBeans(List<DisplayEventDefinitionCRFBean> dedcBeans, UserAccountBean user) {
-
-		ArrayList<DisplayEventDefinitionCRFBean> newList = new ArrayList<DisplayEventDefinitionCRFBean>();
-		for (DisplayEventDefinitionCRFBean dedc : dedcBeans) {
-			int eventCRFId = dedc.getEdc().getId();
-			int studyId = dedc.getEdc().getStudyId();
-			if (!isEventDefinitionCRFMasked(eventCRFId, user.getId(), studyId)) {
-				newList.add(dedc);
-			}
-		}
-		return newList;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public ArrayList<DisplayEventCRFBean> removeMaskedDisplayEventCRFBeans(List<DisplayEventCRFBean> decBeans, UserAccountBean user) {
-
-		ArrayList<DisplayEventCRFBean> newList = new ArrayList<DisplayEventCRFBean>();
-		for (DisplayEventCRFBean dec : decBeans) {
-			int eventCRFId = dec.getEventDefinitionCRF().getId();
-			int studyId = dec.getEventDefinitionCRF().getStudyId();
-			if (!isEventDefinitionCRFMasked(eventCRFId, user.getId(), studyId)) {
-				newList.add(dec);
+	public ArrayList<Object> removeMaskedDisplayEventDefinitionAndEventCRFBeans(List<Object> beansList, UserAccountBean user) {
+		ArrayList<Object> newList = new ArrayList<Object>();
+		for (Object object : beansList) {
+			if (object instanceof DisplayEventDefinitionCRFBean) {
+				DisplayEventDefinitionCRFBean dedc = (DisplayEventDefinitionCRFBean) object;
+				int eventCRFId = dedc.getEdc().getId();
+				int studyId = dedc.getEdc().getStudyId();
+				if (!isEventDefinitionCRFMasked(eventCRFId, user.getId(), studyId)) {
+					newList.add(dedc);
+				}
+			} else if (object instanceof DisplayEventCRFBean) {
+				DisplayEventCRFBean dec = (DisplayEventCRFBean) object;
+				int eventCRFId = dec.getEventDefinitionCRF().getId();
+				int studyId = dec.getEventDefinitionCRF().getStudyId();
+				if (!isEventDefinitionCRFMasked(eventCRFId, user.getId(), studyId)) {
+					newList.add(dec);
+				}
 			}
 		}
 		return newList;

@@ -87,7 +87,7 @@ public class CRFMaskingServiceTest extends DefaultAppContextTest {
 
 	@Test
 	 public void testThatRemoveMaskedDisplayEventDefinitionCRFBeansReturnsCorrectResult() {
-		List<DisplayEventDefinitionCRFBean> testList = new ArrayList<DisplayEventDefinitionCRFBean>();
+		List<Object> testList = new ArrayList<Object>();
 		EventDefinitionCRFBean edc = new EventDefinitionCRFBean();
 		edc.setId(1);
 		edc.setStudyId(1);
@@ -96,12 +96,12 @@ public class CRFMaskingServiceTest extends DefaultAppContextTest {
 		testList.add(dedc);
 		UserAccountBean user = new UserAccountBean();
 		user.setId(1);
-		assertEquals(0, maskingService.removeMaskedDisplayEventDefinitionCRFBeans(testList, user).size());
+		assertEquals(0, maskingService.removeMaskedDisplayEventDefinitionAndEventCRFBeans(testList, user).size());
 	}
 
 	@Test
 	public void testThatRemoveMaskedDisplayEventCRFBeansReturnsCorrectResult() {
-		List<DisplayEventCRFBean> testList = new ArrayList<DisplayEventCRFBean>();
+		List<Object> testList = new ArrayList<Object>();
 		EventDefinitionCRFBean edc = new EventDefinitionCRFBean();
 		edc.setId(1);
 		edc.setStudyId(1);
@@ -110,7 +110,7 @@ public class CRFMaskingServiceTest extends DefaultAppContextTest {
 		testList.add(dec);
 		UserAccountBean user = new UserAccountBean();
 		user.setId(1);
-		assertEquals(0, maskingService.removeMaskedDisplayEventCRFBeans(testList, user).size());
+		assertEquals(0, maskingService.removeMaskedDisplayEventDefinitionAndEventCRFBeans(testList, user).size());
 	}
 
 	@Test

@@ -541,12 +541,8 @@
             </c:if>
 
             <c:if test="${dec.eventCRF.id > 0 && !dec.eventCRF.notStarted && !dec.locked && !dec.stage.locked && (userRole.sysAdmin || userRole.studyAdministrator) && (study.status.available || study.status.pending) && !(studyEvent.subjectEventStatus.removed || studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.stopped || studyEvent.subjectEventStatus.skipped) && dec.eventDefinitionCRF.versions != null && fn:length(dec.eventDefinitionCRF.versions) > 1}">
-                <a href="pages/managestudy/chooseCRFVersion?crfId=${dec.eventCRF.crf.id}&crfName=${dec.eventCRF.crf.name}&crfversionId=${dec.eventCRF.crfVersion.id}&crfVersionName=${dec.eventCRF.crfVersion.name}&studySubjectLabel=${studySubject.label}&studySubjectId=${studySubject.id}&eventCRFId=${dec.eventCRF.id}&eventDefinitionCRFId=${dec.eventDefinitionCRF.id}"
-                onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
-                onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');">
-                <img name="Reassign" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="4"></a>
-   			</c:if>
-
+				<ui:choseCRFVersionIcon dec="${dec}" subjectBean="${studySubject}" hspace="4"/>
+			</c:if>
         </c:otherwise>
     </c:choose>
     </div>

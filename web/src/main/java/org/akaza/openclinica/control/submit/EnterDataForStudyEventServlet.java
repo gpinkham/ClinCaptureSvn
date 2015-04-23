@@ -199,8 +199,6 @@ public class EnterDataForStudyEventServlet extends Controller {
 		}
 
 		// Remove all masked CRFs from the list
-		uncompletedEventDefinitionCRFs = maskingService.removeMaskedDisplayEventDefinitionCRFBeans(uncompletedEventDefinitionCRFs, ub);
-		displayEventCRFs = maskingService.removeMaskedDisplayEventCRFBeans(displayEventCRFs, ub);
 
 		request.setAttribute(BEAN_STUDY_EVENT, seb);
 		request.setAttribute(BEAN_STUDY_SUBJECT, studySubjectBean);
@@ -227,12 +225,14 @@ public class EnterDataForStudyEventServlet extends Controller {
 
 		if (fp.getString(OPEN_FIRST_CRF).equalsIgnoreCase(TRUE)) {
 			try {
-				if (fullCrfList.size() == 0) {
+				// Remove all masked CRFs from the list
+				List<Object> fullListWithoutMasked = maskingService.removeMaskedDisplayEventDefinitionAndEventCRFBeans(fullCrfList, ub);
+				if (fullListWithoutMasked.size() == 0) {
 					addPageMessage(resword.getString("no_crf_available"), request);
 					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 					return;
 				}
-				DisplayEventDefinitionCRFBean dedcb = (DisplayEventDefinitionCRFBean) fullCrfList.get(0);
+				DisplayEventDefinitionCRFBean dedcb = (DisplayEventDefinitionCRFBean) fullListWithoutMasked.get(0);
 				CRFVersionBean defaultCRFVerBean = new CRFVersionBean();
 				for (int i = 0; i < dedcb.getEdc().getVersions().size(); i++) {
 					defaultCRFVerBean = (CRFVersionBean) dedcb.getEdc().getVersions().get(i);

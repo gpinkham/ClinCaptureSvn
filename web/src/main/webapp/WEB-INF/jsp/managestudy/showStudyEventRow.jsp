@@ -438,13 +438,7 @@
                     <c:choose>
                         <c:when test="${allowDataEntry && dec.eventCRF.id > 0 && !dec.eventCRF.notStarted && !dec.locked && !dec.stage.locked && (userRole.sysAdmin || userRole.studyAdministrator) && (study.status.available || study.status.pending) && !(currRow.bean.studyEvent.subjectEventStatus.removed || currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.stopped || currRow.bean.studyEvent.subjectEventStatus.skipped) && dec.eventDefinitionCRF.versions != null && fn:length(dec.eventDefinitionCRF.versions) > 1}">
                             <td>
-                                <a href="pages/managestudy/chooseCRFVersion?crfId=${dec.eventCRF.crf.id}&crfName=${dec.eventCRF.crf.name}&crfversionId=${dec.eventCRF.crfVersion.id}&crfVersionName=${dec.eventCRF.crfVersion.name}&studySubjectLabel=${studySub.label}&studySubjectId=${studySub.id}&eventCRFId=${dec.eventCRF.id}&eventDefinitionCRFId=${dec.eventDefinitionCRF.id}"
-                                   onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
-                                   onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"
-                                   onclick="setAccessedObjected(this)"><img name="Reassign" src="images/bt_Reassign.gif" border="0"
-                                        alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>"
-                                        title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>"
-                                        align="left" hspace="6"></a>
+								<ui:choseCRFVersionIcon dec="${dec}" subjectBean="${studySub}" onClick="setAccessedObjected(this)"/>
                             </td>
                         </c:when>
                         <c:otherwise>
