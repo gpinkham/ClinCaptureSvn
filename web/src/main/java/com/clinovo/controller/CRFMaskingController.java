@@ -285,7 +285,7 @@ public class CRFMaskingController extends BaseController {
 				for (StudyEventDefinitionBean event : events) {
 					int eventId = event.getId();
 					ArrayList<EventDefinitionCRFBean> crfs = (ArrayList<EventDefinitionCRFBean>) definitionCRFDAO
-							.findAllActiveByEventDefinitionId(site, eventId);
+							.findAllByEventDefinitionId(site, eventId);
 					for (EventDefinitionCRFBean edCrf : crfs) {
 						CRFBean crf = (CRFBean) crfDao.findByPK(edCrf.getCrfId());
 						edCrf.setName(crf.getName());
