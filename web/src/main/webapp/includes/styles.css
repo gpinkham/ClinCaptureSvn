@@ -184,9 +184,8 @@ td .aka_revised {
 }
 
 .aka_text_block {
-    /*width: 10em; ticket #53*/
     float:left;
-    text-align:right
+    text-align:left;
 }
 
 .aka_text_block_shared {
