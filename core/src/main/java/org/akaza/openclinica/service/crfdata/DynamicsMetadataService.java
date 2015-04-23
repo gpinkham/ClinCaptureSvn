@@ -539,18 +539,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 				List<EventCRFBean> eventCrfs = getEventCRFDAO().findAllByStudyEventAndCrfOrCrfVersionOid(
 						destinationStudyEventBean, getExpressionService().getCrfOid(expression));
 				if (eventCrfs.size() == 0) {
-					List<EventCRFBean> eventCRFBeanList =  getEventCRFDAO().findAllByStudyEvent(destinationStudyEventBean);
-					List<CRFBean> startedCRFBeanList = new ArrayList<CRFBean>();
-					for (EventCRFBean eventCRFBean : eventCRFBeanList) {
-						CRFBean crfBean = getCRFDAO().findByVersionId(eventCRFBean.getCRFVersionId());
-						startedCRFBeanList.add(crfBean);
-					}
-					CRFVersionBean crfVersionBean = getCRFVersionDAO().findByOid(getExpressionService().getCrfOid(expression));
-					CRFBean destinationCrfBean = getCRFDAO().findByVersionId(crfVersionBean.getId());
-					if (!startedCRFBeanList.contains(destinationCrfBean)) {
-						createNewEventCRF(propertyBean, subjectStudy, sourceEventCrfBean, destinationStudyEventBean,
-								sourceItemDataBean, destinationItemBean, expression, ruleSet, ub, con);
-					}
+					createNewEventCRF(propertyBean, subjectStudy, sourceEventCrfBean, destinationStudyEventBean,
+									sourceItemDataBean, destinationItemBean, expression, ruleSet, ub, con);
 				} else {
 					updateDestinationEventCRF(studySubject, propertyBean, subjectStudy, sourceEventCrfBean, eventCrfs.get(0),
 							destinationStudyEventBean, sourceItemDataBean, destinationItemBean, expression, ruleSet, ub, con);
@@ -609,9 +599,10 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		boolean isDestinationStudyEventBeanAvailable = !(destinationStudyEventStatus.isRemoved()
 				|| destinationStudyEventStatus.isLocked() || destinationStudyEventStatus.isStopped()
 				|| destinationStudyEventStatus.isSkipped());
+		boolean isAnotherVersionStarted = isAnotherVersionStarted(destinationStudyEventBean, expression);
 
 		if (isDestinationEventDefinitionCRFBeanAvailable && isDestinationCrfVersionAvailable
-				&& isDestinationStudyEventBeanAvailable) {
+				&& isDestinationStudyEventBeanAvailable && !isAnotherVersionStarted) {
 
 			EventCRFBean destinationEventCrfBean = new EventCRFBean();
 			destinationEventCrfBean.setStudyEventId(destinationStudyEventBean.getId());
@@ -634,6 +625,29 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 			insertValueIntoTheDestinationItem(propertyBean, sourceEventCrfBean, destinationEventCrfBean,
 					destinationItemBean, sourceItemDataBean, expression, ruleSet, ub, subjectStudy, con, false);
 		}
+	}
+
+	private boolean isAnotherVersionStarted(StudyEventBean destinationStudyEventBean, String expression) {
+
+		List<EventCRFBean> eventCRFBeanList = getEventCRFDAO().findAllByStudyEvent(destinationStudyEventBean);
+		List<CRFBean> startedCRFBeanList = new ArrayList<CRFBean>();
+
+		for (EventCRFBean eventCRFBean: eventCRFBeanList) {
+			if (eventCRFBean.isNotStarted()) {
+				getEventCRFDAO().delete(eventCRFBean.getId());
+			} else {
+				startedCRFBeanList.add(getCRFDAO().findByVersionId(eventCRFBean.getCRFVersionId()));
+			}
+		}
+
+		CRFVersionBean crfVersionBean = getCRFVersionDAO().findByOid(getExpressionService().getCrfOid(expression));
+		if (crfVersionBean != null) {
+			CRFBean destinationCrfBean = getCRFDAO().findByVersionId(crfVersionBean.getId());
+			if (startedCRFBeanList.contains(destinationCrfBean)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void updateDestinationEventCRF(StudySubjectBean studySubject, PropertyBean propertyBean, StudyBean subjectStudy,
