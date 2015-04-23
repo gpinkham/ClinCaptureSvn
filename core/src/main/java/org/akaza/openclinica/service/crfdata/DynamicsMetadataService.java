@@ -75,8 +75,6 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 @SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
 public class DynamicsMetadataService implements MetadataServiceInterface {
@@ -558,8 +556,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 							destinationStudyEventBean, sourceItemDataBean, destinationItemBean, expression, ruleSet, ub, con);
 				}
 			} else {
-				updateItemDataValue(propertyBean, sourceEventCrfBean, sourceEventCrfBean, sourceItemDataBean,
-						destinationItemBean, expression, ruleSet, ub, subjectStudy, con, false);
+				updateSourceEventCRF(studySubject, propertyBean, subjectStudy, sourceEventCrfBean,
+						destinationStudyEventBean, sourceItemDataBean, destinationItemBean, expression, ruleSet, ub, con);
 			}
 		}
 	}
@@ -633,8 +631,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 							getEventDefinitionCRFDAO(), getDiscrepancyNoteDAO()));
 			studyEventDAO.update(destinationStudyEventBean);
 
-			updateItemDataValue(propertyBean, sourceEventCrfBean, destinationEventCrfBean, sourceItemDataBean,
-					destinationItemBean, expression, ruleSet, ub, subjectStudy, con, false);
+			insertValueIntoTheDestinationItem(propertyBean, sourceEventCrfBean, destinationEventCrfBean,
+					destinationItemBean, sourceItemDataBean, expression, ruleSet, ub, subjectStudy, con, false);
 		}
 	}
 
@@ -645,49 +643,75 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 		StudyEventDAO studyEventDAO = getStudyEventDAO();
 		EventDefinitionCRFDAO eventDefCRFDAO = getEventDefinitionCRFDAO();
-		boolean isAllowedToInsertDataIntoDestinationEventCRF = true;
 		boolean createReasonForChangeIfNeeded = false;
-		CRFBean crf = getExpressionService().getCRFFromExpression(expression);
-		EventDefinitionCRFBean destinationEventDefinitionCRFBean =
-				eventDefCRFDAO.findByStudyEventDefinitionIdAndCRFId(subjectStudy,
-						destinationStudyEventBean.getStudyEventDefinitionId(), crf.getId());
-		Status destinationEventCRFStatus = EventCRFUtil.getEventCRFCurrentStatus(studySubject, destinationStudyEventBean,
-				destinationEventDefinitionCRFBean, destinationEventCrfBean, new CRFVersionDAO(ds), eventDefCRFDAO);
+		Status destinationEventCRFStatus = getEventCRFStatus(studySubject, subjectStudy, destinationEventCrfBean,
+				destinationStudyEventBean, expression);
+		boolean isDestinationEventCRFLocked = destinationEventCRFStatus.isDeleted()
+				|| destinationEventCRFStatus.isLocked();
 
-		if (destinationEventCRFStatus.isDeleted() || destinationEventCRFStatus.isLocked()) {
-			isAllowedToInsertDataIntoDestinationEventCRF = false;
-		} else if (destinationEventCRFStatus.isNotStarted()) {
-			destinationEventCrfBean.setNotStarted(false);
-		} else if (destinationEventCRFStatus.isCompleted()) {
-			createReasonForChangeIfNeeded = true;
-		} else if (destinationEventCRFStatus.isSDVed()) {
-			destinationEventCrfBean.setSdvStatus(false);
-			createReasonForChangeIfNeeded = true;
-		} else if (destinationEventCRFStatus.isSigned()) {
-			destinationEventCrfBean.setSdvStatus(false);
-			destinationEventCrfBean.setElectronicSignatureStatus(false);
-			createReasonForChangeIfNeeded = true;
-			if (destinationStudyEventBean.getSubjectEventStatus().isSigned()) {
-				destinationStudyEventBean.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
+		if (!isDestinationEventCRFLocked) {
+
+			if (destinationEventCRFStatus.isNotStarted()) {
+				destinationEventCrfBean.setNotStarted(false);
+			} else if (destinationEventCRFStatus.isCompleted()) {
+				createReasonForChangeIfNeeded = true;
+			} else if (destinationEventCRFStatus.isSDVed()) {
+				destinationEventCrfBean.setSdvStatus(false);
+				createReasonForChangeIfNeeded = true;
+			} else if (destinationEventCRFStatus.isSigned()) {
+				destinationEventCrfBean.setSdvStatus(false);
+				destinationEventCrfBean.setElectronicSignatureStatus(false);
+				createReasonForChangeIfNeeded = true;
+				if (destinationStudyEventBean.getSubjectEventStatus().isSigned()) {
+					destinationStudyEventBean.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
+				}
 			}
-		}
 
-		if (isAllowedToInsertDataIntoDestinationEventCRF) {
-			getEventCRFDAO().update(destinationEventCrfBean);
-			SubjectEventStatusUtil.determineSubjectEventState(destinationStudyEventBean,
-					new DAOWrapper(getStudyDAO(), getCRFVersionDAO(), studyEventDAO, getStudySubjectDAO(),
-							getEventCRFDAO(), eventDefCRFDAO, getDiscrepancyNoteDAO()));
-			studyEventDAO.update(destinationStudyEventBean);
-			updateItemDataValue(propertyBean, sourceEventCrfBean, destinationEventCrfBean, sourceItemDataBean,
-					destinationItemBean, expression, ruleSet, ub, subjectStudy, con, createReasonForChangeIfNeeded);
+			boolean isAllowedToInsertDataIntoDestinationEventCRF =
+					insertValueIntoTheDestinationItem(propertyBean, sourceEventCrfBean, destinationEventCrfBean,
+					destinationItemBean, sourceItemDataBean, expression, ruleSet, ub, subjectStudy, con,
+					createReasonForChangeIfNeeded);
+
+			if (isAllowedToInsertDataIntoDestinationEventCRF) {
+				getEventCRFDAO().update(destinationEventCrfBean);
+				SubjectEventStatusUtil.determineSubjectEventState(destinationStudyEventBean,
+						new DAOWrapper(getStudyDAO(), getCRFVersionDAO(), studyEventDAO, getStudySubjectDAO(),
+								getEventCRFDAO(), eventDefCRFDAO, getDiscrepancyNoteDAO()));
+				studyEventDAO.update(destinationStudyEventBean);
+			}
 		}
 	}
 
-	private void updateItemDataValue(PropertyBean propertyBean, EventCRFBean sourceEventCrfBean,
-			EventCRFBean destinationEventCrfBean, ItemDataBean sourceItemDataBean, ItemBean destinationItemBean,
-			String expression, RuleSetBean ruleSet, UserAccountBean ub, StudyBean subjectStudy, Connection con,
-			boolean createReasonForChangeIfNeeded) {
+	private void updateSourceEventCRF(StudySubjectBean studySubject, PropertyBean propertyBean, StudyBean subjectStudy,
+			EventCRFBean sourceEventCrfBean, StudyEventBean sourceStudyEventBean, ItemDataBean sourceItemDataBean,
+			ItemBean destinationItemBean, String expression, RuleSetBean ruleSet, UserAccountBean ub, Connection con) {
 
+		Status destinationEventCRFStatus = getEventCRFStatus(studySubject, subjectStudy, sourceEventCrfBean,
+				sourceStudyEventBean, expression);
+		boolean createReasonForChangeIfNeeded =  destinationEventCRFStatus.isCompleted()
+				|| destinationEventCRFStatus.isSDVed()
+				|| destinationEventCRFStatus.isSigned();
+		insertValueIntoTheDestinationItem(propertyBean, sourceEventCrfBean, sourceEventCrfBean, destinationItemBean,
+				sourceItemDataBean, expression, ruleSet, ub, subjectStudy, con, createReasonForChangeIfNeeded);
+	}
+
+	private Status getEventCRFStatus(StudySubjectBean studySubject, StudyBean subjectStudy,
+			EventCRFBean sourceEventCrfBean, StudyEventBean sourceStudyEventBean, String expression) {
+
+		EventDefinitionCRFDAO eventDefCRFDAO = getEventDefinitionCRFDAO();
+		CRFBean crf = getExpressionService().getCRFFromExpression(expression);
+		EventDefinitionCRFBean destinationEventDefinitionCRFBean =
+				eventDefCRFDAO.findByStudyEventDefinitionIdAndCRFId(subjectStudy,
+						sourceStudyEventBean.getStudyEventDefinitionId(), crf.getId());
+		return EventCRFUtil.getEventCRFCurrentStatus(studySubject, sourceStudyEventBean,
+				destinationEventDefinitionCRFBean, sourceEventCrfBean, getCRFVersionDAO(), eventDefCRFDAO);
+	}
+
+	private List<ItemDataBean> getItemDataBeansToUpdate(EventCRFBean sourceEventCrfBean,
+			EventCRFBean destinationEventCrfBean, ItemDataBean sourceItemDataBean, ItemBean destinationItemBean,
+			String expression, RuleSetBean ruleSet, UserAccountBean ub) {
+
+		List<ItemDataBean> destinationItemDataBeans = new ArrayList<ItemDataBean>();
 		ItemGroupMetadataBean sourceItemGroupMetadataBean = (ItemGroupMetadataBean) getItemGroupMetadataDAO()
 				.findByItemAndCrfVersion(sourceItemDataBean.getItemId(), sourceEventCrfBean.getCRFVersionId());
 		Boolean isGroupARepeating = isGroupRepeating(sourceItemGroupMetadataBean);
@@ -704,104 +728,78 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 		// If A and B are both non repeating groups
 		if (!isGroupARepeating && !isGroupBRepeating) {
-			ItemDataBean oidBasedItemData = oneToOne(destinationItemBean, destinationItemGroupMetadataBean, destinationEventCrfBean, ub, 1);
-			String destinationItemDataBeanOldValue = oidBasedItemData.getValue();
- 			oidBasedItemData.setValue(getValue(propertyBean, ruleSet, sourceEventCrfBean));
-			getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd", con);
-			if (createReasonForChangeIfNeeded) {
-				generateRFCsForDestinationItemDataBean(destinationItemBean, oidBasedItemData,
-						destinationItemDataBeanOldValue, ub, subjectStudy);
-			}
+			ItemDataBean oidBasedItemData = oneToOne(destinationItemBean, destinationItemGroupMetadataBean,
+					destinationEventCrfBean, ub, 1);
+			destinationItemDataBeans.add(oidBasedItemData);
 		}
 		// If A is not repeating group & B is a repeating group with no index selected
 		if (!isGroupARepeating && isGroupBRepeating && itemGroupBOrdinal.equals("")) {
-			List<ItemDataBean> oidBasedItemDatas = oneToMany(destinationItemBean, destinationItemGroupBean, destinationItemGroupMetadataBean,
-					destinationEventCrfBean, ub);
-			for (ItemDataBean oidBasedItemData : oidBasedItemDatas) {
-				String destinationItemDataBeanOldValue = oidBasedItemData.getValue();
-				oidBasedItemData.setValue(getValue(propertyBean, ruleSet, sourceEventCrfBean));
-				getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd", con);
-				if (createReasonForChangeIfNeeded) {
-					generateRFCsForDestinationItemDataBean(destinationItemBean, oidBasedItemData,
-							destinationItemDataBeanOldValue, ub, subjectStudy);
-				}
-			}
+			destinationItemDataBeans = oneToMany(destinationItemBean, destinationItemGroupBean,
+					destinationItemGroupMetadataBean, destinationEventCrfBean, ub);
 		}
 		// If A is not repeating group & B is a repeating group with index selected
 		if (!isGroupARepeating && isGroupBRepeating && !itemGroupBOrdinal.equals("")) {
-			ItemDataBean oidBasedItemData = oneToIndexedMany(destinationItemBean, destinationItemGroupBean, destinationItemGroupMetadataBean,
-					destinationEventCrfBean, ub, Integer.valueOf(itemGroupBOrdinal));
-			String destinationItemDataBeanOldValue = oidBasedItemData.getValue();
-			oidBasedItemData.setValue(getValue(propertyBean, ruleSet, sourceEventCrfBean));
-			getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd", con);
-			if (createReasonForChangeIfNeeded) {
-				generateRFCsForDestinationItemDataBean(destinationItemBean, oidBasedItemData,
-						destinationItemDataBeanOldValue, ub, subjectStudy);
-			}
+			ItemDataBean oidBasedItemData = oneToIndexedMany(destinationItemBean, destinationItemGroupBean,
+					destinationItemGroupMetadataBean, destinationEventCrfBean, ub, Integer.valueOf(itemGroupBOrdinal));
+			destinationItemDataBeans.add(oidBasedItemData);
 		}
 		// If A is repeating/ non repeating group & B is a repeating group with index selected as END
 		if (isGroupBRepeating && itemGroupBOrdinal.equals("END")) {
-			ItemDataBean oidBasedItemData = oneToEndMany(destinationItemBean, destinationItemGroupBean, destinationItemGroupMetadataBean,
-					destinationEventCrfBean, ub);
-			String destinationItemDataBeanOldValue = oidBasedItemData.getValue();
-			oidBasedItemData.setValue(getValue(propertyBean, ruleSet, sourceEventCrfBean));
-			getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd", con);
-			if (createReasonForChangeIfNeeded) {
-				generateRFCsForDestinationItemDataBean(destinationItemBean, oidBasedItemData,
-						destinationItemDataBeanOldValue, ub, subjectStudy);
-			}
+			ItemDataBean oidBasedItemData = oneToEndMany(destinationItemBean, destinationItemGroupBean,
+					destinationItemGroupMetadataBean, destinationEventCrfBean, ub);
+			destinationItemDataBeans.add(oidBasedItemData);
 		}
 		// If A is repeating group with index & B is a repeating group with index selected
-		if (isGroupARepeating && isGroupBRepeating && !itemGroupBOrdinal.equals("")
-				&& !itemGroupBOrdinal.equals("END")) {
-			ItemDataBean oidBasedItemData = oneToIndexedMany(destinationItemBean, destinationItemGroupBean, destinationItemGroupMetadataBean,
-					destinationEventCrfBean, ub, Integer.valueOf(itemGroupBOrdinal));
-			String destinationItemDataBeanOldValue = oidBasedItemData.getValue();
-			oidBasedItemData.setValue(getValue(propertyBean, ruleSet, sourceEventCrfBean));
-			getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd", con);
-			if (createReasonForChangeIfNeeded) {
-				generateRFCsForDestinationItemDataBean(destinationItemBean, oidBasedItemData,
-						destinationItemDataBeanOldValue, ub, subjectStudy);
-			}
+		if (isGroupARepeating && isGroupBRepeating && !itemGroupBOrdinal.equals("") && !itemGroupBOrdinal.equals("END")) {
+			ItemDataBean oidBasedItemData = oneToIndexedMany(destinationItemBean, destinationItemGroupBean,
+					destinationItemGroupMetadataBean, destinationEventCrfBean, ub, Integer.valueOf(itemGroupBOrdinal));
+			destinationItemDataBeans.add(oidBasedItemData);
 		}
 		// If A is repeating group with index & B is a repeating group with no index selected
 		if (isGroupARepeating && isGroupBRepeating && itemGroupBOrdinal.equals("")) {
-			ItemDataBean oidBasedItemData = oneToIndexedMany(destinationItemBean, destinationItemGroupBean, destinationItemGroupMetadataBean,
-					destinationEventCrfBean, ub, Integer.valueOf(itemGroupAOrdinal));
-			String destinationItemDataBeanOldValue = oidBasedItemData.getValue();
-			oidBasedItemData.setValue(getValue(propertyBean, ruleSet, sourceEventCrfBean));
-			getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd", con);
-			if (createReasonForChangeIfNeeded) {
-				generateRFCsForDestinationItemDataBean(destinationItemBean, oidBasedItemData,
-						destinationItemDataBeanOldValue, ub, subjectStudy);
+			ItemDataBean oidBasedItemData = oneToIndexedMany(destinationItemBean, destinationItemGroupBean,
+					destinationItemGroupMetadataBean, destinationEventCrfBean, ub, Integer.valueOf(itemGroupAOrdinal));
+			destinationItemDataBeans.add(oidBasedItemData);
+		}
+		return destinationItemDataBeans;
+	}
+
+	private boolean insertValueIntoTheDestinationItem(PropertyBean propertyBean, EventCRFBean sourceEventCrfBean,
+			EventCRFBean destinationEventCrfBean, ItemBean destinationItemBean, ItemDataBean sourceItemDataBean,
+			String expression, RuleSetBean ruleSet, UserAccountBean ub, StudyBean subjectStudy, Connection con,
+			boolean createReasonForChangeIfNeeded) {
+
+		boolean isAllowedToInsertDataIntoDestinationEventCRF = false;
+		String valueToInsert = getValue(propertyBean, ruleSet, sourceEventCrfBean);
+		List<ItemDataBean> destinationItemDataBeans = getItemDataBeansToUpdate(sourceEventCrfBean,
+				destinationEventCrfBean, sourceItemDataBean, destinationItemBean, expression, ruleSet, ub);
+		for (ItemDataBean destinationItemDataBean : destinationItemDataBeans) {
+			if (!destinationItemDataBean.getValue().equals(valueToInsert)) {
+				isAllowedToInsertDataIntoDestinationEventCRF = true;
+				destinationItemDataBean.setValue(valueToInsert);
+				getItemDataDAO().updateValue(destinationItemDataBean, "yyyy-MM-dd", con);
+				if (createReasonForChangeIfNeeded) {
+					generateRFCsForDestinationItemDataBean(destinationItemBean, destinationItemDataBean, ub, subjectStudy);
+				}
 			}
 		}
+		return isAllowedToInsertDataIntoDestinationEventCRF;
 	}
 
 	private void generateRFCsForDestinationItemDataBean(ItemBean destinationItemBean, ItemDataBean destinationItemDataBean,
-			String destinationItemDataBeanOldValue, UserAccountBean assignedUser, StudyBean subjectStudy) {
+			UserAccountBean assignedUser, StudyBean subjectStudy) {
 
 		DisplayItemBean displayItem = new DisplayItemBean();
 		displayItem.setItem(destinationItemBean);
 		displayItem.setData(destinationItemDataBean);
 		displayItem.setDbData(destinationItemDataBean);
-		List<DisplayItemBean> changedItems = new ArrayList<DisplayItemBean>();
-		changedItems.add(displayItem);
-
-		List<String> changedItemNames = new ArrayList<String>();
-		changedItemNames.add(destinationItemBean.getName());
-
-		Map<Integer, String> oldItemData = new HashMap<Integer, String>();
-		oldItemData.put(destinationItemDataBean.getId(), destinationItemDataBeanOldValue);
-
 		String noteDescription = ResourceBundleProvider.getResNotes("data_auto_inserted_by_rule");
 		String detailedDescription = "";
 
-		List<DiscrepancyNoteBean> rfcsToSubmit = discrepancyNoteService.generateRFCsForChangedFields(changedItems,
-				changedItemNames, oldItemData, assignedUser, noteDescription, detailedDescription);
-
+		DiscrepancyNoteBean rfc = discrepancyNoteService.createRFC(displayItem, destinationItemBean.getName(),
+				assignedUser, noteDescription, detailedDescription);
 		FormDiscrepancyNotes formDNs = new FormDiscrepancyNotes();
-		formDNs.addAutoRFCs(rfcsToSubmit);
+		formDNs.addNote(rfc.getField(), rfc);
 		discrepancyNoteService.saveFieldNotes(destinationItemBean.getName(), formDNs, destinationItemDataBean.getId(),
 				DiscrepancyNoteService.DN_ITEM_DATA_ENTITY_TYPE, subjectStudy);
 	}

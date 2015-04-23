@@ -245,7 +245,17 @@ public class DiscrepancyNoteService implements IDiscrepancyNoteService {
 		return dbns;
 	}
 
-	private DiscrepancyNoteBean createRFC(DisplayItemBean item, String field, UserAccountBean ub,
+	/**
+	 * Generates RFC for specific CRF field, changed during administrative editing of CRF.
+	 *
+	 * @param item DisplayItemBean
+	 * @param field String
+	 * @param ub UserAccountBean
+	 * @param noteDescription String
+	 * @param detailedDescription String
+	 * @return DiscrepancyNoteBean
+	 */
+	public DiscrepancyNoteBean createRFC(DisplayItemBean item, String field, UserAccountBean ub,
 			String noteDescription, String detailedDescription) {
 		DiscrepancyNoteBean note = new DiscrepancyNoteBean();
 		note.setDescription(noteDescription);
