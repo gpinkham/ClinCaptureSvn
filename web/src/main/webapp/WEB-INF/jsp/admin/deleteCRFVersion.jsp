@@ -353,7 +353,9 @@
                        class="button_medium"
                        onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/>
             </td>
-            <c:if test="${fn:length(eventCRFBeanList) eq 0 and fn:length(crfDiscrepancyNotes) eq 0 and fn:length(eventDefinitionListAvailable) eq 0 and fn:length(ruleSetBeanList) eq 0}">
+            <c:if test="${fn:length(reassignedCrfVersionOid) eq 0 and fn:length(eventCRFBeanList) eq 0
+                        and fn:length(crfDiscrepancyNotes) eq 0 and fn:length(eventDefinitionListAvailable) eq 0
+                        and fn:length(ruleSetBeanList) eq 0}">
                 <td>
                     <input type="submit" name="confirm" value="Submit" class="button_medium" onclick="doSubmit();">
                 </td>

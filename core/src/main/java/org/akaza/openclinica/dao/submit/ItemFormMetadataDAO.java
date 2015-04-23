@@ -1145,4 +1145,25 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		}
 		return has;
 	}
+
+	/**
+	 * Returns list of Metadatabeans for crf version id.
+	 * @param crfVersionId the crf version id for search.
+	 * @return the list of Metadatabeans.
+	 */
+	public ArrayList<ItemFormMetadataBean> findAllCrfVersionItemMetadata(int crfVersionId) {
+
+		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
+		unsetTypeExpected();
+		this.setTypesExpected();
+
+		HashMap variables = new HashMap();
+		variables.put(1, crfVersionId);
+		ArrayList rows = select(digester.getQuery("findAllCrfVersionItemMetadata"), variables);
+		for (Object anAlist : rows) {
+			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) anAlist);
+			answer.add(ifmb);
+		}
+		return answer;
+	}
 }

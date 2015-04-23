@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2015 Clinovo Inc.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -14,7 +14,9 @@
 package com.clinovo.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -27,6 +29,9 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
@@ -34,6 +39,9 @@ import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.util.EventDefinitionCRFUtil;
 import org.akaza.openclinica.util.StudyEventDefinitionUtil;
@@ -115,9 +123,12 @@ public class DeleteCRFVersionController {
 
 			List<DiscrepancyNoteBean> crfDiscrepancyNotes = discrepancyNoteDao.findAllByCrfVersionId(crfVersionId);
 
+			Map<String, List<String>> reassignedCrfVersionOid = validateAnotherVersionForDataReassign(crfBean, crfVersionId);
+
 			model.addAttribute("crfBean", crfBean);
 			model.addAttribute("crfVersionBean", crfVersionBean);
 			model.addAttribute("crfDiscrepancyNotes", crfDiscrepancyNotes);
+			model.addAttribute("reassignedCrfVersionOid", reassignedCrfVersionOid);
 			model.addAttribute("ruleSetBeanList", ruleSetBeanList);
 			model.addAttribute("eventDefinitionListAvailable", eventDefinitionListAvailable);
 			model.addAttribute("eventDefinitionListFull", eventDefinitionListFull);
@@ -135,6 +146,22 @@ public class DeleteCRFVersionController {
 							messageSource.getMessage("you_are_trying_to_delete_last_version", null,
 									LocaleResolver.getLocale()));
 				}
+
+
+			} else if (reassignedCrfVersionOid.size() > 0) {
+				StringBuffer sb = new StringBuffer();
+				for (String key : reassignedCrfVersionOid.keySet()) {
+					sb.append(key).append(" ").append(messageSource.getMessage("contains_next_items", null,
+							LocaleResolver.getLocale())).append(" ");
+					List<String> value = reassignedCrfVersionOid.get(key);
+						for (String element : value) {
+							sb.append(element).append("</br>");
+						}
+					sb.append(" ").append(messageSource.getMessage("after_data_was_reassign", null,
+							LocaleResolver.getLocale())).append(" ");
+				}
+				PageMessagesUtil.addPageMessage(request, sb.toString());
+
 			} else {
 				PageMessagesUtil.addPageMessage(
 						request,
@@ -148,6 +175,50 @@ public class DeleteCRFVersionController {
 		}
 
 		return ACTION_PAGE;
+	}
+
+	private Map<String, List<String>> validateAnotherVersionForDataReassign(CRFBean crfBean, int currentCRFVersionId) {
+
+		ItemFormMetadataDAO itemFormMetadataDAO = new ItemFormMetadataDAO(dataSource);
+		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
+		ItemDAO itemDAO = new ItemDAO(dataSource);
+		EventCRFDAO eventCrfDAO = new EventCRFDAO(dataSource);
+		CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
+
+		List<EventCRFBean> eventCRFBeanList = eventCrfDAO.findAllByCRF(crfBean.getId());
+
+		Map<String, List<String>> resultMap = new HashMap<String, List<String>>();
+
+		for (EventCRFBean eventCRFBean : eventCRFBeanList) {
+			List<String> reassignedItemData = new ArrayList<String>();
+			ArrayList<ItemFormMetadataBean> eCRFFromEventMetadata = itemFormMetadataDAO.findAllCrfVersionItemMetadata(eventCRFBean.getCRFVersionId());
+			//ArrayList<ItemDataBean> itemDatas = itemDataDAO.findAllByEventCRFId(eventCRFBean.getCRFVersionId());
+			ArrayList<ItemDataBean> itemDatas = itemDataDAO.findAllByEventCRFId(eventCRFBean.getId());
+			//item data contains not valid item
+			if (itemDatas.size() != eCRFFromEventMetadata.size()) {
+				for (ItemDataBean itemDataBean : itemDatas) {
+					for (ItemFormMetadataBean itemFormMetadata : eCRFFromEventMetadata) {
+						if (itemFormMetadata.getItemId() != itemDataBean.getItemId() && !reassignedItemData.contains(itemDataBean)) {
+							//get eCRF for delete metadata.
+							ArrayList<ItemFormMetadataBean> currentCRFMetaData = itemFormMetadataDAO.findAllCrfVersionItemMetadata(currentCRFVersionId);
+							for (ItemFormMetadataBean itemFormMetadataBean : currentCRFMetaData) {
+								if (itemFormMetadataBean.getItemId() == itemFormMetadata.getItemId()) {
+									//version to delete ref to this item.
+									ItemBean itemBean = (ItemBean) itemDAO.findByPK(itemDataBean.getItemId());
+									reassignedItemData.add(itemBean.getOid());
+								}
+							}
+
+						}
+					}
+				}
+			}
+			if (reassignedItemData.size() > 0) {
+				CRFVersionBean crfVersionBeanWithReassignedData = (CRFVersionBean) crfVersionDao.findByPK((eventCRFBean.getCRFVersionId()));
+				resultMap.put(crfVersionBeanWithReassignedData.getOid(), reassignedItemData);
+			}
+		}
+		return resultMap;
 	}
 
 	/**

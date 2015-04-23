@@ -287,4 +287,11 @@
             select count(distinct cv.crf_id) = 1 as has from crf_version cv, item_form_metadata ifm where cv.crf_id = ? and ifm.crf_version_id = cv.crf_version_id and ifm.sdv_required = 1
         </sql>
     </query>
+    <query>
+        <name>findAllCrfVersionItemMetadata</name>
+        <sql>
+            select ifm.* from item_form_metadata ifm
+            where ifm.crf_version_id = ?
+        </sql>
+    </query>
 </queries>
