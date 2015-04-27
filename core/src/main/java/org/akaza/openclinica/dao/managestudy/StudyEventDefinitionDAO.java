@@ -608,6 +608,25 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Gets all active study event definitions ordered by dynamic group and study event definition
+	 *
+	 * @param parentStudyId
+	 *            Study ID
+	 * @return List of study even definitions
+	 */
+	public ArrayList<StudyEventDefinitionBean> findAllActiveByParentStudyIdOrderedByGroupClass(int parentStudyId) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, parentStudyId);
+		ArrayList alist = this.select(digester.getQuery("findAllActiveByParentStudyIdOrderedByGroupClass"), variables);
+		ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
+		for (Object anAlist : alist) {
+			seds.add((StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist));
+		}
+		return seds;
+	}
+
 	public ArrayList<StudyEventDefinitionBean> findAllActiveByParentStudyId(int parentStudyId,
 			ArrayList<Integer> idsToHide) {
 		this.setTypesExpected();

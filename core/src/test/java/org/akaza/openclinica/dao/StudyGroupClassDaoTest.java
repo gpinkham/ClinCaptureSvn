@@ -89,11 +89,11 @@ public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatFindDefaultByStudyIdReturnsAnEmptyBeanAsThereIsNoDefaultGroupClass() throws OpenClinicaException {
+	public void testThatFindDefaultByStudyIdReturnsCorrectDefaultGroupClass() throws OpenClinicaException {
 
 		int studyId = 1;
 
-		assertEquals(0, studyGroupClassDAO.findDefaultByStudyId(studyId).getId());
+		assertEquals(4, studyGroupClassDAO.findDefaultByStudyId(studyId).getId());
 	}
 
 	@Test
@@ -173,7 +173,7 @@ public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 	public void testThatFindAllActiveDynamicGroupClassesByStudyIdReturnsCorrectNumberOfBeans() {
 
 		int studyId = 1;
-		int expectedNumberOfStudyGroupClasses = 2;
+		int expectedNumberOfStudyGroupClasses = 1;
 
 		List<StudyGroupClassBean> studyGroupClassBeansList =
 				studyGroupClassDAO.findAllActiveDynamicGroupClassesByStudyId(studyId);

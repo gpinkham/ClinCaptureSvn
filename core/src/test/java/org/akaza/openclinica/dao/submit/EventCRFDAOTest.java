@@ -48,7 +48,7 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testFindAllHasCorrectSize() throws OpenClinicaException {
-		assertEquals(7, eventCRFDAO.findAll().size());
+		assertEquals(8, eventCRFDAO.findAll().size());
 	}
 
 	@Test

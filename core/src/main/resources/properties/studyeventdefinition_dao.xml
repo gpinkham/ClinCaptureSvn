@@ -183,6 +183,22 @@
 		</sql>
 	</query>
 	<query>
+		<name>findAllActiveByParentStudyIdOrderedByGroupClass</name>
+		<sql>
+			SELECT sed.*
+			FROM STUDY_EVENT_DEFINITION sed
+			INNER JOIN study st
+			ON sed.study_id = st.study_id
+			LEFT OUTER JOIN dynamic_event de
+			ON sed.study_event_definition_id = de.study_event_definition_id
+			LEFT OUTER JOIN study_group_class sgc
+			ON de.study_group_class_id = sgc.study_group_class_id
+			WHERE  (st.study_id=?)
+				AND sed.status_id=1
+				order by sgc.dynamic_ordinal, sed.ordinal asc
+		</sql>
+	</query>
+	<query>
 		<name>findAllOrderedByStudyGroupClassId</name>
 		<sql>
 			SELECT *

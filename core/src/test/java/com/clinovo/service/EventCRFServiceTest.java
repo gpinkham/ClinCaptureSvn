@@ -327,4 +327,16 @@ public class EventCRFServiceTest extends DefaultAppContextTest {
 				currentEventDefCRF, currentUser, studyUserRole, currentStudy);
 		assertNull(nextEventCRF);
 	}
+
+	@Test
+	public void testThatGetNextEventCRFForDataEntryReturnsCorrectDynamicStudyEvent() {
+		StudyBean currentStudy = (StudyBean) studyDAO.findByPK(1);
+		UserAccountBean currentUser = (UserAccountBean) userAccountDAO.findByPK(1);
+		StudyUserRoleBean studyUserRole = currentUser.getRoleByStudy(1);
+		StudyEventBean currentStudyEventBean = (StudyEventBean) studyEventDao.findByPK(13);
+		EventDefinitionCRFBean currentEventDefCRF = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(9);
+		EventCRFBean nextEventCRF = eventCRFService.getNextEventCRFForDataEntry(currentStudyEventBean,
+				currentEventDefCRF, currentUser, studyUserRole, currentStudy);
+		assertEquals(1, nextEventCRF.getStudyEventBean().getId());
+	}
 }

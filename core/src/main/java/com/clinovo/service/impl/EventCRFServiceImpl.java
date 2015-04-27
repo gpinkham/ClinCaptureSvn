@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import com.clinovo.service.CRFMaskingService;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -30,16 +29,19 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.clinovo.service.CRFMaskingService;
 import com.clinovo.service.EventCRFService;
 import com.clinovo.service.ItemDataService;
 
@@ -77,6 +79,10 @@ public class EventCRFServiceImpl implements EventCRFService {
 
 	private StudyDAO getStudyDAO() {
 		return new StudyDAO(dataSource);
+	}
+
+	private StudyGroupClassDAO getStudyGroupClassDAO() {
+		return new StudyGroupClassDAO(dataSource);
 	}
 
 	private void remove(EventCRFBean eventCRF, Status crfStatusToSet, UserAccountBean updater) throws Exception {
@@ -233,9 +239,11 @@ public class EventCRFServiceImpl implements EventCRFService {
 		EventCRFBean eventCRF;
 		int parentStudyId = currentStudy.isSite() ? currentStudy.getParentStudyId() : currentStudy.getId();
 		List<StudyEventDefinitionBean> studyEventDefinitions = getStudyEventDefinitionDAO()
-				.findAllActiveByParentStudyId(parentStudyId);
+				.findAllActiveByParentStudyIdOrderedByGroupClass(parentStudyId);
+		boolean studyHasDynamicGroups = getStudyGroupClassDAO().findAllActiveDynamicGroupsByStudyId(parentStudyId)
+				.size() > 0;
 		for (StudyEventDefinitionBean studyEventDefinition : studyEventDefinitions) {
-			if (studyEventDefinition.getOrdinal() <= currentStudyEventDefinition.getOrdinal()) {
+			if (!eventIsAfterCurrent(studyEventDefinition, currentStudyEventDefinition, studyHasDynamicGroups)) {
 				continue;
 			}
 			studyEvents = getStudyEventDAO().findAllByDefinitionAndSubjectOrderByOrdinal(studyEventDefinition.getId(),
@@ -249,6 +257,30 @@ public class EventCRFServiceImpl implements EventCRFService {
 			}
 		}
 		return null;
+	}
+
+	private boolean eventIsAfterCurrent(StudyEventDefinitionBean event, StudyEventDefinitionBean currentEvent,
+			boolean studyHasDynamicGroups) {
+		if (!studyHasDynamicGroups) {
+			return currentEvent.compareTo(event) > -1;
+		}
+		StudyGroupClassBean eventGroup = getStudyGroupClassDAO().findAvailableDynamicGroupByStudyEventDefinitionId(
+				event.getId());
+		StudyGroupClassBean currentEventGroup = getStudyGroupClassDAO()
+				.findAvailableDynamicGroupByStudyEventDefinitionId(currentEvent.getId());
+		if (currentEventGroup.getId() == 0 || eventGroup.isDefault()) {
+			return false;
+		}
+		if (currentEventGroup.getId() == eventGroup.getId()) {
+			return false;
+		}
+		if (currentEventGroup.isDefault()) {
+			return true;
+		}
+		if (currentEventGroup.getId() > 0 && eventGroup.getId() > 0) {
+			return currentEventGroup.getDynamicOrdinal() < eventGroup.getDynamicOrdinal();
+		}
+		return true;
 	}
 
 	private EventCRFBean getNextEventOccurenceCrfAvailableForDataEntry(UserAccountBean currentUser,
@@ -282,10 +314,12 @@ public class EventCRFServiceImpl implements EventCRFService {
 			if (currentStudy.isSite() && edcBean.isHideCrf()) {
 				continue;
 			}
-			int studyId = currentEventDefinitionCRF == null ? getStudyDAO().findByStudySubjectId(currentStudyEvent.getStudySubjectId()).getId() : currentEventDefinitionCRF.getStudyId();
+			int studyId = currentEventDefinitionCRF == null ? getStudyDAO().findByStudySubjectId(
+					currentStudyEvent.getStudySubjectId()).getId() : currentEventDefinitionCRF.getStudyId();
 			int eventDefinitionCRFId = edcBean.getId();
 			if (studyId != currentStudy.getId()) {
-				eventDefinitionCRFId = getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFIdAndStudyId(edcBean.getStudyEventDefinitionId(), edcBean.getCrfId(), studyId).getId();
+				eventDefinitionCRFId = getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+						edcBean.getStudyEventDefinitionId(), edcBean.getCrfId(), studyId).getId();
 			}
 			if (maskingService.isEventDefinitionCRFMasked(eventDefinitionCRFId, currentUser.getId(), studyId)) {
 				continue;

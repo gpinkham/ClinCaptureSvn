@@ -133,6 +133,11 @@
                  status_id="5" date_created="2008-07-02" date_updated="2008-07-02" update_id="1"
                  subject_event_status_id="10" start_time_flag="false" end_time_flag="false" prev_subject_event_status="0"
                  reference_visit_id="0"/>
+    <study_event study_event_id="13" study_event_definition_id="6" study_subject_id="1" location="Cambridge"
+                 sample_ordinal="1" date_start="2015-04-27 00:00:00.0" date_end="2015-06-27 00:00:00.0" owner_id="1"
+                 status_id="1" date_created="2015-04-27" date_updated="2015-04-27" update_id="1"
+                 subject_event_status_id="3" start_time_flag="false" end_time_flag="false" prev_subject_event_status="0"
+                 reference_visit_id="0"/>
 
     <event_crf event_crf_id="1" study_event_id="1" crf_version_id="1" date_interviewed="2001-12-12"
                interviewer_name="Krikor" completion_status_id="1" status_id="2" annotations="" validator_id="0"
@@ -168,6 +173,11 @@
                interviewer_name="Vitaly" completion_status_id="1" status_id="1" annotations="" validator_id="0"
                validator_annotations="" validate_string="" owner_id="1" date_created="2014-05-05" study_subject_id="1"
                date_updated="2014-05-05" update_id="1" electronic_signature_status="false" sdv_status="false"
+               old_status_id="1" sdv_update_id="0" not_started="true"/>
+	<event_crf event_crf_id="15" study_event_id="13" crf_version_id="7" date_interviewed="2015-04-27"
+               interviewer_name="Vitaly" completion_status_id="1" status_id="1" annotations="" validator_id="0"
+               validator_annotations="" validate_string="" owner_id="1" date_created="2015-04-27" study_subject_id="1"
+               date_updated="2015-04-27" update_id="1" electronic_signature_status="false" sdv_status="false"
                old_status_id="1" sdv_update_id="0" not_started="true"/>
 
     <event_definition_crf event_definition_crf_id="1" study_event_definition_id="1" study_id="1" crf_id="1"
@@ -209,6 +219,11 @@
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="7" status_id="1" owner_id="1"
                           date_created="2014-05-05" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="false"
+						  selected_version_ids=""/>
+  <event_definition_crf event_definition_crf_id="9" study_event_definition_id="6" study_id="1" crf_id="5"
+                          required_crf="true" double_entry="false" require_all_text_filled="false"
+                          decision_conditions="false" null_values="" default_version_id="4" status_id="1" owner_id="1"
+                          date_created="2015-04-27" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="false"
 						  selected_version_ids=""/>
 
     <item item_id="1" name="periodStart" description="Start of Agent Administration Period" units="" phi_status="false"
@@ -940,7 +955,7 @@
 					   group_class_type_id="4" status_id="1" is_default="false"
 					   dynamic_ordinal="1"/>
 	<study_group_class study_group_class_id="4" name="study group 4" study_id="1" owner_id="1" date_created="2013-11-29"
-					   group_class_type_id="4" status_id="1" is_default="false"
+					   group_class_type_id="4" status_id="1" is_default="true"
 					   dynamic_ordinal="2"/>
 
     <dynamic_event dynamic_event_id="1" study_group_class_id="3" study_event_definition_id="1" study_id="1" ordinal="1"
