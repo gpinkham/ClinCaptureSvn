@@ -122,6 +122,9 @@ public class EventCRFServiceImpl implements EventCRFService {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void removeEventCRFsByEventDefinitionCRF(String studyEventDefinitionOID, String crfOID,
 			UserAccountBean updater) throws Exception {
 
@@ -179,6 +182,9 @@ public class EventCRFServiceImpl implements EventCRFService {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void restoreEventCRFsByEventDefinitionCRF(String studyEventDefinitionOID, String crfOID,
 			UserAccountBean updater) throws Exception {
 

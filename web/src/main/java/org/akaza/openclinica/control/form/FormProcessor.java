@@ -52,11 +52,11 @@ import com.clinovo.i18n.LocaleResolver;
  * 
  *         TODO handle MultiPartRequests - is this a priority, since we don't have many file uploads?
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class FormProcessor {
 	private HttpServletRequest request;
 	private HashMap presetValues;
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	public static final String DEFAULT_STRING = "";
 	public static final int DEFAULT_INT = 0;
@@ -73,6 +73,11 @@ public class FormProcessor {
 	public static final String EBL_FILTER_KEYWORD = "ebl_filterKeyword";
 	public static final String EBL_PAGINATED = "ebl_paginated";
 
+	/**
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 */
 	public FormProcessor(HttpServletRequest request) {
 		this.request = request;
 		this.presetValues = new HashMap();
@@ -108,10 +113,21 @@ public class FormProcessor {
 		this.presetValues = presetValues;
 	}
 
+	/**
+	 * Clears preset values.
+	 */
 	public void clearPresetValues() {
 		presetValues = new HashMap();
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param searchAttributes
+	 *            boolean
+	 * @return String
+	 */
 	public String getString(String fieldName, boolean searchAttributes) {
 		String result = DEFAULT_STRING;
 
@@ -134,6 +150,12 @@ public class FormProcessor {
 		return result;
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @return String
+	 */
 	public String getString(String fieldName) {
 		return getString(fieldName, false);
 	}
@@ -152,7 +174,7 @@ public class FormProcessor {
 	public ArrayList getStringArray(String fieldName) {
 		ArrayList answer = new ArrayList();
 
-		String values[] = request.getParameterValues(fieldName);
+		String[] values = request.getParameterValues(fieldName);
 
 		if (values != null) {
 			for (String element : values) {
@@ -165,6 +187,12 @@ public class FormProcessor {
 		return answer;
 	}
 
+	/**
+	 * 
+	 * @param partialFieldName
+	 *            String
+	 * @return boolean
+	 */
 	public boolean getStartsWith(String partialFieldName) {
 		boolean answer = false;
 		CharSequence seq = partialFieldName.subSequence(0, partialFieldName.length());
@@ -181,7 +209,12 @@ public class FormProcessor {
 		return answer;
 	}
 
-	// GET INTEGER
+	/**
+	 * 
+	 * @param value
+	 *            String
+	 * @return int
+	 */
 	public static int getIntFromString(String value) {
 		if (value == null) {
 			return DEFAULT_INT;
@@ -198,15 +231,39 @@ public class FormProcessor {
 		return result;
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param searchAttributes
+	 *            boolean
+	 * @return int
+	 */
 	public int getInt(String fieldName, boolean searchAttributes) {
 		String fieldValue = getString(fieldName, searchAttributes);
 		return FormProcessor.getIntFromString(fieldValue);
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @return int
+	 */
 	public int getInt(String fieldName) {
 		return getInt(fieldName, false);
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param searchAttributes
+	 *            boolean
+	 * @return int
+	 * @throws Exception
+	 *             in case of failure
+	 */
 	public int getPresentInt(String fieldName, boolean searchAttributes) throws Exception {
 		String fieldValue = getString(fieldName, searchAttributes);
 		int result;
@@ -221,11 +278,26 @@ public class FormProcessor {
 		return result;
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @return int
+	 * @throws Exception
+	 *             in case of failure
+	 */
 	public int getPresentInt(String fieldName) throws Exception {
 		return getPresentInt(fieldName, false);
 	}
 
-	// GET BOOLEAN
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param searchAttributes
+	 *            boolean
+	 * @return boolean
+	 */
 	public boolean getBoolean(String fieldName, boolean searchAttributes) {
 		int fieldValue = getInt(fieldName, searchAttributes);
 
@@ -235,11 +307,24 @@ public class FormProcessor {
 		return DEFAULT_BOOLEAN;
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @return boolean
+	 */
 	public boolean getBoolean(String fieldName) {
 		return getBoolean(fieldName, false);
 	}
 
-	// GET FLOAT
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param searchAttributes
+	 *            boolean
+	 * @return float
+	 */
 	public float getFloat(String fieldName, boolean searchAttributes) {
 		String fieldValue = getString(fieldName, searchAttributes);
 		float fltValue;
@@ -253,6 +338,12 @@ public class FormProcessor {
 		return fltValue;
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @return float
+	 */
 	public float getFloat(String fieldName) {
 		return getFloat(fieldName, false);
 	}
@@ -264,6 +355,7 @@ public class FormProcessor {
 	 *            The data source for the Entity.
 	 * @return The Entity whose primary key is specified by fieldName, and which can be retrieved by edao.
 	 * @throws OpenClinicaException
+	 *             in case of failure
 	 */
 	public EntityBean getEntity(String fieldName, EntityDAO edao) throws OpenClinicaException {
 		int id = getInt(fieldName);
@@ -271,7 +363,12 @@ public class FormProcessor {
 		return result;
 	}
 
-	// GET DATE
+	/**
+	 * 
+	 * @param date
+	 *            String
+	 * @return Date
+	 */
 	public static Date getDateFromString(String date) {
 		Date answer;
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
@@ -287,12 +384,26 @@ public class FormProcessor {
 		return answer;
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param searchAttributes
+	 *            boolean
+	 * @return Date
+	 */
 	public Date getDate(String fieldName, boolean searchAttributes) {
 		String fieldValue = getString(fieldName, searchAttributes);
 
 		return FormProcessor.getDateFromString(fieldValue);
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @return Date
+	 */
 	public Date getDate(String fieldName) {
 		return getDate(fieldName, false);
 	}
@@ -325,7 +436,8 @@ public class FormProcessor {
 	 * Precondition:Before calling this method, it should make sure that field has been entered valid datetime data.
 	 * 
 	 * @param prefix
-	 * @return
+	 *            String
+	 * @return Date
 	 */
 	public Date getDateTime(String prefix) {
 		/*
@@ -386,21 +498,49 @@ public class FormProcessor {
 		return getBoolean(FIELD_SUBMITTED, true);
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param value
+	 *            int
+	 */
 	public void addPresetValue(String fieldName, int value) {
 		Integer fieldValue = new Integer(value);
 		presetValues.put(fieldName, fieldValue);
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param value
+	 *            float
+	 */
 	public void addPresetValue(String fieldName, float value) {
 		Float fieldValue = new Float(value);
 		presetValues.put(fieldName, fieldValue);
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param value
+	 *            String
+	 */
 	public void addPresetValue(String fieldName, boolean value) {
 		Boolean fieldValue = new Boolean(value);
 		presetValues.put(fieldName, fieldValue);
 	}
 
+	/**
+	 * 
+	 * @param fieldName
+	 *            String
+	 * @param fieldValue
+	 *            String
+	 */
 	public void addPresetValue(String fieldName, String fieldValue) {
 		presetValues.put(fieldName, fieldValue);
 	}
@@ -415,21 +555,36 @@ public class FormProcessor {
 		presetValues.put(fieldName, value);
 	}
 
-	public void setCurrentStringValuesAsPreset(String fieldNames[]) {
+	/**
+	 * 
+	 * @param fieldNames
+	 *            String[]
+	 */
+	public void setCurrentStringValuesAsPreset(String[] fieldNames) {
 		for (String fieldName : fieldNames) {
 			String fieldValue = getString(fieldName);
 			addPresetValue(fieldName, fieldValue);
 		}
 	}
 
-	public void setCurrentIntValuesAsPreset(String fieldNames[]) {
+	/**
+	 * 
+	 * @param fieldNames
+	 *            String[]
+	 */
+	public void setCurrentIntValuesAsPreset(String[] fieldNames) {
 		for (String fieldName : fieldNames) {
 			int fieldValue = getInt(fieldName);
 			addPresetValue(fieldName, fieldValue);
 		}
 	}
 
-	public void setCurrentBoolValuesAsPreset(String fieldNames[]) {
+	/**
+	 * 
+	 * @param fieldNames
+	 *            String[]
+	 */
+	public void setCurrentBoolValuesAsPreset(String[] fieldNames) {
 		for (String fieldName : fieldNames) {
 			boolean fieldValue = getBoolean(fieldName);
 			addPresetValue(fieldName, fieldValue);
@@ -445,7 +600,7 @@ public class FormProcessor {
 	 * @param prefixes
 	 *            An array of Strings. Each String is a prefix for a set of date/time fields.
 	 */
-	public void setCurrentDateTimeValuesAsPreset(String prefixes[]) {
+	public void setCurrentDateTimeValuesAsPreset(String[] prefixes) {
 		for (String prefix : prefixes) {
 			String fieldName = prefix + "Date";
 			String date = getString(fieldName);
@@ -466,6 +621,10 @@ public class FormProcessor {
 		}
 	}
 
+	/**
+	 * 
+	 * @return EntityBeanTable
+	 */
 	public EntityBeanTable getEntityBeanTable() {
 		EntityBeanTable answer = new EntityBeanTable();
 		answer.setLocale(LocaleResolver.getLocale(request));
@@ -482,7 +641,7 @@ public class FormProcessor {
 		// if no value was specified on the form or in the GET query, then
 		// keep the default value for that bit
 		// otherwise, the bits will just be forced to false
-		String blnFields[] = {EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED};
+		String[] blnFields = { EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED };
 
 		for (int i = 0; i < blnFields.length; i++) {
 			String value = getString(blnFields[i]);
@@ -501,6 +660,10 @@ public class FormProcessor {
 		return answer;
 	}
 
+	/**
+	 * 
+	 * @return EntityBeanTable
+	 */
 	public org.akaza.openclinica.web.domain.EntityBeanTable getWebEntityBeanTable() {
 		org.akaza.openclinica.web.domain.EntityBeanTable answer = new org.akaza.openclinica.web.domain.EntityBeanTable();
 
@@ -517,7 +680,7 @@ public class FormProcessor {
 		// if no value was specified on the form or in the GET query, then
 		// keep the default value for that bit
 		// otherwise, the bits will just be forced to false
-		String blnFields[] = {EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED};
+		String[] blnFields = { EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED };
 
 		for (int i = 0; i < blnFields.length; i++) {
 			String value = getString(blnFields[i]);
@@ -541,7 +704,8 @@ public class FormProcessor {
 	 * be returned if none of them has been entered.
 	 * 
 	 * @param prefix
-	 * @return
+	 *            String
+	 * @return String
 	 */
 	public String getDateTimeInputString(String prefix) {
 		String str = "";
@@ -560,7 +724,8 @@ public class FormProcessor {
 	 * Precondition: is a valid datetime.
 	 * 
 	 * @param prefix
-	 * @return
+	 *            String
+	 * @return boolean
 	 */
 	public boolean timeEntered(String prefix) {
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();

@@ -40,7 +40,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 @SuppressWarnings("serial")
 public class EventCRFBean extends AuditableEntityBean {
 	private int studyEventId = 0;
-	private int CRFVersionId = 0;
+	private int crfVersionId = 0;
 	private Date dateInterviewed;
 	private String interviewerName = "";
 	private int completionStatusId = 0;
@@ -73,16 +73,24 @@ public class EventCRFBean extends AuditableEntityBean {
 	private EventDefinitionCRFBean eventDefinitionCrf = new EventDefinitionCRFBean();
 	private StudyEventBean studyEventBean = new StudyEventBean();
 
+	/**
+	 * 
+	 */
 	public EventCRFBean() {
 		stage = DataEntryStage.INVALID;
 		status = Status.INVALID;
 		nexGenStatus = org.akaza.openclinica.domain.Status.INVALID;
 	}
 
+	/**
+	 * 
+	 * @param eventCRFBean
+	 *            EventCRFBean
+	 */
 	public EventCRFBean(EventCRFBean eventCRFBean) {
 		super();
 		this.studyEventId = eventCRFBean.getStudyEventId();
-		this.CRFVersionId = eventCRFBean.getCRFVersionId();
+		this.crfVersionId = eventCRFBean.getCRFVersionId();
 		this.dateInterviewed = eventCRFBean.getDateInterviewed();
 		this.interviewerName = eventCRFBean.getInterviewerName();
 		this.completionStatusId = eventCRFBean.getCompletionStatusId();
@@ -111,6 +119,11 @@ public class EventCRFBean extends AuditableEntityBean {
 		this.notStarted = eventCRFBean.isNotStarted();
 	}
 
+	/**
+	 * Performs copy.
+	 * 
+	 * @return EventCRFBean
+	 */
 	public EventCRFBean copy() {
 		EventCRFBean newObj = new EventCRFBean(this);
 		return newObj;
@@ -167,7 +180,7 @@ public class EventCRFBean extends AuditableEntityBean {
 	 * @return Returns the cRFVersionId.
 	 */
 	public int getCRFVersionId() {
-		return CRFVersionId;
+		return crfVersionId;
 	}
 
 	/**
@@ -175,7 +188,7 @@ public class EventCRFBean extends AuditableEntityBean {
 	 *            The cRFVersionId to set.
 	 */
 	public void setCRFVersionId(int versionId) {
-		CRFVersionId = versionId;
+		crfVersionId = versionId;
 	}
 
 	/**
