@@ -104,11 +104,14 @@ public class ViewSiteServlet extends Controller {
 			study.setStudyParameters(configs);
 
 			String parentStudyName = "";
+			String parentStudyOid = "";
 			if (study.getParentStudyId() > 0) {
 				StudyBean parent = (StudyBean) sdao.findByPK(study.getParentStudyId());
 				parentStudyName = parent.getName();
+				parentStudyOid = parent.getOid();
 			}
 			request.setAttribute("parentName", parentStudyName);
+			request.setAttribute("parentStudyOid", parentStudyOid);
 			request.setAttribute("siteToView", study);
 			request.setAttribute("idToSort", request.getAttribute("idToSort"));
 			viewSiteEventDefinitions(request, study);

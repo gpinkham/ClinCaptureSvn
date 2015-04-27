@@ -688,8 +688,8 @@
 	<input type="button" name="BTN_Print" 
 		value="<fmt:message key="site_crfs" bundle="${resword}"/>" 
 		class="button_long" 
-		onclick="javascript:openDocWindow('PrintAllSiteEventCRF?siteId=<c:out value="${siteToView.id}"/>')"/>	
-</c:if>			
+		onclick="javascript:openDocWindow('${pageContext.request.contextPath}/print/metadata/html/print/${parentStudyOid}/*/*')"/>
+</c:if>
  <br><br>
 
 <jsp:include page="../include/footer.jsp"/>
