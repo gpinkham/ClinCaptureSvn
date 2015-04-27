@@ -65,6 +65,7 @@ import javax.sql.DataSource;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -413,6 +414,11 @@ public class EnterDataForStudyEventServlet extends Controller {
 			ArrayList uncompletedEventDefinitionCRFs) {
 		CRFDAO cdao = new CRFDAO(ds);
 		CRFVersionDAO cvdao = new CRFVersionDAO(ds);
+		Comparator<CRFVersionBean> versionComparator = new Comparator<CRFVersionBean>() {
+			public int compare(CRFVersionBean v1, CRFVersionBean v2) {
+				return v1.getName().compareTo(v2.getName());
+			}
+		};
 
 		int size = uncompletedEventDefinitionCRFs.size();
 		for (int i = 0; i < size; i++) {
@@ -446,7 +452,8 @@ public class EnterDataForStudyEventServlet extends Controller {
 				} else {
 					versions = theVersions;
 				}
-
+				
+				Collections.sort(versions, versionComparator);
 				dedcrf.getEdc().setVersions(versions);
 				if (versions.size() != 0) {
 					boolean isLocked = false;
