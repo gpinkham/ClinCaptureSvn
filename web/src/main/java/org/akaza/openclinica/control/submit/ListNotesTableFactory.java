@@ -300,17 +300,17 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		Limit limit = tableFacade.getLimit();
 		ListNotesFilter listNotesFilter = getListNoteFilter(limit);
 		ListNotesSort listNotesSort = getListSubjectSort(limit);
-		Integer dnCount = discrepancyNoteDao.countViewNotesWithFilter(getCurrentStudy(), listNotesFilter);
+		Integer dnCount = discrepancyNoteDao.countViewNotesWithFilter(getCurrentStudy(), listNotesFilter, getCurrentUserAccount());
 		tableFacade.setTotalRows(dnCount == null ? 0 : dnCount);
 		RowSelect rowSelect = limit.getRowSelect();
 		int offset = rowSelect.getRowStart();
 		int count = rowSelect.getRowEnd() - rowSelect.getRowStart();
 		List<DiscrepancyNoteBean> customItems = discrepancyNoteDao.getViewNotesWithFilterAndSortLimits(
-				getCurrentStudy(), listNotesFilter, listNotesSort, offset, count);
+				getCurrentStudy(), listNotesFilter, listNotesSort, offset, count, getCurrentUserAccount());
 		if (checkUserRole(Role.STUDY_CODER, getCurrentUserAccount())
 				|| checkUserRole(Role.STUDY_EVALUATOR, getCurrentUserAccount())) {
 			customItems = discrepancyNoteDao.getViewNotesWithFilterAndSort(getCurrentStudy(), getCurrentUserAccount(),
-					listNotesFilter, listNotesSort);
+					listNotesFilter, listNotesSort, true);
 			tableFacade.setTotalRows(customItems.size());
 		}
 		this.setAllNotes(populateRowsWithAttachedData(customItems));

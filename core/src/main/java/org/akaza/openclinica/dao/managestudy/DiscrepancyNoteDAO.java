@@ -608,6 +608,19 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return Integer
 	 */
 	public Integer countViewNotesWithFilter(StudyBean currentStudy, ListNotesFilter filter) {
+		return countViewNotesWithFilter(currentStudy, filter, null);
+	}
+
+	/**
+	 * Returns a count of parent DNs by study/site with specific filters and sorting applied.
+	 *
+	 * @param currentStudy StudyBean
+	 * @param filter       ListNotesFilter
+	 * @param ub           UserAccountBean
+	 * @return Integer
+	 */
+	public Integer countViewNotesWithFilter(StudyBean currentStudy, ListNotesFilter filter, UserAccountBean ub) {
+		int activeUserId = ub == null ? 0 : ub.getId();
 		unsetTypeExpected();
 		setTypeExpected(1, TypeNames.INT);
 
@@ -627,12 +640,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(digester.getQuery("findAllStudyEventDNByStudy"));
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
+		sql.append(filter.getFilterForMaskedCRFs(activeUserId));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
+		sql.append(filter.getFilterForMaskedCRFs(activeUserId));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
@@ -677,16 +692,17 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @param currentUser  UserAccountBean
 	 * @param filter       ListNotesFilter
 	 * @param sort         ListNotesSort
+	 * @param filterMasks  boolean defines - should DNs for masked CRFs be shown
 	 * @return List of DiscrepancyNoteBeans
 	 */
 	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy,
-			UserAccountBean currentUser, ListNotesFilter filter, ListNotesSort sort) {
+			UserAccountBean currentUser, ListNotesFilter filter, ListNotesSort sort, boolean filterMasks) {
 		ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
 		Map variables = new HashMap();
 		for (int i = 1; i <= SQL_QUERY_VARIABLES_COUNT_2; i++) {
 			variables.put(i, currentStudy.getId());
 		}
-		StringBuilder sql = buildViewNotesSQL(currentStudy, filter, sort);
+		StringBuilder sql = filterMasks ? buildViewNotesSQL(currentStudy, filter, sort, currentUser) : buildViewNotesSQL(currentStudy, filter, sort);
 		sql.append(filter.getOwnerOrAssignedFilter(currentUser));
 		String sortPart = sort.execute("");
 		sql.append(sortPart);
@@ -699,8 +715,24 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return discNotes;
 	}
 
-	private StringBuilder buildViewNotesSQL(StudyBean currentStudy, ListNotesFilter filter, ListNotesSort sort) {
+	/**
+	 * Gets DNs owned by or assigned to user for view with filter and sort applied.
+	 *
+	 * @param currentStudy StudyBean
+	 * @param currentUser  UserAccountBean
+	 * @param filter       ListNotesFilter
+	 * @param sort         ListNotesSort
+	 * @return List of DiscrepancyNoteBeans
+	 */
+	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy,
+				UserAccountBean currentUser, ListNotesFilter filter, ListNotesSort sort) {
+		return getViewNotesWithFilterAndSort(currentStudy, currentUser, filter, sort, false);
+	}
+
+
+	private StringBuilder buildViewNotesSQL(StudyBean currentStudy, ListNotesFilter filter, ListNotesSort sort, UserAccountBean ub) {
 		setTypesExpected();
+		int activeUserAccountId = ub == null ? 0 : ub.getId();
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
@@ -717,12 +749,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(digester.getQuery("findAllStudyEventDNByStudy"));
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
+		sql.append(filter.getFilterForMaskedCRFs(activeUserAccountId));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
+		sql.append(filter.getFilterForMaskedCRFs(activeUserAccountId));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
@@ -731,6 +765,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(") dns ");
 		sql.append(filter.getAdditionalFilter());
 		return sql;
+	}
+
+	private StringBuilder buildViewNotesSQL(StudyBean currentStudy, ListNotesFilter filter, ListNotesSort sort) {
+		return buildViewNotesSQL(currentStudy, filter, sort, null);
 	}
 
 	/**
@@ -2093,7 +2131,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 				return (AuditableEntityBean) aedao.findByPK(note.getEntityId());
 			}
 		} catch (Exception e) {
-			//
+			logger.error(e.getLocalizedMessage());
 		}
 		return null;
 	}
@@ -2135,7 +2173,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			try {
 				return (Integer) hm.get("num");
 			} catch (Exception e) {
-				//
+				logger.error(e.getLocalizedMessage());
 			}
 		}
 		return 0;
