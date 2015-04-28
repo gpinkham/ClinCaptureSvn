@@ -22,9 +22,10 @@
  */
 package org.akaza.openclinica.control.form;
 
-import com.clinovo.util.ValidatorHelper;
-
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * 
@@ -40,23 +41,54 @@ import java.util.HashMap;
  * 
  * @author ssachs
  */
-@SuppressWarnings({ "rawtypes" })
-public class RuleValidator extends Validator {
-	public RuleValidator(ValidatorHelper validatorHelper, FormDiscrepancyNotes notes) {
-		super(validatorHelper);
-	}
+@SuppressWarnings({"rawtypes", "unchecked"})
+public class DiscrepancyValidator extends Validator {
 
-	public RuleValidator(ValidatorHelper validatorHelper) {
+	public static final int MAX_DESCRIPTION_LENGTH = 255;
+
+	private final FormDiscrepancyNotes notes;
+
+	/**
+	 * DiscrepancyValidator constructor.
+	 * 
+	 * @param validatorHelper
+	 *            ValidatorHelper
+	 * @param notes
+	 *            FormDiscrepancyNotes
+	 */
+	public DiscrepancyValidator(ValidatorHelper validatorHelper, FormDiscrepancyNotes notes) {
 		super(validatorHelper);
+		this.notes = notes;
 	}
 
 	@Override
 	protected HashMap validate(String fieldName, Validation v) {
+		if (v.getType() == MATCHES_INITIAL_DATA_ENTRY_VALUE) {
+			return super.validate(fieldName, v);
+		}
+		if (!v.isAlwaysExecuted()) {
+			if (notes.hasNote(fieldName) || notes.getNumExistingFieldNotes(fieldName) > 0) {
+				return errors;
+			}
+		}
 
 		return super.validate(fieldName, v);
 	}
-	
-	public void dropErrors() {
-		this.errors.clear();
+
+	/**
+	 * Method that always executes last validation.
+	 * 
+	 * @param fieldName
+	 *            String
+	 */
+	public void alwaysExecuteLastValidation(String fieldName) {
+		ArrayList fieldValidations = getFieldValidations(fieldName);
+
+		if (validations.size() >= 1) {
+			Validation v = (Validation) fieldValidations.get(fieldValidations.size() - 1);
+			v.setAlwaysExecuted(true);
+			fieldValidations.set(fieldValidations.size() - 1, v);
+		}
+		validations.put(fieldName, fieldValidations);
 	}
 }

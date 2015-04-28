@@ -20,6 +20,14 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -39,19 +47,12 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.ListCRFRow;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
 /**
  * Lists all the CRF and their CRF versions
  * 
  * @author jxu
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class ListCRFServlet extends RememberLastPage {
 
@@ -70,8 +71,7 @@ public class ListCRFServlet extends RememberLastPage {
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_study_director"), "1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
@@ -100,7 +100,6 @@ public class ListCRFServlet extends RememberLastPage {
 		}
 
 		request.getSession().removeAttribute("version");
-		FormProcessor fp = new FormProcessor(request);
 
 		String controllerMessage = (String) request.getSession().getAttribute("controllerMessage");
 		if (controllerMessage != null) {
@@ -151,13 +150,13 @@ public class ListCRFServlet extends RememberLastPage {
 
 		}
 
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allRows = ListCRFRow.generateRowsFromBeans(crfs);
 
-		String[] columns = { resword.getString("CRF_name"), resword.getString("date_updated"),
+		String[] columns = {resword.getString("CRF_name"), resword.getString("date_updated"),
 				resword.getString("last_updated_by"), resword.getString("crf_oid"), resword.getString("versions"),
 				resword.getString("version_oid"), resword.getString("date_created"), resword.getString("owner"),
-				resword.getString("status"), resword.getString("download"), resword.getString("actions") };
+				resword.getString("status"), resword.getString("download"), resword.getString("actions")};
 
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(3);

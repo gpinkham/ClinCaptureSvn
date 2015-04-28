@@ -43,7 +43,7 @@ import org.akaza.openclinica.web.bean.DatasetRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class RestoreDatasetServlet extends Controller {
 
@@ -120,18 +120,16 @@ public class RestoreDatasetServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 
-		FormProcessor fp = new FormProcessor(request);
-
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		DatasetDAO dsdao = getDatasetDAO();
 		ArrayList datasets = new ArrayList();
 		datasets = dsdao.findAllByStudyId(currentStudy.getId());
 
 		ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
 
-		String[] columns = { resword.getString("dataset_name"), resword.getString("description"),
+		String[] columns = {resword.getString("dataset_name"), resword.getString("description"),
 				resword.getString("created_by"), resword.getString("created_date"), resword.getString("status"),
-				resword.getString("actions") };
+				resword.getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(5);
 		table.addLink(resword.getString("show_only_my_datasets"), "ViewDatasets?action=owner&ownerId=" + ub.getId());

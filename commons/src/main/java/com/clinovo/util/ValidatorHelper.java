@@ -20,7 +20,6 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 
 import com.clinovo.i18n.LocaleResolver;
@@ -29,7 +28,6 @@ public class ValidatorHelper {
 
 	private Locale locale;
 	private HttpServletRequest request;
-	private FormProcessor formProcessor;
 	private ConfigurationDao configurationDao;
 	private HashMap<String, Object> attributes;
 	private HashMap<String, String> parameters;
@@ -45,7 +43,6 @@ public class ValidatorHelper {
 		this.request = request;
 		this.locale = LocaleResolver.getLocale(request);
 		this.configurationDao = configurationDao;
-		formProcessor = new FormProcessor(request);
 		attributes = new HashMap<String, Object>();
 		parameters = new HashMap<String, String>();
 	}
@@ -76,9 +73,5 @@ public class ValidatorHelper {
 
 	public String[] getParameterValues(String key) {
 		return request != null ? request.getParameterValues(key) : new String[]{parameters.get(key)};
-	}
-
-	public FormProcessor getFormProcessor() {
-		return formProcessor;
 	}
 }

@@ -277,7 +277,7 @@ public class SignStudySubjectServlet extends Controller {
 		// eventCRF id, as in New --> 2
 		Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
 		request.setAttribute("discNoteByEventCRFid", discNoteByEventCRFid);
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		table.setSortingIfNotExplicitlySet(1, false); // sort by start date,
 		// desc
 		ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);

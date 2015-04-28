@@ -37,6 +37,8 @@ public class LocaleResolver implements org.springframework.web.servlet.LocaleRes
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LocaleResolver.class);
 
+	public static final String REST_API_LOCALE = "rest.api.locale";
+
 	public static final String CURRENT_SESSION_LOCALE = "current.session.locale";
 
 	/**
@@ -94,13 +96,25 @@ public class LocaleResolver implements org.springframework.web.servlet.LocaleRes
 	 * @return Locale
 	 */
 	public static Locale getLocale(HttpServletRequest request) {
-		Locale locale = (Locale) request.getSession().getAttribute(CURRENT_SESSION_LOCALE);
+		Locale locale = (Locale) request.getAttribute(REST_API_LOCALE);
 		if (locale == null) {
-			locale = CoreResources.getSystemLocale();
-			updateLocale(request, locale);
+			locale = (Locale) request.getSession().getAttribute(CURRENT_SESSION_LOCALE);
+			if (locale == null) {
+				locale = CoreResources.getSystemLocale();
+				updateLocale(request, locale);
+			}
 		}
 		ResourceBundleProvider.updateLocale(locale);
 		return locale;
+	}
+
+	/**
+	 * Method resolves rest api locale.
+	 *
+	 */
+	public static void resolveRestApiLocale() {
+		((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().setAttribute(
+				LocaleResolver.REST_API_LOCALE, CoreResources.getSystemLocale());
 	}
 
 	/**

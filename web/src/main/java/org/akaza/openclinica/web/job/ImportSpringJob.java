@@ -198,7 +198,7 @@ public class ImportSpringJob extends QuartzJobBean {
 		if (localeStr != null) {
 			locale = new Locale(localeStr);
 		} else {
-			locale = new Locale("en-US");
+			locale = new Locale("en");
 		}
 		ResourceBundleProvider.updateLocale(locale);
 		respage = ResourceBundleProvider.getPageMessagesBundle();

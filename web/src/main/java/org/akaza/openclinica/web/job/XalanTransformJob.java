@@ -45,7 +45,7 @@ public class XalanTransformJob extends QuartzJobBean {
 	public static final String SQL_FILE_PATH = "sqlFilePath";
 
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-		Locale locale = new Locale("en-US");
+		Locale locale = new Locale("en");
 		ResourceBundleProvider.updateLocale(locale);
 		JobDataMap dataMap = context.getMergedJobDataMap();
 		try {

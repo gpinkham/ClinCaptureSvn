@@ -123,8 +123,8 @@ public class CreateJobImportServlet extends Controller {
 			forwardPage(Page.CREATE_JOB_IMPORT, request, response);
 		} else if ("confirmall".equalsIgnoreCase(action)) {
 			// collect form information
-			HashMap errors = triggerService.validateImportJobForm(new ValidatorHelper(request, getConfigurationDao()),
-					scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(IMPORT_TRIGGER)));
+			HashMap errors = triggerService.validateImportJobForm(fp, new ValidatorHelper(request,
+					getConfigurationDao()), scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(IMPORT_TRIGGER)));
 
 			Date startTime = getJobStartTime(errors, fp);
 

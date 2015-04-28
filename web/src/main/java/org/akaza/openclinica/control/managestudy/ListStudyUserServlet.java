@@ -20,6 +20,15 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -34,19 +43,11 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyUserRoleRow;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Lists all the users in a study.
  * 
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class ListStudyUserServlet extends RememberLastPage {
 
@@ -79,7 +80,6 @@ public class ListStudyUserServlet extends RememberLastPage {
 
 		StudyBean currentStudy = getCurrentStudy(request);
 
-		FormProcessor fp = new FormProcessor(request);
 		UserAccountDAO udao = new UserAccountDAO(getDataSource());
 		ArrayList users = udao.findAllRolesByStudy(currentStudy.getId());
 		Map<String, Integer> userRolesAvailableCountMap = new HashMap<String, Integer>();
@@ -102,12 +102,12 @@ public class ListStudyUserServlet extends RememberLastPage {
 			}
 		}
 
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allStudyUserRows = StudyUserRoleRow.generateRowsFromBeans(users);
 
-		String[] columns = { resword.getString("user_name"), resword.getString("first_name"),
+		String[] columns = {resword.getString("user_name"), resword.getString("first_name"),
 				resword.getString("last_name"), resword.getString("role"), resword.getString("study_name"),
-				resword.getString("status"), resword.getString("actions") };
+				resword.getString("status"), resword.getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(ACTION_COLUMN_NUM);
 		table.setQuery("ListStudyUser", new HashMap());

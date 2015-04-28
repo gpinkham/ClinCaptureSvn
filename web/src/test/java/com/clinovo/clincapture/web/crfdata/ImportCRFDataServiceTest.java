@@ -53,7 +53,8 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 			permittedEventCRFIds.add(12);
 			permittedEventCRFIds.add(13);
 
-			LocaleResolver.updateLocale(request, new Locale(locale));
+			Locale testLocale = new Locale(locale);
+			LocaleResolver.updateLocale(request, testLocale);
 			validatorHelper = new ValidatorHelper(request, configurationDao);
 		}
 	}

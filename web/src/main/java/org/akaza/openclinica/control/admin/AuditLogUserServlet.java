@@ -23,8 +23,10 @@ package org.akaza.openclinica.control.admin;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -37,7 +39,7 @@ import org.akaza.openclinica.web.bean.AuditEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class AuditLogUserServlet extends Controller {
 
@@ -61,7 +63,7 @@ public class AuditLogUserServlet extends Controller {
 		AuditEventDAO aeDAO = getAuditEventDAO();
 		ArrayList al = aeDAO.findAllByUserId(userId);
 
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allRows = AuditEventRow.generateRowsFromBeans(al);
 
 		String[] columns = {
@@ -71,7 +73,7 @@ public class AuditLogUserServlet extends Controller {
 				resword.getString("study_site"),
 				currentStudy == null ? resword.getString("study_subject_ID") : currentStudy.getStudyParameterConfig()
 						.getStudySubjectIdLabel(), resword.getString("changes_and_additions"),
-				resword.getString("actions") };
+				resword.getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.setAscendingSort(false);
 		table.hideColumnLink(1);

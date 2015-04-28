@@ -23,6 +23,14 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -40,14 +48,7 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class ViewCalendaredEventsForSubjectServlet extends Controller {
 
@@ -129,10 +130,10 @@ public class ViewCalendaredEventsForSubjectServlet extends Controller {
 	}
 
 	private EntityBeanTable getTable(FormProcessor fp, ArrayList events, int subjectId) {
-		EntityBeanTable table = fp.getEntityBeanTable();
-		String[] columns = { resword.getString("calendared_event_name"), resword.getString("min_max_date_range"),
+		EntityBeanTable table = getEntityBeanTable();
+		String[] columns = {resword.getString("calendared_event_name"), resword.getString("min_max_date_range"),
 				resword.getString("schedule_date"), resword.getString("user_email_date"),
-				resword.getString("is_reference_event"), resword.getString("reference_visit_for_event") };
+				resword.getString("is_reference_event"), resword.getString("reference_visit_for_event")};
 		ArrayList rows = CalendarEventRow.generateRowsFromBeans(events);
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		HashMap args = new HashMap();

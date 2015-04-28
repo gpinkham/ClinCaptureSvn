@@ -20,7 +20,21 @@
  */
 package org.akaza.openclinica.control.form;
 
-import com.clinovo.util.ValidatorHelper;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -44,20 +58,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * 
@@ -338,7 +339,7 @@ import java.util.regex.PatternSyntaxException;
 // and making it more beefy (ie adding a checkIfValidated() type method to that
 // class,
 // so that the work is done there and not in this class)
-@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
+@SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class Validator {
 
 	public static final int TWENTY_FOUR = 24;
@@ -795,148 +796,149 @@ public class Validator {
 			errorMessage = v.getErrorMessage();
 		} else {
 			switch (v.getType()) {
-			case NO_BLANKS:
-				errorMessage = resexception.getString("field_not_blank");
-				break;
-			case IS_A_FLOAT:
-				errorMessage = resexception.getString("field_should_number");
-				break;
-			case IS_IN_RANGE:
-				float lowerBound = v.getFloat(0);
-				float upperBound = v.getFloat(1);
-				errorMessage = resexception.getString("input_should_be_between") + new Float(lowerBound).intValue()
-						+ " " + resword.getString("and") + " " + new Float(upperBound).intValue() + ".";
-				break;
-			case IS_A_DATE:
-				errorMessage = resexception.getString("input_not_valid_date") + getDateRegEx().getDescription() + " "
-						+ resexception.getString("format1") + ".";
-				break;
-			case IS_PARTIAL_DATE:
-				errorMessage = resexception.getString("input_not_partial_date") + " ("
-						+ resformat.getString("date_format_year") + ", " + resword.getString("or") + " "
-						+ resformat.getString("date_format_year_month") + ", " + resword.getString("or") + " "
-						+ resformat.getString("date_format_string");
-				break;
-			case IS_A_IMPORT_DATE:
-				errorMessage = resexception.getString("input_not_valid_pdate") + "yyyy-MM-dd" + " "
-						+ resexception.getString("format1") + ".";
-				break;
-			case IS_A_IMPORT_PARTIAL_DATE:
-				errorMessage = resexception.getString("input_not_valid_pdate") + "yyyy, " + resword.getString("or") + " yyyy-MM, " + resword.getString("or") + " yyyy-MM-dd"
-						+ " " + resexception.getString("format1") + ".";
-				break;
-			case IS_DATE_TIME:
-				errorMessage = resexception.getString("input_not_valid_date_time")
-						+ getDateTimeRegEx().getDescription() + " " + resexception.getString("format2") + ".";
-				break;
-			case CHECK_SAME:
-				errorMessage = resexception.getString("anwer_not_match");
-				break;
-			case IS_A_EMAIL:
-				errorMessage = resexception.getString("input_not_valid_email") + EMAIL.getDescription() + " "
-						+ resexception.getString("format3") + ".";
-				break;
-			case IS_A_PHONE_NUMBER:
-				errorMessage = resexception.getString("input_not_valid_phone") + getPhoneRegEx().getDescription() + " "
-						+ resexception.getString("format4") + ".";
-				break;
-			case ENTITY_EXISTS:
-				errorMessage = resexception.getString("not_select_valid_entity");
-				break;
-			case ENTITY_EXISTS_IN_STUDY:
-				errorMessage = resexception.getString("not_select_valid_entity_current_study");
-				break;
-			case USERNAME_UNIQUE:
-				errorMessage = resexception.getString("username_already_exists");
-				break;
-			case IS_AN_INTEGER:
-				errorMessage = resexception.getString("input_not_integer");
-				break;
-			case IS_IN_SET:
-				errorMessage = resexception.getString("input_not_acceptable_option");
-				break;
-			case IS_A_PASSWORD:
-				errorMessage = resexception.getString("password_must_be_at_least") + getPwdMinLen(validatorHelper)
-						+ " " + resword.getString("characters_long") + ".";
-				break;
-			case IS_A_USERNAME:
-				errorMessage = resexception.getString("input_not_valid_username") + USERNAME.getDescription() + " "
-						+ resexception.getString("format5") + ".";
-				break;
-			case IS_VALID_TERM:
-				errorMessage = resexception.getString("input_invalid");
-				break;
-			case COMPARES_TO_STATIC_VALUE:
-				NumericComparisonOperator operator = (NumericComparisonOperator) v.getArg(0);
-				float compareTo = v.getFloat(1);
-				errorMessage = resexception.getString("input_provided_is_not") + operator.getDescription() + " "
-						+ new Float(compareTo).intValue() + ".";
-				break;
-			case LENGTH_NUMERIC_COMPARISON:
-				NumericComparisonOperator operator2 = (NumericComparisonOperator) v.getArg(0);
-				int compareTo2 = v.getInt(1);
+				case NO_BLANKS :
+					errorMessage = resexception.getString("field_not_blank");
+					break;
+				case IS_A_FLOAT :
+					errorMessage = resexception.getString("field_should_number");
+					break;
+				case IS_IN_RANGE :
+					float lowerBound = v.getFloat(0);
+					float upperBound = v.getFloat(1);
+					errorMessage = resexception.getString("input_should_be_between") + new Float(lowerBound).intValue()
+							+ " " + resword.getString("and") + " " + new Float(upperBound).intValue() + ".";
+					break;
+				case IS_A_DATE :
+					errorMessage = resexception.getString("input_not_valid_date") + getDateRegEx().getDescription()
+							+ " " + resexception.getString("format1") + ".";
+					break;
+				case IS_PARTIAL_DATE :
+					errorMessage = resexception.getString("input_not_partial_date") + " ("
+							+ resformat.getString("date_format_year") + ", " + resword.getString("or") + " "
+							+ resformat.getString("date_format_year_month") + ", " + resword.getString("or") + " "
+							+ resformat.getString("date_format_string");
+					break;
+				case IS_A_IMPORT_DATE :
+					errorMessage = resexception.getString("input_not_valid_pdate") + "yyyy-MM-dd" + " "
+							+ resexception.getString("format1") + ".";
+					break;
+				case IS_A_IMPORT_PARTIAL_DATE :
+					errorMessage = resexception.getString("input_not_valid_pdate") + "yyyy, " + resword.getString("or")
+							+ " yyyy-MM, " + resword.getString("or") + " yyyy-MM-dd" + " "
+							+ resexception.getString("format1") + ".";
+					break;
+				case IS_DATE_TIME :
+					errorMessage = resexception.getString("input_not_valid_date_time")
+							+ getDateTimeRegEx().getDescription() + " " + resexception.getString("format2") + ".";
+					break;
+				case CHECK_SAME :
+					errorMessage = resexception.getString("anwer_not_match");
+					break;
+				case IS_A_EMAIL :
+					errorMessage = resexception.getString("input_not_valid_email") + EMAIL.getDescription() + " "
+							+ resexception.getString("format3") + ".";
+					break;
+				case IS_A_PHONE_NUMBER :
+					errorMessage = resexception.getString("input_not_valid_phone") + getPhoneRegEx().getDescription()
+							+ " " + resexception.getString("format4") + ".";
+					break;
+				case ENTITY_EXISTS :
+					errorMessage = resexception.getString("not_select_valid_entity");
+					break;
+				case ENTITY_EXISTS_IN_STUDY :
+					errorMessage = resexception.getString("not_select_valid_entity_current_study");
+					break;
+				case USERNAME_UNIQUE :
+					errorMessage = resexception.getString("username_already_exists");
+					break;
+				case IS_AN_INTEGER :
+					errorMessage = resexception.getString("input_not_integer");
+					break;
+				case IS_IN_SET :
+					errorMessage = resexception.getString("input_not_acceptable_option");
+					break;
+				case IS_A_PASSWORD :
+					errorMessage = resexception.getString("password_must_be_at_least") + getPwdMinLen(validatorHelper)
+							+ " " + resword.getString("characters_long") + ".";
+					break;
+				case IS_A_USERNAME :
+					errorMessage = resexception.getString("input_not_valid_username") + USERNAME.getDescription() + " "
+							+ resexception.getString("format5") + ".";
+					break;
+				case IS_VALID_TERM :
+					errorMessage = resexception.getString("input_invalid");
+					break;
+				case COMPARES_TO_STATIC_VALUE :
+					NumericComparisonOperator operator = (NumericComparisonOperator) v.getArg(0);
+					float compareTo = v.getFloat(1);
+					errorMessage = resexception.getString("input_provided_is_not") + operator.getDescription() + " "
+							+ new Float(compareTo).intValue() + ".";
+					break;
+				case LENGTH_NUMERIC_COMPARISON :
+					NumericComparisonOperator operator2 = (NumericComparisonOperator) v.getArg(0);
+					int compareTo2 = v.getInt(1);
 
-				errorMessage = resexception.getString("input_provided_is_not") + operator2.getDescription() + " "
-						+ compareTo2 + " " + resword.getString("characters_long") + ".";
-				break;
-			case DATE_IS_AFTER_OR_EQUAL:
-				String earlierDateFieldName = v.getString(0);
+					errorMessage = resexception.getString("input_provided_is_not") + operator2.getDescription() + " "
+							+ compareTo2 + " " + resword.getString("characters_long") + ".";
+					break;
+				case DATE_IS_AFTER_OR_EQUAL :
+					String earlierDateFieldName = v.getString(0);
 
-				String earlierDateValue = getFieldValue(earlierDateFieldName);
-				if (earlierDateValue == null || earlierDateValue.equals("")) {
-					errorMessage = resexception.getString("input_provided_not_precede_earlier");
-				} else {
-					errorMessage = resexception.getString("input_provided_not_precede") + earlierDateValue + ".";
-				}
-				break;
-			case NO_BLANKS_SET:
-				errorMessage = resexception.getString("must_choose_leat_one_value");
-				break;
-			case IN_RESPONSE_SET:
-				errorMessage = resexception.getString("all_values_must_from_specified");
-				break;
-			case IN_RESPONSE_SET_COMMA_SEPERATED:
-				errorMessage = resexception.getString("all_values_must_from_specified");
-				break;
-			case IN_RESPONSE_SET_SINGLE_VALUE:
-				errorMessage = resexception.getString("values_must_from_valid");
-				break;
-			case DIFFERENT_NUMBER_OF_GROUPS_IN_DDE:
-				errorMessage = resexception.getString("different_number_of_groups");
-				break;
-			case MATCHES_INITIAL_DATA_ENTRY_VALUE:
-				String value = v.getString(0);
-				errorMessage = resexception.getString("value_not_match") + " : " + value;
-				break;
-			case IS_REQUIRED:
-				errorMessage = resexception.getString("input_is_required");
-				break;
-			case DATE_IN_PAST:
-				errorMessage = resexception.getString("date_provided_not_past");
-				break;
-			case MATCHES_REGULAR_EXPRESSION:
-				errorMessage = resexception.getString("input_not_match_regular_expression") + v.getString(0) + ".";
-				break;
-			case IS_A_DATE_WITHOUT_REQUIRED_CHECK:
-				errorMessage = resexception.getString("input_not_valid_date") + getDateRegEx().getDescription() + " "
-						+ resexception.getString("format1") + ".";
-				break;
-			case IS_AN_RULE:
-				errorMessage = resexception.getString("input_not_integer");
-				break;
-			case BARCODE_EAN_13:
-				errorMessage = resexception.getString("input_not_barcode");
-				break;
+					String earlierDateValue = getFieldValue(earlierDateFieldName);
+					if (earlierDateValue == null || earlierDateValue.equals("")) {
+						errorMessage = resexception.getString("input_provided_not_precede_earlier");
+					} else {
+						errorMessage = resexception.getString("input_provided_not_precede") + earlierDateValue + ".";
+					}
+					break;
+				case NO_BLANKS_SET :
+					errorMessage = resexception.getString("must_choose_leat_one_value");
+					break;
+				case IN_RESPONSE_SET :
+					errorMessage = resexception.getString("all_values_must_from_specified");
+					break;
+				case IN_RESPONSE_SET_COMMA_SEPERATED :
+					errorMessage = resexception.getString("all_values_must_from_specified");
+					break;
+				case IN_RESPONSE_SET_SINGLE_VALUE :
+					errorMessage = resexception.getString("values_must_from_valid");
+					break;
+				case DIFFERENT_NUMBER_OF_GROUPS_IN_DDE :
+					errorMessage = resexception.getString("different_number_of_groups");
+					break;
+				case MATCHES_INITIAL_DATA_ENTRY_VALUE :
+					String value = v.getString(0);
+					errorMessage = resexception.getString("value_not_match") + " : " + value;
+					break;
+				case IS_REQUIRED :
+					errorMessage = resexception.getString("input_is_required");
+					break;
+				case DATE_IN_PAST :
+					errorMessage = resexception.getString("date_provided_not_past");
+					break;
+				case MATCHES_REGULAR_EXPRESSION :
+					errorMessage = resexception.getString("input_not_match_regular_expression") + v.getString(0) + ".";
+					break;
+				case IS_A_DATE_WITHOUT_REQUIRED_CHECK :
+					errorMessage = resexception.getString("input_not_valid_date") + getDateRegEx().getDescription()
+							+ " " + resexception.getString("format1") + ".";
+					break;
+				case IS_AN_RULE :
+					errorMessage = resexception.getString("input_not_integer");
+					break;
+				case BARCODE_EAN_13 :
+					errorMessage = resexception.getString("input_not_barcode");
+					break;
 
-			case NO_SEMI_COLONS_OR_COLONS:
-				errorMessage = resexception.getString("field_not_have_colons_or_semi");
-				break;
+				case NO_SEMI_COLONS_OR_COLONS :
+					errorMessage = resexception.getString("field_not_have_colons_or_semi");
+					break;
 
-			case IS_A_POSITIVE_INTEGER:
-				errorMessage = resexception.getString("field_not_a_positive_integer");
-				break;
-			default:
-				logger.error("reached default on " + fieldName + ", unknown validation type with id " + v.getType());
+				case IS_A_POSITIVE_INTEGER :
+					errorMessage = resexception.getString("field_not_a_positive_integer");
+					break;
+				default :
+					logger.error("reached default on " + fieldName + ", unknown validation type with id " + v.getType());
 			}
 		}
 		addError(fieldName, errorMessage);
@@ -998,277 +1000,277 @@ public class Validator {
 	 */
 	protected HashMap validate(String fieldName, Validation v) {
 		switch (v.getType()) {
-		case NO_BLANKS:
-			if (isBlank(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_A_FLOAT:
-			if (!isFloat(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_IN_RANGE:
-			float lowerBound = v.getFloat(0);
-			float upperBound = v.getFloat(1);
-
-			if (!isInRange(fieldName, lowerBound, upperBound)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_A_DATE:
-			if (!isDate(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_PARTIAL_DATE:
-			boolean isPDate = Boolean.FALSE;
-			String fieldValue = getFieldValue(fieldName);
-			if (fieldValue != null) {
-				if (StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"), locale)
-						|| StringUtil.isPartialYear(fieldValue, resformat.getString("date_format_year"), locale)
-						|| StringUtil.isPartialYearMonth(fieldValue, resformat.getString("date_format_year_month"),
-								locale)) {
-					isPDate = true;
+			case NO_BLANKS :
+				if (isBlank(fieldName)) {
+					addError(fieldName, v);
 				}
-			}
-			if (!isPDate) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_A_IMPORT_DATE:
-			if (!isImportDate(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_A_IMPORT_PARTIAL_DATE:
-			boolean isImportPDate = Boolean.FALSE;
-			String importFieldValue = getFieldValue(fieldName);
-			if (importFieldValue != null) {
-				if (StringUtil.isFormatDate(importFieldValue, "yyyy-MM-dd", locale)
-						|| StringUtil.isPartialYear(importFieldValue, "yyyy", locale)
-						|| StringUtil.isPartialYearMonth(importFieldValue, "yyyy-MM", locale)) {
-					isImportPDate = true;
+				break;
+			case IS_A_FLOAT :
+				if (!isFloat(fieldName)) {
+					addError(fieldName, v);
 				}
-			}
-			if (!isImportPDate) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_DATE_TIME:
-			if (!isDateTime(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case CHECK_SAME:
-			String compareField = v.getString(0);
+				break;
+			case IS_IN_RANGE :
+				float lowerBound = v.getFloat(0);
+				float upperBound = v.getFloat(1);
 
-			if (!isSame(fieldName, compareField)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_A_EMAIL:
-			if (!isEmail(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_A_PHONE_NUMBER:
-			if (!isPhoneNumber(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case ENTITY_EXISTS:
-			EntityDAO edao = (EntityDAO) v.getArg(0);
-
-			if (!entityExists(fieldName, edao)) {
-				addError(fieldName, v);
-			}
-			break;
-		case ENTITY_EXISTS_IN_STUDY:
-			AuditableEntityDAO dao = (AuditableEntityDAO) v.getArg(0);
-			StudyBean study = (StudyBean) v.getArg(1);
-
-			if (!entityExistsInStudy(fieldName, dao, study)) {
-				addError(fieldName, v);
-			}
-			break;
-		case USERNAME_UNIQUE:
-			UserAccountDAO udao = (UserAccountDAO) v.getArg(0);
-
-			if (!usernameUnique(fieldName, udao)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_AN_INTEGER:
-			if (!isInteger(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_IN_SET:
-			ArrayList set = (ArrayList) v.getArg(0);
-
-			if (!isInSet(fieldName, set)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_A_PASSWORD:
-			int pwdMinLen = getPwdMinLen(validatorHelper);
-			if (pwdMinLen > 0
-					&& !lengthComparesToStaticValue(fieldName, NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO,
-							pwdMinLen)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_A_USERNAME:
-			if (!isUsername(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_VALID_TERM:
-			TermType termType = (TermType) v.getArg(0);
-
-			if (!isValidTerm(fieldName, termType)) {
-				addError(fieldName, v);
-			}
-			break;
-		case COMPARES_TO_STATIC_VALUE:
-			NumericComparisonOperator operator = (NumericComparisonOperator) v.getArg(0);
-			float compareTo = v.getFloat(1);
-
-			if (!comparesToStaticValue(fieldName, operator, compareTo)) {
-				addError(fieldName, v);
-			}
-			break;
-		case LENGTH_NUMERIC_COMPARISON:
-			NumericComparisonOperator operator2 = (NumericComparisonOperator) v.getArg(0);
-			int compareTo2 = v.getInt(1);
-
-			if (!lengthComparesToStaticValue(fieldName, operator2, compareTo2)) {
-				addError(fieldName, v);
-			}
-			break;
-		case DATE_IS_AFTER_OR_EQUAL:
-			String earlierDateFieldName = v.getString(0);
-
-			if (!isDateAfterOrEqual(fieldName, earlierDateFieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case NO_BLANKS_SET:
-			if (isSetBlank(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IN_RESPONSE_SET:
-			ResponseSetBean rsb = (ResponseSetBean) v.getArg(0);
-
-			if (!isInResponseSet(fieldName, rsb, true)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IN_RESPONSE_SET_COMMA_SEPERATED:
-			ResponseSetBean rsbs = (ResponseSetBean) v.getArg(0);
-
-			if (!isInResponseSetCommaSeperated(fieldName, rsbs, true)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IN_RESPONSE_SET_SINGLE_VALUE:
-			ResponseSetBean rsbSingle = (ResponseSetBean) v.getArg(0);
-
-			if (!isInResponseSet(fieldName, rsbSingle, false)) {
-				addError(fieldName, v);
-			}
-			break;
-		case MATCHES_INITIAL_DATA_ENTRY_VALUE:
-			String oldValue = v.getString(0);
-			boolean isMultiple = v.getBoolean(1);
-			if (!valueMatchesInitialValue(fieldName, oldValue, isMultiple)) {
-				addError(fieldName, v);
-			}
-			break;
-		case DIFFERENT_NUMBER_OF_GROUPS_IN_DDE:
-
-			addError(fieldName, v);
-
-			break;
-		case IS_REQUIRED:
-			if (isBlank(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case DATE_IN_PAST:
-			if (!isDateInPast(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case MATCHES_REGULAR_EXPRESSION:
-			if (!matchesRegex(fieldName, v)) {
-				addError(fieldName, v);
-			}
-			break;
-		case CHECK_DIFFERENT:
-			String old = v.getString(0);
-
-			if (isSame(fieldName, old)) {
-				addError(fieldName, v);
-			}
-			break;
-		case IS_A_DATE_WITHOUT_REQUIRED_CHECK:
-			if (!isDateWithoutRequiredCheck(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
-		case CALCULATION_FAILED:
-			addError(fieldName, v);
-			break;
-		case IS_AN_RULE:
-			ArrayList<String> messages = (ArrayList<String>) v.getArg(0);
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < messages.size(); i++) {
-				sb.append(messages.get(i));
-				if (i != messages.size() - 1) {
-					sb.append(" , ");
+				if (!isInRange(fieldName, lowerBound, upperBound)) {
+					addError(fieldName, v);
 				}
-				logger.debug(messages.get(i));
-			}
-			v.setErrorMessage(sb.toString());
-			addError(fieldName, v);
-			break;
-		case IS_VALID_WIDTH_DECIMAL:
-			ArrayList<String> params = (ArrayList<String>) v.getArg(0);
-			String dataType = params.get(0);
-			String widthDecimal = params.get(1);
-			StringBuffer error = this.validateFieldWidthDecimal(fieldName, dataType, widthDecimal);
-			if (error.length() > 0) {
-				addError(fieldName, error.toString());
-			}
-			break;
-		case BARCODE_EAN_13:
-			EanCheckDigit eanChk = new EanCheckDigit();
-			if (!eanChk.isValid(getFieldValue(fieldName))) {
-				addError(fieldName, v);
-			}
-			break;
-		case TO_HIDE_CONDITIONAL_DISPLAY:
-			addError(fieldName, v);
-			break;
+				break;
+			case IS_A_DATE :
+				if (!isDate(fieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IS_PARTIAL_DATE :
+				boolean isPDate = Boolean.FALSE;
+				String fieldValue = getFieldValue(fieldName);
+				if (fieldValue != null) {
+					if (StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"), locale)
+							|| StringUtil.isPartialYear(fieldValue, resformat.getString("date_format_year"), locale)
+							|| StringUtil.isPartialYearMonth(fieldValue, resformat.getString("date_format_year_month"),
+									locale)) {
+						isPDate = true;
+					}
+				}
+				if (!isPDate) {
+					addError(fieldName, v);
+				}
+				break;
+			case IS_A_IMPORT_DATE :
+				if (!isImportDate(fieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IS_A_IMPORT_PARTIAL_DATE :
+				boolean isImportPDate = Boolean.FALSE;
+				String importFieldValue = getFieldValue(fieldName);
+				if (importFieldValue != null) {
+					if (StringUtil.isFormatDate(importFieldValue, "yyyy-MM-dd", locale)
+							|| StringUtil.isPartialYear(importFieldValue, "yyyy", locale)
+							|| StringUtil.isPartialYearMonth(importFieldValue, "yyyy-MM", locale)) {
+						isImportPDate = true;
+					}
+				}
+				if (!isImportPDate) {
+					addError(fieldName, v);
+				}
+				break;
+			case IS_DATE_TIME :
+				if (!isDateTime(fieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+			case CHECK_SAME :
+				String compareField = v.getString(0);
 
-		case NO_SEMI_COLONS_OR_COLONS:
-			if (isColonSemiColon(fieldName)) {
-				addError(fieldName, v);
-			}
-			break;
+				if (!isSame(fieldName, compareField)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IS_A_EMAIL :
+				if (!isEmail(fieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IS_A_PHONE_NUMBER :
+				if (!isPhoneNumber(fieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+			case ENTITY_EXISTS :
+				EntityDAO edao = (EntityDAO) v.getArg(0);
 
-		case IS_A_POSITIVE_INTEGER:
-			if (!isInteger(fieldName, true)) {
-				addError(fieldName, v);
-			}
+				if (!entityExists(fieldName, edao)) {
+					addError(fieldName, v);
+				}
+				break;
+			case ENTITY_EXISTS_IN_STUDY :
+				AuditableEntityDAO dao = (AuditableEntityDAO) v.getArg(0);
+				StudyBean study = (StudyBean) v.getArg(1);
 
-			break;
-		default:
-			logger.error("Reached default on field name " + fieldName + ", found unknonwn validation type with id "
-					+ v.getType());
+				if (!entityExistsInStudy(fieldName, dao, study)) {
+					addError(fieldName, v);
+				}
+				break;
+			case USERNAME_UNIQUE :
+				UserAccountDAO udao = (UserAccountDAO) v.getArg(0);
+
+				if (!usernameUnique(fieldName, udao)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IS_AN_INTEGER :
+				if (!isInteger(fieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IS_IN_SET :
+				ArrayList set = (ArrayList) v.getArg(0);
+
+				if (!isInSet(fieldName, set)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IS_A_PASSWORD :
+				int pwdMinLen = getPwdMinLen(validatorHelper);
+				if (pwdMinLen > 0
+						&& !lengthComparesToStaticValue(fieldName, NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO,
+								pwdMinLen)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IS_A_USERNAME :
+				if (!isUsername(fieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IS_VALID_TERM :
+				TermType termType = (TermType) v.getArg(0);
+
+				if (!isValidTerm(fieldName, termType)) {
+					addError(fieldName, v);
+				}
+				break;
+			case COMPARES_TO_STATIC_VALUE :
+				NumericComparisonOperator operator = (NumericComparisonOperator) v.getArg(0);
+				float compareTo = v.getFloat(1);
+
+				if (!comparesToStaticValue(fieldName, operator, compareTo)) {
+					addError(fieldName, v);
+				}
+				break;
+			case LENGTH_NUMERIC_COMPARISON :
+				NumericComparisonOperator operator2 = (NumericComparisonOperator) v.getArg(0);
+				int compareTo2 = v.getInt(1);
+
+				if (!lengthComparesToStaticValue(fieldName, operator2, compareTo2)) {
+					addError(fieldName, v);
+				}
+				break;
+			case DATE_IS_AFTER_OR_EQUAL :
+				String earlierDateFieldName = v.getString(0);
+
+				if (!isDateAfterOrEqual(fieldName, earlierDateFieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+			case NO_BLANKS_SET :
+				if (isSetBlank(fieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IN_RESPONSE_SET :
+				ResponseSetBean rsb = (ResponseSetBean) v.getArg(0);
+
+				if (!isInResponseSet(fieldName, rsb, true)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IN_RESPONSE_SET_COMMA_SEPERATED :
+				ResponseSetBean rsbs = (ResponseSetBean) v.getArg(0);
+
+				if (!isInResponseSetCommaSeperated(fieldName, rsbs, true)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IN_RESPONSE_SET_SINGLE_VALUE :
+				ResponseSetBean rsbSingle = (ResponseSetBean) v.getArg(0);
+
+				if (!isInResponseSet(fieldName, rsbSingle, false)) {
+					addError(fieldName, v);
+				}
+				break;
+			case MATCHES_INITIAL_DATA_ENTRY_VALUE :
+				String oldValue = v.getString(0);
+				boolean isMultiple = v.getBoolean(1);
+				if (!valueMatchesInitialValue(fieldName, oldValue, isMultiple)) {
+					addError(fieldName, v);
+				}
+				break;
+			case DIFFERENT_NUMBER_OF_GROUPS_IN_DDE :
+
+				addError(fieldName, v);
+
+				break;
+			case IS_REQUIRED :
+				if (isBlank(fieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+			case DATE_IN_PAST :
+				if (!isDateInPast(fieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+			case MATCHES_REGULAR_EXPRESSION :
+				if (!matchesRegex(fieldName, v)) {
+					addError(fieldName, v);
+				}
+				break;
+			case CHECK_DIFFERENT :
+				String old = v.getString(0);
+
+				if (isSame(fieldName, old)) {
+					addError(fieldName, v);
+				}
+				break;
+			case IS_A_DATE_WITHOUT_REQUIRED_CHECK :
+				if (!isDateWithoutRequiredCheck(fieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+			case CALCULATION_FAILED :
+				addError(fieldName, v);
+				break;
+			case IS_AN_RULE :
+				ArrayList<String> messages = (ArrayList<String>) v.getArg(0);
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < messages.size(); i++) {
+					sb.append(messages.get(i));
+					if (i != messages.size() - 1) {
+						sb.append(" , ");
+					}
+					logger.debug(messages.get(i));
+				}
+				v.setErrorMessage(sb.toString());
+				addError(fieldName, v);
+				break;
+			case IS_VALID_WIDTH_DECIMAL :
+				ArrayList<String> params = (ArrayList<String>) v.getArg(0);
+				String dataType = params.get(0);
+				String widthDecimal = params.get(1);
+				StringBuffer error = this.validateFieldWidthDecimal(fieldName, dataType, widthDecimal);
+				if (error.length() > 0) {
+					addError(fieldName, error.toString());
+				}
+				break;
+			case BARCODE_EAN_13 :
+				EanCheckDigit eanChk = new EanCheckDigit();
+				if (!eanChk.isValid(getFieldValue(fieldName))) {
+					addError(fieldName, v);
+				}
+				break;
+			case TO_HIDE_CONDITIONAL_DISPLAY :
+				addError(fieldName, v);
+				break;
+
+			case NO_SEMI_COLONS_OR_COLONS :
+				if (isColonSemiColon(fieldName)) {
+					addError(fieldName, v);
+				}
+				break;
+
+			case IS_A_POSITIVE_INTEGER :
+				if (!isInteger(fieldName, true)) {
+					addError(fieldName, v);
+				}
+
+				break;
+			default :
+				logger.error("Reached default on field name " + fieldName + ", found unknonwn validation type with id "
+						+ v.getType());
 		}
 		return errors;
 	}
@@ -1277,7 +1279,8 @@ public class Validator {
 	 * Instead of rewriting the whole Validation do this.
 	 */
 	protected String getFieldValue(String fieldName) {
-		return validatorHelper.getParameter(fieldName) == null ? validatorHelper.getAttribute(fieldName) == null ? null
+		return validatorHelper.getParameter(fieldName) == null ? validatorHelper.getAttribute(fieldName) == null
+				? null
 				: validatorHelper.getAttribute(fieldName).toString() : validatorHelper.getParameter(fieldName);
 	}
 

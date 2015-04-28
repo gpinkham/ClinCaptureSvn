@@ -53,7 +53,7 @@ import org.springframework.stereotype.Component;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class ListSubjectGroupClassServlet extends RememberLastPage {
 
@@ -64,9 +64,9 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 	 * @param response
 	 *            HttpServletResponse
 	 */
-	
-	public static final String LIST_SUBJECT_GROUP_CLASS = "listSubjectGroupClassUrl"; 
-	
+
+	public static final String LIST_SUBJECT_GROUP_CLASS = "listSubjectGroupClassUrl";
+
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -84,8 +84,7 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_study_director"), "1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
@@ -93,13 +92,12 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		if (shouldRedirect(request, response)) {
-		 	return;
+			return;
 		}
 
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		FormProcessor fp = new FormProcessor(request);
 		String action = request.getParameter("action");
 		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
 		StudyDAO stdao = getStudyDAO();
@@ -121,7 +119,8 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 		for (Object group1 : groups) {
 			StudyGroupClassBean group = (StudyGroupClassBean) group1;
 			if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()) {
-				ArrayList<StudyEventDefinitionBean> orderedDefinitions = seddao.findAllAvailableAndOrderedByStudyGroupClassId(group.getId());
+				ArrayList<StudyEventDefinitionBean> orderedDefinitions = seddao
+						.findAllAvailableAndOrderedByStudyGroupClassId(group.getId());
 				group.setEventDefinitions(orderedDefinitions);
 				StringBuilder strOfEventsNames = new StringBuilder("");
 				if (group.getStatus().isAvailable()) {
@@ -149,7 +148,8 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 			for (StudyGroupClassBean dynamicGroup : availableDynGroups) {
 				if (!dynamicGroup.isDefault()) {
 					int index = Integer.valueOf(request.getParameter("dynamicGroup" + dynamicGroup.getId()));
-					int newDynamicOrdinal = listOfGroupClassOrdinalsWithoutDef.get(defGroupExist ? index - 2
+					int newDynamicOrdinal = listOfGroupClassOrdinalsWithoutDef.get(defGroupExist
+							? index - 2
 							: index - 1);
 					if (newDynamicOrdinal != dynamicGroup.getDynamicOrdinal()) {
 						sgcdao.updateDynamicOrdinal(newDynamicOrdinal,
@@ -161,15 +161,15 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 			Collections.sort(availableDynGroups, StudyGroupClassBean.comparatorForDynGroupClasses);
 		}
 
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allGroupRows = StudyGroupClassRow.generateRowsFromBeans(groups);
 		boolean isParentStudy = currentStudy.getParentStudyId() <= 0;
 		request.setAttribute("isParentStudy", isParentStudy);
 
-		String[] columns = { resword.getString("subject_group_class"), resword.getString("type"),
+		String[] columns = {resword.getString("subject_group_class"), resword.getString("type"),
 				resword.getString("subject_assignment"), resword.getString("default"), resword.getString("study_name"),
 				resword.getString("subject_groups"), resword.getString("study_events"), resword.getString("status"),
-				resword.getString("actions") };
+				resword.getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(3);
 		table.hideColumnLink(5);
@@ -191,31 +191,31 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 		forwardPage(Page.SUBJECT_GROUP_CLASS_LIST, request, response);
 
 	}
-	
-	@Override 
-    protected String getUrlKey(HttpServletRequest request) { 
-            return LIST_SUBJECT_GROUP_CLASS; 
-    } 
- 
-    @Override 
-    protected String getDefaultUrl(HttpServletRequest request) { 
-        FormProcessor fp = new FormProcessor(request); 
-        String eblFiltered = fp.getString("ebl_filtered"); 
-        String eblFilterKeyword = fp.getString("ebl_filterKeyword"); 
-        String eblSortColumnInd = fp.getString("ebl_sortColumnInd"); 
-        String eblSortAscending = fp.getString("ebl_sortAscending"); 
-        return new StringBuilder("").append("?submitted=1&module=").append(fp.getString("module")) 
-                        .append("&ebl_page=1&ebl_sortColumnInd=").append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0")) 
-                        .append("&ebl_sortAscending=").append((!eblSortAscending.isEmpty() ? eblSortAscending : "1")) 
-                        .append("&ebl_filtered=").append((!eblFiltered.isEmpty() ? eblFiltered : "0")) 
-                        .append("&ebl_filterKeyword=").append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")) 
-                        .append("&&ebl_paginated=1").toString(); 
-    } 
- 
-    @Override 
-    protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) { 
-		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page="); 
- 	}
+
+	@Override
+	protected String getUrlKey(HttpServletRequest request) {
+		return LIST_SUBJECT_GROUP_CLASS;
+	}
+
+	@Override
+	protected String getDefaultUrl(HttpServletRequest request) {
+		FormProcessor fp = new FormProcessor(request);
+		String eblFiltered = fp.getString("ebl_filtered");
+		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
+		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
+		String eblSortAscending = fp.getString("ebl_sortAscending");
+		return new StringBuilder("").append("?submitted=1&module=").append(fp.getString("module"))
+				.append("&ebl_page=1&ebl_sortColumnInd=")
+				.append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0")).append("&ebl_sortAscending=")
+				.append((!eblSortAscending.isEmpty() ? eblSortAscending : "1")).append("&ebl_filtered=")
+				.append((!eblFiltered.isEmpty() ? eblFiltered : "0")).append("&ebl_filterKeyword=")
+				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1").toString();
+	}
+
+	@Override
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
+		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
+	}
 
 	@Override
 	protected String getSavedUrl(String key, HttpServletRequest request) {

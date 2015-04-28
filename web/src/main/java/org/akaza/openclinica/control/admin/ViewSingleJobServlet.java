@@ -13,6 +13,13 @@
 
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -34,13 +41,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class ViewSingleJobServlet extends Controller {
 
@@ -134,10 +135,10 @@ public class ViewSingleJobServlet extends Controller {
 
 				ArrayList allRows = AuditEventRow.generateRowsFromBeans(triggerLogs);
 
-				EntityBeanTable table = fp.getEntityBeanTable();
-				String[] columns = { resword.getString("date_and_time"), resword.getString("action_message"),
+				EntityBeanTable table = getEntityBeanTable();
+				String[] columns = {resword.getString("date_and_time"), resword.getString("action_message"),
 						resword.getString("entity_operation"), resword.getString("changes_and_additions"),
-						resword.getString("actions") };
+						resword.getString("actions")};
 
 				table.setColumns(new ArrayList(Arrays.asList(columns)));
 				table.setAscendingSort(false);

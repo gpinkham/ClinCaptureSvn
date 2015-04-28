@@ -38,6 +38,7 @@
     <modules>
         <module>medical-coding</module>
         <module>core</module>
+		<module>commons</module>
 		<module>rest</module>
         <module>web</module>
         <module>ws</module> 
@@ -71,6 +72,11 @@
                 <artifactId>core</artifactId>
                 <version>${project.version}</version>
             </dependency>
+			<dependency>
+				<groupId>com.clinovo.clincapture</groupId>
+				<artifactId>commons</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 			<dependency>
                 <groupId>com.clinovo.clincapture</groupId>
                 <artifactId>medical-coding</artifactId>
@@ -611,6 +617,11 @@
             	<artifactId>jasperreports-fonts</artifactId>
             	<version>6.0.0</version>
             </dependency>
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>20090211</version>
+			</dependency>
 	    </dependencies>
     </dependencyManagement>
 	<build>

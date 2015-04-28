@@ -23,8 +23,10 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.DisplayStudyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -39,7 +41,7 @@ import org.akaza.openclinica.web.bean.DisplayStudyRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ListStudyServlet extends RememberLastPage {
 	/**
@@ -94,14 +96,13 @@ public class ListStudyServlet extends RememberLastPage {
 
 		}
 
-		FormProcessor fp = new FormProcessor(request);
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allStudyRows = DisplayStudyRow.generateRowsFromBeans(displayStudies);
 
-		String[] columns = { resword.getString("name"), resword.getString("unique_identifier"),
+		String[] columns = {resword.getString("name"), resword.getString("unique_identifier"),
 				resword.getString("OID"), resword.getString("principal_investigator"),
 				resword.getString("facility_name"), resword.getString("date_created"), resword.getString("status"),
-				resword.getString("actions") };
+				resword.getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(2);
 		table.hideColumnLink(7);

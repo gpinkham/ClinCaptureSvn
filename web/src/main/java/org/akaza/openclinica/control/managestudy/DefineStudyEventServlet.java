@@ -305,7 +305,7 @@ public class DefineStudyEventServlet extends Controller {
 		logger.trace("about to set tmpCRFIdMap " + tmpCRFIdMap.toString());
 		fp.getRequest().getSession().setAttribute("tmpCRFIdMap", tmpCRFIdMap);
 
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
 		String[] columns = {resword.getString("CRF_name"), resword.getString("date_created"),
 				resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),

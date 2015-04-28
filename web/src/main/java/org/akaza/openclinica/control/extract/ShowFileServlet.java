@@ -18,6 +18,12 @@
  */
 package org.akaza.openclinica.control.extract;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -32,12 +38,6 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.ArchivedDatasetFileRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * purpose of this servlet is to respond with a file listing after we've outlasted the 'please wait' message.
@@ -68,9 +68,9 @@ public class ShowFileServlet extends Controller {
 		newFileList.add(asdfBean);
 
 		ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(newFileList);
-		EntityBeanTable table = fp.getEntityBeanTable();
-		String[] columns = { resword.getString("file_name"), resword.getString("run_time"),
-				resword.getString("file_size"), resword.getString("created_date"), resword.getString("created_by") };
+		EntityBeanTable table = getEntityBeanTable();
+		String[] columns = {resword.getString("file_name"), resword.getString("run_time"),
+				resword.getString("file_size"), resword.getString("created_date"), resword.getString("created_by")};
 
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(0);
@@ -93,9 +93,10 @@ public class ShowFileServlet extends Controller {
 	}
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -105,8 +106,9 @@ public class ShowFileServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 

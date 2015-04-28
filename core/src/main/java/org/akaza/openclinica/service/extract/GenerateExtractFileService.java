@@ -13,6 +13,25 @@
 
 package org.akaza.openclinica.service.extract;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.zip.ZipOutputStream;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.DisplayItemHeaderBean;
@@ -43,25 +62,7 @@ import org.akaza.openclinica.logic.odmExport.OdmStudyBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.zip.ZipOutputStream;
-
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class GenerateExtractFileService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -88,7 +89,7 @@ public class GenerateExtractFileService {
 	public GenerateExtractFileService(DataSource ds, UserAccountBean userBean, CoreResources coreResources,
 			RuleSetRuleDao ruleSetRuleDao) {
 		this.ds = ds;
-		this.locale = new Locale("en-US");
+		this.locale = new Locale("en");
 		this.userBean = userBean;
 		this.coreResources = coreResources;
 		this.ruleSetRuleDao = ruleSetRuleDao;

@@ -31,6 +31,17 @@ public class RestException extends Exception {
 	/**
 	 * RestException constructor.
 	 *
+	 * @param message
+	 *            String
+	 */
+	public RestException(String message) {
+		super(message);
+		this.code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+	}
+
+	/**
+	 * RestException constructor.
+	 *
 	 * @param messageSource
 	 *            MessageSource
 	 * @param messageCode

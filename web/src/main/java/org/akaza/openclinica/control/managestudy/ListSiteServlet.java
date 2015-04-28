@@ -20,6 +20,14 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -33,18 +41,11 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyRow;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * ListSiteServlet class.
  */
 @Component
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class ListSiteServlet extends RememberLastPage {
 
 	public static final String SAVED_LIST_SITES_URL = "savedListSitesUrl";
@@ -96,7 +97,6 @@ public class ListSiteServlet extends RememberLastPage {
 		}
 
 		StudyDAO studyDao = getStudyDAO();
-		FormProcessor fp = new FormProcessor(request);
 		StudyBean studyBean = getCurrentStudy(request);
 
 		if (studyBean.getParentStudyId() > 0) {
@@ -120,15 +120,15 @@ public class ListSiteServlet extends RememberLastPage {
 			}
 		}
 
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allStudyRows = StudyRow.generateRowsFromBeans(studies);
 
 		final int two = 2;
 		final int seven = 7;
-		String[] columns = { resword.getString("name"), resword.getString("unique_identifier"),
+		String[] columns = {resword.getString("name"), resword.getString("unique_identifier"),
 				resword.getString("OID"), resword.getString("principal_investigator"),
 				resword.getString("facility_name"), resword.getString("date_created"), resword.getString("status"),
-				resword.getString("actions") };
+				resword.getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(two);
 		table.hideColumnLink(seven);

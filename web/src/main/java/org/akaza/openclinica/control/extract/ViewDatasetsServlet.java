@@ -20,6 +20,14 @@
  */
 package org.akaza.openclinica.control.extract;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -42,20 +50,13 @@ import org.akaza.openclinica.web.bean.DatasetRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
 /**
  * ViewDatasetsServlet.java, the view datasets function accessed from the extract datasets main page.
  * 
  * @author thickerson
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ViewDatasetsServlet extends RememberLastPage {
 
@@ -86,8 +87,9 @@ public class ViewDatasetsServlet extends RememberLastPage {
 		}
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
-		request.setAttribute("subjectAgeAtEvent",
-				currentStudy.getStudyParameterConfig().getCollectDob().equals("3") ? "0" : "1");
+		request.setAttribute("subjectAgeAtEvent", currentStudy.getStudyParameterConfig().getCollectDob().equals("3")
+				? "0"
+				: "1");
 		DatasetDAO dsdao = getDatasetDAO();
 		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.reset();
@@ -111,14 +113,13 @@ public class ViewDatasetsServlet extends RememberLastPage {
 				}
 			}
 			request.getSession().setAttribute("eventsForCreateDataset", events);
-			FormProcessor fp = new FormProcessor(request);
-			EntityBeanTable table = fp.getEntityBeanTable();
+			EntityBeanTable table = getEntityBeanTable();
 			ArrayList datasets;
 			datasets = dsdao.findAllByStudyId(currentStudy.getId());
 			ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
-			String[] columns = { resword.getString("dataset_name"), resword.getString("description"),
+			String[] columns = {resword.getString("dataset_name"), resword.getString("description"),
 					resword.getString("created_by"), resword.getString("created_date"), resword.getString("status"),
-					resword.getString("actions") };
+					resword.getString("actions")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(FIVE);
 			table.addLink(resword.getString("show_only_my_datasets"), "ViewDatasets?action=owner&ownerId=" + ub.getId());
@@ -131,12 +132,12 @@ public class ViewDatasetsServlet extends RememberLastPage {
 			if ("owner".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
 				int ownerId = fp.getInt("ownerId");
-				EntityBeanTable table = fp.getEntityBeanTable();
+				EntityBeanTable table = getEntityBeanTable();
 				ArrayList datasets = (ArrayList) dsdao.findByOwnerId(ownerId, currentStudy.getId());
 				ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
-				String[] columns = { resword.getString("dataset_name"), resword.getString("description"),
+				String[] columns = {resword.getString("dataset_name"), resword.getString("description"),
 						resword.getString("created_by"), resword.getString("created_date"),
-						resword.getString("status"), resword.getString("actions") };
+						resword.getString("status"), resword.getString("actions")};
 				table.setColumns(new ArrayList(Arrays.asList(columns)));
 				table.hideColumnLink(FIVE);
 				table.addLink(resword.getString("show_all_datasets"), "ViewDatasets");

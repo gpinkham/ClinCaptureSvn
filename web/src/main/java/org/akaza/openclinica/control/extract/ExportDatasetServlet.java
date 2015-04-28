@@ -321,7 +321,7 @@ public class ExportDatasetServlet extends Controller {
 				newFileList.add(asdfBean);
 
 				ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(newFileList);
-				EntityBeanTable table = fp.getEntityBeanTable();
+				EntityBeanTable table = getEntityBeanTable();
 				table.setSortingIfNotExplicitlySet(3, false);// sort by date
 				String[] columns = {resword.getString("file_name"), resword.getString("run_time"),
 						resword.getString("file_size"), resword.getString("created_date"),
@@ -428,7 +428,7 @@ public class ExportDatasetServlet extends Controller {
 		fp.getRequest().setAttribute("filelist", fileList);
 
 		ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(fileList);
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		table.setSortingIfNotExplicitlySet(3, false);// sort by date
 		String[] columns = {resword.getString("file_name"), resword.getString("run_time"),
 				resword.getString("file_size"), resword.getString("created_date"), resword.getString("created_by"),

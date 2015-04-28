@@ -243,9 +243,7 @@ public class AddCRFToDefinitionServlet extends Controller {
 	}
 
 	private EntityBeanTable createTable(HttpServletRequest request, ArrayList crfs) throws Exception {
-
-		FormProcessor fp = new FormProcessor(request);
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allRows = CRFRow.generateRowsFromBeans(crfs);
 		String[] columns = {resword.getString("CRF_name"), resword.getString("date_created"),
 				resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),

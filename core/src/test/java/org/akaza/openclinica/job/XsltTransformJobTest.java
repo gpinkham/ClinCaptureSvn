@@ -71,7 +71,7 @@ public class XsltTransformJobTest extends DefaultAppContextTest {
 		PowerMockito.when(applicationContext.getBean("messageSource")).thenReturn(messageSource);
 		PowerMockito.when(applicationContext.getBean("openClinicaMailSender")).thenReturn(openClinicaMailSender);
 		PowerMockito.when(dataMap.getString(Mockito.anyString())).thenReturn("");
-		PowerMockito.when(dataMap.getString("locale")).thenReturn("en-US");
+		PowerMockito.when(dataMap.getString("locale")).thenReturn("en");
 		PowerMockito.when(dataMap.get("epBean")).thenReturn(epBean);
 		PowerMockito.when(dataMap.getInt("user_id")).thenReturn(1);
 		PowerMockito.when(xsltTransformJob, "executeInternal", context).thenCallRealMethod();
@@ -93,7 +93,7 @@ public class XsltTransformJobTest extends DefaultAppContextTest {
 		PowerMockito.when(dataMap.get("sasJobDir")).thenReturn(null);
 		PowerMockito.when(openClinicaMailSender, "sendEmail", Mockito.anyString(), Mockito.anyString(),
 				Mockito.contains(errorMessage), Mockito.anyString(), Mockito.anyBoolean()).thenCallRealMethod();
-		PowerMockito.when(messageSource.getMessage(errorMessage, null, new Locale("en-US"))).thenReturn(errorMessage);
+		PowerMockito.when(messageSource.getMessage(errorMessage, null, new Locale("en"))).thenReturn(errorMessage);
 		xsltTransformJob.executeInternal(context);
 		Mockito.verify(openClinicaMailSender).sendEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
 				Mockito.contains(errorMessage), Mockito.anyBoolean());

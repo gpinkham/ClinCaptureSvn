@@ -76,7 +76,6 @@ public class ViewJobServlet extends RememberLastPage {
 			return;
 		}
 		StudyBean currentStudy = getCurrentStudy(request);
-		FormProcessor fp = new FormProcessor(request);
 		// First we must get a reference to a scheduler
 		StdScheduler scheduler = getStdScheduler();
 		Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher
@@ -133,7 +132,7 @@ public class ViewJobServlet extends RememberLastPage {
 
 		ArrayList allRows = TriggerRow.generateRowsFromBeans(triggerBeans);
 
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		String[] columns = {resword.getString("name"), resword.getString("previous_fire_time"),
 				resword.getString("next_fire_time"), resword.getString("description"), resword.getString("study"),
 				resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("actions")};

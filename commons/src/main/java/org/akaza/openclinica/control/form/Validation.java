@@ -189,19 +189,19 @@ public class Validation {
 		this.alwaysExecuted = alwaysExecuted;
 	}
 
-    public boolean isConvertPDate() {
-        return convertPDate;
-    }
+	public boolean isConvertPDate() {
+		return convertPDate;
+	}
 
-    public void setConvertPDate(boolean convertPDate) {
-        this.convertPDate = convertPDate;
-    }
+	public void setConvertPDate(boolean convertPDate) {
+		this.convertPDate = convertPDate;
+	}
 
-    public boolean isConvertDate() {
-        return convertDate;
-    }
+	public boolean isConvertDate() {
+		return convertDate;
+	}
 
-    public void setConvertDate(boolean convertDate) {
-        this.convertDate = convertDate;
-    }
+	public void setConvertDate(boolean convertDate) {
+		this.convertDate = convertDate;
+	}
 }

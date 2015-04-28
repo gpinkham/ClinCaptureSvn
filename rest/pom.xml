@@ -30,6 +30,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.clinovo.clincapture</groupId>
+            <artifactId>commons</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>

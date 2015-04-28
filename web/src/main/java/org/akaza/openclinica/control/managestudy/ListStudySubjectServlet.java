@@ -220,8 +220,7 @@ public abstract class ListStudySubjectServlet extends Controller {
 			}
 		}
 
-		FormProcessor fp = new FormProcessor(request);
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allStudyRows = DisplayStudySubjectRow.generateRowsFromBeans(displayStudySubs);
 
 		ArrayList columnArray = new ArrayList();

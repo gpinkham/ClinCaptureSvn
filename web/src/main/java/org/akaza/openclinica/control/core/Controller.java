@@ -114,6 +114,7 @@ import org.akaza.openclinica.view.StudyInfoPanelLine;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -127,6 +128,8 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.StudyParameterPriorityUtil;
@@ -151,6 +154,14 @@ public abstract class Controller extends BaseController {
 	public static final String FORM_WITH_STATE_FLAG = "formWithStateFlag";
 	public static final String BOOSTRAP_DATE_FORMAT = "bootstrapDateFormat";
 	public static final String BOOTSTRAP_DATAPICKER_DATE_FORMAT = "bootstrap_datapicker_date_format";
+
+	// entity bean list field names
+	public static final String EBL_PAGE = "ebl_page";
+	public static final String EBL_SORT_COLUMN = "ebl_sortColumnInd";
+	public static final String EBL_SORT_ORDER = "ebl_sortAscending";
+	public static final String EBL_FILTERED = "ebl_filtered";
+	public static final String EBL_FILTER_KEYWORD = "ebl_filterKeyword";
+	public static final String EBL_PAGINATED = "ebl_paginated";
 
 	protected void addPageMessage(String message, HttpServletRequest request) {
 		addPageMessage(message, request, logger);
@@ -1053,7 +1064,7 @@ public abstract class Controller extends BaseController {
 
 	/**
 	 * Get list of Study Group Classes by Current Study.
-	 * 
+	 *
 	 * @param request
 	 *            the HttpServletRequest.
 	 * @return ArrayList.
@@ -2222,5 +2233,43 @@ public abstract class Controller extends BaseController {
 
 	public Locale getLocale() {
 		return LocaleResolver.getLocale();
+	}
+
+	public EntityBeanTable getEntityBeanTable() {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
+		FormProcessor fp = new FormProcessor(request);
+		EntityBeanTable answer = new EntityBeanTable();
+		answer.setLocale(LocaleResolver.getLocale());
+		String sortingColumn = request.getParameter(EBL_SORT_COLUMN);
+		if (sortingColumn != null && !"".equals(sortingColumn)) {
+			answer.setSortingColumnExplicitlySet(true);
+		}
+
+		answer.setCurrPageNumber(fp.getInt(EBL_PAGE));
+		answer.setSortingColumnInd(fp.getInt(EBL_SORT_COLUMN));
+		answer.setKeywordFilter(fp.getString(EBL_FILTER_KEYWORD));
+
+		// this code says that for each of the boolean properties of the table,
+		// if no value was specified on the form or in the GET query, then
+		// keep the default value for that bit
+		// otherwise, the bits will just be forced to false
+		String blnFields[] = {EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED};
+
+		for (int i = 0; i < blnFields.length; i++) {
+			String value = fp.getString(blnFields[i]);
+			boolean b = fp.getBoolean(blnFields[i]);
+			if (!"".equals(value)) {
+				if (i == 0) {
+					answer.setAscendingSort(b);
+				} else if (i == 1) {
+					answer.setFiltered(b);
+				} else {
+					answer.setPaginated(b);
+				}
+			}
+		}
+
+		return answer;
 	}
 }

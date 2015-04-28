@@ -42,6 +42,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.clinovo.clincapture</groupId>
+			<artifactId>commons</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.clinovo.clincapture</groupId>
 			<artifactId>medical-coding</artifactId>
 		</dependency>
 		<dependency>

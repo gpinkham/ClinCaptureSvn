@@ -14,12 +14,11 @@
 package org.akaza.openclinica.control.form;
 
 /**
- * Created by IntelliJ IDEA. User: A. Hamid. Date: Mar 13, 2009 Time: 7:37:05 PM To change this template use File |
- * Settings | File Templates.
+ * EanCheckDigit.
  */
 public class EanCheckDigit {
 
-	private static final int[] POSITION_WEIGHT = new int[] { 3, 1 };
+	private static final int[] POSITION_WEIGHT = new int[]{3, 1};
 	private int modulus = 10;
 
 	public boolean isValid(String code) {

@@ -284,7 +284,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 				// apply finding function or ordering
 				// function
 				// to a specific table
-				table = fp.getEntityBeanTable();
+				table = getEntityBeanTable();
 			} else {
 				table = new EntityBeanTable();
 			}

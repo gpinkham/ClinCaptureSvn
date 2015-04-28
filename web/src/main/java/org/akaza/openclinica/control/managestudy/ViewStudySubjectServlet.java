@@ -20,6 +20,17 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.StudyEventAuditBean;
 import org.akaza.openclinica.bean.core.Role;
@@ -59,22 +70,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 /**
  * @author jxu
  * 
  *         Processes 'view subject' request
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ViewStudySubjectServlet extends RememberLastPage {
 
@@ -352,15 +353,15 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 				}
 			}
 
-			EntityBeanTable table = fp.getEntityBeanTable();
+			EntityBeanTable table = getEntityBeanTable();
 
 			table.setSortingIfNotExplicitlySet(0, true);
 
 			ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
 
-			String[] columns = { resword.getString("event") + " (" + resword.getString("occurrence_number") + ")",
+			String[] columns = {resword.getString("event") + " (" + resword.getString("occurrence_number") + ")",
 					resword.getString("start_date1"), resword.getString("location"), resword.getString("status"),
-					resword.getString("actions"), resword.getString("CRFs_atrib") };
+					resword.getString("actions"), resword.getString("CRFs_atrib")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(4);
 			table.hideColumnLink(5);

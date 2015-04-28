@@ -26,8 +26,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -37,7 +39,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -55,7 +56,7 @@ import org.springframework.stereotype.Component;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ListEventDefinitionServlet extends Controller {
 
@@ -88,8 +89,7 @@ public class ListEventDefinitionServlet extends Controller {
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_study_director"), "1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
@@ -136,14 +136,13 @@ public class ListEventDefinitionServlet extends Controller {
 			}
 		}
 
-		FormProcessor fp = new FormProcessor(request);
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allStudyRows = StudyEventDefinitionRow.generateRowsFromBeans(seds);
 
-		String[] columns = { resword.getString("order"), resword.getString("name"), resword.getString("OID"),
+		String[] columns = {resword.getString("order"), resword.getString("name"), resword.getString("OID"),
 				resword.getString("repeating"), resword.getString("type"), resword.getString("category"),
 				resword.getString("populated"), resword.getString("date_created"), resword.getString("date_updated"),
-				resword.getString("CRFs"), resword.getString("default_version"), resword.getString("actions") };
+				resword.getString("CRFs"), resword.getString("default_version"), resword.getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		// >> tbh #4169 09/2009
 		table.hideColumnLink(2);

@@ -13,16 +13,23 @@
 
 package org.akaza.openclinica.web.job;
 
-import com.clinovo.util.ValidatorHelper;
-
-import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.crfdata.*;
+import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -30,7 +37,9 @@ import org.quartz.JobDataMap;
 import org.quartz.TriggerKey;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 
-@SuppressWarnings({ "rawtypes" })
+import com.clinovo.util.ValidatorHelper;
+
+@SuppressWarnings({"rawtypes"})
 public class TriggerService {
 
 	public TriggerService() {
@@ -54,78 +63,6 @@ public class TriggerService {
 
 	private static String IMPORT_TRIGGER = "importTrigger";
 	public static ResourceBundle resexception;
-
-	public SimpleTriggerImpl generateTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study,
-			String locale) {
-		Date startDateTime = fp.getDateTime(DATE_START_JOB);
-		// check the above?
-		int datasetId = fp.getInt(DATASET_ID);
-		String period = fp.getString(PERIOD);
-		String email = fp.getString(EMAIL);
-		String jobName = fp.getString(JOB_NAME);
-		String jobDesc = fp.getString(JOB_DESC);
-		String spss = fp.getString(SPSS);
-		String tab = fp.getString(TAB);
-		String cdisc = fp.getString(CDISC);
-		String cdisc12 = fp.getString(ExampleSpringJob.CDISC12);
-		String cdisc13 = fp.getString(ExampleSpringJob.CDISC13);
-		String cdisc13oc = fp.getString(ExampleSpringJob.CDISC13OC);
-		BigInteger interval = new BigInteger("0");
-		if ("monthly".equalsIgnoreCase(period)) {
-			interval = new BigInteger("2419200000"); // how many
-			// milliseconds in
-			// a month? should
-			// be 24192000000
-		} else if ("weekly".equalsIgnoreCase(period)) {
-			interval = new BigInteger("604800000"); // how many
-			// milliseconds in
-			// a week? should
-			// be 6048000000
-		} else { // daily
-			interval = new BigInteger("86400000");// how many
-			// milliseconds in a
-			// day?
-		}
-		// set up and commit job here
-
-		SimpleTriggerImpl trigger = new SimpleTriggerImpl();
-		trigger.setJobName(jobName);
-		trigger.setJobGroup("DEFAULT");
-		trigger.setRepeatCount(64000);
-		trigger.setRepeatInterval(interval.longValue());
-		// set the job detail name,
-		// based on our choice of format above
-		// what if there is more than one detail?
-		// what is the number of times it should repeat?
-		// arbitrary large number, 64K should be enough :)
-
-		trigger.setDescription(jobDesc);
-		// set just the start date
-		trigger.setStartTime(startDateTime);
-		trigger.setName(jobName);// + datasetId);
-		trigger.setGroup("DEFAULT");// + datasetId);
-		trigger.setMisfireInstruction(SimpleTriggerImpl.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
-		// set job data map
-		JobDataMap jobDataMap = new JobDataMap();
-		jobDataMap.put(DATASET_ID, datasetId);
-		jobDataMap.put(PERIOD, period);
-		jobDataMap.put(EMAIL, email);
-		jobDataMap.put(TAB, tab);
-		jobDataMap.put(CDISC, cdisc);
-		jobDataMap.put(ExampleSpringJob.CDISC12, cdisc12);
-		jobDataMap.put(ExampleSpringJob.LOCALE, locale);
-		jobDataMap.put(ExampleSpringJob.CDISC13, cdisc13);
-		jobDataMap.put(ExampleSpringJob.CDISC13OC, cdisc13oc);
-		jobDataMap.put(SPSS, spss);
-		jobDataMap.put(USER_ID, userAccount.getId());
-		jobDataMap.put(STUDY_ID, study.getId());
-		jobDataMap.put(STUDY_NAME, study.getName());
-		jobDataMap.put(STUDY_OID, study.getOid());
-
-		trigger.setJobDataMap(jobDataMap);
-		
-		return trigger;
-	}
 
 	public SimpleTriggerImpl generateImportTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study,
 			String locale, Date startTime) {
@@ -182,53 +119,17 @@ public class TriggerService {
 		return trigger;
 	}
 
-	public HashMap validateForm(ValidatorHelper validatorHelper, Set<TriggerKey> triggerKeys,
-			String properName) {
-        FormProcessor fp = validatorHelper.getFormProcessor();
-		Validator v = new Validator(validatorHelper);
-		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
-		// need to be unique too
-		v.addValidation(JOB_DESC, Validator.NO_BLANKS);
-		v.addValidation(EMAIL, Validator.IS_A_EMAIL);
-		v.addValidation(PERIOD, Validator.NO_BLANKS);
-		v.addValidation(DATE_START_JOB + "Date", Validator.IS_A_DATE);
-		// v.addValidation(DATE_START_JOB + "Date", new Date(),
-		// Validator.DATE_IS_AFTER_OR_EQUAL);
-		// TODO job names will have to be unique, tbh
-
-		String tab = fp.getString(TAB);
-		String cdisc = fp.getString(CDISC);
-		String cdisc12 = fp.getString(ExampleSpringJob.CDISC12);
-		String cdisc13 = fp.getString(ExampleSpringJob.CDISC13);
-		String cdisc13oc = fp.getString(ExampleSpringJob.CDISC13OC);
-		String spss = fp.getString(SPSS);
-		Date jobDate = fp.getDateTime(DATE_START_JOB);
-		HashMap errors = v.validate();
-		if ((tab == "") && (cdisc == "") && (spss == "") && (cdisc12 == "") && (cdisc13 == "") && (cdisc13oc == "")) {
-			// throw an error here, at least one should work
-			// errors.put(TAB, "Error Message - Pick one of the below");
-			Validator.addError(errors, TAB, resexception.getString("please_pick_at_least_one"));
-		}
-		for (TriggerKey triggerKey : triggerKeys) {
-			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
-				Validator.addError(errors, JOB_NAME, resexception.getString("a_job_with_that_name_already_exist_please_pick"));
-			}
-		}
-		if (jobDate.before(new Date())) {
-			Validator.addError(errors, DATE_START_JOB + "Date", resexception.getString("this_date_needs_to_be_later"));
-		}
-		return errors;
-	}
-
 	public String generateSummaryStatsMessage(SummaryStatsBean ssBean, ResourceBundle respage) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("<table border=\'0\' cellpadding=\'0\' cellspacing=\'0\' width=\'100%\'>");
-		sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'>" + respage.getString("summary_statistics") + ":</td> </tr> <tr valign=\'top\'>");
-		sb.append("<td class=\'table_cell_left\'>" + respage.getString("subjects_affected") + ": " + ssBean.getStudySubjectCount() + "</td> </tr>");
-		sb.append("<tr valign=\'top\'> <td class=\'table_cell_left\'>" + respage.getString("event_crfs_affected") + ": " + ssBean.getEventCrfCount()
-				+ "</td> </tr> ");
-		sb.append("<tr valign=\'top\'><td class=\'table_cell_left\'>" + respage.getString("validation_rules_generated") + ": "
-				+ ssBean.getDiscNoteCount() + "</td> </tr> </table>");
+		sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'>" + respage.getString("summary_statistics")
+				+ ":</td> </tr> <tr valign=\'top\'>");
+		sb.append("<td class=\'table_cell_left\'>" + respage.getString("subjects_affected") + ": "
+				+ ssBean.getStudySubjectCount() + "</td> </tr>");
+		sb.append("<tr valign=\'top\'> <td class=\'table_cell_left\'>" + respage.getString("event_crfs_affected")
+				+ ": " + ssBean.getEventCrfCount() + "</td> </tr> ");
+		sb.append("<tr valign=\'top\'><td class=\'table_cell_left\'>" + respage.getString("validation_rules_generated")
+				+ ": " + ssBean.getDiscNoteCount() + "</td> </tr> </table>");
 
 		return sb.toString();
 	}
@@ -240,26 +141,28 @@ public class TriggerService {
 		String studyEventRepeatKey = "1";
 		String groupRepeatKey = "1";
 
-        int subjectOidSpan = hasSkippedItems ? 5 : 4;
-        int eventCrfOidSpan = hasSkippedItems ? 4 : 3;
-        int studyEventOidSpan = hasSkippedItems ? 4 : 3;
-        int crfVersionOidSpan = hasSkippedItems ? 3 : 2;
-        int formOidSpan = hasSkippedItems ? 3 : 2;
-        int itemGroupOidSpan = hasSkippedItems ? 3 : 2;
+		int subjectOidSpan = hasSkippedItems ? 5 : 4;
+		int eventCrfOidSpan = hasSkippedItems ? 4 : 3;
+		int studyEventOidSpan = hasSkippedItems ? 4 : 3;
+		int crfVersionOidSpan = hasSkippedItems ? 3 : 2;
+		int formOidSpan = hasSkippedItems ? 3 : 2;
+		int itemGroupOidSpan = hasSkippedItems ? 3 : 2;
 
 		sb.append("<table border=\'0\' cellpadding=\'0\' cellspacing=\'0\' width=\'100%\'>");
 		for (SubjectDataBean subjectDataBean : subjectData) {
-			sb.append("<tr valign=\'top\'> <td class=\'table_header_row\' colspan=\'" + subjectOidSpan + "\'>Study Subject: "
-					+ subjectDataBean.getSubjectOID() + "</td> </tr>");
+			sb.append("<tr valign=\'top\'> <td class=\'table_header_row\' colspan=\'" + subjectOidSpan
+					+ "\'>Study Subject: " + subjectDataBean.getSubjectOID() + "</td> </tr>");
 			// next step here
 			ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
 			for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
-				sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'>" + respage.getString("event_crf_oid") + "</td> <td class=\'table_header_row\' colspan=\'" + eventCrfOidSpan + "\'></td>");
+				sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'>" + respage.getString("event_crf_oid")
+						+ "</td> <td class=\'table_header_row\' colspan=\'" + eventCrfOidSpan + "\'></td>");
 				sb.append("</tr> <tr valign=\'top\'> <td class=\'table_cell_left\'>");
 				sb.append(studyEventDataBean.getStudyEventOID());
 				if (studyEventDataBean.getStudyEventRepeatKey() != null) {
 					studyEventRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
-					sb.append(" (").append(respage.getString("repeat_key")).append(studyEventDataBean.getStudyEventRepeatKey()).append(")");
+					sb.append(" (").append(respage.getString("repeat_key"))
+							.append(studyEventDataBean.getStudyEventRepeatKey()).append(")");
 				} else {
 					// reset
 					studyEventRepeatKey = "1";
@@ -268,18 +171,21 @@ public class TriggerService {
 				ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 				for (FormDataBean formDataBean : formDataBeans) {
 					sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'></td> ");
-					sb.append("<td class=\'table_header_row\'>" + respage.getString("crf_version_oid") + "</td> <td class=\'table_header_row\' colspan=\'" + crfVersionOidSpan + "\'></td></tr>");
+					sb.append("<td class=\'table_header_row\'>" + respage.getString("crf_version_oid")
+							+ "</td> <td class=\'table_header_row\' colspan=\'" + crfVersionOidSpan + "\'></td></tr>");
 					sb.append("<tr valign=\'top\'> <td class=\'table_cell_left\'></td> <td class=\'table_cell\'>");
 					sb.append(formDataBean.getFormOID());
 					sb.append("</td> <td class=\'table_cell\' colspan=\'" + formOidSpan + "\'></td> </tr>");
 					ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
 					for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
 						sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'></td>");
-						sb.append("<td class=\'table_header_row\'></td> <td class=\'table_header_row\' colspan=\'" + itemGroupOidSpan + "\'>");
+						sb.append("<td class=\'table_header_row\'></td> <td class=\'table_header_row\' colspan=\'"
+								+ itemGroupOidSpan + "\'>");
 						sb.append(itemGroupDataBean.getItemGroupOID());
 						if (itemGroupDataBean.getItemGroupRepeatKey() != null) {
 							groupRepeatKey = itemGroupDataBean.getItemGroupRepeatKey();
-							sb.append(" (").append(respage.getString("repeat_key")).append(" " + itemGroupDataBean.getItemGroupRepeatKey()).append(")");
+							sb.append(" (").append(respage.getString("repeat_key"))
+									.append(" " + itemGroupDataBean.getItemGroupRepeatKey()).append(")");
 						} else {
 							groupRepeatKey = "1";
 						}
@@ -318,7 +224,7 @@ public class TriggerService {
 												+ (itemDataBean.isSkip() ? respage.getString("was_skipped") : "")
 												+ "</td>");
 									}
-                                    sb.append("</tr>");
+									sb.append("</tr>");
 								}
 							}
 						}
@@ -335,9 +241,8 @@ public class TriggerService {
 		return generateHardValidationErrorMessage(subjectData, totalValidationErrors, true, hasSkippedItems, respage);
 	}
 
-	public HashMap validateImportJobForm(ValidatorHelper validatorHelper, Set<TriggerKey> triggerKeys,
-			String properName) {
-        FormProcessor fp = validatorHelper.getFormProcessor();
+	public HashMap validateImportJobForm(FormProcessor fp, ValidatorHelper validatorHelper,
+			Set<TriggerKey> triggerKeys, String properName) {
 		Validator v = new Validator(validatorHelper);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
 		// need to be unique too
@@ -362,8 +267,7 @@ public class TriggerService {
 		Matcher matcher = Pattern.compile("[^\\w_\\d ]").matcher(fp.getString(JOB_NAME));
 		boolean isContainSpecialSymbol = matcher.find();
 		if (isContainSpecialSymbol) {
-			Validator.addError(errors, JOB_NAME, resexception
-					.getString("dataset_should_not_contain_any_special"));
+			Validator.addError(errors, JOB_NAME, resexception.getString("dataset_should_not_contain_any_special"));
 		}
 		int studyId = fp.getInt(STUDY_ID);
 		if (!(studyId > 0)) {
@@ -376,25 +280,14 @@ public class TriggerService {
 		}
 		for (TriggerKey triggerKey : triggerKeys) {
 			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
-				Validator.addError(errors, JOB_NAME, resexception.getString("a_job_with_that_name_already_exist_please_pick"));
+				Validator.addError(errors, JOB_NAME,
+						resexception.getString("a_job_with_that_name_already_exist_please_pick"));
 			}
 		}
 		return errors;
 	}
 
-	public HashMap validateImportJobForm(ValidatorHelper validatorHelper, Set<TriggerKey> triggerKeys) {
-		return validateImportJobForm(validatorHelper, triggerKeys, "");
-	}
-
-	public HashMap validateForm(ValidatorHelper validatorHelper, Set<TriggerKey> triggerKeys) {
-		return validateForm(validatorHelper, triggerKeys, "");
-	}
-
-	public HashMap validateImportForm(ValidatorHelper validatorHelper) {
-		Validator v = new Validator(validatorHelper);
-
-		HashMap errors = v.validate();
-
-		return errors;
+	public HashMap validateImportJobForm(FormProcessor fp, ValidatorHelper validatorHelper, Set<TriggerKey> triggerKeys) {
+		return validateImportJobForm(fp, validatorHelper, triggerKeys, "");
 	}
 }

@@ -13,6 +13,17 @@
 
 package com.clinovo.clincapture.control.managestudy;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.BaseController;
@@ -29,22 +40,13 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import static org.junit.Assert.assertEquals;
-
 public class ListSiteServletTest {
 
 	HttpServletRequest request;
 
 	@Before
 	public void setUp() throws Exception {
+		EntityBeanTable table = new EntityBeanTable();
 
 		request = new MockHttpServletRequest();
 		HttpServletResponse response = new MockHttpServletResponse();
@@ -82,6 +84,7 @@ public class ListSiteServletTest {
 
 		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		Whitebox.setInternalState(listSiteServlet, "resword", ResourceBundleProvider.getWordsBundle());
+		Mockito.doReturn(table).when(listSiteServlet).getEntityBeanTable();
 
 		listSiteServlet.processRequest(request, response);
 	}

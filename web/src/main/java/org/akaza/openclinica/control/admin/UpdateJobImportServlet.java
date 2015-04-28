@@ -153,9 +153,9 @@ public class UpdateJobImportServlet extends Controller {
 			setUpServlet(updatingTrigger, request, response);
 			forwardPage(Page.UPDATE_JOB_IMPORT, request, response);
 		} else if ("confirmall".equalsIgnoreCase(action)) {
-			HashMap errors = triggerService.validateImportJobForm(new ValidatorHelper(request, getConfigurationDao()),
-					scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")), updatingTrigger.getKey()
-							.getName());
+			HashMap errors = triggerService.validateImportJobForm(fp, new ValidatorHelper(request,
+					getConfigurationDao()), scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")),
+					updatingTrigger.getKey().getName());
 
 			Date startTime = getJobStartTime(errors, fp);
 

@@ -76,7 +76,6 @@ public class ViewImportJobServlet extends RememberLastPage {
 		}
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyDAO studyDao = getStudyDAO();
-		FormProcessor fp = new FormProcessor(request);
 		// First we must get a reference to a scheduler
 		StdScheduler scheduler = getStdScheduler();
 		// then we pull all the triggers that are specifically named
@@ -123,7 +122,7 @@ public class ViewImportJobServlet extends RememberLastPage {
 		// set up the table here and get ready to send to the web page
 		ArrayList allRows = TriggerRow.generateRowsFromBeans(triggerBeans);
 
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		String[] columns = {resword.getString("name"), resword.getString("previous_fire_time"),
 				resword.getString("next_fire_time"), resword.getString("description"), resword.getString("study"),
 				resword.getString("actions")};

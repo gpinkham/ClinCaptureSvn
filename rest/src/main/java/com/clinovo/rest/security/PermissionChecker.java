@@ -15,11 +15,13 @@
 
 package com.clinovo.rest.security;
 
-import com.clinovo.rest.annotation.RestAccess;
-import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.model.UserDetails;
-import com.clinovo.rest.service.AuthenticationService;
-import com.clinovo.rest.util.RequestParametersValidator;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserRole;
 import org.akaza.openclinica.bean.core.UserType;
@@ -31,11 +33,12 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.util.Arrays;
-import java.util.List;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.rest.annotation.RestAccess;
+import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.model.UserDetails;
+import com.clinovo.rest.service.AuthenticationService;
+import com.clinovo.rest.util.RequestParametersValidator;
 
 /**
  * PermissionChecker class.
@@ -58,6 +61,7 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+		LocaleResolver.resolveRestApiLocale();
 		if (!request.isSecure()) {
 			throw new RestException(messageSource, "rest.authentication.onlyTheHttpsIsSupported",
 					HttpServletResponse.SC_FORBIDDEN);

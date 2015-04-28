@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -32,27 +32,24 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.clinovo.i18n.LocaleResolver;
-
 /**
  * @author ssachs
- * 
+ *
  *         This class does two things: retrieve input from a form, and prepare to set default values
- * 
+ *
  *         three dimensions:
  *         <ul>
  *         <li>do we throw an exception when the key isn't present?</li>
  *         <li>do we look in the attributes and parameters, or just the parameters?</li>
  *         <li>do we look in an HttpServletRequest, or a MultipartRequest?</li>
  *         </ul>
- * 
+ *
  *         TODO handle MultiPartRequests - is this a priority, since we don't have many file uploads?
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class FormProcessor {
 	private HttpServletRequest request;
 	private HashMap presetValues;
@@ -74,7 +71,7 @@ public class FormProcessor {
 	public static final String EBL_PAGINATED = "ebl_paginated";
 
 	/**
-	 * 
+	 *
 	 * @param request
 	 *            HttpServletRequest
 	 */
@@ -121,7 +118,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @param searchAttributes
@@ -151,7 +148,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @return String
@@ -163,9 +160,9 @@ public class FormProcessor {
 	/**
 	 * For an input which is supposed to return an array of strings, such as a checkbox or multiple-select input,
 	 * retrieve all of those strings in an ArrayList.
-	 * 
+	 *
 	 * Note that the values must be contained in the request parameters, not in the attributes.
-	 * 
+	 *
 	 * @param fieldName
 	 *            The name of the input
 	 * @return An array of all the Strings corresponding to that input. Guaranteed to be non-null. All elements
@@ -188,7 +185,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param partialFieldName
 	 *            String
 	 * @return boolean
@@ -210,7 +207,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param value
 	 *            String
 	 * @return int
@@ -232,7 +229,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @param searchAttributes
@@ -245,7 +242,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @return int
@@ -255,7 +252,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @param searchAttributes
@@ -279,7 +276,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @return int
@@ -291,7 +288,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @param searchAttributes
@@ -308,7 +305,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @return boolean
@@ -318,7 +315,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @param searchAttributes
@@ -339,7 +336,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @return float
@@ -364,7 +361,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param date
 	 *            String
 	 * @return Date
@@ -385,7 +382,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @param searchAttributes
@@ -399,7 +396,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @return Date
@@ -434,7 +431,7 @@ public class FormProcessor {
 	 * word,
 	 * <p>
 	 * Precondition:Before calling this method, it should make sure that field has been entered valid datetime data.
-	 * 
+	 *
 	 * @param prefix
 	 *            String
 	 * @return Date
@@ -499,7 +496,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @param value
@@ -511,7 +508,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @param value
@@ -523,7 +520,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @param value
@@ -535,7 +532,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldName
 	 *            String
 	 * @param fieldValue
@@ -556,7 +553,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldNames
 	 *            String[]
 	 */
@@ -568,7 +565,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldNames
 	 *            String[]
 	 */
@@ -580,7 +577,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fieldNames
 	 *            String[]
 	 */
@@ -593,10 +590,10 @@ public class FormProcessor {
 
 	/**
 	 * Propogates values in date/time fields to the preset values, so that they can be used to populate a form.
-	 * 
+	 *
 	 * In particular, for each prefix in prefixes, the following strings are loaded in from the form, and propagated to
 	 * the preset values: prefix + "Date" prefix + "Hour" prefix + "Minute" prefix + "Half"
-	 * 
+	 *
 	 * @param prefixes
 	 *            An array of Strings. Each String is a prefix for a set of date/time fields.
 	 */
@@ -622,87 +619,9 @@ public class FormProcessor {
 	}
 
 	/**
-	 * 
-	 * @return EntityBeanTable
-	 */
-	public EntityBeanTable getEntityBeanTable() {
-		EntityBeanTable answer = new EntityBeanTable();
-		answer.setLocale(LocaleResolver.getLocale(request));
-		String sortingColumn = request.getParameter(EBL_SORT_COLUMN);
-		if (sortingColumn != null && !"".equals(sortingColumn)) {
-			answer.setSortingColumnExplicitlySet(true);
-		}
-
-		answer.setCurrPageNumber(getInt(EBL_PAGE));
-		answer.setSortingColumnInd(getInt(EBL_SORT_COLUMN));
-		answer.setKeywordFilter(getString(EBL_FILTER_KEYWORD));
-
-		// this code says that for each of the boolean properties of the table,
-		// if no value was specified on the form or in the GET query, then
-		// keep the default value for that bit
-		// otherwise, the bits will just be forced to false
-		String[] blnFields = { EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED };
-
-		for (int i = 0; i < blnFields.length; i++) {
-			String value = getString(blnFields[i]);
-			boolean b = getBoolean(blnFields[i]);
-			if (!"".equals(value)) {
-				if (i == 0) {
-					answer.setAscendingSort(b);
-				} else if (i == 1) {
-					answer.setFiltered(b);
-				} else {
-					answer.setPaginated(b);
-				}
-			}
-		}
-
-		return answer;
-	}
-
-	/**
-	 * 
-	 * @return EntityBeanTable
-	 */
-	public org.akaza.openclinica.web.domain.EntityBeanTable getWebEntityBeanTable() {
-		org.akaza.openclinica.web.domain.EntityBeanTable answer = new org.akaza.openclinica.web.domain.EntityBeanTable();
-
-		String sortingColumn = request.getParameter(EBL_SORT_COLUMN);
-		if (sortingColumn != null && !"".equals(sortingColumn)) {
-			answer.setSortingColumnExplicitlySet(true);
-		}
-
-		answer.setCurrPageNumber(getInt(EBL_PAGE));
-		answer.setSortingColumnInd(getInt(EBL_SORT_COLUMN));
-		answer.setKeywordFilter(getString(EBL_FILTER_KEYWORD));
-
-		// this code says that for each of the boolean properties of the table,
-		// if no value was specified on the form or in the GET query, then
-		// keep the default value for that bit
-		// otherwise, the bits will just be forced to false
-		String[] blnFields = { EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED };
-
-		for (int i = 0; i < blnFields.length; i++) {
-			String value = getString(blnFields[i]);
-			boolean b = getBoolean(blnFields[i]);
-			if (!"".equals(value)) {
-				if (i == 0) {
-					answer.setAscendingSort(b);
-				} else if (i == 1) {
-					answer.setFiltered(b);
-				} else {
-					answer.setPaginated(b);
-				}
-			}
-		}
-
-		return answer;
-	}
-
-	/**
 	 * Return a String which concatenates inputed "Date", "Hour", "Minute" and "am/pm" if applicable. Empty string will
 	 * be returned if none of them has been entered.
-	 * 
+	 *
 	 * @param prefix
 	 *            String
 	 * @return String
@@ -722,7 +641,7 @@ public class FormProcessor {
 
 	/**
 	 * Precondition: is a valid datetime.
-	 * 
+	 *
 	 * @param prefix
 	 *            String
 	 * @return boolean

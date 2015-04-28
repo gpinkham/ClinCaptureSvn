@@ -20,6 +20,16 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -38,20 +48,11 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
 /**
  * Servlet for user account list table.
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ListUserAccountsServlet extends RememberLastPage {
 
@@ -80,7 +81,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 
 		UserAccountDAO udao = getUserAccountDAO();
 		StudyDAO sdao = getStudyDAO();
-		EntityBeanTable table = fp.getEntityBeanTable();
+		EntityBeanTable table = getEntityBeanTable();
 		UserAccountBean currentUser = getUserAccountBean(request);
 		List<StudyBean> studyListCurrentUserHasAccessTo = sdao.findAllActiveStudiesWhereUserHasRole(currentUser
 				.getName());
@@ -122,9 +123,9 @@ public class ListUserAccountsServlet extends RememberLastPage {
 
 		ArrayList allUserRows = UserAccountRow.generateRowsFromBeans((ArrayList) allUsers);
 
-		String[] columns = { resword.getString("user_name"), resword.getString("user_type"),
+		String[] columns = {resword.getString("user_name"), resword.getString("user_type"),
 				resword.getString("first_name"), resword.getString("last_name"), resword.getString("status"),
-				resword.getString("actions") };
+				resword.getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(ACTION_COLUMN_NUM);
 		table.setQuery("ListUserAccounts", new HashMap());

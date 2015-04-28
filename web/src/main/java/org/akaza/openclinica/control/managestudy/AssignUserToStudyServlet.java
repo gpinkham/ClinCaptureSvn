@@ -20,7 +20,18 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.StudyParameterPriorityUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -39,21 +50,12 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
+import com.clinovo.util.StudyParameterPriorityUtil;
 
 /**
  * Processes request to assign a user to a study.
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class AssignUserToStudyServlet extends Controller {
 
@@ -86,7 +88,7 @@ public class AssignUserToStudyServlet extends Controller {
 		String nextListPage = request.getParameter("next_list_page");
 		if (StringUtil.isBlank(action) || (nextListPage != null && nextListPage.equalsIgnoreCase("true"))) {
 			FormProcessor fp = new FormProcessor(request);
-			EntityBeanTable table = fp.getEntityBeanTable();
+			EntityBeanTable table = getEntityBeanTable();
 			ArrayList allRows = UserAccountRow.generateRowsFromBeans(users);
 
 			if (nextListPage == null) {
@@ -113,9 +115,9 @@ public class AssignUserToStudyServlet extends Controller {
 				request.getSession().setAttribute("tmpSelectedUsersMap", tmpSelectedUsersMap);
 			}
 
-			String[] columns = { resword.getString("user_name"), resword.getString("first_name"),
+			String[] columns = {resword.getString("user_name"), resword.getString("first_name"),
 					resword.getString("last_name"), resword.getString("role"), resword.getString("selected"),
-					resword.getString("notes") };
+					resword.getString("notes")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(ROLE_COL);
 			table.hideColumnLink(SELECTED_COL);

@@ -43,7 +43,7 @@ import com.clinovo.i18n.LocaleResolver;
 public class OCServletFilter implements javax.servlet.Filter {
 
 	public static final String USER_BEAN_NAME = "userBean";
-	
+
 	private WebApplicationContext springContext;
 
 	/**
