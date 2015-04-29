@@ -820,10 +820,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * Returns DNs statistics by DNs types and resolution statuses from study/site.
 	 *
 	 * @param currentStudy StudyBean
+	 * @param ub           UserAccountBean
 	 * @return List<DiscrepancyNoteStatisticBean>
 	 */
-	public List<DiscrepancyNoteStatisticBean> countNotesStatistic(StudyBean currentStudy) {
+	public List<DiscrepancyNoteStatisticBean> countNotesStatisticWithMasks(StudyBean currentStudy, UserAccountBean ub) {
 		setStatisticTypesExpected();
+		ListNotesFilter filter = new ListNotesFilter();
+		int activeUserId = ub == null ? 0 : ub.getId();
 		Map variables = new HashMap();
 		for (int i = 1; i <= SQL_QUERY_VARIABLES_COUNT_2; i++) {
 			variables.put(i, currentStudy.getId());
@@ -840,6 +843,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllEventCrfDNByStudyForStat"));
+		sql.append(filter.getFilterForMaskedCRFs(activeUserId));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
@@ -847,6 +851,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllItemDataDNByStudyForStat"));
+		sql.append(filter.getFilterForMaskedCRFs(activeUserId));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");

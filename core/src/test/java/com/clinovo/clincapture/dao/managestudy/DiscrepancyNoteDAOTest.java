@@ -283,7 +283,7 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testStatistics() {
-		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
+		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatisticWithMasks(study, null);
 
 		assertEquals(5, statisticBeans.size());
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 1, 1)));
@@ -329,7 +329,7 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		eventCRFDAO.update(ecb);
 		// ----------------------------------------------------
 
-		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
+		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatisticWithMasks(study, null);
 
 		assertTrue(statisticBeans.isEmpty());
 
@@ -368,7 +368,7 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		eventCRFDAO.update(ecb);
 		// ----------------------------------------------------
 
-		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
+		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatisticWithMasks(study, null);
 
 		assertEquals(2, statisticBeans.size());
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 2, 5)));
@@ -409,7 +409,7 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		eventCRFDAO.update(ecb);
 		// ----------------------------------------------------
 
-		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
+		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatisticWithMasks(study, null);
 
 		assertEquals(3, statisticBeans.size());
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 2, 5)));

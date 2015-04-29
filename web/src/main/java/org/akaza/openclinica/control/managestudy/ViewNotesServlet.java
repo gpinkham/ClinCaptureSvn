@@ -245,7 +245,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		if (isCoder(loggedInUser, request) || isEvaluator(loggedInUser, request)) {
 			statisticBeans = dndao.countUserNotesStatistics(currentStudy, ub);
 		} else {
-			statisticBeans = dndao.countNotesStatistic(currentStudy);
+			statisticBeans = dndao.countNotesStatisticWithMasks(currentStudy, ub);
 		}
 		Map<String, String> customTotalMap = ListNotesTableFactory.getNotesTypesStatistics(statisticBeans);
 		Map<String, Map<String, String>> customStat = ListNotesTableFactory.getNotesStatistics(statisticBeans);
