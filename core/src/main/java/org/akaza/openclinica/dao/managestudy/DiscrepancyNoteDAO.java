@@ -929,10 +929,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 *
 	 * @param currentStudy StudyBean
 	 * @param filter       ListNotesFilter
+	 * @param ub           UserAccountBean
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
-	public ArrayList<DiscrepancyNoteBean> getNotesWithFilterAndSort(StudyBean currentStudy, ListNotesFilter filter) {
+	public ArrayList<DiscrepancyNoteBean> getNotesWithFilterAndSortForOutput(StudyBean currentStudy, ListNotesFilter filter, UserAccountBean ub) {
 		setTypesExpected();
+		int activeUserAccountId = ub == null ? 0 : ub.getId();
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
@@ -957,12 +959,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(digester.getQuery("findAllStudyEventDNByStudy"));
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
+		sql.append(filter.getFilterForMaskedCRFs(activeUserAccountId));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
+		sql.append(filter.getFilterForMaskedCRFs(activeUserAccountId));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");

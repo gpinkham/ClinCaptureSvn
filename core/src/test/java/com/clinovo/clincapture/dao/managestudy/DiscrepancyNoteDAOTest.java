@@ -601,4 +601,19 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		assertFalse(discrepancyNoteDAO.doesNotHaveOutstandingDNs(ecb));
 	}
 
+	@Test
+	public void testThatGetNotesWithFilterAndSortForOutputReturnsCorrectResult() {
+		StudyBean study = new StudyBean();
+		study.setId(1);
+		UserAccountBean user = new UserAccountBean();
+		user.setId(1);
+		assertEquals(3, discrepancyNoteDAO.getNotesWithFilterAndSortForOutput(study, new ListNotesFilter(), user).size());
+	}
+
+	@Test
+	public void testThatGetNotesWithFilterAndSortForOutputReturnsCorrectResultIfUserIsNull() {
+		StudyBean study = new StudyBean();
+		study.setId(1);
+		assertEquals(5, discrepancyNoteDAO.getNotesWithFilterAndSortForOutput(study, new ListNotesFilter(), null).size());
+	}
 }

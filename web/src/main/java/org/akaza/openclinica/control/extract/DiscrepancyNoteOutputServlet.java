@@ -134,8 +134,8 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 
 		ListNotesSort listNotesSort = new ListNotesSort();
 		listNotesSort.addSort("", "");
-		ArrayList<DiscrepancyNoteBean> allDiscNotes = getDiscrepancyNoteDAO().getNotesWithFilterAndSort(studyBean,
-				listNotesFilter);
+		ArrayList<DiscrepancyNoteBean> allDiscNotes = getDiscrepancyNoteDAO().getNotesWithFilterAndSortForOutput(studyBean,
+				listNotesFilter, getUserAccountBean());
 
 		// Downloaded notes will contain only filtered notes.
 		ArrayList sessionNotes = (ArrayList) request.getSession().getAttribute("allNotes");
