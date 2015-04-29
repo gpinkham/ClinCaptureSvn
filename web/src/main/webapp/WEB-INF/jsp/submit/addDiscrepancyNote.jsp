@@ -507,7 +507,16 @@ $(document).ready(function() {
 	</c:otherwise>
 	</c:choose>
 	<div class="dnBoxCol1 dnBoxText"><fmt:message key="email_assigned_user" bundle="${resword}"/>:</div>
-	<div class="dnBoxCol2 dnBoxText"><input name="sendEmail" value="1" type="checkbox"/></div>
+	<div class="dnBoxCol2 dnBoxText">
+		<c:choose>
+        <c:when test="${writeToDB eq '1'}">
+            <input name="sendEmail" value="1" type="checkbox"/> 
+        </c:when>
+        <c:otherwise>
+            <input name="sendEmail" value="1" type="checkbox" disabled title="<fmt:message key="email_service_for_DN_will_be_available_after_initial_data_saving" bundle="${resword}"/>"/>    
+        </c:otherwise>
+		</c:choose>
+	</div>
 	</span>
 	<c:if test="${not showStatus}"> </div>  </c:if>
 
