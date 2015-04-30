@@ -106,8 +106,8 @@
 																		<c:set value="" var="notMasked" />
 																		<c:set value="checked" var="masked" />
 																	</c:if>
-																	<input type="radio" ${masked} value="masked" name="crf_mask_c${crf.id}_e${event.id}_s${site.id}"> Yes
-																	<input type="radio" ${notMasked} value="notMasked" name="crf_mask_c${crf.id}_e${event.id}_s${site.id}"> No
+																	<input type="radio" ${masked} value="masked" name="crf_mask_c${crf.id}_e${event.id}_s${site.id}"> <fmt:message bundle="${resword}" key="yes"/>
+																	<input type="radio" ${notMasked} value="notMasked" name="crf_mask_c${crf.id}_e${event.id}_s${site.id}"> <fmt:message bundle="${resword}" key="no"/>
 																</td>
 															</tr>
 														</c:forEach>
