@@ -34,13 +34,4 @@
     <bean id="instantOnChangeService" class="org.akaza.openclinica.service.crfdata.InstantOnChangeService" autowire="byName">
         <constructor-arg ref="dataSource"/>
     </bean>
-
-    <bean id = "generateClinicalDataService" class="org.akaza.openclinica.service.extract.GenerateClinicalDataServiceImpl">
-        <property name="studyDao" ref="studyDao"></property>
-        <property name="studySubjectDao" ref="studySubjectDao"/>
-        <property name="studyEventDefDao" ref="studyEventDefinitionDao"/>
-        <property name="auditEventDAO" ref="auditLogEventDao"/>
-        <property name="userAccountDao" ref="userAccountDao"/>
-    </bean>
-
 </beans>

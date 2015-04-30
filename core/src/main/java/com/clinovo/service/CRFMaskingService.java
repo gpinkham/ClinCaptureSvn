@@ -5,6 +5,8 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,4 +111,11 @@ public interface CRFMaskingService {
 	 * @return first StudyEventDefinitionBean with at least one not masked StudyEventDefinitionBean
 	 */
 	StudyEventDefinitionBean returnFirstNotMaskedEvent(List<StudyEventDefinitionBean> sedList, int userId, int studyId);
+
+	/**
+	 * Remove masked CRFs from the list of StudyEvents.
+	 * @param studyEvents List of StudyEvents
+	 * @param userId int
+	 */
+	void removeMaskedCRFsFromStudyEvents(List<StudyEvent> studyEvents, int userId);
 }

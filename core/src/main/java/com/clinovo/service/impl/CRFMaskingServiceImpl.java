@@ -11,7 +11,10 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,7 +98,6 @@ public class CRFMaskingServiceImpl implements CRFMaskingService {
 			}
 			if (newRole == Role.INVESTIGATOR && study.isSite()) {
 				maskingDAO.removeMasksBySiteAndUserIds(userId, study.getId());
-				return;
 			}
 		}
 	}
@@ -145,5 +147,26 @@ public class CRFMaskingServiceImpl implements CRFMaskingService {
 			}
 		}
 		return new StudyEventDefinitionBean();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeMaskedCRFsFromStudyEvents(List<StudyEvent> studyEvents, int userId) {
+		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
+		UserAccountBean user = (UserAccountBean) userAccountDAO.findByPK(userId);
+		int studyId = user.getActiveStudyId();
+
+		for (StudyEvent studyEvent : studyEvents) {
+			ArrayList<EventCrf> notMaskedList = new ArrayList<EventCrf>();
+			for (EventCrf eventCrf : studyEvent.getEventCrfs()) {
+				EventDefinitionCRFBean edc = eventDefinitionCRFDAO.findForSiteByEventCrfId(eventCrf.getEventCrfId());
+				if (!isEventDefinitionCRFMasked(edc.getId(), userId, studyId)) {
+					notMaskedList.add(eventCrf);
+				}
+			}
+			studyEvent.setEventCrfs(notMaskedList);
+		}
 	}
 }
