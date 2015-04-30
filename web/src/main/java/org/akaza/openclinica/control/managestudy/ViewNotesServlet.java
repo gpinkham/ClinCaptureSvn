@@ -229,7 +229,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		factory.setDataSource(getDataSource());
 		TableFacade tf = factory.createTable(request, response);
 		if ("yes".equalsIgnoreCase(print)) {
-			request.setAttribute("allNotes", factory.getNotesForPrintPop(tf.getLimit()));
+			request.setAttribute("allNotes", factory.getNotesForPrintPop(tf.getLimit(), ub));
 			forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT, request, response);
 			return;
 		}

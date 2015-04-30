@@ -664,16 +664,17 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @param currentStudy StudyBean
 	 * @param filter       ListNotesFilter
 	 * @param sort         ListNotesSort
+	 * @param ub           UserAccountBean
 	 * @return List of DiscrepancyNoteBeans
 	 */
-	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy, ListNotesFilter filter,
-			ListNotesSort sort) {
+	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortForPrint(StudyBean currentStudy, ListNotesFilter filter,
+			ListNotesSort sort, UserAccountBean ub) {
 		ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
 		Map variables = new HashMap();
 		for (int i = 1; i <= SQL_QUERY_VARIABLES_COUNT_2; i++) {
 			variables.put(i, currentStudy.getId());
 		}
-		StringBuilder sql = buildViewNotesSQL(currentStudy, filter, sort);
+		StringBuilder sql = buildViewNotesSQL(currentStudy, filter, sort, ub);
 		String sortPart = sort.execute("");
 		sql.append(sortPart);
 		ArrayList rows = select(sql.toString(), variables);

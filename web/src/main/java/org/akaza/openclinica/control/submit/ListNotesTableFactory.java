@@ -1249,12 +1249,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	 * @param limit
 	 *            the bean with all required info about table (sorting, filtering, paging, max rows to display, and
 	 *            exporting).
+	 * @param ub UserAccountBean
 	 * @return the list with prepared notes and discrepancies.
 	 */
-	public List<DiscrepancyNoteBean> getNotesForPrintPop(Limit limit) {
+	public List<DiscrepancyNoteBean> getNotesForPrintPop(Limit limit, UserAccountBean ub) {
 		ListNotesFilter listNotesFilter = getListNoteFilter(limit);
 		ListNotesSort listNotesSort = getListSubjectSort(limit);
-		return getDiscrepancyNoteDao().getViewNotesWithFilterAndSort(getCurrentStudy(), listNotesFilter, listNotesSort);
+		return getDiscrepancyNoteDao().getViewNotesWithFilterAndSortForPrint(getCurrentStudy(), listNotesFilter, listNotesSort, ub);
 	}
 
 	public void setDataSource(DataSource dataSource) {
