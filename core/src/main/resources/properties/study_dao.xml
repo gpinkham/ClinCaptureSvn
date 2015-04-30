@@ -84,6 +84,16 @@
         </sql>
 	</query>
 	<query>
+		<name>findAllActiveWhereUserHasActiveRole</name>
+		<sql>
+			SELECT s.* FROM study s, study_user_role sur
+			WHERE sur.user_name = ?
+			AND s.study_id = sur.study_id
+			AND s.status_id NOT IN (5,7)
+			AND sur.status_id NOT IN (5,7)
+		</sql>
+	</query>
+	<query>
 		<name>findAllActiveStudiesWhereUserHasRole</name>
 		<sql>
 			SELECT *

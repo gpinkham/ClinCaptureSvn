@@ -69,7 +69,7 @@ public class CRFMaskingController extends BaseController {
 		UserAccountDAO userDAO = new UserAccountDAO(dataSource);
 		int userId = Integer.parseInt(request.getParameter("userId"));
 		UserAccountBean user = (UserAccountBean) userDAO.findByPK(userId);
-		ArrayList<StudyBean> sBeans = (ArrayList<StudyBean>) studyDAO.findAllActiveWhereUserHasRole(user.getName());
+		ArrayList<StudyBean> sBeans = (ArrayList<StudyBean>) studyDAO.findAllActiveWhereUserHasActiveRole(user.getName());
 		ArrayList<StudyBean> studies = (ArrayList<StudyBean>) studyDAO
 				.findAllActiveStudiesWhereUserHasRole(user.getName());
 

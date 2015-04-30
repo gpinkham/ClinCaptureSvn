@@ -636,6 +636,21 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		return al;
 	}
 
+	public List<StudyBean> findAllActiveWhereUserHasActiveRole(String username) {
+		this.unsetTypeExpected();
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), username);
+		List<HashMap> alist = this.select(digester.getQuery("findAllActiveWhereUserHasActiveRole"), variables);
+		List<StudyBean> al = new ArrayList<StudyBean>();
+		Iterator<HashMap> it = alist.iterator();
+		while (it.hasNext()) {
+			StudyBean eb = (StudyBean) this.getEntityFromHashMap(it.next());
+			al.add(eb);
+		}
+		return al;
+	}
+
 	public ArrayList findAllByStatus(Status status) {
 		this.unsetTypeExpected();
 		this.setTypesExpected();
