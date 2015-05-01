@@ -58,9 +58,7 @@
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="alertbox_center">
-<fmt:message key="the_CRF_version_you_try_to_upload_already_exists" bundle="${restext}">
-  <fmt:param><c:out value="${version.crfId}"/></fmt:param>
-</fmt:message>
+<fmt:message key="the_CRF_version_you_try_to_upload_already_exists" bundle="${restext}"/>
 <fmt:message key="or_you_can_change_the_version_name" bundle="${restext}"/>
 <br><br></div>
 
@@ -91,7 +89,12 @@
 </div>
 
 </div></div></div></div></div></div></div></div>
-<br>
+<br/>
+	<input type="button" id="GoToPreviousPage"
+		   value="<fmt:message key="back" bundle="${resword}"/>"
+		   class="button_medium"
+		   onClick="javascript: window.location.href = 'CreateCRFVersion?crfId=${version.crfId}'" />
+<br/>
 <c:choose>
   <c:when test="${userBean.sysAdmin}">
   <c:import url="../include/workflow.jsp">
