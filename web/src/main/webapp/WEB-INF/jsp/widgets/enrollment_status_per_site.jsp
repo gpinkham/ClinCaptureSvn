@@ -7,7 +7,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 <script>
-	<c:import url="../../includes/js/widgets/w_enrollment_status_per_site.js" />
+	<c:import url="../../includes/js/widgets/w_enrollment_status_per_site.js?r=${revisionNumber}" />
 </script>
 
 <div class="enrollment_status_per_site" align="center">

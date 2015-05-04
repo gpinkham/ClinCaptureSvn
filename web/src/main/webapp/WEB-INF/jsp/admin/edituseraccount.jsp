@@ -9,7 +9,7 @@
 <jsp:include page="../include/managestudy_top_pages.jsp" />
 
 <script language="JavaScript">
-	<c:import url="../../../includes/js/pages/edit_user_accout.js" />
+	<c:import url="../../../includes/js/pages/edit_user_accout.js?r=${revisionNumber}" />
 </script>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->

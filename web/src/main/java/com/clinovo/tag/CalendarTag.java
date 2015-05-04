@@ -18,6 +18,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.akaza.openclinica.control.core.OCServletFilter;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ public class CalendarTag extends TagSupport {
 
 	@Override
 	public int doStartTag() throws JspException {
+		String revisionNumber = (String) pageContext.getRequest().getAttribute(OCServletFilter.REVISION_NUMBER);
 		String locale = LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest()).toString();
 		String language = LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest()).getLanguage();
 		locale = CoreResources.CALENDAR_LOCALES.contains(locale) ? locale : (CoreResources.CALENDAR_LOCALES
@@ -50,11 +52,11 @@ public class CalendarTag extends TagSupport {
 		color = color == null ? "blue" : color;
 		html = html.concat("<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"").concat(contextPath);
 		if (color.equals("violet")) {
-			html = html.concat("/includes/calendar/css/calendar_violet.css\"/>");
+			html = html.concat("/includes/calendar/css/calendar_violet.css?r=").concat(revisionNumber).concat("\"/>");
 		} else if (color.equals("green")) {
-			html = html.concat("/includes/calendar/css/calendar_green.css\"/>");
+			html = html.concat("/includes/calendar/css/calendar_green.css?r=").concat(revisionNumber).concat("\"/>");
 		} else {
-			html = html.concat("/includes/calendar/css/calendar_blue.css\"/>");
+			html = html.concat("/includes/calendar/css/calendar_blue.css?r=").concat(revisionNumber).concat("\"/>");
 		}
 
 		JspWriter writer = pageContext.getOut();

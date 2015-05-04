@@ -13,34 +13,39 @@
 
 package com.clinovo.tag;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.akaza.openclinica.control.core.OCServletFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Custom tag for adding hide stuff class.
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings({"serial"})
 public class ThemeTag extends TagSupport {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThemeTag.class);
 
 	@Override
 	public int doStartTag() throws JspException {
+		String revisionNumber = (String) pageContext.getRequest().getAttribute(OCServletFilter.REVISION_NUMBER);
 		String newThemeColor = (String) pageContext.getSession().getAttribute("newThemeColor");
 		newThemeColor = newThemeColor == null || newThemeColor.trim().isEmpty() ? "blue" : newThemeColor;
-		String html = "<script type=\"text/JavaScript\" language=\"JavaScript\" src=\"".concat(
-				pageContext.getServletContext().getContextPath()).concat("/includes/theme.js\"></script>");
+		String html = "<script type=\"text/JavaScript\" language=\"JavaScript\" src=\""
+				.concat(pageContext.getServletContext().getContextPath()).concat("/includes/theme.js?r=")
+				.concat(revisionNumber).concat("\"></script>");
 		if (!newThemeColor.equalsIgnoreCase("blue")) {
 			html = html.concat("<style class=\"hideStuff\" type=\"text/css\">body {visibility:hidden;}</style>");
 		}
 		html = html.concat("<link rel=\"stylesheet\" href=\"").concat(pageContext.getServletContext().getContextPath())
-				.concat("/includes/css/charts_").concat(newThemeColor).concat(".css\" type=\"text/css\"/>");
+				.concat("/includes/css/charts_").concat(newThemeColor).concat(".css?r=").concat(revisionNumber)
+				.concat("\" type=\"text/css\"/>");
 		html = html.concat("<link rel=\"stylesheet\" href=\"").concat(pageContext.getServletContext().getContextPath())
-				.concat("/includes/css/styles_").concat(newThemeColor).concat(".css\" type=\"text/css\"/>");
+				.concat("/includes/css/styles_").concat(newThemeColor).concat(".css?r=").concat(revisionNumber)
+				.concat("\" type=\"text/css\"/>");
 		JspWriter writer = pageContext.getOut();
 		try {
 			writer.write(html);

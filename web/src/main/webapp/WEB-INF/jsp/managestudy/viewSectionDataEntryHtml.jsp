@@ -8,7 +8,7 @@
 
 <html>
 <head>
-    <link rel="stylesheet" href="includes/styles.css" type="text/css">
+    <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
     <ui:theme/>
@@ -17,8 +17,8 @@
 <jsp:useBean scope="session" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
 <!--Ticket 134 -->
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js?r=${revisionNumber}"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js?r=${revisionNumber}"></script>
 <script type="text/JavaScript">
 $(document).ready(function() {
 //Block all inputs and textarea on print page

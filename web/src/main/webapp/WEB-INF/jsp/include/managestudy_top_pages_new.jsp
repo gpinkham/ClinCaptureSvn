@@ -24,20 +24,20 @@
 
     <title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
-    <link rel="stylesheet" href="../../includes/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../includes/styles.css?r=${revisionNumber}" type="text/css" />
     <link rel="stylesheet" href="../../includes/jquery-ui.css"  type="text/css" />
     <script type="text/JavaScript" language="JavaScript" src="../../includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="../../includes/jmesa/jquery-ui.min.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="../../includes/global_functions_javascript.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="../../includes/Tabs.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="../../includes/CalendarPopup.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="../../includes/global_functions_javascript.js?r=${revisionNumber}"></script>
+    <script type="text/JavaScript" language="JavaScript" src="../../includes/Tabs.js?r=${revisionNumber}"></script>
+    <script type="text/JavaScript" language="JavaScript" src="../../includes/CalendarPopup.js?r=${revisionNumber}"></script>
     <!-- Added for the new Calender -->
 
     <ui:calendar/>
     <!-- End -->
     <ui:theme/>
 
-    <script type="text/JavaScript" language="JavaScript" src="../../includes/prototype.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="../../includes/prototype.js?r=${revisionNumber}"></script>
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
 </head>

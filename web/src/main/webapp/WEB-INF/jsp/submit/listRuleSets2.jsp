@@ -20,11 +20,11 @@
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- *JSP* submit/listRuleSets2.jsp -->
-<link type="text/css" href="includes/jmesa/jmesa.css"  rel="stylesheet">    
+<link type="text/css" href="includes/jmesa/jmesa.css?r=${revisionNumber}"  rel="stylesheet">
 
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js?r=${revisionNumber}"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js?r=${revisionNumber}"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js?r=${revisionNumber}"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-ui-1.8.2.custom.min.js"></script>
 
 <script type="text/javascript">

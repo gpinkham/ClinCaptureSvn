@@ -28,7 +28,7 @@
 <c:if test="${saveDcf ne null}">
 	<input type="hidden" id="saveDcf" name="saveDcf" value="${saveDcf}" />
 </c:if>
-<script type="text/javascript" src="includes/js/pages/dcf.js"></script>
+<script type="text/javascript" src="includes/js/pages/dcf.js?r=${revisionNumber}"></script>
 <script>
 	$(document).ready(function() {
 		initDcf("<%=request.getContextPath()%>");

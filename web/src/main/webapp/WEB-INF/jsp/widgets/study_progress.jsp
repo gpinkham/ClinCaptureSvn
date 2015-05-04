@@ -7,7 +7,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 <script>
-	<c:import url="../../includes/js/widgets/w_study_progress.js" />
+	<c:import url="../../includes/js/widgets/w_study_progress.js?r=${revisionNumber}" />
 </script>
 
 <div class="study_progress" align="center">

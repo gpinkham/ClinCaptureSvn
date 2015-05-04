@@ -502,4 +502,4 @@
 <input id="accessAttributeName" type="hidden" value="data-cc-subjectStudyEventId" />
 <jsp:include page="../include/footer.jsp"/>
 
-<script type="text/javascript" src="includes/print/studySubject/viewStudySubject.js"></script>
+<script type="text/javascript" src="includes/print/studySubject/viewStudySubject.js?r=${revisionNumber}"></script>

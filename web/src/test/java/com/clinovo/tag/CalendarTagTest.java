@@ -19,6 +19,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 
+import org.akaza.openclinica.control.core.OCServletFilter;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.apache.commons.lang3.LocaleUtils;
 import org.junit.Before;
@@ -69,6 +70,7 @@ public class CalendarTagTest {
 		Whitebox.setInternalState(calendarTag, "pageContext", pageContext);
 		Mockito.when(calendarTag.doStartTag()).thenCallRealMethod();
 		CoreResources.CALENDAR_LOCALES.clear();
+		Mockito.when(request.getAttribute(OCServletFilter.REVISION_NUMBER)).thenReturn("123456789");
 	}
 
 	@Test
@@ -82,7 +84,7 @@ public class CalendarTagTest {
 		LocaleResolver.updateLocale(session, LocaleUtils.toLocale("es_MX"));
 		calendarTag.doStartTag();
 		Mockito.verify(jspWriter)
-				.write("<script type=\"text/javascript\" src=\"/clincapture/includes/calendar/locales/datepicker-es.js\"></script><script>$.datepicker.regional['es']</script><link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"/clincapture/includes/calendar/css/calendar_blue.css\"/>");
+				.write("<script type=\"text/javascript\" src=\"/clincapture/includes/calendar/locales/datepicker-es.js\"></script><script>$.datepicker.regional['es']</script><link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"/clincapture/includes/calendar/css/calendar_blue.css?r=123456789\"/>");
 	}
 
 	@Test
@@ -92,7 +94,7 @@ public class CalendarTagTest {
 		LocaleResolver.updateLocale(session, LocaleUtils.toLocale("es_MX"));
 		calendarTag.doStartTag();
 		Mockito.verify(jspWriter)
-				.write("<script type=\"text/javascript\" src=\"/clincapture/includes/calendar/locales/datepicker-es_MX.js\"></script><script>$.datepicker.regional['es_MX']</script><link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"/clincapture/includes/calendar/css/calendar_blue.css\"/>");
+				.write("<script type=\"text/javascript\" src=\"/clincapture/includes/calendar/locales/datepicker-es_MX.js\"></script><script>$.datepicker.regional['es_MX']</script><link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"/clincapture/includes/calendar/css/calendar_blue.css?r=123456789\"/>");
 	}
 
 	@Test
@@ -102,6 +104,6 @@ public class CalendarTagTest {
 		LocaleResolver.updateLocale(session, LocaleUtils.toLocale("es"));
 		calendarTag.doStartTag();
 		Mockito.verify(jspWriter)
-				.write("<script type=\"text/javascript\" src=\"/clincapture/includes/calendar/locales/datepicker-es.js\"></script><script>$.datepicker.regional['es']</script><link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"/clincapture/includes/calendar/css/calendar_blue.css\"/>");
+				.write("<script type=\"text/javascript\" src=\"/clincapture/includes/calendar/locales/datepicker-es.js\"></script><script>$.datepicker.regional['es']</script><link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"/clincapture/includes/calendar/css/calendar_blue.css?r=123456789\"/>");
 	}
 }

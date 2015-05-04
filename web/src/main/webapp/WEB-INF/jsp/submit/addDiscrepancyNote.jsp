@@ -18,17 +18,17 @@
 <title><fmt:message key="openclinica" bundle="${resword}"/>- <fmt:message key="add_discrepancy_note" bundle="${resword}"/></title>
 <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
 <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
-<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css">
+<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css?r=${revisionNumber}" type="text/css">
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
 
-<link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
+<link rel="stylesheet" href="includes/jmesa/jmesa.css?r=${revisionNumber}" type="text/css">
 <link rel="stylesheet" href="includes/jquery-ui.css"  type="text/css"/>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js?r=${revisionNumber}"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js?r=${revisionNumber}"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui.min.js"></script>
 
-<script language="JavaScript" src="includes/CalendarPopup.js"></script>
+<script language="JavaScript" src="includes/CalendarPopup.js?r=${revisionNumber}"></script>
 
 <style type="text/css">
 .popup_BG { background-image: url(images/main_BG.gif);

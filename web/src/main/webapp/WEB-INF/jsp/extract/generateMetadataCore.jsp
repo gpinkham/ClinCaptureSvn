@@ -12,7 +12,7 @@
 <HEAD>
 <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
 <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
-<link rel="stylesheet" href="includes/styles.css" type="text/css">
+<link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
 <style type="text/css"> 
     #waitpage { position: absolute; } 
     #mainpage { position: absolute; visibility: hidden; } 

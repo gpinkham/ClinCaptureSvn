@@ -8,7 +8,7 @@
 
 <!-- Function that runs ajax request, and returns widgets chart -->
 <script>
-	<c:import url="../../includes/js/widgets/w_nds_per_crf.js" />
+	<c:import url="../../includes/js/widgets/w_nds_per_crf.js?r=${revisionNumber}" />
 </script>
 
 <div class="nds_per_crf" align="center">

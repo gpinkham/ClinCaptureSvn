@@ -4,7 +4,7 @@
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>

@@ -13,7 +13,7 @@
 
 <jsp:include page="../include/managestudy_top_pages.jsp" />
 
-<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jspfunctions.js'/>"></script>
+<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jspfunctions.js?r=${revisionNumber}'/>"></script>
 
 <jsp:include page="../include/sideAlert.jsp" />
 

@@ -8,7 +8,7 @@
 
 <!-- Function that runs ajax request, and returns widgets chart -->
 <script>
-	<c:import url="../../includes/js/widgets/w_evaluation_progress.js" />
+	<c:import url="../../includes/js/widgets/w_evaluation_progress.js?r=${revisionNumber}" />
 </script>
 
 <div class="evaluation_progress" align="center">

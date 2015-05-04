@@ -12,9 +12,9 @@
 <head>
 <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
 <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
-<link rel="stylesheet" href="includes/styles.css" type="text/css">
+<link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-<script language="JavaScript" src="includes/global_functions_javascript.js"></script>
+<script language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
 <style type="text/css">
 
 .popup_BG { background-image: url(images/main_BG.gif);

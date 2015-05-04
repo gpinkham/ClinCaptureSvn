@@ -25,9 +25,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
     <title><fmt:message key="openclinica" bundle="${resword}"/></title>
-    <link rel="stylesheet" href="includes/styles.css" type="text/css">
+    <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
 </head>

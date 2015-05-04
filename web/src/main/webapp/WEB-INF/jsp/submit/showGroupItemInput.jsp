@@ -12,7 +12,7 @@
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope="request" id="responseOptionBean" class="org.akaza.openclinica.bean.submit.ResponseOptionBean" />
 <jsp:useBean scope="request" id="formMessages" class="java.util.HashMap"/>
-<script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js?r=${revisionNumber}"></script>
 <!-- *JSP* submit/showGroupItemInput.jsp -->
 <script lang="Javascript">
 function genToolTips(itemId){

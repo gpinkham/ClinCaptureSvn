@@ -17,9 +17,9 @@
 
 <title>ClinCapture About</title>
 
-<link rel="stylesheet" href="../includes/styles_hf.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../includes/styles_hf.css?r=${revisionNumber}" type="text/css" media="screen" />
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-1.3.2.min.js"></script>
-<script type="text/javascript" src="colorTheme.js"></script>
+<script type="text/javascript" src="colorTheme.js?r=${revisionNumber}"></script>
 </head>
 
 <body>

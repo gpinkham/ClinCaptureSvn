@@ -24,8 +24,8 @@
 	
 	<title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
-	<link rel="stylesheet" href="../includes/styles.css" type="text/css"/>
-	<link rel="stylesheet" href="../includes/css/charts.css" type="text/css"/>
+	<link rel="stylesheet" href="../includes/styles.css?r=${revisionNumber}" type="text/css"/>
+	<link rel="stylesheet" href="../includes/css/charts.css?r=${revisionNumber}" type="text/css"/>
 
 	<script type="text/javascript" src="../includes/jmesa/jsapi"></script>
 	<script type="text/javascript">
@@ -36,14 +36,14 @@
 	<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-1.11.0.min.js"></script>	
 	<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-ui-1.10.4.custom.min.js"></script>
 	<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-migrate-1.2.1.min.js"></script>
-	<script type="text/JavaScript" language="JavaScript" src="../includes/global_functions_javascript.js"></script>
-	<script type="text/JavaScript" language="JavaScript" src="../includes/Tabs.js"></script>
-	<script type="text/JavaScript" language="JavaScript" src="../includes/js/widgets/Charts.js"></script>
-	<script type="text/JavaScript" language="JavaScript" src="../includes/CalendarPopup.js"></script>
-	<script type="text/JavaScript" language="JavaScript" src="../includes/repetition-model/repetition-model.js"></script>
-	<script type="text/JavaScript" language="JavaScript" src="../includes/prototype.js"></script>
-	<script type="text/JavaScript" language="JavaScript" src="../includes/scriptaculous.js?load=effects"></script>
-	<script type="text/JavaScript" language="JavaScript" src="../includes/effects.js"></script>
+	<script type="text/JavaScript" language="JavaScript" src="../includes/global_functions_javascript.js?r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="../includes/Tabs.js?r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="../includes/js/widgets/Charts.js?r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="../includes/CalendarPopup.js?r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="../includes/repetition-model/repetition-model.js?r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="../includes/prototype.js?r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="../includes/scriptaculous.js?load=effects&r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="../includes/effects.js?r=${revisionNumber}"></script>
 	
     <!-- Added for the new Calender -->
     <ui:calendar/>

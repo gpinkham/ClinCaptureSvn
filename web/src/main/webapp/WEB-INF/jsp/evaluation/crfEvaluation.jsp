@@ -14,13 +14,13 @@
 
 <jsp:include page="../include/managestudy_top_pages.jsp" />
 
-<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jspfunctions.js'/>"></script>
+<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jspfunctions.js?r=${revisionNumber}'/>"></script>
 
 <jsp:include page="../include/sideAlert.jsp" />
-<link rel="stylesheet" href="/includes/styles.css" type="text/css">
-<link rel="stylesheet" href="<c:url value='/includes/jmesa/jmesa.css'/>" type="text/css">
-<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jmesa.js'/>"></script>
-<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.jmesa.js'/>"></script>
+<link rel="stylesheet" href="/includes/styles.css?r=${revisionNumber}" type="text/css">
+<link rel="stylesheet" href="<c:url value='/includes/jmesa/jmesa.css?r=${revisionNumber}'/>" type="text/css">
+<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jmesa.js?r=${revisionNumber}'/>"></script>
+<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.jmesa.js?r=${revisionNumber}'/>"></script>
 
 <script type="text/javascript">
 

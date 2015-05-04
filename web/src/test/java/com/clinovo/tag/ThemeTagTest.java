@@ -13,6 +13,12 @@
 
 package com.clinovo.tag;
 
+import javax.servlet.ServletContext;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+
+import org.akaza.openclinica.control.core.OCServletFilter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,12 +27,8 @@ import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
-
-import javax.servlet.ServletContext;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ThemeTag.class)
@@ -42,6 +44,9 @@ public class ThemeTagTest {
 	private ServletContext servletContext;
 
 	@Mock
+	private MockHttpServletRequest request;
+
+	@Mock
 	private MockHttpSession session;
 
 	@Mock
@@ -50,11 +55,13 @@ public class ThemeTagTest {
 	@Before
 	public void setUp() throws JspException {
 		Mockito.when(pageContext.getOut()).thenReturn(jspWriter);
+		Mockito.when(pageContext.getRequest()).thenReturn(request);
 		Mockito.when(pageContext.getSession()).thenReturn(session);
 		Mockito.when(pageContext.getServletContext()).thenReturn(servletContext);
 		Mockito.when(servletContext.getContextPath()).thenReturn("/clincapture");
 		Whitebox.setInternalState(themeTag, "pageContext", pageContext);
 		Mockito.when(themeTag.doStartTag()).thenCallRealMethod();
+		Mockito.when(request.getAttribute(OCServletFilter.REVISION_NUMBER)).thenReturn("123456789");
 	}
 
 	@Test

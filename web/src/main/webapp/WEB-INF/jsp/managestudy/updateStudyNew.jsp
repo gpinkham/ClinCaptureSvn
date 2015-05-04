@@ -72,7 +72,7 @@
 <jsp:useBean scope='request' id='sitesToView' class='java.util.ArrayList'/>
 
 <script language="JavaScript">
-	<c:import url="../../../includes/js/pages/update_study.js" />
+	<c:import url="../../../includes/js/pages/update_study.js?r=${revisionNumber}" />
 </script>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->

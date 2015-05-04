@@ -41,10 +41,10 @@
     </td>
 </tr>
 <jsp:include page="include/sideInfo.jsp"/>
-<link rel="stylesheet" href="../includes/jmesa/jmesa.css" type="text/css">
+<link rel="stylesheet" href="../includes/jmesa/jmesa.css?r=${revisionNumber}" type="text/css">
 
-<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jmesa.js?r=${revisionNumber}"></script>
+<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js?r=${revisionNumber}"></script>
 <%-- view all subjects starts here --%>
 <script type="text/javascript">
     function onInvokeAction(id,action) {

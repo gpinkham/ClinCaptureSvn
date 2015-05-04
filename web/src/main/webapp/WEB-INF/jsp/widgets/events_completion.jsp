@@ -7,7 +7,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 <script>
-	<c:import url="../../includes/js/widgets/w_events_completion.js" />
+	<c:import url="../../includes/js/widgets/w_events_completion.js?r=${revisionNumber}" />
 </script>
 
 <div class="events_completion" align="center">

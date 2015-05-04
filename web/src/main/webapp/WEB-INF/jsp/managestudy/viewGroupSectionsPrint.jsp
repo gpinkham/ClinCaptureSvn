@@ -14,17 +14,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src=
-            "includes/global_functions_javascript.js"></script>
+            "includes/global_functions_javascript.js?r=${revisionNumber}"></script>
     <script type="text/javascript"  language="JavaScript" src=
-            "includes/repetition-model/repetition-model.js"></script>
-    <link rel="stylesheet" href="includes/styles.css" type="text/css">
-    <link rel="stylesheet" href="includes/print_crf.css" type="text/css">
+            "includes/repetition-model/repetition-model.js?r=${revisionNumber}"></script>
+    <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
+    <link rel="stylesheet" href="includes/print_crf.css?r=${revisionNumber}" type="text/css">
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
     <ui:theme/>
 </head>
 <!-- Clinovo ticket #134 start -->
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script><script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js?r=${revisionNumber}"></script><script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js?r=${revisionNumber}"></script>
 <script type="text/JavaScript">
 $(document).ready(function() {
 $('.tableDiv').find('span').each(function() {    var $this = $(this);

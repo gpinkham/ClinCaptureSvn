@@ -13,15 +13,15 @@
     <title><decorator:title default="ClinCapture" /></title>
     <script type="text/javascript" language="javascript" src="../gwt/GwtMenu/org.akaza.openclinica.gwt.GwtMenu.nocache.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-1.3.2.min.js"></script>
-    <script type="text/javascript" language="javascript" src="../includes/prototype.js"></script>
-    <script type="text/javascript" language="javascript" src="../includes/global_functions_javascript.js"></script>
-    <script type="text/javascript" language="javascript" src="../includes/Tabs.js"></script>
+    <script type="text/javascript" language="javascript" src="../includes/prototype.js?r=${revisionNumber}"></script>
+    <script type="text/javascript" language="javascript" src="../includes/global_functions_javascript.js?r=${revisionNumber}"></script>
+    <script type="text/javascript" language="javascript" src="../includes/Tabs.js?r=${revisionNumber}"></script>
     <!-- Added for the new Calender -->
 
     <ui:calendar/>
     <!-- End -->
-    <link rel="stylesheet" href="../includes/styles_updated.css" type="text/css">
-    <link rel="stylesheet" href="../includes/proto_styles.css" type="text/css">
+    <link rel="stylesheet" href="../includes/styles_updated.css?r=${revisionNumber}" type="text/css">
+    <link rel="stylesheet" href="../includes/proto_styles.css?r=${revisionNumber}" type="text/css">
     <link rel="stylesheet" href="../gwt/GwtMenu/GwtMenu.css" type="text/css">
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />

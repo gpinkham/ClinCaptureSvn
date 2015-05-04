@@ -82,7 +82,7 @@ form element in red --%>
   </c:if>
 </c:forEach>
 
-<script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js?r=${revisionNumber}"></script>
 
 <script lang="Javascript">
 

@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.log.LoggingConstants;
 import org.slf4j.MDC;
 import org.springframework.web.context.WebApplicationContext;
@@ -43,6 +44,7 @@ import com.clinovo.i18n.LocaleResolver;
 public class OCServletFilter implements javax.servlet.Filter {
 
 	public static final String USER_BEAN_NAME = "userBean";
+	public static final String REVISION_NUMBER = "revisionNumber";
 
 	private WebApplicationContext springContext;
 
@@ -80,6 +82,8 @@ public class OCServletFilter implements javax.servlet.Filter {
 		CoreResources.setField("remoteIp", request.getRemoteAddr());
 
 		LocaleResolver.resolveLocale();
+
+		request.setAttribute(REVISION_NUMBER, ResourceBundleProvider.getBuildNumberBundle().getString(REVISION_NUMBER));
 
 		((HttpServletRequest) request).getSession().setAttribute("logoUrl", CoreResources.getField("logo"));
 		((HttpServletRequest) request).getSession()

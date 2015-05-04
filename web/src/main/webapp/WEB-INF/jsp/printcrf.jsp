@@ -143,10 +143,10 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>ClinCapture - <fmt:message key="printable_forms" bundle="${resword}"/></title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/includes/css/normalize.css" type="text/css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/includes/css/app.css" type="text/css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/includes/css/normalize.css?r=${revisionNumber}" type="text/css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/includes/css/app.css?r=${revisionNumber}" type="text/css"/>
     <script src="${pageContext.request.contextPath}/includes/print/lib/head.min.js"></script>
-    <script src="${pageContext.request.contextPath}/includes/print/load_scripts.js"></script>
+    <script src="${pageContext.request.contextPath}/includes/print/load_scripts.js?r=${revisionNumber}"></script>
 </head>
 
 <body>

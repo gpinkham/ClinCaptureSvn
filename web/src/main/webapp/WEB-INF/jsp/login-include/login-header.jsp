@@ -27,22 +27,22 @@
 
     <title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
-    <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css">
-    <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
-    <%-- <link rel="stylesheet" href="includes/NewNavStyles.css" type="text/css" />--%>
+    <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css?r=${revisionNumber}" type="text/css">
+    <%-- <link rel="stylesheet" href="includes/styles2.css?r=${revisionNumber}" type="text/css">--%>
+    <%-- <link rel="stylesheet" href="includes/NewNavStyles.css?r=${revisionNumber}" type="text/css" />--%>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
-    <%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script> --%>
-    <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
+    <%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js?r=${revisionNumber}"></script> --%>
+    <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js?r=${revisionNumber}"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js?r=${revisionNumber}"></script>
     <!-- Added for the new Calender -->
 
     <ui:calendar/>
     <!-- End -->
 
     <%--<script type="text/javascript"  language="JavaScript" src=
-        "includes/repetition-model/repetition-model.js"></script>--%>
-    <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
+        "includes/repetition-model/repetition-model.js?r=${revisionNumber}"></script>--%>
+    <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js?r=${revisionNumber}"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             $.ajax({
@@ -75,8 +75,8 @@
             });
         })
     </script>
-    <%--<script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>--%>
+    <%--<script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?r=${revisionNumber}"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/effects.js?r=${revisionNumber}"></script>--%>
 </head>
 <body style="width:1024px;" class="main_BG"
 

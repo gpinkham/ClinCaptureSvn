@@ -5,7 +5,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 
-<link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
+<link rel="stylesheet" href="includes/jmesa/jmesa.css?r=${revisionNumber}" type="text/css">
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <c:choose>

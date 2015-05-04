@@ -12,7 +12,7 @@
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 <html>
 <head>
-    <link rel="stylesheet" href="includes/styles.css" type="text/css">
+    <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
     	
 </head>
 

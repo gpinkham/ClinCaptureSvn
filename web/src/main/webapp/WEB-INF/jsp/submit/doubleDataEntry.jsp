@@ -19,8 +19,8 @@
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
     
-    <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
+    <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css" media="screen">
+    <link rel="stylesheet" href="includes/print.css?r=${revisionNumber}" type="text/css" media="print">
     <link href="includes/jquery-ui.css" rel="stylesheet" type="text/css"/> 
     <script type="text/javascript" language="JavaScript">
         //this has been declared here so that it is accessible from other functions in the global_functions_javascript.js
@@ -28,17 +28,17 @@
     </script>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui.min.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js?r=${revisionNumber}"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js?r=${revisionNumber}"></script>
      <!-- Added for the new Calender -->
 
     <ui:calendar/>
     <!-- End -->
     <!-- *JSP* submit/doubleDataEntry.jsp -->
-    <script type="text/javascript" language="JavaScript" src="includes/repetition-model/repetition-model.js"></script>    <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
+    <script type="text/javascript" language="JavaScript" src="includes/repetition-model/repetition-model.js?r=${revisionNumber}"></script>    <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js?r=${revisionNumber}"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects&r=${revisionNumber}"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/effects.js?r=${revisionNumber}"></script>
     <ui:theme/>
 </head>
 <body class="aka_bodywidth" onload="document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';" onunload="javascript:clsWin();"><c:if test='${popUpURL != ""}'>

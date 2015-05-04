@@ -7,7 +7,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 <script>
-	<c:import url="../../includes/js/widgets/w_nds_assigned_to_me.js" />
+	<c:import url="../../includes/js/widgets/w_nds_assigned_to_me.js?r=${revisionNumber}" />
 </script>
 
 <div class="dns_assigned_to_me" align="center">

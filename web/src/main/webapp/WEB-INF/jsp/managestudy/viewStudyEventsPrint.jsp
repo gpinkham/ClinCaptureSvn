@@ -12,7 +12,7 @@
 <html>
 <head>
     <title><fmt:message key="openclinica_print_study_events" bundle="${resword}"/></title>
-    <link rel="stylesheet" href="includes/styles.css" type="text/css">
+    <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>

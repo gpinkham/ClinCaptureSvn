@@ -22,15 +22,15 @@
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
-    <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/print.css" type="text/css" media="print">
+    <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css?r=${revisionNumber}" type="text/css" media="screen">
+    <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/print.css?r=${revisionNumber}" type="text/css" media="print">
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/jmesa/jquery-1.3.2.min.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/global_functions_javascript.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/Tabs.js"></script>
-    <script type="text/javascript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/repetition-model/repetition-model.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/prototype.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/scriptaculous.js?load=effects"></script>
-    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/effects.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/global_functions_javascript.js?r=${revisionNumber}"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/Tabs.js?r=${revisionNumber}"></script>
+    <script type="text/javascript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/repetition-model/repetition-model.js?r=${revisionNumber}"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/prototype.js?r=${revisionNumber}"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/scriptaculous.js?load=effects&r=${revisionNumber}"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/effects.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/jmesa/jquery-ui.min.js"></script>
     <!-- Added for the new Calender -->
 
@@ -41,7 +41,7 @@
 <body class="aka_bodywidth"
 	onload="<c:if test='${popUpURL != ""}'>            openDNoteWindow('<c:out value="${popUpURL}" />');	        </c:if>">
 	
-<script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script>
+<script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js?r=${revisionNumber}"></script>
 <script language="JavaScript" type="text/javascript">
 		crfShortcutsTableDefTop += 56;
 		jQuery(document).ready(function() {

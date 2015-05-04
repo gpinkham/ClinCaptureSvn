@@ -15,10 +15,10 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
-    <script type="text/javascript" language="JavaScript" src="includes/repetition-model/repetition-model.js"></script>
-    <link rel="stylesheet" href="includes/styles.css" type="text/css">
-    <link rel="stylesheet" href="includes/print_crf.css" type="text/css">
+    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
+    <script type="text/javascript" language="JavaScript" src="includes/repetition-model/repetition-model.js?r=${revisionNumber}"></script>
+    <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
+    <link rel="stylesheet" href="includes/print_crf.css?r=${revisionNumber}" type="text/css">
 
     <style>
         .infotab {
@@ -54,9 +54,9 @@
 <script type="text/JavaScript" language="JavaScript"
 	src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript"
-	src="includes/jmesa/jquery.jmesa.js"></script>
+	src="includes/jmesa/jquery.jmesa.js?r=${revisionNumber}"></script>
 <script type="text/JavaScript" language="JavaScript"
-	src="includes/jmesa/jmesa.js"></script>
+	src="includes/jmesa/jmesa.js?r=${revisionNumber}"></script>
 <script type="text/JavaScript">
 $(document).ready(function() {
 	$('.tableDiv').find('span').each(function() {

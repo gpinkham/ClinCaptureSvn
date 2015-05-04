@@ -13,14 +13,14 @@
 
 	<meta http-equiv="X-UA-Compatible" content="IE=8" />
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
-    <link rel="stylesheet" href="<c:url value='/includes/styles.css'/>" type="text/css"/>
-    <%--link rel="stylesheet" href="<c:url value='/includes/styles2.css'/>" type="text/css" /--%>
-    <link rel="stylesheet" href="<c:url value='/includes/NewLoginStyles.css'/>" type="text/css"/>
+    <link rel="stylesheet" href="<c:url value='/includes/styles.css?r=${revisionNumber}'/>" type="text/css"/>
+    <%--link rel="stylesheet" href="<c:url value='/includes/styles2.css?r=${revisionNumber}'/>" type="text/css" /--%>
+    <link rel="stylesheet" href="<c:url value='/includes/NewLoginStyles.css?r=${revisionNumber}'/>" type="text/css"/>
     <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery-1.3.2.min.js'/>"></script>
-    <script type="text/javascript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.blockUI.js'/>"></script>
-    <%--script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript2.js'/>"></script--%>
-	<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript.js'/>"></script>
-    <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/theme.js'/>"></script>
+    <script type="text/javascript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.blockUI.js?r=${revisionNumber}'/>"></script>
+    <%--script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript2.js?r=${revisionNumber}'/>"></script--%>
+	<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript.js?r=${revisionNumber}'/>"></script>
+    <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/theme.js?r=${revisionNumber}'/>"></script>
 </head>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>

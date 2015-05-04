@@ -33,9 +33,9 @@
     </td>
 </tr>
 <jsp:include page="include/sideInfo.jsp"/>
-<link rel="stylesheet" href="../includes/jmesa/jmesa.css" type="text/css">
-<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js"></script>
+<link rel="stylesheet" href="../includes/jmesa/jmesa.css?r=${revisionNumber}" type="text/css">
+<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jmesa.js?r=${revisionNumber}"></script>
+<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js?r=${revisionNumber}"></script>
 
 <h1>
 	<span class="first_level_header">
