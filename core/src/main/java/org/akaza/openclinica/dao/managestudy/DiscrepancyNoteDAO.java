@@ -419,11 +419,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 *
 	 * @param filter       String
 	 * @param currentStudy StudyBean
+	 * @param userId       int
 	 * @return Integer
 	 */
-	public Integer getViewNotesCountWithFilter(String filter, StudyBean currentStudy) {
+	public Integer getViewNotesCountWithFilter(String filter, StudyBean currentStudy, int userId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
+		ListNotesFilter filterObj = new ListNotesFilter();
 
 		HashMap variables = new HashMap();
 		for (int i = 1; i <= SQL_QUERY_VARIABLES_COUNT_2; i++) {
@@ -439,12 +441,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(digester.getQuery("findAllStudyEventDNByStudy"));
 		sql.append(filter).append(UNION_OP);
 		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
+		sql.append(filterObj.getFilterForMaskedCRFs(userId));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
 		sql.append(filter).append(UNION_OP);
 		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
+		sql.append(filterObj.getFilterForMaskedCRFs(userId));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");

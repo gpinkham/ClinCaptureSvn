@@ -1,6 +1,7 @@
 package com.clinovo.service;
 
 import com.clinovo.model.CRFMask;
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -118,4 +119,13 @@ public interface CRFMaskingService {
 	 * @param userId int
 	 */
 	void removeMaskedCRFsFromStudyEvents(List<StudyEvent> studyEvents, int userId);
+
+	/**
+	 * Remove CRFs masked in all events for the current user from the list.
+	 * @param crfs List<CRFBean>
+	 * @param studyId int
+	 * @param userId int
+	 * @return List<CRFBean>
+	 */
+	List<CRFBean> removeCRFIfItsMaskedInAllEvents(List<CRFBean> crfs, int studyId, int userId);
 }

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -15,7 +15,6 @@ package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
-import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -35,7 +34,6 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -50,7 +48,6 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -63,327 +60,57 @@ import java.util.TreeSet;
  * DiscrepancyNoteUtil is a convenience class for managing discrepancy notes, such as getting all notes for a study, or
  * filtering them by subject or resolution status.
  */
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class DiscrepancyNoteUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DiscrepancyNoteUtil.class);
-
-	// TODO: initialize these static members from the database.
 	public static final Map<String, Integer> TYPES = new HashMap<String, Integer>();
+	public static final int ANNOTATION_ID = 2;
+	public static final int RFC_ID = 4;
+	public static final int FAILED_VALIDATION_ID = 1;
+	public static final int QUERY_ID = 3;
+	public static final int NEW_ID = 1;
+	public static final int UPDATED_ID = 2;
+	public static final int RESOLUTION_PROPOSED_ID = 3;
+	public static final int CLOSED_ID = 4;
+	public static final int NA_ID = 5;
+
 	static {
-		TYPES.put("Annotation", 2);
-		TYPES.put("Reason for Change", 4);
-		TYPES.put("Failed Validation Check", 1);
-		TYPES.put("Query", 3);
+		TYPES.put("Annotation", ANNOTATION_ID);
+		TYPES.put("Reason for Change", RFC_ID);
+		TYPES.put("Failed Validation Check", FAILED_VALIDATION_ID);
+		TYPES.put("Query", QUERY_ID);
 	}
+
 	public static final Map<String, Integer> RESOLUTION_STATUS = new HashMap<String, Integer>();
+
 	static {
-		RESOLUTION_STATUS.put("New", 1);
-		RESOLUTION_STATUS.put("Updated", 2);
-		RESOLUTION_STATUS.put("Resolution Proposed", 3);
-		RESOLUTION_STATUS.put("Closed", 4);
-		RESOLUTION_STATUS.put("Not Applicable", 5);
+		RESOLUTION_STATUS.put("New", NEW_ID);
+		RESOLUTION_STATUS.put("Updated", UPDATED_ID);
+		RESOLUTION_STATUS.put("Resolution Proposed", RESOLUTION_PROPOSED_ID);
+		RESOLUTION_STATUS.put("Closed", CLOSED_ID);
+		RESOLUTION_STATUS.put("Not Applicable", NA_ID);
 	}
 
-	public static final String[] TYPE_NAMES = { "Query", "Failed Validation Check", "Reason for Change", "Annotation" };
-
-	public static String[] getTypeNames() {
-		return TYPE_NAMES;
-	}
-
+	/**
+	 * Get type names from the resource bundle.
+	 * @param bundle ResourceBundle
+	 * @return String[]
+	 */
 	public static String[] getTypeNames(ResourceBundle bundle) {
-		return new String[] { bundle.getString("query"), bundle.getString("Failed_Validation_Check"),
-				bundle.getString("reason_for_change"), bundle.getString("Annotation") };
+		return new String[]{bundle.getString("query"), bundle.getString("Failed_Validation_Check"),
+				bundle.getString("reason_for_change"), bundle.getString("Annotation")};
 	}
 
 	/**
-	 * This method links discrepancy notes to the study event and study subject associated with those notes
-	 * 
-	 * @param studyBeans
-	 *            A List of StudyEventBeans.
-	 * @param allDiscNotes
-	 *            A List of DiscrepancyNoteBeans associated with a single study.
-	 * @param dataSource
-	 *            A DataSource used to get from the database a study subject associated with a study event.
+	 * Inject DNs into Study Events.
+	 * @param displayStudyBeans List<DisplayStudyEventBean>
+	 * @param resolutionStatusIds Set<Integer>
+	 * @param dataSource DataSource
+	 * @param discNoteType int
 	 */
-	public void injectDiscNotesIntoStudyEvents(List<StudyEventBean> studyBeans, List<DiscrepancyNoteBean> allDiscNotes,
-			DataSource dataSource) {
-
-		if (studyBeans == null || allDiscNotes == null) {
-			return;
-		}
-
-		StudySubjectDAO studySubjDAO = new StudySubjectDAO(dataSource);
-		StudySubjectBean studySubjBean = new StudySubjectBean();
-
-		for (StudyEventBean sbean : studyBeans) {
-			// Get the StudySubjectBean associated with the study event
-			studySubjBean = (StudySubjectBean) studySubjDAO.findByPK(sbean.getStudySubjectId());
-			// For each DiscrepancyNoteBean, find out whether the study event
-			// definition name
-			// equals the bean's event name property, and whether the bean's
-			// subject name
-			// equals the StudySubjectBean's name
-			for (DiscrepancyNoteBean discBean : allDiscNotes) {
-				if (sbean.getStudyEventDefinition().getName().equalsIgnoreCase(discBean.getEventName())
-						&& studySubjBean.getLabel().equalsIgnoreCase(discBean.getSubjectName())) {
-
-					// add discrepancy note to the study event list of notes
-					// Each study bean has a List property containing its
-					// associated
-					// DiscrepancyNoteBeans
-					sbean.getDiscBeanList().add(discBean);
-				}
-
-			}
-		}
-	}
-
-	/**
-	 * Add associated discrepancy notes to the appropriate StudyEventBean (contained by DisplayStudyBeans). A
-	 * StudyEventBean has a List of DiscrepancyNoteBeans.
-	 * 
-	 * @param displayStudyBeans
-	 *            A List of DisplayStudyEventBeans
-	 * @param resolutionStatus
-	 *            An int representing the resolution status, if we are filtering the DiscrepancyNoteBeans based on their
-	 *            resolutionStatus id number.
-	 * @param dataSource
-	 *            A DataSource used for the DAO methods.
-	 * @param discNoteType
-	 *            An int representing the discrepancy note type, if we are filtering the DiscrepancyNoteBeans based on
-	 *            their discrepancyNoteTypeId number.
-	 */
-	public void injectDiscNotesIntoDisplayStudyEvents(List<DisplayStudyEventBean> displayStudyBeans,
-			int resolutionStatus, DataSource dataSource, int discNoteType) {
-
-		if (displayStudyBeans == null) {
-			return;
-		}
-		// booleans representing whether this method should only get
-		// DiscrepancyNoteBeans with
-		// certain resolution status or discrepancyNoteTypeId number.
-		boolean hasResolutionStatus = resolutionStatus >= 1 && resolutionStatus <= 5;
-		boolean hasDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
-
-		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
-
-		StudyEventBean studyEventBean;
-		List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
-		List<DiscrepancyNoteBean> foundDiscNotes = new ArrayList<DiscrepancyNoteBean>();
-
-		for (DisplayStudyEventBean dStudyEventBean : displayStudyBeans) {
-			studyEventBean = dStudyEventBean.getStudyEvent();
-			// All EventCRFs for a study event
-			eventCRFBeans = eventCRFDAO.findAllByStudyEvent(studyEventBean);
-
-			for (EventCRFBean eventCrfBean : eventCRFBeans) {
-				// Find ItemData type notes associated iwth an event crf
-				foundDiscNotes = discrepancyNoteDAO.findItemDataDNotesFromEventCRF(eventCrfBean);
-
-				// filter for any specified disc note type
-				if (!foundDiscNotes.isEmpty() && hasDiscNoteType) {
-					// only include disc notes that have the specified disc note
-					// type id
-					foundDiscNotes = filterforDiscNoteType(foundDiscNotes, discNoteType);
-				}
-
-				if (!foundDiscNotes.isEmpty()) {
-					if (!hasResolutionStatus) {
-						studyEventBean.getDiscBeanList().addAll(foundDiscNotes);
-					} else {
-						// Only include disc notes with a particular resolution
-						// status, specified by
-						// the parameter passed to the servlet
-						for (DiscrepancyNoteBean discBean : foundDiscNotes) {
-							if (discBean.getResolutionStatusId() == resolutionStatus) {
-								studyEventBean.getDiscBeanList().add(discBean);
-							}
-						}
-					}
-				}
-				// Find EventCRF type notes
-				foundDiscNotes = discrepancyNoteDAO.findEventCRFDNotesFromEventCRF(eventCrfBean);
-				// filter for any specified disc note type
-				if (!foundDiscNotes.isEmpty() && hasDiscNoteType) {
-					foundDiscNotes = filterforDiscNoteType(foundDiscNotes, discNoteType);
-				}
-
-				if (!foundDiscNotes.isEmpty()) {
-					if (!hasResolutionStatus) {
-						studyEventBean.getDiscBeanList().addAll(foundDiscNotes);
-					} else {
-						// Only include disc notes with a particular resolution
-						// status, specified by
-						// the parameter passed to the servlet
-						for (DiscrepancyNoteBean discBean : foundDiscNotes) {
-							if (discBean.getResolutionStatusId() == resolutionStatus) {
-								studyEventBean.getDiscBeanList().add(discBean);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * This method is an overloaded version of the previous method, with the only difference being the
-	 * resolutionStatusIds parameter in this method. This method adds the associated discrepancy notes to the
-	 * appropriate StudyEventBean (contained by DisplayStudyBeans).
-	 * 
-	 * @param displayStudyBeans
-	 *            A List of DisplayStudyEventBeans.
-	 * @param resolutionStatusIds
-	 *            A HashSet object consisting of resolution status ids (i.e., 1,2,3).
-	 * @param dataSource
-	 *            A DataSource object, for use with the DAO methods.
-	 * @param discNoteType
-	 *            An int discrepancy note type, for filtering the discrepancy notes that
-	 * @param discrepancyNoteThreads
-	 *            A List of DiscrepancyNoteThreads
-	 */
-	public void injectDiscNotesIntoDisplayStudyEvents(List<DisplayStudyEventBean> displayStudyBeans,
-			Set<Integer> resolutionStatusIds, DataSource dataSource, int discNoteType,
-			List<DiscrepancyNoteThread> discrepancyNoteThreads) {
-
-		if (displayStudyBeans == null) {
-			return;
-		}
-		// booleans representing whether this method should only get
-		// DiscrepancyNoteBeans with
-		// certain resolution status or discrepancyNoteTypeId number.
-		boolean hasResolutionStatus = this.checkResolutionStatus(resolutionStatusIds);
-		boolean hasDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
-
-		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
-
-		StudyEventBean studyEventBean;
-		List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
-		List<DiscrepancyNoteBean> foundDiscNotes = new ArrayList<DiscrepancyNoteBean>();
-
-		for (DisplayStudyEventBean dStudyEventBean : displayStudyBeans) {
-			studyEventBean = dStudyEventBean.getStudyEvent();
-			// All EventCRFs for a study event
-			eventCRFBeans = eventCRFDAO.findAllByStudyEvent(studyEventBean);
-
-			for (EventCRFBean eventCrfBean : eventCRFBeans) {
-				// Find ItemData type notes associated with an event crf
-				foundDiscNotes = discrepancyNoteDAO.findItemDataDNotesFromEventCRF(eventCrfBean);
-				// return only parent beans
-				foundDiscNotes = filterDiscNotesForOnlyParents(foundDiscNotes, discrepancyNoteThreads);
-				// update the resolution status of these parent discrepancy
-				// notes
-				updateStatusUsingThread(foundDiscNotes, discrepancyNoteThreads);
-				// filter for any specified disc note type
-				if (!foundDiscNotes.isEmpty() && hasDiscNoteType) {
-					// only include disc notes that have the specified disc note
-					// type id
-					foundDiscNotes = filterforDiscNoteType(foundDiscNotes, discNoteType);
-				}
-
-				if (!foundDiscNotes.isEmpty()) {
-					if (!hasResolutionStatus) {
-						studyEventBean.getDiscBeanList().addAll(foundDiscNotes);
-					} else {
-						// Only include disc notes with a particular resolution
-						// status, specified by
-						// the parameter passed to the servlet or saved in a
-						// session variable
-						for (DiscrepancyNoteBean discBean : foundDiscNotes) {
-							for (int statusId : resolutionStatusIds) {
-								if (discBean.getResolutionStatusId() == statusId) {
-									studyEventBean.getDiscBeanList().add(discBean);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Cycle through the DiscrepancyNoteThread objects, and update the resolution status of each discrepancy note bean,
-	 * based on the related DiscrepancyNoteThread's latestResolutionStatus property.
-	 * 
-	 * @param foundDiscNotes
-	 *            A List of parent DiscrepancyNoteBeans.
-	 * @param discrepancyNoteThreads
-	 *            A List of DiscrepancyNoteThreads.
-	 */
-	public void updateStatusUsingThread(List<DiscrepancyNoteBean> foundDiscNotes,
-			List<DiscrepancyNoteThread> discrepancyNoteThreads) {
-
-		if (discrepancyNoteThreads == null || discrepancyNoteThreads.isEmpty()) {
-			return;
-		}
-		DiscrepancyNoteBean parentBean = null;
-
-		beginFor: for (DiscrepancyNoteThread discrepancyNoteThread : discrepancyNoteThreads) {
-			// get the most up to date note in the thread
-			parentBean = discrepancyNoteThread.getLinkedNoteList().getFirst();
-
-			for (DiscrepancyNoteBean tmpBean : foundDiscNotes) {
-				// each of these disc beans is a parent; therefore, we find its
-				// thread by
-				// comparing its id to the id of the first bean in the thread
-				// (which are parents)
-				if (tmpBean.getId() == parentBean.getId()) {
-					// update the bean's resolution status
-					tmpBean.setResolutionStatusId(discrepancyNoteThread.getLinkedNoteList().getLast()
-							.getResolutionStatusId());
-					break beginFor;
-				}
-			}
-
-		}
-
-	}
-
-	/**
-	 * Take a List of DiscrepancyNoteBeans, and filter the List to return only "parent" DiscrepancyNoteBeans. the
-	 * parameter List<DiscrepancyNoteThread> contains each parent the DiscrepancyNoteBeans are compared to in order to
-	 * filter the original List.
-	 * 
-	 * @param dnBeans
-	 *            A List of DiscrepancyNoteBeans.
-	 * @param dnThreads
-	 *            A List of DiscrepancyNoteThreads.
-	 * @return The filtered List of DiscrepancyNoteBeans.
-	 */
-	public List<DiscrepancyNoteBean> filterDiscNotesForOnlyParents(List<DiscrepancyNoteBean> dnBeans,
-			List<DiscrepancyNoteThread> dnThreads) {
-
-		// Take the parent of each thread, and compare it to each passed
-		// in DiscrepancyNoteBean; only return a DiscrepancyNoteBean if it
-		// equals a parent bean
-		List<DiscrepancyNoteBean> newBeans = new ArrayList<DiscrepancyNoteBean>();
-		DiscrepancyNoteBean tempBean;
-
-		outer: for (DiscrepancyNoteBean noteBean : dnBeans) {
-			for (DiscrepancyNoteThread dnThread : dnThreads) {
-				// the parent...
-				tempBean = dnThread.getLinkedNoteList().getFirst();
-				if (tempBean != null) {
-					if (tempBean.getId() == noteBean.getId()) {
-						newBeans.add(noteBean);
-						// a noteBean matches a parent, so continue with the
-						// next noteBean
-						continue outer;
-					}
-				}
-			}
-
-		}
-		return newBeans;
-	}
-
 	public void injectParentDiscNotesIntoDisplayStudyEvents(List<DisplayStudyEventBean> displayStudyBeans,
-			Set<Integer> resolutionStatusIds, DataSource dataSource, int discNoteType) {
-
+															Set<Integer> resolutionStatusIds, DataSource dataSource, int discNoteType) {
 		if (displayStudyBeans == null) {
 			return;
 		}
@@ -391,14 +118,14 @@ public class DiscrepancyNoteUtil {
 		// DiscrepancyNoteBeans with
 		// certain resolution status or discrepancyNoteTypeId number.
 		boolean hasResolutionStatus = this.checkResolutionStatus(resolutionStatusIds);
-		boolean hasDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
+		boolean hasDiscNoteType = discNoteType >= 1 && discNoteType <= RFC_ID;
 
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
 
 		StudyEventBean studyEventBean;
-		List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
-		List<DiscrepancyNoteBean> foundDiscNotes = new ArrayList<DiscrepancyNoteBean>();
+		List<EventCRFBean> eventCRFBeans;
+		List<DiscrepancyNoteBean> foundDiscNotes;
 
 		for (DisplayStudyEventBean dStudyEventBean : displayStudyBeans) {
 			studyEventBean = dStudyEventBean.getStudyEvent();
@@ -408,14 +135,12 @@ public class DiscrepancyNoteUtil {
 			for (EventCRFBean eventCrfBean : eventCRFBeans) {
 				// Find ItemData type notes associated with an event crf
 				foundDiscNotes = discrepancyNoteDAO.findParentItemDataDNotesFromEventCRF(eventCrfBean);
-
 				// filter for any specified disc note type
 				if (!foundDiscNotes.isEmpty() && hasDiscNoteType) {
 					// only include disc notes that have the specified disc note
 					// type id
 					foundDiscNotes = filterforDiscNoteType(foundDiscNotes, discNoteType);
 				}
-
 				if (!foundDiscNotes.isEmpty()) {
 					if (!hasResolutionStatus) {
 						studyEventBean.getDiscBeanList().addAll(foundDiscNotes);
@@ -433,265 +158,19 @@ public class DiscrepancyNoteUtil {
 						}
 					}
 				}
-
 			}
 		}
 	}
 
 	/**
-	 * Acquire the DiscrepancyNoteBeans for a specific study.
-	 * 
-	 * @param currentStudy
-	 *            A StudyBean object.
-	 * @param resolutionStatus
-	 *            An int resolution status; only DiscrepancyNoteBeans will be returned if they have this
-	 *            resolutionStatus id.
-	 * @param dataSource
-	 *            A DataSource used for various DAO methods.
-	 * @param discNoteType
-	 *            An int discrepancy note type id; only DiscrepancyNoteBeans will be returned if they have this
-	 *            discrepancyNoteTypeId.
-	 * @return A List of DiscrepancyNoteBeans.
+	 * Create thread of parents.
+	 * @param allDiscNotes List<DiscrepancyNoteBean>
+	 * @param currentStudy StudyBean
+	 * @param resolutionStatusIds Set<Integer>
+	 * @param discNoteType int
+	 * @return List<DiscrepancyNoteThread>
 	 */
-	public List<DiscrepancyNoteBean> getDNotesForStudy(StudyBean currentStudy, int resolutionStatus,
-			DataSource dataSource, int discNoteType) {
-
-		List<DiscrepancyNoteBean> allDiscNotes = new ArrayList<DiscrepancyNoteBean>();
-		if (currentStudy == null)
-			return allDiscNotes;
-
-		// Do the returned DN's have to be filtered? A valid resolution status
-		// has to be between 1 and 5; 0 is "invalid";
-		// -1 means that no resolutionStatus parameter was passed into the
-		// servlet
-		boolean filterDiscNotes = resolutionStatus >= 1 && resolutionStatus <= 5;
-
-		boolean filterforDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
-
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
-		// what is the purpose of this data member?
-		discrepancyNoteDAO.setFetchMapping(true);
-
-		ArrayList itemDataNotes = discrepancyNoteDAO.findAllItemDataByStudy(currentStudy);
-
-		ArrayList subjectNotes = discrepancyNoteDAO.findAllSubjectByStudy(currentStudy);
-
-		ArrayList studySubjectNotes = discrepancyNoteDAO.findAllStudySubjectByStudy(currentStudy);
-
-		ArrayList studyEventNotes = discrepancyNoteDAO.findAllStudyEventByStudy(currentStudy);
-
-		ArrayList eventCRFNotes = discrepancyNoteDAO.findAllEventCRFByStudy(currentStudy);
-
-		allDiscNotes.addAll(itemDataNotes);
-		allDiscNotes.addAll(subjectNotes);
-		allDiscNotes.addAll(studySubjectNotes);
-		allDiscNotes.addAll(studyEventNotes);
-		allDiscNotes.addAll(eventCRFNotes);
-		if (filterDiscNotes) {
-			// filter for the resolution status
-			allDiscNotes = filterDiscNotes(allDiscNotes, resolutionStatus);
-		}
-		if (filterforDiscNoteType) {
-			// filter for the ddiscrepancyNoteTypeId
-			allDiscNotes = filterforDiscNoteType(allDiscNotes, discNoteType);
-		}
-		return allDiscNotes;
-	}
-
-	/**
-	 * An overloaded version of the prior method, the difference being a HashSet of resolution status ids, instead of a
-	 * single id.
-	 * 
-	 * @param currentStudy
-	 *            A StudyBean object.
-	 * @param resolutionStatusIds
-	 *            A HashSet object consisting of resolution status ids (i.e., 1,2,3).
-	 * @param dataSource
-	 *            A DataSource used for various DAO methods.
-	 * @param discNoteType
-	 *            An int discrepancy note type id; only DiscrepancyNoteBeans will be returned if they have this
-	 *            discrepancyNoteTypeId.
-	 * @return A List of DiscrepancyNoteBeans.
-	 */
-	public List<DiscrepancyNoteBean> getDNotesForStudy(StudyBean currentStudy, Set<Integer> resolutionStatusIds,
-			DataSource dataSource, int discNoteType) {
-
-		List<DiscrepancyNoteBean> allDiscNotes = new ArrayList<DiscrepancyNoteBean>();
-		if (currentStudy == null)
-			return allDiscNotes;
-
-		// Do the returned DN's have to be filtered? A valid resolution status
-		// has to be between 1 and 5; 0 is "invalid";
-		// -1 means that no resolutionStatus parameter was passed into the
-		// servlet
-		boolean filterDiscNotes = checkResolutionStatus(resolutionStatusIds);
-
-		boolean filterforDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
-
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
-		// what is the purpose of this data member?
-		discrepancyNoteDAO.setFetchMapping(true);
-
-		ArrayList itemDataNotes = discrepancyNoteDAO.findAllItemDataByStudy(currentStudy);
-
-		ArrayList subjectNotes = discrepancyNoteDAO.findAllSubjectByStudy(currentStudy);
-
-		ArrayList studySubjectNotes = discrepancyNoteDAO.findAllStudySubjectByStudy(currentStudy);
-
-		ArrayList studyEventNotes = discrepancyNoteDAO.findAllStudyEventByStudy(currentStudy);
-
-		ArrayList eventCRFNotes = discrepancyNoteDAO.findAllEventCRFByStudy(currentStudy);
-
-		allDiscNotes.addAll(itemDataNotes);
-		allDiscNotes.addAll(subjectNotes);
-		allDiscNotes.addAll(studySubjectNotes);
-		allDiscNotes.addAll(studyEventNotes);
-		allDiscNotes.addAll(eventCRFNotes);
-		if (filterDiscNotes) {
-			// filter for the resolution status
-			allDiscNotes = filterDiscNotes(allDiscNotes, resolutionStatusIds);
-		}
-		if (filterforDiscNoteType) {
-			// filter for the ddiscrepancyNoteTypeId
-			allDiscNotes = filterforDiscNoteType(allDiscNotes, discNoteType);
-		}
-		return allDiscNotes;
-	}
-
-	/**
-	 * Get all discrepancy notes for a study, including "threads" of parent and child discrepancy notes.
-	 * 
-	 * @param currentStudy
-	 *            A StudyBean object.
-	 * @param resolutionStatusIds
-	 *            A HashSet object consisting of resolution status ids (i.e., 1,2,3).
-	 * @param dataSource
-	 *            A DataSource used for various DAO methods.
-	 * @param discNoteType
-	 *            An int discrepancy note type id; only DiscrepancyNoteBeans will be returned if they have this
-	 *            discrepancyNoteTypeId.
-	 * @param updateStatusOfParents
-	 * @return A List of DiscrepancyNoteBeans.
-	 */
-	public List<DiscrepancyNoteBean> getThreadedDNotesForStudy(StudyBean currentStudy,
-			Set<Integer> resolutionStatusIds, DataSource dataSource, int discNoteType, boolean updateStatusOfParents) {
-
-		List<DiscrepancyNoteBean> allDiscNotes = new ArrayList<DiscrepancyNoteBean>();
-		if (currentStudy == null)
-			return allDiscNotes;
-
-		// Do the returned DN's have to be filtered? A valid resolution status
-		// has to be between 1 and 5; 0 is "invalid";
-		// -1 means that no resolutionStatus parameter was passed into the
-		// servlet
-		boolean filterDiscNotes = checkResolutionStatus(resolutionStatusIds);
-
-		boolean filterforDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
-
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
-		// what is the purpose of this data member?
-		discrepancyNoteDAO.setFetchMapping(true);
-		allDiscNotes = discrepancyNoteDAO.findAllDiscrepancyNotesDataByStudy(currentStudy);
-
-		if (filterDiscNotes) {
-			// filter for the resolution status
-			allDiscNotes = filterDiscNotes(allDiscNotes, resolutionStatusIds);
-		}
-		if (filterforDiscNoteType) {
-			// filter for the ddiscrepancyNoteTypeId
-			allDiscNotes = filterforDiscNoteType(allDiscNotes, discNoteType);
-		}
-
-		return allDiscNotes;
-	}
-
-	/**
-	 * Take a List of "parent" DiscrepancyNoteBeans and if they have any "children," make sure that the resolution
-	 * status id of the parent matches that of the last child DiscrepancyNoteBean.
-	 * 
-	 * @param allDiscNotes
-	 *            A List of DiscrepancyNoteBeans.
-	 * @param dataSource
-	 *            The DataSource the DAO uses.
-	 * @param currentStudy
-	 *            A StudyBean representing the current study.
-	 */
-	public void updateStatusOfParents(List<DiscrepancyNoteBean> allDiscNotes, DataSource dataSource,
-			StudyBean currentStudy) {
-		if (allDiscNotes == null || allDiscNotes.isEmpty()) {
-			return;
-		}
-		List<DiscrepancyNoteBean> childDiscBeans = new ArrayList<DiscrepancyNoteBean>();
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
-		DiscrepancyNoteBean lastChild = new DiscrepancyNoteBean();
-		int resolutionStatusId = 0;
-
-		for (DiscrepancyNoteBean discBean : allDiscNotes) {
-			childDiscBeans = discrepancyNoteDAO.findAllByStudyAndParent(currentStudy, discBean.getId());
-			if (!childDiscBeans.isEmpty()) {
-				lastChild = childDiscBeans.get(childDiscBeans.size() - 1);
-				resolutionStatusId = lastChild.getResolutionStatusId();
-				if (discBean.getResolutionStatusId() != resolutionStatusId) {
-					discBean.setResolutionStatusId(resolutionStatusId);
-				}
-			}
-
-			// clear the List for the next iteration
-			if (childDiscBeans != null) {
-				childDiscBeans.clear();
-			}
-		}
-
-	}
-
-	public List<DiscrepancyNoteThread> getDNotesForStudyAsThreads(StudyBean currentStudy,
-			Set<Integer> resolutionStatusIds, DataSource dataSource, int discNoteType) {
-
-		List<DiscrepancyNoteBean> allDiscNotes = new ArrayList<DiscrepancyNoteBean>();
-		List<DiscrepancyNoteThread> threadedNotes = new ArrayList<DiscrepancyNoteThread>();
-		if (currentStudy == null)
-			return threadedNotes;
-
-		// Do the returned DN's have to be filtered? A valid resolution status
-		// has to be between 1 and 5; 0 is "invalid";
-		// -1 means that no resolutionStatus parameter was passed into the
-		// servlet
-		boolean filterDiscNotes = checkResolutionStatus(resolutionStatusIds);
-
-		boolean filterforDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
-
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
-		// what is the purpose of this data member?
-		discrepancyNoteDAO.setFetchMapping(true);
-		// method finds only parents
-		ArrayList itemDataNotes = discrepancyNoteDAO.findAllItemDataByStudy(currentStudy);
-
-		allDiscNotes.addAll(itemDataNotes);
-		// not doing this for now allDiscNotes.addAll(eventCRFNotes);
-		// make sure that any "parent" notes have the last resolution status of
-		// any
-		// of their child notes
-		updateStatusOfParents(allDiscNotes, dataSource, currentStudy);
-
-		if (filterDiscNotes) {
-			// filter for the resolution status
-			allDiscNotes = filterDiscNotes(allDiscNotes, resolutionStatusIds);
-		}
-		if (filterforDiscNoteType) {
-			// filter for the ddiscrepancyNoteTypeId
-			allDiscNotes = filterforDiscNoteType(allDiscNotes, discNoteType);
-		}
-
-		// convert or encapsulate List of notes in List of disc note thread
-		// objects
-		threadedNotes = createThreadsOfParents(allDiscNotes, dataSource, currentStudy, null, 0, false);
-
-		return threadedNotes;
-	}
-
-	public List<DiscrepancyNoteThread> createThreadsOfParents(List<DiscrepancyNoteBean> allDiscNotes,
-			DataSource dataSource, StudyBean currentStudy, Set<Integer> resolutionStatusIds, int discNoteType,
-			boolean includeEventCRFNotes) {
+	public List<DiscrepancyNoteThread> createThreadsOfParents(List<DiscrepancyNoteBean> allDiscNotes, StudyBean currentStudy, Set<Integer> resolutionStatusIds, int discNoteType) {
 
 		List<DiscrepancyNoteThread> dnThreads = new ArrayList<DiscrepancyNoteThread>();
 		if (allDiscNotes == null || allDiscNotes.isEmpty()) {
@@ -700,27 +179,21 @@ public class DiscrepancyNoteUtil {
 		if (currentStudy == null) {
 			currentStudy = new StudyBean();
 		}
-
 		for (DiscrepancyNoteBean discBean : allDiscNotes) {
 			DiscrepancyNoteThread tempDNThread = new DiscrepancyNoteThread();
 			tempDNThread.setStudyId(currentStudy.getId());
-
 			tempDNThread.getLinkedNoteList().addFirst(discBean);
-
 			int resolutionStatusId = discBean.getResolutionStatusId();
 			// the thread's status id is the parent's in this case, when there
 			// are no children
 			tempDNThread.setLatestResolutionStatus(this.getResolutionStatusName(resolutionStatusId));
-
 			dnThreads.add(tempDNThread);
-
 		}
 		// Do the filtering here; remove any DN threads that do not have any
 		// notes
-		LinkedList<DiscrepancyNoteBean> linkedList = null;
+		LinkedList<DiscrepancyNoteBean> linkedList;
 
 		if (resolutionStatusIds != null && !resolutionStatusIds.isEmpty()) {
-
 			for (DiscrepancyNoteThread dnThread : dnThreads) {
 				linkedList = new LinkedList<DiscrepancyNoteBean>();
 				for (DiscrepancyNoteBean discBean : dnThread.getLinkedNoteList()) {
@@ -734,7 +207,7 @@ public class DiscrepancyNoteUtil {
 			}
 			dnThreads = removeEmptyDNThreads(dnThreads);
 		}
-		if (discNoteType >= 1 && discNoteType <= 5) {
+		if (discNoteType >= 1 && discNoteType <= NA_ID) {
 
 			for (DiscrepancyNoteThread dnThread : dnThreads) {
 				linkedList = new LinkedList<DiscrepancyNoteBean>();
@@ -750,6 +223,11 @@ public class DiscrepancyNoteUtil {
 		return dnThreads;
 	}
 
+	/**
+	 * Remove empty DN Threads.
+	 * @param allDNThreads List<DiscrepancyNoteThread>
+	 * @return List<DiscrepancyNoteThread>
+	 */
 	public List<DiscrepancyNoteThread> removeEmptyDNThreads(List<DiscrepancyNoteThread> allDNThreads) {
 
 		if (allDNThreads == null || allDNThreads.isEmpty()) {
@@ -767,86 +245,33 @@ public class DiscrepancyNoteUtil {
 
 	/**
 	 * Check whether the contents of a list of resolution status ids are valid.
-	 * 
-	 * @param listOfStatusIds
-	 *            A HashSet of resolution status ids.
+	 *
+	 * @param listOfStatusIds A HashSet of resolution status ids.
 	 * @return true or false, depending on whether the ids are valid.
 	 */
 	public boolean checkResolutionStatus(Set<Integer> listOfStatusIds) {
-		if (listOfStatusIds == null)
+		if (listOfStatusIds == null) {
 			return false;
-
+		}
 		for (int id : listOfStatusIds) {
-			if (id >= 1 && id <= 5) {
+			if (id >= 1 && id <= NA_ID) {
 				return true;
 			}
-
 		}
 		return false;
 	}
 
 	/**
-	 * Filter a List of DiscrepancyNoteBeans for a particular resolution status id.
-	 * 
-	 * @param allDiscNotes
-	 *            A List of DiscrepancyNoteBeans prior to being filtered for a resolution status id.
-	 * @param resolutionStatus
-	 *            An int representing a resolution status id.
-	 * @return A List of DiscrepancyNoteBeans that have the specified resolution status id.
-	 */
-	public List<DiscrepancyNoteBean> filterDiscNotes(List<DiscrepancyNoteBean> allDiscNotes, int resolutionStatus) {
-		// Do not filter this List if the resolutionStatus isn't between 1 and 5
-		if (!(resolutionStatus >= 1 && resolutionStatus <= 5)) {
-			return allDiscNotes;
-		}
-		List<DiscrepancyNoteBean> newDiscNotes = new ArrayList<DiscrepancyNoteBean>();
-
-		for (DiscrepancyNoteBean dnBean : allDiscNotes) {
-			if (dnBean.getResolutionStatusId() == resolutionStatus) {
-				newDiscNotes.add(dnBean);
-			}
-		}
-		return newDiscNotes;
-	}
-
-	/**
-	 * An overloaded method that performs the same task as the previous method. The method filters a List of
-	 * DiscrepancyNoteBeans for a particular resolution status id.
-	 * 
-	 * @param allDiscNotes
-	 *            A List of DiscrepancyNoteBeans prior to being filtered for a resolution status id.
-	 * @param resolutionStatusIds
-	 *            A HashSet object consisting of resolution status ids (i.e., 1,2,3).
-	 * @return A List of DiscrepancyNoteBeans that have the specified resolution status id.
-	 */
-	public List<DiscrepancyNoteBean> filterDiscNotes(List<DiscrepancyNoteBean> allDiscNotes,
-			Set<Integer> resolutionStatusIds) {
-
-		List<DiscrepancyNoteBean> newDiscNotes = new ArrayList<DiscrepancyNoteBean>();
-
-		for (DiscrepancyNoteBean dnBean : allDiscNotes) {
-			for (int statusId : resolutionStatusIds) {
-				if (dnBean.getResolutionStatusId() == statusId) {
-					newDiscNotes.add(dnBean);
-				}
-			}
-		}
-		return newDiscNotes;
-	}
-
-	/**
 	 * Filter a List of DiscrepancyNoteBeans for a particular discrepancy note type id.
-	 * 
-	 * @param allDiscNotes
-	 *            A List of DiscrepancyNoteBeans prior to being filtered for a discrepancy note type id.
-	 * @param discNoteType
-	 *            An it representing a discrepancy note type id.
+	 *
+	 * @param allDiscNotes A List of DiscrepancyNoteBeans prior to being filtered for a discrepancy note type id.
+	 * @param discNoteType An it representing a discrepancy note type id.
 	 * @return A List of DiscrepancyNoteBeans that have the specified discrepancy note type id.
 	 */
 	public List<DiscrepancyNoteBean> filterforDiscNoteType(List<DiscrepancyNoteBean> allDiscNotes, int discNoteType) {
 
 		// Do not filter this List if the discNoteType isn't between 1 and 4
-		if (!(discNoteType >= 1 && discNoteType <= 4)) {
+		if (!(discNoteType >= 1 && discNoteType <= RFC_ID)) {
 			return allDiscNotes;
 		}
 		List<DiscrepancyNoteBean> newDiscNotes = new ArrayList<DiscrepancyNoteBean>();
@@ -860,450 +285,30 @@ public class DiscrepancyNoteUtil {
 	}
 
 	/**
-	 * Filter a List of DiscrepancyNoteBeans by subject id.
-	 * 
-	 * @param allDiscNotes
-	 *            A List of DiscrepancyNoteBeans prior to filtering.
-	 * @param subjectId
-	 *            An int subject id.
-	 * @param dataSource
-	 *            A DataSource object used by DAO methods.
-	 * @return The filtered List of DiscrepancyNoteBeans.
-	 */
-	public List<DiscrepancyNoteBean> filterDiscNotesBySubject(List<DiscrepancyNoteBean> allDiscNotes, int subjectId,
-			DataSource dataSource) {
-		// Do not filter this List if the subjectId < 1
-		if (!(subjectId >= 1)) {
-			return allDiscNotes;
-		}
-
-		StudySubjectDAO studySubjDAO = new StudySubjectDAO(dataSource);
-		StudySubjectBean studySubjBean = new StudySubjectBean();
-		studySubjBean = (StudySubjectBean) studySubjDAO.findByPK(subjectId);
-
-		List<DiscrepancyNoteBean> newDiscNotes = new ArrayList<DiscrepancyNoteBean>();
-
-		for (DiscrepancyNoteBean dnBean : allDiscNotes) {
-			if (dnBean.getSubjectName().equalsIgnoreCase(studySubjBean.getLabel())) {
-				newDiscNotes.add(dnBean);
-			}
-		}
-		return newDiscNotes;
-	}
-
-	/**
-	 * Generate a summary of statistics for a collection of discrepancy notes.
-	 * 
-	 * @return A Map mapping the name of each type of note (e.g., "Annotation") to another Map containing that type's
-	 *         statistics.
-	 */
-	public Map generateDiscNoteSummaryRefactored(DataSource ds, StudyBean currentStudy,
-			Set<Integer> resolutionStatusIds, int discNoteType) {
-
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(ds);
-		boolean filterDiscNotes = checkResolutionStatus(resolutionStatusIds);
-		boolean filterforDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
-		// if (allDiscBeans == null || allDiscBeans.isEmpty())
-		// return new HashMap();
-		/*
-		 * This container is a Map of Maps. e.g., Failed Validation Check --> Map [Total --> total number of Failed
-		 * Validation Check type notes, Open --> total number of Failed Validation Check notes that are Open types,
-		 * etc.]
-		 */
-		Map<String, Map> summaryMap = new HashMap<String, Map>();
-		// The internal Map, mapping the name of the status (e.g., Resolved) to
-		// the number of
-		// Notes that are Resolved for that particular discrepancy note type
-		// (e.g., Failed Validation Check).
-		Map<String, Integer> tempMap = null;
-		int tempType = 0;
-		int tempTotal = 0;
-
-		Set<String> p = new HashSet<String>();
-		if (filterforDiscNoteType) {
-			String[] discNoteTypeNames = { "Failed Validation Check", "Annotation", "Query", "Reason for Change" };
-			p.add(discNoteTypeNames[discNoteType - 1]);
-		} else {
-			p = TYPES.keySet();
-		}
-
-		String q = "";
-		if (filterDiscNotes) {
-			q += " AND ( ";
-			int i = 0;
-			for (Integer resolutionStatusId : resolutionStatusIds) {
-				if (i > 0) {
-					q += " OR ";
-				}
-				q += " dn.resolution_status_id = " + resolutionStatusId;
-				i++;
-			}
-			q += " ) ";
-		}
-
-		// initialize Map
-		for (String discNoteTypeName : p) {
-
-			tempMap = new HashMap<String, Integer>();
-			// String query = "";
-			// Create the summary or outer Map for each type name (e.g.,
-			// Incomplete)
-			summaryMap.put(discNoteTypeName, tempMap);
-			tempType = TYPES.get(discNoteTypeName);
-			// tempTotal = getNumberOfDiscNoteType(allDiscBeans, tempType);
-			tempTotal = discrepancyNoteDAO.getViewNotesCountWithFilter(q + " AND dn.discrepancy_note_type_id ="
-					+ tempType, currentStudy);
-			tempMap.put("Total", tempTotal);
-			if (tempTotal == 0)
-				continue;
-
-			for (String statusName : RESOLUTION_STATUS.keySet()) {
-				int number = discrepancyNoteDAO.getViewNotesCountWithFilter(q + " AND dn.discrepancy_note_type_id ="
-						+ tempType + " AND dn.resolution_status_id = " + RESOLUTION_STATUS.get(statusName),
-						currentStudy);
-				tempMap.put(statusName, number);
-			}
-		}
-
-		return summaryMap;
-	}
-
-	public Map generateDiscNoteSummary(ArrayList<DiscrepancyNoteBean> discList, ResourceBundle bundle) {
-		Map<String, Map> summaryMap = new HashMap<String, Map>();
-		Map<String, String> tempMap = null;
-		int tempType = 0;
-		String tempTotal = "--";
-		for (ResolutionStatus status : ResolutionStatus.getMembers()) {
-			tempMap = new HashMap<String, String>();
-			summaryMap.put(status.getName(), tempMap);
-			tempTotal = countNotes(discList, status.getId(), 0);
-			tempMap.put("Total", tempTotal.equals("0") ? "--" : tempTotal);
-
-			String[] typeNames = getTypeNames(bundle);
-
-			Map<String, Integer> types = new HashMap<String, Integer>();
-			types.put(bundle.getString("Annotation"), 2);
-			types.put(bundle.getString("reason_for_change"), 4);
-			types.put(bundle.getString("Failed_Validation_Check"), 1);
-			types.put(bundle.getString("query"), 3);
-
-			for (String typeName : typeNames) {
-				tempType = types.get(typeName);
-				String number = countNotes(discList, status.getId(), tempType);
-				tempMap.put(typeName, number.equals("0") ? "--" : number);
-			}
-		}
-
-		return summaryMap;
-	}
-
-	public Map generateDiscNoteTotal(ArrayList<DiscrepancyNoteBean> discList, ResourceBundle bundle) {
-
-		Map<String, String> summaryMap = new HashMap<String, String>();
-		int tempType = 0;
-
-		Map<String, Integer> types = new HashMap<String, Integer>();
-		types.put(bundle.getString("Annotation"), 2);
-		types.put(bundle.getString("reason_for_change"), 4);
-		types.put(bundle.getString("Failed_Validation_Check"), 1);
-		types.put(bundle.getString("query"), 3);
-
-		for (String typeName : getTypeNames(bundle)) {
-			tempType = types.get(typeName);
-			String tempTotal = countNotes(discList, 0, tempType);
-			summaryMap.put(typeName, tempTotal.equals("0") ? "--" : tempTotal);
-		}
-		return summaryMap;
-	}
-
-	public String countNotes(ArrayList<DiscrepancyNoteBean> discList, int statusId, int typeId) {
-		Integer count = 0;
-		for (int i = 0; i < discList.size(); i++) {
-			DiscrepancyNoteBean discBean = discList.get(i);
-			if (typeId == 0 && statusId != 0) {
-				if (discBean.getResStatus() == ResolutionStatus.get(statusId)) {
-					count++;
-				}
-			} else if (statusId == 0 && typeId != 0) {
-				if (discBean.getDiscrepancyNoteTypeId() == typeId) {
-					count++;
-				}
-			} else {
-				if (discBean.getResStatus() == ResolutionStatus.get(statusId)
-						&& discBean.getDiscrepancyNoteTypeId() == typeId) {
-					count++;
-				}
-			}
-		}
-		return count.toString();
-	}
-
-	public static ArrayList<DiscrepancyNoteBean> customFilter(ArrayList<DiscrepancyNoteBean> mainList,
-			ListNotesFilter discFilter) {
-		String eventName = "";
-		String crfName = "";
-		String entityName = "";
-		String entityValue = "";
-		// String crfStatus = "";
-		for (int i = 0; i < discFilter.getFilters().size(); i++) {
-			ListNotesFilter.Filter filter = discFilter.getFilters().get(i);
-			eventName = filter.getProperty().equals("eventName") ? filter.getValue().toString() : eventName;
-			crfName = filter.getProperty().equals("crfName") ? filter.getValue().toString() : crfName;
-			entityName = filter.getProperty().equals("entityName") ? filter.getValue().toString() : entityName;
-			entityValue = filter.getProperty().equals("entityValue") ? filter.getValue().toString() : entityValue;
-		}
-
-		ArrayList newList = new ArrayList<DiscrepancyNoteBean>();
-		if (eventName.equals("") && crfName.equals("") && entityName.equals("") && entityValue.equals("")) {
-			return mainList;
-		}
-		for (DiscrepancyNoteBean dnBean : mainList) {
-			if (dnBean.getEventName().toLowerCase().indexOf(eventName.toLowerCase()) >= 0
-					&& dnBean.getCrfName().toLowerCase().indexOf(crfName.toLowerCase()) >= 0
-					&& dnBean.getEntityName().toLowerCase().indexOf(entityName.toLowerCase()) >= 0
-					&& dnBean.getEntityValue().toLowerCase().indexOf(entityValue.toLowerCase()) >= 0) {
-				newList.add(dnBean);
-			}
-		}
-
-		return newList;
-	}
-
-	/**
-	 * Generate a summary of statistics for a collection of discrepancy notes.
-	 * 
-	 * @param allDiscBeans
-	 *            A List of DiscrepancyNoteBeans.
-	 * @return A Map mapping the name of each type of note (e.g., "Annotation") to another Map containing that type's
-	 *         statistics.
-	 */
-	public Map generateDiscNoteSummary(List<DiscrepancyNoteBean> allDiscBeans) {
-		if (allDiscBeans == null || allDiscBeans.isEmpty())
-			return new HashMap();
-		/*
-		 * This container is a Map of Maps. e.g., Failed Validation Check --> Map [Total --> total number of Failed
-		 * Validation Check type notes, Open --> total number of Failed Validation Check notes that are Open types,
-		 * etc.]
-		 */
-		Map<String, Map> summaryMap = new HashMap<String, Map>();
-		// The internal Map, mapping the name of the status (e.g., Resolved) to
-		// the number of
-		// Notes that are Resolved for that particular discrepancy note type
-		// (e.g., Failed Validation Check).
-		Map<String, Integer> tempMap = null;
-		int tempType = 0;
-		int tempTotal = 0;
-
-		// initialize Map
-		for (String discNoteTypeName : TYPES.keySet()) {
-
-			tempMap = new HashMap<String, Integer>();
-			// Create the summary or outer Map for each type name (e.g.,
-			// Incomplete)
-			summaryMap.put(discNoteTypeName, tempMap);
-			tempType = TYPES.get(discNoteTypeName);
-			tempTotal = getNumberOfDiscNoteType(allDiscBeans, tempType);
-			tempMap.put("Total", tempTotal);
-			if (tempTotal == 0)
-				continue;
-
-			for (String statusName : RESOLUTION_STATUS.keySet()) {
-				tempMap.put(statusName,
-						getNumberByStatusOfNotes(allDiscBeans, tempType, RESOLUTION_STATUS.get(statusName)));
-			}
-
-		}
-
-		return summaryMap;
-	}
-
-	/**
-	 * Generate a HashMap containing data on the type of discrepancy note and status that the user is currently
-	 * filtering a JSP view for.
-	 * 
-	 * @param discNoteType
-	 *            An id of a type of discrepancy note (e.g., Annotation).
-	 * @param discNoteStatus
-	 *            An id of a status for discrepancy notes (e.g., Open).
-	 * @return A HashMap mapping a String such as "status" to any filter on the status, for example, Open or resolved.
-	 */
-	public Map generateFilterSummary(int discNoteType, int discNoteStatus) {
-		Map<String, String> filterSummary = new HashMap<String, String>();
-		if (discNoteType == 0 && discNoteStatus == 0)
-			return filterSummary;
-
-		// Identify any filter for the resolution status
-		int filterNum = 0;
-		for (String statusName : RESOLUTION_STATUS.keySet()) {
-			filterNum = RESOLUTION_STATUS.get(statusName);
-			if (discNoteStatus == filterNum) {
-				filterSummary.put("status", statusName);
-			}
-
-		}
-
-		// Identify any filter for the resolution type
-		filterNum = 0;
-		for (String typeName : TYPES.keySet()) {
-			filterNum = TYPES.get(typeName);
-			if (discNoteType == filterNum) {
-				filterSummary.put("type", typeName);
-			}
-
-		}
-
-		return filterSummary;
-	}
-
-	/**
-	 * An overloaded version of the previous method. The method generates a HashMap containing data on the type of
-	 * discrepancy note and status that the user is currently filtering a JSP view for.
-	 * 
-	 * @param discNoteType
-	 *            An id of a type of discrepancy note (e.g., Annotation).
-	 * @param discNoteStatus
-	 *            A HashSet of IDs for discrepancy note statuses (e.g., Open, Closed).
-	 * @return A HashMap mapping a String such as "status" to any filter on the status, for example, Open or resolved.
-	 */
-	public Map<String, List<String>> generateFilterSummary(int discNoteType, Set<Integer> discNoteStatus) {
-		Map<String, List<String>> filterSummary = new HashMap<String, List<String>>();
-		if (discNoteType == 0 && discNoteStatus == null)
-			return filterSummary;
-		List<String> listOfStatusNames = new ArrayList<String>();
-		filterSummary.put("status", listOfStatusNames);
-		List<String> listOfTypeNames = new ArrayList<String>();
-		filterSummary.put("type", listOfTypeNames);
-
-		// Identify any filter for the resolution status
-		int filterNum = 0;
-		if (discNoteStatus != null) {
-			for (String statusName : RESOLUTION_STATUS.keySet()) {
-				filterNum = RESOLUTION_STATUS.get(statusName);
-				for (int statusId : discNoteStatus) {
-					if (statusId == filterNum) {
-						filterSummary.get("status").add(statusName);
-					}
-				}
-
-			}
-		}
-
-		// Identify any filter for the resolution type
-		filterNum = 0;
-		for (String typeName : TYPES.keySet()) {
-			filterNum = TYPES.get(typeName);
-			if (discNoteType == filterNum) {
-				filterSummary.get("type").add(typeName);
-			}
-
-		}
-
-		return filterSummary;
-	}
-
-	/**
-	 * Get the number of DiscrepancyNoteBeans of a particular type, like "Failed Validation Check."
-	 * 
-	 * @param discrepancyNoteBeans
-	 *            A List of DiscrepancyNoteBeans.
-	 * @param discNoteType
-	 *            An int representing the dsicrepancy note type id.
-	 * @return Only any DiscrepancyNoteBeans that have this type id.
-	 */
-	public int getNumberOfDiscNoteType(List<DiscrepancyNoteBean> discrepancyNoteBeans, int discNoteType) {
-		int typeCount = 0;
-		for (DiscrepancyNoteBean dBean : discrepancyNoteBeans) {
-			if (dBean.getDiscrepancyNoteTypeId() == discNoteType) {
-				typeCount++;
-			}
-		}
-
-		return typeCount;
-
-	}
-
-	/**
-	 * Get the number of DiscrepancyNoteBeans of a particular type, like "Failed Validation Check."
-	 * 
-	 * @param discrepancyNoteBeans
-	 *            A List of DiscrepancyNoteBeans.
-	 * @param resStatusId
-	 *            An int representing the dsicrepancy note type id.
+	 * Get the number of DiscrepancyNoteBeans of a particular type, like "Failed Validation Check.".
+	 *
+	 * @param discrepancyNoteBeans A List of DiscrepancyNoteBeans.
+	 * @param resStatusId          An int representing the dsicrepancy note type id.
+	 * @param eventCRFId           int
 	 * @return Only any DiscrepancyNoteBeans that have this type id.
 	 */
 	public int getDiscNoteCountByStatusEventCRFId(List<DiscrepancyNoteBean> discrepancyNoteBeans, int resStatusId,
-			int eventCRFId) {
+												  int eventCRFId) {
 		int typeCount = 0;
 		for (DiscrepancyNoteBean dBean : discrepancyNoteBeans) {
 			if (dBean.getResolutionStatusId() == resStatusId && dBean.getEventCRFId() == eventCRFId) {
 				typeCount++;
 			}
 		}
-
 		return typeCount;
-
 	}
 
 	/**
-	 * Get the number of DiscrepancyNoteBeans of a particular resolution status, like Open or Resolved; and of a certain
-	 * discrepancy note type.
-	 * 
-	 * @param discrepancyNoteBeans
-	 *            A List of DiscrepancyNoteBeans.
-	 * @param typeId
-	 *            An int representing the dsicrepancy note type id.
-	 * @param resolutionStatus
-	 *            An int representing the resolution status.
-	 * @return Only any DiscrepancyNoteBeans that have this type id and resolution status.
+	 * Get Resolution Status Name.
+	 * @param resId int
+	 * @return String
 	 */
-	public int getNumberByStatusOfNotes(List<DiscrepancyNoteBean> discrepancyNoteBeans, int typeId, int resolutionStatus) {
-		int tempCount = 0;
-		for (DiscrepancyNoteBean dBean : discrepancyNoteBeans) {
-			if (dBean.getDiscrepancyNoteTypeId() == typeId && dBean.getResolutionStatusId() == resolutionStatus) {
-				tempCount++;
-			}
-		}
-		return tempCount;
-
-	}
-
-	/**
-	 * Examiine a List of StudyEventBeans to determine if any of them have any discrepancy notes. The method is passed
-	 * either a List of DisplayStudyEventBeans or DisplayStudyEventBeans, in the manner of
-	 * studyEventsHaveDiscNotes(studyEventBeans, null) or studyEventsHaveDiscNotes(null,displayStudyEventBeans)
-	 * 
-	 * @param studyEvents
-	 *            A List of StudyEventBeans.
-	 * @param displayStudyEvents
-	 *            A List of DisplayStudyEventBeans.
-	 * @return boolean true if any of the study events have a List that contains some discrepancy notes.
-	 */
-	public boolean studyEventsHaveDiscNotes(List<StudyEventBean> studyEvents,
-			List<DisplayStudyEventBean> displayStudyEvents) {
-
-		if (studyEvents != null) {
-			for (StudyEventBean studyEBean : studyEvents) {
-				if (studyEBean.getDiscBeanList().size() > 0) {
-					return true;
-				}
-			}
-		}
-		StudyEventBean studyEventBean = null;
-
-		if (displayStudyEvents != null) {
-			for (DisplayStudyEventBean displayStudyEventBean : displayStudyEvents) {
-				studyEventBean = displayStudyEventBean.getStudyEvent();
-				if (studyEventBean.getDiscBeanList().size() > 0) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
 	public String getResolutionStatusName(int resId) {
-
 		for (String resName : RESOLUTION_STATUS.keySet()) {
 			if (resId == RESOLUTION_STATUS.get(resName)) {
 				return resName;
@@ -1312,8 +317,12 @@ public class DiscrepancyNoteUtil {
 		return "";
 	}
 
+	/**
+	 * Get resolution status type name.
+	 * @param resTypeId int
+	 * @return String
+	 */
 	public String getResolutionStatusTypeName(int resTypeId) {
-
 		for (String resName : TYPES.keySet()) {
 			if (resTypeId == TYPES.get(resName)) {
 				return resName;
@@ -1322,31 +331,32 @@ public class DiscrepancyNoteUtil {
 		return "";
 	}
 
+	/**
+	 * Create Disc Notes By Event CRF.
+	 * @param displayEvents List<DisplayStudyEventBean>
+	 * @return Map <Integer, Map<String, Integer>>
+	 */
 	public Map<Integer, Map<String, Integer>> createDiscNoteMapByEventCRF(List<DisplayStudyEventBean> displayEvents) {
 
 		Map<Integer, Map<String, Integer>> discNoteMap = new HashMap<Integer, Map<String, Integer>>();
 		if (displayEvents == null || displayEvents.isEmpty()) {
 			return discNoteMap;
 		}
-		Map<String, Integer> innerMap = new HashMap<String, Integer>();
-
+		Map<String, Integer> innerMap;
 		SortedSet<Integer> allEventCRFIds = getEventCRFIdsFromDisplayEvents(displayEvents);
 
 		for (Integer eventCRFId : allEventCRFIds) {
 			innerMap = getDiscNoteCountFromDisplayEvents(displayEvents, eventCRFId);
 			discNoteMap.put(eventCRFId, innerMap);
 		}
-
 		return discNoteMap;
 	}
 
 	private Map<String, Integer> getDiscNoteCountFromDisplayEvents(List<DisplayStudyEventBean> disBeans, int eventCRFId) {
-
 		Map<String, Integer> discNoteMap = new HashMap<String, Integer>();
 		if (eventCRFId == 0 || disBeans == null) {
 			return discNoteMap;
 		}
-
 		List<DiscrepancyNoteBean> dnBeans;
 		for (DisplayStudyEventBean eventBean : disBeans) {
 			dnBeans = eventBean.getStudyEvent().getDiscBeanList();
@@ -1363,9 +373,8 @@ public class DiscrepancyNoteUtil {
 		if (displayEvents == null || displayEvents.isEmpty()) {
 			return treeSet;
 		}
-
-		List<DisplayEventCRFBean> displayEventCRFBeans = null;
-		List<EventCRFBean> eventCRFBeans = null;
+		List<DisplayEventCRFBean> displayEventCRFBeans;
+		List<EventCRFBean> eventCRFBeans;
 
 		for (DisplayStudyEventBean displayStudyEventBean : displayEvents) {
 			displayEventCRFBeans = displayStudyEventBean.getDisplayEventCRFs();
@@ -1384,36 +393,19 @@ public class DiscrepancyNoteUtil {
 		return treeSet;
 	}
 
-	public List<DiscrepancyNoteBean> filterDiscNotesBySubjectOrStudySubject(List<DiscrepancyNoteBean> allDiscNotes,
-			int subjectId, int studySubjectId) {
-		// This collection will hold the beans that are associated with either
-		// the subject id or
-		// study subject id
-		List<DiscrepancyNoteBean> newNotes = new ArrayList<DiscrepancyNoteBean>();
-		if (allDiscNotes == null || allDiscNotes.isEmpty()) {
-			return newNotes;
-		}
-		for (DiscrepancyNoteBean dnBean : allDiscNotes) {
-			if ("subject".equalsIgnoreCase(dnBean.getEntityType())) {
-				if (dnBean.getEntityId() == subjectId) {
-					newNotes.add(dnBean);
-				}
-			} else if ("studySub".equalsIgnoreCase(dnBean.getEntityType())) {
-				if (dnBean.getEntityId() == studySubjectId) {
-					newNotes.add(dnBean);
-				}
-			}
-		}
-
-		return newNotes;
-	}
-
+	/**
+	 * Get study subject id for disc note.
+	 * @param discrepancyNoteBean DiscrepancyNoteBean
+	 * @param dataSource DataSource
+	 * @param studyId int
+	 * @return int
+	 */
 	public int getStudySubjectIdForDiscNote(DiscrepancyNoteBean discrepancyNoteBean, DataSource dataSource, int studyId) {
-		if (discrepancyNoteBean == null)
+		if (discrepancyNoteBean == null) {
 			return 0;
-
+		}
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-		List<StudySubjectBean> studySubjectBeans = new ArrayList<StudySubjectBean>();
+		List<StudySubjectBean> studySubjectBeans;
 
 		if ("subject".equalsIgnoreCase(discrepancyNoteBean.getEntityType())) {
 			studySubjectBeans = studySubjectDAO.findAllBySubjectId(discrepancyNoteBean.getEntityId());
@@ -1432,8 +424,14 @@ public class DiscrepancyNoteUtil {
 		return 0;
 	}
 
-	public List<DiscrepancyNoteThread> createThreads(List<DiscrepancyNoteBean> allDiscNotes, DataSource dataSource,
-			StudyBean currentStudy, Set<Integer> resolutionStatusIds, int discNoteType) {
+	/**
+	 * Create threads.
+	 * @param allDiscNotes List<DiscrepancyNoteBean>
+	 * @param currentStudy StudyBean
+	 * @return List<DiscrepancyNoteThread>
+	 */
+	public List<DiscrepancyNoteThread> createThreads(List<DiscrepancyNoteBean> allDiscNotes,
+													 StudyBean currentStudy) {
 
 		List<DiscrepancyNoteThread> dnThreads = new ArrayList<DiscrepancyNoteThread>();
 		if (allDiscNotes == null || allDiscNotes.isEmpty()) {
@@ -1444,8 +442,8 @@ public class DiscrepancyNoteUtil {
 		}
 
 		List<DiscrepancyNoteBean> childDiscBeans = new ArrayList<DiscrepancyNoteBean>();
-		DiscrepancyNoteThread tempDNThread = null;
-		int resolutionStatusId = 0;
+		DiscrepancyNoteThread tempDNThread;
+		int resolutionStatusId;
 
 		for (DiscrepancyNoteBean discBean : allDiscNotes) {
 			tempDNThread = new DiscrepancyNoteThread();
@@ -1474,8 +472,15 @@ public class DiscrepancyNoteUtil {
 		return dnThreads;
 	}
 
+	/**
+	 * Get all notes for subject and event.
+	 * @param studySubjectBean StudySubjectBean
+	 * @param currentStudy StudyBean
+	 * @param sm SessionManager
+	 * @return List<DiscrepancyNoteBean>
+	 */
 	public static List<DiscrepancyNoteBean> getAllNotesforSubjectAndEvent(StudySubjectBean studySubjectBean,
-			StudyBean currentStudy, SessionManager sm) {
+																		  StudyBean currentStudy, SessionManager sm) {
 		int studyId = studySubjectBean.getStudyId();
 		StudyDAO studydao = new StudyDAO(sm.getDataSource());
 		StudyBean study = (StudyBean) studydao.findByPK(studyId);
@@ -1487,16 +492,14 @@ public class DiscrepancyNoteUtil {
 		// ID.
 		boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
 		boolean isParentStudy = study.getParentStudyId() < 1;
-
 		// Get any disc notes for this study event
 		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
-		ArrayList<DiscrepancyNoteBean> allNotesforSubjectAndEvent = new ArrayList<DiscrepancyNoteBean>();
-
+		ArrayList<DiscrepancyNoteBean> allNotesforSubjectAndEvent;
 		// These methods return only parent disc notes
 		if (subjectStudyIsCurrentStudy && isParentStudy) {
 			allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudyAndId(currentStudy,
 					studySubjectBean.getId());
-		} else { // findAllStudyEventByStudiesAndSubjectId
+		} else {
 			if (!isParentStudy) {
 				StudyBean stParent = (StudyBean) studydao.findByPK(study.getParentStudyId());
 				allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(stParent, study,
@@ -1509,31 +512,41 @@ public class DiscrepancyNoteUtil {
 		return allNotesforSubjectAndEvent;
 	}
 
+	/**
+	 * Get image file name for flag by resolution status id.
+	 * @param resolutionStatusId int
+	 * @return String
+	 */
 	public static String getImageFileNameForFlagByResolutionStatusId(int resolutionStatusId) {
-		String result = "icon_noNote";
+		String result;
 		switch (resolutionStatusId) {
-		case 1:
-			result = "icon_Note";
-			break;
-		case 2:
-			result = "icon_flagYellow";
-			break;
-		case 3:
-			result = "icon_flagBlack";
-			break;
-		case 4:
-			result = "icon_flagGreen";
-			break;
-		case 5:
-			result = "icon_flagWhite";
-			break;
-		default:
-			result = "icon_noNote";
-			break;
+			case NEW_ID:
+				result = "icon_Note";
+				break;
+			case UPDATED_ID:
+				result = "icon_flagYellow";
+				break;
+			case RESOLUTION_PROPOSED_ID:
+				result = "icon_flagBlack";
+				break;
+			case CLOSED_ID:
+				result = "icon_flagGreen";
+				break;
+			case NA_ID:
+				result = "icon_flagWhite";
+				break;
+			default:
+				result = "icon_noNote";
+				break;
 		}
 		return result;
 	}
 
+	/**
+	 * Get DN resolution status.
+	 * @param existingNotes List
+	 * @return int
+	 */
 	public static int getDiscrepancyNoteResolutionStatus(List existingNotes) {
 		int resolutionStatus = 0;
 		boolean hasOtherThread = false;
@@ -1557,88 +570,116 @@ public class DiscrepancyNoteUtil {
 		return resolutionStatus;
 	}
 
-	public static void transformSavedRFCToFVC(DiscrepancyNoteBean dn, UserAccountBean ub, String detailedNote,
-			Integer resStatusId, DiscrepancyNoteDAO dndao) {
+	/**
+	 * Transform RFC for FVC.
+	 * @param dn DiscrepancyNoteBean
+	 * @param ub UserAccountBean
+	 * @param resStatusId Integer
+	 * @param dndao DiscrepancyNoteDAO
+	 */
+	public static void transformSavedRFCToFVC(DiscrepancyNoteBean dn, UserAccountBean ub,
+											  Integer resStatusId, DiscrepancyNoteDAO dndao) {
 		transformSavedDNTo(dn, ub, "", "", DiscrepancyNoteType.REASON_FOR_CHANGE.getId(),
 				DiscrepancyNoteType.FAILEDVAL.getId(), resStatusId, dndao);
 	}
 
-	public static void transformSavedAnnotationToFVC(DiscrepancyNoteBean dn, UserAccountBean ub, String detailedNote,
-			Integer resStatusId, DiscrepancyNoteDAO dndao) {
-		transformSavedDNTo(dn, ub, "", "", DiscrepancyNoteType.ANNOTATION.getId(),
-				DiscrepancyNoteType.FAILEDVAL.getId(), resStatusId, dndao);
-	}
-
-	public static void transformSavedAnnotationToFVC(int dnId, UserAccountBean ub, String detailedNote,
-			Integer resStatusId, DiscrepancyNoteDAO dndao) {
-		DiscrepancyNoteBean dn = (DiscrepancyNoteBean) dndao.findByPK(dnId);
+	/**
+	 * Transform Annotation to FVC.
+	 * @param dn DiscrepancyNoteBean
+	 * @param ub UserAccountBean
+	 * @param resStatusId Integer
+	 * @param dndao DiscrepancyNoteDAO
+	 */
+	public static void transformSavedAnnotationToFVC(DiscrepancyNoteBean dn, UserAccountBean ub,
+													 Integer resStatusId, DiscrepancyNoteDAO dndao) {
 		transformSavedDNTo(dn, ub, "", "", DiscrepancyNoteType.ANNOTATION.getId(),
 				DiscrepancyNoteType.FAILEDVAL.getId(), resStatusId, dndao);
 	}
 
 	private static void transformSavedDNTo(DiscrepancyNoteBean dn, UserAccountBean ub, String description,
-			String detailedNotes, Integer oldTypeId, Integer typeId, Integer resStatusId, DiscrepancyNoteDAO dndao) {
-
-		if (oldTypeId != dn.getDiscrepancyNoteTypeId())
+										   String detailedNotes, Integer oldTypeId, Integer typeId, Integer resStatusId, DiscrepancyNoteDAO dndao) {
+		if (oldTypeId != dn.getDiscrepancyNoteTypeId()) {
 			return;
-		if (ub != null)
+		}
+		if (ub != null) {
 			dn.setAssignedUserId(ub.getId());
-		if (!StringUtil.isBlank(description))
+		}
+		if (!StringUtil.isBlank(description)) {
 			dn.setDescription(description);
-		if (!StringUtil.isBlank(detailedNotes))
+		}
+		if (!StringUtil.isBlank(detailedNotes)) {
 			dn.setDetailedNotes(detailedNotes);
-		if (typeId != null && typeId != 0)
+		}
+		if (typeId != null && typeId != 0) {
 			dn.setDiscrepancyNoteTypeId(typeId);
-		if (resStatusId != null && resStatusId != 0)
+		}
+		if (resStatusId != null && resStatusId != 0) {
 			dn.setResolutionStatusId(resStatusId);
+		}
 
 		DiscrepancyNoteBean parentDN = null;
 		if (dn.getParentDnId() > 0) {
 			parentDN = (DiscrepancyNoteBean) dndao.findByPK(dn.getParentDnId());
-			if (typeId != null && typeId != 0)
+			if (typeId != null && typeId != 0) {
 				parentDN.setDiscrepancyNoteTypeId(typeId);
-			if (resStatusId != null && resStatusId != 0)
+			}
+			if (resStatusId != null && resStatusId != 0) {
 				parentDN.setResolutionStatusId(resStatusId);
+			}
 		}
 		dndao.update(dn);
 		dndao.update(parentDN);
 	}
 
-	public static void transformAnnotationToFVC(DiscrepancyNoteBean dn, UserAccountBean ub, String detailedNote,
-			Integer resStatusId) {
+	/**
+	 * Transform Annotation to FVC.
+	 * @param dn DiscrepancyNoteBean
+	 * @param ub UserAccountBean
+	 * @param resStatusId Integer
+	 */
+	public static void transformAnnotationToFVC(DiscrepancyNoteBean dn, UserAccountBean ub, Integer resStatusId) {
 		transformDNTo(dn, ub, "", "", DiscrepancyNoteType.ANNOTATION.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
 				resStatusId);
 	}
 
-	public static void transformRFCToFVC(DiscrepancyNoteBean dn, UserAccountBean ub, String detailedNote,
-			Integer resStatusId) {
-		transformDNTo(dn, ub, "", "", DiscrepancyNoteType.REASON_FOR_CHANGE.getId(),
-				DiscrepancyNoteType.FAILEDVAL.getId(), resStatusId);
-	}
-
 	private static DiscrepancyNoteBean transformDNTo(DiscrepancyNoteBean dn, UserAccountBean ub, String description,
-			String detailedNotes, Integer oldTypeId, Integer typeId, Integer resStatusId) {
-		if (oldTypeId != dn.getDiscrepancyNoteTypeId())
+													 String detailedNotes, Integer oldTypeId, Integer typeId, Integer resStatusId) {
+		if (oldTypeId != dn.getDiscrepancyNoteTypeId()) {
 			return dn;
-		if (ub != null)
+		}
+		if (ub != null) {
 			dn.setAssignedUserId(ub.getId());
-		if (!StringUtil.isBlank(description))
+		}
+		if (!StringUtil.isBlank(description)) {
 			dn.setDescription(description);
-		if (!StringUtil.isBlank(detailedNotes))
+		}
+		if (!StringUtil.isBlank(detailedNotes)) {
 			dn.setDetailedNotes(detailedNotes);
-		if (typeId != null && typeId != 0)
+		}
+		if (typeId != null && typeId != 0) {
 			dn.setDiscrepancyNoteTypeId(typeId);
-		if (resStatusId != null && resStatusId != 0)
+		}
+		if (resStatusId != null && resStatusId != 0) {
 			dn.setResolutionStatusId(resStatusId);
-
+		}
 		return dn;
 	}
 
+	/**
+	 * Generate user account.
+	 * @param studySubjectId int
+	 * @param currentStudy StudyBean
+	 * @param udao UserAccountDAO
+	 * @param studyDAO StudyDAO
+	 * @param ecb EventCRFBean
+	 * @param eddao EventDefinitionCRFDAO
+	 * @return static ArrayList<StudyUserRoleBean>s
+	 */
 	public static ArrayList<StudyUserRoleBean> generateUserAccounts(int studySubjectId, StudyBean currentStudy,
-			UserAccountDAO udao, StudyDAO studyDAO, EventCRFBean ecb, EventDefinitionCRFDAO eddao) {
+																	UserAccountDAO udao, StudyDAO studyDAO, EventCRFBean ecb, EventDefinitionCRFDAO eddao) {
 		StudyBean subjectStudy = studyDAO.findByStudySubjectId(studySubjectId);
 		int studyId = currentStudy.getId();
-		ArrayList<StudyUserRoleBean> userAccounts = new ArrayList<StudyUserRoleBean>();
+		ArrayList<StudyUserRoleBean> userAccounts;
 		if (currentStudy.getParentStudyId() > 0) {
 			userAccounts = udao.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId(), studySubjectId);
 		} else if (subjectStudy.getParentStudyId() > 0) {
@@ -1657,7 +698,7 @@ public class DiscrepancyNoteUtil {
 	}
 
 	private static void removeEvaluatorsBasedOnCrfStage(List<StudyUserRoleBean> userAccounts, EventCRFBean ecb,
-			EventDefinitionCRFDAO eddao, StudyBean subjectStudy) {
+														EventDefinitionCRFDAO eddao, StudyBean subjectStudy) {
 		if (!shouldRemoveEvaluators(ecb, eddao, subjectStudy)) {
 			return;
 		}
@@ -1675,23 +716,17 @@ public class DiscrepancyNoteUtil {
 			return true;
 		}
 		EventDefinitionCRFBean edcb;
-		if(!subjectStudy.isSite()) {
+		if (!subjectStudy.isSite()) {
 			edcb = eddao.findForStudyByStudyEventIdAndCRFVersionId(ecb.getStudyEventId(),
 					ecb.getCRFVersionId());
 		} else {
 			edcb = eddao.findForSiteByEventCrfId(ecb.getId());
-			if(edcb == null) {
+			if (edcb == null) {
 				edcb = eddao.findForStudyByStudyEventIdAndCRFVersionId(ecb.getStudyEventId(),
 						ecb.getCRFVersionId());
 			}
 		}
-		if (!edcb.isEvaluatedCRF()) {
-			return true;
-		}
-		if (ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) || ecb.isNotStarted()) {
-			return true;
-		}
-		return false;
+		return !edcb.isEvaluatedCRF() || ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) || ecb.isNotStarted();
 	}
 
 	private static StudyUserRoleBean createRootUserRole(UserAccountBean rootUserAccount, int studyId) {
@@ -1710,22 +745,41 @@ public class DiscrepancyNoteUtil {
 		return rootUserRole;
 	}
 
+	/**
+	 * Get Study Subject.
+	 * @param subjectId int
+	 * @param currentStudy StudyBean
+	 * @param dataSource DataSource
+	 * @return StudySubjectBean
+	 */
 	public static StudySubjectBean getStudySubject(int subjectId, StudyBean currentStudy, DataSource dataSource) {
 		StudySubjectBean ssub = new StudySubjectBean();
-		if (subjectId <= 0)
+		if (subjectId <= 0) {
 			return ssub;
+		}
 		StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
 		StudyDAO sdao = new StudyDAO(dataSource);
-		ssub = (StudySubjectBean) ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
-		if (ssub.getId() <= 0 && currentStudy.getParentStudyId() > 0)
-			ssub = (StudySubjectBean) ssdao.findBySubjectIdAndStudy(subjectId,
+		ssub = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
+		if (ssub.getId() <= 0 && currentStudy.getParentStudyId() > 0) {
+			ssub = ssdao.findBySubjectIdAndStudy(subjectId,
 					(StudyBean) sdao.findByPK(currentStudy.getParentStudyId()));
-
+		}
 		return ssub;
 	}
 
+	/**
+	 * Prepare Repeating Info Map.
+	 * @param name String
+	 * @param entityId int
+	 * @param iddao ItemDataDAO
+	 * @param ecdao EventCRFDAO
+	 * @param sedao StudyEventDAO
+	 * @param igmdao ItemGroupMetadataDAO
+	 * @param seddao StudyEventDefinitionDAO
+	 * @return Map <String, String>
+	 */
 	public static Map<String, String> prepareRepeatingInfoMap(String name, int entityId, ItemDataDAO iddao,
-			EventCRFDAO ecdao, StudyEventDAO sedao, ItemGroupMetadataDAO igmdao, StudyEventDefinitionDAO seddao) {
+															  EventCRFDAO ecdao, StudyEventDAO sedao, ItemGroupMetadataDAO igmdao, StudyEventDefinitionDAO seddao) {
 		Map<String, String> repeatingInfoMap = new HashMap<String, String>();
 		try {
 			if (name.equalsIgnoreCase("eventcrf")) {
@@ -1733,14 +787,16 @@ public class DiscrepancyNoteUtil {
 				StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 				StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb
 						.getStudyEventDefinitionId());
-				if (sedb.isRepeating())
+				if (sedb.isRepeating()) {
 					repeatingInfoMap.put("studyEventOrdinal", "" + seb.getSampleOrdinal());
+				}
 			} else if (name.equalsIgnoreCase("studyevent")) {
 				StudyEventBean seb = (StudyEventBean) sedao.findByPK(entityId);
 				StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb
 						.getStudyEventDefinitionId());
-				if (sedb.isRepeating())
+				if (sedb.isRepeating()) {
 					repeatingInfoMap.put("studyEventOrdinal", "" + seb.getSampleOrdinal());
+				}
 			} else if (name.equalsIgnoreCase("itemdata")) {
 				ItemDataBean idb = (ItemDataBean) iddao.findByPK(entityId);
 				EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
@@ -1749,10 +805,12 @@ public class DiscrepancyNoteUtil {
 						.getStudyEventDefinitionId());
 				ItemGroupMetadataBean igmb = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(idb.getItemId(),
 						ecb.getCRFVersionId());
-				if (sedb.isRepeating())
+				if (sedb.isRepeating()) {
 					repeatingInfoMap.put("studyEventOrdinal", "" + seb.getSampleOrdinal());
-				if (igmb.isRepeatingGroup())
+				}
+				if (igmb.isRepeatingGroup()) {
 					repeatingInfoMap.put("itemDataOrdinal", "" + idb.getOrdinal());
+				}
 			}
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);

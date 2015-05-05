@@ -2,6 +2,7 @@ package com.clinovo.service;
 
 import com.clinovo.model.CRFMask;
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
@@ -121,5 +122,14 @@ public class CRFMaskingServiceTest extends DefaultAppContextTest {
 		event.setStudyId(1);
 		events.add(event);
 		assertEquals(event.getId(), maskingService.returnFirstNotMaskedEvent(events, 1, 1).getId());
+	}
+
+	@Test
+	public void testThatRemoveCRFIfItsMaskedInAllEventsReturnsCorrectResult() {
+		ArrayList<CRFBean> crfs = new ArrayList<CRFBean>();
+		CRFBean crf = new CRFBean();
+		crf.setId(1);
+		crfs.add(crf);
+		assertEquals(1, maskingService.removeCRFIfItsMaskedInAllEvents(crfs, 1, 1).size());
 	}
 }
