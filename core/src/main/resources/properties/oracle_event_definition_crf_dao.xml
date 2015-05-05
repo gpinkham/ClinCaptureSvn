@@ -117,15 +117,6 @@
 			     order by ordinal asc
 			</sql>
 		</query>
-		<query>
-			<name>findAllActiveByStudyIdAndCRFId</name>
-			<sql>
-				SELECT * FROM event_definition_crf
-				WHERE study_id=? and status_id=1
-				AND crf_id=?
-				order by ordinal asc
-			</sql>
-		</query>
         <query>
                 <name>findAllActiveByEventDefinitionId</name>
                 <sql>

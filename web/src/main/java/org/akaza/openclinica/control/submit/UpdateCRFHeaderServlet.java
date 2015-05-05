@@ -93,7 +93,8 @@ public class UpdateCRFHeaderServlet extends Controller {
 			allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 		}
 
-		List<DiscrepancyNoteThread> noteThreads = dNoteUtil.createThreadsOfParents(allNotes, currentStudy, null, -1);
+		List<DiscrepancyNoteThread> noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(),
+				currentStudy, null, -1, true);
 
 		CrfShortcutsAnalyzer crfShortcutsAnalyzer = getCrfShortcutsAnalyzer(request, getItemSDVService(), true);
 		crfShortcutsAnalyzer.prepareCrfShortcutLinks(ecb, ifmdao, eventDefinitionCRFId, allSections, noteThreads);

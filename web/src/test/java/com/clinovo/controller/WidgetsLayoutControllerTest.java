@@ -167,7 +167,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				get(NDS_PER_CRF_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("start", "0")
-						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(status().isOk());
+						.param("action", "init").sessionAttr("study", sb)).andExpect(status().isOk());
 	}
 
 	@Test
@@ -445,7 +445,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(NDS_PER_CRF_WIDGET)
 						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("start", "0")
-						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
+						.param("action", "init").sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.model().attributeExists("ndsCrfHasPrevious", "ndsCrfHasNext", "ndsCrfStart",
 						"ndsCrfDataColumns"));
 	}
@@ -462,7 +462,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(NDS_PER_CRF_WIDGET)
 						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("start", "0")
-						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean",ub)).andExpect(
+						.param("action", "init").sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.model().size(NDS_PER_CRF_ATTRIBUTES));
 	}
 
@@ -478,7 +478,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(NDS_PER_CRF_WIDGET)
 						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("start", "0")
-						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
+						.param("action", "init").sessionAttr("study", sb)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/ndsPerCrfChart"));
 	}
 

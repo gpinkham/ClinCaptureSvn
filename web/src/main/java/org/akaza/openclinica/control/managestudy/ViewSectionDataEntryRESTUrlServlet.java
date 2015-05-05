@@ -205,7 +205,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			}
 			// Create disc note threads out of the various notes
 			DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
-			noteThreads = dNoteUtil.createThreadsOfParents(allNotes, currentStudy, null, -1);
+			noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
 			List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 

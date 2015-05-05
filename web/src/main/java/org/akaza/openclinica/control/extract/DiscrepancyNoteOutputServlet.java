@@ -148,7 +148,8 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 		// Do the filtering for type or status here
 		DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
 
-		List<DiscrepancyNoteThread> discrepancyNoteThreads = discNoteUtil.createThreads(allDiscNotes, studyBean);
+		List<DiscrepancyNoteThread> discrepancyNoteThreads = discNoteUtil.createThreads(allDiscNotes, getDataSource(),
+				studyBean, resolutionStatusIds, discNoteType);
 
 		response.getOutputStream().write(UTF8_ENCODING_BYTE_1);
 		response.getOutputStream().write(UTF8_ENCODING_BYTE_2);

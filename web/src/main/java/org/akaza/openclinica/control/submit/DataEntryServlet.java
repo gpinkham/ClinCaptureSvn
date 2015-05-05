@@ -412,7 +412,7 @@ public abstract class DataEntryServlet extends Controller {
 
 		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 		prepareSessionNotesIfValidationsWillFail(request, hasGroup, isSubmitted, allNotes);
-		noteThreads = dNoteUtil.createThreadsOfParents(allNotes, currentStudy, null, -1);
+		noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
 		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
@@ -2102,16 +2102,16 @@ public abstract class DataEntryServlet extends Controller {
 			// for RFC we need to show validation error-message
 			if (!transformedSavedDNIds.contains(dn.getId()) && dn.getId() > 0) {
 				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.ANNOTATION.getId()) {
-					DiscrepancyNoteUtil.transformSavedAnnotationToFVC(dn, ub, ResolutionStatus.UPDATED.getId(),
+					DiscrepancyNoteUtil.transformSavedAnnotationToFVC(dn, ub, "", ResolutionStatus.UPDATED.getId(),
 							dndao);
 				}
 				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
-					DiscrepancyNoteUtil.transformSavedRFCToFVC(dn, ub, ResolutionStatus.UPDATED.getId(), dndao);
+					DiscrepancyNoteUtil.transformSavedRFCToFVC(dn, ub, "", ResolutionStatus.UPDATED.getId(), dndao);
 				}
 				transformedDNs.add(dn);
 			} else if (!transformedUnSavedDNFieldNames.contains(dn.getField()) && !StringUtil.isBlank(dn.getField())) {
 				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.ANNOTATION.getId()) {
-					DiscrepancyNoteUtil.transformAnnotationToFVC(dn, ub, ResolutionStatus.UPDATED.getId());
+					DiscrepancyNoteUtil.transformAnnotationToFVC(dn, ub, "", ResolutionStatus.UPDATED.getId());
 					transformedDNs.add(dn);
 				}
 				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.FAILEDVAL.getId()) {
@@ -3395,13 +3395,13 @@ public abstract class DataEntryServlet extends Controller {
 
 		ArrayList notes = new ArrayList(discNotes.getNotes(INPUT_INTERVIEWER));
 		notes.addAll(existingNameNotes);
-		noteThreads = dNoteUtil.createThreadsOfParents(notes, currentStudy, null, -1);
+		noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
 		crfShortcutsAnalyzer.prepareCrfShortcutAnchors(crfShortcutsAnalyzer.getInterviewerDisplayItemBean(),
 				noteThreads, false);
 
 		notes = new ArrayList(discNotes.getNotes(INPUT_INTERVIEW_DATE));
 		notes.addAll(existingIntrvDateNotes);
-		noteThreads = dNoteUtil.createThreadsOfParents(notes, currentStudy, null, -1);
+		noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
 		crfShortcutsAnalyzer.prepareCrfShortcutAnchors(crfShortcutsAnalyzer.getInterviewDateDisplayItemBean(),
 				noteThreads, false);
 
@@ -3479,7 +3479,8 @@ public abstract class DataEntryServlet extends Controller {
 
 						notes = new ArrayList(discNotes.getNotes(inputName));
 						notes.addAll(dbNotes);
-						noteThreads = dNoteUtil.createThreadsOfParents(notes, currentStudy, null, -1);
+						noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1,
+								true);
 						discNotes.setNumExistingFieldNotes(inputName, dbNotes.size());
 						dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
 						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(request, dndao, itemDataId,
@@ -3520,7 +3521,7 @@ public abstract class DataEntryServlet extends Controller {
 						discNotes.getNotes(inputFieldName)));
 				dib = setTotals(dib, itemDataId, toolTipDNotes, parentNotes, discNotes.getNotes(inputFieldName),
 						ecb.getId(), request);
-				noteThreads = dNoteUtil.createThreadsOfParents(notes, currentStudy, null, -1);
+				noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
 				crfShortcutsAnalyzer.prepareCrfShortcutAnchors(dib, noteThreads, false);
 
 				ArrayList childItems = dib.getChildren();
@@ -3546,7 +3547,7 @@ public abstract class DataEntryServlet extends Controller {
 
 					childNotes.addAll(dbNotes);
 					noteThreads = dNoteUtil
-							.createThreadsOfParents(notes, currentStudy, null, -1);
+							.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
 					discNotes.setNumExistingFieldNotes(childInputFieldName, dbChildNotes.size());
 					child.setNumDiscrepancyNotes(dbChildNotes.size() + childNotes.size());
 					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(request, dndao, childItemDataId,

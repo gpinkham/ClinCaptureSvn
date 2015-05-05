@@ -51,9 +51,4 @@ public class EventDefinitionCRFDAOTest extends DefaultAppContextTest {
 	public void testThatFindAllActiveByDefinitionAndSiteIdReturnsCorrectResult() {
 		assertEquals(2, eventDefinitionCRFDAO.findAllActiveByDefinitionAndSiteId(1, 1).size());
 	}
-
-	@Test
-	public void testThatFindAllActiveByStudyIdAndCRFIdReturnsCorrectResult() {
-		assertEquals(2, eventDefinitionCRFDAO.findAllActiveByStudyIdAndCRFId(1, 1).size());
-	}
 }

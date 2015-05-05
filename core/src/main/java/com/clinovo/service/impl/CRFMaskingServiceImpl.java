@@ -4,7 +4,6 @@ import com.clinovo.dao.CRFMaskingDAO;
 import com.clinovo.model.CRFMask;
 import com.clinovo.service.CRFMaskingService;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
@@ -126,27 +125,6 @@ public class CRFMaskingServiceImpl implements CRFMaskingService {
 			}
 		}
 		return newList;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public List<CRFBean> removeCRFIfItsMaskedInAllEvents(List<CRFBean> crfs, int studyId, int userId) {
-		EventDefinitionCRFDAO eventCRFDAO = new EventDefinitionCRFDAO(dataSource);
-		List<CRFBean> result = new ArrayList<CRFBean>();
-		for (CRFBean crf : crfs) {
-			boolean shouldInclude = false;
-			ArrayList<EventDefinitionCRFBean> eventCRFs = eventCRFDAO.findAllActiveByStudyIdAndCRFId(studyId, crf.getId());
-			for (EventDefinitionCRFBean eventCRF : eventCRFs) {
-				if (!isEventDefinitionCRFMasked(eventCRF.getId(), userId, studyId)) {
-					shouldInclude = true;
-				}
-			}
-			if (shouldInclude) {
-				result.add(crf);
-			}
-		}
-		return result;
 	}
 
 	/**
