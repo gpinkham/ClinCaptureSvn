@@ -284,7 +284,7 @@ Parser.prototype.createNextDroppable = function(params) {
 		}
 		params.element.removeClass("bordered");
 	} else if (params.element.is(".value")) {
-		var destination = Object.create(null), 
+		var destination = Object.create(null),
 			id = params.element.parents(".row").attr("id");
 		destination.id = id;
 		if (this.getInsertAction().destinations.length > 0) {
@@ -829,9 +829,8 @@ Parser.prototype.isOp = function(predicate) {
 	// divide
 	ops.push(unescape(JSON.parse('"\u00F7"')));
 	// multiply
-	ops.push(unescape(JSON.parse('"\u0078"')));
-
-	var dOps = ['eq', 'ne', 'lt', 'gt', 'lte', 'gte', 'nct', 'ct', 'and', 'or', 'not'];
+	ops.push(unescape(JSON.parse('"\u00d7"')));
+	var dOps = ['eq', 'ne', 'lt', 'gt', 'lte', 'gte', 'nct', 'ct', 'and', 'or', 'not', '*', '/'];
 	return ops.indexOf(predicate) > -1 || dOps.indexOf(predicate) > -1;
 };
 
@@ -845,8 +844,6 @@ Parser.prototype.isOp = function(predicate) {
  * =========================================================== */
 Parser.prototype.isAllowedOp = function(predicate) {
 	var ops = ['+', '-'];
-	// Divide
-	ops.push(unescape(JSON.parse('"\u00F7"')));
 	return ops.indexOf(predicate) > -1;
 };
 
@@ -891,9 +888,11 @@ Parser.prototype.getOp = function(predicate) {
 			return "nct";
 		} else if (predicate === unescape(JSON.parse('"\u2208"'))) {
 			return "ct";
-		} else if (predicate === unescape(JSON.parse('"\u0078"'))) {
+		} else if (predicate === unescape(JSON.parse('"\u00d7"'))) {
 			return "*";
-		} else if (predicate === messageSource.terms.or) {
+		} else if (predicate === unescape(JSON.parse('"\u00f7"'))) {
+			return "/";
+		}else if (predicate === messageSource.terms.or) {
 			return "or";
 		} else if (predicate === messageSource.terms.and) {
 			return "and";
@@ -922,7 +921,9 @@ Parser.prototype.getLocalOp = function(predicate) {
 		} else if (predicate === "ct") {
 			return unescape(JSON.parse('"\u2208"'));
 		} else if (predicate === "*") {
-			return "x";
+			return "×";
+		} else if (predicate === "/") {
+			return "÷";
 		} else if (predicate === "and") {
 			return messageSource.terms.and;
 		} else if (predicate === "or") {
@@ -1596,7 +1597,7 @@ Parser.prototype.setDestinations = function(dests) {
 		// Remove labels
 		$(".insert-properties").find("label").hide();
 		for (var x = 0; x < dests.length; x++) {
-			var dest = dests[x], div = $(".insert-properties").find(".row").first().clone(), input = div.find(".item"), 
+			var dest = dests[x], div = $(".insert-properties").find(".row").first().clone(), input = div.find(".item"),
 				attributes = this.createAttributes(dest.oid), item = this.getItem(dest.oid, attributes);
 			div.attr("id", dest.id);
 			input.attr("item-oid", item.oid);
@@ -2087,7 +2088,7 @@ Parser.prototype.eventify = function(targetEvent) {
 	var element = $(targetEvent).parent().siblings(".target"), name = element.val();;
 	this.rule.targets.map(function(target) {
 		if (target.name === name) {
-			if (target.evt == element[0].getAttribute('event-oid') && 
+			if (target.evt == element[0].getAttribute('event-oid') &&
 				target.version == element[0].getAttribute('version-oid'))
 				target.eventify = $(targetEvent).is(":checked");
 			return;
@@ -2098,7 +2099,7 @@ Parser.prototype.versionify = function(targetEvent) {
 	var element = $(targetEvent).parent().siblings(".target"), name = element.val();;
 	this.rule.targets.map(function(target) {
 		if (target.name === name) {
-			if (target.evt == element[0].getAttribute('event-oid') && 
+			if (target.evt == element[0].getAttribute('event-oid') &&
 				target.version == element[0].getAttribute('version-oid'))
 				target.versionify = $(targetEvent).is(":checked");
 			return;
