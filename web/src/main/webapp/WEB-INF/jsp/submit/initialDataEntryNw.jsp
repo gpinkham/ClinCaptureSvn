@@ -398,44 +398,6 @@ function DisplaySectionTabs()
         }
 
         TabID++;
-
-    }
-
-    reverseRowsOrder();
-
-}
-
-function reverseRowsOrder() {
-    TabID=1;
-    var c = 0;
-    var p = 0;
-    var offsets = new Array();
-    var rows = new Array();
-
-    while (TabID<=TabsNumber) {
-        var tab = document.getElementById("Tab" + TabID);
-        if (offsets.length == 0 || tab.offsetTop != offsets[offsets.length - 1]) {
-            c = 0;
-            rows[p++] = new Array();
-            offsets[offsets.length] = tab.offsetTop;
-        }
-        rows[p-1][c++] = tab;
-        TabID++;
-    }
-
-    for (var i = rows.length - 1 ; i >= 0; i--) {
-        var trId = 'tr_' + i;
-        document.write('<tr id="' + trId + '">');
-        for (var j = 0; j <= rows[i].length - 1; j++) {
-            var td = rows[i][j];
-            if ($.browser.msie) {
-            	$(trId).html(document.getElementById(trId).innerHTML + td.outerHTML);
-            } else {
-            	document.getElementById(trId).innerHTML = document.getElementById(trId).innerHTML + td.outerHTML;
-                td.outerHTML = "";
-            }
-        }
-        document.write('</tr>');
     }
 }
 
@@ -467,27 +429,8 @@ function sm(obl, chkbox, wd, ht){if(chkbox.checked==false){checkboxObject=chkbox
 function hm(){var v='visible';var n='none';document.getElementById('ol').style.display=n;document.getElementById('mbox').style.display=n;inf(v);document.onkeypress=''}
 function initmb(){var ab='absolute';var n='none';var obody=document.getElementsByTagName('body')[0];var frag=document.createDocumentFragment();var obol=document.createElement('div');obol.setAttribute('id','ol');obol.style.display=n;obol.style.position=ab;obol.style.top=0;obol.style.left=0;obol.style.zIndex=998;obol.style.width='100%';frag.appendChild(obol);var obbx=document.createElement('div');obbx.setAttribute('id','mbox');obbx.style.display=n;obbx.style.position=ab;obbx.style.zIndex=999;var obl=document.createElement('span');obbx.appendChild(obl);var obbxd=document.createElement('div');obbxd.setAttribute('id','mbd');obl.appendChild(obbxd);frag.insertBefore(obbx,obol.nextSibling);obody.insertBefore(frag,obody.firstChild);
     window.onscroll = scrollFix; window.onresize = sizeFix;
-//    closing = true;
 }
 </script>
-<%--
-<td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
-<td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0" style=
-  "margin-top:10px;margin-right:6px"/></a></td>
-<td>&nbsp;
-    <div class="formfieldM_BG_noMargin">
-        <select id="sectionTabSelectElement" class="formfieldM" name="sectionName" size="1" onchange="gotoLink();">
-        <c:set var="tabCount" value="1"/>
-        <option selected>-- <fmt:message key="select_to_jump" bundle="${resword}"/> --</option>
-        <c:forEach var="sec" items="${toc.sections}" >
-            <c:set var="tabUrl" value = "InitialDataEntry?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tabId=${tabCount}"/>
-            <option value="<c:out value="${tabUrl}"/>"><c:out value="${sec.name}"/></option>
-            <c:set var="tabCount" value="${tabCount+1}"/>
-        </c:forEach>
-    </select>
-    </div>
-</td>
---%>
 </tr>
 </table>
 <input type="hidden" name="submitted" value="1" />

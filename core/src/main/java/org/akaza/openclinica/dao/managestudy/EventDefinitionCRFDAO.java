@@ -698,6 +698,21 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
+	 * Method that returns list of event definition crfs by studyId and crfId.
+	 *
+	 * @param studyId int
+	 * @param crfId int
+	 * @return ArrayList
+	 */
+	public ArrayList findAllActiveByStudyIdAndCRFId(int studyId, int crfId) {
+		int index = 1;
+		HashMap variables = new HashMap();
+		variables.put(index++, studyId);
+		variables.put(index, crfId);
+		return executeFindAllQuery("findAllActiveByStudyIdAndCRFId", variables);
+	}
+
+	/**
 	 * Find all active EventDefinitionCRFBean for the StudyBean and the study_event_definition_id.
 	 * 
 	 * @param study

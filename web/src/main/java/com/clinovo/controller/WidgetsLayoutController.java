@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import com.clinovo.service.CRFMaskingService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
@@ -118,6 +119,9 @@ public class WidgetsLayoutController {
 
 	@Autowired
 	private CodedItemDAO codedItemDAO;
+
+	@Autowired
+	private CRFMaskingService maskingService;
 
 	/**
 	 * This method is used to display the widget on the Home page. It takes the data from the table "widget" and
@@ -260,25 +264,25 @@ public class WidgetsLayoutController {
 		DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(datasource);
 
 		Integer newDns = discrepancyNoteDao.getViewNotesCountWithFilter(" AND dn.assigned_user_id = " + currentUser
-				+ " AND dn.resolution_status_id = 1", currentStudy);
+				+ " AND dn.resolution_status_id = 1", currentStudy, currentUser);
 
 		if (newDns == null) {
 			newDns = 0;
 		}
 		Integer updatedDns = discrepancyNoteDao.getViewNotesCountWithFilter(" AND dn.assigned_user_id = " + currentUser
-				+ " AND dn.resolution_status_id = 2", currentStudy);
+				+ " AND dn.resolution_status_id = 2", currentStudy, currentUser);
 
 		if (updatedDns == null) {
 			updatedDns = 0;
 		}
 		Integer resolutionProposedDns = discrepancyNoteDao.getViewNotesCountWithFilter(" AND dn.assigned_user_id = "
-				+ currentUser + " AND dn.resolution_status_id = 3", currentStudy);
+				+ currentUser + " AND dn.resolution_status_id = 3", currentStudy, currentUser);
 
 		if (resolutionProposedDns == null) {
 			resolutionProposedDns = 0;
 		}
 		Integer closedDns = discrepancyNoteDao.getViewNotesCountWithFilter(" AND dn.assigned_user_id = " + currentUser
-				+ " AND dn.resolution_status_id = 4", currentStudy);
+				+ " AND dn.resolution_status_id = 4", currentStudy, currentUser);
 
 		if (closedDns == null) {
 			closedDns = 0;
@@ -633,34 +637,27 @@ public class WidgetsLayoutController {
 	public String initNdsPerCrfWidget(HttpServletRequest request, HttpServletResponse response, Model model) {
 
 		setRequestHeadersAndUpdateLocale(response, request);
-
 		String page = "widgets/includes/ndsPerCrfChart";
-
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
 		CRFDAO crfdao = new CRFDAO(datasource);
 		EventCRFDAO eCrfdao = new EventCRFDAO(datasource);
 		DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(datasource);
-
 		List<CRFBean> crfs = (List<CRFBean>) crfdao.findAllActiveByDefinitionsForCurrentStudy(sb.getId());
+		crfs = maskingService.removeCRFIfItsMaskedInAllEvents(crfs, sb.getId(), ub.getId());
 		List<NDsPerCRFDisplay> displays = new ArrayList<NDsPerCRFDisplay>();
 
 		for (CRFBean crf : crfs) {
-
 			NDsPerCRFDisplay currentDisplay = new NDsPerCRFDisplay();
 			currentDisplay.setCrfName(crf.getName());
-
 			ListNotesFilter filter = new ListNotesFilter();
 			filter.addFilter("crfName", crf.getName());
-
-			currentDisplay.setCountOfNds(dnDao.countViewNotesWithFilter(sb, filter));
+			currentDisplay.setCountOfNds(dnDao.countViewNotesWithFilter(sb, filter, ub));
 			displays.add(currentDisplay);
 		}
-
 		Collections.sort(displays, new Comparator<NDsPerCRFDisplay>() {
 			public int compare(final NDsPerCRFDisplay display1, final NDsPerCRFDisplay display2) {
-
 				int compareResult;
-
 				if (display1.getCountOfNds() < display2.getCountOfNds()) {
 					compareResult = 1;
 				} else if (display1.getCountOfNds() > display2.getCountOfNds()) {
@@ -668,15 +665,12 @@ public class WidgetsLayoutController {
 				} else {
 					compareResult = display1.getCrfName().compareTo(display2.getCrfName());
 				}
-
 				return compareResult;
 			}
 		});
-
 		LinkedHashMap<String, List<Integer>> dataColumns = new LinkedHashMap<String, List<Integer>>();
 		ResolutionStatus[] statuses = {ResolutionStatus.CLOSED, ResolutionStatus.UPDATED, ResolutionStatus.OPEN,
 				ResolutionStatus.NOT_APPLICABLE};
-
 		int start = Integer.parseInt(request.getParameter("start"));
 		int maxDispay = ND_PER_CRF_DISPLAY_PER_SCREEN;
 		String action = request.getParameter("action");
@@ -684,40 +678,29 @@ public class WidgetsLayoutController {
 		if (action.equals("goForward")) {
 			start += maxDispay;
 		}
-
 		if (action.equals("goBack")) {
 			start -= maxDispay;
 		}
-
 		for (int i = start; i < displays.size() && i < start + maxDispay; i++) {
-
 			boolean eCrfExist = true;
-
 			String crfName = displays.get(i).getCrfName();
 			List<Integer> contNdsWithStatuses = new ArrayList<Integer>();
 
 			for (ResolutionStatus status : statuses) {
-
 				ListNotesFilter filter = new ListNotesFilter();
 				filter.addFilter("crfName", crfName);
 				filter.addFilter("discrepancyNoteBean.resolutionStatus", status.getId());
-
-				int count = dnDao.countViewNotesWithFilter(sb, filter);
-
+				int count = dnDao.countViewNotesWithFilter(sb, filter, ub);
 				contNdsWithStatuses.add(count);
 			}
-
 			dataColumns.put(crfName, contNdsWithStatuses);
 		}
-
 		boolean hasPrevious = start != 0;
 		boolean hasNext = start + maxDispay < displays.size();
-
 		model.addAttribute("ndsCrfHasPrevious", hasPrevious);
 		model.addAttribute("ndsCrfHasNext", hasNext);
 		model.addAttribute("ndsCrfStart", start);
 		model.addAttribute("ndsCrfDataColumns", dataColumns);
-
 		return page;
 	}
 

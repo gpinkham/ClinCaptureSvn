@@ -147,9 +147,6 @@
     // Total number of tabs (one for each CRF)
     var TabsNumber = <c:out value="${sectionNum}"/>;
 
-    var frameWidth = 1000;
-    var tabWidth = frameWidth/TabsNumber;
-
     // Number of tabs to display at a time  o
     var TabsShown = TabsNumber; /* was 3; */
 
@@ -208,7 +205,7 @@
         </c:otherwise>
         </c:choose>
             currTabID = <c:out value="${tabId}"/>;
-            document.write('<td nowrap style="display:inline-block; overflow:hidden; max-width: ' + tabWidth + 'px" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
+            document.write('<td nowrap style="display:inline-block; overflow:hidden;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
             if (TabID != currTabID) {
                 document.write('<div id="Tab' + TabID + 'NotSelected" style="display:all"><div class="tab_BG"><div class="tab_L"><div class="tab_R">');
                 document.write('<a class="tabtext" title="' + TabFullName[(TabID - 1)] + '" href=' + url + '>' + TabLabel[(TabID - 1)] + '</a></div></div></div></div>');
@@ -224,39 +221,6 @@
 
             TabID++;
 
-        }
-
-        reverseRowsOrder();
-
-    }
-
-    function reverseRowsOrder() {
-        TabID=1;
-        var c = 0;
-        var p = 0;
-        var offsets = new Array();
-        var rows = new Array();
-
-        while (TabID<=TabsNumber) {
-            var tab = document.getElementById("Tab" + TabID);
-            if (offsets.length == 0 || tab.offsetTop != offsets[offsets.length - 1]) {
-                c = 0;
-                rows[p++] = new Array();
-                offsets[offsets.length] = tab.offsetTop;
-            }
-            rows[p-1][c++] = tab;
-            TabID++;
-        }
-
-        for (var i = rows.length - 1 ; i >= 0; i--) {
-            var trId = 'tr_' + i;
-            document.write('<tr id="' + trId + '">');
-            for (var j = 0; j <= rows[i].length - 1; j++) {
-                var td = rows[i][j];
-                document.getElementById(trId).innerHTML = document.getElementById(trId).innerHTML + td.outerHTML;
-                td.outerHTML = "";
-            }
-            document.write('</tr>');
         }
     }
 </script>
