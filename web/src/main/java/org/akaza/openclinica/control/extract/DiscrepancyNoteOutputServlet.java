@@ -65,7 +65,7 @@ import com.clinovo.i18n.LocaleResolver;
  * @see ChooseDownloadFormat
  * @see org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked", "serial", "unused"})
 @Component
 public class DiscrepancyNoteOutputServlet extends Controller {
 	// These are the headers that must appear in the HTTP response, when sending a
