@@ -129,6 +129,7 @@ public class StudyParameterConfig {
 
 	private String autoTabbing = "yes";
 	private String showYearsInCalendar = "no";
+	private String instanceType = "development";
 
 	/**
 	 * This is base constructor to set all default values.
@@ -761,5 +762,13 @@ public class StudyParameterConfig {
 
 	public void setShowYearsInCalendar(String showYearsInCalendar) {
 		this.showYearsInCalendar = showYearsInCalendar;
+	}
+
+	public String getInstanceType() {
+		return instanceType;
+	}
+
+	public void setInstanceType(String instanceType) {
+		this.instanceType = instanceType;
 	}
 }

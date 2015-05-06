@@ -2892,6 +2892,11 @@ span.annotated_crfOID, span.annotated_eventOID{
 .maxw250 {
 	max-width: 250px;
 }
+
+.w150 {
+	width: 150px;
+}
+
 .header_crf_cell {
     border: 1px solid #c5c5c5;
     border-spacing: 10px;

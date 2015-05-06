@@ -2,4 +2,5 @@
 <c:choose>
     <c:when test="${instanceType eq 'development'}"><span class="dbTitle">Development DataBase</span></c:when>
     <c:when test="${instanceType eq 'training'}"><span class="dbTitle">Training DataBase</span></c:when>
+	<c:when test="${instanceType != 'training' and instanceType != 'development' and instanceType != 'production'}">${instanceType}</c:when>
 </c:choose>

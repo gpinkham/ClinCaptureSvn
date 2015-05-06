@@ -162,6 +162,8 @@ public abstract class Controller extends BaseController {
 	public static final String EBL_FILTERED = "ebl_filtered";
 	public static final String EBL_FILTER_KEYWORD = "ebl_filterKeyword";
 	public static final String EBL_PAGINATED = "ebl_paginated";
+	public static final String COOKIE_NAME = "lasAccessedInstanceType";
+	public static final int MONTH_IN_SECONDS = 2592000;
 
 	protected void addPageMessage(String message, HttpServletRequest request) {
 		addPageMessage(message, request, logger);
@@ -353,9 +355,7 @@ public abstract class Controller extends BaseController {
 	private String decodeLINKURL(Integer datasetId) {
 
 		String successMsg = "";
-
 		ArchivedDatasetFileDAO asdfDAO = getArchivedDatasetFileDAO();
-
 		ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
 
 		if (fileBeans.size() > 0) {
@@ -363,7 +363,6 @@ public abstract class Controller extends BaseController {
 					+ "AccessFile?fileId=" + fileBeans.get(0).getId() + "\">" + resword.getString("here_lower_case")
 					+ "</a>");
 		}
-
 		return successMsg;
 	}
 
@@ -374,6 +373,17 @@ public abstract class Controller extends BaseController {
 			session.removeAttribute("study");
 			session.removeAttribute("userRole");
 			session.removeAttribute("reloadUserBean");
+		}
+	}
+
+	protected static void updateLastAccessedInstanceType(HttpServletResponse response, StudyBean currentStudy) {
+		if (currentStudy != null) {
+			String cookieValue = currentStudy.getStudyParameterConfig().getInstanceType();
+			String cookiePath = "/";
+			Cookie cookie = new Cookie(COOKIE_NAME, cookieValue);
+			cookie.setMaxAge(MONTH_IN_SECONDS);
+			cookie.setPath(cookiePath);
+			response.addCookie(cookie);
 		}
 	}
 
@@ -479,9 +489,9 @@ public abstract class Controller extends BaseController {
 				}
 				session.setAttribute(STUDY, currentStudy);
 				session.setAttribute(PARENT_STUDY, parentStudy);
-
 			}
 
+			updateLastAccessedInstanceType(response, currentStudy);
 			String randomizationEnviroment = currentStudy.getStudyParameterConfig().getRandomizationEnviroment();
 			session.setAttribute("randomizationEnviroment", randomizationEnviroment);
 

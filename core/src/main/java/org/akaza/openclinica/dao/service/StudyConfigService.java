@@ -197,6 +197,8 @@ public class StudyConfigService {
 				spc.setAutoTabbing(spv.getValue());
 			} else if (handle.equalsIgnoreCase("showYearsInCalendar")) {
 				spc.setShowYearsInCalendar(spv.getValue());
+			} else if (handle.equalsIgnoreCase("instanceType")) {
+				spc.setInstanceType(spv.getValue());
 			}
 		} else if (spv.getId() == 0) {
 			setSystemParameterValues(spvdao, spc, handle);

@@ -1349,6 +1349,28 @@
 			</c:choose>
 		</td>
 	</tr>
+
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="systemProperty.instanceType.label" bundle="${resword}" />:
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.instanceType == 'development'}">
+					<fmt:message key="systemProperty.instanceType.development.radioLabel" bundle="${resword}" />
+				</c:when>
+				<c:when test="${studyToView.studyParameterConfig.instanceType == 'training'}">
+					<fmt:message key="systemProperty.instanceType.training.radioLabel" bundle="${resword}" />
+				</c:when>
+				<c:when test="${studyToView.studyParameterConfig.instanceType == 'production'}">
+					<fmt:message key="systemProperty.instanceType.production.radioLabel" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					${studyToView.studyParameterConfig.instanceType}
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 </table>
 
 </div>

@@ -80,5 +80,6 @@ public class StudyParameterConfigTest {
 
 		assertEquals("yes", config.getAutoTabbing());
 		assertEquals("no", config.getShowYearsInCalendar());
+		assertEquals("development", config.getInstanceType());
 	}
 }

@@ -24,6 +24,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -45,6 +46,8 @@ public class OCServletFilter implements javax.servlet.Filter {
 
 	public static final String USER_BEAN_NAME = "userBean";
 	public static final String REVISION_NUMBER = "revisionNumber";
+	public static final String COOKIE_NAME = "lasAccessedInstanceType";
+	public static final int MONTH_IN_SECONDS = 2592000;
 
 	private WebApplicationContext springContext;
 
@@ -87,7 +90,7 @@ public class OCServletFilter implements javax.servlet.Filter {
 
 		((HttpServletRequest) request).getSession().setAttribute("logoUrl", CoreResources.getField("logo"));
 		((HttpServletRequest) request).getSession()
-				.setAttribute("instanceType", CoreResources.getField("instanceType"));
+				.setAttribute("instanceType", getInstanceType((HttpServletRequest) request));
 
 		Principal principal = req.getUserPrincipal();
 
@@ -130,4 +133,15 @@ public class OCServletFilter implements javax.servlet.Filter {
 		return false;
 	}
 
+	private String getInstanceType(HttpServletRequest request) {
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals(COOKIE_NAME)) {
+					return cookie.getValue();
+				}
+			}
+		}
+		return CoreResources.getField("instanceType");
+	}
 }

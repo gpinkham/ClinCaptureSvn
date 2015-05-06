@@ -44,6 +44,7 @@ import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
@@ -784,6 +785,7 @@ public class CreateStudyServlet extends Controller {
 
 		newStudy.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
 		newStudy.getStudyParameterConfig().setShowYearsInCalendar(fp.getString("showYearsInCalendar"));
+		newStudy.getStudyParameterConfig().setInstanceType(CoreResources.getField("instanceType"));
 
 		request.getSession().setAttribute("newStudy", newStudy);
 
@@ -1007,6 +1009,10 @@ public class CreateStudyServlet extends Controller {
 
 		spv.setParameter("showYearsInCalendar");
 		spv.setValue(newStudy.getStudyParameterConfig().getShowYearsInCalendar());
+		spvdao.create(spv);
+
+		spv.setParameter("instanceType");
+		spv.setValue(newStudy.getStudyParameterConfig().getInstanceType());
 		spvdao.create(spv);
 
 		logger.info("study parameters created done");

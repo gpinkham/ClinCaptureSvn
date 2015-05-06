@@ -197,6 +197,7 @@ public class UpdateStudyServletNew extends Controller {
 				study.setProtocolType(protocolType);
 				submitStudy(study, dDescriptionsMap, request);
 				study.setStudyParameters(getStudyParameterValueDAO().findParamConfigByStudy(study));
+				updateLastAccessedInstanceType(response, study);
 				addPageMessage(respage.getString("the_study_has_been_updated_succesfully"), request);
 				ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
 				request.getSession().setAttribute("pageMessages", pageMessages);
@@ -221,6 +222,10 @@ public class UpdateStudyServletNew extends Controller {
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM7);
 		v.addValidation("protocolDescription", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM7);
+
+		v.addValidation("instanceType", Validator.NO_BLANKS);
+		v.addValidation("instanceType", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM1);
 
 		v.addValidation("studySubjectIdLabel", Validator.NO_BLANKS);
 		v.addValidation("secondaryIdLabel", Validator.NO_BLANKS);
@@ -557,6 +562,7 @@ public class UpdateStudyServletNew extends Controller {
 
 		study.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
 		study.getStudyParameterConfig().setShowYearsInCalendar(fp.getString("showYearsInCalendar"));
+		study.getStudyParameterConfig().setInstanceType(fp.getString("instanceType"));
 
 		try {
 
@@ -974,6 +980,10 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getShowYearsInCalendar());
 		updateParameter(spvdao, spv);
 
+		spv.setParameter("instanceType");
+		spv.setValue(study1.getStudyParameterConfig().getInstanceType());
+		updateParameter(spvdao, spv);
+
 		try {
 
 			// Create custom dictionary
@@ -1188,6 +1198,10 @@ public class UpdateStudyServletNew extends Controller {
 
 			childspv.setParameter("showYearsInCalendar");
 			childspv.setValue(study1.getStudyParameterConfig().getShowYearsInCalendar());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("instanceType");
+			childspv.setValue(study1.getStudyParameterConfig().getInstanceType());
 			updateParameter(spvdao, childspv);
 		}
 	}

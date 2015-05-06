@@ -121,3 +121,17 @@ function allFieldsForGeneratedIdAreValid() {
 	return result;
 }
 
+function updateInstanceType() {
+	var selectInput = $(".instanceType");
+	var textInput = $(".instanceTypeText");
+	var activeName = "instanceType";
+	var inactiveName = "instanceTypeNotUsed";
+
+	if (selectInput.val() == "other") {
+		selectInput.attr("name", inactiveName);
+		textInput.attr("name", activeName).removeAttr("style");
+	} else {
+		selectInput.attr("name", activeName);
+		textInput.attr("name", inactiveName).css("display", "none").val("");
+	}
+}
