@@ -443,6 +443,10 @@ public class Study {
     	if (row.get("Interviewer Name Editable") != null) {
     		study.setInterviewerNameEditable(row.get("Interviewer Name Editable"));
     	}
+    	if (row.get("Use autotabbing") != null) {
+    		study.setUseAutotabbing(row.get("Use autotabbing"));
+    	}
+    	
     	
     	//Medical Coding: 
     	if (row.get("Allow medical coding") != null) {

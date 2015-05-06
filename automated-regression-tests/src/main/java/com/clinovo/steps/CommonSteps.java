@@ -3,6 +3,7 @@ package com.clinovo.steps;
 import java.util.List;
 
 import com.clinovo.pages.*;
+import com.clinovo.pages.beans.CRF;
 import com.clinovo.pages.beans.Study;
 import com.clinovo.pages.beans.StudyEventDefinition;
 import com.clinovo.pages.beans.StudySubject;
@@ -52,8 +53,8 @@ public class CommonSteps extends ScenarioSteps {
 	protected AddSubjectPage addSubjectPage = getPages().get(AddSubjectPage.class);
 	protected SubjectMatrixPage subjectMatrixPage = getPages().get(SubjectMatrixPage.class);
 	protected ManageEventDefinitionsPage manageEventDefinitionsPage = getPages().get(ManageEventDefinitionsPage.class);
-	
-
+	protected CRFPage crfPage = getPages().get(CRFPage.class);
+	protected SDVPage sdvPage = getPages().get(SDVPage.class);
 	
     private LoginPage loginPage = getPages().get(LoginPage.class);
     private HomePage homePage = getPages().get(HomePage.class);
@@ -129,60 +130,64 @@ public class CommonSteps extends ScenarioSteps {
     
     public BasePage getPageByPageName(String page) {
     	switch (page){
-		case LoginPage.PAGE_NAME: 
-			return loginPage;
-		case HomePage.PAGE_NAME: 
-			return homePage;
-		case SubjectMatrixPage.PAGE_NAME: 
-			return subjectMatrixPage;
-		case ViewEventPage.PAGE_NAME: 
-			return viewEventPage;
-		case ResetPasswordPage.PAGE_NAME: 
-			return resetPasswordPage;
-		case AdministerUsersPage.PAGE_NAME: 
-			return administerUsersPage;
-		case ViewUserAccountPage.PAGE_NAME: 
-			return viewUserAccountPage;
-		case BuildStudyPage.PAGE_NAME: 
-			return buildStudyPage;
-		case CreateNewSitePage.PAGE_NAME: 
-			return createNewSitePage;
-		case ConfirmCreateSitePage.PAGE_NAME: 
-			return confirmCreateSitePage;
-		case ManageSitesPage.PAGE_NAME: 
-			return manageSitesPage;
-		case CreateUserAccountPage.PAGE_NAME: 
-			return createUserAccountPage;
-		case ConfigureSystemPropertiesPage.PAGE_NAME: 
-			return configureSystemPropertiesPage;
-		case ConfirmSystemPropertiesPage.PAGE_NAME: 
-			return configureSystemPropertiesPage;
-		case UpdateStudyDetailsPage.PAGE_NAME: 
-			return updateStudyDetailsPage;
-		case CreateCRFVersionPage.PAGE_NAME: 
-			return createCRFVersionPage;
-		case PreviewCRFPage.PAGE_NAME: 
-			return previewCRFPage;	
-		case CreateCRFDataCommitedPage.PAGE_NAME: 
-			return createCRFDataCommitedPage;		
-		case CreateStudyEventDefinitionPage.PAGE_NAME: 
-			return createStudyEventDefinitionPage;	
-		case DefineStudyEventSelectCRFsPage.PAGE_NAME: 
-			return defineStudyEventSelectCRFsPage;	
-		case DefineStudyEventSelectedCRFsPage.PAGE_NAME: 
-			return defineStudyEventSelectedCRFsPage;	
-		case ConfirmEventDefinitionCreationPage.PAGE_NAME: 
-			return confirmEventDefinitionCreationPage;		
-		case ChangeStudyPage.PAGE_NAME: 
-			return changeStudyPage;	
-		case ConfirmChangeStudyPage.PAGE_NAME: 
-			return confirmChangeStudyPage;
-		case AddSubjectPage.PAGE_NAME: 
-			return addSubjectPage;	
-		case ManageEventDefinitionsPage.PAGE_NAME: 
-			return manageEventDefinitionsPage;
+			case LoginPage.PAGE_NAME: 
+				return loginPage;
+			case HomePage.PAGE_NAME: 
+				return homePage;
+			case SubjectMatrixPage.PAGE_NAME: 
+				return subjectMatrixPage;
+			case ViewEventPage.PAGE_NAME: 
+				return viewEventPage;
+			case ResetPasswordPage.PAGE_NAME: 
+				return resetPasswordPage;
+			case AdministerUsersPage.PAGE_NAME: 
+				return administerUsersPage;
+			case ViewUserAccountPage.PAGE_NAME: 
+				return viewUserAccountPage;
+			case BuildStudyPage.PAGE_NAME: 
+				return buildStudyPage;
+			case CreateNewSitePage.PAGE_NAME: 
+				return createNewSitePage;
+			case ConfirmCreateSitePage.PAGE_NAME: 
+				return confirmCreateSitePage;
+			case ManageSitesPage.PAGE_NAME: 
+				return manageSitesPage;
+			case CreateUserAccountPage.PAGE_NAME: 
+				return createUserAccountPage;
+			case ConfigureSystemPropertiesPage.PAGE_NAME: 
+				return configureSystemPropertiesPage;
+			case ConfirmSystemPropertiesPage.PAGE_NAME: 
+				return configureSystemPropertiesPage;
+			case UpdateStudyDetailsPage.PAGE_NAME: 
+				return updateStudyDetailsPage;
+			case CreateCRFVersionPage.PAGE_NAME: 
+				return createCRFVersionPage;
+			case PreviewCRFPage.PAGE_NAME: 
+				return previewCRFPage;	
+			case CreateCRFDataCommitedPage.PAGE_NAME: 
+				return createCRFDataCommitedPage;		
+			case CreateStudyEventDefinitionPage.PAGE_NAME: 
+				return createStudyEventDefinitionPage;	
+			case DefineStudyEventSelectCRFsPage.PAGE_NAME: 
+				return defineStudyEventSelectCRFsPage;	
+			case DefineStudyEventSelectedCRFsPage.PAGE_NAME: 
+				return defineStudyEventSelectedCRFsPage;	
+			case ConfirmEventDefinitionCreationPage.PAGE_NAME: 
+				return confirmEventDefinitionCreationPage;		
+			case ChangeStudyPage.PAGE_NAME: 
+				return changeStudyPage;	
+			case ConfirmChangeStudyPage.PAGE_NAME: 
+				return confirmChangeStudyPage;
+			case AddSubjectPage.PAGE_NAME: 
+				return addSubjectPage;	
+			case ManageEventDefinitionsPage.PAGE_NAME: 
+				return manageEventDefinitionsPage;
+			case CRFPage.PAGE_NAME: 
+				return crfPage;	
+			case SDVPage.PAGE_NAME: 
+				return sdvPage;		
 			
-		default: ;
+			default: ;
     	}
     	
 		return basePage;
@@ -270,9 +275,16 @@ public class CommonSteps extends ScenarioSteps {
 			case SubjectMatrixPage.PAGE_NAME: 
 				go_to_subject_matrix_page();
 				break;	
+			case SDVPage.PAGE_NAME: 
+				go_to_source_data_verification_page();
+				break;		
 				
 			default: ;
 		}		
+	}
+
+	private void go_to_source_data_verification_page() {
+		basePage.goToSDVPage();
 	}
 
 	private void go_to_add_subject_page() {
@@ -356,7 +368,6 @@ public class CommonSteps extends ScenarioSteps {
     @Step
 	public void current_study_is(String studyName) {
 		assert(studyName.equals(basePage.getCurrentStudyName()));
-		
 	}
     
     @Step
@@ -407,6 +418,15 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void click_enter_data_button_in_popup(String aCRFName) {
 		subjectMatrixPage.clickEnterDataButtonInPopup(aCRFName);
-		
+	}
+
+	@Step
+	public void fill_in_crf(CRF crf) {
+		crfPage.fillInCRF(crf);
+	}
+
+	@Step
+	public void click_save_button() {
+		crfPage.clickSaveButton();
 	}
 }

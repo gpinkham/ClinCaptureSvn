@@ -7,13 +7,13 @@ import java.util.Map;
  */
 public class User {
 	public static final User SYSTEM_ADMIN = new User("root", "root@123", UserRole.SYSTEM_ADMIN);
-	public static final User STUDY_ADMIN = new User("demo_admin12", "demo_admin@123", UserRole.STUDY_ADMIN);
+	public static final User STUDY_ADMIN = new User("demo_admin", "demo_admin@123", UserRole.STUDY_ADMIN);
 	public static final User STUDY_MONITOR = new User("demo_mon", "demo_monitor@123", UserRole.STUDY_MONITOR);
 	public static final User STUDY_CODER = new User("demo_coder", "demo_coder@123", UserRole.STUDY_CODER);
 	public static final User STUDY_EVALUATOR = new User("demo_eval", "demo_eval@123", UserRole.STUDY_EVALUATOR);
 	public static final User CRC = new User("demo_crc", "demo_crc@123", UserRole.CRC);
 	public static final User PI = new User("demo_pi", "demo_pi@123", UserRole.PI);
-	public static final User SITE_MONITOR = new User("demo_site_monitor1", "demo_site_monitor@123", UserRole.SITE_MONITOR);
+	public static final User SITE_MONITOR = new User("demo_site_monitor", "demo_site_monitor@123", UserRole.SITE_MONITOR);
 	public static final User STUDY_LEVEL_USER = new User("demo_study_user", "demo_study_user@123", UserRole.STUDY_LEVEL_USER);
 	public static final User USER = new User("demo_user", "demo_user@123", UserRole.USER);
 	public static final String SAVED_USER_NAME = "saved_user_name";

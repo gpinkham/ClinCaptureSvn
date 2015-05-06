@@ -265,20 +265,45 @@ And User goes to SM page
 When User schedules events on SM:
 |Study Subject ID|Event Name      |
 |StSubj_1        |Event C, Event B|
-|StSubj_3        |Event C         |
+|StSubj_2        |Event A, Event B|
+|StSubj_3        |Event B         |
 
-Then User is on SM page
-And Events are scheduled
+Then Events are scheduled
 
 
-Scenario: 15. "Study Admin" changes Study properties to disable 'Collect Interviewer Name' and 'Collect Interview Date' properties
+Scenario: 15. "Study Admin" changes Study properties to disable 'Collect Interviewer Name', 'Collect Interview Date' and 'use Autotabbing' properties
 
 Given User logs in as "Study Admin"
 And User changes Study properties:
-|Collect Interviewer Name|Collect Interview Date|
-|no                      |no                    |
+|Collect Interviewer Name|Collect Interview Date|Use autotabbing|
+|no                      |no                    |no             |
 
 When User clicks 'Submit' button
 Then User is on Build Study page
 And User sets Study status to 'Available'
 
+
+Scenario: 16. "CRC" enters data into CRF for one subject
+
+Given User logs in as "CRC"
+And User goes to SM page
+And User calls a popup for "StSubj_1", "Event B"
+And User clicks 'Enter Data' button in popup for "CRF_w_basic_fields_1"
+And User fills in data into CRF:
+|input1(T)  |input2(T)|input3(R)|input4(T)  |input5(R)|
+|20-Apr-2015|22:00    |1        |description|0        |
+
+When User clicks 'Save' button
+Then User is on SM page
+
+
+Scenario: 16.1 "CRC" enters data into CRF and completes it for some subjects
+
+Given User logs in as "CRC"
+And User goes to SM page
+When User fills in, completes and saves CRF: 
+|Study Subject ID|Event Name|CRF Name            |Mark Complete|input1(T)  |input2(T)|input3(R)|input4(T)|input5(R)|
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|yes          |24-Apr-2015|17:45    |1        |some text|0        |
+|StSubj_3        |Event B   |CRF_w_basic_fields_1|no           |21-Apr-2014|12:00    |0        |         |1        |
+
+Then User is on SM page

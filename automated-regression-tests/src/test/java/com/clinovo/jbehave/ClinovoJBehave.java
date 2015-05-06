@@ -9,6 +9,7 @@ import com.clinovo.pages.BuildStudyPage;
 import com.clinovo.pages.ChangeStudyPage;
 import com.clinovo.pages.ConfirmChangeStudyPage;
 import com.clinovo.steps.CommonSteps;
+import com.clinovo.pages.beans.CRF;
 import com.clinovo.pages.beans.Study;
 import com.clinovo.pages.beans.StudyEventDefinition;
 import com.clinovo.pages.beans.StudySubject;
@@ -334,8 +335,9 @@ public class ClinovoJBehave extends BaseJBehave {
     public void userSchedulesEventsOnSM(ExamplesTable table) {
     	boolean replaceNamedParameters = true;
     	List<StudyEventDefinition> events = new ArrayList<StudyEventDefinition>();
+    	Parameters rowParams;
     	for (int i = 0; i < table.getRowCount(); i++) {
-    		Parameters rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
     		Map<String, String> values = rowParams.values();
     		for (String eventName: rowParams.values().get("Event Name").split(",")) {
     			values.put("Event Name", eventName.trim());
@@ -390,6 +392,58 @@ public class ClinovoJBehave extends BaseJBehave {
     @When("User clicks 'Enter Data' button in popup for \"$CRF\"")
 	public void userClicksEnterDataButtonInPopup(String aCRF) {
     	commonSteps.click_enter_data_button_in_popup(aCRF);
+    }
+    
+    @Given("User fills in data into CRF: $activityTable")
+   	public void userFillsInDataIntoCRF(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams = table.getRowAsParameters(0, replaceNamedParameters);
+    	CRF crf = CRF.fillStudyDetailsFromTableRow(rowParams.values());
+    	commonSteps.fill_in_crf(crf);
+    }
+    
+    
+    @Given("User fills in{ and|, completes and} saves CRF: $activityTable")
+    @When("User fills in{ and|, completes and} saves CRF: $activityTable")
+   	public void userFillsInAndSaveCRF(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		userCallsPopupOnSM(rowParams.values().get("Study Subject ID"), rowParams.values().get("Event Name"));
+    		userClicksEnterDataButtonInPopup(rowParams.values().get("CRF Name"));
+    		rowParams.values().remove("Study Subject ID");
+    		rowParams.values().remove("Event Name");
+    		rowParams.values().remove("CRF Name");
+        	commonSteps.fill_in_crf(CRF.fillStudyDetailsFromTableRow(rowParams.values()));
+    		userClicksSaveButton();
+    	}
+    }
+    
+    @Given("User filters table and performs SDV: $activityTable")
+    @When("User filters table and performs SDV: $activityTable")
+   	public void userFiltersTableAndPerformsSDV(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		userFiltersSDVPage(rowParams);
+    		userClicksPerformSDVButton(rowParams);
+    	}
+    }
+    
+    private void userClicksPerformSDVButton(Parameters rowParams) {
+		
+	}
+
+	private void userFiltersSDVPage(Parameters rowParams) {
+		
+	}
+
+	@Given("User clicks 'Save' button")
+    @When("User clicks 'Save' button")
+	public void userClicksSaveButton() {
+    	commonSteps.click_save_button();
     }
     
     private User getCurrentUser() {

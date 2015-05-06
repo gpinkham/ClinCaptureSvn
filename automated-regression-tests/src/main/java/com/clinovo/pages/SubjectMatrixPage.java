@@ -33,6 +33,9 @@ public class SubjectMatrixPage extends BasePage {
     @FindBy(xpath = ".//div[starts-with(@id, 'eventScheduleWrapper')]//*[@name='Schedule']")
     private WebElementFacade bScheduleEvent;
     
+    @FindBy(className = "crfListTable")
+    private WebElementFacade tCRFList;
+    
     @FindBy(css = "div.dynFilter")
     private WebElementFacade divFindSubjects;
     
@@ -56,7 +59,8 @@ public class SubjectMatrixPage extends BasePage {
     }
 
     public void enterStudySubjectIDToFilterField(String sSubjectID) {
-        divFindSubjects.click();
+    	divFindSubjects.waitUntilVisible();
+    	divFindSubjects.click();
         iFindSubjects.type(sSubjectID);
     }
 
@@ -103,9 +107,10 @@ public class SubjectMatrixPage extends BasePage {
 	}
 
 	public void clickEnterDataButtonInPopup(String aCRFName) { 
+		tCRFList.waitUntilVisible();
 		List<WebElement> tds = tblFindSubjects.findElements(By.xpath(".//div[starts-with(@id, 'crfListWrapper')]//td[contains(text(), '"+ aCRFName +"')]"));
 		for (WebElement td: tds) {
-	    	if (td.getText().replaceFirst(aCRFName, "").trim().replace("*", "").isEmpty()) {
+			if (td.getText().replaceFirst(aCRFName, "").trim().replace("*", "").isEmpty()) {
 	    		td.findElement(By.xpath("./..//img[contains(@name,'bt_EnterData')]")).click();
 	    		break;
 	    	}

@@ -43,6 +43,9 @@ public class BasePage extends AbstractPage {
 
     @FindBy(linkText = "Subject Matrix")
     private WebElementFacade lSubjectMatrix;
+    
+    @FindBy(jquery = "a[href*='pages/viewAllSubjectSDVtmp']")
+    private WebElementFacade lSourceDataVerification;
 
     @FindBy(id = "Submit")
     private WebElementFacade bSubmitA;
@@ -63,6 +66,11 @@ public class BasePage extends AbstractPage {
     public void goToManageRulesPage() {
         lTasksMenu.click();
         lRules.click();
+    }
+    
+    public void goToSDVPage() {
+        lTasksMenu.click();
+        lSourceDataVerification.click();
     }
 
     public void goToBuildStudyPage() {

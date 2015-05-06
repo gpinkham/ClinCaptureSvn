@@ -2,6 +2,16 @@ package com.clinovo.utils;
 
 public class Common {
 
+	public static String removeType(String str) {
+		// input1(R) --> input1
+		return str.substring(0, str.indexOf("("));
+    }
+	
+	public static String getType(String str) {
+		// input1(R) --> R
+		return str.replace(removeType(str)+"(", "").replace(")", "");
+    }
+	
     public static String removeDoubleQuotes(String str) {
 		// "str" --> str
     	return removeQuotes(str, "\"");
