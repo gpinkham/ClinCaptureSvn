@@ -1627,6 +1627,10 @@ public class OdmExtractDAO extends DatasetDAO {
         if (dataset.getExcludeItems() != null && !dataset.getExcludeItems().trim().isEmpty()) {
             excludeItems = Arrays.asList(dataset.getExcludeItems().trim().split(","));
         }
+		List<String> eventsAndCrfs = new ArrayList<String>();
+		if (dataset.getSedIdAndCRFIdPairs() != null && !dataset.getSedIdAndCRFIdPairs().trim().isEmpty()) {
+			eventsAndCrfs = Arrays.asList(dataset.getSedIdAndCRFIdPairs().trim().split(","));
+		}
         if (viewRows.size() > 0) {
             if (!skipBlanks) {
                 checkForUnsavedSectionItems(itemIds, viewRows);
@@ -1686,7 +1690,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     }
                     String newpos = oidPoses.get(ecId) + "---" + igpos.get(key + itDataOrdinal);
                     key = itId + "_" + itDataOrdinal + key;
-                    if (!itprev.equals(key) && !excludeItems.contains(sedId + "_" + cvId + "_" + itId)) {
+                    if (itemShouldBeIncluded(itprev, key, excludeItems, sedId, cvId, itId, eventsAndCrfs)) {
                         itprev = key;
                         ImportItemDataBean it = new ImportItemDataBean();
                         it.setItemOID(itOID);
@@ -1776,7 +1780,16 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    private void addUnsavedItemsToExtract(ExportFormDataBean form, Integer cvId) {
+	private boolean itemShouldBeIncluded(String itprev, String key, List<String> excludeItems, Integer sedId, Integer cvId, Integer itId, List<String> eventsAndCrfs) {
+		boolean suffix = !itprev.equals(key) && !excludeItems.contains(sedId + "_" + cvId + "_" + itId);
+		if (eventsAndCrfs.size() != 0) {
+			return eventsAndCrfs.contains(sedId + "_" + cvId) && suffix;
+		} else {
+			return suffix;
+		}
+	}
+
+	private void addUnsavedItemsToExtract(ExportFormDataBean form, Integer cvId) {
         ImportItemGroupDataBean ig;
         List<Integer> itemIds = getUnsavedItemIdsByVersionId(cvId);
         if (itemIds.size() == 0) {

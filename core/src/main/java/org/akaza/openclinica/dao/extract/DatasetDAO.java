@@ -33,6 +33,7 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 
+import javax.sql.DataSource;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,8 +45,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
-
-import javax.sql.DataSource;
 
 /**
  * The data access object for datasets; also generates datasets based on their query and criteria set; also generates
@@ -131,6 +130,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		this.setTypeExpected(35, TypeNames.BOOL);// show_secondary_id
 		this.setTypeExpected(36, TypeNames.INT);// dataset_item_status_id
         this.setTypeExpected(37, TypeNames.STRING);// exclude_items
+		this.setTypeExpected(38, TypeNames.STRING); //sed_id_and_crf_id_pairs
 	}
 
 	public void setExtractTypesExpected() {
@@ -272,11 +272,13 @@ public class DatasetDAO extends AuditableEntityDAO {
 		 */
 		DatasetBean db = (DatasetBean) eb;
         String excludeItems = "";
+		String sedIdAndCrfIdPairs = "";
         for (String key : (Set<String>) db.getItemMap().keySet()) {
             ItemBean ib = (ItemBean) db.getItemMap().get(key);
             if (!ib.isSelected()) {
                 excludeItems += (excludeItems.isEmpty() ? "" : ",") + key;
             }
+			sedIdAndCrfIdPairs = addSedIdAndCRFIdIfUnique(sedIdAndCrfIdPairs, key);
         }
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		HashMap nullVars = new HashMap();
@@ -320,6 +322,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		variables.put(Integer.valueOf(29), db.isShowSubjectSecondaryId());
 		variables.put(Integer.valueOf(30), db.getDatasetItemStatus().getId());
 		variables.put(Integer.valueOf(31), excludeItems);
+		variables.put(32, sedIdAndCrfIdPairs);
 
 		this.executeWithPK(digester.getQuery("create"), variables, nullVars);
 
@@ -333,6 +336,15 @@ public class DatasetDAO extends AuditableEntityDAO {
 			}
 		}
 		return eb;
+	}
+
+	private String addSedIdAndCRFIdIfUnique(String sedIdAndCrfIdPairs, String key) {
+		String [] arguments = key.split("_");
+		String sedAndCrfId = arguments[0] + "_" + arguments[1];
+		if (!sedIdAndCrfIdPairs.contains(sedAndCrfId)) {
+			sedIdAndCrfIdPairs += (sedIdAndCrfIdPairs.isEmpty() ? "" : ",") + sedAndCrfId;
+		}
+		return sedIdAndCrfIdPairs;
 	}
 
 	public Object getEntityFromHashMap(HashMap hm) {
@@ -375,6 +387,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		DatasetItemStatus dis = DatasetItemStatus.get(isId);
 		eb.setDatasetItemStatus(dis);
         eb.setExcludeItems((String) hm.get("exclude_items"));
+		eb.setSedIdAndCRFIdPairs((String) hm.get("sed_id_and_crf_id_pairs"));
 		return eb;
 	}
 
@@ -615,8 +628,12 @@ public class DatasetDAO extends AuditableEntityDAO {
 		ItemDAO idao = new ItemDAO(ds);
 		DatasetBean db = (DatasetBean) findByPK(datasetId);
 		List<String> excludeItems = new ArrayList<String>();
+		List<String> eventsAndCrfs = new ArrayList<String>();
 		if (db.getExcludeItems() != null && !db.getExcludeItems().trim().isEmpty()) {
 			excludeItems = Arrays.asList(db.getExcludeItems().trim().split(","));
+		}
+		if (db.getSedIdAndCRFIdPairs() != null && !db.getSedIdAndCRFIdPairs().trim().isEmpty()) {
+			eventsAndCrfs = Arrays.asList(db.getSedIdAndCRFIdPairs().trim().split(","));
 		}
 		String sql = db.getSQLStatement();
 		sql = sql.split("study_event_definition_id in")[1];
@@ -641,7 +658,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 			String key = defId + "_" + crfVersionId + "_" + itemId;
 			if (!db.getItemMap().containsKey(key)) {
 				ib.setDefId(defId);
-				ib.setSelected(!excludeItems.contains(key));
+				ib.setSelected(isItemSelected(key, excludeItems, eventsAndCrfs));
 				ib.setDefName(defName);
 				ib.setCrfName(crfName);
 				ib.setDatasetItemMapKey(key);
@@ -660,6 +677,12 @@ public class DatasetDAO extends AuditableEntityDAO {
 		db.setSubjectGroupIds(getGroupIds(db.getId()));
 		Collections.sort(db.getItemDefCrf(), new ItemBean.ItemBeanComparator());
 		return db;
+	}
+
+	private boolean isItemSelected(String key, List<String> excludeItems, List<String> eventsAndCrfs) {
+		String [] arguments = key.split("_");
+		String keyEventCRF = arguments[0] + "_" + arguments[1];
+		return eventsAndCrfs.size() != 0 ? eventsAndCrfs.contains(keyEventCRF) && !excludeItems.contains(key) : !excludeItems.contains(key);
 	}
 
 	protected String getDefinitionCrfItemSql(String sedIds, String itemIds) {
@@ -686,11 +709,13 @@ public class DatasetDAO extends AuditableEntityDAO {
 		eb.setActive(false);
 		DatasetBean db = (DatasetBean) eb;
         String excludeItems = "";
+		String sedIdAndCrfIdPairs = "";
         for (String key : (Set<String>) db.getItemMap().keySet()) {
             ItemBean ib = (ItemBean) db.getItemMap().get(key);
             if (!ib.isSelected()) {
                 excludeItems += (excludeItems.isEmpty() ? "" : ",") + key;
             }
+			sedIdAndCrfIdPairs = addSedIdAndCRFIdIfUnique(sedIdAndCrfIdPairs, key);
         }
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
@@ -740,7 +765,8 @@ public class DatasetDAO extends AuditableEntityDAO {
 		variables.put(Integer.valueOf(31), db.getOdmPriorMetaDataVersionOid());
 		variables.put(Integer.valueOf(32), new Boolean(db.isShowSubjectSecondaryId()));
 		variables.put(Integer.valueOf(33), Integer.valueOf(db.getDatasetItemStatus().getId()));
-		variables.put(Integer.valueOf(34), Integer.valueOf(db.getId()));
+		variables.put(34, sedIdAndCrfIdPairs);
+		variables.put(Integer.valueOf(35), Integer.valueOf(db.getId()));
 		this.execute(digester.getQuery("updateAll"), variables, nullVars);
 		if (isQuerySuccessful()) {
 			eb.setActive(true);

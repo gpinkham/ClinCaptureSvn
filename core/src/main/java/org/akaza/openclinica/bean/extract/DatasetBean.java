@@ -95,6 +95,7 @@ public class DatasetBean extends AuditableEntityBean {
     private ArrayList allSelectedGroups;
 
     private String excludeItems;
+	private String sedIdAndCRFIdPairs;
 
 	public DatasetBean() {
 	}
@@ -646,4 +647,12 @@ public class DatasetBean extends AuditableEntityBean {
     public void setExcludeItems(String excludeItems) {
         this.excludeItems = excludeItems;
     }
+
+	public String getSedIdAndCRFIdPairs() {
+		return sedIdAndCRFIdPairs;
+	}
+
+	public void setSedIdAndCRFIdPairs(String sedIdAndCRFIdPairs) {
+		this.sedIdAndCRFIdPairs = sedIdAndCRFIdPairs;
+	}
 }

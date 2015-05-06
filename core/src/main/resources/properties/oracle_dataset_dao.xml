@@ -45,9 +45,9 @@
 		  			SHOW_GROUP_INFO,SHOW_DISC_INFO,
 		  			odm_metadataversion_name, odm_metadataversion_oid,
 		  			odm_prior_study_oid, odm_prior_metadataversion_oid, show_secondary_id,
-		  			dataset_item_status_id, exclude_items)
+		  			dataset_item_status_id, exclude_items, sed_id_and_crf_id_pairs)
 		  			VALUES (?,?,?,?,?,?,sysdate,sysdate,?,?,?,
-		  			?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		  			?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 </sql>
         </query>
         <query>
@@ -126,7 +126,7 @@
 			SHOW_GROUP_INFO=?,SHOW_DISC_INFO=?,
 			odm_metadataversion_name=?, odm_metadataversion_oid=?,
 			odm_prior_study_oid=?, odm_prior_metadataversion_oid=?,
-			show_secondary_id=?, dataset_item_status_id=?
+			show_secondary_id=?, dataset_item_status_id=?, sed_id_and_crf_id_pairs=?
             WHERE DATASET_ID=?</sql>
 		</query>
 </queries>
