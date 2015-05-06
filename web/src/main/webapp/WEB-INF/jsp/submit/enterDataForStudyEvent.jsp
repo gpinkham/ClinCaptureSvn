@@ -502,7 +502,7 @@
 			<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
 			<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}" name="bt_View${rowCount}"/>
 
-			<ui:printEventCRFLink studyOid="${study.oid}" subjectOid="${studySubject.oid}" studyEvent="${studyEvent}" dec="${dec}" hspace="4"/>
+			<ui:printEventCRFLink studyOid="${parentStudyOid}" subjectOid="${studySubject.oid}" studyEvent="${studyEvent}" dec="${dec}" hspace="4"/>
 
             <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and (!studySubject.status.deleted) && (study.status.available)}">
                 <ui:restoreEventCRFLink object="${dec}" subjectId="${studySubject.id}"/>
@@ -514,7 +514,7 @@
         <c:when test='${!allowDataEntry}'>
 			<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
 			<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}"/>
-			<ui:printEventCRFLink studyOid="${study.oid}" subjectOid="${studySubject.oid}" studyEvent="${studyEvent}" dec="${dec}" hspace="4"/>
+			<ui:printEventCRFLink studyOid="${parentStudyOid}" subjectOid="${studySubject.oid}" studyEvent="${studyEvent}" dec="${dec}" hspace="4"/>
         </c:when>
         <c:otherwise>
 			<c:choose>
@@ -530,7 +530,7 @@
 			</c:choose>
 
 			<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}" name="bt_View${rowCount}"/>
-			<ui:printEventCRFLink studyOid="${study.oid}" subjectOid="${studySubject.oid}" studyEvent="${studyEvent}" dec="${dec}" hspace="4"/>
+			<ui:printEventCRFLink studyOid="${parentStudyOid}" subjectOid="${studySubject.oid}" studyEvent="${studyEvent}" dec="${dec}" hspace="4"/>
 
             <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available)}">
 				<ui:removeEventCRFLink object="${dec}" subjectId="${studySubject.id}"/>

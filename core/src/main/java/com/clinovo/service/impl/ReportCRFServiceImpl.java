@@ -1,10 +1,10 @@
 /*******************************************************************************
  * CLINOVO RESERVES ALL RIGHTS TO THIS SOFTWARE, INCLUDING SOURCE AND DERIVED BINARY CODE. BY DOWNLOADING THIS SOFTWARE YOU AGREE TO THE FOLLOWING LICENSE:
- * 
+ *
  * Subject to the terms and conditions of this Agreement including, Clinovo grants you a non-exclusive, non-transferable, non-sublicenseable limited license without license fees to reproduce and use internally the software complete and unmodified for the sole purpose of running Programs on one computer. 
  * This license does not allow for the commercial use of this software except by IRS approved non-profit organizations; educational entities not working in joint effort with for profit business.
  * To use the license for other purposes, including for profit clinical trials, an additional paid license is required. Please contact our licensing department at http://www.clinovo.com/contact for pricing information.
- * 
+ *
  * You may not modify, decompile, or reverse engineer the software.
  * Clinovo disclaims any express or implied warranty of fitness for use. 
  * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
@@ -15,6 +15,7 @@
 
 package com.clinovo.service.impl;
 
+import com.clinovo.bean.DRDataSourceExtended;
 import com.clinovo.service.DataEntryService;
 import com.clinovo.service.ReportCRFService;
 import com.clinovo.util.DRTemplates;
@@ -27,6 +28,7 @@ import net.sf.dynamicreports.report.constant.HorizontalAlignment;
 import net.sf.dynamicreports.report.datasource.DRDataSource;
 import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Utils;
@@ -36,10 +38,15 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.control.managestudy.BeanFactory;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
@@ -51,11 +58,14 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,12 +75,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import static net.sf.dynamicreports.report.builder.DynamicReports.cmp;
 import static net.sf.dynamicreports.report.builder.DynamicReports.col;
@@ -79,9 +93,7 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.report;
 import static net.sf.dynamicreports.report.builder.DynamicReports.type;
 
 /**
- * 
  * Provides report generation service.
- * 
  */
 @Service("reportCRFService")
 @SuppressWarnings("unchecked")
@@ -118,7 +130,7 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 
 	/**
 	 * Create a report for CRF.
-	 * 
+	 *
 	 * @param eventCRFId
 	 *            EventDefinitionCRF Id to be used
 	 * @param locale
@@ -179,14 +191,14 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 				Page.VIEW_SECTION_DATA_ENTRY_SERVLET, dynamicsMetadataService);
 		String titleText = cb.getName() + " " + crfVerBean.getName();
 		String reportFilePath = dataPath + (titleText + " " + ssubj.getLabel()).replaceAll("( |/|\\\\)", "_");
-
-		generateReportFile(sectionBeans, createHeaderValues(study, subj, ssubj, se, ecb, studydao, locale), titleText,
-				reportFilePath, fileExt, urlPath, sysPath);
-		return reportFilePath + fileExt;
-	}
+        Map<List<DisplayItemBean>, SortedMap<Integer, List<DisplayItemBean>>> repeatingGroupSectionContainer = getSectionRepeatingGroupItemData(crfVerBean, ecb, dynamicsMetadataService);
+        generateReportFile(sectionBeans, repeatingGroupSectionContainer, createHeaderValues(study, subj, ssubj, se, ecb, studydao, locale), titleText,
+                reportFilePath, fileExt, urlPath, sysPath);
+        return reportFilePath + fileExt;
+    }
 
 	/**
-	 * 
+	 *
 	 * @param displaySectionBeans
 	 *            List of DisplaySessionBeans to be used
 	 * @param values
@@ -205,34 +217,77 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 	 *             Thrown in case of I/O failure
 	 * @throws DRException
 	 *             Thrown in case of DynamicReports failure
-	 */
-	private void generateReportFile(List<DisplaySectionBean> displaySectionBeans, Map<String, String> values,
-			String titleText, String reportFilePath, String fileExt, String urlPath, String sysPath)
-			throws IOException, DRException {
-		OutputStream out = new FileOutputStream(reportFilePath + fileExt);
+     */
+    private void generateReportFile(List<DisplaySectionBean> displaySectionBeans, Map<List<DisplayItemBean>, SortedMap<Integer, List<DisplayItemBean>>> repeatingGroupSectionContainer,
+                                    Map<String, String> values, String titleText, String reportFilePath, String fileExt, String urlPath, String sysPath)
+            throws IOException, DRException {
+        OutputStream out = new FileOutputStream(reportFilePath + fileExt);
+        JasperReportBuilder report = DynamicReports.report();
 
-		JasperReportBuilder report = DynamicReports.report();
-		TextColumnBuilder<String> groupColumn = col.column("group", "group_column", type.stringType());
-		ColumnGroupBuilder itemGroup = grp.group(groupColumn).setStyle(DRTemplates.GROUP_COLUMN_CONDITIONAL_STYLE)
-				.addHeaderComponent(cmp.horizontalList().newRow().add(cmp.verticalGap(FIVE)))
-				.addFooterComponent(cmp.horizontalList().newRow().add(cmp.verticalGap(FIVE)));
+        TextColumnBuilder<String> groupColumn = col.column("group", "group_column", type.stringType());
+        ColumnGroupBuilder itemGroup = grp.group(groupColumn).setStyle(DRTemplates.GROUP_COLUMN_CONDITIONAL_STYLE)
+                .addHeaderComponent(cmp.horizontalList().newRow().add(cmp.verticalGap(FIVE)))
+                .addFooterComponent(cmp.horizontalList().newRow().add(cmp.verticalGap(FIVE)));
 
-		report.title(
-				DRTemplates.getTitleComponent(titleText, DRTemplates.getDynamicReportsComponent(urlPath, sysPath)),
-				cmp.subreport(createCRFHeaderTable(values)), DRTemplates.getGapComponent()).pageFooter(
-				DRTemplates.FOOTER_COMPONENT);
-		report.setColumnTitleStyle(DRTemplates.COLUMN_TITLE_STYLE)
-				.highlightDetailEvenRows()
-				.columns(
-						groupColumn,
-						col.column("Question", "left_item_text", type.stringType()),
-						col.column("Answer", "item_value", type.stringType()).setHorizontalAlignment(
-								HorizontalAlignment.CENTER), col.column("", "right_item_text", type.stringType()))
-				.setDataSource(createDataSource(displaySectionBeans)).groupBy(itemGroup).setShowColumnTitle(false);
-		report.toPdf(out);
+        report.title(DRTemplates.getTitleComponent(titleText, DRTemplates.getDynamicReportsComponent(urlPath, sysPath)),
+				cmp.subreport(createCRFHeaderTable(values)),
+				DRTemplates.getGapComponent());
+        report.pageFooter(DRTemplates.FOOTER_COMPONENT);
+        report.setDataSource(new JREmptyDataSource());
 
-		out.close();
-	}
+        JasperReportBuilder nonRepeatingSubReport = DynamicReports.report();
+        nonRepeatingSubReport.setColumnTitleStyle(DRTemplates.COLUMN_TITLE_STYLE)
+                .highlightDetailEvenRows()
+                .columns(groupColumn,
+                        col.column("Question", "left_item_text", type.stringType()),
+                        col.column("Answer", "item_value", type.stringType()).setHorizontalAlignment(HorizontalAlignment.CENTER),
+                        col.column("", "right_item_text", type.stringType()))
+                .setDataSource(createDataSource(displaySectionBeans)).groupBy(itemGroup).setShowColumnTitle(false);
+
+        report.detail(cmp.subreport(nonRepeatingSubReport));
+
+        for (List<DisplayItemBean> groupFirstRow : repeatingGroupSectionContainer.keySet()) {
+            JasperReportBuilder repeatingSubReport = DynamicReports.report();
+            repeatingSubReport.setColumnTitleStyle(DRTemplates.COLUMN_TITLE_STYLE).highlightDetailEvenRows().setShowColumnTitle(true);
+            for (DisplayItemBean firstRowElement : groupFirstRow) {
+				String header = DRUtil.getTextFromHTML(firstRowElement.getMetadata().getHeader()).isEmpty()
+						? DRUtil.getTextFromHTML(firstRowElement.getMetadata().getLeftItemText()).isEmpty()
+						? firstRowElement.getMetadata().getGroupLabel() + firstRowElement.getMetadata().getOrdinal()
+						: firstRowElement.getMetadata().getLeftItemText()
+						: firstRowElement.getMetadata().getHeader();
+				repeatingSubReport.columns().addColumn(col.column(DRUtil.getTextFromHTML(header), DRUtil.getTextFromHTML(header), type.stringType())
+					   .setHorizontalAlignment(HorizontalAlignment.CENTER));
+            }
+			repeatingSubReport.columns().setIgnorePagination(true);
+
+            SortedMap<Integer, List<DisplayItemBean>> groupAdditionalRows = repeatingGroupSectionContainer.get(groupFirstRow);
+            repeatingSubReport.setDataSource(createRepeatingGroupDataset(groupFirstRow, groupAdditionalRows));
+            report.detail(cmp.subreport(repeatingSubReport));
+        }
+
+        report.toPdf(out);
+        out.close();
+    }
+
+    private JRDataSource createRepeatingGroupDataset(List<DisplayItemBean> firstRow, SortedMap<Integer, List<DisplayItemBean>> groupAdditionalRows) {
+
+        DRDataSourceExtended dataSource = new DRDataSourceExtended(DRUtil.getRepeatingColumnNames(firstRow));
+        List<List<String>> generalRepeatingGroupRowValues = new ArrayList<List<String>>();
+        List<String> firstRowValues = new ArrayList<String>();
+        for (DisplayItemBean firstRowElement : firstRow) {
+            firstRowValues.add(getValidDataFormat(firstRowElement));
+        }
+        generalRepeatingGroupRowValues.add(firstRowValues);
+        for (List<DisplayItemBean> row : groupAdditionalRows.values()) {
+            List<String> additionalRowValues = new ArrayList<String>();
+            for (DisplayItemBean rowElement : row) {
+                additionalRowValues.add(getValidDataFormat(rowElement));
+            }
+            generalRepeatingGroupRowValues.add(additionalRowValues);
+        }
+        dataSource.addListRow(generalRepeatingGroupRowValues);
+        return dataSource;
+    }
 
 	private JasperReportBuilder createCRFHeaderTable(Map<String, String> values) {
 		JasperReportBuilder report = report();
@@ -374,6 +429,33 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 		return dataSource;
 	}
 
+    private String getValidDataFormat(DisplayItemBean dib) {
+        String value = "";
+        if (dib.getMetadata().getResponseSet().getResponseType() == ResponseType.TEXT
+                || dib.getMetadata().getResponseSet().getResponseType() == ResponseType.TEXTAREA) {
+            return  dib.getData().getValue();
+        } else if (dib.getMetadata().getResponseSet().getResponseType() == ResponseType.RADIO || dib.getMetadata().getResponseSet().getResponseType() == ResponseType.SELECT
+                || dib.getMetadata().getResponseSet().getResponseType() == ResponseType.SELECTMULTI) {
+            for (Object responseSetOptionBean : dib.getMetadata().getResponseSet().getOptions()) {
+                ResponseOptionBean responseOptionBean = (ResponseOptionBean) responseSetOptionBean;
+                if (dib.getData().getValue().equals(responseOptionBean.getValue())) {
+                    return responseOptionBean.getText();
+                }
+            }
+        } else if (dib.getMetadata().getResponseSet().getResponseType() == ResponseType.CHECKBOX) {
+			List<String> checkedValues = new ArrayList<String>(Arrays.asList(dib.getData().getValue().split(",")));
+			for (String checkValue : checkedValues) {
+				for (Object responseSetOptionBean : dib.getMetadata().getResponseSet().getOptions()) {
+					ResponseOptionBean responseOptionBean = (ResponseOptionBean) responseSetOptionBean;
+					if (checkValue.equals(responseOptionBean.getValue())) {
+						value = value.concat(value.length() > 0 ? ", " : "").concat(responseOptionBean.getText());
+					}
+				}
+			}
+		}
+        return value;
+    }
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -400,5 +482,75 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 	 */
 	public void setResword(ResourceBundle resword) {
 		this.resword = resword;
+    }
+
+
+	private Map<List<DisplayItemBean>, SortedMap<Integer, List<DisplayItemBean>>> getSectionRepeatingGroupItemData(CRFVersionBean crfVerBean, EventCRFBean eventCRFBean, DynamicsMetadataService dynamicsMetadataService) {
+
+		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
+		Map<List<DisplayItemBean>, SortedMap<Integer, List<DisplayItemBean>>> repeatingBean = new LinkedHashMap<List<DisplayItemBean>, SortedMap<Integer, List<DisplayItemBean>>>();
+		SortedMap<Integer, List<DisplayItemBean>> additionalRowOrderedList;
+		DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, dataSource, dynamicsMetadataService);
+		handler.setCrfVersionId(crfVerBean.getId());
+		handler.setEventCRFId(eventCRFBean.getId());
+		List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
+		for (DisplaySectionBean displaySectionBean : displaySectionBeans) {
+			for (DisplayItemGroupBean displayItemGroupBean : displaySectionBean.getDisplayFormGroups()) {
+				boolean unGroupedTable = displayItemGroupBean.getItemGroupBean().getName().equalsIgnoreCase(BeanFactory.UNGROUPED);
+				if (!unGroupedTable) {
+					List<DisplayItemBean> firstRow = displayItemGroupBean.getItems();
+					List<ItemDataBean> allSectionBeanList = itemDataDAO.findAllActiveBySectionIdAndEventCRFId(displaySectionBean.getSection().getId(), eventCRFBean.getId());
+					additionalRowOrderedList = fetchDataForCurrentRepeatingGroup(firstRow, allSectionBeanList, eventCRFBean);
+					if (firstRow.size() > 0) {
+						repeatingBean.put(firstRow, additionalRowOrderedList);
+					}
+				}
+			}
+		}
+		return repeatingBean;
 	}
+
+    private SortedMap<Integer, List<DisplayItemBean>> fetchDataForCurrentRepeatingGroup(List<DisplayItemBean> firstRow, List<ItemDataBean> itemDataBeans, EventCRFBean eventCRFBean) {
+        ItemFormMetadataDAO itemFormMetadataDAO = new ItemFormMetadataDAO(dataSource);
+        String groupLabel = "";
+        for (DisplayItemBean displayItemBean : firstRow) {
+            groupLabel = displayItemBean.getMetadata().getGroupLabel();
+            if (!groupLabel.isEmpty()) {
+              break;
+            }
+        }
+        SortedMap<Integer, List<DisplayItemBean>> orderedAdditionalRowList = new TreeMap<Integer, List<DisplayItemBean>>();
+        List<DisplayItemBean> innerDataBeanList = new ArrayList<DisplayItemBean>();
+        int tracker = 0;
+        List<Integer> listOrdinal = new ArrayList<Integer>();
+        int tempOrdinal;
+        for (ItemDataBean itemDataBean : itemDataBeans) {
+            ItemFormMetadataBean itemFormMetadataBean = itemFormMetadataDAO.findByItemIdAndCRFVersionId(itemDataBean.getItemId(), eventCRFBean.getCRFVersionId());
+            DisplayItemBean displayItemBean = new DisplayItemBean();
+            displayItemBean.setData(itemDataBean);
+            displayItemBean.setMetadata(itemFormMetadataBean);
+            tempOrdinal = itemDataBean.getOrdinal();
+            if (tempOrdinal > 1 && displayItemBean.getMetadata().getGroupLabel().equals(groupLabel)) {
+                tracker++;
+                if (tracker == 1) {
+                    innerDataBeanList.add(displayItemBean);
+                    listOrdinal.add(tempOrdinal);
+                    orderedAdditionalRowList.put(tempOrdinal, innerDataBeanList);
+                } else {
+                    if (listOrdinal.contains(tempOrdinal)) {
+                        orderedAdditionalRowList.get(tempOrdinal).add(displayItemBean);
+                    } else {
+                        listOrdinal.add(tempOrdinal);
+                        innerDataBeanList = new ArrayList<DisplayItemBean>();
+                        innerDataBeanList.add(displayItemBean);
+                        orderedAdditionalRowList.put(tempOrdinal, innerDataBeanList);
+                    }
+                }
+            }
+        }
+        for (List<DisplayItemBean> list : orderedAdditionalRowList.values()) {
+            Collections.sort(list, new DRUtil.RepeatingRowComparator());
+        }
+       return orderedAdditionalRowList;
+    }
 }

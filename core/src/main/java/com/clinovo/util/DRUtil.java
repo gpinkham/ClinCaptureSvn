@@ -18,6 +18,10 @@ package com.clinovo.util;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 public class DRUtil {
 	public static String getTextFromHTML(String htmlText) {
 		// remove tags and returns text
@@ -49,5 +53,28 @@ public class DRUtil {
 
 	public static String getTextFromHeader(String header) {
 		return header.replaceAll("</br>", "\n");
+	}
+
+	public static String[] getRepeatingColumnNames(List<DisplayItemBean> repeatingGroupRow) {
+		List<String> columnNames = new ArrayList<String>();
+		for (DisplayItemBean firstRowElement : repeatingGroupRow) {
+			String header = getTextFromHTML(firstRowElement.getMetadata().getHeader()).isEmpty()
+					? getTextFromHTML(firstRowElement.getMetadata().getLeftItemText()).isEmpty()
+					? firstRowElement.getMetadata().getGroupLabel() + firstRowElement.getMetadata().getOrdinal()
+					: firstRowElement.getMetadata().getLeftItemText()
+					: firstRowElement.getMetadata().getHeader();
+			columnNames.add(DRUtil.getTextFromHTML(header));
+		}
+		String[] stockArr = new String[columnNames.size()];
+		return  columnNames.toArray(stockArr);
+	}
+
+	public static class RepeatingRowComparator implements Comparator<DisplayItemBean> {
+		/**
+		 * {@inheritDoc}
+		 */
+		public int compare(DisplayItemBean o1, DisplayItemBean o2) {
+			return o1.getMetadata().getOrdinal() - o2.getMetadata().getOrdinal();
+		}
 	}
 }

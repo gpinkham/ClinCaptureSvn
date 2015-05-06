@@ -223,6 +223,12 @@ public class EnterDataForStudyEventServlet extends Controller {
 		request.setAttribute("eventCRF", ecb);
 		// Make available the study
 		request.setAttribute("study", currentStudy);
+		if (currentStudy.getParentStudyId() > 0) {
+			StudyBean parentStudyBean = (StudyBean) studydao.findByPK(currentStudy.getParentStudyId());
+			request.setAttribute("parentStudyOid", parentStudyBean.getOid());
+		} else {
+			request.setAttribute("parentStudyOid", currentStudy.getOid());
+		}
 
 		if (fp.getString(OPEN_FIRST_CRF).equalsIgnoreCase(TRUE)) {
 			try {
