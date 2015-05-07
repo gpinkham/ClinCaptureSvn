@@ -85,6 +85,10 @@
 		<td class="table_cell"><c:out value="${user.institutionalAffiliation}" />&nbsp;</td>
 	</tr>
 	<tr>
+		<td class="table_header_column"><fmt:message key="time_zone" bundle="${resword}"/>:</td>
+		<td class="table_cell"><c:out value="${user.userTimeZoneId}" />&nbsp;</td>
+	</tr>
+	<tr>
 		<td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td>
 		<td class="table_cell"><c:out value="${user.status.name}" />&nbsp;</td>
 	</tr>

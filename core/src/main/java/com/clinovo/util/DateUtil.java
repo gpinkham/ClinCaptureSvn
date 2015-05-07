@@ -17,13 +17,22 @@ package com.clinovo.util;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +49,8 @@ public final class DateUtil {
 	private static ResourceBundle resformat;
 
 	private static Locale locale;
+
+	private static Map<String, String> timeZoneIDsSortedMap;
 
 	private DateUtil() {
 
@@ -72,7 +83,7 @@ public final class DateUtil {
 
 	/**
 	 * Converts String in date format to Date object.
-	 * 
+	 *
 	 * @param dateString
 	 *            String
 	 * @return Date
@@ -157,5 +168,77 @@ public final class DateUtil {
 			locale = CoreResources.getSystemLocale();
 		}
 		return locale;
+	}
+
+	/**
+	 * Verifies if string passed represents a valid time zone name,
+	 * based off on the set of standard time zones, provided by <code>joda-time</code> library.
+	 *
+	 * @param timeZoneId String time zone name.
+	 * @return boolean <code>true</code> if string passed represents a valid time zone name,
+	 * <code>false</code> otherwise.
+	 */
+	public static boolean isValidTimeZoneId(String timeZoneId) {
+		return (timeZoneId != null) && DateTimeZone.getAvailableIDs().contains(timeZoneId);
+	}
+
+	/**
+	 * Returns an immutable linked map, which contains a list of pairs
+	 * {key: "time zone ID", value: "(time zone offset) time zone ID"},
+	 * sorted by time zone offset in ascending order.
+	 * Based off on the set of standard time zones, provided by <code>joda-time</code> library.
+	 *
+	 * @return Map<String, String>
+	 */
+	public static Map<String, String> getAvailableTimeZoneIDsSorted() {
+
+		if (timeZoneIDsSortedMap == null) {
+			long instant = System.currentTimeMillis();
+			List<DateTimeZone> timeZonesSorted = new ArrayList<DateTimeZone>();
+			for (String zoneID : DateTimeZone.getAvailableIDs()) {
+				timeZonesSorted.add(DateTimeZone.forID(zoneID));
+			}
+			Collections.sort(timeZonesSorted, new TimeZoneComparator(instant));
+
+			Map<String, String> timeZoneIDsSorted = new LinkedHashMap<String, String>();
+			DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("ZZ");
+			for (DateTimeZone timeZone : timeZonesSorted) {
+				timeZoneIDsSorted.put(timeZone.getID(),
+						"(" + dateTimeFormatter.withZone(timeZone).print(instant) + ") " + timeZone.getID());
+			}
+			timeZoneIDsSortedMap = Collections.unmodifiableMap(timeZoneIDsSorted);
+		}
+		return timeZoneIDsSortedMap;
+	}
+
+	/**
+	 * Comparator class. Compares time zones based on offset.
+	 */
+	private static final class TimeZoneComparator implements Comparator<DateTimeZone> {
+
+		private final long instant;
+
+		TimeZoneComparator(long instant) {
+			this.instant = instant;
+		}
+
+		public long getInstant() {
+			return instant;
+		}
+
+		public int compare(DateTimeZone timeZone1, DateTimeZone timeZone2) {
+
+			int offsetCriteria = ((Integer) timeZone1.getOffset(getInstant()))
+					.compareTo(timeZone2.getOffset(getInstant()));
+			if (offsetCriteria == 0) {
+				return timeZone1.getID().compareTo(timeZone2.getID());
+			} else {
+				return offsetCriteria;
+			}
+		}
+
+		public boolean equals(Object obj) {
+			return super.equals(obj);
+		}
 	}
 }

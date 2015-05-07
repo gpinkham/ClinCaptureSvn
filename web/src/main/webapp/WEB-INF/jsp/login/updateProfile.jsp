@@ -80,6 +80,25 @@
                         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="email"/></jsp:include></td><td class="formlabel">*</td></tr>
                     <tr valign="bottom"><td class="formlabel"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" type="text" name="institutionalAffiliation" value="<c:out value="${userBean1.institutionalAffiliation}"/>" class="formfieldXL"></div>
                         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="institutionalAffiliation"/></jsp:include></td><td class="formlabel">*</td></tr>
+
+					<tr>
+						<td class="formlabel">
+							<fmt:message key="time_zone" bundle="${resword}"/>:
+						</td>
+						<td>
+							<div class="formfieldXL_BG">
+								<select id="userTimeZoneID" name="userTimeZoneID" class="formfieldXL"
+										onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
+									<c:forEach var="timeZoneID" items="${timeZoneIDsSorted}">
+										<option value='<c:out value="${timeZoneID.key}" />' <c:if test="${timeZoneID.key == userBean1.userTimeZoneId}">selected</c:if>>
+											<c:out value="${timeZoneID.value}"/>
+										</option>
+									</c:forEach>
+								</select>
+							</div>
+						</td>
+					</tr>
+
                     <tr><td class="formlabel"><fmt:message key="default_active_study" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
                         <c:set var="activeStudy1" value="${userBean1.activeStudyId}"/>
                         <select name="activeStudyId" class="formfieldXL"  onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">

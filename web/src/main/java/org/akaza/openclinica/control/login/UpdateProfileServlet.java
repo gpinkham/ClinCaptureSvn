@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -83,7 +84,7 @@ public class UpdateProfileServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		String action = request.getParameter("action");// action sent by user
+		String action = request.getParameter("action"); // action sent by user
 		StudyDAO sdao = new StudyDAO(getDataSource());
 		UserAccountDAO udao = new UserAccountDAO(getDataSource());
 		UserAccountBean userBean1 = (UserAccountBean) udao.findByUserName(ub.getName());
@@ -95,10 +96,12 @@ public class UpdateProfileServlet extends Controller {
 		if (StringUtils.isBlank(action)) {
 			request.setAttribute("studies", studies);
 			request.getSession().setAttribute("userBean1", userBean1);
+			request.setAttribute(TIME_ZONE_IDS_SORTED_REQUEST_ATR, DateUtil.getAvailableTimeZoneIDsSorted());
 			forwardPage(Page.UPDATE_PROFILE, request, response);
 		} else {
 			if ("back".equalsIgnoreCase(action)) {
 				request.setAttribute("studies", studies);
+				request.setAttribute(TIME_ZONE_IDS_SORTED_REQUEST_ATR, DateUtil.getAvailableTimeZoneIDsSorted());
 				forwardPage(Page.UPDATE_PROFILE, request, response);
 			}
 			if ("confirm".equalsIgnoreCase(action)) {
@@ -131,7 +134,7 @@ public class UpdateProfileServlet extends Controller {
 		v.addValidation("email", Validator.IS_A_EMAIL);
 		v.addValidation("passwdChallengeQuestion", Validator.NO_BLANKS);
 		v.addValidation("passwdChallengeAnswer", Validator.NO_BLANKS);
-		v.addValidation("oldPasswd", Validator.NO_BLANKS);// old password
+		v.addValidation("oldPasswd", Validator.NO_BLANKS); // old password
 		String password = fp.getString("passwd").trim();
 
 		ConfigurationDao configurationDao = getConfigurationDao();
@@ -142,8 +145,8 @@ public class UpdateProfileServlet extends Controller {
 		List<String> pwdErrors = new ArrayList<String>();
 
 		if (!StringUtils.isBlank(password)) {
-			v.addValidation("passwd", Validator.IS_A_PASSWORD);// new password
-			v.addValidation("passwd1", Validator.CHECK_SAME, "passwd");// confirm
+			v.addValidation("passwd", Validator.IS_A_PASSWORD); // new password
+			v.addValidation("passwd1", Validator.CHECK_SAME, "passwd"); // confirm
 			// password
 
 			PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
@@ -166,6 +169,7 @@ public class UpdateProfileServlet extends Controller {
 		userBean1.setPasswdChallengeAnswer(fp.getString("passwdChallengeAnswer"));
 		userBean1.setPhone(fp.getString("phone"));
 		userBean1.setActiveStudyId(fp.getInt("activeStudyId"));
+		userBean1.setUserTimeZoneId(fp.getString(INPUT_USER_TIME_ZONE_ID));
 		StudyDAO sdao = getStudyDAO();
 
 		StudyBean newActiveStudy = (StudyBean) sdao.findByPK(userBean1.getActiveStudyId());
@@ -194,13 +198,14 @@ public class UpdateProfileServlet extends Controller {
 			logger.info("has validation errors");
 			request.getSession().setAttribute("userBean1", userBean1);
 			request.setAttribute("formMessages", errors);
+			request.setAttribute(TIME_ZONE_IDS_SORTED_REQUEST_ATR, DateUtil.getAvailableTimeZoneIDsSorted());
 			forwardPage(Page.UPDATE_PROFILE, request, response);
 		}
 
 	}
 
 	/**
-	 * Updates user new profile
+	 * Updates user new profile.
 	 * 
 	 */
 	private void submitProfile(UserAccountDAO udao, HttpServletRequest request) {

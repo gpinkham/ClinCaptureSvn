@@ -154,6 +154,8 @@ public abstract class Controller extends BaseController {
 	public static final String FORM_WITH_STATE_FLAG = "formWithStateFlag";
 	public static final String BOOSTRAP_DATE_FORMAT = "bootstrapDateFormat";
 	public static final String BOOTSTRAP_DATAPICKER_DATE_FORMAT = "bootstrap_datapicker_date_format";
+	public static final String TIME_ZONE_IDS_SORTED_REQUEST_ATR = "timeZoneIDsSorted";
+	public static final String INPUT_USER_TIME_ZONE_ID = "userTimeZoneID";
 
 	// entity bean list field names
 	public static final String EBL_PAGE = "ebl_page";

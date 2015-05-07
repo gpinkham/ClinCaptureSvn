@@ -4,6 +4,7 @@ import com.clinovo.controller.base.BaseController;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.EmailService;
 import com.clinovo.service.UserAccountService;
+import com.clinovo.util.DateUtil;
 import com.clinovo.util.EmailUtil;
 import com.clinovo.util.PageMessagesUtil;
 import com.clinovo.util.ValidatorHelper;
@@ -111,6 +112,7 @@ public class EditUserAccountController extends BaseController {
 			model.addAttribute("editedUser", user);
 			model.addAttribute("isSiteLevelUser", userAccountService.isSiteLevelUser(user));
 			if (!fp.isSubmitted()) {
+				model.addAttribute(TIME_ZONE_IDS_SORTED_REQUEST_ATR, DateUtil.getAvailableTimeZoneIDsSorted());
 				model.addAttribute("userTypes", getUserTypes());
 				loadPresetValuesFromBean(fp, user);
 				model.addAttribute("presetValues", fp.getPresetValues());
@@ -152,6 +154,7 @@ public class EditUserAccountController extends BaseController {
 				setInputMessages(errors, request);
 				model.addAttribute("presetValues", fp.getPresetValues());
 				model.addAttribute("userTypes", getUserTypes());
+				model.addAttribute(TIME_ZONE_IDS_SORTED_REQUEST_ATR, DateUtil.getAvailableTimeZoneIDsSorted());
 				PageMessagesUtil.addPageMessage(model,
 						messageSource.getMessage("there_were_some_errors_submission", null, locale)
 								+ messageSource.getMessage("see_below_for_details", null, locale));
@@ -223,6 +226,7 @@ public class EditUserAccountController extends BaseController {
 			model.addAttribute("presetValues", fp.getPresetValues());
 			model.addAttribute("userTypes", getUserTypes());
 			model.addAttribute("userName", user.getName());
+			model.addAttribute(TIME_ZONE_IDS_SORTED_REQUEST_ATR, DateUtil.getAvailableTimeZoneIDsSorted());
 		}
 		return page;
 	}
@@ -242,6 +246,7 @@ public class EditUserAccountController extends BaseController {
 		fp.addPresetValue(INPUT_USER_TYPE, userTypeId);
 		fp.addPresetValue(ARG_USERID, user.getId());
 		fp.addPresetValue(INPUT_RUN_WEBSERVICES, user.getRunWebservices() ? 1 : 0);
+		fp.addPresetValue(INPUT_USER_TIME_ZONE_ID, user.getUserTimeZoneId());
 
 		String sendPwd = SQLInitServlet.getField("user_account_notification");
 		fp.addPresetValue(USER_ACCOUNT_NOTIFICATION, sendPwd);
@@ -251,7 +256,7 @@ public class EditUserAccountController extends BaseController {
 		fp.clearPresetValues();
 
 		String[] textFields = { ARG_USERID, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
-				INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
+				INPUT_INSTITUTION, INPUT_DISPLAY_PWD, INPUT_USER_TIME_ZONE_ID };
 		fp.setCurrentStringValuesAsPreset(textFields);
 
 		String[] ddlbFields = { INPUT_USER_TYPE, INPUT_RESET_PASSWORD, INPUT_RUN_WEBSERVICES };
@@ -369,6 +374,7 @@ public class EditUserAccountController extends BaseController {
 		user.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
 		user.setUpdater(ub);
 		user.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
+		user.setUserTimeZoneId(fp.getString(INPUT_USER_TIME_ZONE_ID));
 		if (!user.getName().equalsIgnoreCase("root")) {
 			UserType ut = UserType.get(fp.getInt(INPUT_USER_TYPE));
 			if (ut.equals(UserType.SYSADMIN)) {

@@ -122,7 +122,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.BOOL);
 		this.setTypeExpected(index++, TypeNames.BOOL);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index, TypeNames.BOOL);
+		this.setTypeExpected(index++, TypeNames.BOOL);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(index, TypeNames.STRING);
 	}
 
 	/**
@@ -232,6 +235,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		variables.put(index++, uab.getRunWebservices());
 
 		variables.put(index++, uab.getEnabled());
+		variables.put(index++, uab.getUserTimeZoneId());
 
 		variables.put(index, uab.getId());
 
@@ -355,7 +359,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 			variables.put(index++, UserType.USER.getId());
 		}
 
-		variables.put(index, uab.getRunWebservices());
+		variables.put(index++, uab.getRunWebservices());
+		variables.put(index, uab.getUserTimeZoneId());
 
 		boolean success;
 		this.execute(digester.getQuery("insert"), variables);
@@ -519,6 +524,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		eb.setAccountNonLocked((Boolean) hm.get("account_non_locked"));
 		eb.setLockCounter(((Integer) hm.get("lock_counter")));
 		eb.setRunWebservices((Boolean) hm.get("run_webservices"));
+		eb.setUserTimeZoneId((String) hm.get("time_zone_id"));
 		eb.setOwnerId(ownerId);
 		eb.setUpdaterId(updateId);
 

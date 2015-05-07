@@ -18,8 +18,8 @@
 			email, active_study, institutional_affiliation,
 			status_id, owner_id, date_created,
 			passwd_challenge_question, passwd_challenge_answer,
-			phone, user_type_id,run_webservices)
-			values (?,?,?,?,?,?,?,?,?,?,now(),?,?,?,?,?)</sql>
+			phone, user_type_id,run_webservices, time_zone_id)
+			values (?,?,?,?,?,?,?,?,?,?,now(),?,?,?,?,?,?)</sql>
 	</query>
 	<query>
 		<name>insertStudyUserRole</name>
@@ -42,7 +42,8 @@
 			email=?, active_study=?, institutional_affiliation=?,
 			status_id=?, update_id=?, date_updated=now(), date_lastvisit=?,
 			passwd_timestamp=?, passwd_challenge_question=?,
-			passwd_challenge_answer=?, phone=?, user_type_id=?, account_non_locked=?,lock_counter=?,run_webservices=?,enabled=?
+			passwd_challenge_answer=?, phone=?, user_type_id=?, account_non_locked=?,lock_counter=?,run_webservices=?,
+			enabled=?, time_zone_id=?
 			where user_id=?</sql>
 	</query>
     <query>

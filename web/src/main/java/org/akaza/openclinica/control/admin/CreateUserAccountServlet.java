@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -82,6 +83,7 @@ public class CreateUserAccountServlet extends Controller {
 	public static final int NAMES_LENGTH = 50;
 	public static final int EMAIL_LENGTH = 120;
 	public static final int INPUT_INSTITUTION_LENGTH = 255;
+	public static final String DEFAULT_TIME_ZONE_ID_REQUEST_ATR = "defaultTimeZoneID";
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -135,18 +137,17 @@ public class CreateUserAccountServlet extends Controller {
 
 		if (!fp.isSubmitted() || changeRoles) {
 			String[] textFields = {INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
-					INPUT_INSTITUTION, INPUT_DISPLAY_PWD};
+					INPUT_INSTITUTION, INPUT_DISPLAY_PWD, INPUT_USER_TIME_ZONE_ID};
 			fp.setCurrentStringValuesAsPreset(textFields);
-
 			String[] ddlbFields = {INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES};
 			fp.setCurrentIntValuesAsPreset(ddlbFields);
-
 			HashMap presetValues = fp.getPresetValues();
 			String sendPwd = SQLInitServlet.getField("user_account_notification");
 			fp.addPresetValue(USER_ACCOUNT_NOTIFICATION, sendPwd);
-			//
 			setPresetValues(presetValues, request);
 			request.setAttribute("pageIsChanged", changeRoles);
+			request.setAttribute(TIME_ZONE_IDS_SORTED_REQUEST_ATR, DateUtil.getAvailableTimeZoneIDsSorted());
+			request.setAttribute(DEFAULT_TIME_ZONE_ID_REQUEST_ATR, ub.getUserTimeZoneId());
 			forwardPage(Page.CREATE_ACCOUNT, request, response);
 		} else {
 			UserType type = UserType.get(fp.getInt("type"));
@@ -178,6 +179,7 @@ public class CreateUserAccountServlet extends Controller {
 				createdUserAccountBean.setPasswdChallengeAnswer("");
 				createdUserAccountBean.setOwner(ub);
 				createdUserAccountBean.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
+				createdUserAccountBean.setUserTimeZoneId(fp.getString(INPUT_USER_TIME_ZONE_ID));
 
 				int studyId = fp.getInt(INPUT_STUDY);
 				int roleId = fp.getInt(INPUT_ROLE);
@@ -227,7 +229,7 @@ public class CreateUserAccountServlet extends Controller {
 				}
 			} else {
 				String[] textFields = {INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
-						INPUT_INSTITUTION, INPUT_DISPLAY_PWD};
+						INPUT_INSTITUTION, INPUT_DISPLAY_PWD, INPUT_USER_TIME_ZONE_ID};
 				fp.setCurrentStringValuesAsPreset(textFields);
 
 				String[] ddlbFields = {INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES};
@@ -237,10 +239,10 @@ public class CreateUserAccountServlet extends Controller {
 				setPresetValues(presetValues, request);
 
 				setInputMessages(errors, request);
-				addPageMessage(
-						respage.getString("there_were_some_errors_submission")
+				addPageMessage(respage.getString("there_were_some_errors_submission")
 								+ respage.getString("see_below_for_details"), request);
 
+				request.setAttribute(TIME_ZONE_IDS_SORTED_REQUEST_ATR, DateUtil.getAvailableTimeZoneIDsSorted());
 				forwardPage(Page.CREATE_ACCOUNT, request, response);
 			}
 		}

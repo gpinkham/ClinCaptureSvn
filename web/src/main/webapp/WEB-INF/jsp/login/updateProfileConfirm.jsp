@@ -54,21 +54,17 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="first_name" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${userBean1.firstName}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="last_name" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${userBean1.lastName}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="email" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${userBean1.email}"/></td></tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="time_zone" bundle="${resword}"/>:
+		</td>
+		<td class="table_cell">
+			<c:out value="${userBean1.userTimeZoneId}"/>
+		</td>
+	</tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${userBean1.institutionalAffiliation}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="default_active_study" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${newActiveStudy.name}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="password_challenge_question" bundle="${resword}"/>:</td><td class="table_cell">
-  <%--<c:set var="question1" value="Mother's Maiden Name"/>--%>
-  <%--<c:choose>--%>
-  <%--<c:when test="${userBean1.passwdChallengeQuestion == question1}">--%>
-	  <%--<fmt:message key="mother_maiden_name" bundle="${resword}"/>--%>
-  <%--</c:when>--%>
-  <%--<c:when test="${userBean1.passwdChallengeQuestion == 'Favorite Pet'}">--%>
-	  <%--<fmt:message key="favourite_pet" bundle="${resword}"/>--%>
-  <%--</c:when>--%>
-  <%--<c:otherwise>--%>
-     <%--<fmt:message key="city_of_birth" bundle="${resword}"/>--%>
-  <%--</c:otherwise>--%>
-   <%--</c:choose>--%>
       <c:out value="${userBean1.passwdChallengeQuestion}"/>
   </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="password_challenge_answer" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${userBean1.passwdChallengeAnswer}"/></td></tr>

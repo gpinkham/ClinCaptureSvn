@@ -81,6 +81,9 @@
     <c:if test='${presetValue.key == "runWebServices"}'>
         <c:set var="runWebServices" value="${presetValue.value}" />
     </c:if>
+	<c:if test='${presetValue.key == "userTimeZoneID"}'>
+		<c:set var="userTimeZoneID" value="${presetValue.value}"/>
+	</c:if>
 </c:forEach>
 <script type="text/JavaScript" language="JavaScript">
   <!--
@@ -120,6 +123,7 @@
 <input type="hidden" name="resetPassword" value='<c:out value="${resetPassword}"/>'/>
 <input type="hidden" name="displayPwd" value='<c:out value="${displayPwd}"/>'/>
 <input type="hidden" name="runWebServices" value='<c:out value="${runWebServices}"/>'/>
+	<input type="hidden" name="userTimeZoneID" value='<c:out value="${userTimeZoneID}"/>'/>
 
 <div style="width: 400px">
 
@@ -162,6 +166,11 @@
     <td class="table_header_column"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td>
     <td class="table_cell"><c:out value="${institutionalAffiliation}" /></td>
   </tr>
+
+	<tr valign="bottom">
+		<td class="table_header_column"><fmt:message key="time_zone" bundle="${resword}"/>:</td>
+		<td class="table_cell"><c:out value="${userTimeZoneID}"/></td>
+	</tr>
 
   <tr valign="bottom">
     <td class="table_header_column"><fmt:message key="user_type" bundle="${resword}"/>:</td>

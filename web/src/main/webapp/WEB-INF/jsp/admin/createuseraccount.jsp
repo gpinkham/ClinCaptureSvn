@@ -100,6 +100,9 @@
     <c:if test='${presetValue.key == "notifyPassword"}'>
         <c:set var="notifyPassword" value="${presetValue.value}"/>
     </c:if>
+	<c:if test='${presetValue.key == "userTimeZoneID"}'>
+		<c:set var="userTimeZoneID" value="${empty presetValue.value ? defaultTimeZoneID : presetValue.value}"/>
+	</c:if>
 </c:forEach>
 
 <script type="text/JavaScript" language="JavaScript">
@@ -272,6 +275,26 @@
         </table>
     </td>
 </tr>
+	<tr valign="top">
+		<td class="formlabel"><fmt:message key="time_zone" bundle="${resword}"/>:</td>
+		<td valign="top">
+			<table border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td valign="top">
+						<div class="formfieldXL_BG">
+							<select id="userTimeZoneID" name="userTimeZoneID" class="formfieldXL">
+								<c:forEach var="timeZoneID" items="${timeZoneIDsSorted}">
+									<option value='<c:out value="${timeZoneID.key}" />' <c:if test="${timeZoneID.key == userTimeZoneID}">selected</c:if>>
+										<c:out value="${timeZoneID.value}"/>
+									</option>
+								</c:forEach>
+							</select>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
 
 <tr valign="top" id="studyTr">
     <td class="formlabel"><fmt:message key="active_study" bundle="${resword}"/>:</td>

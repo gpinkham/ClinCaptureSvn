@@ -37,6 +37,8 @@ public class BaseController {
 	private OpenClinicaSchedulerFactoryBean scheduler;
 
 	public static final String INPUT_MESSAGES = "formMessages";
+	public static final String TIME_ZONE_IDS_SORTED_REQUEST_ATR = "timeZoneIDsSorted";
+	public static final String INPUT_USER_TIME_ZONE_ID = "userTimeZoneID";
 	
 	public ArrayList getAllStudies() {
 		StudyDAO studyDAO = new StudyDAO(dataSource);

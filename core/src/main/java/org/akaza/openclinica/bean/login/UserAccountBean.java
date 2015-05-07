@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -40,6 +41,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.joda.time.DateTimeZone;
 
 /**
  * @author thickerson
@@ -108,10 +110,13 @@ public class UserAccountBean extends AuditableEntityBean {
 	private Boolean runWebservices;
 	@JsonIgnore
 	@XmlTransient
-	public String pentahoUserSession;
+	private String pentahoUserSession;
 	@JsonIgnore
 	@XmlTransient
-	public Date pentahoTokenDate;
+	private Date pentahoTokenDate;
+	@JsonIgnore
+	@XmlTransient
+	private String userTimeZoneId;
 
 	/**
 	 * Counts the number of times the user visited Main Menu servlet.
@@ -179,7 +184,6 @@ public class UserAccountBean extends AuditableEntityBean {
 
 	public UserAccountBean() {
 		super();
-
 		passwd = "";
 		firstName = "";
 		lastName = "";
@@ -192,7 +196,6 @@ public class UserAccountBean extends AuditableEntityBean {
 		phone = "";
 		sysAdmin = false;
 		techAdmin = false;
-
 		userTypes = new ArrayList<UserType>();
 		status = Status.AVAILABLE;
 		numVisitsToMainMenu = 0;
@@ -201,8 +204,8 @@ public class UserAccountBean extends AuditableEntityBean {
 		accountNonLocked = true;
 		lockCounter = 0;
 		runWebservices = false;
-
 		pentahoTokenDate = new Date(0);
+		userTimeZoneId = DateTimeZone.getDefault().getID();
 	}
 
 	@Override
@@ -534,27 +537,6 @@ public class UserAccountBean extends AuditableEntityBean {
 		return getRoleByStudy(activeStudyId).getRole().getName();
 	}
 
-	// public boolean hasPrivilege(Privilege p) {
-	// boolean returnMe = false;
-	// Iterator it = userPrivileges.iterator();
-	// while (it.hasNext()) {
-	// Privilege myPriv = (Privilege)it.next();
-	// if (myPriv.equals(p)) {
-	// returnMe = true;
-	// }
-	// } // end of iterator
-	// return returnMe;
-	// }
-	//
-	// public Privilege getPrivilege(Privilege p) {
-	// if (this.hasPrivilege(p)) {
-	// return p;
-	// }
-	// else {
-	// return Privilege.get(0);
-	// }
-	// }
-
 	/**
 	 * @return Returns the roles.
 	 */
@@ -672,5 +654,13 @@ public class UserAccountBean extends AuditableEntityBean {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public String getUserTimeZoneId() {
+		return userTimeZoneId;
+	}
+
+	public void setUserTimeZoneId(String userTimeZoneId) {
+		this.userTimeZoneId = DateUtil.isValidTimeZoneId(userTimeZoneId) ? userTimeZoneId : DateTimeZone.getDefault().getID();
 	}
 }
