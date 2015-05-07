@@ -232,10 +232,6 @@ function getSib(theSibling){
 // Total number of tabs (one for each CRF)
 var TabsNumber = <c:out value="${sectionNum}"/>;
 
-var frameWidth = 850;
-var tabWidth = frameWidth/TabsNumber;
-
-
 // Number of tabs to display at a time
 var TabsShown = TabsNumber;
 
@@ -277,10 +273,10 @@ function DisplaySectionTabs()
 		</c:choose>
 		currTabID = <c:out value="${tabId}"/>;
         if (TabID <= TabsShown) {
-            document.write('<td nowrap style="display:inline-block; overflow:hidden; max-width: ' + tabWidth + 'px" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
+            document.write('<td nowrap style="display:inline-block; overflow:hidden;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
         }
         else {
-            document.write('<td nowrap style="display:inline-block; overflow:hidden; max-width: ' + tabWidth + 'px" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
+            document.write('<td nowrap style="display:inline-block; overflow:hidden;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
         }
 		if (TabID != currTabID) {
 		document.write('<div id="Tab' + TabID + 'NotSelected" style="display:all"><div class="tab_BG"><div class="tab_L"><div class="tab_R">');
@@ -298,73 +294,15 @@ function DisplaySectionTabs()
 		TabID++;
 
 		}
-
-        reverseRowsOrder();
 	}
-
-function reverseRowsOrder() {
-    TabID=1;
-    var c = 0;
-    var p = 0;
-    var offsets = new Array();
-    var rows = new Array();
-
-    while (TabID<=TabsNumber) {
-        var tab = document.getElementById("Tab" + TabID);
-        if (offsets.length == 0 || tab.offsetTop != offsets[offsets.length - 1]) {
-            c = 0;
-            rows[p++] = new Array();
-            offsets[offsets.length] = tab.offsetTop;
-        }
-        rows[p-1][c++] = tab;
-        TabID++;
-    }
-
-    for (var i = rows.length - 1 ; i >= 0; i--) {
-        var trId = 'tr_' + i;
-        document.write('<tr id="' + trId + '">');
-        for (var j = 0; j <= rows[i].length - 1; j++) {
-            var td = rows[i][j];
-            document.getElementById(trId).innerHTML = document.getElementById(trId).innerHTML + td.outerHTML;
-            td.outerHTML = "";
-        }
-        document.write('</tr>');
-    }
-}
-
 function gotoLink() {
 var OptionIndex=document.sForm.sectionSelect.selectedIndex;
 window.location = document.sForm.sectionSelect.options[OptionIndex].value;
 }
 
 </script>
-<%--
-	<td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"></td>
-	<td align="right"id="TabsNext" style="display: all"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0"></a></td>
-    <td>&nbsp;
-     <div class="formfieldM_BG_noMargin">
-     <select class="formfieldM" name="sectionSelect" size="1" onchange="gotoLink();">
-       <c:set var="tabCount" value="1"/>
-        <option selected>-- <fmt:message key="select_to_jump" bundle="${resword}"/> --</option>
-       <c:forEach var="sec" items="${toc.sections}" >
-         <c:choose>
-		  <c:when test="${studySubject != null && studySubject.id>0}">
-		  <c:set var="tabUrl" value ="SectionPreview?crfId=${crfId}&tabId=${tabCount}"/>
-    	  </c:when>
-		  <c:otherwise>
-		    <c:set var="tabUrl" value ="SectionPreview?crfId=${crfId}&tabId=${tabCount}"/>
-    	  </c:otherwise>
-		  </c:choose>
-        <option value="<c:out value="${tabUrl}"/>"><c:out value="${sec.name}"/></option>
-        <c:set var="tabCount" value="${tabCount+1}"/>
-        </c:forEach>
-        </select>
-        </div>
-     </td>
---%>
   </tr>
 </table>
-
 <!-- </form> -->
 
 <c:choose>
