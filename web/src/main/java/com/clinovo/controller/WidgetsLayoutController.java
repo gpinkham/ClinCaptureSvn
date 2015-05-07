@@ -536,6 +536,7 @@ public class WidgetsLayoutController {
 		int sdvProgressYear = Integer.parseInt(request.getParameter("sdvProgressYear"));
 		sdvProgressYear = sdvProgressYear == 0 ? Calendar.getInstance().get(Calendar.YEAR) : sdvProgressYear;
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
 
 		EventCRFDAO eCrfdao = new EventCRFDAO(datasource);
 		ArrayList<EventCRFBean> previousYear = (ArrayList<EventCRFBean>) eCrfdao.findSDVedEventCRFsByStudyAndYear(sb,
@@ -551,9 +552,7 @@ public class WidgetsLayoutController {
 				.toLowerCase());
 		EventCRFSDVSort sdvSortDone = new EventCRFSDVSort();
 		boolean sdvWithOpenQueries = sb.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes");
-		ArrayList<EventCRFBean> ecrfs = eCrfdao.getAvailableWithFilterAndSort(sb.getId(), sb.getParentStudyId() > 0
-				? sb.getParentStudyId()
-				: sb.getId(), sdvFilterDone, sdvSortDone, sdvWithOpenQueries, 0, FILTER_END);
+		ArrayList<EventCRFBean> ecrfs = eCrfdao.getAvailableWithFilterAndSort(sb.getId(), sdvFilterDone, sdvSortDone, sdvWithOpenQueries, 0, FILTER_END, ub.getId());
 
 		List<Integer> countValues = new ArrayList<Integer>(Collections.nCopies(NUMBER_OF_MONTHS + 1, 0));
 		int currentMonth = sdvCal.get(Calendar.MONTH);
@@ -588,9 +587,8 @@ public class WidgetsLayoutController {
 		EventCRFSDVFilter sdvFilter = new EventCRFSDVFilter(sb.getId());
 		sdvFilter.addFilter("sdvStatus", messageSource.getMessage("not_done", null, LocaleResolver.getLocale()));
 		EventCRFSDVSort sdvSort = new EventCRFSDVSort();
-		ArrayList<EventCRFBean> availableForSDV = eCrfdao.getAvailableWithFilterAndSort(sb.getId(),
-				sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries,
-				0, FILTER_END);
+		ArrayList<EventCRFBean> availableForSDV = eCrfdao.getAvailableWithFilterAndSort(sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries,
+				0, FILTER_END, ub.getId());
 		List<Integer> countAvailableCRFs = new ArrayList<Integer>(Collections.nCopies(NUMBER_OF_MONTHS + 1, 0));
 
 		for (EventCRFBean avCRF : availableForSDV) {

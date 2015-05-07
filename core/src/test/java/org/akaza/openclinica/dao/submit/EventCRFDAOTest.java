@@ -59,15 +59,15 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testGetAvailableWithFilterAndSortReturnsCorrectSizeOfSDVed() {
 		int studyId = 1;
-		int parentStudyId = 1;
+		int userId = 0;
 		EventCRFSDVFilter filter = new EventCRFSDVFilter(1);
 		EventCRFSDVSort sort = new EventCRFSDVSort();
 		int rowStart = 0;
 		int rowEnd = 15;
-		assertNotNull(eventCRFDAO.getAvailableWithFilterAndSort(studyId, parentStudyId, filter, sort, true, rowStart,
-				rowEnd));
+		assertNotNull(eventCRFDAO.getAvailableWithFilterAndSort(studyId, filter, sort, true, rowStart,
+				rowEnd, userId));
 		assertEquals(0,
-				eventCRFDAO.getAvailableWithFilterAndSort(studyId, parentStudyId, filter, sort, true, rowStart, rowEnd)
+				eventCRFDAO.getAvailableWithFilterAndSort(studyId, filter, sort, true, rowStart, rowEnd, userId)
 						.size());
 	}
 

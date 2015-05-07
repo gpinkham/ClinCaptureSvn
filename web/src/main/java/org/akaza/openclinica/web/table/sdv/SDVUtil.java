@@ -256,10 +256,10 @@ public class SDVUtil {
 		}
 		EventCRFSDVFilter eventCRFSDVFilter = getEventCRFSDVFilter(limit, studyId);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+		UserAccountBean user = (UserAccountBean) request.getSession().getAttribute("userBean");
 		boolean allowSdvWithOpenQueries = !"no".equals(currentStudy.getStudyParameterConfig()
 				.getAllowSdvWithOpenQueries());
-		int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, currentStudy.getParentStudyId(),
-				allowSdvWithOpenQueries);
+		int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, allowSdvWithOpenQueries, user.getId());
 		// If maxRows was previously set, we need to set it again in the tableFacade before we
 		// setTotalRows
 		if (maxRows > 0) {
@@ -291,19 +291,16 @@ public class SDVUtil {
 	 *            EventCRFSDVFilter
 	 * @param studyId
 	 *            int
-	 * @param parentStudyId
-	 *            int
 	 * @param allowSdvWithOpenQueries
 	 *            boolean
+	 * @param userId int
 	 * @return int
 	 */
-	public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, int studyId, int parentStudyId,
-			boolean allowSdvWithOpenQueries) {
+	public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, int studyId,
+			boolean allowSdvWithOpenQueries, int userId) {
 
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		return eventCRFDAO.getCountOfAvailableWithFilter(studyId, parentStudyId > 0 ? parentStudyId : studyId,
-				eventCRFSDVFilter, allowSdvWithOpenQueries);
-
+		return eventCRFDAO.getCountOfAvailableWithFilter(studyId, eventCRFSDVFilter, allowSdvWithOpenQueries, userId);
 	}
 
 	protected EventCRFSDVFilter getEventCRFSDVFilter(Limit limit, Integer studyId) {
@@ -335,12 +332,12 @@ public class SDVUtil {
 	private Collection<SubjectSDVContainer> getFilteredItems(EventCRFSDVFilter filterSet, EventCRFSDVSort sortSet,
 			int rowStart, int rowEnd, int studyId, StudyBean currentStudy, HttpServletRequest request) {
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
+		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
 		boolean allowSdvWithOpenQueries = !"no".equals(currentStudy.getStudyParameterConfig()
 				.getAllowSdvWithOpenQueries());
 
-		List<EventCRFBean> eventCRFBeans = eventCRFDAO.getAvailableWithFilterAndSort(studyId,
-				currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : studyId, filterSet, sortSet,
-				allowSdvWithOpenQueries, rowStart, rowEnd);
+		List<EventCRFBean> eventCRFBeans = eventCRFDAO.getAvailableWithFilterAndSort(studyId, filterSet, sortSet,
+				allowSdvWithOpenQueries, rowStart, rowEnd, ub.getId());
 		return getSubjectRows(eventCRFBeans, request);
 	}
 

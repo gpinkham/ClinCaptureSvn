@@ -116,6 +116,28 @@ public class EventCRFSDVFilter implements CriteriaCommand {
 		return criteria;
 	}
 
+	/**
+	 * Get filter for masked CRFs for the current user.
+	 * @param userId int
+	 * @return string query part
+	 */
+	public static String getMaskedCRFsFilter(int userId) {
+		StringBuilder builder = new StringBuilder("");
+		if (userId != 0) {
+			builder = builder.append("and ((SELECT COUNT (*) ")
+					.append("FROM crfs_masking ")
+					.append("WHERE (event_definition_crf_id = (")
+					.append("SELECT event_definition_crf_id ")
+					.append("FROM event_definition_crf edc ")
+					.append("WHERE crf_id = crf.crf_id ")
+					.append("AND study_event_definition_id = sed.study_event_definition_id ")
+					.append("AND study_id = ss.study_id) ")
+					.append("AND study_id = ss.study_id ")
+					.append("AND user_id = ").append(userId).append(")) = 0)");
+		}
+		return builder.toString();
+	}
+
 	private static class Filter {
 		private final String property;
 		private final Object value;

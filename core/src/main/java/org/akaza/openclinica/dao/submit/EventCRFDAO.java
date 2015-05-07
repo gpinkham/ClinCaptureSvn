@@ -1125,27 +1125,26 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	 * 
 	 * @param studyId
 	 *            int
-	 * @param parentStudyId
-	 *            int
 	 * @param filter
 	 *            EventCRFSDVFilter
 	 * @param allowSdvWithOpenQueries
 	 *            boolean
+	 * @param userId int
 	 * @return Integer
 	 */
-	public Integer getCountOfAvailableWithFilter(int studyId, int parentStudyId, EventCRFSDVFilter filter,
-			boolean allowSdvWithOpenQueries) {
+	public Integer getCountOfAvailableWithFilter(int studyId, EventCRFSDVFilter filter,
+			boolean allowSdvWithOpenQueries, int userId) {
 		setTypesExpected();
 		int ind = 1;
 		HashMap variables = new HashMap();
 		variables.put(ind++, studyId);
 		variables.put(ind, studyId);
 		String sql = digester.getQuery("getCountOfAvailableWithFilter");
+		sql += EventCRFSDVFilter.getMaskedCRFsFilter(userId);
 		sql += filter.execute("");
 		if (!allowSdvWithOpenQueries) {
 			sql = sql + digester.getQuery("notAllowSdvWithOpenQueries");
 		}
-
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
 
@@ -1189,7 +1188,6 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		} else {
 			sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
 		}
-
 		ArrayList rows = this.select(sql, variables);
 
 		for (Object row : rows) {
@@ -1204,8 +1202,6 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	 * 
 	 * @param studyId
 	 *            int
-	 * @param parentStudyId
-	 *            int
 	 * @param filter
 	 *            EventCRFSDVFilter
 	 * @param sort
@@ -1216,10 +1212,11 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	 *            int
 	 * @param rowEnd
 	 *            int
+	 * @param userId int can be 0.
 	 * @return ArrayList<EventCRFBean>
 	 */
-	public ArrayList<EventCRFBean> getAvailableWithFilterAndSort(int studyId, int parentStudyId,
-			EventCRFSDVFilter filter, EventCRFSDVSort sort, boolean allowSdvWithOpenQueries, int rowStart, int rowEnd) {
+	public ArrayList<EventCRFBean> getAvailableWithFilterAndSort(int studyId, EventCRFSDVFilter filter,
+					 EventCRFSDVSort sort, boolean allowSdvWithOpenQueries, int rowStart, int rowEnd, int userId) {
 		ArrayList<EventCRFBean> eventCRFs = new ArrayList<EventCRFBean>();
 		setTypesExpected();
 
@@ -1227,9 +1224,9 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		HashMap variables = new HashMap();
 		variables.put(ind++, studyId);
 		variables.put(ind, studyId);
-
 		String sql = digester.getQuery("getAvailableWithFilterAndSort");
-		sql = sql + filter.execute("");
+		sql += EventCRFSDVFilter.getMaskedCRFsFilter(userId);
+		sql += filter.execute("");
 
 		if (!allowSdvWithOpenQueries) {
 			sql = sql + digester.getQuery("notAllowSdvWithOpenQueries");
@@ -1842,14 +1839,13 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	/**
 	 * Method returns all ids with required SDV codes by study subject id.
 	 * 
-	 * @param studySujectId
-	 *            int
+	 * @param studySujectId int
+	 * @param userId int
 	 * @return ArrayList<Integer>
 	 */
-	public ArrayList<Integer> findAllIdsWithRequiredSDVCodesBySSubjectId(int studySujectId) {
+	public ArrayList<Integer> findAllIdsWithRequiredSDVCodesBySSubjectId(int studySujectId, int userId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
-
 		int ind = 1;
 		HashMap variables = new HashMap();
 		variables.put(ind++, studySujectId);
@@ -1858,6 +1854,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(ind++, 1);
 		variables.put(ind, 2);
 		String sql = digester.getQuery("findAllIdsWithSDVCodesBySSubjectId");
+		sql += EventCRFSDVFilter.getMaskedCRFsFilter(userId);
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
 		for (Object anAlist : alist) {

@@ -17,6 +17,7 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -184,6 +185,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		}
 
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
+		UserAccountBean ub = (UserAccountBean) tableFacade.getWebContext().getSessionAttribute("userBean");
 
 		if (!limit.isComplete()) {
 			int totalRows = getTotalRowCount(currentStudy, studySubjectSDVFilter);
@@ -204,7 +206,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		int pageSize = limit.getRowSelect().getMaxRows();
 
 		Collection<SubjectAggregateContainer> items = getFilteredItems(currentStudy, studySubjectSDVFilter,
-				studySubjectSDVSort, rowStart, page * pageSize);
+				studySubjectSDVSort, rowStart, page * pageSize, ub);
 		tableFacade.setItems(items);
 
 	}
@@ -255,7 +257,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 	}
 
 	private Collection<SubjectAggregateContainer> getFilteredItems(StudyBean currentStudy,
-			StudySubjectSDVFilter filterSet, StudySubjectSDVSort sortSet, int rowStart, int rowEnd) {
+			StudySubjectSDVFilter filterSet, StudySubjectSDVSort sortSet, int rowStart, int rowEnd, UserAccountBean ub) {
 		List<SubjectAggregateContainer> rows = new ArrayList<SubjectAggregateContainer>();
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 		if (sortSet.getSorts().size() == 0) {
@@ -265,7 +267,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 				rowStart, rowEnd);
 
 		for (StudySubjectBean studSubjBean : studySubjectBeans) {
-			rows.add(getRow(studSubjBean, currentStudy));
+			rows.add(getRow(studSubjBean, currentStudy, ub));
 		}
 
 		return rows;
@@ -276,7 +278,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		return "<img hspace='2' border='0'  title='SDV Complete' alt='SDV Status' src='" + prefix + "images/icon_";
 	}
 
-	private SubjectAggregateContainer getRow(StudySubjectBean studySubjectBean, StudyBean currentStudy) {
+	private SubjectAggregateContainer getRow(StudySubjectBean studySubjectBean, StudyBean currentStudy, UserAccountBean ub) {
 		SubjectAggregateContainer row = new SubjectAggregateContainer();
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		StudyDAO studyDAO = new StudyDAO(dataSource);
@@ -294,7 +296,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		int numberEventCRFs = eventCRFBeans.size();
 		row.setTotalEventCRF(numberEventCRFs + "");
 
-		HashMap<String, Integer> stats = getEventCRFStats(eventCRFBeans, currentStudy, studySubjectBean);
+		HashMap<String, Integer> stats = getEventCRFStats(eventCRFBeans, currentStudy, studySubjectBean, ub);
 
 		int numberOfCompletedEventCRFs = stats.get("numberOfCompletedEventCRFs");
 		int numberOfSDVdEventCRFs = stats.get("numberOfSDVdEventCRFs");
@@ -362,7 +364,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 	}
 
 	private HashMap<String, Integer> getEventCRFStats(List<EventCRFBean> eventCRFBeans, StudyBean currentStudy,
-			StudySubjectBean studySubject) {
+			StudySubjectBean studySubject, UserAccountBean ub) {
 		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
@@ -378,7 +380,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		List<Integer> eventCRFDefIdsCopy = new ArrayList<Integer>(eventCRFDefIds);
 		HashMap<String, Integer> stats = new HashMap<String, Integer>();
 		List<Integer> eventCRFIdWithRequiredSDVCodesList = eventCRFDAO
-				.findAllIdsWithRequiredSDVCodesBySSubjectId(studySubject.getId());
+				.findAllIdsWithRequiredSDVCodesBySSubjectId(studySubject.getId(), ub.getId());
 
 		boolean studySubjectSDVed = studySubjectDAO.isStudySubjectSDVed(currentStudy, studySubject);
 		boolean studySubjectIsReadyToBeSDVed = !studySubjectSDVed
