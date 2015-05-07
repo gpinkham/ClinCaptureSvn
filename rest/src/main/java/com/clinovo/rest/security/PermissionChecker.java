@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.clinovo.i18n.LocaleResolver;
@@ -38,6 +39,8 @@ import com.clinovo.rest.annotation.RestAccess;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.service.AuthenticationService;
+import com.clinovo.rest.service.OdmController;
+import com.clinovo.rest.service.WadlController;
 import com.clinovo.rest.util.RequestParametersValidator;
 
 /**
@@ -69,7 +72,9 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 			boolean proceed = false;
 			if (handler instanceof HandlerMethod) {
 				RequestParametersValidator.validate(request, messageSource, (HandlerMethod) handler);
-				proceed = ((HandlerMethod) handler).getBean() instanceof AuthenticationService;
+				proceed = ((HandlerMethod) handler).getBean() instanceof AuthenticationService
+						|| ((HandlerMethod) handler).getBean() instanceof WadlController
+						|| ((HandlerMethod) handler).getBean() instanceof OdmController;
 				if (!proceed) {
 					UserDetails userDetails = (UserDetails) request.getSession().getAttribute(
 							API_AUTHENTICATED_USER_DETAILS);
@@ -113,4 +118,11 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 			return proceed;
 		}
 	}
+
+	@Override
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			ModelAndView modelAndView) throws Exception {
+		int x = 0;
+	}
+
 }

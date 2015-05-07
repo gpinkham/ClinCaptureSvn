@@ -15,6 +15,11 @@
 
 package com.clinovo.rest.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.clinovo.rest.security.PermissionChecker;
 import com.clinovo.rest.util.RequestUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,22 +29,29 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * UserDetails.
  */
-@JsonPropertyOrder({ "username", "studyname", "role", "usertype" })
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "UserDetails", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonPropertyOrder({"username", "studyname", "role", "usertype"})
 public class UserDetails {
 
 	@JsonProperty("username")
+	@XmlElement(name = "UserName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String userName;
 
 	@JsonIgnore
+	@XmlElement(name = "Password", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String password;
 
 	@JsonProperty("studyname")
+	@XmlElement(name = "StudyName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String studyName;
 
 	@JsonProperty("role")
+	@XmlElement(name = "Role", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String roleCode;
 
 	@JsonProperty("usertype")
+	@XmlElement(name = "UserType", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String userTypeCode;
 
 	public String getUserName() {
@@ -84,11 +96,10 @@ public class UserDetails {
 
 	/**
 	 * Method that returns current user details.
-	 * 
+	 *
 	 * @return UserDetails
 	 */
-	public static UserDetails getCurrentUserDetails() {
-		return (UserDetails) RequestUtil.getRequest().getSession()
+	public static UserDetails getCurrentUserDetails() {		return (UserDetails) RequestUtil.getRequest().getSession()
 				.getAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
 	}
 }

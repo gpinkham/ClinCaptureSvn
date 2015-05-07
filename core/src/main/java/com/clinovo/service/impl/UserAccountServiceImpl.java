@@ -445,6 +445,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 			if (!displayPassword) {
 				sendEmail(userAccountBean, password,
 						new StudyDAO(dataSource).findByPK(userAccountBean.getActiveStudyId()).getName());
+			} else {
+				userAccountBean.setPasswd(password);
 			}
 		}
 		return userAccountBean;

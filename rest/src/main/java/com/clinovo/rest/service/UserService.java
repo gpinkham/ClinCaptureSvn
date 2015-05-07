@@ -1,9 +1,8 @@
 package com.clinovo.rest.service;
 
-import com.clinovo.rest.annotation.RestAccess;
-import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.model.UserDetails;
-import com.clinovo.service.UserAccountService;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserRole;
 import org.akaza.openclinica.bean.core.UserType;
@@ -18,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
+import com.clinovo.rest.annotation.RestAccess;
+import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.model.UserDetails;
+import com.clinovo.service.UserAccountService;
 
 /**
  * UserService.
@@ -68,19 +69,19 @@ public class UserService extends BaseService {
 	 *            int
 	 * @param role
 	 *            int
-	 * @return String
+	 * @return UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
 	@RestAccess(UserRole.ANY_ADMIN)
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@ResponseBody
-	public String createUser(@RequestParam("username") String userName, @RequestParam("firstname") String firstName,
-			@RequestParam("lastname") String lastName, @RequestParam("email") String email,
-			@RequestParam("phone") String phone, @RequestParam("company") String company,
-			@RequestParam("usertype") int userType, @RequestParam("allowsoap") boolean allowSoap,
-			@RequestParam("displaypassword") boolean displayPassword, @RequestParam("scope") int scope,
-			@RequestParam("role") int role) throws Exception {
+	public UserAccountBean createUser(@RequestParam("username") String userName,
+			@RequestParam("firstname") String firstName, @RequestParam("lastname") String lastName,
+			@RequestParam("email") String email, @RequestParam("phone") String phone,
+			@RequestParam("company") String company, @RequestParam("usertype") int userType,
+			@RequestParam("allowsoap") boolean allowSoap, @RequestParam("displaypassword") boolean displayPassword,
+			@RequestParam("scope") int scope, @RequestParam("role") int role) throws Exception {
 		checkStudyAccess(scope);
 		checkUsernameExistence(userName);
 		checkRoleScopeConsistency(role, scope);
@@ -102,6 +103,8 @@ public class UserService extends BaseService {
 		userAccountBean.setRunWebservices(allowSoap);
 		userAccountBean.addUserType(userAccountType);
 		userAccountBean.setInstitutionalAffiliation(company);
+		userAccountBean.setRoleCode(userAccountRole.getCode());
+		userAccountBean.setUserTypeCode(userAccountType.getCode());
 
 		userAccountBean = userAccountService.createUser(UserDetails.getCurrentUserDetails().getUserName(),
 				userAccountBean, userAccountRole, displayPassword, password);
@@ -111,7 +114,7 @@ public class UserService extends BaseService {
 					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 
-		return userAccountBean.getJsonData(displayPassword ? password : "", userAccountType, userAccountRole);
+		return userAccountBean;
 	}
 
 }

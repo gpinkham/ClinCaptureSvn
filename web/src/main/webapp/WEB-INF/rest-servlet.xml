@@ -15,8 +15,18 @@
         <bean class="com.clinovo.rest.security.PermissionChecker" />
     </mvc:interceptors>
 
-    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager" />
+    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
+        <mvc:message-converters register-defaults="false">
+            <bean class="com.clinovo.rest.serializer.JsonSerializer"/>
+            <bean class="com.clinovo.rest.serializer.OdmXmlSerializer"/>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
 
-    <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean" p:favorPathExtension="false"/>
+    <bean id="contentNegotiationManager"
+          class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <property name="favorPathExtension" value="false"/>
+        <property name="ignoreAcceptHeader" value="false" />
+        <property name="useJaf" value="false"/>
+    </bean>
 
 </beans>

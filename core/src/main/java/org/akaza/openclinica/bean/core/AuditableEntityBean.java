@@ -20,11 +20,17 @@
  */
 package org.akaza.openclinica.bean.core;
 
+import java.util.Date;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * <P>
@@ -43,25 +49,44 @@ import java.util.Date;
  * 
  */
 @SuppressWarnings("serial")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class AuditableEntityBean extends EntityBean {
 
+	@JsonIgnore
+	@XmlTransient
 	protected Date createdDate;
 
+	@JsonIgnore
+	@XmlTransient
 	protected Date updatedDate;
 
+	@JsonIgnore
+	@XmlTransient
 	protected int ownerId;
 
+	@JsonIgnore
+	@XmlTransient
 	protected UserAccountBean owner;
 
+	@JsonIgnore
+	@XmlTransient
 	protected int updaterId;
 
+	@JsonIgnore
+	@XmlTransient
 	protected UserAccountBean updater;
 
+	@JsonIgnore
+	@XmlTransient
 	protected Status status;
 
+	@JsonIgnore
+	@XmlTransient
 	protected Status oldStatus;
 
 	// used to retrieve the owner and updater when needed
+	@JsonIgnore
+	@XmlTransient
 	protected UserAccountDAO udao;
 
 	/**

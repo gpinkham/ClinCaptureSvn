@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema targetNamespace="http://www.cdisc.org/ns/odm/v1.3" xmlns="http://www.cdisc.org/ns/odm/v1.3" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:redefine schemaLocation="ODM1-3-0-foundation.xsd">
+        <xs:group name="ODMElementExtension">
+            <xs:sequence>
+                <xs:group ref="ODMElementExtension"/>
+                <xs:element ref="RestData" minOccurs="0"/>
+            </xs:sequence>
+        </xs:group>
+    </xs:redefine>
+
+    <xs:element name="RestData" type="restData"/>
+
+    <xs:complexType name="restData">
+        <xs:sequence>
+            <xs:element ref="UserAccount" minOccurs="0"/>
+            <xs:element ref="UserDetails" minOccurs="0"/>
+            <xs:element ref="Error" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="Error" type="error"/>
+
+    <xs:element name="Code" type="xs:int"/>
+    <xs:element name="Message" type="xs:string"/>
+
+    <xs:complexType name="error">
+        <xs:sequence>
+            <xs:element ref="Code" minOccurs="0"/>
+            <xs:element ref="Message" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="UserDetails" type="userDetails"/>
+
+    <xs:element name="UserName" type="xs:string"/>
+    <xs:element name="Password" type="xs:string"/>
+    <xs:element name="UserType" type="xs:string"/>
+
+    <xs:complexType name="userDetails">
+        <xs:sequence>
+            <xs:element ref="UserName" minOccurs="0"/>
+            <xs:element ref="Password" minOccurs="0"/>
+            <xs:element ref="StudyName" minOccurs="0"/>
+            <xs:element ref="Role" minOccurs="0"/>
+            <xs:element ref="UserType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="UserAccount" type="userAccountBean"/>
+
+    <xs:element name="AllowSoap" type="xs:boolean"/>
+    <xs:element name="Company" type="xs:string"/>
+    <xs:element name="Id" type="xs:int"/>
+    <xs:element name="Scope" type="xs:int"/>
+
+    <xs:complexType name="userAccountBean">
+        <xs:sequence>
+            <xs:element ref="Id" minOccurs="0"/>
+            <xs:element ref="UserName" minOccurs="0"/>
+            <xs:element ref="Role" minOccurs="0"/>
+            <xs:element ref="UserType" minOccurs="0"/>
+            <xs:element ref="Password" minOccurs="0"/>
+            <xs:element ref="FirstName" minOccurs="0"/>
+            <xs:element ref="LastName" minOccurs="0"/>
+            <xs:element ref="Email" minOccurs="0"/>
+            <xs:element ref="Company" minOccurs="0"/>
+            <xs:element ref="Phone" minOccurs="0"/>
+            <xs:element ref="AllowSoap" minOccurs="0"/>
+            <xs:element ref="Scope" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
+

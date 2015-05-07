@@ -20,49 +20,108 @@
  */
 package org.akaza.openclinica.bean.login;
 
-import org.akaza.openclinica.bean.core.AuditableEntityBean;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 /**
  * @author thickerson
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "UserAccount", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonPropertyOrder({"id", "username", "firstname", "lastname", "email", "phone", "scope", "password", "company",
+		"allowsoap", "role", "usertype"})
 public class UserAccountBean extends AuditableEntityBean {
 
 	private static final long serialVersionUID = -7373737639499260727L;
 
 	public static final String ROOT = "root";
 
+	@JsonProperty("userName")
+	@XmlElement(name = "UserName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String userName;
+	@JsonProperty("role")
+	@XmlElement(name = "Role", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String roleCode;
+	@JsonProperty("usertype")
+	@XmlElement(name = "UserType", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String userTypeCode;
+
+	@JsonProperty("password")
+	@XmlElement(name = "Password", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String passwd;
+	@JsonProperty("firstname")
+	@XmlElement(name = "FirstName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String firstName;
+	@JsonProperty("lastname")
+	@XmlElement(name = "LastName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String lastName;
+	@JsonProperty("email")
+	@XmlElement(name = "Email", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String email;
+	@JsonProperty("company")
+	@XmlElement(name = "Company", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String institutionalAffiliation;
+	@JsonIgnore
+	@XmlTransient
 	private Date lastVisitDate;
+	@JsonIgnore
+	@XmlTransient
 	private Date passwdTimestamp;
+	@JsonIgnore
+	@XmlTransient
 	private String passwdChallengeQuestion;
+	@JsonIgnore
+	@XmlTransient
 	private String passwdChallengeAnswer;
+	@JsonProperty("phone")
+	@XmlElement(name = "Phone", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String phone;
+	@JsonIgnore
+	@XmlTransient
 	private Boolean enabled;
+	@JsonIgnore
+	@XmlTransient
 	private Boolean accountNonLocked;
+	@JsonIgnore
+	@XmlTransient
 	private Integer lockCounter;
+	@JsonProperty("allowsoap")
+	@XmlElement(name = "AllowSoap", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private Boolean runWebservices;
+	@JsonIgnore
+	@XmlTransient
 	public String pentahoUserSession;
+	@JsonIgnore
+	@XmlTransient
 	public Date pentahoTokenDate;
 
 	/**
 	 * Counts the number of times the user visited Main Menu servlet.
 	 */
+	@JsonIgnore
+	@XmlTransient
 	private int numVisitsToMainMenu;
 
+	@JsonProperty("scope")
+	@XmlElement(name = "Scope", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int activeStudyId;
 	// private Study activeStudy;
 
@@ -76,9 +135,15 @@ public class UserAccountBean extends AuditableEntityBean {
 	// ie it may be possible for a user to have multiple usertypes in the future
 	// we maintain the sysAdmin flag to speed up isSysAdmin queries
 	//
+	@JsonIgnore
+	@XmlTransient
 	private boolean sysAdmin; // this is true if the user is the business
 	// dmin, false otherwise
+	@JsonIgnore
+	@XmlTransient
 	private boolean techAdmin;
+	@JsonIgnore
+	@XmlTransient
 	private final ArrayList<UserType> userTypes;
 
 	//
@@ -96,12 +161,18 @@ public class UserAccountBean extends AuditableEntityBean {
 	//
 
 	// elements are StudyUserRoleBeans
+	@JsonIgnore
+	@XmlTransient
 	private ArrayList<StudyUserRoleBean> roles = new ArrayList<StudyUserRoleBean>();
 
 	// key is Integer whose intValue is a studyId, value is StudyUserRoleBean
 	// for that study
+	@JsonIgnore
+	@XmlTransient
 	private final HashMap<Integer, Integer> rolesByStudy = new HashMap<Integer, Integer>();
 
+	@JsonIgnore
+	@XmlTransient
 	private String notes; // not in the DB, only for showing some notes for
 
 	// this acocunt on page
@@ -132,6 +203,12 @@ public class UserAccountBean extends AuditableEntityBean {
 		runWebservices = false;
 
 		pentahoTokenDate = new Date(0);
+	}
+
+	@Override
+	public void setName(String name) {
+		super.setName(name);
+		userName = name;
 	}
 
 	/**
@@ -411,6 +488,7 @@ public class UserAccountBean extends AuditableEntityBean {
 		}
 	}
 
+	@JsonIgnore
 	public StudyUserRoleBean getSysAdminRole() {
 		StudyUserRoleBean studyUserRoleBean = null;
 		for (StudyUserRoleBean surb : roles) {
@@ -446,10 +524,12 @@ public class UserAccountBean extends AuditableEntityBean {
 		return s.isActive();
 	}
 
+	@JsonIgnore
 	public Role getActiveStudyRole() {
 		return getRoleByStudy(activeStudyId).getRole();
 	}
 
+	@JsonIgnore
 	public String getActiveStudyRoleName() {
 		return getRoleByStudy(activeStudyId).getRole().getName();
 	}
@@ -570,22 +650,27 @@ public class UserAccountBean extends AuditableEntityBean {
 		this.pentahoTokenDate = pentahoTokenDate;
 	}
 
-	public String getJsonData(String password, UserType userType, Role role) throws Exception {
-		JSONObject jsonData = new JSONObject();
-		jsonData.put("id", id);
-		jsonData.put("username", name);
-		jsonData.put("firstname", firstName);
-		jsonData.put("lastname", lastName);
-		jsonData.put("email", email);
-		jsonData.put("phone", phone);
-		jsonData.put("scope", activeStudyId);
-		if (!password.isEmpty()) {
-			jsonData.put("password", password);
-		}
-		jsonData.put("company", institutionalAffiliation);
-		jsonData.put("allowsoap", runWebservices);
-		jsonData.put("role", role.getCode());
-		jsonData.put("usertype", userType.getCode());
-		return jsonData.toString();
+	public String getRoleCode() {
+		return roleCode;
+	}
+
+	public void setRoleCode(String roleCode) {
+		this.roleCode = roleCode;
+	}
+
+	public String getUserTypeCode() {
+		return userTypeCode;
+	}
+
+	public void setUserTypeCode(String userTypeCode) {
+		this.userTypeCode = userTypeCode;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 }

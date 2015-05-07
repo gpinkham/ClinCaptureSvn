@@ -1,7 +1,15 @@
 package com.clinovo.rest.service;
 
-import com.clinovo.rest.model.UserDetails;
-import com.clinovo.rest.security.PermissionChecker;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.InputStream;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Properties;
+
 import org.akaza.openclinica.AbstractContextSentiveTest;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -12,6 +20,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.hamcrest.core.IsInstanceOf;
+import org.hamcrest.core.StringContains;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -19,6 +28,7 @@ import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ContextConfiguration;
@@ -30,25 +40,17 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.InputStream;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Properties;
+import com.clinovo.rest.model.UserDetails;
+import com.clinovo.rest.security.PermissionChecker;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-/**
- * BaseServiceTest class.
- */
 @Ignore
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:servlet-context.xml")
 @SuppressWarnings("rawtypes")
 public class BaseServiceTest extends AbstractContextSentiveTest {
+
+	protected MediaType mediaType = MediaType.APPLICATION_JSON;
 
 	protected StudyDAO studyDAO;
 	protected UserAccountDAO userAccountDAO;
@@ -74,6 +76,8 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 	public static final String API_WRONG_MAPPING = "/wrongmapping";
 	public static final String API_USER_CREATE_USER = "/user/create";
 	public static final String API_AUTHENTICATION = "/authentication";
+	public static final String API_WADL = "/wadl";
+	public static final String API_ODM = "/odm";
 
 	public static final Locale LOCALE = new Locale("en");
 
@@ -151,14 +155,16 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 		String company = "home";
 		MvcResult result = this.mockMvc
 				.perform(
-						post(API_USER_CREATE_USER).param("username", userName).param("firstname", firstName)
-								.param("lastname", lastName).param("email", email).param("phone", phone)
-								.param("company", company).param("usertype", Integer.toString(userType.getId()))
-								.param("allowsoap", "true").param("displaypassword", "true")
-								.param("scope", Integer.toString(studyId))
+						post(API_USER_CREATE_USER).accept(mediaType).param("username", userName)
+								.param("firstname", firstName).param("lastname", lastName).param("email", email)
+								.param("phone", phone).param("company", company)
+								.param("usertype", Integer.toString(userType.getId())).param("allowsoap", "true")
+								.param("displaypassword", "true").param("scope", Integer.toString(studyId))
 								.param("role", Integer.toString(role.getId())).secure(true).session(session))
 				.andExpect(status().isOk()).andReturn();
-		String password = (String) new JSONObject(result.getResponse().getContentAsString()).get("password");
+		String password = mediaType.equals(MediaType.APPLICATION_JSON)
+				? (String) new JSONObject(result.getResponse().getContentAsString()).get("password")
+				: result.getResponse().getContentAsString().split("<Password>")[1].split("</Password>")[0];
 		newUser = (UserAccountBean) userAccountDAO.findByUserName(userName);
 		assertTrue(newUser.getId() > 0);
 		newUser.setPasswd(password);
@@ -194,17 +200,20 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 		session.clearAttributes();
 		this.mockMvc
 				.perform(
-						post(API_AUTHENTICATION).secure(true).param("username", userName).param("password", password)
-								.param("studyname", studyName).session(session))
+						post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", userName)
+								.param("password", password).param("studyname", studyName).session(session))
 				.andExpect(status().isOk())
 				.andExpect(
 						MockMvcResultMatchers.request().sessionAttribute(
 								PermissionChecker.API_AUTHENTICATED_USER_DETAILS, IsInstanceOf.any(UserDetails.class)))
 				.andExpect(
 						content().string(
-								"{\"username\":\"".concat(userName).concat("\",\"studyname\":\"").concat(studyName)
-										.concat("\",\"role\":\"").concat(role.getCode()).concat("\",\"usertype\":\"")
-										.concat(userType.getCode()).concat("\"}")));
+								mediaType.equals(MediaType.APPLICATION_JSON)
+										? StringContains.containsString("{\"username\":\"".concat(userName)
+												.concat("\",\"studyname\":\"").concat(studyName)
+												.concat("\",\"role\":\"").concat(role.getCode())
+												.concat("\",\"usertype\":\"").concat(userType.getCode()).concat("\"}"))
+										: StringContains.containsString("<ODM Description=\"REST Data\"")));
 	}
 
 	@Before

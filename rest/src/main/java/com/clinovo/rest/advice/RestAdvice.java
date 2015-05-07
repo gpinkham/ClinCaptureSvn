@@ -15,53 +15,24 @@
 
 package com.clinovo.rest.advice;
 
-import com.clinovo.rest.exception.RestException;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletResponse;
+import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.model.Error;
 
 /**
  * RestAdvice.
  */
 @ControllerAdvice
-@SuppressWarnings("unused")
 public class RestAdvice {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RestAdvice.class);
-
-	/**
-	 * ExceptionWrapper.
-	 */
-	private class ExceptionWrapper {
-
-		private int code;
-		private String message;
-
-		/**
-		 * ExceptionWrapper constructor.
-		 * 
-		 * @param ex
-		 *            Exception
-		 * @param code
-		 *            integer
-		 */
-		public ExceptionWrapper(Exception ex, int code) {
-			this.code = code;
-			this.message = ex.getMessage();
-		}
-
-		public int getCode() {
-			return code;
-		}
-
-		public String getMessage() {
-			return message;
-		}
-	}
 
 	/**
 	 * Exception handler for rest api.
@@ -74,13 +45,13 @@ public class RestAdvice {
 	 */
 	@ExceptionHandler(Exception.class)
 	@ResponseBody
-	public ExceptionWrapper handleException(Exception ex, HttpServletResponse response) {
+	public Error handleException(Exception ex, HttpServletResponse response) {
 		LOGGER.error("Error has occurred.", ex);
 		int code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		if (ex instanceof RestException) {
 			code = ((RestException) ex).getCode();
 		}
 		response.setStatus(code);
-		return new ExceptionWrapper(ex, code);
+		return new Error(ex, code);
 	}
 }
