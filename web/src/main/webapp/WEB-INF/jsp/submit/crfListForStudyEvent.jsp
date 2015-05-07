@@ -286,19 +286,18 @@
     </c:when>
 
     <c:otherwise>
-    <tr>
-        <td class="table_header_row_left" style="width: auto; min-width: 170px;"><fmt:message key="CRF_name" bundle="${resword}"/></td>
-        <td class="table_header_row_left" style="width: auto;"><fmt:message key="version" bundle="${resword}"/></td>
-        <td class="table_header_row_left" style="width: auto;"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
-        <td class="table_header_row_left ddeColumnHeader" style="width: auto;"><fmt:message key="validation" bundle="${resword}"/></td>
-        <td class="table_header_row_left" style="width: auto;">&nbsp;<%--fmt:message key="status" bundle="${resword}"/--%></td>
-        <td class="table_header_row_left crfListTableActions" style="width: auto;">&nbsp;<%--fmt:message key="actions" bundle="${resword}"/--%></td>
-    </tr>
-    <c:set var="rowCount" value="${0}" />
-
-    <c:forEach var="dedc" items="${fullCrfList}">
+        <tr>
+            <td class="table_header_row_left" style="width: auto; min-width: 170px;"><fmt:message key="CRF_name" bundle="${resword}"/></td>
+            <td class="table_header_row_left" style="width: auto;"><fmt:message key="version" bundle="${resword}"/></td>
+            <td class="table_header_row_left" style="width: auto;"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
+            <td class="table_header_row_left ddeColumnHeader" style="width: auto;"><fmt:message key="validation" bundle="${resword}"/></td>
+            <td class="table_header_row_left" style="width: auto;">&nbsp;<%--fmt:message key="status" bundle="${resword}"/--%></td>
+            <td class="table_header_row_left crfListTableActions" style="width: auto;">&nbsp;<%--fmt:message key="actions" bundle="${resword}"/--%></td>
+        </tr>
+        <c:set var="rowCount" value="${0}" />
+        <c:forEach var="dedc" items="${fullCrfList}">
         <c:choose>
-            <c:when test="${dedc.class.name eq 'org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean'}">
+            <c:when test="${dedc['class'].name eq 'org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean'}">
                         <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
                             <tr valign="top">
                                 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" />
@@ -472,7 +471,7 @@
 
                 <!-- end of for each for dedc, uncompleted event crfs, started CRFs below -->
                 </c:when>
-                    <c:when test="${dedc.class.name eq 'org.akaza.openclinica.bean.submit.DisplayEventCRFBean'}">
+                    <c:when test="${dedc['class'].name eq 'org.akaza.openclinica.bean.submit.DisplayEventCRFBean'}">
                         <c:set var="dec" value="${dedc}"/>
 
                         <tr>
