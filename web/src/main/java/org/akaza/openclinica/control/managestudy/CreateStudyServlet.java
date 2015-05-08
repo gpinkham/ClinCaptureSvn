@@ -785,7 +785,6 @@ public class CreateStudyServlet extends Controller {
 
 		newStudy.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
 		newStudy.getStudyParameterConfig().setShowYearsInCalendar(fp.getString("showYearsInCalendar"));
-		newStudy.getStudyParameterConfig().setInstanceType(CoreResources.getField("instanceType"));
 
 		request.getSession().setAttribute("newStudy", newStudy);
 

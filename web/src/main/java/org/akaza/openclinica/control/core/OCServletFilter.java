@@ -46,7 +46,7 @@ public class OCServletFilter implements javax.servlet.Filter {
 
 	public static final String USER_BEAN_NAME = "userBean";
 	public static final String REVISION_NUMBER = "revisionNumber";
-	public static final String COOKIE_NAME = "lasAccessedInstanceType";
+	public static final String COOKIE_NAME = "lastAccessedInstanceType";
 	public static final int MONTH_IN_SECONDS = 2592000;
 
 	private WebApplicationContext springContext;
@@ -142,6 +142,6 @@ public class OCServletFilter implements javax.servlet.Filter {
 				}
 			}
 		}
-		return CoreResources.getField("instanceType");
+		return "";
 	}
 }

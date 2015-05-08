@@ -16,7 +16,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
-import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
@@ -25,7 +24,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
-import org.joda.time.DateTimeZone;
 
 /**
  * StudySubject.
@@ -53,7 +51,6 @@ public class StudySubject extends DataMapDomainObject {
     private List<DnStudySubjectMap> dnStudySubjectMaps;
     private List<StudyEvent> studyEvents;
     private List<EventCrf> eventCrfs;
-	private String userTimeZoneId;
 
     @Id
     @Column(name = "study_subject_id", unique = true, nullable = false)
@@ -212,13 +209,4 @@ public class StudySubject extends DataMapDomainObject {
     public void setEventCrfs(List<EventCrf> eventCrfs) {
         this.eventCrfs = eventCrfs;
     }
-
-	@Column(name = "time_zone_id")
-	public String getUserTimeZoneId() {
-		return userTimeZoneId;
-	}
-
-	public void setUserTimeZoneId(String userTimeZoneId) {
-		this.userTimeZoneId = DateUtil.isValidTimeZoneId(userTimeZoneId) ? userTimeZoneId : DateTimeZone.getDefault().getID();
-	}
 }

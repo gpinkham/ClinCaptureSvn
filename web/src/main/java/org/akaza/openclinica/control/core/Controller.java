@@ -164,7 +164,7 @@ public abstract class Controller extends BaseController {
 	public static final String EBL_FILTERED = "ebl_filtered";
 	public static final String EBL_FILTER_KEYWORD = "ebl_filterKeyword";
 	public static final String EBL_PAGINATED = "ebl_paginated";
-	public static final String COOKIE_NAME = "lasAccessedInstanceType";
+	public static final String COOKIE_NAME = "lastAccessedInstanceType";
 	public static final int MONTH_IN_SECONDS = 2592000;
 
 	protected void addPageMessage(String message, HttpServletRequest request) {

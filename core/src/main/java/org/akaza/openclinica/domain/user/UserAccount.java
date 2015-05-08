@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfBean;
@@ -35,7 +36,7 @@ import org.akaza.openclinica.domain.datamap.Subject;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
-
+import org.joda.time.DateTimeZone;
 
 /**
  * UserAccount.
@@ -70,6 +71,7 @@ public class UserAccount extends DataMapDomainObject {
     private boolean accountNonLocked;
     private int lockCounter;
     private boolean runWebservices;
+	private String userTimeZoneId;
     private List<Item> items;
     private List<Section> sections;
     private List<ItemGroup> itemGroups;
@@ -303,6 +305,16 @@ public class UserAccount extends DataMapDomainObject {
     public void setRunWebservices(boolean runWebservices) {
         this.runWebservices = runWebservices;
     }
+
+	@Column(name = "time_zone_id")
+	public String getUserTimeZoneId() {
+		return userTimeZoneId;
+	}
+
+	public void setUserTimeZoneId(String userTimeZoneId) {
+		this.userTimeZoneId = DateUtil.isValidTimeZoneId(userTimeZoneId)
+				? userTimeZoneId : DateTimeZone.getDefault().getID();
+	}
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
     public List<Item> getItems() {
