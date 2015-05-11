@@ -13,6 +13,9 @@
     <mvc:interceptors>
         <bean class="com.clinovo.interceptor.SetUpSessionInterceptor" />
         <bean class="org.akaza.openclinica.web.print.RestODMFilter" />
+        <bean class="org.springframework.web.servlet.mvc.WebContentInterceptor">
+            <property name="cacheSeconds" value="0" />
+        </bean>
     </mvc:interceptors>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" id="internalViewResolver"          p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />

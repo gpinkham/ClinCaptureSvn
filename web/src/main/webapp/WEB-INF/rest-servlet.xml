@@ -13,6 +13,9 @@
 
     <mvc:interceptors>
         <bean class="com.clinovo.rest.security.PermissionChecker" />
+        <bean class="org.springframework.web.servlet.mvc.WebContentInterceptor">
+            <property name="cacheSeconds" value="0" />
+        </bean>
     </mvc:interceptors>
 
     <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
