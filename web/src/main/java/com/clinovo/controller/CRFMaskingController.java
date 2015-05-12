@@ -169,7 +169,9 @@ public class CRFMaskingController extends BaseController {
 		Locale locale = LocaleResolver.getLocale(request);
 		ArrayList<String> messages = new ArrayList<String>();
 		messages.add(messageSource.getMessage("crf_masking_success", null, locale) + " " + user.getName() + ".");
-		attributes.addFlashAttribute("pageMessages", messages);
+		Map storedAttributes = new HashMap();
+		storedAttributes.put("pageMessages", messages);
+		request.getSession().setAttribute("RememberLastPage_storedAttributes", storedAttributes);
 
 		return page;
 	}

@@ -100,6 +100,7 @@ public class EditUserAccountController extends BaseController {
 		if (!isAdmin(request)) {
 			page = "redirect:/MainMenu?message=system_no_permission";
 		} else {
+			org.akaza.openclinica.control.core.Controller.restorePageMessages(request);
 			locale = LocaleResolver.getLocale(request);
 			FormProcessor fp = new FormProcessor(request);
 			// because we need to use this in the confirmation and error parts too
