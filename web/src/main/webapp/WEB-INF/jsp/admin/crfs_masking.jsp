@@ -106,8 +106,8 @@
 																		<c:set value="" var="notMasked" />
 																		<c:set value="checked" var="masked" />
 																	</c:if>
-																	<input type="radio" ${masked} value="masked" name="crf_mask_c${crf.id}_e${event.id}_s${site.id}"> <fmt:message bundle="${resword}" key="yes"/>
-																	<input type="radio" ${notMasked} value="notMasked" name="crf_mask_c${crf.id}_e${event.id}_s${site.id}"> <fmt:message bundle="${resword}" key="no"/>
+																	<input type="radio" ${masked} value="masked" name="crf_mask_c${crf.id}_e${event.id}_s${site.id}" onchange="javascript:changeIcon()" /> <fmt:message bundle="${resword}" key="yes"/>
+																	<input type="radio" ${notMasked} value="notMasked" name="crf_mask_c${crf.id}_e${event.id}_s${site.id}" onchange="javascript:changeIcon()" /> <fmt:message bundle="${resword}" key="no"/>
 																</td>
 															</tr>
 														</c:forEach>
@@ -128,10 +128,17 @@
 	<table style="margin-top:40px">
 		<tr>
 			<td>
-				<input type="button" name="back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onclick="history.go(-1);"/>
+				<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage"
+					   value="<fmt:message key="back" bundle="${resword}"/>"
+					   class="button_medium"
+					   onClick="checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', 'EditUserAccount?userId=${userId}');"/>
+
 			</td>
 			<td>
 				<input type="submit" name="submit_and_restore" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"/>
+			</td>
+			<td>
+				<img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
 			</td>
 		</tr>
 	</table>
