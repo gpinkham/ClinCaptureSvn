@@ -305,5 +305,18 @@ When User fills in, completes and saves CRF:
 |Study Subject ID|Event Name|CRF Name            |Mark Complete|input1(T)  |input2(T)|input3(R)|input4(T)|input5(R)|
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|yes          |24-Apr-2015|17:45    |1        |some text|0        |
 |StSubj_3        |Event B   |CRF_w_basic_fields_1|no           |21-Apr-2014|12:00    |0        |         |1        |
+|StSubj_1        |Event B   |CRF_w_basic_fields_1|yes          |           |         |         |         |         |
 
 Then User is on SM page
+
+Scenario: 17 "Study Monitor" performs SDV on SDV page
+ 
+Given User logs in as "Study Monitor"
+And User goes to SDV page
+When User filters table and performs SDV: 
+|Study Subject ID|Event Name|CRF Name            |
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|
+|StSubj_1        |Event B   |CRF_w_basic_fields_1|
+ 
+Then CRFs are SDVed
+

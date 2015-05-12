@@ -428,16 +428,18 @@ public class ClinovoJBehave extends BaseJBehave {
     	for (int i = 0; i < table.getRowCount(); i++) {
     		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
     		userFiltersSDVPage(rowParams);
-    		userClicksPerformSDVButton(rowParams);
+    		userClicksPerformSDVButtonForFilteredTable();
     	}
+    	
+    	Thucydides.getCurrentSession().put(CRF.CRFS_TO_CHECK_SDV_STATUS, table);
     }
     
-    private void userClicksPerformSDVButton(Parameters rowParams) {
-		
+    private void userClicksPerformSDVButtonForFilteredTable() {
+    	commonSteps.click_perform_SDV_button_for_filtered_table();
 	}
 
 	private void userFiltersSDVPage(Parameters rowParams) {
-		
+		commonSteps.filter_SDV_page(rowParams.values());
 	}
 
 	@Given("User clicks 'Save' button")
@@ -445,8 +447,25 @@ public class ClinovoJBehave extends BaseJBehave {
 	public void userClicksSaveButton() {
     	commonSteps.click_save_button();
     }
+	
+	@Then("CRFs are SDVed")
+	public void crfsAreSDVed() {
+		ExamplesTable table = (ExamplesTable) Thucydides.getCurrentSession().get(CRF.CRFS_TO_CHECK_SDV_STATUS);
+    	Thucydides.getCurrentSession().remove(CRF.CRFS_TO_CHECK_SDV_STATUS);
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		userFiltersSDVPage(rowParams);
+    		userCheckCRFSDVed();
+    	}
+    }
     
-    private User getCurrentUser() {
+    private void userCheckCRFSDVed() {
+    	commonSteps.user_check_CRF_SDVed();		
+	}
+
+	private User getCurrentUser() {
     	User user = (User) Thucydides.getCurrentSession().get(User.CURRENT_USER);
 		return user;
     }

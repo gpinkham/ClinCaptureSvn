@@ -1,6 +1,7 @@
 package com.clinovo.steps;
 
 import java.util.List;
+import java.util.Map;
 
 import com.clinovo.pages.*;
 import com.clinovo.pages.beans.CRF;
@@ -428,5 +429,20 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void click_save_button() {
 		crfPage.clickSaveButton();
+	}
+	
+	@Step
+	public void click_perform_SDV_button_for_filtered_table() {
+		sdvPage.clickPerformSDVButtonForFilteredTable();
+	}
+
+	@Step
+	public void filter_SDV_page(Map<String, String> map) {
+		sdvPage.fillFiltersOnSDVPage(map);
+	}
+
+	@Step
+	public void user_check_CRF_SDVed() {
+		sdvPage.checkSDVIcon();
 	}
 }

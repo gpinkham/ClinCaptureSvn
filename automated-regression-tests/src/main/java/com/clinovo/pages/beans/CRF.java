@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 
 public class CRF{
 	
+	public static final String CRFS_TO_CHECK_SDV_STATUS = "CRFs to check SDV tatus";
+
 	public static ComparatorForItemOIDs comparatorForItemOIDs = new ComparatorForItemOIDs();
 	
 	private Map<String, String> fieldNameToValueMap;
