@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.service.CRFMaskingService;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.SDVUtil;
 import com.clinovo.util.SignUtil;
@@ -53,6 +54,7 @@ import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.util.CrfComparator;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -73,21 +75,13 @@ import java.util.Map;
 public class CRFListForStudyEventServlet extends Controller {
 
 	public static final String SUBJECT_FLAG_COLOR = "subjectFlagColor";
-
 	public static final String STUDY_ID = "studyId";
-
 	public static final String SES_ICON_URL = "sesIconUrl";
-
 	public static final String INPUT_EVENT_ID = "studyEventId";
-
 	public static final String BEAN_STUDY_EVENT = "studyEvent";
-
 	public static final String BEAN_STUDY_SUBJECT = "studySubject";
-
 	public static final String BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS = "uncompletedEventDefinitionCRFs";
-
 	public static final String FULL_CRF_LIST = "fullCrfList";
-
 	public static final String BEAN_DISPLAY_EVENT_CRFS = "displayEventCRFs";
 	// The study event has an existing discrepancy note related to its location
 	// property; this
@@ -101,19 +95,18 @@ public class CRFListForStudyEventServlet extends Controller {
 	// property; this
 	// value will be saved as a request attribute
 	public static final String HAS_END_DATE_NOTE = "hasEndDateNote";
-
 	public static final String SHOW_SIGN_BUTTON = "showSignButton";
-
 	public static final String SHOW_SUBJECT_SIGN_BUTTON = "showSubjectSignButton";
-
 	public static final String SHOW_SDV_BUTTON = "showSDVButton";
-
 	public static final String SHOW_SUBJECT_SDV_BUTTON = "showSubjectSDVButton";
 	public static final String EVENT_FLAG_COLOR = "eventFlagColor";
 	public static final String STUDY_EVENT_NAME = "studyEventName";
 	public static final String EVENT_CRF_ID_PARAMETER = "eventCRFId";
 	public static final String EVENT_DEFINITION_CRF_ID_PARAMETER = "eventDefintionCRFId";
 	public static final String PAGE_PARAMETER = "page";
+
+	@Autowired
+	private CRFMaskingService maskingService;
 
 	private StudyEventBean getStudyEvent(HttpServletRequest request, int eventId) throws Exception {
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -361,7 +354,7 @@ public class CRFListForStudyEventServlet extends Controller {
 		request.setAttribute(
 				SHOW_SDV_BUTTON,
 				SDVUtil.permitSDV(seb, studySubjectBean.getStudyId(), daoWrapper, currentStudy
-						.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes"), notedMap));
+						.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes"), notedMap, ub.getId(), maskingService));
 		request.setAttribute(SHOW_SUBJECT_SDV_BUTTON, SDVUtil.permitSDV(studySubjectBean, daoWrapper));
 
 		boolean allLocked = true;

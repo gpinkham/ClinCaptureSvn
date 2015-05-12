@@ -15,6 +15,7 @@ package com.clinovo.util;
 import java.util.ArrayList;
 import java.util.Map;
 
+import com.clinovo.service.CRFMaskingService;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -64,10 +65,12 @@ public final class SDVUtil {
 	 *            boolean
 	 * @param notedMap
 	 *            Map<Integer, String>
+	 * @param userId int
+	 * @param maskingService CRFMaskingService
 	 * @return boolean
 	 */
 	public static boolean permitSDV(StudyEventBean studyEventBean, int studyId, DAOWrapper daoWrapper,
-			boolean allowSdvWithOpenQueries, Map<Integer, String> notedMap) {
+									boolean allowSdvWithOpenQueries, Map<Integer, String> notedMap, int userId, CRFMaskingService maskingService) {
 		boolean hasReadyForSDV = false;
 		StudyBean studyBean = (StudyBean) daoWrapper.getSdao().findByPK(studyId);
 		ArrayList eventCrfs = daoWrapper.getEcdao().findAllStartedByStudyEvent(studyEventBean);
@@ -82,7 +85,8 @@ public final class SDVUtil {
 					&& !eventCRFBean.isSdvStatus()
 					&& eventCRFBean.getStatus() == Status.UNAVAILABLE
 					&& eventCRFBean.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
-					&& (allowSdvWithOpenQueries || !notedMap.containsKey(eventDefinitionCrf.getCrfId()))) {
+					&& (allowSdvWithOpenQueries || !notedMap.containsKey(eventDefinitionCrf.getCrfId()))
+					&& !maskingService.isEventDefinitionCRFMasked(eventDefinitionCrf.getId(), userId, studyId)) {
 				hasReadyForSDV = true;
 			}
 		}
