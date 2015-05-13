@@ -13,16 +13,7 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -51,7 +42,14 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.ValidatorHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * The servlet for creating sub study of user's current active study.
@@ -649,15 +647,12 @@ public class CreateSubStudyServlet extends Controller {
 			EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 			ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
 			for (EventDefinitionCRFBean edcBean : edcs) {
-				int edcStatusId = edcBean.getStatus().getId();
-				if (!(edcStatusId == Status.DELETED.getId() || edcStatusId == Status.AUTO_DELETED.getId())) {
-					edcBean.setParentId(edcBean.getId());
-					edcBean.setStudyId(site.getId());
-					edcBean.setUpdater(ub);
-					edcBean.setUpdatedDate(new Date());
-					logger.debug("create for the site");
-					edcdao.create(edcBean);
-				}
+				edcBean.setParentId(edcBean.getId());
+				edcBean.setStudyId(site.getId());
+				edcBean.setUpdater(ub);
+				edcBean.setUpdatedDate(new Date());
+				logger.debug("create for the site");
+				edcdao.create(edcBean);
 			}
 		}
 		request.getSession().removeAttribute("definitions");
@@ -686,11 +681,9 @@ public class CreateSubStudyServlet extends Controller {
 					.findAllByDefinitionAndSiteIdAndParentStudyId(defId, site.getId(), parentStudy.getId());
 			ArrayList<EventDefinitionCRFBean> defCrfs = new ArrayList<EventDefinitionCRFBean>();
 			for (EventDefinitionCRFBean edcBean : edcs) {
-				int edcStatusId = edcBean.getStatus().getId();
 				CRFBean crf = (CRFBean) cdao.findByPK(edcBean.getCrfId());
 				int crfStatusId = crf.getStatusId();
-				if (!(edcStatusId == Status.DELETED.getId() || edcStatusId == Status.AUTO_DELETED.getId()
-						|| crfStatusId == Status.DELETED.getId() || crfStatusId == Status.AUTO_DELETED.getId())) {
+				if (!(crfStatusId == Status.DELETED.getId() || crfStatusId == Status.AUTO_DELETED.getId())) {
 					ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) cvdao.findAllActiveByCRF(edcBean
 							.getCrfId());
 					edcBean.setVersions(versions);
