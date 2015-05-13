@@ -42,8 +42,8 @@ public class HtmlToPdfController {
     @ResponseBody
     public void getPdf(HttpServletResponse response, HttpServletRequest request) throws Exception {
 
-        String subjectOid = request.getParameter("subjectOid");
-        response.setHeader("Content-Disposition", "inline; filename=" + subjectOid + "_casebook.pdf");
+        String pdfName = request.getParameter("fileName");
+        response.setHeader("Content-Disposition", "inline; filename=" + pdfName + "_casebook.pdf");
         response.setContentType("application/pdf;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 

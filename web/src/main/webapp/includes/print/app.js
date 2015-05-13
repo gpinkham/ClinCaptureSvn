@@ -86,18 +86,26 @@ $(document).ready(function () {
 function getPrintableContent() {
     $('.spinner').css({display: "block"});
     var url = app_contextPath + '/print/metadata/json/view/' + app_studyOID + '/*/' + app_formVersionOID;
-    if (app_studySubjectOID.length > 0) {
+    if (app_studySubjectOID.length > 0 && app_studySubjectOID != "*") {
         url = app_contextPath + '/print/clinicaldata/json/view/' + app_studyOID + '/' + app_studySubjectOID + '/' + app_eventOID + '/' + app_formVersionOID + '?includeAudits=' + app_displayAudits + '&includeDNs=' + app_displayDNs;
+    } else if (app_studyOID != "*" && app_eventOID == "*" && app_formVersionOID == "*" && app_studySubjectOID == "*" && window.location.search.indexOf('metadata') < 0) {
+        url = app_contextPath + '/print/clinicaldata/siteCasebooks/' + app_studyOID;
     }
     $.get(url, {}, function (data) {
+        var renderString = "";
         app_pagesArray = new Array();
-        setRenderMode();
-        app_renderMode = renderMode;
-        app_odmRenderer = new ODMRenderer(data);
-        var renderString = undefined;
-
         try {
-            renderString = app_odmRenderer.renderPrintableStudy(renderMode);
+            setRenderMode();
+            if(renderMode == 'SITE_SUBJECT_CASE_BOOKS') {
+                for (var i = 0; i < data.length; i++) {
+                    app_odmRenderer = new ODMRenderer(data[i]);
+                    renderString += app_odmRenderer.renderPrintableStudy(renderMode);
+                    renderString += "<div class='page-break'></div>";
+                }
+            } else {
+                app_odmRenderer = new ODMRenderer(data);
+                renderString = app_odmRenderer.renderPrintableStudy(renderMode);
+            }
         }
         catch (error) {
             alert(app_error_print_CRF_Message_at_Loading + "   " + error.message);
@@ -106,7 +114,7 @@ function getPrintableContent() {
         $('.spinner').hide();
         if (window.location.search.indexOf('convertToPdf=yes') > 0) {
             $('#hiddenInput').val(renderString);
-            $('#subjectOid').val(app_studySubjectOID);
+            $('#fileName').val(app_studySubjectOID == "*" ? app_studyOID : app_studySubjectOID);
             $("#subForm").submit();
         } else {
             $('#subForm').append(renderString);
@@ -133,6 +141,10 @@ function setRenderMode() {
         else if (app_studyOID != "*" && app_eventOID != "*" && app_formVersionOID != "*" && app_studySubjectOID != "*") {
             renderMode = 'POPULATED_FORM_CRF';
         }
+        else if (app_studyOID != "*" && app_eventOID == "*" && app_formVersionOID == "*"
+            && app_studySubjectOID == "*" && window.location.search.indexOf('metadata') < 0) {
+            renderMode = 'SITE_SUBJECT_CASE_BOOKS';
+        }
     }
-
+    app_renderMode = renderMode;
 }
