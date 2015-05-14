@@ -209,7 +209,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 						eventCRF.setCrf(crfBean);
 					}
 					// Get the event crf audits
-					eventCRFAudits.addAll(adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId()));
+					eventCRFAudits.addAll(adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId(), eventCRF.getCRFVersionId()));
 					logger.info("eventCRFAudits size [" + eventCRFAudits.size() + "] eventCRF id [" + eventCRF.getId()
 							+ "]");
 				}

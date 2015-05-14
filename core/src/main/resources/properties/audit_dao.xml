@@ -93,7 +93,7 @@
 			WHERE ale.audit_log_event_type_id IN (1,8,9,10,11,12,13,14,15,16,30,32,33,52,53) AND ale.event_crf_id=?
 			)as ale
 			LEFT JOIN item_data id ON ale.audit_log_event_type_id IN (1,12,13,30) and ale.entity_id = id.item_data_id
-			LEFT JOIN item ON id.item_id = item.item_id and ale.entity_name = item.name
+			LEFT JOIN item ON ale.entity_name = item.name AND (? = 0 or item.item_id IN (SELECT item_id FROM item_form_metadata WHERE crf_version_id = ?))
 			ORDER BY ale.audit_date
     	</sql>
     </query>
