@@ -111,10 +111,10 @@
      <form action='RemoveStudyEvent?action=submit&id=<c:out value="${displayEvent.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
        <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
        &nbsp;
-       <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirmSubmit({ message: "<fmt:message key="this_event_has_CRF_data_shown" bundle="${resword}"/>", height: 150, width: 500, submit: this });'>
+       <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit" onClick='return confirmSubmit({ message: "<fmt:message key="this_event_has_CRF_data_shown" bundle="${resword}"/>", height: 150, width: 500, submit: this });'>
        <%-- <input type="button" onclick="confirmCancel('ViewStudySubject?id=<c:out value="${studySub.id}"/>');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>--%>
      </form>    
     </c:when>
@@ -122,10 +122,10 @@
       <form action='RemoveStudyEvent?action=submit&id=<c:out value="${displayEvent.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
         <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
         &nbsp;
-        <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirmSubmit({ message: "<fmt:message key="are_you_sure_you_want_to_remove_it" bundle="${resword}"/>", height: 150, width: 500, submit: this });'>
+        <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit" onClick='return confirmSubmit({ message: "<fmt:message key="are_you_sure_you_want_to_remove_it" bundle="${resword}"/>", height: 150, width: 500, submit: this });'>
         <%-- <input type="button" onclick="confirmCancel('ViewStudySubject?id=<c:out value="${studySub.id}"/>');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>--%>
       </form> 
     </c:otherwise>

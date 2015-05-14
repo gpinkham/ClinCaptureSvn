@@ -228,18 +228,18 @@
 				<table>
 					<tr>
 						<td colspan="3" align="left">
-							<input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50"
+							<input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" size="50"
 								onclick="datasetConfirmBack('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'CreateDataset', 'back_to_beginsubmit');"/>
 						</td>
 						<td>
-							<input type="submit" id="btnSubmit" name="btnSubmit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium"
+							<input type="submit" id="btnSubmit" name="btnSubmit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue"
 								onclick=" return checkMetaDataVersionODMID($.trim($('[name=mdvOID]').val()),
 								'<fmt:message key="datasetConfirmIncludeDescriptorsDisabled" bundle="${restext}"/>',
 								document.forms['datasetForm'], ${study.parentStudyId eq 0});" />
 						</td>
 						<td>
 							<input type="button" onclick="confirmCancel('ViewDatasets');" name="cancel"
-								   value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
+								   value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel"/>
 						</td>
 					</tr>
 				</table>

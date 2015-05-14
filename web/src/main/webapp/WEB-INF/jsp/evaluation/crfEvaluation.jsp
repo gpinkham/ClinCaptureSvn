@@ -87,7 +87,7 @@ ${summaryTable}
 <div style="clear:left; float:left">
     <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
            value="<fmt:message key="back" bundle="${resword}"/>"
-           class="button_medium"
+           class="button_medium medium_back"
            onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/>
 </div>
 

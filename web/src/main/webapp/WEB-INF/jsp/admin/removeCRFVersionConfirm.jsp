@@ -62,7 +62,7 @@
     <td>
        <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
        <input type="button" name="BTN_Submit" value="<fmt:message key="delete_version" bundle="${resword}"/>" class="button_medium" onClick="window.location.href = 'CreateCRFVersion?action=delete&id=<c:out value="${version.id}"/>&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>';"/>
     </td>

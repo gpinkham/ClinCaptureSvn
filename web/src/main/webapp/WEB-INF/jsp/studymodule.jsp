@@ -605,9 +605,9 @@
   <br>
   <br>
   <div>
-      <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
+      <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
       
-      <input type="submit" name="submitEvent" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
+      <input type="submit" name="submitEvent" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
       <img src="../images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">
       <%-- <input type="button" onclick="confirmCancel('${pageContext.request.contextPath}/MainMenu');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long"> --%>
   </div>

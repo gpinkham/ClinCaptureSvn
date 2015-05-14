@@ -82,9 +82,9 @@
 	<br clear="all">
 	<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
 						value="<fmt:message key="back" bundle="${resword}"/>" 
-						class="button_medium" 
+						class="button_medium medium_back" 
 						onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
-	<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" onclick="return checkFileUpload('xml_file_path', '<fmt:message key="select_a_file_to_upload" bundle="${restext}"/>');" class="button_medium" />
+	<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" onclick="return checkFileUpload('xml_file_path', '<fmt:message key="select_a_file_to_upload" bundle="${restext}"/>');" class="button_medium medium_continue" />
 	<img src="images/icon_UnchangedData.gif" style="visibility:hidden" alt="Data Status" name="DataStatus_bottom">
 </form>
 

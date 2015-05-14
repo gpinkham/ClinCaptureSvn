@@ -482,7 +482,7 @@
 
   </div> 
             
- <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
+ <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
 </form>
 <br><br>
 

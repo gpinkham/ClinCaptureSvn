@@ -192,14 +192,14 @@
 	method="POST">
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 		value='<fmt:message key="back" bundle="${resword}"/>'
-		class="button_medium"
+		class="button_medium medium_back"
 		onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
 	<input type="button" id="RestoreFrom"
 		title='<fmt:message key="restore_event_definition" bundle="${resword}"/>'
 		value='<fmt:message key="submit" bundle="${resword}"/>'
 		onClick='return confirmSubmit({ message: "<fmt:message key="if_you_restore_this_definition" bundle="${resword}"/>", height: "auto", width: 500, form: document.getElementById("RestoreEventDefinitionForm"), disableSet: $("[class=button_medium]")});'
-		class="button_medium">
+		class="button_medium medium_submit">
 </form>
 
 <c:import url="../include/workflow.jsp">

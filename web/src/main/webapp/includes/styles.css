@@ -1047,6 +1047,14 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     margin-right: 10px;
 }
 
+.cancel { 
+    background-image: url(../images/button_cancel_BG.gif);
+}
+
+.submit { 
+    background-image: url(../images/button_submit_BG.gif);
+}
+
 .button_div { background-color:transparent;
     border-width: 0px;
     background-image: url(../images/button_BG.gif);
@@ -1146,6 +1154,22 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     margin-right: 10px;
 }
 
+.medium_cancel { 
+    background-image: url(../images/button_medium_cancel_BG.png);
+}
+
+.medium_submit { 
+    background-image: url(../images/button_medium_submit_BG.png);
+}
+
+.medium_continue { 
+    background-image: url(../images/button_medium_continue_BG.png);
+}
+
+.medium_back { 
+    background-image: url(../images/button_medium_back_BG.png);
+}
+
 .button_medium_green { 
 	background-color:transparent;
     border-width: 0px;
@@ -1190,7 +1214,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     line-height: 11px;
     color: #FFFFFF;
     font-weight: bold;
-    width: 80px;
+    width: 120px;
     height: 17px;
     margin-right: 10px;
 }
@@ -1211,6 +1235,22 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     margin-right: 10px;
 }
 
+.long_back { 
+    background-image: url(../images/button_long_back_BG.png);
+}
+
+.long_continue {
+    background-image: url(../images/button_long_continue_BG.png);
+}
+
+.long_cancel { 
+    background-image: url(../images/button_long_cancel_BG.png);
+}
+
+.long_submit { 
+    background-image: url(../images/button_long_submit_BG.png);
+}
+
 .button_xlong { background-color:transparent;
     border-width: 0px;
     background-image: url(../images/button_xlong_BG.gif);
@@ -1225,6 +1265,10 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     height: 17px;
     margin-top: 6px;
     margin-right: 10px;
+}
+
+.xlong_submit { 
+	background-image: url(../images/button_xlong_submit_BG.gif);
 }
 
 select.single_select_property {

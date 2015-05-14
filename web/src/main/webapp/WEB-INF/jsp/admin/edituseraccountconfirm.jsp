@@ -235,14 +235,14 @@
 <tr>
 <td>
 <td>
-  <input type="button" value="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="history.go(-1);"/>
+  <input type="button" value="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" size="50" onclick="history.go(-1);"/>
 </td>
 </td>
 <td>
-<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
+<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
 </td>
 <td>
-<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="confirmCancel('../ListUserAccounts')"/>
+<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="confirmCancel('../ListUserAccounts')"/>
 </td>
 </tr>
 </table>

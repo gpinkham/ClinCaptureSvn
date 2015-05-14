@@ -66,7 +66,7 @@
 </c:choose>
 
 <input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>"
-		class="button_medium" onclick="${onclick}"/><br/><br>
+		class="button_medium medium_back" onclick="${onclick}"/><br/><br>
 		
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
@@ -88,7 +88,7 @@
 <span class="alert"><c:out value="${error}"/></span><br/><hr/>
 </c:forEach>
 <input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>"
-		class="button_medium" onclick="${onclick}"/>
+		class="button_medium medium_back" onclick="${onclick}"/>
 <c:choose>
   <c:when test="${userBean.sysAdmin}">
   <c:import url="../include/workflow.jsp">

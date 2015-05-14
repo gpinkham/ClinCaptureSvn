@@ -289,7 +289,7 @@
  <input type="button" name="BTN_Smart_Exit" id="GoToPreviousPage" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 </td>
 <td>
- <input type="submit" name="BTN_CaptureData" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" title="<fmt:message key="update_study_event" bundle="${resword}"/>"/>
+ <input type="submit" name="BTN_CaptureData" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit" title="<fmt:message key="update_study_event" bundle="${resword}"/>"/>
 </td>
 <td>
  <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">

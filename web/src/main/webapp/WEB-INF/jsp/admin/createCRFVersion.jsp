@@ -147,11 +147,11 @@ function submitform(){
 <td>
   <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>
 <td>
-  <input type="submit" onclick="return checkFileUpload('excel_file_path', '<fmt:message key="select_a_file_to_upload" bundle="${restext}"/>');" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+  <input type="submit" onclick="return checkFileUpload('excel_file_path', '<fmt:message key="select_a_file_to_upload" bundle="${restext}"/>');" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue">
 </td>
 <td>
   <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">

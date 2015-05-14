@@ -31,11 +31,20 @@ var helpPageApplyTheme = function() {
             $('a').css('color', theme.mainColor);
             $('H1').css('color', theme.mainColor);
             if (theme.name != 'blue') {
-                $("input").each(function () {
+            	$("input.button_medium").not(".medium_back, .medium_cancel, .medium_continue, .medium_submit").each(function () { 
                     var newSrc = $(this).css('background-image');
+                    if (newSrc.indexOf('/' + theme.name + '/') >= 0) return;
                     newSrc = newSrc.replace('images/', 'images/' + theme.name + '/');
                     $(this).css('background-image', newSrc);
                 });
+                
+            	$("input.button_long").not(".long_back, .long_cancel, .long_continue").each(function () {
+                    var newSrc = $(this).css('background-image');
+                    if (newSrc.indexOf('/' + theme.name + '/') >= 0) return;
+                    newSrc = newSrc.replace('images/', 'images/' + theme.name + '/');
+                    $(this).css('background-image', newSrc);
+                });
+                
                 $("img[src*='bt_']").each(
                     function () {
                         var newSrc = $(this).attr('src');
@@ -170,28 +179,28 @@ var applyCommonStylesForTheme = function(theme) {
         $(this).attr('src', newSrc);
     });
 
-    $("input.button_medium").each(function () {
+    $("input.button_medium").not(".medium_back, .medium_cancel, .medium_continue, .medium_submit").each(function () {
         var newSrc = $(this).css('background-image');
         if (newSrc.indexOf('/' + theme.name + '/') >= 0) return;
         newSrc = newSrc.replace('images/', 'images/' + theme.name + '/');
         $(this).css('background-image', newSrc);
     });
 
-    $("input.button").each(function () {
+    $("input.button").not(".cancel, .submit").each(function () {
         var newSrc = $(this).css('background-image');
         if (newSrc.indexOf('/' + theme.name + '/') >= 0) return;
         newSrc = newSrc.replace('images/', 'images/' + theme.name + '/');
         $(this).css('background-image', newSrc);
     });
 
-    $("input.button_long").each(function () {
+    $("input.button_long").not(".long_back, .long_cancel, .long_continue, .long_submit").each(function () {
         var newSrc = $(this).css('background-image');
         if (newSrc.indexOf('/' + theme.name + '/') >= 0) return;
         newSrc = newSrc.replace('images/', 'images/' + theme.name + '/');
         $(this).css('background-image', newSrc);
     });
 
-    $("input.button_xlong").each(function () {
+    $("input.button_xlong").not(".xlong_submit").each(function () {
         var newSrc = $(this).css('background-image');
         if (newSrc.indexOf('/' + theme.name + '/') >= 0) return;
         newSrc = newSrc.replace('images/', 'images/' + theme.name + '/');

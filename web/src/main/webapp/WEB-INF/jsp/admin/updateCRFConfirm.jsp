@@ -75,11 +75,11 @@
 
 </div>
 
-<input type="button" name="back" id="back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="$('input[name=action]').val('back'); submitFormWithState();"/>
+<input type="button" name="back" id="back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="$('input[name=action]').val('back'); submitFormWithState();"/>
 
-<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
+<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
 
-<input type="button" onClick="confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
+<input type="button" onClick="confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel"/>
 
 </form>
 

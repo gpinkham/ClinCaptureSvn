@@ -186,13 +186,13 @@
 	method="POST">
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 		value="<fmt:message key="back" bundle="${resword}"/>"
-		class="button_medium"
+		class="button_medium medium_back"
 		onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
 	<input type="submit" name="Submit"
 		value="<fmt:message key="submit" bundle="${resword}"/>"
 		title="<fmt:message key="remove_event_definition" bundle="${resword}"/>"
-		class="button_medium"
+		class="button_medium medium_submit"
 		onClick='return confirmSubmit({ message: "<fmt:message key="if_you_remove_this_definition" bundle="${resword}"/>", height: 150, width: 500, form: document.getElementById("RemoveEventDefinitionForm"), disableSet: $("[class=button_medium]") });'>
 
 </form>

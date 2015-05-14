@@ -64,7 +64,7 @@
 	<%-- <a id="haCreateStudy" href="CreateStudy" style="display: none;"><fmt:message key="create_a_new_study" bundle="${resword}"/></a> --%>
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
 		<input type="button" onclick="location.href = '${pageContext.request.contextPath}/CreateStudy'"  name="create_study" value="<fmt:message key="create_study" bundle="${resword}"/>" class="button_medium"/>

@@ -223,7 +223,7 @@
 	<tr>
 		<td align="right">
 			<c:if test="${fn:length(availableDynGroups) > 1 && !(defaultGroupExists && fn:length(availableDynGroups) == 2) && (study.parentStudyId == 0)}">
-				<input type="submit" name="BTN_Change_Group_Order" value="<fmt:message key="submit" bundle="${resword}"/>" class="button"/>
+				<input type="submit" name="BTN_Change_Group_Order" value="<fmt:message key="submit" bundle="${resword}"/>" class="button submit"/>
 			</c:if>  
 		</td>
 	</tr>
@@ -236,7 +236,7 @@
 <br> 
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
     <c:if test="${study.parentStudyId == 0}">
     	<input type="button" onclick="window.location.href=('CreateSubjectGroupClass');" name="BTN_Group" value="<fmt:message key="create_group" bundle="${resword}"/>" class="button_medium"/>

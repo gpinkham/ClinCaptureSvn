@@ -114,7 +114,23 @@ body {
     margin-right: 10px;
 	margin-bottom: 3px;
 	}
-	
+
+.medium_back {
+    background-image: url(../images/button_medium_back_BG.png);
+	}
+
+.medium_continue {
+    background-image: url(../images/button_medium_continue_BG.png);
+	}
+
+.medium_submit {
+    background-image: url(../images/button_medium_submit_BG.png);
+	}
+
+.medium_cancel {
+    background-image: url(../images/button_medium_cancel_BG.png);
+	}
+
 .button_long {
 	background-color: transparent;
     border-width: 0px;
@@ -130,6 +146,22 @@ body {
     height: 17px;
     margin-right: 10px;
 	margin-bottom: 3px;
+	}
+	
+.long_back {
+    background-image: url(../images/button_long_back_BG.png);
+	}
+
+.long_continue {
+    background-image: url(../images/button_long_continue_BG.png);
+	}
+
+.long_submit {
+    background-image: url(../images/button_long_submit_BG.png);
+	}
+
+.long_cancel {
+    background-image: url(../images/button_long_cancel_BG.png);
 	}
 
 .button_xlong {

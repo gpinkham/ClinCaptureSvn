@@ -372,12 +372,12 @@
 <td>
   <input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
 					value="<fmt:message key="back" bundle="${resword}"/>" 
-					class="button_medium" 
+					class="button_medium medium_back" 
 					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
   <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">
 </td>  
 <td>
-<input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+<input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue">
 </td>
 <td>
 </td>

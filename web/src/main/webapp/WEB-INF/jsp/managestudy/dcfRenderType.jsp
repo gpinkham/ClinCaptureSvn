@@ -15,7 +15,7 @@
 		<div id="invalid_email" style="display: none; text-align: center;" class="alert">
 			<fmt:message key="dcf_invalid_email_message" bundle="${resword}"/>
 		</div>
-		<input type="button" id="btn_cancel_dcf" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" style="margin-top:20px" />
+		<input type="button" id="btn_cancel_dcf" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" style="margin-top:20px" />
 		<input type="hidden" id="generateDcf" name="generateDcf" value="" />
 		&nbsp;&nbsp;
 		<input type="button" id="btn_submit_dcf" value="<fmt:message key="dcf_generate" bundle="${resword}"/>" class="${generate_dcf_button_class}" style="margin-top:20px" />

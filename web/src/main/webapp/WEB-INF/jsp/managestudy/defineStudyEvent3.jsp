@@ -254,13 +254,13 @@
 	<table border="0">
 		<tr>
 			<td>
-				<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'DefineStudyEvent?actionName=back1');"/> 
+				<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'DefineStudyEvent?actionName=back1');"/> 
 			</td>
 			<td>
-				<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#defineStudyEventForm');">
+				<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#defineStudyEventForm');">
 			</td>
 			<td>
-				<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="javascript:myCancel();"/>
+				<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="javascript:myCancel();"/>
 			</td>
 			<td>
 				<img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom"/>

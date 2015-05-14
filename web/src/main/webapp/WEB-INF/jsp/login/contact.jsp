@@ -107,11 +107,11 @@
   <td>
    <input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
 					value="<fmt:message key="back" bundle="${resword}"/>" 
-					class="button_medium" 
+					class="button_medium medium_back" 
 					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
   </td>
   <td>
-   <input type="submit" name="BTN_Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
+   <input type="submit" name="BTN_Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
   </td>
   <td>
    <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="you_have_not_changed_any_data" alt="Data Status" name="DataStatus_bottom">

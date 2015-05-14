@@ -200,7 +200,7 @@
     </form>
 
 
-<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" style="margin-top:20px"/> 
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" style="margin-top:20px"/> 
 <c:set var="generate_dcf_button_class" scope="request" value="${system_lang eq 'ru' ? 'button_long': 'button_medium'}" />
 <c:if test="${allowDcf}">
     <input type="button" name="btn_generate_dcf" id="btn_generate_dcf" value="<fmt:message key="dcf_generate" bundle="${resword}"/>" class="${generate_dcf_button_class}" style="margin-top:20px" />

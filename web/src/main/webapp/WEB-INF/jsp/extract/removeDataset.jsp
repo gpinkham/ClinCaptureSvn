@@ -73,8 +73,8 @@
 
 	<input type="hidden" name="dsId" value="<c:out value="${dataset.id}"/>"/>
 	
-	<input type="submit" name="action" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/>	
-	<input type="submit" name="action" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"/>	
+	<input type="submit" name="action" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back"/>	
+	<input type="submit" name="action" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit"/>	
 
 </form>
 

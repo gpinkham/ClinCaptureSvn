@@ -198,10 +198,10 @@
 	<table>
 	<tr>
 		<td>
-			<input type="button" name="BTN_Back_Smart" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
+			<input type="button" name="BTN_Back_Smart" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
 		</td>
 		<td>
-			<input type="button" name="Submit" id="SubminAndContinue" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick="javascript: saveLayoutAndExit()"/>
+			<input type="button" name="Submit" id="SubminAndContinue" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit" onClick="javascript: saveLayoutAndExit()"/>
 		</td>
 	</tr>
 	</table> 

@@ -363,10 +363,10 @@
 	<tr>
 		<td>
 			<input type="button" value="<fmt:message key="back" bundle="${resword}"/>"
-			       title="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50"
+			       title="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" size="50"
 			       onclick="back_checkEditUserFormState();"/>
 			<input type="submit" name="continue" value="<fmt:message key="continue" bundle="${resword}"/>"
-			       class="button_medium"/>
+			       class="button_medium medium_continue"/>
 			<c:if test="${userBean.sysAdmin && editedUser.name != 'root' && isSiteLevelUser}">
 				<input type="button" value="<fmt:message key="crfs_masking" bundle="${resword}"/>" class="button_medium"
 				       onclick="redirectRequestToMaskingPage();"/>

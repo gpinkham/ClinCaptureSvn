@@ -1040,7 +1040,7 @@ function setDNFlag(strImageName,strParentWinImageFullPath, resolutionStatusId) {
         <td>
             <input type="submit" name="Schedule" value="<fmt:message key="schedule_event" bundle="${resword}"/>" class="button_medium"/>
             <input type="button" name="StartDataEntry" value="<fmt:message key="start_data_entry" bundle="${resword}"/>" class="button_medium" onClick="$('#openFirstCrf').val('true'); $('input[name=Schedule]').click();"/>
-            <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" "/>
+            <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" "/>
         </td>
     </tr>
 </table>

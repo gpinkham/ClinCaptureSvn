@@ -835,7 +835,7 @@
 <td>
  <input type="submit" name="Submit" value="<fmt:message key="confirm_study" bundle="${resword}"/>" class="button_long">
 </td>
-<td><input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="myCancel('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');"/></td>
+<td><input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="myCancel('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');"/></td>
 </tr>
 </table>
 </form>

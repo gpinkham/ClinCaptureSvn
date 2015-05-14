@@ -177,9 +177,9 @@
 <form action='RemoveSubject?action=submit&id=<c:out value="${subjectToRemove.id}"/>' method="POST">
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-<input type="submit" name="BTN_Submit"  value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirmSubmit({ message: "<fmt:message key="if_you_remove_this_subject" bundle="${restext}"/>", height: 150, width: 500, submit: this });'>
+<input type="submit" name="BTN_Submit"  value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit" onClick='return confirmSubmit({ message: "<fmt:message key="if_you_remove_this_subject" bundle="${restext}"/>", height: 150, width: 500, submit: this });'>
 </form>
 <br><br>
 

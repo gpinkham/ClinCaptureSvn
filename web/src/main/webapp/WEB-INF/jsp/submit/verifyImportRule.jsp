@@ -124,16 +124,16 @@
 
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <c:choose>
 <c:when test="${fn:length(importedData.inValidRuleDefs) > 0 || fn:length(importedData.inValidRuleSetDefs) > 0 }"></c:when>
 <c:otherwise>
-    <input type="button" id="Submit" onClick="proceed()" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"> 
+    <input type="button" id="Submit" onClick="proceed()" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit"> 
 </c:otherwise>
 </c:choose>
 <%-- <input type="button" onclick="goBack()"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/> --%>
-<input type="button" name="cancel" id="GoToManageRules" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onclick="window.location.href=('ViewRuleAssignment');"/>
+<input type="button" name="cancel" id="GoToManageRules" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onclick="window.location.href=('ViewRuleAssignment');"/>
 
 </p>
 
@@ -522,16 +522,16 @@
 
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <c:choose>
 <c:when test="${fn:length(importedData.inValidRuleDefs) > 0 || fn:length(importedData.inValidRuleSetDefs) > 0 }"></c:when>
 <c:otherwise>
-    <input type="button" id="Submit" onClick="proceed()" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"> 
+    <input type="button" id="Submit" onClick="proceed()" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit"> 
 </c:otherwise>
 </c:choose>
 <%-- <input type="button" onclick="goBack()"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/> --%>
-<input type="button" name="cancel" id="GoToManageRules" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onclick="window.location.href=('ViewRuleAssignment');"/>
+<input type="button" name="cancel" id="GoToManageRules" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onclick="window.location.href=('ViewRuleAssignment');"/>
 
 </form>
 

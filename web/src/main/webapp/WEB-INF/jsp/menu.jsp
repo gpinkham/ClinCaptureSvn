@@ -301,7 +301,7 @@
 	        ${sdvMatrix}
 	      <br/>
 	      <input type="button" name="BTN_Back_Smart" id="GoToPreviousPage"
-	             value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"
+	             value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back"
 	             onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/>
 	      <input type="submit" name="sdvAllFormSubmit" class="button_medium"
 	             value="<fmt:message key="sdv_all_checked" bundle="${resword}"/>"
@@ -409,7 +409,7 @@
  		<tr>
  			<c:if test="${((userRole.role.id ne 6 && displayPageVersion=='old') || (displayPageVersion=='new'))}">
 	 		<td>
-	 			<input type="button" name="BTN_Back_Smart" id="GoToPrevisusPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
+	 			<input type="button" name="BTN_Back_Smart" id="GoToPrevisusPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
 	 		</td>
 	 		</c:if>
 	 		<c:if test="${displayPageVersion=='new'}">

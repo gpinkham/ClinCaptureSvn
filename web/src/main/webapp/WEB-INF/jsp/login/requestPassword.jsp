@@ -95,7 +95,7 @@
                        value="<fmt:message key="submit_password_request" bundle="${resword}"/>" class="button_xlong">
             </td>
             <td><input type="button" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>"
-                       class="button_medium" onclick="javascript:window.location.href='MainMenu'"></td>
+                       class="button_medium medium_cancel" onclick="javascript:window.location.href='MainMenu'"></td>
         </tr>
     </table>
 

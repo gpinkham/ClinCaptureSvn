@@ -105,7 +105,7 @@
  <tr><td>
  <input type="submit" name="submit" value="<fmt:message key="confirm_account_request" bundle="${resword}"/>" class="button_xlong">
  </td>
- <td><input type="button" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.location.href='MainMenu'"></td>
+ <td><input type="button" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onclick="javascript:window.location.href='MainMenu'"></td>
  </tr> 
  </table>
  

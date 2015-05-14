@@ -101,9 +101,9 @@
 <br clear="all">
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue">
 <%-- <p><a href="pages/studymodule"><fmt:message key="import_rules_back_to_study_build" bundle="${resword}"/></a></p> --%>
 </form>
 

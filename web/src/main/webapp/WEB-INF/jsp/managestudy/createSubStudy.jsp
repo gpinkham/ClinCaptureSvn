@@ -800,12 +800,12 @@
 		<td>
 			<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 							value="<fmt:message key="back" bundle="${resword}"/>"
-							class="button_medium"
+							class="button_medium medium_back"
 							onClick="javascript: confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}')" />
 		</td>
 
 		<td>
-			<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#createSubStudyForm');">
+			<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#createSubStudyForm');">
 		</td>
 	</tr>
 </table>

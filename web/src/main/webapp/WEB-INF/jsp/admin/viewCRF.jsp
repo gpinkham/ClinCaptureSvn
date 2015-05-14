@@ -199,7 +199,7 @@
 
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
        value="<fmt:message key="back" bundle="${resword}"/>"
-       class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+       class="button_medium medium_back" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" name="<fmt:message key="view_crf_rules" bundle="${resword}"/>" value="<fmt:message key="view_crf_rules" bundle="${resword}"/>" class="button_long" onClick="window.location.href='ViewRuleAssignment?ruleAssignments_f_crfName=<c:out value="${crfName}"/>'"/>
 <input type="button" name="<fmt:message key="run_crf_rules" bundle="${resword}"/>" value="<fmt:message key="run_crf_rules" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRule?crfId=<c:out value="${crf.id}"/>&action=dryRun'"/>
 <jsp:include page="../include/footer.jsp"/>

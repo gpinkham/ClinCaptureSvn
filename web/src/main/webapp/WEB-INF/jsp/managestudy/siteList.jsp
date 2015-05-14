@@ -66,7 +66,7 @@
 
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" name="BTN_Create_Site"
 					value="<fmt:message key="create_site" bundle="${resword}"/>"

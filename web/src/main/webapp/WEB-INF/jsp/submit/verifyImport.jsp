@@ -217,10 +217,10 @@
 	<br clear="all">
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
                value="<fmt:message key="back" bundle="${resword}"/>"
-               class="button_medium"
+               class="button_medium medium_back"
                onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 	
-	<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+	<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue">
 
 	</form>
 	</c:when>
@@ -487,23 +487,23 @@
 		<td>
 			<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />		
 		</td>
 		<td>
 			<c:if test="${overwriteCount == 0}">
-				<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+				<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue">
 			</c:if> 
 			<c:if test="${overwriteCount > 0 }">
 				<input type="submit"
 					value="<fmt:message key="continue" bundle="${resword}"/>"
-					class="button_medium" 
+					class="button_medium medium_continue" 
 					onClick="return confirmSubmit({ message: '<fmt:message key="you_will_overwrite_event_CRFs_continue" bundle="${resword}"/>', height: 150, width: 500, submit: this });">
 			</c:if>	
 		</td>
 			<%-- added an alert above --%>
 		<td>
-			<input id="Cancel" class="button_medium" type="button" name="BTN_Cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" onclick="window.location.href=('ListStudySubjects');"/>
+			<input id="Cancel" class="button_medium" type="button cancel" name="BTN_Cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" onclick="window.location.href=('ListStudySubjects');"/>
 		</td>	
 	</table>
 </form>				

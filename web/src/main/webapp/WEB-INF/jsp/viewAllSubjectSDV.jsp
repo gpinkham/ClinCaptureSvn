@@ -228,8 +228,8 @@
         <%--<input type="hidden" name="decorator" value="mydecorator">--%>
         ${sdvTableAttribute}
         <br />
-        <input type="submit" name="sdvAllFormSubmit" class="button_medium" value="<fmt:message key="submit" bundle="${resword}"/>" onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();"/>
-        <input type="submit" name="sdvAllFormCancel" class="button_medium" value="<fmt:message key="cancel" bundle="${resword}"/>" onclick="this.form.action='${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp';this.form.submit();"/>
+        <input type="submit" name="sdvAllFormSubmit" class="button_medium medium_submit" value="<fmt:message key="submit" bundle="${resword}"/>" onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();"/>
+        <input type="submit" name="sdvAllFormCancel" class="button_medium medium_cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" onclick="this.form.action='${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp';this.form.submit();"/>
     </form>
     <script type="text/javascript">hideCols('sdv',[2,3,6,7,11,12,13])</script>
 

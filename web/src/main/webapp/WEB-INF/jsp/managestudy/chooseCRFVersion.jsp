@@ -183,17 +183,17 @@ href="#" onclick="window.location.href='../../ViewCRFVersion?id=<c:out value="${
  <td VALIGN="top">
   <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 				 value="<fmt:message key="back" bundle="${resword}"/>"
-				 class="button_long"
+				 class="button_long long_back"
 				 onClick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
  </td >
  <td VALIGN="top">
-   <input type="submit" name="confirmCRFVersionSubmit" class="button_long" 
+   <input type="submit" name="confirmCRFVersionSubmit" class="button_long long_continue" 
           value="<fmt:message key="continue" bundle="${resword}"/>" >
  </td >
  <td VALIGN="top">
     <input type="button" name="customCancel" id="customCancel"
            value="<fmt:message key="cancel" bundle="${resword}"/>"
-           class="button_long" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
+           class="button_long long_cancel" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
  </td>
 </tr></table>
 </form>

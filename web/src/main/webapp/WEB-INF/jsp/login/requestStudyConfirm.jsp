@@ -66,6 +66,6 @@
 
 </div>
  <input type="submit" name="Submit" value="<fmt:message key="submit_request" bundle="${resword}"/>" class="button_long">
- <input type="button" onclick="confirmCancel('MainMenu');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
+ <input type="button" onclick="confirmCancel('MainMenu');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium medium_cancel"/>
 </form>
 <jsp:include page="../include/footer.jsp"/>

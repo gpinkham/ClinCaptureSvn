@@ -54,9 +54,9 @@
 				<p><fmt:message key="you_choose_to_reassign_subject2" bundle="${restext}"/> <b><c:out value="${subject.uniqueIdentifier}"/></b> <fmt:message key="to_study" bundle="${restext}"/>  <b><c:out value="${newStudy.name}"/></b>.</p>
 				<br>
 				<input type="button" name="BTN_Back" id="GoToPreviousPage"
-						value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"
+						value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back"
 						onClick="javascript: window.location = 'ReassignStudySubject?id=<c:out value="${studySub.id}"/>&studyId=${newStudy.id}&action=back'" />
-				<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
+				<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
 			</form>
 		</td>
 	</tr>

@@ -504,11 +504,11 @@
     <td>
     	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
     </td>  
 	
-	<td><input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" title="<fmt:message key="test_rule2" bundle="${resword}"/>" class="button_medium" size="50""/>
+	<td><input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" title="<fmt:message key="test_rule2" bundle="${resword}"/>" class="button_medium medium_submit" size="50""/>
 	</td>
 	
 	<td><input type="button" name="Exit" onClick="window.location.href='ViewRuleAssignment'" value="<fmt:message key="exit" bundle="${resword}"/>" title="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" size="50""/>

@@ -191,13 +191,13 @@
 			<c:when test="${empty eventDefinitionCRFs}">
 				<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
 						value="<fmt:message key="back" bundle="${resword}"/>" 
-						class="button_medium" 
+						class="button_medium medium_back" 
 						onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 			</c:when>
 			<c:otherwise>
 				<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
 						value="<fmt:message key="back" bundle="${resword}"/>" 
-						class="button_medium" 
+						class="button_medium medium_back" 
 						onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 			</c:otherwise>
 		</c:choose>
@@ -206,14 +206,14 @@
 			<form action="DefineStudyEvent" method="POST">
 				<input type="hidden" name="actionName" value="submit">
 				<input type="hidden" name="nextAction" value="2">
-				<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
+				<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
 			</form>
 		</td>
 		<td>
 			<form action="DefineStudyEvent" method="POST">
 				<input type="hidden" name="actionName" value="submit">
 				<input type="hidden" name="nextAction" value="1">
-				<input type="submit" name="submit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium">
+				<input type="submit" name="submit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel">
 			</form>
 		</td>
 	</tr>

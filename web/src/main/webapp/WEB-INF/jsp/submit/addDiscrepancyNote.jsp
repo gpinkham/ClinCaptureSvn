@@ -528,7 +528,7 @@ $(document).ready(function() {
                 <input type="button" name="SubmitExit" onclick="javascript: $('#typeId option').removeAttr('disabled'); sendFormDataViaAjax();" value="<fmt:message key="submit_close" bundle="${resword}"/>" class="button_medium">
             </c:when>
             <c:otherwise>
-                <input type="button" name="Submit" onclick="javascript: sendFormDataViaAjax();" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
+                <input type="button" name="Submit" onclick="javascript: sendFormDataViaAjax();" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
             </c:otherwise>
         </c:choose>
 		</div>

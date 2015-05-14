@@ -81,11 +81,11 @@
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td>
-                        <input type="button" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"
+                        <input type="button" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back"
                                onClick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
                     </td>
                     <td>
-                        <input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" onClick="doSubmit();">
+                        <input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue" onClick="doSubmit();">
                     </td>
                 </tr>
             </table>

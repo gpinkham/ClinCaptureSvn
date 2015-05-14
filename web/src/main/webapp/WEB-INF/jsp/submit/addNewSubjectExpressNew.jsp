@@ -416,7 +416,7 @@
         <td colspan="2" align="center">
         <input type="submit" name="addSubject" value="<fmt:message key="add2" bundle="${resword}"/>" class="button" />
         &nbsp;
-        <input type="button" id="cancel" name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>" class="button"/>
+        <input type="button" id="cancel" name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>" class="button cancel"/>
 
         <div id="dvForCalander" style="width:1px; height:1px;"></div>
     </td>

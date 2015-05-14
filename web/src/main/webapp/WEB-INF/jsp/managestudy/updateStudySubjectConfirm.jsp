@@ -216,13 +216,13 @@
 	
 	<br> 
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" 
-		value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"
+		value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back"
 		onClick="$('input[name=action]').val('back'); submitFormWithState();" />
 
-	<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" /> 
+	<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit" /> 
 		
 	<input type="button" name="BTN_Cancel"
-		id="Cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"
+		id="Cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel"
 		onClick="confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
 	<br>
 </form>

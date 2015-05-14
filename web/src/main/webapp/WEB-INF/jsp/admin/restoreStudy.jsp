@@ -176,9 +176,9 @@
 <form action='RestoreStudy?action=submit&id=<c:out value="${studyToRestore.id}"/>' method="POST">
  <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
- <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long" onClick='return confirmSubmit({ message: "<fmt:message key="are_you_sure_you_want_to_restore_this_study" bundle="${restext}"/>", height: 150, width: 500, submit: this });'>
+ <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long long_submit" onClick='return confirmSubmit({ message: "<fmt:message key="are_you_sure_you_want_to_restore_this_study" bundle="${restext}"/>", height: 150, width: 500, submit: this });'>
 </form>
 
 <c:import url="../include/workflow.jsp">

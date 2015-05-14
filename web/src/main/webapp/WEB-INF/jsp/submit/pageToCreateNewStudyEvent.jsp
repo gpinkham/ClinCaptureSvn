@@ -969,7 +969,7 @@
       <input type="button" name="Schedule" value="<fmt:message key="schedule_event" bundle="${resword}"/>" class="button_medium" onClick="createNewEvent('${page}', event);"/>
       <input type="button" name="StartDataEntry" value="<fmt:message key="start_data_entry" bundle="${resword}"/>" class="button_medium" onClick="$('#openFirstCrf').val('true'); $('input[name=Submit]').click();"/>
       <input type="submit" name="Submit" value="<fmt:message key="view_event" bundle="${resword}"/>" class="button_medium"/>
-      <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="createNewEvent_ClosePopup(event);"/>
+      <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="createNewEvent_ClosePopup(event);"/>
     </td>
 </tr></table>
 </form>

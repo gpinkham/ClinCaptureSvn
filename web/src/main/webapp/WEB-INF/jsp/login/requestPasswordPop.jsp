@@ -45,7 +45,7 @@
  <tr><td>
  <input type="submit" name="Submit" value="<fmt:message key="submit_password_request" bundle="${resword}"/>" class="button_xlong">
  </td>
- <td><input type="button" id="cancel" name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>" class="button"/></td>
+ <td><input type="button" id="cancel" name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>" class="button cancel"/></td>
  </tr>
  </table>
 </form>

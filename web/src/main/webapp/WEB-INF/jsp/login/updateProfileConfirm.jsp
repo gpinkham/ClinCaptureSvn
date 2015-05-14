@@ -80,10 +80,10 @@
 <table><tr><td>
 <form action="UpdateProfile" method="post">
  <input type="hidden" name="action" value="back">
- <input type="submit" name="back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium">
+ <input type="submit" name="back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back">
 </form></td>
 <td><form action="UpdateProfile?action=submit" method="post">
- <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></form>
+ <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit"></form>
  <!-- 
  <td>
  <form action="UpdateProfile" method="post">

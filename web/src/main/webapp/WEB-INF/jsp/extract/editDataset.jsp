@@ -101,7 +101,7 @@
   <tr>
    <td><input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
               value="<fmt:message key="back" bundle="${resword}"/>"
-              class="button_medium"
+              class="button_medium medium_back"
               onclick="formWithStateConfirmGoTo('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', '${pageContext.request.contextPath}/ViewDatasets');"/>
    </td>
    <td><input type="submit" name="save" value="<fmt:message key="add_or_remove_items" bundle="${resword}"/>" class="button_xlong"/></td>
@@ -116,7 +116,7 @@
   <tr>
    <td><input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
               value="<fmt:message key="back" bundle="${resword}"/>"
-              class="button_medium"
+              class="button_medium medium_back"
               onclick="formWithStateConfirmGoTo('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', '${pageContext.request.contextPath}/ViewDatasets');"/>
    </td>
    <td><input type="submit" name="save" value="<fmt:message key="add_or_remove_items" bundle="${resword}"/>" class="button_xlong"/></td>

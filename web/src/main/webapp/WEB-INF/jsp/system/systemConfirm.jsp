@@ -107,17 +107,17 @@
 				<tr>
 					<td>
 						<input type="submit" name="back" id="back" value="<fmt:message key="back" bundle="${resword}"/>"
-								class="button_medium" />
+								class="button_medium medium_back" />
 					</td>
 					
 					<td>
 						<input type="submit" name="confirm" id="confirm" value="<fmt:message key="submit" bundle="${resword}"/>"
-								class="button_medium">
+								class="button_medium medium_submit">
 					</td>
 					
 					<td>
 						<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>"
-								class="button_medium" 
+								class="button_medium medium_cancel" 
 								onClick="confirmCancel('${defaultURL}')" />
 					</td>
 				</tr>

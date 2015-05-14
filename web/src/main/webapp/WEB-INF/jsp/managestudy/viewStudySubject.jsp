@@ -484,7 +484,7 @@
 <table>
 	<tr>
 		<td>
-			<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
+			<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
 		</td>
 		<td>
 			<input id="NotesDiscrepancies" class="button_long" type="button" name="BTN_NotesDiscrepancies" value="<fmt:message key="subjects_discrepancies" bundle="${resword}"/>" onclick="window.location.href=('ViewNotes?module=<c:out value="${module}"/>&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=<c:out value="${studySub.label}"/>');"/>

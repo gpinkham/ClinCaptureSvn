@@ -70,11 +70,11 @@
 <table>
 	<tr>
 		<td colspan="3" align="left">
-          <input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="datasetConfirmBack('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'CreateDataset', 'back_to_scopesubmit');"/></td>
+          <input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" size="50" onclick="datasetConfirmBack('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'CreateDataset', 'back_to_scopesubmit');"/></td>
 		<td>
 		  <input type="submit" id="btnSubmit" name="btnSubmit" title="<fmt:message key="create_new_dataset" bundle="${resword}"/>" value="<fmt:message key="submit_for_dataset" bundle="${resword}"/>" class="button_medium"/></td>
 		<td>
-		  <input type="button" onclick="confirmCancel('ViewDatasets');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/></td>
+		  <input type="button" onclick="confirmCancel('ViewDatasets');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel"/></td>
 	</tr>
 </table>
 

@@ -727,10 +727,10 @@ $(document).ready(function() {
 	<table border="0" cellpadding="0" cellspacing="0">
 		<tr>
 			<td>
-				<input id="GoBack" class="button_medium" type="button" name="BTN_Back" title="<fmt:message key="back" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" onclick="javascript: return checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
+				<input id="GoBack" class="button_medium medium_back" type="button" name="BTN_Back" title="<fmt:message key="back" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" onclick="javascript: return checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 			</td>
 			<td>
-				<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#updateEventDefinition');">
+				<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#updateEventDefinition');">
 			</td>
 			<td>
 				<input type="button" name="<fmt:message key="add_a_new_CRF" bundle="${resword}"/>" value="<fmt:message key="add_a_new_CRF" bundle="${resword}"/>" class="button_medium" onclick="javascript:upateEventDefinitionAddCRF()">

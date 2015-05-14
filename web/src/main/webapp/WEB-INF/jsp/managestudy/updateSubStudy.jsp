@@ -831,9 +831,9 @@ function updateThis(multiSelEle, count) {
   <table border="0" cellpadding="0" cellspacing="0" style="width: 100%">
       <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
              value="<fmt:message key="back" bundle="${resword}"/>"
-             class="button_medium"
+             class="button_medium medium_back"
              onClick="javascript: formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
-      <input type="button" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#updateSubStudyForm');">
+      <input type="button" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#updateSubStudyForm');">
       <%--input type="button" onclick="confirmCancel('ListSite');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/--%>
 	</table>
 </form>

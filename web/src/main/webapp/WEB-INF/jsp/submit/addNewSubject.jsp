@@ -524,12 +524,12 @@
 <br>
 <table border="0" cellpadding="0" cellspacing="0">
     <tr>
-        <td><input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" style="float: left; cursor: pointer;"/></td>
-        <td><input type="submit" name="submitDone" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" style="float: left; cursor: pointer; margin-left: 10px;"></td>
+        <td><input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" style="float: left; cursor: pointer;"/></td>
+        <td><input type="submit" name="submitDone" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit" style="float: left; cursor: pointer; margin-left: 10px;"></td>
         <td><input type="button" name="StartDataEntry" value="<fmt:message key="start_data_entry" bundle="${resword}"/>" class="button_medium" onClick="$('#openFirstCrf').val('true'); $('input[name=submitDone]').click();" style="float: left; cursor: pointer;"/></td>
         <td><input type="submit" name="submitEvent" value="<fmt:message key="schedule_events" bundle="${restext}"/>" class="button_medium" style="float: left; cursor: pointer; margin-left: 10px;"></td>
         <td><input type="submit" name="submitEnroll" value="<fmt:message key="add_next_subject" bundle="${restext}"/>" class="button_medium" style="float: left; cursor: pointer; margin-left: 10px;"></td>
-        <td><input type="button" onclick="confirmCancel('ListStudySubjects');"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" style="float: left; cursor: pointer; margin-left: 10px;"/></td>
+        <td><input type="button" onclick="confirmCancel('ListStudySubjects');"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" style="float: left; cursor: pointer; margin-left: 10px;"/></td>
     </tr>
 </table>
 </form>

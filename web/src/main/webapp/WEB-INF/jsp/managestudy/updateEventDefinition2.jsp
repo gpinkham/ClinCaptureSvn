@@ -73,12 +73,12 @@
 	<table border="0" cellpadding="0" cellspacing="0">
 		<tr>
 			<td>
-				<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'UpdateEventDefinition');"/>
+				<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'UpdateEventDefinition');"/>
 				<img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
 			</td>
 
 			<td>
-				<input type="button" name="SubmitButton" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" 
+				<input type="button" name="SubmitButton" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue" 
 					onclick="$('input[name=actionName]').val(''); $('#addCRFToDefinition').append('<input type=\'hidden\' name=\'Submit\' value=\'submit\'/>'); $('#addCRFToDefinition').submit();">
 			</td>
 		</tr>

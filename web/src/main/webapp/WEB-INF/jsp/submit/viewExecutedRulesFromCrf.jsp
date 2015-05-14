@@ -228,11 +228,11 @@
 <table border="0" cellpadding="0" cellspacing="0">
     <tr>
         <td>
-            <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/>
+            <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/>
         </td>
         <c:if test="${fn:length(result) > 0}">
             <td>
-                <input type="button" name="Submit" id="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRule?${submitLinkParams}';"/>
+                <input type="button" name="Submit" id="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long long_submit" onClick="window.location.href='RunRule?${submitLinkParams}';"/>
             </td>
         </c:if>
         <td>

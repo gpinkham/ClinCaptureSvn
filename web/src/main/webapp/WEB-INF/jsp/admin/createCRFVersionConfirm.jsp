@@ -76,7 +76,7 @@
 <td>
 <input type="button" name="BTN_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
                     <c:choose>
                         <c:when test="${param.crfId == 0}">
                             onClick="javascript: window.location.href = 'CreateCRFVersion';"/>
@@ -87,7 +87,7 @@
                     </c:choose>
 </td>  
   <td><b><form action="CreateCRFVersion?action=confirmsql&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post">
- <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></form></b> </td>
+ <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit"></form></b> </td>
    </tr>
   </table>
 <br/>
@@ -99,7 +99,7 @@
 <td>
  <input type="button" name="BTN_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
                     <c:choose>
                         <c:when test="${param.crfId == 0}">
                             onClick="javascript: window.location.href = 'CreateCRFVersion';"/>
@@ -112,7 +112,7 @@
 <td><b><form action="CreateCRFVersion?action=confirmsql&crfId=<c:out value=
 "${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post">
 
- <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></form></b> </td>
+ <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit"></form></b> </td>
   </tr>
   </table>
 
@@ -142,7 +142,7 @@
 </br>
 <input type="button" name="BTN_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
                     <c:choose>
                         <c:when test="${param.crfId == 0}">
                             onClick="javascript: window.location.href = 'CreateCRFVersion';" />

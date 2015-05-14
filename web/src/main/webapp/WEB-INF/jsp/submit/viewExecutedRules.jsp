@@ -224,12 +224,12 @@
 <table border="0" cellpadding="0" cellspacing="0">
     <tr>
         <td>
-            <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"
+            <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back"
                    onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/>
         </td>
         <c:if test="${fn:length(ruleSetResult) > 0}">
             <td>
-                <input type="button" name="Submit" id="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"
+                <input type="button" name="Submit" id="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit"
                        onClick="window.location.href='RunRuleSet?ruleSetId=${ruleSet.id}&dryRun=no';"/></td>
             </td>
         </c:if>

@@ -145,9 +145,9 @@
  <form action='RestoreSite?action=submit&id=<c:out value="${siteToRestore.id}"/>' method="POST">
      <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
             value="<fmt:message key="back" bundle="${resword}"/>"
-            class="button_medium"
+            class="button_medium medium_back"
             onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-     <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" onClick='return confirmSubmit({ message: "<fmt:message key="are_you_sure_you_want_to_restore_this_site" bundle="${resword}"/>", height: 150, width: 500, submit: this });' class="button_medium">
+     <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" onClick='return confirmSubmit({ message: "<fmt:message key="are_you_sure_you_want_to_restore_this_site" bundle="${resword}"/>", height: 150, width: 500, submit: this });' class="button_medium medium_submit">
  </form>
 
 <br><br>

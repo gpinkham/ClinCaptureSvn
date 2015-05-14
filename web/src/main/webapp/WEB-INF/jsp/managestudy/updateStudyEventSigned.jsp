@@ -542,7 +542,7 @@
     <br>
     <input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
 					value="<fmt:message key="back" bundle="${resword}"/>" 
-					class="button_medium" 
+					class="button_medium medium_back" 
 					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 
     <input type="submit" name="BTN_Sign" value="<fmt:message key="sign" bundle="${resword}"/>" class="button_medium">

@@ -61,7 +61,7 @@
 
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
+					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" name="<fmt:message key="export_jobs" bundle="${resword}"/>" value="<fmt:message key="export_jobs" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='ViewJob'"/>
 <input type="button" name="<fmt:message key="import_jobs" bundle="${resword}"/>" value="<fmt:message key="import_jobs" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='ViewImportJob'"/>

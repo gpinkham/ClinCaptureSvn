@@ -44,9 +44,9 @@
 </div>
 <table border="0" cellpadding="0">
  <tr><td>
- <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
+ <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
  </td>
- <td><input type="button" id="cancel" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.location.href='login'"></td>
+ <td><input type="button" id="cancel" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onclick="javascript:window.location.href='login'"></td>
  </tr>
  </table>
 </form>
