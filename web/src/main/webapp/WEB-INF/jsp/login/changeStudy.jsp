@@ -4,6 +4,7 @@
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/js/pages/change_study.js?r=${revisionNumber}"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -12,33 +13,24 @@
 
 <jsp:include page="../include/home-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
-
+	<td class="sidebar_tab">
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
-
 		<div class="sidebar_tab_content">
-
 		</div>
-
-		</td>
-
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
-
+	</td>
+</tr>
+<tr id="sidebar_Instructions_closed" style="display: all">
+	<td class="sidebar_tab">
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+	</td>
+</tr>
 
-		</td>
-  </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope="request" id="studies" class="java.util.ArrayList"/>
@@ -111,7 +103,6 @@
             </c:otherwise>
            </c:choose>
 
-
          </c:when>
          <c:otherwise>
           <c:choose>
@@ -151,9 +142,9 @@
 	</div></div></div></div></div></div></div></div>
   <br>
   <p>
-  	  <input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
-					value="<fmt:message key="back" bundle="${resword}"/>" 
-					class="button_medium medium_back" 
+  	  <input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage"
+					value="<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium medium_back"
 					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 
       <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue">
@@ -168,4 +159,9 @@
   <p><i><fmt:message key="no_other_studies_and_roles_available" bundle="${restext}"/></i> <a href="MainMenu"><fmt:message key="go_back" bundle="${restext}"/></a></p>
 </c:otherwise>
 </c:choose>
+<script>
+	$(window).load(function(){
+		restoreParamsFromBack();
+	});
+</script>
 <jsp:include page="../include/footer.jsp"/>

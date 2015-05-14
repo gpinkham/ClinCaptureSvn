@@ -6,6 +6,8 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
+<script type="text/JavaScript" language="JavaScript" src="includes/js/pages/change_study.js"></script>
+
 <jsp:include page="../include/home-header.jsp"/>
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -57,7 +59,7 @@
 		<fmt:message key="the_study_site_status_is" bundle="${restext}"/> <c:out value="${currentStudy.status.name}"/>
 	</p><br>
 
-	<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: history.go(-1);"/>
+	<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="goBackAndSaveParams();"/>
 	<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
 </form>
 <jsp:include page="../include/footer.jsp"/>
