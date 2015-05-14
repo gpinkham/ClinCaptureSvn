@@ -13,6 +13,8 @@
 
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.DateUtil;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
@@ -51,6 +53,8 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 
 	private AuditUserLoginDao auditUserLoginDao;
 
+	private UserAccountBean currentUser;
+
 	@Override
 	protected String getTableName() {
 		return "userLogins";
@@ -61,9 +65,10 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 		tableFacade.setColumnProperties("userName", "loginAttemptDate", "loginStatus", "actions");
 		Row row = tableFacade.getTable().getRow();
 		configureColumn(row.getColumn("userName"), ResourceBundleProvider.getResWord("user_name"), null, null);
-		configureColumn(row.getColumn("loginAttemptDate"), ResourceBundleProvider.getResWord("login_attempt_date"), new DateCellEditor(
-				"yyyy-MM-dd HH:mm:ss"), null);
-		configureColumn(row.getColumn("loginStatus"), ResourceBundleProvider.getResWord("login_status"), null, new AvailableDroplistFilterEditor());
+		configureColumn(row.getColumn("loginAttemptDate"), ResourceBundleProvider.getResWord("login_attempt_date"),
+				new DateEditor(DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS, getCurrentUser().getUserTimeZoneId()), null);
+		configureColumn(row.getColumn("loginStatus"), ResourceBundleProvider.getResWord("login_status"), null,
+				new AvailableDroplistFilterEditor());
 		String actionsHeader = ResourceBundleProvider.getResWord("actions")
 				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
 		configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(
@@ -172,6 +177,14 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 
 	public void setAuditUserLoginDao(AuditUserLoginDao auditUserLoginDao) {
 		this.auditUserLoginDao = auditUserLoginDao;
+	}
+
+	public UserAccountBean getCurrentUser() {
+		return currentUser;
+	}
+
+	public void setCurrentUser(UserAccountBean currentUser) {
+		this.currentUser = currentUser;
 	}
 
 	private class AvailableDroplistFilterEditor extends DroplistFilterEditor {

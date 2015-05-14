@@ -15,7 +15,6 @@
 
 
 <link rel="stylesheet" href="includes/jmesa/jmesa.css?r=${revisionNumber}" type="text/css">
-<!--script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script-->
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js?r=${revisionNumber}"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js?r=${revisionNumber}"></script>
 
@@ -72,7 +71,7 @@
 </h1>
 
 <jsp:useBean id="now" class="java.util.Date" />
-<P><I><fmt:message key="server_time_info" bundle="${resword}"/> <fmt:formatDate value="${now}" pattern="yyyy-MM-dd hh:mm"/>.</I></P>
+<P><I><fmt:message key="local_time_info" bundle="${resword}"/></I></P>
 <div id="auditUserLoginDiv">
     <form  action="${pageContext.request.contextPath}/AuditUserActivity">
         <input type="hidden" name="module" value="admin">
@@ -83,7 +82,6 @@
 
 
 <br>
-<%-- <input type="button" onclick="confirmExit('ListUserAccounts');"  name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>--%>
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium medium_back"

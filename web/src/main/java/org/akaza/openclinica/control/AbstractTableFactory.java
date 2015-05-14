@@ -22,6 +22,7 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.facade.TableFacadeImpl;
 import org.jmesa.limit.ExportType;
@@ -30,10 +31,13 @@ import org.jmesa.limit.LimitImpl;
 import org.jmesa.limit.RowSelect;
 import org.jmesa.limit.RowSelectImpl;
 import org.jmesa.view.component.Column;
+import org.jmesa.view.editor.AbstractCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.FilterEditor;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlTable;
+import org.jmesa.util.ItemUtils;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -258,6 +262,55 @@ public abstract class AbstractTableFactory {
 		} else {
 			tableFacade.setStateAttr("restore");
 			logger.debug("getTableName() returned null, so tableFacade.setStateAttr = restore");
+		}
+	}
+
+
+	protected class DateEditor extends AbstractCellEditor {
+
+		private Logger logger = LoggerFactory.getLogger(DateEditor.class);
+
+		private String userTimeZoneId;
+
+		private DateUtil.DatePattern datePattern;
+
+		public DateEditor() {
+			this.userTimeZoneId = DateTimeZone.getDefault().getID();
+			this.datePattern = DateUtil.DatePattern.DATE;
+		}
+
+		public DateEditor(DateUtil.DatePattern datePattern) {
+			this.userTimeZoneId = DateTimeZone.getDefault().getID();
+			this.datePattern = datePattern;
+		}
+
+		public DateEditor(String userTimeZoneId) {
+			setUserTimeZoneId(userTimeZoneId);
+			this.datePattern = DateUtil.DatePattern.DATE;
+		}
+
+		public DateEditor(DateUtil.DatePattern datePattern, String userTimeZoneId) {
+			setUserTimeZoneId(userTimeZoneId);
+			this.datePattern = datePattern;
+		}
+
+		public void setUserTimeZoneId(String userTimeZoneId) {
+			this.userTimeZoneId = DateUtil.isValidTimeZoneId(userTimeZoneId) ? userTimeZoneId : DateTimeZone.getDefault().getID();
+		}
+
+		public Object getValue(Object item, String property, int rowcount) {
+
+			String output = null;
+			try {
+				Object itemValue = ItemUtils.getItemValue(item, property);
+				if (itemValue == null) {
+					return null;
+				}
+				output = DateUtil.printDate((Date) itemValue, userTimeZoneId, datePattern);
+			} catch (Exception exception) {
+				this.logger.error("Could not process date editor with property " + property, exception);
+			}
+			return output;
 		}
 	}
 }

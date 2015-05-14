@@ -64,10 +64,10 @@ public class AuditUserActivityServlet extends RememberLastPage {
 		}
 		AuditUserLoginTableFactory factory = new AuditUserLoginTableFactory();
 		factory.setAuditUserLoginDao(getAuditUserLoginDao());
+		factory.setCurrentUser(getUserAccountBean());
 		String auditUserLoginHtml = factory.createTable(request, response).render();
 		request.setAttribute("auditUserLoginHtml", auditUserLoginHtml);
 		forwardPage(Page.AUDIT_USER_ACTIVITY, request, response);
-
 	}
 
 	@Override

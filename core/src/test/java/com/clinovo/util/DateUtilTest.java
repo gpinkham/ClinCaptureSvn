@@ -15,11 +15,22 @@
 package com.clinovo.util;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.joda.time.DateTimeZone;
+import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class DateUtilTest extends DefaultAppContextTest {
+
+	private DateTimeZone jvmTimeZone = DateTimeZone.getDefault();
+
+	@After
+	public void restoreDefault() {
+		DateTimeZone.setDefault(jvmTimeZone);
+	}
 
 	@Test
 	public void testThatStringIsInValidOcDateFormat() {
@@ -58,5 +69,94 @@ public class DateUtilTest extends DefaultAppContextTest {
 	@Test
 	public void testThatConvertStringToDateReturnsNullForInvalidFormat() {
 		assertNull(DateUtil.convertStringToDate("wrong format"));
+	}
+
+	@Test
+	public void testThatPrintDateMakesCorrectTranslationBetweenTimeZones_1() {
+
+		// SETUP
+		DateTimeZone.setDefault(DateTimeZone.forID("America/Chihuahua"));
+		Date dateToTranslate = new Date(1427284953000L); // 25th March 2015 12:02:33 GMT
+
+		// TEST
+		String output = DateUtil.printDate(dateToTranslate, "Europe/Helsinki", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS);
+
+		// VERIFY
+		// As of 25th March 2015 12:02:33 GMT
+		// time zone "America/Chihuahua" has offset -07:00
+		// and time zone "Europe/Helsinki" has offset +02:00.
+		// result of translation "America/Chihuahua" -> "Europe/Helsinki" must be equal to 25th March 2015 14:02:33
+		Assert.assertEquals("25-Mar-2015 14:02:33", output);
+	}
+
+	@Test
+	public void testThatDoEndTagMakesCorrectTranslationBetweenTimeZones_2() throws Exception {
+
+		// SETUP
+		DateTimeZone.setDefault(DateTimeZone.forID("America/Chihuahua"));
+		Date dateToTranslate = new Date(1431348770000L); // 11th May 2015 12:52:50 GMT
+
+		// TEST
+		String output = DateUtil.printDate(dateToTranslate, "Europe/Helsinki", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS);
+
+		// VERIFY
+		// As of 11th May 2015 12:52:50 GMT
+		// time zone "America/Chihuahua" has offset -06:00
+		// and time zone "Europe/Helsinki" has offset +03:00.
+		// result of translation "America/Chihuahua" -> "Europe/Helsinki" must be equal to 11th May 2015 15:52:50
+		Assert.assertEquals("11-May-2015 15:52:50", output);
+	}
+
+	@Test
+	public void testThatDoEndTagMakesCorrectTranslationBetweenTimeZones_3() throws Exception {
+
+		// SETUP
+		DateTimeZone.setDefault(DateTimeZone.forID("America/Chihuahua"));
+		Date dateToTranslate = new Date(1427284953000L); // 25th March 2015 12:02:33 GMT
+
+		// TEST
+		String output = DateUtil.printDate(dateToTranslate, "Asia/Muscat", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS);
+
+		// VERIFY
+		// As of 25th March 2015 12:02:33 GMT
+		// time zone "America/Chihuahua" has offset -07:00.
+		// Time zone "Asia/Muscat" has constant offset +04:00.
+		// result of translation "America/Chihuahua" -> "Asia/Muscat" must be equal to 25th March 2015 16:02:33
+		Assert.assertEquals("25-Mar-2015 16:02:33", output);
+	}
+
+	@Test
+	public void testThatDoEndTagMakesCorrectTranslationBetweenTimeZones_4() throws Exception {
+
+		// SETUP
+		DateTimeZone.setDefault(DateTimeZone.forID("America/Chihuahua"));
+		Date dateToTranslate = new Date(1431348770000L); // 11th May 2015 12:52:50 GMT
+
+		// TEST
+		String output = DateUtil.printDate(dateToTranslate, "Asia/Muscat", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS);
+
+		// VERIFY
+		// As of 11th May 2015 12:52:50 GMT
+		// time zone "America/Chihuahua" has offset -06:00.
+		// Time zone "Asia/Muscat" has constant offset +04:00.
+		// result of translation "America/Chihuahua" -> "Asia/Muscat" must be equal to 11th May 2015 16:52:50
+		Assert.assertEquals("11-May-2015 16:52:50", output);
+	}
+
+	@Test
+		public void testThatPrintDateMakesCorrectTranslationBetweenTimeZones_5() {
+
+		// SETUP
+		DateTimeZone.setDefault(DateTimeZone.forID("America/Chihuahua"));
+		Date dateToTranslate = new Date(1427284953000L); // 25th March 2015 12:02:33 GMT
+
+		// TEST
+		String output = DateUtil.printDate(dateToTranslate, "America/Chihuahua", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS);
+
+		// VERIFY
+		// As of 25th March 2015 12:02:33 GMT
+		// time zone "America/Chihuahua" has offset -07:00.
+		// Target time zone was not set, thus date must remain in the JVM time zone
+		Assert.assertEquals("25-Mar-2015 05:02:33", output);
 	}
 }

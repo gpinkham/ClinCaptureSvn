@@ -199,4 +199,14 @@ public class ResourceBundleProvider {
 	public static String getResNotes(String key) {
 		return getTextsBundle().containsKey(key) ? getTextsBundle().getString(key) : key;
 	}
+
+	/**
+	 * Method returns property value from format bundle.
+	 *
+	 * @param key String
+	 * @return String
+	 */
+	public static String getResFormat(String key) {
+		return getFormatBundle().containsKey(key) ? getFormatBundle().getString(key) : key;
+	}
 }

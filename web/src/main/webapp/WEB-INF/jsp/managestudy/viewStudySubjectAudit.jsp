@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -18,7 +19,8 @@
     <ui:theme/>
 </head>
 
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set><c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
+<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 
 <body>
 <a name="root"></a>
@@ -73,7 +75,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="550" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
     <tr>
         <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="audit_event" bundle="${resword}"/></b></td>
-        <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="date_time_of_server" bundle="${resword}"/></b></td>
+        <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="local_date_time" bundle="${resword}"/></b></td>
         <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="user" bundle="${resword}"/></b></td>
         <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="value_type" bundle="${resword}"/></b></td>
         <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="old" bundle="${resword}"/></b></td>
@@ -83,7 +85,10 @@
         <tr>
             <td class="table_header_column"><fmt:message key="${studySubjectAudit.auditEventTypeName}" bundle="${resaudit}"/>&nbsp;</td>
             <!-- YW 12-06-2007, use dateStyle and timeStyle to display datetime -->
-            <td class="table_header_column"><fmt:formatDate value="${studySubjectAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
+            <td class="table_header_column">
+				<cc-fmt:formatDate value="${studySubjectAudit.auditDate}" pattern="${dtetmeFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+				&nbsp;
+			</td>
             <td class="table_header_column"><c:out value="${studySubjectAudit.userName}"/>&nbsp;</td>
             <td class="table_header_column"><c:out value="${studySubjectAudit.entityName}"/>&nbsp;</td>
             <td class="table_header_column"><c:out value="${studySubjectAudit.oldValue}"/>&nbsp;</td>
@@ -105,7 +110,6 @@
         <tr>
 			<!-- Link to Dynamic Anchor -->
 			<td class="table_header_column"><a href="#<c:out value="${event.studyEventDefinition.name}"/><c:out value="${event.sampleOrdinal}"/>"><c:out value="${event.studyEventDefinition.name}"/>&nbsp;</a></td>
-            <%-- <td class="table_header_column"><c:out value="${event.studyEventDefinition.name}"/>&nbsp;</td> --%>
             <td class="table_header_column"><c:out value="${event.location}"/>&nbsp;</td>
             <c:choose>
                 <c:when test="${event.startTimeFlag=='false'}">
@@ -172,7 +176,10 @@
                             <td class="table_header_column"><c:out value="${deletedEventCRF.crfName}"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${deletedEventCRF.crfVersion}"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${deletedEventCRF.deletedBy}"/>&nbsp;</td>
-                            <td class="table_header_column"><fmt:formatDate value="${deletedEventCRF.deletedDate}" type="both" pattern="${dteFormat}" timeStyle="short"/>&nbsp;</td>
+                            <td class="table_header_column">
+								<cc-fmt:formatDate value="${deletedEventCRF.deletedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+								&nbsp;
+							</td>
                         </tr>
                     </c:if>
                 </c:forEach>
@@ -190,7 +197,7 @@
             <table border="0" cellpadding="0" cellspacing="0" width="550" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
                 <tr>
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="audit_event" bundle="${resword}"/></b></td>
-                    <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="date_time_of_server" bundle="${resword}"/></b></td>
+                    <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="local_date_time" bundle="${resword}"/></b></td>
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="user" bundle="${resword}"/></b></td>
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="value_type" bundle="${resword}"/></b></td>
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="old" bundle="${resword}"/></b></td>
@@ -201,13 +208,14 @@
                     <c:if test="${studyEventAudit.entityId==event.id}">
                         <tr>
                             <td class="table_header_column"><fmt:message key="${studyEventAudit.auditEventTypeName}" bundle="${resaudit}"/>&nbsp;</td>
-                            <td class="table_header_column"><fmt:formatDate value="${studyEventAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
+                            <td class="table_header_column">
+								<cc-fmt:formatDate value="${studyEventAudit.auditDate}" pattern="${dtetmeFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+								&nbsp;
+							</td>
                             <td class="table_header_column"><c:out value="${studyEventAudit.userName}"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${studyEventAudit.entityName}"/>&nbsp;</td>
                             <td class="table_header_column">
                                         <c:choose>
-                                            <%--BWP issue 3300; 02/24/2009: The displayed old value is the SubjectEventStatus id;
-                                the new value is the Status id (both objects in a StudyEventBean) --%>
                                             <c:when test="${studyEventAudit.oldValue eq '0'}"><fmt:message key="invalid" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.oldValue eq '1'}"><fmt:message key="scheduled" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.oldValue eq '2'}"><fmt:message key="not_scheduled" bundle="${resterm}"/></c:when>
@@ -219,7 +227,6 @@
                                             <c:when test="${studyEventAudit.oldValue eq '8'}"><fmt:message key="signed" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.oldValue eq '9'}"><fmt:message key="source_data_verified" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.oldValue eq '10'}"><fmt:message key="deleted" bundle="${resterm}"/></c:when>
-
                                             <c:otherwise><c:out value="${studyEventAudit.oldValue}"/></c:otherwise>
                                         </c:choose>
                                 &nbsp;</td>
@@ -237,10 +244,8 @@
                                             <c:when test="${studyEventAudit.newValue eq '6'}"><fmt:message key="locked" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.newValue eq '7'}"><fmt:message key="auto-removed" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.newValue eq '8'}"><fmt:message key="signed" bundle="${resterm}"/></c:when>
-                                            <%--c:when test="${studyEventAudit.newValue eq '9'}"><fmt:message key="frozen" bundle="${resterm}"/></c:when--%>
                                             <c:when test="${studyEventAudit.newValue eq '9'}"><fmt:message key="source_data_verified" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.newValue eq '10'}"><fmt:message key="deleted" bundle="${resterm}"/></c:when>
-
                                             <c:otherwise><c:out value="${studyEventAudit.newValue}"/></c:otherwise>
                                         </c:choose>
                                     </c:when>
@@ -257,7 +262,6 @@
                                             <c:when test="${studyEventAudit.newValue eq '8'}"><fmt:message key="signed" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.newValue eq '9'}"><fmt:message key="source_data_verified" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.newValue eq '10'}"><fmt:message key="deleted" bundle="${resterm}"/></c:when>
-
                                             <c:otherwise><c:out value="${studyEventAudit.newValue}"/></c:otherwise>
                                         </c:choose>
                                     </c:otherwise>
@@ -289,7 +293,6 @@
                     <td class="table_header_column"><c:out value="${eventCRF.crfVersion.name}"/>&nbsp;</td>
                     <td class="table_header_column">
 						<fmt:formatDate value="${eventCRF.dateInterviewed}" type="both" pattern="${dteFormat}" timeStyle="short"/>&nbsp;
-                    	<%--<c:out value="${eventCRF.dateInterviewed}"/>&nbsp;--%>
 					</td>
                     <td class="table_header_column"><c:out value="${eventCRF.interviewerName}"/>&nbsp;</td>
                     <td class="table_header_column"><c:out value="${eventCRF.owner.name}"/>&nbsp;</td>
@@ -306,7 +309,7 @@
             <table border="0" cellpadding="0" cellspacing="0" width="550" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
                 <tr>
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="audit_event" bundle="${resword}"/></b></td>
-                    <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="date_time_of_server" bundle="${resword}"/></b></td>
+                    <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="local_date_time" bundle="${resword}"/></b></td>
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="user" bundle="${resword}"/></b></td>
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="value_type" bundle="${resword}"/></b></td>
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="old" bundle="${resword}"/></b></td>
@@ -317,7 +320,10 @@
                     <c:if test="${eventCRFAudit.eventCRFId==eventCRF.id}">
                         <tr>
                             <td class="table_header_column"><fmt:message key="${eventCRFAudit.auditEventTypeName}" bundle="${resaudit}"/>&nbsp;</td>
-                            <td class="table_header_column"><fmt:formatDate value="${eventCRFAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
+                            <td class="table_header_column">
+								<cc-fmt:formatDate value="${eventCRFAudit.auditDate}" pattern="${dtetmeFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+								&nbsp;
+							</td>
                             <td class="table_header_column"><c:out value="${eventCRFAudit.userName}"/>&nbsp;</td>
                             <td class="table_header_column">
 								<c:choose>

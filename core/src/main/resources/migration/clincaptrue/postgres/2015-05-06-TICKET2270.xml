@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-01" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="v_dn_count" />
+		</preConditions>
+		<comment>drop unused view v_dn_count, if exists</comment>
+		<dropView viewName="v_dn_count"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-02" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="v_enrolled_per_site" />
+		</preConditions>
+		<comment>drop unused view v_enrolled_per_site, if exists</comment>
+		<dropView viewName="v_enrolled_per_site"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-03" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="v_enrollment_per_month_2012" />
+		</preConditions>
+		<comment>drop unused view v_enrollment_per_month_2012, if exists</comment>
+		<dropView viewName="v_enrollment_per_month_2012"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-04" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="v_enrollment_per_month_2013" />
+		</preConditions>
+		<comment>drop unused view v_enrollment_per_month_2013, if exists</comment>
+		<dropView viewName="v_enrollment_per_month_2013"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-05" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="view_discrepancy_note" />
+		</preConditions>
+		<comment>drop view view_discrepancy_note, if exists</comment>
+		<dropView viewName="view_discrepancy_note"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-06" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="view_dn_event_crf" />
+		</preConditions>
+		<comment>drop view view_dn_event_crf, if exists</comment>
+		<dropView viewName="view_dn_event_crf"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-07" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="view_dn_item_data" />
+		</preConditions>
+		<comment>drop view view_dn_item_data, if exists</comment>
+		<dropView viewName="view_dn_item_data"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-08" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="view_dn_study_event" />
+		</preConditions>
+		<comment>drop view view_dn_study_event, if exists</comment>
+		<dropView viewName="view_dn_study_event"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-09" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="view_dn_study_subject" />
+		</preConditions>
+		<comment>drop view view_dn_study_subject, if exists</comment>
+		<dropView viewName="view_dn_study_subject"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-10" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="view_dn_subject" />
+		</preConditions>
+		<comment>drop view view_dn_subject, if exists</comment>
+		<dropView viewName="view_dn_subject"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-11" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="view_dn_stats" />
+		</preConditions>
+		<comment>drop view view_dn_stats, if exists</comment>
+		<dropView viewName="view_dn_stats"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-12" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="view_site_hidden_event_definition_crf" />
+		</preConditions>
+		<comment>drop view view_site_hidden_event_definition_crf, if exists</comment>
+		<dropView viewName="view_site_hidden_event_definition_crf"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-06-TICKET2270-13" dbms="postgresql">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="view_study_hidden_event_definition_crf" />
+		</preConditions>
+		<comment>drop view view_study_hidden_event_definition_crf, if exists</comment>
+		<dropView viewName="view_study_hidden_event_definition_crf"/>
+	</changeSet>
+
+</databaseChangeLog>
+
+
+
+
+
+
+

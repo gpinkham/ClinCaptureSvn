@@ -48,8 +48,6 @@ public final class DateUtil {
 
 	private static ResourceBundle resformat;
 
-	private static Locale locale;
-
 	private static Map<String, String> timeZoneIDsSortedMap;
 
 	private DateUtil() {
@@ -164,10 +162,7 @@ public final class DateUtil {
 	}
 
 	private static Locale getLocale() {
-		if (locale == null) {
-			locale = CoreResources.getSystemLocale();
-		}
-		return locale;
+		return CoreResources.getSystemLocale();
 	}
 
 	/**
@@ -188,7 +183,7 @@ public final class DateUtil {
 	 * sorted by time zone offset in ascending order.
 	 * Based off on the set of standard time zones, provided by <code>joda-time</code> library.
 	 *
-	 * @return Map<String, String>
+	 * @return Map
 	 */
 	public static Map<String, String> getAvailableTimeZoneIDsSorted() {
 
@@ -209,6 +204,22 @@ public final class DateUtil {
 			timeZoneIDsSortedMap = Collections.unmodifiableMap(timeZoneIDsSorted);
 		}
 		return timeZoneIDsSortedMap;
+	}
+
+	/**
+	 * Returns string representation of a given date, translated into specified time zone
+	 * and formatted according to specified date pattern.
+	 *
+	 * @param dateToPrint Date date to print
+	 * @param timeZoneId  String time zone to translate to
+	 * @param datePattern DatePattern specifies output format of date
+	 * @return String string representation of a given date
+	 */
+	public static String printDate(Date dateToPrint, String timeZoneId, DatePattern datePattern) {
+
+		DateTimeFormatter dateFormatter = DateTimeFormat.forPattern(datePattern.getPattern())
+				.withZone(DateTimeZone.forID(timeZoneId)).withLocale(getLocale());
+		return dateFormatter.print(dateToPrint.getTime());
 	}
 
 	/**
@@ -239,6 +250,28 @@ public final class DateUtil {
 
 		public boolean equals(Object obj) {
 			return super.equals(obj);
+		}
+	}
+
+	/**
+	 * Enumeration <code>DateUtil.DatePattern</code> represents available date format patterns.
+	 * DATE is for pattern <code>yyyy-MM-dd</code>
+	 * TIMESTAMP is for pattern <code>dd-MMM-yyyy HH:MM</code>
+	 * TIMESTAMP_WITH_SECONDS is for pattern <code>dd-MMM-yyyy HH:mm:ss</code>
+	 */
+	public enum DatePattern {
+		DATE(ResourceBundleProvider.getResFormat("date_format_string")),
+		TIMESTAMP(ResourceBundleProvider.getResFormat("date_time_format_short")),
+		TIMESTAMP_WITH_SECONDS(ResourceBundleProvider.getResFormat("date_time_format_string"));
+
+		private String pattern;
+
+		private DatePattern(String pattern) {
+			this.pattern = pattern;
+		}
+
+		public String getPattern() {
+			return pattern;
 		}
 	}
 }
