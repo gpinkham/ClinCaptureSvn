@@ -29,6 +29,7 @@ import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
@@ -60,6 +61,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
@@ -124,17 +126,24 @@ public class ImportRuleServlet extends Controller {
 					RuleSetRuleBean ruleSetRule = getRuleSetRuleDao().findById(
 							Integer.parseInt(request.getParameter("id")));
 					RuleSetBean ruleSet = ruleSetRule.getRuleSetBean();
-					if (ruleSetRule != null) {
-						getRuleDao().getSessionFactory().getCurrentSession().clear();
-						Session session = getRuleDao().getSessionFactory().getCurrentSession();
-						Transaction transaction = session.beginTransaction();
-						session.delete(ruleSetRule);
-						if (ruleSet.getRuleSetRuleSize() <= 1) {
-							session.delete(ruleSet);
+					RuleBean rule = ruleSetRule.getRuleBean();
+					List<RuleSetRuleBean> duplicatedRuleSetRules = getRuleSetRuleDao().findByRuleSetBeanAndRuleBean(ruleSet, rule);
+					getRuleDao().getSessionFactory().getCurrentSession().clear();
+					Session session = getRuleDao().getSessionFactory().getCurrentSession();
+					Transaction transaction = session.beginTransaction();
+					for (int i = 0; i < duplicatedRuleSetRules.size(); i++) {
+						RuleSetRuleBean currentRuleSetRule = duplicatedRuleSetRules.get(i);
+						if (i != 0) {
+							currentRuleSetRule.setRuleBean(null);
 						}
-						transaction.commit();
-						session.flush();
+						session.delete(currentRuleSetRule);
 					}
+					transaction.commit();
+					if (ruleSet.getRuleSetRuleSize() <= duplicatedRuleSetRules.size()) {
+						ruleSet.getRuleSetRules().clear();
+						session.delete(ruleSet);
+					}
+					session.flush();
 				}
 
 				RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService(
