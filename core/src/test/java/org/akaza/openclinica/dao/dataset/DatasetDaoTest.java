@@ -97,21 +97,6 @@ public class DatasetDaoTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testInitialDatasetData() throws OpenClinicaException {
-		DatasetBean dataset;
-		List<DatasetBean> datasets = (List<DatasetBean>) datasetDAO.findAll();
-		if (datasets.size() == 0) {
-			dataset = createDateset();
-			dataset = (DatasetBean) datasetDAO.create(dataset);
-		} else {
-			dataset = datasets.get(0);
-		}
-		assertTrue(dataset.getId() > 0);
-		dataset = datasetDAO.initialDatasetData(dataset.getId());
-		assertTrue(dataset.getItemIds().size() > 0);
-	}
-
-	@Test
 	public void testThatFindByNameAndStudyCannotFindAnObject() throws OpenClinicaException {
 		DatasetBean datasetBean = (DatasetBean) datasetDAO.findByNameAndStudy(TEST_DATASET_NAME, studyBean);
 		assertTrue(datasetBean.getId() == 0);

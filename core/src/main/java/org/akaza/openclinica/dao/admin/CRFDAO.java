@@ -23,6 +23,7 @@ package org.akaza.openclinica.dao.admin;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -669,5 +670,29 @@ public class CRFDAO extends AuditableEntityDAO {
 			result.add(getEntityFromHashMap((HashMap) object));
 		}
 		return result;
+	}
+
+	/**
+	 * Method returns all unmasked available CRFs.
+	 * @param sed StudyEventDefinitionBean
+	 * @param ub  UserAccountBean
+	 * @return    List<CRFBean>
+	 */
+	public List<CRFBean> findAllActiveUnmaskedByDefinition(StudyEventDefinitionBean sed, UserAccountBean ub) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		int index = 1;
+		variables.put(index++, sed.getId());
+		variables.put(index++, ub.getId());
+		variables.put(index++, ub.getActiveStudyId());
+		variables.put(index, ub.getActiveStudyId());
+		ArrayList alist = this.select(digester.getQuery("findAllActiveUnmaskedByDefinition"), variables);
+
+		ArrayList al = new ArrayList();
+		for (Object anAlist : alist) {
+			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
+			al.add(eb);
+		}
+		return al;
 	}
 }

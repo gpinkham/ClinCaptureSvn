@@ -74,19 +74,21 @@ import com.clinovo.i18n.LocaleResolver;
 /**
  * Take a dataset and show it in different formats,<BR/>
  * Detect whether or not files exist in the system or database,<BR/>
- * Give the user the option of showing a stored dataset, or refresh the current one. </P>
- * 
- * TODO eventually allow for a thread to be split off, so that exporting can run seperately from the servlet and be
+ * Give the user the option of showing a stored dataset, or refresh the current one.
+ *
  * retrieved at a later time.
  * 
  * @author thickerson
- * 
- * 
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ExportDatasetServlet extends Controller {
 
+	/**
+	 * Get link for this servlet.
+	 * @param dsId dataset ID.
+	 * @return link
+	 */
 	public static String getLink(int dsId) {
 		return "ExportDataset?datasetId=" + dsId;
 	}
@@ -119,10 +121,16 @@ public class ExportDatasetServlet extends Controller {
 				logger.info("tripped over null pointer exception");
 			}
 		}
-		DatasetBean db = (DatasetBean) dsdao.findByPK(datasetId);
+		DatasetBean db = getDatasetService().initialDatasetData(datasetId, ub);
 		StudyDAO sdao = getStudyDAO();
 		StudyBean study = (StudyBean) sdao.findByPK(db.getStudyId());
 		checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
+
+		if (db.isContainsMaskedCRFs()) {
+			addPageMessage(resword.getString("this_dataset_contains_items_from_masked_crfs_extract"), request);
+			forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
+			return;
+		}
 
 		// Checks if the study is current study or child of current study
 		if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
@@ -182,15 +190,15 @@ public class ExportDatasetServlet extends Controller {
 			int fId = 0;
 			if ("sas".equalsIgnoreCase(action)) {
 				long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
-				String SASFileName = db.getName() + "_sas.sas";
-				generateFileService.createFile(SASFileName, generalFileDir, generateReport, db, sysTimeEnd,
+				String sasFileName = db.getName() + "_sas.sas";
+				generateFileService.createFile(sasFileName, generalFileDir, generateReport, db, sysTimeEnd,
 						ExportFormatBean.TXTFILE, true);
 				logger.info("created sas file");
-				request.setAttribute("generate", generalFileDir + SASFileName);
-				finalTarget.setFileName(generalFileDir + SASFileName);
+				request.setAttribute("generate", generalFileDir + sasFileName);
+				finalTarget.setFileName(generalFileDir + sasFileName);
 			} else if ("odm".equalsIgnoreCase(action)) {
 				String odmVersion = fp.getString("odmVersion");
-				String ODMXMLFileName = "";
+				String odmXMLFileName = "";
 				HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db,
 						currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", true, true,
 						true, false, null);
@@ -199,11 +207,11 @@ public class ExportDatasetServlet extends Controller {
 					Map.Entry entry = (Map.Entry) o;
 					Object key = entry.getKey();
 					Object value = entry.getValue();
-					ODMXMLFileName = (String) key;
+					odmXMLFileName = (String) key;
 					fId = (Integer) value;
 				}
-				request.setAttribute("generate", generalFileDir + ODMXMLFileName);
-				System.out.println("+++ set the following: " + generalFileDir + ODMXMLFileName);
+				request.setAttribute("generate", generalFileDir + odmXMLFileName);
+				System.out.println("+++ set the following: " + generalFileDir + odmXMLFileName);
 				// Working group
 				// put an extra flag here, where we generate the XML, and then
 				// find the XSL, run a job and
@@ -216,11 +224,11 @@ public class ExportDatasetServlet extends Controller {
 
 					// the trick there, we need to open up the zipped file and
 					// get at the XML
-					openZipFile(generalFileDir + ODMXMLFileName + ".zip");
+					openZipFile(generalFileDir + odmXMLFileName + ".zip");
 					// need to find out how to copy this xml file from /bin to
 					// the generalFileDir
 					SimpleTriggerImpl simpleTrigger = xts.generateXalanTrigger(propertiesPath + File.separator
-							+ "ODMReportStylesheet.xsl", ODMXMLFileName, generalFileDir + "output.sql", db.getId());
+							+ "ODMReportStylesheet.xsl", odmXMLFileName, generalFileDir + "output.sql", db.getId());
 					StdScheduler scheduler = getStdScheduler();
 
 					JobDetailImpl jobDetailBean = new JobDetailImpl();
@@ -239,7 +247,7 @@ public class ExportDatasetServlet extends Controller {
 					}
 				}
 			} else if ("txt".equalsIgnoreCase(action)) {
-				String TXTFileName = "";
+				String txtFileName = "";
 				HashMap answerMap = generateFileService.createTabFile(eb, sysTimeBegin, generalFileDir, db,
 						currentstudyid, currentstudyid, "");
 				// the above gets us the best of both worlds - the file name,
@@ -251,11 +259,11 @@ public class ExportDatasetServlet extends Controller {
 					Map.Entry entry = (Map.Entry) o;
 					Object key = entry.getKey();
 					Object value = entry.getValue();
-					TXTFileName = (String) key;
+					txtFileName = (String) key;
 					fId = (Integer) value;
 				}
-				request.setAttribute("generate", generalFileDir + TXTFileName);
-				System.out.println("+++ set the following: " + generalFileDir + TXTFileName);
+				request.setAttribute("generate", generalFileDir + txtFileName);
+				System.out.println("+++ set the following: " + generalFileDir + txtFileName);
 			} else if ("html".equalsIgnoreCase(action)) {
 				// html based dataset browser
 				TabReportBean answer = new TabReportBean();
@@ -276,7 +284,7 @@ public class ExportDatasetServlet extends Controller {
 
 				eb.computeReport(answer);
 
-				String DDLFileName = "";
+				String ddlFileName = "";
 				HashMap answerMap = generateFileService.createSPSSFile(db, eb, currentStudy, parentStudy, sysTimeBegin,
 						generalFileDir, answer, "");
 
@@ -284,22 +292,22 @@ public class ExportDatasetServlet extends Controller {
 					Map.Entry entry = (Map.Entry) o;
 					Object key = entry.getKey();
 					Object value = entry.getValue();
-					DDLFileName = (String) key;
+					ddlFileName = (String) key;
 					fId = (Integer) value;
 				}
-				request.setAttribute("generate", generalFileDir + DDLFileName);
-				System.out.println("+++ set the following: " + generalFileDir + DDLFileName);
+				request.setAttribute("generate", generalFileDir + ddlFileName);
+				System.out.println("+++ set the following: " + generalFileDir + ddlFileName);
 			} else if ("csv".equalsIgnoreCase(action)) {
 				CommaReportBean answer = new CommaReportBean();
 				eb = dsdao.getDatasetData(eb, currentstudyid, currentstudyid);
 				eb.getMetadata();
 				eb.computeReport(answer);
 				long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
-				String CSVFileName = db.getName() + "_comma.txt";
-				fId = generateFileService.createFile(CSVFileName, generalFileDir, answer.toString(), db, sysTimeEnd,
+				String csvFileName = db.getName() + "_comma.txt";
+				fId = generateFileService.createFile(csvFileName, generalFileDir, answer.toString(), db, sysTimeEnd,
 						ExportFormatBean.CSVFILE, true);
 				logger.info("just created csv file");
-				request.setAttribute("generate", generalFileDir + CSVFileName);
+				request.setAttribute("generate", generalFileDir + csvFileName);
 			} else if ("excel".equalsIgnoreCase(action)) {
 				String excelFileName = db.getName() + "_excel.xls";
 
@@ -403,6 +411,15 @@ public class ExportDatasetServlet extends Controller {
 		}
 	}
 
+	/**
+	 * Load list.
+	 *
+	 * @param db DatasetBean
+	 * @param asdfdao ArchivedDatasetFileDAO
+	 * @param datasetId int
+	 * @param fp FormProcessor
+	 * @param eb ExtractBean
+	 */
 	public void loadList(DatasetBean db, ArchivedDatasetFileDAO asdfdao, int datasetId, FormProcessor fp, ExtractBean eb) {
 		logger.info("action is blank");
 		fp.getRequest().setAttribute("dataset", db);
@@ -434,12 +451,13 @@ public class ExportDatasetServlet extends Controller {
 				resword.getString("file_size"), resword.getString("created_date"), resword.getString("created_by"),
 				resword.getString("action")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(0);
-		table.hideColumnLink(1);
-		table.hideColumnLink(2);
-		table.hideColumnLink(3);
-		table.hideColumnLink(4);
-		table.hideColumnLink(5);
+		int index = 0;
+		table.hideColumnLink(index++);
+		table.hideColumnLink(index++);
+		table.hideColumnLink(index++);
+		table.hideColumnLink(index++);
+		table.hideColumnLink(index++);
+		table.hideColumnLink(index);
 
 		table.setQuery("ExportDataset?datasetId=" + db.getId(), new HashMap());
 		// trying to continue...
@@ -447,7 +465,7 @@ public class ExportDatasetServlet extends Controller {
 		table.setRows(filterRows);
 		table.computeDisplay();
 
-		SimpleDateFormat local_df = getLocalDf(fp.getRequest());
+		SimpleDateFormat localDf = getLocalDf(fp.getRequest());
 
 		fp.getRequest().setAttribute("table", table);
 		StudyInfoPanel panel = getStudyInfoPanel(fp.getRequest());
@@ -456,12 +474,12 @@ public class ExportDatasetServlet extends Controller {
 		setToPanel(resword.getString("study_name"), eb.getStudy().getName(), fp.getRequest());
 		setToPanel(resword.getString("protocol_ID"), eb.getStudy().getIdentifier(), fp.getRequest());
 		setToPanel(resword.getString("dataset_name"), db.getName(), fp.getRequest());
-		setToPanel(resword.getString("created_date"), local_df.format(db.getCreatedDate()), fp.getRequest());
+		setToPanel(resword.getString("created_date"), localDf.format(db.getCreatedDate()), fp.getRequest());
 		setToPanel(resword.getString("dataset_owner"), db.getOwner().getName(), fp.getRequest());
 		try {
 			// do we not set this or is it null b/c we come to the page with no
 			// session?
-			setToPanel(resword.getString("date_last_run"), local_df.format(db.getDateLastRun()), fp.getRequest());
+			setToPanel(resword.getString("date_last_run"), localDf.format(db.getDateLastRun()), fp.getRequest());
 		} catch (NullPointerException npe) {
 			System.out.println("exception: " + npe.getMessage());
 		}

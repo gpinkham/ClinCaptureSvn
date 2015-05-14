@@ -52,9 +52,6 @@ public class DatasetBean extends AuditableEntityBean {
 	private boolean showEventEnd = false;
 	private boolean showSubjectDob = false;
 	private boolean showSubjectGender = false;
-	//
-	// TODO add new attributes to show/hide here, tbh 07/09/2007
-	//
 	private boolean showSubjectStatus = false;
 	private boolean showSubjectUniqueIdentifier = false;
 	private boolean showSubjectAgeAtEvent = false;
@@ -74,6 +71,7 @@ public class DatasetBean extends AuditableEntityBean {
 	private boolean showCRFcompletionDate = false;
 	// again, how is it different from Start/End?
 	private boolean showSubjectGroupInformation = false;
+	private boolean containsMaskedCRFs = false;
 	
 	private ArrayList itemDefCrf = new ArrayList();
 	// map items with definition and CRF
@@ -654,5 +652,13 @@ public class DatasetBean extends AuditableEntityBean {
 
 	public void setSedIdAndCRFIdPairs(String sedIdAndCRFIdPairs) {
 		this.sedIdAndCRFIdPairs = sedIdAndCRFIdPairs;
+    }
+
+	public boolean isContainsMaskedCRFs() {
+		return containsMaskedCRFs;
+	}
+
+	public void setContainsMaskedCRFs(boolean containsMaskedCRFs) {
+		this.containsMaskedCRFs = containsMaskedCRFs;
 	}
 }

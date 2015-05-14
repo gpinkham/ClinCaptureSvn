@@ -138,7 +138,7 @@
 			<td>
 				<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B">
 				<div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-					<div class="textbox_center" align="center">
+					<div class="tablebox_center" align="center">
 						<table border="0" cellpadding="0" cellspacing="0" width="100%">
 							<c:choose>
 								<c:when test='${itemStatusId eq null or itemStatusId eq "1"}'>

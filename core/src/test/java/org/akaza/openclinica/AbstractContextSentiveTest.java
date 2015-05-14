@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.DatasetService;
 import com.clinovo.service.UserAccountService;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
@@ -216,6 +217,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
 	@Autowired
 	protected SCDItemMetadataDao scdItemMetadataDao;
+	@Autowired
+	protected DatasetService datasetService;
 
 	// Services
 	@Autowired

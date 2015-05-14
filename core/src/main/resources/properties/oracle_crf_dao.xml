@@ -144,6 +144,27 @@
          and edc.status_id=1
       </sql>
     </query>
+	<query>
+		<name>findAllActiveUnmaskedByDefinition</name>
+		<sql>
+			SELECT *
+			FROM crf
+			WHERE crf_id IN
+			(SELECT DISTINCT crf_id
+			FROM event_definition_crf edc
+			WHERE edc.study_event_definition_id = ?
+			AND edc.event_definition_crf_id NOT IN
+			(SELECT event_definition_crf_id
+			FROM crfs_masking cm
+			WHERE cm.study_event_definition_id = edc.study_event_definition_id
+			AND cm.user_id = ?
+			AND cm.study_id = ?)
+			AND edc.status_id=1
+			AND study_id = ?
+			AND status_id = 1)
+			AND status_id = 1
+		</sql>
+	</query>
     <query>
       <name>findAllActiveByDefinitions</name>
       <sql>select distinct c.* from crf c,event_definition_crf edc

@@ -17,6 +17,7 @@ import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Before;
@@ -356,5 +357,15 @@ public class CRFDaoTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindAllEvaluableCrfsReturnsCorrectCollectionSize() {
 		assertTrue(crfdao.findAllEvaluableCrfs(1).size() == 2);
+	}
+
+	@Test
+	public void testThatFindAllActiveUnmaskedByDefinitionReturnsCorrectResult() {
+		StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
+		sed.setId(1);
+		UserAccountBean ub = new UserAccountBean();
+		ub.setActiveStudyId(1);
+		ub.setId(1);
+		assertEquals(1, crfdao.findAllActiveUnmaskedByDefinition(sed, ub).size());
 	}
 }

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -51,6 +51,9 @@ import org.springframework.stereotype.Component;
 
 import com.clinovo.i18n.LocaleResolver;
 
+/**
+ * Edit selected into dataset items servlet.
+ */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class EditSelectedServlet extends Controller {
@@ -78,8 +81,10 @@ public class EditSelectedServlet extends Controller {
 	}
 
 	/**
-	 * This function exists in four different places... needs to be added to an additional superclass for Submit Data
-	 * Control Servlets, tbh July 2007
+	 * This function exists in four different places. needs to be added to an additional superclass for Submit Data.
+	 *
+	 * @param ub UserAccountBean
+	 * @param db DatasetBean
 	 */
 	public void setUpStudyGroups(UserAccountBean ub, DatasetBean db) {
 		ArrayList sgclasses = db.getAllSelectedGroups();
@@ -162,7 +167,16 @@ public class EditSelectedServlet extends Controller {
 		forwardPage(Page.CREATE_DATASET_VIEW_SELECTED, request, response);
 	}
 
+	/**
+	 * Parent method to select all items into Data set.
+	 *
+	 * @param db      DatasetBean
+	 * @param imfdao  ItemFormMetadataDAO
+	 * @param request HttpServletRequest
+	 * @return DatasetBean
+	 */
 	public DatasetBean selectAll(DatasetBean db, ItemFormMetadataDAO imfdao, HttpServletRequest request) {
+		UserAccountBean ub = getUserAccountBean(request);
 		HashMap events = (HashMap) request.getSession().getAttribute(CreateDatasetServlet.EVENTS_FOR_CREATE_DATASET);
 		if (events == null) {
 			events = new HashMap();
@@ -182,7 +196,7 @@ public class EditSelectedServlet extends Controller {
 
 		ItemDAO idao = getItemDAO();
 		CRFDAO crfdao = getCRFDAO();
-		db.setItemDefCrf(selectAll(events, crfdao, idao, imfdao));
+		db.setItemDefCrf(selectAll(events, crfdao, idao, imfdao, ub));
 		for (ItemBean item : (List<ItemBean>) db.getItemDefCrf()) {
 			db.getItemIds().add(item.getId());
 			db.getItemMap()
@@ -205,23 +219,21 @@ public class EditSelectedServlet extends Controller {
 	}
 
 	/**
-	 * Finds all the items in a study giving all events in the study
-	 * 
-	 * @param events
-	 *            HashMap
-	 * @param crfdao
-	 *            CRFDAO
-	 * @param idao
-	 *            ItemDAO
-	 * @param imfdao
-	 *            ItemFormMetadataDAO
+	 * Finds all the items in a study giving all events in the study.
+	 *
+	 * @param events HashMap
+	 * @param crfdao CRFDAO
+	 * @param idao   ItemDAO
+	 * @param imfdao ItemFormMetadataDAO
+	 * @param ub     UserAccountBean
 	 * @return ArrayList
 	 */
-	public static ArrayList selectAll(HashMap events, CRFDAO crfdao, ItemDAO idao, ItemFormMetadataDAO imfdao) {
+	public static ArrayList selectAll(HashMap events, CRFDAO crfdao, ItemDAO idao, ItemFormMetadataDAO imfdao, UserAccountBean ub) {
+
 		ArrayList allItems = new ArrayList();
 		for (Object o : events.keySet()) {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) o;
-			ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
+			ArrayList crfs = (ArrayList) crfdao.findAllActiveUnmaskedByDefinition(sed, ub);
 			for (Object crf1 : crfs) {
 				CRFBean crf = (CRFBean) crf1;
 				ArrayList items = idao.findAllActiveByCRF(crf);

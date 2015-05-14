@@ -78,40 +78,29 @@ import org.springframework.stereotype.Component;
 public class CreateDatasetServlet extends Controller {
 
 	public static final String BEAN_YEARS = "years";
-
 	public static final String BEAN_MONTHS = "months";
-
 	public static final String EVENTS_FOR_CREATE_DATASET = "eventsForCreateDataset";
-
 	public static final String SAVE_BUTTON = "save";
-
 	public static final String DOB = "dob";
-
 	public static final String GENDER = "gender";
-
 	public static final String EVENT_LOCATION = "location";
-
 	public static final String EVENT_START = "start";
-
 	public static final String EVENT_END = "end";
-
 	public static final String SUBJ_STATUS = "subj_status";
-
 	public static final String UNIQUE_ID = "unique_identifier";
-
 	public static final String AGE_AT_EVENT = "age_at_event";
-
 	public static final String SUBJ_SECONDARY_ID = "subj_secondary_id";
-
 	public static final String EVENT_STATUS = "event_status";
-
 	public static final String CRF_STATUS = "crf_status";
-
 	public static final String CRF_VERSION = "crf_version";
-
 	public static final String INTERVIEWER_NAME = "interviewer";
-
 	public static final String INTERVIEWER_DATE = "interviewer_date";
+	public static final int MIN_YEAR = 1980;
+	public static final int TWO_T_ONE_H = 2100;
+	public static final int TWELVE = 12;
+	public static final int FIRST_YEAR = 1900;
+	public static final int TWO_H_FF = 255;
+	public static final int TWO_T = 2000;
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -134,14 +123,17 @@ public class CreateDatasetServlet extends Controller {
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 	}
 
+	/**
+	 * Set up study groups.
+	 * @param ub UserAccountBean
+	 * @return ArrayList
+	 */
 	public ArrayList setUpStudyGroups(UserAccountBean ub) {
 
 		StudyDAO studydao = getStudyDAO();
 		StudyGroupClassDAO sgclassdao = getStudyGroupClassDAO();
 		StudyBean theStudy = (StudyBean) studydao.findByPK(ub.getActiveStudyId());
-		ArrayList sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
-
-		return sgclasses;
+		return sgclassdao.findAllActiveByStudy(theStudy);
 	}
 
 	@Override
@@ -155,7 +147,7 @@ public class CreateDatasetServlet extends Controller {
 		String action = fp.getString("action");
 		Date ddate = new SimpleDateFormat("MM/dd/yyyy").parse("01/01/1900");
 		request.setAttribute("defaultStart", localDateFormat.parse(localDateFormat.format(ddate)));
-		request.setAttribute("defaultEnd", getLastDayOfMonth(2100, 12));
+		request.setAttribute("defaultEnd", getLastDayOfMonth(TWO_T_ONE_H, TWELVE));
 		request.setAttribute("statuses", Status.toActiveArrayList());
 		request.setAttribute(BEAN_MONTHS, getMonths());
 		request.setAttribute(BEAN_YEARS, getYears());
@@ -207,59 +199,49 @@ public class CreateDatasetServlet extends Controller {
 
 				CRFDAO crfdao = getCRFDAO();
 				HashMap events = new LinkedHashMap();
-				for (int i = 0; i < seds.size(); i++) {
+				for (Object sed1 : seds) {
 
-					StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seds.get(i);
-					ArrayList<CRFBean> crfs = (ArrayList<CRFBean>) crfdao.findAllActiveByDefinition(sed);
+					StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sed1;
+					ArrayList<CRFBean> crfs = (ArrayList<CRFBean>) crfdao.findAllActiveUnmaskedByDefinition(sed, ub);
 
 					if (currentStudy.getParentStudyId() > 0) {
-
 						// sift through these CRFs and see which ones are hidden
 						HideCRFManager hideCRFs = HideCRFManager.createHideCRFManager();
 						crfs = hideCRFs.removeHiddenCRFBeans(studyWithEventDefinitions, sed, crfs, getDataSource());
 					}
-
 					if (!crfs.isEmpty()) {
 						events.put(sed, crfs);
 					}
 				}
 				if (events.isEmpty()) {
-
 					addPageMessage(respage.getString("not_have_study_definitions_assigned"), request);
 					forwardPage(Page.CREATE_DATASET_1, request, response);
 				} else {
-
 					crfdao = getCRFDAO();
 					ItemDAO idao = getItemDAO();
-					ArrayList sedItemIds = CreateDatasetServlet.allSedItemIdsInStudy(events, crfdao, idao);
-
+					ArrayList sedItemIds = CreateDatasetServlet.allSedItemIdsInStudy(events, crfdao, idao, ub);
 					request.setAttribute("eventlist", events);
 					request.getSession().setAttribute("totalNumberOfStudyItems", sedItemIds.size());
 					request.getSession().setAttribute(EVENTS_FOR_CREATE_DATASET, events);
 
 					forwardPage(Page.CREATE_DATASET_VIEW_SELECTED, request, response);
 				}
-
 			} else if ("beginsubmit".equalsIgnoreCase(action)) {
-
 				String saveItems = fp.getString(SAVE_BUTTON);
 				extractIdsFromForm(request, dsb);
 				extractEventIds(dsb);
 				if (!StringUtil.isBlank(saveItems)) {
-
 					request.setAttribute("eventlist", request.getSession().getAttribute(EVENTS_FOR_CREATE_DATASET));
 					String summary = respage.getString("you_have_selected") + " " + dsb.getItemIds().size() + " "
 							+ respage.getString("items_so_far");
 					summary += genAttMsg(currentStudy, dsb);
 					addPageMessage(summary, request);
-
 					int crfId = fp.getInt("crfId");
 					if (crfId > 0) {
 
 						request.setAttribute("allItems", dsb.getItemDefCrf());
 						forwardPage(Page.CREATE_DATASET_2, request, response);
 					} else {
-
 						ArrayList sgclasses = dsb.getAllSelectedGroups();
 						if (sgclasses == null || sgclasses.size() == 0) {
 							sgclasses = setUpStudyGroups(ub);
@@ -284,9 +266,9 @@ public class CreateDatasetServlet extends Controller {
 
 						fp.addPresetValue("firstmonth", 0);    // 0 means using
 
-						fp.addPresetValue("firstyear", 1900);
+						fp.addPresetValue("firstyear", FIRST_YEAR);
 						fp.addPresetValue("lastmonth", 0);
-						fp.addPresetValue("lastyear", 2100);
+						fp.addPresetValue("lastyear", TWO_T_ONE_H);
 						setPresetValues(fp.getPresetValues(), request);
 
 						logger.warn("found preset values while setting date: " + fp.getPresetValues().toString());
@@ -303,38 +285,35 @@ public class CreateDatasetServlet extends Controller {
 				dsb.setLastYear(fp.getInt("lastyear"));
 
 				HashMap errors = new HashMap();
-				if (dsb.getFirstMonth() > 0 && dsb.getFirstYear() == 1900) {
+				if (dsb.getFirstMonth() > 0 && dsb.getFirstYear() == FIRST_YEAR) {
 					Validator.addError(errors, "firstmonth", restext.getString("if_specify_month_also_specify_year"));
 				}
 
-				if (dsb.getLastMonth() > 0 && dsb.getLastYear() == 2100) {
+				if (dsb.getLastMonth() > 0 && dsb.getLastYear() == TWO_T_ONE_H) {
 					Validator.addError(errors, "lastmonth", restext.getString("if_specify_month_also_specify_year"));
 				}
 
-				if (dsb.getFirstYear() > 1900 && dsb.getFirstMonth() == 0) {
+				if (dsb.getFirstYear() > FIRST_YEAR && dsb.getFirstMonth() == 0) {
 					Validator.addError(errors, "firstmonth", restext.getString("if_specify_year_also_specify_month"));
 				}
 
-				if (dsb.getLastYear() < 2100 && dsb.getLastMonth() == 0) {
+				if (dsb.getLastYear() < TWO_T_ONE_H && dsb.getLastMonth() == 0) {
 					Validator.addError(errors, "lastmonth", restext.getString("if_specify_year_also_specify_month"));
 				}
-				Date dateStart = dsb.getFirstYear() > 1900 && dsb.getFirstMonth() > 0
+				Date dateStart = dsb.getFirstYear() > FIRST_YEAR && dsb.getFirstMonth() > 0
 						? getFirstDayOfMonth(dsb.getFirstYear(), dsb.getFirstMonth()) : null;
-				Date dateEnd = dsb.getLastYear() < 2100 && dsb.getLastMonth() > 0
+				Date dateEnd = dsb.getLastYear() < TWO_T_ONE_H && dsb.getLastMonth() > 0
 						? getLastDayOfMonth(dsb.getLastYear(), dsb.getLastMonth()) : null;
 
 				if (dateEnd != null && dateStart != null && dateEnd.compareTo(dateStart) < 0) {
 					Validator.addError(errors, "firstmonth", restext.getString("the_from_should_be_come_before_to"));
 				}
-
 				if (!errors.isEmpty()) {
-
 					setInputMessages(errors, request);
 					addPageMessage(respage.getString("errors_in_submission_see_below"), request);
 					setPresetValues(fp.getPresetValues(), request);
 					forwardPage(Page.CREATE_DATASET_3, request, response);
 				} else {
-
 					dsb.setDateStart(dateStart);
 					dsb.setDateEnd(dateEnd);
 
@@ -345,7 +324,6 @@ public class CreateDatasetServlet extends Controller {
 					}
 				}
 			} else if ("specifysubmit".equalsIgnoreCase(action)) {
-
 				dsb.setOdmMetaDataVersionName(fp.getString("mdvName"));
 				dsb.setOdmMetaDataVersionOid(fp.getString("mdvOID"));
 				dsb.setOdmPriorMetaDataVersionOid(fp.getString("mdvPrevOID"));
@@ -363,9 +341,9 @@ public class CreateDatasetServlet extends Controller {
 				v.addValidation("dsStatus", Validator.IS_VALID_TERM, TermType.STATUS);
 
 				v.addValidation("dsName", Validator.LENGTH_NUMERIC_COMPARISON,
-						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, TWO_H_FF);
 				v.addValidation("dsDesc", Validator.LENGTH_NUMERIC_COMPARISON,
-						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, TWO_T);
 
 				if (dsb.getOdmPriorStudyOid() != null && dsb.getOdmPriorStudyOid().length() > 0) {
 					v.addValidation("mdvPrevOID", Validator.NO_BLANKS);
@@ -446,7 +424,8 @@ public class CreateDatasetServlet extends Controller {
 						logger.info("created dataset bean: " + dsb.getId() + ", name: " + dsb.getName());
 						if (!dsb.isActive()) {
 							addPageMessage(restext.getString("problem_creating_dataset_try_again"), request);
-							forwardPage(Page.EXTRACT_DATASETS_MAIN, request, response);
+							forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
+							return;
 						}
 					} else if (dsb.getId() > 0) {
 
@@ -477,6 +456,11 @@ public class CreateDatasetServlet extends Controller {
 		}
 	}
 
+	/**
+	 * Extract IDs from Form and put in to DatasetBean.
+	 * @param request HttpServletRequest
+	 * @param db DatasetBean
+	 */
 	public void extractIdsFromForm(HttpServletRequest request, DatasetBean db) {
 
 		FormProcessor fp = new FormProcessor(request);
@@ -654,7 +638,7 @@ public class CreateDatasetServlet extends Controller {
 		Calendar currTime = Calendar.getInstance();
 		int currYear = currTime.get(Calendar.YEAR);
 
-		for (int i = currYear; i >= 1980; i--) {
+		for (int i = currYear; i >= MIN_YEAR; i--) {
 			answer.add(String.valueOf(i));
 		}
 
@@ -792,7 +776,6 @@ public class CreateDatasetServlet extends Controller {
 	}
 
 	private void getEventAttr(FormProcessor fp, DatasetBean db) {
-
 		String location = fp.getString(EVENT_LOCATION);
 		if (!StringUtil.isBlank(location) && "yes".equalsIgnoreCase(location.trim())) {
 			db.setShowEventLocation(true);
@@ -805,14 +788,12 @@ public class CreateDatasetServlet extends Controller {
 		} else if (db.isShowEventStart()) {
 			db.setShowEventStart(false);
 		}
-
 		String end = fp.getString(EVENT_END);
 		if (!StringUtil.isBlank(end) && "yes".equalsIgnoreCase(end.trim())) {
 			db.setShowEventEnd(true);
 		} else if (db.isShowEventEnd()) {
 			db.setShowEventEnd(false);
 		}
-
 		String status = fp.getString(EVENT_STATUS);
 		if (!StringUtil.isBlank(status) && "yes".equalsIgnoreCase(status.trim())) {
 			db.setShowEventStatus(true);
@@ -820,7 +801,6 @@ public class CreateDatasetServlet extends Controller {
 		} else if (db.isShowEventStatus()) {
 			db.setShowEventStatus(false);
 		}
-
 		String ageAtEvent = fp.getString(AGE_AT_EVENT);
 		if (!StringUtil.isBlank(ageAtEvent) && "yes".equalsIgnoreCase(ageAtEvent.trim())) {
 			db.setShowSubjectAgeAtEvent(true);
@@ -831,16 +811,13 @@ public class CreateDatasetServlet extends Controller {
 	}
 
 	private void getGroupAttr(FormProcessor fp, DatasetBean db) {
-
 		UserAccountBean ub = getUserAccountBean(fp.getRequest());
 		db.setAllSelectedGroups(new ArrayList());
 		List<StudyGroupClassBean> allGroups = setUpStudyGroups(ub);
 
 		for (StudyGroupClassBean studyGroupClass: allGroups) {
-
 			String checked = fp.getString("groupSelected" + studyGroupClass.getId());
 			if (!StringUtil.isBlank(checked) && "yes".equalsIgnoreCase(checked.trim())) {
-
 				db.setShowSubjectGroupInformation(true);
 				studyGroupClass.setSelected(true);
 				logger.info("just set a group to true: " + studyGroupClass.getName());
@@ -849,7 +826,6 @@ public class CreateDatasetServlet extends Controller {
 					db.getSubjectGroupIds().add(studyGroupClass.getId());
 				}
 			} else {
-
 				studyGroupClass.setSelected(false);
 
 				if (db.getSubjectGroupIds() != null && db.getSubjectGroupIds().contains(studyGroupClass.getId())) {
@@ -859,10 +835,8 @@ public class CreateDatasetServlet extends Controller {
 			db.getAllSelectedGroups().add(studyGroupClass);
 			logger.info("just added subject group ids: " + studyGroupClass.getId());
 		}
-
 		logger.info("added SUBJECT group info");
 		if (db.isShowSubjectGroupInformation() && db.getAllSelectedGroups().size() == 0) {
-
 			db.setShowSubjectGroupInformation(false);
 			logger.info("show subject group info was TRUE, set to FALSE");
 		}
@@ -919,15 +893,22 @@ public class CreateDatasetServlet extends Controller {
 		}
 	}
 
-	public static ArrayList<String> allSedItemIdsInStudy(HashMap events, CRFDAO crfdao, ItemDAO idao) {
+	/**
+	 * Get aff litems in the study.
+	 * @param events HashMap
+	 * @param crfdao CRFDAO
+	 * @param idao ItemDAO
+	 * @param ub UserAccountBean
+	 * @return ArrayList
+	 */
+	public static ArrayList<String> allSedItemIdsInStudy(HashMap events, CRFDAO crfdao, ItemDAO idao, UserAccountBean ub) {
 
 		ArrayList<String> sedItemIds = new ArrayList<String>();
-		Iterator it = events.keySet().iterator();
-		while (it.hasNext()) {
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) it.next();
-			ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
-			for (int i = 0; i < crfs.size(); i++) {
-				CRFBean crf = (CRFBean) crfs.get(i);
+		for (Object o : events.keySet()) {
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) o;
+			ArrayList crfs = (ArrayList) crfdao.findAllActiveUnmaskedByDefinition(sed, ub);
+			for (Object crf1 : crfs) {
+				CRFBean crf = (CRFBean) crf1;
 				ArrayList<ItemBean> items = idao.findAllActiveByCRF(crf);
 				for (ItemBean item : items) {
 					Integer itemId = item.getId();
@@ -940,8 +921,10 @@ public class CreateDatasetServlet extends Controller {
 		return sedItemIds;
 	}
 
-	/*
-	 * Make sure item ids are unique and match SQLStatement for them
+	/**
+	 * Update Dataset.
+	 * @param datasetBean DatasetBean
+	 * @return DatasetBean
 	 */
 	protected DatasetBean finalUpateDatasetBean(DatasetBean datasetBean) {
 
@@ -956,7 +939,7 @@ public class CreateDatasetServlet extends Controller {
 				idList += ib.getId() + ", ";
 			}
 		}
-		idList = idList.length() > 12 ? idList.substring(0, idList.length() - 2) : idList;
+		idList = idList.length() > TWELVE ? idList.substring(0, idList.length() - 2) : idList;
 		datasetBean.getItemIds().clear();
 		datasetBean.setItemIds(itemIds);
 		datasetBean.setSQLStatement(datasetBean.sqlWithUniqeItemIds(idList));

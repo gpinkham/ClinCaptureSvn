@@ -51,14 +51,18 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 /**
+ * Edit Dataset Servlet.
  * @author thickerson
- * 
- * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class EditDatasetServlet extends Controller {
 
+	/**
+	 * Get link for this servlet.
+	 * @param dsId dataset ID.
+	 * @return link
+	 */
 	public static String getLink(int dsId) {
 		return "EditDataset?dsId=" + dsId;
 	}
@@ -81,6 +85,10 @@ public class EditDatasetServlet extends Controller {
 		StudyBean study = (StudyBean) sdao.findByPK(dataset.getStudyId());
 		// Checking if user has permission to access the current study/site
 		checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
+
+		if (dataset.isContainsMaskedCRFs()) {
+			addPageMessage(resword.getString("this_dataset_contains_items_from_masked_crfs"), request);
+		}
 
 		// Checking the dataset belongs to current study or a site of current study
 		if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
@@ -116,7 +124,7 @@ public class EditDatasetServlet extends Controller {
 			ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
 			for (Object sed1 : seds) {
 				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sed1;
-				ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
+				ArrayList crfs = (ArrayList) crfdao.findAllActiveUnmaskedByDefinition(sed, ub);
 				if (!crfs.isEmpty()) {
 					events.put(sed, crfs);
 				}
@@ -175,7 +183,7 @@ public class EditDatasetServlet extends Controller {
 	public DatasetBean initializeAttributes(HttpServletRequest request, int datasetId) {
 		UserAccountBean ub = getUserAccountBean(request);
 		DatasetDAO dsdao = getDatasetDAO();
-		DatasetBean db = dsdao.initialDatasetData(datasetId);
+		DatasetBean db = getDatasetService().initialDatasetData(datasetId, ub);
 		Calendar calendar = GregorianCalendar.getInstance();
 		if (db.getDateStart() != null) {
 			calendar.setTime(db.getDateStart());

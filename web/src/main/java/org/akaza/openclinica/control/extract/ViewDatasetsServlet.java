@@ -107,7 +107,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
 			HashMap events = new LinkedHashMap();
 			for (Object sed1 : seds) {
 				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sed1;
-				ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
+				ArrayList crfs = (ArrayList) crfdao.findAllActiveUnmaskedByDefinition(sed, ub);
 				if (!crfs.isEmpty()) {
 					events.put(sed, crfs);
 				}
@@ -206,8 +206,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
 	 */
 	public DatasetBean initializeAttributes(int datasetId, HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
-		DatasetDAO dsdao = getDatasetDAO();
-		DatasetBean db = dsdao.initialDatasetData(datasetId);
+		DatasetBean db = getDatasetService().initialDatasetData(datasetId, ub);
 		request.getSession().setAttribute("newDataset", db);
 		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
 		StudyDAO studydao = getStudyDAO();
