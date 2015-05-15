@@ -115,20 +115,14 @@
 	    
 	</p>
 	
-	<div style="width: 900px">
+	<div style="width: 100%">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="tablebox_center">
 	
 	<table border="0" cellpadding="0" cellspacing="0" width="100%"> 
 		<tr valign="top"> 
 			<td class="table_header_row_left"><fmt:message key="order" bundle="${resword}"/></td>
-			<td class="table_header_row"><fmt:message key="name" bundle="${resword}"/>&nbsp;
-			<a href="javascript:openDocWindow('PrintEventCRF?id=<c:out value="${definition.id}"/>')"
-				onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
-				onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
-				name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" 
-				title="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" align="right" hspace="6"></a>
-			</td>
+			<td class="table_header_row"><fmt:message key="name" bundle="${resword}"/>&nbsp;</td>
 			<td valign="top" class="table_header_row"><fmt:message key="required" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="double_data_entry" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="password_required" bundle="${resword}"/></td>
