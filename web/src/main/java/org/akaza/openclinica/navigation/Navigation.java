@@ -55,7 +55,8 @@ public final class Navigation {
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc", "/help",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
 			"/ChangeDefinitionCRFOrdinal", "/CreateOneDiscrepancyNote", "/MatchPassword", "/pages/handleSDVPost",
-			"/pages/handleSDVRemove", "/pages/sdvStudySubjects", "/UploadFile", "/DownloadAttachedFile", "/pages/CRFsMasking"));
+			"/pages/handleSDVRemove", "/pages/sdvStudySubjects", "/UploadFile", "/DownloadAttachedFile", "/pages/CRFsMasking",
+			"/print/getPdf"));
 	// set of pages with special processing
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
 			"/ListStudySubjects", "/EnterDataForStudyEvent", "/ViewSectionDataEntry", "/pages/crfEvaluation"));
@@ -114,7 +115,7 @@ public final class Navigation {
 				}
 				if (!exclusionURLs.contains(requestShortURI)) {
 					if (!visitedURLs.peek().split("\\?")[0].equals(requestShortURI)) {
-						if (!specialURLs.contains(requestShortURI) && !requestShortURL.contains("ref=sm")) {
+						if (!specialURLs.contains(requestShortURI) && !requestShortURL.contains("ref=sm") && !requestShortURI.contains("/print/")) {
 							visitedURLs.push(requestShortURL);
 						} else {
 							specialProcessingForURL(visitedURLs, requestShortURL);
@@ -127,7 +128,7 @@ public final class Navigation {
 				}
 			}
 		} else {
-			if ((!exclusionURLs.contains(requestShortURI)) && (!exclusionPopUpURLs.contains(requestShortURI))
+			if ((!exclusionURLs.contains(requestShortURI)) && (!exclusionPopUpURLs.contains(requestShortURI) && !requestShortURI.contains("/print/"))
 					&& (!"XMLHttpRequest".equals(request.getHeader("X-Requested-With")))) {
 				if (!specialURLs.contains(requestShortURI)) {
 					visitedURLs.push(requestShortURL);
@@ -193,6 +194,10 @@ public final class Navigation {
 			}
 			return;
 		}
+		
+		if (requestShortURI.indexOf("/print/") == 0) {
+ 			return;
+ 		}
 
 		visitedURLs.push(requestShortURL);
 	}
