@@ -476,7 +476,7 @@
 </div>
 
 <div id="subjectEvents">
-	<c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showStudyEventRow.jsp" /></c:import>
+	<c:import url="../include/showTable.jsp"><c:param name="colspanValue" value="5"/><c:param name="rowURL" value="showStudyEventRow.jsp" /></c:import>
 	</br></br>
 </div>
 

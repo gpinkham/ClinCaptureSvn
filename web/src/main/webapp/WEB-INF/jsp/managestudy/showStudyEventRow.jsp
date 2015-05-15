@@ -12,18 +12,20 @@
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.DisplayStudyEventRow"/>
 <jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 
+<c:set var="currentRowCrfs" value="${fn:length(currRow.bean.fullCrfList) + 1}"/>
+
 <tr>
-<td class="table_cell_left"><c:out value="${currRow.bean.studyEvent.studyEventDefinition.name}"/>
+<td class="table_cell_left" rowspan="${currentRowCrfs}"><c:out value="${currRow.bean.studyEvent.studyEventDefinition.name}"/>
     <c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">
         (<c:out value="${currRow.bean.studyEvent.sampleOrdinal}"/>)
     </c:if>
 </td>
-<td class="table_cell"><fmt:formatDate value="${currRow.bean.studyEvent.dateStarted}" pattern="${dteFormat}"/>
+<td class="table_cell" rowspan="${currentRowCrfs}"><fmt:formatDate value="${currRow.bean.studyEvent.dateStarted}" pattern="${dteFormat}"/>
 </td>
 
-<td class="table_cell"><c:out value="${currRow.bean.studyEvent.location}"/></td>
-<td class="table_cell" width="30"><c:out value="${currRow.bean.studyEvent.subjectEventStatus.name}"/></td>
-<td class="table_cell">
+<td class="table_cell" rowspan="${currentRowCrfs}"><c:out value="${currRow.bean.studyEvent.location}"/></td>
+<td class="table_cell" rowspan="${currentRowCrfs}" width="30"><c:out value="${currRow.bean.studyEvent.subjectEventStatus.name}"/></td>
+<td class="table_cell" rowspan="${currentRowCrfs}">
     <table border="0" cellpadding="0" cellspacing="0">
         <tr class="innerTable">
             <td>
@@ -107,8 +109,7 @@
         </tr>
     </table>
 </td>
-<td class="table_cell">
-
+</tr>
 <c:choose>
 
 <c:when test="${empty currRow.bean.uncompletedCRFs && empty currRow.bean.displayEventCRFs}">
@@ -117,9 +118,8 @@
 
 <c:otherwise>
 
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-
 <c:forEach var="dedc" items="${currRow.bean.fullCrfList}">
+<tr valign="top" class="innerTable">
 <c:choose>
 <c:when test="${dedc['class'].name eq 'org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean'}">
 
@@ -127,7 +127,6 @@
            value="eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${currRow.bean.studyEvent.id}&subjectId=${studySub.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=ViewStudySubject?id=${studySub.id}"/>
     <form name="startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
 
-        <tr valign="top" class="innerTable">
             <td class="table_cell_border" width="180px"><c:out value="${dedc.edc.crf.name}"/>
                 <c:if test="${dedc.edc.requiredCRF}">
                     <span style="color: orange">*</span>
@@ -287,14 +286,12 @@
                     </tr>
                 </table>
             </td>
-        </tr>
     </form>
 
 </c:when>
 <c:when test="${dedc['class'].name eq 'org.akaza.openclinica.bean.submit.DisplayEventCRFBean'}">
     <c:set var="dec" value="${dedc}"/>
     <c:set var="allowDataEntry" value="${(study.status.available && dec.continueInitialDataEntryPermitted) || (study.status.available && (dec.startDoubleDataEntryPermitted || dec.continueDoubleDataEntryPermitted)) || ((study.status.available || study.status.frozen) && dec.performAdministrativeEditingPermitted)}" />
-    <tr class="innerTable">
         <td class="table_cell_border" width="180px"><c:out value="${dec.eventCRF.crf.name}"/> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if
                 test="${(dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6 or userRole.role.id eq 9)}">
             <img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
@@ -372,7 +369,7 @@
                         <c:choose>
                             <c:when test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6 && userRole.role.id ne 9}">
                                 <ui:dataEntryLink object="${dec}" actionQueryTail="?eventCRFId=${dec.eventCRF.id}&exitTo=ViewStudySubject?id=${studySub.id}" imgAlign="left" imgHSpace="6" onClickFunction="setAccessedObjected(this); checkCRFLocked"/>
-                                <%-- locked status here --%>
+                                <!-- locked status here -->
                                 <c:if test="${dec.locked || dec.eventCRF.status.locked || dec.stage.locked || currRow.bean.studyEvent.subjectEventStatus.locked}">
                                     <img name="itemForSpace" src="images/bt_EnterData.gif" border="0"
                                          style="visibility:hidden" align="left" hspace="6">
@@ -455,11 +452,11 @@
                 </tr>
             </table>
         </td>
-    </tr>
 </c:when>
 </c:choose>
+</tr>
 </c:forEach>
-</table>
+
 </c:otherwise>
 </c:choose>
 </td>

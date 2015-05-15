@@ -8,8 +8,10 @@
 
 <jsp:useBean scope="request" id="table" class="org.akaza.openclinica.web.bean.EntityBeanTable" />
 <c:set var="rowURL" value="${param.rowURL}" />
+<c:set var="colspanValue" value="${param.colspanValue}" />
 <c:set var="outerFormName" value="${param.outerFormName}" />
 <c:set var="searchFormOnClickJS" value="${param.searchFormOnClickJS}" />
+
 <c:choose>
 	<c:when test='${(outerFormName != null) && (outerFormName != "")}'><c:set var="searchFormDisplayed" value="${0}"/></c:when>
 	<c:otherwise><c:set var="searchFormDisplayed" value="${1}"/></c:otherwise>
@@ -189,7 +191,7 @@
 				<c:otherwise>
 					<tr valign="top">
 					<c:set var="i" value="${0}" />
-					<c:forEach var="column" items="${table.columns}">
+					<c:forEach var="column" items="${table.columns}" varStatus="columnsStatus">
 						<%-- BEGIN SET ORDER BY QUERY --%>
 						<c:choose>
 							<%-- if the user clicks on the column which is already the current sorting column, flip the sorting order; if he clicks on a different column, default to ascending --%>
@@ -206,7 +208,7 @@
 						 <td class="table_header_row_left">
 						</c:when>
 						<c:otherwise>
-						<td class="table_header_row">
+						<td class="table_header_row" colspan="${columnsStatus.last && colspanValue != null ? ('' + colspanValue) : ''}">
 						</c:otherwise>
 						</c:choose>
 							<c:if test="${column.showLink}"><a href="<c:out value="${orderByQuery}"/>"></c:if>
