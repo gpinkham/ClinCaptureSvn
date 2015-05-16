@@ -125,6 +125,7 @@
 			<td class="table_header_row"><fmt:message key="name" bundle="${resword}"/>&nbsp;</td>
 			<td valign="top" class="table_header_row"><fmt:message key="required" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="double_data_entry" bundle="${resword}"/></td>
+			<td valign="top" class="table_header_row"><fmt:message key="crf_evaluation" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="password_required" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="default_version" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="acceptNewCrfVersions" bundle="${resword}"/></td>
@@ -187,6 +188,13 @@
 				<c:choose>
 				<c:when test="${crf.doubleEntry == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
 				<c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+				</c:choose>
+			</td>
+
+			<td class="table_cell">
+				<c:choose>
+					<c:when test="${crf.evaluatedCRF == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+					<c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
 				</c:choose>
 			</td>
 
