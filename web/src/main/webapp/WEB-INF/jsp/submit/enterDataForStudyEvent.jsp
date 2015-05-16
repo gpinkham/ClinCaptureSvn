@@ -332,7 +332,7 @@
           </c:choose>
         </c:when>
         <c:when test="${dedc.eventCRF.notStarted || dedc.eventCRF.id == 0}">
-        <select name="versionId<c:out value="${dedc.edc.crf.id}"/>" onchange="javascript:changeQuery<c:out value="${dedc.edc.crf.id}"/>();">
+        <select name="versionId" onchange="javascript:changeQuery${studyEvent.id}${dedc.edc.crf.id}();">
             <c:forEach var="version" items="${dedc.edc.versions}">
                 <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${currRow.bean.studyEvent.id}&subjectId=${studySub.subjectId}" />
                 <c:choose>
@@ -351,9 +351,9 @@
             </c:forEach><%-- end versions --%>
         </select>
         <SCRIPT LANGUAGE="JavaScript">
-            function changeQuery<c:out value="${dedc.edc.crf.id}"/>() {
-                var qer = document.startForm<c:out value="${dedc.edc.crf.id}"/>.versionId<c:out value="${dedc.edc.crf.id}"/>.value;
-                document.startForm<c:out value="${dedc.edc.crf.id}"/>.crfVersionId.value=qer;
+            function changeQuery${studyEvent.id}${dedc.edc.crf.id}() {
+                var qer = document.startForm${studyEvent.id}${dedc.edc.crf.id}.versionId.value;
+                document.startForm${studyEvent.id}${dedc.edc.crf.id}.crfVersionId.value=qer;
             }
         </SCRIPT>
         </c:when>
