@@ -20,12 +20,11 @@ body {
 body .container {
   top: 0;
   left: 0;
-  height: 100%;
   width: 70%;
   bottom: 15%;
+  height: 100%;
   position: fixed;
   margin-top: 1rem;
-  overflow-y: hidden;
   padding-right: 1px;
 }
 
@@ -87,7 +86,6 @@ body .panel-body {
   margin-top: 1rem;
   width: 30% !important;
   position: fixed !important;
-  height: 75.9%;
 }
 
 .panel-primary-custom {
@@ -124,6 +122,12 @@ body .panel-body {
   .data .panel {
     margin-left: -2px;
     margin-bottom: 2px;
+  }
+  body .container {
+    padding-right: 0px;
+  }
+  .data {
+    margin-top: 10.4px;
   }
 }
 
