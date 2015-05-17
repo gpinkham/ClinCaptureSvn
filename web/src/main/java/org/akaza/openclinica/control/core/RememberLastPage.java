@@ -49,15 +49,11 @@ public abstract class RememberLastPage extends Controller {
 			saveUrl(key, request.getRequestURL() + defaultUrl, request);
 		}
 		if (request.getMethod().equalsIgnoreCase("POST")) {
-			System.out.println("referer: " + request.getHeader(REFERER));
-			System.out.println("url: " + request.getRequestURL());
 			if (request.getHeader(REFERER) != null
 					&& !request.getHeader(REFERER).toLowerCase()
 							.startsWith(request.getRequestURL().toString().toLowerCase())) {
-				System.out.println("-->> 1");
 				result = redirect(request, response);
 			} else if (defaultUrl != null) {
-				System.out.println("-->> 2");
 				saveUrl(key, request.getRequestURL() + defaultUrl, request);
 			}
 		} else if (request.getMethod().equalsIgnoreCase("GET")) {
