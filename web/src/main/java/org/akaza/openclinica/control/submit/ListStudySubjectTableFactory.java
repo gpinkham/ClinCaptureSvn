@@ -131,7 +131,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private boolean sortForMainMenuServlet;
 
 	public static final int POPUP_BASE_WIDTH = 600;
-	public static final String POPUP_BASE_WIDTH_PX = "width: " + POPUP_BASE_WIDTH + "px";
 
 	// To avoid showing title in other pages, the request element is used to determine where the request came from.
 	@Override
@@ -1142,7 +1141,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 		// Event Div
 		eventDiv.div().id("Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
-				.styleClass("eventDivWrapper ViewSubjectsPopup").style("width:" + divWidth + "px;")
+				.styleClass("eventDivWrapper ViewSubjectsPopup").style("min-width:" + divWidth + "px;")
 				.rel("" + studySubject.getId()).append("event_name='" + sed.getName() + "'").close();
 
 		eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").close();
@@ -1219,7 +1218,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			StudyEventBean studyEventBean = studyEvents.get(i);
 			idAttribute = studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_" + (i + 1);
 
-			eventDiv.td(0).id("Event_" + idAttribute).rel("" + studyEventBean.getId()).valign("top").width("180")
+			eventDiv.td(0).id("Event_" + idAttribute).rel("" + studyEventBean.getId()).valign("top")
 					.rel("" + studySubject.getId());
 			if (i + 1 > 1) {
 				eventDiv.style("display: none;");
@@ -1310,13 +1309,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				linksDivBuilderWrapper.eventDiv.tr(0).valign("top").close();
 				linksDivBuilderWrapper.eventDiv.td(0).styleClass("table_cell").close();
 				linksDivBuilderWrapper.eventDiv.div().id("crfListWrapper_" + linksDivBuilderWrapper.idAttribute)
-						.style(POPUP_BASE_WIDTH_PX).styleClass(WRAPPER).close().divEnd();
+						.styleClass(WRAPPER).close().divEnd();
 				linksDivBuilderWrapper.eventDiv.tdEnd().trEnd(0);
 			} else {
 				linksDivBuilderWrapper.eventDiv.tr(0).valign("top").close();
 				linksDivBuilderWrapper.eventDiv.td(0).styleClass("table_cell_left").close();
 				linksDivBuilderWrapper.eventDiv.div().id("crfListWrapper_" + linksDivBuilderWrapper.idAttribute)
-						.style(POPUP_BASE_WIDTH_PX).styleClass(WRAPPER).close().divEnd();
+						.styleClass(WRAPPER).close().divEnd();
 				linksDivBuilderWrapper.eventDiv.tdEnd().trEnd(0);
 			}
 		}
@@ -1325,7 +1324,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			linksDivBuilderWrapper.eventDiv.tr(0).valign("top").close();
 			linksDivBuilderWrapper.eventDiv.td(0).styleClass("table_cell").close();
 			linksDivBuilderWrapper.eventDiv.div().id("crfListWrapper_" + linksDivBuilderWrapper.idAttribute)
-					.style(POPUP_BASE_WIDTH_PX).styleClass(WRAPPER).close().divEnd();
+					.styleClass(WRAPPER).close().divEnd();
 			linksDivBuilderWrapper.eventDiv.tdEnd().trEnd(0);
 		}
 
@@ -1382,13 +1381,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				String href1 = "PageToCreateNewStudyEvent?studySubjectId=" + studySubject.getId()
 						+ "&studyEventDefinition=" + sed.getId();
 				eventDiv.div().id("eventScheduleWrapper_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
-						.rel(href1).style(POPUP_BASE_WIDTH_PX).styleClass(WRAPPER).close().divEnd();
+						.rel(href1).styleClass(WRAPPER).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			} else {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
 				eventDiv.div().id("crfListWrapper_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
-						.style(POPUP_BASE_WIDTH_PX).styleClass(WRAPPER).close().divEnd();
+						.styleClass(WRAPPER).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			}
 		}
@@ -1397,7 +1396,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			eventDiv.tr(0).valign("top").close();
 			eventDiv.td(0).styleClass("table_cell_left").close();
 			eventDiv.div().id("crfListWrapper_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
-					.style(POPUP_BASE_WIDTH_PX).styleClass(WRAPPER).close().divEnd();
+					.styleClass(WRAPPER).close().divEnd();
 			eventDiv.tdEnd().trEnd(0);
 		}
 

@@ -123,7 +123,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	private StudyEventDefinitionBean selectedStudyEventDefinition;
 
 	private static final int POPUP_BASE_WIDTH = 600;
-	private static final String POPUP_BASE_WIDTH_PX = "width: " + (POPUP_BASE_WIDTH + FIFTY) + "px";
 
 	private final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>();
 	private final HashMap<Integer, String> crfColumnImageIconPaths = new HashMap<Integer, String>();
@@ -1108,7 +1107,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 							+ (eventDivBuilderWrapper.eventDefintionCRFId == null ? eventDivBuilderWrapper.sed.getId()
 									+ "ev" : eventDivBuilderWrapper.eventDefintionCRFId) + "_"
 							+ eventDivBuilderWrapper.rowCount).styleClass("eventDivWrapper ViewSubjectsPopup")
-					.style("width:" + divWidth + "px;").rel("" + eventDivBuilderWrapper.studySubject.getId()).close();
+					.style("min-width:" + divWidth + "px;").rel("" + eventDivBuilderWrapper.studySubject.getId()).close();
 		}
 
 		eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").close();
@@ -1187,7 +1186,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 								+ "_"
 								+ (eventDivBuilderWrapper.eventDefintionCRFId == null ? eventDivBuilderWrapper.sed
 										.getId() + "ev" : eventDivBuilderWrapper.eventDefintionCRFId) + "_"
-								+ eventDivBuilderWrapper.rowCount).rel(href1).style(POPUP_BASE_WIDTH_PX).close()
+								+ eventDivBuilderWrapper.rowCount).rel(href1).close()
 						.divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			} else {
@@ -1199,7 +1198,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 								+ "_"
 								+ (eventDivBuilderWrapper.eventDefintionCRFId == null ? eventDivBuilderWrapper.sed
 										.getId() + "ev" : eventDivBuilderWrapper.eventDefintionCRFId) + "_"
-								+ eventDivBuilderWrapper.rowCount).style(POPUP_BASE_WIDTH_PX).close().divEnd();
+								+ eventDivBuilderWrapper.rowCount).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			}
 		}
@@ -1213,7 +1212,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 							+ "_"
 							+ (eventDivBuilderWrapper.eventDefintionCRFId == null ? eventDivBuilderWrapper.sed.getId()
 									+ "ev" : eventDivBuilderWrapper.eventDefintionCRFId) + "_"
-							+ eventDivBuilderWrapper.rowCount).style(POPUP_BASE_WIDTH_PX).close().divEnd();
+							+ eventDivBuilderWrapper.rowCount).close().divEnd();
 			eventDiv.tdEnd().trEnd(0);
 		}
 
