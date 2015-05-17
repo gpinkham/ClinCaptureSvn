@@ -15,10 +15,11 @@ package org.akaza.openclinica.control.core;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public abstract class RememberLastPage extends Controller {
 
 	protected abstract String getUrlKey(HttpServletRequest request);
@@ -49,9 +50,11 @@ public abstract class RememberLastPage extends Controller {
 			saveUrl(key, request.getRequestURL() + defaultUrl, request);
 		}
 		if (request.getMethod().equalsIgnoreCase("POST")) {
-			if (request.getHeader(REFERER) != null
-					&& !request.getHeader(REFERER).toLowerCase()
-							.startsWith(request.getRequestURL().toString().toLowerCase())) {
+			String referer = request.getHeader(REFERER);
+			String url = request.getRequestURL().toString();
+			if (referer != null
+					&& !referer.replaceAll("http.*://", "").toLowerCase()
+							.startsWith(url.replaceAll("http.*://", "").toLowerCase())) {
 				result = redirect(request, response);
 			} else if (defaultUrl != null) {
 				saveUrl(key, request.getRequestURL() + defaultUrl, request);
