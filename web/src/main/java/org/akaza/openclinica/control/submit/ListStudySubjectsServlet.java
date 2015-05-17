@@ -20,6 +20,13 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Stack;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -29,26 +36,23 @@ import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.managestudy.ListEventsForSubjectsServlet;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
 
 /**
  * Servlet for creating subject matrix page.
  * 
  */
-@SuppressWarnings({ "rawtypes" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ListStudySubjectsServlet extends RememberLastPage {
 
-	public static final String SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX = "savedPageSizeForSubjectMatrix";
-	public static final String SAVED_LAST_VISITED_PAGE_URL = "savedLastPageUrl";
-	public static final String SAVED_LAST_VIEW_BY_EVENT = "savedLastViewByEvent";
+	public static final String SUBJECT_MATRIX_PAGE_SIZE = "subjectMatrixPageSize";
+	public static final String SAVED_LIST_STUDY_SUBJECTS_URL = "savedListStudySubjectsUrl";
+	public static final String CURRENT_SUBJECT_MATRIX_SERVLET = "currentSubjectMatrixServlet";
+
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -87,6 +91,8 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 			StudySubjectBean studySubject = getStudySubjectDAO().findByLabelAndStudy(
 					fp.getString("findSubjects_f_studySubject.label"), currentStudy);
 			if (studySubject.getId() > 0) {
+				Stack<String> visitedURLs = (Stack<String>) request.getSession().getAttribute("visitedURLs");
+				visitedURLs.pop();
 				response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id="
 						+ Integer.toString(studySubject.getId()) + "&ref=sm");
 				return;
@@ -94,11 +100,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 				request.getSession().removeAttribute(getUrlKey(request));
 			}
 		}
-		if (isViewByEventLastView(request)) {
-			forwardPage(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET, request, response);
-			unSetLastViewedByEvent(request);
-			return;
-		}
+
 		if (shouldRedirect(request, response)) {
 			return;
 		}
@@ -175,26 +177,41 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 
 	@Override
 	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_LAST_VISITED_PAGE_URL;
+		return SAVED_LIST_STUDY_SUBJECTS_URL;
 	}
 
 	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
-		boolean showMoreLink;
 		FormProcessor fp = new FormProcessor(request);
-		showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
-		String savedUrl = (String) request.getSession().getAttribute(SAVED_LAST_VISITED_PAGE_URL);
-		savedUrl = savedUrl != null ? savedUrl.replaceAll(".*" + request.getContextPath() + "/ListStudySubjects", "")
-				: null;
-		return request.getMethod().equalsIgnoreCase("POST") && savedUrl != null ? savedUrl : "?module="
+		boolean showMoreLink = fp.getString("showMoreLink").equals("")
+				|| Boolean.parseBoolean(fp.getString("showMoreLink"));
+		String pageSize = (String) request.getSession().getAttribute(SUBJECT_MATRIX_PAGE_SIZE);
+		pageSize = pageSize == null ? "15" : pageSize;
+		return "?module="
 				+ fp.getString("module")
-				+ "&maxRows=15&showMoreLink="
+				+ "&maxRows="
+				+ pageSize
+				+ "&showMoreLink="
 				+ showMoreLink
 				+ "&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_="
-				+ getPageSize(request)
+				+ pageSize
 				+ "&findSubjects_s_0_studySubject.createdDate=desc"
 				+ (fp.getString("navBar").equalsIgnoreCase("yes") ? ("&findSubjects_f_studySubject.label=" + fp
 						.getString("findSubjects_f_studySubject.label")) : "");
+	}
+
+	@Override
+	protected void saveUrl(String key, String value, HttpServletRequest request) {
+		super.saveUrl(key, value, request);
+		FormProcessor fp = new FormProcessor(request);
+		String pageSize = fp.getString("findSubjects_mr_");
+		request.getSession().setAttribute(ListStudySubjectsServlet.SUBJECT_MATRIX_PAGE_SIZE, pageSize);
+		String savedUrl = getSavedUrl(ListEventsForSubjectsServlet.SAVED_LIST_EVENTS_FOR_SUBJECTS_URL, request);
+		if (savedUrl != null) {
+			super.saveUrl(ListEventsForSubjectsServlet.SAVED_LIST_EVENTS_FOR_SUBJECTS_URL,
+					savedUrl.replaceAll("listEventsForSubject_mr_=\\d*", "listEventsForSubject_mr_=".concat(pageSize)),
+					request);
+		}
 	}
 
 	@Override
@@ -203,59 +220,16 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected void saveUrl(String key, String value, HttpServletRequest request) {
-		if (value != null) {
-			String pageSize = value.contains("findSubjects_mr_") ? value.replaceFirst(
-					".*&findSubjects_mr_=(\\d{2,}).*", "$1") : "15";
-			request.getSession().setAttribute(SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX, pageSize);
-			request.getSession().setAttribute(key, value);
-		}
-	}
-
-	@Override
-	protected String getSavedUrl(String key, HttpServletRequest request) {
-
-		if (request.getQueryString() != null) {
-			return request.getRequestURL() + getDefaultUrl(request);
-		}
-
-		String savedUrl = (String) request.getSession().getAttribute(key);
-
-		return savedUrl == null ? savedUrl : savedUrl.replaceFirst("&findSubjects_mr_=\\d{2,}&", "&findSubjects_mr_="
-				+ getPageSize(request) + "&");
-	}
-
-	/**
-	 * Returns number of elements on the subject matrix page.
-	 * 
-	 * @param request
-	 *            the incoming request.
-	 * @return the number of elements.
-	 */
-	public static String getPageSize(HttpServletRequest request) {
-		String pageSize = (String) request.getSession().getAttribute(SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
-		return pageSize == null ? "15" : pageSize;
-	}
-
-	private boolean isViewByEventLastView(HttpServletRequest request) {
-		Object lastView = request.getSession().getAttribute(SAVED_LAST_VIEW_BY_EVENT);
-		if (lastView != null) {
-			if (request.getQueryString() != null && request.getQueryString().contains("&findSubjects_p_=")) {
-				unSetLastViewedByEvent(request);
-				return false;
+	protected boolean shouldRedirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if (request.getQueryString() == null) {
+			String currentSubjectMatrixServlet = (String) request.getSession().getAttribute(
+					CURRENT_SUBJECT_MATRIX_SERVLET);
+			if (currentSubjectMatrixServlet != null && !currentSubjectMatrixServlet.equals(request.getServletPath())) {
+				response.sendRedirect(request.getContextPath().concat(currentSubjectMatrixServlet));
+				return true;
 			}
-			return Boolean.parseBoolean(lastView.toString());
 		}
-		return false;
-	}
-
-	/**
-	 * Removes flag that previous page was subject events.
-	 * 
-	 * @param request
-	 *            the incoming request.
-	 */
-	public static void unSetLastViewedByEvent(HttpServletRequest request) {
-		request.getSession().removeAttribute(SAVED_LAST_VIEW_BY_EVENT);
+		request.getSession().setAttribute(CURRENT_SUBJECT_MATRIX_SERVLET, request.getServletPath());
+		return super.shouldRedirect(request, response);
 	}
 }

@@ -55,8 +55,8 @@ public final class Navigation {
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc", "/help",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
 			"/ChangeDefinitionCRFOrdinal", "/CreateOneDiscrepancyNote", "/MatchPassword", "/pages/handleSDVPost",
-			"/pages/handleSDVRemove", "/pages/sdvStudySubjects", "/UploadFile", "/DownloadAttachedFile", "/pages/CRFsMasking",
-			"/print/getPdf"));
+			"/pages/handleSDVRemove", "/pages/sdvStudySubjects", "/UploadFile", "/DownloadAttachedFile",
+			"/pages/CRFsMasking", "/print/getPdf"));
 	// set of pages with special processing
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
 			"/ListStudySubjects", "/EnterDataForStudyEvent", "/ViewSectionDataEntry", "/pages/crfEvaluation"));
@@ -68,7 +68,7 @@ public final class Navigation {
 
 	/**
 	 * Here send/receive logic of visitedURLs-stack is accumulated. You can add transfer-logic here.
-	 * 
+	 *
 	 * @param request
 	 *            HttpServletRequest
 	 */
@@ -115,7 +115,8 @@ public final class Navigation {
 				}
 				if (!exclusionURLs.contains(requestShortURI)) {
 					if (!visitedURLs.peek().split("\\?")[0].equals(requestShortURI)) {
-						if (!specialURLs.contains(requestShortURI) && !requestShortURL.contains("ref=sm") && !requestShortURI.contains("/print/")) {
+						if (!specialURLs.contains(requestShortURI) && !requestShortURL.contains("ref=sm")
+								&& !requestShortURI.contains("/print/")) {
 							visitedURLs.push(requestShortURL);
 						} else {
 							specialProcessingForURL(visitedURLs, requestShortURL);
@@ -128,7 +129,8 @@ public final class Navigation {
 				}
 			}
 		} else {
-			if ((!exclusionURLs.contains(requestShortURI)) && (!exclusionPopUpURLs.contains(requestShortURI) && !requestShortURI.contains("/print/"))
+			if ((!exclusionURLs.contains(requestShortURI))
+					&& (!exclusionPopUpURLs.contains(requestShortURI) && !requestShortURI.contains("/print/"))
 					&& (!"XMLHttpRequest".equals(request.getHeader("X-Requested-With")))) {
 				if (!specialURLs.contains(requestShortURI)) {
 					visitedURLs.push(requestShortURL);
@@ -145,19 +147,12 @@ public final class Navigation {
 
 	private static void specialProcessingForURL(Stack<String> visitedURLs, String requestShortURL) {
 		String requestShortURI = requestShortURL.split("\\?")[0];
-		if ("/ListEventsForSubjects".equals(requestShortURI)) {
-			if (!visitedURLs.isEmpty()
-					&& (visitedURLs.peek().split("\\?")[0].equals("/ListEventsForSubjects") || visitedURLs.peek()
-							.split("\\?")[0].equals("/ListStudySubjects"))) {
-				visitedURLs.pop();
-			}
-		}
 
-		if (!visitedURLs.isEmpty() && "/ListStudySubjects".equals(requestShortURI)
-				&& requestShortURL.contains("navBar=yes")) {
-			visitedURLs.push(requestShortURL.replace("&navBar=yes", "&fromSearch=true"));
+		if ("/ListEventsForSubjects".equals(requestShortURI) || "/ListStudySubjects".equals(requestShortURI)) {
+			visitedURLs.push(requestShortURI.concat("?goBack=true"));
 			return;
 		}
+
 		if (!visitedURLs.isEmpty() && "/ViewStudySubject".equals(requestShortURI) && requestShortURL.contains("ref=sm")) {
 			// remove subject matrix url
 			if (visitedURLs.peek().contains("&fromSearch=true")) {
@@ -194,10 +189,10 @@ public final class Navigation {
 			}
 			return;
 		}
-		
+
 		if (requestShortURI.indexOf("/print/") == 0) {
- 			return;
- 		}
+			return;
+		}
 
 		visitedURLs.push(requestShortURL);
 	}

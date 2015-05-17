@@ -32,13 +32,15 @@ import java.util.ResourceBundle;
 
 public class ListStudySubjectTableToolbar extends DefaultToolbar {
 
+	private String contextPath;
 	private final ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
 	private final List<StudyGroupClassBean> studyGroupClasses;
 	private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
 
 	public ListStudySubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions,
-			List<StudyGroupClassBean> studyGroupClasses, boolean showMoreLink) {
+			List<StudyGroupClassBean> studyGroupClasses, String contextPath, boolean showMoreLink) {
 		super();
+		this.contextPath = contextPath;
 		this.studyEventDefinitions = studyEventDefinitions;
 		this.studyGroupClasses = studyGroupClasses;
 		this.showMoreLink = showMoreLink;
@@ -75,23 +77,34 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
 		public String enabled() {
 			HtmlBuilder html = new HtmlBuilder();
 			if (showMoreLink) {
-				html.a().id("showMore").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],true);onInvokeAction('findSubjects','filter');")
-						.close();
+				html.a()
+						.id("showMore")
+						.href("javascript:hideCols('findSubjects',[" + getIndexes()
+								+ "],true);onInvokeAction('findSubjects','filter');").close();
 				html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
-				html.a().id("hide").style("display: none;")
-						.href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);onInvokeAction('findSubjects','filter');").close();
+				html.a()
+						.id("hide")
+						.style("display: none;")
+						.href("javascript:hideCols('findSubjects',[" + getIndexes()
+								+ "],false);onInvokeAction('findSubjects','filter');").close();
 				html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
 				html.script()
 						.type("text/javascript")
 						.close()
-						.append("$(document).ready(function(){ "
-								+ "hideCols('findSubjects',[" + getIndexes() + "],false);});").scriptEnd();
+						.append("$(document).ready(function(){ " + "hideCols('findSubjects',[" + getIndexes()
+								+ "],false);});").scriptEnd();
 			} else {
-				html.a().id("hide").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);onInvokeAction('findSubjects','filter');").close();
+				html.a()
+						.id("hide")
+						.href("javascript:hideCols('findSubjects',[" + getIndexes()
+								+ "],false);onInvokeAction('findSubjects','filter');").close();
 				html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
-				html.a().id("showMore").style("display: none;")
-						.href("javascript:hideCols('findSubjects',[" + getIndexes() + "],true);onInvokeAction('findSubjects','filter');").close();
+				html.a()
+						.id("showMore")
+						.style("display: none;")
+						.href("javascript:hideCols('findSubjects',[" + getIndexes()
+								+ "],true);onInvokeAction('findSubjects','filter');").close();
 				html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
 			}
 			return html.toString();
@@ -139,8 +152,9 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
 		@Override
 		public String enabled() {
 			String js = "var selectedValue = document.getElementById('sedDropDown').options[document.getElementById('sedDropDown').selectedIndex].value;  "
-					+ " if (selectedValue != null  ) { "
-					+ "window.location='ListEventsForSubjects?module=submit&defId=' + selectedValue + '&useJmesa=true';" + " } ";
+					+ " if (selectedValue != null) { window.location = '"
+					+ contextPath
+					+ "' + (parseInt(selectedValue) == 0 ? '/ListStudySubjects?showAll=true' : ('/ListEventsForSubjects?newDefId=' + selectedValue)); }";
 			HtmlBuilder html = new HtmlBuilder();
 			html.select().id("sedDropDown").onchange(js).close();
 			html.option().close().append(reswords.getString("select_an_event")).optionEnd();

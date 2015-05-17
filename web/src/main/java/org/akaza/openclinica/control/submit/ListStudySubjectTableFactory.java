@@ -13,20 +13,11 @@
 
 package org.akaza.openclinica.control.submit;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SDVUtil;
+import com.clinovo.util.SignUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -83,11 +74,18 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SDVUtil;
-import com.clinovo.util.SignUtil;
-import com.clinovo.util.SubjectEventStatusUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * ListStudySubjectTableFactory class.
@@ -268,7 +266,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	@Override
 	public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
 		tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitionsForFilter(),
-				getStudyGroupClasses(), showMoreLink));
+				getStudyGroupClasses(), tableFacade.getWebContext().getContextPath(), showMoreLink));
 	}
 
 	private void prepareLimit(Limit limit) {
@@ -1623,9 +1621,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		Boolean isSignable = (Boolean) ((HashMap<Object, Object>) item).get("isSignable");
 		Integer studySubjectId = studySubjectBean.getId();
 		String flagColour = null;
-		if (daoWrapper.getDiscDao().doesSubjectHaveAnyUnclosedDNsInStudy(studyBean, studySubjectBean.getLabel(), currentUser)) {
+		if (daoWrapper.getDiscDao().doesSubjectHaveAnyUnclosedDNsInStudy(studyBean, studySubjectBean.getLabel(),
+				currentUser)) {
 			flagColour = "yellow";
-			if (daoWrapper.getDiscDao().doesSubjectHaveAnyNewDNsInStudy(studyBean, studySubjectBean.getLabel(), currentUser)) {
+			if (daoWrapper.getDiscDao().doesSubjectHaveAnyNewDNsInStudy(studyBean, studySubjectBean.getLabel(),
+					currentUser)) {
 				flagColour = "red";
 			}
 		}

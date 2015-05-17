@@ -20,6 +20,12 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -34,18 +40,12 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 @Component
 public class ListEventsForSubjectsServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 1L;
+
 	public static final String SAVED_LIST_EVENTS_FOR_SUBJECTS_URL = "savedListEventsForSubjectsUrl";
-	public static final String SAVED_LAST_VISITED_PAGE_URL = "savedLastEventPageUrl";
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -97,12 +97,9 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			return;
 		}
-		
+
 		if (definitionId == 0) {
-			StringBuffer requestURL = request.getRequestURL();
-			String url = requestURL.substring(0, requestURL.lastIndexOf("/"));
-			ListStudySubjectsServlet.unSetLastViewedByEvent(request);
-			response.sendRedirect(url + Page.LIST_STUDY_SUBJECTS_SERVLET.getFileName());
+			response.sendRedirect(request.getContextPath().concat(Page.LIST_STUDY_SUBJECTS_SERVLET.getFileName()));
 			return;
 		}
 
@@ -124,8 +121,8 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		factory.setCrfDAO(getCRFDAO());
 		factory.setCRFVersionDAO(getCRFVersionDAO());
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
-		factory.setSelectedStudyEventDefinition((StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(
-				definitionId));
+		factory.setSelectedStudyEventDefinition(
+				(StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(definitionId));
 		String listEventsForSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("listEventsForSubjectsHtml", listEventsForSubjectsHtml);
 		request.setAttribute("defId", definitionId);
@@ -134,8 +131,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		request.setAttribute("studyGroupClasses", getStudyGroupClassesByCurrentStudy(request));
 		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
 		request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
-		request.getSession().setAttribute(ListStudySubjectsServlet.SAVED_LAST_VIEW_BY_EVENT, true);
-		
+
 		forwardPage(Page.LIST_EVENTS_FOR_SUBJECTS, request, response);
 	}
 
@@ -148,27 +144,36 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 
 	@Override
 	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_LAST_VISITED_PAGE_URL;
+		return SAVED_LIST_EVENTS_FOR_SUBJECTS_URL;
 	}
 
 	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
-		boolean showMoreLink;
-		showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
-		String currentDefId = fp.getString("defId");
-		String savedUrl = (String) request.getSession().getAttribute(SAVED_LIST_EVENTS_FOR_SUBJECTS_URL);
-		if (savedUrl != null && !currentDefId.equals(parseDefId(currentDefId, savedUrl))) {
-			savedUrl = null;
-			request.getSession().removeAttribute(ListStudySubjectsServlet.SAVED_LAST_VISITED_PAGE_URL);
+		boolean showMoreLink = fp.getString("showMoreLink").equals("")
+				|| Boolean.parseBoolean(fp.getString("showMoreLink"));
+		String newDefId = fp.getString("newDefId");
+		if (!newDefId.trim().isEmpty()) {
+			request.getSession().removeAttribute(SAVED_LIST_EVENTS_FOR_SUBJECTS_URL);
 		}
-		savedUrl = savedUrl != null ? savedUrl.replaceAll(".*" + request.getContextPath() + "/ListStudySubjects", "")
-				: null;
-
-		return request.getMethod().equalsIgnoreCase("POST") && savedUrl != null ? savedUrl : "?module="
-				+ fp.getString("module") + "&defId=" + fp.getString("defId") + "&maxRows=15&showMoreLink="
+		String pageSize = (String) request.getSession().getAttribute(ListStudySubjectsServlet.SUBJECT_MATRIX_PAGE_SIZE);
+		pageSize = pageSize == null ? "15" : pageSize;
+		return "?module=" + fp.getString("module") + "&defId=" + newDefId + "&maxRows=" + pageSize + "&showMoreLink="
 				+ showMoreLink + "&listEventsForSubject_tr_=true&listEventsForSubject_p_=1&listEventsForSubject_mr_="
-				+ ListStudySubjectsServlet.getPageSize(request);
+				+ pageSize;
+	}
+
+	@Override
+	protected void saveUrl(String key, String value, HttpServletRequest request) {
+		super.saveUrl(key, value, request);
+		FormProcessor fp = new FormProcessor(request);
+		String pageSize = fp.getString("listEventsForSubject_mr_");
+		request.getSession().setAttribute(ListStudySubjectsServlet.SUBJECT_MATRIX_PAGE_SIZE, pageSize);
+		String savedUrl = getSavedUrl(ListStudySubjectsServlet.SAVED_LIST_STUDY_SUBJECTS_URL, request);
+		if (savedUrl != null) {
+			super.saveUrl(ListStudySubjectsServlet.SAVED_LIST_STUDY_SUBJECTS_URL,
+					savedUrl.replaceAll("findSubjects_mr_=\\d*", "findSubjects_mr_=".concat(pageSize)), request);
+		}
 	}
 
 	@Override
@@ -177,22 +182,9 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected void saveUrl(String key, String value, HttpServletRequest request) {
-		if (value != null) {
-			String pageSize = value.contains("listEventsForSubject_mr_") ? value.replaceFirst(
-					".*&listEventsForSubject_mr_=(\\d{2,}).*", "$1") : "15";
-			request.getSession().setAttribute(ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX, pageSize);
-			request.getSession().setAttribute(key, value);
-		}
-	}
-
-	@Override
-	protected String getSavedUrl(String key, HttpServletRequest request) {
-		if (request.getQueryString() != null && request.getQueryString().contains("useJmesa=true")) {
-			return request.getRequestURL() + getDefaultUrl(request);
-		}
-		String savedUrl = (String) request.getSession().getAttribute(key);
-		return savedUrl == null ? savedUrl : savedUrl.replaceFirst("&listEventsForSubject_mr_=\\d{2,}",
-				"&listEventsForSubject_mr_=" + ListStudySubjectsServlet.getPageSize(request));
+	protected boolean shouldRedirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.getSession().setAttribute(ListStudySubjectsServlet.CURRENT_SUBJECT_MATRIX_SERVLET,
+				request.getServletPath());
+		return super.shouldRedirect(request, response);
 	}
 }

@@ -24,7 +24,6 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.util.EventCRFUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -82,6 +81,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.EventCRFUtil;
 import com.clinovo.util.SignUtil;
 
 /**
@@ -245,7 +245,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		Role r = currentRole.getRole();
 		boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !Role.isMonitor(r);
 		tableFacade.setToolbar(new ListEventsForSubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(),
-				selectedStudyEventDefinition, addSubjectLinkShow, showMoreLink));
+				selectedStudyEventDefinition, tableFacade.getWebContext().getContextPath(), showMoreLink));
 	}
 
 	@Override
@@ -320,11 +320,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				d.getProps().put("studySubject.createdDate", null);
 				for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
 					CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
-					EventDefinitionCRFBean eventDefinitionCRFBean =
-							getEventDefinitionCRFBean(selectedStudyEventDefinition.getId(), crf, studySubjectBean);
-					d.getProps().put("crf_" + crf.getId(),
-							EventCRFUtil.getEventCRFCurrentStatus(studySubjectBean, null, eventDefinitionCRFBean,
-									null, getCRFVersionDAO(), getEventDefintionCRFDAO()));
+					EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRFBean(
+							selectedStudyEventDefinition.getId(), crf, studySubjectBean);
+					d.getProps().put(
+							"crf_" + crf.getId(),
+							EventCRFUtil.getEventCRFCurrentStatus(studySubjectBean, null, eventDefinitionCRFBean, null,
+									getCRFVersionDAO(), getEventDefintionCRFDAO()));
 					d.getProps().put("crf_" + crf.getId() + "_eventCrf", null);
 					d.getProps().put("crf_" + crf.getId() + "_crf", crf);
 					d.getProps().put("crf_" + crf.getId() + "_eventDefinitionCrf", eventDefinitionCRFBean);
@@ -340,12 +341,14 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				d.getProps().put("studySubject.createdDate", studyEventBean.getDateStarted());
 				for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
 					CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
-					EventDefinitionCRFBean eventDefinitionCRFBean =
-							getEventDefinitionCRFBean(selectedStudyEventDefinition.getId(), crf, studySubjectBean);
+					EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRFBean(
+							selectedStudyEventDefinition.getId(), crf, studySubjectBean);
 					EventCRFBean eventCRFBean = crfAsKeyEventCrfAsValue.get(crf.getId() + "_" + studyEventBean.getId());
-					d.getProps().put("crf_" + crf.getId(),
-							EventCRFUtil.getEventCRFCurrentStatus(studySubjectBean, studyEventBean,
-									eventDefinitionCRFBean, eventCRFBean, getCRFVersionDAO(), getEventDefintionCRFDAO()));
+					d.getProps().put(
+							"crf_" + crf.getId(),
+							EventCRFUtil
+									.getEventCRFCurrentStatus(studySubjectBean, studyEventBean, eventDefinitionCRFBean,
+											eventCRFBean, getCRFVersionDAO(), getEventDefintionCRFDAO()));
 					if (eventCRFBean != null) {
 						d.getProps().put("crf_" + crf.getId() + "_eventCrf", eventCRFBean);
 					} else {
@@ -1107,7 +1110,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 							+ (eventDivBuilderWrapper.eventDefintionCRFId == null ? eventDivBuilderWrapper.sed.getId()
 									+ "ev" : eventDivBuilderWrapper.eventDefintionCRFId) + "_"
 							+ eventDivBuilderWrapper.rowCount).styleClass("eventDivWrapper ViewSubjectsPopup")
-					.style("min-width:" + divWidth + "px;").rel("" + eventDivBuilderWrapper.studySubject.getId()).close();
+					.style("min-width:" + divWidth + "px;").rel("" + eventDivBuilderWrapper.studySubject.getId())
+					.close();
 		}
 
 		eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").close();
@@ -1186,8 +1190,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 								+ "_"
 								+ (eventDivBuilderWrapper.eventDefintionCRFId == null ? eventDivBuilderWrapper.sed
 										.getId() + "ev" : eventDivBuilderWrapper.eventDefintionCRFId) + "_"
-								+ eventDivBuilderWrapper.rowCount).rel(href1).close()
-						.divEnd();
+								+ eventDivBuilderWrapper.rowCount).rel(href1).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			} else {
 				eventDiv.tr(0).valign("top").close();

@@ -13,6 +13,9 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
@@ -27,11 +30,9 @@ import org.jmesa.view.html.toolbar.ToolbarItem;
 import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItemType;
 
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-
 public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
 
+	private String contextPath;
 	private final ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
 	private final ArrayList<StudyGroupClassBean> studyGroupClasses;
 	private final StudyEventDefinitionBean selectedStudyEventDefinition;
@@ -40,8 +41,9 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
 
 	public ListEventsForSubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions,
 			ArrayList<StudyGroupClassBean> studyGroupClasses, StudyEventDefinitionBean selectedStudyEventDefinition,
-			boolean addSubjectLinkShow, boolean showMoreLink) {
+			String contextPath, boolean showMoreLink) {
 		super();
+		this.contextPath = contextPath;
 		this.studyEventDefinitions = studyEventDefinitions;
 		this.studyGroupClasses = studyGroupClasses;
 		this.selectedStudyEventDefinition = selectedStudyEventDefinition;
@@ -90,24 +92,34 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
 			HtmlBuilder html = new HtmlBuilder();
 
 			if (showMoreLink) {
-				html.a().id("showMore")
-						.href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],true);").close();
+				html.a()
+						.id("showMore")
+						.href("javascript:hideCols('listEventsForSubject',[" + getIndexes()
+								+ "],true);onInvokeAction('listEventsForSubject','filter');").close();
 				html.div().close().nbsp().append(resword.getString("show_more")).nbsp().divEnd().aEnd();
-				html.a().id("hide").style("display: none;")
-						.href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],false);").close();
+				html.a()
+						.id("hide")
+						.style("display: none;")
+						.href("javascript:hideCols('listEventsForSubject',[" + getIndexes()
+								+ "],false);onInvokeAction('listEventsForSubject','filter');").close();
 				html.div().close().nbsp().append(resword.getString("hide")).nbsp().divEnd().aEnd();
 
 				html.script()
 						.type("text/javascript")
 						.close()
-						.append("$(document).ready(function(){ "
-								+ "hideCols('listEventsForSubject',[" + getIndexes() + "],false);});").scriptEnd();
+						.append("$(document).ready(function(){ " + "hideCols('listEventsForSubject',[" + getIndexes()
+								+ "],false);});").scriptEnd();
 			} else {
-				html.a().id("showMore").style("display: none;")
-						.href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],true);").close();
+				html.a()
+						.id("showMore")
+						.style("display: none;")
+						.href("javascript:hideCols('listEventsForSubject',[" + getIndexes()
+								+ "],true);onInvokeAction('listEventsForSubject','filter');").close();
 				html.div().close().nbsp().append(resword.getString("show_more")).nbsp().divEnd().aEnd();
-				html.a().id("hide").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],false);")
-						.close();
+				html.a()
+						.id("hide")
+						.href("javascript:hideCols('listEventsForSubject',[" + getIndexes()
+								+ "],false);onInvokeAction('listEventsForSubject','filter');").close();
 				html.div().close().nbsp().append(resword.getString("hide")).nbsp().divEnd().aEnd();
 			}
 
@@ -149,8 +161,9 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
 		@Override
 		public String enabled() {
 			String js = "var selectedValue = document.getElementById('sedDropDown').options[document.getElementById('sedDropDown').selectedIndex].value;  "
-					+ " if (selectedValue != null ) { "
-					+ "window.location='ListEventsForSubjects?module=submit&defId='+selectedValue+'&useJmesa=true';}";
+					+ " if (selectedValue != null) { window.location = '"
+					+ contextPath
+					+ "' + (parseInt(selectedValue) == 0 ? '/ListStudySubjects?showAll=true' : ('/ListEventsForSubjects?newDefId=' + selectedValue)); }";
 			HtmlBuilder html = new HtmlBuilder();
 			html.append(resword.getString("events") + ": ");
 			html.select().id("sedDropDown").onchange(js).close();
