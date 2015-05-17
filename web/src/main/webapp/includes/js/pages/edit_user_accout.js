@@ -13,14 +13,10 @@ function myCancel() {
 
 function a() {
 	if (document.getElementById('resetPassword').checked) {
-		if ($("#notifyPassword").val() == "true") {
-			document.getElementById('displayPwd0').disabled = false
-		}
+		document.getElementById('displayPwd0').disabled = false
 		document.getElementById('displayPwd1').disabled = false
 	} else {
-		if ($("#notifyPassword").val() == "true") {
-			document.getElementById('displayPwd0').disabled = true
-		}
+		document.getElementById('displayPwd0').disabled = true
 		document.getElementById('displayPwd1').disabled = true
 	}
 }
@@ -54,6 +50,7 @@ function back_checkEditUserFormState() {
 $(window).load(function(){
 	saveEditUserFormState(editUserFormState);
 	resetFormAction();
+	a();
 });
 
 function redirectRequestToMaskingPage() {

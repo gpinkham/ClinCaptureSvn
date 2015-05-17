@@ -154,6 +154,7 @@ public class EditUserAccountController extends BaseController {
 				loadPresetValuesFromForm(fp);
 				setInputMessages(errors, request);
 				model.addAttribute("presetValues", fp.getPresetValues());
+				model.addAttribute("userName", user.getName());
 				model.addAttribute("userTypes", getUserTypes());
 				model.addAttribute(TIME_ZONE_IDS_SORTED_REQUEST_ATR, DateUtil.getAvailableTimeZoneIDsSorted());
 				PageMessagesUtil.addPageMessage(model,
