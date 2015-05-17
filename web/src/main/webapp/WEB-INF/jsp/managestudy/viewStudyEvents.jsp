@@ -87,7 +87,6 @@
     </div>
 </h1>
 
-definitionId: ${definitionId}
 
 <div style="width: 640px">
     <!-- These DIVs define shaded box borders -->

@@ -99,18 +99,10 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		System.out.println("request.getMethod(): " + request.getMethod());
-		System.out.println("request.getRequestURL(): " + request.getRequestURL());
-		System.out.println("request.getQueryString(): " + request.getQueryString());
-
 		FormProcessor fp = new FormProcessor(request);
 		if (fp.getString(PRINT).isEmpty() && shouldRedirect(request, response)) {
-			System.out.println("0!");
 			return;
 		}
-
-		System.out.println("1!");
-
 		StudyBean currentStudy = getCurrentStudy(request);
 		SimpleDateFormat localDf = getLocalDf(request);
 
@@ -131,23 +123,13 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		Date startDate = fp.getDate(INPUT_STARTDATE);
 		Date endDate = fp.getDate(INPUT_ENDDATE);
 
-		System.out.println("sedId: " + sedId);
-		System.out.println("statusId: " + statusId);
-		System.out.println("definitionId: " + definitionId);
-		System.out.println("startDate: " + startDate);
-		System.out.println("endDate: " + endDate);
-		System.out.println("defaultStartDate: " + defaultStartDate);
-		System.out.println("defaultEndDate: " + defaultEndDate);
-
 		if (request.getMethod().equalsIgnoreCase(POST)) {
-			System.out.println("2!");
 			request.getSession().setAttribute(VIEW_STUDY_EVENTS_SED_ID, fp.getInt(SED_ID));
 			request.getSession().setAttribute(VIEW_STUDY_EVENTS_STATUS_ID, fp.getInt(INPUT_STATUS_ID));
 			request.getSession().setAttribute(VIEW_STUDY_EVENTS_DEFINITION_ID, fp.getInt(INPUT_DEF_ID));
 			request.getSession().setAttribute(VIEW_STUDY_EVENTS_START_DATE, fp.getDate(INPUT_STARTDATE));
 			request.getSession().setAttribute(VIEW_STUDY_EVENTS_END_DATE, fp.getDate(INPUT_ENDDATE));
 		} else if (userDoesNotUseJmesaTableForNavigation(request)) {
-			System.out.println("3!");
 			sedId = request.getSession().getAttribute(VIEW_STUDY_EVENTS_SED_ID) != null ? (Integer) request
 					.getSession().getAttribute(VIEW_STUDY_EVENTS_SED_ID) : sedId;
 			statusId = request.getSession().getAttribute(VIEW_STUDY_EVENTS_STATUS_ID) != null ? (Integer) request
@@ -167,10 +149,6 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		request.setAttribute(INPUT_STARTDATE, localDf.format(startDate));
 		request.setAttribute(INPUT_ENDDATE, localDf.format(endDate));
 
-		System.out.println(INPUT_DEF_ID + ": " + definitionId);
-		System.out.println(INPUT_STARTDATE + ": " + localDf.format(startDate));
-		System.out.println(INPUT_ENDDATE + ": " + localDf.format(endDate));
-
 		Validator v = getValidator(request);
 		v.addValidation(INPUT_STARTDATE, Validator.IS_A_DATE);
 		v.addValidation(INPUT_ENDDATE, Validator.IS_A_DATE);
@@ -180,8 +158,6 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 			startDate = defaultStartDate;
 			endDate = defaultEndDate;
 		}
-
-		System.out.println("4!");
 
 		request.setAttribute(STATUS_MAP, SubjectEventStatus.toArrayList());
 
@@ -197,26 +173,11 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 				+ localDf.format(endDate) + "&" + INPUT_DEF_ID + "=" + definitionId + "&" + INPUT_STATUS_ID + "="
 				+ statusId + "&" + "sedId=" + sedId + "&submitted=" + fp.getInt("submitted");
 		request.setAttribute("queryUrl", queryUrl);
-
-		System.out.println("queryUrl" + queryUrl);
-
 		if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
-			System.out.println("5!");
 			allEvents = genEventsForPrint(currentStudy, definitions, startDate, endDate, definitionId, statusId);
 			request.setAttribute("allEvents", allEvents);
-
-			System.out.println(INPUT_DEF_ID + ": " + definitionId);
-			System.out.println(INPUT_STARTDATE + ": " + localDf.format(startDate));
-			System.out.println(INPUT_ENDDATE + ": " + localDf.format(endDate));
-
 			forwardPage(Page.VIEW_STUDY_EVENTS_PRINT, request, response);
 		} else {
-			System.out.println("6!");
-
-			System.out.println(INPUT_DEF_ID + ": " + definitionId);
-			System.out.println(INPUT_STARTDATE + ": " + localDf.format(startDate));
-			System.out.println(INPUT_ENDDATE + ": " + localDf.format(endDate));
-
 			forwardPage(Page.VIEW_STUDY_EVENTS, request, response);
 		}
 
