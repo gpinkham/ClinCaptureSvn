@@ -87,7 +87,7 @@ public final class RequestParametersValidator {
 			}
 		}
 		Annotation[] annotationArray = handler.getMethod().getAnnotations();
-		if (annotationArray != null) {
+		if (UserDetails.getCurrentUserDetails() != null && annotationArray != null) {
 			for (Annotation annotation : annotationArray) {
 				if (annotation instanceof RestScope) {
 					StudyBean studyBean = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);

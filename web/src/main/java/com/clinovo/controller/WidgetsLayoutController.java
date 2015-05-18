@@ -372,7 +372,7 @@ public class WidgetsLayoutController {
 
 		hasPrevious = displayFrom != 0;
 
-		hasNext = displayFrom + EC_DISPLAY_PER_SCREEN <= studyEventDefinitions.size();
+		hasNext = displayFrom + EC_DISPLAY_PER_SCREEN < studyEventDefinitions.size();
 
 		model.addAttribute("eventCompletionRows", eventCompletionRows);
 		model.addAttribute("eventCompletionHasNext", hasNext);
