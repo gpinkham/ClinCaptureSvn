@@ -4,9 +4,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.UserRole;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.clinovo.rest.annotation.RestAccess;
+import com.clinovo.rest.enums.UserRole;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.service.UserAccountService;
@@ -25,7 +26,7 @@ import com.clinovo.service.UserAccountService;
 /**
  * UserService.
  */
-@Controller
+@Controller("restUserService")
 @RequestMapping("/user")
 @SuppressWarnings("unused")
 public class UserService extends BaseService {
@@ -45,7 +46,7 @@ public class UserService extends BaseService {
 	private org.akaza.openclinica.core.SecurityManager securityManager;
 
 	/**
-	 * The method.
+	 * Method that creates new user.
 	 *
 	 * @param userName
 	 *            String
@@ -65,8 +66,6 @@ public class UserService extends BaseService {
 	 *            boolean
 	 * @param displayPassword
 	 *            boolean
-	 * @param scope
-	 *            int
 	 * @param role
 	 *            int
 	 * @return UserAccountBean
@@ -81,10 +80,11 @@ public class UserService extends BaseService {
 			@RequestParam("email") String email, @RequestParam("phone") String phone,
 			@RequestParam("company") String company, @RequestParam("usertype") int userType,
 			@RequestParam("allowsoap") boolean allowSoap, @RequestParam("displaypassword") boolean displayPassword,
-			@RequestParam("scope") int scope, @RequestParam("role") int role) throws Exception {
-		checkStudyAccess(scope);
+			@RequestParam("role") int role) throws Exception {
+		StudyBean studyBean = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+
 		checkUsernameExistence(userName);
-		checkRoleScopeConsistency(role, scope);
+		checkRoleScopeConsistency(role, studyBean);
 
 		Role userAccountRole = Role.get(role);
 		UserType userAccountType = UserType.get(userType);
@@ -98,7 +98,7 @@ public class UserService extends BaseService {
 		userAccountBean.setLastName(lastName);
 		userAccountBean.setEmail(email);
 		userAccountBean.setPhone(phone);
-		userAccountBean.setActiveStudyId(scope);
+		userAccountBean.setActiveStudyId(studyBean.getId());
 		userAccountBean.setPasswd(passwordHash);
 		userAccountBean.setRunWebservices(allowSoap);
 		userAccountBean.addUserType(userAccountType);
@@ -106,7 +106,7 @@ public class UserService extends BaseService {
 		userAccountBean.setRoleCode(userAccountRole.getCode());
 		userAccountBean.setUserTypeCode(userAccountType.getCode());
 
-		userAccountBean = userAccountService.createUser(UserDetails.getCurrentUserDetails().getUserName(),
+		userAccountBean = userAccountService.createUser(UserDetails.getCurrentUserDetails().getCurrentUser(dataSource),
 				userAccountBean, userAccountRole, displayPassword, password);
 
 		if (userAccountBean.getId() == 0) {

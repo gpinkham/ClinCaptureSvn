@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * OdmController.
+ * OdmService.
  */
-@Controller
+@Controller("restOdmService")
 @RequestMapping("/odm")
-public class OdmController {
+public class OdmService {
 
 	@RequestMapping
 	@ResponseBody

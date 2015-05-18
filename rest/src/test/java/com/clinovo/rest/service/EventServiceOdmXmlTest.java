@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.springframework.http.MediaType;
 
-public class AuthenticationServiceOdmXmlTest extends AuthenticationServiceTest {
+public class EventServiceOdmXmlTest extends EventServiceTest {
 
 	@Before
 	public void before() throws Exception {
@@ -16,7 +16,7 @@ public class AuthenticationServiceOdmXmlTest extends AuthenticationServiceTest {
 	public void after() {
 		super.after();
 		if (result != null && mediaType == MediaType.APPLICATION_XML) {
-			assertNotNull(restOdmContainer.getRestData().getUserDetails());
+			assertNotNull(restOdmContainer.getRestData().getStudyEventDefinitionBean());
 		}
 	}
 }

@@ -195,12 +195,12 @@ $(document).ready(function() {
 				<td align="left">
 					<c:choose>
 						<c:when test="${definition.repeating == true}">
-							<input type="radio" onchange="javascript:changeIcon();" checked name="repeating" value="1"><fmt:message key="yes" bundle="${resword}"/>
-							<input type="radio" onchange="javascript:changeIcon();" name="repeating" value="0"><fmt:message key="no" bundle="${resword}"/>
+							<input type="radio" onchange="javascript:changeIcon();" checked name="repeating" value="true"><fmt:message key="yes" bundle="${resword}"/>
+							<input type="radio" onchange="javascript:changeIcon();" name="repeating" value="false"><fmt:message key="no" bundle="${resword}"/>
 						</c:when>
 						<c:otherwise>
-							<input type="radio" onchange="javascript:changeIcon();" name="repeating" value="1"><fmt:message key="yes" bundle="${resword}"/>
-							<input type="radio" onchange="javascript:changeIcon();" checked name="repeating" value="0"><fmt:message key="no" bundle="${resword}"/>
+							<input type="radio" onchange="javascript:changeIcon();" name="repeating" value="true"><fmt:message key="yes" bundle="${resword}"/>
+							<input type="radio" onchange="javascript:changeIcon();" checked name="repeating" value="false"><fmt:message key="no" bundle="${resword}"/>
 						</c:otherwise>
 					</c:choose>
 				</td>

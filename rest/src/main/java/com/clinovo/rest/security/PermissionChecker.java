@@ -22,8 +22,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import com.clinovo.rest.service.OdmService;
+import com.clinovo.rest.service.WadlService;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.UserRole;
 import org.akaza.openclinica.bean.core.UserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +37,10 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.annotation.RestAccess;
+import com.clinovo.rest.enums.UserRole;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.service.AuthenticationService;
-import com.clinovo.rest.service.OdmController;
-import com.clinovo.rest.service.WadlController;
 import com.clinovo.rest.util.RequestParametersValidator;
 
 /**
@@ -71,10 +71,10 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 		} else {
 			boolean proceed = false;
 			if (handler instanceof HandlerMethod) {
-				RequestParametersValidator.validate(request, messageSource, (HandlerMethod) handler);
+				RequestParametersValidator.validate(request, dataSource, messageSource, (HandlerMethod) handler);
 				proceed = ((HandlerMethod) handler).getBean() instanceof AuthenticationService
-						|| ((HandlerMethod) handler).getBean() instanceof WadlController
-						|| ((HandlerMethod) handler).getBean() instanceof OdmController;
+						|| ((HandlerMethod) handler).getBean() instanceof WadlService
+						|| ((HandlerMethod) handler).getBean() instanceof OdmService;
 				if (!proceed) {
 					UserDetails userDetails = (UserDetails) request.getSession().getAttribute(
 							API_AUTHENTICATED_USER_DETAILS);
@@ -122,7 +122,7 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		int x = 0;
+		//
 	}
 
 }

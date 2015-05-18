@@ -14,26 +14,18 @@
  *******************************************************************************/
 package com.clinovo.controller;
 
-import com.clinovo.coding.Search;
-import com.clinovo.coding.model.Classification;
-import com.clinovo.coding.model.ClassificationElement;
-import com.clinovo.coding.source.impl.BioPortalSearchInterface;
-import com.clinovo.dao.MedicalProductDAO;
-import com.clinovo.dao.SystemDAO;
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.model.CodedItem;
-import com.clinovo.model.CodedItemElement;
-import com.clinovo.model.CodedItemsTableFactory;
-import com.clinovo.model.Dictionary;
-import com.clinovo.model.LowLevelTerm;
-import com.clinovo.model.MedicalProduct;
-import com.clinovo.model.Status.CodeStatus;
-import com.clinovo.model.Term;
-import com.clinovo.model.TermElement;
-import com.clinovo.service.CodedItemService;
-import com.clinovo.service.DictionaryService;
-import com.clinovo.service.TermService;
-import com.clinovo.util.CodingFieldsUtil;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -59,16 +51,26 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import com.clinovo.coding.Search;
+import com.clinovo.coding.model.Classification;
+import com.clinovo.coding.model.ClassificationElement;
+import com.clinovo.coding.source.impl.BioPortalSearchInterface;
+import com.clinovo.dao.MedicalProductDAO;
+import com.clinovo.dao.SystemDAO;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.CodedItemElement;
+import com.clinovo.model.CodedItemsTableFactory;
+import com.clinovo.model.Dictionary;
+import com.clinovo.model.LowLevelTerm;
+import com.clinovo.model.MedicalProduct;
+import com.clinovo.model.Status.CodeStatus;
+import com.clinovo.model.Term;
+import com.clinovo.model.TermElement;
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DictionaryService;
+import com.clinovo.service.TermService;
+import com.clinovo.util.CodingFieldsUtil;
 
 /**
  * The controller for managing coded items. Acts as the glue between the service layer and the UI.
@@ -99,10 +101,13 @@ public class CodedItemsController {
 	/**
 	 * Handle for retrieving all the coded items.
 	 *
-	 * @param request  The incoming request
-	 * @param response The response to redirect to
+	 * @param request
+	 *            The incoming request
+	 * @param response
+	 *            The response to redirect to
 	 * @return Map The map with coded item attributes that will be placed on the UX.
-	 * @throws Exception For all exceptions
+	 * @throws Exception
+	 *             For all exceptions
 	 */
 	@RequestMapping("/codedItems")
 	public ModelMap codedItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -135,12 +140,12 @@ public class CodedItemsController {
 				"autoCodeDictionaryName");
 		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
 
-		boolean configuredDictionaryIsAvailable =
-				configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty();
+		boolean configuredDictionaryIsAvailable = configuredDictionary.getValue() != null
+				&& !configuredDictionary.getValue().isEmpty();
 
 		List<CodedItem> items;
 
-		// Scope the items
+		// RestScope the items
 		if (study.isSite(study.getParentStudyId())) {
 			items = codedItemService.findByStudyAndSite(study.getParentStudyId(), study.getId());
 		} else {
@@ -194,10 +199,13 @@ public class CodedItemsController {
 	/**
 	 * Handle for coding a specified item.
 	 *
-	 * @param request  The request containing the item to code.
-	 * @param response The response to redirect to.
+	 * @param request
+	 *            The request containing the item to code.
+	 * @param response
+	 *            The response to redirect to.
 	 * @return Map with attributes to be used on the UX.
-	 * @throws Exception For all exceptions.
+	 * @throws Exception
+	 *             For all exceptions.
 	 */
 	@RequestMapping("/codeItem")
 	public ModelMap codeItemHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -214,8 +222,8 @@ public class CodedItemsController {
 		StudyParameterValueBean configuredDictionary = new StudyParameterValueDAO(datasource).findByHandleAndStudy(
 				codedItem.getStudyId(), "autoCodeDictionaryName");
 
-		boolean configuredDictionaryIsAvailable =
-				configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty();
+		boolean configuredDictionaryIsAvailable = configuredDictionary.getValue() != null
+				&& !configuredDictionary.getValue().isEmpty();
 
 		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
 		com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
@@ -226,13 +234,13 @@ public class CodedItemsController {
 			ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
 			String dataValue;
 			if (codedItem.getCodedItemElementByItemName("GR").getItemDataId() > 0) {
-				dataValue = data.getValue() + " (Grade " + codedItem.getCodedItemElementByItemName("GR").getItemCode() + ")";
+				dataValue = data.getValue() + " (Grade " + codedItem.getCodedItemElementByItemName("GR").getItemCode()
+						+ ")";
 			} else {
 				dataValue = data.getValue();
 			}
 
-			term = termService.findByAliasAndExternalDictionary(dataValue.toLowerCase(),
-					codedItem.getDictionary());
+			term = termService.findByAliasAndExternalDictionary(dataValue.toLowerCase(), codedItem.getDictionary());
 		}
 
 		if (term != null) {
@@ -259,28 +267,34 @@ public class CodedItemsController {
 					if (dictionary.contains("WHOD")) {
 						final int minCodeLength = 5;
 						final int firstCodeLength = 3;
-						//search using code
+						// search using code
 						if (prefLabel.matches("\\d+") && prefLabel.length() > minCodeLength) {
 							String drugRecordNum = prefLabel.substring(0, prefLabel.length() - minCodeLength);
-							String seq1 = prefLabel.substring(prefLabel.length() - minCodeLength, prefLabel.length() - firstCodeLength);
+							String seq1 = prefLabel.substring(prefLabel.length() - minCodeLength, prefLabel.length()
+									- firstCodeLength);
 							String seq2 = prefLabel.substring(prefLabel.length() - firstCodeLength, prefLabel.length());
-							List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductUniqueKeys(drugRecordNum, seq1, seq2, bioontologyUrl.getValue(), bioontologyUser.getValue(), codedItem.getDictionary());
-							classifications = CodingFieldsUtil.medicalProductListToClassificationList(medicalProducts, LocaleResolver.getLocale());
+							List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductUniqueKeys(
+									drugRecordNum, seq1, seq2, bioontologyUrl.getValue(), bioontologyUser.getValue(),
+									codedItem.getDictionary());
+							classifications = CodingFieldsUtil.medicalProductListToClassificationList(medicalProducts,
+									LocaleResolver.getLocale());
 						} else {
-							//search by name
-							List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductName(prefLabel, codedItem.getDictionary(), bioontologyUrl.getValue(), bioontologyUser.getValue());
-							classifications = CodingFieldsUtil.medicalProductListToClassificationList(medicalProducts, LocaleResolver.getLocale());
+							// search by name
+							List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductName(prefLabel,
+									codedItem.getDictionary(), bioontologyUrl.getValue(), bioontologyUser.getValue());
+							classifications = CodingFieldsUtil.medicalProductListToClassificationList(medicalProducts,
+									LocaleResolver.getLocale());
 						}
 					} else if (dictionary.contains("MEDDRA")) {
-						//search preferred terms
-						List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductName(prefLabel, codedItem.getDictionary(), bioontologyUrl.getValue(), bioontologyUser.getValue());
-						classifications = CodingFieldsUtil.medicalHierarchyToClassificationList(
-								medicalProducts);
+						// search preferred terms
+						List<Object> medicalProducts = getMedicalProductDAO().findByMedicalProductName(prefLabel,
+								codedItem.getDictionary(), bioontologyUrl.getValue(), bioontologyUser.getValue());
+						classifications = CodingFieldsUtil.medicalHierarchyToClassificationList(medicalProducts);
 
 					} else {
-						//search using VA.
-						classifications = search.getClassifications(prefLabel.toLowerCase(), dictionary, bioontologyUrl.getValue(),
-								bioontologyApiKey.getValue());
+						// search using VA.
+						classifications = search.getClassifications(prefLabel.toLowerCase(), dictionary,
+								bioontologyUrl.getValue(), bioontologyApiKey.getValue());
 					}
 					if (classifications.size() == 0) {
 						codedItem.setStatus(String.valueOf(CodeStatus.CODE_NOT_FOUND));
@@ -316,9 +330,12 @@ public class CodedItemsController {
 	/**
 	 * Handle for auto-coding using terms from database.
 	 *
-	 * @param request  The request containing the item to code.
-	 * @param response The response to redirect to.
-	 * @throws Exception The exception for all exceptions.
+	 * @param request
+	 *            The request containing the item to code.
+	 * @param response
+	 *            The response to redirect to.
+	 * @throws Exception
+	 *             The exception for all exceptions.
 	 */
 	@RequestMapping("/autoCode")
 	public void autoCodeItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -345,7 +362,8 @@ public class CodedItemsController {
 				ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(item.getItemId());
 				String dataValue;
 				if (item.getCodedItemElementByItemName("GR").getItemDataId() > 0) {
-					dataValue = data.getValue() + " (Grade " + item.getCodedItemElementByItemName("GR").getItemCode() + ")";
+					dataValue = data.getValue() + " (Grade " + item.getCodedItemElementByItemName("GR").getItemCode()
+							+ ")";
 				} else {
 					dataValue = data.getValue();
 				}
@@ -378,10 +396,13 @@ public class CodedItemsController {
 	/**
 	 * Handle for saving a coded item.
 	 *
-	 * @param request  The request containing the coded item to save
-	 * @param response The response to redirect to.
+	 * @param request
+	 *            The request containing the coded item to save
+	 * @param response
+	 *            The response to redirect to.
 	 * @return Redirects to the coded items handler.
-	 * @throws IOException For all exception
+	 * @throws IOException
+	 *             For all exception
 	 */
 
 	@RequestMapping("/saveCodedItem")
@@ -409,9 +430,11 @@ public class CodedItemsController {
 	/**
 	 * Handle for uncoding a given coded item.
 	 *
-	 * @param request The request containing the item to uncode.
+	 * @param request
+	 *            The request containing the item to uncode.
 	 * @return Redirects to coded items.
-	 * @throws Exception For all exceptions
+	 * @throws Exception
+	 *             For all exceptions
 	 */
 	@RequestMapping("/uncodeCodedItem")
 	public String unCodeCodedItemHandler(HttpServletRequest request) throws Exception {
@@ -447,9 +470,11 @@ public class CodedItemsController {
 	/**
 	 * Handle for getting specified item additional fields.
 	 *
-	 * @param request The request containing the term url to getting additional fields.
+	 * @param request
+	 *            The request containing the term url to getting additional fields.
 	 * @return Map with attributes to be used on the UX-
-	 * @throws Exception For all exceptions
+	 * @throws Exception
+	 *             For all exceptions
 	 */
 	@RequestMapping("/codeItemFields")
 	public ModelMap termAdditionalFieldsHandler(HttpServletRequest request) throws Exception {
@@ -481,10 +506,13 @@ public class CodedItemsController {
 	/**
 	 * Handle for coding and aliasing a given coded item.
 	 *
-	 * @param request  The request containing the item to code and alias.
-	 * @param response The response to redirect to.
+	 * @param request
+	 *            The request containing the item to code and alias.
+	 * @param response
+	 *            The response to redirect to.
 	 * @return Redirects to coded items.
-	 * @throws Exception For all exceptions
+	 * @throws Exception
+	 *             For all exceptions
 	 */
 	@RequestMapping("/codeAndAlias")
 	public String codeAndAliasHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -497,8 +525,8 @@ public class CodedItemsController {
 
 		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
 
-		StudyParameterValueBean configuredDictionary = new StudyParameterValueDAO(datasource).findByHandleAndStudy(study.getId(),
-				"autoCodeDictionaryName");
+		StudyParameterValueBean configuredDictionary = new StudyParameterValueDAO(datasource).findByHandleAndStudy(
+				study.getId(), "autoCodeDictionaryName");
 		com.clinovo.model.System bioontologyUrl = systemDAO.findByName("defaultBioontologyURL");
 		com.clinovo.model.System bioontologyApiKey = systemDAO.findByName("medicalCodingApiKey");
 
@@ -557,7 +585,7 @@ public class CodedItemsController {
 	}
 
 	private CodedItem provideCoding(String verbatimTerm, boolean isAlias, String categoryList, String codeSearchTerm,
-									String bioontologyUrl, String bioontologyApiKey, int codedItemId, Locale locale) throws Exception {
+			String bioontologyUrl, String bioontologyApiKey, int codedItemId, Locale locale) throws Exception {
 
 		StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(datasource);
 
@@ -568,13 +596,16 @@ public class CodedItemsController {
 
 		Classification classificationResult = getClassificationFromCategoryString(categoryList);
 		if (codedItem.getDictionary().contains("WHOD")) {
-			MedicalProduct mpBean = (MedicalProduct) getMedicalProductDAO().findByPk(Integer.valueOf(classificationResult.getHttpPath()), codedItem.getDictionary(), bioontologyURL.getValue(), bioontologyUsername.getValue());
+			MedicalProduct mpBean = (MedicalProduct) getMedicalProductDAO().findByPk(
+					Integer.valueOf(classificationResult.getHttpPath()), codedItem.getDictionary(),
+					bioontologyURL.getValue(), bioontologyUsername.getValue());
 			classificationResult = CodingFieldsUtil.medicalProductToClassification(mpBean, locale);
 		} else if (codedItem.getDictionary().contains("MEDDRA")) {
 			int ptCode = Integer.valueOf(Arrays.asList(classificationResult.getHttpPath().split("\\-")).get(0));
 			int lltCode = Integer.valueOf(Arrays.asList(classificationResult.getHttpPath().split("\\-")).get(1));
 
-			LowLevelTerm medicalHierarchy = getMedicalProductDAO().findByLltPKAndPtPK(lltCode, ptCode, codedItem.getDictionary(), bioontologyURL.getValue(), bioontologyUsername.getValue());
+			LowLevelTerm medicalHierarchy = getMedicalProductDAO().findByLltPKAndPtPK(lltCode, ptCode,
+					codedItem.getDictionary(), bioontologyURL.getValue(), bioontologyUsername.getValue());
 			classificationResult = CodingFieldsUtil.medicalHierarchyToClassification(medicalHierarchy);
 		} else {
 			Search search = getSearch();
@@ -647,7 +678,7 @@ public class CodedItemsController {
 	}
 
 	private void generateCodedItemFields(List<CodedItemElement> codedItemElements,
-										 List<ClassificationElement> classificationElements) {
+			List<ClassificationElement> classificationElements) {
 		for (CodedItemElement codedItemElement : codedItemElements) {
 			for (ClassificationElement classificationElement : classificationElements) {
 				String name = codedItemElement.getItemName();

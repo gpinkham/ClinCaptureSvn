@@ -15,13 +15,13 @@
 
 package com.clinovo.service;
 
+import java.util.List;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-
-import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * UserAccountService.
@@ -176,8 +176,8 @@ public interface UserAccountService {
 	/**
 	 * Method that creates new user.
 	 * 
-	 * @param ownerUserName
-	 *            String
+	 * @param ownerUser
+	 *            UserAccountBean
 	 * @param userAccountBean
 	 *            UserAccountBean
 	 * @param role
@@ -188,12 +188,14 @@ public interface UserAccountService {
 	 *            String
 	 * @return UserAccountBean
 	 */
-	UserAccountBean createUser(String ownerUserName, UserAccountBean userAccountBean, Role role,
+	UserAccountBean createUser(UserAccountBean ownerUser, UserAccountBean userAccountBean, Role role,
 			boolean displayPassword, String password);
 
 	/**
 	 * Check if user has site-level roles or study level roles.
-	 * @param ub UserAccountBean
+	 * 
+	 * @param ub
+	 *            UserAccountBean
 	 * @return boolean result
 	 */
 	boolean isSiteLevelUser(UserAccountBean ub);

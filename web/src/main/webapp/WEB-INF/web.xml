@@ -122,6 +122,14 @@
         <filter-name>logFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    <filter>
+        <filter-name>restFilter</filter-name>
+        <filter-class>com.clinovo.rest.filter.RestFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>restFilter</filter-name>
+        <url-pattern>/rest/*</url-pattern>
+    </filter-mapping>
 
     <servlet>
         <servlet-name>rest</servlet-name>

@@ -15,10 +15,17 @@
 
 package com.clinovo.rest.model;
 
+import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 
 import com.clinovo.rest.security.PermissionChecker;
 import com.clinovo.rest.util.RequestUtil;
@@ -34,6 +41,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({"username", "studyname", "role", "usertype"})
 public class UserDetails {
 
+	@JsonIgnore
+	@XmlTransient
+	private int userId;
+
 	@JsonProperty("username")
 	@XmlElement(name = "UserName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String userName;
@@ -45,6 +56,10 @@ public class UserDetails {
 	@JsonProperty("studyname")
 	@XmlElement(name = "StudyName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String studyName;
+
+	@JsonIgnore
+	@XmlTransient
+	private String studyOid;
 
 	@JsonProperty("role")
 	@XmlElement(name = "Role", namespace = "http://www.cdisc.org/ns/odm/v1.3")
@@ -94,12 +109,51 @@ public class UserDetails {
 		this.userTypeCode = userTypeCode;
 	}
 
+	public String getStudyOid() {
+		return studyOid;
+	}
+
+	public void setStudyOid(String studyOid) {
+		this.studyOid = studyOid;
+	}
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
 	/**
 	 * Method that returns current user details.
 	 *
 	 * @return UserDetails
 	 */
-	public static UserDetails getCurrentUserDetails() {		return (UserDetails) RequestUtil.getRequest().getSession()
+	public static UserDetails getCurrentUserDetails() {
+		return (UserDetails) RequestUtil.getRequest().getSession()
 				.getAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
+	}
+
+	/**
+	 * Method that returns current StudyBean.
+	 *
+	 * @param dataSource
+	 *            DataSource
+	 * @return StudyBean
+	 */
+	public StudyBean getCurrentStudy(DataSource dataSource) {
+		return new StudyDAO(dataSource).findByOid(studyOid);
+	}
+
+	/**
+	 * Method that returns current UserAccountBean.
+	 *
+	 * @param dataSource
+	 *            DataSource
+	 * @return UserAccountBean
+	 */
+	public UserAccountBean getCurrentUser(DataSource dataSource) {
+		return (UserAccountBean) new UserAccountDAO(dataSource).findByPK(userId);
 	}
 }

@@ -26,6 +26,18 @@ public class XsdSchemaValidationTest {
 	}
 
 	@Test
+	public void testThatSchemaPassesValidationDuringUnmarshallingTheStudyEventDefinitionBean() throws Exception {
+		JAXBContext jaxbContext = JAXBContext.newInstance(ODM.class, RestOdmContainer.class);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		jaxbUnmarshaller.setSchema(schema);
+		RestOdmContainer restOdmContainer = (RestOdmContainer) jaxbUnmarshaller
+				.unmarshal(new FileSystemResourceLoader().getResource("classpath:xml/studyeventdefinition.xml")
+						.getFile());
+		assertNotNull(restOdmContainer.getRestData().getStudyEventDefinitionBean());
+		assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getName(), "test visit");
+	}
+
+	@Test
 	public void testThatSchemaPassesValidationDuringUnmarshallingTheUserAccountBean() throws Exception {
 		JAXBContext jaxbContext = JAXBContext.newInstance(ODM.class, RestOdmContainer.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -33,7 +45,7 @@ public class XsdSchemaValidationTest {
 		RestOdmContainer restOdmContainer = (RestOdmContainer) jaxbUnmarshaller
 				.unmarshal(new FileSystemResourceLoader().getResource("classpath:xml/user.xml").getFile());
 		assertNotNull(restOdmContainer.getRestData().getUserAccountBean());
-		assertEquals(restOdmContainer.getRestData().getUserAccountBean().getUserName(), "user1");
+		assertEquals(restOdmContainer.getRestData().getUserAccountBean().getName(), "user1");
 	}
 
 	@Test

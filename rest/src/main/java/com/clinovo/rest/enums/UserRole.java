@@ -13,78 +13,56 @@
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
 
-package com.clinovo.rest.exception;
+package com.clinovo.rest.enums;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.springframework.context.MessageSource;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.UserType;
 
 /**
- * RestException.
+ * UserRole enum class.
  */
-@SuppressWarnings("serial")
-public class RestException extends RuntimeException {
+public enum UserRole {
 
-	private int code;
+	ANY_USER(null, null),
 
-	/**
-	 * RestException constructor.
-	 *
-	 * @param message
-	 *            String
-	 */
-	public RestException(String message) {
-		super(message);
-		this.code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+	ANY_ADMIN(null, null),
+
+	SYS_ADMIN(Role.SYSTEM_ADMINISTRATOR.getCode(), UserType.SYSADMIN.getCode()),
+
+	STUDY_ADMIN_ADMIN(Role.STUDY_ADMINISTRATOR.getCode(), UserType.SYSADMIN.getCode()), STUDY_ADMIN_USER(
+			Role.STUDY_ADMINISTRATOR.getCode(), UserType.USER.getCode()),
+
+	STUDY_MONITOR_ADMIN(Role.STUDY_MONITOR.getCode(), UserType.SYSADMIN.getCode()), STUDY_MONITOR_USER(
+			Role.STUDY_MONITOR.getCode(), UserType.USER.getCode()),
+
+	STUDY_CODER_ADMIN(Role.STUDY_CODER.getCode(), UserType.SYSADMIN.getCode()), STUDY_CODER_USER(Role.STUDY_CODER
+			.getCode(), UserType.USER.getCode()),
+
+	STUDY_EVALUATOR_ADMIN(Role.STUDY_EVALUATOR.getCode(), UserType.SYSADMIN.getCode()), STUDY_EVALUATOR_USER(
+			Role.STUDY_EVALUATOR.getCode(), UserType.USER.getCode()),
+
+	STUDY_DIRECTOR_ADMIN(Role.STUDY_DIRECTOR.getCode(), UserType.SYSADMIN.getCode()), STUDY_DIRECTOR_USER(
+			Role.STUDY_DIRECTOR.getCode(), UserType.USER.getCode()),
+
+	CRC_ADMIN(Role.CLINICAL_RESEARCH_COORDINATOR.getCode(), UserType.SYSADMIN.getCode()), CRC_USER(
+			Role.CLINICAL_RESEARCH_COORDINATOR.getCode(), UserType.USER.getCode()),
+
+	INVESTIGATOR_ADMIN(Role.INVESTIGATOR.getCode(), UserType.SYSADMIN.getCode()), INVESTIGATOR_USER(Role.INVESTIGATOR
+			.getCode(), UserType.USER.getCode());
+
+	private String roleCode;
+	private String userTypeCode;
+
+	UserRole(String roleCode, String userTypeCode) {
+		this.roleCode = roleCode;
+		this.userTypeCode = userTypeCode;
 	}
 
-	/**
-	 * RestException constructor.
-	 *
-	 * @param messageSource
-	 *            MessageSource
-	 * @param messageCode
-	 *            String
-	 */
-	public RestException(MessageSource messageSource, String messageCode) {
-		super(messageSource.getMessage(messageCode, null, CoreResources.getSystemLocale()));
-		this.code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+	public String getRoleCode() {
+		return roleCode;
 	}
 
-	/**
-	 * RestException constructor.
-	 *
-	 * @param messageSource
-	 *            MessageSource
-	 * @param messageCode
-	 *            String
-	 * @param code
-	 *            integer
-	 */
-	public RestException(MessageSource messageSource, String messageCode, int code) {
-		super(messageSource.getMessage(messageCode, null, CoreResources.getSystemLocale()));
-		this.code = code;
-	}
-
-	/**
-	 * RestException constructor.
-	 *
-	 * @param messageSource
-	 *            MessageSource
-	 * @param messageCode
-	 *            String
-	 * @param args
-	 *            Object[]
-	 * @param code
-	 *            integer
-	 */
-	public RestException(MessageSource messageSource, String messageCode, Object[] args, int code) {
-		super(messageSource.getMessage(messageCode, args, CoreResources.getSystemLocale()));
-		this.code = code;
-	}
-
-	public int getCode() {
-		return code;
+	public String getUserTypeCode() {
+		return userTypeCode;
 	}
 }

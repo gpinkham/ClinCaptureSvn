@@ -418,11 +418,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public UserAccountBean createUser(String ownerUserName, UserAccountBean userAccountBean, Role role,
+	public UserAccountBean createUser(UserAccountBean ownerUser, UserAccountBean userAccountBean, Role role,
 			boolean displayPassword, String password) {
 		UserAccountDAO userAccountDAO = getUserAccountDAO();
-
-		UserAccountBean ownerUser = (UserAccountBean) userAccountDAO.findByUserName(ownerUserName);
 
 		userAccountBean.setPasswdTimestamp(null);
 		userAccountBean.setLastVisitDate(null);

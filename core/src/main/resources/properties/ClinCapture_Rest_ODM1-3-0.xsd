@@ -14,6 +14,7 @@
 
     <xs:complexType name="restData">
         <xs:sequence>
+            <xs:element ref="StudyEvent" minOccurs="0"/>
             <xs:element ref="UserAccount" minOccurs="0"/>
             <xs:element ref="UserDetails" minOccurs="0"/>
             <xs:element ref="Error" minOccurs="0"/>
@@ -69,6 +70,39 @@
             <xs:element ref="Phone" minOccurs="0"/>
             <xs:element ref="AllowSoap" minOccurs="0"/>
             <xs:element ref="Scope" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="StudyEvent" type="studyEventDefinitionBean"/>
+
+    <xs:element name="EventName" type="xs:string"/>
+    <xs:element name="EventDescription" type="xs:string"/>
+    <xs:element name="Repeating" type="xs:boolean"/>
+    <xs:element name="Category" type="xs:string"/>
+    <xs:element name="EventType" type="xs:string"/>
+    <xs:element name="Oid" type="xs:string"/>
+    <xs:element name="MinDay" type="xs:int"/>
+    <xs:element name="MaxDay" type="xs:int"/>
+    <xs:element name="EmailDay" type="xs:int"/>
+    <xs:element name="SchDay" type="xs:int"/>
+    <xs:element name="UserEmailId" type="xs:int"/>
+    <xs:element name="IsReference" type="xs:boolean"/>
+
+    <xs:complexType name="studyEventDefinitionBean">
+        <xs:sequence>
+            <xs:element ref="Id" minOccurs="0"/>
+            <xs:element ref="EventName" minOccurs="0"/>
+            <xs:element ref="EventDescription" minOccurs="0"/>
+            <xs:element ref="Repeating" minOccurs="0"/>
+            <xs:element ref="Category" minOccurs="0"/>
+            <xs:element ref="EventType" minOccurs="0"/>
+            <xs:element ref="Oid" minOccurs="0"/>
+            <xs:element ref="MinDay" minOccurs="0"/>
+            <xs:element ref="MaxDay" minOccurs="0"/>
+            <xs:element ref="EmailDay" minOccurs="0"/>
+            <xs:element ref="SchDay" minOccurs="0"/>
+            <xs:element ref="UserEmailId" minOccurs="0"/>
+            <xs:element ref="IsReference" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 

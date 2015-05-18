@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.core.NullValue;
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -44,9 +43,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -60,7 +57,7 @@ import org.springframework.stereotype.Component;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.SignStateRestorer;
 import com.clinovo.util.SubjectEventStatusUtil;
-import com.clinovo.util.ValidatorHelper;
+import com.clinovo.validator.EventDefinitionValidator;
 
 /**
  * Servlet handles update requests on study event definition bean properties and update/remove/restore requests on event
@@ -120,71 +117,11 @@ public class UpdateEventDefinitionServlet extends Controller {
 	}
 
 	private void confirmDefinition(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
-		HashMap errors = v.validate();
-
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
-		v.addValidation("name", Validator.NO_BLANKS);
-		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				VALIDATION_MAX_CHARACTERS_NUMBER);
-		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_MAX_CHARACTERS_NUMBER);
-		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_MAX_CHARACTERS_NUMBER);
 
-		String calendaredVisitType = fp.getString("type");
-		if ("calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
-			v.addValidation("maxDay", Validator.IS_REQUIRED);
-			v.addValidation("maxDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-					VALIDATION_MAX_DIGIT_NUMBER);
-			v.addValidation("minDay", Validator.IS_REQUIRED);
-			v.addValidation("minDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-					VALIDATION_MAX_DIGIT_NUMBER);
-			v.addValidation("schDay", Validator.IS_REQUIRED);
-			v.addValidation("schDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-					VALIDATION_MAX_DIGIT_NUMBER);
-			if ("".equalsIgnoreCase(fp.getString("isReference"))) {
-				v.addValidation("emailUser", Validator.NO_BLANKS);
-			}
-			v.addValidation("emailDay", Validator.IS_REQUIRED);
-			v.addValidation("emailDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-					VALIDATION_MAX_DIGIT_NUMBER);
-			String showCalendarBox = fp.getString("type");
-			if ("calendared_visit".equalsIgnoreCase(showCalendarBox)) {
-				request.getSession().setAttribute("showCalendaredVisitBox", true);
-			}
-			String changedReference = fp.getString("isReference");
-			if ("true".equalsIgnoreCase(changedReference)) {
-				request.getSession().setAttribute("changedReference", true);
-			} else {
-				request.getSession().setAttribute("changedReference", false);
-			}
-		}
-
-		int minDay = fp.getInt("minDay");
-		int maxDay = fp.getInt("maxDay");
-		int schDay = fp.getInt("schDay");
-		int emailDay = fp.getInt("emailDay");
-		String emailUser = fp.getString("emailUser");
-
-		if (!(maxDay >= schDay)) {
-			Validator.addError(errors, "maxDay", resexception.getString("daymax_greate_or_equal_dayschedule"));
-		}
-		if (!(minDay <= schDay)) {
-			Validator.addError(errors, "minDay", resexception.getString("daymin_less_or_equal_dayschedule"));
-		}
-		if (!(minDay <= maxDay)) {
-			Validator.addError(errors, "minDay", resexception.getString("daymin_less_or_equal_daymax"));
-		}
-		if (!(emailDay <= schDay)) {
-			Validator.addError(errors, "emailDay", resexception.getString("dayemail_less_or_equal_dayschedule"));
-		}
-		if (!checkUserName(request, emailUser) && "calendared_visit".equalsIgnoreCase(calendaredVisitType)
-				&& "".equalsIgnoreCase(fp.getString("isReference"))) {
-			Validator.addError(errors, "emailUser", resexception.getString("this_user_name_does_not_exist"));
-		}
+		HashMap errors = EventDefinitionValidator.validate(request, getConfigurationDao(), getUserAccountDAO()
+				.findAllByStudyId(getCurrentStudy().getId()));
 
 		if (!errors.isEmpty()) {
 			StudyEventDefinitionBean sedForErrors = new StudyEventDefinitionBean();
@@ -192,16 +129,11 @@ public class UpdateEventDefinitionServlet extends Controller {
 			sedForErrors.setDescription(fp.getString("description"));
 			sedForErrors.setCategory(fp.getString("category"));
 			sedForErrors.setType(fp.getString("type"));
-			sedForErrors.setRepeating(fp.getBoolean("repeating"));
+			sedForErrors.setRepeating("true".equalsIgnoreCase(fp.getString("repeating")));
 			sedForErrors.setMaxDay(fp.getInt("maxDay"));
 			sedForErrors.setMinDay(fp.getInt("minDay"));
 			sedForErrors.setScheduleDay(fp.getInt("schDay"));
-			String referenceVisitValue = fp.getString("isReference");
-			if ("true".equalsIgnoreCase(referenceVisitValue)) {
-				sedForErrors.setReferenceVisit(true);
-			} else {
-				sedForErrors.setReferenceVisit(false);
-			}
+			sedForErrors.setReferenceVisit("true".equalsIgnoreCase(fp.getString("isReference")));
 			request.setAttribute("userNameInsteadEmail", fp.getString("emailUser"));
 			request.setAttribute("definition", sedForErrors);
 			logger.info("has errors");
@@ -308,21 +240,6 @@ public class UpdateEventDefinitionServlet extends Controller {
 				break;
 			}
 		}
-	}
-
-	private boolean checkUserName(HttpServletRequest request, String emailUser) {
-
-		StudyBean currentStudy = getCurrentStudy(request);
-		boolean isValid = false;
-		UserAccountDAO uadao = getUserAccountDAO();
-		List<StudyUserRoleBean> userBean = uadao.findAllByStudyId(currentStudy.getId());
-		for (StudyUserRoleBean userAccountBean : userBean) {
-			if (emailUser.equals(userAccountBean.getUserName())) {
-				isValid = true;
-				break;
-			}
-		}
-		return isValid;
 	}
 
 	private int getIdByUserName(String userName) {
@@ -443,7 +360,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 	private void saveEventDefinitionToSession(StudyEventDefinitionBean sed, FormProcessor fp) {
 
 		sed.setName(fp.getString("name"));
-		sed.setRepeating(fp.getBoolean("repeating"));
+		sed.setRepeating("true".equalsIgnoreCase(fp.getString("repeating")));
 		sed.setCategory(fp.getString("category"));
 		sed.setDescription(fp.getString("description"));
 		sed.setType(fp.getString("type"));
@@ -451,18 +368,9 @@ public class UpdateEventDefinitionServlet extends Controller {
 		sed.setMinDay(fp.getInt("minDay"));
 		sed.setScheduleDay(fp.getInt("schDay"));
 		int userId = getIdByUserName(fp.getString("emailUser"));
-		if (userId != 0) {
-			sed.setUserEmailId(userId);
-		} else {
-			sed.setUserEmailId(1);
-		}
+		sed.setUserEmailId(userId != 0 ? userId : 1);
 		sed.setEmailDay(fp.getInt("emailDay"));
-		String referenceVisitValue = fp.getString("isReference");
-		if ("true".equalsIgnoreCase(referenceVisitValue)) {
-			sed.setReferenceVisit(true);
-		} else {
-			sed.setReferenceVisit(false);
-		}
+		sed.setReferenceVisit("true".equalsIgnoreCase(fp.getString("isReference")));
 		fp.getRequest().getSession().setAttribute("definition", sed);
 	}
 

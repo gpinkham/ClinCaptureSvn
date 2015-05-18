@@ -35,11 +35,11 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
- * WadlController.
+ * WadlService.
  */
-@Controller
+@Controller("restWadlService")
 @RequestMapping("/wadl")
-public class WadlController {
+public class WadlService {
 
 	public static final String XS_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
 
@@ -65,7 +65,7 @@ public class WadlController {
 			Object object = handlerMethod.getBean();
 			Object bean = applicationContext.getBean(object.toString());
 
-			boolean isRestContoller = bean instanceof AuthenticationService || bean instanceof UserService;
+			boolean isRestContoller = bean instanceof BaseService;
 			if (!isRestContoller) {
 				continue;
 			}
@@ -110,8 +110,8 @@ public class WadlController {
 							waldParam.setStyle(ParamStyle.QUERY);
 							waldParam.setRequired(param2.required());
 							String defaultValue = cleanDefault(param2.defaultValue());
-							if (!defaultValue.equals("")) {
-								// waldParam.setDefault(defaultValue);
+							if (!param2.required()) {
+								waldParam.setDefault(defaultValue);
 							}
 							waldParam.setType(nm);
 							wadlRequest.getParam().add(waldParam);

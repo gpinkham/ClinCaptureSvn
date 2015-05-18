@@ -15,10 +15,9 @@
 
 package com.clinovo.rest.service;
 
-import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.model.UserDetails;
-import com.clinovo.rest.security.PermissionChecker;
-import com.clinovo.rest.util.RequestUtil;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -36,13 +35,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
+import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.model.UserDetails;
+import com.clinovo.rest.security.PermissionChecker;
+import com.clinovo.rest.util.RequestUtil;
 
 /**
  * AuthenticationService.
  */
-@Controller
+@Controller("restAuthenticationService")
 @SuppressWarnings("unused")
 public class AuthenticationService extends BaseService {
 
@@ -89,9 +90,11 @@ public class AuthenticationService extends BaseService {
 					}
 					if (surBean != null && surBean.getId() > 0) {
 						userDetails = new UserDetails();
+						userDetails.setUserId(userAccountBean.getId());
 						userDetails.setUserName(userName);
 						userDetails.setPassword(password);
 						userDetails.setStudyName(studyName);
+						userDetails.setStudyOid(studyBean.getOid());
 						userDetails.setRoleCode(surBean.getRole().getCode());
 						userDetails.setUserTypeCode(userAccountBean.hasUserType(UserType.USER) ? UserType.USER
 								.getCode() : UserType.SYSADMIN.getCode());

@@ -31,17 +31,17 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.joda.time.DateTimeZone;
 
+import com.clinovo.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import org.joda.time.DateTimeZone;
 
 /**
  * @author thickerson
@@ -56,9 +56,9 @@ public class UserAccountBean extends AuditableEntityBean {
 
 	public static final String ROOT = "root";
 
-	@JsonProperty("userName")
+	@JsonProperty("username")
 	@XmlElement(name = "UserName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-	private String userName;
+	private String name = "";
 	@JsonProperty("role")
 	@XmlElement(name = "Role", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String roleCode;
@@ -210,8 +210,12 @@ public class UserAccountBean extends AuditableEntityBean {
 
 	@Override
 	public void setName(String name) {
-		super.setName(name);
-		userName = name;
+		this.name = name;
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -648,19 +652,12 @@ public class UserAccountBean extends AuditableEntityBean {
 		this.userTypeCode = userTypeCode;
 	}
 
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
 	public String getUserTimeZoneId() {
 		return userTimeZoneId;
 	}
 
 	public void setUserTimeZoneId(String userTimeZoneId) {
-		this.userTimeZoneId = DateUtil.isValidTimeZoneId(userTimeZoneId) ? userTimeZoneId : DateTimeZone.getDefault().getID();
+		this.userTimeZoneId = DateUtil.isValidTimeZoneId(userTimeZoneId) ? userTimeZoneId : DateTimeZone.getDefault()
+				.getID();
 	}
 }

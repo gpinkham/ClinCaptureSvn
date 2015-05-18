@@ -196,12 +196,12 @@ $(document).ready(function() {
     <tr valign="top" name="repeating" style="height: 25px;"><td align="right"><fmt:message key="repeating" bundle="${resword}"/>:</td><td align="left">
         <c:choose>
             <c:when test="${definition.repeating == true}">
-                <input type="radio" checked name="repeating" onchange="javascript:changeIcon();" value="1"><fmt:message key="yes" bundle="${resword}"/>
-                <input type="radio" name="repeating" onchange="javascript:changeIcon();" value="0"><fmt:message key="no" bundle="${resword}"/>
+                <input type="radio" checked name="repeating" onchange="javascript:changeIcon();" value="true"><fmt:message key="yes" bundle="${resword}"/>
+                <input type="radio" name="repeating" onchange="javascript:changeIcon();" value="false"><fmt:message key="no" bundle="${resword}"/>
             </c:when>
             <c:otherwise>
-                <input type="radio" name="repeating" onchange="javascript:changeIcon();" value="1"><fmt:message key="yes" bundle="${resword}"/>
-                <input type="radio" checked name="repeating" onchange="javascript:changeIcon();" value="0"><fmt:message key="no" bundle="${resword}"/>
+                <input type="radio" name="repeating" onchange="javascript:changeIcon();" value="true"><fmt:message key="yes" bundle="${resword}"/>
+                <input type="radio" checked name="repeating" onchange="javascript:changeIcon();" value="false"><fmt:message key="no" bundle="${resword}"/>
             </c:otherwise>
         </c:choose>
     </td></tr>

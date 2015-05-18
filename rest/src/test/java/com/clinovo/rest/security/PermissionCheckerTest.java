@@ -43,7 +43,7 @@ public class PermissionCheckerTest extends BaseServiceTest {
 	public void testThatPermissionCheckerReturnsUnauthorizedIfUserIsNotAuthenticated() throws Exception {
 		session.clearAttributes();
 		this.mockMvc.perform(
-				post(API_USER_CREATE_USER).param("username", userName).param("firstname", "firstname")
+				post(API_USER_CREATE).param("username", userName).param("firstname", "firstname")
 						.param("lastname", "lastname").param("email", "user@gmail.com").param("phone", "111111111")
 						.param("company", "company").param("usertype", "1").param("allowsoap", "false")
 						.param("displaypassword", "true").param("scope", "1").param("role", "2").secure(true)

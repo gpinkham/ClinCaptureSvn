@@ -13,78 +13,29 @@
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
 
-package com.clinovo.rest.exception;
+package com.clinovo.rest.annotation;
 
-import javax.servlet.http.HttpServletResponse;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Component;
+
+import com.clinovo.rest.enums.Scope;
 
 /**
- * RestException.
+ * Rest scope annotation.
  */
-@SuppressWarnings("serial")
-public class RestException extends RuntimeException {
-
-	private int code;
-
-	/**
-	 * RestException constructor.
-	 *
-	 * @param message
-	 *            String
-	 */
-	public RestException(String message) {
-		super(message);
-		this.code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-	}
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface RestScope {
 
 	/**
-	 * RestException constructor.
-	 *
-	 * @param messageSource
-	 *            MessageSource
-	 * @param messageCode
-	 *            String
+	 * Method that returns annotation value.
 	 */
-	public RestException(MessageSource messageSource, String messageCode) {
-		super(messageSource.getMessage(messageCode, null, CoreResources.getSystemLocale()));
-		this.code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-	}
-
-	/**
-	 * RestException constructor.
-	 *
-	 * @param messageSource
-	 *            MessageSource
-	 * @param messageCode
-	 *            String
-	 * @param code
-	 *            integer
-	 */
-	public RestException(MessageSource messageSource, String messageCode, int code) {
-		super(messageSource.getMessage(messageCode, null, CoreResources.getSystemLocale()));
-		this.code = code;
-	}
-
-	/**
-	 * RestException constructor.
-	 *
-	 * @param messageSource
-	 *            MessageSource
-	 * @param messageCode
-	 *            String
-	 * @param args
-	 *            Object[]
-	 * @param code
-	 *            integer
-	 */
-	public RestException(MessageSource messageSource, String messageCode, Object[] args, int code) {
-		super(messageSource.getMessage(messageCode, args, CoreResources.getSystemLocale()));
-		this.code = code;
-	}
-
-	public int getCode() {
-		return code;
-	}
+	Scope value();
 }

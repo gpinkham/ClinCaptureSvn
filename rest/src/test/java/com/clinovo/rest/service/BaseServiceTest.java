@@ -5,10 +5,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
+
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.akaza.openclinica.AbstractContextSentiveTest;
 import org.akaza.openclinica.bean.core.Role;
@@ -19,6 +26,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.cdisc.ns.odm.v130.ODM;
 import org.hamcrest.core.IsInstanceOf;
 import org.hamcrest.core.StringContains;
 import org.json.JSONObject;
@@ -28,6 +36,7 @@ import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
@@ -40,7 +49,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.clinovo.rest.filter.RestFilter;
 import com.clinovo.rest.model.UserDetails;
+import com.clinovo.rest.odm.RestOdmContainer;
 import com.clinovo.rest.security.PermissionChecker;
 
 @Ignore
@@ -51,6 +62,12 @@ import com.clinovo.rest.security.PermissionChecker;
 public class BaseServiceTest extends AbstractContextSentiveTest {
 
 	protected MediaType mediaType = MediaType.APPLICATION_JSON;
+
+	protected MvcResult result;
+
+	protected RestOdmContainer restOdmContainer;
+
+	protected Schema schema;
 
 	protected StudyDAO studyDAO;
 	protected UserAccountDAO userAccountDAO;
@@ -73,8 +90,9 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 	protected MockHttpSession session = new MockHttpSession();
 
 	// Managed services
+	public static final String API_EVENT_CREATE = "/event/create";
 	public static final String API_WRONG_MAPPING = "/wrongmapping";
-	public static final String API_USER_CREATE_USER = "/user/create";
+	public static final String API_USER_CREATE = "/user/create";
 	public static final String API_AUTHENTICATION = "/authentication";
 	public static final String API_WADL = "/wadl";
 	public static final String API_ODM = "/odm";
@@ -124,8 +142,9 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 		userAccountDAO.execute(
 				"delete from authorities where username = '".concat(userAccountBean.getName()).concat("'"),
 				new HashMap());
-		userAccountDAO.execute("delete from study_user_role where user_name = '".concat(userAccountBean.getName())
-				.concat("'"), new HashMap());
+		userAccountDAO.execute(
+				"delete from study_user_role where user_name = '".concat(userAccountBean.getName()).concat("'"),
+				new HashMap());
 		userAccountDAO.execute(
 				"delete from user_account where user_name = '".concat(userAccountBean.getName()).concat("'"),
 				new HashMap());
@@ -146,7 +165,7 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 		assertTrue(newSite.getId() > 0);
 	}
 
-	protected void createNewUser(int studyId, UserType userType, Role role) throws Exception {
+	protected void createNewUser(UserType userType, Role role) throws Exception {
 		String userName = "userName_".concat(Long.toString(timestamp));
 		String firstName = "firstName_".concat(Long.toString(timestamp));
 		String lastName = "lastName_".concat(Long.toString(timestamp));
@@ -155,13 +174,12 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 		String company = "home";
 		MvcResult result = this.mockMvc
 				.perform(
-						post(API_USER_CREATE_USER).accept(mediaType).param("username", userName)
+						post(API_USER_CREATE).accept(mediaType).param("username", userName)
 								.param("firstname", firstName).param("lastname", lastName).param("email", email)
 								.param("phone", phone).param("company", company)
 								.param("usertype", Integer.toString(userType.getId())).param("allowsoap", "true")
-								.param("displaypassword", "true").param("scope", Integer.toString(studyId))
-								.param("role", Integer.toString(role.getId())).secure(true).session(session))
-				.andExpect(status().isOk()).andReturn();
+								.param("displaypassword", "true").param("role", Integer.toString(role.getId()))
+								.secure(true).session(session)).andExpect(status().isOk()).andReturn();
 		String password = mediaType.equals(MediaType.APPLICATION_JSON)
 				? (String) new JSONObject(result.getResponse().getContentAsString()).get("password")
 				: result.getResponse().getContentAsString().split("<Password>")[1].split("</Password>")[0];
@@ -217,15 +235,22 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 	}
 
 	@Before
-	public void setup() throws Exception {
+	public void before() throws Exception {
 		super.setUp();
+
+		result = null;
+		restOdmContainer = null;
+
+		schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
+				new FileSystemResourceLoader().getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd")
+						.getURL());
 
 		setTestProperties();
 
 		studyDAO = new StudyDAO(dataSource);
 		userAccountDAO = new UserAccountDAO(dataSource);
 
-		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilters(new RestFilter()).build();
 
 		ResourceBundleProvider.updateLocale(LOCALE);
 
@@ -237,8 +262,23 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 		rootUser = (UserAccountBean) userAccountDAO.findByUserName(userName);
 	}
 
+	protected void unmarshalResult() {
+		if (result != null && mediaType == MediaType.APPLICATION_XML) {
+			try {
+				JAXBContext jaxbContext = JAXBContext.newInstance(ODM.class, RestOdmContainer.class);
+				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+				jaxbUnmarshaller.setSchema(schema);
+				restOdmContainer = (RestOdmContainer) jaxbUnmarshaller.unmarshal(new StringReader(result.getResponse()
+						.getContentAsString()));
+			} catch (Exception ex) {
+				//
+			}
+			assertNotNull(restOdmContainer);
+		}
+	}
+
 	@After
-	public void tearDown() {
+	public void after() {
 		if (newUser != null && newUser.getId() > 0) {
 			deleteUser(newUser);
 		}
@@ -248,5 +288,6 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 		if (newSite != null && newSite.getId() > 0) {
 			deleteStudy(newSite);
 		}
+		unmarshalResult();
 	}
 }

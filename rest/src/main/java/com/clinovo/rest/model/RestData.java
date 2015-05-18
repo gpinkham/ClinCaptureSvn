@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 
 /**
  * RestData.
@@ -37,6 +38,9 @@ public class RestData {
 
 	@XmlElement(name = "UserAccount", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private UserAccountBean userAccountBean;
+
+	@XmlElement(name = "StudyEvent", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private StudyEventDefinitionBean studyEventDefinitionBean;
 
 	public Error getError() {
 		return error;
@@ -60,5 +64,13 @@ public class RestData {
 
 	public void setUserAccountBean(UserAccountBean userAccountBean) {
 		this.userAccountBean = userAccountBean;
+	}
+
+	public StudyEventDefinitionBean getStudyEventDefinitionBean() {
+		return studyEventDefinitionBean;
+	}
+
+	public void setStudyEventDefinitionBean(StudyEventDefinitionBean studyEventDefinitionBean) {
+		this.studyEventDefinitionBean = studyEventDefinitionBean;
 	}
 }

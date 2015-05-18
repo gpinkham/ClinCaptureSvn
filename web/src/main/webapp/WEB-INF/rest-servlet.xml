@@ -18,7 +18,9 @@
         </bean>
     </mvc:interceptors>
 
-    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
+    <bean class="com.clinovo.rest.conversion.RestConversionService" id="restConversionService"/>
+
+    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager" conversion-service="restConversionService">
         <mvc:message-converters register-defaults="false">
             <bean class="com.clinovo.rest.serializer.JsonSerializer"/>
             <bean class="com.clinovo.rest.serializer.OdmXmlSerializer"/>

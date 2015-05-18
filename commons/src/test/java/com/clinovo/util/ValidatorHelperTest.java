@@ -44,7 +44,7 @@ public class ValidatorHelperTest {
 	private ValidatorHelper requestBasedValidatorHelper;
 
 	@Before
-	public void setUp() throws Exception {
+		 public void setUp() throws Exception {
 		locale = Locale.ENGLISH;
 		request = new MockHttpServletRequest();
 		LocaleResolver.updateLocale(request, locale);

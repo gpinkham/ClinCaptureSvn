@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.Test;
 import org.springframework.http.MediaType;
 
-public class OdmControllerTest extends BaseServiceTest {
+public class OdmServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatOdmServiceReturnsOkForPostRequest() throws Exception {

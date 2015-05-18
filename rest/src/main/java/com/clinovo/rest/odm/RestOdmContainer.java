@@ -34,6 +34,9 @@ public class RestOdmContainer extends ODM {
 		this.restData = restData;
 	}
 
+	/**
+	 * Collects odm root data.
+	 */
 	public void collectOdmRoot() {
 		Date creationDatetime = new Date();
 		SimpleDateFormat localTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
