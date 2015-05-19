@@ -1291,8 +1291,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			filterValue = eventsForSubjectFilter.getFilterValueByProperty("crf_" + crfBean.getId());
 
 			if (filterValue != null) {
-				if ((Integer) eventDisplayBean.getProps().get("crf_" + crfBean.getId()) != Status
-						.getByName(filterValue).getId()) {
+				if (((Status) eventDisplayBean.getProps().get("crf_" + crfBean.getId())).getId() != Status.getByName(
+						filterValue).getId()) {
 					return false;
 				}
 			}
