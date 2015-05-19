@@ -198,17 +198,17 @@ function displayMessageInBox(showOkButton, showCancelButton, headerOfMessageBox,
         });
 
 		if (themeColor == 'violet') {
-			$('input.button_medium').css('background-image', 'url(images/violet/button_medium_BG.gif)');
+			$('input.button_medium').not(".medium_back, .medium_cancel, .medium_continue, .medium_submit").css('background-image', 'url(images/violet/button_medium_BG.gif)');
 			$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
 		}
 
 		if (themeColor == 'green') {
-			$('input.button_medium').css('background-image', 'url(images/green/button_medium_BG.gif)');
+			$('input.button_medium').not(".medium_back, .medium_cancel, .medium_continue, .medium_submit").css('background-image', 'url(images/green/button_medium_BG.gif)');
 			$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
 		}
 
 		if (themeColor == 'darkBlue') {
-			$('input.button_medium').css('background-image', 'url(images/darkBlue/button_medium_BG.gif)');
+			$('input.button_medium').not(".medium_back, .medium_cancel, .medium_continue, .medium_submit").css('background-image', 'url(images/darkBlue/button_medium_BG.gif)');
 			$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#2C6CAF');
 		}
 
