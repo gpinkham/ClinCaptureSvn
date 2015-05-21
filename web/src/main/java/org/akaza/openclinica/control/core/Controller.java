@@ -13,39 +13,8 @@
 
 package org.akaza.openclinica.control.core;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.StringTokenizer;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.StudyParameterPriorityUtil;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -131,8 +100,37 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.util.StudyParameterPriorityUtil;
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * Abstract class for creating a controller servlet and extending capabilities of Controller. However, not using the
@@ -1287,34 +1285,46 @@ public abstract class Controller extends BaseController {
 			String successMessage, String failMessage, Boolean sendMessage, String[] files, HttpServletRequest request)
 			throws Exception {
 		Boolean messageSent = true;
-		try {
-			JavaMailSenderImpl mailSender = getMailSender();
-			MimeMessage mimeMessage = mailSender.createMimeMessage();
+		if (allRequiredAttributesNotEmpty(to, from)) {
+			try {
+				JavaMailSenderImpl mailSender = getMailSender();
+				MimeMessage mimeMessage = mailSender.createMimeMessage();
 
-			MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, htmlEmail);
-			helper.setFrom(from);
-			helper.setTo(processMultipleImailAddresses(to.trim()));
-			helper.setSubject(subject);
-			helper.setText(body, true);
-			for (String filePath : files) {
-				FileSystemResource file = new FileSystemResource(filePath);
-				helper.addAttachment(file.getFilename(), file);
-			}
+				MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, htmlEmail);
+				helper.setFrom(from);
+				helper.setTo(processMultipleImailAddresses(to.trim()));
+				helper.setSubject(subject);
+				helper.setText(body, true);
+				for (String filePath : files) {
+					FileSystemResource file = new FileSystemResource(filePath);
+					helper.addAttachment(file.getFilename(), file);
+				}
 
-			mailSender.send(mimeMessage);
-			if (successMessage != null && sendMessage) {
-				addPageMessage(successMessage, request);
+				mailSender.send(mimeMessage);
+				if (successMessage != null && sendMessage) {
+					addPageMessage(successMessage, request);
+				}
+				logger.debug("Email sent successfully on {}", new Date());
+			} catch (MailException me) {
+				me.printStackTrace();
+				if (failMessage != null && sendMessage) {
+					addPageMessage(failMessage, request);
+				}
+				logger.debug("Email could not be sent on {} due to: {}", new Date(), me.toString());
+				messageSent = false;
 			}
-			logger.debug("Email sent successfully on {}", new Date());
-		} catch (MailException me) {
-			me.printStackTrace();
+		} else {
 			if (failMessage != null && sendMessage) {
 				addPageMessage(failMessage, request);
 			}
-			logger.debug("Email could not be sent on {} due to: {}", new Date(), me.toString());
+			logger.info("Email could not be sent, because some required email attributes are empty.");
 			messageSent = false;
 		}
 		return messageSent;
+	}
+
+	private boolean allRequiredAttributesNotEmpty(String to, String from) {
+		return  !to.isEmpty() && !from.isEmpty();
 	}
 
 	/**
