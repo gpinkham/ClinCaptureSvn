@@ -41,6 +41,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 @Component
+@SuppressWarnings("unused")
 public class ListEventsForSubjectsServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 1L;

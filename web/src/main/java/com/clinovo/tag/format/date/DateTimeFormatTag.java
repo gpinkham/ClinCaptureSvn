@@ -23,6 +23,7 @@ import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import com.clinovo.i18n.LocaleResolver;
+
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.joda.time.DateTimeZone;
 import org.joda.time.ReadableInstant;
@@ -33,6 +34,7 @@ import org.joda.time.format.DateTimeFormatter;
 /**
  * The date and time formatting tag.
  */
+@SuppressWarnings("serial")
 public class DateTimeFormatTag extends TagSupport {
 
 	private static final String REQUEST = "request";

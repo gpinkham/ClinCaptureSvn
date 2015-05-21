@@ -34,6 +34,7 @@ import java.util.Date;
  * @author Krikor Krumlian
  * 
  */
+@SuppressWarnings("deprecation")
 public class OpenClinicaVariableNode extends ExpressionNode {
 
 	String number;

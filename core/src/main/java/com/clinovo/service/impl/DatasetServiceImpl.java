@@ -2,6 +2,7 @@ package com.clinovo.service.impl;
 
 import com.clinovo.service.CRFMaskingService;
 import com.clinovo.service.DatasetService;
+
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,6 +28,7 @@ import java.util.List;
  * Implementation of DatasetService interface.
  */
 @Service("datasetService")
+@SuppressWarnings("rawtypes")
 public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired

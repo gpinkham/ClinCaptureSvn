@@ -30,13 +30,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({"unchecked", "deprecation"})
 public class CalendarLogic {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

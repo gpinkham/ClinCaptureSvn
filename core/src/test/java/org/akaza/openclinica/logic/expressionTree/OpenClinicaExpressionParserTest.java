@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import junit.framework.TestCase;
 
+@SuppressWarnings("deprecation")
 public class OpenClinicaExpressionParserTest extends TestCase {
 
 	@Test

@@ -54,7 +54,7 @@ import org.springframework.stereotype.Component;
  * Edit Dataset Servlet.
  * @author thickerson
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({ "rawtypes", "unchecked", "serial", "unused"})
 @Component
 public class EditDatasetServlet extends Controller {
 

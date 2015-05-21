@@ -30,6 +30,7 @@ import org.joda.time.format.ISODateTimeFormat;
  * @author Krikor Krumlian
  * 
  */
+@SuppressWarnings("deprecation")
 public class ArithmeticOpNode extends ExpressionNode {
 	Operator op;
 	ExpressionNode left;

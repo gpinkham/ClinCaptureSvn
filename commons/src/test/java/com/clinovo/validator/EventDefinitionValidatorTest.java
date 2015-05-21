@@ -18,6 +18,7 @@ import org.springframework.mock.web.MockHttpSession;
 
 import com.clinovo.i18n.LocaleResolver;
 
+@SuppressWarnings("static-access")
 public class EventDefinitionValidatorTest {
 
 	private MockHttpSession session;
