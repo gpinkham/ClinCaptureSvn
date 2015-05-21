@@ -367,8 +367,7 @@ public class AuditDAO extends EntityDAO {
 			// 3 6 12 32
 			if (eb.getAuditEventTypeId() == STUDY_SUBJECT_STATUS_CHANGED_ID
 					|| eb.getAuditEventTypeId() == SUBJECT_STATUS_CHANGED_ID
-					|| eb.getAuditEventTypeId() == ITEM_DATA_STATUS_CHANGED_ID
-					|| eb.getAuditEventTypeId() == EVENT_CRF_SDV_ID) {
+					|| eb.getAuditEventTypeId() == ITEM_DATA_STATUS_CHANGED_ID) {
 				// If status is pending/unavailable - we should replace it by Initial/Completed
 				String oldValue = eb.getOldValue().equals("4")
 						? Status.INITIAL.getName() : eb.getOldValue().equals("2")
