@@ -507,9 +507,17 @@
 					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
     </td>  
-	
-	<td><input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" title="<fmt:message key="test_rule2" bundle="${resword}"/>" class="button_medium medium_submit" size="50""/>
-	</td>
+    
+	<c:choose>
+		<c:when test="${ruleEvaluatesTo != null}"> 
+			<td><input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" title="<fmt:message key="test_rule2" bundle="${resword}"/>" class="button_medium medium_submit" size="50""/>
+			</td>
+		</c:when>
+		<c:otherwise>
+			<td><input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" title="<fmt:message key="test_rule2" bundle="${resword}"/>" class="button_medium medium_continue" size="50""/>
+			</td>
+		</c:otherwise>
+	</c:choose>
 	
 	<td><input type="button" name="Exit" onClick="window.location.href='ViewRuleAssignment'" value="<fmt:message key="exit" bundle="${resword}"/>" title="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" size="50""/>
 	</td>
