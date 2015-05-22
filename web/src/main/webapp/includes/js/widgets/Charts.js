@@ -385,17 +385,32 @@ function setDataToLegend(displayType, selector, values, names) {
 function setStacksLengths(selector, values, captionLimit) {
 	var barWidth = parseInt($(selector).parent().parent().width());
 	var unitSize = barWidth / captionLimit;
+	var tops = [];
 	$(selector).each(function (index) {
 		var stackWidth = parseInt(values[index], 10) * unitSize;
-		$(this).animate({width: stackWidth}, 500);
+
+		var result = false;
+		while (!result) {
+			$(this).css("width", stackWidth);
+			if (tops.length != 0) {
+				if (tops[0] < $(this).position().top) {
+					stackWidth--;
+				} else {
+					result = true;
+				}
+			} else {
+				result = true;
+			}
+		}
 		$(this).find(".pop-up").css(
 			"margin-left", ((parseInt(values[index]) / 2) * unitSize) - (values[index].toString().length * 7 / 2))
 			.html(parseInt(values[index]));
 		if (values[index].toString().length * 15 < stackWidth) {
 			$(this).find('.pop-up').removeClass('pop-up').addClass('pop-up-visible');
-			if ($(this).hasClass('not_scheduled')) 
+			if ($(this).hasClass('not_scheduled'))
 				$(this).find('.pop-up-visible').css('color', '#4D4D4D');
 		}
+		tops.push($(this).position().top)
 	});
 }
 
