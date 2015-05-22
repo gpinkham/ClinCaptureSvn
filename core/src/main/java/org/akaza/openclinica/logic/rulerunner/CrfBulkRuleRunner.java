@@ -13,6 +13,17 @@
 
 package org.akaza.openclinica.logic.rulerunner;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -37,35 +48,27 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
- * 
- * CRF Bulk Rule Runner.
- * 
+ * Bulk Rule Runner for CRF rules.
  */
 public class CrfBulkRuleRunner extends RuleRunner {
 
+	private final Logger logger = LoggerFactory.getLogger(CrfBulkRuleRunner.class);
+
 	/**
-	 * 
+	 *
 	 * @param ds
 	 *            DataSource
 	 * @param requestURLMinusServletPath
-	 *            String
+	 *            Request URL
 	 * @param contextPath
-	 *            String
+	 *            Context Path
 	 * @param mailSender
-	 *            JavaMailSenderImpl
+	 *            Mail Sender
 	 */
 	public CrfBulkRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath,
 			JavaMailSenderImpl mailSender) {
@@ -75,11 +78,20 @@ public class CrfBulkRuleRunner extends RuleRunner {
 	/**
 	 * Organize objects in a certain way so that we can show to Users on UI. step1 : Get StudyEvent , eventCrf ,
 	 * crfVersion from studyEventId.
-	 * 
+	 *
 	 * @param crfViewSpecificOrderedObjects
+	 *            HashMap
 	 * @param ruleSet
+	 *            RuleSetBean
 	 * @param rule
-	 * @return
+	 *            RuleBean
+	 * @param result
+	 *            String
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param actions
+	 *            List
+	 * @return HashMap
 	 */
 	private HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> populateForCrfBasedRulesView(
 			HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> crfViewSpecificOrderedObjects,
@@ -134,105 +146,8 @@ public class CrfBulkRuleRunner extends RuleRunner {
 	}
 
 	/**
-	 * 
-	 * @param ruleSets
-	 *            List of RuleSetBeans
-	 * @param executionMode
-	 *            ExecutionMode
-	 * @param currentStudy
-	 *            StudyBean
-	 * @param variableAndValue
-	 *            HashMap
-	 * @param ub
-	 *            UserAccountBean
-	 * @return HashMap
-	 */
-	@Deprecated
-	public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesBulkOLD(
-			List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy,
-			HashMap<String, String> variableAndValue, UserAccountBean ub) {
-
-		if (variableAndValue == null || variableAndValue.isEmpty()) {
-			logger.warn("You must be executing Rules in Batch");
-			variableAndValue = new HashMap<String, String>();
-		}
-
-		HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> crfViewSpecificOrderedObjects = new HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>>();
-		for (RuleSetBean ruleSet : ruleSets) {
-			for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
-				ruleSet.setTarget(expressionBean);
-
-				for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
-					String result;
-					RuleBean rule = ruleSetRule.getRuleBean();
-					dynamicsMetadataService.getExpressionService().setExpressionWrapper(
-							new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,
-									variableAndValue));
-					try {
-						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(
-								dynamicsMetadataService.getExpressionService());
-						result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
-
-						// Actions
-						List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result,
-								Phase.BATCH);
-
-						ItemDataBean itemData = getExpressionService().getItemDataBeanFromDb(
-								ruleSet.getTarget().getValue());
-						if (itemData != null) {
-							Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
-							while (itr.hasNext()) {
-								RuleActionBean ruleActionBean = itr.next();
-								RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(
-										ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule
-												.getRuleBean().getOid());
-								if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
-									itr.remove();
-								}
-							}
-						}
-
-						List<RuleActionBean> actionBeansToShow = new ArrayList<RuleActionBean>();
-						if (actionListBasedOnRuleExecutionResult.size() > 0) {
-							// if (!dryRun) {
-							for (RuleActionBean ruleAction : actionListBasedOnRuleExecutionResult) {
-								ruleAction.setCuratedMessage(curateMessage(ruleAction, ruleSetRule));
-								// getDiscrepancyNoteService().saveFieldNotes(ruleAction.getSummary(), itemDataBeanId,
-								// "ItemData", currentStudy, ub);
-								ActionProcessor ap = ActionProcessorFacade.getActionProcessor(
-										ruleAction.getActionType(), ds, getMailSender(), dynamicsMetadataService,
-										ruleSet, getRuleActionRunLogDao(), ruleSetRule);
-								RuleActionBean rab = ap.execute(RuleRunnerMode.RULSET_BULK, executionMode, ruleAction,
-										itemData, DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub,
-										prepareEmailContents(ruleSet, ruleSetRule, currentStudy, ruleAction));
-								if (rab != null) {
-									actionBeansToShow.add(ruleAction);
-								}
-							}
-							if (actionBeansToShow.size() > 0) {
-								crfViewSpecificOrderedObjects = populateForCrfBasedRulesView(
-										crfViewSpecificOrderedObjects, ruleSet, rule, result, currentStudy,
-										actionBeansToShow);
-							}
-
-						}
-					} catch (OpenClinicaSystemException osa) {
-						String errorMessage = "RuleSet with target  : " + ruleSet.getTarget().getValue()
-								+ " , Ran Rule : " + rule.getName() + " , It resulted in an error due to : "
-								+ osa.getMessage();
-						// log error
-						logger.warn(errorMessage);
-
-					}
-				}
-			}
-		}
-		logCrfViewSpecificOrderedObjects(crfViewSpecificOrderedObjects);
-		return crfViewSpecificOrderedObjects;
-	}
-
-	/**
-	 * 
+	 * Runs rules bulk.
+	 *
 	 * @param ruleSets
 	 *            List
 	 * @param executionMode
@@ -258,58 +173,61 @@ public class CrfBulkRuleRunner extends RuleRunner {
 		HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
 		for (RuleSetBean ruleSet : ruleSets) {
 			String key = getExpressionService().getItemOid(ruleSet.getOriginalTarget().getValue());
-			List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult = null;
+			List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult;
 			if (toBeExecuted.containsKey(key)) {
 				allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
 			} else {
 				toBeExecuted.put(key, new ArrayList<RuleActionContainer>());
 				allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
 			}
-			ItemDataBean itemData = null;
+			ItemDataBean itemData;
 
 			for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
 				ruleSet.setTarget(expressionBean);
 
 				for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
-					String result = null;
+					String result;
 					RuleBean rule = ruleSetRule.getRuleBean();
-					dynamicsMetadataService.getExpressionService().setExpressionWrapper(
-							new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,
+					getDynamicsMetadataService().getExpressionService().setExpressionWrapper(
+							new ExpressionObjectWrapper(getDataSource(), currentStudy, rule.getExpression(), ruleSet,
 									variableAndValue));
 					try {
-						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(
-								dynamicsMetadataService.getExpressionService());
-						result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
-						itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
-
-						// Actions
-						List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result,
-								Phase.BATCH);
-
-						if (itemData != null) {
-							Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
-							while (itr.hasNext()) {
-								RuleActionBean ruleActionBean = itr.next();
-								RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(
-										ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule
-												.getRuleBean().getOid());
-								if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
-									itr.remove();
+						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(getDynamicsMetadataService()
+								.getExpressionService());
+						List<String> expressions = getExpressionService().prepareRuleExpression(
+								rule.getExpression().getValue(), ruleSet);
+						for (String expression : expressions) {
+							result = oep.parseAndEvaluateExpression(expression);
+							itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
+							List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result,
+									Phase.BATCH);
+							if (itemData != null) {
+								Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
+								while (itr.hasNext()) {
+									RuleActionBean ruleActionBean = itr.next();
+									RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(
+											ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule
+													.getRuleBean().getOid());
+									if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
+										itr.remove();
+									}
 								}
 							}
+							for (RuleActionBean ruleActionBean : actionListBasedOnRuleExecutionResult) {
+								RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean,
+										expressionBean, itemData, ruleSet);
+								if (!ruleActionContainerAlreadyExistsInList(ruleActionContainer,
+										allActionContainerListBasedOnRuleExecutionResult)) {
+									allActionContainerListBasedOnRuleExecutionResult.add(ruleActionContainer);
+								}
+							}
+							logger.info(
+									"RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed in {} mode. ",
+									ruleSet.getTarget().getValue(), rule.getName(), result,
+									actionListBasedOnRuleExecutionResult.size(), executionMode.name());
 						}
-						for (RuleActionBean ruleActionBean : actionListBasedOnRuleExecutionResult) {
-							RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean,
-									expressionBean, itemData, ruleSet);
-							allActionContainerListBasedOnRuleExecutionResult.add(ruleActionContainer);
-						}
-						logger.info(
-								"RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed in {} mode. ",
-								new Object[] { ruleSet.getTarget().getValue(), rule.getName(), result,
-										actionListBasedOnRuleExecutionResult.size(), executionMode.name() });
 					} catch (OpenClinicaSystemException osa) {
-						logger.error(osa.getLocalizedMessage());
-						// TODO report something useful
+						logger.error(osa.getMessage());
 					}
 				}
 			}
@@ -325,9 +243,9 @@ public class CrfBulkRuleRunner extends RuleRunner {
 						curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction()
 								.getRuleSetRule()));
 				ActionProcessor ap = ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction()
-						.getActionType(), ds, getMailSender(), dynamicsMetadataService, ruleActionContainer
-						.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction()
-						.getRuleSetRule());
+						.getActionType(), getDataSource(), getMailSender(), getDynamicsMetadataService(),
+						ruleActionContainer.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer
+								.getRuleAction().getRuleSetRule());
 
 				ap.execute(
 						RuleRunnerMode.RULSET_BULK,
@@ -342,6 +260,7 @@ public class CrfBulkRuleRunner extends RuleRunner {
 
 				Key k = new Key(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getExpressionBean()
 						.getValue(), ruleActionContainer.getRuleAction().getRuleSetRule().getRuleBean());
+
 				if (hms.containsKey(k)) {
 					hms.get(k).add(ruleActionContainer.getRuleAction());
 				} else {

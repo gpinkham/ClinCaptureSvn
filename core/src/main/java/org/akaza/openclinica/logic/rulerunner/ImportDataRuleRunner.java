@@ -13,6 +13,17 @@
 
 package org.akaza.openclinica.logic.rulerunner;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -31,21 +42,30 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+/**
+ * ImportDataRuleRunner.
+ */
 public class ImportDataRuleRunner extends RuleRunner {
 
+	private final Logger logger = LoggerFactory.getLogger(ImportDataRuleRunner.class);
+
+	/**
+	 * ImportDataRuleRunner constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param requestURLMinusServletPath
+	 *            String
+	 * @param contextPath
+	 *            String
+	 * @param mailSender
+	 *            JavaMailSenderImpl
+	 */
 	public ImportDataRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath,
 			JavaMailSenderImpl mailSender) {
 		super(ds, requestURLMinusServletPath, contextPath, mailSender);
@@ -76,9 +96,10 @@ public class ImportDataRuleRunner extends RuleRunner {
 
 		if (executionMode == ExecutionMode.DRY_RUN) {
 			for (ImportDataRuleRunnerContainer container : containers) {
-				if (container.getShouldRunRules())
+				if (container.getShouldRunRules()) {
 					container.setRuleActionContainerMap(this.populateToBeExpected(optimiseRuleValidator, container,
 							study));
+				}
 			}
 		} else if (executionMode == ExecutionMode.SAVE) {
 			for (ImportDataRuleRunnerContainer container : containers) {
@@ -120,11 +141,12 @@ public class ImportDataRuleRunner extends RuleRunner {
 				for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
 					String result;
 					RuleBean rule = ruleSetRule.getRuleBean();
-					dynamicsMetadataService.getExpressionService().setExpressionWrapper(
-							new ExpressionObjectWrapper(ds, study, rule.getExpression(), ruleSet, variableAndValue));
+					getDynamicsMetadataService().getExpressionService().setExpressionWrapper(
+							new ExpressionObjectWrapper(getDataSource(), study, rule.getExpression(), ruleSet,
+									variableAndValue));
 					try {
-						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(
-								dynamicsMetadataService.getExpressionService());
+						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(getDynamicsMetadataService()
+								.getExpressionService());
 						result = oep.parseAndEvaluateExpression(rule.getExpression().getValue(), optimiseRuleValidator);
 						itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
 
@@ -169,10 +191,10 @@ public class ImportDataRuleRunner extends RuleRunner {
 						}
 						logger.info(
 								"RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed. ",
-								new Object[] { ruleSet.getTarget().getValue(), rule.getName(), result,
-										actionListBasedOnRuleExecutionResult.size() });
+								ruleSet.getTarget().getValue(), rule.getName(), result,
+								actionListBasedOnRuleExecutionResult.size());
 					} catch (OpenClinicaSystemException osa) {
-						// TODO: report something useful
+						logger.error(osa.getMessage());
 					}
 				}
 			}
@@ -190,18 +212,18 @@ public class ImportDataRuleRunner extends RuleRunner {
 			Collections.sort(entry.getValue(), new RuleActionContainerComparator());
 
 			for (RuleActionContainer ruleActionContainer : entry.getValue()) {
-				logger.info("START Expression is : {} , RuleAction : {} ", new Object[] {
+				logger.info("START Expression is : {} , RuleAction : {} ", new Object[]{
 						ruleActionContainer.getExpressionBean().getValue(),
-						ruleActionContainer.getRuleAction().toString() });
+						ruleActionContainer.getRuleAction().toString()});
 
 				ruleActionContainer.getRuleSetBean().setTarget(ruleActionContainer.getExpressionBean());
 				ruleActionContainer.getRuleAction().setCuratedMessage(
 						curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction()
 								.getRuleSetRule()));
 				ActionProcessor ap = ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction()
-						.getActionType(), connection, ds, getMailSender(), dynamicsMetadataService, ruleActionContainer
-						.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction()
-						.getRuleSetRule());
+						.getActionType(), connection, getDataSource(), getMailSender(), getDynamicsMetadataService(),
+						ruleActionContainer.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer
+								.getRuleAction().getRuleSetRule());
 
 				ItemDataBean itemData = getExpressionService().getItemDataBeanFromDb(
 						ruleActionContainer.getRuleSetBean().getTarget().getValue());
@@ -233,9 +255,9 @@ public class ImportDataRuleRunner extends RuleRunner {
 								ruleActionContainer.getRuleAction());
 					}
 				}
-				logger.info("END Expression is : {} , RuleAction : {} ", new Object[] {
+				logger.info("END Expression is : {} , RuleAction : {} ", new Object[]{
 						ruleActionContainer.getExpressionBean().getValue(),
-						ruleActionContainer.getRuleAction().toString() });
+						ruleActionContainer.getRuleAction().toString()});
 			}
 		}
 		return messageContainer;

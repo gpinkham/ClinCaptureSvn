@@ -54,7 +54,7 @@ public class SystemStatusBeanTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatValueForCrfSectionsIsCorrect() {
-		assertEquals(systemStatusBean.getCrfSections(), 10);
+		assertEquals(systemStatusBean.getCrfSections(), 11);
 	}
 
 	@Test

@@ -1,5 +1,7 @@
 package org.akaza.openclinica.dao;
 
+import java.util.List;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -7,25 +9,20 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
 
-import java.util.List;
-
 @SuppressWarnings("unchecked")
 public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
 
 	@Test
-	public void testGetRequiredEventCRFDefIdsThatShouldBeSDVd()
-			throws OpenClinicaException {
+	public void testGetRequiredEventCRFDefIdsThatShouldBeSDVd() throws OpenClinicaException {
 		StudyBean studyBean = (StudyBean) studyDAO.findByPK(1);
-		List<Integer> result = eventDefinitionCRFDAO
-				.getRequiredEventCRFDefIdsThatShouldBeSDVd(studyBean);
+		List<Integer> result = eventDefinitionCRFDAO.getRequiredEventCRFDefIdsThatShouldBeSDVd(studyBean);
 		assertEquals(result.size(), 0);
 	}
 
 	@Test
-	public void testThatFindAllReturnsCorrectNumber() {		
-		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eventDefinitionCRFDAO
-				.findAll();
-		assertEquals(9, eventCRFs.size());
+	public void testThatFindAllReturnsCorrectNumber() {
+		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eventDefinitionCRFDAO.findAll();
+		assertEquals(10, eventCRFs.size());
 	}
 
 	@Test
@@ -63,7 +60,7 @@ public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatFindByPkReturnsEdcWithCorrectDefaultVersion(){
+	public void testThatFindByPkReturnsEdcWithCorrectDefaultVersion() {
 		EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(5);
 		assertEquals(2, edc.getDefaultVersionId());
 	}
@@ -71,7 +68,7 @@ public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
 	@Test
 	public void testThatUpdateSetsTheChangedField() {
 		EventDefinitionCRFBean edc;
-		int id=5;
+		int id = 5;
 		int newDefaultVersion = 1;
 		edc = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(id);
 		edc.setDefaultVersionId(newDefaultVersion);
@@ -82,7 +79,7 @@ public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatFindByPkReturnsEdcWithCorrectEvaluatedFlags(){
+	public void testThatFindByPkReturnsEdcWithCorrectEvaluatedFlags() {
 		EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		assertEquals(true, edc.isEvaluatedCRF());
 

@@ -29,7 +29,7 @@ public class EventDefinitionCRFDAOTest extends DefaultAppContextTest {
 	public void testThatUpdateEDCThatHasItemsToSDVReturnsCorrectValue() {
 		assertTrue(eventDefinitionCRFDAO.updateEDCThatHasItemsToSDV(1, SourceDataVerification.AllREQUIRED));
 	}
-	
+
 	@Test
 	public void testThatFindForSiteByEventCrfIdReturnsTheCorrectEventDefinitionCRFBean() {
 		assertEquals(2, eventDefinitionCRFDAO.findForSiteByEventCrfId(13).getId());
@@ -49,7 +49,7 @@ public class EventDefinitionCRFDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatFindAllActiveByDefinitionAndSiteIdReturnsCorrectResult() {
-		assertEquals(2, eventDefinitionCRFDAO.findAllActiveByDefinitionAndSiteId(1, 1).size());
+		assertEquals(3, eventDefinitionCRFDAO.findAllActiveByDefinitionAndSiteId(1, 1).size());
 	}
 
 	@Test

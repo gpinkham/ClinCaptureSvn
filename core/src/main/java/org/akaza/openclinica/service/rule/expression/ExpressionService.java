@@ -20,6 +20,15 @@
  */
 package org.akaza.openclinica.service.rule.expression;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Utils;
@@ -52,18 +61,10 @@ import org.akaza.openclinica.util.StringValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Provides rule expression services.
  */
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class ExpressionService {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -438,8 +439,8 @@ public class ExpressionService {
 					String valueFromDb = getValueFromDb(fullExpression, itemDatas, itemBeansI);
 					logger.debug("valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
 					if (valueFromForm == null && valueFromDb == null) {
-						throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { fullExpression,
-								expressionWrapper.getRuleSet().getTarget().getValue() });
+						throw new OpenClinicaSystemException("OCRERR_0017", new Object[]{fullExpression,
+								expressionWrapper.getRuleSet().getTarget().getValue()});
 					}
 					value = valueFromForm == null ? valueFromDb : valueFromForm;
 				}
@@ -448,7 +449,7 @@ public class ExpressionService {
 				if (checkSyntax(expression)) {
 					String valueFromDb = getValueFromDbb(expression);
 					if (valueFromDb == null) {
-						throw new OpenClinicaSystemException("OCRERR_0018", new Object[] { expression });
+						throw new OpenClinicaSystemException("OCRERR_0018", new Object[]{expression});
 					}
 					logger.debug("valueFromDb : {}", valueFromDb);
 					value = valueFromDb;
@@ -680,17 +681,17 @@ public class ExpressionService {
 		} else {
 			String[] splitExpression = expression.split(ESCAPED_SEPARATOR);
 			switch (splitExpression.length) {
-			case ONE:
-				return deContextualizeExpression(THREE, expression, ruleSetTargetExpression);
-			case TWO:
-				return deContextualizeExpression(TWO, expression, ruleSetTargetExpression);
-			case THREE:
-				return deContextualizeExpression(ONE, expression, ruleSetTargetExpression);
-			case FOUR:
-				return expression;
-			default:
-				throw new OpenClinicaSystemException(
-						"Full Expression cannot be constructed from provided expression : " + expression);
+				case ONE :
+					return deContextualizeExpression(THREE, expression, ruleSetTargetExpression);
+				case TWO :
+					return deContextualizeExpression(TWO, expression, ruleSetTargetExpression);
+				case THREE :
+					return deContextualizeExpression(ONE, expression, ruleSetTargetExpression);
+				case FOUR :
+					return expression;
+				default :
+					throw new OpenClinicaSystemException(
+							"Full Expression cannot be constructed from provided expression : " + expression);
 			}
 		}
 	}
@@ -753,17 +754,17 @@ public class ExpressionService {
 		} else {
 			String[] splitExpression = expression.split(ESCAPED_SEPARATOR);
 			switch (splitExpression.length) {
-			case ONE:
-				return deContextualizeExpression(THREE, expression, ruleSetTargetExpression);
-			case TWO:
-				return deContextualizeExpression(TWO, expression, ruleSetTargetExpression);
-			case THREE:
-				return deContextualizeExpression(ONE, expression, ruleSetTargetExpression);
-			case FOUR:
-				return expression;
-			default:
-				throw new OpenClinicaSystemException(
-						"Full Expression cannot be constructed from provided expression : " + expression);
+				case ONE :
+					return deContextualizeExpression(THREE, expression, ruleSetTargetExpression);
+				case TWO :
+					return deContextualizeExpression(TWO, expression, ruleSetTargetExpression);
+				case THREE :
+					return deContextualizeExpression(ONE, expression, ruleSetTargetExpression);
+				case FOUR :
+					return expression;
+				default :
+					throw new OpenClinicaSystemException(
+							"Full Expression cannot be constructed from provided expression : " + expression);
 			}
 		}
 	}
@@ -1084,7 +1085,7 @@ public class ExpressionService {
 		String[] splitExpression = expression.split(ESCAPED_SEPARATOR);
 		if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], pattern[patternIndex])) {
 			if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], ruleActionPattern[patternIndex])) {
-				throw new OpenClinicaSystemException("OCRERR_0019", new String[] { expression });
+				throw new OpenClinicaSystemException("OCRERR_0019", new String[]{expression});
 			}
 		}
 		return splitExpression[splitExpression.length - 1 - expressionIndex];
@@ -1378,60 +1379,60 @@ public class ExpressionService {
 		oid = oid.trim();
 		String[] theOid = oid.split(ESCAPED_SEPARATOR);
 		switch (theOid.length) {
-		case FOUR:
-			String edcOid = theOid[pos];
-			EventDefinitionCRFBean eventDefinitionCRFBean = eventDefinitionCrfOidMap.get(edcOid);
-			if (eventDefinitionCRFBean == null) {
-				eventDefinitionCRFBean = getEventDefinitionCRFDao().findByOid(edcOid);
-				cache(eventDefinitionCrfOidMap, edcOid, eventDefinitionCRFBean);
-			}
-			if (eventDefinitionCRFBean != null) {
-				return oid;
-			}
-			pos++;
-		case THREE:
-			String crfOid = theOid[pos];
-			CRFBean crfBean = crfOidMap.get(crfOid);
-			if (crfBean == null) {
-				crfBean = getCrfDao().findByOid(crfOid);
-				cache(crfOidMap, crfOid, crfBean);
-			}
-			CRFVersionBean crfVersionBean = crfVersionOidMap.get(crfOid);
-			if (crfVersionBean == null) {
-				crfVersionBean = getCrfVersionDao().findByOid(crfOid);
-				cache(crfVersionOidMap, crfOid, crfVersionBean);
-			}
-			if (crfBean != null && crfVersionBean != null) {
-				return oid;
-			}
-			pos++;
-		case TWO:
-			String itemGroupOid = theOid[pos];
-			ItemGroupBean itemGroup = itemGroupOidMap.get(itemGroupOid);
-			if (itemGroup == null) {
-				itemGroup = getItemGroupDao().findByOid(itemGroupOid);
-				cache(itemGroupOidMap, itemGroupOid, itemGroup);
-			}
-			boolean isItemGroupBePartOfCrfOrNull = ruleSet.getCrfId() == null
-					|| itemGroup.getCrfId().equals(ruleSet.getCrfId());
-			if (itemGroup == null || !isItemGroupBePartOfCrfOrNull) {
-				return oid;
-			} else if (ruleSet.getCrfId() != null && !itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
-				return oid;
-			}
-			pos++;
-		case ONE:
-			String itemOid = theOid[pos];
-			List<ItemBean> itemList = itemOidToItemListMap.get(itemOid);
-			if (itemList == null) {
-				itemList = getItemDao().findByOid(itemOid);
-				cache(itemOidToItemListMap, itemOid, itemList);
-			}
-			if (itemList.size() == 0) {
-				return oid;
-			}
-		default:
-			break;
+			case FOUR :
+				String edcOid = theOid[pos];
+				EventDefinitionCRFBean eventDefinitionCRFBean = eventDefinitionCrfOidMap.get(edcOid);
+				if (eventDefinitionCRFBean == null) {
+					eventDefinitionCRFBean = getEventDefinitionCRFDao().findByOid(edcOid);
+					cache(eventDefinitionCrfOidMap, edcOid, eventDefinitionCRFBean);
+				}
+				if (eventDefinitionCRFBean != null) {
+					return oid;
+				}
+				pos++;
+			case THREE :
+				String crfOid = theOid[pos];
+				CRFBean crfBean = crfOidMap.get(crfOid);
+				if (crfBean == null) {
+					crfBean = getCrfDao().findByOid(crfOid);
+					cache(crfOidMap, crfOid, crfBean);
+				}
+				CRFVersionBean crfVersionBean = crfVersionOidMap.get(crfOid);
+				if (crfVersionBean == null) {
+					crfVersionBean = getCrfVersionDao().findByOid(crfOid);
+					cache(crfVersionOidMap, crfOid, crfVersionBean);
+				}
+				if (crfBean != null && crfVersionBean != null) {
+					return oid;
+				}
+				pos++;
+			case TWO :
+				String itemGroupOid = theOid[pos];
+				ItemGroupBean itemGroup = itemGroupOidMap.get(itemGroupOid);
+				if (itemGroup == null) {
+					itemGroup = getItemGroupDao().findByOid(itemGroupOid);
+					cache(itemGroupOidMap, itemGroupOid, itemGroup);
+				}
+				boolean isItemGroupBePartOfCrfOrNull = ruleSet.getCrfId() == null
+						|| itemGroup.getCrfId().equals(ruleSet.getCrfId());
+				if (itemGroup == null || !isItemGroupBePartOfCrfOrNull) {
+					return oid;
+				} else if (ruleSet.getCrfId() != null && !itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
+					return oid;
+				}
+				pos++;
+			case ONE :
+				String itemOid = theOid[pos];
+				List<ItemBean> itemList = itemOidToItemListMap.get(itemOid);
+				if (itemList == null) {
+					itemList = getItemDao().findByOid(itemOid);
+					cache(itemOidToItemListMap, itemOid, itemList);
+				}
+				if (itemList.size() == 0) {
+					return oid;
+				}
+			default :
+				break;
 		}
 		return "OK";
 	}
@@ -1604,7 +1605,7 @@ public class ExpressionService {
 			logger.error(e.getMessage());
 			return listifyString(expression);
 		}
-		return expressions;
+		return expressions.size() > 0 ? expressions : listifyString(expression);
 	}
 
 	/**

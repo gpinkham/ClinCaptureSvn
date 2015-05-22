@@ -13,6 +13,15 @@
 
 package org.akaza.openclinica.logic.rulerunner;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -32,18 +41,30 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+/**
+ * 
+ * Bulk Rule Runner for RuleSet rules.
+ *
+ */
 public class RuleSetBulkRuleRunner extends RuleRunner {
 
+	private final Logger logger = LoggerFactory.getLogger(RuleSetBulkRuleRunner.class);
+
+	/**
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param requestURLMinusServletPath
+	 *            Request URL
+	 * @param contextPath
+	 *            Context path
+	 * @param mailSender
+	 *            Mail sender
+	 */
 	public RuleSetBulkRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath,
 			JavaMailSenderImpl mailSender) {
 		super(ds, requestURLMinusServletPath, contextPath, mailSender);
@@ -75,6 +96,20 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
 
 	}
 
+	/**
+	 * 
+	 * @param ruleSets
+	 *            List of RuleSets
+	 * @param executionMode
+	 *            Mode of Execution
+	 * @param currentStudy
+	 *            Current study
+	 * @param variableAndValue
+	 *            Variable and value map
+	 * @param ub
+	 *            Current user
+	 * @return List of RuleSetBaseViewContainers
+	 */
 	public List<RuleSetBasedViewContainer> runRulesBulkFromRuleSetScreen(List<RuleSetBean> ruleSets,
 			ExecutionMode executionMode, StudyBean currentStudy, HashMap<String, String> variableAndValue,
 			UserAccountBean ub) {
@@ -103,41 +138,46 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
 				for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
 					String result;
 					RuleBean rule = ruleSetRule.getRuleBean();
-					dynamicsMetadataService.getExpressionService().setExpressionWrapper(
-							new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,
+					getDynamicsMetadataService().getExpressionService().setExpressionWrapper(
+							new ExpressionObjectWrapper(getDataSource(), currentStudy, rule.getExpression(), ruleSet,
 									variableAndValue));
 					try {
-						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(
-								dynamicsMetadataService.getExpressionService());
-						result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
-						itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
-
-						List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result,
-								Phase.BATCH);
-
-						if (itemData != null) {
-							Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
-							while (itr.hasNext()) {
-								RuleActionBean ruleActionBean = itr.next();
-								RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(
-										ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule
-												.getRuleBean().getOid());
-								if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
-									itr.remove();
+						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(getDynamicsMetadataService()
+								.getExpressionService());
+						List<String> expressions = getExpressionService().prepareRuleExpression(
+								rule.getExpression().getValue(), ruleSet);
+						for (String expression : expressions) {
+							result = oep.parseAndEvaluateExpression(expression);
+							itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
+							List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result,
+									Phase.BATCH);
+							if (itemData != null) {
+								Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
+								while (itr.hasNext()) {
+									RuleActionBean ruleActionBean = itr.next();
+									RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(
+											ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule
+													.getRuleBean().getOid());
+									if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
+										itr.remove();
+									}
 								}
 							}
+							for (RuleActionBean ruleActionBean : actionListBasedOnRuleExecutionResult) {
+								RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean,
+										expressionBean, itemData, ruleSet);
+								if (!ruleActionContainerAlreadyExistsInList(ruleActionContainer,
+										allActionContainerListBasedOnRuleExecutionResult)) {
+									allActionContainerListBasedOnRuleExecutionResult.add(ruleActionContainer);
+								}
+							}
+							logger.info(
+									"RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed in {} mode. ",
+									ruleSet.getTarget().getValue(), rule.getName(), result,
+									actionListBasedOnRuleExecutionResult.size(), executionMode.name());
 						}
-						for (RuleActionBean ruleActionBean : actionListBasedOnRuleExecutionResult) {
-							RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean,
-									expressionBean, itemData, ruleSet);
-							allActionContainerListBasedOnRuleExecutionResult.add(ruleActionContainer);
-						}
-						logger.info(
-								"RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed in {} mode. ",
-								new Object[] { ruleSet.getTarget().getValue(), rule.getName(), result,
-										actionListBasedOnRuleExecutionResult.size(), executionMode.name() });
 					} catch (OpenClinicaSystemException osa) {
-						// TODO: report something useful
+						logger.error(osa.getMessage());
 					}
 				}
 			}
@@ -153,9 +193,9 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
 						curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction()
 								.getRuleSetRule()));
 				ActionProcessor ap = ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction()
-						.getActionType(), ds, getMailSender(), dynamicsMetadataService, ruleActionContainer
-						.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction()
-						.getRuleSetRule());
+						.getActionType(), getDataSource(), getMailSender(), getDynamicsMetadataService(),
+						ruleActionContainer.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer
+								.getRuleAction().getRuleSetRule());
 				RuleActionBean rab = ap.execute(
 						RuleRunnerMode.RULSET_BULK,
 						executionMode,

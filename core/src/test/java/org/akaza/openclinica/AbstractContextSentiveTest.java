@@ -19,8 +19,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import com.clinovo.service.DatasetService;
-import com.clinovo.service.UserAccountService;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -56,6 +54,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -64,6 +63,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.EventServiceInterface;
 import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.dbunit.DataSourceBasedDBTestCase;
@@ -95,6 +95,7 @@ import com.clinovo.dao.WidgetsLayoutDAO;
 import com.clinovo.service.CRFMaskingService;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DataEntryService;
+import com.clinovo.service.DatasetService;
 import com.clinovo.service.DcfService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
@@ -105,6 +106,7 @@ import com.clinovo.service.ReportCRFService;
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.service.SystemService;
 import com.clinovo.service.TermService;
+import com.clinovo.service.UserAccountService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
 
@@ -151,6 +153,7 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected static DatasetDAO datasetDAO;
 	protected static ItemDataDAO itemDataDAO;
 	protected static ItemFormMetadataDAO imfdao;
+	protected static ItemGroupDAO itgdao;
 	protected static OdmExtractDAO odmExtractDAO;
 	protected static CRFVersionDAO crfVersionDao;
 	protected static StudyEventDAO studyEventDao;
@@ -166,6 +169,7 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected static PasswordRequirementsDao requirementsDao;
 	protected static EventServiceInterface eventService;
 	protected static DiscrepancyNoteService discrepancyNoteService;
+	protected static RuleSetService ruleSetService;
 
 	@Autowired
 	protected JavaMailSenderImpl mailSender;

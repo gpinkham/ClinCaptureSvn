@@ -13,6 +13,17 @@
 
 package org.akaza.openclinica.logic.rulerunner;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -36,23 +47,17 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
 
 /**
  * Handles rule execution during data entry.
  */
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({"unchecked", "unused"})
 public class DataEntryRuleRunner extends RuleRunner {
+
+	private final Logger logger = LoggerFactory.getLogger(DataEntryRuleRunner.class);
 
 	private Phase phase;
 	private EventCRFBean ecb;
@@ -109,19 +114,19 @@ public class DataEntryRuleRunner extends RuleRunner {
 		MessageContainer messageContainer = new MessageContainer();
 		HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
 		switch (executionMode) {
-		case SAVE:
-			toBeExecuted = (HashMap<String, ArrayList<RuleActionContainer>>) request.getAttribute("toBeExecuted");
+			case SAVE :
+				toBeExecuted = (HashMap<String, ArrayList<RuleActionContainer>>) request.getAttribute("toBeExecuted");
 
-			if (request.getAttribute("insertAction") == null) {
+				if (request.getAttribute("insertAction") == null) {
+					break;
+				} else {
+					toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
+				}
+			case DRY_RUN :
+				performDryRun(ruleSets, variableAndValue, currentCrfVersionOid, currentCrfOid, toBeExecuted);
 				break;
-			} else {
-				toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
-			}
-		case DRY_RUN:
-			performDryRun(ruleSets, variableAndValue, currentCrfVersionOid, currentCrfOid, toBeExecuted);
-			break;
-		default:
-			break;
+			default :
+				break;
 
 		}
 		for (Map.Entry<String, ArrayList<RuleActionContainer>> entry : toBeExecuted.entrySet()) {
@@ -137,11 +142,11 @@ public class DataEntryRuleRunner extends RuleRunner {
 						curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction()
 								.getRuleSetRule()));
 				ActionProcessor ap = ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction()
-						.getActionType(), ds, getMailSender(), dynamicsMetadataService, ruleActionContainer
-						.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction()
-						.getRuleSetRule());
+						.getActionType(), getDataSource(), getMailSender(), getDynamicsMetadataService(),
+						ruleActionContainer.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer
+								.getRuleAction().getRuleSetRule());
 
-				ItemDataBean itemData = dynamicsMetadataService.getExpressionService().getItemDataBeanFromDb(
+				ItemDataBean itemData = getDynamicsMetadataService().getExpressionService().getItemDataBeanFromDb(
 						ruleActionContainer.getRuleSetBean().getTarget().getValue());
 
 				if (ruleActionContainer.getRuleAction() instanceof EmailActionBean) {
@@ -163,11 +168,11 @@ public class DataEntryRuleRunner extends RuleRunner {
 				if (rab != null) {
 					if (rab instanceof ShowActionBean) {
 						messageContainer.add(
-								dynamicsMetadataService.getExpressionService().getGroupOidOrdinal(
+								getDynamicsMetadataService().getExpressionService().getGroupOidOrdinal(
 										ruleActionContainer.getRuleSetBean().getTarget().getValue()), rab);
 					} else {
 						messageContainer.add(
-								dynamicsMetadataService.getExpressionService().getGroupOrdninalConcatWithItemOid(
+								getDynamicsMetadataService().getExpressionService().getGroupOrdninalConcatWithItemOid(
 										ruleActionContainer.getRuleSetBean().getTarget().getValue()),
 								ruleActionContainer.getRuleAction());
 					}
@@ -183,7 +188,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 			String currentCrfVersionOid, String currentCrfOid,
 			HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted) {
 		for (RuleSetBean ruleSet : ruleSets) {
-			String key = dynamicsMetadataService.getExpressionService().getItemOid(
+			String key = getDynamicsMetadataService().getExpressionService().getItemOid(
 					ruleSet.getOriginalTarget().getValue());
 			if (toBeExecuted.containsKey(key)) {
 				allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
@@ -193,7 +198,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 			}
 			for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
 				ruleSet.setTarget(expressionBean);
-				String ruleSetForCrfVersionOid = dynamicsMetadataService.getExpressionService().getCrfOid(
+				String ruleSetForCrfVersionOid = getDynamicsMetadataService().getExpressionService().getCrfOid(
 						ruleSet.getTarget().getValue());
 				if (!ruleSetForCrfVersionOid.equals(currentCrfVersionOid)
 						&& !ruleSetForCrfVersionOid.equals(currentCrfOid)) {
@@ -201,17 +206,17 @@ public class DataEntryRuleRunner extends RuleRunner {
 				}
 				for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
 					RuleBean rule = ruleSetRule.getRuleBean();
-					dynamicsMetadataService.getExpressionService().setExpressionWrapper(
-							new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,
+					getDynamicsMetadataService().getExpressionService().setExpressionWrapper(
+							new ExpressionObjectWrapper(getDataSource(), currentStudy, rule.getExpression(), ruleSet,
 									variableAndValue, ecb));
 					try {
 						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(currentStudy, request,
-								dynamicsMetadataService.getExpressionService());
-						List<String> expressions = dynamicsMetadataService.getExpressionService()
+								getDynamicsMetadataService().getExpressionService());
+						List<String> expressions = getDynamicsMetadataService().getExpressionService()
 								.prepareRuleExpression(rule.getExpression().getValue(), ruleSet);
 						for (String expression : expressions) {
 							String result = oep.parseAndEvaluateExpression(expression);
-							ItemDataBean itemData = dynamicsMetadataService.getExpressionService()
+							ItemDataBean itemData = getDynamicsMetadataService().getExpressionService()
 									.getItemDataBeanFromDb(ruleSet.getTarget().getValue());
 							List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result,
 									phase);
@@ -229,7 +234,8 @@ public class DataEntryRuleRunner extends RuleRunner {
 							for (RuleActionBean ruleActionBean : actionListBasedOnRuleExecutionResult) {
 								RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean,
 										expressionBean, itemData, ruleSet);
-								if (!ruleActionContainerAlreadyExistsInList(ruleActionContainer)) {
+								if (!ruleActionContainerAlreadyExistsInList(ruleActionContainer,
+										allActionContainerListBasedOnRuleExecutionResult)) {
 									allActionContainerListBasedOnRuleExecutionResult.add(ruleActionContainer);
 								}
 							}
@@ -296,7 +302,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 
 		if (!(request.getAttribute(firstDDE) == Boolean.TRUE)) {
 
-			String key = dynamicsMetadataService.getExpressionService().getItemOid(
+			String key = getDynamicsMetadataService().getExpressionService().getItemOid(
 					ruleSet.getOriginalTarget().getValue());
 			String itemDataValueFromForm;
 			if (variableAndValue.containsKey(key)) {
@@ -318,7 +324,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 		for (RuleActionBean ruleActionBean : ruleSetRule.getActions()) {
 			if (ruleActionBean.getRuleSetRule() == ruleSetRule && ruleActionBean.getRuleActionRun().canRun(phase)
 					&& ruleActionBean instanceof DiscrepancyNoteActionBean) {
-				ItemDataBean itemData = dynamicsMetadataService.getExpressionService().getItemDataBeanFromDb(
+				ItemDataBean itemData = getDynamicsMetadataService().getExpressionService().getItemDataBeanFromDb(
 						ruleSet.getTarget().getValue());
 				if (itemData == null
 						|| !doesTheRuleActionRunLogExist(itemData, ruleSetRule, ruleSet, ruleActionBean,

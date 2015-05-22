@@ -10,6 +10,8 @@
 
 package org.akaza.openclinica.dao.rule;
 
+import java.util.List;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -22,8 +24,6 @@ import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.junit.Test;
-
-import java.util.List;
 
 public class RuleSetDaoTest extends DefaultAppContextTest {
 
@@ -67,11 +67,9 @@ public class RuleSetDaoTest extends DefaultAppContextTest {
 	public void testFindByCrfEmptyResultSet() {
 
 		CRFBean crfBean = new CRFBean();
-		crfBean.setId(4);
+		crfBean.setId(10);
 		StudyBean studyBean = new StudyBean();
 		studyBean.setId(1);
-
-		crfBean.setId(4);
 		List<RuleSetBean> persistentRuleSets = ruleSetDao.findByCrf(crfBean, studyBean);
 		assertNotNull("The returned ruleSet was null", persistentRuleSets);
 		assertEquals("The List size of ruleset objects should be 0 ", persistentRuleSets.size(), 0);

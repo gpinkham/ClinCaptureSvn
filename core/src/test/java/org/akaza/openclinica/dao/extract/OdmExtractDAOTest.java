@@ -83,9 +83,10 @@ public class OdmExtractDAOTest extends DefaultAppContextTest {
 	public void testThatGetOCSubjectEventFormSqlSSReturnsCorrectAmountOfRecords() throws Exception {
 		odmExtractDAO.setSubjectEventFormDataTypesExpected(odmVersion);
 		assertEquals(
+				4,
 				odmExtractDAO.select(
 						odmExtractDAO.getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint,
-								datasetItemStatusId, studySubjectIds, parentStudyIds)).size(), 3);
+								datasetItemStatusId, studySubjectIds, parentStudyIds)).size());
 	}
 
 	@Test
@@ -118,7 +119,7 @@ public class OdmExtractDAOTest extends DefaultAppContextTest {
 				.getItemGroupData().get(0).getItemData().size();
 		assertEquals(4, numOfItems);
 	}
-	
+
 	@Test
 	public void testThatNumberOfItemsInClinicalDataIsCorrectWhenBlanksAreSkipped() {
 		DatasetBean dataset = createDateset();

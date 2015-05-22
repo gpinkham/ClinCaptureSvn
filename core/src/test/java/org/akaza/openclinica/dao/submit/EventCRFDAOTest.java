@@ -48,7 +48,7 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testFindAllHasCorrectSize() throws OpenClinicaException {
-		assertEquals(8, eventCRFDAO.findAll().size());
+		assertEquals(9, eventCRFDAO.findAll().size());
 	}
 
 	@Test
@@ -64,11 +64,9 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 		EventCRFSDVSort sort = new EventCRFSDVSort();
 		int rowStart = 0;
 		int rowEnd = 15;
-		assertNotNull(eventCRFDAO.getAvailableWithFilterAndSort(studyId, filter, sort, true, rowStart,
-				rowEnd, userId));
-		assertEquals(0,
-				eventCRFDAO.getAvailableWithFilterAndSort(studyId, filter, sort, true, rowStart, rowEnd, userId)
-						.size());
+		assertNotNull(eventCRFDAO.getAvailableWithFilterAndSort(studyId, filter, sort, true, rowStart, rowEnd, userId));
+		assertEquals(0, eventCRFDAO
+				.getAvailableWithFilterAndSort(studyId, filter, sort, true, rowStart, rowEnd, userId).size());
 	}
 
 	@Test

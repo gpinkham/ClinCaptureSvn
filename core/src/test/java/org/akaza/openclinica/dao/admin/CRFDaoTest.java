@@ -13,6 +13,9 @@
 
 package org.akaza.openclinica.dao.admin;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -23,9 +26,6 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.util.reflection.Whitebox;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class CRFDaoTest extends DefaultAppContextTest {
 
@@ -118,7 +118,7 @@ public class CRFDaoTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindAllByStudyReturnsAllExistingCRFs() throws OpenClinicaException {
 		int studyId = 1;
-		assertEquals(5, crfdao.findAllByStudy(studyId).size());
+		assertEquals(6, crfdao.findAllByStudy(studyId).size());
 	}
 
 	@Test
@@ -139,17 +139,17 @@ public class CRFDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testGetAllCRFNamesFromStudyReturnCorrectSize() throws OpenClinicaException {
-		assertEquals(5, crfdao.getAllCRFNamesFromStudy(1).size());
+		assertEquals(6, crfdao.getAllCRFNamesFromStudy(1).size());
 	}
 
 	@Test
 	public void testThatFindAllActiveByDefinitionsForCurrentStudyReturnsCorrectSize() throws Exception {
-		assertEquals(5, crfdao.findAllActiveByDefinitionsForCurrentStudy(1).size());
+		assertEquals(6, crfdao.findAllActiveByDefinitionsForCurrentStudy(1).size());
 	}
 
 	@Test
 	public void testThatFindAllActiveCrfsReturnsCorrectSize() throws OpenClinicaException {
-		assertEquals(5, crfdao.findAllActiveCrfs().size());
+		assertEquals(6, crfdao.findAllActiveCrfs().size());
 	}
 
 	@Test
@@ -366,6 +366,6 @@ public class CRFDaoTest extends DefaultAppContextTest {
 		UserAccountBean ub = new UserAccountBean();
 		ub.setActiveStudyId(1);
 		ub.setId(1);
-		assertEquals(1, crfdao.findAllActiveUnmaskedByDefinition(sed, ub).size());
+		assertEquals(2, crfdao.findAllActiveUnmaskedByDefinition(sed, ub).size());
 	}
 }

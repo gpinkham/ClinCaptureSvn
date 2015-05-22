@@ -13,6 +13,13 @@
 
 package org.akaza.openclinica.logic.rulerunner;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -44,28 +51,45 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
-
+/**
+ * 
+ * Contains all basic routines for running rules.
+ * 
+ */
 public class RuleRunner {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(RuleRunner.class);
+
+	private static final int TWENTY = 20;
 
 	private final JavaMailSenderImpl mailSender;
-	protected DynamicsMetadataService dynamicsMetadataService;
-	protected RuleActionRunLogDao ruleActionRunLogDao;
-	protected DataSource ds;
+	private DynamicsMetadataService dynamicsMetadataService;
+	private RuleActionRunLogDao ruleActionRunLogDao;
+	private DataSource ds;
 
-	String requestURLMinusServletPath;
-	String contextPath;
+	private String requestURLMinusServletPath;
+	private String contextPath;
 
+	/**
+	 *
+	 * Rule Runner Mode Enum.
+	 *
+	 */
 	public enum RuleRunnerMode {
 		DATA_ENTRY, CRF_BULK, RULSET_BULK, IMPORT_DATA
 	}
 
+	/**
+	 *
+	 * @param ds
+	 *            DataSource
+	 * @param requestURLMinusServletPath
+	 *            Request URL
+	 * @param contextPath
+	 *            Context path
+	 * @param mailSender
+	 *            Mail sender
+	 */
 	public RuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath,
 			JavaMailSenderImpl mailSender) {
 		this.ds = ds;
@@ -74,8 +98,11 @@ public class RuleRunner {
 		this.mailSender = mailSender;
 	}
 
-	String curateMessage(RuleActionBean ruleAction, RuleSetRuleBean ruleSetRule) {
+	public DataSource getDataSource() {
+		return ds;
+	}
 
+	String curateMessage(RuleActionBean ruleAction, RuleSetRuleBean ruleSetRule) {
 		String message = ruleAction.getSummary();
 		String ruleOid = ruleSetRule.getRuleBean().getOid();
 		return ruleOid + " " + message;
@@ -174,7 +201,7 @@ public class RuleRunner {
 
 		String subject = contextPath + " - [" + currentStudy.getName() + "] ";
 		String ruleSummary = ruleAction.getSummary() != null ? ruleAction.getSummary() : "";
-		String message = ruleSummary.length() < 20 ? ruleSummary : ruleSummary.substring(0, 20) + " ... ";
+		String message = ruleSummary.length() < TWENTY ? ruleSummary : ruleSummary.substring(0, TWENTY) + " ... ";
 		subject += message;
 
 		HashMap<String, String> emailContents = new HashMap<String, String>();
@@ -192,8 +219,8 @@ public class RuleRunner {
 				for (String studySubjectIds : crfViewSpecificOrderedObjects.get(key1).get(key2)) {
 					studySubjects += studySubjectIds + " : ";
 				}
-				logger.debug("key1 {} , key2 {} , studySubjectId {}", new Object[] { key1.toString(), key2.toString(),
-						studySubjects });
+				logger.debug("key1 {} , key2 {} , studySubjectId {}", new Object[]{key1.toString(), key2.toString(),
+						studySubjects});
 			}
 		}
 	}
@@ -256,5 +283,18 @@ public class RuleRunner {
 
 	public void setRuleActionRunLogDao(RuleActionRunLogDao ruleActionRunLogDao) {
 		this.ruleActionRunLogDao = ruleActionRunLogDao;
+	}
+
+	protected boolean ruleActionContainerAlreadyExistsInList(RuleActionContainer ruleActionContainer,
+			List<RuleActionContainer> ruleActionContainerList) {
+		for (RuleActionContainer rac : ruleActionContainerList) {
+			if (rac.getRuleAction().getId().equals(ruleActionContainer.getRuleAction().getId())
+					&& rac.getExpressionBean().equals(ruleActionContainer.getExpressionBean())
+					&& rac.getItemDataBean().getId() == ruleActionContainer.getItemDataBean().getId()
+					&& rac.getRuleSetBean().getId().equals(ruleActionContainer.getRuleSetBean().getId())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -1,5 +1,9 @@
 package org.akaza.openclinica;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
@@ -23,20 +27,18 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.EventService;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.hibernate.classic.Session;
 import org.junit.Before;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
 
 /**
  * To avoid the constant loading of beans from the application context, which can take a lot of memory on the test, we
@@ -68,6 +70,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			datasetDAO = new DatasetDAO(dataSource);
 			itemDataDAO = new ItemDataDAO(dataSource);
 			imfdao = new ItemFormMetadataDAO(dataSource);
+			itgdao = new ItemGroupDAO(dataSource);
 			odmExtractDAO = new OdmExtractDAO(dataSource);
 			studyEventDao = new StudyEventDAO(dataSource);
 			crfVersionDao = new CRFVersionDAO(dataSource);
@@ -82,7 +85,8 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			requirementsDao = new PasswordRequirementsDao(configurationDao);
 			discrepancyNoteService = new DiscrepancyNoteService(dataSource);
 			eventService = new EventService(dataSource);
-
+			ruleSetService = new RuleSetService(dataSource, dynamicsItemFormMetadataDao, dynamicsItemGroupMetadataDao,
+					mailSender, ruleDao, ruleSetDao, ruleSetRuleDao, ruleSetAuditDao, ruleActionRunLogDao);
 			postImportContainerService = new RulesPostImportContainerService(dataSource, null, null, ruleDao,
 					ruleSetDao, ResourceBundleProvider.getPageMessagesBundle(new Locale(locale)));
 			postImportContainerService.setRuleDao(ruleDao);
