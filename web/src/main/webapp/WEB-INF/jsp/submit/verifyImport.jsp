@@ -231,7 +231,7 @@
 		<c:if test="${not empty validationErrors}">
 			<fmt:message key="validation_error_generated" bundle="${resword}" />
 
-			<div style="width: 600px">
+			<div style="width: 100%">
 
 			<div class="box_T">
 			<div class="box_L">
@@ -357,7 +357,7 @@
 		<!--  valid data section, show all valid data -->
 		<fmt:message key="valid_data_imported" bundle="${resword}"/>
 
-			<div style="width: 600px">
+			<div style="width: 100%">
 
 			<div class="box_T">
 			<div class="box_L">
@@ -503,7 +503,7 @@
 		</td>
 			<%-- added an alert above --%>
 		<td>
-			<input id="Cancel" class="button_medium" type="button cancel" name="BTN_Cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" onclick="window.location.href=('ListStudySubjects');"/>
+			<input id="Cancel" class="button_medium medium_cancel" type="button" name="BTN_Cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" onclick="window.location.href=('ListStudySubjects');"/>
 		</td>	
 	</table>
 </form>				
