@@ -1255,7 +1255,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	public List<DiscrepancyNoteBean> getNotesForPrintPop(Limit limit, UserAccountBean ub) {
 		ListNotesFilter listNotesFilter = getListNoteFilter(limit);
 		ListNotesSort listNotesSort = getListSubjectSort(limit);
-		return getDiscrepancyNoteDao().getViewNotesWithFilterAndSortForPrint(getCurrentStudy(), listNotesFilter, listNotesSort, ub);
+		List<DiscrepancyNoteBean> result = discrepancyNoteDao.getViewNotesWithFilterAndSortLimits(
+				getCurrentStudy(), listNotesFilter, listNotesSort, 0, 0, getCurrentUserAccount());
+		return populateRowsWithAttachedData(result);
 	}
 
 	public void setDataSource(DataSource dataSource) {
