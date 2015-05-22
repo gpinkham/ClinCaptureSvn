@@ -20,12 +20,12 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.io.IOException;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.exception.CRFReadingException;
 import org.apache.poi.ss.usermodel.Workbook;
-
-import java.io.IOException;
-import java.util.ResourceBundle;
 
 /**
  * SpreadSheetTable, an abstract superclass of spreadsheet classes used in OpenClinica. by Tom Hickerson, May 25 2007
@@ -35,10 +35,38 @@ import java.util.ResourceBundle;
  */
 public interface SpreadSheetTable {
 
-	public NewCRFBean toNewCRF(javax.sql.DataSource ds, ResourceBundle bundle) throws IOException, CRFReadingException;
+	String SQL_CLEAR_OUT_OF_EMPTY_SECTIONS = " DELETE FROM section WHERE section_id IN"
+			+ " (SELECT sct.section_id FROM section sct WHERE NOT EXISTS "
+			+ " (SELECT * FROM item_form_metadata WHERE sct.section_id = item_form_metadata.section_id))";
 
-	public void setCrfId(int id);
+	/**
+	 * Returns NewCRFBean.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param bundle
+	 *            ResourceBundle
+	 * @return NewCRFBean
+	 * @throws IOException
+	 *             the IOException
+	 * @throws CRFReadingException
+	 *             the CRFReadingException
+	 */
+	NewCRFBean toNewCRF(javax.sql.DataSource ds, ResourceBundle bundle) throws IOException, CRFReadingException;
 
-	public Workbook getWorkbook();
+	/**
+	 * Sets crf id.
+	 * 
+	 * @param id
+	 *            int
+	 */
+	void setCrfId(int id);
+
+	/**
+	 * Returns Workbook.
+	 * 
+	 * @return Workbook
+	 */
+	Workbook getWorkbook();
 
 }

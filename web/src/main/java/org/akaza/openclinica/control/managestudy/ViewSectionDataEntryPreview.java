@@ -22,7 +22,6 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -62,9 +61,11 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.util.SpreadsheetPreviewUtil;
+
 /**
- * Preview a CRF version section data entry. This class is based almost entirely on ViewSectionDataEntryServlet 
- * except that it's designed to provide a preview of a crf before the crfversion is inserted into the database.
+ * Preview a CRF version section data entry. This class is based almost entirely on ViewSectionDataEntryServlet except
+ * that it's designed to provide a preview of a crf before the crfversion is inserted into the database.
  * 
  * @author Bruce W. Perry
  * 
@@ -72,11 +73,12 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ViewSectionDataEntryPreview extends DataEntryServlet {
-	public static String SECTION_TITLE = "section_title";
-	public static String SECTION_LABEL = "section_label";
-	public static String SECTION_SUBTITLE = "subtitle";
-	public static String INSTRUCTIONS = "instructions";
-	public static String BORDERS = "borders";
+
+	public static final String SECTION_TITLE = "section_title";
+	public static final String SECTION_LABEL = "section_label";
+	public static final String SECTION_SUBTITLE = "subtitle";
+	public static final String INSTRUCTIONS = "instructions";
+	public static final String BORDERS = "borders";
 
 	/**
 	 * Checks whether the user has the correct privilege. This is from ViewSectionDataEntryServlet.
@@ -162,8 +164,9 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 
 		// All the groups data, if it's present in the CRF
 		Map<Integer, Map<String, String>> groupsMap = null;
-		if (crfMap != null)
+		if (crfMap != null) {
 			groupsMap = crfMap.get("groups");
+		}
 		// Find out whether this CRF involves groups
 		// At least one group is involved if the groups Map is not null or
 		// empty, and the first group entry (there may be only one) has a
@@ -173,16 +176,18 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 		// A SortedMap containing the row number as the key, and the
 		// section headers/values (contained in a Map) as the value
 		Map<Integer, Map<String, String>> sectionsMap = null;
-		if (crfMap != null)
+		if (crfMap != null) {
 			sectionsMap = crfMap.get("sections");
+		}
 		// The itemsMap contains the spreadsheet table items row number as a
 		// key,
 		// followed by a map of the column names/values; it contains values for
 		// display
 		// such as 'left item text'
 		Map<Integer, Map<String, String>> itemsMap = null;
-		if (crfMap != null)
+		if (crfMap != null) {
 			itemsMap = crfMap.get("items");
+		}
 
 		// Create a list of FormGroupBeans from Maps of groups,
 		// items, and sections
@@ -190,13 +195,13 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 		// FormBeanUtil formUtil = new FormBeanUtil();
 
 		// Set up sections for the preview
-		Map.Entry me = null;
-		SectionBean secbean = null;
+		Map.Entry me;
+		SectionBean secbean;
 		ArrayList<SectionBean> allSectionBeans = new ArrayList<SectionBean>();
-		String name_str = "";
-		String pageNum = "";
-		Map secMap = null;
-		
+		String nameStr;
+		String pageNum;
+		Map secMap;
+
 		NumberFormat numFormatter = NumberFormat.getInstance();
 		numFormatter.setMaximumFractionDigits(0);
 		if (sectionsMap != null) {
@@ -204,8 +209,8 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 				secbean = new SectionBean();
 				me = (Map.Entry) element;
 				secMap = (Map) me.getValue();
-				name_str = (String) secMap.get("section_label");
-				secbean.setName(name_str);
+				nameStr = (String) secMap.get("section_label");
+				secbean.setName(nameStr);
 				secbean.setTitle((String) secMap.get("section_title"));
 				secbean.setInstructions((String) secMap.get("instructions"));
 				secbean.setSubtitle((String) secMap.get("subtitle"));
@@ -222,7 +227,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 				secbean.setPageNumberLabel(pageNum);
 				// Sift through the items to see if their section label matches
 				// the section's section_label column
-				secbean.setNumItems(this.getNumberOfItems(itemsMap, secbean.getName()));
+				secbean.setNumItems(SpreadsheetPreviewUtil.getNumberOfItemsInSection(itemsMap, secbean.getName()));
 				allSectionBeans.add(secbean);
 			}
 		}
@@ -236,7 +241,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 
 		// Assuming that the super class' SectionBean sb variable must be
 		// initialized,
-		// since it happens in ViewSectionDataEntryServlet. TODO: verify this
+		// since it happens in ViewSectionDataEntryServlet. verify this
 		sb = allSectionBeans.get(0);
 		// This is the StudySubjectBean
 		// Not sure if this is needed for a Preview, but leaving
@@ -288,7 +293,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 		SectionBean aSecBean = new SectionBean();
 
 		request.setAttribute(BEAN_DISPLAY, displaySection);
-		// TODO: verify these attributes, from the original servlet, are
+		// verify these attributes, from the original servlet, are
 		// necessary
 		request.setAttribute("sec", aSecBean);
 		request.setAttribute("EventCRFBean", ebean);
@@ -335,36 +340,6 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 		} else {
 			return 0;
 		}
-	}
-
-	// Determine the number of items associated with this section
-	// by checking the page number value of each item, and comparing it
-	// with the page number of the section
-	private int getNumberOfItems(Map itemsMap, String sectionLabel) {
-		if (itemsMap == null)
-			return 0;
-		int itemCount = 0;
-		Map itemVals = null;
-		Map.Entry me = null;
-		Map.Entry me2 = null;
-		String columnName = "";
-		String val = "";
-		for (Iterator iter = itemsMap.entrySet().iterator(); iter.hasNext();) {
-			me = (Map.Entry) iter.next();
-			itemVals = (Map) me.getValue();
-			// each Map member is a key/value pair representing an
-			// item column/value
-			for (Iterator iter2 = itemVals.entrySet().iterator(); iter2.hasNext();) {
-				me2 = (Map.Entry) iter2.next();
-				columnName = (String) me2.getKey();
-				val = (String) me2.getValue();
-				if (columnName.equalsIgnoreCase("section_label")) {
-					if (val.equalsIgnoreCase(sectionLabel))
-						itemCount++;
-				}
-			}
-		}
-		return itemCount;
 	}
 
 	private void setupStudyBean(HttpServletRequest request) {

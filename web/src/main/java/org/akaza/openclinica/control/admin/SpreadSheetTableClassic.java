@@ -20,6 +20,21 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.PatternSyntaxException;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -53,21 +68,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.PatternSyntaxException;
-
 /**
  * <P>
  * Returns multiple types of things based on the parsing; returns html table returns data objects as SQL strings.
@@ -77,7 +77,7 @@ import java.util.regex.PatternSyntaxException;
  * 
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class SpreadSheetTableClassic implements SpreadSheetTable {
 
 	private POIFSFileSystem fs = null;
@@ -125,6 +125,9 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setCrfId(int id) {
 		this.crfId = id;
 	}
@@ -133,6 +136,9 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 		return this.crfId;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public NewCRFBean toNewCRF(javax.sql.DataSource ds, ResourceBundle resPageMsg) throws IOException,
 			CRFReadingException {
 
@@ -803,7 +809,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 						// Create oid for Item Bean
 						String itemOid = idao.getValidOid(new ItemBean(), crfName, itemName, itemOids);
 						itemOids.add(itemOid);
-                        String validSasName = sasNameValidator.getValidName(itemName);
+						String validSasName = sasNameValidator.getValidName(itemName);
 						String vlSql = "";
 						if (dbName.equals("oracle")) {
 							vlSql = "INSERT INTO ITEM (NAME,DESCRIPTION,UNITS,PHI_STATUS,"
@@ -1472,17 +1478,19 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							cellType = cell.getCellType();
 						}
 						switch (cellType) {
-						case Cell.CELL_TYPE_BLANK:
-							buf.append("<td class=\"table_cell\">" + error + "</td>");
-							break;
-						case Cell.CELL_TYPE_NUMERIC:
-							buf.append("<td class=\"table_cell\">" + cell.getNumericCellValue() + " " + error + "</td>");
-							break;
-						case Cell.CELL_TYPE_STRING:
-							buf.append("<td class=\"table_cell\">" + cell.getStringCellValue() + " " + error + "</td>");
-							break;
-						default:
-							buf.append("<td class=\"table_cell\">" + error + "</td>");
+							case Cell.CELL_TYPE_BLANK :
+								buf.append("<td class=\"table_cell\">" + error + "</td>");
+								break;
+							case Cell.CELL_TYPE_NUMERIC :
+								buf.append("<td class=\"table_cell\">" + cell.getNumericCellValue() + " " + error
+										+ "</td>");
+								break;
+							case Cell.CELL_TYPE_STRING :
+								buf.append("<td class=\"table_cell\">" + cell.getStringCellValue() + " " + error
+										+ "</td>");
+								break;
+							default :
+								buf.append("<td class=\"table_cell\">" + error + "</td>");
 						}
 					}
 					buf.append("</tr>");
@@ -1494,6 +1502,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 			}// end of the else sheet loop
 
 		}// end of the for loop for sheets
+
+		queries.add(SQL_CLEAR_OUT_OF_EMPTY_SECTIONS);
 		ncrf.setQueries(queries);
 		ncrf.setItemQueries(openQueries);
 		ncrf.setBackupItemQueries(backupItemQueries);
@@ -1541,35 +1551,35 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 		}
 
 		switch (cellType) {
-		case Cell.CELL_TYPE_BLANK:
-			val = "";
-			break;
-		case Cell.CELL_TYPE_NUMERIC:
-			// Modify code so that floating number alone can be used for
-			// CRF version. Before it must use, e.g. v1.1
-			// Meanwhile modification has been done for read PHI cell and
-			// Required cell
-			val = cell.getNumericCellValue() + "";
-			logger.info("found a numeric cell: " + val);
-			// what if the version is a whole number? added other code below
-			// from PHI, tbh 6/5/07
-			// So now we also treat 3, 3.0, 3.00 as same as 3. If users want 3.0
-			// or 3.10 the best way is use String type. -YW
-			// >> YW
-			double dphi = cell.getNumericCellValue();
-			if ((dphi - (int) dphi) * 1000 == 0) {
-				val = (int) dphi + "";
-			}
-			logger.info("found a numeric cell after transfer: " + val);
-			break;
-		case Cell.CELL_TYPE_STRING:
-			val = cell.getStringCellValue();
-			if (val.matches("'")) {
-				val.replaceAll("'", "''");
-			}
-			break;
-		default:
-			val = "";
+			case Cell.CELL_TYPE_BLANK :
+				val = "";
+				break;
+			case Cell.CELL_TYPE_NUMERIC :
+				// Modify code so that floating number alone can be used for
+				// CRF version. Before it must use, e.g. v1.1
+				// Meanwhile modification has been done for read PHI cell and
+				// Required cell
+				val = cell.getNumericCellValue() + "";
+				logger.info("found a numeric cell: " + val);
+				// what if the version is a whole number? added other code below
+				// from PHI, tbh 6/5/07
+				// So now we also treat 3, 3.0, 3.00 as same as 3. If users want 3.0
+				// or 3.10 the best way is use String type. -YW
+				// >> YW
+				double dphi = cell.getNumericCellValue();
+				if ((dphi - (int) dphi) * 1000 == 0) {
+					val = (int) dphi + "";
+				}
+				logger.info("found a numeric cell after transfer: " + val);
+				break;
+			case Cell.CELL_TYPE_STRING :
+				val = cell.getStringCellValue();
+				if (val.matches("'")) {
+					val.replaceAll("'", "''");
+				}
+				break;
+			default :
+				val = "";
 		}
 		return val.trim();
 	}
@@ -1611,17 +1621,17 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 					}
 
 					switch (cellType) {
-					case Cell.CELL_TYPE_BLANK:
-						buf.append("<td> </td>");
-						break;
-					case Cell.CELL_TYPE_NUMERIC:
-						buf.append("<td>" + cell.getNumericCellValue() + "</td>");
-						break;
-					case Cell.CELL_TYPE_STRING:
-						buf.append("<td>" + cell.getStringCellValue() + "</td>");
-						break;
-					default:
-						buf.append("<td></td>");
+						case Cell.CELL_TYPE_BLANK :
+							buf.append("<td> </td>");
+							break;
+						case Cell.CELL_TYPE_NUMERIC :
+							buf.append("<td>" + cell.getNumericCellValue() + "</td>");
+							break;
+						case Cell.CELL_TYPE_STRING :
+							buf.append("<td>" + cell.getStringCellValue() + "</td>");
+							break;
+						default :
+							buf.append("<td></td>");
 					}
 				}
 				buf.append("</tr>");
@@ -1653,6 +1663,9 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 		this.measurementUnitDao = measurementUnitDao;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Workbook getWorkbook() {
 		return this.workbook;
 	}
