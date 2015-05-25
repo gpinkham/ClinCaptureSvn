@@ -61,12 +61,17 @@ a:active {
   color: red;
 }
 
+.repeating-group-table {
+  table-layout:fixed !important;
+  width: 100%  !important;
+}
 
-
+.repeating_item_group_element {
+  vertical-align:top;
+}
 
 #page-header {
-  table-layout:fixed;
-  width: 100%;
+  table-layout:fixed;  width: 100%;
   padding:20px;
   margin-bottom: 1px;
   font-size: 14px;

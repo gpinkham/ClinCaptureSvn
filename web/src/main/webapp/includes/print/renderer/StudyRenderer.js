@@ -691,7 +691,7 @@ function StudyRenderer(json) {
             if (sectionLabel != prevSectionLabel) {
                 if (isFirstSection == false) {
                     app_renderMode = undefined;
-                    this.renderPageHeader(this.PAGE_BREAK, app_printTime,
+                    this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime,
                         app_studyContentPageType, eventDef);
                 }
                 this.renderString += "<div class='vertical-spacer-30px'></div>";
@@ -717,7 +717,6 @@ function StudyRenderer(json) {
                     : "";
                 isFirstSection = false;
             }
-            this.renderString += "<div class='vertical-spacer-20px'></div>";
 
             debug(name + " - repeating: " + repeating
             + ", totalRepeatingRows: " + totalRepeatingRows
@@ -878,7 +877,7 @@ function StudyRenderer(json) {
                         repeatingHeaderString += "</tr>";
                     }
                     if (repeatRowNumber == totalRepeatingRows) {
-                        this.renderString += RenderUtil.render(RenderUtil
+                        var repeatingTables = RenderUtil.render(RenderUtil
                             .get("print_repeating_item_group"), {
                             headerColspan: itemGroupLength,
                             name: itemGroupHeader,
@@ -887,6 +886,35 @@ function StudyRenderer(json) {
                         })[0].outerHTML;
                         saveForAuditsIndex = repeatRowNumber;
                         repeatRowNumber++;
+
+                        var repeatingTablesObj = $.parseHTML(repeatingTables);
+                        var headers = $(repeatingTablesObj).find(".repeating_item_header");
+                        var elements = $(repeatingTablesObj).find(".repeating_item_group_element");
+                        var elementsLength = elements.length / (elements.length / headers.length);
+
+                        var elementsChunks = this.sliceArray(elements, elementsLength);
+                        var rowsWithChunks = [];
+                        for (var i = 0; i < elementsChunks.length; i++) {
+                            rowsWithChunks.push(this.sliceArray(elementsChunks[i], 4));
+                        }
+
+                        var headerChunks = this.sliceArray(headers, 4);
+                        var tableHtml = "";
+                        for (var i = 0; i < headerChunks.length; i++) {
+                            tableHtml += "<table border=\"1\" class=\"repeating-group-table\">";
+                            var chunkOfHeader = headerChunks[i];
+                            tableHtml += "<tr>";
+                            tableHtml += this.appendTdElement(chunkOfHeader);
+                            tableHtml += "</tr>";
+                            for (var j = 0; j < rowsWithChunks.length; j++) {
+                                var row = rowsWithChunks[j];
+                                tableHtml += "<tr>";
+                                var chunkOfTd = row[i];
+                                tableHtml += this.appendTdElement(chunkOfTd);
+                                tableHtml += "</tr>";
+                            }
+                        }
+                        this.renderString += tableHtml;
                     } else {
                         saveForAuditsIndex = repeatRowNumber;
                         repeatRowNumber++;
@@ -946,8 +974,30 @@ function StudyRenderer(json) {
 
     }
 
-    this.printItemMetadata = function (itemGroupName) {
-        this.itemMetadataPrint = "";
+    this.sliceArray = function (array, sliceSize) {
+        var chunks = [];
+        var i = 0;
+        while (i < array.length) {
+            chunks.push(array.slice(i, i += sliceSize));
+        }
+        return chunks;
+    }
+
+    this.appendTdElement = function (array) {
+        var container = "";
+        for (var j in array) {
+            var tdElement = array[j];
+            if (typeof tdElement != 'undefined') {
+                var value = tdElement.outerHTML;
+                if (typeof value != 'undefined') {
+                    container += value;
+                }
+            }
+        }
+        return container;
+    }
+
+    this.printItemMetadata = function (itemGroupName) {        this.itemMetadataPrint = "";
         // this.itemMetadataPrint+="<div
         // align='center'>"+formDef["@Name"]+"</div>";
         this.itemMetadataPrint += itemDefRenderer
