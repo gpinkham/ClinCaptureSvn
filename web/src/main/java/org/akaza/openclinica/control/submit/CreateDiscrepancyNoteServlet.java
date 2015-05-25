@@ -125,7 +125,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 	public static final String CAN_MONITOR = "canMonitor";
 
-	public static final String NEW_NOTE = "new";
+	public static final String NEW_NOTE = "newNote";
 
 	public static final String RES_STATUS_ID = "resStatusId";
 

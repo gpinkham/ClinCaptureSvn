@@ -465,7 +465,7 @@
                     </c:when>
                     <c:otherwise>
                         <a id="nameNote1" href="#" onmouseout="UnTip();" onmouseover="callTip(genToolTipFromArray('interviewNotes'));"
-                           onClick="openDSNoteWindow('<c:out value="${contextPath}" />/CreateDiscrepancyNote?stSubjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer', event); return false;">
+                           onClick="openDSNoteWindow('<c:out value="${contextPath}" />/CreateDiscrepancyNote?stSubjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&newNote=${isNewDN}','spanAlert-interviewer', event); return false;">
                             <img style="vertical-align: middle;" id="flag_interviewer" name="flag_interviewer" src="<c:out value="${contextPath}" />/images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
                             <input type="hidden" value="<c:out value="${contextPath}" />/ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySubject.id}&itemId=${itemId}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&enterData=${enterData}&monitor=${monitor}&blank=${blank}"/>
                         </a>
@@ -558,7 +558,7 @@
                     </c:when>
                     <c:otherwise>
                         <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') );" onmouseout="UnTip();"
-                           onClick="openDNoteWindow('<c:out value="${contextPath}" />/CreateDiscrepancyNote?stSubjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate', undefined, event); return false;">
+                           onClick="openDNoteWindow('<c:out value="${contextPath}" />/CreateDiscrepancyNote?stSubjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&newNote=${isNewDNDate}','spanAlert-interviewDate', undefined, event); return false;">
                             <img style="vertical-align: middle;" id="flag_interviewDate" name="flag_interviewDate"src="<c:out value="${contextPath}" />/images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
                             <input type="hidden" value="<c:out value="${contextPath}" />/ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySubject.id}&itemId=${itemId}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&enterData=${enterData}&monitor=${monitor}&blank=${blank}"/>
                         </a>

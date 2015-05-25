@@ -20,7 +20,7 @@
 					</c:when>
 					<c:otherwise>
 						<a href="#"
-							onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob', '', event); return false;">
+							onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&newNote=1','spanAlert-dob', '', event); return false;">
 							<img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif"
 							border="0"
 							alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
@@ -51,7 +51,7 @@
 					</c:when>
 					<c:otherwise>
 						<a href="#"
-							onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob', '', event); return false;">
+							onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&newNote=1','spanAlert-dob', '', event); return false;">
 							<img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif"
 							border="0"
 							alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
@@ -82,7 +82,7 @@
 					</c:when>
 					<c:otherwise>
 						<a href="#"
-							onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob', '', event); return false;">
+							onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&newNote=1','spanAlert-dob', '', event); return false;">
 							<img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif"
 							border="0"
 							alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"

@@ -265,7 +265,7 @@ $(document).ready(function() {
 <input type="hidden" name="subjectId" value="<c:out value="${param.subjectId}"/>">
 <input type="hidden" name="field" value="<c:out value="${discrepancyNote.field}"/>"><input type="hidden" name="writeToDB" value="<c:out value="${writeToDB}" />">
 <input type="hidden" name="monitor" value="<c:out value="${monitor}" />">
-<input type="hidden" name="new" value="<c:out value="${new}" />">
+<input type="hidden" name="newNote" value="<c:out value="${newNote}" />">
 <input type="hidden" name="enterData" value="<c:out value="${enterData}" />">
 <input type="hidden" name="eventCRFId" value="<c:out value="${eventCRFId}"/>">
 <input type="hidden" name="errorFlag" value="<c:out value="${errorFlag}"/>">

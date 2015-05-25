@@ -163,7 +163,7 @@
                         </c:when>
                         <c:otherwise>
 
-                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&newNote=1','spanAlert-dob'); return false;">
                                 <img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
                         </c:otherwise>
@@ -191,7 +191,7 @@
                         </c:when>
                         <c:otherwise>
 
-                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&newNote=1','spanAlert-dob'); return false;">
                                 <img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
                         </c:otherwise>
@@ -219,7 +219,7 @@
                         </c:when>
                         <c:otherwise>
 
-                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&newNote=1','spanAlert-dob'); return false;">
                                 <img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
                         </c:otherwise>
