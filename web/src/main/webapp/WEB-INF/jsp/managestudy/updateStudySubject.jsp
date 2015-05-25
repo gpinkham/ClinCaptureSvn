@@ -129,7 +129,7 @@
 																	</jsp:include>
 																</td>
 																
-																<td><fmt:message key="field_required"bundle="${resword}" /></td>
+																<td><fmt:message key="field_required" bundle="${resword}" /></td>
 															</tr>
 
 															<c:if test="${secondaryIdShow}">
