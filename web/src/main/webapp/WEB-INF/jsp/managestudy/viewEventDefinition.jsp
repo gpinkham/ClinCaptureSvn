@@ -44,7 +44,7 @@
 
 <h1>
 	<span class="first_level_header">
-		<fmt:message key="view_event_definition" bundle="${resword}"/> 
+		<fmt:message key="view_event_definition" bundle="${resword}"/>: <c:out value="${definition.name}"/>
 	</span>
 </h1>
 
@@ -103,7 +103,7 @@
 <br>
 
 <c:if test="${!empty eventDefinitionCRFs}">
-	<div class="table_title_manage">
+	<div class="table_title_Admin">
 		<fmt:message key="CRFs" bundle="${resword}"/>
 	</div>
 	<p><fmt:message key="click_the_up_down_arrow_icons" bundle="${restext}"/></p>
@@ -224,11 +224,19 @@
 			<td class="table_cell">
 				<fmt:message key="${crf.sourceDataVerification.description}" bundle="${resterm}"/>
 			</td>
-
-			<td class="table_cell">
-				<c:out value="${crf.status.name}"/>
-			</td>
-
+			
+			<c:choose>
+				<c:when test="${crf.status.available}">
+					<td class="table_cell aka_green_highlight"><c:out value="${crf.status.name}"/>
+				</c:when>
+				<c:when test="${crf.status.deleted}">
+					<td class="table_cell aka_red_highlight"><c:out value="${crf.status.name}"/>
+				</c:when>
+				<c:otherwise>
+					<td class="table_cell"><c:out value="${crf.status.name}"/>
+				</c:otherwise>
+			</c:choose>
+			
 			<td class="table_cell">
 				<c:out value="${crf.emailStep}"/>&nbsp;
 			</td>
