@@ -180,27 +180,26 @@
 		<td class="text"><input type="text" name="contactEmail" size="60" value="<c:out value="${contactEmail}"/>" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"/>
 		</td>
 	</tr>
-	<tr>
+</table>
 
-	</tr>
-
+<table>
 	<tr>
 		<td align="left">
-		  <input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
+			<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>" 
 					class="button_medium medium_back" 
 					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 					
-		 </td><td>
-		  <input type="submit" name="btnSubmit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_xlong xlong_submit"/>
-		  <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">  
-
 		</td>
-		</form>
+		<td>
+			<input type="submit" name="btnSubmit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit"/>
+		</td>
+		<td>
+			<img src="images/icon_UnchangedData.gif" style="visibility:hidden"
+			   title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
+		</td>
 	</tr>
-
 </table>
-
-
+</form>
 
 <jsp:include page="../include/footer.jsp"/>
