@@ -1,5 +1,6 @@
 package org.akaza.openclinica.web.print;
 
+import org.akaza.openclinica.web.SQLInitServlet;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.PrettyXmlSerializer;
 import org.htmlcleaner.TagNode;
@@ -20,7 +21,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -40,13 +43,35 @@ public class HtmlToPdfController {
      */
     @RequestMapping(value = "/getPdf", method = RequestMethod.POST)
     @ResponseBody
-    public void getPdf(HttpServletResponse response, HttpServletRequest request) throws Exception {
+    public void buildPdf(HttpServletResponse response, HttpServletRequest request) throws Exception {
 
-        String pdfName = request.getParameter("fileName");
+        String pdfName = searchParameter("fileName", request);
         response.setHeader("Content-Disposition", "inline; filename=" + pdfName + "_casebook.pdf");
         response.setContentType("application/pdf;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 
+        Document document = getDocument(prepareHtmlForPrint(request));
+        ITextRenderer renderer = new ITextRenderer();
+        SharedContext sharedContext = renderer.getSharedContext();
+        sharedContext.setReplacedElementFactory(new ImageReplaceFactory(renderer.getSharedContext().getReplacedElementFactory()));
+        renderer.setDocument(document, null);
+        renderer.layout();
+
+        String isJob = (String) request.getAttribute("isJob");
+        if (isJob != null && Boolean.valueOf(isJob)) {
+            OutputStream os = new FileOutputStream(getFile(pdfName, "Casebooks"));
+            renderer.createPDF(os);
+            os.flush();
+            os.close();
+        } else {
+            renderer.createPDF((response.getOutputStream()));
+            response.getOutputStream().flush();
+            response.getOutputStream().close();
+        }
+
+    }
+
+    private String prepareHtmlForPrint(HttpServletRequest request) throws IOException {
         String csUrl = "";
         String normalize = "";
         Resource resource = new DefaultResourceLoader().getResource("..".concat(File.separator).concat("..")
@@ -63,22 +88,26 @@ public class HtmlToPdfController {
         String mainCss = "<style>" + csUrl + "</style>";
         String normalizeCss = "<style>" + normalize + "</style>";
         String html = "<head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />" + mainCss + "\n" + normalizeCss + "</head>";
-        String cc = request.getParameter("htmlCode");
-        html = html.concat(cc);
+        String htmlCode = request.getParameter("htmlCode") == null ? (String) request.getAttribute("htmlCode") : request.getParameter("htmlCode");
+        html = html.concat(htmlCode);
         HtmlCleaner cleaner = new HtmlCleaner();
         TagNode node = cleaner.clean(html);
-        String cleanedResult = new PrettyXmlSerializer(cleaner.getProperties()).getAsString(node);
+        return new PrettyXmlSerializer(cleaner.getProperties()).getAsString(node);
+    }
 
-        Document document = getDocument(cleanedResult);
-        ITextRenderer renderer = new ITextRenderer();
-        SharedContext sharedContext = renderer.getSharedContext();
-        sharedContext.setReplacedElementFactory(new ImageReplaceFactory(renderer.getSharedContext().getReplacedElementFactory()));
+    private String searchParameter(String parameter, HttpServletRequest request) {
+        return request.getParameter(parameter) == null ? (String) request.getAttribute(parameter) : request.getParameter(parameter);
+    }
 
-        renderer.setDocument(document, null);
-        renderer.layout();
-        renderer.createPDF((response.getOutputStream()));
-        response.getOutputStream().flush();
-        response.getOutputStream().close();
+    private File getFile(String pdfName, String folderName) throws IOException {
+        String datasetFilePath = SQLInitServlet.getField("filePath") + folderName + File.separator + pdfName + ".pdf";
+        File file = new File(datasetFilePath);
+        if (!file.getParentFile().isDirectory()) {
+            file.getParentFile().mkdir();
+        }
+        file.createNewFile();
+
+        return file;
     }
 
     private Document getDocument(String htmlContent) throws Exception {
