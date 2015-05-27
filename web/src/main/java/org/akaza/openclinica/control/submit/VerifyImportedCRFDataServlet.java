@@ -505,7 +505,9 @@ public class VerifyImportedCRFDataServlet extends Controller {
 
 		List<String> messages = new ArrayList<String>();
 		if (containers != null && !containers.isEmpty()) {
-			HashMap<String, ArrayList<String>> summary = getRuleSetService().runRulesInImportData(runRulesOptimisation,
+			RuleSetService ruleSetService = getRuleSetService();
+			ruleSetService.getDynamicsMetadataService().getExpressionService().clearItemDataCache();
+			HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(runRulesOptimisation,
 					connection, containers, skippedItemIds, studyBean, userBean, executionMode);
 			logger.debug("=== found summary " + summary.toString());
 			messages = extractRuleActionWarnings(summary);

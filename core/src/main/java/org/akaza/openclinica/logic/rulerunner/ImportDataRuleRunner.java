@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -33,6 +34,7 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.ActionProcessor;
 import org.akaza.openclinica.domain.rule.action.ActionProcessorFacade;
+import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
@@ -40,6 +42,7 @@ import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.slf4j.Logger;
@@ -53,6 +56,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ImportDataRuleRunner extends RuleRunner {
 
 	private final Logger logger = LoggerFactory.getLogger(ImportDataRuleRunner.class);
+
+	private ResourceBundle resexception;
 
 	/**
 	 * ImportDataRuleRunner constructor.
@@ -69,6 +74,7 @@ public class ImportDataRuleRunner extends RuleRunner {
 	public ImportDataRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath,
 			JavaMailSenderImpl mailSender) {
 		super(ds, requestURLMinusServletPath, contextPath, mailSender);
+		resexception = ResourceBundleProvider.getExceptionsBundle(ResourceBundleProvider.getLocale());
 	}
 
 	/**
@@ -147,52 +153,46 @@ public class ImportDataRuleRunner extends RuleRunner {
 					try {
 						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(getDynamicsMetadataService()
 								.getExpressionService());
-						result = oep.parseAndEvaluateExpression(rule.getExpression().getValue(), optimiseRuleValidator);
-						itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
-
-						// Actions
-						List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result,
-								Phase.IMPORT);
-
-						if (itemData != null) {
-							Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
-							// String firstDDE = "firstDDEInsert_"+ruleSetRule.getOid()+"_"+itemData.getId();
-							while (itr.hasNext()) {
-								RuleActionBean ruleActionBean = itr.next();
-								/*
-								 * if(ruleActionBean.getActionType()==ActionType.INSERT) {
-								 * request.setAttribute("insertAction", true); if(phase==Phase.DOUBLE_DATA_ENTRY &&
-								 * itemData.getStatus().getId()==4 && request.getAttribute(firstDDE)==null) {
-								 * request.setAttribute(firstDDE, true); } }
-								 * if(request.getAttribute(firstDDE)==Boolean.TRUE) { } else {
-								 */
-								String itemDataValueFromImport;
-								if (variableAndValue.containsKey(key)) {
-									itemDataValueFromImport = variableAndValue.get(key);
-								} else {
-									logger.info("Cannot find value from variableAndValue for item=" + key + ". "
-											+ "Used itemData.getValue()");
-									itemDataValueFromImport = itemData.getValue();
+						List<String> expressions = getExpressionService().prepareRuleExpression(
+								rule.getExpression().getValue(), ruleSet);
+						for (String expression : expressions) {
+							result = oep.parseAndEvaluateExpression(expression, optimiseRuleValidator);
+							itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
+							List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result,
+									Phase.IMPORT);
+							if (itemData != null) {
+								Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
+								while (itr.hasNext()) {
+									RuleActionBean ruleActionBean = itr.next();
+									String itemDataValueFromImport;
+									if (variableAndValue.containsKey(key)) {
+										itemDataValueFromImport = variableAndValue.get(key);
+									} else {
+										logger.info("Cannot find value from variableAndValue for item=" + key + ". "
+												+ "Used itemData.getValue()");
+										itemDataValueFromImport = itemData.getValue();
+									}
+									RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(
+											ruleActionBean.getActionType(), itemData, itemDataValueFromImport,
+											ruleSetRule.getRuleBean().getOid());
+									if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
+										itr.remove();
+									}
 								}
-								RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(
-										ruleActionBean.getActionType(), itemData, itemDataValueFromImport, ruleSetRule
-												.getRuleBean().getOid());
-								if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
-									itr.remove();
-								}
-								// }
 							}
+							for (RuleActionBean ruleActionBean : actionListBasedOnRuleExecutionResult) {
+								RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean,
+										expressionBean, itemData, ruleSet);
+								if (!ruleActionContainerAlreadyExistsInList(ruleActionContainer,
+										allActionContainerListBasedOnRuleExecutionResult)) {
+									allActionContainerListBasedOnRuleExecutionResult.add(ruleActionContainer);
+								}
+							}
+							logger.info(
+									"RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed. ",
+									ruleSet.getTarget().getValue(), rule.getName(), result,
+									actionListBasedOnRuleExecutionResult.size());
 						}
-
-						for (RuleActionBean ruleActionBean : actionListBasedOnRuleExecutionResult) {
-							RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean,
-									expressionBean, itemData, ruleSet);
-							allActionContainerListBasedOnRuleExecutionResult.add(ruleActionContainer);
-						}
-						logger.info(
-								"RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed. ",
-								ruleSet.getTarget().getValue(), rule.getName(), result,
-								actionListBasedOnRuleExecutionResult.size());
 					} catch (OpenClinicaSystemException osa) {
 						logger.error(osa.getMessage());
 					}
@@ -230,6 +230,11 @@ public class ImportDataRuleRunner extends RuleRunner {
 
 				if (itemData != null && skippedItemIds.contains(itemData.getItemId())) {
 					continue;
+				}
+
+				if (ruleActionContainer.getRuleAction() instanceof EmailActionBean) {
+					((EmailActionBean) ruleActionContainer.getRuleAction()).setExceptionMessage(resexception
+							.getString("email_action_processor_exception"));
 				}
 
 				RuleActionBean rab = ap.execute(

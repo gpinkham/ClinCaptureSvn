@@ -290,7 +290,8 @@ public class RuleRunner {
 		for (RuleActionContainer rac : ruleActionContainerList) {
 			if (rac.getRuleAction().getId().equals(ruleActionContainer.getRuleAction().getId())
 					&& rac.getExpressionBean().equals(ruleActionContainer.getExpressionBean())
-					&& rac.getItemDataBean().getId() == ruleActionContainer.getItemDataBean().getId()
+					&& ((rac.getItemDataBean() == null && ruleActionContainer.getItemDataBean() == null) || (rac
+							.getItemDataBean().getId() == ruleActionContainer.getItemDataBean().getId()))
 					&& rac.getRuleSetBean().getId().equals(ruleActionContainer.getRuleSetBean().getId())) {
 				return true;
 			}

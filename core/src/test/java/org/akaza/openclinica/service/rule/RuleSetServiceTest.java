@@ -13,6 +13,16 @@
 
 package org.akaza.openclinica.service.rule;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.sax.SAXSource;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -30,15 +40,6 @@ import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.InputSource;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.sax.SAXSource;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class RuleSetServiceTest extends DefaultAppContextTest {
 
@@ -106,7 +107,6 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 
 	@Test
 	public void testGetRuleSetsByCrfStudyAndStudyEventDefinition() {
-
 		List<RuleSetBean> ruleSets = getRuleSetsByCrfStudyAndStudyEventDefinition();
 		assertEquals("RuleSet size should be 4", FOUR, ruleSets.size());
 		assertNotNull(ruleSets.get(0).getRuleSetRules());
@@ -114,7 +114,6 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 
 	@Test
 	public void testFilterByStatusEqualsAvailable() {
-
 		List<RuleSetBean> ruleSets = getRuleSetsByCrfStudyAndStudyEventDefinition();
 		assertEquals("RuleSet size should be 4", FOUR, ruleSets.size());
 
@@ -138,12 +137,12 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 				}
 			}
 			if (!containers.isEmpty()) {
-				ruleSetService.runRulesInImportData(runRulesOptimisation, getDataSource().getConnection(), containers,
-						studyBean, ub, ExecutionMode.DRY_RUN);
+				ruleSetService.runRulesInImportData(runRulesOptimisation, null, containers, studyBean, ub,
+						ExecutionMode.DRY_RUN);
+				ruleSetService.runRulesInImportData(runRulesOptimisation, null, containers, new HashSet<Integer>(),
+						studyBean, ub, ExecutionMode.SAVE);
 			}
 		}
-		ruleSetService.runRulesInImportData(runRulesOptimisation, getDataSource().getConnection(), containers,
-				new HashSet<Integer>(), studyBean, ub, ExecutionMode.SAVE);
 		assertTrue(discrepancyNoteDAO.findAll().size() > total);
 	}
 
@@ -161,12 +160,12 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 				}
 			}
 			if (!containers.isEmpty()) {
-				ruleSetService.runRulesInImportData(runRulesOptimisation, getDataSource().getConnection(), containers,
-						studyBean, ub, ExecutionMode.DRY_RUN);
+				ruleSetService.runRulesInImportData(runRulesOptimisation, null, containers, studyBean, ub,
+						ExecutionMode.DRY_RUN);
+				ruleSetService.runRulesInImportData(runRulesOptimisation, null, containers, skippedItemsIds, studyBean,
+						ub, ExecutionMode.SAVE);
 			}
 		}
-		ruleSetService.runRulesInImportData(runRulesOptimisation, getDataSource().getConnection(), containers,
-				skippedItemsIds, studyBean, ub, ExecutionMode.SAVE);
 		assertEquals(discrepancyNoteDAO.findAll().size(), total);
 	}
 
