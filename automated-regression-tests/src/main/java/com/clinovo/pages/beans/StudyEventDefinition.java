@@ -6,11 +6,13 @@ import java.util.Map;
 
 public class StudyEventDefinition {
 	
-	public static final Object NEW_CREATED_EVENT = "new_created_event";
+	public static final String NEW_CREATED_EVENT = "new_created_event";
 
-	public static final Object EVENT_TO_SCHEDULE = "event_to_schedule";
+	public static final String EVENT_TO_SCHEDULE = "event_to_schedule";
 
-	public static final Object EVENTS_TO_SCHEDULE = "events_to_schedule";;
+	public static final String EVENTS_TO_SCHEDULE = "events_to_schedule";
+
+	public static final String EVENTS_TO_CHECK_SIGN_STATUS = "events_to_check_sign_status";;
 
 	private String name = "";
     

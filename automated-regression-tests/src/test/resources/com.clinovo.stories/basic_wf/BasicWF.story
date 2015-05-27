@@ -193,8 +193,11 @@ Examples:
 {scope=Scenario}
 |filepath                                                |
 |.\\src\\test\\resources\\eCRFs\\CRF_w_basic_fields_1.xls|
+|.\\src\\test\\resources\\eCRFs\\CRF_w_basic_fields_2.xls|
+|.\\src\\test\\resources\\eCRFs\\CRF_w_basic_fields_3.xls|
 |.\\src\\test\\resources\\eCRFs\\CRF_w_file_1.xls        |
 |.\\src\\test\\resources\\eCRFs\\CRF_w_group_1.xlsx      |
+|.\\src\\test\\resources\\eCRFs\\CRF_w_sections_1.xls    |
 
 
 Scenario: 12. "Root" creates Study Event Definitions
@@ -221,10 +224,13 @@ Then User is on Create Study Event Definition page
 
 Examples:
 {scope=Scenario}
-|<Name>      |<Description>|<Type>     |<Category>|<Repeating>|<eCRFs>                            |
-|Event A     |             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_file_1 |
-|Event B     |             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_group_1|
-|Event C     |             |Unscheduled|          |No         |CRF_w_group_1, CRF_w_file_1        |
+|<Name>      |<Description>|<Type>     |<Category>|<Repeating>|<eCRFs>                                   |
+|Event A     |             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_file_1        |
+|Event B     |             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_group_1       |
+|Event C     |             |Unscheduled|          |No         |CRF_w_group_1, CRF_w_file_1               |
+|Event D     |             |Unscheduled|          |No         |CRF_w_basic_fields_2, CRF_w_sections_1    |
+|Event E     |             |Unscheduled|          |No         |CRF_w_basic_fields_2, CRF_w_basic_fields_3|
+|Event F     |             |Unscheduled|          |No         |CRF_w_group_1, CRF_w_sections_1           |
 
 
 Scenario: 13. "CRC" creates subjects
@@ -241,8 +247,11 @@ Examples:
 {scope=Scenario}
 |<Study Subject ID>|<Person ID>|<Secondary ID>|<Date of Enrollment for Study>|<Gender>|<Date of Birth>|<Dynamic Group>|
 |StSubj_1          |ss_1       |              |                              |Male    |03-Mar-1985    |               |
-|StSubj_2          |ss_2       |              |                              |Female  |04-Mar-1987    |               |
+|StSubj_2          |ss_2       |              |                              |Female  |04-Jul-1987    |               |
 |StSubj_3          |ss_3       |              |                              |Male    |16-Mar-1983    |               |
+|StSubj_4          |ss_4       |              |                              |Female  |06-Apr-1982    |               |
+|StSubj_5          |ss_5       |              |                              |Female  |23-Mar-1984    |               |
+|StSubj_6          |ss_6       |              |                              |Male    |27-May-1986    |               |
 
 
 Scenario: 14. "CRC" schedules event for subject
@@ -263,10 +272,13 @@ Scenario: 14.1 "CRC" schedules events for subjects
 Given User logs in as "CRC"
 And User goes to SM page
 When User schedules events on SM:
-|Study Subject ID|Event Name      |
-|StSubj_1        |Event C, Event B|
-|StSubj_2        |Event A, Event B|
-|StSubj_3        |Event B         |
+|Study Subject ID|Event Name                        |
+|StSubj_1        |Event A, Event C, Event B         |
+|StSubj_2        |Event A, Event B                  |
+|StSubj_3        |Event B, Event F                  |
+|StSubj_4        |Event A, Event D, Event E         |
+|StSubj_5        |Event B, Event D, Event E, Event F|
+|StSubj_6        |Event C, Event E, Event F         |
 
 Then Events are scheduled
 
@@ -290,8 +302,8 @@ And User goes to SM page
 And User calls a popup for "StSubj_1", "Event B"
 And User clicks 'Enter Data' button in popup for "CRF_w_basic_fields_1"
 And User fills in data into CRF:
-|input1(T)  |input2(T)|input3(R)|input4(T)  |input5(R)|
-|20-Apr-2015|22:00    |1        |description|0        |
+|Mark Complete|input1(T)  |input2(T)|input3(R)|input4(T)  |input5(R)|
+|no           |20-Apr-2015|22:00    |1        |description|0        |
 
 When User clicks 'Save' button
 Then User is on SM page
@@ -304,19 +316,66 @@ And User goes to SM page
 When User fills in, completes and saves CRF: 
 |Study Subject ID|Event Name|CRF Name            |Mark Complete|input1(T)  |input2(T)|input3(R)|input4(T)|input5(R)|
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|yes          |24-Apr-2015|17:45    |1        |some text|0        |
-|StSubj_3        |Event B   |CRF_w_basic_fields_1|no           |21-Apr-2014|12:00    |0        |         |1        |
+|StSubj_3        |Event B   |CRF_w_basic_fields_1|yes          |21-Apr-2014|12:00    |0        |         |1        |
+|StSubj_1        |Event B   |CRF_w_basic_fields_1|yes          |           |         |         |         |         |
 |StSubj_1        |Event B   |CRF_w_basic_fields_1|yes          |           |         |         |         |         |
 
 Then User is on SM page
+
+
+Scenario: 16.2 "CRC" enters data into CRF and completes it for some subjects
+
+Given User logs in as "CRC"
+And User goes to SM page
+When User fills in, completes and saves CRF: 
+|Study Subject ID|Event Name|CRF Name            |Mark Complete|item1                                          |item2                                          |item3           |item4                 |item5        |
+|StSubj_1        |Event B   |CRF_w_group_1       |yes          |IG_CRF_W_CONCOMITANTMEDICATIONS_0input35(T): 21|IG_CRF_W_CONCOMITANTMEDICATIONS_0input36(T): 22|                |                      |             |
+|StSubj_2        |Event B   |CRF_w_group_1       |yes          |IG_CRF_W_CONCOMITANTMEDICATIONS_0input35(T): 14|IG_CRF_W_CONCOMITANTMEDICATIONS_0input36(T): 15|                |                      |             |
+|StSubj_2        |Event C   |CRF_w_group_1       |no           |IG_CRF_W_CONCOMITANTMEDICATIONS_0input35(T): 34|IG_CRF_W_CONCOMITANTMEDICATIONS_0input36(T): 25|                |                      |             |
+|StSubj_3        |Event B   |CRF_w_group_1       |yes          |IG_CRF_W_CONCOMITANTMEDICATIONS_0input35(T): 83|IG_CRF_W_CONCOMITANTMEDICATIONS_0input36(T): 12|                |                      |             |
+|StSubj_1        |Event A   |CRF_w_basic_fields_1|no           |input1(T): 13-Apr-2014                         |input2(T): 22:45                               |input3(R): 1    |input4(T): discrepancy|input5(R): 1 |
+|StSubj_4        |Event E   |CRF_w_basic_fields_2|yes          |input6(R): 1                                   |input7(T): 17-Feb-2013                         |input8(T): 13:35|input9(R): 1          |input15(R): 1|
+|StSubj_4        |Event E   |CRF_w_basic_fields_3|yes          |input31(T): 18-May-2014                        |input32(T): 13:22                              |input33(T): 100 |                      |             |
+|StSubj_5        |Event F   |CRF_w_group_1       |yes          |IG_CRF_W_CONCOMITANTMEDICATIONS_0input35(T): 54|IG_CRF_W_CONCOMITANTMEDICATIONS_0input36(T): 15|                |                      |             |
+|StSubj_5        |Event E   |CRF_w_basic_fields_2|yes          |input6(R): 1                                   |input7(T): 27-Feb-2013                         |input8(T): 17:25|input9(R): 0          |input15(R): 1|
+|StSubj_5        |Event E   |CRF_w_basic_fields_3|yes          |input31(T): 28-May-2013                        |input32(T): 11:24                              |input33(T): 23  |                      |             |
+
+Then User is on SM page
+
 
 Scenario: 17 "Study Monitor" performs SDV on SDV page
  
 Given User logs in as "Study Monitor"
 And User goes to SDV page
 When User filters table and performs SDV: 
-|Study Subject ID|Event Name|CRF Name            |
-|StSubj_2        |Event B   |CRF_w_basic_fields_1|
-|StSubj_1        |Event B   |CRF_w_basic_fields_1|
+|Study Subject ID|Event Name|CRF Name                                  |
+|StSubj_2        |Event B   |CRF_w_basic_fields_1, CRF_w_group_1       |
+|StSubj_1        |Event B   |CRF_w_basic_fields_1, CRF_w_group_1       |
+|StSubj_5        |Event F   |CRF_w_group_1                             |
+|StSubj_4        |Event E   |CRF_w_basic_fields_2, CRF_w_basic_fields_3|
  
 Then CRFs are SDVed
 
+
+Scenario: 18 "PI" signs event
+ 
+Given User logs in as "PI"
+And User goes to SM page
+And User calls a popup for "StSubj_2", "Event B"
+And User clicks 'Sign Event' button in popup
+And User is on Sign Study Event page
+And User enters credentials on Sign Study Event page
+When User clicks 'Sign' button on Sign Study Event page
+Then User is on View Subject Record page
+
+
+Scenario: 18.1 "PI" signs events
+ 
+Given User logs in as "PI"
+And User goes to SM page
+When User filters table and signs events: 
+|Study Subject ID|Event Name|
+|StSubj_1        |Event B   |
+|StSubj_4        |Event E   |
+ 
+Then Events are signed

@@ -17,7 +17,7 @@ public class CreateCRFVersionPage extends BasePage {
         super(driver);
     }
 
-    @FindBy(jquery = "input[type='submit'][class='button_medium']")
+    @FindBy(jquery = "input[type='submit'][class='button_medium medium_continue']")
     private WebElementFacade bContinue;
     
     @FindBy(id = "excel_file_path")

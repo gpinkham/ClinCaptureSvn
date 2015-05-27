@@ -56,6 +56,8 @@ public class CommonSteps extends ScenarioSteps {
 	protected ManageEventDefinitionsPage manageEventDefinitionsPage = getPages().get(ManageEventDefinitionsPage.class);
 	protected CRFPage crfPage = getPages().get(CRFPage.class);
 	protected SDVPage sdvPage = getPages().get(SDVPage.class);
+	protected SignStudyEventPage signStudyEventPage = getPages().get(SignStudyEventPage.class);
+	protected ViewSubjectRecordPage viewSubjectRecordPage = getPages().get(ViewSubjectRecordPage.class);
 	
     private LoginPage loginPage = getPages().get(LoginPage.class);
     private HomePage homePage = getPages().get(HomePage.class);
@@ -183,10 +185,14 @@ public class CommonSteps extends ScenarioSteps {
 				return addSubjectPage;	
 			case ManageEventDefinitionsPage.PAGE_NAME: 
 				return manageEventDefinitionsPage;
-			case CRFPage.PAGE_NAME: 
-				return crfPage;	
-			case SDVPage.PAGE_NAME: 
-				return sdvPage;		
+			case CRFPage.PAGE_NAME:
+				return crfPage;
+			case SDVPage.PAGE_NAME:
+				return sdvPage;
+			case SignStudyEventPage.PAGE_NAME:
+				return signStudyEventPage;
+			case ViewSubjectRecordPage.PAGE_NAME:
+				return viewSubjectRecordPage;
 			
 			default: ;
     	}
@@ -444,5 +450,30 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void user_check_CRF_SDVed() {
 		sdvPage.checkSDVIcon();
+	}
+	
+	@Step
+	public void click_sign_event_button_in_popup() {
+		subjectMatrixPage.clickSignEventButton();
+	}
+	
+	@Step
+	public void enter_credentials_on_sign_study_event_page(User user) {
+		signStudyEventPage.enterCredentials(user);
+	}
+	
+	@Step
+	public void clicks_sign_button_on_sign_study_event_page() {
+		signStudyEventPage.clickSignButton();
+	}
+	
+	@Step
+	public void user_filters_SM_page(Map<String, String> map) {
+		subjectMatrixPage.filterSMPage(map);
+	}
+	
+	@Step
+	public void check_sign_event_status(Map<String, String> values) {
+		subjectMatrixPage.checkSignEventStatus(values);
 	}
 }

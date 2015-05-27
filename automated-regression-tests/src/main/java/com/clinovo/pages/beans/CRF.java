@@ -1,6 +1,7 @@
 package com.clinovo.pages.beans;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,9 +29,33 @@ public class CRF{
 			crf.setMarkComplete(values.get("Mark Complete"));
 			values.remove("Mark Complete");
 		}
-		crf.setFieldNameToValueMap(values);
+		
+		crf.setFieldNameToValueMap(getFieldToValueMap(values));
 		
 		return crf;
+	}
+
+	private static Map<String, String> getFieldToValueMap(Map<String, String> values) {
+		if (values.containsKey("item1")) {
+			Map<String, String> parsedValues = new HashMap<String, String>();
+			String parsedKey;
+			String parsedValue;
+			String value;
+			String number;
+			for (String key: values.keySet()) {
+				value = values.get(key);
+				if (value.isEmpty()) continue;
+				number = key.replace("item", "");
+				parsedValue = value.replaceFirst(".*input(\\d+)\\(\\w\\):", "").trim();
+				parsedKey = value.replaceFirst(": "+parsedValue, "").trim();
+				
+				parsedValues.put("("+number+")"+parsedKey, parsedValue);
+			}
+			
+			return parsedValues;
+		}
+		
+		return values;
 	}
 
 	public String getMarkComplete() {

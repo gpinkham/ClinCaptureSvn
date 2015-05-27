@@ -7,9 +7,14 @@ public class Common {
 		return str.substring(0, str.indexOf("("));
     }
 	
+	public static String removeOrderAndType(String str) {
+		// (1)input1(R) --> input1
+		return str.replaceAll("\\(\\d+\\)|\\(\\w\\)", "");
+    }
+	
 	public static String getType(String str) {
-		// input1(R) --> R
-		return str.replace(removeType(str)+"(", "").replace(")", "");
+		// (1)input1(R) --> R
+		return str.replaceAll("\\(\\d+\\)", "").replace(removeOrderAndType(str)+"(", "").replace(")", "");
     }
 	
     public static String removeDoubleQuotes(String str) {
@@ -23,7 +28,7 @@ public class Common {
     }
     
     public static String removeQuotes(String str, String quote) {
-		// 'str' --> str
+		// 'quote'str'quote' --> str
     	String result = str;
     	
     	if (result.startsWith(quote)) {

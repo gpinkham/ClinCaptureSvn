@@ -52,7 +52,7 @@ public class CRFPage extends BasePage {
 		Collections.sort(names, CRF.comparatorForItemOIDs);
 		for (String fieldName: names) {
 			if (crf.getFieldNameToValueMap().get(fieldName).isEmpty()) continue;
-			WebElementFacade element = formWithData.find(By.xpath(".//*[@name='"+Common.removeType(fieldName)+"']"));
+			WebElementFacade element = formWithData.find(By.xpath(".//*[@name='"+Common.removeOrderAndType(fieldName)+"']"));
 			switch (Common.getType(fieldName)){
 				case "T":
 					// text (or date) field
@@ -60,7 +60,7 @@ public class CRFPage extends BasePage {
 					break;
 				case "R":
 					// radio button group
-					RadioButtonGroup rBgroup = new RadioButtonGroup(formWithData.findElements(By.xpath(".//*[@name='"+Common.removeType(fieldName)+"']")));
+					RadioButtonGroup rBgroup = new RadioButtonGroup(formWithData.findElements(By.xpath(".//*[@name='"+Common.removeOrderAndType(fieldName)+"']")));
 					rBgroup.selectByValue(crf.getFieldNameToValueMap().get(fieldName));
 					break;
 				case "S": 

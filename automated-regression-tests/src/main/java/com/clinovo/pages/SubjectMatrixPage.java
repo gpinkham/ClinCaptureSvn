@@ -3,11 +3,14 @@ package com.clinovo.pages;
 import net.thucydides.core.annotations.findby.By;
 import net.thucydides.core.annotations.findby.FindBy;
 import net.thucydides.core.pages.WebElementFacade;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import com.clinovo.pages.beans.StudyEventDefinition;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Anton on 18.07.2014.
@@ -32,6 +35,12 @@ public class SubjectMatrixPage extends BasePage {
     
     @FindBy(xpath = ".//div[starts-with(@id, 'eventScheduleWrapper')]//*[@name='Schedule']")
     private WebElementFacade bScheduleEvent;
+    
+    @FindBy(xpath = ".//*[@class='crfListTable']//a[contains(@href,'UpdateStudyEvent')]/img[contains(@src,'icon_SignedBlue.gif')]")
+    private WebElementFacade bSignEvent;
+    
+    @FindBy(xpath = ".//*[@class='crfListTable']//a[contains(@href,'SignStudySubject')]/img[contains(@src,'icon_SignedBlue.gif')]")
+    private WebElementFacade bSignSubject;
     
     @FindBy(className = "crfListTable")
     private WebElementFacade tCRFList;
@@ -102,7 +111,7 @@ public class SubjectMatrixPage extends BasePage {
 	}
 
 	public void eventIsScheduled(StudyEventDefinition event) {
-		WebElementFacade eventIcon = tblFindSubjects.findBy(By.xpath(".//td[text()='" + event.getStudySubjectID() + "']/..//div[@event_name='" + event.getName() + "']/../a/img"));		
+		WebElementFacade eventIcon = findEventIconOnSM(event.getStudySubjectID(), event.getName());		
 		assert(eventIcon.getAttribute("src").endsWith("icon_Scheduled.gif"));
 	}
 
@@ -115,5 +124,29 @@ public class SubjectMatrixPage extends BasePage {
 	    		break;
 	    	}
 	    }
+	}
+
+	public void clickSignEventButton() {
+		bSignEvent.waitUntilVisible();
+		bSignEvent.click();
+	}
+
+	public void filterSMPage(Map<String, String> map) {
+		if (map.containsKey("Study Subject ID")) {
+			enterStudySubjectIDToFilterField(map.get("Study Subject ID"));
+		}
+		
+		clickApplyFilterLink();
+	}
+
+	public void checkSignEventStatus(Map<String, String> values) {
+		if (values.containsKey("Study Subject ID") && values.containsKey("Event Name")) {
+			WebElementFacade eventIcon = findEventIconOnSM(values.get("Study Subject ID"), values.get("Event Name"));		
+			assert(eventIcon.getAttribute("src").endsWith("icon_Signed.gif"));
+		}
+	}
+	
+	public WebElementFacade findEventIconOnSM(String studySubjectID, String eventName) {
+		return tblFindSubjects.findBy(By.xpath(".//td[text()='" + studySubjectID + "']/..//div[@event_name='" + eventName + "']/../a/img"));
 	}
 }

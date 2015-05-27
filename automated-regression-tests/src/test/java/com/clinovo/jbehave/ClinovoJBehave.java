@@ -8,6 +8,7 @@ import java.util.Map;
 import com.clinovo.pages.BuildStudyPage;
 import com.clinovo.pages.ChangeStudyPage;
 import com.clinovo.pages.ConfirmChangeStudyPage;
+import com.clinovo.pages.SubjectMatrixPage;
 import com.clinovo.steps.CommonSteps;
 import com.clinovo.pages.beans.CRF;
 import com.clinovo.pages.beans.Study;
@@ -339,7 +340,7 @@ public class ClinovoJBehave extends BaseJBehave {
     	for (int i = 0; i < table.getRowCount(); i++) {
     		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
     		Map<String, String> values = rowParams.values();
-    		for (String eventName: rowParams.values().get("Event Name").split(",")) {
+    		for (String eventName: rowParams.values().get("Event Name").split(", ")) {
     			values.put("Event Name", eventName.trim());
     			StudyEventDefinition event = StudyEventDefinition.fillStudyEventDefinitionFromTableRow(values);
     			userCallsPopupOnSM(event.getStudySubjectID(), event.getName());
@@ -424,11 +425,14 @@ public class ClinovoJBehave extends BaseJBehave {
     @When("User filters table and performs SDV: $activityTable")
    	public void userFiltersTableAndPerformsSDV(ExamplesTable table) {
     	boolean replaceNamedParameters = true;
-    	Parameters rowParams;
+    	Map<String, String> values;
     	for (int i = 0; i < table.getRowCount(); i++) {
-    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
-    		userFiltersSDVPage(rowParams);
-    		userClicksPerformSDVButtonForFilteredTable();
+    		values = new HashMap<String, String>(table.getRowAsParameters(i, replaceNamedParameters).values());
+    		for (String crfName: values.get("CRF Name").split(", ")) {
+    			values.put("CRF Name", crfName.trim());
+    			userFiltersSDVPage(values);
+    			userClicksPerformSDVButtonForFilteredTable();
+    		}
     	}
     	
     	Thucydides.getCurrentSession().put(CRF.CRFS_TO_CHECK_SDV_STATUS, table);
@@ -438,8 +442,8 @@ public class ClinovoJBehave extends BaseJBehave {
     	commonSteps.click_perform_SDV_button_for_filtered_table();
 	}
 
-	private void userFiltersSDVPage(Parameters rowParams) {
-		commonSteps.filter_SDV_page(rowParams.values());
+	private void userFiltersSDVPage(Map<String, String> values) {
+		commonSteps.filter_SDV_page(values);
 	}
 
 	@Given("User clicks 'Save' button")
@@ -453,16 +457,88 @@ public class ClinovoJBehave extends BaseJBehave {
 		ExamplesTable table = (ExamplesTable) Thucydides.getCurrentSession().get(CRF.CRFS_TO_CHECK_SDV_STATUS);
     	Thucydides.getCurrentSession().remove(CRF.CRFS_TO_CHECK_SDV_STATUS);
     	boolean replaceNamedParameters = true;
-    	Parameters rowParams;
+    	Map<String, String> values;
     	for (int i = 0; i < table.getRowCount(); i++) {
-    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
-    		userFiltersSDVPage(rowParams);
-    		userCheckCRFSDVed();
+    		values = new HashMap<String, String>(table.getRowAsParameters(i, replaceNamedParameters).values());
+    		for (String crfName: values.get("CRF Name").split(", ")) {
+    			values.put("CRF Name", crfName.trim());
+    			userFiltersSDVPage(values);
+    			userCheckCRFSDVed();
+    		}
     	}
+    }
+	
+    @Given("User clicks 'Sign Event' button in popup")
+    @When("User clicks 'Sign Event' button in popup")
+	public void userClicksSignEventButtonInPopup() {
+    	commonSteps.click_sign_event_button_in_popup();
+    }
+    
+    @Given("User enters credentials on Sign Study Event page")
+    @When("User enters credentials on Sign Study Event page")
+	public void userEntersCredentialsOnSignStudyEventPage() {
+    	commonSteps.enter_credentials_on_sign_study_event_page(getCurrentUser());
+    }
+    
+    @Given("User clicks 'Sign' button on Sign Study Event page")
+    @When("User clicks 'Sign' button on Sign Study Event page")
+	public void userClicksSignButtonOnSignStudyEventPage() {
+    	commonSteps.clicks_sign_button_on_sign_study_event_page();
     }
     
     private void userCheckCRFSDVed() {
     	commonSteps.user_check_CRF_SDVed();		
+	}
+
+    @Given("User filters table and signs events: $activityTable")
+    @When("User filters table and signs events: $activityTable")
+   	public void userFiltersTableAndSignsEvents(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Map<String, String> values;
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		values = new HashMap<String, String>(table.getRowAsParameters(i, replaceNamedParameters).values());
+    		for (String eventName: values.get("Event Name").split(", ")) {
+    			values.put("Event Name", eventName.trim());
+    			userFiltersSMPage(values);
+    			userCallsPopupOnSM(values);
+    			userClicksSignEventButtonInPopup();
+    			userEntersCredentialsOnSignStudyEventPage();
+    			userClicksSignButtonOnSignStudyEventPage();
+    			userGoesToPage(SubjectMatrixPage.PAGE_NAME);
+    		}
+    	}
+    	
+    	Thucydides.getCurrentSession().put(StudyEventDefinition.EVENTS_TO_CHECK_SIGN_STATUS, table);
+    	commonSteps.clear_filter_on_SM();
+    }
+    
+    @Then("Events are signed")
+	public void eventsAreSigned() {
+		ExamplesTable table = (ExamplesTable) Thucydides.getCurrentSession().get(StudyEventDefinition.EVENTS_TO_CHECK_SIGN_STATUS);
+    	boolean replaceNamedParameters = true;
+    	Map<String, String> values;
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		values = new HashMap<String, String>(table.getRowAsParameters(i, replaceNamedParameters).values());
+    		for (String eventName: values.get("Event Name").split(", ")) {
+    			values.put("Event Name", eventName.trim());
+    			userFiltersSMPage(values);
+    			userChecksSignEventStatus(values);
+    		}
+    	}
+    	
+    	Thucydides.getCurrentSession().remove(StudyEventDefinition.EVENTS_TO_CHECK_SIGN_STATUS);
+    }
+    
+	private void userChecksSignEventStatus(Map<String, String> values) {
+		commonSteps.check_sign_event_status(values);
+	}
+
+	private void userCallsPopupOnSM(Map<String, String> values) {
+		userCallsPopupOnSM(values.get("Study Subject ID"), values.get("Event Name"));
+	}
+
+	private void userFiltersSMPage(Map<String, String> map) {
+		commonSteps.user_filters_SM_page(map);
 	}
 
 	private User getCurrentUser() {
