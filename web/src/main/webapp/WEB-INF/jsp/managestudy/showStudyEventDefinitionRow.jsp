@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -72,8 +73,14 @@
          <c:otherwise><fmt:message key="no" bundle="${resword}"/></c:otherwise> 
         </c:choose>
        </td>      
-      <td class="table_cell"><fmt:formatDate value="${currRow.bean.createdDate}" pattern="${dteFormat}"/><br>(<c:out value="${currRow.bean.owner.name}"/>)</td>
-      <td class="table_cell"><fmt:formatDate value="${currRow.bean.updatedDate}" pattern="${dteFormat}"/><br>(<c:out value="${currRow.bean.updater.name}"/>)</td>
+      <td class="table_cell">
+		  <cc-fmt:formatDate value="${currRow.bean.createdDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+		  <br>(<c:out value="${currRow.bean.owner.name}"/>)
+	  </td>
+      <td class="table_cell">
+		  <cc-fmt:formatDate value="${currRow.bean.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+		  <br>(<c:out value="${currRow.bean.updater.name}"/>)
+	  </td>
       <td class="table_cell" style="display: none;white-space:nowrap" id="Groups_0_9_<c:out value="${eblRowCount+1}"/>">
         <c:forEach var="entry" items="${currRow.bean.crfsWithDefaultVersion}" varStatus="status">
             <c:out value="${entry.key}"/>

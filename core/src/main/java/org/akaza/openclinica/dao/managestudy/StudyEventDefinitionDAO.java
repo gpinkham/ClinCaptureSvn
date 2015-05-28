@@ -87,8 +87,8 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		// int int date date int
 		this.setTypeExpected(8, TypeNames.INT);
 		this.setTypeExpected(9, TypeNames.INT);
-		this.setTypeExpected(10, TypeNames.DATE);
-		this.setTypeExpected(11, TypeNames.DATE);
+		this.setTypeExpected(10, TypeNames.TIMESTAMP);
+		this.setTypeExpected(11, TypeNames.TIMESTAMP);
 		this.setTypeExpected(12, TypeNames.INT);
 		this.setTypeExpected(13, TypeNames.INT);
 		this.setTypeExpected(14, TypeNames.STRING);
@@ -329,8 +329,8 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	/**
 	 * Gets all available Study Event Definitions that contain CRFs that can be evaluated.
 	 * 
-	 * @param studyId
-	 *            Study ID
+	 * @param study
+	 *            StudyBean
 	 * @return StudyEventDefinitionBean with CRFs which can be evaluated.
 	 */
 	public List<StudyEventDefinitionBean> findAllAvailableWithEvaluableCRFByStudy(StudyBean study) {
@@ -610,7 +610,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Gets all active study event definitions ordered by dynamic group and study event definition
+	 * Gets all active study event definitions ordered by dynamic group and study event definition.
 	 *
 	 * @param parentStudyId
 	 *            Study ID
