@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <jsp:useBean scope="session" id="userRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean" />
@@ -164,7 +165,7 @@
                     <c:if test="${isStartDateUsed eq true}">
                     <tr>
                         <td class="table_header_column">${startDateLabel}</td>
-                        <td class="table_cell"><span style="float:left"><fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}"/></span>
+                        <td class="table_cell"><span style="float:left"><cc-fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/></span>
                         <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 							<c:set var="imageFileName" value="${imageFileNameForDateStart}"/>
 							<c:choose>
@@ -193,7 +194,7 @@
                     <c:if test="${isEndDateUsed eq true}">
                     <tr>
                         <td class="table_header_column">${endDateLabel}</td>
-                        <td class="table_cell"><span style="float:left"><fmt:formatDate value="${studyEvent.dateEnded}" pattern="${dteFormat}"/></span>
+                        <td class="table_cell"><span style="float:left"><cc-fmt:formatDate value="${studyEvent.dateEnded}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/></span>
                             <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 							<c:set var="imageFileName" value="${imageFileNameForDateEnd}"/>
 							<c:choose>
@@ -225,7 +226,7 @@
                     </tr>
                     <tr>
                         <td class="table_header_column"><fmt:message key="last_updated_by" bundle="${resword}"/></td>
-                        <td class="table_cell"><c:out value="${studyEvent.updater.name}"/> (<fmt:formatDate value="${studyEvent.updatedDate}" pattern="${dteFormat}"/>)</td>
+                        <td class="table_cell"><c:out value="${studyEvent.updater.name}"/> (<cc-fmt:formatDate value="${studyEvent.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>)</td>
                     </tr>
 
                 </table>

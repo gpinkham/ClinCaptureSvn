@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
@@ -166,10 +167,10 @@
     <c:out value="${event.studySubjectId}"/>
    </td>
    <td class="table_cell">
-    <fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/>&nbsp;
+    <cc-fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>&nbsp;
    </td>
    <td class="table_cell">
-    <fmt:formatDate value="${event.dateEnded}" pattern="${dteFormat}"/>&nbsp;
+    <cc-fmt:formatDate value="${event.dateEnded}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>&nbsp;
    </td>
   </tr>  
   </c:forEach>

@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
@@ -136,14 +137,20 @@
    
        <c:forEach var="displayEvents" items="${events}">
        <tr>
-           <td class="table_cell"><fmt:formatDate value="${displayEvents.studyEvent.updatedDate}" pattern="${dteFormat}"/></td>
+           <td class="table_cell">
+			   <cc-fmt:formatDate value="${displayEvents.studyEvent.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+		   </td>
            <td class="table_cell"><c:out value="${displayEvents.studyEvent.studyEventDefinition.name}"/>
            <c:if test="${displayEvents.studyEvent.studyEventDefinition.repeating}">
                (<c:out value="${displayEvents.studyEvent.sampleOrdinal}"/>)
            </c:if>
            </td>
-           <td class="table_cell"><fmt:formatDate value="${displayEvents.studyEvent.dateStarted}" pattern="${dteFormat}"/></td>
-           <td class="table_cell"><fmt:formatDate value="${displayEvents.studyEvent.dateEnded}" pattern="${dteFormat}"/></td>
+           <td class="table_cell">
+			   <cc-fmt:formatDate value="${displayEvents.studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+		   </td>
+           <td class="table_cell">
+			   <cc-fmt:formatDate value="${displayEvents.studyEvent.dateEnded}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+		   </td>
            <td class="table_cell"><c:out value="${displayEvents.studyEvent.location}"/></td>
            <td class="table_cell"><c:out value="${displayEvents.studyEvent.updater.name}"/></td>
            <td class="table_cell"><c:out value="${displayEvents.studyEvent.status.name}"/></td>

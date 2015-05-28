@@ -22,7 +22,7 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.util.DateUtil;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.facade.TableFacadeImpl;
 import org.jmesa.limit.ExportType;
@@ -30,25 +30,39 @@ import org.jmesa.limit.Limit;
 import org.jmesa.limit.LimitImpl;
 import org.jmesa.limit.RowSelect;
 import org.jmesa.limit.RowSelectImpl;
+import org.jmesa.util.ItemUtils;
 import org.jmesa.view.component.Column;
 import org.jmesa.view.editor.AbstractCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.FilterEditor;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlTable;
-import org.jmesa.util.ItemUtils;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.DateUtil;
 
+/**
+ * AbstractTableFactory.
+ */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class AbstractTableFactory {
 
 	protected Locale locale;
 
 	protected Logger logger = LoggerFactory.getLogger(getClass().getName());
+
+	private UserAccountBean currentUser;
+
+	public UserAccountBean getCurrentUser() {
+		return currentUser;
+	}
+
+	public void setCurrentUser(UserAccountBean currentUser) {
+		this.currentUser = currentUser;
+	}
 
 	protected abstract String getTableName();
 
@@ -62,12 +76,36 @@ public abstract class AbstractTableFactory {
 		configureColumns(tableFacade, locale);
 	}
 
+	/**
+	 * Returns TableFacade.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @return TableFacade
+	 */
 	public TableFacade getTableFacadeImpl(HttpServletRequest request, HttpServletResponse response) {
 		return new TableFacadeImpl(getTableName(), request);
 	}
 
+	/**
+	 * Sets DataAndLimitVariables.
+	 * 
+	 * @param tableFacade
+	 *            TableFacade
+	 */
 	public abstract void setDataAndLimitVariables(TableFacade tableFacade);
 
+	/**
+	 * Creates TableFacade.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @return TableFacade
+	 */
 	public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
 		locale = LocaleResolver.getLocale(request);
 		TableFacade tableFacade = getTableFacadeImpl(request, response);
@@ -91,14 +129,15 @@ public abstract class AbstractTableFactory {
 	 * page by page 3. Configure getSize(Limit limit)
 	 * 
 	 * @param request
+	 *            HttpServletRequest
 	 * @param response
-	 * @see getSize(Limit limit), createLimits()
-	 * @see filter & sort methods in implementations
+	 *            HttpServletResponse
+	 * @param path
+	 *            String
 	 */
 	public void exportCSVTable(HttpServletRequest request, HttpServletResponse response, String path) {
 		locale = LocaleResolver.getLocale(request);
-		String DATE_FORMAT = "yyyyMMddHHmmss";
-		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String fileName = getTableName() + "_" + sdf.format(new Date());
 
 		for (Limit limit : createLimits()) {
@@ -141,10 +180,25 @@ public abstract class AbstractTableFactory {
 		return rowSelects;
 	}
 
+	/**
+	 * Returns size.
+	 * 
+	 * @param limit
+	 *            Limit
+	 * @return int
+	 */
 	public int getSize(Limit limit) {
 		return 0;
 	}
 
+	/**
+	 * Configures TableFacade.
+	 * 
+	 * @param response
+	 *            HttpServletResponse
+	 * @param tableFacade
+	 *            TableFacade
+	 */
 	public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {
 		tableFacade.setExportTypes(response, getExportTypes());
 	}
@@ -158,6 +212,7 @@ public abstract class AbstractTableFactory {
 	 * configure other options.
 	 * 
 	 * @param tableFacade
+	 *            TableFacade
 	 */
 	public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
 		tableFacade.setToolbar(new DefaultToolbar());
@@ -167,6 +222,7 @@ public abstract class AbstractTableFactory {
 	 * By Default we configure a default view. Overwrite this method if you need to provide a custom view.
 	 * 
 	 * @param tableFacade
+	 *            TableFacade
 	 * @see http://code.google.com/p/jmesa/wiki/CustomViewTotalsTutorial
 	 */
 	public void configureTableFacadeCustomView(TableFacade tableFacade) {
@@ -211,6 +267,13 @@ public abstract class AbstractTableFactory {
 		}
 	}
 
+	/**
+	 * Returns DN Flag icon name.
+	 * 
+	 * @param dnResolutionStatusId
+	 *            int
+	 * @return String
+	 */
 	public static String getDNFlagIconName(int dnResolutionStatusId) {
 		String name = "";
 		switch (dnResolutionStatusId) {
@@ -240,6 +303,17 @@ public abstract class AbstractTableFactory {
 		return name;
 	}
 
+	/**
+	 * Returns paginated data.
+	 * 
+	 * @param list
+	 *            ArrayList
+	 * @param rowStart
+	 *            int
+	 * @param rowEnd
+	 *            int
+	 * @return ArrayList
+	 */
 	public ArrayList paginateData(ArrayList list, int rowStart, int rowEnd) {
 		ArrayList mainList = new ArrayList();
 		if (rowStart > 0) {
@@ -256,6 +330,12 @@ public abstract class AbstractTableFactory {
 		return mainList;
 	}
 
+	/**
+	 * Sets state attribute.
+	 * 
+	 * @param tableFacade
+	 *            TableFacade
+	 */
 	public void setStateAttr(TableFacade tableFacade) {
 		if (getTableName() != null) {
 			tableFacade.setStateAttr(getTableName() + "_restore");
@@ -264,7 +344,6 @@ public abstract class AbstractTableFactory {
 			logger.debug("getTableName() returned null, so tableFacade.setStateAttr = restore");
 		}
 	}
-
 
 	protected class DateEditor extends AbstractCellEditor {
 
@@ -295,7 +374,8 @@ public abstract class AbstractTableFactory {
 		}
 
 		public void setUserTimeZoneId(String userTimeZoneId) {
-			this.userTimeZoneId = DateUtil.isValidTimeZoneId(userTimeZoneId) ? userTimeZoneId : DateTimeZone.getDefault().getID();
+			this.userTimeZoneId = DateUtil.isValidTimeZoneId(userTimeZoneId) ? userTimeZoneId : DateTimeZone
+					.getDefault().getID();
 		}
 
 		public Object getValue(Object item, String property, int rowcount) {

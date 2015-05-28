@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
@@ -16,6 +17,8 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
+
+<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <tr id="sidebar_Instructions_open">
     <td class="sidebar_tab">
@@ -271,10 +274,10 @@
                                                             <c:out value="${eventCRFBean.eventName}"/>
                                                         </td>
                                                         <td class="table_cell">
-                                                            <c:out value="${eventCRFBean.createdDate}"/>
+															<cc-fmt:formatDate value="${eventCRFBean.createdDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
                                                         </td>
                                                         <td class="table_cell">
-                                                            <c:out value="${eventCRFBean.updatedDate}"/>
+															<cc-fmt:formatDate value="${eventCRFBean.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
                                                         </td>
                                                     </tr>
                                                 </c:forEach>
@@ -328,7 +331,9 @@
                                                             </c:otherwise>
                                                         </c:choose>
                                                         <td class="table_cell"><c:out value="${eventDefinition.studyName}"/></td>
-                                                        <td class="table_cell"><c:out value="${eventDefinition.createdDate}"/></td>
+                                                        <td class="table_cell">
+															<cc-fmt:formatDate value="${eventDefinition.createdDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+														</td>
                                                         <td class="table_cell"><c:out value="${eventDefinition.owner.name}"/></td>
                                                     </tr>
                                                 </c:forEach>

@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -20,7 +21,8 @@
         (<c:out value="${currRow.bean.studyEvent.sampleOrdinal}"/>)
     </c:if>
 </td>
-<td class="table_cell" rowspan="${currentRowCrfs}"><fmt:formatDate value="${currRow.bean.studyEvent.dateStarted}" pattern="${dteFormat}"/>
+<td class="table_cell" rowspan="${currentRowCrfs}">
+	<cc-fmt:formatDate value="${currRow.bean.studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
 </td>
 
 <td class="table_cell" rowspan="${currentRowCrfs}"><c:out value="${currRow.bean.studyEvent.location}"/></td>
@@ -348,7 +350,7 @@
         </td>
         <td class="table_cell_border" width="110">
             <c:if test="${dec.eventCRF.updatedDate != null}">
-                <fmt:formatDate value="${dec.eventCRF.updatedDate}" pattern="${dteFormat}"/><br>
+                <cc-fmt:formatDate value="${dec.eventCRF.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/><br>
             </c:if>
             <c:choose>
                 <c:when test="${dec.eventCRF.updater.name == null}">

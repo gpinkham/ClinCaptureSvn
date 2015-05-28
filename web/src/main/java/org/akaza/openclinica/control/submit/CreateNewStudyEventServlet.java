@@ -20,7 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,6 +31,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -289,7 +289,6 @@ public class CreateNewStudyEventServlet extends Controller {
 					seddao, sgcdao, sedao);
 		}
 		eventDefinitionsScheduled = eventDefinitions;
-		SimpleDateFormat localDf = getLocalDf(request);
 		if (!fp.isSubmitted()) {
 			HashMap presetValues = new HashMap();
 			presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", -1);
@@ -310,7 +309,8 @@ public class CreateNewStudyEventServlet extends Controller {
 			// SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 			// example of taking the above line and transferring to i18n on the
 			// below line, tbh
-			String dateValue = localDf.format(new Date(System.currentTimeMillis()));
+			String dateValue = DateUtil.printDate(new Date(), getUserAccountBean().getUserTimeZoneId(),
+					DateUtil.DatePattern.DATE);
 			presetValues.put(INPUT_STARTDATE_PREFIX + "Date", dateValue);
 			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 				presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date", dateValue);
@@ -326,7 +326,8 @@ public class CreateNewStudyEventServlet extends Controller {
 				String requestStudySubject = (String) request.getAttribute(INPUT_REQUEST_STUDY_SUBJECT);
 				if (requestStudySubject != null) {
 					presetValues.put(INPUT_REQUEST_STUDY_SUBJECT, requestStudySubject);
-					dateValue = localDf.format(new Date());
+					dateValue = DateUtil.printDate(new Date(), getUserAccountBean().getUserTimeZoneId(),
+							DateUtil.DatePattern.DATE);
 					presetValues.put(INPUT_STARTDATE_PREFIX + "Date", dateValue);
 				}
 			}
@@ -529,7 +530,7 @@ public class CreateNewStudyEventServlet extends Controller {
 					}
 					scheduledSeds.put(scheduledDefinitionIds[i], i);
 					if (!strEndScheduled[i].equals("")) {
-						endScheduled[i] = fp.getDateTime(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
+						endScheduled[i] = fp.getDateTimeInput(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
 						String prevEndPrefix = i > 0 ? INPUT_ENDDATE_PREFIX_SCHEDULED[i - 1] : INPUT_ENDDATE_PREFIX;
 						if (!fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date").equals(
 								fp.getString(prevEndPrefix + "Date"))) {
@@ -606,8 +607,6 @@ public class CreateNewStudyEventServlet extends Controller {
 					studyEvent.setStartTimeFlag(true);
 				}
 				studyEvent.setDateStarted(start);
-				// comment to find bug 1389, tbh
-				logger.info("found start date: " + localDf.format(start));
 				Date[] startScheduled2 = new Date[ADDITIONAL_SCHEDULED_NUM];
 				for (int i = 0; i < startScheduled2.length; ++i) {
 					startScheduled2[i] = getInputStartDateScheduled(fp, i);
@@ -668,12 +667,8 @@ public class CreateNewStudyEventServlet extends Controller {
 				if (hasScheduledEvent) {
 					for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 
-						// should only do the following process if user inputs a
-						// scheduled event,
-						// which is scheduledDefinitionIds[i] > 0
 						if (scheduledDefinitionIds[i] > 0) {
 							if (subjectMayReceiveStudyEvent(sed, definitionScheduleds.get(i), studySubject)) {
-
 								StudyEventBean studyEventScheduled = new StudyEventBean();
 								studyEventScheduled.setStudyEventDefinitionId(scheduledDefinitionIds[i]);
 								studyEventScheduled.setStudySubjectId(studySubject.getId());
@@ -688,7 +683,7 @@ public class CreateNewStudyEventServlet extends Controller {
 
 								studyEventScheduled.setDateStarted(startScheduled[i]);
 								if (!"".equals(strEndScheduled[i])) {
-									endScheduled[i] = fp.getDateTime(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
+									endScheduled[i] = fp.getDateTimeInput(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
 									if ("-1".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Hour"))
 											&& "-1".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Minute"))
 											&& "".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Half"))) {
@@ -926,15 +921,15 @@ public class CreateNewStudyEventServlet extends Controller {
 	}
 
 	private Date getInputStartDate(FormProcessor fp) {
-		return fp.getDateTime(INPUT_STARTDATE_PREFIX);
+		return fp.getDateTimeInput(INPUT_STARTDATE_PREFIX);
 	}
 
 	private Date getInputStartDateScheduled(FormProcessor fp, int i) {
-		return fp.getDateTime(INPUT_STARTDATE_PREFIX_SCHEDULED[i]);
+		return fp.getDateTimeInput(INPUT_STARTDATE_PREFIX_SCHEDULED[i]);
 	}
 
 	private Date getInputEndDate(FormProcessor fp) {
-		return fp.getDateTime(INPUT_ENDDATE_PREFIX);
+		return fp.getDateTimeInput(INPUT_ENDDATE_PREFIX);
 	}
 
 	private String getInputStartHour(FormProcessor fp) {

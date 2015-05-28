@@ -13,7 +13,6 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -24,12 +23,12 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -116,7 +115,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	private ArrayList<CRFBean> crfBeans;
 	private ArrayList<StudyGroupClassBean> studyGroupClasses;
 	private StudyUserRoleBean currentRole;
-	private UserAccountBean currentUser;
 	private boolean showMoreLink;
 	private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
 	private ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
@@ -622,14 +620,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		this.discrepancyNoteDAO = discrepancyNoteDAO;
 	}
 
-	public UserAccountBean getCurrentUser() {
-		return currentUser;
-	}
-
-	public void setCurrentUser(UserAccountBean currentUser) {
-		this.currentUser = currentUser;
-	}
-
 	public StudyEventDefinitionBean getSelectedStudyEventDefinition() {
 		return selectedStudyEventDefinition;
 	}
@@ -876,7 +866,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			for (DisplayBean display : events) {
 				eventStartDate = (Date) display.getProps().get("studySubject.createdDate");
 				url.append("<table border='0'  cellpadding='0'  cellspacing='0' ><tr valign='top' ><td>");
-				url.append(eventStartDate == null ? "" : formatDate(eventStartDate));
+				url.append(eventStartDate == null ? "" : DateUtil.printDate(eventStartDate,
+						getCurrentUser().getUserTimeZoneId(), DateUtil.DatePattern.DATE));
 				url.append("</td></tr></table>");
 			}
 			return url.toString();
@@ -940,7 +931,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 	private class ActionsCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
-			return ListStudySubjectTableFactory.getSubjectActionsColumnContent(item, currentUser, getCurrentRole(),
+			return ListStudySubjectTableFactory.getSubjectActionsColumnContent(item, getCurrentUser(), getCurrentRole(),
 					getStudyBean(), new DAOWrapper(getStudyDAO(), getStudyEventDAO(), getStudySubjectDAO(),
 							getEventCRFDAO(), getEventDefintionCRFDAO(), getStudyEventDefinitionDAO(),
 							getDiscrepancyNoteDAO()), resword);
@@ -1148,7 +1139,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 							+ eventDivBuilderWrapper.studyEvents.get(0).getSampleOrdinal() + " of "
 							+ eventDivBuilderWrapper.eventOccurrencesNumber).br();
 			if (eventDivBuilderWrapper.studyEvents.size() > 0) {
-				eventDiv.append(formatDate(eventDivBuilderWrapper.studyEvents.get(0).getDateStarted())).br();
+				eventDiv.append(DateUtil.printDate(eventDivBuilderWrapper.studyEvents.get(0).getDateStarted(),
+								getCurrentUser().getUserTimeZoneId(), DateUtil.DatePattern.DATE)).br();
 
 			} else {
 				eventDiv.append(status + " : " + SubjectEventStatus.NOT_SCHEDULED.getName());
@@ -1261,12 +1253,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		builder.onmouseout("clearInterval(popupInterval);");
 		builder.append(" onclick=\"justShowPopup(eval(" + params.toString().replaceAll("\"", "'") + "), event);\"");
 		builder.close();
-	}
-
-	private String formatDate(Date date) {
-		String format = resformat.getString("date_format_string");
-		SimpleDateFormat sdf = new SimpleDateFormat(format, locale);
-		return sdf.format(date);
 	}
 
 	private String getDateFormat() {

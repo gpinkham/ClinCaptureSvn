@@ -113,10 +113,16 @@
             <td class="table_header_column"><c:out value="${event.location}"/>&nbsp;</td>
             <c:choose>
                 <c:when test="${event.startTimeFlag=='false'}">
-                    <td class="table_header_column"><fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/>&nbsp;</td>
+                    <td class="table_header_column">
+						<cc-fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+						&nbsp;
+					</td>
                 </c:when>
                 <c:otherwise>
-                    <td class="table_header_column"><fmt:formatDate value="${event.dateStarted}" type="both" pattern="${dteFormat}" timeStyle="short"/>&nbsp;</td>
+                    <td class="table_header_column">
+						<cc-fmt:formatDate value="${event.dateStarted}" pattern="${dtetmeFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+						&nbsp;
+					</td>
                 </c:otherwise>
             </c:choose>
             <td class="table_header_column"><c:out value="${event.sampleOrdinal}"/>&nbsp;</td>
@@ -141,10 +147,16 @@
     <td class="table_header_column"><c:out value="Start Date"/></td>
     <c:choose>
         <c:when test="${event.startTimeFlag=='false'}">
-            <td class="table_header_column"><fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/>&nbsp;</td>
+            <td class="table_header_column">
+				<cc-fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+				&nbsp;
+			</td>
         </c:when>
         <c:otherwise>
-            <td class="table_header_column"><fmt:formatDate value="${event.dateStarted}" type="both" pattern="${dteFormat}" timeStyle="short"/>&nbsp;</td>
+            <td class="table_header_column">
+				<cc-fmt:formatDate value="${event.dateStarted}" pattern="${dtetmeFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+				&nbsp;
+			</td>
         </c:otherwise>
     </c:choose>
 </tr>
@@ -292,7 +304,8 @@
                     <td class="table_header_column"><c:out value="${eventCRF.crf.name}"/>&nbsp;</td>
                     <td class="table_header_column"><c:out value="${eventCRF.crfVersion.name}"/>&nbsp;</td>
                     <td class="table_header_column">
-						<fmt:formatDate value="${eventCRF.dateInterviewed}" type="both" pattern="${dteFormat}" timeStyle="short"/>&nbsp;
+						<cc-fmt:formatDate value="${eventCRF.dateInterviewed}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+						&nbsp;
 					</td>
                     <td class="table_header_column"><c:out value="${eventCRF.interviewerName}"/>&nbsp;</td>
                     <td class="table_header_column"><c:out value="${eventCRF.owner.name}"/>&nbsp;</td>

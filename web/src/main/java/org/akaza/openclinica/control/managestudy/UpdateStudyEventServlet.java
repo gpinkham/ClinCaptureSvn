@@ -20,7 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
@@ -79,6 +79,8 @@ import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.util.StudyEventDefinitionUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.quartz.impl.StdScheduler;
 import org.springframework.stereotype.Component;
 
@@ -311,7 +313,7 @@ public class UpdateStudyEventServlet extends Controller {
 			}
 
 			String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
-			Date start = fp.getDateTime(INPUT_STARTDATE_PREFIX);
+			Date start = fp.getDateTimeInput(INPUT_STARTDATE_PREFIX);
 			Date end = null;
 
 			String strStart = fp.getDateTimeInputString(INPUT_STARTDATE_PREFIX);
@@ -332,7 +334,7 @@ public class UpdateStudyEventServlet extends Controller {
 			HashMap errors = v.validate();
 			if (!strEnd.equals("") && !errors.containsKey(INPUT_STARTDATE_PREFIX)
 					&& !errors.containsKey(INPUT_ENDDATE_PREFIX)) {
-				end = fp.getDateTime(INPUT_ENDDATE_PREFIX);
+				end = fp.getDateTimeInput(INPUT_ENDDATE_PREFIX);
 				if (!fp.getString(INPUT_STARTDATE_PREFIX + "Date").equals(fp.getString(INPUT_ENDDATE_PREFIX + "Date"))) {
 					if (end.before(start)) {
 						Validator.addError(errors, INPUT_ENDDATE_PREFIX,
@@ -577,11 +579,13 @@ public class UpdateStudyEventServlet extends Controller {
 					request);
 
 			HashMap presetValues = new HashMap();
+			DateTimeZone userTimeZone = DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId());
 			if (studyEvent.getStartTimeFlag()) {
 				Calendar c = new GregorianCalendar();
 				c.setTime(studyEvent.getDateStarted());
-				presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", c.get(Calendar.HOUR));
-				presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", c.get(Calendar.MINUTE));
+				DateTime studyEventStartDate = new DateTime(studyEvent.getDateStarted()).withZone(userTimeZone);
+				presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", studyEventStartDate.getHourOfDay());
+				presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", studyEventStartDate.getMinuteOfHour());
 				// Later it could be put to somewhere as a static method if
 				// necessary.
 				switch (c.get(Calendar.AM_PM)) {
@@ -600,20 +604,19 @@ public class UpdateStudyEventServlet extends Controller {
 				presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", -1);
 				presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
 			}
-
-			SimpleDateFormat localDf = getLocalDf(request);
-			String dateValue = localDf.format(studyEvent.getDateStarted());
-			presetValues.put(INPUT_STARTDATE_PREFIX + "Date", dateValue);
+			presetValues.put(INPUT_STARTDATE_PREFIX + "Date", DateUtil.printDate(studyEvent.getDateStarted(),
+					getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE));
 
 			presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", -1);
 			presetValues.put(INPUT_ENDDATE_PREFIX + "Minute", -1);
 			presetValues.put(INPUT_ENDDATE_PREFIX + "Half", "");
 			if (studyEvent.getDateEnded() != null) {
+				DateTime studyEventEndDate = new DateTime(studyEvent.getDateEnded()).withZone(userTimeZone);
 				if (studyEvent.getEndTimeFlag()) {
 					Calendar c = new GregorianCalendar();
 					c.setTime(studyEvent.getDateEnded());
-					presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", c.get(Calendar.HOUR));
-					presetValues.put(INPUT_ENDDATE_PREFIX + "Minute", c.get(Calendar.MINUTE));
+					presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", studyEventEndDate.getHourOfDay());
+					presetValues.put(INPUT_ENDDATE_PREFIX + "Minute", studyEventEndDate.getMinuteOfHour());
 					// Later it could be put to somewhere as a static method if
 					// necessary.
 					switch (c.get(Calendar.AM_PM)) {
@@ -628,7 +631,8 @@ public class UpdateStudyEventServlet extends Controller {
 							break;
 					}
 				}
-				presetValues.put(INPUT_ENDDATE_PREFIX + "Date", localDf.format(studyEvent.getDateEnded()));
+				presetValues.put(INPUT_ENDDATE_PREFIX + "Date", DateUtil.printDate(studyEvent.getDateEnded(),
+						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE));
 			}
 
 			setPresetValues(presetValues, request);

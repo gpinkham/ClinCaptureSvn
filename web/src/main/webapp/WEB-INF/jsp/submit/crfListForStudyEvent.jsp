@@ -1,8 +1,8 @@
-<%@ page import="org.akaza.openclinica.bean.core.Role" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <jsp:useBean scope="session" id="userRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean" />
@@ -211,19 +211,19 @@
                     <c:set var="hideCol6" value="false"/>
                     <c:set var="signUrl" value="UpdateStudyEvent?action=submit&event_id=${studyEvent.id}&ss_id=${studySubject.id}&changeDate=&startDate="/>
 	                    <c:if test="${study.studyParameterConfig.startDateTimeRequired != 'not_used'}">
-                            <fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}" var="dateStart"/>
+                            <cc-fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}" var="dateStart"/>
                             <c:set var="signUrl" value="${signUrl}${dateStart}" />
 	                     </c:if>
                     <c:choose>
                         <c:when test="${study.studyParameterConfig.useStartTime == 'yes' && study.studyParameterConfig.startDateTimeRequired != 'not_used'}">
                             <c:set var="signUrl" value="${signUrl}&startHour=" />
-                            <fmt:formatDate value="${studyEvent.dateStarted}" pattern="hh" var="startHour"/>
+                            <cc-fmt:formatDate value="${studyEvent.dateStarted}" pattern="HH" dateTimeZone="${userBean.userTimeZoneId}" var="startHour"/>
                             <c:set var="signUrl" value="${signUrl}${startHour}"/>
                             <c:set var="signUrl" value="${signUrl}&startMinute="/>
-                            <fmt:formatDate value="${studyEvent.dateStarted}" pattern="mm" var="startMinutes"/>
+                            <cc-fmt:formatDate value="${studyEvent.dateStarted}" pattern="mm" dateTimeZone="${userBean.userTimeZoneId}" var="startMinutes"/>
                             <c:set var="signUrl" value="${signUrl}${startMinutes}" />
                             <c:set var="signUrl" value="${signUrl}&startHalf=" />
-                            <fmt:formatDate value="${studyEvent.dateStarted}" pattern="a" var="startHalf"/>
+                            <cc-fmt:formatDate value="${studyEvent.dateStarted}" pattern="a" dateTimeZone="${userBean.userTimeZoneId}" var="startHalf"/>
                             <c:set var="signUrl" value="${signUrl}${startHalf}" />
                         </c:when>
                         <c:otherwise>
@@ -232,19 +232,19 @@
                     </c:choose>
                     <c:set var="signUrl" value="${signUrl}&endDate=" />
 		                <c:if test="${study.studyParameterConfig.endDateTimeRequired != 'not_used'}">
-                           <fmt:formatDate value="${studyEvent.dateEnded}" pattern="${dteFormat}" var="dateEnd"/>
+                           <cc-fmt:formatDate value="${studyEvent.dateEnded}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}" var="dateEnd"/>
                             <c:set var="signUrl" value="${signUrl}${dateEnd}" />
 	                     </c:if>
                     <c:choose>
-                        <c:when test="${study.studyParameterConfig.useEndTime == 'yes' && study.studyParameterConfig.endDateTimeRequired != 'not_used'}}">
+                        <c:when test="${study.studyParameterConfig.useEndTime == 'yes' && study.studyParameterConfig.endDateTimeRequired != 'not_used'}">
                             <c:set var="signUrl" value="${signUrl}&endHour=" />
-                            <fmt:formatDate value="${studyEvent.dateEnded}" pattern="hh" var="endHour"/>
+                            <cc-fmt:formatDate value="${studyEvent.dateEnded}" pattern="HH" dateTimeZone="${userBean.userTimeZoneId}" var="endHour"/>
                             <c:set var="signUrl" value="${signUrl}${endHour}"/>
                             <c:set var="signUrl" value="${signUrl}&endMinute=" />
-                            <fmt:formatDate value="${studyEvent.dateEnded}" pattern="mm" var="endMinutes"/>
+                            <cc-fmt:formatDate value="${studyEvent.dateEnded}" pattern="mm" dateTimeZone="${userBean.userTimeZoneId}" var="endMinutes"/>
                             <c:set var="signUrl" value="${signUrl}${endMinutes}"/>
                             <c:set var="signUrl" value="${signUrl}&endHalf=" />
-                            <fmt:formatDate value="${studyEvent.dateEnded}" pattern="a" var="endHalf"/>
+                            <cc-fmt:formatDate value="${studyEvent.dateEnded}" pattern="a" dateTimeZone="${userBean.userTimeZoneId}" var="endHalf"/>
                             <c:set var="signUrl" value="${signUrl}${endHalf}"/>
                         </c:when>
                         <c:otherwise>

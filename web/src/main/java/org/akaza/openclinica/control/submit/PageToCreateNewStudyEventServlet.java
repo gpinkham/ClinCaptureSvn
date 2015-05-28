@@ -54,11 +54,13 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.util.DateUtil;
 import com.clinovo.util.ValidatorHelper;
 
-// TODO: support YYYY-MM-DD HH:MM time formats
-
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+/**
+ * PageToCreateNewStudyEventServlet.
+ */
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class PageToCreateNewStudyEventServlet extends Controller {
 
@@ -80,16 +82,18 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 
 	public static final String INPUT_LOCATION = "location";
 
-	public final static String[] INPUT_STUDY_EVENT_DEFINITION_SCHEDULED = { "studyEventDefinitionScheduled0",
-			"studyEventDefinitionScheduled1", "studyEventDefinitionScheduled2", "studyEventDefinitionScheduled3" };
-	public final static String[] INPUT_SCHEDULED_LOCATION = { "locationScheduled0", "locationScheduled1",
-			"locationScheduled2", "locationScheduled3" };
-	public final static String[] INPUT_STARTDATE_PREFIX_SCHEDULED = { "startScheduled0", "startScheduled1",
-			"startScheduled2", "startScheduled3" };
-	public final static String[] INPUT_ENDDATE_PREFIX_SCHEDULED = { "endScheduled0", "endScheduled1", "endScheduled2",
-			"endScheduled3" };
-	public final static String[] DISPLAY_SCHEDULED = { "display0", "display1", "display2", "display3" };
-	public final static int ADDITIONAL_SCHEDULED_NUM = 4;
+	public static final String[] INPUT_STUDY_EVENT_DEFINITION_SCHEDULED = {"studyEventDefinitionScheduled0",
+			"studyEventDefinitionScheduled1", "studyEventDefinitionScheduled2", "studyEventDefinitionScheduled3"};
+	public static final String[] INPUT_SCHEDULED_LOCATION = {"locationScheduled0", "locationScheduled1",
+			"locationScheduled2", "locationScheduled3"};
+	public static final String[] INPUT_STARTDATE_PREFIX_SCHEDULED = {"startScheduled0", "startScheduled1",
+			"startScheduled2", "startScheduled3"};
+	public static final String[] INPUT_ENDDATE_PREFIX_SCHEDULED = {"endScheduled0", "endScheduled1", "endScheduled2",
+			"endScheduled3"};
+	public static final String[] DISPLAY_SCHEDULED = {"display0", "display1", "display2", "display3"};
+	public static final int ADDITIONAL_SCHEDULED_NUM = 4;
+
+	public static final int INT_2000 = 2000;
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -108,7 +112,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 		String pageToShowPopup = fp.getString(INPUT_PAGE_TO_SHOW_POPUP);
 		request.setAttribute(INPUT_PAGE_TO_SHOW_POPUP, pageToShowPopup);
 
-		// TODO: make this sensitive to permissions
+		// make this sensitive to permissions
 		StudySubjectDAO sdao = getStudySubjectDAO();
 		StudySubjectBean ssb;
 		if (studySubjectId <= 0) {
@@ -127,7 +131,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 			request.setAttribute(INPUT_REQUEST_STUDY_SUBJECT, "no");
 		}
 
-		// TODO: make this sensitive to permissions
+		// make this sensitive to permissions
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
 
 		StudyBean studyWithEventDefinitions = currentStudy;
@@ -141,7 +145,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 		ArrayList eventDefinitions = CreateNewStudyEventServlet.selectNotStartedOrRepeatingSortedEventDefs(ssb,
 				studyWithEventDefinitions.getId(), seddao, sgcdao, sedao);
 
-		SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat localDf = getLocalDf(request);
 		if (!fp.isSubmitted()) {
 
 			HashMap presetValues = new HashMap();
@@ -164,7 +168,8 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 			// SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 			// example of taking the above line and transferring to i18n on the
 			// below line, tbh
-			String dateValue = local_df.format(new Date(System.currentTimeMillis()));
+			String dateValue = DateUtil.printDate(new Date(), getUserAccountBean().getUserTimeZoneId(),
+					DateUtil.DatePattern.DATE);
 			presetValues.put(INPUT_STARTDATE_PREFIX + "Date", dateValue);
 			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 				presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date", dateValue);
@@ -172,7 +177,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 				presetValues.put(INPUT_SCHEDULED_LOCATION[i], currentStudy.getFacilityCity());
 				presetValues.put(PageToCreateNewStudyEventServlet.DISPLAY_SCHEDULED[i], "none");
 			}
-			presetValues.put(INPUT_LOCATION, currentStudy.getFacilityCity());// defualt
+			presetValues.put(INPUT_LOCATION, currentStudy.getFacilityCity()); // defualt
 
 			if (ssb != null && ssb.isActive()) {
 				presetValues.put(INPUT_STUDY_SUBJECT, ssb);
@@ -181,7 +186,8 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 				if (requestStudySubject != null) {
 					presetValues.put(INPUT_REQUEST_STUDY_SUBJECT, requestStudySubject);
 
-					dateValue = local_df.format(new Date());
+					dateValue = DateUtil.printDate(new Date(), getUserAccountBean().getUserTimeZoneId(),
+							DateUtil.DatePattern.DATE);
 					presetValues.put(INPUT_STARTDATE_PREFIX + "Date", dateValue);
 				}
 			}
@@ -211,7 +217,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 			logger.info(dateCheck2 + "; " + endCheck2);
 
 			String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
-			String strEndScheduled[] = new String[ADDITIONAL_SCHEDULED_NUM];
+			String[] strEndScheduled = new String[ADDITIONAL_SCHEDULED_NUM];
 			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 				strEndScheduled[i] = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
 			}
@@ -250,7 +256,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 					studyWithEventDefinitions);
 			v.addValidation(INPUT_STUDY_SUBJECT_LABEL, Validator.NO_BLANKS);
 			v.addValidation(INPUT_LOCATION, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_2000);
 			if (currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")) {
 				v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
 			}
@@ -266,7 +272,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 					if (currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")) {
 						v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.NO_BLANKS);
 						v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.LENGTH_NUMERIC_COMPARISON,
-								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_2000);
 						v.alwaysExecuteLastValidation(INPUT_SCHEDULED_LOCATION[i]);
 					}
 					v.addValidation(INPUT_STARTDATE_PREFIX_SCHEDULED[i], Validator.IS_DATE_TIME);
@@ -360,7 +366,8 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 						&& !errors.containsKey(INPUT_ENDDATE_PREFIX_SCHEDULED[i])) {
 					if (scheduledSeds.containsKey(scheduledDefinitionIds[i])) {
 						int prevStart = scheduledSeds.get(scheduledDefinitionIds[i]);
-						prevStartPrefix = prevStart == -1 ? INPUT_STARTDATE_PREFIX
+						prevStartPrefix = prevStart == -1
+								? INPUT_STARTDATE_PREFIX
 								: INPUT_STARTDATE_PREFIX_SCHEDULED[prevStart];
 						Date prevStartDate = prevStart == -1 ? this.getInputStartDate(fp) : this
 								.getInputStartDateScheduled(fp,
@@ -386,7 +393,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 					}
 					scheduledSeds.put(scheduledDefinitionIds[i], i);
 					if (!strEndScheduled[i].equals("")) {
-						endScheduled[i] = fp.getDateTime(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
+						endScheduled[i] = fp.getDateTimeInput(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
 						String prevEndPrefix = i > 0 ? INPUT_ENDDATE_PREFIX_SCHEDULED[i - 1] : INPUT_ENDDATE_PREFIX;
 						if (!fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date").equals(
 								fp.getString(prevEndPrefix + "Date"))) {
@@ -426,7 +433,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 				for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 					fp.addPresetValue(INPUT_SCHEDULED_LOCATION[i], fp.getString(INPUT_SCHEDULED_LOCATION[i]));
 				}
-				String prefixes[] = new String[2 + 2 * ADDITIONAL_SCHEDULED_NUM];
+				String[] prefixes = new String[2 + 2 * ADDITIONAL_SCHEDULED_NUM];
 				prefixes[0] = INPUT_STARTDATE_PREFIX;
 				prefixes[1] = INPUT_ENDDATE_PREFIX;
 				int b = ADDITIONAL_SCHEDULED_NUM + 2;
@@ -458,7 +465,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 				}
 				studyEvent.setDateStarted(start);
 				// comment to find bug 1389, tbh
-				logger.info("found start date: " + local_df.format(start));
+				logger.info("found start date: " + localDf.format(start));
 				if (!"".equals(strEnd)) {
 					if ("-1".equals(getInputEndHour(fp)) && "-1".equals(getInputEndMinute(fp))
 							&& "".equals(getInputEndHalf(fp))) {
@@ -490,7 +497,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
 						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
-				String[] eventFields = { INPUT_LOCATION, INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX };
+				String[] eventFields = {INPUT_LOCATION, INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX};
 				for (String element : eventFields) {
 					dnService.saveFieldNotes(element, fdn, studyEvent.getId(), "studyEvent", currentStudy);
 				}
@@ -517,7 +524,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 
 								studyEventScheduled.setDateStarted(startScheduled[i]);
 								if (!"".equals(strEndScheduled[i])) {
-									endScheduled[i] = fp.getDateTime(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
+									endScheduled[i] = fp.getDateTimeInput(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
 									if ("-1".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Hour"))
 											&& "-1".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Minute"))
 											&& "".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Half"))) {
@@ -592,6 +599,8 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 	 * <li>The subject does not yet have a study event for the given study event definition
 	 * </ul>
 	 * 
+	 * @param sedao
+	 *            StudyEventDAO
 	 * @param studyEventDefinition
 	 *            The definition of the study event which is to be added for the subject.
 	 * @param studySubject
@@ -620,15 +629,15 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 	}
 
 	private Date getInputStartDate(FormProcessor fp) {
-		return fp.getDateTime(INPUT_STARTDATE_PREFIX);
+		return fp.getDateTimeInput(INPUT_STARTDATE_PREFIX);
 	}
 
 	private Date getInputStartDateScheduled(FormProcessor fp, int i) {
-		return fp.getDateTime(INPUT_STARTDATE_PREFIX_SCHEDULED[i]);
+		return fp.getDateTimeInput(INPUT_STARTDATE_PREFIX_SCHEDULED[i]);
 	}
 
 	private Date getInputEndDate(FormProcessor fp) {
-		return fp.getDateTime(INPUT_ENDDATE_PREFIX);
+		return fp.getDateTimeInput(INPUT_ENDDATE_PREFIX);
 	}
 
 	private String getInputStartHour(FormProcessor fp) {

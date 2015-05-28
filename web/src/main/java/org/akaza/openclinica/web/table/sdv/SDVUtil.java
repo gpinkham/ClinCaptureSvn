@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -47,6 +48,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.DefaultActionsEditor;
+import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.controller.helper.table.SDVToolbar;
 import org.akaza.openclinica.controller.helper.table.SubjectSDVContainer;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
@@ -256,7 +258,7 @@ public class SDVUtil {
 		}
 		EventCRFSDVFilter eventCRFSDVFilter = getEventCRFSDVFilter(limit, studyId);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-		UserAccountBean user = (UserAccountBean) request.getSession().getAttribute("userBean");
+		UserAccountBean user = getCurrentUser(request);
 		boolean allowSdvWithOpenQueries = !"no".equals(currentStudy.getStudyParameterConfig()
 				.getAllowSdvWithOpenQueries());
 		int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, allowSdvWithOpenQueries, user.getId());
@@ -332,7 +334,7 @@ public class SDVUtil {
 	private Collection<SubjectSDVContainer> getFilteredItems(EventCRFSDVFilter filterSet, EventCRFSDVSort sortSet,
 			int rowStart, int rowEnd, int studyId, StudyBean currentStudy, HttpServletRequest request) {
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
+		UserAccountBean ub = getCurrentUser(request);
 		boolean allowSdvWithOpenQueries = !"no".equals(currentStudy.getStudyParameterConfig()
 				.getAllowSdvWithOpenQueries());
 
@@ -787,7 +789,8 @@ public class SDVUtil {
 			}
 
 			if (crfBean.getCreatedDate() != null) {
-				tempSDVBean.setEventDate(sdformat.format(crfBean.getCreatedDate()));
+				tempSDVBean.setEventDate(DateUtil.printDate(crfBean.getCreatedDate(),
+						getCurrentUser(request).getUserTimeZoneId(), DateUtil.DatePattern.DATE));
 			}
 			tempSDVBean.setEventName(crfBean.getEventName());
 			// The checkbox is next to the study subject id
@@ -820,7 +823,8 @@ public class SDVUtil {
 			}
 
 			if (crfBean.getUpdatedDate() != null) {
-				tempSDVBean.setLastUpdatedDate(sdformat.format(crfBean.getUpdatedDate()));
+				tempSDVBean.setLastUpdatedDate(DateUtil.printDate(crfBean.getUpdatedDate(),
+						getCurrentUser(request).getUserTimeZoneId(), DateUtil.DatePattern.DATE));
 			} else {
 				tempSDVBean.setLastUpdatedDate("unknown");
 
@@ -1306,5 +1310,9 @@ public class SDVUtil {
 		public Object getValue(Object item, String property, int rowCount) {
 			return ItemUtils.getItemValue(item, property);
 		}
+	}
+
+	private UserAccountBean getCurrentUser(HttpServletRequest request) {
+		return (UserAccountBean) request.getSession().getAttribute(BaseController.USER_BEAN_NAME);
 	}
 }

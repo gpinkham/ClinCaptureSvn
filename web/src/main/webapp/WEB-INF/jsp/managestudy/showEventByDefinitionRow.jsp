@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -24,11 +25,7 @@
       <td class="table_cell_left" width="230px"><c:out value="${currRow.bean.studySubjectLabel}"/></td>
 
       <td class="table_cell">
-      <c:choose>
-      <c:when test="${currRow.bean.startTimeFlag}"><fmt:formatDate value="${currRow.bean.dateStarted}" type="both" timeStyle="short" pattern="${dteFormat}"/>
-      </c:when>
-      <c:otherwise><fmt:formatDate value="${currRow.bean.dateStarted}" type="both" timeStyle="short" pattern="${dteFormat}"/></c:otherwise>
-      </c:choose>
+		  <cc-fmt:formatDate value="${currRow.bean.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
       </td>
 
       <td class="table_cell"><c:out value="${currRow.bean.subjectEventStatus.name}"/></td>

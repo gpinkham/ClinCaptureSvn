@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -87,7 +88,9 @@
 		<c:forEach var="eventCRF" items="${eventCRFs}">
 		<tr>
 			<td><c:out value="${eventCRF.studyEventId}"/></td>
-			<td><c:out value="${eventCRF.dateInterviewed}"/></td>
+			<td>
+				<cc-fmt:formatDate value="${eventCRF.dateInterviewed}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+			</td>
 			<td><c:out value="${eventCRF.status.name}"/></td>
 		</tr>
 		</c:forEach>

@@ -28,7 +28,9 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -61,14 +63,7 @@ public class FormProcessor {
 	public static final boolean DEFAULT_BOOLEAN = false;
 	public static final Date DEFAULT_DATE = new Date();
 	public static final String FIELD_SUBMITTED = "submitted";
-
-	// entity bean list field names
-	public static final String EBL_PAGE = "ebl_page";
-	public static final String EBL_SORT_COLUMN = "ebl_sortColumnInd";
-	public static final String EBL_SORT_ORDER = "ebl_sortAscending";
-	public static final String EBL_FILTERED = "ebl_filtered";
-	public static final String EBL_FILTER_KEYWORD = "ebl_filterKeyword";
-	public static final String EBL_PAGINATED = "ebl_paginated";
+	public static final String CURRENT_USER_ATTR_NAME = "userBean";
 
 	/**
 	 *
@@ -406,24 +401,35 @@ public class FormProcessor {
 	}
 
 	/**
-	 * @param dateTime
-	 *            A string in in date_time_format_string
-	 * @return The Date object corresponding to the provided string, or DEFAULT_DATE if the string is improperly
-	 *         formatted.
+	 * Parses date from the input date string, stored in the http request parameter/attribute,
+	 * and translates it from the user's time zone into the server time zone.
+	 * The date format <code>dd-Mmm-yyyy</code> is expected for input date string.
+	 * The time of the day for the result date object will be set to current server time of the day.
+	 *
+	 * @param searchAttributes if <code>true</code>, then method searches for input date string
+	 *                         both in request parameters and attributes;
+	 *                         if <code>false</code>, then method searches for input date string
+	 *                         in request parameters only.
+	 * @param fieldName        request parameter name, which stores input date string.
+	 * @return date object, created from the input date string.
 	 */
-	public static Date getDateTimeFromString(String dateTime) {
-		Date answer;
-		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
-		try {
-			SimpleDateFormat f = new SimpleDateFormat(resformat.getString("date_time_format_string"),
-					ResourceBundleProvider.getLocale());
-			f.setLenient(false);
-			answer = f.parse(dateTime);
-		} catch (Exception e) {
-			answer = DEFAULT_DATE;
-		}
+	public Date getDateInput(String fieldName, boolean searchAttributes) {
+		String fieldValue = getString(fieldName, searchAttributes);
+		return DateUtil.parseDateStringToServerDateTime(fieldValue, getCurrentUser().getUserTimeZoneId(),
+				DateUtil.DatePattern.DATE, true);
+	}
 
-		return answer;
+	/**
+	 * Parses date from the input date string, stored in the http request parameter,
+	 * and translates it from the user's time zone into the server time zone.
+	 * The date format <code>dd-Mmm-yyyy</code> is expected for input date string.
+	 * The time of the day for the result date object will be set to current server time of the day.
+	 *
+	 * @param fieldName request parameter name, which stores input date string.
+	 * @return date object, created from the input date string.
+	 */
+	public Date getDateInput(String fieldName) {
+		return getDateInput(fieldName, false);
 	}
 
 	/**
@@ -486,6 +492,34 @@ public class FormProcessor {
 		}
 		logger.info("returning " + result.toString());
 		return result;
+	}
+
+	/**
+	 * Parses date from the input date and time strings, stored in the http request parameters,
+	 * and translates it from the user's time zone into the server time zone.
+	 * If exact time of a day is not provided, then it will default to 12:00.
+	 *
+	 * @param prefix request parameters name prefix, which store input date, hour and minute values.
+	 * @return date object, created from the input date and time strings.
+	 */
+	public Date getDateTimeInput(String prefix) {
+
+		String date = getString(prefix + "Date");
+		String hour = getString(prefix + "Hour");
+		String minute = getString(prefix + "Minute");
+		if (hour.startsWith("-1")) {
+			hour = "12";
+		} else if (hour.length() == 1) {
+			hour = "0" + hour;
+		}
+		if (minute.startsWith("-1")) {
+			minute = "00";
+		} else if (minute.length() == 1) {
+			minute = "0" + minute;
+		}
+		String fieldValue = date + " " + hour + ":" + minute + ":00";
+		return DateUtil.parseDateStringToServerDateTime(fieldValue, getCurrentUser().getUserTimeZoneId(),
+				DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS, false);
 	}
 
 	/**
@@ -658,5 +692,9 @@ public class FormProcessor {
 			}
 		}
 		return false;
+	}
+
+	private UserAccountBean getCurrentUser() {
+		return (UserAccountBean) getRequest().getSession().getAttribute(CURRENT_USER_ATTR_NAME);
 	}
 }

@@ -14,7 +14,6 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.DateUtil;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
@@ -52,8 +51,6 @@ import java.util.Locale;
 public class AuditUserLoginTableFactory extends AbstractTableFactory {
 
 	private AuditUserLoginDao auditUserLoginDao;
-
-	private UserAccountBean currentUser;
 
 	@Override
 	protected String getTableName() {
@@ -177,14 +174,6 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 
 	public void setAuditUserLoginDao(AuditUserLoginDao auditUserLoginDao) {
 		this.auditUserLoginDao = auditUserLoginDao;
-	}
-
-	public UserAccountBean getCurrentUser() {
-		return currentUser;
-	}
-
-	public void setCurrentUser(UserAccountBean currentUser) {
-		this.currentUser = currentUser;
 	}
 
 	private class AvailableDroplistFilterEditor extends DroplistFilterEditor {

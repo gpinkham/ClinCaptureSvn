@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -590,12 +590,9 @@ public abstract class DataEntryServlet extends Controller {
 
 		// set up interviewer name and date
 		fp.addPresetValue(INPUT_INTERVIEWER, ecb.getInterviewerName());
-
-		SimpleDateFormat localDf = getLocalDf(request);
-
 		if (ecb.getDateInterviewed() != null) {
-			String idateFormatted = localDf.format(ecb.getDateInterviewed());
-			fp.addPresetValue(INPUT_INTERVIEW_DATE, idateFormatted);
+			fp.addPresetValue(INPUT_INTERVIEW_DATE, DateUtil.printDate(ecb.getDateInterviewed(), ub.getUserTimeZoneId(),
+					DateUtil.DatePattern.DATE));
 		} else {
 			fp.addPresetValue(INPUT_INTERVIEW_DATE, "");
 		}
@@ -1333,7 +1330,17 @@ public abstract class DataEntryServlet extends Controller {
 				// save interviewer name and date into DB
 				ecb.setInterviewerName(fp.getString(INPUT_INTERVIEWER));
 				if (!StringUtil.isBlank(fp.getString(INPUT_INTERVIEW_DATE))) {
-					ecb.setDateInterviewed(fp.getDate(INPUT_INTERVIEW_DATE));
+
+					if (ecb.getDateInterviewed() != null) {
+						String actualDateInterviewed = DateUtil.printDate(ecb.getDateInterviewed(), ub.getUserTimeZoneId(),
+								DateUtil.DatePattern.DATE);
+						if (!actualDateInterviewed.equals(fp.getString(INPUT_INTERVIEW_DATE))) {
+							ecb.setDateInterviewed(fp.getDateInput(INPUT_INTERVIEW_DATE));
+						}
+					} else {
+						ecb.setDateInterviewed(fp.getDateInput(INPUT_INTERVIEW_DATE));
+					}
+
 				} else {
 					ecb.setDateInterviewed(null);
 				}

@@ -146,21 +146,21 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.INT);
-		this.setTypeExpected(ind++, TypeNames.DATE);
+		this.setTypeExpected(ind++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(ind++, TypeNames.STRING);
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.STRING); // annotations
 		this.setTypeExpected(ind++, TypeNames.TIMESTAMP); // completed
 		this.setTypeExpected(ind++, TypeNames.INT); // validator id
-		this.setTypeExpected(ind++, TypeNames.DATE); // date validate
+		this.setTypeExpected(ind++, TypeNames.TIMESTAMP); // date validate
 		this.setTypeExpected(ind++, TypeNames.TIMESTAMP); // date val. completed
 		this.setTypeExpected(ind++, TypeNames.STRING);
 		this.setTypeExpected(ind++, TypeNames.STRING);
 		this.setTypeExpected(ind++, TypeNames.INT); // owner id
-		this.setTypeExpected(ind++, TypeNames.DATE);
+		this.setTypeExpected(ind++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(ind++, TypeNames.INT); // subject id
-		this.setTypeExpected(ind++, TypeNames.DATE); // date updated
+		this.setTypeExpected(ind++, TypeNames.TIMESTAMP); // date updated
 		this.setTypeExpected(ind++, TypeNames.INT); // updater
 		this.setTypeExpected(ind++, TypeNames.BOOL); // electronic_signature_status
 		this.setTypeExpected(ind++, TypeNames.BOOL); // sdv_status
@@ -201,10 +201,10 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(ind++, ecb.getStudyEventId());
 		variables.put(ind++, ecb.getCRFVersionId());
 		if (ecb.getDateInterviewed() == null) {
-			nullVars.put(ind, Types.DATE);
+			nullVars.put(ind, Types.TIMESTAMP);
 			variables.put(ind++, null);
 		} else {
-			variables.put(ind++, ecb.getDateInterviewed());
+			variables.put(ind++, new Timestamp(ecb.getDateInterviewed().getTime()));
 		}
 		variables.put(ind++, ecb.getInterviewerName());
 		variables.put(ind++, ecb.getCompletionStatusId());
@@ -214,16 +214,16 @@ public class EventCRFDAO extends AuditableEntityDAO {
 			nullVars.put(ind, Types.TIMESTAMP);
 			variables.put(ind++, null);
 		} else {
-			variables.put(ind++, new java.sql.Timestamp(ecb.getDateCompleted().getTime()));
+			variables.put(ind++, new Timestamp(ecb.getDateCompleted().getTime()));
 		}
 
 		variables.put(ind++, ecb.getValidatorId());
 
 		if (ecb.getDateValidate() == null) {
-			nullVars.put(ind, Types.DATE);
+			nullVars.put(ind, Types.TIMESTAMP);
 			variables.put(ind++, null);
 		} else {
-			variables.put(ind++, ecb.getDateValidate());
+			variables.put(ind++, new Timestamp(ecb.getDateValidate().getTime()));
 		}
 
 		if (ecb.getDateValidateCompleted() == null) {
@@ -306,10 +306,10 @@ public class EventCRFDAO extends AuditableEntityDAO {
 
 		Date interviewed = ecb.getDateInterviewed();
 		if (interviewed != null) {
-			variables.put(ind++, ecb.getDateInterviewed());
+			variables.put(ind++, new Timestamp(ecb.getDateInterviewed().getTime()));
 		} else {
 			variables.put(ind, null);
-			nullVars.put(ind++, Types.DATE);
+			nullVars.put(ind++, Types.TIMESTAMP);
 		}
 		logger.info("created: ecb.getInterviewerName()" + ecb.getInterviewerName());
 		variables.put(ind++, ecb.getInterviewerName());
@@ -1933,11 +1933,11 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.DATE);
-		this.setTypeExpected(index++, TypeNames.DATE);
-		this.setTypeExpected(index++, TypeNames.DATE);
-		this.setTypeExpected(index++, TypeNames.DATE);
-		this.setTypeExpected(index, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(index, TypeNames.TIMESTAMP);
 
 		index = 1;
 		HashMap variables = new HashMap();

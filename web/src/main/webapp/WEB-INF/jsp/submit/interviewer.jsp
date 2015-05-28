@@ -1,8 +1,8 @@
-<%@ page import="org.akaza.openclinica.bean.submit.EventCRFBean" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
@@ -23,7 +23,7 @@
 
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <c:set var="interviewer" value="${toc.eventCRF.interviewerName}" />
-<c:set var="interviewDate" value="${toc.eventCRF.dateInterviewed}" />
+<c:set var="interviewDate"><cc-fmt:formatDate value="${toc.eventCRF.dateInterviewed}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/></c:set>
 <c:set var="itemId" value="${displayItem.item.id}" />
 
 <style type="text/css">
@@ -194,7 +194,7 @@
             <div class="crfInfoBlock">
                 <div class="table_title_Admin">
                     <fmt:message key="event" bundle="${resword}"/>: </b><c:out value="${toc.studyEventDefinition.name}" />
-                    (<fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}"/>)
+                    (<cc-fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>)
                     &emsp;
 	                <c:if test="${not empty siteTitle}">
                         <fmt:message key="site" bundle="${resword}"/>:
@@ -244,7 +244,7 @@
             <div class="crfInfoBlock">
                 <div class="table_title_Admin">
                     <fmt:message key="event" bundle="${resword}"/>: </b><c:out value="${toc.studyEventDefinition.name}" />
-                    (<fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}"/>)
+                    (<cc-fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>)
                     &emsp;
 	                <c:if test="${not empty siteTitle}">
                         <fmt:message key="site" bundle="${resword}"/>:

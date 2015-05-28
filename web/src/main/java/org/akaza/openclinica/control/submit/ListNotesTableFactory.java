@@ -27,6 +27,7 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -88,8 +89,6 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.HtmlSnippets;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.jmesa.view.html.editor.HtmlFilterEditor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.clinovo.web.table.filter.UserAccountNameDroplistFilterEditor;
 
@@ -127,7 +126,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	private EventCRFDAO eventCRFDao;
 	private StudyBean currentStudy;
 	private ResourceBundle resword;
-	private ResourceBundle resformat;
 	private ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
 	private String module;
 	private Integer resolutionStatus;
@@ -182,15 +180,15 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 				null, true, true);
 		configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, false);
 		configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), resword.getString("date_created"),
-				new DateCellEditor(getDateFormat()), null, false, true);
+				new DateCellEditor(DateUtil.DatePattern.DATE.getPattern()), null, false, true);
 		configureColumn(row.getColumn("discrepancyNoteBean.updatedDate"), resword.getString("date_updated"),
-				new DateCellEditor(getDateFormat()), null, false, false);
-		configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"), new DateCellEditor(
-				getDateFormat()), null, false, false);
+				new DateCellEditor(DateUtil.DatePattern.DATE.getPattern()), null, false, false);
+		configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"),
+				new DateEditor(DateUtil.DatePattern.DATE, getCurrentUser().getUserTimeZoneId()), null, false, false);
 		configureColumn(row.getColumn(eventName), resword.getString("event_name"), null, new StudyEventTableRowFilter(
-				dataSource, currentStudy, getCurrentUserAccount()), true, false);
+				dataSource, currentStudy, getCurrentUser()), true, false);
 		configureColumn(row.getColumn(crfName), resword.getString("CRF"), null, new CRFFilter(dataSource, currentStudy,
-				getCurrentUserAccount()), true, false);
+				getCurrentUser()), true, false);
 		configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, false, false);
 		configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), null, null, true, false);
 		configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, false);
@@ -244,9 +242,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {
 		super.configureTableFacade(response, tableFacade);
 		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "discrepancyNoteBean.createdDate"),
-				new DateFilterMatcher(getDateFormat()));
+				new DateFilterMatcher(DateUtil.DatePattern.DATE.getPattern()));
 		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "discrepancyNoteBean.updatedDate"),
-				new DateFilterMatcher(getDateFormat()));
+				new DateFilterMatcher(DateUtil.DatePattern.DATE.getPattern()));
 		tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "discrepancyNoteBean.user"),
 				new GenericFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "studySubject.label"),
@@ -296,20 +294,19 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	@Override
 	public void setDataAndLimitVariables(TableFacade tableFacade) {
 		resword = ResourceBundleProvider.getWordsBundle(getLocale());
-		resformat = ResourceBundleProvider.getFormatBundle(getLocale());
 		Limit limit = tableFacade.getLimit();
 		ListNotesFilter listNotesFilter = getListNoteFilter(limit);
 		ListNotesSort listNotesSort = getListSubjectSort(limit);
-		Integer dnCount = discrepancyNoteDao.countViewNotesWithFilter(getCurrentStudy(), listNotesFilter, getCurrentUserAccount());
+		Integer dnCount = discrepancyNoteDao.countViewNotesWithFilter(getCurrentStudy(), listNotesFilter, getCurrentUser());
 		tableFacade.setTotalRows(dnCount == null ? 0 : dnCount);
 		RowSelect rowSelect = limit.getRowSelect();
 		int offset = rowSelect.getRowStart();
 		int count = rowSelect.getRowEnd() - rowSelect.getRowStart();
 		List<DiscrepancyNoteBean> customItems = discrepancyNoteDao.getViewNotesWithFilterAndSortLimits(
-				getCurrentStudy(), listNotesFilter, listNotesSort, offset, count, getCurrentUserAccount());
-		if (checkUserRole(Role.STUDY_CODER, getCurrentUserAccount())
-				|| checkUserRole(Role.STUDY_EVALUATOR, getCurrentUserAccount())) {
-			customItems = discrepancyNoteDao.getViewNotesWithFilterAndSort(getCurrentStudy(), getCurrentUserAccount(),
+				getCurrentStudy(), listNotesFilter, listNotesSort, offset, count, getCurrentUser());
+		if (checkUserRole(Role.STUDY_CODER, getCurrentUser())
+				|| checkUserRole(Role.STUDY_EVALUATOR, getCurrentUser())) {
+			customItems = discrepancyNoteDao.getViewNotesWithFilterAndSort(getCurrentStudy(), getCurrentUser(),
 					listNotesFilter, listNotesSort, true);
 			tableFacade.setTotalRows(customItems.size());
 		}
@@ -1075,10 +1072,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		}
 	}
 
-	private String getDateFormat() {
-		return resformat.getString("date_format_string");
-	}
-
 	public StudySubjectDAO getStudySubjectDao() {
 		return studySubjectDao;
 	}
@@ -1256,17 +1249,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		ListNotesFilter listNotesFilter = getListNoteFilter(limit);
 		ListNotesSort listNotesSort = getListSubjectSort(limit);
 		List<DiscrepancyNoteBean> result = discrepancyNoteDao.getViewNotesWithFilterAndSortLimits(
-				getCurrentStudy(), listNotesFilter, listNotesSort, 0, 0, getCurrentUserAccount());
+				getCurrentStudy(), listNotesFilter, listNotesSort, 0, 0, getCurrentUser());
 		return populateRowsWithAttachedData(result);
 	}
 
 	public void setDataSource(DataSource dataSource) {
 
 		this.dataSource = dataSource;
-	}
-
-	private UserAccountBean getCurrentUserAccount() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		return (UserAccountBean) userAccountDao.findByUserName(authentication.getName());
 	}
 }

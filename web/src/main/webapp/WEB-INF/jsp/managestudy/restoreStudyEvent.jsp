@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
@@ -52,8 +53,22 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="location" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${displayEvent.studyEvent.location}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="visit" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${displayEvent.studyEvent.sampleOrdinal}"/></td></tr>
     
-  <tr valign="top"><td class="table_header_column"><fmt:message key="date_started" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${displayEvent.studyEvent.dateStarted}" pattern="${dteFormat}"/></td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="date_ended" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${displayEvent.studyEvent.dateEnded}" pattern="${dteFormat}"/></td></tr>
+  <tr valign="top">
+	  <td class="table_header_column">
+		  <fmt:message key="date_started" bundle="${resword}"/>:
+	  </td>
+	  <td class="table_cell">
+		  <cc-fmt:formatDate value="${displayEvent.studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	  </td>
+  </tr>
+  <tr valign="top">
+	  <td class="table_header_column">
+		  <fmt:message key="date_ended" bundle="${resword}"/>:
+	  </td>
+	  <td class="table_cell">
+		  <cc-fmt:formatDate value="${displayEvent.studyEvent.dateEnded}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	  </td>
+  </tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${displayEvent.studyEvent.status.name}"/>
   </td></tr>
 
@@ -84,7 +99,7 @@
 	<tr>
 		<td class="table_cell"><c:out value="${dec.eventCRF.crf.name}" /></td>
 		<td class="table_cell"><c:out value="${dec.eventCRF.crfVersion.name}" /></td>
-		<td class="table_cell"><fmt:formatDate value="${dec.eventCRF.dateInterviewed}" pattern="${dteFormat}"/></td>
+		<td class="table_cell"><cc-fmt:formatDate value="${dec.eventCRF.dateInterviewed}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/></td>
 		<td class="table_cell"><c:out value="${dec.eventCRF.interviewerName}"/></td>
 		<td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" /></td>
 		<td class="table_cell"><c:out value="${dec.stage.name}" /></td>	

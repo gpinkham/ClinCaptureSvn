@@ -2,13 +2,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <jsp:useBean id="date" class="java.util.Date"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
-<c:set var="dteFormat"><fmt:message key="date_time_format_short" bundle="${resformat}"/></c:set>
+<c:set var="dteFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 
 <c:choose>
  <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
@@ -83,7 +84,7 @@
 
 <b><fmt:message key="user_full_name" bundle="${resword}"/>: <c:out value="${userBean.firstName}"/>&nbsp;<c:out value="${userBean.lastName}"/>
 <br/>
-<fmt:message key="date_time" bundle="${resword}"/>: <fmt:formatDate value="${date}" type="both" pattern="${dteFormat}" timeStyle="long"/>
+<fmt:message key="date_time" bundle="${resword}"/>: <cc-fmt:formatDate value="${date}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
 <br/>
 <fmt:message key="sure_to_sign_subject2" bundle="${resword}"/>
 <br/>
@@ -166,11 +167,16 @@
                         </tr>
                         <tr>
                             <td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/></td>
-                            <td class="table_cell"><fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}"/> &nbsp;</td>
+                            <td class="table_cell">
+								<cc-fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+								&nbsp;
+							</td>
                         </tr>
                         <tr>
                             <td class="table_header_column"><fmt:message key="end_date_time" bundle="${resword}"/></td>
-                            <td class="table_cell"><fmt:formatDate value="${studyEvent.dateEnded}" pattern="${dteFormat}"/></td>
+                            <td class="table_cell">
+								<cc-fmt:formatDate value="${studyEvent.dateEnded}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+							</td>
                         </tr>
                         <tr>
                             <td class="table_header_column"><fmt:message key="subject_event_status" bundle="${resword}"/></td>
@@ -178,7 +184,9 @@
                         </tr>
                         <tr>
                             <td class="table_header_column"><fmt:message key="last_updated_by" bundle="${resword}"/></td>
-                            <td class="table_cell"><c:out value="${studyEvent.updater.name}"/> (<fmt:formatDate value="${studyEvent.updatedDate}" pattern="${dteFormat}"/>)</td>
+                            <td class="table_cell">
+								<c:out value="${studyEvent.updater.name}"/> (<cc-fmt:formatDate value="${studyEvent.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>)
+							</td>
                         </tr>
 
                     </table>

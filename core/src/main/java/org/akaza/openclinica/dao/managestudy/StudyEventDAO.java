@@ -142,8 +142,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind++, TypeNames.INT);
 
 		this.setTypeExpected(ind++, TypeNames.INT);
-		this.setTypeExpected(ind++, TypeNames.DATE);
-		this.setTypeExpected(ind++, TypeNames.DATE);
+		this.setTypeExpected(ind++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(ind++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.BOOL); // start_time_flag
@@ -175,8 +175,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind++, TypeNames.INT);
 
 		this.setTypeExpected(ind++, TypeNames.INT);
-		this.setTypeExpected(ind++, TypeNames.DATE);
-		this.setTypeExpected(ind++, TypeNames.DATE);
+		this.setTypeExpected(ind++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(ind++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.BOOL); // start_time_flag
@@ -796,7 +796,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 			variables.put(ind++, new Timestamp(sb.getDateEnded().getTime()));
 		}
 		variables.put(ind++, sb.getStatus().getId());
-		variables.put(ind++, new java.util.Date()); // DATE_Updated
+		variables.put(ind++, new Timestamp(new Date().getTime())); // DATE_Updated
 		if (sb.getUpdater() == null) {
 			nullVars.put(ind, Types.INTEGER);
 			variables.put(ind++, null);
