@@ -153,25 +153,16 @@ public class UploadFileServlet extends Controller {
 		public File rename(File f) {
 			// here, File f has been validated as a valid File.
 			String pathAndName = f.getPath();
-			int p = pathAndName.lastIndexOf('.');
-			int n = pathAndName.lastIndexOf(File.separatorChar);
-			logger.debug("found n: " + n);
-			logger.debug("found p: " + p);
-			String fileName = pathAndName.substring(n, p);
+			String fileName = pathAndName.substring(pathAndName.lastIndexOf(File.separator, pathAndName.length()));
+			String fileExtension = fileName.indexOf(".") > 0 ? fileName.substring(fileName.indexOf("."), fileName.length()) : "";
 			logger.debug("found file name: " + fileName);
 			if (Utils.isWithinRegexp(fileName, "\\W+")) {
 				logger.debug("found non word characters");
 				fileName = fileName.replaceAll("\\W+", "_");
 			}
+			int n = pathAndName.lastIndexOf(File.separatorChar);
 			String newName = pathAndName.substring(0, n) + File.separator + fileName
-					+ new SimpleDateFormat("yyyyMMddHHmmssZ").format(new Date()) + pathAndName.substring(p);
-			// >> tbh 5545 remove all html-symbol characters here
-			// if (!Utils.isMatchingRegexp(newName, "[a-zA-Z_0-9/\\\\:.+-\\s]")) {
-			// logger.debug("found non word characters");
-			// newName = newName.replaceAll("[^a-zA-Z_0-9/\\\\:.+-\\s]", "_");
-			// }
-
-			// << tbh 5545 replace all non-words with the underscore
+					+ new SimpleDateFormat("yyyyMMddHHmmssZ").format(new Date()) + fileExtension;
 			logger.debug("-- > returning: " + newName);
 			return new File(newName);
 		}
