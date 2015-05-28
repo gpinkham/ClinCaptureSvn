@@ -98,6 +98,10 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 				if (userName != null) {
 					UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
 					StudyBean currentStudy = (StudyBean) studyDAO.findByPK(userAccountBean.getActiveStudyId());
+					if (currentStudy.isSite()) {
+						StudyBean parentStudy = (StudyBean) studyDAO.findByPK(currentStudy.getParentStudyId());
+						currentStudy.setParentStudyOid(parentStudy.getOid());
+					}
 					StudyUserRoleBean currentRole = userAccountBean.getRoleByStudy(currentStudy.getId());
 					request.getSession().setAttribute(BaseController.THEME_COLOR, CoreResources.getField("themeColor"));
 					request.getSession().setAttribute(BaseController.USER_ROLE, currentRole);

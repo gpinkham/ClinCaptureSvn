@@ -17,6 +17,7 @@ package com.clinovo.service;
 
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -27,7 +28,7 @@ import java.util.ResourceBundle;
  */
 public interface ReportCRFService {
 
-	String CRF_REPORT_DIR = "crfReport";
+	String CRF_REPORT_DIR = "print" + File.separator + "crfReport";
 
 	/**
 	 * Create PDF-report for CRF.

@@ -38,7 +38,8 @@ public class DcfServiceTest extends DefaultAppContextTest {
 		Map<Integer, Integer> noteIds = new HashMap<Integer, Integer>();
 		noteIds.put(1, 1);
 		String fileName = dcfService.generateDcf(study, noteIds.keySet(), "root");
-		String expectedFileName = "dcf" + File.separator + "root" + File.separator
+		String expectedFileName = "print" + File.separator + "dcf" + File.separator
+				+ "S_DEFAULTS1" + File.separator + "root" + File.separator
 				+ "default-study_S_DEFAULTS1_ssID1_Failed_Validation_Check_1.pdf";
 		assertEquals(expectedFileName, fileName);
 	}
@@ -48,7 +49,8 @@ public class DcfServiceTest extends DefaultAppContextTest {
 		Map<Integer, Integer> noteIds = new HashMap<Integer, Integer>();
 		noteIds.put(1, 1);
 		dcfService.generateDcf(study, noteIds.keySet(), "root");
-		File dcfFile = new File("dcf" + File.separator + "root" + File.separator
+		File dcfFile = new File("print" + File.separator + "dcf" + File.separator
+				+ "S_DEFAULTS1" + File.separator + "root" + File.separator
 				+ "default-study_S_DEFAULTS1_ssID1_Failed_Validation_Check_1.pdf");
 		assertTrue(dcfFile.exists());
 	}

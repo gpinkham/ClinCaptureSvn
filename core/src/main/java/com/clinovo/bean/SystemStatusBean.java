@@ -50,6 +50,10 @@ public class SystemStatusBean {
 	public static final String EVENT_CRF_DATA = "Event_CRF_Data";
 	public static final String DATA_SETS_DATA_SETS = "datasetsdatasets";
 	public static final String SCHEDULED_DATA_IMPORT = "scheduled_data_import";
+	public static final String PRINT = "print";
+	public static final String DCF = "dcf";
+	public static final String REPORTS = "crfReport";
+	public static final String CASEBOOKS = "Casebooks";
 
 	public static final int INT_0 = 0;
 	public static final int INT_1024 = 1024;
@@ -63,10 +67,26 @@ public class SystemStatusBean {
 	private long dataImportSize;
 	private long dataExportSize;
 	private long fileAttachmentsSize;
+	private long dcfSize;
+	private long crfReportsSize;
+	private long casebooksSize;
+	private long printSize;
 	private String dataImportSizeValue;
 	private String dataExportSizeValue;
 	private String fileAttachmentsSizeValue;
+	private String dcfSizeValue;
+	private String crfReportsSizeValue;
+	private String casebooksSizeValue;
+	private String printSizeValue;
 
+	/**
+	 * System Status.
+	 *
+	 * @param parameterId String
+	 * @param studyDao StudyDAO
+	 * @param userAccountDao UserAccountDAO
+	 * @param itemFormMetadataDao ItemFormMetadataDAO
+	 */
 	public SystemStatusBean(String parameterId, StudyDAO studyDao, UserAccountDAO userAccountDao,
 			ItemFormMetadataDAO itemFormMetadataDao) {
 		try {
@@ -96,6 +116,21 @@ public class SystemStatusBean {
 
 					fileAttachmentsSize = getDirSize(Utils.getAttachedFilePath(studyBean));
 					fileAttachmentsSizeValue = convertSize(fileAttachmentsSize);
+
+					dcfSize = getDirSize(baseDir.concat(File.separator).concat(PRINT).concat(File.separator).concat(DCF)
+							.concat(File.separator).concat(studyBean.getOid()));
+					dcfSizeValue = convertSize(dcfSize);
+
+					crfReportsSize = getDirSize(baseDir.concat(File.separator).concat(PRINT).concat(File.separator).concat(REPORTS)
+							.concat(File.separator).concat(studyBean.getOid()));
+					crfReportsSizeValue = convertSize(crfReportsSize);
+
+					casebooksSize = getDirSize(baseDir.concat(File.separator).concat(PRINT).concat(File.separator).concat(CASEBOOKS)
+							.concat(File.separator).concat(studyBean.getOid()));
+					casebooksSizeValue = convertSize(casebooksSize);
+
+					printSize = casebooksSize + crfReportsSize + dcfSize;
+					printSizeValue = convertSize(printSize);
 				}
 			}
 		} catch (Exception ex) {
@@ -148,6 +183,38 @@ public class SystemStatusBean {
 
 	public String getFileAttachmentsSizeValue() {
 		return fileAttachmentsSizeValue;
+	}
+
+	public String getCasebooksSizeValue() {
+		return casebooksSizeValue;
+	}
+
+	public long getDcfSize() {
+		return dcfSize;
+	}
+
+	public long getCrfReportsSize() {
+		return crfReportsSize;
+	}
+
+	public long getCasebooksSize() {
+		return casebooksSize;
+	}
+
+	public String getDcfSizeValue() {
+		return dcfSizeValue;
+	}
+
+	public String getCrfReportsSizeValue() {
+		return crfReportsSizeValue;
+	}
+
+	public String getPrintSizeValue() {
+		return printSizeValue;
+	}
+
+	public long getPrintSize() {
+		return printSize;
 	}
 
 	private long getDirSize(String dirPath) {

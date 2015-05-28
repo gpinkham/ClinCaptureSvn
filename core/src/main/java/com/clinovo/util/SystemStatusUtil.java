@@ -40,16 +40,20 @@ public final class SystemStatusUtil {
 
 	public static final String OK = "OK";
 	public static final String ID = "id";
+	public static final String DCF = "dcf";
 	public static final String OID = "oid";
 	public static final String NAME = "name";
 	public static final String STUDY = "study";
+	public static final String PRINT = "print";
 	public static final String STUDIES = "studies";
 	public static final String STORAGE = "storage";
 	public static final String STUDY_ID = "studyId";
 	public static final String REAL_SIZE = "realSize";
 	public static final String STUDY_OID = "study_oid";
+	public static final String CASEBOOKS = "casebooks";
 	public static final String DATA_IMPORT = "dataImport";
 	public static final String DATA_EXPORT = "dataExport";
+	public static final String CRF_REPORTS = "crfReports";
 	public static final String CRF_SECTIONS = "crfSections";
 	public static final String ASSIGNED_USERS = "assignedUsers";
 	public static final String FILE_ATTACHMENTS = "fileAttachments";
@@ -57,6 +61,11 @@ public final class SystemStatusUtil {
 	private SystemStatusUtil() {
 	}
 
+	/**
+	 * Get statistic for study.
+	 * @param systemStatusBean SystemStatusBean
+	 * @return String
+	 */
 	public static String getStatisticsForStudy(SystemStatusBean systemStatusBean) {
 		StringBuilder sb = new StringBuilder("\n        ");
 		try {
@@ -73,6 +82,12 @@ public final class SystemStatusUtil {
 					sb.append("\n            - data export: ").append(systemStatusBean.getDataExportSizeValue());
 					sb.append("\n            - file attachments inside the CRFs: ").append(
 							systemStatusBean.getFileAttachmentsSizeValue());
+
+					sb.append("\n      - Print storage: ").append(systemStatusBean.getPrintSizeValue());
+					sb.append("\n            - DCFs: ").append(systemStatusBean.getDcfSizeValue());
+					sb.append("\n            - CRF reports: ").append(systemStatusBean.getCrfReportsSizeValue());
+					sb.append("\n            - Casebooks: ").append(
+							systemStatusBean.getCasebooksSizeValue());
 					sb.append("\n");
 				} else {
 					sb.append("Parent study is not found.");
@@ -84,6 +99,11 @@ public final class SystemStatusUtil {
 		return sb.toString();
 	}
 
+	/**
+	 * Get statistics in XML.
+	 * @param systemStatusBean SystemStatusBean;
+	 * @return String;
+	 */
 	public static String getXmlStatisticsForStudy(SystemStatusBean systemStatusBean) {
 		String result = "";
 		try {
@@ -135,6 +155,25 @@ public final class SystemStatusUtil {
 				storage.appendChild(fileAttachments);
 				fileAttachments.setTextContent(systemStatusBean.getFileAttachmentsSizeValue());
 				fileAttachments.setAttribute(REAL_SIZE, Long.toString(systemStatusBean.getFileAttachmentsSize()));
+
+				Element print = document.createElement(PRINT);
+				storage.appendChild(print);
+				print.setAttribute(REAL_SIZE, Long.toString(systemStatusBean.getPrintSize()));
+
+				Element dcfs = document.createElement(DCF);
+				print.appendChild(dcfs);
+				dcfs.setTextContent(systemStatusBean.getDcfSizeValue());
+				dcfs.setAttribute(REAL_SIZE, Long.toString(systemStatusBean.getDcfSize()));
+
+				Element reports = document.createElement(CRF_REPORTS);
+				print.appendChild(reports);
+				reports.setTextContent(systemStatusBean.getCrfReportsSizeValue());
+				reports.setAttribute(REAL_SIZE, Long.toString(systemStatusBean.getCrfReportsSize()));
+
+				Element casebooks = document.createElement(CASEBOOKS);
+				print.appendChild(casebooks);
+				casebooks.setTextContent(systemStatusBean.getCasebooksSizeValue());
+				casebooks.setAttribute(REAL_SIZE, Long.toString(systemStatusBean.getCasebooksSize()));
 
 				TransformerFactory transformerFactory = TransformerFactory.newInstance();
 				Transformer transformer = transformerFactory.newTransformer();

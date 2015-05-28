@@ -1967,13 +1967,18 @@ public abstract class DataEntryServlet extends Controller {
 		try {
 			String urlPath = request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
 			String sysPath = this.getServletContext().getRealPath("/");
-			String dataPath = SQLInitServlet.getField("filePath") + ReportCRFService.CRF_REPORT_DIR + File.separator;
+			String studyOid = currentStudy.isSite() ? currentStudy.getParentStudyOid() : currentStudy.getOid();
+			String dataPath = SQLInitServlet.getField("filePath") + ReportCRFService.CRF_REPORT_DIR + File.separator + studyOid + File.separator;
 
 			reportCRFService.setUrlPath(urlPath);
 			reportCRFService.setSysPath(sysPath);
 			reportCRFService.setDataPath(dataPath);
 			reportCRFService.setResword(resword);
 
+			File dataPatchDir = new File(dataPath);
+			if (!dataPatchDir.exists()) {
+				dataPatchDir.mkdirs();
+			}
 			String reportFilePath = reportCRFService.createPDFReport(ecb.getId(), locale, getDynamicsMetadataService());
 
 			if (!StringUtil.isBlank(reportFilePath) && "complete".equals(edcb.getEmailStep())) {

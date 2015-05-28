@@ -86,4 +86,35 @@ public class SystemStatusBeanTest extends DefaultAppContextTest {
 	public void testThatValueForFileAttachmentsSizeValueIsCorrect() {
 		assertTrue(systemStatusBean.getFileAttachmentsSizeValue().contains("Bytes"));
 	}
+
+	@Test
+	public void testThatValueForDCFSizeIsCorrect() {
+		assertEquals(0, systemStatusBean.getDcfSize());
+	}
+
+	@Test
+	public void testThatValueForDCFSizeValueIsCorrect() {
+		assertTrue(systemStatusBean.getDcfSizeValue().contains("Bytes"));
+	}
+
+
+	@Test
+	public void testThatValueForReportsSizeIsCorrect() {
+		assertEquals(0, systemStatusBean.getCrfReportsSize());
+	}
+
+	@Test
+	public void testThatValueForReportsSizeValueIsCorrect() {
+		assertTrue(systemStatusBean.getCrfReportsSizeValue().contains("Bytes"));
+	}
+
+	@Test
+	public void testThatValueForCasebooksSizeIsCorrect() {
+		assertEquals(0, systemStatusBean.getCasebooksSize());
+	}
+
+	@Test
+	public void testThatValueForCasebooksSizeValueIsCorrect() {
+		assertTrue(systemStatusBean.getCasebooksSizeValue().contains("Bytes"));
+	}
 }

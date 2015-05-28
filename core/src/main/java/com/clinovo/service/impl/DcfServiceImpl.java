@@ -61,6 +61,8 @@ public class DcfServiceImpl implements DcfService {
 	@Autowired
 	private DataSource datasource;
 
+	public static final String PRINT_PATH = "print";
+	public static final String DCF_PATH = "dcf";
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private List<DcfRenderType> renderTypes;
@@ -85,7 +87,7 @@ public class DcfServiceImpl implements DcfService {
 		String fileName = null;
 		if (dcfs.size() > 0) {
 			try {
-				fileName = getFileName(dcfs, username, ".pdf");
+				fileName = getFileName(dcfs, username, ".pdf", study);
 				dcfReportBuilder.buildPdf(dcfs, fileName);
 			} catch (FileNotFoundException e) {
 				logger.error(e.getMessage());
@@ -99,10 +101,12 @@ public class DcfServiceImpl implements DcfService {
 		return fileName;
 	}
 
-	private String getFileName(List<DiscrepancyCorrectionForm> dcfs, String username, String extension)
+	private String getFileName(List<DiscrepancyCorrectionForm> dcfs, String username, String extension, StudyBean study)
 			throws FileNotFoundException {
-		String dcfDirName = "";
 		String dcfUserDirName = "";
+		String printDirName = "";
+		String studyOid = study.isSite() ? study.getParentStudyOid() : study.getOid();
+
 		String ccRepoPath = systemDAO.findByName("filePath").getValue().trim();
 		File ccRepoDir = new File(ccRepoPath);
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(CoreResources.getSystemLocale());
@@ -112,18 +116,18 @@ public class DcfServiceImpl implements DcfService {
 			throw new FileNotFoundException(exceptionMessage);
 		}
 		if (ccRepoPath.endsWith(File.separator) || ccRepoPath.trim().length() == 0) {
-			dcfDirName = ccRepoPath.concat("dcf");
+			printDirName = ccRepoPath.concat(PRINT_PATH);
 		} else {
-			dcfDirName = ccRepoPath.concat(File.separator).concat("dcf").concat(File.separator).concat(username);
+			printDirName = ccRepoPath.concat(File.separator).concat(PRINT_PATH);
 		}
-		dcfUserDirName = dcfDirName.concat(File.separator).concat(username);
-		File dcfDir = new File(dcfDirName);
+		String dcfDirName = printDirName.concat(File.separator).concat(DCF_PATH);
+		String studyDirName = dcfDirName.concat(File.separator).concat(studyOid);
+		dcfUserDirName = studyDirName.concat(File.separator).concat(username);
+
 		File dcfUserDir = new File(dcfUserDirName);
-		if (!dcfDir.exists()) {
-			dcfDir.mkdir();
-		}
+
 		if (!dcfUserDir.exists()) {
-			dcfUserDir.mkdir();
+			dcfUserDir.mkdirs();
 		}
 		String fileName = dcfs.get(0).getDcfFileName().concat(extension);
 		fileName = dcfUserDirName.concat(File.separator).concat(fileName);

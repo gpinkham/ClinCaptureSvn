@@ -1,5 +1,6 @@
 package org.akaza.openclinica.web.print;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.PrettyXmlSerializer;
@@ -35,6 +36,8 @@ import java.nio.file.Paths;
 @Controller
 public class HtmlToPdfController {
 
+	public static final String DIR_NAME = "print" + File.separator + "Casebooks";
+
     /**
      * Current method gets html source and subject oid and builds pdf file.
      * @param request The request containing the item to code.
@@ -50,6 +53,8 @@ public class HtmlToPdfController {
         response.setContentType("application/pdf;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 
+		StudyBean studyBean = (StudyBean) request.getSession().getAttribute("study");
+		String studyOid = studyBean.isSite() ? studyBean.getParentStudyOid() : studyBean.getOid();
         Document document = getDocument(prepareHtmlForPrint(request));
         ITextRenderer renderer = new ITextRenderer();
         SharedContext sharedContext = renderer.getSharedContext();
@@ -59,7 +64,7 @@ public class HtmlToPdfController {
 
         String isJob = (String) request.getAttribute("isJob");
         if (isJob != null && Boolean.valueOf(isJob)) {
-            OutputStream os = new FileOutputStream(getFile(pdfName, "Casebooks"));
+            OutputStream os = new FileOutputStream(getFile(pdfName, DIR_NAME + File.separator + studyOid));
             renderer.createPDF(os);
             os.flush();
             os.close();
@@ -103,7 +108,7 @@ public class HtmlToPdfController {
         String datasetFilePath = SQLInitServlet.getField("filePath") + folderName + File.separator + pdfName + ".pdf";
         File file = new File(datasetFilePath);
         if (!file.getParentFile().isDirectory()) {
-            file.getParentFile().mkdir();
+            file.getParentFile().mkdirs();
         }
         file.createNewFile();
 
