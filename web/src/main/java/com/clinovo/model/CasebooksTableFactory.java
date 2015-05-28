@@ -11,6 +11,7 @@ import org.jmesa.view.editor.CellEditor;
 import org.springframework.context.MessageSource;
 
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import java.util.Locale;
 /**
  * Subject casebooks table factory.
  */
+@SuppressWarnings("unchecked")
 public class CasebooksTableFactory extends AbstractTableFactory {
 
     public static final String STUDY_CASEBOOKS_TABLE = "studyCasebooksTable";
@@ -181,7 +183,7 @@ public class CasebooksTableFactory extends AbstractTableFactory {
     }
 
     private class SelectCellEditor implements CellEditor {
-        public Object getValue(Object o, String s, int i) {
+		public Object getValue(Object o, String s, int i) {
             String studySubjectOid = (String) ((HashMap<Object, Object>) o).get("studySubjectOid");
             String html = "<div style=\"width:130px;text-align:center;\"><input name=\"oids\" type=\"checkbox\" ssOid=\"" + studySubjectOid + "\"/></div>";
             return html;

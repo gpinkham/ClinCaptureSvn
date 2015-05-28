@@ -45,14 +45,21 @@ import com.clinovo.i18n.LocaleResolver;
 public class BreadcrumbTrail {
 	private ArrayList trail = new ArrayList();
 
+	/**
+	 * Default Constructor.
+	 */
 	public BreadcrumbTrail() {
-
+		//
 	}
 
+	/**
+	 * Constructor.
+	 *
+	 * @param trail
+	 *            ArrayList
+	 */
 	public BreadcrumbTrail(ArrayList trail) {
-
 		this.trail = trail;
-
 	}
 
 	/**
@@ -96,17 +103,17 @@ public class BreadcrumbTrail {
 				trail.add(new BreadcrumbBean(resworkflow.getString("extract_datasets"), "ExtractDatasetsMain",
 						Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("create_dataset_instructions"), "CreateDataset"
-						+ this.generateURLString(request), Status.PENDING));// 0
+						+ this.generateURLString(request), Status.PENDING)); // 0
 				trail.add(new BreadcrumbBean(resworkflow.getString("select_items_event"), "CreateDataset",
-						Status.UNAVAILABLE));// 1
+						Status.UNAVAILABLE)); // 1
 				trail.add(new BreadcrumbBean(resworkflow.getString("define_temporal_scope"), "CreateDataset",
-						Status.UNAVAILABLE));// 2
+						Status.UNAVAILABLE)); // 2
 				trail.add(new BreadcrumbBean(resworkflow.getString("specify_dataset_properties"), "CreateDataset",
-						Status.UNAVAILABLE));// 3
+						Status.UNAVAILABLE)); // 3
 				trail.add(new BreadcrumbBean(resworkflow.getString("confirm_dataset_properties"), "CreateDataset",
-						Status.UNAVAILABLE));// 4
+						Status.UNAVAILABLE)); // 4
 				trail.add(new BreadcrumbBean(resworkflow.getString("generate_dataset"), "CreateDataset",
-						Status.UNAVAILABLE));// 5, 6
+						Status.UNAVAILABLE)); // 5, 6
 				// items
 				// total
 
@@ -264,26 +271,6 @@ public class BreadcrumbTrail {
 							"MarkEventCRFComplete", Status.UNAVAILABLE));
 				}
 				closeRestOfTrail(ordinal);
-			} else if (jspPage.equals(Page.TABLE_OF_CONTENTS)) {
-				int ordinal;
-				if (containsServlet("EnterDataForStudyEvent")) {
-					ordinal = trail.size() - 3;
-					trail = advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("event_CRF_data_submission"),
-							"TableOfContents" + this.generateURLString(request), Status.PENDING), ordinal);
-					closeRestOfTrail(ordinal);
-				} else {
-					ordinal = 1;
-					trail = new ArrayList();
-					trail.add(new BreadcrumbBean(resworkflow.getString("submit_data"), "ListStudySubjectsSubmit",
-							Status.AVAILABLE));
-					trail.add(new BreadcrumbBean(resworkflow.getString("event_CRF_data_submission"), "TableOfContents"
-							+ generateURLString(request), Status.PENDING));
-					trail.add(new BreadcrumbBean(resworkflow.getString("data_entry"), "InitialDataEntry",
-							Status.UNAVAILABLE));
-					trail.add(new BreadcrumbBean(resworkflow.getString("mark_event_CRF_omplete"),
-							"MarkEventCRFComplete", Status.UNAVAILABLE));
-				}
-				closeRestOfTrail(ordinal);
 			} else if (jspPage.equals(Page.INITIAL_DATA_ENTRY)) {
 				int ordinal = trail.size() - 2;
 				trail = advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("data_entry"), "InitialDataEntry"
@@ -294,14 +281,7 @@ public class BreadcrumbTrail {
 				trail = advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("data_entry"), "DoubleDataEntry"
 						+ this.generateURLString(request), Status.PENDING), ordinal);
 				closeRestOfTrail(ordinal);
-			} else if (jspPage.equals(Page.MARK_EVENT_CRF_COMPLETE)) {
-				int ordinal = trail.size() - 1;
-				trail = advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("mark_event_CRF_complete"),
-						"MarkEventCRFComplete" + this.generateURLString(request), Status.PENDING), ordinal);
-				closeRestOfTrail(ordinal);
-			}
-
-			else if (jspPage.equals(Page.CREATE_STUDY1)) {
+			} else if (jspPage.equals(Page.CREATE_STUDY1)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("study_description"), "#", Status.PENDING));
 				trail.add(new BreadcrumbBean(resworkflow.getString("study_status"), "#", Status.UNAVAILABLE));
@@ -311,9 +291,7 @@ public class BreadcrumbTrail {
 				trail.add(new BreadcrumbBean(resworkflow.getString("facility_information"), "#", Status.UNAVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("related_information"), "#", Status.UNAVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("confirm_and_submit"), "#", Status.UNAVAILABLE));
-			}
-
-			else if (jspPage.equals(Page.CREATE_STUDY2)) {
+			} else if (jspPage.equals(Page.CREATE_STUDY2)) {
 				advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("study_status"), "#", Status.PENDING), 1);
 				closeRestOfTrail(1);
 			} else if (jspPage.equals(Page.CREATE_STUDY3) || jspPage.equals(Page.CREATE_STUDY4)) {
@@ -346,9 +324,7 @@ public class BreadcrumbTrail {
 				trail.add(new BreadcrumbBean(resworkflow.getString("facility_information"), "#", Status.UNAVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("related_information"), "#", Status.UNAVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("confirm_and_submit"), "#", Status.UNAVAILABLE));
-			}
-
-			else if (jspPage.equals(Page.UPDATE_STUDY2)) {
+			} else if (jspPage.equals(Page.UPDATE_STUDY2)) {
 				advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("study_status"), "#", Status.PENDING), 1);
 				closeRestOfTrail(1);
 			} else if (jspPage.equals(Page.UPDATE_STUDY3) || jspPage.equals(Page.CREATE_STUDY4)) {
@@ -394,9 +370,7 @@ public class BreadcrumbTrail {
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_event_definitions"), "ListEventDefinition",
 						Status.PENDING));
-			}
-
-			else if (jspPage.equals(Page.SUBJECT_GROUP_CLASS_LIST)) {
+			} else if (jspPage.equals(Page.SUBJECT_GROUP_CLASS_LIST)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_groups"), "ListSubjectGroupClass",
@@ -429,9 +403,7 @@ public class BreadcrumbTrail {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_CRFs"), "ListCRF", Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("create_a_new_CRF"), "CreateCRF", Status.PENDING));
-			}
-
-			else if (jspPage.equals(Page.CREATE_CRF_VERSION)) {
+			} else if (jspPage.equals(Page.CREATE_CRF_VERSION)) {
 				trail = new ArrayList();
 
 				trail.add(new BreadcrumbBean(resworkflow.getString("upload_spreadsheet"), "#", Status.PENDING));
@@ -525,9 +497,7 @@ public class BreadcrumbTrail {
 						Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("view_user_account"), "ViewUserAccount"
 						+ generateURLString(request), Status.PENDING));
-			}
-
-			else if (jspPage.equals(Page.EDIT_ACCOUNT)) {
+			} else if (jspPage.equals(Page.EDIT_ACCOUNT)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("administer_system"), "AdminSystem",
 						Status.AVAILABLE));
@@ -537,22 +507,16 @@ public class BreadcrumbTrail {
 						+ generateURLString(request), Status.PENDING));
 				trail.add(new BreadcrumbBean(resworkflow.getString("confirm_user_account_details"), "EditUserAccount",
 						Status.UNAVAILABLE));
-			}
-
-			else if (jspPage.equals(Page.EDIT_ACCOUNT_CONFIRM)) {
+			} else if (jspPage.equals(Page.EDIT_ACCOUNT_CONFIRM)) {
 				trail = advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("confirm_user_account_details"),
 						"EditUserAccount" + generateURLString(request), Status.PENDING), 3);
-			}
-
-			else if (jspPage.equals(Page.EDIT_STUDY_USER_ROLE)) {
+			} else if (jspPage.equals(Page.EDIT_STUDY_USER_ROLE)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("administer_users"), "ListUserAccounts",
 						Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("edit_user_role"), "EditStudyUserRole",
 						Status.PENDING));
-			}
-
-			else if (jspPage.equals(Page.CREATE_ACCOUNT)) {
+			} else if (jspPage.equals(Page.CREATE_ACCOUNT)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("administer_users"), "ListUserAccounts",
 						Status.AVAILABLE));
@@ -715,13 +679,9 @@ public class BreadcrumbTrail {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_CRFs"), "ListCRF", Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("delete_CRF_version"), "#", Status.PENDING));
-			}
-
-			else if (jspPage.equals(Page.MENU)) {
+			} else if (jspPage.equals(Page.MENU)) {
 				trail = new ArrayList();
-			}
-
-			else if (jspPage.equals(Page.EDIT_DATASET)) {
+			} else if (jspPage.equals(Page.EDIT_DATASET)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("extract_datasets"), "ExtractDatasetsMain",
 						Status.AVAILABLE));
@@ -786,6 +746,13 @@ public class BreadcrumbTrail {
 		return trail;
 	}
 
+	/**
+	 * Generates url string.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @return String
+	 */
 	public String generateURLString(HttpServletRequest request) {
 		String newURL = "?";
 		FormProcessor fp = new FormProcessor(request);
@@ -798,6 +765,17 @@ public class BreadcrumbTrail {
 		return newURL;
 	}
 
+	/**
+	 * Creates advanced trail.
+	 * 
+	 * @param trail
+	 *            ArrayList
+	 * @param newBean
+	 *            BreadcrumbBean
+	 * @param ordinal
+	 *            int
+	 * @return ArrayList
+	 */
 	public ArrayList advanceTrail(ArrayList trail, BreadcrumbBean newBean, int ordinal) {
 
 		int previous = ordinal - 1;

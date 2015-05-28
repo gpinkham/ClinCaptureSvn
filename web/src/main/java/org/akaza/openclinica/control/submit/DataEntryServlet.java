@@ -543,10 +543,10 @@ public abstract class DataEntryServlet extends Controller {
 		DisplayTableOfContentsBean toc = getDisplayBeanWithShownSections(
 				(DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY), dynamicsMetadataService);
 		request.setAttribute(TOC_DISPLAY, toc);
-		LinkedList<Integer> sectionIdsInToc = TableOfContentsServlet.sectionIdsInToc(toc);
+		LinkedList<Integer> sectionIdsInToc = sectionIdsInToc(toc);
 
 		logMe("Entering  displayItemWithGroups sdao.findPrevious  " + System.currentTimeMillis());
-		int sIndex = TableOfContentsServlet.sectionIndexInToc(section.getSection(), toc, sectionIdsInToc);
+		int sIndex = sectionIndexInToc(section.getSection(), toc, sectionIdsInToc);
 		SectionBean previousSec = this.prevSection(section.getSection(), ecb, toc, sIndex);
 		logMe("Entering  displayItemWithGroups sdao.findPrevious  end " + System.currentTimeMillis());
 		SectionBean nextSec = this.nextSection(section.getSection(), ecb, toc, sIndex);
@@ -1672,8 +1672,8 @@ public abstract class DataEntryServlet extends Controller {
 					toc = getDisplayBeanWithShownSections(
 							(DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY), dynamicsMetadataService);
 					request.setAttribute(TOC_DISPLAY, toc);
-					sectionIdsInToc = TableOfContentsServlet.sectionIdsInToc(toc);
-					sIndex = TableOfContentsServlet.sectionIndexInToc(section.getSection(), toc, sectionIdsInToc);
+					sectionIdsInToc = sectionIdsInToc(toc);
+					sIndex = sectionIndexInToc(section.getSection(), toc, sectionIdsInToc);
 					previousSec = this.prevSection(section.getSection(), ecb, toc, sIndex);
 					nextSec = this.nextSection(section.getSection(), ecb, toc, sIndex);
 					section.setFirstSection(!previousSec.isActive());
@@ -5119,5 +5119,36 @@ public abstract class DataEntryServlet extends Controller {
 			request.setAttribute("subjectsNumberAssignedToEachDynamicGroupMap",
 					subjectsNumberAssignedToEachDynamicGroupMap);
 		}
+	}
+
+	private LinkedList<Integer> sectionIdsInToc(DisplayTableOfContentsBean toc) {
+		LinkedList<Integer> ids = new LinkedList<Integer>();
+		if (toc != null) {
+			ArrayList<SectionBean> sectionBeans = toc.getSections();
+			if (sectionBeans != null && sectionBeans.size() > 0) {
+				for (SectionBean s : sectionBeans) {
+					ids.add(s.getId());
+				}
+			}
+		}
+		return ids;
+	}
+
+	private int sectionIndexInToc(SectionBean sb, DisplayTableOfContentsBean toc,
+			LinkedList<Integer> sectionIdsInToc) {
+		ArrayList<SectionBean> sectionBeans = new ArrayList<SectionBean>();
+		int index = -1;
+		if (toc != null) {
+			sectionBeans = toc.getSections();
+		}
+		if (sectionBeans != null && sectionBeans.size() > 0) {
+			for (int i = 0; i < sectionIdsInToc.size(); ++i) {
+				if (sb.getId() == sectionIdsInToc.get(i)) {
+					index = i;
+					break;
+				}
+			}
+		}
+		return index;
 	}
 }

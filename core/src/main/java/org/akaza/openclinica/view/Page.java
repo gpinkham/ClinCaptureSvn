@@ -618,13 +618,7 @@ public final class Page {
 			"Enter Data for a Study Event");
 	public static final Page ENTER_DATA_FOR_STUDY_EVENT_SERVLET = new Page("/EnterDataForStudyEvent",
 			"Enter Data for a Study Event");
-
-	public static final Page TABLE_OF_CONTENTS = new Page(PATH + "submit/tableOfContents.jsp",
-			"Event CRF Data Submission");
-	public static final Page TABLE_OF_CONTENTS_SERVLET = new Page("/TableOfContents", "Event CRF Data Submission");
 	public static final Page INTERVIEWER = new Page(PATH + "submit/interviewer.jsp",
-			"Event CRF Interview Info Submission");
-	public static final Page INTERVIEWER_ENTIRE_PAGE = new Page(PATH + "submit/interviewerEntirePage.jsp",
 			"Event CRF Interview Info Submission");
 
 	public static final Page INITIAL_DATA_ENTRY = new Page(PATH + "submit/initialDataEntry.jsp", "Initial Data Entry");
@@ -632,9 +626,6 @@ public final class Page {
 
 	public static final Page DOUBLE_DATA_ENTRY = new Page(PATH + "submit/doubleDataEntry.jsp", "Double Data Entry");
 	public static final Page DOUBLE_DATA_ENTRY_SERVLET = new Page("/DoubleDataEntry", "Double Data Entry");
-
-	public static final Page MARK_EVENT_CRF_COMPLETE = new Page(PATH + "submit/markEventCRFComplete.jsp",
-			"Mark Event CRF Complete");
 
 	public static final Page ADMIN_EDIT = new Page(PATH + "submit/administrativeEditing.jsp", "Administrative Editing");
 	public static final Page ADMIN_EDIT_SERVLET = new Page("/AdministrativeEditing", "Administrative Editing Servlet");

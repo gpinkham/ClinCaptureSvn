@@ -1,13 +1,13 @@
 package com.clinovo.controller;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.model.CasebooksTableFactory;
-import com.gargoylesoftware.htmlunit.AjaxController;
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.WebRequest;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.util.Cookie;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -21,17 +21,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.model.CasebooksTableFactory;
+import com.gargoylesoftware.htmlunit.AjaxController;
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebRequest;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.util.Cookie;
 
 /**
  * Controller for print subject casebooks page.
  */
 @Controller
+@SuppressWarnings("serial")
 public class CasebooksController extends Redirection {
 
     @Autowired
@@ -109,7 +112,7 @@ public class CasebooksController extends Redirection {
      * @return the casebooks page.
      * @throws Exception for all exceptions.
      */
-    @RequestMapping("/generateCasebooks")
+	@RequestMapping("/generateCasebooks")
     public String generateCasebooks(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String studySubjectOid = request.getParameter("oids");
         List<String> studySubjectOidList = new ArrayList<String>(Arrays.asList(studySubjectOid.split("\\,")));
@@ -144,11 +147,11 @@ public class CasebooksController extends Redirection {
         return CASEBOOKS_PAGE;
     }
 
-    private String getCasebookUrl(HttpServletRequest request, String studySubjectOid, String studyOid) {
-        String validUri = request.getRequestURI().substring(0, request.getRequestURI().lastIndexOf("/pages"));
-        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + validUri +
-                "/print/clinicaldata/html/print/" + studyOid + "/" + studySubjectOid + "/*/*";
-    }
+	private String getCasebookUrl(HttpServletRequest request, String studySubjectOid, String studyOid) {
+		String validUri = request.getRequestURI().substring(0, request.getRequestURI().lastIndexOf("/pages"));
+		return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + validUri
+				+ "/print/clinicaldata/html/print/" + studyOid + "/" + studySubjectOid + "/*/*";
+	}
 
     @Override
     public String getUrl() {

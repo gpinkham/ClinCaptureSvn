@@ -57,7 +57,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateDiscrepancyNoteServlet;
 import org.akaza.openclinica.control.submit.DataEntryServlet;
 import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
-import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -196,7 +195,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 
 			EventCRFDAO ecdao = getEventCRFDAO();
 			EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(id);
-			request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, ecb);
+			request.setAttribute("eventCRF", ecb);
 			// If the request is passed along to ViewSectionDataEntryServlet,
 			// that code needs
 			// an event crf id; the (ecb.getId()+"") is necessary because

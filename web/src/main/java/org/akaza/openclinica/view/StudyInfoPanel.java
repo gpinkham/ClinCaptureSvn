@@ -23,7 +23,6 @@ package org.akaza.openclinica.view;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -47,8 +46,6 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.clinovo.i18n.LocaleResolver;
 
@@ -61,9 +58,6 @@ import com.clinovo.i18n.LocaleResolver;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class StudyInfoPanel {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	ResourceBundle resword;
-
 	private TreeMap data = new TreeMap();
 
 	/**
@@ -71,10 +65,10 @@ public class StudyInfoPanel {
 	 */
 	private ArrayList userOrderedData = new ArrayList();
 
-	String datePattern = "MM/dd/yyyy";
+	private String datePattern = "MM/dd/yyyy";
 
-	SimpleDateFormat english_sdf = new SimpleDateFormat(datePattern);
-	SimpleDateFormat local_sdf;
+	private SimpleDateFormat englishSdf = new SimpleDateFormat(datePattern);
+
 	private boolean studyInfoShown = true;
 
 	private boolean orderedData = false;
@@ -87,9 +81,9 @@ public class StudyInfoPanel {
 
 	private boolean createDataset = false;
 
-	private boolean iconInfoShown = true;// added for the side icons
+	private boolean iconInfoShown = true; // added for the side icons
 
-	private boolean manageSubject = false;// added to control the group of
+	private boolean manageSubject = false; // added to control the group of
 
 	// side icons
 
@@ -153,18 +147,38 @@ public class StudyInfoPanel {
 		this.submitDataModule = submitDataModule;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public StudyInfoPanel() {
 		// blank generator
 	}
 
+	/**
+	 * Set data method.
+	 * 
+	 * @param key
+	 *            String
+	 * @param value
+	 *            String
+	 */
 	public void setData(String key, String value) {
 		data.put(key, value);
 	}
 
+	/**
+	 * Remove data method.
+	 * 
+	 * @param key
+	 *            String
+	 */
 	public void removeData(String key) {
 		data.remove(key);
 	}
 
+	/**
+	 * Reset method.
+	 */
 	public void reset() {
 		data = new TreeMap();
 		userOrderedData = new ArrayList();
@@ -186,17 +200,21 @@ public class StudyInfoPanel {
 	}
 
 	/**
-	 * setData, the external function which creates data for the panel to reflect.
-	 * 
+	 * The external function which creates data for the panel to reflect.
+	 *
 	 * @param page
+	 *            Page
 	 * @param session
+	 *            HttpSession
 	 * @param request
+	 *            HttpServletRequest
 	 */
 	public void setData(Page page, HttpSession session, HttpServletRequest request) {
 
 		Locale locale = LocaleResolver.getLocale(request);
-		resword = ResourceBundleProvider.getWordsBundle(locale);
-		local_sdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string"));
+		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(locale);
+		SimpleDateFormat localSdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+				"date_format_string"));
 
 		try {
 			// defaults, can be reset by mistake by running through one page,
@@ -227,9 +245,9 @@ public class StudyInfoPanel {
 				this.setExtractData(false);
 
 				DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
-				int ev_count = dsb.getItemIds().size();
+				int evCount = dsb.getItemIds().size();
 
-				this.setData(resword.getString("items_selected"), new Integer(ev_count).toString());
+				this.setData(resword.getString("items_selected"), Integer.toString(evCount));
 
 			} else if (page.equals(Page.CREATE_DATASET_4)) {
 				this.reset();
@@ -241,18 +259,18 @@ public class StudyInfoPanel {
 				this.removeData(resword.getString("beginning_date"));
 				this.removeData(resword.getString("ending_date"));
 				DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
-				int ev_count = dsb.getItemIds().size();
-				this.setData(resword.getString("items_selected"), new Integer(ev_count).toString());
+				int evCount = dsb.getItemIds().size();
+				this.setData(resword.getString("items_selected"), Integer.toString(evCount));
 
-				if ("01/01/1900".equals(english_sdf.format(dsb.getDateStart()))) {
+				if ("01/01/1900".equals(englishSdf.format(dsb.getDateStart()))) {
 					this.setData(resword.getString("beginning_date"), resword.getString("not_specified"));
 				} else {
-					this.setData(resword.getString("beginning_date"), local_sdf.format(dsb.getDateStart()));
+					this.setData(resword.getString("beginning_date"), localSdf.format(dsb.getDateStart()));
 				}
-				if ("12/31/2100".equals(english_sdf.format(dsb.getDateEnd()))) {
+				if ("12/31/2100".equals(englishSdf.format(dsb.getDateEnd()))) {
 					this.setData(resword.getString("ending_date"), resword.getString("not_specified"));
 				} else {
-					this.setData(resword.getString("ending_date"), local_sdf.format(dsb.getDateEnd()));
+					this.setData(resword.getString("ending_date"), localSdf.format(dsb.getDateEnd()));
 				}
 				FilterBean fb = (FilterBean) session.getAttribute("newFilter");
 				if (fb != null) {
@@ -269,26 +287,24 @@ public class StudyInfoPanel {
 				DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
 				this.setData(resword.getString("dataset_name"), dsb.getName());
 				this.setData(resword.getString("dataset_description"), dsb.getDescription());
-				int ev_count = dsb.getItemIds().size();
-				this.setData(resword.getString("items_selected"), new Integer(ev_count).toString());
+				int evCount = dsb.getItemIds().size();
+				this.setData(resword.getString("items_selected"), Integer.toString(evCount));
 
-				if ("01/01/1900".equals(english_sdf.format(dsb.getDateStart()))) {
+				if ("01/01/1900".equals(englishSdf.format(dsb.getDateStart()))) {
 					this.setData(resword.getString("beginning_date"), resword.getString("not_specified"));
 				} else {
-					this.setData(resword.getString("beginning_date"), local_sdf.format(dsb.getDateStart()));
+					this.setData(resword.getString("beginning_date"), localSdf.format(dsb.getDateStart()));
 				}
-				if ("12/31/2100".equals(english_sdf.format(dsb.getDateEnd()))) {
+				if ("12/31/2100".equals(englishSdf.format(dsb.getDateEnd()))) {
 					this.setData(resword.getString("ending_date"), resword.getString("not_specified"));
 				} else {
-					this.setData(resword.getString("ending_date"), local_sdf.format(dsb.getDateEnd()));
+					this.setData(resword.getString("ending_date"), localSdf.format(dsb.getDateEnd()));
 				}
 				FilterBean fb = (FilterBean) session.getAttribute("newFilter");
 				if (fb != null) {
 					this.setData(resword.getString("added_filter"), fb.getName());
 				}
 
-			} else if (page.equals(Page.ADMIN_SYSTEM)) {
-				// blank here , info set in servlet itself
 			} else if (page.equals(Page.VIEW_STUDY_SUBJECT)) {
 				this.reset();
 				this.setStudyInfoShown(true);
@@ -317,14 +333,13 @@ public class StudyInfoPanel {
 				this.setCreateDataset(false);
 				this.setIconInfoShown(false);
 
-			} else if (page.equals(Page.INTERVIEWER) || page.equals(Page.TABLE_OF_CONTENTS)
-					|| page.equals(Page.TABLE_OF_CONTENTS_SERVLET) || page.equals(Page.INITIAL_DATA_ENTRY)
+			} else if (page.equals(Page.INTERVIEWER) || page.equals(Page.INITIAL_DATA_ENTRY)
 					|| page.equals(Page.INITIAL_DATA_ENTRY_SERVLET) || page.equals(Page.DOUBLE_DATA_ENTRY)
 					|| page.equals(Page.DOUBLE_DATA_ENTRY_SERVLET) || page.equals(Page.ADMIN_EDIT)
 					|| page.equals(Page.ADMIN_EDIT_SERVLET)) {
 				/*
 				 * pages designed to also follow the above format; check to see if they are in the session already, and
-				 * does not refresh. TODO refine and test
+				 * does not refresh.
 				 */
 				StudyBean study = (StudyBean) session.getAttribute("study");
 				StudySubjectBean studySubject = (StudySubjectBean) request.getAttribute("studySubject");
@@ -355,9 +370,9 @@ public class StudyInfoPanel {
 
 				DatasetBean dsb = (DatasetBean) request.getAttribute("dataset");
 				this.setData(resword.getString("dataset_name"), dsb.getName());
-				this.setData(resword.getString("date_created"), local_sdf.format(dsb.getCreatedDate()));
+				this.setData(resword.getString("date_created"), localSdf.format(dsb.getCreatedDate()));
 				this.setData(resword.getString("dataset_owner"), dsb.getOwner().getName());
-				this.setData(resword.getString("date_last_run"), local_sdf.format(dsb.getDateLastRun()));
+				this.setData(resword.getString("date_last_run"), localSdf.format(dsb.getDateLastRun()));
 
 			} else if (page.equals(Page.EXPORT_DATASETS)) {
 
@@ -367,7 +382,7 @@ public class StudyInfoPanel {
 				DatasetBean db = (DatasetBean) request.getAttribute("dataset");
 				ExtractBean exbean = (ExtractBean) request.getAttribute("extractBean");
 				this.reset();
-				ArrayList displayData = new ArrayList();
+				ArrayList displayData;
 
 				displayData = generateDatasetTree(exbean, db);
 				this.setUserOrderedData(displayData);
@@ -486,11 +501,15 @@ public class StudyInfoPanel {
 		this.userOrderedData = userOrderedData;
 	}
 
-	/*
-	 * note that this has to change if the texts change, so this might be something different in the future.
+	/**
+	 * Note that this has to change if the texts change, so this might be something different in the future.
+	 * 
+	 * @param stage
+	 *            DataEntryStage
+	 * @return String
 	 */
 	public String getStageImageText(DataEntryStage stage) {
-		String answer = "";
+		String answer;
 		if (stage.isInitialDE()) {
 			answer = "<img src='images/icon_InitialDE.gif' alt='Initial Data Entry'>";
 		} else if (stage.isInitialDE_Complete()) {
@@ -510,6 +529,13 @@ public class StudyInfoPanel {
 		return answer;
 	}
 
+	/**
+	 * Returns TOC link.
+	 * 
+	 * @param dec
+	 *            DisplayEventCRFBean
+	 * @return String
+	 */
 	public String getTOCLink(DisplayEventCRFBean dec) {
 		String answer = "";
 		if (!dec.getEventCRF().getStatus().equals(Status.DELETED)
@@ -530,6 +556,20 @@ public class StudyInfoPanel {
 		return answer;
 	}
 
+	/**
+	 * Add study event rules tree.
+	 * 
+	 * @param study
+	 *            StudyBean
+	 * @param studySubject
+	 *            StudySubjectBean
+	 * @param displayStudyEventBeans
+	 *            ArrayList
+	 * @param ecb
+	 *            EventCRFBean
+	 * @param withLink
+	 *            boolean
+	 */
 	public void addStudyEventRulesTree(StudyBean study, StudySubjectBean studySubject,
 			ArrayList displayStudyEventBeans, EventCRFBean ecb, boolean withLink) {
 		// method behind madness: we want the other pages to show
@@ -548,6 +588,20 @@ public class StudyInfoPanel {
 		this.setUserOrderedData(displayData);
 	}
 
+	/**
+	 * Adds study event tree.
+	 * 
+	 * @param study
+	 *            StudyBean
+	 * @param studySubject
+	 *            StudySubjectBean
+	 * @param displayStudyEventBeans
+	 *            ArrayList
+	 * @param ecb
+	 *            EventCRFBean
+	 * @param withLink
+	 *            boolean
+	 */
 	public void addStudyEventTree(StudyBean study, StudySubjectBean studySubject, ArrayList displayStudyEventBeans,
 			EventCRFBean ecb, boolean withLink) {
 		// method behind madness: we want the other pages to show
@@ -567,20 +621,22 @@ public class StudyInfoPanel {
 	}
 
 	/**
-	 * Generates a tree view in sdie info panel for submitting data page
+	 * Generates a tree view in sdie info panel for submitting data page.
 	 * 
 	 * @param rows
+	 *            ArrayList
 	 * @param displayData
+	 *            ArrayList
 	 * @param studySubject
+	 *            StudySubjectBean
 	 * @param ecb
-	 * @return
+	 *            EventCRFBean
+	 * @return ArrayList
 	 */
 	public ArrayList generateTreeFromBeans(ArrayList rows, ArrayList displayData, StudySubjectBean studySubject,
 			EventCRFBean ecb) {
-		Iterator itRows = rows.iterator();
-
-		while (itRows.hasNext()) {
-			DisplayStudyEventBean dseBean = (DisplayStudyEventBean) itRows.next();
+		for (Object row : rows) {
+			DisplayStudyEventBean dseBean = (DisplayStudyEventBean) row;
 			StudyEventBean seBean = dseBean.getStudyEvent();
 			// checks whether the event is the current one
 			if (ecb != null && ecb.getStudyEventId() == seBean.getId()) {
@@ -596,17 +652,16 @@ public class StudyInfoPanel {
 					+ seBean.getId() + "'>" + seBean.getSubjectEventStatus().getName() + "</a>", false, false, false));
 			ArrayList displayCRFs = dseBean.getDisplayEventCRFs();
 			int count = 0;
-			Iterator displayIt = displayCRFs.iterator();
-			while (displayIt.hasNext()) {
-				DisplayEventCRFBean dec = (DisplayEventCRFBean) displayIt.next();
+			for (Object displayCRF : displayCRFs) {
+				DisplayEventCRFBean dec = (DisplayEventCRFBean) displayCRF;
 				if (count == displayCRFs.size() - 1 && dseBean.getUncompletedCRFs().size() == 0) {
 					// last event CRF for this event
 					// it's the current crf
 					// JN:Removing the linkx, since the links are being shown in the tree without access, Mantis:9964
-					if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {// was
+					if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
+						// was
 						// getName(),
 						// tbh
-
 						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()),
 								"<span class='alert'>" + dec.getEventCRF().getCrf().getName() + " "
 										+ dec.getEventCRF().getCrfVersion().getName() + "</span>", false, true, true));
@@ -631,34 +686,37 @@ public class StudyInfoPanel {
 			}
 			count = 0;
 			ArrayList uncompleted = dseBean.getUncompletedCRFs();
-			Iterator uncompIt = uncompleted.iterator();
-			while (uncompIt.hasNext()) {
-				DisplayEventDefinitionCRFBean dedc = (DisplayEventDefinitionCRFBean) uncompIt.next();
+			for (Object anUncompleted : uncompleted) {
+				DisplayEventDefinitionCRFBean dedc = (DisplayEventDefinitionCRFBean) anUncompleted;
 				if (count == uncompleted.size() - 1) {
 					if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()
 							&& ecb.getCrf().getId() == dedc.getEventCRF().getCrf().getId()) {
 						// logger.info("ecb id*******" + ecb.getId() +
 						// dedc.getEventCRF().getId());
-						displayData.add(new StudyInfoPanelLine(
-								"<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
-										+ dedc.getEdc().getCrf().getName() + "</span>", false, true, true));
+						displayData.add(
+								new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
+										"<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</span>", false,
+										true, true));
 					} else {
-						displayData.add(new StudyInfoPanelLine(
-								"<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
-										+ dedc.getEdc().getCrf().getName() + "</a>", false, true, false));
+						displayData.add(
+								new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
+										"<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</a>", false, true,
+										false));
 
 					}
 				} else {
 					if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()) {
 						// logger.info("ecb id*******" + ecb.getId() +
 						// dedc.getEventCRF().getId());
-						displayData.add(new StudyInfoPanelLine(
-								"<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
-										+ dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
+						displayData.add(
+								new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
+										"<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</span>", false,
+										false, true));
 					} else {
-						displayData.add(new StudyInfoPanelLine(
-								"<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
-										+ dedc.getEdc().getCrf().getName() + "</a>", false, false, false));
+						displayData.add(
+								new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
+										"<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</a>", false,
+										false, false));
 
 					}
 				}
@@ -670,20 +728,23 @@ public class StudyInfoPanel {
 	}
 
 	/**
-	 * Generates a tree view in sdie info panel for submitting data page
+	 * Generates a tree view in sdie info panel for submitting data page.
 	 * 
 	 * @param rows
+	 *            ArrayList
 	 * @param displayData
+	 *            ArrayList
 	 * @param studySubject
+	 *            StudySubjectBean
 	 * @param ecb
-	 * @return
+	 *            EventCRFBean
+	 * @return ArrayList
 	 */
 	public ArrayList generateTreeFromBeansWithoutLink(ArrayList rows, ArrayList displayData,
 			StudySubjectBean studySubject, EventCRFBean ecb) {
-		Iterator itRows = rows.iterator();
 
-		while (itRows.hasNext()) {
-			DisplayStudyEventBean dseBean = (DisplayStudyEventBean) itRows.next();
+		for (Object row : rows) {
+			DisplayStudyEventBean dseBean = (DisplayStudyEventBean) row;
 			StudyEventBean seBean = dseBean.getStudyEvent();
 			// checks whether the event is the current one
 			if (ecb != null && ecb.getStudyEventId() == seBean.getId()) {
@@ -699,9 +760,8 @@ public class StudyInfoPanel {
 					false, false));
 			ArrayList displayCRFs = dseBean.getDisplayEventCRFs();
 			int count = 0;
-			Iterator displayIt = displayCRFs.iterator();
-			while (displayIt.hasNext()) {
-				DisplayEventCRFBean dec = (DisplayEventCRFBean) displayIt.next();
+			for (Object displayCRF : displayCRFs) {
+				DisplayEventCRFBean dec = (DisplayEventCRFBean) displayCRF;
 				if (count == displayCRFs.size() - 1 && dseBean.getUncompletedCRFs().size() == 0) {
 					// last event CRF for this event
 					// it's the current crf
@@ -730,9 +790,8 @@ public class StudyInfoPanel {
 			}
 			count = 0;
 			ArrayList uncompleted = dseBean.getUncompletedCRFs();
-			Iterator uncompIt = uncompleted.iterator();
-			while (uncompIt.hasNext()) {
-				DisplayEventDefinitionCRFBean dedc = (DisplayEventDefinitionCRFBean) uncompIt.next();
+			for (Object anUncompleted : uncompleted) {
+				DisplayEventDefinitionCRFBean dedc = (DisplayEventDefinitionCRFBean) anUncompleted;
 				if (count == uncompleted.size() - 1) {
 					if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()
 							&& ecb.getCrf().getId() == dedc.getEventCRF().getCrf().getId()) {
@@ -786,7 +845,8 @@ public class StudyInfoPanel {
 					displayData.add(new StudyInfoPanelLine("CRF", cb.getName() + " <b>"
 							+ ExtractBean.getSEDCRFCode(i + 1, j + 1) + "</b>", false, false));
 
-				} else {// last crf
+				} else {
+					// last crf
 					displayData.add(new StudyInfoPanelLine("CRF", cb.getName() + " <b>"
 							+ ExtractBean.getSEDCRFCode(i + 1, j + 1) + "</b>", false, true));
 				}
@@ -797,14 +857,14 @@ public class StudyInfoPanel {
 
 	private ArrayList generateEventTree(HashMap eventlist, Boolean isExtractData) {
 		ArrayList displayData = new ArrayList();
-		for (Iterator keyIt = eventlist.keySet().iterator(); keyIt.hasNext();) {
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) keyIt.next();
+		for (Object o : eventlist.keySet()) {
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) o;
 			displayData.add(new StudyInfoPanelLine("Definition", sed.getName(), true, false));
 			ArrayList crfs = (ArrayList) eventlist.get(sed);
-			int ordinal_crf = 1;
+			int ordinalCrf = 1;
 			for (int i = 0; i < crfs.size(); i++) {
 				CRFBean crf = (CRFBean) crfs.get(i);
-				if (ordinal_crf < crfs.size()) {
+				if (ordinalCrf < crfs.size()) {
 					if (isExtractData) {
 						displayData.add(new StudyInfoPanelLine("CRF", "<a href='SelectItems?crfId=" + crf.getId()
 								+ "&defId=" + sed.getId() + "'>" + crf.getName() + "</a>", false, false));
@@ -825,7 +885,7 @@ public class StudyInfoPanel {
 					}
 
 				}
-				ordinal_crf++;
+				ordinalCrf++;
 			}
 		}
 		return displayData;

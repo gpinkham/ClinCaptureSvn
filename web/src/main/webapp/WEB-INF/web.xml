@@ -636,16 +636,6 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>tableOfContentsServlet</servlet-name>
-        <display-name>TableOfContents</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>markEventCRFCompleteServlet</servlet-name>
-        <display-name>MarkEventCRFComplete</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>initialDataEntryServlet</servlet-name>
         <display-name>InitialDataEntry</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -1522,14 +1512,6 @@
     <servlet-mapping>
         <servlet-name>CRFListForStudyEventServlet</servlet-name>
         <url-pattern>/CRFListForStudyEvent</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>tableOfContentsServlet</servlet-name>
-        <url-pattern>/TableOfContents</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>markEventCRFCompleteServlet</servlet-name>
-        <url-pattern>/MarkEventCRFComplete</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>initialDataEntryServlet</servlet-name>
