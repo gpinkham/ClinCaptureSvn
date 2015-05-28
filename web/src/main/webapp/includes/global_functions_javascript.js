@@ -1049,7 +1049,7 @@ function displayMessageFromCheckbox(checkboxObject, dde){
     }
 
     if (theme.name != 'blue') {
-		$('input.button_medium').css('background-image', 'url(images/' + theme.name + '/button_medium_BG.gif)');
+		$('input.button_medium').not('.medium_back, .medium_cancel, .medium_continue, .medium_submit').css('background-image', 'url(images/' + theme.name + '/button_medium_BG.gif)');
         $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', theme.mainColor);
         $('.ui-dialog-titlebar').css('border', '1px Solid ' + theme.mainColor);
 	}

@@ -462,16 +462,15 @@
                                       </c:otherwise>
                                     </c:choose>--%>
                                 <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
-                                  "button_medium" onClick="disableSubmit('DataStatus_top'); this.form.submit();"/></td>
-                                <td>
-                                    <input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" />
-                                </td>
-								
+                                  "button_medium medium_submit" onClick="disableSubmit('DataStatus_top'); this.form.submit();"/></td>
+                                
                                 <c:choose>
                                     <c:when test="${! empty formMessages}">
+                                    	<td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
                                         <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif"></td>
                                     </c:when>
                                     <c:otherwise>
+                                    	<td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
                                         <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="not_changed_data" bundle="${restext}"/>" src="images/icon_UnchangedData.gif"></td>
                                     </c:otherwise>
                                 </c:choose>
@@ -499,9 +498,9 @@
                     <td align="right" valign="bottom">
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                <td><input type="submit" id="srm" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class="button_medium" onClick="disableSubmit('DataStatus_top'); this.form.submit();"/></td>
+                                <td><input type="submit" id="srm" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class="button_medium medium_submit" onClick="disableSubmit('DataStatus_top'); this.form.submit();"/></td>
                                 <td>
-                                    <input type="submit" id="sem" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" />
+                                    <input type="submit" id="sem" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkEntryStatus('DataStatus_top', this);" />
                                 </td>
                             </tr>
                         </table>
@@ -1381,16 +1380,16 @@ table-->
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td><input type="submit" id="srl" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
-                      "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
+                      "button_medium medium_submit" onclick="disableSubmit(); this.form.submit();"/></td>
                     <td>
-						<input type="hidden" name="fromResolvingNotes" value="${fromResolvingNotes}"/>
-                        <input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom', this);" />
-                    </td>
+                      <input type="hidden" name="fromResolvingNotes" value="${fromResolvingNotes}"/>                   
                     <c:choose>
                         <c:when test="${! empty formMessages}">
+                        	<input type="submit" id="sel" name="submittedExit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
                             <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif">&nbsp;</td>
                         </c:when>
                         <c:otherwise>
+                        	<input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
                             <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="not_changed_data" bundle="${restext}"/>" src="images/icon_UnchangedData.gif">&nbsp;</td>
                         </c:otherwise>
                     </c:choose>
