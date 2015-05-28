@@ -1,21 +1,27 @@
 {
-    "page": 1,
-    "pageCount": 1,
-    "prevPage": null,
+  "page": 1,
+  "pageCount": 1,
+  "prevPage": null,
+  "nextPage": null,
+  "links": {
     "nextPage": null,
-    "links": {
-        "nextPage": null,
-        "prevPage": null
-    },
-    "collection": [{
-        "prefLabel": "Gastrointestinal disorders",
-        "property": ["http://ncicb.nci.nih.gov/xml/owl/EVS/ctcae.owl#Adverse_Event_by_System_Organ_Class",
-            "<ncicp:ComplexTerm><ncicp:term-name>Gastrointestinal disorders</ncicp:term-name><ncicp:term-group>PT</ncicp:term-group><ncicp:term-source>CTCAE</ncicp:term-source></ncicp:ComplexTerm>",
-            "E10904",
-            "10017947",
-            "Gastrointestinal disorders",
-            "http://www.w3.org/2002/07/owl#Class"],
-        "@id": "http://ncicb.nci.nih.gov/xml/owl/EVS/ctcae.owl#Gastrointestinal_disorders",
-        "@type": "http://www.w3.org/2002/07/owl#Class"
-    }]
+    "prevPage": null
+  },
+  "collection": [
+    {
+      "prefLabel": "Cushingoid",
+      "properties": {
+        "http://ncicb.nci.nih.gov/xml/owl/EVS/ctcae.owl#FULL_SYN": [
+          "<ncicp:ComplexTerm><ncicp:term-name>Cushingoid</ncicp:term-name><ncicp:term-group>PT</ncicp:term-group><ncicp:term-source>CTCAE</ncicp:term-source></ncicp:ComplexTerm>",
+          "<ncicp:ComplexTerm><ncicp:term-name>Cushingoid facies</ncicp:term-name><ncicp:term-group>LLT</ncicp:term-group><ncicp:term-source>MedDRA</ncicp:term-source><ncicp:source-code>10011656</ncicp:source-code></ncicp:ComplexTerm>",
+          "<ncicp:ComplexTerm><ncicp:term-name>Moon face</ncicp:term-name><ncicp:term-group>LLT</ncicp:term-group><ncicp:term-source>MedDRA</ncicp:term-source><ncicp:source-code>10027953</ncicp:source-code></ncicp:ComplexTerm>",
+          "<ncicp:ComplexTerm><ncicp:term-name>Cushingoid</ncicp:term-name><ncicp:term-group>LLT</ncicp:term-group><ncicp:term-source>MedDRA</ncicp:term-source><ncicp:source-code>10011655</ncicp:source-code></ncicp:ComplexTerm>",
+          "<ncicp:ComplexTerm><ncicp:term-name>Cushing-like build</ncicp:term-name><ncicp:term-group>LLT</ncicp:term-group><ncicp:term-source>MedDRA</ncicp:term-source><ncicp:source-code>10011654</ncicp:source-code></ncicp:ComplexTerm>"
+        ],
+        "http://ncicb.nci.nih.gov/xml/owl/EVS/ctcae.owl#code": ["E10904"]
+      },
+      "@id": "http://ncicb.nci.nih.gov/xml/owl/EVS/ctcae.owl#Cushingoid",
+      "@type": "http://www.w3.org/2002/07/owl#Class"
+    }
+  ]
 }

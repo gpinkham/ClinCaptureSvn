@@ -48,6 +48,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 	private static final String ICD9CM = "ICD9CM";
 	private static final String ICD10 = "ICD10";
 	private static final String CTCAE = "CTCAE";
+	private static final String CTC_CODE = "http://ncicb.nci.nih.gov/xml/owl/EVS/ctcae.owl#code";
 	private static final int THREAD_LIVE_TIME = 30;
 
 	/**
@@ -238,11 +239,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 				if (!responseArray.isJsonNull() && responseArray.size() > 0) {
 					String codeValue = "";
 					if (responseArray.get(0).getAsJsonObject().get("@id").getAsString().indexOf("ctcae") > 0) {
-						for (JsonElement element : responseArray.get(0).getAsJsonObject().get("property").getAsJsonArray()) {
-							if (element.getAsString().startsWith("E")) {
-								codeValue = element.getAsString();
-							}
-						}
+						codeValue = responseArray.get(0).getAsJsonObject().get("properties").getAsJsonObject().get(CTC_CODE).getAsJsonArray().get(0).getAsString();
 					} else {
 						codeValue = responseArray.get(0).getAsJsonObject().get("notation").getAsString();
 					}
@@ -273,7 +270,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 			method.setPath("/search");
 			method.setQueryString(new NameValuePair[] {
 					new NameValuePair("q", classificationElement.getCodeName()), new NameValuePair("ontologies", dictionary),
-					new NameValuePair("include", "prefLabel,notation,property"),
+					new NameValuePair("include", "prefLabel,notation,properties"),
 					new NameValuePair("exact_match", "true"),
 					new NameValuePair("no_links", "true"),
 					new NameValuePair("no_context", "true"),
