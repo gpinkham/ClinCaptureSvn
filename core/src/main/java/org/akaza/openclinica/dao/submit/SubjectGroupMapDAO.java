@@ -28,8 +28,10 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
 import javax.sql.DataSource;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -87,8 +89,8 @@ public class SubjectGroupMapDAO extends AuditableEntityDAO {
 
 		this.setTypeExpected(5, TypeNames.INT);
 		this.setTypeExpected(6, TypeNames.INT);
-		this.setTypeExpected(7, TypeNames.DATE);
-		this.setTypeExpected(8, TypeNames.DATE);
+		this.setTypeExpected(7, TypeNames.TIMESTAMP);
+		this.setTypeExpected(8, TypeNames.TIMESTAMP);
 
 		this.setTypeExpected(9, TypeNames.INT);
 		this.setTypeExpected(10, TypeNames.STRING);
@@ -237,7 +239,7 @@ public class SubjectGroupMapDAO extends AuditableEntityDAO {
 		variables.put(new Integer(3), new Integer(sb.getStudyGroupId()));
 		variables.put(new Integer(4), new Integer(sb.getStatus().getId()));
 
-		variables.put(new Integer(5), new java.util.Date());
+		variables.put(new Integer(5), new Timestamp(new Date().getTime()));
 		variables.put(new Integer(6), new Integer(sb.getUpdater().getId()));
 		variables.put(new Integer(8), new Integer(sb.getId()));
 		variables.put(new Integer(7), sb.getNotes());

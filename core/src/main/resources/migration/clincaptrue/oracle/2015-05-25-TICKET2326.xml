@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-01" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table archived_dataset_file</comment>
+		<modifyColumn tableName="archived_dataset_file">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-02" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table crf</comment>
+		<modifyColumn tableName="crf">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-03" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table crf_version</comment>
+		<modifyColumn tableName="crf_version">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-04" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table dictionary</comment>
+		<modifyColumn tableName="dictionary">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-05" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table dynamic_event</comment>
+		<modifyColumn tableName="dynamic_event">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-06" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table event_definition_crf</comment>
+		<modifyColumn tableName="event_definition_crf">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-7" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table item</comment>
+		<modifyColumn tableName="item">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-8" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table item_data</comment>
+		<modifyColumn tableName="item_data">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-9" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table item_group</comment>
+		<modifyColumn tableName="item_group">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-10" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table rule</comment>
+		<modifyColumn tableName="rule">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-11" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table rule_action</comment>
+		<modifyColumn tableName="rule_action">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-12" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table rule_expression</comment>
+		<modifyColumn tableName="rule_expression">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-13" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table rule_set</comment>
+		<modifyColumn tableName="rule_set">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-14" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table rule_set_audit</comment>
+		<modifyColumn tableName="rule_set_audit">
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-15" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table rule_set_rule</comment>
+		<modifyColumn tableName="rule_set_rule">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-16" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table rule_set_rule_audit</comment>
+		<modifyColumn tableName="rule_set_rule_audit">
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-17" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table section</comment>
+		<modifyColumn tableName="section">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-18" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table study_group_class</comment>
+		<modifyColumn tableName="study_group_class">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-19" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table study_module_status</comment>
+		<modifyColumn tableName="study_module_status">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-20" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table study_user_role</comment>
+		<modifyColumn tableName="study_user_role">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-21" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table subject_group_map</comment>
+		<modifyColumn tableName="subject_group_map">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-22" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table term</comment>
+		<modifyColumn tableName="term">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2326-23" dbms="oracle">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table user_account</comment>
+		<modifyColumn tableName="user_account">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="passwd_timestamp" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+</databaseChangeLog>
+
+
+

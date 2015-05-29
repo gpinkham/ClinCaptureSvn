@@ -109,11 +109,11 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.DATE); // created
-		this.setTypeExpected(index++, TypeNames.DATE); // updated
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // created
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // updated
 		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // lastvisit, changed
 		// from date
-		this.setTypeExpected(index++, TypeNames.DATE); // passwd timestamp
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // passwd timestamp
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.STRING);
@@ -154,8 +154,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.DATE);
-		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index, TypeNames.INT);
@@ -213,10 +213,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 			variables.put(index++, new Timestamp(uab.getLastVisitDate().getTime()));
 		}
 		if (uab.getPasswdTimestamp() == null) {
-			nullVars.put(index, TypeNames.DATE);
+			nullVars.put(index, TypeNames.TIMESTAMP);
 			variables.put(index++, null);
 		} else {
-			variables.put(index++, uab.getPasswdTimestamp());
+			variables.put(index++, new Timestamp(uab.getPasswdTimestamp().getTime()));
 		}
 		variables.put(index++, uab.getPasswdChallengeQuestion());
 		variables.put(index++, uab.getPasswdChallengeAnswer());
@@ -413,8 +413,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.DATE);
-		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index, TypeNames.STRING);
 		HashMap variables = new HashMap();
@@ -853,7 +853,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
@@ -902,7 +902,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
@@ -953,7 +953,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);

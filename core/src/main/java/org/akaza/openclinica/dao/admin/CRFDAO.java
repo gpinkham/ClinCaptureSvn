@@ -100,8 +100,8 @@ public class CRFDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.DATE);
-		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);

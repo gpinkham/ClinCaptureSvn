@@ -61,8 +61,8 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 		assertEquals((Integer) TypeNames.INT, itemDataDAO.getTypeExpected(index++));
 		assertEquals((Integer) TypeNames.INT, itemDataDAO.getTypeExpected(index++));
 		assertEquals((Integer) TypeNames.STRING, itemDataDAO.getTypeExpected(index++));
-		assertEquals((Integer) TypeNames.DATE, itemDataDAO.getTypeExpected(index++));
-		assertEquals((Integer) TypeNames.DATE, itemDataDAO.getTypeExpected(index++));
+		assertEquals((Integer) TypeNames.TIMESTAMP, itemDataDAO.getTypeExpected(index++));
+		assertEquals((Integer) TypeNames.TIMESTAMP, itemDataDAO.getTypeExpected(index++));
 		assertEquals((Integer) TypeNames.INT, itemDataDAO.getTypeExpected(index++));
 		assertEquals((Integer) TypeNames.INT, itemDataDAO.getTypeExpected(index++));
 		assertEquals((Integer) TypeNames.INT, itemDataDAO.getTypeExpected(index++));

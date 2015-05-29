@@ -83,8 +83,8 @@ public class SectionDAO extends AuditableEntityDAO {
 		this.setTypeExpected(8, TypeNames.STRING);// page num label
 		this.setTypeExpected(9, TypeNames.INT);// order by
 		this.setTypeExpected(10, TypeNames.INT);// parent id
-		this.setTypeExpected(11, TypeNames.DATE);
-		this.setTypeExpected(12, TypeNames.DATE);
+		this.setTypeExpected(11, TypeNames.TIMESTAMP);
+		this.setTypeExpected(12, TypeNames.TIMESTAMP);
 		this.setTypeExpected(13, TypeNames.INT);// owner id
 		this.setTypeExpected(14, TypeNames.INT);// update id
 		this.setTypeExpected(15, TypeNames.INT);// borders

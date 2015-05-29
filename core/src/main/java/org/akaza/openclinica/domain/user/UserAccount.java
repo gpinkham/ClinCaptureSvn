@@ -194,7 +194,7 @@ public class UserAccount extends DataMapDomainObject {
         this.institutionalAffiliation = institutionalAffiliation;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_created", length = 4)
     public Date getDateCreated() {
         return this.dateCreated;
@@ -204,7 +204,7 @@ public class UserAccount extends DataMapDomainObject {
         this.dateCreated = dateCreated;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_updated", length = 4)
     public Date getDateUpdated() {
         return this.dateUpdated;
@@ -224,7 +224,7 @@ public class UserAccount extends DataMapDomainObject {
         this.dateLastvisit = dateLastvisit;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "passwd_timestamp", length = 4)
     public Date getPasswdTimestamp() {
         return this.passwdTimestamp;

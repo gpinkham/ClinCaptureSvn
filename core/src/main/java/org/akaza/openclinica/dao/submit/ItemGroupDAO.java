@@ -77,8 +77,8 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		this.setTypeExpected(2, TypeNames.STRING); // name
 		this.setTypeExpected(3, TypeNames.INT);// crf_id
 		this.setTypeExpected(4, TypeNames.INT); // status_id
-		this.setTypeExpected(5, TypeNames.DATE); // date_created
-		this.setTypeExpected(6, TypeNames.DATE); // date_updated
+		this.setTypeExpected(5, TypeNames.TIMESTAMP); // date_created
+		this.setTypeExpected(6, TypeNames.TIMESTAMP); // date_updated
 		this.setTypeExpected(7, TypeNames.INT); // owner_id
 		this.setTypeExpected(8, TypeNames.INT); // update_id
 		this.setTypeExpected(9, TypeNames.STRING); // oc_oid

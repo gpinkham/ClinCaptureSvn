@@ -63,8 +63,8 @@ public class CRFDaoTest extends DefaultAppContextTest {
 		expectedSetTypes.put(3, TypeNames.STRING);
 		expectedSetTypes.put(4, TypeNames.STRING);
 		expectedSetTypes.put(5, TypeNames.INT);
-		expectedSetTypes.put(6, TypeNames.DATE);
-		expectedSetTypes.put(7, TypeNames.DATE);
+		expectedSetTypes.put(6, TypeNames.TIMESTAMP);
+		expectedSetTypes.put(7, TypeNames.TIMESTAMP);
 		expectedSetTypes.put(8, TypeNames.INT);
 		expectedSetTypes.put(9, TypeNames.STRING);
 		expectedSetTypes.put(10, TypeNames.INT);

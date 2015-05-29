@@ -164,8 +164,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT); // event crf id
 		this.setTypeExpected(index++, TypeNames.INT); // status id
 		this.setTypeExpected(index++, TypeNames.STRING); // value
-		this.setTypeExpected(index++, TypeNames.DATE); // date created
-		this.setTypeExpected(index++, TypeNames.DATE); // date updated
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date created
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date updated
 		this.setTypeExpected(index++, TypeNames.INT); // owner id
 		this.setTypeExpected(index++, TypeNames.INT); // update id
 		this.setTypeExpected(index++, TypeNames.INT); // ordinal

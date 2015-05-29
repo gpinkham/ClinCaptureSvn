@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -101,8 +102,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.DATE);
-		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.BOOL);
@@ -499,7 +500,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		variables.put(index++, sb.getNullValues());
 		variables.put(index++, sb.getDefaultVersionId());
 		variables.put(index++, sb.getStatus().getId());
-		variables.put(index++, new Date()); // DATE_Updated
+		variables.put(index++, new Timestamp(new Date().getTime())); // DATE_Updated
 		variables.put(index++, sb.getUpdater().getId());
 		variables.put(index++, sb.getOrdinal());
 		variables.put(index++, sb.isElectronicSignature());

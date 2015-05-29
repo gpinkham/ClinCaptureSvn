@@ -86,8 +86,8 @@ public class ItemDAO extends AuditableEntityDAO {
 		this.setTypeExpected(7, TypeNames.INT); // reference type id
 		this.setTypeExpected(8, TypeNames.INT); // status id
 		this.setTypeExpected(9, TypeNames.INT); // owner id
-		this.setTypeExpected(10, TypeNames.DATE); // created
-		this.setTypeExpected(11, TypeNames.DATE); // updated
+		this.setTypeExpected(10, TypeNames.TIMESTAMP); // created
+		this.setTypeExpected(11, TypeNames.TIMESTAMP); // updated
 		this.setTypeExpected(12, TypeNames.INT); // update id
 		this.setTypeExpected(13, TypeNames.STRING); // oc_oid
 		this.setTypeExpected(14, TypeNames.STRING); // sas_name

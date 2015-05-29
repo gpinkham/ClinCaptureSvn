@@ -30,7 +30,9 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
 import javax.sql.DataSource;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,11 +96,10 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING);    // name varchar(30)
 		this.setTypeExpected(index++, TypeNames.INT);    	// study_id numeric
 		this.setTypeExpected(index++, TypeNames.INT);    	// owner_id numeric
-		this.setTypeExpected(index++, TypeNames.DATE);    	// date_created date
-
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);    	// date_created date
 		this.setTypeExpected(index++, TypeNames.INT);    	// group_class_type_id numeric
 		this.setTypeExpected(index++, TypeNames.INT);    	// status_id numeric
-		this.setTypeExpected(index++, TypeNames.DATE);    	// date_updated date
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);    	// date_updated date
 		this.setTypeExpected(index++, TypeNames.INT);   	// update_id numeric
 		this.setTypeExpected(index++, TypeNames.STRING);	// subject_assignment varchar(30)
 		this.setTypeExpected(index++, TypeNames.BOOL);		// is_default boolean
@@ -389,7 +390,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		queryParameters.put(index++, groupClass.getStudyId());
 		queryParameters.put(index++, groupClass.getGroupClassTypeId());
 		queryParameters.put(index++, groupClass.getStatus().getId());
-		queryParameters.put(index++, new java.util.Date());
+		queryParameters.put(index++, new Timestamp(new Date().getTime()));
 		queryParameters.put(index++, groupClass.getUpdater().getId());
 		queryParameters.put(index++, groupClass.getSubjectAssignment());
 		queryParameters.put(index++, groupClass.isDefault());

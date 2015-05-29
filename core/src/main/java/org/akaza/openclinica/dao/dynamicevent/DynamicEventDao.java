@@ -62,8 +62,8 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 		this.setTypeExpected(5, TypeNames.INT);// ordinal
 		this.setTypeExpected(6, TypeNames.INT);// owner id
 		this.setTypeExpected(7, TypeNames.INT);// updater id
-		this.setTypeExpected(8, TypeNames.DATE);// created
-		this.setTypeExpected(9, TypeNames.DATE);// updated
+		this.setTypeExpected(8, TypeNames.TIMESTAMP);// created
+		this.setTypeExpected(9, TypeNames.TIMESTAMP);// updated
 		this.setTypeExpected(10, TypeNames.STRING);// name
 		this.setTypeExpected(11, TypeNames.STRING);// description
 	}

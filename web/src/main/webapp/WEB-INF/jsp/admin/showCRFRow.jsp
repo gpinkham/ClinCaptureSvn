@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
@@ -22,13 +23,18 @@
 </c:choose>
 <tr valign="top" bgcolor="#F5F5F5">
   <td rowspan="<c:out value="${count}"/>" class="table_cell_left"><c:out value="${currRow.bean.name}"/></td>
-  <td rowspan="<c:out value="${count}"/>" class="table_cell"><fmt:formatDate value="${currRow.bean.updatedDate}" pattern="${dteFormat}"/>&nbsp;</td>
+  <td rowspan="<c:out value="${count}"/>" class="table_cell">
+	  <cc-fmt:formatDate value="${currRow.bean.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	  &nbsp;
+  </td>
   <td rowspan="<c:out value="${count}"/>" class="table_cell"><c:out value="${currRow.bean.updater.name}"/>&nbsp;</td>
   <td rowspan="<c:out value="${count}"/>" class="table_cell"><c:out value="${currRow.bean.oid}"/>&nbsp;</td>
   <td class="table_cell">(<fmt:message key="original" bundle="${resword}"/>)</td>
     <%--oid space --%>
   <td class="table_cell">&nbsp;</td>
-  <td class="table_cell"><fmt:formatDate value="${currRow.bean.createdDate}" pattern="${dteFormat}"/></td>
+  <td class="table_cell">
+	  <cc-fmt:formatDate value="${currRow.bean.createdDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+  </td>
   <td class="table_cell"><c:out value="${currRow.bean.owner.name}"/></td>
   <td class="table_cell <c:out value='${className}'/>"><c:out value="${currRow.bean.status.name}"/></td>
   <td class="table_cell">&nbsp;</td>
@@ -109,7 +115,9 @@
   <tr valign="top">
     <td class="table_cell"><c:out value="${version.name}"/></td>
     <td class="table_cell"><c:out value="${version.oid}"/></td>    
-    <td class="table_cell"><fmt:formatDate value="${version.createdDate}" pattern="${dteFormat}"/></td>
+    <td class="table_cell">
+		<cc-fmt:formatDate value="${version.createdDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	</td>
     <td class="table_cell"><c:out value="${version.owner.name}"/></td>
     <td class="table_cell <c:out value='${className}'/>"><c:out value="${version.status.name}"/></td>
     <td class="table_cell">
