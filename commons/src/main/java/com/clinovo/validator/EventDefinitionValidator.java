@@ -87,7 +87,9 @@ public class EventDefinitionValidator {
 
 		String type = fp.getString("type");
 		if (!Arrays.asList(SCHEDULED, UNSCHEDULED, COMMON, CALENDARED_VISIT).contains(type)) {
-			errors.put("type", Arrays.asList(resexception.getString("rest.studyEventDefinition.wrongType")));
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(resexception.getString("rest.studyEventDefinition.wrongType"));
+			errors.put("type", errorMessages);
 			return errors;
 		}
 
