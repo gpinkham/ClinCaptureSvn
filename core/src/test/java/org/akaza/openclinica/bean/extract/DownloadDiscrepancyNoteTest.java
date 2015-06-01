@@ -244,6 +244,6 @@ public class DownloadDiscrepancyNoteTest {
 	@Test
 	public void testThatGetThreadListContentLengthReturnsCorrectNumberOfBytes() throws IOException {
 
-		Assert.assertEquals(1287, downloadDiscrepancyNote.getThreadListContentLength(testDNThreadsList));
+		Assert.assertEquals(1475, downloadDiscrepancyNote.getThreadListContentLength(testDNThreadsList));
 	}
 }

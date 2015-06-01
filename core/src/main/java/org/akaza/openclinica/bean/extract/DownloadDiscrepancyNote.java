@@ -581,13 +581,12 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 		if (csvValue.contains("\u2018")) {
 			csvValue = csvValue.replaceAll("\u2018", "'");
 		}
+		if (csvValue.contains("\"")) {
+			csvValue = csvValue.replaceAll("\"", "\"\"");
+		}
 		if (csvValue.contains("\u201C")) {
-			csvValue = csvValue.replaceAll("\u201C", "\"");
+			csvValue = csvValue.replaceAll("\u201C", "\"\"");
 		}
-		if (csvValue.contains(",")) {
-			return "\"" + csvValue + "\"";
-		} else {
-			return csvValue;
-		}
+		return "\"" + csvValue + "\"";
 	}
 }
