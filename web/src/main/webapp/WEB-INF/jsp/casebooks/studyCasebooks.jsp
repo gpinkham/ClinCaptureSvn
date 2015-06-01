@@ -34,15 +34,20 @@
   function sendSubjectOids() {
     var list = $("input[name=oids]:checked").map(function () {return $(this).attr("ssoid");}).get().join(",")
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
+    if($("#sidebar_Alerts_open").css("display") == 'none') {
+      leftnavExpand('sidebar_Alerts_open');
+      leftnavExpand('sidebar_Alerts_closed');
+    }
+    $("#sidebar_Alerts_open .sidebar_tab_content").html('')
+            .append("<div class='alert'><fmt:message key="selected_casebooks_in_progress" bundle="${resword}"/></div>");
     $.ajax({
-
       type: "POST",
       url: url + "/generateCasebooks",
       data: {
         oids: list
       },
       success: function(data) {
-        console.log("Medical coding executed successfully");
+        $("#sidebar_Alerts_open .sidebar_tab_content").html('');
       },
       error: function(e) {
         console.log("Error:" + e);
@@ -95,6 +100,8 @@
          onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/>
   <input type="button" value="<fmt:message key="generate_casebooks" bundle="${resword}"/>"
          class="button_long" onClick="javascript: sendSubjectOids();"/>
+  <input type="button" value="Download Casebooks"
+         class="button_long" onClick="javascript:window.open('${pageContext.request.contextPath}/pages/downloadCasebooks','','location=0,status=0,scrollbars=1,width=650,height=600');"/>
 </div>
 
 
