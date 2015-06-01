@@ -20,6 +20,23 @@
  */
 package org.akaza.openclinica.dao.core;
 
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -32,20 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import com.clinovo.util.OdmExtractUtil;
 
 /**
  * <p/>
@@ -1136,34 +1140,32 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	}
 
 	/**
-	 * ********************************************************************************
-	 * ********************************************************************************
+	 * Selects study subjects.
 	 * 
-	 * @vbc 08/06/2008 NEW EXTRACT DATA IMPLEMENTATION - a new section that uses a different way to access the data -
-	 *      this is to improve performance and fix some bugs with the data extraction
-	 *      *******************************************************************************
-	 * 
-	 * 
-	 * @ywang, 09-09-2008, modified syntax of some sql scripts for oracle database.
-	 * 
+	 * @param pairList
+	 *            List
+	 * @param sedin
+	 *            String
+	 * @param itIn
+	 *            String
+	 * @param dateConstraint
+	 *            String
+	 * @param ecStatusConstraint
+	 *            String
+	 * @param itStatusConstraint
+	 *            String
+	 * @param studySubjectNumber
+	 *            int
+	 * @return Map
 	 */
-	/**
-	 * select, a static query interface to the database, returning an array of hashmaps that contain key->object pairs.
-	 * <P>
-	 * This is the first operation created for the database, so therefore it is the simplest; cull information from the
-	 * database but not specify any parameters.
-	 * 
-	 * a static query of the database.
-	 * 
-	 * @return ArrayList of HashMaps carrying the database values.
-	 */
-	public ArrayList selectStudySubjects(int studyid, int parentid, String sedin, String it_in, String dateConstraint,
-			String ecStatusConstraint, String itStatusConstraint) {
+	public Map<Integer, List<OdmExtractUtil.StudySubjectsHolder>> selectStudySubjects(
+			List<Map<Integer, Integer>> pairList, String sedin, String itIn, String dateConstraint,
+			String ecStatusConstraint, String itStatusConstraint, int studySubjectNumber) {
 		clearSignals();
-		String query = getSQLSubjectStudySubjectDataset(studyid, parentid, sedin, it_in, dateConstraint,
-				ecStatusConstraint, itStatusConstraint, CoreResources.getDBType());
+		String query = getSQLSubjectStudySubjectDataset(pairList, sedin, itIn, dateConstraint, ecStatusConstraint,
+				itStatusConstraint, CoreResources.getDBType());
 		logger.error("sqlSubjectStudySubjectDataset=" + query);
-		ArrayList results = new ArrayList();
+		Map<Integer, List<OdmExtractUtil.StudySubjectsHolder>> mapOfStudySubjectsHolderList = new HashMap<Integer, List<OdmExtractUtil.StudySubjectsHolder>>();
 		ResultSet rs = null;
 		con = null;
 		Statement ps = null;
@@ -1175,8 +1177,9 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					logger.warn("Connection is closed: GenericDAO.select!");
 				throw new SQLException();
 			}
-			ps = con.createStatement();
-			ps.setFetchSize(50);
+			final int fetchSize = 50;
+			ps = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			ps.setFetchSize(fetchSize);
 			rs = ps.executeQuery(query);
 			if (logger.isInfoEnabled()) {
 				logger.trace("Executing static query, GenericDAO.select: " + query);
@@ -1185,7 +1188,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			}
 			// ps.close();
 			signalSuccess();
-			results = this.processStudySubjects(rs);
+			mapOfStudySubjectsHolderList = this.processStudySubjects(rs, studySubjectNumber);
 			// rs.close();
 
 		} catch (SQLException sqle) {
@@ -1199,23 +1202,46 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			this.closeIfNecessary(con, rs, ps);
 		}
 		// return rs;
-		return results;
+		return mapOfStudySubjectsHolderList;
 
-	}//
+	}
 
 	/**
-	 * 
+	 * Processes StudySubjects.
+	 *
 	 * @param rs
 	 *            ResultSet
+	 * @param studySubjectNumber
+	 *            int
 	 * @return ArrayList
 	 */
-	public ArrayList processStudySubjects(ResultSet rs) {// throws
-		// SQLException
-		ArrayList al = new ArrayList();
-
+	public Map<Integer, List<OdmExtractUtil.StudySubjectsHolder>> processStudySubjects(ResultSet rs,
+			int studySubjectNumber) {
+		Map<Integer, List<OdmExtractUtil.StudySubjectsHolder>> mapOfStudySubjectsHolderList = new HashMap<Integer, List<OdmExtractUtil.StudySubjectsHolder>>();
 		try {
 			while (rs.next()) {
+				int studyId = rs.getInt("study_id");
+
+				List<OdmExtractUtil.StudySubjectsHolder> studySubjectsHolderList = mapOfStudySubjectsHolderList
+						.get(studyId);
+				if (studySubjectsHolderList == null) {
+					studySubjectsHolderList = new ArrayList<OdmExtractUtil.StudySubjectsHolder>();
+					mapOfStudySubjectsHolderList.put(studyId, studySubjectsHolderList);
+				}
+				OdmExtractUtil.StudySubjectsHolder studySubjectsHolder;
+				if (studySubjectsHolderList.size() == 0) {
+					studySubjectsHolder = new OdmExtractUtil.StudySubjectsHolder();
+					studySubjectsHolderList.add(studySubjectsHolder);
+				} else {
+					studySubjectsHolder = studySubjectsHolderList.get(studySubjectsHolderList.size() - 1);
+				}
+				if (studySubjectNumber > 0 && studySubjectsHolder.getStudySubjectList().size() == studySubjectNumber) {
+					studySubjectsHolder = new OdmExtractUtil.StudySubjectsHolder();
+					studySubjectsHolderList.add(studySubjectsHolder);
+				}
+
 				StudySubjectBean obj = new StudySubjectBean();
+
 				// first column
 				obj.setId(rs.getInt("study_subject_id"));
 				if (rs.wasNull()) {
@@ -1235,10 +1261,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				}
 
 				obj.setDateOfBirth(rs.getDate("date_of_birth"));
-				// what default?
-				/*
-				 * if (rs.wasNull()) { obj.setDateOfBirth(""); }
-				 */
+
 				String gender = rs.getString("gender");
 				if (gender != null && gender.length() > 0) {
 					obj.setGender(gender.charAt(0));
@@ -1272,22 +1295,20 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					obj.setSecondaryLabel("");
 				}
 
-				// add
-				al.add(obj);
-
-			}// while
+				studySubjectsHolder.addStudySubject(obj);
+			}
 		} catch (SQLException sqle) {
 			if (logger.isWarnEnabled()) {
 				logger.warn("Exception while processing result rows, EntityDAO.processStudySubjects: " + ": "
-						+ sqle.getMessage() + ": array length: " + al.size());
+						+ sqle.getMessage() + ": array length: " + mapOfStudySubjectsHolderList.size());
 				sqle.printStackTrace();
 			}
 		}
 
-		return al;
+		return mapOfStudySubjectsHolderList;
 	}
 
-	protected String getSQLSubjectStudySubjectDataset(int studyid, int studyparentid, String sedin, String it_in,
+	protected String getSQLSubjectStudySubjectDataset(List<Map<Integer, Integer>> pairList, String sedin, String it_in,
 			String dateConstraint, String ecStatusConstraint, String itStatusConstraint, String databaseName) {
 		/**
 		 * 
@@ -1387,7 +1408,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			// Or study_event in the script has never be used.
 			// So, I take off the study_event. If something goes wrong, we can
 			// come back to recover it.
-			return "SELECT distinct study_subject.study_subject_id , study_subject.label,  study_subject.subject_id, "
+			return "SELECT distinct study_subject.study_subject_id, study_subject.study_id, study_subject.label,  study_subject.subject_id, "
 					+ "  subject.date_of_birth, subject.gender, subject.unique_identifier, subject.dob_collected,  "
 					+ "  subject.status_id, study_subject.secondary_label"
 					+ "  FROM  "
@@ -1398,9 +1419,9 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					+ "  ( "
 					+ "SELECT DISTINCT studysubjectid FROM "
 					+ "( "
-					+ getSQLDatasetBASE_EVENTSIDE(studyid, studyparentid, sedin, it_in, dateConstraint,
+					+ getSQLDatasetBASE_EVENTSIDE(pairList, sedin, it_in, dateConstraint,
 							ecStatusConstraint, itStatusConstraint) + " ) SBQTWO "
-					+ "  ) order by study_subject.study_subject_id";
+					+ "  ) order by study_subject.study_id, study_subject.study_subject_id";
 			/*
 			 * // Here, for oracle, we go for min(study_event_id) for a // study_subject_id return "SELECT
 			 * study_subject.study_subject_id , study_subject.label, study_subject.subject_id, " + "
@@ -1415,8 +1436,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			 */
 		} else {
 			return " SELECT   "
-					+ " DISTINCT ON (study_subject.study_subject_id ) "
-					+ " study_subject.study_subject_id , study_subject.label,  study_subject.subject_id, "
+					+ " DISTINCT study_subject.study_subject_id, study_subject.study_id, study_subject.label,  study_subject.subject_id, "
 					+ "  subject.date_of_birth, subject.gender, subject.unique_identifier, subject.dob_collected,  "
 					+ "  subject.status_id, study_subject.secondary_label, study_event.start_time_flag, study_event.end_time_flag  "
 					+ "  FROM  "
@@ -1428,8 +1448,8 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					+ "  ( "
 					+ "SELECT DISTINCT studysubjectid FROM "
 					+ "( "
-					+ getSQLDatasetBASE_EVENTSIDE(studyid, studyparentid, sedin, it_in, dateConstraint,
-							ecStatusConstraint, itStatusConstraint) + " ) AS SBQTWO " + "  ) ";
+					+ getSQLDatasetBASE_EVENTSIDE(pairList, sedin, it_in, dateConstraint,
+							ecStatusConstraint, itStatusConstraint) + " ) AS SBQTWO " + "  ) order by study_subject.study_id, study_subject.study_subject_id";
 
 		}
 	}// getSQLSubjectStudySubjectDataset
@@ -1522,7 +1542,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
 		String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
 		// YW, 09-2008, << modified syntax of sql for oracle database
-		String query = getSQLDatasetBASE_EVENTSIDE(studyid, parentid, sedin, it_in, this.genDatabaseDateConstraint(eb),
+		String query = getSQLDatasetBASE_EVENTSIDE(OdmExtractUtil.pairList(studyid, parentid), sedin, it_in, this.genDatabaseDateConstraint(eb),
 				ecStatusConstraint, itStatusConstraint);
 		// YW, 09-2008>>
 		logger.error("sqlDatasetBase_eventside=" + query);
@@ -2004,7 +2024,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 *            String
 	 * @return String
 	 */
-	protected String getSQLDatasetBASE_EVENTSIDE(int studyid, int studyparentid, String sedin, String it_in,
+	protected String getSQLDatasetBASE_EVENTSIDE(List<Map<Integer, Integer>> pairList, String sedin, String it_in,
 			String dateConstraint, String ecStatusConstraint, String itStatusConstraint) {
 
 		/**
@@ -2126,10 +2146,10 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					+ " 					 JOIN	study  			ON ( "
 					+ " 										study.study_id = study_subject.study_id  "
 					+ " 									   AND "
-					+ " 										(study.study_id= "
-					+ studyid
-					+ "OR study.parent_study_id= "
-					+ studyparentid
+					+ " 										(study.study_id in "
+					+ OdmExtractUtil.keysAsSql(pairList)
+					+ "OR study.parent_study_id in "
+					+ OdmExtractUtil.valuesAsSql(pairList)
 					+ ") "
 					+ " 									   ) "
 					+ " 					 JOIN	subject  		ON study_subject.subject_id = subject.subject_id "
@@ -2165,10 +2185,10 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					+ " 				 JOIN	study  			ON ( "
 					+ " 									study.study_id  = study_subject.study_id  "
 					+ " 								   AND "
-					+ " 									(study.study_id= "
-					+ studyid
-					+ " OR study.parent_study_id= "
-					+ studyparentid
+					+ " 									(study.study_id in "
+					+ OdmExtractUtil.keysAsSql(pairList)
+					+ " OR study.parent_study_id in "
+					+ OdmExtractUtil.valuesAsSql(pairList)
 					+ ") "
 					+ " 								   ) "
 					+ " 				 JOIN	subject  		ON study_subject.subject_id = subject.subject_id  "
@@ -2263,10 +2283,10 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					+ "                    JOIN   study           ON ( "
 					+ "                                       study.study_id::numeric = study_subject.study_id  "
 					+ "                                      AND "
-					+ "                                       (study.study_id= "
-					+ studyid
-					+ "OR study.parent_study_id= "
-					+ studyparentid
+					+ "                                       (study.study_id in "
+					+ OdmExtractUtil.keysAsSql(pairList)
+					+ "OR study.parent_study_id in "
+					+ OdmExtractUtil.valuesAsSql(pairList)
 					+ ") "
 					+ "                                      ) "
 					+ "                    JOIN   subject         ON study_subject.subject_id = subject.subject_id::numeric "
@@ -2302,10 +2322,10 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					+ "                JOIN   study           ON ( "
 					+ "                                   study.study_id::numeric = study_subject.study_id  "
 					+ "                                  AND "
-					+ "                                   (study.study_id= "
-					+ studyid
-					+ " OR study.parent_study_id= "
-					+ studyparentid
+					+ "                                   (study.study_id in "
+					+ OdmExtractUtil.keysAsSql(pairList)
+					+ " OR study.parent_study_id in "
+					+ OdmExtractUtil.valuesAsSql(pairList)
 					+ ") "
 					+ "                                  ) "
 					+ "                JOIN   subject         ON study_subject.subject_id = subject.subject_id::numeric "
@@ -2824,7 +2844,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					+ " (  "
 					+ "	SELECT DISTINCT eventcrfid FROM  "
 					+ "	(     "
-					+ getSQLDatasetBASE_EVENTSIDE(studyid, studyparentid, sedin, it_in, dateConstraint,
+					+ getSQLDatasetBASE_EVENTSIDE(OdmExtractUtil.pairList(studyid, studyparentid), sedin, it_in, dateConstraint,
 							ecStatusConstraint, itStatusConstraint) + "	) SBQTWO " + " ) ";
 
 		} else {
@@ -2848,7 +2868,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					+ " (  "
 					+ "   SELECT DISTINCT eventcrfid FROM  "
 					+ "   (     "
-					+ getSQLDatasetBASE_EVENTSIDE(studyid, studyparentid, sedin, it_in, dateConstraint,
+					+ getSQLDatasetBASE_EVENTSIDE(OdmExtractUtil.pairList(studyid, studyparentid), sedin, it_in, dateConstraint,
 							ecStatusConstraint, itStatusConstraint) + "   ) AS SBQTWO " + " ) ";
 		}
 		// TODO - replace with sql

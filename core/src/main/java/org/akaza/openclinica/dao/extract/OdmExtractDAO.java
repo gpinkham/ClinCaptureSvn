@@ -3116,16 +3116,56 @@ public class OdmExtractDAO extends DatasetDAO {
                 + " and item.units = mu.name order by mu.oc_oid";
     }
 
-    protected String getEventGroupItemWithUnitSql(String studyIds, String sedIds, String itemIds,
-                                                  String dateConstraint, int datasetItemStatusId, String studySubjectIds, boolean skipBlanks) {
-        return "select cvit.*, mu.oc_oid as mu_oid, xxec.study_event_definition_id as study_event_definition_id from ("
-                + this.getEventGroupItemSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId,
-                studySubjectIds, skipBlanks)
-                + " ) cvit left join (select item.item_id, mu.oc_oid from versioning_map vm, item, measurement_unit mu where vm.item_id in "
-                + itemIds
-                + " and vm.item_id = item.item_id and item.units = mu.name ) mu on cvit.item_id = mu.item_id "
-                + " left join (select xec.event_crf_id as event_crf_id, xsed.study_event_definition_id as study_event_definition_id from event_crf xec, study_event xse, study_event_definition xsed where xse.study_event_id = xec.study_event_id and xsed.study_event_definition_id = xse.study_event_definition_id) xxec on xxec.event_crf_id = cvit.event_crf_id;";
-    }
+	/**
+	 * Returns EventGroupItemWithUnitSql
+	 * 
+	 * @param studyIds
+	 *            String
+	 * @param sedIds
+	 *            String
+	 * @param itemIds
+	 *            String
+	 * @param dateConstraint
+	 *            String
+	 * @param datasetItemStatusId
+	 *            int
+	 * @param studySubjectIds
+	 *            String
+	 * @param skipBlanks
+	 *            boolean
+	 * @return String
+	 */
+	protected String getEventGroupItemWithUnitSql(String studyIds, String sedIds, String itemIds,
+			String dateConstraint, int datasetItemStatusId, String studySubjectIds, boolean skipBlanks) {
+		String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
+		String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
+		String blanksFilter = skipBlanks ? " and length(id.value) > 0 " : "";
+		return "select ec.event_crf_id, cv.crf_version_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name, i.item_id, i.oc_oid as item_oid, id.ordinal as item_data_ordinal, id.value, i.item_data_type_id, id.item_data_id, mu.oc_oid as mu_oid, sed.study_event_definition_id from event_crf ec \n"
+				+ " join study_subject ss on ss.study_subject_id = ec.study_subject_id "
+				+ dateConstraint
+				+ " and ss.study_subject_id in ("
+				+ studySubjectIds
+				+ ") \n"
+				+ " join study_event se on se.study_event_id = ec.study_event_id \n"
+				+ " join study_event_definition sed on sed.study_event_definition_id = se.study_event_definition_id and sed.study_event_definition_id in "
+				+ sedIds
+				+ " \n"
+				+ " join crf_version cv on cv.crf_version_id = ec.crf_version_id \n"
+				+ " join item_data id on id.event_crf_id = ec.event_crf_id "
+				+ blanksFilter
+				+ " and id.status_id "
+				+ itStatusConstraint
+				+ " and id.item_id in "
+				+ itemIds
+				+ " \n"
+				+ " join item i on i.item_id = id.item_id \n"
+				+ " join item_group_metadata igm on igm.crf_version_id = ec.crf_version_id and igm.item_id = i.item_id \n"
+				+ " join item_group ig on ig.item_group_id = igm.item_group_id \n"
+				+ " left join measurement_unit mu on mu.name = i.units\n"
+				+ "where ec.status_id "
+				+ ecStatusConstraint
+				+ " \n";
+	}
 
     protected String getItemGroupAndItemMetaWithUnitSql(String crfVersionIds) {
         return "select cv.*, mu.oc_oid as mu_oid from ("

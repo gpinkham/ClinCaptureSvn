@@ -20,6 +20,19 @@
  */
 package org.akaza.openclinica.dao.extract;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.DatasetItemStatus;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -31,15 +44,7 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
-import javax.sql.DataSource;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Vector;
+import com.clinovo.util.OdmExtractUtil;
 
 /**
  * The data access object for datasets; also generates datasets based on their query and criteria set; also generates
@@ -558,10 +563,11 @@ public class DatasetDAO extends AuditableEntityDAO {
 		int datasetItemStatusId = eb.getDataset().getDatasetItemStatus().getId();
 		String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
 		String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
-		ArrayList newRows = selectStudySubjects(currentstudyid, parentstudyid, stSedIn, stItemidIn,
-				this.genDatabaseDateConstraint(eb), ecStatusConstraint, itStatusConstraint);
+		Map<Integer, List<OdmExtractUtil.StudySubjectsHolder>> results = selectStudySubjects(
+				OdmExtractUtil.pairList(currentstudyid, parentstudyid), stSedIn, stItemidIn,
+				this.genDatabaseDateConstraint(eb), ecStatusConstraint, itStatusConstraint, -1);
 		// Add it to ths subjects
-		eb.addStudySubjectData(newRows);
+		eb.addStudySubjectData(OdmExtractUtil.getAllStudySubjects(results));
 		// II. Add the study_event records
 		HashMap nhInHelpKeys = setHashMapInKeysHelper(currentstudyid, parentstudyid, stSedIn, stItemidIn,
 				this.genDatabaseDateConstraint(eb), ecStatusConstraint, itStatusConstraint);
