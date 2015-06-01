@@ -1048,11 +1048,11 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 }
 
 .cancel { 
-    background-image: url(../images/button_cancel_BG.gif);
+    background-image: url(../images/button_cancel_BG.png);
 }
 
 .submit { 
-    background-image: url(../images/button_submit_BG.gif);
+    background-image: url(../images/button_submit_BG.png);
 }
 
 .button_div { background-color:transparent;
