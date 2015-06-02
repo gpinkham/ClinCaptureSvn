@@ -54,7 +54,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Processes the request of removing a top level study, all the data assoicated with this study will be removed
+ * Processes the request of removing a top level study, all the data assoicated with this study will be removed.
  * 
  * @author jxu
  * 
@@ -119,19 +119,19 @@ public class RemoveStudyServlet extends Controller {
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
 				request.setAttribute("studyToRemove", study);
-
 				request.setAttribute("sitesToRemove", sites);
-
 				request.setAttribute("userRolesToRemove", userRoles);
-
 				request.setAttribute("subjectsToRemove", subjects);
-
 				request.setAttribute("definitionsToRemove", definitions);
 				forwardPage(Page.REMOVE_STUDY, request, response);
 			} else {
 				logger.info("submit to remove the study");
 				// change all statuses to unavailable
-				study.setOldStatus(study.getStatus());
+				if (study.getStatus() != Status.DELETED) {
+					study.setOldStatus(study.getStatus());
+				} else  {
+					study.setOldStatus(Status.AVAILABLE);
+				}
 				study.setStatus(Status.DELETED);
 				study.setUpdater(currentUser);
 				study.setUpdatedDate(new Date());
@@ -157,12 +157,12 @@ public class RemoveStudyServlet extends Controller {
 				if (study.getId() == currentStudy.getId()) {
 					currentStudy.setStatus(Status.DELETED);
 					currentRole.setStatus(Status.DELETED);
-				}
-				// if current active study is a site and the deleted study is
-				// this active site's parent study,
-				// then this active site has to be removed as well
-				// (auto-removed)
-				else if (currentStudy.getParentStudyId() == study.getId()) {
+				} else if (currentStudy.getParentStudyId() == study.getId()) {
+					// if current active study is a site and the deleted study is
+					// this active site's parent study,
+					// then this active site has to be removed as well
+					// (auto-removed)
+
 					currentStudy.setStatus(Status.AUTO_DELETED);
 					// we may need handle this later?
 					currentRole.setStatus(Status.DELETED);
@@ -205,7 +205,7 @@ public class RemoveStudyServlet extends Controller {
 					}
 				}
 
-				ArrayList<StudyGroupClassBean> groupClasses = (ArrayList<StudyGroupClassBean>) sgcdao
+				ArrayList<StudyGroupClassBean> groupClasses = sgcdao
 						.findAllActiveByStudy(study);
 				for (StudyGroupClassBean gc : groupClasses) {
 					if (!gc.getStatus().equals(Status.DELETED)) {
@@ -249,7 +249,7 @@ public class RemoveStudyServlet extends Controller {
 							}
 						}
 					}
-				}// for definitions
+				} // for definitions
 
 				DatasetDAO datadao = getDatasetDAO();
 				ArrayList<DatasetBean> datasets = datadao.findAllByStudyId(study.getId());

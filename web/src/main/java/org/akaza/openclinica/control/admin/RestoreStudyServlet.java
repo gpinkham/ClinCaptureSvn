@@ -91,15 +91,12 @@ public class RestoreStudyServlet extends Controller {
 		StudyBean currentStudy = getCurrentStudy(request);
 		UserAccountBean currentUser = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
-
 		StudyBean study = (StudyBean) sdao.findByPK(studyId);
 		// find all sites
 		ArrayList<StudyBean> sites = (ArrayList) sdao.findAllByParent(studyId);
-
 		// find all user and roles in the study, include ones in sites
 		UserAccountDAO udao = getUserAccountDAO();
 		ArrayList<StudyUserRoleBean> userRoles = udao.findAllByStudyId(studyId);
-
 		// find all subjects in the study, include ones in sites
 		StudySubjectDAO ssdao = getStudySubjectDAO();
 		ArrayList<StudySubjectBean> subjects = ssdao.findAllByStudy(study);
@@ -115,24 +112,24 @@ public class RestoreStudyServlet extends Controller {
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
 				request.setAttribute("studyToRestore", study);
-
 				request.setAttribute("sitesToRestore", sites);
-
 				request.setAttribute("userRolesToRestore", userRoles);
-
 				request.setAttribute("subjectsToRestore", subjects);
-
 				request.setAttribute("definitionsToRRestore", definitions);
 				forwardPage(Page.RESTORE_STUDY, request, response);
 			} else {
 				logger.info("submit to restore the study");
 				// change all statuses to unavailable
-				study.setStatus(study.getOldStatus());
+				if (study.getOldStatus() != Status.DELETED) {
+					study.setStatus(study.getOldStatus());
+				} else {
+					study.setStatus(Status.AVAILABLE);
+				}
 				study.setUpdater(currentUser);
 				study.setUpdatedDate(new Date());
 				sdao.update(study);
 
-				// YW 09-27-2007 << restore auto-removed sites
+				// restore auto-removed sites
 				for (StudyBean site : sites) {
 					if (site.getStatus() == Status.AUTO_DELETED) {
 						site.setStatus(site.getOldStatus());
@@ -141,7 +138,6 @@ public class RestoreStudyServlet extends Controller {
 						sdao.update(site);
 					}
 				}
-
 				// restore all users and roles
 				for (StudyUserRoleBean role : userRoles) {
 					getUserAccountService().autoRestoreStudyUserRole(role, currentUser);
@@ -155,11 +151,10 @@ public class RestoreStudyServlet extends Controller {
 					StudyUserRoleBean r = udao
 							.findRoleByUserNameAndStudyId(currentUser.getName(), currentStudy.getId());
 					currentRole.setRole(r.getRole());
-				}
-				// when an active site's parent study has been restored, this
-				// active site will be restored as well if it was auto-removed
-				else if (currentStudy.getParentStudyId() == study.getId()
+				} else if (currentStudy.getParentStudyId() == study.getId()
 						&& currentStudy.getStatus() == Status.AUTO_DELETED) {
+					// when an active site's parent study has been restored, this
+					// active site will be restored as well if it was auto-removed
 					currentStudy.setStatus(Status.AVAILABLE);
 
 					StudyUserRoleBean r = udao
@@ -241,8 +236,7 @@ public class RestoreStudyServlet extends Controller {
 							}
 						}
 					}
-				}// for definitions
-
+				} // for definitions
 				DatasetDAO datadao = getDatasetDAO();
 				ArrayList<DatasetBean> datasets = datadao.findAllByStudyId(study.getId());
 				for (DatasetBean data : datasets) {
