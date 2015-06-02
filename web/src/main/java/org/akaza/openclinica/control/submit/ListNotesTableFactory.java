@@ -180,9 +180,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 				null, true, true);
 		configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, false);
 		configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), resword.getString("date_created"),
-				new DateCellEditor(DateUtil.DatePattern.DATE.getPattern()), null, false, true);
+				new DateEditor(DateUtil.DatePattern.DATE, getCurrentUser().getUserTimeZoneId()), null, false, true);
 		configureColumn(row.getColumn("discrepancyNoteBean.updatedDate"), resword.getString("date_updated"),
-				new DateCellEditor(DateUtil.DatePattern.DATE.getPattern()), null, false, false);
+				new DateEditor(DateUtil.DatePattern.DATE, getCurrentUser().getUserTimeZoneId()), null, false, false);
 		configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"),
 				new DateEditor(DateUtil.DatePattern.DATE, getCurrentUser().getUserTimeZoneId()), null, false, false);
 		configureColumn(row.getColumn(eventName), resword.getString("event_name"), null, new StudyEventTableRowFilter(

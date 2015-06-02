@@ -252,7 +252,7 @@ public class AuditDAO extends EntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING); // crf name
 		this.setTypeExpected(index++, TypeNames.STRING); // crf version
 		this.setTypeExpected(index++, TypeNames.STRING); // user name
-		this.setTypeExpected(index, TypeNames.DATE); // delete date
+		this.setTypeExpected(index, TypeNames.TIMESTAMP); // delete date
 
 		HashMap variables = new HashMap();
 		variables.put(1, ITEM_TYPE_ID); // audit_log_event_type_id
@@ -573,7 +573,7 @@ public class AuditDAO extends EntityDAO {
 		int index = SECOND_INDEX;
 		this.setTypeExpected(index++, TypeNames.STRING); // crf name
 		this.setTypeExpected(index++, TypeNames.STRING); // crf version
-		this.setTypeExpected(index++, TypeNames.DATE); // date_interviewed
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_interviewed
 		this.setTypeExpected(index++, TypeNames.STRING); // interviewer_name
 		this.setTypeExpected(index++, TypeNames.INT); // event_crf_version_id
 		this.setTypeExpected(index++, TypeNames.INT); // study_event_id

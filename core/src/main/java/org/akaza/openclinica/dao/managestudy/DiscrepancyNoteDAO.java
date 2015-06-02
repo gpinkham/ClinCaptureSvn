@@ -138,7 +138,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT);
 
 		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.STRING);
@@ -173,7 +173,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.STRING);
@@ -191,13 +191,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.DATE);
-		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.DATE);
-		this.setTypeExpected(index++, TypeNames.DATE);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index, TypeNames.STRING);
 	}
 
@@ -1022,18 +1022,18 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			alist = this.select(digester.getQuery("findAllByStudySubjectAndColumn"), variables);
 		} else if ("eventCrf".equalsIgnoreCase(entityName)) {
 			index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED + 1;
-			this.setTypeExpected(index++, TypeNames.DATE); // date_start
+			this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_start
 			this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 			this.setTypeExpected(index, TypeNames.STRING); // crf_name
 			alist = this.select(digester.getQuery("findAllByEventCRFAndColumn"), variables);
 		} else if ("studyEvent".equalsIgnoreCase(entityName)) {
 			index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED + 1;
-			this.setTypeExpected(index++, TypeNames.DATE); // date_start
+			this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_start
 			this.setTypeExpected(index, TypeNames.STRING); // sed_name
 			alist = this.select(digester.getQuery("findAllByStudyEventAndColumn"), variables);
 		} else if ("itemData".equalsIgnoreCase(entityName)) {
 			index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED + 1;
-			this.setTypeExpected(index++, TypeNames.DATE); // date_start
+			this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_start
 			this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 			this.setTypeExpected(index++, TypeNames.STRING); // crf_name
 			this.setTypeExpected(index, TypeNames.STRING); // item_name
@@ -1294,7 +1294,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		ArrayList alist;
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING); // ss.label
-		this.setTypeExpected(index++, TypeNames.DATE); // date_start
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_start
 		this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 		this.setTypeExpected(index++, TypeNames.STRING); // column_name
 		this.setTypeExpected(index, TypeNames.INT); // study_event_id
@@ -1332,7 +1332,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		ArrayList alist;
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING); // ss.label
-		this.setTypeExpected(index++, TypeNames.DATE); // date_start
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_start
 		this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 		this.setTypeExpected(index++, TypeNames.STRING); // column_name
 		this.setTypeExpected(index, TypeNames.INT); // study_event_id
@@ -1374,7 +1374,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		ArrayList alist;
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING); // ss.label
-		this.setTypeExpected(index++, TypeNames.DATE); // date_start
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_start
 		this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 		this.setTypeExpected(index++, TypeNames.STRING); // column_name
 		this.setTypeExpected(index, TypeNames.INT); // study_event_id
@@ -1413,7 +1413,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		ArrayList alist;
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING); // ss.label
-		this.setTypeExpected(index++, TypeNames.DATE); // date_start
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_start
 		this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 		this.setTypeExpected(index++, TypeNames.STRING); // crf_name
 		this.setTypeExpected(index++, TypeNames.STRING); // column_name
@@ -1452,7 +1452,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		ArrayList alist;
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING); // ss.label
-		this.setTypeExpected(index++, TypeNames.DATE); // date_start
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_start
 		this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 		this.setTypeExpected(index++, TypeNames.STRING); // crf_name
 		this.setTypeExpected(index++, TypeNames.STRING); // column_name
@@ -1623,7 +1623,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		ArrayList alist;
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING); // ss.label
-		this.setTypeExpected(index++, TypeNames.DATE); // date_start
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_start
 		this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 		this.setTypeExpected(index++, TypeNames.STRING); // crf_name
 		this.setTypeExpected(index++, TypeNames.STRING); // item_name
@@ -1667,7 +1667,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		ArrayList al = new ArrayList();
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING); // ss.label
-		this.setTypeExpected(index++, TypeNames.DATE); // date_start
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_start
 		this.setTypeExpected(index++, TypeNames.INT); // sed_id
 		this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 		this.setTypeExpected(index++, TypeNames.STRING); // crf_name
@@ -1731,7 +1731,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING); // ss.label
-		this.setTypeExpected(index++, TypeNames.DATE); // date_start
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_start
 		this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 		this.setTypeExpected(index++, TypeNames.STRING); // crf_name
 		this.setTypeExpected(index++, TypeNames.STRING); // item_name
@@ -1767,7 +1767,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		ArrayList alist;
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING); // ss.label
-		this.setTypeExpected(index++, TypeNames.DATE); // date_start
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_start
 		this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 		this.setTypeExpected(index++, TypeNames.STRING); // crf_name
 		this.setTypeExpected(index++, TypeNames.STRING); // item_name

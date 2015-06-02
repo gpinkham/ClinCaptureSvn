@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="aram" id="2015-05-25-TICKET2330-01" dbms="postgresql">
+		<comment>drop view dn_age_days before change type of column date_created in the table discrepancy_note</comment>
+		<dropView viewName="dn_age_days"/>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2330-02" dbms="postgresql">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table discrepancy_note</comment>
+		<modifyColumn tableName="discrepancy_note">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2330-03" dbms="postgresql">
+		<comment>recreate view dn_age_days after change type of column date_created in the table discrepancy_note</comment>
+		<sql splitStatements="false">
+			CREATE OR REPLACE VIEW dn_age_days AS
+			SELECT dn.discrepancy_note_id,
+				CASE
+					WHEN dn.resolution_status_id = ANY (ARRAY[1, 2, 3])
+					THEN DATE_PART('day', current_timestamp - (( SELECT cdn.date_created FROM discrepancy_note cdn
+						WHERE cdn.discrepancy_note_id = ((SELECT max(idn.discrepancy_note_id) AS max FROM discrepancy_note idn
+						WHERE idn.parent_dn_id = dn.discrepancy_note_id)))))
+					ELSE NULL::integer
+				END AS days,
+				CASE
+					WHEN dn.resolution_status_id = 4
+					THEN DATE_PART('day', (( SELECT cdn.date_created FROM discrepancy_note cdn
+						WHERE cdn.discrepancy_note_id = ((SELECT max(idn.discrepancy_note_id) AS max
+						FROM discrepancy_note idn WHERE idn.parent_dn_id = dn.discrepancy_note_id)))) - dn.date_created)
+
+					WHEN dn.resolution_status_id = ANY (ARRAY[1, 2, 3])
+					THEN DATE_PART('day', current_timestamp - dn.date_created)
+
+					ELSE NULL::integer
+				END AS age
+			FROM discrepancy_note dn
+			WHERE dn.parent_dn_id IS NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="aram" id="2015-05-25-TICKET2330-04" dbms="postgresql">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table audit_log_event</comment>
+		<modifyColumn tableName="audit_log_event">
+			<column name="date_interviewed" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+
+</databaseChangeLog>
+
+
+
+
