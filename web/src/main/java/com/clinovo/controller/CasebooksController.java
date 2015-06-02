@@ -298,7 +298,7 @@ public class CasebooksController extends Redirection {
     private String getCasebookUrl(HttpServletRequest request, String studySubjectOid, String studyOid) {
         String validUri = request.getRequestURI().substring(0, request.getRequestURI().lastIndexOf("/pages"));
         return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + validUri
-                + "/print/clinicaldata/html/print/" + studyOid + "/" + studySubjectOid + "/*/*";
+                + "/print/clinicaldata/html/print/" + studyOid + "/" + studySubjectOid + "/*/*?includeDNs=y&includeAudits=y";
     }
 
     @Override

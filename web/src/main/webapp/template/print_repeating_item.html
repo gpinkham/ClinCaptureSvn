@@ -11,8 +11,8 @@
                 <div class='item_def_control'>
                     {{each optionNames}}
                     <div class='select-option'>
-                        <input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue== id}}checked{{/if}}/> {{html
-                        label}}
+                        <input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue== id}}checked{{/if}}/>
+                        <span {{if itemValue== id}} style="text-decoration: underline;font-weight: bold;" {{/if}}>{{html label}}</span>
                     </div>
                     {{/each}}
                 </div>
@@ -21,8 +21,8 @@
                 <div class='item_def_control'>
                     {{each optionNames}}
                     <div class='select-option'>
-                        <input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue== id}}checked{{/if}}/> {{html
-                        label}}
+                        <input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue== id}}checked{{/if}}/>
+                        <span {{if itemValue== id}} style="text-decoration: underline;font-weight: bold;" {{/if}}>{{html label}}</span>
                     </div>
                     {{/each}}
                 </div>
@@ -31,8 +31,8 @@
                 <div class='item_def_control'>
                     {{each multiSelectOptionNames}}
                     <div class='select-option'>
-                        <input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue && (itemValue.split(",")).indexOf(id)
-                        != -1}}checked{{/if}}/> {{html label}}
+                        <input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue && (itemValue.split(",")).indexOf(id) != -1}}checked{{/if}}/>
+                        <span {{if itemValue && (itemValue.split(",")).indexOf(id) != -1}} style="text-decoration: underline;font-weight: bold;"{{/if}}> {{html label}}</span>
                     </div>
                     {{/each}}
                 </div>

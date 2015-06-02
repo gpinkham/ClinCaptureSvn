@@ -510,7 +510,8 @@ function StudyRenderer(json) {
         } else if (renderMode == "STUDY_SUBJECT_CASE_BOOK" || renderMode == "SITE_SUBJECT_CASE_BOOKS") {
             app_renderMode = renderMode;
             this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime,
-                app_studyCoverPageType, app_eventName);            this.renderString += this.renderSubjectTableOfContents();
+                app_studyCoverPageType, app_eventName);
+            this.renderString += this.renderSubjectTableOfContents();
             this.renderPageHeader(this.PAGE_BREAK, app_printTime,
                 app_studyCoverPageType, app_eventName);
 
@@ -717,6 +718,7 @@ function StudyRenderer(json) {
                     : "";
                 isFirstSection = false;
             }
+            this.renderString += "<div class='vertical-spacer-20px'></div>";
 
             debug(name + " - repeating: " + repeating
             + ", totalRepeatingRows: " + totalRepeatingRows
@@ -739,10 +741,7 @@ function StudyRenderer(json) {
             if (currentItemGroupOID != previousItemGroupOID) {
                 repeatRowNumber = 1;
                 isFirstRepeatingItem = true;
-                idxForFirstItem = itemDetails["@OrderInForm"]; // this will be
-                // the first
-                // item in a
-                // grid.
+                idxForFirstItem = itemDetails["@OrderInForm"];
             }
 
             if (eventDef)
@@ -913,6 +912,7 @@ function StudyRenderer(json) {
                                 tableHtml += this.appendTdElement(chunkOfTd);
                                 tableHtml += "</tr>";
                             }
+                            tableHtml += "</table>";
                         }
                         this.renderString += tableHtml;
                     } else {
@@ -998,8 +998,6 @@ function StudyRenderer(json) {
     }
 
     this.printItemMetadata = function (itemGroupName) {        this.itemMetadataPrint = "";
-        // this.itemMetadataPrint+="<div
-        // align='center'>"+formDef["@Name"]+"</div>";
         this.itemMetadataPrint += itemDefRenderer
             .renderItemFormMetadata(itemGroupName);
         return this.itemMetadataPrint;
@@ -1023,8 +1021,6 @@ function StudyRenderer(json) {
                         var userid = audits["@Name"] ? audits["@Name"] : "";
                         userid += audits["@UserName"] ? " ("
                         + audits["@UserName"] + ")" : "";
-                        // thisAuditLog.user =
-                        // app_userData[userid]?app_userData[userid]["FullName"]:userid;
                         thisAuditLog.user = userid;
                         thisAuditLog.dateTime = audits["@DateTimeStamp"];
                         thisAuditLog.valueType = audits["@ValueType"];
