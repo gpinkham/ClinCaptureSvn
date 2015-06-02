@@ -27,7 +27,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 /**
  * OdmExtractUtil.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public final class OdmExtractUtil {
 
 	private OdmExtractUtil() {

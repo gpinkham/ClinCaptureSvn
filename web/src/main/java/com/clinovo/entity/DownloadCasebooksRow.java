@@ -1,6 +1,5 @@
 package com.clinovo.entity;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.web.bean.EntityBeanRow;
 
 import java.util.ArrayList;
@@ -8,6 +7,7 @@ import java.util.ArrayList;
 /**
  * Row object for download casebooks table.
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class DownloadCasebooksRow extends EntityBeanRow {
 
     public static final int COL_SUBJECT_LABEL = 0;
@@ -43,7 +43,7 @@ public class DownloadCasebooksRow extends EntityBeanRow {
         return thisElement.getStudyName() + " " + thisElement.getStudySubjectLabel();
     }
 
-    @Override
+	@Override
     public ArrayList generatRowsFromBeans(ArrayList beans) {
         return DownloadCasebooksRow.generateRowsFromBeans(beans);
     }

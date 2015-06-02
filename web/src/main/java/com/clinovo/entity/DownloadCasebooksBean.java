@@ -5,6 +5,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 /**
  * Download casebook object bean for UX.
  */
+@SuppressWarnings("serial")
 public class DownloadCasebooksBean extends EntityBean {
 
     private String studySubjectLabel = "";

@@ -22,7 +22,6 @@ import com.clinovo.coding.source.SearchInterface;
 import com.clinovo.http.HttpTransport;
 import com.clinovo.util.CodingFieldsUtil;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.httpclient.Header;

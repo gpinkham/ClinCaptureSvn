@@ -2,6 +2,7 @@ package com.clinovo.model;
 
 import com.clinovo.entity.DownloadCasebooksBean;
 import com.clinovo.entity.DownloadCasebooksRow;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -12,6 +13,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,6 +24,7 @@ import java.util.ResourceBundle;
 /**
  * Download casebook table factory.
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class DownloadCasebooksTableFactory {
 
     public static final String EBL_PAGE = "ebl_page";
