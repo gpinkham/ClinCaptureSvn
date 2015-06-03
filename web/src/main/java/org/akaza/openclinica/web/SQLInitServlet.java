@@ -34,6 +34,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.admin.DownloadVersionSpreadSheetServlet;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DNSLookup;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
 

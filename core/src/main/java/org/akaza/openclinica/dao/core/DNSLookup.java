@@ -13,10 +13,10 @@
 
 package org.akaza.openclinica.dao.core;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.HttpURLConnection;
-import java.io.IOException;
 
 import org.akaza.openclinica.core.form.StringUtil;
 
@@ -29,10 +29,20 @@ import org.akaza.openclinica.core.form.StringUtil;
  */
 public class DNSLookup {
 
+	/**
+	 * Default constructor.
+	 */
 	public DNSLookup() {
-
+		//
 	}
 
+	/**
+	 * Returns real system URL.
+	 * 
+	 * @param url
+	 *            getTrueSystemURL
+	 * @return getTrueSystemURL
+	 */
 	public String getTrueSystemURL(String url) {
 		String trueUrl = "";
 		try {
@@ -43,14 +53,15 @@ public class DNSLookup {
 			System.out.println(responseCode);
 			String location = con.getHeaderField("Location");
 			System.out.println(location);
-			trueUrl = location;
+			trueUrl = location.replaceAll("/pages/login/login.*", "/");
 		} catch (MalformedURLException e) {
 			System.out.println("Incorrect url for " + url);
 		} catch (IOException e) {
 			System.out.println("Error reading for " + url);
 		}
 
-		return StringUtil.isBlank(trueUrl) ? url.trim() : trueUrl.trim();
+		trueUrl = StringUtil.isBlank(trueUrl) ? url.trim() : trueUrl.trim();
+		return trueUrl.endsWith("/") ? trueUrl : trueUrl.concat("/");
 	}
 
 }

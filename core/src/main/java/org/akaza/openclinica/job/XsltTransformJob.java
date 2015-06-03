@@ -249,7 +249,6 @@ public class XsltTransformJob extends QuartzJobBean {
 					studyBean.getOid());
 
 			int dsId = dataMap.getInt(DATASET_ID);
-			CoreResources.getSystemURL();
 
 			ExtractPropertyBean epBean = (ExtractPropertyBean) dataMap.get(EP_BEAN);
 			boolean sasDatasetJob = epBean.getId() == SAS_DATASET_JOB_ID
@@ -543,8 +542,8 @@ public class XsltTransformJob extends QuartzJobBean {
 
 						if (successMsg.contains("$linkURL")) {
 							successMsg = successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getSystemURL()
-									+ "/AccessFile?fileId=" + fbFinal.getId() + "\">" + CoreResources.getSystemURL()
-									+ "/AccessFile?fileId=" + fbFinal.getId() + " </a>");
+									+ "AccessFile?fileId=" + fbFinal.getId() + "\">" + CoreResources.getSystemURL()
+									+ "AccessFile?fileId=" + fbFinal.getId() + " </a>");
 						}
 						emailBuffer.append("<p>").append(successMsg).append("</p>");
 						logMe("System time begining.." + sysTimeBegin);

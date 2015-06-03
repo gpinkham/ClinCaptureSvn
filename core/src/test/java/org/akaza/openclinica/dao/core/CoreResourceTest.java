@@ -33,4 +33,11 @@ public class CoreResourceTest extends AbstractContextSentiveTest {
 		assertEquals(CoreResources.getField(SYS_URL),
 				HTTP_WWW_CLINOVO_COM.concat($_WEBAPP_UPPER).replace($_WEBAPP_UPPER, WEBAPP_NAME));
 	}
+
+	@Test
+	public void testThatSysUrlReturnsUrlWithSlash() {
+		CoreResources.setField(SYS_URL, "http://localhost:8080/clincapture");
+		CoreResources.prepareDataInfoProperties();
+		assertEquals(CoreResources.getSystemURL(), "http://localhost:8080/clincapture/");
+	}
 }
