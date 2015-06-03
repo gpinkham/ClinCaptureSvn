@@ -128,6 +128,10 @@
         <sql>delete from event_crf where crf_version_id=</sql>
     </query>
 	<query>
+		<name>deleteNotSharedItemDataByVersion</name>
+		<sql>delete from item_data where item_id = </sql>
+	</query>
+	<query>
 		<name>getCRFIdFromCRFVersionId</name>
 		<sql>SELECT crf_id FROM crf_version WHERE crf_version_id=?</sql>
 	</query>

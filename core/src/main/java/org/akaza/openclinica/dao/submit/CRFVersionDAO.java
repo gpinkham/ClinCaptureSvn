@@ -416,6 +416,13 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 
 		for (Object item1 : items) {
 			ItemBean item = (ItemBean) item1;
+			sql = digester.getQuery("deleteNotSharedItemDataByVersion") + item.getId();
+			sqls.add(sql);
+		}
+
+
+		for (Object item1 : items) {
+			ItemBean item = (ItemBean) item1;
 			sql = digester.getQuery("deleteItemsByVersion") + item.getId();
 			sqls.add(sql);
 		}
