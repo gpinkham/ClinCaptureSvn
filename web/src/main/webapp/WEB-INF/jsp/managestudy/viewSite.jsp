@@ -689,10 +689,10 @@
 		value="<fmt:message key="site_crfs" bundle="${resword}"/>" 
 		class="button_long" 
 		onclick="javascript:openDocWindow('${pageContext.request.contextPath}/print/metadata/html/print/${parentStudyOid}/*/*')"/>
-    <input type="button" name="BTN_Print"
+    <!--<input type="button" name="BTN_Print"
            value="<fmt:message key="print_site_casebooks" bundle="${resword}"/>"
            class="button_long"
-           onclick="javascript:openDocWindow('${pageContext.request.contextPath}/print/clinicaldata/html/print/${siteToView.oid}/*/*/*?convertToPdf=yes')"/>
+           onclick="javascript:openDocWindow('${pageContext.request.contextPath}/print/clinicaldata/html/print/${siteToView.oid}/*/*/*?convertToPdf=yes')"/>-->
 </c:if>
  <br><br>
 
