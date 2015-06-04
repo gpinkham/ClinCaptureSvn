@@ -85,9 +85,15 @@ public class MainMenuServlet extends Controller {
 
 		String redirectAfterLogin = (String) request.getSession().getAttribute("redirectAfterLogin");
 		if (redirectAfterLogin != null) {
+			redirectAfterLogin = request.isSecure()
+					? redirectAfterLogin.replaceAll("http:", "https:")
+					: redirectAfterLogin;
 			request.getSession().removeAttribute("redirectAfterLogin");
-			request.setAttribute("redirectAfterLogin",
-					request.isSecure() ? redirectAfterLogin.replaceAll("http:", "https:") : redirectAfterLogin);
+			request.setAttribute("redirectAfterLogin", redirectAfterLogin);
+			request.setAttribute("redirectAfterLoginInfo",
+					"redirectAfterLogin: " + redirectAfterLogin + "; request.isSecure(): " + request.isSecure()
+							+ "; request.getProtocol(): " + request.getProtocol() + "; request.getRequestURL(): "
+							+ request.getRequestURL());
 		}
 
 		request.getSession().setAttribute(USER_BEAN_NAME, ub);
