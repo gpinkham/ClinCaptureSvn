@@ -421,10 +421,6 @@
  	</table> 
 <br>
 <c:if test="${redirectAfterLogin ne null}">
-<div class="hidden">
-	redirectAfterLogin: ${redirectAfterLogin}
-	redirectAfterLoginInfo: ${redirectAfterLoginInfo}
-	<iframe src="${redirectAfterLogin}"></iframe>
-</div>
+<div class="hidden"><iframe src="${redirectAfterLogin}"></iframe></div>
 </c:if>
 <jsp:include page="include/footer.jsp"/>
