@@ -50,9 +50,9 @@ public class DNSLookup {
 			con.setInstanceFollowRedirects(false);
 			con.connect();
 			int responseCode = con.getResponseCode();
-			System.out.println("responseCode: " + responseCode);
+			System.out.println(responseCode);
 			String location = con.getHeaderField("Location");
-			System.out.println("location: " + location);
+			System.out.println(location);
 			trueUrl = location.replaceAll("/pages/login/login.*", "/");
 		} catch (MalformedURLException e) {
 			System.out.println("Incorrect url for " + url);
@@ -61,9 +61,7 @@ public class DNSLookup {
 		}
 
 		trueUrl = StringUtil.isBlank(trueUrl) ? url.trim() : trueUrl.trim();
-		trueUrl = trueUrl.endsWith("/") ? trueUrl : trueUrl.concat("/");
-		System.out.println("getTrueSystemURL: " + trueUrl);
-		return trueUrl;
+		return trueUrl.endsWith("/") ? trueUrl : trueUrl.concat("/");
 	}
 
 }

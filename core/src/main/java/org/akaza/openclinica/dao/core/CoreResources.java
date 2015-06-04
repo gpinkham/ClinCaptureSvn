@@ -805,8 +805,6 @@ public class CoreResources implements ResourceLoaderAware {
 		} else {
 			return "";
 		}
-		System.out.println("url: " + url);
-		System.out.println("sysURL: " + dataInfo.getProperty("sysURL"));
 		// lookup the DNS here and report it
 		DNSLookup lookup = new DNSLookup();
 		return lookup.getTrueSystemURL(url);
