@@ -20,9 +20,15 @@
  */
 package org.akaza.openclinica.control;
 
-import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
-import com.clinovo.model.Widget;
-import com.clinovo.model.WidgetsLayout;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -42,13 +48,9 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
+import com.clinovo.model.Widget;
+import com.clinovo.model.WidgetsLayout;
 
 /**
  * 
@@ -84,7 +86,8 @@ public class MainMenuServlet extends Controller {
 		String redirectAfterLogin = (String) request.getSession().getAttribute("redirectAfterLogin");
 		if (redirectAfterLogin != null) {
 			request.getSession().removeAttribute("redirectAfterLogin");
-			request.setAttribute("redirectAfterLogin", redirectAfterLogin);
+			request.setAttribute("redirectAfterLogin",
+					request.isSecure() ? redirectAfterLogin.replaceAll("http:", "https:") : redirectAfterLogin);
 		}
 
 		request.getSession().setAttribute(USER_BEAN_NAME, ub);
