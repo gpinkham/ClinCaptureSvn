@@ -421,6 +421,13 @@
  	</table> 
 <br>
 <c:if test="${redirectAfterLogin ne null}">
-<div class="hidden"><iframe src="${redirectAfterLogin}"></iframe></div>
+<div class="hidden">
+	<iframe id="downloadFileIframe" src=""></iframe>
+	<script>
+		var redirectAfterLogin = "${redirectAfterLogin}";
+		redirectAfterLogin = location.href.indexOf("https") >= 0 ? redirectAfterLogin.replace("http:", "https:") : redirectAfterLogin;
+		$("#downloadFileIframe").attr("src", redirectAfterLogin);
+	</script>
+</div>
 </c:if>
 <jsp:include page="include/footer.jsp"/>
