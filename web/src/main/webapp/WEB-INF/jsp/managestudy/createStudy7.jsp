@@ -65,7 +65,7 @@
 </script>
 <form action="CreateStudy" method="post">
 <span class="title_Admin"><p><b><fmt:message key="section_e_related_information" bundle="${resword}"/></b></p></span>
-* <fmt:message key="indicates_required_field" bundle="${resword}"/><br>
+<span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/><br>
 <input type="hidden" name="action" value="next">
 <input type="hidden" name="pageNum" value="6">
 <div style="width: 600px">

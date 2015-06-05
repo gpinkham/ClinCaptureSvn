@@ -67,7 +67,7 @@
 </h1>
 
 <span class="title_Admin"><p><b><fmt:message key="section_f_study_parameter_configuration" bundle="${resword}"/> </b></p></span>
-<P>* <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
+<P><span class="alert"> *</span><fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 
 <form action="CreateStudy" method="post">
 <input type="hidden" name="action" value="confirm">

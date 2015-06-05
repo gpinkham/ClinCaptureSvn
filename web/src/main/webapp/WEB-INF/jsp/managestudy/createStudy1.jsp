@@ -71,7 +71,7 @@
 <fmt:message key="ClinicalTrials.gov" bundle="${restext}"/>
 </p>
 <span class="title_Admin"><p><b><fmt:message key="section_a_study_description" bundle="${resword}"/></b></p></span>
-<P>* <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
+<P><span class="alert">*</span> <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 <form action="CreateStudy" method="post">
 <input type="hidden" name="action" value="next">
 <input type="hidden" name="pageNum" value="1">
@@ -84,11 +84,11 @@
 <table border="0" cellpadding="0" cellspacing="0">
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</a></td><td><div class="formfieldXL_BG">
   <input type="text" name="uniqueProId" value="<c:out value="${newStudy.identifier}"/>" class="formfieldXL" onchange="javascript:changeIcon();"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td class="formlabel">*</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td class="formlabel alert">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#BriefTitle" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#BriefTitle'); return false;"><b><fmt:message key="brief_title" bundle="${resword}"/></b></a>:</td><td><div class="formfieldXL_BG">
   <input type="text" name="name" value="<c:out value="${newStudy.name}"/>" class="formfieldXL" onchange="javascript:changeIcon();"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td class="formlabel">*</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td class="formlabel alert">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#OfficialTitle" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#OfficialTitle'); return false;"><b><fmt:message key="official_title" bundle="${resword}"/></b></a>:</td><td><div class="formfieldXL_BG">
   <input type="text" name="officialTitle" value="<c:out value="${newStudy.officialTitle}"/>" class="formfieldXL" onchange="javascript:changeIcon();"></div>
@@ -103,7 +103,7 @@
 
   <tr valign="top"><td class="formlabel"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
   <input type="text" name="prinInvestigator" value="<c:out value="${newStudy.principalInvestigator}"/>" class="formfieldXL" onchange="javascript:changeIcon();"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="prinInvestigator"/></jsp:include></td><td class="formlabel">*</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="prinInvestigator"/></jsp:include></td><td class="formlabel alert">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#StudyType" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#StudyType'); return false;"><fmt:message key="protocol_type" bundle="${resword}"/></a>:</td><td>
    <c:set var="type1" value="observational"/>
@@ -117,7 +117,7 @@
       <input type="radio" name="protocolType" value="observational" onchange="javascript:changeIcon();"><fmt:message key="observational" bundle="${resadmin}"/>
     </c:otherwise>
    </c:choose>
-   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="protocolType"/></jsp:include></td><td>*</td></tr>
+   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="protocolType"/></jsp:include></td><td class="alert">*</td></tr>
 
 
   </table>
@@ -132,7 +132,7 @@
   <table border="0" cellpadding="0" cellspacing="0">
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#BriefSummary" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#BriefSummary'); return false;"><fmt:message key="brief_summary" bundle="${resword}"/></a>:</td><td><div class="formtextareaXL4_BG">
   <textarea class="formtextareaXL4" name="description" rows="4" cols="50" maxlength="2000" onchange="javascript:changeIcon();"><c:out value="${newStudy.summary}"/></textarea></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include></td><td class="formlabel">*</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include></td><td class="formlabel alert">*</td></tr>
 
    <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#DetailedDescription" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#DetailedDescription'); return false;"><fmt:message key="detailed_description" bundle="${resword}"/></a>:</td><td>
    <div class="formtextareaXL4_BG"><textarea class="formtextareaXL4" name="protocolDescription" rows="4" cols="50" onchange="javascript:changeIcon();"><c:out value="${newStudy.protocolDescription}"/></textarea></div>
@@ -153,7 +153,7 @@
 
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#LeadSponsor" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#LeadSponsor'); return false;"><fmt:message key="sponsor" bundle="${resword}"/></a>:</td><td>
   <div class="formfieldXL_BG"><input type="text" name="sponsor" value="<c:out value="${newStudy.sponsor}"/>" class="formfieldXL" onchange="javascript:changeIcon();"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="sponsor"/></jsp:include></td><td class="formlabel">*</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="sponsor"/></jsp:include></td><td class="formlabel alert">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><fmt:message key="collaborators" bundle="${resword}"/>:<br>(<fmt:message key="separate_by_commas" bundle="${resword}"/>)</td><td>
   <div class="formtextareaXL4_BG">

@@ -57,7 +57,7 @@
 <jsp:useBean id="now" class="java.util.Date" />
 <P><I><fmt:message key="note_that_job_is_set" bundle="${resword}"/> <fmt:formatDate value="${now}" pattern="${dtetmeFormat}"/>.</I></P>
 
-<p class="text"><br/><fmt:message key="field_required" bundle="${resword}"/></p>
+<p class="text"><br/><span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/></p>
 
 <form action="CreateJobImport" method="post">
 
@@ -67,12 +67,12 @@
 	<tr>
 		<td class="text"><b><fmt:message key="import_job_name" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="jobName"/></jsp:include></td>
 		<td class="text">
-			<input type="text" name="jobName" size="30" value="<c:out value="${jobName}"/>" onchange="javascript:changeIcon();"/> *
+			<input type="text" name="jobName" size="30" value="<c:out value="${jobName}"/>" onchange="javascript:changeIcon();"/> <span class="alert">*</span>
 		</td>		
 	</tr>
 	<tr>
 		<td class="text"><b><fmt:message key="import_job_desc" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="jobDesc"/></jsp:include></td>
-		<td class="text"><input type="text" name="jobDesc" size="60" value="<c:out value="${jobDesc}"/>" onchange="javascript:changeIcon();"/> *
+		<td class="text"><input type="text" name="jobDesc" size="60" value="<c:out value="${jobDesc}"/>" onchange="javascript:changeIcon();"/> <span class="alert">*</span>
 		</td> 
 	</tr>
 	<tr>
@@ -113,7 +113,7 @@
 									</c:otherwise>
 								</c:choose>
 							</c:forEach>
-						</select> *
+						</select> <span class="alert">*</span>
 
 						<%-- have to put a default picker here next, tbh--%>
 		</td>
@@ -156,7 +156,7 @@
                         <c:param name="jobHour" value="${jobHour}"/>
                         <c:param name="jobMinute" value="${jobMinute}"/>
                     </c:import>
-                    <td>(HH:MM) *</td>
+                    <td>(HH:MM) <span class="alert">*</span></td>
                 </tr>
                 <tr>
                     <td colspan="5">
@@ -236,7 +236,7 @@
 			selected
 			</c:if>
 			>50</option>
-		</select> <fmt:message key="minutes" bundle="${resword}"/>. *
+		</select> <fmt:message key="minutes" bundle="${resword}"/>. <span class="alert">*</span>
 		</td>		
 	</tr>
 

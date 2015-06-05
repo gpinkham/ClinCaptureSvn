@@ -67,18 +67,18 @@
 <jsp:useBean id="now" class="java.util.Date" />
 <P><I><fmt:message key="note_that_job_is_set" bundle="${resword}"/> <fmt:formatDate value="${now}" pattern="${dtetmeFormat}"/>.</I></P>
 
-<p class="text"><br/><fmt:message key="field_required" bundle="${resword}"/></p>
+<p class="text"><br/><span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/></p>
 
 <table>
 	<tr>
 		<td class="text" width="280px"><b><fmt:message key="job_name" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="jobName"/></jsp:include></td>
 		<td class="text">
-			<input type="text" name="jobName" size="30" value="<c:out value="${jobName}"/>" onchange="javascript:changeIcon();"/> *
+			<input type="text" name="jobName" size="30" value="<c:out value="${jobName}"/>" onchange="javascript:changeIcon();"/> <span class="alert">*</span>
 		</td> 	
 	</tr>
 	<tr>
 		<td class="text"><b><fmt:message key="description" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="jobDesc"/></jsp:include></td>
-		<td class="text"><input type="text" name="jobDesc" size="60" value="<c:out value="${jobDesc}"/>" onchange="javascript:changeIcon();"/> *
+		<td class="text"><input type="text" name="jobDesc" size="60" value="<c:out value="${jobDesc}"/>" onchange="javascript:changeIcon();"/> <span class="alert">*</span>
 		</td> 	
 	</tr>
 	<tr>
@@ -104,7 +104,8 @@
 			<c:if test="${periodToRun == 'daily'}">
 				checked
 			</c:if>
-			/></td>			
+			/></td>	
+			<td class="alert">*</td>		
 		</tr>
 		<tr>
 			<td class="text"><fmt:message key="weekly" bundle="${resword}"/></td>
@@ -121,7 +122,7 @@
 				checked
 			</c:if>
 			/>
-		</td>
+		</td>		
 		</tr>
 		</table>
 		</td>
@@ -169,7 +170,7 @@
 					</c:if>
 				/></td>
 				<c:if test="${loopCounter.count == 1}">
-					<td>*</td>
+					<td class="alert">*</td>
 				</c:if>
 			</tr>
             </c:forEach>
@@ -182,7 +183,7 @@
 
 	<tr>
 		<td class="text"><b><fmt:message key="contact_email" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="contactEmail"/></jsp:include></td>
-		<td class="text"><input type="text" name="contactEmail" size="60" value="<c:out value="${contactEmail}"/>" onchange="javascript:changeIcon();"/> *
+		<td class="text"><input type="text" name="contactEmail" size="60" value="<c:out value="${contactEmail}"/>" onchange="javascript:changeIcon();"/> <span class="alert">*</span>
 		</td>		
 	</tr>
 	<tr>

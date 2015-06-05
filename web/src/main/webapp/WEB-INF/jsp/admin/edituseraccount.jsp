@@ -106,7 +106,7 @@
 						<c:out value="${userName}"/>
 					</div>
 				</td>
-				<td>*</td>
+				<td class="alert">*</td>
 			</tr>
 		</table>
 	</td>
@@ -122,7 +122,7 @@
 						       class="formfieldM"/>
 					</div>
 				</td>
-				<td>*</td>
+				<td class="alert">*</td>
 			</tr>
 			<tr>
 				<td colspan="2">
@@ -146,7 +146,7 @@
 						       class="formfieldM"/>
 					</div>
 				</td>
-				<td>*</td>
+				<td class="alert">*</td>
 			</tr>
 			<tr>
 				<td colspan="2"><jsp:include page="../showMessage.jsp">
@@ -169,7 +169,7 @@
 						       class="formfieldM"/>
 					</div>
 				</td>
-				<td>(<fmt:message key="username@institution" bundle="${resword}"/>) *</td>
+				<td>(<fmt:message key="username@institution" bundle="${resword}"/>) <span class="alert">*</span></td>
 			</tr>
 			<tr>
 				<td colspan="2">
@@ -221,7 +221,7 @@
 						       class="formfieldM"/>
 					</div>
 				</td>
-				<td>*</td>
+				<td class="alert">*</td>
 			</tr>
 			<tr>
 				<td colspan="2">
@@ -287,7 +287,7 @@
 						</c:if>
 					</div>
 				</td>
-				<td>*</td>
+				<td class="alert">*</td>
 			</tr>
 			<tr>
 				<td colspan="2">

@@ -113,7 +113,7 @@
 </c:if>
 -->
 <p class="text">
-<br/><fmt:message key="field_required" bundle="${resword}"/></P>
+<br/><span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 <form action="AddNewSubject" method="post">
 <input type="hidden" id="formWithStateFlag" value=""/>
 <input type="hidden" id="openFirstCrf" name="openFirstCrf" value="false"/>
@@ -167,7 +167,7 @@
 					 </c:otherwise>
 					</c:choose>
 					</div></td>
-					<td valign="top">*</td>
+					<td valign="top"><span class="alert">*</span></td>
 				</tr>
 				<tr>
 					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
@@ -185,7 +185,7 @@
 					<td valign="top"><div class="formfieldXL_BG">
 						<input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" size="50" class="formfieldXL">
 					</div></td>
-					<td valign="top">* <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+					<td valign="top"><span class="alert">*</span> <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 					<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
 					<img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 				</tr>
@@ -239,7 +239,7 @@
 					</div></td>
 					<td>
                         <c:if test="${study.studyParameterConfig.secondaryIdRequired == 'yes'}">
-                            <span class="formlabel">*</span>
+                            <span class="formlabel alert">*</span>
                         </c:if>
 					</td>
 				</tr>
@@ -275,7 +275,7 @@
 					</td>
 					<td valign="top">
                             <c:if test="${study.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'yes'}">
-                                <span class="formlabel">*</span>
+                                <span class="formlabel alert">*</span>
                             </c:if>
 						<ui:calendarIcon onClickSelector="'#enrollmentDateField'"/>
 					<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
@@ -324,7 +324,7 @@
                         <td align="left">
                             <c:choose>
                             <c:when test="${study.studyParameterConfig.genderRequired != 'false'}">
-                               <span class="formlabel">*</span>
+                               <span class="formlabel alert">*</span>
                             </c:when>
                             </c:choose>
                             <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
@@ -357,7 +357,7 @@
                         </div>
 					</td>
 					<td valign="top">
-                      &nbsp;&nbsp;*&nbsp;&nbsp;
+                      &nbsp;&nbsp;<span class="alert">*</span>&nbsp;&nbsp;
 						<ui:calendarIcon onClickSelector="'#dobField'"/>
                     </td>
 					<td valign="top">
@@ -382,7 +382,7 @@
 						    <input onfocus="this.select()" type="text" name="yob" size="15" value="<c:out value="${yob}" />" class="formfieldM" />
                         </div>
 					</td>
-					<td valign="top">(<fmt:message key="date_format_year" bundle="${resformat}"/>) * <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=yob&column=date_of_birth','spanAlert-yob'); return false;">
+					<td valign="top">(<fmt:message key="date_format_year" bundle="${resformat}"/>) <span class="alert">*</span> <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=yob&column=date_of_birth','spanAlert-yob'); return false;">
 					<img name="flag_yob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 				</tr>
 				<tr>
@@ -497,7 +497,7 @@
 					<c:import url="../showMessage.jsp"><c:param name="key" value="studyGroupId${count}" /></c:import>
 				</td>
 	    	<c:if test="${group.subjectAssignment=='Required'}">
-				<td align="left">*</td>
+				<td align="left" class="alert">*</td>
 	    	</c:if>
 	    	</tr>
 	    	<tr valign="top">

@@ -126,7 +126,7 @@ $(document).ready(function() {
 	<fmt:message key="list_create_SED_for"  bundle="${resword}"/>
 </ol>
 
-<P>* <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
+<P><span class="alert">* </span> <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 
 <form action="UpdateEventDefinition" method="post" name="UpdateEventDefinition" id="updateEventDefinition">
 	<input type="hidden" name="action" value="confirm">
@@ -141,7 +141,7 @@ $(document).ready(function() {
 					<table>
 						<tr><td>
 							<div class="formfieldXL_BG"><input type="text" name="name" onchange="javascript:changeIcon();" value="<c:out value="${definition.name}"/>" class="formfieldXL"></div>
-						</td><td class="formlabel">*</td>
+						</td><td class="formlabel alert">*</td>
 						<td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td></tr>
 					</table>
 				</td>
@@ -239,7 +239,7 @@ $(document).ready(function() {
 					<table width=480px>
 						<tr>
 							<td><div class="formfieldL_BG_cf"><input class="formfieldL_cf" value="<c:out value="${definition.scheduleDay}"/>" type="text" size="3" name="schDay"/></div></td>
-							<td style="padding-bottom:20px">*</td>
+							<td style="padding-bottom:20px" class="alert">*</td>
 							<td width="250px"><fmt:message key="after_the_reference_visit" bundle="${resword}"/></td>
 							<td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="schDay"/></jsp:include></td>
 						</tr>
@@ -253,7 +253,7 @@ $(document).ready(function() {
 					<table width=480px>
 						<tr>
 							<td><div class="formfieldL_BG_cf"><input class="formfieldL_cf" value="<c:out value="${definition.maxDay}"/>" type="text" size="3" name="maxDay"/></div></td>
-							<td style="padding-bottom:20px">*</td><td width="250px"><fmt:message key="the_maximum_day_that_an_event" bundle="${resword}"/></td>
+							<td style="padding-bottom:20px" class="alert">*</td><td width="250px"><fmt:message key="the_maximum_day_that_an_event" bundle="${resword}"/></td>
 							<td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="maxDay"/></jsp:include></td>
 						</tr>
 					</table>
@@ -266,7 +266,7 @@ $(document).ready(function() {
 					<table width=480px>
 						<tr>
 							<td><div class="formfieldL_BG_cf"><input class="formfieldL_cf" value="<c:out value="${definition.minDay}"/>" type="text" size="3" name="minDay"/></div></td>
-							<td style="padding-bottom:20px">*</td>
+							<td style="padding-bottom:20px" class="alert">*</td>
 							<td width="250px"><fmt:message key="the_minimum_day_that_an_event" bundle="${resword}"/></td>
 							<td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="minDay"/></jsp:include></td>
 						</tr>
@@ -280,7 +280,7 @@ $(document).ready(function() {
 					<table width=480px>
 						<tr>
 							<td><div class="formfieldL_BG_cf"><input class="formfieldL_cf" value="<c:out value="${definition.emailDay}"/>" type="text" size="3" name="emailDay"/></div></td>
-							<td style="padding-bottom:20px">*</td>
+							<td style="padding-bottom:20px" class="alert">*</td>
 							<td width="250px"><fmt:message key="the_day_a_reminder_email_is" bundle="${resword}"/></td>
 							<td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="emailDay"/></jsp:include></td>
 						</tr>
@@ -294,7 +294,7 @@ $(document).ready(function() {
 					<table>
 						<tr>
 							<td><div class="formfieldXL_BG" ><input class="formfieldXL" value="<c:out value="${userNameInsteadEmail}"/>" type="text" size="3" name="emailUser"/></div></td>
-							<td style="padding-bottom:20px">*</td>
+							<td style="padding-bottom:20px" class="alert">*</td>
 						</tr>
 					</table>
 				</td>

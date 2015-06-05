@@ -131,7 +131,7 @@
 
             <td class="table_cell_border" width="180px"><c:out value="${dedc.edc.crf.name}"/>
                 <c:if test="${dedc.edc.requiredCRF}">
-                    <span style="color: orange">*</span>
+                    <span class="alert">*</span>
                 </c:if>
                 <c:if test="${(dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6 or userRole.role.id eq 9)}">
                     <img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/>
@@ -292,7 +292,7 @@
 <c:when test="${dedc['class'].name eq 'org.akaza.openclinica.bean.submit.DisplayEventCRFBean'}">
     <c:set var="dec" value="${dedc}"/>
     <c:set var="allowDataEntry" value="${(study.status.available && dec.continueInitialDataEntryPermitted) || (study.status.available && (dec.startDoubleDataEntryPermitted || dec.continueDoubleDataEntryPermitted)) || ((study.status.available || study.status.frozen) && dec.performAdministrativeEditingPermitted)}" />
-        <td class="table_cell_border" width="180px"><c:out value="${dec.eventCRF.crf.name}"/> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if
+        <td class="table_cell_border" width="180px"><c:out value="${dec.eventCRF.crf.name}"/> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span class="alert">*</span></c:if> <c:if
                 test="${(dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6 or userRole.role.id eq 9)}">
             <img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
         <td class="table_cell_border" width="60px"><c:out value="${dec.eventCRF.crfVersion.name}"/></td>

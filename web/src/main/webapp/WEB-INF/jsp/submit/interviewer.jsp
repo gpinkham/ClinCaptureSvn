@@ -400,7 +400,7 @@
                 </c:when>
                 <c:otherwise>
                     <fmt:message key="interviewer_name" bundle="${resword}"/>:
-                    <c:if test="${study.studyParameterConfig.interviewerNameRequired=='yes'}">*</c:if>
+                    <c:if test="${study.studyParameterConfig.interviewerNameRequired=='yes'}"><span class="alert">*</span></c:if>
                 </c:otherwise>
             </c:choose>
         </c:if>
@@ -491,7 +491,7 @@
                 <c:otherwise>
                     <fmt:message key="interview_date" bundle="${resword}"/>:
                     <c:if test="${study.studyParameterConfig.interviewDateRequired=='yes'}">
-                        *
+                        <span class="alert">*</span>
                     </c:if>
                 </c:otherwise>
             </c:choose>

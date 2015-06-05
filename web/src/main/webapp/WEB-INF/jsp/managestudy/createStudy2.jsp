@@ -69,7 +69,7 @@
 </h1>
 
 <span class="title_Admin"><p><b><fmt:message key="section_b_study_status" bundle="${resword}"/> - <fmt:message key="status" bundle="${resword}"/> </b></p></span>
-<P>* <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
+<P><span class="alert">* </span> <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 <c:set var="startDate" value="" />
 <c:set var="endDate" value="" />
 <c:set var="protocolDateVerification" value="" />
@@ -109,7 +109,7 @@
        </c:choose>
     </c:forEach>
   </select></div>
-  </td><td>*</td></tr>
+  </td><td class="alert">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#StudyType" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#StudyType'); return false;"><fmt:message key="protocol_type" bundle="${resword}"/></a>:</td><td>
   <c:set var="type1" value="observational"/>
@@ -123,7 +123,7 @@
     <input type="radio" name="protocolType" value="observational"><fmt:message key="observational" bundle="${resadmin}"/>
    </c:otherwise>
   </c:choose>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="protocolType"/></jsp:include></td><td>*</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="protocolType"/></jsp:include></td><td class="alert">*</td></tr>
 
   <!--
   <tr valign="top"><td class="formlabel">Collect Subject Father/Mother Information?:</td><td>
@@ -166,7 +166,7 @@
    </select></div> --%>
    <input type="text" name="statusName" value="Available" class="formfieldL" disabled>
    <input type="hidden" name="statusId" value="1"></div>
-  </td><td>*</td></tr>
+  </td><td class="alert">*</td></tr>
 
 
   <tr valign="top">
@@ -189,7 +189,7 @@
   <input type="text" name="startDate" value="<c:out value="${startDate}" />" class="formfieldL" id="startDateField"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDate"/></jsp:include></td>
   <td>
-	  <ui:calendarIcon onClickSelector="'#startDateField'"/>*
+	  <ui:calendarIcon onClickSelector="'#startDateField'"/><span class="alert">*</span>
   </td></tr>
 
   <tr valign="top"><td class="formlabel"><fmt:message key="study_completion_date" bundle="${resword}"/>:</td><td><div class="formfieldL_BG">

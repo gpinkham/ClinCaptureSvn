@@ -129,7 +129,7 @@
 		<input type="text" name="uniqueProId" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.identifier}"/>" class="formfieldXL bw2 h15">
 		<br>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td>
-	<td width="10%">
+	<td width="10%" class="alert">
 		*
 	</td>
 </tr>
@@ -143,7 +143,7 @@
 		<br>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include>
 	</td>
-	<td>
+	<td class="alert">
 		*
 	</td>
 </tr>
@@ -191,7 +191,7 @@
 		</select>
 		<input type=hidden name="status" value="${status1}">
 	</td>
-	<td>
+	<td class="alert">
 		*
 	</td>
 </tr>
@@ -218,7 +218,7 @@
 		<br>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="prinInvestigator"/></jsp:include>
 	</td>
-	<td>*</td>
+	<td class="alert">*</td>
 </tr>
 
 <tr valign="top">
@@ -232,7 +232,7 @@
 		<br>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
 	</td>
-	<td>
+	<td class="alert">
 		*
 	</td>
 </tr>
@@ -259,7 +259,7 @@
 		<br>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="sponsor"/></jsp:include>
 	</td>
-	<td>
+	<td class="alert">
 		*
 	</td>
 </tr>
@@ -303,7 +303,7 @@
 				</c:forEach>
 		</select>
 	</td>
-	<td>
+	<td class="alert">
 		*
 	</td>
 </tr>
@@ -353,7 +353,7 @@
 	</td>
 	<td>
 		<ui:calendarIcon onClickSelector="'#startDateField'"/>
-		*
+		<span class="alert">*</span>
 	</td>
 </tr>
 
@@ -554,7 +554,7 @@
 			</select>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="purpose"/></jsp:include>
 		</td>
-		<td valign="top">
+		<td valign="top" class="alert">
 			*
 		</td>
 	</tr>
@@ -774,7 +774,7 @@
 							<br>
 							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="expectedTotalEnrollment"/></jsp:include>
 						</td>
-						<td>*</td>
+						<td class="alert">*</td>
 					</tr>
 				</table>
 			</div>

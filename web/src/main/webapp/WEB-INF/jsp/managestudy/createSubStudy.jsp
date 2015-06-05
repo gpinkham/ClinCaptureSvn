@@ -116,7 +116,7 @@
 </h1>
 
 <form action="CreateSubStudy" method="post" id="createSubStudyForm">
-* <fmt:message key="indicates_required_field" bundle="${resword}"/><br>
+<span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/><br>
 <input type="hidden" name="action" value="confirm">
 
 <div class="table_title_Manage">
@@ -140,11 +140,11 @@
   
   <tr valign="top"><td class="formlabel"><fmt:message key="site_name" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
   <input type="text" name="name" value="<c:out value="${newStudy.name}"/>" class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td> *</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td> <span class="alert">*</span></td></tr>
   
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</td><td><div class="formfieldXL_BG">
   <input type="text" name="uniqueProId" value="<c:out value="${newStudy.identifier}"/>" class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td> *</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td> <span class="alert">*</span></td></tr>
   
   <tr valign="top"><td class="formlabel"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b><br>(<fmt:message key="separate_by_commas" bundle="${resword}"/>):</td><td>
   <div class="formtextareaXL4_BG"><textarea class="formtextareaXL4" name="secondProId" rows="4" cols="50"><c:out value="${newStudy.secondaryIdentifier}"/></textarea></div>
@@ -153,7 +153,7 @@
    
   <tr valign="top"><td class="formlabel"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
   <input type="text" name="prinInvestigator" value="<c:out value="${newStudy.principalInvestigator}"/>" class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="prinInvestigator"/></jsp:include></td><td> *</td></tr> 
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="prinInvestigator"/></jsp:include></td><td> <span class="alert">*</span></td></tr> 
   
   <tr valign="top"><td class="formlabel"><fmt:message key="brief_summary" bundle="${resword}"/>:</td><td><div class="formtextareaXL4_BG">
   <textarea class="formtextareaXL4" name="description" rows="4" cols="50" maxlength="2000"><c:out value="${newStudy.summary}"/></textarea></div>
@@ -188,7 +188,7 @@
   <tr valign="top"><td class="formlabel"><fmt:message key="expected_total_enrollment" bundle="${resword}"/>:</td><td>
   <div class="formfieldXL_BG"><input type="text" name="expectedTotalEnrollment" value="<c:out value="${newStudy.expectedTotalEnrollment}"/>" class="formfieldXL"></div>
    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="expectedTotalEnrollment"/></jsp:include>
-  </td><td class="formlabel" style="text-align:left">*</td></tr>
+  </td><td class="formlabel alert" style="text-align:left">*</td></tr>
   
   <tr valign="top"><td class="formlabel"><fmt:message key="facility_name" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
   <input type="text" name="facName" value="<c:out value="${newStudy.facilityName}"/>" class="formfieldXL"></div>
@@ -249,7 +249,7 @@
    <input type="hidden" name="statusId" value="${study.status.id}">
 
    </div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="statusId"/></jsp:include></td><td> *</td></tr>      
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="statusId"/></jsp:include></td><td> <span class="alert">*</span></td></tr>      
      
   <c:forEach var="config" items="${newStudy.studyParameters}">
    <c:choose>

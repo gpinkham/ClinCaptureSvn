@@ -67,7 +67,7 @@
    //-->
 </script>
 <span class="title_Admin"><p><b><fmt:message key="section_c_conditions_and_eligibility" bundle="${resword}"/></b></p></span>
-<P>* <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
+<P><span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 <form action="CreateStudy" method="post">
 <input type="hidden" name="action" value="next">
 <input type="hidden" name="pageNum" value="4">
@@ -162,7 +162,7 @@
           </div>
           <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="expectedTotalEnrollment"/></jsp:include>
        </td>
-      <td class="formlabel" width="40%"><div align="left">*</div></td>
+      <td class="formlabel alert" width="40%"><div align="left">*</div></td>
   </tr>
 
   </table>

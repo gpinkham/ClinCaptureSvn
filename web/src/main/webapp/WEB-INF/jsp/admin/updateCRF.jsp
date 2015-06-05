@@ -50,7 +50,7 @@
 	</span>
 </h1>
 
-<P>* <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
+<P><span class="alert">*</span> <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 <form action="UpdateCRF" method="post">
 <input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag}">
 <input type="hidden" name="action" value="confirm">
@@ -63,7 +63,7 @@
    <td>
     <div class="formfieldXL_BG"><input type="text" name="name" value="<c:out value="${crf.name}"/>" class="formfieldXL"></div>
    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include>
-   </td><td class="formlabel">*</td>
+   </td><td class="formlabel alert">*</td>
    </tr>
   <tr valign="top"><td class="formlabel"><fmt:message key="description" bundle="${resword}"/>:</td>
   <td>

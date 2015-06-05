@@ -116,7 +116,7 @@
 			<td><fmt:message key="name" bundle="${resword}"/>:</td>
 			<td>
 				<input type="text" name="dsName" size="30" value="<c:out value='${dsName}' />"/>
-				<span class="asterisk">*</span><br>
+				<span class="asterisk alert">*</span><br>
 				<jsp:include page="../showMessage.jsp">
 					<jsp:param name="key" value="dsName"/>
 				</jsp:include>
@@ -126,7 +126,7 @@
 		<tr>
 			<td><fmt:message key="description" bundle="${resword}"/>:</td>
 			<td><textarea name="dsDesc" cols="40" rows="4"><c:out value="${dsDesc}"/></textarea>
-				<span class="asterisk">*</span><br>
+				<span class="asterisk alert">*</span><br>
 				<jsp:include page="../showMessage.jsp">
 					<jsp:param name="key" value="dsDesc"/>
 				</jsp:include>

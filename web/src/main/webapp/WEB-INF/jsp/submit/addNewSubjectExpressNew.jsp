@@ -108,7 +108,7 @@
                      </c:otherwise>
                     </c:choose>
                     </div></td>
-                    <td>*</td>
+                    <td class="alert">*</td>
                 </tr>
                 <tr>
                     <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
@@ -127,7 +127,7 @@
                     <td valign="top"><div class="formfieldXL_BG">
                         <input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" size="50" class="formfieldXL">
                     </div></td>
-                    <td>*</td>
+                    <td class="alert">*</td>
                 </tr>
                 <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
             </table>
@@ -185,12 +185,12 @@
                     </td>
                     <td>
                         <c:if test="${study.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'yes'}">
-                            <span class="formlabel">*</span>
+                            <span class="formlabel alert">*</span>
                         </c:if>
                         <a href="#!" onclick="$('#enrollmentDateField').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
                         <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" />
                     </a>
-                        *
+                        <span class="alert">*</span>
                     </td>
                 </tr>
                 <tr>
@@ -232,7 +232,7 @@
     <td align="left">
         <c:choose>
         <c:when test="${study.studyParameterConfig.genderRequired != 'false'}">
-           <span class="formlabel">*</span>
+           <span class="formlabel alert">*</span>
         </c:when>
         </c:choose>
     </td>
@@ -261,7 +261,7 @@
                     <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" />
                     </a>
                     </td>
-                    <td>* </td>
+                    <td class="alert">* </td>
                 </tr>
             </table>
         </td>
@@ -280,7 +280,7 @@
                     <td valign="top"><div class="formfieldM_BG">
                         <input onfocus="this.select()" type="text" name="yob" size="15" value="<c:out value="${yob}" />" class="formfieldM" />
                     </td>
-                    <td>(<fmt:message key="date_format_year" bundle="${resformat}"/>) *</td>
+                    <td>(<fmt:message key="date_format_year" bundle="${resformat}"/>) <span class="alert">*</span></td>
                 </tr>
             </table>
         </td>
@@ -314,7 +314,7 @@
 
               </td>
               <c:if test="${group.subjectAssignment=='Required'}">
-                <td align="left">*</td>
+                <td align="left"><span class="alert">*</span></td>
               </c:if>
               </tr>
              <c:set var="count" value="${count+1}"/>
@@ -339,7 +339,7 @@
                         </select>
                     </div>
                     </td>
-                    <td><span class="formlabel">*</span></td>
+                    <td><span class="formlabel alert">*</span></td>
                 </tr>
                 <tr>
                     <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyEventDefinition"/></jsp:include></td>
@@ -363,7 +363,7 @@
                     <td>
                         <a href="#!" onclick="$('#enrollmentDateField2').datepicker({ dateFormat: '<fmt:message key='date_format_calender' bundle='${resformat}'/>', showOn: 'none'}).datepicker('show');">
                          <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" />
-                        </a>*
+                        </a><span class="alert">*</span>
                     </td>
                 </tr>
                 <tr>
@@ -383,7 +383,7 @@
                     <td valign="top"><div class="formfieldXL_BG">
                        <input type="text" name="location"size="50" value="<c:out value="${location}"/>" class="formfieldXL">
                     </div></td>
-                    <td>*</td>
+                    <td class="alert">*</td>
                 </tr>
             </table>
         </td>

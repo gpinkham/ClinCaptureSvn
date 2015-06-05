@@ -56,7 +56,7 @@
 	</span>
 </h1>
 
-<P><fmt:message key="field_required" bundle="${resword}"/></P>
+<P><span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 <form action="UpdateSubject" method="post">
 <input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag != null ? formWithStateFlag : ''}" />
 <input type="hidden" name="action" value="confirm">
@@ -81,7 +81,7 @@
 								<input type="text" name="uniqueIdentifier" value="<c:out value="${fields['personId']}"/>" class="formfieldXL">
 							</div>
 						</td>
-						<td> *
+						<td> <span class="alert">*</span>
 							<c:if test="${parameters['discrepancyManagement']}">
 							
 							<c:choose>
@@ -178,7 +178,7 @@
 					</td>
 
 					<td>
-						<c:if test="${parameters['genderRequired']}">*</c:if>
+						<c:if test="${parameters['genderRequired']}"><span class="alert">*</span></c:if>
 						<c:if test="${parameters['discrepancyManagement']}">
 
 							<c:choose>
@@ -220,7 +220,7 @@
 							<ui:calendarIcon onClickSelector="'#dateOfBirth'" />
 						</td>
 						<td class="formlabel">
-							(<fmt:message key="date_format" bundle="${resformat}"/>)*
+							(<fmt:message key="date_format" bundle="${resformat}"/>)<span class="alert">*</span>
 							<c:if test="${parameters['discrepancyManagement']}">
                 <c:choose>
                   <c:when test="${hasDOBNote eq 'yes'}">
@@ -255,7 +255,7 @@
 							</div>
 						</td>
 						<td class="formlabel">
-							(<fmt:message key="date_format_year" bundle="${resformat}"/>)*
+							(<fmt:message key="date_format_year" bundle="${resformat}"/>)<span class="alert">*</span>
 							<c:if test="${parameters['discrepancyManagement']}">
                 <c:choose>
                   <c:when test="${hasDOBNote eq 'yes'}">

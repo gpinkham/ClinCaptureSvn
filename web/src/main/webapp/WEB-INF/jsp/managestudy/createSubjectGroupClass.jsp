@@ -87,7 +87,7 @@
 </h1>
 
 <form action="CreateSubjectGroupClass" method="post">
-* <fmt:message key="indicates_required_field" bundle="${resword}"/><br>
+<span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/><br>
 <input type="hidden" name="action" value="confirm">
 <!-- These DIVs define shaded box borders -->
 <div style="width: 600px">
@@ -104,7 +104,7 @@
 			</div>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include>
 		</td>
-		<td>*</td>
+		<td class="alert">*</td>
 	</tr>
     
 	<tr valign="top">
@@ -130,7 +130,7 @@
 			</div>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="groupClassTypeId"/></jsp:include>
 		</td>
-		<td>*</td>
+		<td class="alert">*</td>
 	</tr>      
   
 	<tr valign="top" id="subjAssignmentRow">
@@ -151,7 +151,7 @@
 		</td>
 		
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="subjectAssignment"/></jsp:include>
-		<td>*</td>
+		<td class="alert">*</td>
 	</tr>
 	<tr valign="top" id="isDefaultRow">
 		<td class="formlabel" width="140">

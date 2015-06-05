@@ -36,7 +36,7 @@
 			        <input onfocus="this.select()" onclick = "<%--if (this.value == '${studySubjectLabel}'){ this.value =''}--%>" type="text" name="label" tabindex ="<c:out value="${tabCount}"/>" value="${studySubjectLabel}" size="12" class="formfield">
 			      </c:otherwise>
 			    </c:choose>
-			<span class="formlabel">*</span></td>
+			<span class="formlabel alert">*</span></td>
 			<c:set var="tabCount" value="${tabCount+1}"/>
 
 			<td valign="top" class="table_cell" nowrap>
@@ -48,7 +48,7 @@
                 </select>
                  <c:choose>
                  <c:when test="${study.studyParameterConfig.genderRequired != 'false'}">
-                    <span class="formlabel">*</span>
+                    <span class="formlabel alert">*</span>
                  </c:when>
                  </c:choose>
             </c:if>
@@ -88,12 +88,12 @@
 					</td>
 					 <c:set var="tabCount" value="${tabCount+1}"/>
 					<td valign="top" align="right">
-					 <input onfocus="<%--if (this.value == '<fmt:message key="location" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="location" tabindex="<c:out value="${tabCount}"/>" size="8" value="<fmt:message key="location" bundle="${resword}"/>" class="formfield" />*
+					 <input onfocus="<%--if (this.value == '<fmt:message key="location" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="location" tabindex="<c:out value="${tabCount}"/>" size="8" value="<fmt:message key="location" bundle="${resword}"/>" class="formfield" /><span class="alert">*</span>
 					</td>
 					 <c:set var="tabCount" value="${tabCount+1}"/>
 					<td valign="top">
 					<input onfocus="<%--if (this.value == '<fmt:message key="eventMMDDYYYY" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="startDate" size="15" value="<fmt:message key="eventMMDDYYYY" bundle="${resword}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield" id="enrollmentDateField"/>
-					<span class="formlabel">*</span></td>
+					<span class="formlabel alert">*</span></td>
 					 <c:set var="tabCount" value="${tabCount+1}"/>
 				     <td valign="top">
 						<ui:calendarIcon onClickSelector="'#enrollmentDateField'"/>
@@ -110,7 +110,7 @@
 			<td valign="top" align="left" colspan="2" class="table_cell_left" nowrap>
 			 <c:choose>
 	           <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
-			    &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="person_ID" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="uniqueIdentifier" value="<fmt:message key="person_ID" bundle="${resword}"/>" size="12" tabindex="<c:out value="${tabCount}"/>" class="formfield"><span class="formlabel">*</span>
+			    &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="person_ID" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="uniqueIdentifier" value="<fmt:message key="person_ID" bundle="${resword}"/>" size="12" tabindex="<c:out value="${tabCount}"/>" class="formfield"><span class="formlabel alert">*</span>
 			   </c:when>
 			   <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='optional'}">
 			    &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="person_ID" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="uniqueIdentifier" value="<fmt:message key="person_ID" bundle="${resword}"/>" size="12" tabindex="<c:out value="${tabCount}"/>" class="formfield">
@@ -135,13 +135,13 @@
 					<td valign="top" align="right">
 					 <c:choose>
 	                    <c:when test="${study.studyParameterConfig.collectDob == '1'}">
-						&nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="DOB" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="dob" size="20" value="<fmt:message key="DOB" bundle="${resword}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield" id="dobField" ><span class="formlabel">*</span>
+						&nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="DOB" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="dob" size="20" value="<fmt:message key="DOB" bundle="${resword}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield" id="dobField" ><span class="formlabel alert">*</span>
 						</td>
 						 <td valign="top" align="left">
 							 <ui:calendarIcon onClickSelector="'#dobField'"/>
                         </c:when>
 					    <c:when test="${study.studyParameterConfig.collectDob == '2'}">
-					     &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="YOB" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="yob" size="15" value="YOB: YYYY" class="formfield" tabindex="<c:out value="${tabCount}"/>"/><span class="formlabel">*</span>
+					     &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="YOB" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="yob" size="15" value="YOB: YYYY" class="formfield" tabindex="<c:out value="${tabCount}"/>"/><span class="formlabel alert">*</span>
 					    </c:when>
 					    <c:otherwise>
 					      &nbsp;<input type="hidden" name="dob" value="" />
@@ -158,7 +158,7 @@
 			<tr>
 			 <td valign="top" align="left">
 			  <input onfocus="<%--if (this.value == '<fmt:message key="enrollMMDDYYYY" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="enrollmentDate" size="20" value="<fmt:message key="enrollMMDDYYYY" bundle="${resword}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield" id="enrollmentDateField2"/>
-			  <span class="formlabel">*</span></td>
+			  <span class="formlabel alert">*</span></td>
 					 <c:set var="tabCount" value="${tabCount+1}"/>
 				     <td valign="top">
 						 <ui:calendarIcon onClickSelector="'#enrollmentDateField2'" imageId="enrollmentDateTrigger2"/>

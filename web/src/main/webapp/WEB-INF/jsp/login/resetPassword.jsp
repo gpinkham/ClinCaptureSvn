@@ -17,7 +17,7 @@
 <jsp:include page="../login-include/login-alertbox.jsp"/>
 
 <form action="ResetPassword" method="post">
-    * <fmt:message key="indicates_required_field" bundle="${resword}"/><br>
+    <span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/><br>
     <input type="hidden" name="mustChangePwd" value=<c:out value="${mustChangePass}"/> >
     <!-- These DIVs define shaded box borders -->
     <div style="width: 600px">
@@ -31,11 +31,11 @@
                             <input type="password" style="display:none">
                             <input type="password" name="oldPasswd" value="" class="formfieldXL">
                         </div>
-                        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="oldPasswd"/></jsp:include></td><td class="formlabel">*</td></tr>
+                        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="oldPasswd"/></jsp:include></td><td class="formlabel alert">*</td></tr>
                     <tr><td class="formlabel"><fmt:message key="new_password" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="password" name="passwd" value="" class="formfieldXL"></div>
                         <c:choose>
                         <c:when test="${mustChangePass=='yes'}">
-                        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd"/></jsp:include></td><td class="formlabel">*</td></tr>
+                        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd"/></jsp:include></td><td class="formlabel alert">*</td></tr>
                     </c:when>
                     <c:otherwise>
                         (<fmt:message key="leave_new_password_blank" bundle="${resword}"/>)
@@ -45,7 +45,7 @@
                     <tr><td class="formlabel"><fmt:message key="confirm_new_password" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="password" name="passwd1" value="" class="formfieldXL"></div>
                         <c:choose>
                         <c:when test="${mustChangePass=='yes'}">
-                        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd1"/></jsp:include></td><td class="formlabel">*</td></tr>
+                        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd1"/></jsp:include></td><td class="formlabel alert">*</td></tr>
                     </c:when>
                     <c:otherwise>
                         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd1"/></jsp:include></td></tr>
@@ -70,11 +70,11 @@
 
                             </select>
                         </div>
-                            <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwdChallengeQ"/></jsp:include></td><td class="formlabel">*</td>
+                            <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwdChallengeQ"/></jsp:include></td><td class="formlabel alert">*</td>
                         </tr>
                         <tr><td class="formlabel"><fmt:message key="password_challenge_answer" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
                             <input type="text" name="passwdChallengeA" value="${ userBean1.passwdChallengeAnswer}" class="formfieldXL"></div>
-                            <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwdChallengeA"/></jsp:include></td><td class="formlabel">*</td>
+                            <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwdChallengeA"/></jsp:include></td><td class="formlabel alert">*</td>
                         </tr>
                     </c:if>
                 </table>

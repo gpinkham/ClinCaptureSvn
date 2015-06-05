@@ -129,7 +129,7 @@
 																	</jsp:include>
 																</td>
 																
-																<td><fmt:message key="field_required" bundle="${resword}" /></td>
+																<td><span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}" /></td>
 															</tr>
 
 															<c:if test="${secondaryIdShow}">
@@ -391,7 +391,7 @@
 																						</select>
 																					</div> 
 																					<c:if test="${group.subjectAssignment=='Required'}">
-																						<td align="left">*</td>
+																						<td align="left" class="alert">*</td>
 																					</c:if>
 																				</td>
 																			</tr>

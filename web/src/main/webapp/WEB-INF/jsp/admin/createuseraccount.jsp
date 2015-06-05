@@ -118,7 +118,7 @@
 	</span>
 </h1>
 
-<fmt:message key="field_required" bundle="${resword}"/>
+<span class="alert">*</span><fmt:message key="indicates_required_field" bundle="${resword}"/>
 <form action="CreateUserAccount" method="post" onsubmit="return isPhoneNumberValid('phone', '<fmt:message key="invalid_phone_number_format" bundle="${resword}"/>');">
 <jsp:include page="../include/showSubmitted.jsp" />
 
@@ -148,7 +148,7 @@
                         <input type="text" id="userName" onchange="javascript:changeIcon();" name="userName" value="<c:out value="${userName}"/>" size="20" class="formfieldM"/>
                     </div>
                 </td>
-                <td>*</td>
+                <td class="alert">*</td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -171,7 +171,7 @@
                         <input type="text" id="firstName" name="firstName" onchange="javascript:changeIcon();" value="<c:out value="${firstName}"/>" size="20" class="formfieldM"/>
                     </div>
                 </td>
-                <td>*</td>
+                <td class="alert">*</td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -194,7 +194,7 @@
                         <input type="text" id="lastName" name="lastName" onchange="javascript:changeIcon();" value="<c:out value="${lastName}"/>" size="20" class="formfieldM"/>
                     </div>
                 </td>
-                <td>*</td>
+                <td class="alert">*</td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -217,7 +217,7 @@
                         <input type="text" id="email" name="email" onchange="javascript:changeIcon();" value="<c:out value="${email}"/>" size="20" class="formfieldM"/>
                     </div>
                 </td>
-                <td>(<fmt:message key="username@institution" bundle="${resword}"/>) *</td>
+                <td>(<fmt:message key="username@institution" bundle="${resword}"/>) <span class="alert">*</span></td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -263,7 +263,7 @@
                         <input type="text" id="institutionalAffiliation" name="institutionalAffiliation" onchange="javascript:changeIcon();" value="<c:out value="${institutionalAffiliation}"/>" size="20" class="formfieldM"/>
                     </div>
                 </td>
-                <td>*</td>
+                <td class="alert">*</td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -332,7 +332,7 @@
                         </select>
                     </div>
                 </td>
-                <td>*</td>
+                <td class="alert">*</td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -364,7 +364,7 @@
                         </select>
                     </div>
                 </td>
-                <td>*</td>
+                <td class="alert">*</td>
             </tr>
             <tr>
                 <td colspan="2">

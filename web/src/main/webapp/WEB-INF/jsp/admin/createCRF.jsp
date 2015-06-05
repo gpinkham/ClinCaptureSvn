@@ -66,7 +66,7 @@
 
 
 <P>
-<P><fmt:message key="field_required" bundle="${resword}"/></P>
+<P><span class="alert">* </span></span><fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 <form action="CreateCRF" method="post">
 <input type="hidden" name="action" value="confirm">
 <!-- These DIVs define shaded box borders -->
@@ -77,7 +77,7 @@
 <table border="0" cellpadding="0" cellspacing="0">
   <tr valign="top"><td class="formlabel"><fmt:message key="CRF_name" bundle="${resword}"/></td><td>
   <div class="formfieldXL_BG"><input type="text" name="name" value="<c:out value="${crf.name}"/>" class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td class="formlabel">*</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td class="formlabel alert">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><fmt:message key="CRF_description" bundle="${resword}"/></td><td>
   <div class="formtextareaXL4_BG">

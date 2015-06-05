@@ -112,7 +112,7 @@
                      </c:otherwise>
                     </c:choose>
                     </div></td>
-                    <td>*</td>
+                    <td class="alert">*</td>
                 </tr>
                 <tr>
                     <td><jsp:include page="showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
@@ -131,7 +131,7 @@
                     <td valign="top"><div class="formfieldXL_BG">
                         <input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" size="50" class="formfieldXL">
                     </div></td>
-                    <td>*</td>
+                    <td class="alert">*</td>
                 </tr>
                 <td colspan="2"><jsp:include page="showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
             </table>
@@ -191,7 +191,7 @@
                         </td>
                         <td>
 							<ui:calendarIcon onClickSelector="'#enrollmentDateField'" imageId="enrollmentDateTrigger" />
-                            *
+                            <span class="alert">*</span>
                         </td>
                     </tr>
                     <tr>
@@ -236,7 +236,7 @@
                         <td align="left">
                             <c:choose>
                             <c:when test="${study.studyParameterConfig.genderRequired != 'false'}">
-                               <span class="formlabel">*</span>
+                               <span class="formlabel alert">*</span>
                             </c:when>
                             </c:choose>
                         </td>
@@ -266,7 +266,7 @@
                     <td>
 						<ui:calendarIcon onClickSelector="'#dobField'" imageId="dobTrigger"/>
                     </td>
-                    <td>* </td>
+                    <td class="alert">* </td>
                 </tr>
             </table>
         </td>
@@ -287,7 +287,7 @@
                             <input onfocus="this.select()" type="text" name="yob" size="15" value="<c:out value="${yob}" />" class="formfieldM" />
                         </div>
                     </td>
-                    <td>(<fmt:message key="date_format_year" bundle="${resformat}"/>) *</td>
+                    <td>(<fmt:message key="date_format_year" bundle="${resformat}"/>) <span class="alert">*</span></td>
                 </tr>
             </table>
         </td>
@@ -321,7 +321,7 @@
 
               </td>
               <c:if test="${group.subjectAssignment=='Required'}">
-                <td align="left">*</td>
+                <td align="left"><span class="alert">*</span></td>
               </c:if>
               </tr>
              <c:set var="count" value="${count+1}"/>
@@ -346,7 +346,7 @@
                         </select>
                     </div>
                     </td>
-                    <td><span class="formlabel">*</span></td>
+                    <td><span class="formlabel alert">*</span></td>
                 </tr>
                 <tr>
                     <td colspan="2"><jsp:include page="showMessage.jsp"><jsp:param name="key" value="studyEventDefinition"/></jsp:include></td>
@@ -370,7 +370,7 @@
                     </td>
                     <td>
 						<ui:calendarIcon onClickSelector="'#enrollmentDateField2'" imageId="enrollmentDateTrigger2"/>
-                        *
+                        <span class="alert">*</span>
                     </td>
                 </tr>
                 <tr>
@@ -390,7 +390,7 @@
                     <td valign="top"><div class="formfieldXL_BG">
                        <input type="text" name="location"size="50" value="<c:out value="${location}"/>" class="formfieldXL">
                     </div></td>
-                    <td>*</td>
+                    <td class="alert">*</td>
                 </tr>
             </table>
         </td>

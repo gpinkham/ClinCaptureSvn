@@ -74,12 +74,12 @@
 <tr>
 		<td class="text" width="280px"><b><fmt:message key="job_name" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="jobName"/></jsp:include></td>
 		<td class="text">
-			<input type="text" name="jobName" size="30" value="<c:out value="${jobName}"/>" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"/>
+			<input type="text" name="jobName" size="30" value="<c:out value="${jobName}"/>" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"/> <span class="alert">*</span>
 		</td>
 	</tr>
 	<tr>
 		<td class="text"><b><fmt:message key="description" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="jobDesc"/></jsp:include></td>
-		<td class="text"><input type="text" name="jobDesc" size="60" value="<c:out value="${jobDesc}"/>" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"/>
+		<td class="text"><input type="text" name="jobDesc" size="60" value="<c:out value="${jobDesc}"/>" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"/> <span class="alert">*</span>
 		</td>
 	</tr>
 	<tr>
@@ -92,7 +92,7 @@
 					</c:if>
 				><c:out value="${dataset.name}" /></option>
 			</c:forEach>
-		</select></td>
+		</select> <span class="alert">*</span></td>
 	</tr>
 	<tr>
 		<td class="text"><b><fmt:message key="period_to_run" bundle="${resword}"/>:</b>
@@ -103,9 +103,9 @@
 		<td class="text"><fmt:message key="daily" bundle="${resword}"/></td>
 		<td class="text"><input type="radio" name="periodToRun" value="daily" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"
 			<c:if test="${periodToRun == 'daily'}">
-				checked
+				checked 
 			</c:if>
-			/></td>
+			/> <span class="alert">*</span></td>
 		</tr>
 		<tr>
 			<td class="text"><fmt:message key="weekly" bundle="${resword}"/></td>
@@ -149,7 +149,7 @@
 		</td>
 		<td class="text">
 			<table border="0" cellpadding="0" cellspacing="0">
-            <c:forEach var="extract" items="${extractProperties}">
+            <c:forEach var="extract" items="${extractProperties}" varStatus="loopCounter">
             <tr>
                 <td class="text">
                     <c:choose>
@@ -166,6 +166,9 @@
 						checked
 					</c:if>
 				/></td>
+				<c:if test="${loopCounter.count == 1}">
+					<td class="alert">*</td>
+				</c:if>
 			</tr>
             </c:forEach>    
 			</table>

@@ -123,7 +123,7 @@
                         <c:when test="${study.studyParameterConfig.useStartTime == 'no'}">(<fmt:message key="date_format_string" bundle="${resformat}"/>)</c:when>
                         <c:otherwise>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</c:otherwise>
                     </c:choose>
-                    <c:if test="${study.studyParameterConfig.startDateTimeRequired == 'yes'}"> *</c:if>
+                    <c:if test="${study.studyParameterConfig.startDateTimeRequired == 'yes'}"> <span class="alert">*</span></c:if>
                     <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 							<c:set var="imageFileName" value="${imageFileNameForDateStart}"/>
 							<c:choose>
@@ -174,7 +174,7 @@
                         <c:when test="${study.studyParameterConfig.useEndTime == 'no'}">(<fmt:message key="date_format_string" bundle="${resformat}"/>)</c:when>
                         <c:otherwise>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</c:otherwise>
                     </c:choose>
-                    <c:if test="${study.studyParameterConfig.endDateTimeRequired == 'yes'}"> *</c:if>
+                    <c:if test="${study.studyParameterConfig.endDateTimeRequired == 'yes'}"> <span class="alert">*</span></c:if>
                     <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 							<c:set var="imageFileName" value="${imageFileNameForDateEnd}"/>
 							<c:choose>

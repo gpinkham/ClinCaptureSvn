@@ -64,7 +64,7 @@
 
 <form action="CreateStudy" method="post">
 <span class="title_Admin"><p><b><fmt:message key="section_b_study_status" bundle="${resword}"/>- <fmt:message key="design_details" bundle="${resword}"/> - <fmt:message key="observational" bundle="${resadmin}"/></b></p></span>
-* <fmt:message key="indicates_required_field" bundle="${resword}"/><br>
+<span class="alert">*</span> <fmt:message key="indicates_required_field" bundle="${resword}"/><br>
 <input type="hidden" name="action" value="next">
 <input type="hidden" name="pageNum" value="3">
 <div style="width: 600px">

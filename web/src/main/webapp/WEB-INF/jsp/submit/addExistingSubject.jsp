@@ -118,7 +118,7 @@
 <!-- c:if test="${study.genetic && (!empty mothers) || (!empty fathers)}" -->
 <!-- <p class="text">Indicate the subject's parents, if applicable. -->
 <!-- /c:if -->
-<br/><fmt:message key="field_required" bundle="${resword}"/></P>
+<br/><span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 <form action="AddNewSubject" method="post">
 <jsp:include page="../include/showSubmitted.jsp" />
 <input type="hidden" name="existingSubShown" value="1">
@@ -144,7 +144,7 @@
 						 </c:otherwise>
 					</c:choose>
 					</div></td>
-					<td >*</td>
+					<td class="alert">*</td>
 				</tr>
 				<tr>
 					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
@@ -182,7 +182,7 @@
 					</div></td>
 					<td>
                         <c:if test="${study.studyParameterConfig.secondaryIdRequired == 'yes'}">
-                            <span class="formlabel">*</span>
+                            <span class="formlabel alert">*</span>
                         </c:if>
 					</td>
 				</tr>
@@ -205,7 +205,7 @@
 					</td>
 					<td>
                         <c:if test="${study.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'yes'}">
-                            <span class="formlabel">*</span>
+                            <span class="formlabel alert">*</span>
                         </c:if>
 						<ui:calendarIcon onClickSelector="'#enrollmentDate'"/>
 					<%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%> *
@@ -233,7 +233,7 @@
 					</td>
                     <td align="left">
                         <c:if test="${study.studyParameterConfig.genderRequired != 'false'}">
-                            <span class="formlabel">*</span>
+                            <span class="formlabel alert">*</span>
                         </c:if>
                     </td>
 				</tr>
@@ -487,7 +487,7 @@
 
 	    	</td>
 	    	<c:if test="${group.subjectAssignment=='Required'}">
-	    	  <td align="left">*</td>
+	    	  <td align="left"><span class="alert">*</span></td>
 	    	</c:if>
 	    	</tr>
 	    	<tr valign="top">
