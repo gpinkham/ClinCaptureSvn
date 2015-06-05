@@ -1924,7 +1924,11 @@ public abstract class DataEntryServlet extends Controller {
 		if (redirectPath != null) {
 			response.sendRedirect(redirectPath);
 		} else {
-			response.sendRedirect(Navigation.getSavedUrl(request));
+			if( Navigation.getSavedUrl(request).contains("AddNewSubject")) {
+				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
+			} else {
+				response.sendRedirect(Navigation.getLastVisitedURL(request));
+			}
 		}
 	}
 

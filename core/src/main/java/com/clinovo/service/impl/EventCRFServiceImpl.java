@@ -29,14 +29,12 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,10 +77,6 @@ public class EventCRFServiceImpl implements EventCRFService {
 
 	private StudyDAO getStudyDAO() {
 		return new StudyDAO(dataSource);
-	}
-
-	private StudyGroupClassDAO getStudyGroupClassDAO() {
-		return new StudyGroupClassDAO(dataSource);
 	}
 
 	private void remove(EventCRFBean eventCRF, Status crfStatusToSet, UserAccountBean updater) throws Exception {
@@ -210,7 +204,7 @@ public class EventCRFServiceImpl implements EventCRFService {
 	public EventCRFBean getNextEventCRFForDataEntry(StudyEventBean currentStudyEventBean,
 			EventDefinitionCRFBean currentEventDefCRF, UserAccountBean currentUser, StudyUserRoleBean currentUserRole,
 			StudyBean currentStudy) {
-		StudyEventDefinitionBean currentStudyEventDefinition = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
+		StudyEventDefinitionBean currentStudyEventDefinition = getStudyEventDefinitionDAO()
 				.findByEventDefinitionCRFId(currentEventDefCRF.getId());
 		Collection<EventDefinitionCRFBean> eventDefinitionCRFs = getEventDefinitionCRFDAO()
 				.findAllActiveByEventDefinitionId(currentStudy, currentStudyEventDefinition.getId());
@@ -219,87 +213,6 @@ public class EventCRFServiceImpl implements EventCRFService {
 		if (eventCRF != null) {
 			eventCRF.setStudyEventBean(currentStudyEventBean);
 			return eventCRF;
-		}
-		List<StudyEventBean> studyEvents = getStudyEventDAO().findAllByDefinitionAndSubjectOrderByOrdinal(
-				currentStudyEventDefinition.getId(), currentStudyEventBean.getStudySubjectId());
-		if (studyEvents != null && studyEvents.size() > 1) {
-			eventCRF = getNextEventOccurenceCrfAvailableForDataEntry(currentUser, currentUserRole, currentStudy,
-					studyEvents, currentStudyEventBean, currentStudyEventDefinition);
-			if (eventCRF != null) {
-				return eventCRF;
-			}
-		}
-		return getNextAvailableCrfFromNextStudyEventDefinitions(currentStudyEventBean, currentUser, currentUserRole,
-				currentStudy, currentStudyEventDefinition, studyEvents);
-	}
-
-	private EventCRFBean getNextAvailableCrfFromNextStudyEventDefinitions(StudyEventBean currentStudyEventBean,
-			UserAccountBean currentUser, StudyUserRoleBean currentUserRole, StudyBean currentStudy,
-			StudyEventDefinitionBean currentStudyEventDefinition, List<StudyEventBean> studyEvents) {
-		EventCRFBean eventCRF;
-		int parentStudyId = currentStudy.isSite() ? currentStudy.getParentStudyId() : currentStudy.getId();
-		List<StudyEventDefinitionBean> studyEventDefinitions = getStudyEventDefinitionDAO()
-				.findAllActiveByParentStudyIdOrderedByGroupClass(parentStudyId);
-		boolean studyHasDynamicGroups = getStudyGroupClassDAO().findAllActiveDynamicGroupsByStudyId(parentStudyId)
-				.size() > 0;
-		for (StudyEventDefinitionBean studyEventDefinition : studyEventDefinitions) {
-			if (!eventIsAfterCurrent(studyEventDefinition, currentStudyEventDefinition, studyHasDynamicGroups)) {
-				continue;
-			}
-			studyEvents = getStudyEventDAO().findAllByDefinitionAndSubjectOrderByOrdinal(studyEventDefinition.getId(),
-					currentStudyEventBean.getStudySubjectId());
-			if (studyEvents != null && studyEvents.size() > 0) {
-				eventCRF = getNextEventOccurenceCrfAvailableForDataEntry(currentUser, currentUserRole, currentStudy,
-						studyEvents, null, studyEventDefinition);
-				if (eventCRF != null) {
-					return eventCRF;
-				}
-			}
-		}
-		return null;
-	}
-
-	private boolean eventIsAfterCurrent(StudyEventDefinitionBean event, StudyEventDefinitionBean currentEvent,
-			boolean studyHasDynamicGroups) {
-		if (!studyHasDynamicGroups) {
-			return currentEvent.compareTo(event) > -1;
-		}
-		StudyGroupClassBean eventGroup = getStudyGroupClassDAO().findAvailableDynamicGroupByStudyEventDefinitionId(
-				event.getId());
-		StudyGroupClassBean currentEventGroup = getStudyGroupClassDAO()
-				.findAvailableDynamicGroupByStudyEventDefinitionId(currentEvent.getId());
-		if (currentEventGroup.getId() == 0 || eventGroup.isDefault()) {
-			return false;
-		}
-		if (currentEventGroup.getId() == eventGroup.getId()) {
-			return false;
-		}
-		if (currentEventGroup.isDefault()) {
-			return true;
-		}
-		if (currentEventGroup.getId() > 0 && eventGroup.getId() > 0) {
-			return currentEventGroup.getDynamicOrdinal() < eventGroup.getDynamicOrdinal();
-		}
-		return true;
-	}
-
-	private EventCRFBean getNextEventOccurenceCrfAvailableForDataEntry(UserAccountBean currentUser,
-			StudyUserRoleBean currentUserRole, StudyBean currentStudy, List<StudyEventBean> studyEvents,
-			StudyEventBean currentStudyEvent, StudyEventDefinitionBean studyEventDefinition) {
-		Collection<EventDefinitionCRFBean> eventDefinitionCRFs;
-		EventCRFBean eventCRF;
-		eventDefinitionCRFs = getEventDefinitionCRFDAO().findAllActiveByEventDefinitionId(currentStudy,
-				studyEventDefinition.getId());
-		for (StudyEventBean studyEvent : studyEvents) {
-			if (currentStudyEvent != null && studyEvent.getSampleOrdinal() <= currentStudyEvent.getSampleOrdinal()) {
-				continue;
-			}
-			eventCRF = getNextCrfAvailableForDataEntry(currentStudy, studyEvent, null, currentUser, currentUserRole,
-					eventDefinitionCRFs);
-			if (eventCRF != null) {
-				eventCRF.setStudyEventBean(studyEvent);
-				return eventCRF;
-			}
 		}
 		return null;
 	}

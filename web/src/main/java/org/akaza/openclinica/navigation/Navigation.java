@@ -220,4 +220,21 @@ public final class Navigation {
 
 		return request.getContextPath() + (visitedURLs.isEmpty() ? defaultUrl : visitedURLs.peek());
 	}
+
+	/**
+	 * Returns latest URL from stack of saved URLs.
+	 *
+	 * @param request HttpServletRequest
+	 * @return String Saved URL from the stack
+	 */
+	public static String getLastVisitedURL(HttpServletRequest request) {
+		Stack<String> visitedURLs = (Stack<String>) request.getSession().getAttribute("visitedURLs");
+		String defaultUrl = "/MainMenu";
+
+		if (visitedURLs == null) {
+			visitedURLs = new Stack<String>();
+		}
+
+		return request.getContextPath() + (visitedURLs.isEmpty() ? defaultUrl : visitedURLs.peek());
+	}
 }
