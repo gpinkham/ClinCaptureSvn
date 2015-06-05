@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.web.bean;
 
+import com.clinovo.i18n.LocaleResolver;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
@@ -35,7 +36,7 @@ public class DatasetRow extends EntityBeanRow {
 	public static final int COL_DATASETCREATEDDATE = 3;
 	public static final int COL_STATUS = 4;
 	public SimpleDateFormat sdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString(
-			"date_format_string"));
+			"date_format_string"), LocaleResolver.getLocale());
 
 	@Override
 	protected int compareColumn(Object row, int sortingColumn) {

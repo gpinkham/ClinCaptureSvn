@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import com.clinovo.i18n.LocaleResolver;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -684,7 +685,7 @@ public class ChangeCRFVersionController {
 	private String formatDate(Date date) {
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
 		String dateFormat = resformat.getString("date_format_string");
-		SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+		SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, LocaleResolver.getLocale());
 		return formatter.format(date);
 	}
 

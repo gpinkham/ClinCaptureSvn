@@ -174,7 +174,7 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 		resword = ResourceBundleProvider.getWordsBundle(l);
 		resformat = ResourceBundleProvider.getFormatBundle(l);
 		SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"),
-				ResourceBundleProvider.getLocale());
+				LocaleResolver.getLocale());
 		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 		StudySubjectDAO studySubjectDAO = getStudySubjectDAO();
 		StudyEventDAO sedao = getStudyEventDAO();

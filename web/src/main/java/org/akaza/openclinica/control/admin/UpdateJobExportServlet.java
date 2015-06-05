@@ -116,8 +116,7 @@ public class UpdateJobExportServlet extends Controller {
 		calendar.setTime(jobDate);
 		presetValues.put(CreateJobExportServlet.DATE_START_JOB + "Hour", calendar.get(Calendar.HOUR_OF_DAY));
 		presetValues.put(CreateJobExportServlet.DATE_START_JOB + "Minute", calendar.get(Calendar.MINUTE));
-		SimpleDateFormat local_df = new SimpleDateFormat(resformat.getString("date_format_string"));
-		presetValues.put(CreateJobExportServlet.DATE_START_JOB + "Date", local_df.format(jobDate));
+		presetValues.put(CreateJobExportServlet.DATE_START_JOB + "Date", getLocalDf(request).format(jobDate));
 		fp2.setPresetValues(presetValues);
 		setPresetValues(fp2.getPresetValues(), request);
 

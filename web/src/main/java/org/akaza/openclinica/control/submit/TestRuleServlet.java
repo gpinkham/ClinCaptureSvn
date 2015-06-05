@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.ValidatorHelper;
 import com.google.gson.Gson;
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -273,7 +274,8 @@ public class TestRuleServlet extends Controller {
 				request.setAttribute(entry.getKey() + "-dib", dib);
 				if (item.getItemDataTypeId() == 9) {
 					try {
-						SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
+						SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"), LocaleResolver
+								.getLocale());
 						SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
 						if (!entry.getValue().isEmpty()) {
 							java.util.Date date = sdf2.parse(entry.getValue());
@@ -328,7 +330,7 @@ public class TestRuleServlet extends Controller {
 
 				if (item.getItemDataTypeId() == 9) {
 					try {
-						SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
+						SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"), LocaleResolver.getLocale());
 						SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
 						if (!entry.getValue().isEmpty()) {
 							java.util.Date date = sdf.parse(entry.getValue());

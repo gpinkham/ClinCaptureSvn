@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.i18n.LocaleResolver;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -65,7 +66,6 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
@@ -218,7 +218,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			String formattedInterviewerDate;
 			try {
 				DateFormat localDf = new SimpleDateFormat(resformat.getString("date_format_string"),
-						ResourceBundleProvider.getLocale());
+						LocaleResolver.getLocale());
 				formattedInterviewerDate = localDf.format(tmpDate);
 			} catch (Exception e) {
 				formattedInterviewerDate = "";

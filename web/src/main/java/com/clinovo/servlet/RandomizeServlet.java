@@ -17,6 +17,7 @@ package com.clinovo.servlet;
 import com.clinovo.context.SubmissionContext;
 import com.clinovo.context.impl.JSONSubmissionContext;
 import com.clinovo.exception.RandomizationException;
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.Randomization;
 import com.clinovo.model.RandomizationResult;
 import com.clinovo.rule.ext.HttpTransportProtocol;
@@ -163,7 +164,7 @@ public class RandomizeServlet extends Controller {
 		}
 		JSONObject randomizationResult = new JSONObject();
 
-		DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+		DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy", LocaleResolver.getLocale());
 		Date date = new Date();
 
 		randomizationResult.put("date", dateFormat.format(date));

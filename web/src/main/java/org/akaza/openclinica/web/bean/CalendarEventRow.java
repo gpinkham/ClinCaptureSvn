@@ -23,6 +23,7 @@
 
 package org.akaza.openclinica.web.bean;
 
+import com.clinovo.i18n.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.calendar.CalendarFuncBean;
 
@@ -42,7 +43,7 @@ public class CalendarEventRow extends EntityBeanRow {
     public static final int COL_REFERENCE_VISIT = 4;
     public static final int COL_REFERENCE_EVENT_FOR_VISIT = 5;
     public SimpleDateFormat sdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString(
-            "date_format_string"));
+            "date_format_string"), LocaleResolver.getLocale());
 
     @Override
     protected int compareColumn(Object row, int sortingColumn) {
