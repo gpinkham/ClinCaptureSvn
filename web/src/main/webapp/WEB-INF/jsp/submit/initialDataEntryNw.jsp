@@ -70,7 +70,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%><d
         <c:set var="checkInputsValue" value="0" />    </c:otherwise></c:choose>
 
 <c:set var="save_and_next_button_caption" scope="request"><fmt:message key="save_and_next" bundle="${resword}"/></c:set>
-<c:set var="save_and_next_button_class" scope="request" value="${view:getHtmlButtonCssClass(save_and_next_button_caption)}" />
+<c:set var="submitClassType" value="submit"/>
 <table width="75%"><tr><td>
 <span class="first_level_header"> <b id="crfNameId"> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
     <c:choose>
@@ -549,8 +549,8 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
                                 <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                                   "button_medium medium_submit" onclick="disableSubmit(); this.form.submit();"/></td>                           
                                 <c:if test="${section.lastSection }">
-                                	<td><input type="submit" id="snl" name="saveAndNext" value="${save_and_next_button_caption}" class=
-                      			  		"${save_and_next_button_class} medium_submit" onclick="disableSubmit(); this.form.submit();"/></td>
+                                	<td><input type="submit" id="snl" name="saveAndNext" value="${save_and_next_button_caption}"
+                                               class="${view:getHtmlButtonCssClass(save_and_next_button_caption, submitClassType)}" onclick="disableSubmit(); this.form.submit();"/></td>
                                 </c:if> 
                                                                  
                                 <c:choose>
@@ -1618,8 +1618,8 @@ table-->
                     <td><input type="submit" id="srl" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                       "button_medium medium_submit" onclick="disableSubmit(); this.form.submit();"/></td>
                     <c:if test="${section.lastSection }">
-                     	<td><input type="submit" id="snl" name="saveAndNext" value="${save_and_next_button_caption}" class=
-           			  		"${save_and_next_button_class} medium_submit" onclick="disableSubmit(); this.form.submit();"/></td>
+                     	<td><input type="submit" id="snl" name="saveAndNext" value="${save_and_next_button_caption}"
+                                   class="${view:getHtmlButtonCssClass(save_and_next_button_caption, submitClassType)}" onclick="disableSubmit(); this.form.submit();"/></td>
                     </c:if>
                     <c:choose>
                         <c:when test="${! empty formMessages}">

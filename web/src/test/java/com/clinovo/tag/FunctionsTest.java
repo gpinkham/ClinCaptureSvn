@@ -8,11 +8,16 @@ public class FunctionsTest {
 	
 	@Test
 	public void testThatButtonMediumCssClassIsReturnedForShorterButtonCaption() {
-		assertEquals("button_medium", Functions.getHtmlButtonCssClass("Save & Next"));
+		assertEquals("button_medium", Functions.getHtmlButtonCssClass("Save & Next", ""));
 	}
 	
 	@Test
 	public void testThatButtonLongCssClassIsReturnedForLongerThan16CharacterButtonCaption() {
-		assertEquals("button_long", Functions.getHtmlButtonCssClass("Customize Home Page"));
+		assertEquals("button_long long_submit", Functions.getHtmlButtonCssClass("Customize Home Page", "submit"));
+	}
+
+	@Test
+	public void testThatButtonLongCssClassIsReturnsValidStyleForEmptyParameters() {
+		assertEquals("button_medium", Functions.getHtmlButtonCssClass("", ""));
 	}
 }
