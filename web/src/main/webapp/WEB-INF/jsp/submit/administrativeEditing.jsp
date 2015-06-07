@@ -781,7 +781,9 @@
         </c:when>
         <%-- could be a radio or checkbox that is not horizontal --%>
         <c:otherwise>
-            <td class="itemHolderClass aka_padding_norm aka_cellBorders" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
+			<c:set var="extra_class" value="${bodyItem.metadata.responseSet.responseType.name eq 'checkbox' ||
+												bodyItem.metadata.responseSet.responseType.name eq 'radio' ? 'align_left' : ''}"/>
+            <td class="itemHolderClass aka_padding_norm aka_cellBorders ${extra_class}" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                 <c:set var="displayItem" scope="request" value="${bodyItem}" />
 				<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>

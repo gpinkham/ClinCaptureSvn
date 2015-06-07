@@ -2963,3 +2963,7 @@ a.sdvItemLink {
 table.footerInnerTable {
 	width: 1024px;
 }
+
+.itemHolderClass.aka_padding_norm.aka_cellBorders.align_left {
+	text-align: left;
+}

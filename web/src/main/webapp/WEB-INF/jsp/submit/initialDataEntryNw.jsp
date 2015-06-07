@@ -856,6 +856,10 @@ but the custom tag uses that, not this jstl code--%>
         	<c:when test="${isItemShown && hasShown}">
             	<c:set var="extraClass" value="aka_group_show"/>
             </c:when>
+			<c:when test="${bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
+							bodyItem.metadata.responseSet.responseType.name eq 'checkbox'}">
+				<c:set var="extraClass" value="align_left"/>
+			</c:when>
             <c:otherwise>
 				<c:set var="extraClass" value=" "/>
             	<%-- do nothing here ? --%>
