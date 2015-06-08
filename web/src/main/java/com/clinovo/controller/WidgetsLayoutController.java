@@ -37,6 +37,7 @@ import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -72,8 +73,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
-import com.clinovo.bean.display.DisplayWidgetsRowWithExtraField;
-import com.clinovo.bean.display.DisplayWidgetsRowWithName;
+import com.clinovo.bean.display.WidgetsRowWithExtraField;
+import com.clinovo.bean.display.WidgetsRowWithName;
 import com.clinovo.dao.CodedItemDAO;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.jmesa.evaluation.CRFEvaluationFilter;
@@ -100,10 +101,14 @@ public class WidgetsLayoutController {
 	private static final int EC_DISPLAY_PER_SCREEN = 5;
 	private static final int ND_PER_CRF_DISPLAY_PER_SCREEN = 8;
 	private static final int ESPS_DISPLAY_PER_SCREEN = 5;
+	private static final int ESPAS_DISPLAY_PER_SCREEN = 5;
 
 	private static final String STATUS_NOT_CODED = "items to be coded";
 	private static final String STATUS_CODED = "coded items";
 	private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
+
+	private static final Status[] SUBJECTS_STATUSES = {Status.LOCKED, Status.DELETED, Status.AUTO_DELETED, Status.SIGNED, Status.AVAILABLE};
+	private static final Status[] LEGEND_SUBJECT_STATUSES = {Status.AVAILABLE, Status.DELETED, Status.AUTO_DELETED, Status.LOCKED, Status.SIGNED};
 
 	@Autowired
 	private DataSource datasource;
@@ -340,10 +345,10 @@ public class WidgetsLayoutController {
 		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(datasource);
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
 
-		List<DisplayWidgetsRowWithName> eventCompletionRows = new ArrayList<DisplayWidgetsRowWithName>();
+		List<WidgetsRowWithName> eventCompletionRows = new ArrayList<WidgetsRowWithName>();
 
 		for (int i = displayFrom; i < studyEventDefinitions.size() && i < displayFrom + maxDisplayNumber; i++) {
-			DisplayWidgetsRowWithName currentRow = new DisplayWidgetsRowWithName();
+			WidgetsRowWithName currentRow = new WidgetsRowWithName();
 
 			LinkedHashMap<String, Integer> countOfSubjectEventStatuses = new LinkedHashMap<String, Integer>();
 			int countOfSubjectsStartedEvent = 0;
@@ -1005,14 +1010,14 @@ public class WidgetsLayoutController {
 
 	/**
 	 * This method is used to gather data from Database and send it to widget.
-	 * 
+	 *
 	 * @param request
 	 *            is used to gather information about current user and study.
 	 * @param model
 	 *            is used to return gathered from database data.
 	 * @param response
 	 *            is used to set correct locale and clear cache.
-	 * 
+	 *
 	 * @return model - Model with gathered data.
 	 */
 	@RequestMapping("/initEnrollStatusPerSiteWidget")
@@ -1030,10 +1035,9 @@ public class WidgetsLayoutController {
 			currentDisplay += ESPS_DISPLAY_PER_SCREEN;
 		}
 		ArrayList<Integer> listOfSitesIds = (ArrayList<Integer>) studyDAO.findAllSiteIdsByStudy(sb);
-		Status[] listOfStatuses = {Status.LOCKED, Status.DELETED, Status.AUTO_DELETED, Status.SIGNED, Status.AVAILABLE};
-		ArrayList<DisplayWidgetsRowWithExtraField> dataRows = new ArrayList<DisplayWidgetsRowWithExtraField>();
+		ArrayList<WidgetsRowWithExtraField> dataRows = new ArrayList<WidgetsRowWithExtraField>();
 		listOfSitesIds.remove(listOfSitesIds.indexOf(sb.getId()));
-		ArrayList<StudyBean> listOfSites = new ArrayList<StudyBean>();
+		List<StudyBean> listOfSites = new ArrayList<StudyBean>();
 
 		for (int index : listOfSitesIds) {
 			StudyBean currentSite = (StudyBean) studyDAO.findByPK(index);
@@ -1044,21 +1048,10 @@ public class WidgetsLayoutController {
 
 		for (int i = currentDisplay; i < currentDisplay + ESPS_DISPLAY_PER_SCREEN && i < listSize; i++) {
 			StudyBean site = listOfSites.get(i);
-			DisplayWidgetsRowWithExtraField currentRow = new DisplayWidgetsRowWithExtraField();
+			WidgetsRowWithExtraField currentRow = new WidgetsRowWithExtraField();
 			currentRow.setRowName(site.getName());
 			currentRow.setName(site.getIdentifier());
-			LinkedHashMap<String, Integer> values = new LinkedHashMap<String, Integer>();
-
-			for (Status status : listOfStatuses) {
-				if (status == Status.AUTO_DELETED) {
-					int countOfDeletedSubjects = values.get(Status.DELETED.getCode());
-					int countOfAutoRemovedSubject = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(site, status);
-					values.put(Status.DELETED.getCode(), countOfAutoRemovedSubject + countOfDeletedSubjects);
-				} else {
-					int countOfSubjectWithStatus = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(site, status);
-					values.put(status.getCode(), countOfSubjectWithStatus);
-				}
-			}
+			LinkedHashMap<String, Integer> values = getEnrollmentPerSiteValues(site);
 			currentRow.setRowValues(values);
 			String percentOfExpectedEnrollment = getPercentOfEnrollmentForSite(site);
 			currentRow.setExtraField(percentOfExpectedEnrollment);
@@ -1112,12 +1105,9 @@ public class WidgetsLayoutController {
 	/**
 	 * This method is used to gather data from Database and send it to widget.
 	 * 
-	 * @param request
-	 *            is used to gather information about current user and study.
-	 * @param model
-	 *            is used to return gathered from database data.
-	 * @param response
-	 *            is used to set correct locale and clear cache.
+	 * @param request is used to gather information about current user and study.
+	 * @param model is used to return gathered from database data.
+	 * @param response is used to set correct locale and clear cache.
 	 * @return model - Model with gathered data.
 	 */
 	@RequestMapping("/initEvaluationProgressWidget")
@@ -1208,7 +1198,97 @@ public class WidgetsLayoutController {
 		return page;
 	}
 
-	private ArrayList<StudyBean> sortSitesByPercentOfExpectedEnrollment(ArrayList<StudyBean> listOfSites) {
+	/**
+	 * Enrollment Status per Available Sites Widget.
+	 *
+	 * @param request is used to gather information about current user and study.
+	 * @param model is used to return gathered from database data.
+	 * @param response is used to set correct locale and clear cache.
+	 *
+	 * @return model - Model with gathered data.
+	 */
+	@RequestMapping("/initESPASWidget")
+	public String initESPASWidget(HttpServletRequest request, HttpServletResponse response, Model model) {
+
+		String page = "widgets/includes/enrollmentStatusPerAvailableSitesChart";
+		StudyDAO studyDAO = new StudyDAO(datasource);
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+		UserAccountBean user = (UserAccountBean) request.getSession().getAttribute("userBean");
+		String action = request.getParameter("action");
+		int firstRowNum = Integer.parseInt(request.getParameter("firstRowNum"));
+		if (action.equals("back")) {
+			firstRowNum -= ESPAS_DISPLAY_PER_SCREEN;
+		} else if (action.equals("forward")) {
+			firstRowNum += ESPAS_DISPLAY_PER_SCREEN;
+		}
+		List<StudyBean> sites = getSitesInCurrentStudyWhereRoleIsMonitor(user, sb);
+		ArrayList<WidgetsRowWithExtraField> rows = new ArrayList<WidgetsRowWithExtraField>();
+		int sitesNum = sites.size();
+		int lastRowNum = firstRowNum + ESPAS_DISPLAY_PER_SCREEN;
+
+		for (int i = firstRowNum; i < lastRowNum && i < sitesNum; i++) {
+			StudyBean site = sites.get(i);
+			WidgetsRowWithExtraField currentRow = new WidgetsRowWithExtraField();
+			currentRow.setRowName(site.getName());
+			currentRow.setName(site.getIdentifier());
+			currentRow.setRowValues(getEnrollmentPerSiteValues(site));
+			currentRow.setExtraField(getPercentOfEnrollmentForSite(site));
+			rows.add(currentRow);
+		}
+		model.addAttribute("rows", rows);
+		model.addAttribute("firstRowNum", firstRowNum);
+		model.addAttribute("showBack", firstRowNum > 0);
+		model.addAttribute("showNext", firstRowNum + ESPS_DISPLAY_PER_SCREEN < sitesNum);
+		return page;
+	}
+
+	/**
+	 * Get legend for Enrollment Status per Available Sites.
+	 *
+	 * @param request is used to gather information about current user and study.
+	 * @param response is used to set correct locale and clear cache.
+	 * @throws IOException if data from request is incorrect or database contains corrupted data.
+	 */
+	@RequestMapping("/getESPASLegendValues")
+	public void getESPASLegendValues(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
+
+		setRequestHeadersAndUpdateLocale(response, request);
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
+		UserAccountBean user = (UserAccountBean) request.getSession().getAttribute("userBean");
+		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
+		List<StudyBean> sites = getSitesInCurrentStudyWhereRoleIsMonitor(user, study);
+		LinkedHashMap<String, Integer> statusesMap = new LinkedHashMap<String, Integer>();
+
+		for (Status status : LEGEND_SUBJECT_STATUSES) {
+			int subjectsNum = status == Status.AUTO_DELETED ? statusesMap.get(Status.DELETED.getCode()) : 0;
+			String key = status == Status.AUTO_DELETED ? Status.DELETED.getCode() : status.getCode();
+			for (StudyBean site : sites) {
+				subjectsNum += studySubjectDAO.getCountofStudySubjectsBasedOnStatus(site, status);
+			}
+			statusesMap.put(key, subjectsNum);
+		}
+		response.getWriter().println(new ArrayList<Integer>(statusesMap.values()));
+	}
+
+	private List<StudyBean> getSitesInCurrentStudyWhereRoleIsMonitor(UserAccountBean user, StudyBean currentStudy) {
+		StudyDAO studyDAO = new StudyDAO(datasource);
+		ArrayList<StudyUserRoleBean> userRoles = user.getRoles();
+		List<StudyBean> sites = new ArrayList<StudyBean>();
+
+		for (StudyUserRoleBean userRole : userRoles) {
+			if (userRole.getRole() == Role.SITE_MONITOR) {
+				int siteId = userRole.getStudyId();
+				StudyBean site = (StudyBean) studyDAO.findByPK(siteId);
+				if (site.getParentStudyId() == currentStudy.getParentStudyId()) {
+					sites.add(site);
+				}
+			}
+		}
+		return sites;
+	}
+
+	private List<StudyBean> sortSitesByPercentOfExpectedEnrollment(List<StudyBean> listOfSites) {
 		Collections.sort(listOfSites, new Comparator<StudyBean>() {
 			public int compare(final StudyBean site1, final StudyBean site2) {
 				int compareResult;
@@ -1230,6 +1310,22 @@ public class WidgetsLayoutController {
 			}
 		});
 		return listOfSites;
+	}
+
+	private LinkedHashMap<String, Integer> getEnrollmentPerSiteValues(StudyBean site) {
+		LinkedHashMap<String, Integer> values = new LinkedHashMap<String, Integer>();
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
+		for (Status status : SUBJECTS_STATUSES) {
+			if (status == Status.AUTO_DELETED) {
+				int deleted = values.get(Status.DELETED.getCode());
+				int autoRemoved = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(site, status);
+				values.put(Status.DELETED.getCode(), autoRemoved + deleted);
+			} else {
+				int countOfSubjectWithStatus = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(site, status);
+				values.put(status.getCode(), countOfSubjectWithStatus);
+			}
+		}
+		return values;
 	}
 
 	private LinkedHashMap<String, LinkedHashMap<String, Integer>> getUpdateValueForMonth(

@@ -20,7 +20,7 @@ import java.util.LinkedHashMap;
 import org.akaza.openclinica.bean.core.EntityBean;
 
 @SuppressWarnings("serial")
-public class DisplayWidgetsRowWithName extends EntityBean {
+public class WidgetsRowWithName extends EntityBean {
 
 	private String rowName = "";
 	private LinkedHashMap<String, Integer> rowValues = new LinkedHashMap<String, Integer>();

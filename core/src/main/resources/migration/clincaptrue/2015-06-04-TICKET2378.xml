@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-06-24-TICKET2378-CREATE-ESPAS-WIDGET">
+		<comment>Create "Enrollment Status Per Available Sites" widget</comment>
+		<insert tableName="widget">
+			<column name="id" value="17" />
+			<column name="version" value="0" />
+			<column name="widget_name" value="Enrollment Status Per Available Sites" />
+			<column name="have_access" value="9" />
+			<column name="display_as_default" value="9" />
+			<column name="study_metrics" value="FALSE" />
+			<column name="site_metrics" value="TRUE" />
+			<column name="two_column_widget" value="FALSE" />
+		</insert>
+	</changeSet>
+</databaseChangeLog>

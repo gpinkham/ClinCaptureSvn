@@ -30,7 +30,6 @@ function initEnrollStatusPerSiteWidget(action) {
 		},
 		success : function(html) {
 			$("#enrollment_status_per_site_container").html(html);
-			$(".pop-up").css('display', 'none');
 			var hasNext = $("#esps_next_page_exists").val();
 			var hasPrevious = $("#esps_previous_page_exists").val();
 			if (hasNext == "true")

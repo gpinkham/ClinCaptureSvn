@@ -20,6 +20,7 @@ import com.clinovo.i18n.LocaleResolver;
 /**
  * Tests for WidgetLayoutController.
  **/
+@SuppressWarnings("unused")
 public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 	private static final int EVENT_COMPL_ATTRIBUTES = 4;
@@ -29,6 +30,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	private static final int ENROLL_PROG_ATTRIBUTES = 4;
 	private static final int CODING_PROG_ATTRIBUTES = 5;
 	private static final int ENROLL_STAT_PER_SITE_ATTRIBUTES = 4;
+	private static final int ESPAS_ATTRIBUTES = 4;
 	private static final int EVALUATION_PROG_ATTRIBUTES = 5;
 
 	private StudyBean sb;
@@ -209,6 +211,13 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 		this.mockMvc.perform(
 				get(ESPS_LEGEND).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("userId", "1")
 						.sessionAttr("study", sb)).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatGetESPASLegendValuesReturnsCode200() throws Exception {
+		this.mockMvc.perform(
+				get(ESPAS_LIGEND).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("userId", "1")
+						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(status().isOk());
 	}
 
 	/**
@@ -639,5 +648,35 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("epPerSiteDisplay", "0")
 						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/enrollStatusPerSiteChart"));
+	}
+
+	@Test
+	public void testThatInitEnrollStatusPerAvailableSitesReturnsCorrectNumberOfAttributes() throws Exception {
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(ESPAS_WIDGET)
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("firstRowNum", "0")
+						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
+				MockMvcResultMatchers.model().size(ENROLL_STAT_PER_SITE_ATTRIBUTES));
+	}
+
+	@Test
+	public void testThatInitEnrollStatusPerAvailableSitesReturnsModelWithAllAttributes() throws Exception {
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(ESPAS_WIDGET)
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("firstRowNum", "0")
+						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
+				MockMvcResultMatchers.model().attributeExists("firstRowNum", "rows", "showBack", "showNext"));
+	}
+
+	@Test
+	public void testThatInitEnrollStatusPerAvailableSitesReturnsCorrectUrl() throws Exception {
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(ESPAS_WIDGET)
+						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("firstRowNum", "0")
+						.param("action", "init").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
+				MockMvcResultMatchers.view().name("widgets/includes/enrollmentStatusPerAvailableSitesChart"));
 	}
 }

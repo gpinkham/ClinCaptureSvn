@@ -4,7 +4,7 @@ package com.clinovo.bean.display;
  * This bean is used to display rows in the small horizontal bar widgets, with some extra field.
  */
 @SuppressWarnings("serial")
-public class DisplayWidgetsRowWithExtraField extends DisplayWidgetsRowWithName {
+public class WidgetsRowWithExtraField extends WidgetsRowWithName {
 
 	private Object extraField;
 

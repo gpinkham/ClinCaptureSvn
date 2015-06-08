@@ -28,7 +28,6 @@ function initEventsCompletionWidget(action) {
 			$("#events_completion_container").html(html);
 			var hasNext = $("#ec_has_next").val();
 			var hasPrevious = $("#ec_has_previous").val();
-			$(".pop-up").css('display', 'none');
 			if (hasNext == "true") 
 				$(".events_completion input#next").css("display", "block");
 			else
