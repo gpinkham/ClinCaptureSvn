@@ -1,6 +1,7 @@
 package com.clinovo.rest.util;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.method.HandlerMethod;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.rest.annotation.RestParameterPossibleValues;
+import com.clinovo.rest.annotation.RestParametersPossibleValues;
 import com.clinovo.rest.annotation.RestScope;
 import com.clinovo.rest.enums.Scope;
 import com.clinovo.rest.exception.RestException;
@@ -87,14 +90,36 @@ public final class RequestParametersValidator {
 			}
 		}
 		Annotation[] annotationArray = handler.getMethod().getAnnotations();
-		if (UserDetails.getCurrentUserDetails() != null && annotationArray != null) {
+		if (annotationArray != null) {
 			for (Annotation annotation : annotationArray) {
-				if (annotation instanceof RestScope) {
+				if (annotation instanceof RestScope && UserDetails.getCurrentUserDetails() != null) {
 					StudyBean studyBean = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 					if ((((RestScope) annotation).value() == Scope.STUDY && studyBean.getParentStudyId() > 0)
 							|| (((RestScope) annotation).value() == Scope.SITE && studyBean.getParentStudyId() == 0)) {
 						throw new RestException(messageSource.getMessage("rest.wrongScope", null,
 								LocaleResolver.getLocale()));
+					}
+				} else if (annotation instanceof RestParametersPossibleValues) {
+					for (RestParameterPossibleValues restParameterPossibleValues : ((RestParametersPossibleValues) annotation)
+							.value()) {
+						String parameterName = restParameterPossibleValues.name();
+						String parameterValue = request.getParameter(parameterName);
+						if (restParameterPossibleValues.canBeNotSpecified() && parameterValue != null
+								&& parameterValue.isEmpty()) {
+							continue;
+						}
+						if (parameterValue != null && restParameterPossibleValues.multiValue() ? !Arrays.asList(
+								restParameterPossibleValues.values().split(",")).containsAll(
+								Arrays.asList(parameterValue.split(","))) : !Arrays.asList(
+								restParameterPossibleValues.values().split(",")).contains(parameterValue)) {
+							throw new RestException(messageSource, restParameterPossibleValues.valueDescriptions()
+									.isEmpty() ? "rest.possibleValuesAre" : "rest.possibleValuesWithDescriptionsAre",
+									restParameterPossibleValues.valueDescriptions().isEmpty() ? new Object[]{
+											parameterName, restParameterPossibleValues.values()} : new Object[]{
+											parameterName, restParameterPossibleValues.values(),
+											restParameterPossibleValues.valueDescriptions()},
+									HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+						}
 					}
 				}
 			}

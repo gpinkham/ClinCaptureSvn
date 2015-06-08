@@ -10,6 +10,30 @@ import org.junit.Test;
 public class UserServiceTest extends BaseServiceTest {
 
 	@Test
+	public void testThatItIsImpossibleToCreateAUserIfUserTypeParameterHasWrongValue() throws Exception {
+		this.mockMvc.perform(
+				post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
+						.param("firstname", "firstname_".concat(Long.toString(timestamp)))
+						.param("lastname", "lastname_".concat(Long.toString(timestamp)))
+						.param("email", "test@gmail.com").param("phone", "111111111111").param("company", "clinovo")
+						.param("usertype", "123").param("allowsoap", "true").param("displaypassword", "true")
+						.param("role", Integer.toString(3456)).accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateAUserIfRoleParameterHasWrongValue() throws Exception {
+		this.mockMvc.perform(
+				post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
+						.param("firstname", "firstname_".concat(Long.toString(timestamp)))
+						.param("lastname", "lastname_".concat(Long.toString(timestamp)))
+						.param("email", "test@gmail.com").param("phone", "111111111111").param("company", "clinovo")
+						.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
+						.param("displaypassword", "true").param("role", "123123").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
 	public void testThatItIsNotPossibleToCreateAUserWithRoleThatDoesNotExist() throws Exception {
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))

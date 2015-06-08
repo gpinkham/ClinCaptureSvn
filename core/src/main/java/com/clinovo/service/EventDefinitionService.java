@@ -1,5 +1,6 @@
 package com.clinovo.service;
 
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 
@@ -20,4 +21,12 @@ public interface EventDefinitionService {
 	 */
 	void createStudyEventDefinition(StudyBean studyBean, String emailUser,
 			StudyEventDefinitionBean studyEventDefinitionBean);
+
+	/**
+	 * Add event definition crf.
+	 * 
+	 * @param eventDefinitionCrfBean
+	 *            EventDefinitionCRFBean
+	 */
+	void addEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCrfBean);
 }

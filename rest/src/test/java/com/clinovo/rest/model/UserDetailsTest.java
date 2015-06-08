@@ -44,8 +44,9 @@ public class UserDetailsTest {
 	public void testThatDefaultConstructorSetsCorrectValuesForFields() throws Exception {
 		UserDetails userDetails = new UserDetails();
 		assertNull(userDetails.getUserName());
-		assertNull(userDetails.getPassword());
+		assertNull(userDetails.getUserStatus());
 		assertNull(userDetails.getStudyName());
+		assertNull(userDetails.getStudyStatus());
 		assertNull(userDetails.getRoleCode());
 		assertNull(userDetails.getUserTypeCode());
 	}

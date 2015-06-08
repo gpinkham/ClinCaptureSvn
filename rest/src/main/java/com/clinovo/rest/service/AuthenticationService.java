@@ -93,7 +93,9 @@ public class AuthenticationService extends BaseService {
 						userDetails.setUserId(userAccountBean.getId());
 						userDetails.setUserName(userName);
 						userDetails.setPassword(password);
+						userDetails.setUserStatus(userAccountBean.getStatus().getCode());
 						userDetails.setStudyName(studyName);
+						userDetails.setStudyStatus(studyBean.getStatus().getCode());
 						userDetails.setStudyOid(studyBean.getOid());
 						userDetails.setRoleCode(surBean.getRole().getCode());
 						userDetails.setUserTypeCode(userAccountBean.hasUserType(UserType.USER) ? UserType.USER

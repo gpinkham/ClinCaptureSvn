@@ -82,7 +82,7 @@ public class OdmXmlSerializer extends Jaxb2RootElementHttpMessageConverter {
 		if (o instanceof Application) {
 			super.writeToResult(o, headers, result);
 		} else {
-			if (o instanceof String) {				
+			if (o instanceof String) {
 				LinkedList mediaTypes = new LinkedList();
 				mediaTypes.add(MediaType.APPLICATION_XML_VALUE);
 				headers.put(CONTENT_TYPE, mediaTypes);
@@ -113,7 +113,7 @@ public class OdmXmlSerializer extends Jaxb2RootElementHttpMessageConverter {
 
 			}
 			((StreamResult) result).setWriter(new StringWriter());
-			((StreamResult) result).getOutputStream().write(xmlOutput.toString().getBytes());
+			((StreamResult) result).getOutputStream().write(xmlOutput.toString().getBytes("UTF-8"));
 		}
 	}
 }

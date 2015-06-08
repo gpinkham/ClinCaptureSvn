@@ -3,6 +3,7 @@
   <RestData>
     <UserAccount>
       <Id>1</Id>
+      <Status>avaliable</Status>
       <UserName>user1</UserName>
       <Role>admin</Role>
       <UserType>kuku</UserType>

@@ -38,7 +38,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "UserDetails", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"username", "studyname", "role", "usertype"})
+@JsonPropertyOrder({"username", "userstatus", "studyname", "studystatus", "role", "usertype"})
 public class UserDetails {
 
 	@JsonIgnore
@@ -50,12 +50,20 @@ public class UserDetails {
 	private String userName;
 
 	@JsonIgnore
-	@XmlElement(name = "Password", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	@XmlTransient
 	private String password;
+
+	@JsonProperty("userstatus")
+	@XmlElement(name = "UserStatus", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String userStatus;
 
 	@JsonProperty("studyname")
 	@XmlElement(name = "StudyName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String studyName;
+
+	@JsonProperty("studystatus")
+	@XmlElement(name = "StudyStatus", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String studyStatus;
 
 	@JsonIgnore
 	@XmlTransient
@@ -85,12 +93,28 @@ public class UserDetails {
 		this.password = password;
 	}
 
+	public String getUserStatus() {
+		return userStatus;
+	}
+
+	public void setUserStatus(String userStatus) {
+		this.userStatus = userStatus;
+	}
+
 	public String getStudyName() {
 		return studyName;
 	}
 
 	public void setStudyName(String studyName) {
 		this.studyName = studyName;
+	}
+
+	public String getStudyStatus() {
+		return studyStatus;
+	}
+
+	public void setStudyStatus(String studyStatus) {
+		this.studyStatus = studyStatus;
 	}
 
 	public String getRoleCode() {

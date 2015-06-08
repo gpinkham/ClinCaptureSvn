@@ -471,7 +471,7 @@ $(document).ready(function() {
             <tr valign="top">
                 <td class="table_cell" colspan="2">
 
-					<fmt:message key="send_email_when" bundle="${resword}"/>:
+					<fmt:message key="send_email_when" bundle="${resword}"/>:<br/>
 					<c:choose>
 						<c:when test="${edc.emailStep eq 'complete'}">
 							<c:set var="emailStepComplete" value="checked"/>
@@ -509,7 +509,7 @@ $(document).ready(function() {
 
 					<span class="email_wrapper" style="display:${display}">
 						<fmt:message key="email_crf_to" bundle="${resword}"/>: 
-						<input type="text" name="mailTo${count}" onchange="javascript:changeIcon();" style="width:115px;margin-left:79px" class="email_to_check_field" value="${edc.emailTo}"/>
+						<input type="text" name="mailTo${count}" onchange="javascript:changeIcon();" style="width:160px;margin-left:15px" class="email_to_check_field" value="${edc.emailTo}"/>
 					</span>
 					<span class="alert" style="display:none"><fmt:message key="enter_valid_email" bundle="${resnote}"/></span>
 				</td>

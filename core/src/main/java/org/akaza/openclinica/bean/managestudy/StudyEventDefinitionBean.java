@@ -14,6 +14,7 @@
 package org.akaza.openclinica.bean.managestudy;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -35,13 +36,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * StudyEventDefinitionBean.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "StudyEvent", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"id", "oid", "name", "type", "repeating", "description", "category", "isreference", "minday",
-		"maxday", "schday", "emailday", "useremailid"})
+@XmlRootElement(name = "StudyEventDefinition", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonPropertyOrder({"id", "oid", "eventname", "type", "repeating", "description", "category", "isreference", "minday",
+		"maxday", "schday", "emailday", "useremailid", "status", "eventdefinitioncrfs"})
 @SuppressWarnings({"rawtypes", "serial"})
 public class StudyEventDefinitionBean extends AuditableEntityBean implements Comparable {
 
-	@JsonProperty("name")
+	@JsonProperty("eventname")
 	@XmlElement(name = "EventName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String name;
 
@@ -122,7 +123,9 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 	@XmlElement(name = "IsReference", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private boolean referenceVisit = false;
 
-	// end
+	@JsonProperty("eventdefinitioncrfs")
+	@XmlElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private List<EventDefinitionCRFBean> eventDefinitionCrfs = new ArrayList<EventDefinitionCRFBean>();
 
 	@Override
 	public void setName(String name) {
@@ -394,5 +397,13 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 
 	public void setStudyName(String name) {
 		this.studyName = name;
+	}
+
+	public List<EventDefinitionCRFBean> getEventDefinitionCrfs() {
+		return eventDefinitionCrfs;
+	}
+
+	public void setEventDefinitionCrfs(List<EventDefinitionCRFBean> eventDefinitionCrfs) {
+		this.eventDefinitionCrfs = eventDefinitionCrfs;
 	}
 }

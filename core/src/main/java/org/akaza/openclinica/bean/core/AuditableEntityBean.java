@@ -24,6 +24,7 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -31,6 +32,7 @@ import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * <P>
@@ -75,6 +77,10 @@ public class AuditableEntityBean extends EntityBean {
 	@JsonIgnore
 	@XmlTransient
 	protected UserAccountBean updater;
+
+	@JsonProperty("status")
+	@XmlElement(name = "Status", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	protected String statusCode = "";
 
 	@JsonIgnore
 	@XmlTransient
@@ -235,6 +241,10 @@ public class AuditableEntityBean extends EntityBean {
 		this.updatedDate = updatedDate;
 	}
 
+	public String getStatusCode() {
+		return statusCode;
+	}
+
 	public Status getStatus() {
 		return status;
 	}
@@ -244,6 +254,7 @@ public class AuditableEntityBean extends EntityBean {
 	 *            The status to set.
 	 */
 	public void setStatus(Status status) {
+		statusCode = status != null ? status.getCode() : "";
 		this.status = status;
 	}
 

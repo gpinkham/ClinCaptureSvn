@@ -12,5 +12,7 @@ public class RestDataTest {
 		assertNull(restData.getError());
 		assertNull(restData.getUserAccountBean());
 		assertNull(restData.getUserDetails());
+		assertNull(restData.getStudyEventDefinitionBean());
+		assertNull(restData.getEventDefinitionCRFBean());
 	}
 }

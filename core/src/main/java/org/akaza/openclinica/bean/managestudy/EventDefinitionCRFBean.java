@@ -24,48 +24,159 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * The bean for event definition crf parameters.
  *
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonPropertyOrder({"id", "eventname", "crfname", "status", "defaultversion", "hidecrf", "required",
+		"passwordrequired", "acceptnewcrfversions", "evaluatedcrf", "doubledataentry", "sourcedataverification",
+		"tabbingmode", "ordinal", "studyid", "emailwhen", "email"})
 @SuppressWarnings({"serial", "rawtypes", "unchecked"})
 public class EventDefinitionCRFBean extends AuditableEntityBean implements Comparable {
 
-	private boolean hideCrf = false;
-	private boolean hidden = false;
-	private boolean evaluatedCRF = false;
-	private boolean requiredCRF = true;
-	private boolean doubleEntry = false;
-	private boolean electronicSignature = false;
-	private boolean requireAllTextFilled = false;
-	private boolean decisionCondition = true;
-	private int ordinal = 1;
-	private int studyEventDefinitionId = 0;
-	private int studyId = 0;
-	private int crfId = 0;
-	private int parentId = 0;
-	private int defaultVersionId = 0;
-	private String selectedVersionIds = "";
+	@JsonProperty("eventname")
+	@XmlElement(name = "EventName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String eventName;
-	private String emailTo = "";
-	private String emailStep = "";
+
+	@JsonProperty("crfname")
+	@XmlElement(name = "CrfName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String crfName = ""; // not in DB
+
+	@JsonProperty("defaultversion")
+	@XmlElement(name = "DefaultVersion", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String defaultVersionName = ""; // not in DB
-	private String nullValues = "";
-	private String selectedVersionNames = ""; // not in DB
-	private CRFBean crf = new CRFBean(); // not in DB
-	private SourceDataVerification sourceDataVerification = null;
-	private ArrayList nullValuesList = new ArrayList();
-	private ArrayList versions = new ArrayList(); // not in DB
-	private ArrayList<Integer> selectedVersionIdList = new ArrayList<Integer>(); // not in DB
-	private HashMap nullFlags = new LinkedHashMap(); // not in DB
-	private ArrayList<SourceDataVerification> sdvOptions = new ArrayList<SourceDataVerification>();
-	private String tabbingMode;
+
+	@JsonProperty("hidecrf")
+	@XmlElement(name = "HideCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private boolean hideCrf = false;
+
+	@JsonIgnore
+	@XmlTransient
+	private boolean hidden = false;
+
+	@JsonProperty("required")
+	@XmlElement(name = "Required", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private boolean requiredCRF = true;
+
+	@JsonProperty("passwordrequired")
+	@XmlElement(name = "PasswordRequired", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private boolean electronicSignature = false;
+
+	@JsonProperty("acceptnewcrfversions")
+	@XmlElement(name = "AcceptNewCrfVersions", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private boolean acceptNewCrfVersions;
+
+	@JsonProperty("evaluatedcrf")
+	@XmlElement(name = "EvaluatedCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private boolean evaluatedCRF = false;
+
+	@JsonProperty("doubledataentry")
+	@XmlElement(name = "DoubleDataEntry", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private boolean doubleEntry = false;
+
+	@JsonProperty("sourcedataverification")
+	@XmlElement(name = "SourceDataVerification", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String sdvCode = "";
+
+	@JsonIgnore
+	@XmlTransient
+	private SourceDataVerification sourceDataVerification = null;
+
+	@JsonProperty("tabbingmode")
+	@XmlElement(name = "TabbingMode", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String tabbingMode;
+
+	@JsonProperty("ordinal")
+	@XmlElement(name = "Ordinal", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private int ordinal = 1;
+
+	@JsonProperty("studyid")
+	@XmlElement(name = "StudyId", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private int studyId = 0;
+
+	@JsonIgnore
+	@XmlTransient
+	private boolean requireAllTextFilled = false;
+
+	@JsonIgnore
+	@XmlTransient
+	private boolean decisionCondition = true;
+
+	@JsonIgnore
+	@XmlTransient
+	private int studyEventDefinitionId = 0;
+
+	@JsonProperty("emailwhen")
+	@XmlElement(name = "EmailWhen", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String emailStep = "";
+
+	@JsonProperty("email")
+	@XmlElement(name = "Email", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String emailTo = "";
+
+	@JsonIgnore
+	@XmlTransient
+	private int crfId = 0;
+
+	@JsonIgnore
+	@XmlTransient
+	private int parentId = 0;
+
+	@JsonIgnore
+	@XmlTransient
+	private int defaultVersionId = 0;
+
+	@JsonIgnore
+	@XmlTransient
+	private String selectedVersionIds = "";
+
+	@JsonIgnore
+	@XmlTransient
+	private String selectedVersionNames = ""; // not in DB
+
+	@JsonIgnore
+	@XmlTransient
+	private String nullValues = "";
+
+	@JsonIgnore
+	@XmlTransient
+	private CRFBean crf = new CRFBean(); // not in DB
+
+	@JsonIgnore
+	@XmlTransient
+	private ArrayList nullValuesList = new ArrayList();
+
+	@JsonIgnore
+	@XmlTransient
+	private ArrayList versions = new ArrayList(); // not in DB
+
+	@JsonIgnore
+	@XmlTransient
+	private ArrayList<Integer> selectedVersionIdList = new ArrayList<Integer>(); // not in DB
+
+	@JsonIgnore
+	@XmlTransient
+	private HashMap nullFlags = new LinkedHashMap(); // not in DB
+
+	@JsonIgnore
+	@XmlTransient
+	private ArrayList<SourceDataVerification> sdvOptions = new ArrayList<SourceDataVerification>();
 
 	@Override
 	public int hashCode() {
@@ -490,6 +601,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	public void setSourceDataVerification(SourceDataVerification sourceDataVerification) {
 		this.sourceDataVerification = sourceDataVerification;
+		sdvCode = sourceDataVerification != null ? sourceDataVerification.getDescription() : "";
 	}
 
 	public String getSelectedVersionNames() {
@@ -562,5 +674,9 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	public void setAcceptNewCrfVersions(boolean acceptNewCrfVersions) {
 		this.acceptNewCrfVersions = acceptNewCrfVersions;
+	}
+
+	public String getSdvCode() {
+		return sdvCode;
 	}
 }

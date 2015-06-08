@@ -159,6 +159,18 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 						.uniqueResult();
 				session.createSQLQuery("ALTER SEQUENCE study_subject_study_subject_id_seq RESTART WITH " + (max + 1))
 						.executeUpdate();
+
+				max = (Integer) session.createSQLQuery("SELECT max(event_definition_crf_id) from event_definition_crf")
+						.uniqueResult();
+				session.createSQLQuery(
+						"ALTER SEQUENCE event_definition_crf_event_definition_crf_id_seq RESTART WITH " + (max + 1))
+						.executeUpdate();
+
+				max = (Integer) session.createSQLQuery(
+						"SELECT max(study_event_definition_id) from study_event_definition").uniqueResult();
+				session.createSQLQuery(
+						"ALTER SEQUENCE study_event_definition_study_event_definition_id_seq RESTART WITH " + (max + 1))
+						.executeUpdate();
 			} else if (dbDriverClassName.contains(ORACLE)) {
 				Integer max = (Integer) session.createSQLQuery("SELECT max(discrepancy_note_id) from discrepancy_note")
 						.uniqueResult();
@@ -258,6 +270,22 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 				session.createSQLQuery("DROP SEQUENCE study_subject_study_subject_id_seq").executeUpdate();
 				session.createSQLQuery(
 						"CREATE SEQUENCE study_subject_study_subject_id_seq START WITH " + (max + 1)
+								+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+				max = (Integer) session.createSQLQuery("SELECT max(event_definition_crf_id) from event_definition_crf")
+						.uniqueResult();
+				session.createSQLQuery("DROP SEQUENCE event_definition_crf_event_definition_crf_id_seq")
+						.executeUpdate();
+				session.createSQLQuery(
+						"CREATE SEQUENCE event_definition_crf_event_definition_crf_id_seq START WITH " + (max + 1)
+								+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+				max = (Integer) session.createSQLQuery(
+						"SELECT max(study_event_definition_id) from study_event_definition").uniqueResult();
+				session.createSQLQuery("DROP SEQUENCE study_event_definition_study_event_definition_id_seq")
+						.executeUpdate();
+				session.createSQLQuery(
+						"CREATE SEQUENCE study_event_definition_study_event_definition_id_seq START WITH " + (max + 1)
 								+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
 			}
 

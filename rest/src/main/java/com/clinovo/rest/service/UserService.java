@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.clinovo.rest.annotation.RestAccess;
+import com.clinovo.rest.annotation.RestParameterPossibleValues;
+import com.clinovo.rest.annotation.RestParametersPossibleValues;
 import com.clinovo.rest.enums.UserRole;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
@@ -75,6 +77,9 @@ public class UserService extends BaseService {
 	@RestAccess(UserRole.ANY_ADMIN)
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@ResponseBody
+	@RestParametersPossibleValues({
+			@RestParameterPossibleValues(name = "usertype", values = "1,2", valueDescriptions = "1 -> ADMINISTRATOR, 2 -> USER"),
+			@RestParameterPossibleValues(name = "role", values = "1,2,6,7,8,4,5,9", valueDescriptions = "1 -> SYSTEM_ADMINISTRATOR, 2 -> STUDY_ADMINISTRATOR, 6 -> STUDY_MONITOR, 7 -> STUDY_CODER, 8 -> STUDY_EVALUATOR, 4 -> INVESTIGATOR, 5 -> CLINICAL_RESEARCH_COORDINATOR, 9 -> SITE_MONITOR")})
 	public UserAccountBean createUser(@RequestParam("username") String userName,
 			@RequestParam("firstname") String firstName, @RequestParam("lastname") String lastName,
 			@RequestParam("email") String email, @RequestParam("phone") String phone,

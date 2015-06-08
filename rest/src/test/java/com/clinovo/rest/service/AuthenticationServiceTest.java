@@ -86,8 +86,11 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 						content().string(
 								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
 										.containsString("{\"username\":\"".concat(newUser.getName())
+												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
 												.concat("\",\"studyname\":\"").concat(studyBean.getName())
-												.concat("\",\"role\":\"").concat(Role.STUDY_ADMINISTRATOR.getCode())
+												.concat("\",\"studystatus\":\"")
+												.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"")
+												.concat(Role.STUDY_ADMINISTRATOR.getCode())
 												.concat("\",\"usertype\":\"").concat(UserType.SYSADMIN.getCode())
 												.concat("\"}")) : StringContains
 										.containsString("<ODM Description=\"REST Data\"")));
@@ -105,10 +108,12 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 						content().string(
 								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
 										.containsString("{\"username\":\"".concat(newUser.getName())
+												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
 												.concat("\",\"studyname\":\"").concat(studyBean.getName())
-												.concat("\",\"role\":\"").concat(Role.STUDY_MONITOR.getCode())
-												.concat("\",\"usertype\":\"").concat(UserType.SYSADMIN.getCode())
-												.concat("\"}")) : StringContains
+												.concat("\",\"studystatus\":\"")
+												.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"")
+												.concat(Role.STUDY_MONITOR.getCode()).concat("\",\"usertype\":\"")
+												.concat(UserType.SYSADMIN.getCode()).concat("\"}")) : StringContains
 										.containsString("<ODM Description=\"REST Data\"")));
 	}
 
@@ -124,10 +129,12 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 						content().string(
 								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
 										.containsString("{\"username\":\"".concat(newUser.getName())
+												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
 												.concat("\",\"studyname\":\"").concat(studyBean.getName())
-												.concat("\",\"role\":\"").concat(Role.STUDY_EVALUATOR.getCode())
-												.concat("\",\"usertype\":\"").concat(UserType.SYSADMIN.getCode())
-												.concat("\"}")) : StringContains
+												.concat("\",\"studystatus\":\"")
+												.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"")
+												.concat(Role.STUDY_EVALUATOR.getCode()).concat("\",\"usertype\":\"")
+												.concat(UserType.SYSADMIN.getCode()).concat("\"}")) : StringContains
 										.containsString("<ODM Description=\"REST Data\"")));
 	}
 
@@ -143,10 +150,12 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 						content().string(
 								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
 										.containsString("{\"username\":\"".concat(newUser.getName())
+												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
 												.concat("\",\"studyname\":\"").concat(studyBean.getName())
-												.concat("\",\"role\":\"").concat(Role.STUDY_CODER.getCode())
-												.concat("\",\"usertype\":\"").concat(UserType.SYSADMIN.getCode())
-												.concat("\"}")) : StringContains
+												.concat("\",\"studystatus\":\"")
+												.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"")
+												.concat(Role.STUDY_CODER.getCode()).concat("\",\"usertype\":\"")
+												.concat(UserType.SYSADMIN.getCode()).concat("\"}")) : StringContains
 										.containsString("<ODM Description=\"REST Data\"")));
 	}
 
@@ -164,7 +173,9 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 						content().string(
 								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
 										.containsString("{\"username\":\"".concat(newUser.getName())
+												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
 												.concat("\",\"studyname\":\"").concat(newSite.getName())
+												.concat("\",\"studystatus\":\"").concat(newSite.getStatus().getName())
 												.concat("\",\"role\":\"")
 												.concat(Role.CLINICAL_RESEARCH_COORDINATOR.getCode())
 												.concat("\",\"usertype\":\"").concat(UserType.USER.getCode())
@@ -186,7 +197,9 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 						content().string(
 								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
 										.containsString("{\"username\":\"".concat(newUser.getName())
+												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
 												.concat("\",\"studyname\":\"").concat(newSite.getName())
+												.concat("\",\"studystatus\":\"").concat(newSite.getStatus().getName())
 												.concat("\",\"role\":\"").concat(Role.INVESTIGATOR.getCode())
 												.concat("\",\"usertype\":\"").concat(UserType.USER.getCode())
 												.concat("\"}")) : StringContains

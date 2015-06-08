@@ -3,8 +3,9 @@
     <RestData>
         <UserDetails>
             <UserName>root</UserName>
-            <Password>Password.001</Password>
+            <UserStatus>avaliable</UserStatus>
             <StudyName>Default Study</StudyName>
+            <StudyStatus>avaliable</StudyStatus>
             <Role>system_administrator</Role>
             <UserType>administrator</UserType>
         </UserDetails>

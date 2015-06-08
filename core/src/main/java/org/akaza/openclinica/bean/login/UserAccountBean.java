@@ -49,7 +49,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "UserAccount", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 @JsonPropertyOrder({"id", "username", "firstname", "lastname", "email", "phone", "scope", "password", "company",
-		"allowsoap", "role", "usertype"})
+		"allowsoap", "role", "usertype", "status"})
 public class UserAccountBean extends AuditableEntityBean {
 
 	private static final long serialVersionUID = -7373737639499260727L;
@@ -198,6 +198,7 @@ public class UserAccountBean extends AuditableEntityBean {
 		techAdmin = false;
 		userTypes = new ArrayList<UserType>();
 		status = Status.AVAILABLE;
+		statusCode = Status.AVAILABLE.getCode();
 		numVisitsToMainMenu = 0;
 		notes = "";
 		enabled = true;

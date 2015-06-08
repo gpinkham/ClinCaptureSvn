@@ -80,7 +80,7 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 	protected long timestamp;
 
 	protected StudyBean studyBean;
-	protected UserAccountBean rootUser;
+	protected UserAccountBean userBean;
 
 	protected StudyBean newSite;
 	protected StudyBean newStudy;
@@ -90,6 +90,7 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 	protected MockHttpSession session = new MockHttpSession();
 
 	// Managed services
+	public static final String API_EVENT_ADD_CRF = "/event/addCrf";
 	public static final String API_EVENT_CREATE = "/event/create";
 	public static final String API_WRONG_MAPPING = "/wrongmapping";
 	public static final String API_USER_CREATE = "/user/create";
@@ -122,7 +123,7 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 	private StudyBean createStudy() throws Exception {
 		StudyBean study = new StudyBean();
 		study.setName("study_".concat(Long.toString(timestamp)));
-		study.setOwner(rootUser);
+		study.setOwner(userBean);
 		study.setCreatedDate(new Date());
 		study.setStatus(Status.PENDING);
 		return (StudyBean) studyDAO.create(study);
@@ -132,7 +133,7 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 		StudyBean site = new StudyBean();
 		site.setName("site_".concat(Long.toString(timestamp)));
 		site.setParentStudyId(studyId);
-		site.setOwner(rootUser);
+		site.setOwner(userBean);
 		site.setCreatedDate(new Date());
 		site.setStatus(Status.PENDING);
 		return (StudyBean) studyDAO.create(site);
@@ -142,9 +143,8 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 		userAccountDAO.execute(
 				"delete from authorities where username = '".concat(userAccountBean.getName()).concat("'"),
 				new HashMap());
-		userAccountDAO.execute(
-				"delete from study_user_role where user_name = '".concat(userAccountBean.getName()).concat("'"),
-				new HashMap());
+		userAccountDAO.execute("delete from study_user_role where user_name = '".concat(userAccountBean.getName())
+				.concat("'"), new HashMap());
 		userAccountDAO.execute(
 				"delete from user_account where user_name = '".concat(userAccountBean.getName()).concat("'"),
 				new HashMap());
@@ -207,7 +207,7 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 		userAccountBean.setStatus(Status.AVAILABLE);
 		userAccountBean.setPasswdChallengeQuestion("");
 		userAccountBean.setPasswdChallengeAnswer("");
-		userAccountBean.setOwner(rootUser);
+		userAccountBean.setOwner(userBean);
 		newUser = (UserAccountBean) userAccountDAO.create(userAccountBean);
 		assertTrue(newUser.getId() > 0);
 		newUser.setPasswd(password);
@@ -215,6 +215,8 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 
 	protected void login(String userName, UserType userType, Role role, String password, String studyName)
 			throws Exception {
+		studyBean = (StudyBean) studyDAO.findByName(studyName);
+		userBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
 		session.clearAttributes();
 		this.mockMvc
 				.perform(
@@ -226,12 +228,15 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 								PermissionChecker.API_AUTHENTICATED_USER_DETAILS, IsInstanceOf.any(UserDetails.class)))
 				.andExpect(
 						content().string(
-								mediaType.equals(MediaType.APPLICATION_JSON)
-										? StringContains.containsString("{\"username\":\"".concat(userName)
+								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
+										.containsString("{\"username\":\"".concat(userName)
+												.concat("\",\"userstatus\":\"").concat(userBean.getStatus().getName())
 												.concat("\",\"studyname\":\"").concat(studyName)
-												.concat("\",\"role\":\"").concat(role.getCode())
-												.concat("\",\"usertype\":\"").concat(userType.getCode()).concat("\"}"))
-										: StringContains.containsString("<ODM Description=\"REST Data\"")));
+												.concat("\",\"studystatus\":\"")
+												.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"")
+												.concat(role.getCode()).concat("\",\"usertype\":\"")
+												.concat(userType.getCode()).concat("\"}")) : StringContains
+										.containsString("<ODM Description=\"REST Data\"")));
 	}
 
 	@Before
@@ -254,12 +259,9 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 
 		ResourceBundleProvider.updateLocale(LOCALE);
 
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
-
 		timestamp = new Date().getTime();
 
-		studyBean = (StudyBean) studyDAO.findByName(studyName);
-		rootUser = (UserAccountBean) userAccountDAO.findByUserName(userName);
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
 	}
 
 	protected void unmarshalResult() {
@@ -271,7 +273,7 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 				restOdmContainer = (RestOdmContainer) jaxbUnmarshaller.unmarshal(new StringReader(result.getResponse()
 						.getContentAsString()));
 			} catch (Exception ex) {
-				//
+				int x = 0;
 			}
 			assertNotNull(restOdmContainer);
 		}

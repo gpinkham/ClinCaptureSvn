@@ -18,17 +18,26 @@ package com.clinovo.validator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.springframework.context.MessageSource;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.ValidatorHelper;
 
 /**
@@ -80,18 +89,9 @@ public class EventDefinitionValidator {
 	 */
 	public static HashMap validate(HttpServletRequest request, ConfigurationDao configurationDao,
 			ArrayList<StudyUserRoleBean> studyUserRoleBeanList, boolean lowerCaseParameterNames) {
-		HashMap errors = new HashMap();
 		FormProcessor fp = new FormProcessor(request);
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
 		Validator validator = new Validator(new ValidatorHelper(request, configurationDao));
-
-		String type = fp.getString("type");
-		if (!Arrays.asList(SCHEDULED, UNSCHEDULED, COMMON, CALENDARED_VISIT).contains(type)) {
-			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(resexception.getString("rest.studyEventDefinition.wrongType"));
-			errors.put("type", errorMessages);
-			return errors;
-		}
 
 		validator.addValidation(name("name", lowerCaseParameterNames), Validator.NO_BLANKS);
 		validator.addValidation(name("type", lowerCaseParameterNames), Validator.NO_BLANKS);
@@ -132,7 +132,15 @@ public class EventDefinitionValidator {
 					.setAttribute("isReference", fp.getString(name("isReference", lowerCaseParameterNames)));
 		}
 
-		errors = validator.validate();
+		HashMap errors = validator.validate();
+
+		String type = fp.getString("type");
+		if (errors.isEmpty() && !Arrays.asList(SCHEDULED, UNSCHEDULED, COMMON, CALENDARED_VISIT).contains(type)) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(resexception.getString("rest.studyEventDefinition.wrongType"));
+			errors.put("type", errorMessages);
+			return errors;
+		}
 
 		int minDay = fp.getInt(name("minDay", lowerCaseParameterNames));
 		int maxDay = fp.getInt(name("maxDay", lowerCaseParameterNames));
@@ -177,5 +185,69 @@ public class EventDefinitionValidator {
 			}
 		}
 		return isValid;
+	}
+
+	/**
+	 * Method perform validation.
+	 *
+	 * @param messageSource
+	 *            MessageSource
+	 * @param dataSource
+	 *            DataSource
+	 * @param eventId
+	 *            int
+	 * @param versionName
+	 *            String
+	 * @param crfName
+	 *            String
+	 * @param sdvCode
+	 *            int
+	 * @param hasSDVRequiredItems
+	 *            boolean
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @param crfVersionBean
+	 *            CRFVersionBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return HashMap
+	 */
+	public static HashMap validateCrfAdding(MessageSource messageSource, DataSource dataSource, int eventId,
+			String versionName, String crfName, int sdvCode, boolean hasSDVRequiredItems,
+			StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersionBean, StudyBean currentStudy) {
+		HashMap errors = new HashMap();
+
+		Locale locale = LocaleResolver.getLocale();
+
+		EventDefinitionCRFBean eventDefinitionCrfBean = new EventDefinitionCRFDAO(dataSource)
+				.findByStudyEventDefinitionIdAndCRFId(studyEventDefinitionBean.getId(), crfVersionBean.getCrfId());
+
+		if (studyEventDefinitionBean.getId() == 0) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.isNotFound", new Object[]{eventId}, locale));
+			errors.put("eventid", errorMessages);
+		} else if (crfVersionBean.getId() == 0) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfIsNotFound", new Object[]{crfName,
+					versionName}, locale));
+			errors.put("crfname", errorMessages);
+		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.doesNotBelongToCurrentStudy", new Object[]{eventId,
+					currentStudy.getId()}, locale));
+			errors.put("eventid", errorMessages);
+		} else if (eventDefinitionCrfBean.getId() > 0) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.eventDefinitionCrfAlreadyExists", new Object[]{
+					crfVersionBean.getCrfId(), eventId}, locale));
+			errors.put("eventid", errorMessages);
+		} else if (hasSDVRequiredItems && sdvCode != 2) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.crfHasSDVRequiredItems",
+					new Object[]{crfVersionBean.getCrfId()}, locale));
+			errors.put("sourcedataverification", errorMessages);
+		}
+
+		return errors;
 	}
 }

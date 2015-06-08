@@ -6,9 +6,11 @@ import java.util.Date;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +41,15 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		studyEventDefinitionBean.setUserEmailId(userId != 0 ? userId : 1);
 		studyEventDefinitionBean.setCreatedDate(new Date());
 		studyEventDefinitionBean.setStatus(Status.AVAILABLE);
-		studyEventDefinitionBean.setStudyId(studyBean.getId());
 		studyEventDefinitionDao.create(studyEventDefinitionBean);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCrfBean) {
+		eventDefinitionCrfBean.setCreatedDate(new Date());
+		eventDefinitionCrfBean.setStatus(Status.AVAILABLE);
+		new EventDefinitionCRFDAO(dataSource).create(eventDefinitionCrfBean);
 	}
 }

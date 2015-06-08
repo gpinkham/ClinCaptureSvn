@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:ns2="http://www.openclinica.org/ns/odm_ext_v130/v3.1" xmlns:ns3="http://www.openclinica.org/ns/rules/v3.1" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Description="REST Data" FileType="Snapshot" FileOID="REST-Data20150512233454+0200" CreationDateTime="2015-05-12T23:34:54+02:00" ODMVersion="1.3" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 ClinCapture_Rest_ODM1-3-0.xsd">
+    <RestData>
+        <StudyEventDefinition>
+            <Id>1</Id>
+            <Status>avaliable</Status>
+            <EventName>test visit</EventName>
+            <EventDescription>desc</EventDescription>
+            <Repeating>true</Repeating>
+            <Category>Private</Category>
+            <EventType>scheduled</EventType>
+            <Oid>OID</Oid>
+            <MinDay>2</MinDay>
+            <MaxDay>3</MaxDay>
+            <EmailDay>2</EmailDay>
+            <SchDay>2</SchDay>
+            <UserEmailId>1</UserEmailId>
+            <IsReference>true</IsReference>
+            <EventDefinitionCrf>
+                <Id>60825</Id>
+                <Status>available</Status>
+                <EventName>test visit</EventName>
+                <CrfName>SAE</CrfName>
+                <DefaultVersion>Ver. 1</DefaultVersion>
+                <HideCrf>false</HideCrf>
+                <Required>true</Required>
+                <PasswordRequired>false</PasswordRequired>
+                <AcceptNewCrfVersions>false</AcceptNewCrfVersions>
+                <EvaluatedCrf>false</EvaluatedCrf>
+                <DoubleDataEntry>false</DoubleDataEntry>
+                <SourceDataVerification>specificItems</SourceDataVerification>
+                <TabbingMode>leftToRight</TabbingMode>
+                <Ordinal>1</Ordinal>
+                <StudyId>1</StudyId>
+                <EmailWhen />
+                <Email />
+            </EventDefinitionCrf>
+            <EventDefinitionCrf>
+                <Id>60820</Id>
+                <Status>available</Status>
+                <EventName>test visit</EventName>
+                <CrfName>XX</CrfName>
+                <DefaultVersion>Ver. 2</DefaultVersion>
+                <HideCrf>false</HideCrf>
+                <Required>true</Required>
+                <PasswordRequired>false</PasswordRequired>
+                <AcceptNewCrfVersions>false</AcceptNewCrfVersions>
+                <EvaluatedCrf>false</EvaluatedCrf>
+                <DoubleDataEntry>false</DoubleDataEntry>
+                <SourceDataVerification>entireCRF</SourceDataVerification>
+                <TabbingMode>leftToRight</TabbingMode>
+                <Ordinal>2</Ordinal>
+                <StudyId>1</StudyId>
+                <EmailWhen />
+                <Email />
+            </EventDefinitionCrf>
+        </StudyEventDefinition>
+    </RestData>
+</ODM>

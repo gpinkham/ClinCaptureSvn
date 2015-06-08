@@ -14,7 +14,8 @@
 
     <xs:complexType name="restData">
         <xs:sequence>
-            <xs:element ref="StudyEvent" minOccurs="0"/>
+            <xs:element ref="EventDefinitionCrf" minOccurs="0"/>
+            <xs:element ref="StudyEventDefinition" minOccurs="0"/>
             <xs:element ref="UserAccount" minOccurs="0"/>
             <xs:element ref="UserDetails" minOccurs="0"/>
             <xs:element ref="Error" minOccurs="0"/>
@@ -38,12 +39,16 @@
     <xs:element name="UserName" type="xs:string"/>
     <xs:element name="Password" type="xs:string"/>
     <xs:element name="UserType" type="xs:string"/>
+    <xs:element name="Status" type="xs:string"/>
+    <xs:element name="UserStatus" type="xs:string"/>
+    <xs:element name="StudyStatus" type="xs:string"/>
 
     <xs:complexType name="userDetails">
         <xs:sequence>
             <xs:element ref="UserName" minOccurs="0"/>
-            <xs:element ref="Password" minOccurs="0"/>
+            <xs:element ref="UserStatus" minOccurs="0"/>
             <xs:element ref="StudyName" minOccurs="0"/>
+            <xs:element ref="StudyStatus" minOccurs="0"/>
             <xs:element ref="Role" minOccurs="0"/>
             <xs:element ref="UserType" minOccurs="0"/>
         </xs:sequence>
@@ -59,6 +64,7 @@
     <xs:complexType name="userAccountBean">
         <xs:sequence>
             <xs:element ref="Id" minOccurs="0"/>
+            <xs:element ref="Status" minOccurs="0"/>
             <xs:element ref="UserName" minOccurs="0"/>
             <xs:element ref="Role" minOccurs="0"/>
             <xs:element ref="UserType" minOccurs="0"/>
@@ -73,7 +79,7 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:element name="StudyEvent" type="studyEventDefinitionBean"/>
+    <xs:element name="StudyEventDefinition" type="studyEventDefinitionBean"/>
 
     <xs:element name="EventName" type="xs:string"/>
     <xs:element name="EventDescription" type="xs:string"/>
@@ -91,6 +97,7 @@
     <xs:complexType name="studyEventDefinitionBean">
         <xs:sequence>
             <xs:element ref="Id" minOccurs="0"/>
+            <xs:element ref="Status" minOccurs="0"/>
             <xs:element ref="EventName" minOccurs="0"/>
             <xs:element ref="EventDescription" minOccurs="0"/>
             <xs:element ref="Repeating" minOccurs="0"/>
@@ -103,6 +110,45 @@
             <xs:element ref="SchDay" minOccurs="0"/>
             <xs:element ref="UserEmailId" minOccurs="0"/>
             <xs:element ref="IsReference" minOccurs="0"/>
+            <xs:element ref="EventDefinitionCrf" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="EventDefinitionCrf" type="eventDefinitionCRFBean"/>
+
+    <xs:element name="CrfName" type="xs:string"/>
+    <xs:element name="DefaultVersion" type="xs:string"/>
+    <xs:element name="HideCrf" type="xs:boolean"/>
+    <xs:element name="Required" type="xs:boolean"/>
+    <xs:element name="PasswordRequired" type="xs:boolean"/>
+    <xs:element name="AcceptNewCrfVersions" type="xs:boolean"/>
+    <xs:element name="EvaluatedCrf" type="xs:boolean"/>
+    <xs:element name="DoubleDataEntry" type="xs:boolean"/>
+    <xs:element name="SourceDataVerification" type="xs:string"/>
+    <xs:element name="TabbingMode" type="xs:string"/>
+    <xs:element name="Ordinal" type="xs:int"/>
+    <xs:element name="StudyId" type="xs:int"/>
+    <xs:element name="EmailWhen" type="xs:string"/>
+
+    <xs:complexType name="eventDefinitionCRFBean">
+        <xs:sequence>
+            <xs:element ref="Id" minOccurs="0"/>
+            <xs:element ref="Status" minOccurs="0"/>
+            <xs:element ref="EventName" minOccurs="0"/>
+            <xs:element ref="CrfName" minOccurs="0"/>
+            <xs:element ref="DefaultVersion" minOccurs="0"/>
+            <xs:element ref="HideCrf" minOccurs="0"/>
+            <xs:element ref="Required" minOccurs="0"/>
+            <xs:element ref="PasswordRequired" minOccurs="0"/>
+            <xs:element ref="AcceptNewCrfVersions" minOccurs="0"/>
+            <xs:element ref="EvaluatedCrf" minOccurs="0"/>
+            <xs:element ref="DoubleDataEntry" minOccurs="0"/>
+            <xs:element ref="SourceDataVerification" minOccurs="0"/>
+            <xs:element ref="TabbingMode" minOccurs="0"/>
+            <xs:element ref="Ordinal" minOccurs="0"/>
+            <xs:element ref="StudyId" minOccurs="0"/>
+            <xs:element ref="EmailWhen" minOccurs="0"/>
+            <xs:element ref="Email" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 

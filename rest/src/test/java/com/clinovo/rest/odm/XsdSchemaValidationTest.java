@@ -26,15 +26,40 @@ public class XsdSchemaValidationTest {
 	}
 
 	@Test
+	public void testThatSchemaPassesValidationDuringUnmarshallingTheEventDefinitionCrfBean() throws Exception {
+		JAXBContext jaxbContext = JAXBContext.newInstance(ODM.class, RestOdmContainer.class);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		jaxbUnmarshaller.setSchema(schema);
+		RestOdmContainer restOdmContainer = (RestOdmContainer) jaxbUnmarshaller
+				.unmarshal(new FileSystemResourceLoader().getResource("classpath:xml/eventdefinitioncrf.xml").getFile());
+		assertNotNull(restOdmContainer.getRestData().getEventDefinitionCRFBean());
+		assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEventName(), "TEST EDC");
+	}
+
+	@Test
 	public void testThatSchemaPassesValidationDuringUnmarshallingTheStudyEventDefinitionBean() throws Exception {
 		JAXBContext jaxbContext = JAXBContext.newInstance(ODM.class, RestOdmContainer.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		jaxbUnmarshaller.setSchema(schema);
 		RestOdmContainer restOdmContainer = (RestOdmContainer) jaxbUnmarshaller
-				.unmarshal(new FileSystemResourceLoader().getResource("classpath:xml/studyeventdefinition.xml")
+				.unmarshal(new FileSystemResourceLoader().getResource("classpath:xml/studyeventdefinition1.xml")
 						.getFile());
 		assertNotNull(restOdmContainer.getRestData().getStudyEventDefinitionBean());
 		assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getName(), "test visit");
+	}
+
+	@Test
+	public void testThatSchemaPassesValidationDuringUnmarshallingTheStudyEventDefinitionBeanWithEventDefinitionCrfBeans()
+			throws Exception {
+		JAXBContext jaxbContext = JAXBContext.newInstance(ODM.class, RestOdmContainer.class);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		jaxbUnmarshaller.setSchema(schema);
+		RestOdmContainer restOdmContainer = (RestOdmContainer) jaxbUnmarshaller
+				.unmarshal(new FileSystemResourceLoader().getResource("classpath:xml/studyeventdefinition2.xml")
+						.getFile());
+		assertNotNull(restOdmContainer.getRestData().getStudyEventDefinitionBean());
+		assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getName(), "test visit");
+		assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getEventDefinitionCrfs().size(), 2);
 	}
 
 	@Test
