@@ -432,14 +432,15 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	private void copyImportRulesFiles() throws IOException {
-		ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[3];
+		final int size = 3;
+		InputStream listSrcFiles[] = new InputStream[size];
 		String[] fileNames = {"rules.xsd", "rules_template.xml", "rules_template_with_notes.xml"};
-		listSrcFiles[0] = (ByteArrayInputStream) resourceLoader.getResource(
-				"classpath:properties" + File.separator + fileNames[0]).getInputStream();
-		listSrcFiles[1] = (ByteArrayInputStream) resourceLoader.getResource(
-				"classpath:properties" + File.separator + fileNames[1]).getInputStream();
-		listSrcFiles[2] = (ByteArrayInputStream) resourceLoader.getResource(
-				"classpath:properties" + File.separator + fileNames[2]).getInputStream();
+		listSrcFiles[0] = resourceLoader.getResource("classpath:properties" + File.separator + fileNames[0])
+				.getInputStream();
+		listSrcFiles[1] = resourceLoader.getResource("classpath:properties" + File.separator + fileNames[1])
+				.getInputStream();
+		listSrcFiles[2] = resourceLoader.getResource("classpath:properties" + File.separator + fileNames[2])
+				.getInputStream();
 		File dest = new File(getField("filePath") + "rules");
 		if (!dest.exists()) {
 			if (!dest.mkdirs()) {
@@ -448,9 +449,9 @@ public class CoreResources implements ResourceLoaderAware {
 			}
 		}
 		for (int i = 0; i < listSrcFiles.length; i++) {
-			File dest1 = new File(dest, fileNames[i]);
 			if (listSrcFiles[i] != null) {
-				copyFiles(listSrcFiles[i], dest1);
+				FileCopyUtils.copy(listSrcFiles[i],
+						new FileOutputStream(dest.getPath().concat(File.separator).concat(fileNames[i])));
 			}
 		}
 
