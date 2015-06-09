@@ -6,29 +6,26 @@
 function buildCasebookUrl() {
     var casebookType = $("[name='casebookType']:checked").val();
     var casebookPdf = $("#casebookTypePdf").is(':checked');
-
+    var baseUrl = window.location.href;
+    if(casebookPdf) {
+        baseUrl = baseUrl.substr(0, baseUrl.lastIndexOf("/")) + "/pages/generateCasebook?studyOid=" + parentStudyOid()
+        + "&studySubjectOid=" + subjectOid();
+    } else {
+        baseUrl = baseUrl.substr(0, baseUrl.lastIndexOf("/")) + "/print/clinicaldata/"
+        + casebookType + "/" + parentStudyOid() + "/" + subjectOid();
+        baseUrl += "/" + "*" + "/" + "*";
+    }
     var casebookParams = [];
     $("[name='casebookParam']:checked").each(function () {
         casebookParams.push($(this).val());
     });
-
-    var baseUrl = window.location.href;
-    baseUrl = baseUrl.substr(0, baseUrl.lastIndexOf("/")) + "/print/clinicaldata/"
-    + casebookType + "/" + studySubjectResource();
-    baseUrl += "/" + "*" + "/" + "*";
-
     if (casebookParams.length > 0) {
-        baseUrl += "?" + (casebookParams.join("&"));
-    }
-    if (casebookPdf) {
-        if (baseUrl.indexOf('?') > 0) {
-            baseUrl += "&convertToPdf=yes";
-        } else {
-            baseUrl += "?convertToPdf=yes";
-        }
+        baseUrl = baseUrl.indexOf("&") > 0 ? baseUrl += "&" : baseUrl += "?";
+        baseUrl += casebookParams.join("&");
     }
 
-    return baseUrl;}
+    return baseUrl;
+}
 /**
  * Updates casebook link text field, reflecting the user's selection
  */

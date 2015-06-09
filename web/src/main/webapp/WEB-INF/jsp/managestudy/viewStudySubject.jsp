@@ -29,9 +29,13 @@
 
 <script type="text/javascript" language="javascript">
 
-	function studySubjectResource() {
-		return "${parentStudyOid}/${studySub.oid}";
+	function parentStudyOid() {
+		return "${parentStudyOid}";
 	}
+	function subjectOid() {
+		return "${studySub.oid}"
+	}
+
 
     function checkCRFLocked(ecId, url){
         jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){

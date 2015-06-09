@@ -150,10 +150,6 @@
 </head>
 
 <body>
-<form method="POST" id="subForm" action="../../../../../../getPdf">
-    <input id="hiddenInput" type="hidden" name="htmlCode" value=""/>
-    <input id="fileName" type="hidden" name="fileName" value=""/>
-</form>
 <div id="loading_msg"> ${app_print_CRF_Message_at_Loading}</div>
 <img id="loading" src="${pageContext.request.contextPath}/images/ajax-loader-blue.gif" class="spinner"/>
 </body>

@@ -249,10 +249,11 @@ function StudyDataLoader(study, json) {
         var subjectsData = util_ensureArray(clinicalData["SubjectData"]);
 
         for (var i = 0; i < subjectsData.length; i++) {
-            if (subjectsData[i]["@SubjectKey"] == app_studySubjectOID || renderMode == 'SITE_SUBJECT_CASE_BOOKS') {
+            if (subjectsData[i]["@SubjectKey"] == app_studySubjectOID) {
                 subjectData = subjectsData[i];
                 break;
-            }        }
+            }
+        }
         app_thisClinicalData = clinicalData;
         app_thisSubjectsData = subjectData;
         //app_studySubjectDOB = subjectData["@OpenClinica:DateOfBirth"];

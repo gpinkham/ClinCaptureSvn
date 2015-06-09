@@ -65,18 +65,44 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <script language="JavaScript">
+    function runCasebooks() {
+        if($("#sidebar_Alerts_open").css("display") == 'none') {
+            leftnavExpand('sidebar_Alerts_open');
+            leftnavExpand('sidebar_Alerts_closed');
+        }
+        $("#sidebar_Alerts_open .sidebar_tab_content").html('').append("<div class='alert'><fmt:message key="site_level_casebooks_in_progress" bundle="${resword}"/></div>");
+        document.body.scrollTop = document.documentElement.scrollTop = 0;
+        $.ajax({
+            type: "POST",
+            url: "${pageContext.request.contextPath}/pages/generateSiteCasebooks",
+            data: {
+                siteId: "${siteToView.id}"
+            },
+            success: function() {
+                //$("#sidebar_Alerts_open .sidebar_tab_content").html('');
+            },
+            error: function(e) {
+                console.log("Error: " + e);
+            }
+        });
+    }
+
     function leftnavExpand(strLeftNavRowElementName){
       var objLeftNavRowElement;
-
       objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
       if (objLeftNavRowElement != null) {
-        if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
+          if (objLeftNavRowElement.style) {
+              objLeftNavRowElement = objLeftNavRowElement.style;
+          }
           objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
-          objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
-          if(objLeftNavRowElement.display == "none"){
-              objExCl.src = "images/bt_Expand.gif";
-          }else{
-              objExCl.src = "images/bt_Collapse.gif";
+
+          objExCl = MM_findObj("excl_" + strLeftNavRowElementName);
+          if (typeof objExCl != 'undefined' && objExCl != null) {
+              if (objLeftNavRowElement.display == "none") {
+                  objExCl.src = "images/bt_Expand.gif";
+              } else {
+                  objExCl.src = "images/bt_Collapse.gif";
+              }
           }
         }
       }
@@ -689,10 +715,10 @@
 		value="<fmt:message key="site_crfs" bundle="${resword}"/>" 
 		class="button_long" 
 		onclick="javascript:openDocWindow('${pageContext.request.contextPath}/print/metadata/html/print/${parentStudyOid}/*/*')"/>
-    <!--<input type="button" name="BTN_Print"
+    <input type="button" name="BTN_Print"
            value="<fmt:message key="print_site_casebooks" bundle="${resword}"/>"
            class="button_long"
-           onclick="javascript:openDocWindow('${pageContext.request.contextPath}/print/clinicaldata/html/print/${siteToView.oid}/*/*/*?convertToPdf=yes')"/>-->
+           onclick="javascript:runCasebooks()"/>
 </c:if>
  <br><br>
 

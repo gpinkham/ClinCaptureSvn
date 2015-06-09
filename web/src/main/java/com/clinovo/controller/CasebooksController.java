@@ -17,7 +17,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.akaza.openclinica.web.print.HtmlToPdfController;
+import com.clinovo.util.HtmlToPdfUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -32,7 +32,9 @@ import javax.sql.DataSource;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,9 +56,7 @@ public class CasebooksController extends Redirection {
     public static final String DOWNLOADCASEBOOKS_PAGE = "casebooks/downloadCasebooks";
     public static final String CRF_CASEBOOK_STORED_URL = "studyCasebooksUrl";
     public static final String JSESSIONID = "JSESSIONID";
-    public static final String IS_JOB = "isJob";
-    public static final String HTML_CODE = "htmlCode";
-    public static final String FILE_NAME = "fileName";
+    public static final String DIR_NAME = "print" + File.separator + "Casebooks";
     public static final int WAIT_FOR_JAVA_SCRIPT = 15000;
 
     /**
@@ -112,47 +112,91 @@ public class CasebooksController extends Redirection {
         return CASEBOOKS_PAGE;
     }
 
-    /**
-     * Generates subject casebook PDF files.
-     *
-     * @param request  The request containing the item to code and alias.
-     * @param response The response to redirect to.
-     * @return the casebooks page.
-     * @throws Exception for all exceptions.
-     */
-	@RequestMapping("/generateCasebooks")
-    public String generateCasebooks(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String studySubjectOid = request.getParameter("oids");
-        List<String> studySubjectOidList = new ArrayList<String>(Arrays.asList(studySubjectOid.split("\\,")));
-        String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
-        HtmlToPdfController controller = new HtmlToPdfController();
+    @RequestMapping("/generateSiteCasebooks")
+    public void generateSiteCasebooks(HttpServletRequest request) throws Exception {
+        String siteId = (String) request.getParameter("siteId");
+        if (siteId != null) {
+            StudyDAO studyDAO = new StudyDAO(dataSource);
+            StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
+            StudyBean siteBean = (StudyBean) studyDAO.findByPK(Integer.valueOf(siteId));
+            List<StudySubjectBean> studySubjectBeans = studySubjectDAO.findAllByStudyId(Integer.valueOf(siteId));
+            StudyBean parentStudyBean = siteBean.isSite() ? (StudyBean) studyDAO.findByPK(siteBean.getParentStudyId()) : siteBean;
+            for (StudySubjectBean studySubjectBean : studySubjectBeans) {
+                String reportXml = getSubjectCasebookXml(request, true, true, studySubjectBean.getOid());
+                OutputStream os = new FileOutputStream(getFile(studySubjectBean.getOid(), DIR_NAME + File.separator + parentStudyBean.getOid()));
+                HtmlToPdfUtil.buildPdf(reportXml, os);
+            }
+        }
+    }
+
+    @RequestMapping("/generateCasebook")
+    public void generateCasebook(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String subjectOid = request.getParameter("studySubjectOid");
+        String includeAudit = request.getParameter("includeAudits");
+        String includeDNs = request.getParameter("includeDNs");
+        boolean audit = includeAudit != null && !includeAudit.isEmpty() ? includeAudit.equals("y") ? true : false : false;
+        boolean notes = includeDNs != null && !includeDNs.isEmpty() ? includeDNs.equals("y") ? true : false : false;
+
         StudyBean studyBean = (StudyBean) request.getSession().getAttribute("study");
         StudyDAO studyDAO = new StudyDAO(dataSource);
         studyBean = studyBean.isSite() ? (StudyBean) studyDAO.findByPK(studyBean.getParentStudyId()) : studyBean;
 
-        for (String ssOid : studySubjectOidList) {
-            WebClient webClient = new WebClient(BrowserVersion.FIREFOX_24);
-            webClient.setAjaxController(new AjaxController() {
-                @Override
-                public boolean processSynchron(HtmlPage page, WebRequest request, boolean async) {
-                    return true;
-                }
-            });
+        response.setHeader("Content-Disposition", "inline; filename=" + subjectOid + "_casebook.pdf");
+        response.setContentType("application/pdf;charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        String reportXml = getSubjectCasebookXml(request, audit, notes, subjectOid);
+        OutputStream os = new FileOutputStream(getFile(subjectOid, DIR_NAME + File.separator + studyBean.getOid()));
+        HtmlToPdfUtil.buildPdf(reportXml, os);
+        HtmlToPdfUtil.buildPdf(reportXml, response.getOutputStream());
+    }
 
-            webClient.getCookieManager().addCookie(new Cookie(request.getServerName(), JSESSIONID, sessionId));
-            HtmlPage page = webClient.getPage(getCasebookUrl(request, ssOid, studyBean.getOid()));
-            while (page.asXml().indexOf("page-header") < 0) {
-                if (page.asText().isEmpty()) {
-                    break;
-                }
-                webClient.waitForBackgroundJavaScript(WAIT_FOR_JAVA_SCRIPT);
-            }
-            request.setAttribute(IS_JOB, "true");
-            request.setAttribute(HTML_CODE, page.getBody().asXml());
-            request.setAttribute(FILE_NAME, ssOid);
-            controller.buildPdf(response, request);
+    /**
+     * Generates subject casebook PDF files.
+     *
+     * @param request  The request containing the item to code and alias.
+     * @return the casebooks page.
+     * @throws Exception for all exceptions.
+     */
+	@RequestMapping("/generateCasebooks")
+    public String generateCasebooks(HttpServletRequest request) throws Exception {
+        String studySubjectOidString = request.getParameter("oids");
+        StudyBean studyBean = (StudyBean) request.getSession().getAttribute("study");
+        StudyDAO studyDAO = new StudyDAO(dataSource);
+        List<String> studySubjectOidList = new ArrayList<String>(Arrays.asList(studySubjectOidString.split("\\,")));
+        StudyBean parentStudyBean = studyBean.isSite() ? (StudyBean) studyDAO.findByPK(studyBean.getParentStudyId()) : studyBean;
+        for (String ssOid : studySubjectOidList) {
+            String reportXml = getSubjectCasebookXml(request, true, true, ssOid);
+            OutputStream os = new FileOutputStream(getFile(ssOid, DIR_NAME + File.separator + parentStudyBean.getOid()));
+            HtmlToPdfUtil.buildPdf(reportXml, os);
         }
         return CASEBOOKS_PAGE;
+    }
+
+    private String getSubjectCasebookXml(HttpServletRequest request, boolean includeAudit, boolean includeNotes, String ssOid) throws IOException {
+
+        StudyBean studyBean = (StudyBean) request.getSession().getAttribute("study");
+        StudyDAO studyDAO = new StudyDAO(dataSource);
+        StudyBean parentStudyBean = studyBean.isSite() ? (StudyBean) studyDAO.findByPK(studyBean.getParentStudyId()) : studyBean;
+        String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
+        WebClient webClient = new WebClient(BrowserVersion.FIREFOX_24);
+        webClient.setAjaxController(new AjaxController() {
+            @Override
+            public boolean processSynchron(HtmlPage page, WebRequest request, boolean async) {
+                return true;
+            }
+        });
+
+        webClient.getCookieManager().addCookie(new Cookie(request.getServerName(), JSESSIONID, sessionId));
+        HtmlPage page = webClient.getPage(getCasebookUrl(request, includeAudit, includeNotes, ssOid, parentStudyBean.getOid()));
+        while (page.asXml().indexOf("page-header") < 0) {
+            if (page.asText().isEmpty()) {
+                break;
+            }
+            webClient.waitForBackgroundJavaScript(WAIT_FOR_JAVA_SCRIPT);
+        }
+        String result = page.getBody().asXml();
+        webClient.closeAllWindows();
+        return result;
     }
 
     /**
@@ -269,12 +313,14 @@ public class CasebooksController extends Redirection {
         List<StudySubjectBean> studySubjectBeans = new ArrayList<StudySubjectBean>();
         for (String ssOid : studySubjectOid) {
             StudySubjectBean studySubjectBean = studySubjectDAO.findByOid(ssOid);
-            if (isSite) {
-                if (studySubjectBean.getStudyId() == studyId) {
+            if (studySubjectBean != null) {
+                if (isSite) {
+                    if (studySubjectBean.getStudyId() == studyId) {
+                        studySubjectBeans.add(studySubjectBean);
+                    }
+                } else {
                     studySubjectBeans.add(studySubjectBean);
                 }
-            } else {
-                studySubjectBeans.add(studySubjectBean);
             }
         }
         return studySubjectBeans;
@@ -295,11 +341,25 @@ public class CasebooksController extends Redirection {
         return studySubjectOid;
     }
 
-    private String getCasebookUrl(HttpServletRequest request, String studySubjectOid, String studyOid) {
+    private String getCasebookUrl(HttpServletRequest request, boolean includeAudit, boolean includeNotes, String studySubjectOid, String studyOid) {
         String validUri = request.getRequestURI().substring(0, request.getRequestURI().lastIndexOf("/pages"));
         return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + validUri
-                + "/print/clinicaldata/html/print/" + studyOid + "/" + studySubjectOid + "/*/*?includeDNs=y&includeAudits=y";
+                + "/print/clinicaldata/html/print/" + studyOid + "/" + studySubjectOid + "/*/*?includeDNs="
+                + (includeNotes ? "y" : "n") + "&includeAudits=" + (includeAudit ? "y" : "n");
     }
+
+
+    private File getFile(String pdfName, String folderName) throws IOException {
+        String datasetFilePath = SQLInitServlet.getField("filePath") + folderName + File.separator + pdfName + ".pdf";
+        File file = new File(datasetFilePath);
+        if (!file.getParentFile().isDirectory()) {
+            file.getParentFile().mkdirs();
+        }
+        file.createNewFile();
+
+        return file;
+    }
+
 
     @Override
     public String getUrl() {

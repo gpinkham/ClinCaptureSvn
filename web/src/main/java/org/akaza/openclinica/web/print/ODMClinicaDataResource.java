@@ -4,7 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import net.sf.json.JSON;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.xml.XMLSerializer;
 
@@ -27,8 +26,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.clinovo.i18n.LocaleResolver;
-
-import java.util.List;
 
 /**
  * * Rest service for ODM clinical data usage.
@@ -198,40 +195,6 @@ public class ODMClinicaDataResource {
 		LOGGER.debug(report.getXmlOutput().toString().trim());
 
 		return report.getXmlOutput().toString().trim();
-	}
-
-	@RequestMapping(value = "/siteCasebooks/{studyOID}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE
-			+ ";charset=UTF-8")
-	@ResponseBody
-	public String getODMSubjectCasebookClinicaldata(@PathVariable("studyOID") String studyOID, HttpServletRequest request) {
-		StudyDAO studyDAO = new StudyDAO(dataSource);
-		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-		StudyBean studyBean = studyDAO.findByOid(studyOID);
-		StudyBean parentStudy = new StudyBean();
-		if (studyBean.isSite()) {
-			parentStudy = (StudyBean) studyDAO.findByPK(studyBean.getParentStudyId());
-		}
-		JSONArray reportContantainer = new JSONArray();
-		int userId = ((UserAccountBean) request.getSession().getAttribute("userBean")).getId();
-		XMLSerializer xmlSerializer = new XMLSerializer();
-		xmlSerializer.setTypeHintsEnabled(true);
-		JSONClinicalDataPostProcessor processor = new JSONClinicalDataPostProcessor(LocaleResolver.getLocale(request));
-		List<StudySubjectBean> studySubjectBeanList = studySubjectDAO.findAllByStudyId(studyBean.getId());
-		for (StudySubjectBean ssb : studySubjectBeanList) {
-			if (ssb.getStudyId() == studyBean.getId()) {
-				FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(parentStudy.getOid() != null ? parentStudy.getOid() : studyBean.getOid(),
-						"*", getClinicalDataCollectorResource()
-								.generateClinicalData(studyOID, ssb.getOid(),
-										"*", "*", true, true,
-										LocaleResolver.getLocale(request), userId));
-				report.createOdmXml(true);
-				JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
-				processor.process((JSONObject) json);
-				reportContantainer.add(json.toString(INDENT_LEVEL));
-			}
-		}
-
-		return reportContantainer.toString();
 	}
 
 	private String getStudySubjectOID(String subjectIdentifier, String studyOID) {

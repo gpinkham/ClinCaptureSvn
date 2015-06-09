@@ -184,7 +184,7 @@ public class CRFMaskingServiceImpl implements CRFMaskingService {
 			ArrayList<EventCrf> notMaskedList = new ArrayList<EventCrf>();
 			for (EventCrf eventCrf : studyEvent.getEventCrfs()) {
 				EventDefinitionCRFBean edc = eventDefinitionCRFDAO.findForSiteByEventCrfId(eventCrf.getEventCrfId());
-				if (!isEventDefinitionCRFMasked(edc.getId(), userId, studyId)) {
+				if (edc != null && !isEventDefinitionCRFMasked(edc.getId(), userId, studyId)) {
 					notMaskedList.add(eventCrf);
 				}
 			}

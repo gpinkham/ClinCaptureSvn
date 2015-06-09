@@ -100,7 +100,7 @@
          onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/>
   <input type="button" value="<fmt:message key="generate_casebooks" bundle="${resword}"/>"
          class="button_long" onClick="javascript: sendSubjectOids();"/>
-  <input type="button" value="Download Casebooks"
+  <input type="button" value="<fmt:message key="download_casebooks" bundle="${resword}"/>"
          class="button_long" onClick="javascript:window.open('${pageContext.request.contextPath}/pages/downloadCasebooks','','location=0,status=0,scrollbars=1,width=650,height=600');"/>
 </div>
 

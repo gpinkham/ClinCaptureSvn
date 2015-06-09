@@ -84,7 +84,6 @@ function StudyRenderer(json) {
                 app_siteName = "";
                 app_protocolName = "";
                 break;
-            case 'SITE_SUBJECT_CASE_BOOKS' :
             case 'STUDY_SUBJECT_CASE_BOOK' :
                 app_studyName = this.study["GlobalVariables"]["StudyName"];
                 app_siteName = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"]["@SiteName"];
@@ -258,7 +257,7 @@ function StudyRenderer(json) {
 
         app_renderMode = undefined;
 
-        if (renderMode == "STUDY_SUBJECT_CASE_BOOK" || renderMode == 'SITE_SUBJECT_CASE_BOOKS') {
+        if (renderMode == "STUDY_SUBJECT_CASE_BOOK") {
             this.renderStudyEventData(eventDef);
         } else {
             this.renderString += this.createStudyEventCoverPage(eventDef);
@@ -507,7 +506,7 @@ function StudyRenderer(json) {
                 this.renderPrintableEventCRFs(renderMode, eventDef,
                     this.PAGE_BREAK);
             }
-        } else if (renderMode == "STUDY_SUBJECT_CASE_BOOK" || renderMode == "SITE_SUBJECT_CASE_BOOKS") {
+        } else if (renderMode == "STUDY_SUBJECT_CASE_BOOK") {
             app_renderMode = renderMode;
             this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime,
                 app_studyCoverPageType, app_eventName);
