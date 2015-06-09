@@ -605,7 +605,7 @@ public class UpdateStudyEventServlet extends Controller {
 				presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
 			}
 			presetValues.put(INPUT_STARTDATE_PREFIX + "Date", DateUtil.printDate(studyEvent.getDateStarted(),
-					getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE));
+					getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 
 			presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", -1);
 			presetValues.put(INPUT_ENDDATE_PREFIX + "Minute", -1);
@@ -632,7 +632,7 @@ public class UpdateStudyEventServlet extends Controller {
 					}
 				}
 				presetValues.put(INPUT_ENDDATE_PREFIX + "Date", DateUtil.printDate(studyEvent.getDateEnded(),
-						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE));
+						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
 
 			setPresetValues(presetValues, request);

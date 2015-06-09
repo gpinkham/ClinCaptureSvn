@@ -790,7 +790,8 @@ public class SDVUtil {
 
 			if (crfBean.getCreatedDate() != null) {
 				tempSDVBean.setEventDate(DateUtil.printDate(crfBean.getCreatedDate(),
-						getCurrentUser(request).getUserTimeZoneId(), DateUtil.DatePattern.DATE));
+						getCurrentUser(request).getUserTimeZoneId(), DateUtil.DatePattern.DATE,
+						LocaleResolver.getLocale(request)));
 			}
 			tempSDVBean.setEventName(crfBean.getEventName());
 			// The checkbox is next to the study subject id
@@ -824,7 +825,8 @@ public class SDVUtil {
 
 			if (crfBean.getUpdatedDate() != null) {
 				tempSDVBean.setLastUpdatedDate(DateUtil.printDate(crfBean.getUpdatedDate(),
-						getCurrentUser(request).getUserTimeZoneId(), DateUtil.DatePattern.DATE));
+						getCurrentUser(request).getUserTimeZoneId(), DateUtil.DatePattern.DATE,
+						LocaleResolver.getLocale(request)));
 			} else {
 				tempSDVBean.setLastUpdatedDate("unknown");
 

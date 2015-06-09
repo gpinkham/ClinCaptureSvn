@@ -78,12 +78,14 @@
             <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>"
                  title="<fmt:message key="help" bundle="${resword}"/>">
         </a>
-        <a href="javascript:openDocWindow('ViewStudyEvents?print=yes&${queryUrl}')"
-           onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"
-           onMouseUp="javascript:setImage('bt_Print0','images/bt_Print.gif');">
-            <img name="bt_Print0" src="images/bt_Print.gif" border="0"
-                 alt="<fmt:message key="print" bundle="${resword}"/>">
-        </a>
+		<c:if test="${enablePrint == 'yes' and not empty allEvents}">
+			<a href="javascript:openDocWindow('ViewStudyEvents?print=yes&${queryUrl}')"
+			   onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"
+			   onMouseUp="javascript:setImage('bt_Print0','images/bt_Print.gif');">
+				<img name="bt_Print0" src="images/bt_Print.gif" border="0"
+					 alt="<fmt:message key="print" bundle="${resword}"/>">
+			</a>
+		</c:if>
     </div>
 </h1>
 

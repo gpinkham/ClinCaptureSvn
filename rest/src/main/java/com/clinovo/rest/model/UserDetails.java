@@ -28,7 +28,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 
 import com.clinovo.rest.security.PermissionChecker;
-import com.clinovo.rest.util.RequestUtil;
+import com.clinovo.util.RequestUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

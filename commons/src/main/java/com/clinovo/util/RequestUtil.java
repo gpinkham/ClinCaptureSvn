@@ -1,4 +1,4 @@
-package com.clinovo.rest.util;
+package com.clinovo.util;
 
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -22,3 +22,8 @@ public final class RequestUtil {
 		return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 	}
 }
+
+
+
+
+

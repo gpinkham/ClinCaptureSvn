@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.security.PermissionChecker;
-import com.clinovo.rest.util.RequestUtil;
+import com.clinovo.util.RequestUtil;
 
 /**
  * AuthenticationService.

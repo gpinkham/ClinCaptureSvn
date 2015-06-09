@@ -13,12 +13,9 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -27,6 +24,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.RequestUtil;
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -46,6 +45,9 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyEventRow;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Component;
 
 import com.clinovo.i18n.LocaleResolver;
@@ -59,13 +61,6 @@ import com.clinovo.util.ValidatorHelper;
 public class ViewStudyEventsServlet extends RememberLastPage {
 
 	public static final String SAVED_VIEW_STUDY_EVENTS_URL = "savedViewStudyEventsUrl";
-	public static final String VIEW_STUDY_EVENTS_STATUS_ID = "viewStudyEvents_statusId";
-	public static final String VIEW_STUDY_EVENTS_DEFINITION_ID = "viewStudyEvents_definitionId";
-	public static final String VIEW_STUDY_EVENTS_START_DATE = "viewStudyEvents_startDate";
-	public static final String VIEW_STUDY_EVENTS_END_DATE = "viewStudyEvents_endDate";
-	public static final String VIEW_STUDY_EVENTS_SED_ID = "viewStudyEvents_sedId";
-
-	public static final String POST = "post";
 
 	public static final String SED_ID = "sedId";
 
@@ -82,6 +77,10 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 	public static final String DEFINITION_MAP = "definitions";
 
 	public static final String PRINT = "print";
+
+	public static final int DEFAULT_FILTER_DATE_END_HOUR = 23;
+
+	public static final int DEFAULT_FILTER_DATE_END_MINUTE = 59;
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -104,60 +103,22 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 			return;
 		}
 		StudyBean currentStudy = getCurrentStudy(request);
-		SimpleDateFormat localDf = getLocalDf(request);
 
 		// checks which module requests are from
 		String module = fp.getString(MODULE);
 		request.setAttribute(MODULE, module);
 
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.set(Calendar.DAY_OF_MONTH, 1);
-		Date defaultStartDate = calendar.getTime();
-		calendar.add(Calendar.MONTH, 1);
-		calendar.add(Calendar.DAY_OF_MONTH, -1);
-		Date defaultEndDate = calendar.getTime();
-
 		int sedId = fp.getInt(SED_ID);
 		int statusId = fp.getInt(INPUT_STATUS_ID);
 		int definitionId = fp.getInt(INPUT_DEF_ID);
-		Date startDate = fp.getDate(INPUT_STARTDATE);
-		Date endDate = fp.getDate(INPUT_ENDDATE);
-
-		if (request.getMethod().equalsIgnoreCase(POST)) {
-			request.getSession().setAttribute(VIEW_STUDY_EVENTS_SED_ID, fp.getInt(SED_ID));
-			request.getSession().setAttribute(VIEW_STUDY_EVENTS_STATUS_ID, fp.getInt(INPUT_STATUS_ID));
-			request.getSession().setAttribute(VIEW_STUDY_EVENTS_DEFINITION_ID, fp.getInt(INPUT_DEF_ID));
-			request.getSession().setAttribute(VIEW_STUDY_EVENTS_START_DATE, fp.getDate(INPUT_STARTDATE));
-			request.getSession().setAttribute(VIEW_STUDY_EVENTS_END_DATE, fp.getDate(INPUT_ENDDATE));
-		} else if (userDoesNotUseJmesaTableForNavigation(request)) {
-			sedId = request.getSession().getAttribute(VIEW_STUDY_EVENTS_SED_ID) != null ? (Integer) request
-					.getSession().getAttribute(VIEW_STUDY_EVENTS_SED_ID) : sedId;
-			statusId = request.getSession().getAttribute(VIEW_STUDY_EVENTS_STATUS_ID) != null ? (Integer) request
-					.getSession().getAttribute(VIEW_STUDY_EVENTS_STATUS_ID) : statusId;
-			definitionId = request.getSession().getAttribute(VIEW_STUDY_EVENTS_DEFINITION_ID) != null
-					? (Integer) request.getSession().getAttribute(VIEW_STUDY_EVENTS_DEFINITION_ID)
-					: definitionId;
-			startDate = request.getSession().getAttribute(VIEW_STUDY_EVENTS_START_DATE) != null ? (Date) request
-					.getSession().getAttribute(VIEW_STUDY_EVENTS_START_DATE) : defaultStartDate;
-			endDate = request.getSession().getAttribute(VIEW_STUDY_EVENTS_END_DATE) != null ? (Date) request
-					.getSession().getAttribute(VIEW_STUDY_EVENTS_END_DATE) : defaultStartDate;
-		}
+		String startDateString = fp.getString(INPUT_STARTDATE);
+		String endDateString = fp.getString(INPUT_ENDDATE);
 
 		request.setAttribute(SED_ID, sedId);
 		request.setAttribute(INPUT_STATUS_ID, statusId);
 		request.setAttribute(INPUT_DEF_ID, definitionId);
-		request.setAttribute(INPUT_STARTDATE, localDf.format(startDate));
-		request.setAttribute(INPUT_ENDDATE, localDf.format(endDate));
-
-		Validator v = getValidator(request);
-		v.addValidation(INPUT_STARTDATE, Validator.IS_A_DATE);
-		v.addValidation(INPUT_ENDDATE, Validator.IS_A_DATE);
-		HashMap errors = v.validate();
-		if (!errors.isEmpty()) {
-			setInputMessages(errors, request);
-			startDate = defaultStartDate;
-			endDate = defaultEndDate;
-		}
+		request.setAttribute(INPUT_STARTDATE, startDateString);
+		request.setAttribute(INPUT_ENDDATE, endDateString);
 
 		request.setAttribute(STATUS_MAP, SubjectEventStatus.toArrayList());
 
@@ -165,27 +126,38 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		ArrayList<StudyEventDefinitionBean> definitions = seddao.findAllAvailableByStudy(currentStudy);
 		request.setAttribute(DEFINITION_MAP, definitions);
 
-		ArrayList allEvents = genTables(fp, definitions, startDate, endDate, sedId, definitionId, statusId);
-
-		request.setAttribute("allEvents", allEvents);
-
-		String queryUrl = INPUT_STARTDATE + "=" + localDf.format(startDate) + "&" + INPUT_ENDDATE + "="
-				+ localDf.format(endDate) + "&" + INPUT_DEF_ID + "=" + definitionId + "&" + INPUT_STATUS_ID + "="
-				+ statusId + "&" + "sedId=" + sedId + "&submitted=" + fp.getInt("submitted");
-		request.setAttribute("queryUrl", queryUrl);
-		if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
-			allEvents = genEventsForPrint(currentStudy, definitions, startDate, endDate, definitionId, statusId);
-			request.setAttribute("allEvents", allEvents);
-			forwardPage(Page.VIEW_STUDY_EVENTS_PRINT, request, response);
-		} else {
+		Validator v = getValidator(request);
+		v.addValidation(INPUT_STARTDATE, Validator.IS_A_DATE);
+		v.addValidation(INPUT_ENDDATE, Validator.IS_A_DATE);
+		HashMap errors = v.validate();
+		if (!errors.isEmpty()) {
+			setInputMessages(errors, request);
+			request.setAttribute("allEvents", new ArrayList());
+			request.setAttribute("queryUrl", "");
+			request.setAttribute("enablePrint", "no");
 			forwardPage(Page.VIEW_STUDY_EVENTS, request, response);
+		} else {
+			if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
+				List allEvents = genEventsForPrint(currentStudy, definitions, getStartDateFilterValue(startDateString),
+						getEndDateFilterValue(endDateString), definitionId, statusId);
+				request.setAttribute("allEvents", allEvents);
+				forwardPage(Page.VIEW_STUDY_EVENTS_PRINT, request, response);
+			} else {
+				List allEvents = genTables(fp, definitions, startDateString, endDateString, sedId, definitionId, statusId);
+				request.setAttribute("allEvents", allEvents);
+				String queryUrl = INPUT_STARTDATE + "=" + startDateString + "&" + INPUT_ENDDATE + "="
+						+ endDateString + "&" + INPUT_DEF_ID + "=" + definitionId + "&" + INPUT_STATUS_ID + "="
+						+ statusId + "&" + "sedId=" + sedId + "&submitted=" + fp.getInt("submitted");
+				request.setAttribute("queryUrl", queryUrl);
+				request.setAttribute("enablePrint", "yes");
+				forwardPage(Page.VIEW_STUDY_EVENTS, request, response);
+			}
 		}
-
 	}
 
-	private ArrayList genTables(FormProcessor fp, ArrayList<StudyEventDefinitionBean> definitions, Date startDate,
-			Date endDate, int sedId, int definitionId, int statusId) {
-		SimpleDateFormat localDf = getLocalDf(fp.getRequest());
+	private ArrayList genTables(FormProcessor fp, ArrayList<StudyEventDefinitionBean> definitions, String startDateString,
+			String endDateString, int sedId, int definitionId, int statusId) throws Exception {
+
 		StudyBean currentStudy = getCurrentStudy(fp.getRequest());
 		StudyUserRoleBean currentRole = getCurrentRole(fp.getRequest());
 		StudyEventDAO sedao = getStudyEventDAO();
@@ -227,7 +199,8 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 			int subjectScheduled = 0;
 			int subjectCompleted = 0;
 			int subjectDiscontinued = 0;
-			events = findEventByStatusAndDate(events, statusId, startDate, endDate);
+			events = findEventByStatusAndDate(events, statusId, getStartDateFilterValue(startDateString),
+					getEndDateFilterValue(endDateString));
 
 			Date firstStartDateForScheduled = null;
 			Date lastCompletionDate = null;
@@ -306,8 +279,8 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 			args.put("sedId", Integer.toString(sed.getId()));
 			args.put("definitionId", Integer.toString(definitionId));
 			args.put("statusId", Integer.toString(statusId));
-			args.put("startDate", localDf.format(startDate));
-			args.put("endDate", localDf.format(endDate));
+			args.put("startDate", startDateString);
+			args.put("endDate", endDateString);
 			table.setQuery("ViewStudyEvents", args);
 			table.setRows(allEventRows);
 			table.computeDisplay();
@@ -468,21 +441,22 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 
 	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.set(Calendar.DAY_OF_MONTH, 1);
-		Date defaultStartDate = calendar.getTime();
-		calendar.add(Calendar.MONTH, 1);
-		calendar.add(Calendar.DAY_OF_MONTH, -1);
-		Date defaultEndDate = calendar.getTime();
+
+		DateTime userDefaultStartDate = new DateTime().withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0)
+				.withZoneRetainFields(DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId()));
+		DateTime userDefaultEndDate = userDefaultStartDate.plusMonths(1).minusDays(1)
+				.withHourOfDay(DEFAULT_FILTER_DATE_END_HOUR).withMinuteOfHour(DEFAULT_FILTER_DATE_END_MINUTE);
+		DateTimeFormatter dateFormatter = DateUtil.getDateTimeFormatter(DateUtil.DatePattern.DATE,
+				LocaleResolver.getLocale(request));
+
 		FormProcessor fp = new FormProcessor(request);
-		SimpleDateFormat localDf = getLocalDf(request);
 		int sedId = fp.getInt(SED_ID);
 		int statusId = fp.getInt(INPUT_STATUS_ID);
 		int definitionId = fp.getInt(INPUT_DEF_ID);
-		String startDate = request.getParameter(INPUT_STARTDATE) == null ? localDf.format(defaultStartDate) : localDf
-				.format(fp.getDate(INPUT_STARTDATE));
-		String endDate = request.getParameter(INPUT_ENDDATE) == null ? localDf.format(defaultEndDate) : localDf
-				.format(fp.getDate(INPUT_ENDDATE));
+		String startDate = request.getParameter(INPUT_STARTDATE) == null
+				? dateFormatter.print(userDefaultStartDate) : fp.getString(INPUT_STARTDATE);
+		String endDate = request.getParameter(INPUT_ENDDATE) == null
+				? dateFormatter.print(userDefaultEndDate) : fp.getString(INPUT_ENDDATE);
 		try {
 			startDate = URLEncoder.encode(startDate, "UTF-8");
 			endDate = URLEncoder.encode(endDate, "UTF-8");
@@ -517,5 +491,17 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 
 	private Validator getValidator(HttpServletRequest request) {
 		return new Validator(new ValidatorHelper(request, getConfigurationDao()));
+	}
+
+	private Date getStartDateFilterValue(String startDateString) throws Exception {
+		return DateUtil.parseDateStringToServerDateTime(startDateString + " 00:00",
+				getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.TIMESTAMP,
+				LocaleResolver.getLocale(RequestUtil.getRequest()));
+	}
+
+	private Date getEndDateFilterValue(String endDateString) throws Exception {
+		return DateUtil.parseDateStringToServerDateTime(endDateString + " 23:59",
+				getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.TIMESTAMP,
+				LocaleResolver.getLocale(RequestUtil.getRequest()));
 	}
 }

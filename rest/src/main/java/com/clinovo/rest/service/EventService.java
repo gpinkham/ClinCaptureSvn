@@ -30,7 +30,7 @@ import com.clinovo.rest.enums.Scope;
 import com.clinovo.rest.enums.UserRole;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
-import com.clinovo.rest.util.RequestUtil;
+import com.clinovo.util.RequestUtil;
 import com.clinovo.rest.util.ValidatorUtil;
 import com.clinovo.service.EventDefinitionService;
 import com.clinovo.service.ItemSDVService;

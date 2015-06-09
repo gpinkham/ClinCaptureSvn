@@ -867,7 +867,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				eventStartDate = (Date) display.getProps().get("studySubject.createdDate");
 				url.append("<table border='0'  cellpadding='0'  cellspacing='0' ><tr valign='top' ><td>");
 				url.append(eventStartDate == null ? "" : DateUtil.printDate(eventStartDate,
-						getCurrentUser().getUserTimeZoneId(), DateUtil.DatePattern.DATE));
+						getCurrentUser().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 				url.append("</td></tr></table>");
 			}
 			return url.toString();
@@ -1140,7 +1140,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 							+ eventDivBuilderWrapper.eventOccurrencesNumber).br();
 			if (eventDivBuilderWrapper.studyEvents.size() > 0) {
 				eventDiv.append(DateUtil.printDate(eventDivBuilderWrapper.studyEvents.get(0).getDateStarted(),
-								getCurrentUser().getUserTimeZoneId(), DateUtil.DatePattern.DATE)).br();
+								getCurrentUser().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale())).br();
 
 			} else {
 				eventDiv.append(status + " : " + SubjectEventStatus.NOT_SCHEDULED.getName());

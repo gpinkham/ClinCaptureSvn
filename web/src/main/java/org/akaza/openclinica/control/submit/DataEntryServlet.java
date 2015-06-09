@@ -592,7 +592,7 @@ public abstract class DataEntryServlet extends Controller {
 		fp.addPresetValue(INPUT_INTERVIEWER, ecb.getInterviewerName());
 		if (ecb.getDateInterviewed() != null) {
 			fp.addPresetValue(INPUT_INTERVIEW_DATE, DateUtil.printDate(ecb.getDateInterviewed(), ub.getUserTimeZoneId(),
-					DateUtil.DatePattern.DATE));
+					DateUtil.DatePattern.DATE, getLocale()));
 		} else {
 			fp.addPresetValue(INPUT_INTERVIEW_DATE, "");
 		}
@@ -1333,7 +1333,7 @@ public abstract class DataEntryServlet extends Controller {
 
 					if (ecb.getDateInterviewed() != null) {
 						String actualDateInterviewed = DateUtil.printDate(ecb.getDateInterviewed(), ub.getUserTimeZoneId(),
-								DateUtil.DatePattern.DATE);
+								DateUtil.DatePattern.DATE, getLocale());
 						if (!actualDateInterviewed.equals(fp.getString(INPUT_INTERVIEW_DATE))) {
 							ecb.setDateInterviewed(fp.getDateInput(INPUT_INTERVIEW_DATE));
 						}

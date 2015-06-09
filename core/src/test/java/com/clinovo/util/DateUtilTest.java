@@ -16,6 +16,7 @@ package com.clinovo.util;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.joda.time.DateTimeZone;
@@ -79,7 +80,8 @@ public class DateUtilTest extends DefaultAppContextTest {
 		Date dateToTranslate = new Date(1427284953000L); // 25th March 2015 12:02:33 GMT
 
 		// TEST
-		String output = DateUtil.printDate(dateToTranslate, "Europe/Helsinki", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS);
+		String output = DateUtil.printDate(dateToTranslate, "Europe/Helsinki", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS,
+				Locale.ENGLISH);
 
 		// VERIFY
 		// As of 25th March 2015 12:02:33 GMT
@@ -97,7 +99,8 @@ public class DateUtilTest extends DefaultAppContextTest {
 		Date dateToTranslate = new Date(1431348770000L); // 11th May 2015 12:52:50 GMT
 
 		// TEST
-		String output = DateUtil.printDate(dateToTranslate, "Europe/Helsinki", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS);
+		String output = DateUtil.printDate(dateToTranslate, "Europe/Helsinki", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS,
+				Locale.ENGLISH);
 
 		// VERIFY
 		// As of 11th May 2015 12:52:50 GMT
@@ -115,7 +118,8 @@ public class DateUtilTest extends DefaultAppContextTest {
 		Date dateToTranslate = new Date(1427284953000L); // 25th March 2015 12:02:33 GMT
 
 		// TEST
-		String output = DateUtil.printDate(dateToTranslate, "Asia/Muscat", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS);
+		String output = DateUtil.printDate(dateToTranslate, "Asia/Muscat", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS,
+				Locale.ENGLISH);
 
 		// VERIFY
 		// As of 25th March 2015 12:02:33 GMT
@@ -133,7 +137,8 @@ public class DateUtilTest extends DefaultAppContextTest {
 		Date dateToTranslate = new Date(1431348770000L); // 11th May 2015 12:52:50 GMT
 
 		// TEST
-		String output = DateUtil.printDate(dateToTranslate, "Asia/Muscat", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS);
+		String output = DateUtil.printDate(dateToTranslate, "Asia/Muscat", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS,
+				Locale.ENGLISH);
 
 		// VERIFY
 		// As of 11th May 2015 12:52:50 GMT
@@ -151,7 +156,8 @@ public class DateUtilTest extends DefaultAppContextTest {
 		Date dateToTranslate = new Date(1427284953000L); // 25th March 2015 12:02:33 GMT
 
 		// TEST
-		String output = DateUtil.printDate(dateToTranslate, "America/Chihuahua", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS);
+		String output = DateUtil.printDate(dateToTranslate, "America/Chihuahua", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS,
+				Locale.ENGLISH);
 
 		// VERIFY
 		// As of 25th March 2015 12:02:33 GMT

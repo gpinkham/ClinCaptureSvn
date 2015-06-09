@@ -28,6 +28,7 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -412,11 +413,12 @@ public class FormProcessor {
 	 *                         in request parameters only.
 	 * @param fieldName        request parameter name, which stores input date string.
 	 * @return date object, created from the input date string.
+	 * @throws Exception exception
 	 */
-	public Date getDateInput(String fieldName, boolean searchAttributes) {
+	public Date getDateInput(String fieldName, boolean searchAttributes) throws Exception {
 		String fieldValue = getString(fieldName, searchAttributes);
 		return DateUtil.parseDateStringToServerDateTime(fieldValue, getCurrentUser().getUserTimeZoneId(),
-				DateUtil.DatePattern.DATE, true);
+				DateUtil.DatePattern.DATE, LocaleResolver.getLocale(request), true);
 	}
 
 	/**
@@ -427,8 +429,9 @@ public class FormProcessor {
 	 *
 	 * @param fieldName request parameter name, which stores input date string.
 	 * @return date object, created from the input date string.
+	 * @throws Exception exception
 	 */
-	public Date getDateInput(String fieldName) {
+	public Date getDateInput(String fieldName) throws Exception {
 		return getDateInput(fieldName, false);
 	}
 
@@ -501,8 +504,9 @@ public class FormProcessor {
 	 *
 	 * @param prefix request parameters name prefix, which store input date, hour and minute values.
 	 * @return date object, created from the input date and time strings.
+	 * @throws Exception exception
 	 */
-	public Date getDateTimeInput(String prefix) {
+	public Date getDateTimeInput(String prefix) throws Exception {
 
 		String date = getString(prefix + "Date");
 		String hour = getString(prefix + "Hour");
@@ -519,7 +523,7 @@ public class FormProcessor {
 		}
 		String fieldValue = date + " " + hour + ":" + minute + ":00";
 		return DateUtil.parseDateStringToServerDateTime(fieldValue, getCurrentUser().getUserTimeZoneId(),
-				DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS, false);
+				DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS, LocaleResolver.getLocale(request));
 	}
 
 	/**

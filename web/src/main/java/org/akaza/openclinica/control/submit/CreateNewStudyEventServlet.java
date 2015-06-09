@@ -310,7 +310,7 @@ public class CreateNewStudyEventServlet extends Controller {
 			// example of taking the above line and transferring to i18n on the
 			// below line, tbh
 			String dateValue = DateUtil.printDate(new Date(), getUserAccountBean().getUserTimeZoneId(),
-					DateUtil.DatePattern.DATE);
+					DateUtil.DatePattern.DATE, getLocale());
 			presetValues.put(INPUT_STARTDATE_PREFIX + "Date", dateValue);
 			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 				presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date", dateValue);
@@ -327,7 +327,7 @@ public class CreateNewStudyEventServlet extends Controller {
 				if (requestStudySubject != null) {
 					presetValues.put(INPUT_REQUEST_STUDY_SUBJECT, requestStudySubject);
 					dateValue = DateUtil.printDate(new Date(), getUserAccountBean().getUserTimeZoneId(),
-							DateUtil.DatePattern.DATE);
+							DateUtil.DatePattern.DATE, getLocale());
 					presetValues.put(INPUT_STARTDATE_PREFIX + "Date", dateValue);
 				}
 			}
@@ -920,15 +920,15 @@ public class CreateNewStudyEventServlet extends Controller {
 
 	}
 
-	private Date getInputStartDate(FormProcessor fp) {
+	private Date getInputStartDate(FormProcessor fp) throws Exception {
 		return fp.getDateTimeInput(INPUT_STARTDATE_PREFIX);
 	}
 
-	private Date getInputStartDateScheduled(FormProcessor fp, int i) {
+	private Date getInputStartDateScheduled(FormProcessor fp, int i) throws Exception {
 		return fp.getDateTimeInput(INPUT_STARTDATE_PREFIX_SCHEDULED[i]);
 	}
 
-	private Date getInputEndDate(FormProcessor fp) {
+	private Date getInputEndDate(FormProcessor fp) throws Exception {
 		return fp.getDateTimeInput(INPUT_ENDDATE_PREFIX);
 	}
 

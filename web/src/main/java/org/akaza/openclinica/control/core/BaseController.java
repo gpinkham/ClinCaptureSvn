@@ -75,7 +75,7 @@ import org.springframework.web.context.ServletContextAware;
 
 import com.clinovo.dao.SystemDAO;
 import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.rest.util.RequestUtil;
+import com.clinovo.util.RequestUtil;
 import com.clinovo.service.CRFMaskingService;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DcfService;

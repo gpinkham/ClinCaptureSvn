@@ -386,7 +386,7 @@ public abstract class AbstractTableFactory {
 				if (itemValue == null) {
 					return null;
 				}
-				output = DateUtil.printDate((Date) itemValue, userTimeZoneId, datePattern);
+				output = DateUtil.printDate((Date) itemValue, userTimeZoneId, datePattern, getLocale());
 			} catch (Exception exception) {
 				this.logger.error("Could not process date editor with property " + property, exception);
 			}

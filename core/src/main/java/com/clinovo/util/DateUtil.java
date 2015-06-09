@@ -168,6 +168,36 @@ public final class DateUtil {
 	}
 
 	/**
+	 * Returns date formatter fot specified date pattern and system language.
+	 * The formatter returned by method will not perform any translations in time zones.
+	 *
+	 * @param datePattern date pattern string
+	 * @param locale      locale
+	 * @return returns date formatter fot specified date pattern
+	 */
+	public static DateTimeFormatter getDateTimeFormatter(DatePattern datePattern, Locale locale) {
+		return getDateTimeFormatter(datePattern, locale, null);
+	}
+
+	/**
+	 * Returns date formatter fot specified date pattern, time zone and system language.
+	 *
+	 * @param datePattern date pattern string
+	 * @param locale      locale
+	 * @param timeZone    time zone to translate to
+	 * @return returns date formatter fot specified date pattern and time zone
+	 */
+	public static DateTimeFormatter getDateTimeFormatter(DatePattern datePattern, Locale locale,
+			DateTimeZone timeZone) {
+
+		DateTimeFormatter dateFormatter = DateTimeFormat.forPattern(datePattern.getPattern()).withLocale(locale);
+		if (timeZone != null) {
+			dateFormatter.withZone(timeZone);
+		}
+		return dateFormatter;
+	}
+
+	/**
 	 * Verifies if string passed represents a valid time zone name,
 	 * based off on the set of standard time zones, provided by <code>joda-time</code> library.
 	 *
@@ -215,13 +245,30 @@ public final class DateUtil {
 	 * @param dateToPrint Date date to print
 	 * @param timeZoneId  String time zone to translate to
 	 * @param datePattern DatePattern specifies output format of date
+	 * @param locale      locale
 	 * @return String string representation of a given date
 	 */
-	public static String printDate(Date dateToPrint, String timeZoneId, DatePattern datePattern) {
+	public static String printDate(Date dateToPrint, String timeZoneId, DatePattern datePattern, Locale locale) {
 
 		DateTimeFormatter dateFormatter = DateTimeFormat.forPattern(datePattern.getPattern())
-				.withZone(DateTimeZone.forID(timeZoneId)).withLocale(getLocale());
+				.withZone(DateTimeZone.forID(timeZoneId)).withLocale(locale);
 		return dateFormatter.print(dateToPrint.getTime());
+	}
+
+	/**
+	 * Parses date from the input date-time string according to specified date pattern format,
+	 * and translates it from the input date time zone into the server time zone.
+	 *
+	 * @param dateTimeString     input date-time string
+	 * @param originalTimeZoneId time zone of input date-time
+	 * @param datePattern        specifies expected format of input date-time string
+	 * @param locale             locale
+	 * @return date object, created from the input date-time string and translated into the server time zone.
+	 * @throws Exception exception
+	 */
+	public static Date parseDateStringToServerDateTime(String dateTimeString, String originalTimeZoneId,
+			DatePattern datePattern, Locale locale) throws Exception {
+		return parseDateStringToServerDateTime(dateTimeString, originalTimeZoneId, datePattern, locale, false);
 	}
 
 	/**
@@ -235,12 +282,14 @@ public final class DateUtil {
 	 * @param dateTimeString         input date-time string
 	 * @param originalTimeZoneId     time zone of input date-time
 	 * @param datePattern            specifies expected format of input date-time string
+	 * @param locale                 locale
 	 * @param applyCurrentServerTime specifies, if the time of the day of input date-time
 	 *                               should be replaced with current server time of the day
 	 * @return date object, created from the input date-time string and translated into the server time zone.
+	 * @throws Exception exception
 	 */
 	public static Date parseDateStringToServerDateTime(String dateTimeString, String originalTimeZoneId,
-			DatePattern datePattern, boolean applyCurrentServerTime) {
+			DatePattern datePattern, Locale locale, boolean applyCurrentServerTime) throws Exception {
 
 		if (dateTimeString == null || dateTimeString.isEmpty()) {
 			return new Date();
@@ -248,25 +297,13 @@ public final class DateUtil {
 		String validOriginalTimeZoneId = isValidTimeZoneId(originalTimeZoneId)
 				? originalTimeZoneId : DateTimeZone.getDefault().getID();
 		DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(datePattern.getPattern())
-				.withLocale(getLocale()).withZone(DateTimeZone.forID(validOriginalTimeZoneId));
+				.withLocale(locale).withZone(DateTimeZone.forID(validOriginalTimeZoneId));
 
-		Date serverDateTime;
-		try {
-			LOGGER.info("trying to parse " + dateTimeString + " on the pattern " + datePattern.getPattern());
-			DateTime originalDateTime = dateTimeFormatter.parseDateTime(dateTimeString);
-			if (applyCurrentServerTime) {
-				originalDateTime = originalDateTime.withTime(new LocalTime(DateTimeZone.forID(validOriginalTimeZoneId)));
-			}
-			serverDateTime = originalDateTime.withZone(DateTimeZone.getDefault()).toDate();
-
-		} catch (Exception fe) {
-			LOGGER.info("failed to parse");
-			fe.printStackTrace();
-			serverDateTime = new Date();
-			LOGGER.info("replace with default date: " + serverDateTime.toString());
+		DateTime originalDateTime = dateTimeFormatter.parseDateTime(dateTimeString.toLowerCase());
+		if (applyCurrentServerTime) {
+			originalDateTime = originalDateTime.withTime(new LocalTime(DateTimeZone.forID(validOriginalTimeZoneId)));
 		}
-		LOGGER.info("returning " + serverDateTime.toString());
-		return serverDateTime;
+		return originalDateTime.withZone(DateTimeZone.getDefault()).toDate();
 	}
 
 	/**
