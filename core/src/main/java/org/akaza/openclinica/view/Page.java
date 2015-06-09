@@ -84,13 +84,6 @@ public final class Page {
 	public static final Page REQUEST_PWD = new Page("/WEB-INF/jsp/login/requestPassword.jsp", "Request passwod form");
 
 	/**
-	 * Page for user to request study access.
-	 */
-	public static final Page REQUEST_STUDY = new Page("/WEB-INF/jsp/login/requestStudy.jsp", "Request study access");
-	public static final Page REQUEST_STUDY_CONFIRM = new Page("/WEB-INF/jsp/login/requestStudyConfirm.jsp",
-			"Request study access Confirm");
-
-	/**
 	 * Page for changing study.
 	 */
 	public static final Page CHANGE_STUDY = new Page("/WEB-INF/jsp/login/changeStudy.jsp", "Change Study");

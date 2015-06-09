@@ -366,11 +366,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>requestStudyServlet</servlet-name>
-        <display-name>RequestStudyServlet</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>resetPasswordServlet</servlet-name>
         <display-name>ResetPassword</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -1393,10 +1388,6 @@
         <url-pattern>/ViewScheduler</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>requestStudyServlet</servlet-name>
-        <url-pattern>/RequestStudy</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>resetPasswordServlet</servlet-name>
         <url-pattern>/ResetPassword</url-pattern>
