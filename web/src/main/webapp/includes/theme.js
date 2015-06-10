@@ -86,7 +86,7 @@ var loginPageApplyTheme = function(themeColor) {
     jQuery('a').css('color', theme.mainColor);
     jQuery('H1').css('color', theme.mainColor);
     if (theme.name != 'blue') {
-        jQuery("input").each(function() {
+        jQuery("input").not(".cancel").each(function() {
             var newSrc = jQuery(this).css('background-image');
             if (newSrc.indexOf('/' + theme.name + '/') >= 0) return;
             newSrc = newSrc.replace('images/', 'images/' + theme.name + '/');
