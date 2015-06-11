@@ -76,7 +76,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Creates a DatasetDAO object suitable for testing purposes only.
-	 * 
+	 *
 	 * @param ds DataSource
 	 * @param digester DAODigester
 	 */
@@ -197,7 +197,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 	/**
 	 * Set Item types expected.
 	 */
-	public void setDefinitionCrfItemTypesExpected() {
+	public void setItemTypesExpected() {
 		this.unsetTypeExpected();
 		int index = 1;
 		this.setTypeExpected(index++, TypeNames.INT);
@@ -213,13 +213,23 @@ public class DatasetDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.DATE); // updated
 		this.setTypeExpected(index++, TypeNames.INT); // update id
 		this.setTypeExpected(index++, TypeNames.STRING); // oc_oid
-		this.setTypeExpected(index++, TypeNames.STRING); // sas_name
+		this.setTypeExpected(index, TypeNames.STRING); // sas_name
+	}
+
+	/**
+	 * Set Item types expected.
+	 */
+	public void setDefinitionCrfItemTypesExpected() {
+		this.unsetTypeExpected();
+		int index = 1;
+		this.setTypeExpected(index++, TypeNames.INT); // item_id
 		this.setTypeExpected(index++, TypeNames.INT); // sed_id
 		this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 		this.setTypeExpected(index++, TypeNames.INT); // crf_id
 		this.setTypeExpected(index++, TypeNames.STRING); // crf_name
         this.setTypeExpected(index++, TypeNames.INT); // cv_version_id
-        this.setTypeExpected(index, TypeNames.STRING); // cv_name
+        this.setTypeExpected(index++, TypeNames.STRING); // cv_name
+		this.setTypeExpected(index, TypeNames.INT); // crfs_masking id
 	}
 
 	/**
@@ -465,7 +475,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Find by owner id, reports a list of datasets by user account id.
-	 * 
+	 *
 	 * @param ownerId
 	 *            studyId
 	 * @param studyId int
@@ -634,30 +644,50 @@ public class DatasetDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Select DefinitionCRFItems.
-	 * @param sedIds String
-	 * @param itemIds String
+	 * Select ItemBeans.
+	 *
+	 * @param itemIds
+	 *            String
 	 * @return ArrayList
 	 */
-	public ArrayList selectDefinitionCrfItems(String sedIds, String itemIds) {
-		return select(getDefinitionCrfItemSql(sedIds, itemIds));
+	public ArrayList selectItemBeans(String itemIds) {
+		return select("select * from item where item_id in ".concat(itemIds));
 	}
 
-	private String getDefinitionCrfItemSql(String sedIds, String itemIds) {
-		return "select item.*, sed.study_event_definition_id as sed_id, sed.name as sed_name, crf.crf_id, crf.name as crf_name, "
-				+ " cv.crf_version_id as cv_version_id,  cv.name as cv_name"
-				+ " from study_event_definition sed, event_definition_crf edc, crf, crf_version cv,item_form_metadata ifm, item"
-				+ " where sed.study_event_definition_id in "
-				+ sedIds
-				+ " and item.item_id in "
-				+ itemIds
-				+ " and sed.study_event_definition_id = edc.study_event_definition_id and edc.crf_id = crf.crf_id"
-				+ " and crf.crf_id = cv.crf_id and cv.crf_version_id = ifm.crf_version_id and ifm.item_id = item.item_id";
+	/**
+	 * Select DefinitionCRFItemIds.
+	 *
+	 * @param userId
+	 *            int
+	 * @param studyId
+	 *            int
+	 * @param sedIds
+	 *            String
+	 * @param itemIds
+	 *            String
+	 * @return ArrayList
+	 */
+	public ArrayList selectNotMaskedDefinitionCrfItemIds(int userId, int studyId, String sedIds, String itemIds) {
+		return select("select i.item_id as item_id, sed.study_event_definition_id as sed_id, sed.name as sed_name,c.crf_id as crf_id, c.name as crf_name, cv.crf_version_id as cv_version_id, cv.name as cv_name, cm.id as masked "
+				+ "from study_event_definition sed "
+				+ "join study s on s.study_id = "
+				+ studyId
+				+ " join event_definition_crf edc on edc.study_event_definition_id = sed.study_event_definition_id and ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id))) "
+				+ "join crf c on c.crf_id = edc.crf_id "
+				+ "join crf_version cv on cv.crf_id = c.crf_id "
+				+ "join item_form_metadata ifm on ifm.crf_version_id = cv.crf_version_id "
+				+ "join item i on i.item_id = ifm.item_id "
+				+ "left join crfs_masking cm on cm.user_id = "
+				+ userId
+				+ " and cm.study_event_definition_id = sed.study_event_definition_id and cm.event_definition_crf_id = edc.event_definition_crf_id "
+				+ "and cm.study_id = s.study_id "
+				+ "and cm.status_id != 5 "
+				+ "where sed.study_event_definition_id in " + sedIds + " and i.item_id in " + itemIds);
 	}
 
 	/**
 	 * Update all columns of the dataset table except owner_id.
-	 * 
+	 *
 	 * @param eb EntityBean
 	 * @return EntityBean
 	 */

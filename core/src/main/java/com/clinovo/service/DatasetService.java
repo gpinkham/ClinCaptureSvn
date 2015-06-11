@@ -10,23 +10,21 @@ public interface DatasetService {
 
 	/**
 	 * Create DatasetBean.
-	 * @param datasetBean DatasetBean
+	 * 
+	 * @param datasetBean
+	 *            DatasetBean
 	 * @return EntityBean
 	 */
 	DatasetBean create(DatasetBean datasetBean);
 
 	/**
-	* Initialize itemMap, itemIds, itemDefCrf and groupIds for a DatasetBean.
-	* @param datasetId int
-	* @param ub UserAccountBean
-	* @return DatasetBean
-	*/
-	DatasetBean initialDatasetData(int datasetId, UserAccountBean ub);
-
-	/**
 	 * Initialize itemMap, itemIds, itemDefCrf and groupIds for a DatasetBean.
-	 * @param datasetId int
+	 * 
+	 * @param datasetId
+	 *            int
+	 * @param ub
+	 *            UserAccountBean
 	 * @return DatasetBean
 	 */
-	DatasetBean initialDatasetData(int datasetId);
+	DatasetBean initialDatasetData(int datasetId, UserAccountBean ub);
 }

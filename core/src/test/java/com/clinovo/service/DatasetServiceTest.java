@@ -1,16 +1,16 @@
 package com.clinovo.service;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.DatasetItemStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.junit.Test;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
 
 @SuppressWarnings("unchecked")
 public class DatasetServiceTest extends DefaultAppContextTest {
@@ -42,6 +42,7 @@ public class DatasetServiceTest extends DefaultAppContextTest {
 	@Test
 	public void testInitialDatasetData() {
 		DatasetBean dataset;
+		UserAccountBean ub = (UserAccountBean) userAccountDAO.findByPK(1);
 		List<DatasetBean> datasets = (List<DatasetBean>) datasetDAO.findAll();
 		if (datasets.size() == 0) {
 			dataset = createDateset();
@@ -50,7 +51,7 @@ public class DatasetServiceTest extends DefaultAppContextTest {
 			dataset = datasets.get(0);
 		}
 		assertTrue(dataset.getId() > 0);
-		dataset = datasetService.initialDatasetData(dataset.getId());
-		assertTrue(dataset.getItemIds().size() > 0);
+		dataset = datasetService.initialDatasetData(dataset.getId(), ub);
+		assertTrue(dataset.getItemIds().size() == 0);
 	}
 }

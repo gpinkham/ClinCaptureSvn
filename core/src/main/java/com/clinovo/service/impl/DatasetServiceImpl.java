@@ -1,7 +1,13 @@
 package com.clinovo.service.impl;
 
-import com.clinovo.service.CRFMaskingService;
-import com.clinovo.service.DatasetService;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -16,13 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import com.clinovo.service.CRFMaskingService;
+import com.clinovo.service.DatasetService;
 
 /**
  * Implementation of DatasetService interface.
@@ -38,13 +39,6 @@ public class DatasetServiceImpl implements DatasetService {
 	private CRFMaskingService maskingService;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public DatasetBean initialDatasetData(int datasetId) {
-		return initialDatasetData(datasetId, null);
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -77,20 +71,29 @@ public class DatasetServiceImpl implements DatasetService {
 		String[] sss = ss[1].split("and");
 		String itemIds = sss[0];
 
-		datasetDAO.setDefinitionCrfItemTypesExpected();
+		Map<Integer, ItemBean> itemBeanMap = new HashMap<Integer, ItemBean>();
+		datasetDAO.setItemTypesExpected();
+		ArrayList itemBeanList = datasetDAO.selectItemBeans(itemIds);
+		for (Object row : itemBeanList) {
+			ItemBean itemBean = (ItemBean) idao.getEntityFromHashMap((HashMap) row);
+			itemBeanMap.put(itemBean.getId(), itemBean);
+		}
+
 		logger.debug("begin to execute GetDefinitionCrfItemSql");
-		ArrayList alist = datasetDAO.selectDefinitionCrfItems(sedIds, itemIds);
+		datasetDAO.setDefinitionCrfItemTypesExpected();
+		ArrayList alist = datasetDAO.selectNotMaskedDefinitionCrfItemIds(ub.getId(), ub.getActiveStudyId(), sedIds,
+				itemIds);
 		for (Object anAlist : alist) {
 			HashMap row = (HashMap) anAlist;
-
-			if (!isItemFromMaskedCRFs(row, ub)) {
-				ItemBean ib = (ItemBean) idao.getEntityFromHashMap(row);
+			boolean masked = row.get("masked") != null && (Integer) row.get("masked") > 0;
+			if (!masked) {
+				Integer itemId = (Integer) row.get("item_id");
+				ItemBean ib = itemBeanMap.get(itemId).clone();
 				Integer defId = (Integer) row.get("sed_id");
 				String defName = (String) row.get("sed_name");
 				String crfName = (String) row.get("crf_name");
 				Integer crfVersionId = (Integer) row.get("cv_version_id");
 				String crfVersionName = (String) row.get("cv_name");
-				Integer itemId = ib.getId();
 				String key = defId + "_" + crfVersionId + "_" + itemId;
 				if (!dataset.getItemMap().containsKey(key)) {
 					ib.setDefId(defId);
@@ -126,9 +129,11 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private boolean isItemSelected(String key, List<String> excludeItems, List<String> eventsAndCRFs) {
-		String [] arguments = key.split("_");
+		String[] arguments = key.split("_");
 		String keyEventCRF = arguments[0] + "_" + arguments[1];
-		return eventsAndCRFs.size() != 0 ? eventsAndCRFs.contains(keyEventCRF) && !excludeItems.contains(key) : !excludeItems.contains(key);
+		return eventsAndCRFs.size() != 0
+				? eventsAndCRFs.contains(keyEventCRF) && !excludeItems.contains(key)
+				: !excludeItems.contains(key);
 	}
 
 	private boolean isItemFromMaskedCRFs(HashMap map, UserAccountBean ub) {
@@ -136,7 +141,8 @@ public class DatasetServiceImpl implements DatasetService {
 			int crfId = (Integer) map.get("crf_id");
 			int sedId = (Integer) map.get("sed_id");
 			EventDefinitionCRFDAO edcDao = new EventDefinitionCRFDAO(ds);
-			EventDefinitionCRFBean edcBean = edcDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sedId, crfId, ub.getActiveStudyId());
+			EventDefinitionCRFBean edcBean = edcDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sedId, crfId,
+					ub.getActiveStudyId());
 			return maskingService.isEventDefinitionCRFMasked(edcBean.getId(), ub.getId(), ub.getActiveStudyId());
 		}
 		return false;

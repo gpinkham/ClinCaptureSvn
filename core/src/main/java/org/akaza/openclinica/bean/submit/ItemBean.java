@@ -13,17 +13,17 @@
 
 package org.akaza.openclinica.bean.submit;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.extract.SasNameValidator;
 import org.akaza.openclinica.bean.oid.ItemOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
-
-import javax.sql.DataSource;
-
-import java.util.ArrayList;
-import java.util.Comparator;
 
 /**
  * ItemBean for item table.
@@ -54,12 +54,54 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
     private String datasetItemMapKey = "";
     private String sasName = "";
 
-
     public ItemBean() {
         dataType = ItemDataType.ST;
         itemMetas = new ArrayList();
         this.oidGenerator = new ItemOidGenerator();
     }
+
+	/**
+	 * Clones ItemBean.
+	 *
+	 * @return ItemBean
+	 */
+	public ItemBean clone() {
+		ItemBean ib = new ItemBean();
+		ib.id = id;
+		ib.name = name;
+		ib.active = active;
+		ib.createdDate = createdDate;
+		ib.updatedDate = updatedDate;
+		ib.ownerId = ownerId;
+		ib.owner = owner;
+		ib.updaterId = updaterId;
+		ib.updater = updater;
+		ib.statusCode = statusCode;
+		ib.status = status;
+		ib.oldStatus = oldStatus;
+		ib.udao = udao;
+		ib.description = description;
+		ib.units = units;
+		ib.phiStatus = phiStatus;
+		ib.itemDataTypeId = itemDataTypeId;
+		ib.crfVersion = crfVersion;
+		ib.importItemDataBean = importItemDataBean;
+		ib.dataType = dataType;
+		ib.itemReferenceTypeId = itemReferenceTypeId;
+		ib.statusId = statusId;
+		ib.itemMeta = itemMeta;
+		ib.itemMetas = itemMetas;
+		ib.itemDataElements = itemDataElements;
+		ib.selected = selected;
+		ib.defName = defName;
+		ib.defId = defId;
+		ib.crfName = crfName;
+		ib.oid = oid;
+		ib.oidGenerator = oidGenerator;
+		ib.datasetItemMapKey = datasetItemMapKey;
+		ib.sasName = sasName;
+		return ib;
+	}
 
     public String getCrfVersion() {
         return crfVersion;
@@ -339,7 +381,8 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
                 if (itemBean1.getItemMeta().getCrfVersionName().equals(itemBean2.getItemMeta().getCrfVersionName())) {
                     result = ((Integer) itemBean1.getId()).compareTo(itemBean2.getId());
                 } else {
-                    result = itemBean1.getItemMeta().getCrfVersionName().compareTo(itemBean2.getItemMeta().getCrfVersionName());
+                    result = itemBean1.getItemMeta().getCrfVersionName().compareTo(
+                            itemBean2.getItemMeta().getCrfVersionName());
                 }
             } else {
                 result = ((Integer) itemBean1.getDefId()).compareTo(itemBean2.getDefId());
