@@ -42,18 +42,7 @@
 	onload="<c:if test='${popUpURL != ""}'>            openDNoteWindow('<c:out value="${popUpURL}" />');	        </c:if>">
 	
 <script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js?r=${revisionNumber}"></script>
-<script language="JavaScript" type="text/javascript">
-		crfShortcutsTableDefTop += 56;
-		jQuery(document).ready(function() {
-            jQuery("table > tbody  tr").attr("repeat", "0");
-            jQuery("table > tbody  button").attr("disabled", "true");
-            jQuery("table > tbody  input").attr("disabled", "disabled");
-            jQuery("table > tbody a").not('[tabindex]').not('.crfShortcut').not('.closeLink').removeAttr("onclick");
-            jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
-            jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
-            jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
-		});
-</script>
+
 <input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
 <c:set var="prevItemHolderId" value="0"/>
 	<div id="centralContainer"		style="padding-left: 3em; margin-top: 1em; background-color: white; color: black;">
@@ -652,7 +641,7 @@
 																										<c:set var="columnNum" value="1" />
 																										<!-- hasError is set to true when validation error happens-->
 																										<c:choose>
-																											<c:when test="${status.last && !status.first}">
+																											<c:when test="${status.last}">
 																												<!-- for the last but not the first row and only row, we need to use [] so the repetition javascript can copy it to create new row-->
 																												<tr id="<c:out value="${repeatParentId}"/>"
                                                                                                                     class="repeatingTableRow"
@@ -1265,5 +1254,16 @@
 	<div id="testdiv1"
 		style="position: absolute; visibility: hidden; background-color: white"></div>
 </body>
+<script language="JavaScript" type="text/javascript">
+	crfShortcutsTableDefTop += 56;
+	$(window).load(function() {
+		$("table > tbody  button").attr("disabled", "true");
+		$("table > tbody  input").attr("disabled", "disabled");
+		$("table > tbody a").not('[tabindex]').not('.crfShortcut').not('.closeLink').removeAttr("onclick");
+		$("table > tbody .tablebox_center select").attr("disabled", "disabled");
+		$("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
+		$("table > tbody .tablebox_center button").attr("disabled", "disabled");
+	});
+</script>
 <jsp:include page="../include/changeTheme.jsp" />
 </html>
