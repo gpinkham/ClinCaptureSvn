@@ -26,6 +26,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -194,11 +195,12 @@ public class RestoreEventCRFServlet extends Controller {
 				event.setUpdatedDate(new Date());
 				sedao.update(event);
 
-				String emailBody = new StringBuilder("").append(respage.getString("the_event_CRF"))
-						.append(cb.getName()).append(" ").append(respage.getString("has_been_restored_to_the_event"))
-						.append(" ").append(event.getStudyEventDefinition().getName()).append(".").toString();
-
-				addPageMessage(emailBody, request);
+				String messageBody = respage.getString("the_event_CRF")
+						+ cb.getName() + " " + respage.getString("has_been_restored_to_the_event") + " "
+						+ event.getStudyEventDefinition().getName() + ".";
+				addPageMessage(messageBody, request);
+				String emailBody = "" + EmailUtil.getEmailBodyStart() + messageBody + EmailUtil.getEmailBodyEnd()
+						+ EmailUtil.getEmailFooter(getLocale());
 				sendEmail(emailBody, request);
 				storePageMessages(request);
 				response.sendRedirect(request.getContextPath().concat(Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName())

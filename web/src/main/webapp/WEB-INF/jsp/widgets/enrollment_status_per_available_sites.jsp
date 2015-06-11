@@ -30,12 +30,12 @@
 				<div class="available sign"></div> - <fmt:message bundle="${resword}" key="available" /></td>
 			<td>
 				<div class="popup_legend_medium"><p></p></div>
-				<div class="locked sign"></div> - <fmt:message bundle="${resword}" key="locked" /></td>
+				<div class="removed sign"></div> - <fmt:message bundle="${resword}" key="removed" /></td>
 		</tr>
 		<tr align="left">
 			<td>
 				<div class="popup_legend_medium"><p></p></div>
-				<div class="removed sign"></div> - <fmt:message bundle="${resword}" key="removed" /></td>
+				<div class="locked sign"></div> - <fmt:message bundle="${resword}" key="locked" /></td>
 			<td>
 				<div class="popup_legend_medium"><p></p></div>
 				<div class="signed sign"></div> - <fmt:message bundle="${resword}" key="subjectEventSigned" /></td>

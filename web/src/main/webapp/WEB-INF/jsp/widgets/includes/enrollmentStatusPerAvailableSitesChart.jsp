@@ -27,8 +27,8 @@
 	<input type="hidden" class="show_back" value="${showBack}" />
 	<input type="hidden" class="first_row" value="${firstRowNum}" />
 	<input type="hidden" class="status" value="<fmt:message bundle='${resword}' key='Signed'/>" />
-	<input type="hidden" class="status" value="<fmt:message bundle='${resword}' key='removed'/>" />
 	<input type="hidden" class="status" value="<fmt:message bundle='${resword}' key='locked'/>"/>
+	<input type="hidden" class="status" value="<fmt:message bundle='${resword}' key='removed'/>" />
 	<input type="hidden" class="status" value="<fmt:message bundle='${resword}' key='available'/>"/>
 </form>
 
