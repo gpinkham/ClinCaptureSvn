@@ -91,13 +91,6 @@ public final class Page {
 			"Change Study Confirm");
 
 	/**
-	 * Page for user to request account.
-	 */
-	public static final Page REQUEST_ACCOUNT = new Page("/WEB-INF/jsp/login/requestAccount.jsp", "Request account form");
-
-	public static final Page REQUEST_ACCOUNT_CONFIRM = new Page("/WEB-INF/jsp/login/requestAccountConfirm.jsp",
-			"Request account confirm");
-	/**
 	 * Page for user to confirm inputs of requesting password.
 	 */
 	public static final Page REQUEST_PWD_CONFIRM = new Page("/WEB-INF/jsp/login/requestPasswordConfirm.jsp",

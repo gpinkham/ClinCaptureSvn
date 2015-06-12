@@ -5,18 +5,10 @@
 
 <script type="text/javascript" src="<c:url value='/includes/wz_tooltip/wz_tooltip.js'/>"></script>
 <!-- END MAIN CONTENT AREA -->
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<br>
-<tr>
-	<td valign="bottom">
 
-		<!-- Footer -->
-
-		<table style="border: 0px; width: 100%; bottom: 0px; margin-bottom: 10px; position: fixed">
+<!-- Footer -->
+<div style="width: 100%; position: absolute; bottom: 0px;">
+		<table style="border: 0px; width: 100%;">
 			<tr>
 				<td style="width: 90%; vertical-align: bottom">
 					<table style="border: 0px; width: 100%; height: 30px;">
@@ -45,16 +37,14 @@
 					</table>
 				</td>
 				<td style="padding-left: 10px; padding-right: 10px; vertical-align: bottom; text-align: right">
-					<a href="http://www.clinovo.com/" target="_blank"><img src="<c:url value='${logoUrl}'/>" border="0"></a>
+					<a href="http://www.clinovo.com/" target="_blank">
+						<img src="<c:url value='${logoUrl}'/>" border="0" style="max-height: 150px;">
+					</a>
 				</td>
 			</tr>
 		</table>
-
-		<!-- End Footer -->
-
-	</td>
-</tr>
-</table>
+</div>
+<!-- End Footer -->
 
 <script type="text/javascript">
 	jQuery(document).ready(function () {
@@ -70,9 +60,4 @@
 </script>
 
 <div id="contactForm" style="display:none;">
-	<%-- <c:import url="contactPop.jsp">
-	  </c:import> --%>
 </div>
-
-</body>
-</html>

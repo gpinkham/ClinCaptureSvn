@@ -17,7 +17,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" style="position: relative; min-height: 100%;">
 
 <head>
     <c:set var="contextPath" value="${pageContext.request.contextPath}" />
@@ -28,11 +28,8 @@
     <title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
     <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css?r=${revisionNumber}" type="text/css">
-    <%-- <link rel="stylesheet" href="includes/styles2.css?r=${revisionNumber}" type="text/css">--%>
-    <%-- <link rel="stylesheet" href="includes/NewNavStyles.css?r=${revisionNumber}" type="text/css" />--%>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
-    <%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js?r=${revisionNumber}"></script> --%>
     <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js?r=${revisionNumber}"></script>
     <!-- Added for the new Calender -->
@@ -40,8 +37,6 @@
     <ui:calendar/>
     <!-- End -->
 
-    <%--<script type="text/javascript"  language="JavaScript" src=
-        "includes/repetition-model/repetition-model.js?r=${revisionNumber}"></script>--%>
     <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js?r=${revisionNumber}"></script>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -75,10 +70,9 @@
             });
         })
     </script>
-    <%--<script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?r=${revisionNumber}"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/effects.js?r=${revisionNumber}"></script>--%>
+
 </head>
-<body style="width:1024px;" class="main_BG"
+<body style="width:1024px; margin-bottom: 170px;" class="main_BG"
 
 <c:choose>
 
@@ -93,8 +87,7 @@ onload="TabsForwardByNum(<c:out value="${tabId}"/>);<jsp:include page="../includ
 </c:otherwise>
 </c:choose>
 >
-<table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%" class=
-  "background">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%" class="background">
     <tr>
         <td valign="top">
 <!-- Header Table -->

@@ -3,22 +3,18 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" style="position: relative; min-height: 100%;" >
 
 <head>
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
-
     <title>ClinCapture</title>
-
 	<meta http-equiv="X-UA-Compatible" content="IE=8" />
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="<c:url value='/includes/styles.css?r=${revisionNumber}'/>" type="text/css"/>
-    <%--link rel="stylesheet" href="<c:url value='/includes/styles2.css?r=${revisionNumber}'/>" type="text/css" /--%>
     <link rel="stylesheet" href="<c:url value='/includes/NewLoginStyles.css?r=${revisionNumber}'/>" type="text/css"/>
     <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery-1.3.2.min.js'/>"></script>
     <script type="text/javascript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.blockUI.js?r=${revisionNumber}'/>"></script>
-    <%--script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript2.js?r=${revisionNumber}'/>"></script--%>
 	<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript.js?r=${revisionNumber}'/>"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/theme.js?r=${revisionNumber}'/>"></script>
 </head>
@@ -28,7 +24,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 
-<body class="login_BG" onLoad="document.getElementById('username').focus();">
+<body class="login_BG" onLoad="document.getElementById('username').focus();" style="margin-bottom: 170px;">
 <div class="login_BG">
     <center>
 
@@ -84,6 +80,7 @@
         </table>
 
     </center>
+</div>
 
     <script type="text/javascript">
         jQuery(document).ready(function() {
@@ -107,6 +104,8 @@
         </c:import>
     </div>
 
-    <!-- Footer -->
     <!-- End Main Content Area -->
 <jsp:include page="../login-include/login-footer.jsp"/>
+
+</body>
+</html>

@@ -100,4 +100,12 @@
     </table>
 
 </form>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
 <jsp:include page="../login-include/login-footer.jsp"/>
+</body>
+</html>
