@@ -11,6 +11,8 @@ import net.thucydides.core.webelements.RadioButtonGroup;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
 import com.clinovo.pages.beans.CRF;
 import com.clinovo.utils.Common;
 import com.clinovo.utils.ItemsUtil;
@@ -71,7 +73,7 @@ public class CRFPage extends BasePage {
 					// checkbox
 					ItemsUtil.fillCheckbox(new Checkbox(element), crf.getFieldNameToValueMap().get(fieldName));
 					break;
-				case "F": 
+				case "F":
 					// upload file 
 					upload(crf.getFieldNameToValueMap().get(fieldName)).to(element);
 					break;
@@ -92,5 +94,16 @@ public class CRFPage extends BasePage {
 
 	public void clickSaveButton() {
 		bSave.click();
+	}
+
+	public WebElement findFlagIconElementByCRFItem(String itemName) {
+		switch (itemName){
+			case "Interviewer Name":
+				return formWithData.findElement(By.xpath(".//*[@id='flag_interviewer']"));
+			case "Interview Date":
+				return formWithData.findElement(By.xpath(".//*[@id='flag_interviewDate']"));
+			default: 
+				return formWithData.findElement(By.xpath(".//*[@id='flag_"+itemName+"']"));
+		} 
 	}
 }

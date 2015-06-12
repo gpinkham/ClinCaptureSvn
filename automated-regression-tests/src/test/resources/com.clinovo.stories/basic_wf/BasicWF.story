@@ -347,7 +347,7 @@ Scenario: 17 "Study Monitor" performs SDV on SDV page
  
 Given User logs in as "Study Monitor"
 And User goes to SDV page
-When User filters table and performs SDV: 
+When User filters SDV table and performs SDV: 
 |Study Subject ID|Event Name|CRF Name                                  |
 |StSubj_2        |Event B   |CRF_w_basic_fields_1, CRF_w_group_1       |
 |StSubj_1        |Event B   |CRF_w_basic_fields_1, CRF_w_group_1       |
@@ -373,9 +373,28 @@ Scenario: 18.1 "PI" signs events
  
 Given User logs in as "PI"
 And User goes to SM page
-When User filters table and signs events: 
+When User filters SM table and signs events: 
 |Study Subject ID|Event Name|
 |StSubj_1        |Event B   |
 |StSubj_4        |Event E   |
  
 Then Events are signed
+
+
+Scenario: 19.1 "Study Admin" creates DN in CRF
+
+Given User logs in as "Study Admin"
+And User goes to SM page
+When User creates DNs for the items from CRF: 
+|Study Subject ID|Event Name|CRF Name            |Item  |Type      |Description|Detailed Note   |Assign to User|Email Assigned User|
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|input1|Annotation|test DN 1  |peace of text...|              |                   |
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|input2|Query     |test DN 2  |peace of text...|demo_pi       |                   |
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|input3|Query     |test DN 2  |peace of text...|demo_crc      |                   |
+
+Then DNs are created
+
+
+
+
+
+

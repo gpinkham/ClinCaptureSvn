@@ -25,7 +25,7 @@ public class SubjectMatrixPage extends BasePage {
     }
     
     @FindBy(id = "findSubjects")
-    private WebElementFacade tblFindSubjects;
+    private WebElementFacade tFindSubjects;
     
     @FindBy(xpath = ".//div[starts-with(@id, 'eventScheduleWrapper')]//*[@id='startdateField']")
     private WebElementFacade iStartDate;
@@ -59,7 +59,7 @@ public class SubjectMatrixPage extends BasePage {
 
     @Override
 	public boolean isOnPage(WebDriver driver) {
-    	return tblFindSubjects.isCurrentlyVisible();
+    	return tFindSubjects.isCurrentlyVisible();
 	}
     
     public void filterSMByStudySubjectID(String sSubjectID) {
@@ -82,11 +82,11 @@ public class SubjectMatrixPage extends BasePage {
     }
     
 	public void callPopupForSubjectAndEvent(String studySubjectID, String eventName) {
-		List<WebElement> eventIcons = tblFindSubjects.findElements(By.xpath(".//td[text()='" + studySubjectID + "']"));
+		List<WebElement> eventIcons = tFindSubjects.findElements(By.xpath(".//td[text()='" + studySubjectID + "']"));
 		if (eventIcons.size() == 0) {
 			filterSMByStudySubjectID(studySubjectID);
 		}
-		WebElementFacade eventIcon = tblFindSubjects.findBy(By.xpath(".//td[text()='" + studySubjectID + "']/..//div[@event_name='" + eventName + "']/../a"));		
+		WebElementFacade eventIcon = tFindSubjects.findBy(By.xpath(".//td[text()='" + studySubjectID + "']/..//div[@event_name='" + eventName + "']/../a"));		
     	eventIcon.click();
 	}
 	
@@ -117,7 +117,7 @@ public class SubjectMatrixPage extends BasePage {
 
 	public void clickEnterDataButtonInPopup(String aCRFName) { 
 		tCRFList.waitUntilVisible();
-		List<WebElement> tds = tblFindSubjects.findElements(By.xpath(".//div[starts-with(@id, 'crfListWrapper')]//td[contains(text(), '"+ aCRFName +"')]"));
+		List<WebElement> tds = tFindSubjects.findElements(By.xpath(".//div[starts-with(@id, 'crfListWrapper')]//td[contains(text(), '"+ aCRFName +"')]"));
 		for (WebElement td: tds) {
 			if (td.getText().replaceFirst(aCRFName, "").trim().replace("*", "").isEmpty()) {
 	    		td.findElement(By.xpath("./..//img[contains(@name,'bt_EnterData')]")).click();
@@ -147,6 +147,6 @@ public class SubjectMatrixPage extends BasePage {
 	}
 	
 	public WebElementFacade findEventIconOnSM(String studySubjectID, String eventName) {
-		return tblFindSubjects.findBy(By.xpath(".//td[text()='" + studySubjectID + "']/..//div[@event_name='" + eventName + "']/../a/img"));
+		return tFindSubjects.findBy(By.xpath(".//td[text()='" + studySubjectID + "']/..//div[@event_name='" + eventName + "']/../a/img"));
 	}
 }

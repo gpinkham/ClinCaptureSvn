@@ -12,7 +12,7 @@ public class StudyEventDefinition {
 
 	public static final String EVENTS_TO_SCHEDULE = "events_to_schedule";
 
-	public static final String EVENTS_TO_CHECK_SIGN_STATUS = "events_to_check_sign_status";;
+	public static final String EVENTS_TO_CHECK_SIGN_STATUS = "events_to_check_sign_status";
 
 	private String name = "";
     

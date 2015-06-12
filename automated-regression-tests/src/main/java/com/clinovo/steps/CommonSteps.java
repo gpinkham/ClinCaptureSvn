@@ -3,8 +3,11 @@ package com.clinovo.steps;
 import java.util.List;
 import java.util.Map;
 
+import org.openqa.selenium.WebElement;
+
 import com.clinovo.pages.*;
 import com.clinovo.pages.beans.CRF;
+import com.clinovo.pages.beans.DNote;
 import com.clinovo.pages.beans.Study;
 import com.clinovo.pages.beans.StudyEventDefinition;
 import com.clinovo.pages.beans.StudySubject;
@@ -22,9 +25,6 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public class CommonSteps extends ScenarioSteps {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public CommonSteps(Pages pages) {
@@ -58,6 +58,8 @@ public class CommonSteps extends ScenarioSteps {
 	protected SDVPage sdvPage = getPages().get(SDVPage.class);
 	protected SignStudyEventPage signStudyEventPage = getPages().get(SignStudyEventPage.class);
 	protected ViewSubjectRecordPage viewSubjectRecordPage = getPages().get(ViewSubjectRecordPage.class);
+	protected DNPage dnPage = getPages().get(DNPage.class);
+	protected NotesAndDiscrepanciesPage notesAndDiscrepanciesPage = getPages().get(NotesAndDiscrepanciesPage.class);
 	
     private LoginPage loginPage = getPages().get(LoginPage.class);
     private HomePage homePage = getPages().get(HomePage.class);
@@ -193,6 +195,10 @@ public class CommonSteps extends ScenarioSteps {
 				return signStudyEventPage;
 			case ViewSubjectRecordPage.PAGE_NAME:
 				return viewSubjectRecordPage;
+			case DNPage.PAGE_NAME:
+				return dnPage;	
+			case NotesAndDiscrepanciesPage.PAGE_NAME:
+				return notesAndDiscrepanciesPage;
 			
 			default: ;
     	}
@@ -285,9 +291,16 @@ public class CommonSteps extends ScenarioSteps {
 			case SDVPage.PAGE_NAME: 
 				go_to_source_data_verification_page();
 				break;		
-				
+			case NotesAndDiscrepanciesPage.PAGE_NAME: 
+				go_to_notes_and_discrepancies_page();
+				break;
+			
 			default: ;
 		}		
+	}
+
+	private void go_to_notes_and_discrepancies_page() {
+		basePage.goToNDsPage();
 	}
 
 	private void go_to_source_data_verification_page() {
@@ -463,7 +476,7 @@ public class CommonSteps extends ScenarioSteps {
 	}
 	
 	@Step
-	public void clicks_sign_button_on_sign_study_event_page() {
+	public void click_sign_button_on_sign_study_event_page() {
 		signStudyEventPage.clickSignButton();
 	}
 	
@@ -475,5 +488,58 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void check_sign_event_status(Map<String, String> values) {
 		subjectMatrixPage.checkSignEventStatus(values);
+	}
+
+	@Step
+	public void create_DN(DNote dn) {
+		String oldWindowId = switch_to_another_window("");
+		dnPage.fillInAndSaveDN(dn);
+		switch_to_another_window(oldWindowId);
+	}
+	
+	@Step
+	public void save_crf() {
+		crfPage.clickSaveButton();
+	}
+
+	public WebElement get_flag_icon_element_by_CRF_item(String itemName) {
+		return crfPage.findFlagIconElementByCRFItem(itemName);
+	}
+
+	@Step
+	public void click_dn_flag_icon(WebElement flagIcon) {
+		flagIcon.click();
+	}
+	
+	public String switch_to_another_window(String windowId) {
+		//Store the current window handle
+		String winHandleBefore = getDriver().getWindowHandle();
+		if (windowId.isEmpty()) {
+			//Switch to new window opened
+			for(String winHandle : getDriver().getWindowHandles()){
+				getDriver().switchTo().window(winHandle);
+			}
+		} else {
+			getDriver().switchTo().window(windowId);			
+		}
+
+		//Close the new window, if that window no more required
+		//webdriver.close();
+
+		//Switch back to original browser (first window)
+		//webdriver.switchTo().window(winHandleBefore);
+		
+		return winHandleBefore;
+	}
+
+	@Step
+	public void filter_NDs_page(DNote dn) {
+		notesAndDiscrepanciesPage.fillFiltersFromDNOnNDPage(dn);
+	}
+
+	@Step
+	public void check_DN_row_is_present(DNote dn) {
+		notesAndDiscrepanciesPage.checkDNPresent(dn);
+		
 	}
 }

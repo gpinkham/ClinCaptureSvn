@@ -11,6 +11,9 @@ public class BasePage extends AbstractPage {
 	@FindBy(jquery = "a[href$='j_spring_security_logout']")
     private WebElementFacade lLogOut;
 	
+	@FindBy(jquery = "a[href='ViewNotes?module=submit']")
+    private WebElementFacade lNDs;
+	
 	@FindBy(jquery = "a[href$='system']")
     private WebElementFacade lSystem;
 	
@@ -154,5 +157,9 @@ public class BasePage extends AbstractPage {
 
 	public void clickAddSubjectLink() {
 		lAddSubject.click();	
+	}
+
+	public void goToNDsPage() {
+		lNDs.click();
 	}
 }
