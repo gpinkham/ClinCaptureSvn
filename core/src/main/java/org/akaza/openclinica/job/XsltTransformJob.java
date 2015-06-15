@@ -184,6 +184,34 @@ public class XsltTransformJob extends QuartzJobBean {
 		return reportAboutException;
 	}
 
+	private void fixPaths(JobDataMap dataMap) {
+		String filePath = CoreResources.getField("filePath");
+		String jobFilePath = dataMap.get(XSLT_PATH) != null ? ((String) dataMap.get(XSLT_PATH))
+				.replaceAll("xslt.*", "") : null;
+		if (!filePath.equals(jobFilePath)) {
+			dataMap.put(XSLT_PATH,
+					dataMap.get(XSLT_PATH) != null
+							? ((String) dataMap.get(XSLT_PATH)).replace(jobFilePath, filePath)
+							: null);
+			dataMap.put(
+					XSL_FILE_PATH,
+					dataMap.get(XSL_FILE_PATH) != null ? ((String) dataMap.get(XSL_FILE_PATH)).replace(jobFilePath,
+							filePath) : null);
+			dataMap.put(
+					XML_FILE_PATH,
+					dataMap.get(XML_FILE_PATH) != null ? ((String) dataMap.get(XML_FILE_PATH)).replace(jobFilePath,
+							filePath) : null);
+			dataMap.put(
+					POST_FILE_PATH,
+					dataMap.get(POST_FILE_PATH) != null ? ((String) dataMap.get(POST_FILE_PATH)).replace(jobFilePath,
+							filePath) : null);
+			dataMap.put(
+					SAS_ODM_OUTPUT_PATH,
+					dataMap.get(SAS_ODM_OUTPUT_PATH) != null ? ((String) dataMap.get(SAS_ODM_OUTPUT_PATH)).replace(
+							jobFilePath, filePath) : null);
+		}
+	}
+
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		boolean reportAboutException = true;
@@ -219,6 +247,8 @@ public class XsltTransformJob extends QuartzJobBean {
 		FileOutputStream endFileStream = null;
 		UserAccountBean userBean = null;
 		try {
+			fixPaths(dataMap);
+
 			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
 					.get("applicationContext");
 			MessageSource messageSource = (MessageSource) appContext.getBean("messageSource");

@@ -83,21 +83,39 @@ public class CoreResources implements ResourceLoaderAware {
 	private static ArrayList<ExtractPropertyBean> extractProperties;
 	private static String domainName;
 
-	private static boolean loadPropertiesFromDB(Connection connection) throws Exception {
-		boolean result = false;
+	private static void loadPropertiesFromDB(Connection connection) throws Exception {
+		boolean filePathIsEmptyInDb = false;
 		PreparedStatement ps = connection.prepareStatement("select name, value, type from system");
 		ResultSet rs = ps.executeQuery();
 		while (rs.next()) {
 			String propertyName = rs.getString(1);
 			String propertyValue = rs.getString(2);
 			String propertyType = rs.getString(3);
-			if (!propertyType.equalsIgnoreCase("dynamic_input") && !propertyType.equalsIgnoreCase("dynamic_radio")) {
-				dataInfo.put(propertyName, propertyValue == null ? "" : propertyValue);
+			propertyValue = (propertyValue == null ? "" : propertyValue).trim();
+			if (propertyName.equals("filePath")) {
+				filePathIsEmptyInDb = propertyValue.isEmpty();
+				if (!filePathIsEmptyInDb) {
+					dataInfo.put(
+							propertyName,
+							propertyValue.endsWith(File.separator) ? propertyValue : propertyValue
+									.concat(File.separator));
+				}
+			} else if (!propertyType.equalsIgnoreCase("dynamic_input")
+					&& !propertyType.equalsIgnoreCase("dynamic_radio")) {
+				dataInfo.put(propertyName, propertyValue);
 			}
 		}
 		ps.close();
 		rs.close();
-		return result;
+		if (filePathIsEmptyInDb) {
+			ps = connection.prepareStatement("update system set value = ? where name = 'filePath'");
+			ps.setString(1, (String) dataInfo.get("filePath"));
+			ps.executeUpdate();
+		}
+		File filePath = new File((String) dataInfo.get("filePath"));
+		if (!filePath.exists()) {
+			filePath.mkdirs();
+		}
 	}
 
 	private void setDatabaseProperties(String dbType) {

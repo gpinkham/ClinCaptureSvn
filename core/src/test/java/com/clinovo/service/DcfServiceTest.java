@@ -38,21 +38,19 @@ public class DcfServiceTest extends DefaultAppContextTest {
 		Map<Integer, Integer> noteIds = new HashMap<Integer, Integer>();
 		noteIds.put(1, 1);
 		String fileName = dcfService.generateDcf(study, noteIds.keySet(), "root");
-		String expectedFileName = "print" + File.separator + "dcf" + File.separator
-				+ "S_DEFAULTS1" + File.separator + "root" + File.separator
-				+ "default-study_S_DEFAULTS1_ssID1_Failed_Validation_Check_1.pdf";
-		assertEquals(expectedFileName, fileName);
+		String expectedFileName = "print" + File.separator + "dcf" + File.separator + "S_DEFAULTS1" + File.separator
+				+ "root" + File.separator + "default-study_S_DEFAULTS1_ssID1_Failed_Validation_Check_1.pdf";
+		assertTrue(fileName.endsWith(expectedFileName));
 	}
 
 	@Test
 	public void testThatDcfIsGeneratedAndSaved() throws Exception {
 		Map<Integer, Integer> noteIds = new HashMap<Integer, Integer>();
 		noteIds.put(1, 1);
-		dcfService.generateDcf(study, noteIds.keySet(), "root");
-		File dcfFile = new File("print" + File.separator + "dcf" + File.separator
-				+ "S_DEFAULTS1" + File.separator + "root" + File.separator
-				+ "default-study_S_DEFAULTS1_ssID1_Failed_Validation_Check_1.pdf");
-		assertTrue(dcfFile.exists());
+		String fileName = dcfService.generateDcf(study, noteIds.keySet(), "root");
+		String expectedFileName = "print" + File.separator + "dcf" + File.separator + "S_DEFAULTS1" + File.separator
+				+ "root" + File.separator + "default-study_S_DEFAULTS1_ssID1_Failed_Validation_Check_1.pdf";
+		assertTrue(fileName.endsWith(expectedFileName));
 	}
 
 	@After
