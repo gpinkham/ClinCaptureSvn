@@ -390,8 +390,12 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		variables.put(index++, studyId);
 		variables.put(index, studyId);
 
-		String sql = "SELECT mss.*, s.unique_identifier FROM study_subject mss LEFT JOIN study s on s.study_id = mss.study_id WHERE mss.study_subject_id IN ("
-				.concat(digester.getQuery("findAllByStudySDV"));
+		String sql = "SELECT distinct mss.*, s.unique_identifier FROM study_subject mss"
+				+ " INNER JOIN study_event ON study_event.study_subject_id = mss.study_subject_id "
+				+ " INNER JOIN event_crf ON event_crf.study_event_id = study_event.study_event_id "
+				+ " LEFT JOIN study s on s.study_id = mss.study_id WHERE event_crf.status_id = 2 AND mss.study_subject_id IN ("
+		.concat(digester.getQuery("findAllByStudySDV"));
+		
 		if (withoutDns) {
 			sql = sql.concat(" ").concat(digester.getQuery("withoutDns"));
 		}
@@ -479,8 +483,11 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		variables.put(index++, studyId);
 		variables.put(index, studyId);
 
-		String sql = "SELECT count(distinct mss.study_subject_id) FROM study_subject mss WHERE mss.study_subject_id IN ("
-				.concat(digester.getQuery("findAllByStudySDV"));
+		String sql = "SELECT count(distinct mss.study_subject_id) FROM study_subject mss"
+				+ " INNER JOIN study_event ON study_event.study_subject_id = mss.study_subject_id "
+				+ " INNER JOIN event_crf ON event_crf.study_event_id = study_event.study_event_id "
+				+ " LEFT JOIN study s on s.study_id = mss.study_id WHERE event_crf.status_id = 2 AND mss.study_subject_id IN ("
+		.concat(digester.getQuery("findAllByStudySDV"));
 		if (withoutDns) {
 			sql = sql.concat(" ").concat(digester.getQuery("withoutDns"));
 		}
