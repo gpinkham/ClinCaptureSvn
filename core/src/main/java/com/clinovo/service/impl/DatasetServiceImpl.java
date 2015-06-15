@@ -29,7 +29,7 @@ import com.clinovo.service.DatasetService;
  * Implementation of DatasetService interface.
  */
 @Service("datasetService")
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unused"})
 public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
