@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 
@@ -151,6 +152,7 @@
 																	
 																	<td>
 																		<div class="formfieldXL_BG">
+																			<cc-fmt:formatDate value="${studySub.enrollmentDate}" dateTimeZone="${userBean.userTimeZoneId}" var="enrollDateStr"/>
 																			<input type="text" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" class="formfieldXL" id="enrollmentDateField"
 																					onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
 																		</div> 
@@ -237,6 +239,7 @@
 																	<td class="table_header_column">${enrollmentDateLabel}:</td>
 																	
 																	<td class="table_cell">
+																		<cc-fmt:formatDate value="${studySub.enrollmentDate}" dateTimeZone="${userBean.userTimeZoneId}" var="enrollDateStr"/>
 																		<input type="text" name="enrollmentDate"
 																				value="<c:out value="${enrollDateStr}" />"
 																				disabled="disabled" class="formfieldM"

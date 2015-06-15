@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.DateUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -52,8 +53,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -68,6 +67,7 @@ import java.util.Map;
 public class UpdateStudySubjectServlet extends Controller {
 
 	public static final String ENROLLMENT_NOTE_STATUS = "enrollmentNoteStatus";
+	public static final String INPUT_ENROLLMENT_DATE = "enrollmentDate";
 	public static final String HAS_NOTES = "hasNotes";
 
 	@Override
@@ -101,8 +101,6 @@ public class UpdateStudySubjectServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		int defaultDynGroupClassId = 0;
 		String defaultDynGroupClassName = "";
-
-		SimpleDateFormat localDateFormat = getLocalDf(request);
 
 		String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
 		if (StringUtil.isBlank(fromResolvingNotes)) {
@@ -197,8 +195,6 @@ public class UpdateStudySubjectServlet extends Controller {
 				clearSession(request);
 				request.getSession().setAttribute("selectedDynGroupClassId", subjectToUpdate.getDynamicGroupClassId());
 				request.getSession().setAttribute("studySub", subjectToUpdate);
-				String enrollDateStr = localDateFormat.format(subjectToUpdate.getEnrollmentDate());
-				request.getSession().setAttribute("enrollDateStr", enrollDateStr);
 				discNotes = new FormDiscrepancyNotes();
 				request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 				forwardPage(Page.UPDATE_STUDY_SUBJECT, request, response);
@@ -227,7 +223,6 @@ public class UpdateStudySubjectServlet extends Controller {
 
 		request.getSession().removeAttribute("studySub");
 		request.getSession().removeAttribute("groups");
-		request.getSession().removeAttribute("enrollDateStr");
 		request.getSession().removeAttribute("selectedDynGroupClassId");
 		request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 	}
@@ -245,80 +240,61 @@ public class UpdateStudySubjectServlet extends Controller {
 
 		UserAccountBean currentUser = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
-
-		StudyGroupDAO sgdao = getStudyGroupDAO();
 		FormProcessor fp = new FormProcessor(request);
 		List<StudyGroupClassBean> classes = (List<StudyGroupClassBean>) request.getAttribute("groups");
-
-		HashMap errors = getErrorsHolder(request);
-		SimpleDateFormat localDateFormat = getLocalDf(request);
-
 		StudySubjectBean subjectToUpdate = (StudySubjectBean) request.getSession().getAttribute("studySub");
 		FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(
 				AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 		DiscrepancyValidator v = new DiscrepancyValidator(new ValidatorHelper(request, getConfigurationDao()),
 				discNotes);
-		Date enrollDate = subjectToUpdate.getEnrollmentDate();
+		v.addValidation("label", Validator.NO_BLANKS);
 
-		if (currentUser.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator()
-				|| (currentStudy.getParentStudyId() > 0 && currentRole.isClinicalResearchCoordinator())) {
+		String eDateString = fp.getString(INPUT_ENROLLMENT_DATE);
+		if (!StringUtil.isBlank(eDateString)) {
+			v.addValidation(INPUT_ENROLLMENT_DATE, Validator.IS_A_DATE);
+			v.alwaysExecuteLastValidation(INPUT_ENROLLMENT_DATE);
+		}
+		HashMap errors = v.validate();
 
-			v.addValidation("label", Validator.NO_BLANKS);
+		if (!StringUtil.isBlank(fp.getString("label"))) {
 
-			String eDateString = fp.getString("enrollmentDate");
-			if (!StringUtil.isBlank(eDateString)) {
-				v.addValidation("enrollmentDate", Validator.IS_A_DATE);
-				v.alwaysExecuteLastValidation("enrollmentDate");
-			}
-
-			errors = v.validate();
-
-			if (!StringUtil.isBlank(fp.getString("label"))) {
-
-				StudySubjectDAO ssdao = getStudySubjectDAO();
-
-				StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(fp.getString("label").trim(),
+			StudySubjectDAO ssdao = getStudySubjectDAO();
+			StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(fp.getString("label").trim(),
+					currentStudy.getId(), subjectToUpdate.getId());
+			if (sub1.getId() == 0) {
+				sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabelInSites(fp.getString("label").trim(),
 						currentStudy.getId(), subjectToUpdate.getId());
-
-				// Also look for labels in the child studies
-				if (sub1.getId() == 0) {
-					sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabelInSites(fp.getString("label").trim(),
-							currentStudy.getId(), subjectToUpdate.getId());
-				}
-
-				if (sub1.getId() > 0) {
-					Validator.addError(errors, "label",
-							resexception.getString("subject_ID_used_by_another_choose_unique"));
-				}
 			}
+			if (sub1.getId() > 0) {
+				Validator.addError(errors, "label", resexception.getString("subject_ID_used_by_another_choose_unique"));
+			}
+		}
+		subjectToUpdate.setLabel(fp.getString("label"));
+		subjectToUpdate.setSecondaryLabel(fp.getString("secondaryLabel"));
 
-			subjectToUpdate.setLabel(fp.getString("label"));
-			subjectToUpdate.setSecondaryLabel(fp.getString("secondaryLabel"));
-
+		if (!StringUtil.isBlank(eDateString)) {
+			Date enrollDate = subjectToUpdate.getEnrollmentDate();
 			try {
-
-				localDateFormat.setLenient(false);
-				if (!StringUtil.isBlank(eDateString)) {
-					enrollDate = localDateFormat.parse(eDateString);
+				if (enrollDate != null) {
+					String actualEnrollDate = DateUtil.printDate(enrollDate, currentUser.getUserTimeZoneId(),
+							DateUtil.DatePattern.DATE, getLocale());
+					if (!actualEnrollDate.equals(fp.getString(INPUT_ENROLLMENT_DATE))) {
+						enrollDate = fp.getDateInputWithServerTimeOfDay(INPUT_ENROLLMENT_DATE);
+					}
+				} else {
+					enrollDate = fp.getDateInputWithServerTimeOfDay(INPUT_ENROLLMENT_DATE);
 				}
-			} catch (ParseException fe) {
-
+			} catch (Exception fe) {
 				logger.error("Date parsing error.", fe);
 			}
 			subjectToUpdate.setEnrollmentDate(enrollDate);
-
+		} else {
+			subjectToUpdate.setEnrollmentDate(null);
 		}
-
-		String enrollDateStr = localDateFormat.format(enrollDate);
-
-		request.getSession().setAttribute("enrollDateStr", enrollDateStr);
 		request.getSession().setAttribute("studySub", subjectToUpdate);
 
 		if (!classes.isEmpty()) {
-
 			for (int i = 0; i < classes.size(); i++) {
-
 				StudyGroupClassBean sgc = classes.get(i);
 				int groupId = fp.getInt("studyGroupId" + i);
 				String notes = fp.getString("notes" + i);
@@ -327,28 +303,21 @@ public class UpdateStudySubjectServlet extends Controller {
 				sgc.setStudyGroupId(groupId);
 				sgc.setGroupNotes(notes);
 				if (groupId > 0) {
-
-					StudyGroupBean sgb = (StudyGroupBean) sgdao.findByPK(groupId);
+					StudyGroupBean sgb = (StudyGroupBean) getStudyGroupDAO().findByPK(groupId);
 					sgc.setStudyGroupName(sgb.getName());
 				}
 			}
 		}
-
 		request.getSession().setAttribute("groups", classes);
 
 		if (!errors.isEmpty()) {
-
-			logger.info("has errors");
 			if (StringUtil.isBlank(subjectToUpdate.getLabel())) {
-
-				addPageMessage(
-						new StringBuilder("").append(respage.getString("must_enter_subject_ID_for_identifying"))
+				addPageMessage(new StringBuilder("").append(respage.getString("must_enter_subject_ID_for_identifying"))
 								.append(respage.getString("this_may_be_external_ID_number"))
 								.append(respage.getString("you_may_enter_study_subject_ID_listed"))
 								.append(respage.getString("study_subject_ID_should_not_contain_protected_information"))
 								.toString(), request);
 			} else {
-
 				StudySubjectDAO subdao = getStudySubjectDAO();
 				StudySubjectBean sub1 = (StudySubjectBean) subdao.findAnotherBySameLabel(subjectToUpdate.getLabel(),
 						subjectToUpdate.getStudyId(), subjectToUpdate.getId());
@@ -356,15 +325,11 @@ public class UpdateStudySubjectServlet extends Controller {
 					addPageMessage(resexception.getString("subject_ID_used_by_another_choose_unique"), request);
 				}
 			}
-
 			request.setAttribute("formMessages", errors);
 			forwardPage(Page.UPDATE_STUDY_SUBJECT, request, response);
-
 		} else {
-
 			forwardPage(Page.UPDATE_STUDY_SUBJECT_CONFIRM, request, response);
 		}
-
 	}
 
 	private void submit(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -388,7 +353,7 @@ public class UpdateStudySubjectServlet extends Controller {
 		DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
 		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
 				AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-		dnService.saveFieldNotes("enrollmentDate", fdn, subjectToUpdate.getId(), "studySub", getCurrentStudy(request));
+		dnService.saveFieldNotes(INPUT_ENROLLMENT_DATE, fdn, subjectToUpdate.getId(), "studySub", getCurrentStudy(request));
 
 		List<StudyGroupClassBean> groups = (List<StudyGroupClassBean>) request.getSession().getAttribute("groups");
 		if (!groups.isEmpty()) {

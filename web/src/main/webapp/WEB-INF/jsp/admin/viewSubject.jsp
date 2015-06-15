@@ -2,10 +2,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:include page="../include/admin-header.jsp"/>
 
@@ -73,7 +73,7 @@
 					<td class="table_header_column">
 						<fmt:message key="date_of_birth" bundle="${resword}" />:</td>
 					<td class="table_cell">
-						<fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}" />
+						<cc-fmt:formatDate value="${subject.dateOfBirth}" />
 					</td>
 				</tr>
 			
@@ -81,7 +81,7 @@
 					<td class="table_header_column">
 						<fmt:message key="date_created" bundle="${resword}" />:</td>
 					<td class="table_cell">
-						<fmt:formatDate value="${subject.createdDate}" pattern="${dteFormat}" />
+						<cc-fmt:formatDate value="${subject.createdDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
 					</td>
 				</tr>
 			</table>
@@ -162,12 +162,12 @@
 
 		<c:if test="${enrollmentDateShow}">
 		<td class="table_cell">
-			<fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}" />
+			<cc-fmt:formatDate value="${studySub.enrollmentDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
 		</td>
 		</c:if>
 
 		<td class="table_cell">
-			<fmt:formatDate value="${studySub.createdDate}" pattern="${dteFormat}" />
+			<cc-fmt:formatDate value="${studySub.createdDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
 		</td>
 
 		<td class="table_cell">

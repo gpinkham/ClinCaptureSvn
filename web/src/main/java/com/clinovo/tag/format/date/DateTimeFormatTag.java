@@ -24,7 +24,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import com.clinovo.i18n.LocaleResolver;
 
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import com.clinovo.util.DateUtil;
 import org.joda.time.DateTimeZone;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
@@ -129,7 +129,7 @@ public class DateTimeFormatTag extends TagSupport {
 		} else if (style != null) {
 			formatter = DateTimeFormat.forStyle(style);
 		} else {
-			formatter = DateTimeFormat.forPattern(ResourceBundleProvider.getResFormat("date_format_string"));
+			formatter = DateTimeFormat.forPattern(DateUtil.DatePattern.DATE.getPattern());
 		}
 		formatter = formatter.withLocale(LocaleResolver.getLocale()).withZone(dateTimeZone);
 

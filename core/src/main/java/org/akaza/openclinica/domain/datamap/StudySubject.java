@@ -124,7 +124,7 @@ public class StudySubject extends DataMapDomainObject {
         this.secondaryLabel = secondaryLabel;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "enrollment_date", length = 4)
     public Date getEnrollmentDate() {
         return this.enrollmentDate;
@@ -134,7 +134,7 @@ public class StudySubject extends DataMapDomainObject {
         this.enrollmentDate = enrollmentDate;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_created", length = 4)
     public Date getDateCreated() {
         return this.dateCreated;
@@ -144,7 +144,7 @@ public class StudySubject extends DataMapDomainObject {
         this.dateCreated = dateCreated;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_updated", length = 4)
     public Date getDateUpdated() {
         return this.dateUpdated;

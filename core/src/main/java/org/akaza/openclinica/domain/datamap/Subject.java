@@ -105,7 +105,7 @@ public class Subject extends DataMapDomainObject {
         this.subjectByFatherId = subjectByFatherId;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_of_birth", length = 4)
     public Date getDateOfBirth() {
         return this.dateOfBirth;
@@ -133,7 +133,7 @@ public class Subject extends DataMapDomainObject {
         this.uniqueIdentifier = uniqueIdentifier;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_created", length = 4)
     public Date getDateCreated() {
         return this.dateCreated;
@@ -143,7 +143,7 @@ public class Subject extends DataMapDomainObject {
         this.dateCreated = dateCreated;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_updated", length = 4)
     public Date getDateUpdated() {
         return this.dateUpdated;

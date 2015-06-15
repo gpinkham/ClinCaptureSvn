@@ -226,9 +226,6 @@ public class UpdateStudySubjectServletTest {
 		Assert.assertEquals(subjectToUpdate.getDynamicGroupClassId(),
 				request.getSession().getAttribute("selectedDynGroupClassId"));
 
-		String enrollDateStr = dateFormat.format(subjectToUpdate.getEnrollmentDate());
-		Assert.assertEquals(enrollDateStr, request.getSession().getAttribute("enrollDateStr"));
-
 		Mockito.verify(mockedServletContext).getRequestDispatcher(Page.UPDATE_STUDY_SUBJECT.getFileName());
 		Mockito.verify(mockedRequestDispatcher).forward(request, spiedResponse);
 	}
@@ -261,9 +258,6 @@ public class UpdateStudySubjectServletTest {
 		spiedUpdateStudySubjectServlet.processRequest(request, spiedResponse);
 
 		Assert.assertEquals(subjectToUpdate, request.getSession().getAttribute("studySub"));
-
-		String enrollDateStr = dateFormat.format(subjectToUpdate.getEnrollmentDate());
-		Assert.assertEquals(enrollDateStr, request.getSession().getAttribute("enrollDateStr"));
 
 		Mockito.verify(mockedServletContext).getRequestDispatcher(Page.UPDATE_STUDY_SUBJECT_CONFIRM.getFileName());
 		Mockito.verify(mockedRequestDispatcher).forward(request, spiedResponse);

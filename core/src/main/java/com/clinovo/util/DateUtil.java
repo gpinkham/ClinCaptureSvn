@@ -239,6 +239,18 @@ public final class DateUtil {
 	}
 
 	/**
+	 * Returns string representation of a given date, formatted according to specified date pattern.
+	 *
+	 * @param dateToPrint Date date to print
+	 * @param datePattern DatePattern specifies output format of date
+	 * @param locale      locale
+	 * @return String string representation of a given date
+	 */
+	public static String printDate(Date dateToPrint, DatePattern datePattern, Locale locale) {
+		return printDate(dateToPrint, null, datePattern, locale);
+	}
+
+	/**
 	 * Returns string representation of a given date, translated into specified time zone
 	 * and formatted according to specified date pattern.
 	 *
@@ -250,9 +262,29 @@ public final class DateUtil {
 	 */
 	public static String printDate(Date dateToPrint, String timeZoneId, DatePattern datePattern, Locale locale) {
 
-		DateTimeFormatter dateFormatter = DateTimeFormat.forPattern(datePattern.getPattern())
-				.withZone(DateTimeZone.forID(timeZoneId)).withLocale(locale);
+		DateTimeFormatter dateFormatter;
+		if (timeZoneId != null) {
+			String validTargetTimeZoneId = isValidTimeZoneId(timeZoneId) ? timeZoneId : DateTimeZone.getDefault().getID();
+			dateFormatter = DateTimeFormat.forPattern(datePattern.getPattern())
+					.withZone(DateTimeZone.forID(validTargetTimeZoneId)).withLocale(locale);
+		} else {
+			dateFormatter = DateTimeFormat.forPattern(datePattern.getPattern()).withLocale(locale);
+		}
 		return dateFormatter.print(dateToPrint.getTime());
+	}
+
+	/**
+	 * Parses date from the input date string according to specified date pattern format.
+	 *
+	 * @param dateTimeString     input date string
+	 * @param datePattern        specifies expected format of input date string
+	 * @param locale             locale
+	 * @return date object, created from the input date string.
+	 */
+	public static Date parseDateString(String dateTimeString, DatePattern datePattern, Locale locale) {
+
+		DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(datePattern.getPattern()).withLocale(locale);
+		return dateTimeFormatter.parseDateTime(dateTimeString.toLowerCase()).toDate();
 	}
 
 	/**
@@ -264,10 +296,9 @@ public final class DateUtil {
 	 * @param datePattern        specifies expected format of input date-time string
 	 * @param locale             locale
 	 * @return date object, created from the input date-time string and translated into the server time zone.
-	 * @throws Exception exception
 	 */
 	public static Date parseDateStringToServerDateTime(String dateTimeString, String originalTimeZoneId,
-			DatePattern datePattern, Locale locale) throws Exception {
+			DatePattern datePattern, Locale locale) {
 		return parseDateStringToServerDateTime(dateTimeString, originalTimeZoneId, datePattern, locale, false);
 	}
 
@@ -286,10 +317,9 @@ public final class DateUtil {
 	 * @param applyCurrentServerTime specifies, if the time of the day of input date-time
 	 *                               should be replaced with current server time of the day
 	 * @return date object, created from the input date-time string and translated into the server time zone.
-	 * @throws Exception exception
 	 */
 	public static Date parseDateStringToServerDateTime(String dateTimeString, String originalTimeZoneId,
-			DatePattern datePattern, Locale locale, boolean applyCurrentServerTime) throws Exception {
+			DatePattern datePattern, Locale locale, boolean applyCurrentServerTime) {
 
 		if (dateTimeString == null || dateTimeString.isEmpty()) {
 			return new Date();
@@ -339,14 +369,18 @@ public final class DateUtil {
 
 	/**
 	 * Enumeration <code>DateUtil.DatePattern</code> represents available date format patterns.
-	 * DATE is for pattern <code>yyyy-MM-dd</code>
+	 * DATE is for pattern <code>dd-MMM-yyyy</code>
 	 * TIMESTAMP is for pattern <code>dd-MMM-yyyy HH:MM</code>
 	 * TIMESTAMP_WITH_SECONDS is for pattern <code>dd-MMM-yyyy HH:mm:ss</code>
 	 */
 	public enum DatePattern {
 		DATE(ResourceBundleProvider.getResFormat("date_format_string")),
 		TIMESTAMP(ResourceBundleProvider.getResFormat("date_time_format_short")),
-		TIMESTAMP_WITH_SECONDS(ResourceBundleProvider.getResFormat("date_time_format_string"));
+		TIMESTAMP_WITH_SECONDS(ResourceBundleProvider.getResFormat("date_time_format_string")),
+		DATE_AND_HOUR("dd-MMM-yyyy HH"),
+		YEAR_AND_MONTH("MMM-yyyy"),
+		YEAR("yyyy"),
+		ISO_DATE("yyyy-MM-dd");
 
 		private String pattern;
 

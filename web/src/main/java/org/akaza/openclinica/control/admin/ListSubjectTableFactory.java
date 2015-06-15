@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -38,7 +39,6 @@ import org.jmesa.limit.Sort;
 import org.jmesa.limit.SortSet;
 import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.CellEditor;
-import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
@@ -59,7 +59,6 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	private SubjectDAO subjectDao;
 	private StudyBean currentStudy;
 	private ResourceBundle resword;
-	private ResourceBundle resformat;
 
 	@Override
 	protected String getTableName() {
@@ -103,12 +102,12 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 					null, null);
 		}
 
-		configureColumn(row.getColumn("subject.createdDate"), resword.getString("date_created"), new DateCellEditor(
-				getDateFormat()), null);
+		configureColumn(row.getColumn("subject.createdDate"), resword.getString("date_created"),
+				new DateEditor(DateUtil.DatePattern.DATE, getCurrentUser().getUserTimeZoneId()), null);
 		configureColumn(row.getColumn("subject.owner"), resword.getString("owner"), new OwnerCellEditor(), null, true,
 				false);
-		configureColumn(row.getColumn("subject.updatedDate"), resword.getString("date_updated"), new DateCellEditor(
-				getDateFormat()), null);
+		configureColumn(row.getColumn("subject.updatedDate"), resword.getString("date_updated"),
+				new DateEditor(DateUtil.DatePattern.DATE, getCurrentUser().getUserTimeZoneId()), null);
 		configureColumn(row.getColumn("subject.updater"), resword.getString("last_updated_by"),
 				new UpdaterCellEditor(), null, true, false);
 		configureColumn(row.getColumn("subject.status"), resword.getString("status"), new StatusCellEditor(),
@@ -121,11 +120,10 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	@Override
 	public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {
 		super.configureTableFacade(response, tableFacade);
-		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "subject.createdDate"), new DateFilterMatcher(
-				getDateFormat()));
-		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "subject.updatedDate"), new DateFilterMatcher(
-				getDateFormat()));
-		// tableFacade.addFilterMatcher(new MatcherKey(Status.class, "subject.status"), new GenericFilterMatecher());
+		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "subject.createdDate"),
+				new FilterMatcher() { public boolean evaluate(Object itemValue, String filterValue) { return true; } });
+		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "subject.updatedDate"),
+				new FilterMatcher() { public boolean evaluate(Object itemValue, String filterValue) { return true; } });
 		tableFacade.addFilterMatcher(new MatcherKey(Status.class, "subject.status"), new StatusFilterMatecher());
 		tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "subject.owner"),
 				new GenericFilterMatecher());
@@ -138,7 +136,6 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	public void setDataAndLimitVariables(TableFacade tableFacade) {
 		// initialize i18n
 		resword = ResourceBundleProvider.getWordsBundle(getLocale());
-		resformat = ResourceBundleProvider.getFormatBundle(getLocale());
 
 		Limit limit = tableFacade.getLimit();
 		ListSubjectFilter listSubjectFilter = getListSubjectFilter(limit);
@@ -194,7 +191,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	 *            The Limit to use.
 	 */
 	protected ListSubjectFilter getListSubjectFilter(Limit limit) {
-		ListSubjectFilter listSubjectFilter = new ListSubjectFilter(getDateFormat(), getLocale());
+		ListSubjectFilter listSubjectFilter = new ListSubjectFilter(getCurrentUser().getUserTimeZoneId(), getLocale());
 		FilterSet filterSet = limit.getFilterSet();
 		Collection<Filter> filters = filterSet.getFilters();
 		for (Filter filter : filters) {
@@ -354,10 +351,6 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 				.title(resword.getString("restore")).align("left").append("hspace=\"6\"").close();
 		builder.aEnd();
 		return builder.toString();
-	}
-
-	private String getDateFormat() {
-		return resformat.getString("date_format_string");
 	}
 
 	public StudySubjectDAO getStudySubjectDao() {

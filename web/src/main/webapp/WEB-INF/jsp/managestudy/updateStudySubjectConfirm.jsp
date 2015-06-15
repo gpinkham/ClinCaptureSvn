@@ -2,12 +2,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat" />
-<c:set var="dteFormat">
-	<fmt:message key="date_format_string" bundle="${resformat}" />
-</c:set>
 
 <c:choose>
 	<c:when
@@ -96,7 +94,9 @@
 												<c:if test="${enrollmentDateShow}">
 													<tr valign="bottom">
 														<td class="table_header_column">${enrollmentDateLabel}:</td>
-														<td class="table_cell"><fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}" /></td>
+														<td class="table_cell">
+															<cc-fmt:formatDate value="${studySub.enrollmentDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+														</td>
 													</tr>
 												</c:if>
 
@@ -107,7 +107,9 @@
 												
 												<tr valign="top">
 													<td class="table_header_column"><fmt:message key="date_created" bundle="${resword}" />:</td>
-													<td class="table_cell"><fmt:formatDate value="${studySub.createdDate}" pattern="${dteFormat}" /></td>
+													<td class="table_cell">
+														<cc-fmt:formatDate value="${studySub.createdDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+													</td>
 												</tr>
 												
 												<tr valign="top">
@@ -117,7 +119,10 @@
 												
 												<tr valign="top">
 													<td class="table_header_column"><fmt:message key="date_updated" bundle="${resword}" />:</td>
-													<td class="table_cell"><fmt:formatDate value="${studySub.updatedDate}" pattern="${dteFormat}" />&nbsp;</td>
+													<td class="table_cell">
+														<cc-fmt:formatDate value="${studySub.updatedDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+														&nbsp;
+													</td>
 												</tr>
 
 											</table>

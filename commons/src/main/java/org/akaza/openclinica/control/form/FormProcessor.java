@@ -378,24 +378,27 @@ public class FormProcessor {
 	}
 
 	/**
+	 * Parses date from the input date string, stored in the http request parameter/attribute.
+	 * The date format <code>dd-Mmm-yyyy</code> is expected for input date string.
 	 *
-	 * @param fieldName
-	 *            String
-	 * @param searchAttributes
-	 *            boolean
-	 * @return Date
+	 * @param searchAttributes if <code>true</code>, then method searches for input date string
+	 *                         both in request parameters and attributes;
+	 *                         if <code>false</code>, then method searches for input date string
+	 *                         in request parameters only.
+	 * @param fieldName        request parameter name, which stores input date string.
+	 * @return date object, created from the input date string.
 	 */
 	public Date getDate(String fieldName, boolean searchAttributes) {
 		String fieldValue = getString(fieldName, searchAttributes);
-
-		return FormProcessor.getDateFromString(fieldValue);
+		return DateUtil.parseDateString(fieldValue, DateUtil.DatePattern.DATE, LocaleResolver.getLocale());
 	}
 
 	/**
+	 * Parses date from the input date string, stored in the http request parameter.
+	 * The date format <code>dd-Mmm-yyyy</code> is expected for input date string.
 	 *
-	 * @param fieldName
-	 *            String
-	 * @return Date
+	 * @param fieldName request parameter name, which stores input date string.
+	 * @return date object, created from the input date string.
 	 */
 	public Date getDate(String fieldName) {
 		return getDate(fieldName, false);
@@ -413,9 +416,8 @@ public class FormProcessor {
 	 *                         in request parameters only.
 	 * @param fieldName        request parameter name, which stores input date string.
 	 * @return date object, created from the input date string.
-	 * @throws Exception exception
 	 */
-	public Date getDateInput(String fieldName, boolean searchAttributes) throws Exception {
+	public Date getDateInputWithServerTimeOfDay(String fieldName, boolean searchAttributes) {
 		String fieldValue = getString(fieldName, searchAttributes);
 		return DateUtil.parseDateStringToServerDateTime(fieldValue, getCurrentUser().getUserTimeZoneId(),
 				DateUtil.DatePattern.DATE, LocaleResolver.getLocale(request), true);
@@ -429,10 +431,9 @@ public class FormProcessor {
 	 *
 	 * @param fieldName request parameter name, which stores input date string.
 	 * @return date object, created from the input date string.
-	 * @throws Exception exception
 	 */
-	public Date getDateInput(String fieldName) throws Exception {
-		return getDateInput(fieldName, false);
+	public Date getDateInputWithServerTimeOfDay(String fieldName) {
+		return getDateInputWithServerTimeOfDay(fieldName, false);
 	}
 
 	/**
@@ -506,7 +507,7 @@ public class FormProcessor {
 	 * @return date object, created from the input date and time strings.
 	 * @throws Exception exception
 	 */
-	public Date getDateTimeInput(String prefix) throws Exception {
+	public Date getDateTimeInput(String prefix) {
 
 		String date = getString(prefix + "Date");
 		String hour = getString(prefix + "Hour");

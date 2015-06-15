@@ -2,10 +2,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
@@ -171,7 +171,9 @@
 
                 </c:if>
             </td>
-            <td class="table_cell"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/></td>
+            <td class="table_cell">
+                <cc-fmt:formatDate value="${subject.dateOfBirth}"/>
+            </td>
 
         </c:when>
         <c:when test="${subjectStudy.studyParameterConfig.collectDob == '3'}">
@@ -306,8 +308,10 @@
                     </c:choose>
                 </c:if>
             </td>
-            <td class="table_cell"><fmt:formatDate value="${studySubjectBean.enrollmentDate}" pattern="${dteFormat}"/>&nbsp;
-            </td>
+            <td class="table_cell">
+				<cc-fmt:formatDate value="${studySubjectBean.enrollmentDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+				&nbsp;
+			</td>
         </c:when>
         <c:otherwise>
             <td class="table_header_row">&nbsp;</td>

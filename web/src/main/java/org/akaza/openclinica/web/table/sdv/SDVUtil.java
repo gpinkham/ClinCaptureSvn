@@ -16,7 +16,6 @@ package org.akaza.openclinica.web.table.sdv;
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -781,11 +780,10 @@ public class SDVUtil {
 
 			tempSDVBean.setStudyEventStatus(studyEventBean.getStatus().getName());
 
-			String pattern = getDateFormat();
-			SimpleDateFormat sdformat = new SimpleDateFormat(pattern, LocaleResolver.getLocale(request));
-
 			if (studySubjectBean.getEnrollmentDate() != null) {
-				tempSDVBean.setEnrollmentDate(sdformat.format(studySubjectBean.getEnrollmentDate()));
+				tempSDVBean.setEnrollmentDate(DateUtil.printDate(studySubjectBean.getEnrollmentDate(),
+						getCurrentUser(request).getUserTimeZoneId(), DateUtil.DatePattern.DATE,
+						LocaleResolver.getLocale(request)));
 			}
 
 			if (crfBean.getCreatedDate() != null) {

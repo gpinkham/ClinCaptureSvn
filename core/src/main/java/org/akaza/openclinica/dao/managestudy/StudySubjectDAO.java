@@ -29,6 +29,7 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -99,19 +100,6 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
 	@Override
 	public void setTypesExpected() {
-		// study_subject_id | integer | not null default
-		// nextval('public.study_subject_study_subject_id_seq'::text)
-		// label | character varying(30) |
-		// secondary_label | character varying(30) |
-		// subject_id | numeric |
-		// study_id | numeric |
-		// status_id | numeric |
-		// enrollment_date | date |
-		// date_created | date |
-		// date_updated | date |
-		// owner_id | numeric |
-		// update_id | numeric |
-		// dynamic_group_class_id | numeric |
 
 		this.unsetTypeExpected();
 		int ind = 1;
@@ -128,9 +116,9 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // status_id
 
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // enrollment_date
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // date_created
 		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // date_updated
@@ -142,8 +130,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		ind++; // oc oid
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // dynamic_group_class_id
-		this.setTypeExpected(ind, TypeNames.DATE);
-		ind++; // Randomzation Date
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
+		ind++; // Randomization Date
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // Randomization Result
 		this.setTypeExpected(ind, TypeNames.STRING);
@@ -171,11 +159,11 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // status_id
 
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // enrollment_date
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // date_created
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // date_updated
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // owner_id
@@ -185,7 +173,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		ind++; // oc oid
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // dynamic_group_class_id
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++;
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++;
@@ -837,11 +825,11 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
 		Date enrollmentDate = sb.getEnrollmentDate();
 		if (enrollmentDate == null) {
-			nullVars.put(ind, Types.DATE);
+			nullVars.put(ind, Types.TIMESTAMP);
 			variables.put(ind, null);
 			ind++;
 		} else {
-			variables.put(ind, enrollmentDate);
+			variables.put(ind, new Timestamp(enrollmentDate.getTime()));
 			ind++;
 		}
 
@@ -1397,14 +1385,14 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
 		Date enrollmentDate = sb.getEnrollmentDate();
 		if (enrollmentDate == null) {
-			nullVars.put(ind, Types.DATE);
+			nullVars.put(ind, Types.TIMESTAMP);
 			variables.put(ind, null);
 		} else {
-			variables.put(ind, enrollmentDate);
+			variables.put(ind, new Timestamp(enrollmentDate.getTime()));
 		}
 		ind++;
 
-		variables.put(ind, new java.util.Date());
+		variables.put(ind, new Timestamp(new Date().getTime()));
 		ind++;
 		if (sb.getUpdater() == null) {
 			nullVars.put(ind, Types.INTEGER);
@@ -1420,10 +1408,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
 		Date randomizationDate = sb.getRandomizationDate();
 		if (randomizationDate == null) {
-			nullVars.put(ind, Types.DATE);
+			nullVars.put(ind, Types.TIMESTAMP);
 			variables.put(ind, null);
 		} else {
-			variables.put(ind, randomizationDate);
+			variables.put(ind, new Timestamp(randomizationDate.getTime()));
 		}
 		ind++;
 
@@ -1555,11 +1543,11 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // status_id
 
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // enrollment_date
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // date_created
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // date_updated
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // owner_id
@@ -1569,7 +1557,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		ind++; // oc_oid
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // dynamic_group_class_id
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // randomization_date
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // randomization_result
@@ -1642,11 +1630,11 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // status_id
 
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // enrollment_date
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // date_created
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // date_updated
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // owner_id
@@ -1656,7 +1644,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		ind++; // oc_oid
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // dynamic_group_class_id
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // randomization_date
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // randomization_result

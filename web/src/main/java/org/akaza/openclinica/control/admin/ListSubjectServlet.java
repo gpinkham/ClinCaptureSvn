@@ -23,20 +23,15 @@ package org.akaza.openclinica.control.admin;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 /**
- * Processes user request and generate subject list
+ * Processes user request and generate subject list.
  * 
  * @author jxu
  */
@@ -70,28 +65,19 @@ public class ListSubjectServlet extends RememberLastPage {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
 		if (shouldRedirect(request, response)) {
 			return;
 		}
-
-		StudyBean currentStudy = getCurrentStudy(request);
-
-		SubjectDAO sdao = getSubjectDAO();
-
-		StudySubjectDAO subdao = getStudySubjectDAO();
-		StudyDAO studyDao = getStudyDAO();
-		UserAccountDAO uadao = getUserAccountDAO();
-
 		ListSubjectTableFactory factory = new ListSubjectTableFactory();
-		factory.setSubjectDao(sdao);
-		factory.setStudySubjectDao(subdao);
-		factory.setUserAccountDao(uadao);
-		factory.setStudyDao(studyDao);
-		factory.setCurrentStudy(currentStudy);
-
+		factory.setSubjectDao(getSubjectDAO());
+		factory.setStudySubjectDao(getStudySubjectDAO());
+		factory.setUserAccountDao(getUserAccountDAO());
+		factory.setStudyDao(getStudyDAO());
+		factory.setCurrentStudy(getCurrentStudy(request));
+		factory.setCurrentUser(getUserAccountBean());
 		String listSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("listSubjectsHtml", listSubjectsHtml);
-
 		forwardPage(Page.SUBJECT_LIST, request, response);
 	}
 

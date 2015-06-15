@@ -2,13 +2,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
-
-
 
 <c:import url="../include/admin-header.jsp"/>
 
@@ -75,12 +73,17 @@
       </tr>
   </c:if>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td><td class="table_cell">
-  <fmt:formatDate value="${subjectToRestore.dateOfBirth}" pattern="${dteFormat}"/>
-  </td>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td><td class="table_cell">
-  <fmt:formatDate value="${subjectToRestore.createdDate}" pattern="${dteFormat}"/>
-  </td>
+  <tr valign="top">
+	  <td class="table_header_column"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
+      <td class="table_cell">
+		  <cc-fmt:formatDate value="${subjectToRestore.dateOfBirth}" />
+	  </td>
+  </tr>
+  <tr valign="top">
+	  <td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td>
+	  <td class="table_cell">
+		  <cc-fmt:formatDate value="${subjectToRestore.createdDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	  </td>
   </tr>
 </table>
 </div>
@@ -135,9 +138,13 @@
     </c:if>
     <td class="table_cell"><c:out value="${studySub.studyId}"/></td>
     <c:if test="${enrollmentDateShow}">
-        <td class="table_cell"><fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}"/></td>
+        <td class="table_cell">
+			<cc-fmt:formatDate value="${studySub.enrollmentDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+		</td>
     </c:if>
-    <td class="table_cell"><fmt:formatDate value="${studySub.createdDate}" pattern="${dteFormat}"/></td>
+    <td class="table_cell">
+		<cc-fmt:formatDate value="${studySub.createdDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	</td>
     <td class="table_cell"><c:out value="${studySub.owner.name}"/></td>
     <td class="table_cell"><c:out value="${studySub.status.name}"/></td>
     </tr>
@@ -165,7 +172,9 @@
     <tr valign="top">
     <td class="table_cell"><c:out value="${event.id}"/></td>
     <td class="table_cell"><c:out value="${event.location}"/>&nbsp;</td>
-    <td class="table_cell"><fmt:formatDate value="${event.createdDate}" pattern="${dteFormat}"/></td>
+    <td class="table_cell">
+		<cc-fmt:formatDate value="${event.createdDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	</td>
     <td class="table_cell"><c:out value="${event.owner.name}"/></td>
     <td class="table_cell"><c:out value="${event.status.name}"/></td>
     </tr>

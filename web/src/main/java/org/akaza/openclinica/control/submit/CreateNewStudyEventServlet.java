@@ -920,15 +920,15 @@ public class CreateNewStudyEventServlet extends Controller {
 
 	}
 
-	private Date getInputStartDate(FormProcessor fp) throws Exception {
+	private Date getInputStartDate(FormProcessor fp) {
 		return fp.getDateTimeInput(INPUT_STARTDATE_PREFIX);
 	}
 
-	private Date getInputStartDateScheduled(FormProcessor fp, int i) throws Exception {
+	private Date getInputStartDateScheduled(FormProcessor fp, int i) {
 		return fp.getDateTimeInput(INPUT_STARTDATE_PREFIX_SCHEDULED[i]);
 	}
 
-	private Date getInputEndDate(FormProcessor fp) throws Exception {
+	private Date getInputEndDate(FormProcessor fp) {
 		return fp.getDateTimeInput(INPUT_ENDDATE_PREFIX);
 	}
 

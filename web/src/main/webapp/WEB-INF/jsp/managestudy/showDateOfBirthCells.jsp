@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <c:choose>
 	<c:when test="${subjectStudy.studyParameterConfig.collectDob == '1'}">
 		<td class="${headerClass }"><fmt:message key="date_of_birth"
@@ -31,8 +32,9 @@
 					</c:otherwise>
 				</c:choose>
 			</c:if></td>
-		<td class="table_cell"><fmt:formatDate
-				value="${subject.dateOfBirth}" pattern="${dteFormat}" /></td>
+		<td class="table_cell">
+			<cc-fmt:formatDate value="${subject.dateOfBirth}"/>
+		</td>
 	</c:when>
 	<c:when test="${subjectStudy.studyParameterConfig.collectDob == '3'}">
 		<td class="${headerClass }"><fmt:message key="date_of_birth"

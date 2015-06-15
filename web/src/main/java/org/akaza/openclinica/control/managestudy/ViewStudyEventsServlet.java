@@ -156,7 +156,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 	}
 
 	private ArrayList genTables(FormProcessor fp, ArrayList<StudyEventDefinitionBean> definitions, String startDateString,
-			String endDateString, int sedId, int definitionId, int statusId) throws Exception {
+			String endDateString, int sedId, int definitionId, int statusId) {
 
 		StudyBean currentStudy = getCurrentStudy(fp.getRequest());
 		StudyUserRoleBean currentRole = getCurrentRole(fp.getRequest());
@@ -493,13 +493,13 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		return new Validator(new ValidatorHelper(request, getConfigurationDao()));
 	}
 
-	private Date getStartDateFilterValue(String startDateString) throws Exception {
+	private Date getStartDateFilterValue(String startDateString) {
 		return DateUtil.parseDateStringToServerDateTime(startDateString + " 00:00",
 				getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.TIMESTAMP,
 				LocaleResolver.getLocale(RequestUtil.getRequest()));
 	}
 
-	private Date getEndDateFilterValue(String endDateString) throws Exception {
+	private Date getEndDateFilterValue(String endDateString) {
 		return DateUtil.parseDateStringToServerDateTime(endDateString + " 23:59",
 				getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.TIMESTAMP,
 				LocaleResolver.getLocale(RequestUtil.getRequest()));

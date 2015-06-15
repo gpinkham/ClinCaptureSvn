@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.util.DateUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -206,9 +207,8 @@ public class AddNewSubjectServlet extends Controller {
 				setUpBeans(classes, request);
 				request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
 
-				Date today = new Date(System.currentTimeMillis());
-				String todayFormatted = localDf.format(today);
-				fp.addPresetValue(INPUT_ENROLLMENT_DATE, todayFormatted);
+				fp.addPresetValue(INPUT_ENROLLMENT_DATE, DateUtil.printDate(new Date(), getUserAccountBean().getUserTimeZoneId(),
+						DateUtil.DatePattern.DATE, getLocale()));
 
 				String idSetting;
 				idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
@@ -720,7 +720,10 @@ public class AddNewSubjectServlet extends Controller {
 				studySubject.setLabel(label);
 				studySubject.setSecondaryLabel(fp.getString(INPUT_SECONDARY_LABEL));
 				studySubject.setStatus(Status.AVAILABLE);
-				studySubject.setEnrollmentDate(fp.getDate(INPUT_ENROLLMENT_DATE));
+
+				if (!StringUtil.isBlank(fp.getString(INPUT_ENROLLMENT_DATE))) {
+					studySubject.setEnrollmentDate(fp.getDateInputWithServerTimeOfDay(INPUT_ENROLLMENT_DATE));
+				}
 				if (fp.getBoolean("addWithEvent")) {
 					studySubject.setEventStartDate(fp.getDate(INPUT_EVENT_START_DATE));
 				}
@@ -809,9 +812,8 @@ public class AddNewSubjectServlet extends Controller {
 					// NEW MANTIS ISSUE 4770
 					setUpBeans(classes, request);
 					request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
-					Date today = new Date(System.currentTimeMillis());
-					String todayFormatted = localDf.format(today);
-					fp.addPresetValue(INPUT_ENROLLMENT_DATE, todayFormatted);
+					fp.addPresetValue(INPUT_ENROLLMENT_DATE, DateUtil.printDate(new Date(), getUserAccountBean().getUserTimeZoneId(),
+							DateUtil.DatePattern.DATE, getLocale()));
 
 					String idSetting;
 					idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();

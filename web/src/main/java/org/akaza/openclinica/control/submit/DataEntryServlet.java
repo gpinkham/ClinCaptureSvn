@@ -1336,10 +1336,10 @@ public abstract class DataEntryServlet extends Controller {
 						String actualDateInterviewed = DateUtil.printDate(ecb.getDateInterviewed(), ub.getUserTimeZoneId(),
 								DateUtil.DatePattern.DATE, getLocale());
 						if (!actualDateInterviewed.equals(fp.getString(INPUT_INTERVIEW_DATE))) {
-							ecb.setDateInterviewed(fp.getDateInput(INPUT_INTERVIEW_DATE));
+							ecb.setDateInterviewed(fp.getDateInputWithServerTimeOfDay(INPUT_INTERVIEW_DATE));
 						}
 					} else {
-						ecb.setDateInterviewed(fp.getDateInput(INPUT_INTERVIEW_DATE));
+						ecb.setDateInterviewed(fp.getDateInputWithServerTimeOfDay(INPUT_INTERVIEW_DATE));
 					}
 
 				} else {

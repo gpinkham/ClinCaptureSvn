@@ -30,9 +30,11 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
 import javax.sql.DataSource;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -71,20 +73,18 @@ public class SubjectDAO extends AuditableEntityDAO {
 
 	@Override
 	public void setTypesExpected() {
-		// SERIAL, NUMERIC, NUMERIC, NUMERIC,
-		// DATE, CHAR(1), VARCHAR(255),DATE,
-		// NUMERIC, DATE, NUMERIC
+
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.INT);
 		this.setTypeExpected(3, TypeNames.INT);
 		this.setTypeExpected(4, TypeNames.INT);
-		this.setTypeExpected(5, TypeNames.DATE);
+		this.setTypeExpected(5, TypeNames.TIMESTAMP);
 		this.setTypeExpected(6, TypeNames.CHAR);
 		this.setTypeExpected(7, TypeNames.STRING);
-		this.setTypeExpected(8, TypeNames.DATE);
+		this.setTypeExpected(8, TypeNames.TIMESTAMP);
 		this.setTypeExpected(9, TypeNames.INT);
-		this.setTypeExpected(10, TypeNames.DATE);
+		this.setTypeExpected(10, TypeNames.TIMESTAMP);
 		this.setTypeExpected(11, TypeNames.INT);
 		this.setTypeExpected(12, TypeNames.BOOL);
 		this.setTypeExpected(13, TypeNames.STRING);
@@ -184,7 +184,11 @@ public class SubjectDAO extends AuditableEntityDAO {
 		variables.put(new Integer(1), currentStudy.getId());
 		variables.put(new Integer(2), currentStudy.getId());
 		String sql = digester.getQuery("getWithFilterAndSort");
-		sql = sql + filter.execute("");
+		try {
+			sql += filter.execute("");
+		} catch (IllegalArgumentException ex) {
+			return new ArrayList<SubjectBean>();
+		}
 
 		if (CoreResources.getDBType().equals("oracle")) {
 			sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
@@ -211,7 +215,11 @@ public class SubjectDAO extends AuditableEntityDAO {
 		variables.put(new Integer(1), currentStudy.getId());
 		variables.put(new Integer(2), currentStudy.getId());
 		String sql = digester.getQuery("getCountWithFilter");
-		sql += filter.execute("");
+		try {
+			sql += filter.execute("");
+		} catch (IllegalArgumentException ex) {
+			return 0;
+		}
 
 		ArrayList rows = this.select(sql);
 		Iterator it = rows.iterator();
@@ -426,10 +434,10 @@ public class SubjectDAO extends AuditableEntityDAO {
 		ind++;
 
 		if (sb.getDateOfBirth() == null) {
-			nullVars.put(new Integer(ind), new Integer(Types.DATE));
+			nullVars.put(new Integer(ind), new Integer(Types.TIMESTAMP));
 			variables.put(new Integer(ind), null);
 		} else {
-			variables.put(new Integer(ind), sb.getDateOfBirth());
+			variables.put(new Integer(ind), new Timestamp(sb.getDateOfBirth().getTime()));
 		}
 		ind++;
 
@@ -531,9 +539,9 @@ public class SubjectDAO extends AuditableEntityDAO {
 		}
 		variables.put(new Integer(3), new Integer(sb.getStatus().getId()));
 		if (sb.getDateOfBirth() != null) {
-			variables.put(new Integer(4), sb.getDateOfBirth());
+			variables.put(new Integer(4), new Timestamp(sb.getDateOfBirth().getTime()));
 		} else {
-			nullVars.put(new Integer(4), new Integer(Types.DATE));
+			nullVars.put(new Integer(4), new Integer(Types.TIMESTAMP));
 			variables.put(new Integer(4), null);
 		}
 		if (sb.getGender() != 'm' && sb.getGender() != 'f') {
@@ -545,7 +553,7 @@ public class SubjectDAO extends AuditableEntityDAO {
 		}
 
 		variables.put(new Integer(6), new String(sb.getUniqueIdentifier()));
-		variables.put(new Integer(7), new java.util.Date());
+		variables.put(new Integer(7), new Timestamp(new Date().getTime()));
 		variables.put(new Integer(8), new Integer(sb.getUpdater().getId()));
 		variables.put(new Integer(9), new Boolean(sb.isDobCollected()));
 

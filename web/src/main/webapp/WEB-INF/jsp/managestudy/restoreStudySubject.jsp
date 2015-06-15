@@ -5,7 +5,6 @@
 <%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
@@ -101,17 +100,28 @@
   <c:if test="${enrollmentDateShow}">
       <tr valign="top">
           <td class="table_header_column">${enrollmentDateLabel}:</td>
-          <td class="table_cell"><fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}"/></td>
+          <td class="table_cell">
+              <cc-fmt:formatDate value="${studySub.enrollmentDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+          </td>
       </tr>
   </c:if>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="created_by" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.owner.name}"/></td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${studySub.createdDate}" pattern="${dteFormat}"/>
-  </td></tr>
+  <tr valign="top">
+	  <td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td>
+	  <td class="table_cell">
+		  <cc-fmt:formatDate value="${studySub.createdDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	  </td>
+  </tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="last_updated_by" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.updater.name}"/>&nbsp;
   </td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="date_updated" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${studySub.updatedDate}" pattern="${dteFormat}"/>&nbsp;
-  </td></tr>
+  <tr valign="top">
+	  <td class="table_header_column"><fmt:message key="date_updated" bundle="${resword}"/>:</td>
+	  <td class="table_cell">
+		  <cc-fmt:formatDate value="${studySub.updatedDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+		  &nbsp;
+	  </td>
+  </tr>
  </table>
 </div>
 </div></div></div></div></div></div></div></div>
@@ -138,7 +148,7 @@
        <c:forEach var="displayEvents" items="${events}">
        <tr>
            <td class="table_cell">
-			   <cc-fmt:formatDate value="${displayEvents.studyEvent.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+			   <cc-fmt:formatDate value="${displayEvents.studyEvent.updatedDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
 		   </td>
            <td class="table_cell"><c:out value="${displayEvents.studyEvent.studyEventDefinition.name}"/>
            <c:if test="${displayEvents.studyEvent.studyEventDefinition.repeating}">
@@ -146,10 +156,10 @@
            </c:if>
            </td>
            <td class="table_cell">
-			   <cc-fmt:formatDate value="${displayEvents.studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+			   <cc-fmt:formatDate value="${displayEvents.studyEvent.dateStarted}" dateTimeZone="${userBean.userTimeZoneId}"/>
 		   </td>
            <td class="table_cell">
-			   <cc-fmt:formatDate value="${displayEvents.studyEvent.dateEnded}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+			   <cc-fmt:formatDate value="${displayEvents.studyEvent.dateEnded}" dateTimeZone="${userBean.userTimeZoneId}"/>
 		   </td>
            <td class="table_cell"><c:out value="${displayEvents.studyEvent.location}"/></td>
            <td class="table_cell"><c:out value="${displayEvents.studyEvent.updater.name}"/></td>

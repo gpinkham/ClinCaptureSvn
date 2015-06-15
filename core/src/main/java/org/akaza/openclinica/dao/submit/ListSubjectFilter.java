@@ -13,12 +13,11 @@
 
 package org.akaza.openclinica.dao.submit;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.joda.time.DateTime;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,20 +26,15 @@ import java.util.Locale;
 
 public class ListSubjectFilter implements CriteriaCommand {
 
-	List<Filter> filters = new ArrayList<Filter>();
-	HashMap<String, String> columnMapping = new HashMap<String, String>();
-	Integer studyEventDefinitionId;
-	String defaultFormat = "yyyy-MM-dd";
-	DateFormat theDefaultFormat;
-	String i18Format;
-	Locale locale;
+	private List<Filter> filters = new ArrayList<Filter>();
+	private HashMap<String, String> columnMapping = new HashMap<String, String>();
+	private Locale locale;
+	private String userTimeZoneId;
 
-	public ListSubjectFilter(String dateFormat, Locale locale) {
+	public ListSubjectFilter(String userTimeZoneId, Locale locale) {
 
-		theDefaultFormat = new SimpleDateFormat(defaultFormat);
-		i18Format = dateFormat;
+		this.userTimeZoneId = userTimeZoneId;
 		this.locale = locale;
-
 		columnMapping.put("subject.uniqueIdentifier", "s.unique_identifier");
 		columnMapping.put("subject.gender", "s.gender");
 		columnMapping.put("subject.createdDate", "s.date_created");
@@ -71,8 +65,11 @@ public class ListSubjectFilter implements CriteriaCommand {
 				criteria = criteria + " and ";
 				criteria = criteria + " " + columnMapping.get(property) + " = " + value.toString() + " ";
 			} else if (property.equals("subject.createdDate") || property.equals("subject.updatedDate")) {
-				criteria += onlyYearAndMonthAndDay(String.valueOf(value), columnMapping.get(property));
-				criteria += onlyYear(String.valueOf(value), columnMapping.get(property));
+				try {
+					criteria += onlyYearAndMonthAndDay(String.valueOf(value), columnMapping.get(property));
+				} catch (IllegalArgumentException ex) {
+					criteria += onlyYear(String.valueOf(value), columnMapping.get(property));
+				}
 			} else if (property.equals("subject.owner")) {
 				criteria = criteria + " and s.owner_id = ua.user_id and ";
 				criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString()
@@ -91,14 +88,14 @@ public class ListSubjectFilter implements CriteriaCommand {
 						strB.append(val.split("-", -1)[j]);
 					}
 					String str1 = strB.toString().replaceFirst("-", "");
-					String str2 = val.replaceFirst(str1+"-", "");
+					String str2 = val.replaceFirst(str1 + "-", "");
 					
-					criteria = criteria + " ( UPPER(study.unique_identifier) like UPPER('%" + str1 +"')";
+					criteria = criteria + " ( UPPER(study.unique_identifier) like UPPER('%" + str1 + "')";
 					criteria = criteria + " and ";
 					criteria = criteria + "  UPPER(ss.label) like UPPER('" + str2 + "%')" + " ) ";
 					criteria = criteria + " or ";
 				}
-				criteria = criteria + " ( UPPER(study.unique_identifier) like UPPER('%" + val +"%')";
+				criteria = criteria + " ( UPPER(study.unique_identifier) like UPPER('%" + val + "%')";
 				criteria = criteria + " or ";
 				criteria = criteria + "  UPPER(ss.label) like UPPER('%" + val + "%')" + " ) ";
 
@@ -113,40 +110,25 @@ public class ListSubjectFilter implements CriteriaCommand {
 	}
 
 	private String onlyYear(String value, String column) {
-		String criteria = "";
-		try {
-			DateFormat format = new SimpleDateFormat("yyyy");
-			Date startDate = format.parse(value);
-			DateTime dt = new DateTime(startDate.getTime());
-			dt = dt.plusYears(1);
-			Date endDate = dt.toDate();
-			if (format.format(startDate).equals(value)) {
-				criteria = " AND ( " + column + " between '" + theDefaultFormat.format(startDate) + "' and '"
-						+ theDefaultFormat.format(endDate) + "')";
-			}
 
-		} catch (Exception e) {
-			// Do nothing
-		}
-		return criteria;
+		Date startDate = DateUtil.parseDateStringToServerDateTime(value, userTimeZoneId, DateUtil.DatePattern.YEAR,
+				locale);
+		DateTime dt = new DateTime(startDate.getTime());
+		dt = dt.plusYears(1);
+		Date endDate = dt.toDate();
+		return (" AND ( " + column + " between '" + DateUtil.printDate(startDate, DateUtil.DatePattern.ISO_DATE,
+				locale) + "' and '" + DateUtil.printDate(endDate, DateUtil.DatePattern.ISO_DATE, locale) + "')");
 	}
 
 	private String onlyYearAndMonthAndDay(String value, String column) {
-		String criteria = "";
-		try { 
-			DateFormat format = new SimpleDateFormat(i18Format, locale);
-			Date startDate = format.parse(value);
-			DateTime dt = new DateTime(startDate.getTime());
-			dt = dt.plusDays(1);
-			Date endDate = dt.toDate();
-			if (format.format(startDate).equals(value)) {
-				criteria = " AND (  " + column + " between '" + theDefaultFormat.format(startDate) + "' and '"
-						+ theDefaultFormat.format(endDate) + "')";
-			}
-		} catch (Exception e) {
-			// Do nothing
-		}
-		return criteria;
+
+		Date startDate = DateUtil.parseDateStringToServerDateTime(value, userTimeZoneId, DateUtil.DatePattern.DATE,
+				locale);
+		DateTime dt = new DateTime(startDate.getTime());
+		dt = dt.plusDays(1);
+		Date endDate = dt.toDate();
+		return (" AND (  " + column + " between '" + DateUtil.printDate(startDate, DateUtil.DatePattern.ISO_DATE,
+				locale) + "' and '" + DateUtil.printDate(endDate, DateUtil.DatePattern.ISO_DATE, locale) + "')");
 	}
 
 	private static class Filter {
