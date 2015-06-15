@@ -43,7 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -115,6 +114,7 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -148,6 +148,7 @@ import com.clinovo.service.DataEntryService;
 import com.clinovo.service.ReportCRFService;
 import com.clinovo.util.CrfShortcutsAnalyzer;
 import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.DateUtil;
 import com.clinovo.util.SubjectEventStatusUtil;
 import com.clinovo.util.ValidatorHelper;
 
@@ -1384,7 +1385,9 @@ public abstract class DataEntryServlet extends Controller {
 					ssb.setUpdatedDate(new Date());
 					studySubjectDao.update(ssb);
 					ecb.setSdvUpdateId(ub.getId());
-					if (getItemSDVService().hasChangedSDVRequiredItems(changedItemsList)) {
+					if (edcBean.getSourceDataVerification().equals(SourceDataVerification.AllREQUIRED)
+							|| (edcBean.getSourceDataVerification().equals(SourceDataVerification.PARTIALREQUIRED) && getItemSDVService()
+									.hasChangedSDVRequiredItems(changedItemsList))) {
 						ecb.setSdvStatus(false);
 						resetSDVForItems = true;
 					}
