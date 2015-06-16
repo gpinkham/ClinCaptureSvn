@@ -41,6 +41,7 @@ import com.clinovo.i18n.LocaleResolver;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ResourceBundleProvider.class)
+@SuppressWarnings("unused")
 public class UpdateStudySubjectServletTest {
 
 	@Mock

@@ -28,7 +28,6 @@ import org.akaza.openclinica.dao.submit.ListSubjectFilter;
 import org.akaza.openclinica.dao.submit.ListSubjectSort;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
