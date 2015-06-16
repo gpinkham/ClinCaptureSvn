@@ -117,6 +117,7 @@ public class XsltTransformJob extends QuartzJobBean {
 	public static final String SAS_EMAIL_BUFFER = "sasEmailBuffer";
 	public static final String SAS_ODM_OUTPUT_PATH = "sasOdmOutputPath";
 	public static final String SAS_DIR = "sas.dir";
+	public static final String FILE_TAG = "$linkURL";
 	public static final int SAS_DATASET_JOB_ID = 10;
 	public static final int MILLISECONDS_IN_MINUTE = 60000;
 	public static final String SAS_DELETE_OLD_OBJECT = "sasDeleteOldObject";
@@ -298,7 +299,7 @@ public class XsltTransformJob extends QuartzJobBean {
 			GenerateExtractFileService generateFileService = new GenerateExtractFileService(dataSource, userBean,
 					coreResources, ruleSetRuleDao);
 			StudyBean parentStudy = (StudyBean) studyDao.findByPK(currentStudy.getParentStudyId());
-			String successMsg = epBean.getSuccessMessage();
+			String successMsg = messageSource.getMessage("extract.success", null, locale) + " " + FILE_TAG + ".";
 			String failureMsg = epBean.getFailureMessage();
 			final long start = System.currentTimeMillis();
 
@@ -403,10 +404,8 @@ public class XsltTransformJob extends QuartzJobBean {
 					successMsg = messageSource.getMessage("sas.success.warnings.email", null, locale);
 				}
 
-				if (successMsg != null && successMsg.contains("$linkURL")) {
-					successMsg = successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getSystemURL()
-							+ "AccessFile?fileId=" + fbFinal.getId() + "\">" + CoreResources.getSystemURL()
-							+ "AccessFile?fileId=" + fbFinal.getId() + " </a>");
+				if (successMsg != null) {
+					successMsg = replaceURLInMessage(successMsg, fbFinal);
 					emailBuffer.append("<p>").append(successMsg).append("</p>");
 					if (sasSideHasWarnings) {
 						emailBuffer.append(sasWarnings);
@@ -503,7 +502,8 @@ public class XsltTransformJob extends QuartzJobBean {
 
 				ProcessingFunction function = epBean.getPostProcessing();
 				emailBuffer.append("<p>").append(pageMessages.getString("email_header_1")).append(" ")
-						.append(pageMessages.getString("email_header_2")).append(" Job Execution ")
+						.append(pageMessages.getString("email_header_2")).append(" ")
+						.append(words.getString("job_execution")).append(" ")
 						.append(pageMessages.getString("email_header_3")).append("</p>");
 				emailBuffer.append("<P>").append(words.getString("dataset")).append(": ").append(datasetBean.getName())
 						.append("</P>");
@@ -570,11 +570,7 @@ public class XsltTransformJob extends QuartzJobBean {
 								done, new File(outputPath + File.separator + archivedFile).length(),
 								ExportFormatBean.PDFFILE, userAccountId);
 
-						if (successMsg.contains("$linkURL")) {
-							successMsg = successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getSystemURL()
-									+ "AccessFile?fileId=" + fbFinal.getId() + "\">" + CoreResources.getSystemURL()
-									+ "AccessFile?fileId=" + fbFinal.getId() + " </a>");
-						}
+						successMsg = replaceURLInMessage(successMsg, fbFinal);
 						emailBuffer.append("<p>").append(successMsg).append("</p>");
 						logMe("System time begining.." + sysTimeBegin);
 						logMe("System time end.." + System.currentTimeMillis());
@@ -624,7 +620,6 @@ public class XsltTransformJob extends QuartzJobBean {
 					if (dontDelFiles.length > 1 && zipped) {
 						// unzip(dontDelFiles);
 						logMe("count =====" + cnt + "dontDelFiles length==---" + dontDelFiles.length);
-
 						logMe("Entering this?" + cnt + "dontDelFiles" + Arrays.toString(dontDelFiles));
 						String path = outputPath + File.separator;
 						logMe("path = " + path);
@@ -724,11 +719,7 @@ public class XsltTransformJob extends QuartzJobBean {
 						logger.trace("email buffer??" + emailBuffer);
 
 					} else {
-						if (successMsg.contains("$linkURL")) {
-							successMsg = successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getSystemURL()
-									+ "AccessFile?fileId=" + fbFinal.getId() + "\">" + CoreResources.getSystemURL()
-									+ "AccessFile?fileId=" + fbFinal.getId() + " </a>");
-						}
+						successMsg = replaceURLInMessage(successMsg, fbFinal);
 						emailBuffer.append("<p>").append(successMsg).append("</p>");
 					}
 					if (deleteOld) {
@@ -1033,7 +1024,6 @@ public class XsltTransformJob extends QuartzJobBean {
 			if (fos != null) {
 				fos.close();
 			}
-
 		}
 
 		// since zip is successful, deleting the endfile.
@@ -1141,32 +1131,22 @@ public class XsltTransformJob extends QuartzJobBean {
 	}
 
 	private void postSuccessMessage(String message, JobExecutionContext context) {
-		try {
-			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
-					.get("applicationContext");
-			StdScheduler scheduler = (StdScheduler) appContext.getBean("schedulerFactoryBean");
-			JobDetailImpl jobDetail = (JobDetailImpl) context.getJobDetail();
-			JobDataMap dataMap = jobDetail.getJobDataMap();
-			dataMap.put("successMsg", message);
-			jobDetail.setJobDataMap(dataMap);
-			// replace the job with the extra data
-			scheduler.addJob(jobDetail, true);
-
-		} catch (Exception e) {
-			logger.error("Error has occurred.", e);
-		}
+		postMessage(message, null, context, "successMsg");
 	}
 
 	private void postErrorMessage(String message, String additionalMessage, JobExecutionContext context) {
+		postMessage(message, additionalMessage, context, "failMessage");
+	}
+
+	private void postMessage(String message, String additionalMessage, JobExecutionContext context, String key) {
 		try {
 			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
 					.get("applicationContext");
 			StdScheduler scheduler = (StdScheduler) appContext.getBean("schedulerFactoryBean");
 			JobDetailImpl jobDetail = (JobDetailImpl) context.getJobDetail();
 			JobDataMap dataMap = jobDetail.getJobDataMap();
-			dataMap.put("failMessage", message.concat(additionalMessage != null ? additionalMessage : ""));
+			dataMap.put(key, message.concat(additionalMessage != null ? additionalMessage : ""));
 			jobDetail.setJobDataMap(dataMap);
-			// replace the job with the extra data
 			scheduler.addJob(jobDetail, true);
 
 		} catch (Exception e) {
@@ -1183,14 +1163,10 @@ public class XsltTransformJob extends QuartzJobBean {
 		ArchivedDatasetFileBean fbInitial = new ArchivedDatasetFileBean();
 		// Deleting off the original file archive dataset file.
 		ArchivedDatasetFileDAO asdfDAO = new ArchivedDatasetFileDAO(dataSource);
-
 		fbInitial.setName(name);
 		fbInitial.setFileReference(dir + name);
-
 		fbInitial.setFileSize((int) (fileLength));
-
 		fbInitial.setRunTime(time);
-
 		fbInitial.setDatasetId(datasetBean.getId());
 		fbInitial.setExportFormatBean(efb);
 		fbInitial.setExportFormatId(efb.getId());
@@ -1300,5 +1276,14 @@ public class XsltTransformJob extends QuartzJobBean {
 		BigDecimal num = new BigDecimal(number);
 		logger.trace("Number is" + num.setScale(THREE, BigDecimal.ROUND_HALF_UP).doubleValue());
 		return num.setScale(THREE, BigDecimal.ROUND_HALF_UP).doubleValue();
+	}
+
+	private String replaceURLInMessage(String message, ArchivedDatasetFileBean file) {
+		if (message.contains(FILE_TAG)) {
+			message = message.replace(FILE_TAG, "<a href=\"" + CoreResources.getSystemURL()
+					+ "AccessFile?fileId=" + file.getId() + "\">" + CoreResources.getSystemURL()
+					+ "AccessFile?fileId=" + file.getId() + " </a>");
+		}
+		return message;
 	}
 }
