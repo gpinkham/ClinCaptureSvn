@@ -53,6 +53,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
 /**
@@ -177,9 +178,17 @@ public class RemoveEventCRFServlet extends Controller {
 						+ cb.getName() + " " + respage.getString("has_been_removed_from_the_event")
 						+ event.getStudyEventDefinition().getName() + ".";
 				addPageMessage(messageBody, request);
-				String emailBody = EmailUtil.getEmailBodyStart() + messageBody
+				String emailBody = EmailUtil.getEmailBodyStart()
+						+ messageBody + "<br/><ul>"
+						+ resword.getString("job_error_mail.serverUrl") + " " + SQLInitServlet.getSystemURL() + "</li>"
+						+ resword.getString("job_error_mail.studyName") + " " + study.getName() + "</li>"
+						+ "<li><b>" + resword.getString("mail.removed_by") + ":</b> " + currentUser.getName() + "</li>"
+						+ "<li><b>" + resword.getString("subject") + "</b>: " + studySub.getLabel() + "</li></ul>"
 						+ EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(getLocale());
-								sendEmail(emailBody, request);
+				String emailHeader = respage.getString("remove_event_CRF_from_event") + " "
+						+ resword.getString("subject") + ": " + studySub.getLabel();
+
+				sendEmail(emailHeader, emailBody, request);
 				storePageMessages(request);
 				response.sendRedirect(request.getContextPath().concat(Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName())
 						.concat("?id=").concat(Integer.toString(studySubId)));
@@ -192,14 +201,14 @@ public class RemoveEventCRFServlet extends Controller {
 	 * @param emailBody
 	 *            String
 	 */
-	private void sendEmail(String emailBody, HttpServletRequest request) throws Exception {
+	private void sendEmail(String emailHeader, String emailBody, HttpServletRequest request) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 
 		logger.info("Sending email...");
 		// to study director
 
-		sendEmail(ub.getEmail().trim(), respage.getString("remove_event_CRF_from_event"), emailBody, false, request);
-		sendEmail(EmailEngine.getAdminEmail(), respage.getString("remove_event_CRF_from_event"), emailBody, false,
+		sendEmail(ub.getEmail().trim(), emailHeader, emailBody, false, request);
+		sendEmail(EmailEngine.getAdminEmail(), emailHeader, emailBody, false,
 				request);
 		logger.info("Sending email done..");
 	}

@@ -56,6 +56,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
 /**
@@ -199,9 +200,17 @@ public class RestoreEventCRFServlet extends Controller {
 						+ cb.getName() + " " + respage.getString("has_been_restored_to_the_event") + " "
 						+ event.getStudyEventDefinition().getName() + ".";
 				addPageMessage(messageBody, request);
-				String emailBody = "" + EmailUtil.getEmailBodyStart() + messageBody + EmailUtil.getEmailBodyEnd()
+				String emailBody = EmailUtil.getEmailBodyStart()
+						+ messageBody + "<br/><ul>"
+						+ resword.getString("job_error_mail.serverUrl") + " " + SQLInitServlet.getSystemURL() + "</li>"
+						+ resword.getString("job_error_mail.studyName") + " " + study.getName() + "</li>"
+						+ "<li><b>" + resword.getString("mail.restored_by") + ":</b> " + currentUser.getName() + "</li>"
+						+ "<li><b>" + resword.getString("subject") + "</b>: " + studySub.getLabel() + "</li></ul>"
+						+ EmailUtil.getEmailBodyEnd()
 						+ EmailUtil.getEmailFooter(getLocale());
-				sendEmail(emailBody, request);
+				String emailHeader = respage.getString("restore_event_CRF_to_event") + " "
+						+ resword.getString("subject") + ": " + studySub.getLabel();
+				sendEmail(emailHeader, emailBody, request);
 				storePageMessages(request);
 				response.sendRedirect(request.getContextPath().concat(Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName())
 						.concat("?id=").concat(Integer.toString(studySubId)));
@@ -224,14 +233,14 @@ public class RestoreEventCRFServlet extends Controller {
 	 * @param emailBody
 	 *            String
 	 */
-	private void sendEmail(String emailBody, HttpServletRequest request) throws Exception {
+	private void sendEmail(String emailHeader, String emailBody, HttpServletRequest request) throws Exception {
 
 		UserAccountBean ub = getUserAccountBean(request);
 
 		logger.info("Sending email...");
-		sendEmail(ub.getEmail().trim(), respage.getString("restore_event_CRF_to_event"), emailBody, false, request);
+		sendEmail(ub.getEmail().trim(), emailHeader, emailBody, false, request);
 		// to admin
-		sendEmail(EmailEngine.getAdminEmail(), respage.getString("restore_event_CRF_to_event"), emailBody, false,
+		sendEmail(EmailEngine.getAdminEmail(), emailHeader, emailBody, false,
 				request);
 		logger.info("Sending email done..");
 	}
