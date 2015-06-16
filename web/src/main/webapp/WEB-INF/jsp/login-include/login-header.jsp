@@ -50,7 +50,7 @@
                     if (themeColor == 'violet') {
                         $('a').css('color','#AA62C6');
                         $('H1').css('color', '#AA62C6');
-                        $("input").not(".medium_cancel").each(function() {
+                        $("input").not(".medium_cancel, .medium_back, .medium_submit").each(function() {
                             var newSrc = $(this).css('background-image');
                             if (newSrc.indexOf('/violet/') >= 0) return;
                             newSrc = newSrc.replace('images/','images/violet/');
