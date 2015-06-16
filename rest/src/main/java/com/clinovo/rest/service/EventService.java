@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * CLINOVO RESERVES ALL RIGHTS TO THIS SOFTWARE, INCLUDING SOURCE AND DERIVED BINARY CODE. BY DOWNLOADING THIS SOFTWARE YOU AGREE TO THE FOLLOWING LICENSE:
+ *
+ * Subject to the terms and conditions of this Agreement including, Clinovo grants you a non-exclusive, non-transferable, non-sublicenseable limited license without license fees to reproduce and use internally the software complete and unmodified for the sole purpose of running Programs on one computer.
+ * This license does not allow for the commercial use of this software except by IRS approved non-profit organizations; educational entities not working in joint effort with for profit business.
+ * To use the license for other purposes, including for profit clinical trials, an additional paid license is required. Please contact our licensing department at http://www.clinovo.com/contact for pricing information.
+ *
+ * You may not modify, decompile, or reverse engineer the software.
+ * Clinovo disclaims any express or implied warranty of fitness for use.
+ * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
+ * THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. CLINOVO FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
+
+ * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
+ *******************************************************************************/
+
 package com.clinovo.rest.service;
 
 import java.util.HashMap;
@@ -30,11 +45,11 @@ import com.clinovo.rest.enums.Scope;
 import com.clinovo.rest.enums.UserRole;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
-import com.clinovo.util.RequestUtil;
 import com.clinovo.rest.util.ValidatorUtil;
+import com.clinovo.rest.validator.EventServiceValidator;
 import com.clinovo.service.EventDefinitionService;
 import com.clinovo.service.ItemSDVService;
-import com.clinovo.util.EmailUtil;
+import com.clinovo.util.RequestUtil;
 import com.clinovo.validator.EventDefinitionValidator;
 
 /**
@@ -132,6 +147,10 @@ public class EventService extends BaseService {
 		eventDefinitionService.createStudyEventDefinition(studyBean, isReference ? "" : emailUser,
 				studyEventDefinitionBean);
 
+		if (studyEventDefinitionBean.getId() == 0) {
+			throw new RestException(messageSource, "rest.createEvent.operationFailed");
+		}
+
 		return studyEventDefinitionBean;
 	}
 
@@ -202,8 +221,8 @@ public class EventService extends BaseService {
 		boolean hasSDVRequiredItems = itemSDVService.hasItemsToSDV(crfVersionBean.getCrfId());
 
 		HashMap errors = EventDefinitionValidator.validateCrfAdding(messageSource, dataSource, eventId, defaultVersion,
-				crfName, sourceDataVerification, hasSDVRequiredItems, studyEventDefinitionBean, crfVersionBean,
-				currentStudy);
+				crfName, sourceDataVerification, emailWhen, email, hasSDVRequiredItems, studyEventDefinitionBean,
+				crfVersionBean, currentStudy);
 
 		ValidatorUtil.checkForErrors(errors);
 
@@ -222,18 +241,38 @@ public class EventService extends BaseService {
 		eventDefinitionCrfBean.setCrfName(crfName);
 		eventDefinitionCrfBean.setCrfId(crfVersionBean.getCrfId());
 		eventDefinitionCrfBean.setStudyId(currentStudy.getId());
-		if (emailWhen.equals("sign") || emailWhen.equals("complete")) {
-			if (!EmailUtil.isValid(email)) {
-				throw new RestException(messageSource, "rest.event.emailAddressIsNotValid");
-			}
-			eventDefinitionCrfBean.setEmailStep(emailWhen);
-			eventDefinitionCrfBean.setEmailTo(email);
-		}
+		eventDefinitionCrfBean.setEmailStep(emailWhen);
+		eventDefinitionCrfBean.setEmailTo(email);
 		eventDefinitionCrfBean.setTabbingMode(tabbing);
 		eventDefinitionCrfBean.setOwner(currentUser);
 
 		eventDefinitionService.addEventDefinitionCrf(eventDefinitionCrfBean);
 
 		return eventDefinitionCrfBean;
+	}
+
+	/**
+	 * Method returns the study event definition.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyEventDefinitionBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RestAccess(UserRole.ANY_ADMIN)
+	@ResponseBody
+	@RequestMapping(method = RequestMethod.GET)
+	public StudyEventDefinitionBean mainGet(@RequestParam(value = "id") int id) throws Exception {
+		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
+				dataSource).findByPK(id);
+
+		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, currentStudy);
+
+		eventDefinitionService.fillEventDefinitionCrfs(currentStudy, studyEventDefinitionBean);
+
+		return studyEventDefinitionBean;
 	}
 }

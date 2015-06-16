@@ -38,6 +38,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.context.MessageSource;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.EmailUtil;
 import com.clinovo.util.ValidatorHelper;
 
 /**
@@ -202,6 +203,10 @@ public class EventDefinitionValidator {
 	 *            String
 	 * @param sdvCode
 	 *            int
+	 * @param emailWhen
+	 *            String
+	 * @param email
+	 *            String
 	 * @param hasSDVRequiredItems
 	 *            boolean
 	 * @param studyEventDefinitionBean
@@ -213,10 +218,10 @@ public class EventDefinitionValidator {
 	 * @return HashMap
 	 */
 	public static HashMap validateCrfAdding(MessageSource messageSource, DataSource dataSource, int eventId,
-			String versionName, String crfName, int sdvCode, boolean hasSDVRequiredItems,
-			StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersionBean, StudyBean currentStudy) {
+			String versionName, String crfName, int sdvCode, String emailWhen, String email,
+			boolean hasSDVRequiredItems, StudyEventDefinitionBean studyEventDefinitionBean,
+			CRFVersionBean crfVersionBean, StudyBean currentStudy) {
 		HashMap errors = new HashMap();
-
 		Locale locale = LocaleResolver.getLocale();
 
 		EventDefinitionCRFBean eventDefinitionCrfBean = new EventDefinitionCRFDAO(dataSource)
@@ -246,6 +251,10 @@ public class EventDefinitionValidator {
 			errorMessages.add(messageSource.getMessage("rest.event.crfHasSDVRequiredItems",
 					new Object[]{crfVersionBean.getCrfId()}, locale));
 			errors.put("sourcedataverification", errorMessages);
+		} else if ((emailWhen.equals("sign") || emailWhen.equals("complete")) && !EmailUtil.isValid(email)) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.emailAddressIsNotValid", null, locale));
+			errors.put("email", errorMessages);
 		}
 
 		return errors;

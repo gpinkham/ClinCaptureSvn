@@ -13,27 +13,49 @@
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
 
-package com.clinovo.rest.annotation;
+package com.clinovo.rest.validator;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Locale;
 
-import org.springframework.stereotype.Component;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.springframework.context.MessageSource;
+
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.rest.exception.RestException;
 
 /**
- * Rest parameters possible values annotation.
+ * EventServiceValidator.
  */
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@Component
-public @interface RestParametersPossibleValues {
+public final class EventServiceValidator {
+
+	private EventServiceValidator() {
+	}
 
 	/**
-	 * Method that returns annotation value.
+	 * Validates StudyEventDefinitionBean.
+	 *
+	 * @param messageSource
+	 *            MessageSource
+	 * @param id
+	 *            int
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @throws RestException
+	 *             the RestException
 	 */
-	RestParameterPossibleValues[] value();
+	public static void validateStudyEventDefinition(MessageSource messageSource, int id,
+			StudyEventDefinitionBean studyEventDefinitionBean, StudyBean currentStudy) throws RestException {
+		Locale locale = LocaleResolver.getLocale();
+		if (!(studyEventDefinitionBean.getId() > 0)) {
+			throw new RestException(messageSource.getMessage("rest.event.isNotFound", new Object[]{id}, locale));
+		} else if (!((currentStudy.getParentStudyId() > 0 && studyEventDefinitionBean.getStudyId() == currentStudy
+				.getParentStudyId()) || (currentStudy.getParentStudyId() == 0 && studyEventDefinitionBean.getStudyId() == currentStudy
+				.getId()))) {
+			throw new RestException(messageSource.getMessage("rest.event.doesNotBelongToCurrentStudy", new Object[]{id,
+					currentStudy.getId()}, locale));
+		}
+	}
 }

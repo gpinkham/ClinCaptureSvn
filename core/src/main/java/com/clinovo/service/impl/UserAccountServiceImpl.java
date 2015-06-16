@@ -418,7 +418,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public UserAccountBean createUser(UserAccountBean ownerUser, UserAccountBean userAccountBean, Role role,
+	public void createUser(UserAccountBean ownerUser, UserAccountBean userAccountBean, Role role,
 			boolean displayPassword, String password) {
 		UserAccountDAO userAccountDAO = getUserAccountDAO();
 
@@ -447,7 +447,6 @@ public class UserAccountServiceImpl implements UserAccountService {
 				userAccountBean.setPasswd(password);
 			}
 		}
-		return userAccountBean;
 	}
 
 	/**

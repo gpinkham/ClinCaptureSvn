@@ -1,5 +1,6 @@
 package com.clinovo.rest.service;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -619,5 +620,32 @@ public class EventServiceTest extends BaseServiceTest {
 					Status.AVAILABLE);
 			assertTrue(restOdmContainer.getRestData().getEventDefinitionCRFBean().getId() > 0);
 		}
+	}
+
+	@Test
+	public void testThatInfoAboutExistingStudyEventDefinitionIsReturnedCorrectly() throws Exception {
+		result = this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getName(), "ED-1-NonRepeating");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getEventDefinitionCrfs().size(),
+					3);
+		}
+	}
+
+	@Test
+	public void testThatItIsImpossibleToGetInfoAboutNonExistingStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(get(API_EVENT).param("id", "413341").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToGetInfoAboutExistingStudyEventDefinitionThatDoesNotBelongToCurrentScope()
+			throws Exception {
+		createNewStudy();
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
+		this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
 	}
 }

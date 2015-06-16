@@ -90,6 +90,7 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 	protected MockHttpSession session = new MockHttpSession();
 
 	// Managed services
+	public static final String API_EVENT = "/event";
 	public static final String API_EVENT_ADD_CRF = "/event/addCrf";
 	public static final String API_EVENT_CREATE = "/event/create";
 	public static final String API_WRONG_MAPPING = "/wrongmapping";
@@ -273,7 +274,7 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 				restOdmContainer = (RestOdmContainer) jaxbUnmarshaller.unmarshal(new StringReader(result.getResponse()
 						.getContentAsString()));
 			} catch (Exception ex) {
-				int x = 0;
+				//
 			}
 			assertNotNull(restOdmContainer);
 		}

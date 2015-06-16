@@ -186,10 +186,9 @@ public interface UserAccountService {
 	 *            boolean
 	 * @param password
 	 *            String
-	 * @return UserAccountBean
 	 */
-	UserAccountBean createUser(UserAccountBean ownerUser, UserAccountBean userAccountBean, Role role,
-			boolean displayPassword, String password);
+	void createUser(UserAccountBean ownerUser, UserAccountBean userAccountBean, Role role, boolean displayPassword,
+			String password);
 
 	/**
 	 * Check if user has site-level roles or study level roles.

@@ -29,4 +29,14 @@ public interface EventDefinitionService {
 	 *            EventDefinitionCRFBean
 	 */
 	void addEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCrfBean);
+
+	/**
+	 * Fills info for EventDefinitionCRFBeans.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 */
+	void fillEventDefinitionCrfs(StudyBean currentStudy, StudyEventDefinitionBean studyEventDefinitionBean);
 }

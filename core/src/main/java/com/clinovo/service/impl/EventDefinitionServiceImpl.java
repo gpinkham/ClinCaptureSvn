@@ -1,17 +1,22 @@
 package com.clinovo.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +26,7 @@ import com.clinovo.service.EventDefinitionService;
  * EventDefinitionServiceImpl.
  */
 @Service
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class EventDefinitionServiceImpl implements EventDefinitionService {
 
 	@Autowired
@@ -51,5 +56,28 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		eventDefinitionCrfBean.setCreatedDate(new Date());
 		eventDefinitionCrfBean.setStatus(Status.AVAILABLE);
 		new EventDefinitionCRFDAO(dataSource).create(eventDefinitionCrfBean);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void fillEventDefinitionCrfs(StudyBean currentStudy, StudyEventDefinitionBean studyEventDefinitionBean) {
+		if (studyEventDefinitionBean != null) {
+			Collection<EventDefinitionCRFBean> eventDefinitionCrfs = new EventDefinitionCRFDAO(dataSource)
+					.findAllActiveByEventDefinitionId(currentStudy, studyEventDefinitionBean.getId());
+			if (eventDefinitionCrfs != null) {
+				CRFDAO crfDao = new CRFDAO(dataSource);
+				CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
+				for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefinitionCrfs) {
+					CRFVersionBean crfBeanVersion = (CRFVersionBean) crfVersionDao.findByPK(eventDefinitionCRFBean
+							.getDefaultVersionId());
+					CRFBean crfBean = (CRFBean) crfDao.findByPK(eventDefinitionCRFBean.getCrfId());
+					eventDefinitionCRFBean.setEventName(studyEventDefinitionBean.getName());
+					eventDefinitionCRFBean.setDefaultVersionName(crfBeanVersion.getName());
+					eventDefinitionCRFBean.setCrfName(crfBean.getName());
+					studyEventDefinitionBean.getEventDefinitionCrfs().add(eventDefinitionCRFBean);
+				}
+			}
+		}
 	}
 }
