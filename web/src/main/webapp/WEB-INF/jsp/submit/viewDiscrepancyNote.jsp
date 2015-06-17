@@ -2,12 +2,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <html> 
 <head>
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
@@ -156,7 +156,7 @@
                         
 						<b><c:choose>
                             <c:when test="${studyEvent.dateStarted != null}">
-                                <fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;
+                                <cc-fmt:formatDate value="${studyEvent.dateStarted}" dateTimeZone="${userBean.userTimeZoneId}"/>&nbsp;
                             </c:when>
                             <c:otherwise>
 								<fmt:message key='N/A' bundle='${resword}'/>
@@ -264,7 +264,7 @@
                                             </b>
                                         </div>
                                         <div style="float: right; padding-left: 30px;">
-                                            <fmt:message key="Last_updated" bundle="${resword}"/>: <b><fmt:formatDate value="${note.value.lastDateUpdated}" pattern="${dteFormat}"/> by <c:out value="${note.value.owner.name}"/></b><br>
+                                            <fmt:message key="Last_updated" bundle="${resword}"/>: <b><cc-fmt:formatDate value="${note.value.lastDateUpdated}" dateTimeZone="${userBean.userTimeZoneId}"/> by <c:out value="${note.value.owner.name}"/></b><br>
                                             <fmt:message key="Assigned_to" bundle="${resword}"/>:&nbsp;&nbsp;  <b> <c:out value="${note.value.assignedUser.firstName}"/> <c:out value="${note.value.assignedUser.lastName}"/> (<c:out value ="${note.value.assignedUser.name}"/>)
                                         </div>
                                     </td>
@@ -298,7 +298,7 @@
                                         <td class="table_cell_left" colspan="2" bgcolor="#f5f5f5" width="50%" valign="top"><b><c:out value="${child.description}"/></b></td>
                                         <td class="table_cell" bgcolor="#f5f5f5" align="left" width="25%" valign="top" nowrap><fmt:message key="status" bundle="${resword}"/>: <c:out value="${child.resStatus.name}"/></td>
                                         <td class="table_cell" bgcolor="#f5f5f5" width="25%" align="right" valign="top" nowrap>
-                                            <fmt:formatDate value="${child.createdDate}" pattern="${dteFormat}"/> by <c:out value="${child.owner.name}"/><br>
+                                            <cc-fmt:formatDate value="${child.createdDate}" dateTimeZone="${userBean.userTimeZoneId}"/> by <c:out value="${child.owner.name}"/><br>
                                             <c:if test="${child.assignedUserId > 0}">
                                                 <fmt:message key="Assigned_to" bundle="${resword}"/>: <c:out value="${child.assignedUser.firstName}"/> <c:out value="${child.assignedUser.lastName}"/> (<c:out value ="${child.assignedUser.name}"/>)
                                             </c:if>

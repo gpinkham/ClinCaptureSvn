@@ -2,13 +2,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <html>    
 <head>
@@ -321,7 +321,7 @@ $(document).ready(function() {
                         <fmt:message key="N/A" bundle="${resword}"/>
                     </c:when>
                     <c:otherwise>
-						<fmt:formatDate value="${discrepancyNote.eventStart}" pattern="${dteFormat}"/>
+						<cc-fmt:formatDate value="${discrepancyNote.eventStart}" dateTimeZone="${userBean.userTimeZoneId}"/>
                     </c:otherwise>
                 </c:choose></b>
             </td>

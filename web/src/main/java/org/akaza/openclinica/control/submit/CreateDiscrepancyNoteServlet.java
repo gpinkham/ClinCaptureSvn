@@ -20,7 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -266,7 +266,6 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			request.setAttribute("enterItemData", "yes");
 		}
 
-		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, LocaleResolver.getLocale(request));
 		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 		StudySubjectBean ssub = (StudySubjectBean) ssdao.findByPK(stSubjectId);
 		int preUserId = 0;
@@ -290,7 +289,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				if (!StringUtil.isBlank(column)) {
 					if ("enrollment_date".equalsIgnoreCase(column)) {
 						if (ssub.getEnrollmentDate() != null) {
-							request.setAttribute("entityValue", dateFormatter.format(ssub.getEnrollmentDate()));
+							request.setAttribute("entityValue", DateUtil.printDate(ssub.getEnrollmentDate(),
+									getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 						} else {
 							request.setAttribute("entityValue", resword.getString("N/A"));
 						}
@@ -306,7 +306,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 						request.setAttribute("entityName", resword.getString("gender"));
 					} else if ("date_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
-							request.setAttribute("entityValue", dateFormatter.format(sub.getDateOfBirth()));
+							request.setAttribute("entityValue", DateUtil.printDate(sub.getDateOfBirth(),
+									DateUtil.DatePattern.DATE, getLocale()));
 						} else {
 							request.setAttribute("entityValue", resword.getString("N/A"));
 						}
@@ -344,7 +345,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 						request.setAttribute("entityName", resword.getString("gender"));
 					} else if ("date_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
-							request.setAttribute("entityValue", dateFormatter.format(sub.getDateOfBirth()));
+							request.setAttribute("entityValue", DateUtil.printDate(sub.getDateOfBirth(),
+									DateUtil.DatePattern.DATE, getLocale()));
 						}
 						request.setAttribute("entityName", resword.getString("date_of_birth"));
 					} else if ("year_of_birth".equalsIgnoreCase(column)) {
@@ -372,14 +374,16 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 						request.setAttribute("entityName", resword.getString("location"));
 					} else if ("date_start".equalsIgnoreCase(column)) {
 						if (se.getDateStarted() != null) {
-							request.setAttribute("entityValue", dateFormatter.format(se.getDateStarted()));
+							request.setAttribute("entityValue", DateUtil.printDate(se.getDateStarted(),
+									getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 						} else {
 							request.setAttribute("entityValue", resword.getString("N/A"));
 						}
 						request.setAttribute("entityName", resword.getString("start_date"));
 					} else if ("date_end".equalsIgnoreCase(column)) {
 						if (se.getDateEnded() != null) {
-							request.setAttribute("entityValue", dateFormatter.format(se.getDateEnded()));
+							request.setAttribute("entityValue", DateUtil.printDate(se.getDateEnded(),
+									getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 						} else {
 							request.setAttribute("entityValue", resword.getString("N/A"));
 						}
@@ -393,7 +397,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				if (!StringUtil.isBlank(column)) {
 					if ("date_interviewed".equals(column)) {
 						if (ecb.getDateInterviewed() != null) {
-							request.setAttribute("entityValue", dateFormatter.format(ecb.getDateInterviewed()));
+							request.setAttribute("entityValue", DateUtil.printDate(ecb.getDateInterviewed(),
+									getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 						} else {
 							request.setAttribute("entityValue", resword.getString("N/A"));
 						}
@@ -518,8 +523,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			if (dnb.getEventName() == null || dnb.getEventName().equals("")) {
 				dnb.setEventName(fp.getString("eventName"));
 			}
-			if (dnb.getEventStart() == null) {
-				dnb.setEventStart(fp.getDate("eventDate"));
+			if (dnb.getEventStart() == null && !StringUtil.isBlank(fp.getString("eventDate"))) {
+				dnb.setEventStart(fp.getDate("eventDate", DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS));
 			}
 			if (dnb.getCrfName() == null || dnb.getCrfName().equals("")) {
 				dnb.setCrfName(fp.getString("crfName"));

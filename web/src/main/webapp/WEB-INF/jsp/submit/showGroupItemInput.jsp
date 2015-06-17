@@ -2,11 +2,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+
+<c:set var="dateTimeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
  
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
@@ -781,7 +784,9 @@ function changeImage(name) {
 			<c:if test="${(isLocked == null) || (isLocked eq 'no')}">
 				<c:set var="imageFileName" value="icon_noNote" />
 				<c:set var="eventName" value="${toc.studyEventDefinition.name}"/>
-				<c:set var="eventDate" value="${toc.studyEvent.dateStarted}"/>
+				<c:set var="eventDate">
+					<cc-fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dateTimeFormat}"/>
+				</c:set>
 				<c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
 				<a class="dnLink"
 							tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip();"
@@ -801,35 +806,7 @@ function changeImage(name) {
     </c:import>
 
 </c:if>
-<%-- we won't need this if we're not embedding error messages
-<br><c:import url="../showMessage.jsp"><c:param name="key" value=
-              "${inputName}" /></c:import>    --%>
-<%--
-adding units...
- if(responseName.equalsIgnoreCase("text") ||
-      responseName.equalsIgnoreCase("textarea") ||
-      responseName.equalsIgnoreCase("single-select") ||
-      responseName.equalsIgnoreCase("multi-select")){
 
-       td = this.addUnits(td,displayBean);
-       //td = this.addRightItemText(td,displayBean);
-    }
-    if(responseName.equalsIgnoreCase("radio") ||
-      responseName.equalsIgnoreCase("checkbox") ){
-      String grLabel = displayBean.getMetadata().getGroupLabel();
-      boolean grouped = (grLabel != null && (! "".equalsIgnoreCase(grLabel)) &&
-      (! grLabel.equalsIgnoreCase("ungrouped")));
- 
-      if(! grouped) {
-         td = this.addUnits(td,displayBean); 
-      }  else {
-        //the radio or checkbox does appear in a group table
-        //Do not add units if the layout is horizontal
-        if(! displayBean.getMetadata().getResponseLayout().
-          equalsIgnoreCase("Horizontal")){
-           td = this.addUnits(td,displayBean);
-        }
---%>
 <c:if test='${inputType == "text"|| inputType == "textarea" ||
 inputType == "multi-select" || inputType == "single-select" ||
 inputType == "calculation" }'>

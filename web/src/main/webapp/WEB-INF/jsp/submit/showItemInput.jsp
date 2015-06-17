@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
@@ -9,6 +10,8 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+
+<c:set var="dateTimeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
@@ -976,7 +979,9 @@ include the default value first in the select list --%>
             </c:when>
             <c:otherwise>
                 <c:set var="eventName" value="${toc.studyEventDefinition.name}"/>
-                <c:set var="eventDate" value="${toc.studyEvent.dateStarted}"/>
+				<c:set var="eventDate">
+					<cc-fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dateTimeFormat}"/>
+				</c:set>
                 <c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
                 <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip()"
                    onClick="openDNWindow('CreateDiscrepancyNote?stSubjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}" />&column=value&enterData=1&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}&originJSP=<c:out value="${param.originJSP}"/>&writeToDB=<c:out value="${writeToDB}"/>','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">

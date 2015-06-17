@@ -379,18 +379,29 @@ public class FormProcessor {
 
 	/**
 	 * Parses date from the input date string, stored in the http request parameter/attribute.
-	 * The date format <code>dd-Mmm-yyyy</code> is expected for input date string.
 	 *
+	 * @param fieldName        request parameter name, which stores input date string.
+	 * @param datePattern      expected date format.
 	 * @param searchAttributes if <code>true</code>, then method searches for input date string
 	 *                         both in request parameters and attributes;
 	 *                         if <code>false</code>, then method searches for input date string
 	 *                         in request parameters only.
-	 * @param fieldName        request parameter name, which stores input date string.
 	 * @return date object, created from the input date string.
 	 */
-	public Date getDate(String fieldName, boolean searchAttributes) {
+	public Date getDate(String fieldName, DateUtil.DatePattern datePattern, boolean searchAttributes) {
 		String fieldValue = getString(fieldName, searchAttributes);
-		return DateUtil.parseDateString(fieldValue, DateUtil.DatePattern.DATE, LocaleResolver.getLocale());
+		return DateUtil.parseDateString(fieldValue, datePattern, LocaleResolver.getLocale());
+	}
+
+	/**
+	 * Parses date from the input date string, stored in the http request parameter.
+	 *
+	 * @param fieldName   request parameter name, which stores input date string.
+	 * @param datePattern expected date format
+	 * @return date object, created from the input date string.
+	 */
+	public Date getDate(String fieldName, DateUtil.DatePattern datePattern) {
+		return getDate(fieldName, datePattern, false);
 	}
 
 	/**
@@ -401,7 +412,7 @@ public class FormProcessor {
 	 * @return date object, created from the input date string.
 	 */
 	public Date getDate(String fieldName) {
-		return getDate(fieldName, false);
+		return getDate(fieldName, DateUtil.DatePattern.DATE, false);
 	}
 
 	/**
