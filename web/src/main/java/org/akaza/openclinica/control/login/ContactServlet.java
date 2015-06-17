@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.login;
 
+import com.clinovo.util.EmailUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -39,7 +40,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 
 /**
- * Sends user message to the administrator
+ * Sends user message to the administrator.
  * 
  * @author jxu
  * 
@@ -115,10 +116,10 @@ public class ContactServlet extends Controller {
 		logger.info("Sending email...");
 
 		msg.applyPattern(restext.getString("support_email_message_html_full"));
-		emailBody = msg.format(new Object[] { name, role.getName(),
+		emailBody = EmailUtil.getEmailBodyStart() + msg.format(new Object[] { name, role.getName(),
 				currentStudy.getParentStudyId() == 0 ? resword.getString("study") : resword.getString("site"),
 				currentStudy.getName(), request.getRequestURL().toString().replaceFirst(request.getServletPath(), ""),
-				email, subject, message });
+				email, subject, message }) + EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(getLocale());
 
 		sendEmail(EmailEngine.getAdminEmail(), subject, emailBody, true, request);
 
