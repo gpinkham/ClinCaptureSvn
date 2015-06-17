@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
+import com.clinovo.util.DRUtil;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.BasicDefinitionsBean;
 import org.akaza.openclinica.bean.odmbeans.CodeListBean;
@@ -1072,11 +1073,11 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             xml.append(nls);
             temp = inform.getLeftItemText();
             xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent
-                    + "<OpenClinica:LeftItemText>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:LeftItemText>"
+                    + "<OpenClinica:LeftItemText>" + StringEscapeUtils.escapeXml(DRUtil.getTextFromHTML(temp)) + "</OpenClinica:LeftItemText>"
                     + nls : "");
             temp = inform.getRightItemText();
             xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent
-                    + "<OpenClinica:RightItemText>" + StringEscapeUtils.escapeXml(temp)
+                    + "<OpenClinica:RightItemText>" + StringEscapeUtils.escapeXml(DRUtil.getTextFromHTML(temp))
                     + "</OpenClinica:RightItemText>" + nls : "");
             temp = inform.getItemHeader();
             xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:ItemHeader>"

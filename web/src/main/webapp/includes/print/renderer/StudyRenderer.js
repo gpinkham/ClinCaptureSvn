@@ -922,24 +922,18 @@ function StudyRenderer(json) {
                     }
                 }
             } else if (repeating == false) {
-                if (columnNumber === undefined || columnNumber == 1) {
+                if (columnNumber === undefined || columnNumber == 1 || columnNumber % 4 == 0) {
                     this.renderString += itemHeader !== undefined ? "<div class='header-title'>"
-                    + itemHeader + "</div>"
-                        : "";
+                    + itemHeader + "</div>" : "";
                     this.renderString += itemSubHeader !== undefined ? "<div class='header-title'>"
-                    + itemSubHeader + "</div>"
-                        : "";
+                    + itemSubHeader + "</div>" : "";
                     this.renderString += "<table class='item-row'>";
                 }
-                this.renderString += itemDefRenderer
-                    .renderPrintableItem(repeating);
-                if (columns == columnNumber || nextColumnNumber == 1
-                    || nextColumnNumber === undefined
-                    || i + 1 == orderedItems.length) {
+                this.renderString += itemDefRenderer.renderPrintableItem(repeating);
+                if (columns == columnNumber || nextColumnNumber == 1 || columnNumber % 4 == 0 || nextColumnNumber === undefined || i + 1 == orderedItems.length) {
                     this.renderString += "</table>";
                 }
             }
-
             if (app_displayAudits == 'y' || app_displayDNs == 'y') {
                 if (typeof itemOids === 'undefined'
                     || itemOids.toString().indexOf(itemDef["@OID"]) < 0) {
