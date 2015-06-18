@@ -14,7 +14,14 @@
  *******************************************************************************/
 package com.clinovo.service.impl;
 
-import com.clinovo.service.DataEntryService;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -50,12 +57,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import com.clinovo.service.DataEntryService;
 
 @Service("dataEntryService")
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -190,23 +192,11 @@ public class DataEntryServiceImpl implements DataEntryService {
 	 * @return boolean
 	 */
 	public boolean shouldLoadDBValues(DisplayItemBean dib, Page servletPage) {
-		if (Page.ADMIN_EDIT_SERVLET.equals(servletPage)) {
-			if (dib.getData().getStatus() == null) {
-				return true;
-			}
-			if (!Status.UNAVAILABLE.equals(dib.getData().getStatus())) {
-				return false;
-			}
-		}
-
 		if (Page.DOUBLE_DATA_ENTRY_SERVLET.equals(servletPage)) {
 			if (dib.getEventDefinitionCRF().isEvaluatedCRF()) {
 				return true;
 			}
-			if (dib.getData().getStatus() == null || dib.getData().getStatus().equals(Status.UNAVAILABLE)) {
-				return true;
-			}
-			if (dib.getData().getStatus().equals(Status.PENDING)) {
+			if (dib.getData().getStatus() != null && dib.getData().getStatus().equals(Status.PENDING)) {
 				return false;
 			}
 		}
