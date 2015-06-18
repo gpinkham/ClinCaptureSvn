@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -1997,13 +1998,14 @@ public abstract class DataEntryServlet extends Controller {
 
 			if (!StringUtil.isBlank(reportFilePath) && "complete".equals(edcb.getEmailStep())) {
 				StringBuilder body = new StringBuilder();
+				body.append(EmailUtil.getEmailBodyStart());
 				body.append(MessageFormat.format(respage.getString("crf_report_email_body"), "completed"));
 				body.append(respage.getString("email_body_simple_separator"));
 				body.append(respage.getString("email_body_simple_separator"));
 				body.append(MessageFormat.format(respage.getString("thank_you_message"), currentStudy.getName()));
-				body.append(respage.getString("email_body_separator"));
 				body.append(respage.getString("email_body_simple_separator"));
-				body.append(respage.getString("email_footer"));
+				body.append(EmailUtil.getEmailBodyEnd());
+				body.append(EmailUtil.getEmailFooter(locale));
 				String[] files = {reportFilePath};
 
 				boolean isEmailSent = sendEmailWithAttach(
