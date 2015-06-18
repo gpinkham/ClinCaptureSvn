@@ -120,7 +120,7 @@ public class EmailActionProcessor implements ActionProcessor {
 			helper.setFrom(EmailEngine.getAdminEmail());
 			helper.setTo(processMultipleImailAddresses(((EmailActionBean) ruleAction).getTo().trim()));
 			helper.setSubject(subject);
-			helper.setText(body);
+			helper.setText(body, true);
 
 			mailSender.send(mimeMessage);
 			logger.debug("Email sent successfully on {}", new Date());

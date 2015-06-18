@@ -163,8 +163,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 						currentStudy,
 						ub,
 						shouldCreateDNForItem(itemData, request),
-						prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction()
-								.getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
+						prepareEmailContents(ruleActionContainer.getRuleSetBean(), currentStudy, ruleActionContainer.getRuleAction()));
 				if (rab != null) {
 					if (rab instanceof ShowActionBean) {
 						messageContainer.add(

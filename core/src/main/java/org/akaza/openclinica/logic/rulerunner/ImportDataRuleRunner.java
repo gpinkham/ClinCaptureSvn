@@ -245,8 +245,7 @@ public class ImportDataRuleRunner extends RuleRunner {
 						DiscrepancyNoteBean.ITEM_DATA,
 						currentStudy,
 						ub,
-						prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction()
-								.getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
+						prepareEmailContents(ruleActionContainer.getRuleSetBean(), currentStudy, ruleActionContainer.getRuleAction()));
 
 				if (rab != null) {
 					if (rab instanceof ShowActionBean) {

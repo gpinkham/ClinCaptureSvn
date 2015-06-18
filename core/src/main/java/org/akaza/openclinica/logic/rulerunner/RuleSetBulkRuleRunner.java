@@ -204,8 +204,7 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
 						DiscrepancyNoteBean.ITEM_DATA,
 						currentStudy,
 						ub,
-						prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction()
-								.getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
+						prepareEmailContents(ruleActionContainer.getRuleSetBean(), currentStudy, ruleActionContainer.getRuleAction()));
 				if (rab != null) {
 					ruleSetBasedView = populateForRuleSetBasedView(ruleSetBasedView,
 							ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction().getRuleSetRule()

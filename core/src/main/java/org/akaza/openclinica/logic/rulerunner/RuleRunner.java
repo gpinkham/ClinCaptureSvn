@@ -15,11 +15,12 @@ package org.akaza.openclinica.logic.rulerunner;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import javax.sql.DataSource;
 
+import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -30,6 +31,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -39,8 +41,6 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
-import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
-import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
@@ -61,6 +61,7 @@ public class RuleRunner {
 	private final Logger logger = LoggerFactory.getLogger(RuleRunner.class);
 
 	private static final int TWENTY = 20;
+	public static final String NEW_LINE = "<br/>";
 
 	private final JavaMailSenderImpl mailSender;
 	private DynamicsMetadataService dynamicsMetadataService;
@@ -109,8 +110,8 @@ public class RuleRunner {
 	}
 
 	@SuppressWarnings("unchecked")
-	HashMap<String, String> prepareEmailContents(RuleSetBean ruleSet, RuleSetRuleBean ruleSetRule,
-			StudyBean currentStudy, RuleActionBean ruleAction) {
+	HashMap<String, String> prepareEmailContents(RuleSetBean ruleSet,
+												 StudyBean currentStudy, RuleActionBean ruleAction) {
 
 		// get the Study Event
 		StudyEventBean studyEvent = (StudyEventBean) getStudyEventDao().findByPK(
@@ -165,39 +166,40 @@ public class RuleRunner {
 				getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemBean.getId(), crfVersion.getId())
 						.getSectionId());
 
+		Locale locale = CoreResources.getSystemLocale();
 		StringBuilder sb = new StringBuilder();
 		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
 
+		sb.append(EmailUtil.getEmailBodyStart());
 		sb.append(respage.getString("email_header_1"));
 		sb.append(" ");
 		sb.append(respage.getString("email_header_2"));
-		sb.append(" '" + currentStudy.getName() + "' ");
+		sb.append(" '").append(currentStudy.getName()).append("' ");
 		sb.append(respage.getString("email_header_3"));
-		sb.append(" \n\n ");
+		sb.append(NEW_LINE);
 
-		sb.append(respage.getString("email_body_1") + " " + theStudyName + " \n ");
-		sb.append(respage.getString("email_body_1_a") + " " + theSiteName + " \n ");
-		sb.append(respage.getString("email_body_2") + " " + studySubject.getName() + " \n ");
-		sb.append(respage.getString("email_body_3") + " " + studyEventDefinitionName + " \n ");
-		sb.append(respage.getString("email_body_4") + " " + crf.getName() + " " + crfVersion.getName() + " \n ");
-		sb.append(respage.getString("email_body_5") + " " + section.getTitle() + " \n ");
-		sb.append(respage.getString("email_body_6") + " " + itemGroupName + " \n ");
-		sb.append(respage.getString("email_body_7") + " " + itemName + " \n ");
-		sb.append(respage.getString("email_body_8") + " " + ruleAction.getCuratedMessage() + " \n ");
+		sb.append(respage.getString("email_body_1")).append(" ").append(theStudyName).append(NEW_LINE);
+		sb.append(respage.getString("email_body_1_a")).append(" ").append(theSiteName).append(NEW_LINE);
+		sb.append(respage.getString("email_body_2")).append(" ").append(studySubject.getName()).append(NEW_LINE);
+		sb.append(respage.getString("email_body_3")).append(" ").append(studyEventDefinitionName).append(NEW_LINE);
+		sb.append(respage.getString("email_body_4")).append(" ").append(crf.getName()).append(" ").append(crfVersion.getName()).append(NEW_LINE);
+		sb.append(respage.getString("email_body_5")).append(" ").append(section.getTitle()).append(NEW_LINE);
+		sb.append(respage.getString("email_body_6")).append(" ").append(itemGroupName).append(NEW_LINE);
+		sb.append(respage.getString("email_body_7")).append(" ").append(itemName).append(NEW_LINE);
+		sb.append(respage.getString("email_body_8")).append(" ").append(ruleAction.getCuratedMessage()).append(NEW_LINE);
 
-		sb.append(" \n\n ");
+		sb.append(NEW_LINE);
 		sb.append(respage.getString("email_body_9"));
-		sb.append(" " + contextPath + " ");
+		sb.append(" ").append(contextPath).append(" ");
 		sb.append(respage.getString("email_body_10"));
-		sb.append(" \n");
+		sb.append(NEW_LINE);
 
 		requestURLMinusServletPath = requestURLMinusServletPath == null ? "" : requestURLMinusServletPath;
 
-		sb.append(requestURLMinusServletPath + "/ViewSectionDataEntry?eventCRFId=" + eventCrf.getId() + "&sectionId="
-				+ section.getId() + "&tabId=" + section.getOrdinal());
-		// &eventId="+ studyEvent.getId());
-		sb.append("\n\n");
-		sb.append(respage.getString("email_footer"));
+		sb.append(requestURLMinusServletPath).append("/ViewSectionDataEntry?eventCRFId=").append(eventCrf.getId()).append("&sectionId=").append(section.getId()).append("&tabId=").append(section.getOrdinal());
+		sb.append(NEW_LINE);
+		sb.append(EmailUtil.getEmailBodyEnd());
+		sb.append(EmailUtil.getEmailFooter(locale));
 
 		String subject = contextPath + " - [" + currentStudy.getName() + "] ";
 		String ruleSummary = ruleAction.getSummary() != null ? ruleAction.getSummary() : "";
@@ -209,20 +211,6 @@ public class RuleRunner {
 		emailContents.put("subject", subject);
 
 		return emailContents;
-	}
-
-	void logCrfViewSpecificOrderedObjects(
-			HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> crfViewSpecificOrderedObjects) {
-		for (RuleBulkExecuteContainer key1 : crfViewSpecificOrderedObjects.keySet()) {
-			for (RuleBulkExecuteContainerTwo key2 : crfViewSpecificOrderedObjects.get(key1).keySet()) {
-				String studySubjects = "";
-				for (String studySubjectIds : crfViewSpecificOrderedObjects.get(key1).get(key2)) {
-					studySubjects += studySubjectIds + " : ";
-				}
-				logger.debug("key1 {} , key2 {} , studySubjectId {}", new Object[]{key1.toString(), key2.toString(),
-						studySubjects});
-			}
-		}
 	}
 
 	ExpressionService getExpressionService() {
