@@ -786,7 +786,22 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		public Object getValue(Object item, String property, int rowcount) {
 			RuleSetRuleBean ruleSetRule = (RuleSetRuleBean) new BasicCellEditor().getValue(item, "ruleSetRule",
 					rowcount);
-			return ruleSetRule.getStatus().getI18nDescription(locale);
+			Status status = ruleSetRule.getStatus();
+			
+			HtmlBuilder builder = new HtmlBuilder();
+
+			if (status != null) {
+				builder.span();
+				if (status == Status.AVAILABLE) {
+					builder.styleClass("aka_green_highlight");
+				} else if (status == Status.DELETED || status == Status.LOCKED) {
+					builder.styleClass("aka_red_highlight");
+				}
+
+				builder.close().append(status.getI18nDescription(locale)).spanEnd();
+			}
+			
+			return builder.toString();
 		}
 	}
 

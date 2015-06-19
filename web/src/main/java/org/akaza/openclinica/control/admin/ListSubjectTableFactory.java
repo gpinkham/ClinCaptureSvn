@@ -250,13 +250,21 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	private class StatusCellEditor implements CellEditor {
 		@SuppressWarnings("unchecked")
 		public Object getValue(Object item, String property, int rowcount) {
-			String value = "";
 			Status status = (Status) ((HashMap<Object, Object>) item).get("subject.status");
+			HtmlBuilder builder = new HtmlBuilder();
 
 			if (status != null) {
-				value = status.getName();
+				builder.span();
+				if (status.isAvailable()) {
+					builder.styleClass("aka_green_highlight");
+				} else if (status.isLocked() || status.isDeleted()) {
+					builder.styleClass("aka_red_highlight");
+				}
+
+				builder.close().append(status.getName()).spanEnd();
 			}
-			return value;
+			
+			return builder.toString();
 		}
 	}
 

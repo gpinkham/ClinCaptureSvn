@@ -50,6 +50,7 @@ import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
+import org.jmesa.view.html.HtmlBuilder;
 
 @SuppressWarnings({"unchecked"})
 public class StudyAuditLogTableFactory extends AbstractTableFactory {
@@ -224,13 +225,21 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
 
 	private class StatusCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
-			String value = "";
 			Status status = (Status) ((HashMap<Object, Object>) item).get("studySubject.status");
+			HtmlBuilder builder = new HtmlBuilder();
 
 			if (status != null) {
-				value = status.getName();
+				builder.span();
+				if (status.isAvailable()) {
+					builder.styleClass("aka_green_highlight");
+				} else if (status.isLocked() || status.isDeleted()) {
+					builder.styleClass("aka_red_highlight");
+				}
+
+				builder.close().append(status.getName()).spanEnd();
 			}
-			return value;
+			
+			return builder.toString();
 		}
 	}
 
