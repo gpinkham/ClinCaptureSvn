@@ -102,13 +102,9 @@
 		<c:choose>
 			<c:when test="${requestStudySubject == requestStudySubjectFalse}">
 				<fmt:message key="schedule_study_event_for" bundle="${resword}"/><b> <c:out value="${chosenStudySubject.name}" /></b>
-				<a href="javascript:openDocWindow('help/2_2_enrollSubject_Help.html#step2')">
-				<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 			</c:when>
-			<c:otherwise>	
-				<fmt:message key="schedule_study_event_for" bundle="${resword}"/>
-				<a href="javascript:openDocWindow('help/2_4_scheduleEvent_Help.html')">
-				<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+			<c:otherwise>
+				<fmt:message key="schedule_study_event" bundle="${resword}"/>
 			</c:otherwise>
 		</c:choose>
 	</span>
@@ -1038,12 +1034,13 @@ function setDNFlag(strImageName,strParentWinImageFullPath, resolutionStatusId) {
 <table border="0" cellpadding="0" cellspacing="0">
     <tr>
         <td>
-            <input type="submit" name="Schedule" value="<fmt:message key="schedule_event" bundle="${resword}"/>" class="button_medium"/>
-            <input type="button" name="StartDataEntry" value="<fmt:message key="start_data_entry" bundle="${resword}"/>" class="button_medium" onClick="$('#openFirstCrf').val('true'); $('input[name=Schedule]').click();"/>
+			<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>"
+				   class="button_medium medium_back" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+            <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit"/>
+            <input type="button" name="StartDataEntry" value="<fmt:message key="start_data_entry" bundle="${resword}"/>" class="button_medium" onClick="$('#openFirstCrf').val('true'); $('input[name=Submit]').click();"/>
             <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" "/>
         </td>
-    </tr>
-</table>
+    </tr></table>
 </form>
 
 <script>
