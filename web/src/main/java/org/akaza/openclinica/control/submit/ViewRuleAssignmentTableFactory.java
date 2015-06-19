@@ -69,6 +69,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+/**
+ * Table factory for View Rules page.
+ */
 @SuppressWarnings("unchecked")
 public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
@@ -84,8 +87,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 	private String[] columnNames = new String[] {};
 	private UserAccountBean currentUser;
 
-	private String designerLink;
-
 	private DataSource dataSource;
 
 	public UserAccountBean getCurrentUser() {
@@ -96,7 +97,12 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		this.currentUser = currentUser;
 	}
 
-	public ViewRuleAssignmentTableFactory(boolean showMoreLink, String designerURL, boolean isDesignerRequest) {
+	/**
+	 * Constructor for factory.
+	 * @param showMoreLink show more link
+	 * @param isDesignerRequest is designer request
+	 */
+	public ViewRuleAssignmentTableFactory(boolean showMoreLink, boolean isDesignerRequest) {
 		this.showMoreLink = showMoreLink;
 		this.isDesignerRequest = isDesignerRequest;
 	}
@@ -222,7 +228,16 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
 	}
 
+	/**
+	 * Always return true.
+	 */
 	public class GenericFilterMatcher implements FilterMatcher {
+		/**
+		 * Matcher for filter - always return true.
+		 * @param itemValue Object
+		 * @param filterValue String
+		 * @return true
+		 */
 		public boolean evaluate(Object itemValue, String filterValue) {
 			// No need to evaluate itemValue and filterValue.
 			return true;
@@ -246,15 +261,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		viewRuleAssignmentFilter.addFilter("studyId", currentStudy.getId());
 		if (viewRuleAssignmentSort.getSorts().size() == 0) {
 			viewRuleAssignmentSort.addSort("itemName", "asc");
-		}
-		Boolean ruleSetRuleStatusFilterNotSelected = true;
-		for (ViewRuleAssignmentFilter.Filter filter : viewRuleAssignmentFilter.getFilters()) {
-			if (filter.getProperty().equals("ruleSetRuleStatus")) {
-				ruleSetRuleStatusFilterNotSelected = false;
-			}
-		}
-		if (ruleSetRuleStatusFilterNotSelected) {
-			// viewRuleAssignmentFilter.addFilter("ruleSetRuleStatus", "1");
 		}
 
 		viewRuleAssignmentFilter.addFilter("ignoreWrongRules", true);
@@ -424,15 +430,21 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 	}
 
 	private class ItemCellEditor implements CellEditor {
-		ItemBean theItem;
 
+		/**
+		 * Get item value.
+		 * @param item Object
+		 * @param property String
+		 * @param rowcount int
+		 * @return Object
+		 */
 		public Object getValue(Object item, String property, int rowcount) {
 
 			String value;
 			HtmlBuilder builder = new HtmlBuilder();
 			String mouseOver = "this.style.textDecoration='underline';";
 			String mouseOut = "this.style.textDecoration='none';";
-			theItem = (ItemBean) ((HashMap<Object, Object>) item).get("item");
+			ItemBean theItem = (ItemBean) ((HashMap<Object, Object>) item).get("item");
 
 			value = builder.a().href("javascript: openDocWindow('ViewItemDetail?itemId=" + theItem.getId() + "')")
 					.style("color: #789EC5;text-decoration: none;").onmouseover(mouseOver).onmouseout(mouseOut).close()
@@ -443,23 +455,22 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 	}
 
 	private class ValidationsValueCellEditor implements CellEditor {
-		ItemBean theItem;
-		CRFBean crf;
-		CRFVersionBean crfVersion;
-		String YES = "yes";
-		String NO = "no";
-		Boolean isExport;
+		private ItemBean theItem;
+		private CRFBean crf;
+		private CRFVersionBean crfVersion;
+		public static final String YES = "yes";
+		public static final String NO = "no";
+		private Boolean isExport;
 
 		public ValidationsValueCellEditor(Boolean isExport) {
 			this.isExport = isExport;
 		}
 
 		public Object getValue(Object item, String property, int rowcount) {
-			return isExport ? renderExportValue(item, property, rowcount) : renderHtmlValue(item, property, rowcount);
-
+			return isExport ? renderExportValue(item) : renderHtmlValue(item);
 		}
 
-		public Object renderExportValue(Object item, String property, int rowcount) {
+		public Object renderExportValue(Object item) {
 
 			String value;
 			HtmlBuilder builder = new HtmlBuilder();
@@ -501,7 +512,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			return value;
 		}
 
-		public Object renderHtmlValue(Object item, String property, int rowcount) {
+		public Object renderHtmlValue(Object item) {
 
 			String value;
 			HtmlBuilder builder = new HtmlBuilder();
@@ -547,8 +558,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 	}
 
 	private class ExecuteOnCellEditor implements CellEditor {
-		List<RuleActionBean> actions;
-		Boolean isExport;
+		private List<RuleActionBean> actions;
+		private Boolean isExport;
 
 		public ExecuteOnCellEditor(Boolean isExport) {
 			this.isExport = isExport;
@@ -557,13 +568,13 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		public Object getValue(Object item, String property, int rowcount) {
 
 			if (isExport) {
-				return renderExportValue(item, property, rowcount);
+				return renderExportValue(item);
 			} else {
-				return renderHtmlValue(item, property, rowcount);
+				return renderHtmlValue(item);
 			}
 		}
 
-		public Object renderHtmlValue(Object item, String property, int rowcount) {
+		public Object renderHtmlValue(Object item) {
 
 			HtmlBuilder builder = new HtmlBuilder();
 			actions = (List<RuleActionBean>) ((HashMap<Object, Object>) item).get("theActions");
@@ -575,7 +586,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			return builder.toString();
 		}
 
-		public Object renderExportValue(Object item, String property, int rowcount) {
+		public Object renderExportValue(Object item) {
 
 			actions = (List<RuleActionBean>) ((HashMap<Object, Object>) item).get("theActions");
 			String expressionEvaluatesTo = actions.size() > 0 ? String.valueOf(actions.get(0)
@@ -589,36 +600,32 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 	}
 
 	private class ActionTypeCellEditor implements CellEditor {
-		List<RuleActionBean> actions;
-
-		Boolean isExport;
+		private List<RuleActionBean> actions;
+		private Boolean isExport;
 
 		public ActionTypeCellEditor(Boolean isExport) {
 			this.isExport = isExport;
 		}
 
 		public Object getValue(Object item, String property, int rowcount) {
-
 			if (isExport) {
-				return renderExportValue(item, property, rowcount);
+				return renderExportValue(item);
 			} else {
-				return renderHtmlValue(item, property, rowcount);
+				return renderHtmlValue(item);
 			}
 		}
 
-		public Object renderHtmlValue(Object item, String property, int rowcount) {
-
+		public Object renderHtmlValue(Object item) {
 			HtmlBuilder builder = new HtmlBuilder();
 			actions = (List<RuleActionBean>) ((HashMap<Object, Object>) item).get("theActions");
 
 			for (RuleActionBean ruleAction : actions) {
 				builder.append(ruleAction.getActionType().getDescription() + "<br/>");
 			}
-
 			return builder.toString();
 		}
 
-		public Object renderExportValue(Object item, String property, int rowcount) {
+		public Object renderExportValue(Object item) {
 
 			actions = (List<RuleActionBean>) ((HashMap<Object, Object>) item).get("theActions");
 			String expressionEvaluatesTo = actions.size() > 0 ? String.valueOf(actions.get(0).getActionType()
@@ -631,23 +638,22 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 	}
 
 	private class ActionSummaryCellEditor implements CellEditor {
-		List<RuleActionBean> actions;
-		Boolean isExport;
+		private List<RuleActionBean> actions;
+		private Boolean isExport;
 
 		public ActionSummaryCellEditor(Boolean isExport) {
 			this.isExport = isExport;
 		}
 
 		public Object getValue(Object item, String property, int rowcount) {
-
 			if (isExport) {
-				return renderExportValue(item, property, rowcount);
+				return renderExportValue(item);
 			} else {
-				return renderHtmlValue(item, property, rowcount);
+				return renderHtmlValue(item);
 			}
 		}
 
-		public Object renderHtmlValue(Object item, String property, int rowcount) {
+		public Object renderHtmlValue(Object item) {
 
 			HtmlBuilder builder = new HtmlBuilder();
 			actions = (List<RuleActionBean>) ((HashMap<Object, Object>) item).get("theActions");
@@ -666,7 +672,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			return builder.toString();
 		}
 
-		public Object renderExportValue(Object item, String property, int rowcount) {
+		public Object renderExportValue(Object item) {
 
 			actions = (List<RuleActionBean>) ((HashMap<Object, Object>) item).get("theActions");
 			String expressionEvaluatesTo = actions.size() > 0 ? String.valueOf(actions.get(0).getSummary()) : "";
@@ -679,21 +685,27 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		public void appendRunOn(HtmlBuilder builder, RuleActionBean ruleAction) {
 			String s = "";
 			RuleActionRunBean ruleActionRun = ruleAction.getRuleActionRun();
-			if (ruleActionRun.getInitialDataEntry())
+			if (ruleActionRun.getInitialDataEntry()) {
 				s += resword.getString("IDE_comma") + " ";
-			if (ruleActionRun.getDoubleDataEntry())
+			}
+			if (ruleActionRun.getDoubleDataEntry()) {
 				s += resword.getString("DDE_comma") + " ";
-			if (ruleActionRun.getAdministrativeDataEntry())
+			}
+			if (ruleActionRun.getAdministrativeDataEntry()) {
 				s += resword.getString("ADE_comma") + " ";
-			if (ruleActionRun.getImportDataEntry())
+			}
+			if (ruleActionRun.getImportDataEntry()) {
 				s += resword.getString("import_comma") + " ";
-			if (ruleActionRun.getBatch())
+			}
+			if (ruleActionRun.getBatch()) {
 				s += resword.getString("batch_comma") + " ";
+			}
 			s = s.trim();
 			s = s.substring(0, s.length() - 1);
-			if (s.length() > 0)
+			if (s.length() > 0) {
 				builder.tr(1).close().td(1).close().append("<i>" + resword.getString("run_on_colon") + "</i>").tdEnd()
 						.td(1).close().append(s).tdEnd().trEnd(1);
+			}
 		}
 
 		public void appendDest(HtmlBuilder builder, RuleActionBean ruleAction) {
@@ -701,6 +713,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			if (actionType == ActionType.INSERT) {
 				InsertActionBean a = (InsertActionBean) ruleAction;
 				appendDestProps(builder, a.getProperties());
+				appendInsertValues(builder, a.getProperties());
 			}
 			if (actionType == ActionType.SHOW) {
 				ShowActionBean a = (ShowActionBean) ruleAction;
@@ -724,8 +737,19 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 				builder.tr(1).close().td(1).close().append("<i>" + resword.getString("dest_prop_colon") + "</i>")
 						.tdEnd().td(1).close().append(s).tdEnd().td(1).close().tdEnd();
 				builder.trEnd(1);
-				builder.tr(1).close().td(1).close().tdEnd().trEnd(1);
-				builder.tr(1).close().td(1).close().tdEnd().trEnd(1);
+			}
+		}
+
+		private void appendInsertValues(HtmlBuilder builder,
+									 List<org.akaza.openclinica.domain.rule.action.PropertyBean> propertyBeans) {
+			if (propertyBeans != null && propertyBeans.size() > 0) {
+				String value = "";
+				for (org.akaza.openclinica.domain.rule.action.PropertyBean p : propertyBeans) {
+					String propertyValue = p.getValue() == null ? (p.getValueExpression() == null ? "" : p.getValueExpression().getValue()) : p.getValue();
+					value += value.isEmpty() ? propertyValue.trim() : (", " + propertyValue.trim());
+				}
+				builder.tr(1).close().td(1).close().append("<i>" + resword.getString("insert_values_colon") + "</i>")
+						.tdEnd().td(1).close().append(value).tdEnd().td(1).close().tdEnd().trEnd(1);
 			}
 		}
 	}
@@ -912,14 +936,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 				.append("hspace=\"2px\"").end().aEnd();
 		return actionLink.toString();
 
-	}
-
-	public String getDesingerLink() {
-		return designerLink;
-	}
-
-	public void setDesignerLink(String designerLink) {
-		this.designerLink = designerLink;
 	}
 
 	/**

@@ -119,7 +119,7 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 
 		log.debug("Creating table");
 
-		ViewRuleAssignmentTableFactory factory = new ViewRuleAssignmentTableFactory(showMoreLink, "", isDesigner);
+		ViewRuleAssignmentTableFactory factory = new ViewRuleAssignmentTableFactory(showMoreLink, isDesigner);
 
 		factory.setRuleSetService(getRuleSetService());
 		factory.setItemFormMetadataDAO(getItemFormMetadataDAO());
