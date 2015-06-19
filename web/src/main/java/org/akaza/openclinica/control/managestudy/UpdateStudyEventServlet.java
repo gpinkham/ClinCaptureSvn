@@ -477,8 +477,8 @@ public class UpdateStudyEventServlet extends Controller {
 				if (studyEvent.getSubjectEventStatus().isCompleted()) {
 					StdScheduler scheduler = getStdScheduler();
 					CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
-					calLogic.ScheduleSubjectEvents(studyEvent);
-					String message = calLogic.MaxMinDaysValidator(studyEvent);
+					calLogic.scheduleSubjectEvents(studyEvent);
+					String message = calLogic.maxMinDaysValidator(studyEvent);
 					if (!"empty".equalsIgnoreCase(message)) {
 						addPageMessage(message, request);
 					}

@@ -40,10 +40,11 @@ import java.util.ResourceBundle;
 @SuppressWarnings({"unchecked", "deprecation"})
 public class CalendarLogic {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarLogic.class);
+	private static final int ZERO_YEAR = 1970;
 
-	StdScheduler scheduler;
-	DataSource ds;
+	private StdScheduler scheduler;
+	private DataSource ds;
 	private ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
 	private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
 
@@ -53,7 +54,7 @@ public class CalendarLogic {
 
 	}
 
-	public void ScheduleSubjectEvents(StudyEventBean studyEventBean) {
+	public void scheduleSubjectEvents(StudyEventBean studyEventBean) {
 
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
 		StudyEventDAO sed = new StudyEventDAO(ds);
@@ -74,21 +75,21 @@ public class CalendarLogic {
 				List<StudyEventBean> seb = sed.findAllByDefinitionAndSubject(studyEventDefinitionBean, ssb);
 				for (StudyEventBean studyEventBeanReferenceVisit : seb) {
 					if (studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
-						if (studyEventBeanRef.getUpdatedDate() == null) {
+						if (getDateEndedIfExist(studyEventBeanRef) == null) {
 							studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
 						} else {
-							if (studyEventBeanRef.getUpdatedDate()
-									.before(studyEventBeanReferenceVisit.getUpdatedDate())) {
+							if (getDateEndedIfExist(studyEventBeanRef)
+									.before(getDateEndedIfExist(studyEventBeanReferenceVisit))) {
 								studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
 							}
 						}
 					}
 				}
 			}
-			logger.debug("RefEvent ID " + studyEventBeanRef.getId());
+			LOGGER.debug("RefEvent ID " + studyEventBeanRef.getId());
 			StudyEventDefinitionBean studyEventDefBeanRef = (StudyEventDefinitionBean) seddao
 					.findByPK(studyEventBeanRef.getStudyEventDefinitionId());
-			logger.debug("Latest reference visit date for this subject updated" + studyEventBeanRef.getUpdatedDate()
+			LOGGER.debug("Latest reference visit date for this subject updated" + studyEventBeanRef.getUpdatedDate()
 					+ " and called " + studyEventDefBeanRef.getName());
 			// schedule all other events using this date and their sch_day fields
 			int subjectDynGroupId = ssb.getDynamicGroupClassId();
@@ -100,8 +101,8 @@ public class CalendarLogic {
 				sgcb.setId(subjectDynGroupId);
 			}
 			List<StudyEventDefinitionBean> sedForSch;
-			logger.debug("study bean id " + studyBean.getId());
-			logger.debug("subject dyn group id " + subjectDynGroupId);
+			LOGGER.debug("study bean id " + studyBean.getId());
+			LOGGER.debug("subject dyn group id " + subjectDynGroupId);
 			if (sgcb.getId() == 0) {
 				sedForSch = seddao.findAllByStudy(studyBean);
 			} else {
@@ -111,9 +112,9 @@ public class CalendarLogic {
 			List<StudyEventDefinitionBean> nonGroupedEvents = seddao.findAllActiveNotClassGroupedByStudyId(studyBean
 					.getId());
 			sedForSch.addAll(nonGroupedEvents);
-			logger.debug("found list " + sedForSch.size());
+			LOGGER.debug("found list " + sedForSch.size());
 			for (StudyEventDefinitionBean sedTmp : sedForSch) {
-				logger.debug("found name " + sedTmp.getName());
+				LOGGER.debug("found name " + sedTmp.getName());
 				if (!sedTmp.getReferenceVisit() && "calendared_visit".equalsIgnoreCase(sedTmp.getType())) {
 					ArrayList<StudyEventBean> eventsForValidation = sed.findAllByStudySubjectAndDefinition(ssb, sedTmp);
 					if (eventsForValidation.size() == 0) {
@@ -122,8 +123,7 @@ public class CalendarLogic {
 						studyEvent.setStudySubjectId(subjectId);
 						studyEvent.setStartTimeFlag(false);
 						int schDay = sedTmp.getScheduleDay();
-						DateTime dateTimeCompleted = new DateTime(studyEventBeanRef.getUpdatedDate().getTime());
-						dateTimeCompleted = dateTimeCompleted.plusDays(schDay);
+						DateTime dateTimeCompleted = getDateTimeEndedIfExist(studyEventBeanRef).plusDays(schDay);
 						studyEvent.setDateStarted(dateTimeCompleted.toDate());
 						studyEvent.setOwner(getUserByEmailId(sedTmp.getUserEmailId()));
 						studyEvent.setStatus(Status.AVAILABLE);
@@ -135,16 +135,15 @@ public class CalendarLogic {
 						UserAccountDAO useracdao = new UserAccountDAO(ds);
 						UserAccountBean useracBean = (UserAccountBean) useracdao.findByPK(sedTmp.getUserEmailId());
 						try {
-							logger.debug("Start quartz scheduler for this event");
-							DateTime dateTimeEmail = new DateTime(studyEventBeanRef.getUpdatedDate().getTime());
+							LOGGER.debug("Start quartz scheduler for this event");
+							DateTime dateTimeEmail = getDateTimeEndedIfExist(studyEventBeanRef);
 							dateTimeEmail = dateTimeEmail.plusDays(sedTmp.getEmailDay());
 							int daysBetween = Days.daysBetween(dateTimeEmail.toDateMidnight(),
 									dateTimeCompleted.toDateMidnight()).getDays();
-							ScheduleEmailQuartz(sedTmp, ssb, dateTimeEmail.toDate(), daysBetween,
+							scheduleEmailQuartz(sedTmp, ssb, dateTimeEmail.toDate(), daysBetween,
 									useracBean.getEmail(), useracBean, studyBean.getName());
 						} catch (SchedulerException e) {
-
-							logger.error(e.getMessage());
+							LOGGER.error(e.getMessage());
 						}
 					}
 				}
@@ -152,7 +151,7 @@ public class CalendarLogic {
 		}
 	}
 
-	public String MaxMinDaysValidator(StudyEventBean studyEventBean) {
+	public String maxMinDaysValidator(StudyEventBean studyEventBean) {
 		String messageReturn = "empty";
 		StudySubjectDAO ssdao = new StudySubjectDAO(ds);
 		StudyEventDAO sedao = new StudyEventDAO(ds);
@@ -172,38 +171,38 @@ public class CalendarLogic {
 			if (!studyEventBeanRef.getSubjectEventStatus().isSourceDataVerified()
 					&& !studyEventBeanRef.getSubjectEventStatus().isCompleted()
 					&& !studyEventBeanRef.getSubjectEventStatus().isSigned()) {
-				logger.debug("RV for this events is not Completed/SDV/Signed");
+				LOGGER.debug("RV for this events is not Completed/SDV/Signed");
 				studyEventBeanRef = new StudyEventBean();
 			}
 
 			boolean refEventsIsEmpty = false;
-			if (getYearFromDate(studyEventBeanRef.getUpdatedDate()) == 1970) {
+			if (getYearFromDate(studyEventBeanRef.getUpdatedDate()) == ZERO_YEAR) {
 				studyEventBeanRef.setUpdatedDate(new Date());
-				logger.debug("RV not founds so get currentDate and skip DN");
+				LOGGER.debug("RV not founds so get currentDate and skip DN");
 				refEventsIsEmpty = true;
 			}
 
 			StudyEventDefinitionBean infoBean = (StudyEventDefinitionBean) seddao.findByPK(studyEventBeanRef
 					.getStudyEventDefinitionId());
-			logger.debug("Reference visit name " + infoBean.getName());
-			logger.debug("Latest referense visit date complete " + studyEventBeanRef.getUpdatedDate());
-			logger.debug("Information about filled event. OID? " + seBean.getOid());
+			LOGGER.debug("Reference visit name " + infoBean.getName());
+			LOGGER.debug("Latest referense visit date ended " + getDateEndedIfExist(studyEventBeanRef));
+			LOGGER.debug("Information about filled event. OID? " + seBean.getOid());
 
 			DateTime dateTimeCurrent = new DateTime();
-			DateTime ReferenceEventStartDate = new DateTime(studyEventBeanRef.getUpdatedDate().getTime());
-			logger.debug("Days range for the filled event. from "
-					+ ReferenceEventStartDate.plusDays(dayMin).toDateMidnight() + " to "
-					+ ReferenceEventStartDate.toDateMidnight().plusDays(dayMax + 1));
-			Interval timeRangeForStudyEvent = new Interval(ReferenceEventStartDate.plusDays(dayMin).toDateMidnight(),
-					ReferenceEventStartDate.toDateMidnight().plusDays(dayMax + 1));
+			DateTime referenceEventStartDate = new DateTime(studyEventBeanRef.getUpdatedDate().getTime());
+			LOGGER.debug("Days range for the filled event. from "
+					+ referenceEventStartDate.plusDays(dayMin).toDateMidnight() + " to "
+					+ referenceEventStartDate.toDateMidnight().plusDays(dayMax + 1));
+			Interval timeRangeForStudyEvent = new Interval(referenceEventStartDate.plusDays(dayMin).toDateMidnight(),
+					referenceEventStartDate.toDateMidnight().plusDays(dayMax + 1));
 
 			if (timeRangeForStudyEvent.getStart().isAfter(dateTimeCurrent) && !refEventsIsEmpty) {
-				logger.debug("Early start");
+				LOGGER.debug("Early start");
 				messageReturn = resexception.getString("data_has_enteret_too_early_in_the_calendar");
 				DiscrepancyNoteBean parent = createDiscrepancyNote(true, ssb, seBean, studyEventBean, null);
 				createDiscrepancyNote(true, ssb, seBean, studyEventBean, parent.getId());
 			} else if (timeRangeForStudyEvent.getEnd().isBefore(dateTimeCurrent) && !refEventsIsEmpty) {
-				logger.debug("Late start");
+				LOGGER.debug("Late start");
 				messageReturn = resexception.getString("data_has_enteret_too_late_in_the_calendaror");
 				DiscrepancyNoteBean parent = createDiscrepancyNote(false, ssb, seBean, studyEventBean, null);
 				createDiscrepancyNote(false, ssb, seBean, studyEventBean, parent.getId());
@@ -263,7 +262,7 @@ public class CalendarLogic {
 		return note;
 	}
 
-	private void ScheduleEmailQuartz(StudyEventDefinitionBean sedTmp, StudySubjectBean ssb, Date sendEmailDay,
+	private void scheduleEmailQuartz(StudyEventDefinitionBean sedTmp, StudySubjectBean ssb, Date sendEmailDay,
 			int daysBetween, String contactEmail, UserAccountBean uaBean, String studyName) throws SchedulerException {
 		EmailTriggerService emailTriggerService = new EmailTriggerService();
 		SimpleTriggerImpl trigger = emailTriggerService.generateEmailSenderTrigger(sedTmp, ssb, sendEmailDay,
@@ -289,4 +288,15 @@ public class CalendarLogic {
 		return result;
 	}
 
+	public static DateTime getDateTimeEndedIfExist(StudyEventBean studyEventBeanRef) {
+		return new DateTime(getDateEndedIfExist(studyEventBeanRef).getTime());
+	}
+	
+	public static Date getDateEndedIfExist(StudyEventBean studyEventBeanRef) {
+		if (studyEventBeanRef.getDateEnded() != null) {
+			return studyEventBeanRef.getDateEnded();
+		} else {
+			return studyEventBeanRef.getUpdatedDate();
+		}
+	}
 }

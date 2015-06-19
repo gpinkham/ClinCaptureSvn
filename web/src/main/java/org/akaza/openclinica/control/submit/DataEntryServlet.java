@@ -1879,7 +1879,7 @@ public abstract class DataEntryServlet extends Controller {
 									StdScheduler scheduler = getScheduler(request);
 									CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
 									if (!isAdministrativeEditing()) {
-										String message = calLogic.MaxMinDaysValidator(seb);
+										String message = calLogic.maxMinDaysValidator(seb);
 										if (!"empty".equalsIgnoreCase(message)) {
 											addPageMessage(message, request);
 										}
@@ -3799,9 +3799,9 @@ public abstract class DataEntryServlet extends Controller {
 			System.out.println("AutoSchedule");
 			StdScheduler scheduler = getScheduler(request);
 			CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
-			calLogic.ScheduleSubjectEvents(seb);
+			calLogic.scheduleSubjectEvents(seb);
 			if (!isAdministrativeEditing()) {
-				String message = calLogic.MaxMinDaysValidator(seb);
+				String message = calLogic.maxMinDaysValidator(seb);
 				if (!"empty".equalsIgnoreCase(message)) {
 					addPageMessage(message, request);
 				}

@@ -41,6 +41,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.service.calendar.CalendarFuncBean;
+import org.akaza.openclinica.service.calendar.CalendarLogic;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.CalendarEventRow;
@@ -54,7 +55,6 @@ public class ViewCalendaredEventsForSubjectServlet extends Controller {
 
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		//
 	}
 
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -78,13 +78,14 @@ public class ViewCalendaredEventsForSubjectServlet extends Controller {
 				StudyEventBean refEventResult = (StudyEventBean) sedao.findByPK(seBean.getReferenceVisitId());
 				Date dateStart = seBean.getDateStarted();
 				CalendarFuncBean calendFuncBean = new CalendarFuncBean();
-				if (!(refEventResult == null) && seBean.getReferenceVisitId() != 0) {
+				if (refEventResult != null && seBean.getReferenceVisitId() != 0) {
 					if (refEventResult.getSubjectEventStatus().isCompleted()
 							|| refEventResult.getSubjectEventStatus().isSourceDataVerified()
 							|| refEventResult.getSubjectEventStatus().isSigned()) {
-						Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(
+						
+						Date maxDate = CalendarLogic.getDateTimeEndedIfExist(refEventResult).plusDays(
 								sedBean.getMaxDay()).toDate();
-						Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(
+						Date minDate = CalendarLogic.getDateTimeEndedIfExist(refEventResult).plusDays(
 								sedBean.getMinDay()).toDate();
 						int daysBetween = sedBean.getScheduleDay() - sedBean.getEmailDay();
 						Date emailDay = new DateTime(seBean.getDateStarted()).minusDays(daysBetween).toDate();
@@ -123,13 +124,13 @@ public class ViewCalendaredEventsForSubjectServlet extends Controller {
 			}
 		}
 		// request.setAttribute("events", events);
-		request.setAttribute("table", getTable(fp, events, subjectId));
+		request.setAttribute("table", getTable(events, subjectId));
 		request.setAttribute("subjectLabel", ssBean.getLabel());
 		request.setAttribute("currentDate", new Date());
 		forwardPage(Page.SHOW_CALENDAR_FUNC_PER_SUBJ, request, response);
 	}
 
-	private EntityBeanTable getTable(FormProcessor fp, ArrayList events, int subjectId) {
+	private EntityBeanTable getTable(ArrayList events, int subjectId) {
 		EntityBeanTable table = getEntityBeanTable();
 		String[] columns = {resword.getString("calendared_event_name"), resword.getString("min_max_date_range"),
 				resword.getString("schedule_date"), resword.getString("user_email_date"),
