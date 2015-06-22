@@ -109,9 +109,13 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 				+ " left outer join item_group ig on rs.item_group_id = ig.item_group_id "
 				+ " join rule_expression re on rs.rule_expression_id = re.id " + " join rule r on r.id = rsr.rule_id "
 				+ " join rule_expression rer on r.rule_expression_id = rer.id "
-				+ " join rule_action ra on ra.rule_set_rule_id = rsr.id " + " where ";
+				+ " join rule_action ra on ra.rule_set_rule_id = rsr.id "
+				+ " left join event_definition_crf related_edc on related_edc.parent_id is null and related_edc.crf_id = c.crf_id and related_edc.study_event_definition_id = rs.study_event_definition_id and related_edc.status_id = 1 and related_edc.study_id = rs.study_id "
+				+ " left join event_definition_crf actual_edc on actual_edc.parent_id is null and actual_edc.crf_id = c.crf_id and actual_edc.status_id = 1 and actual_edc.study_id = rs.study_id "
+				+ " where ";
 
 		query += filter.execute("");
+		query += " and ((rs.study_event_definition_id is null and actual_edc.event_definition_crf_id is not null) or (rs.study_event_definition_id is not null and related_edc.event_definition_crf_id is not null)) ";
 		org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
 
 		return ((Number) q.uniqueResult()).intValue();
@@ -135,9 +139,13 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 				+ " left outer join item_group ig on rs.item_group_id = ig.item_group_id "
 				+ " join rule_expression re on rs.rule_expression_id = re.id " + " join rule r on r.id = rsr.rule_id "
 				+ " join rule_expression rer on r.rule_expression_id = rer.id "
-				+ " join rule_action ra on ra.rule_set_rule_id = rsr.id " + " where ";
+				+ " join rule_action ra on ra.rule_set_rule_id = rsr.id "
+				+ " left join event_definition_crf related_edc on related_edc.parent_id is null and related_edc.crf_id = c.crf_id and related_edc.study_event_definition_id = rs.study_event_definition_id and related_edc.status_id = 1 and related_edc.study_id = rs.study_id "
+				+ " left join event_definition_crf actual_edc on actual_edc.parent_id is null and actual_edc.crf_id = c.crf_id and actual_edc.status_id = 1 and actual_edc.study_id = rs.study_id "
+				+ " where ";
 
 		query += filter.execute("");
+		query += " and ((rs.study_event_definition_id is null and actual_edc.event_definition_crf_id is not null) or (rs.study_event_definition_id is not null and related_edc.event_definition_crf_id is not null)) ";
 		query += sort.execute("");
 		org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
 		q.setFirstResult(rowStart);
