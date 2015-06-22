@@ -398,6 +398,10 @@ public class CreateSubStudyServlet extends Controller {
 						&& !fp.getString("interviewerNameDefault").isEmpty()) {
 					scg.getValue().setValue(fp.getString("interviewerNameDefault"));
 					study.getStudyParameterConfig().setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("interviewerNameEditable")
+						&& !fp.getString("interviewerNameEditable").isEmpty()) {
+					scg.getValue().setValue(fp.getString("interviewerNameEditable"));
+					study.getStudyParameterConfig().setInterviewerNameEditable(fp.getString("interviewerNameEditable"));
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("interviewDateRequired")
 						&& !fp.getString("interviewDateRequired").isEmpty()) {
 					scg.getValue().setValue(fp.getString("interviewDateRequired"));
@@ -406,6 +410,10 @@ public class CreateSubStudyServlet extends Controller {
 						&& !fp.getString("interviewDateDefault").isEmpty()) {
 					scg.getValue().setValue(fp.getString("interviewDateDefault"));
 					study.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("interviewDateEditable")
+						&& !fp.getString("interviewDateEditable").isEmpty()) {
+					scg.getValue().setValue(fp.getString("interviewDateEditable"));
+					study.getStudyParameterConfig().setInterviewDateEditable(fp.getString("interviewDateEditable"));
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("markImportedCRFAsCompleted")
 						&& !fp.getString("markImportedCRFAsCompleted").isEmpty()) {
 					scg.getValue().setValue(fp.getString("markImportedCRFAsCompleted"));

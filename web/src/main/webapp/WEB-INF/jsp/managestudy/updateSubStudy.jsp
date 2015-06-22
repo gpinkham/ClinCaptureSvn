@@ -475,7 +475,6 @@ function updateThis(multiSelEle, count) {
 		   <c:when test="${config.value.value== 'true'}">
 		    <input type="radio" checked name="interviewerNameEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
 		    <input type="radio" name="interviewerNameEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
-
 		   </c:when>
 		   <c:otherwise>
 		    <input type="radio" name="interviewerNameEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>

@@ -330,8 +330,10 @@ public class UpdateSubStudyServlet extends Controller {
 
 		study.getStudyParameterConfig().setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
 		study.getStudyParameterConfig().setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
+		study.getStudyParameterConfig().setInterviewerNameEditable(fp.getString("interviewerNameEditable"));
 		study.getStudyParameterConfig().setInterviewDateRequired(fp.getString("interviewDateRequired"));
 		study.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
+		study.getStudyParameterConfig().setInterviewDateEditable(fp.getString("interviewDateEditable"));
 		study.getStudyParameterConfig().setSubjectPersonIdRequired(fp.getString("subjectPersonIdRequired"));
 
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));

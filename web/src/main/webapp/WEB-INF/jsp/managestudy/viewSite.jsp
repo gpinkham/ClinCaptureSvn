@@ -386,6 +386,19 @@
 		  </td>
 		  </tr>
 	</c:when>
+	<c:when test="${config.parameter.handle=='interviewerNameEditable'}">
+		<tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_editable" bundle="${resword}"/></td><td class="table_cell">
+			   <c:choose>
+				   <c:when test="${config.value.value== 'true'}">
+					   <fmt:message key="yes" bundle="${resword}"/>
+				   </c:when>
+				   <c:when test="${config.value.value== 'false'}">
+					   <fmt:message key="no" bundle="${resword}"/>
+				   </c:when>
+			   </c:choose>
+		   </td>
+		</tr>
+	</c:when>
 	<c:when test="${config.parameter.handle=='interviewDateRequired'}">
 		  <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_required" bundle="${resword}"/></td><td class="table_cell">
 		   <c:choose>
@@ -402,6 +415,19 @@
 		  </td>
 		  </tr>
     </c:when>
+	<c:when test="${config.parameter.handle=='interviewDateEditable'}">
+		<tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_date_editable" bundle="${resword}"/></td><td class="table_cell">
+			   <c:choose>
+				   <c:when test="${config.value.value== 'true'}">
+					   <fmt:message key="yes" bundle="${resword}"/>
+				   </c:when>
+				   <c:when test="${config.value.value== 'false'}">
+					   <fmt:message key="no" bundle="${resword}"/>
+				   </c:when>
+			   </c:choose>
+		   </td>
+		</tr>
+	</c:when>
 
   <c:when test="${config.parameter.handle=='allowCodingVerification'}">
    <tr valign="top">
