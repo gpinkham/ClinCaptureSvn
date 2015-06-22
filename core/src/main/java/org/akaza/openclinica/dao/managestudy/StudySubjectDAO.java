@@ -25,6 +25,7 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
 import javax.sql.DataSource;
@@ -1729,17 +1730,21 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		int suffixLength = suffixParam == null || suffixParam.isEmpty() ? 0 : Integer.parseInt(suffixParam);
 		String prefix = prefixParam.equals("SiteID") ? siteLabel : prefixParam;
 		Integer greatestNum = getCountofStudySubjects(studyBean);
-
 		if (greatestNum == null) {
 			greatestNum = 0;
 		}
-		greatestNum += 1;
-		String numericLabel = Integer.toString(greatestNum);
-		for (int i = 0; i < suffixLength; i++) {
-			if (numericLabel.length() < suffixLength) {
-				numericLabel = "0" + numericLabel;
+		String numericLabel;
+
+		do {
+			greatestNum += 1;
+			numericLabel = Integer.toString(greatestNum);
+			for (int i = 0; i < suffixLength; i++) {
+				if (numericLabel.length() < suffixLength) {
+					numericLabel = "0" + numericLabel;
+				}
 			}
-		}
+		} while (findByLabelAndStudy(prefix + separatorParam + numericLabel, studyBean).getSubjectId() != 0);
+
 		return prefix + separatorParam + numericLabel;
 	}
 
