@@ -196,6 +196,9 @@
                                                 <td class="table_header_row">
                                                     <fmt:message key="view_rule_assignment_target" bundle="${resword}"/>
                                                 </td>
+												<td class="table_header_row">
+													<fmt:message key="destination" bundle="${resword}"/>
+												</td>
                                             </tr>
                                             <c:if test="${fn:length(ruleSetBeanList) gt 0}">
                                                 <c:forEach var="ruleSetBean" items="${ruleSetBeanList}">
@@ -216,6 +219,16 @@
                                                             <td class="table_cell">
                                                                 <c:out value="${ruleSetBean.originalTarget.value}"/>
                                                             </td>
+															<td class="table_cell">
+																<c:forEach var="action" items="${ruleSetRule.actions}">
+																	<c:if test="${action.actionType.code == 4}">
+																		<c:forEach var="property" items="${action.properties}">
+																			${property.oid}
+																		</c:forEach>
+																		<br/>
+																	</c:if>
+																</c:forEach>
+															</td>
                                                         </tr>
                                                     </c:forEach>
                                                 </c:forEach>

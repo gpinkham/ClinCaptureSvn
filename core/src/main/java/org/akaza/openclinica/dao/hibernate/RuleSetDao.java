@@ -143,8 +143,8 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 
 	@SuppressWarnings("unchecked")
 	public ArrayList<RuleSetBean> findByCrfIdAndCrfOid(CRFBean crfBean) {
-		String query = "select distinct rs.* from rule_set_rule rsr, rule_set rs, rule r, rule_expression re where rsr.rule_set_id = rs.id and rsr.rule_id = r.id and (rs.rule_expression_id = re.id or r.rule_expression_id = re.id)\n"
-				+ "and (rs.item_id in (select distinct(item_id) from item_form_metadata ifm, crf_version cv where ifm.crf_version_id = cv.crf_version_id and cv.crf_id = :crfId) or re.value like '%." + crfBean.getOid() + ".%' or re.target_version_oid in (select cv.oc_oid from crf_version cv where cv.crf_id = :crfId))";
+		String query = "select distinct rs.* from rule_set rs, rule r, rule_expression re, rule_set_rule rsr left OUTER join rule_action ra on ra.rule_set_rule_id = rsr.id left outer join rule_action_property rap on rap.rule_action_id = ra.id where rsr.rule_set_id = rs.id and rsr.rule_id = r.id and (rs.rule_expression_id = re.id or r.rule_expression_id = re.id)\n"
+				+ "and (rs.item_id in (select distinct(item_id) from item_form_metadata ifm, crf_version cv where ifm.crf_version_id = cv.crf_version_id and cv.crf_id = :crfId) or re.value like '%" + crfBean.getOid() + ".%' or rap.oc_oid like '%" + crfBean.getOid() + ".%' or re.target_version_oid in (select cv.oc_oid from crf_version cv where cv.crf_id = :crfId))";
 		// Using a sql query because we are referencing objects not managed by hibernate
 		org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
 		q.setInteger("crfId", crfBean.getId());
