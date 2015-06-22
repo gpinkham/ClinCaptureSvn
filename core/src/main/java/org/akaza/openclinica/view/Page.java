@@ -499,8 +499,6 @@ public final class Page {
 			"View Dataset Details");
 
 	public static final Page EXPORT_DATASETS = new Page("/WEB-INF/jsp/extract/exportDatasets.jsp", "Export Dataset");
-	public static final Page GENERATE_DATASET = new Page("/WEB-INF/jsp/extract/generatedDataset.jsp",
-			"Generate Dataset");
 	public static final Page GENERATE_DATASET_HTML = new Page("/WEB-INF/jsp/extract/generatedDatasetHtml.jsp",
 			"Generate Dataset");
 	public static final Page GENERATE_EXCEL_DATASET = new Page("/WEB-INF/jsp/extract/generatedExcelDataset.jsp",
