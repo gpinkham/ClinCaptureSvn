@@ -63,7 +63,7 @@
 <fmt:message key="all_fields_are_required" bundle="${resword}"/><br>
 <input type="hidden" name="action" value="submit">
 <!-- These DIVs define shaded box borders -->
-<div style="width: 600px">
+<div style="min-width: 600px">
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
@@ -90,9 +90,9 @@
 </td></tr>
 <tr><td class="formlabel">
 <fmt:message key="your_message" bundle="${resword}"/>:</td>
- <td><div class="formtextareaXL4_BG">
-<textarea name="message" rows="4" cols="50" class="formtextareaXL4" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" ><c:out value="${message}"/></textarea>
-</div>
+
+ <td><textarea name="message" rows="4" cols="50" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" ><c:out value="${message}"/></textarea>
+
 <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="message"/></jsp:include>
 </td></tr>
 
