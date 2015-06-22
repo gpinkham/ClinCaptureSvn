@@ -48,6 +48,7 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	private boolean canCode;
 	private boolean canEvaluate;
 	private boolean canGenerateDCF;
+	private boolean canSDV;
 	private int primaryKey;
 
 	/**
@@ -94,6 +95,8 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
 		this.canGenerateDCF = this.canManageStudy || this.canMonitor || this.canCode;
 
+		this.canSDV = this.role == Role.SITE_MONITOR || this.role == Role.STUDY_MONITOR
+				|| this.role == Role.STUDY_ADMINISTRATOR || this.role == Role.SYSTEM_ADMINISTRATOR;
 	}
 
 	public int getUserAccountId() {
@@ -262,6 +265,10 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
 	public void setCanEvaluate(boolean canEvaluate) {
 		this.canEvaluate = canEvaluate;
+	}
+
+	public boolean isCanSDV() {
+		return canSDV;
 	}
 
 	public boolean isStudyLevelRole() {

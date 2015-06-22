@@ -169,6 +169,7 @@ public class ListStudySubjectsServletTest {
 		Mockito.doReturn(studyEventDAO).when(listStudySubjectsServlet).getStudyEventDAO();
 		Mockito.doReturn(currentUser).when(listStudySubjectsServlet).getUserAccountBean(request);
 		Mockito.doReturn(currentRole).when(listStudySubjectsServlet).getCurrentRole(request);
+		Mockito.doReturn("").when(listStudySubjectsServlet).createTable(request, response, true);
 	}
 
 	private StudySubjectBean buildStudySubject() {
@@ -238,22 +239,5 @@ public class ListStudySubjectsServletTest {
 		Assert.assertNotNull(request.getAttribute("findSubjectsHtml"));
 		Assert.assertNotNull(request.getAttribute("allDefsArray"));
 		Assert.assertNotNull(request.getAttribute("studyGroupClasses"));
-	}
-
-	@Test
-	public void testThatListStudySubjectServletReturnsSubjectMatrixTableWithCalendaredEventsIcon() throws Exception {
-		listStudySubjectsServlet.processRequest(request, response);
-		String htmlCode = (String) request.getAttribute("findSubjectsHtml");
-		Assert.assertEquals(true, htmlCode.contains("bt_Calendar"));
-	}
-
-	@Test
-	public void testThatListStudySubjectServletReturnsSubjectMatrixTableWithSdvIcon() throws Exception {
-		Mockito.when(
-				studySubjectDAO.isStudySubjectReadyToBeSDVed(Mockito.any(StudyBean.class),
-						Mockito.any(StudySubjectBean.class))).thenReturn(true);
-		listStudySubjectsServlet.processRequest(request, response);
-		String htmlCode = (String) request.getAttribute("findSubjectsHtml");
-		Assert.assertEquals(true, htmlCode.contains("icon_DoubleCheck_Action"));
 	}
 }

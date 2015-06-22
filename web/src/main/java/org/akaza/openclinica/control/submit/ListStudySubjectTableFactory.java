@@ -14,8 +14,8 @@
 package org.akaza.openclinica.control.submit;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.tag.SDVStudySubjectLinkTag;
 import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SDVUtil;
 import com.clinovo.util.SignUtil;
 import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.core.Role;
@@ -134,6 +134,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	@Override
 	public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
 		locale = LocaleResolver.getLocale(request);
+		setRequest(request);
 		TableFacade tableFacade = getTableFacadeImpl(request, response);
 		tableFacade.setStateAttr("restore");
 		setDataAndLimitVariables(tableFacade);
@@ -919,7 +920,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		public Object getValue(Object item, String property, int rowcount) {
 			return getSubjectActionsColumnContent(item, currentUser, getCurrentRole(), getStudyBean(), new DAOWrapper(
 					getStudyDAO(), getStudyEventDAO(), getStudySubjectDAO(), getEventCRFDAO(),
-					getEventDefintionCRFDAO(), getStudyEventDefinitionDao(), getDiscrepancyNoteDAO()), resword);
+					getEventDefintionCRFDAO(), getStudyEventDefinitionDao(), getDiscrepancyNoteDAO()), resword,
+					getRequest());
 		}
 	}
 
@@ -994,30 +996,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		return result + transparentButton.toString();
 	}
 
-	private static String sdvStudySubjectLinkBuilder(StudySubjectBean studySubject, String allowSdvWithOpenQueries,
-			String flagColour, ResourceBundle resword, StudyBean studyBean) {
-		String result;
-		if (allowSdvWithOpenQueries.equals("yes") || (allowSdvWithOpenQueries.equals("no") && flagColour == null)) {
-			HtmlBuilder actionLink = new HtmlBuilder();
-			actionLink
-					.a()
-					.href("pages/viewSubjectAggregate?sbb=true&studyId="
-							+ studyBean.getId()
-							+ "&studySubjectId=&theStudySubjectId=0&redirection=viewSubjectAggregate&maxRows=15&showMoreLink=true&s_sdv_tr_=true&s_sdv_p_=1&s_sdv_mr_=15&s_sdv_f_studySubjectId="
-							+ studySubject.getLabel());
-			actionLink.append("onClick=\"javascript:setAccessedObjected(this);\"").close();
-			actionLink.img().src("images/icon_DoubleCheck_Action.gif").border("0")
-					.alt(resword.getString("perform_sdv")).title(resword.getString("perform_sdv"))
-					.append("hspace=\"4\"").end().aEnd();
+	private static String sdvStudySubjectLinkBuilder(HttpServletRequest request, StudySubjectBean studySubject,
+			String flagColour) {
 
-			result = actionLink.toString();
-		} else {
-			HtmlBuilder transparentButton = new HtmlBuilder();
-			transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0")
-					.append("hspace=\"4\"").end();
-			result = transparentButton.toString();
-		}
-		return result;
+		SDVStudySubjectLinkTag sdvStudySubjectLinkTag = new SDVStudySubjectLinkTag();
+		sdvStudySubjectLinkTag.setRequest(request);
+		sdvStudySubjectLinkTag.setStudySubject(studySubject);
+		sdvStudySubjectLinkTag.setStudySubjectHasUnclosedDNs(flagColour != null);
+		sdvStudySubjectLinkTag.setPage(Page.LIST_STUDY_SUBJECTS);
+		return sdvStudySubjectLinkTag.buildLink();
 	}
 
 	private static String reAssignStudySubjectLinkBuilder(StudySubjectBean studySubject, ResourceBundle resword) {
@@ -1598,24 +1585,20 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 
 	/**
-	 * Merthod getSubjectActionsColumnContent.
-	 * 
-	 * @param item
-	 *            Object item
-	 * @param currentUser
-	 *            UserAccountBean
-	 * @param currentRole
-	 *            StudyUserRoleBean
-	 * @param studyBean
-	 *            StudyBean
-	 * @param daoWrapper
-	 *            DAOWrapper
-	 * @param resword
-	 *            ResourceBundle
+	 * Method getSubjectActionsColumnContent.
+	 *
+	 * @param item        Object item
+	 * @param currentUser UserAccountBean
+	 * @param currentRole StudyUserRoleBean
+	 * @param studyBean   StudyBean
+	 * @param daoWrapper  DAOWrapper
+	 * @param resword     ResourceBundle
+	 * @param request     HttpServletRequest
 	 * @return String
 	 */
 	public static String getSubjectActionsColumnContent(Object item, UserAccountBean currentUser,
-			StudyUserRoleBean currentRole, StudyBean studyBean, DAOWrapper daoWrapper, ResourceBundle resword) {
+			StudyUserRoleBean currentRole, StudyBean studyBean, DAOWrapper daoWrapper, ResourceBundle resword,
+			HttpServletRequest request) {
 		String value;
 		StudySubjectBean studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
 		Boolean isSignable = (Boolean) ((HashMap<Object, Object>) item).get("isSignable");
@@ -1655,15 +1638,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				&& (studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)) {
 			url.append(restoreStudySubjectLinkBuilder(studySubjectBean, resword, currentRole));
 		}
-		if (studySubjectBean.getStatus() != Status.DELETED
-				&& (currentRole.getRole() == Role.STUDY_ADMINISTRATOR || Role.isMonitor(currentRole.getRole()) || currentUser
-						.isSysAdmin()) && SDVUtil.permitSDV(studySubjectBean, daoWrapper)) {
-			url.append(sdvStudySubjectLinkBuilder(studySubjectBean, studyBean.getStudyParameterConfig()
-					.getAllowSdvWithOpenQueries(), flagColour, resword, studyBean));
-		} else if (currentRole.getRole().getId() != Role.CLINICAL_RESEARCH_COORDINATOR.getId()
-				&& currentRole.getRole().getId() != Role.INVESTIGATOR.getId()) {
-			url.append(transparentButton);
-		}
+
+		url.append(sdvStudySubjectLinkBuilder(request, studySubjectBean, flagColour));
+
 		if (studyBean.getStatus() == Status.AVAILABLE && currentRole.getRole() != Role.CLINICAL_RESEARCH_COORDINATOR
 				&& currentRole.getRole() != Role.INVESTIGATOR && !Role.isMonitor(currentRole.getRole())
 				&& studySubjectBean.getStatus() == Status.AVAILABLE) {

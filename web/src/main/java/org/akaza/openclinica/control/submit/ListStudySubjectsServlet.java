@@ -132,42 +132,42 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		}
 
 		request.setAttribute("closeInfoShowIcons", true);
-
-		createTable(request, response, showMoreLink);
+		request.setAttribute("findSubjectsHtml", createTable(request, response, showMoreLink));
+		request.setAttribute("allDefsArray", getEventDefinitionsByCurrentStudy(request));
+		request.setAttribute("studyGroupClasses", getStudyGroupClassesByCurrentStudy(request));
+		request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, new FormDiscrepancyNotes());
+		forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
 	}
 
-	private void createTable(HttpServletRequest request, HttpServletResponse response, boolean showMoreLink)
+	/**
+	 *
+	 * @param request HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @param showMoreLink boolean
+	 * @return String
+	 * @throws Exception exception
+	 */
+	public String createTable(HttpServletRequest request, HttpServletResponse response, boolean showMoreLink)
 			throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyBean currentStudy = getCurrentStudy(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(showMoreLink);
 		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDAO());
 		factory.setSubjectDAO(getSubjectDAO());
 		factory.setStudySubjectDAO(getStudySubjectDAO());
 		factory.setStudyEventDAO(getStudyEventDAO());
-		factory.setStudyBean(currentStudy);
+		factory.setStudyBean(getCurrentStudy(request));
 		factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
 		factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
 		factory.setStudyDAO(getStudyDAO());
 		factory.setCrfVersionDAO(getCRFVersionDAO());
-		factory.setCurrentRole(currentRole);
-		factory.setCurrentUser(ub);
+		factory.setCurrentRole(getCurrentRole(request));
+		factory.setCurrentUser(getUserAccountBean(request));
 		factory.setEventCRFDAO(getEventCRFDAO());
 		factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
 		factory.setStudyGroupDAO(getStudyGroupDAO());
 		factory.setDynamicEventDao(getDynamicEventDao());
-		String findSubjectsHtml = factory.createTable(request, response).render();
-		request.setAttribute("findSubjectsHtml", findSubjectsHtml);
-		request.setAttribute("allDefsArray", getEventDefinitionsByCurrentStudy(request));
-		request.setAttribute("studyGroupClasses", getStudyGroupClassesByCurrentStudy(request));
-
-		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
-		request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
-
-		forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
+		return factory.createTable(request, response).render();
 	}
 
 	@Override

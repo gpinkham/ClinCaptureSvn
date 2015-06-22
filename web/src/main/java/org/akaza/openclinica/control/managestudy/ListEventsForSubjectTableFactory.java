@@ -934,7 +934,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			return ListStudySubjectTableFactory.getSubjectActionsColumnContent(item, getCurrentUser(), getCurrentRole(),
 					getStudyBean(), new DAOWrapper(getStudyDAO(), getStudyEventDAO(), getStudySubjectDAO(),
 							getEventCRFDAO(), getEventDefintionCRFDAO(), getStudyEventDefinitionDAO(),
-							getDiscrepancyNoteDAO()), resword);
+							getDiscrepancyNoteDAO()), resword, getRequest());
 		}
 	}
 

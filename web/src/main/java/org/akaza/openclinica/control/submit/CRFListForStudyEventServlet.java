@@ -98,12 +98,12 @@ public class CRFListForStudyEventServlet extends Controller {
 	public static final String SHOW_SIGN_BUTTON = "showSignButton";
 	public static final String SHOW_SUBJECT_SIGN_BUTTON = "showSubjectSignButton";
 	public static final String SHOW_SDV_BUTTON = "showSDVButton";
-	public static final String SHOW_SUBJECT_SDV_BUTTON = "showSubjectSDVButton";
 	public static final String EVENT_FLAG_COLOR = "eventFlagColor";
 	public static final String STUDY_EVENT_NAME = "studyEventName";
 	public static final String EVENT_CRF_ID_PARAMETER = "eventCRFId";
 	public static final String EVENT_DEFINITION_CRF_ID_PARAMETER = "eventDefintionCRFId";
 	public static final String PAGE_PARAMETER = "page";
+	public static final String PAGE_TO_RENDER = "pageToRender";
 
 	@Autowired
 	private CRFMaskingService maskingService;
@@ -355,7 +355,7 @@ public class CRFListForStudyEventServlet extends Controller {
 				SHOW_SDV_BUTTON,
 				SDVUtil.permitSDV(seb, studySubjectBean.getStudyId(), daoWrapper, currentStudy
 						.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes"), notedMap, ub.getId(), maskingService));
-		request.setAttribute(SHOW_SUBJECT_SDV_BUTTON, SDVUtil.permitSDV(studySubjectBean, daoWrapper));
+		request.setAttribute(PAGE_TO_RENDER, Page.CRF_LIST_FOR_STUDY_EVENT);
 
 		boolean allLocked = true;
 		List<StudyEventBean> studyEventBeanList = sedao.findAllByStudySubject(studySubjectBean);

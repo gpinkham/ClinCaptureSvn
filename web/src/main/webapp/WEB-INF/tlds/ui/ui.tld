@@ -360,6 +360,27 @@
 	</tag>
 
 	<tag>
+		<name>sdvStudySubjectLink</name>
+		<tagclass>com.clinovo.tag.SDVStudySubjectLinkTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<attribute>
+			<name>studySubject</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>studySubjectHasUnclosedDNs</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>page</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
 		<name>choseCRFVersionIcon</name>
 		<tagclass>com.clinovo.tag.ChoseCRFVersionIconTag</tagclass>
 		<bodycontent>empty</bodycontent>

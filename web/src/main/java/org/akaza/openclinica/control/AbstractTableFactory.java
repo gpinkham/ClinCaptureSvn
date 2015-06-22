@@ -56,6 +56,16 @@ public abstract class AbstractTableFactory {
 
 	private UserAccountBean currentUser;
 
+	private HttpServletRequest request;
+
+	public HttpServletRequest getRequest() {
+		return request;
+	}
+
+	public void setRequest(HttpServletRequest request) {
+		this.request = request;
+	}
+
 	public UserAccountBean getCurrentUser() {
 		return currentUser;
 	}
@@ -108,6 +118,7 @@ public abstract class AbstractTableFactory {
 	 */
 	public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
 		locale = LocaleResolver.getLocale(request);
+		setRequest(request);
 		TableFacade tableFacade = getTableFacadeImpl(request, response);
 		setStateAttr(tableFacade);
 		setDataAndLimitVariables(tableFacade);

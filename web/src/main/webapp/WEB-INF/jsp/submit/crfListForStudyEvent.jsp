@@ -105,15 +105,7 @@
 
             <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
 
-            <c:choose>
-                <c:when test="${showSubjectSDVButton and not studySubject.status.deleted and not study.status.frozen and not study.status.locked and (userRole.id eq 9 or userRole.role.id eq 6 or userRole.id eq 2 or userRole.id eq 1) and not study.status.frozen and not study.status.locked and ((currentStudy.studyParameterConfig.allowSdvWithOpenQueries eq 'yes') or (currentStudy.studyParameterConfig.allowSdvWithOpenQueries eq 'no' and subjectFlagColor eq null))}">
-                    <c:set var="hideCol5" value="false"/>
-                    <a class="sdvLink" href="pages/viewSubjectAggregate?sbb=true&studyId=${studyId}&studySubjectId=&theStudySubjectId=0&redirection=viewSubjectAggregate&maxRows=15&showMoreLink=true&s_sdv_tr_=true&s_sdv_p_=1&s_sdv_mr_=15&s_sdv_f_studySubjectId=${studySubject.label}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
-                </c:when>
-                <c:otherwise>
-                    <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
-                </c:otherwise>
-            </c:choose>
+            <ui:sdvStudySubjectLink studySubject="${studySubject}" studySubjectHasUnclosedDNs="${subjectFlagColor != null}" page="${pageToRender}"/>
 
             <c:choose>
                 <c:when test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 1 or studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 8 or studyEvent.subjectEventStatus.id eq 9) and userRole.id eq 4 and not study.status.locked and not study.status.pending}">
