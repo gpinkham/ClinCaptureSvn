@@ -87,13 +87,14 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 	public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {
 		super.configureTableFacade(response, tableFacade);
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "loginStatus"), new AvailableFilterMatcher());
-		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "loginAttemptDate"), new DateFilterMatcher(
-				"yyyy-MM-dd HH:mm"));
+		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "loginAttemptDate"),
+				new FilterMatcher() { public boolean evaluate(Object itemValue, String filterValue) { return true;  } });
 	}
 
 	@Override
 	public int getSize(Limit limit) {
-		return getAuditUserLoginDao().getCountWithFilter(new AuditUserLoginFilter());
+		return getAuditUserLoginDao().getCountWithFilter(new AuditUserLoginFilter(getCurrentUser().getUserTimeZoneId(),
+				getLocale()));
 	}
 
 	@Override
@@ -132,7 +133,8 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 	 *            The Limit to use.
 	 */
 	protected AuditUserLoginFilter getAuditUserLoginFilter(Limit limit) {
-		AuditUserLoginFilter auditUserLoginFilter = new AuditUserLoginFilter();
+		AuditUserLoginFilter auditUserLoginFilter =
+				new AuditUserLoginFilter(getCurrentUser().getUserTimeZoneId(), getLocale());
 		FilterSet filterSet = limit.getFilterSet();
 		if (filterSet != null) {
 			Collection<Filter> filters = filterSet.getFilters();

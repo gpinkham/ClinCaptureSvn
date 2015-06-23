@@ -13,20 +13,29 @@
 
 package org.akaza.openclinica.dao.hibernate;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class AuditUserLoginFilter implements CriteriaCommand {
 
-	List<Filter> filters = new ArrayList<Filter>();
+	private List<Filter> filters = new ArrayList<Filter>();
+
+	private String userTimeZoneId;
+
+	private Locale locale;
+
+	public AuditUserLoginFilter(String userTimeZoneId, Locale locale) {
+		this.userTimeZoneId = userTimeZoneId;
+		this.locale = locale;
+	}
 
 	public void addFilter(String property, Object value) {
 		filters.add(new Filter(property, value));
@@ -45,79 +54,77 @@ public class AuditUserLoginFilter implements CriteriaCommand {
 			if (property.equals("loginStatus")) {
 				criteria.add(Restrictions.eq(property, LoginStatus.getByName((String) value)));
 			} else if (property.equals("loginAttemptDate")) {
-				onlyYearAndMonthAndDayAndHourAndMinute(String.valueOf(value), criteria);
-				onlyYearAndMonthAndDayAndHour(String.valueOf(value), criteria);
-				onlyYearAndMonthAndDay(String.valueOf(value), criteria);
-				onlyYearAndMonth(String.valueOf(value), criteria);
-				onlyYear(String.valueOf(value), criteria);
-			} else
+				try {
+					onlyYearAndMonthAndDayAndHourAndMinute(String.valueOf(value), criteria);
+				} catch (IllegalArgumentException ex) {
+					try {
+						onlyYearAndMonthAndDayAndHour(String.valueOf(value), criteria);
+					} catch (IllegalArgumentException ex2) {
+						try {
+							onlyYearAndMonthAndDay(String.valueOf(value), criteria);
+						} catch (IllegalArgumentException ex3) {
+							try {
+								onlyYearAndMonth(String.valueOf(value), criteria);
+							} catch (IllegalArgumentException ex4) {
+								onlyYear(String.valueOf(value), criteria);
+							}
+						}
+					}
+				}
+			} else {
 				criteria.add(Restrictions.like(property, "%" + value + "%").ignoreCase());
+			}
 		}
 	}
 
 	private void onlyYear(String value, Criteria criteria) {
-		try {
-			DateFormat format = new SimpleDateFormat("yyyy");
-			Date startDate = format.parse(value);
-			DateTime dt = new DateTime(startDate.getTime());
-			dt = dt.plusYears(1);
-			Date endDate = dt.toDate();
-			criteria.add(Restrictions.between("loginAttemptDate", startDate, endDate));
-		} catch (Exception e) {
-			// Do nothing
-		}
+
+		Date startDate = DateUtil.parseDateStringToServerDateTime(value, userTimeZoneId, DateUtil.DatePattern.YEAR,
+				locale);
+		DateTime dt = new DateTime(startDate.getTime());
+		dt = dt.plusYears(1);
+		Date endDate = dt.toDate();
+		criteria.add(Restrictions.between("loginAttemptDate", startDate, endDate));
 	}
 
 	private void onlyYearAndMonth(String value, Criteria criteria) {
-		try {
-			DateFormat format = new SimpleDateFormat("yyyy-MM");
-			Date startDate = format.parse(value);
-			DateTime dt = new DateTime(startDate.getTime());
-			dt = dt.plusMonths(1);
-			Date endDate = dt.toDate();
-			criteria.add(Restrictions.between("loginAttemptDate", startDate, endDate));
-		} catch (Exception e) {
-			// Do nothing
-		}
+
+		Date startDate = DateUtil.parseDateStringToServerDateTime(value, userTimeZoneId,
+				DateUtil.DatePattern.YEAR_AND_MONTH, locale);
+		DateTime dt = new DateTime(startDate.getTime());
+		dt = dt.plusMonths(1);
+		Date endDate = dt.toDate();
+		criteria.add(Restrictions.between("loginAttemptDate", startDate, endDate));
 	}
 
 	private void onlyYearAndMonthAndDay(String value, Criteria criteria) {
-		try {
-			DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-			Date startDate = format.parse(value);
-			DateTime dt = new DateTime(startDate.getTime());
-			dt = dt.plusDays(1);
-			Date endDate = dt.toDate();
-			criteria.add(Restrictions.between("loginAttemptDate", startDate, endDate));
-		} catch (Exception e) {
-			// Do nothing
-		}
+
+		Date startDate = DateUtil.parseDateStringToServerDateTime(value, userTimeZoneId, DateUtil.DatePattern.DATE,
+				locale);
+		DateTime dt = new DateTime(startDate.getTime());
+		dt = dt.plusDays(1);
+		Date endDate = dt.toDate();
+		criteria.add(Restrictions.between("loginAttemptDate", startDate, endDate));
 	}
 
 	private void onlyYearAndMonthAndDayAndHour(String value, Criteria criteria) {
-		try {
-			DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH");
-			Date startDate = format.parse(value);
-			DateTime dt = new DateTime(startDate.getTime());
-			dt = dt.plusHours(1);
-			Date endDate = dt.toDate();
-			criteria.add(Restrictions.between("loginAttemptDate", startDate, endDate));
-		} catch (Exception e) {
-			// Do nothing
-		}
+
+		Date startDate = DateUtil.parseDateStringToServerDateTime(value, userTimeZoneId,
+				DateUtil.DatePattern.DATE_AND_HOUR, locale);
+		DateTime dt = new DateTime(startDate.getTime());
+		dt = dt.plusHours(1);
+		Date endDate = dt.toDate();
+		criteria.add(Restrictions.between("loginAttemptDate", startDate, endDate));
 	}
 
 	private void onlyYearAndMonthAndDayAndHourAndMinute(String value, Criteria criteria) {
-		try {
-			DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-			Date startDate = format.parse(value);
-			DateTime dt = new DateTime(startDate.getTime());
-			dt = dt.plusMinutes(1);
-			Date endDate = dt.toDate();
-			criteria.add(Restrictions.between("loginAttemptDate", startDate, endDate));
-		} catch (Exception e) {
-			// Do nothing
-		}
+
+		Date startDate = DateUtil.parseDateStringToServerDateTime(value, userTimeZoneId, DateUtil.DatePattern.TIMESTAMP,
+				locale);
+		DateTime dt = new DateTime(startDate.getTime());
+		dt = dt.plusMinutes(1);
+		Date endDate = dt.toDate();
+		criteria.add(Restrictions.between("loginAttemptDate", startDate, endDate));
 	}
 
 	private static class Filter {
