@@ -15,10 +15,8 @@ package org.akaza.openclinica.control.admin;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -27,6 +25,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -42,6 +41,8 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.job.ExampleSpringJob;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.quartz.JobDataMap;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -109,14 +110,15 @@ public class UpdateJobExportServlet extends Controller {
 		request.setAttribute(DATASET_ID, dsId);
 		request.setAttribute("extractProperties", CoreResources.getExtractProperties());
 
-		Date jobDate = trigger.getNextFireTime();
-		jobDate = jobDate == null ? trigger.getStartTime() : jobDate;
+		DateTime serverJobDate = trigger.getNextFireTime() == null
+				? new DateTime(trigger.getStartTime()) : new DateTime(trigger.getNextFireTime());
+		DateTimeZone userTimeZone = DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId());
+		DateTime localJobDate = serverJobDate.withZone(userTimeZone);
 		HashMap presetValues = new HashMap();
-		Calendar calendar = new GregorianCalendar();
-		calendar.setTime(jobDate);
-		presetValues.put(CreateJobExportServlet.DATE_START_JOB + "Hour", calendar.get(Calendar.HOUR_OF_DAY));
-		presetValues.put(CreateJobExportServlet.DATE_START_JOB + "Minute", calendar.get(Calendar.MINUTE));
-		presetValues.put(CreateJobExportServlet.DATE_START_JOB + "Date", getLocalDf(request).format(jobDate));
+		presetValues.put(DATE_START_JOB + "Hour", localJobDate.getHourOfDay());
+		presetValues.put(DATE_START_JOB + "Minute", localJobDate.getMinuteOfHour());
+		presetValues.put(DATE_START_JOB + "Date", DateUtil.printDate(serverJobDate.toDate(), userTimeZone.getID(),
+				DateUtil.DatePattern.DATE, getLocale()));
 		fp2.setPresetValues(presetValues);
 		setPresetValues(fp2.getPresetValues(), request);
 
@@ -158,7 +160,7 @@ public class UpdateJobExportServlet extends Controller {
 				String email = fp.getString(EMAIL);
 				String jobName = fp.getString(JOB_NAME);
 				String jobDesc = fp.getString(JOB_DESC);
-				Date startDateTime = fp.getDateTime(DATE_START_JOB);
+				Date startDateTime = fp.getDateTimeInput(DATE_START_JOB);
 				Integer exportFormatId = fp.getInt(FORMAT_ID);
 
 				ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(exportFormatId, "" + datasetId);
@@ -247,24 +249,22 @@ public class UpdateJobExportServlet extends Controller {
 
 	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys,
 			String properName) {
+
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
-		HashMap errors = v.validate();
 		v.addValidation(DATASET_ID, Validator.NO_BLANKS_SET);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
+		v.addValidation(JOB_DESC, Validator.NO_BLANKS);
+		v.addValidation(EMAIL, Validator.IS_A_EMAIL);
+		v.addValidation(PERIOD, Validator.NO_BLANKS);
+		v.addValidation(DATE_START_JOB + "Date", Validator.IS_A_DATE);
+		HashMap errors = v.validate();
+
 		Matcher matcher = Pattern.compile("[^\\w_\\d ]").matcher(fp.getString(JOB_NAME));
 		boolean isContainSpecialSymbol = matcher.find();
 		if (isContainSpecialSymbol) {
 			Validator.addError(errors, JOB_NAME, resexception.getString("dataset_should_not_contain_any_special"));
 		}
-		// need to be unique too
-		v.addValidation(JOB_DESC, Validator.NO_BLANKS);
-		v.addValidation(EMAIL, Validator.IS_A_EMAIL);
-		v.addValidation(PERIOD, Validator.NO_BLANKS);
-		v.addValidation(DATE_START_JOB + "Date", Validator.IS_A_DATE);
-		// TODO job names will have to be unique, tbh
-
 		int formatId = fp.getInt(FORMAT_ID);
-		Date jobDate = fp.getDateTime(DATE_START_JOB);
 		if (formatId == 0) {
 			Validator.addError(errors, FORMAT_ID, respage.getString("please_pick_at_least_one"));
 		}
@@ -274,8 +274,13 @@ public class UpdateJobExportServlet extends Controller {
 						resexception.getString("a_job_with_that_name_already_exist_please_pick"));
 			}
 		}
-		if (jobDate.before(new Date())) {
-			Validator.addError(errors, DATE_START_JOB + "Date", resexception.getString("this_date_needs_to_be_later"));
+		try {
+			Date jobDate = fp.getDateTimeInput(DATE_START_JOB);
+			if (jobDate.before(new Date())) {
+				Validator.addError(errors, DATE_START_JOB + "Date", resexception.getString("this_date_needs_to_be_later"));
+			}
+		} catch (IllegalArgumentException ex) {
+			//
 		}
 		return errors;
 	}

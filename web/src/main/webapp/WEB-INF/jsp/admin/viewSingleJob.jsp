@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -55,7 +56,9 @@
 	</span>
 </h1>
 
-<P><I><fmt:message key="note_that_job_is_set" bundle="${resword}"/> <fmt:formatDate value="${now}" pattern="${dtetmeFormat}"/>.</I></P>
+<P><I>
+	<fmt:message key="job_is_set_to_run_on_local_time" bundle="${resword}"/> <cc-fmt:formatDate value="${now}" pattern="${dtetmeFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>.
+</I></P>
 <%-- set up table here --%>
 <div style="width: 400px">
 
@@ -75,13 +78,15 @@
 	</tr>
 	<tr>
 		<td class="table_header_column"><fmt:message key="last_time_fired" bundle="${resword}"/>:</td>
-		<td class="table_cell"><fmt:formatDate value="${triggerBean.previousDate}" pattern="${dtetmeFormat}"/>&nbsp;</td>
+		<td class="table_cell">
+			<cc-fmt:formatDate value="${triggerBean.previousDate}" pattern="${dtetmeFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>&nbsp;
+		</td>
 	</tr>
 	<tr>
 		<td class="table_header_column"><fmt:message key="next_time_to_fire" bundle="${resword}"/>:</td>
 		<td class="table_cell">
 		<c:if test="${triggerBean.active}">
-			<fmt:formatDate value="${triggerBean.nextDate}" pattern="${dtetmeFormat}"/>&nbsp;
+			<cc-fmt:formatDate value="${triggerBean.nextDate}" pattern="${dtetmeFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>&nbsp;
 		</c:if>
 		</td>
 	</tr>

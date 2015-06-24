@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -11,10 +12,12 @@
 
 <tr valign="top" bgcolor="#F5F5F5">
 	<td class="table_cell_left"><c:out value="${currRow.bean.fullName}" /></td>
-	<td class="table_cell"><fmt:formatDate value="${currRow.bean.previousDate}" pattern="${dtetmeFormat}"/></td>
+	<td class="table_cell">
+		<cc-fmt:formatDate value="${currRow.bean.previousDate}" pattern="${dtetmeFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	</td>
 	<td class="table_cell">
 	<c:if test="${currRow.bean.active}">
-		<fmt:formatDate value="${currRow.bean.nextDate}" pattern="${dtetmeFormat}"/>
+		<cc-fmt:formatDate value="${currRow.bean.nextDate}" pattern="${dtetmeFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
 	</c:if>
 	</td>
 	<td class="table_cell"><c:out value="${currRow.bean.description}" /></td>

@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -64,7 +65,9 @@
 
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 <jsp:useBean id="now" class="java.util.Date" />
-<P><I><fmt:message key="note_that_job_is_set" bundle="${resword}"/> <fmt:formatDate value="${now}" pattern="${dtetmeFormat}"/>.</I></P>
+<P><I>
+	<fmt:message key="job_is_set_to_run_on_local_time" bundle="${resword}"/> <cc-fmt:formatDate value="${now}" pattern="${dtetmeFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>.
+</I></P>
 
 <form action="UpdateJobExport" method="post">
 <input type="hidden" name="action" value="confirmall" />
@@ -133,12 +136,15 @@
 		<td class="text"><b><fmt:message key="start_date_time" bundle="${resword}"/>:</b></td>
 		<td class="text">
 			<table border="0" cellpadding="0" cellspacing="0">
-			<tr>
-				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="jobDate"/></jsp:include><br/>
-				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="job"/><c:param name="count" value="1"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) </td>
-			</tr>
-			
+				<tr>
+					<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="job"/><c:param name="count" value="1"/></c:import>
+					<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) </td>
+				</tr>
+				<tr>
+					<td	colspan="7">
+						<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="jobDate"/></jsp:include>
+					</td>
+				</tr>
 			</table>
 		</td>
 	</tr>

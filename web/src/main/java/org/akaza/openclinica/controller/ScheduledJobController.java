@@ -14,22 +14,23 @@
 package org.akaza.openclinica.controller;
 
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory;
@@ -191,9 +192,13 @@ public class ScheduledJobController {
 
 				jobs.setCheckbox(checkbox.toString());
 				jobs.setDatasetId(epBean.getDatasetName());
-				jobs.setFireTime(dateTimeFormat(st.getStartTime(), LocaleResolver.getLocale()) + "");
+				UserAccountBean currentUser =
+						(UserAccountBean) request.getSession().getAttribute(BaseController.USER_BEAN_NAME);
+				jobs.setFireTime(DateUtil.printDate(st.getStartTime(), currentUser.getUserTimeZoneId(),
+						DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS, LocaleResolver.getLocale()));
 				if (st.getNextFireTime() != null) {
-					jobs.setScheduledFireTime(dateTimeFormat(st.getNextFireTime(), LocaleResolver.getLocale()) + "");
+					jobs.setScheduledFireTime(DateUtil.printDate(st.getNextFireTime(), currentUser.getUserTimeZoneId(),
+							DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS, LocaleResolver.getLocale()));
 				}
 				jobs.setExportFileName(epBean.getExportFileName()[0]);
 				jobs.setAction(actions.toString());
@@ -355,15 +360,5 @@ public class ScheduledJobController {
 
 		ex.printStackTrace();
 		return "redirect:/MainMenu";
-	}
-
-	private String dateTimeFormat(Date date, Locale locale) {
-		if (date == null) {
-			return "";
-		} else {
-			SimpleDateFormat dateFormat = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString(
-					"date_time_format_string"), locale);
-			return dateFormat.format(date);
-		}
 	}
 }

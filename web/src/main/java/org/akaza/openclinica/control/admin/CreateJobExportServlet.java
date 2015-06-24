@@ -15,10 +15,8 @@ package org.akaza.openclinica.control.admin;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -27,6 +25,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -41,6 +40,8 @@ import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
 import org.quartz.impl.JobDetailImpl;
@@ -103,18 +104,16 @@ public class CreateJobExportServlet extends Controller {
 		request.setAttribute(PERIOD, fp2.getString(PERIOD));
 		request.setAttribute(DATASET_ID, fp2.getInt(DATASET_ID));
 		// to back local time use expression fp2.getDateTime(DATE_START_JOB)
-		Date jobDate = new Date(System.currentTimeMillis() + 15 * 60 * 1000);
+		DateTimeZone userTimeZone = DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId());
+		DateTime serverJobDate = new DateTime().plusMinutes(15);
+		DateTime localJobDate = serverJobDate.withZone(userTimeZone);
 		HashMap presetValues = new HashMap();
-		Calendar calendar = new GregorianCalendar();
-		calendar.setTime(jobDate);
-		presetValues.put(DATE_START_JOB + "Hour", calendar.get(Calendar.HOUR_OF_DAY));
-		presetValues.put(DATE_START_JOB + "Minute", calendar.get(Calendar.MINUTE));
-		presetValues.put(DATE_START_JOB + "Date", getLocalDf(request).format(jobDate));
+		presetValues.put(DATE_START_JOB + "Hour", localJobDate.getHourOfDay());
+		presetValues.put(DATE_START_JOB + "Minute", localJobDate.getMinuteOfHour());
+		presetValues.put(DATE_START_JOB + "Date", DateUtil.printDate(serverJobDate.toDate(), userTimeZone.getID(),
+				DateUtil.DatePattern.DATE, getLocale()));
 		fp2.setPresetValues(presetValues);
 		setPresetValues(fp2.getPresetValues(), request);
-		request.setAttribute(DATE_START_JOB, fp2.getDateTime(DATE_START_JOB));
-		// EMAIL, TAB, CDISC, SPSS, PERIOD, DATE_START_JOB
-		// TODO pick out the datasets and the date
 	}
 
 	@Override
@@ -158,7 +157,7 @@ public class CreateJobExportServlet extends Controller {
 				String email = fp.getString(EMAIL);
 				String jobName = fp.getString(JOB_NAME);
 				String jobDesc = fp.getString(JOB_DESC);
-				Date startDateTime = fp.getDateTime(DATE_START_JOB);
+				Date startDateTime = fp.getDateTimeInput(DATE_START_JOB);
 				Integer exportFormatId = fp.getInt(FORMAT_ID);
 
 				ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(exportFormatId, "" + datasetId);
@@ -280,7 +279,6 @@ public class CreateJobExportServlet extends Controller {
 		v.addValidation(DATE_START_JOB + "Date", Validator.IS_A_DATE);
 
 		int formatId = fp.getInt(FORMAT_ID);
-		Date jobDate = fp.getDateTime(DATE_START_JOB);
 		HashMap errors = v.validate();
 		if (formatId == 0) {
 			// throw an error here, at least one should work
@@ -293,8 +291,13 @@ public class CreateJobExportServlet extends Controller {
 						respage.getString("a_job_with_that_name_already_exist_please_pick"));
 			}
 		}
-		if (jobDate.before(new Date())) {
-			Validator.addError(errors, DATE_START_JOB + "Date", respage.getString("this_date_needs_to_be_later"));
+		try {
+			Date jobDate = fp.getDateTimeInput(DATE_START_JOB);
+			if (jobDate.before(new Date())) {
+				Validator.addError(errors, DATE_START_JOB + "Date", respage.getString("this_date_needs_to_be_later"));
+			}
+		} catch (IllegalArgumentException ex) {
+			//
 		}
 		String jobDesc = fp.getString(JOB_DESC);
 		if ((null != jobDesc) && (!jobDesc.equals(""))) {
