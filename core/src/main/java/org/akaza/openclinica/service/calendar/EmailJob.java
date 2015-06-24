@@ -58,7 +58,6 @@ public class EmailJob extends QuartzJobBean {
 		String subjectlabel = dataMap.getString(SUBJECT_NAME);
 		String daysBetween = dataMap.getString(DAYS_BETWEEN);
 		String studyName = dataMap.getString(STUDY_NAME);
-		daysBetween = "in " + daysBetween + " days";
 		System.out.println("EmailJob " + contactEmail);
 		logger.error(contactEmail + " " + eventName + " " + subjectlabel);
 		try {
@@ -89,15 +88,15 @@ public class EmailJob extends QuartzJobBean {
 
 	private String emailTextMessage(UserAccountBean ub, String eventName, String subjectLabel, String daysBetween,
 			String studyName) {
-		String emailTestMessage = "";
-		emailTestMessage = EmailUtil.getEmailBodyStart();
-		emailTestMessage += reswords.getString("day_email_message_htm");
-		emailTestMessage = emailTestMessage.replace("{0}", ub.getFirstName() + " " + ub.getLastName())
-				.replace("{1}", eventName).replace("{2}", subjectLabel).replace("{3}", studyName)
-				.replace("{4}", daysBetween).replace("{5}", studyName);
-		emailTestMessage += EmailUtil.getEmailBodyEnd();
-		emailTestMessage += EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
-		return emailTestMessage;
+
+		return EmailUtil.getEmailBodyStart() + reswords.getString("job_error_mail.greeting")
+				+ " " + ub.getFirstName() + ",<br/><br/>" + reswords.getString("email.calendar_reminder")
+				+ " " + eventName + " " + reswords.getString("for_subject") + " " + subjectLabel + "."
+				+ "<ul><li><b>" + reswords.getString("study") + ":</b> " + studyName + "</li>"
+				+ "<li><b>" + reswords.getString("email.days_to_complete_visit") + "</b>: " + daysBetween + "</li>"
+				+ reswords.getString("job_error_mail.serverUrl") + " " + CoreResources.getSystemURL()
+				+ "</li></ul><br/>" + reswords.getString("email.best_system_administrator_for")
+				+ " " + studyName + "." + EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
 	}
 
 	private String emailHeader(String eventName, String subjectLabel) {
