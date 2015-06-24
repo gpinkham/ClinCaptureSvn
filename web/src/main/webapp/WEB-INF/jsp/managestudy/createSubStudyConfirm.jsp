@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -9,7 +10,6 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="resnotes"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterms"/>
 
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
 
 <jsp:include page="../include/managestudy-header.jsp"/>
@@ -125,7 +125,7 @@
 		<td class="table_header_column">
 			<fmt:message key="protocol_verification" bundle="${resword}" />:</td>
 		<td class="table_cell">
-			<fmt:formatDate value="${newStudy.protocolDateVerification}" pattern="${dteFormat}" />
+			<cc-fmt:formatDate value="${newStudy.protocolDateVerification}" dateTimeZone="${userBean.userTimeZoneId}" />
 		</td>
 	</tr>
 
@@ -133,7 +133,7 @@
 		<td class="table_header_column">
 			<fmt:message key="start_date" bundle="${resword}" />:</td>
 		<td class="table_cell">
-			<fmt:formatDate value="${newStudy.datePlannedStart}" pattern="${dteFormat}" />
+			<cc-fmt:formatDate value="${newStudy.datePlannedStart}" dateTimeZone="${userBean.userTimeZoneId}" />
 		</td>
 	</tr>
 
@@ -141,7 +141,7 @@
 		<td class="table_header_column">
 			<fmt:message key="estimated_completion_date" bundle="${resword}" />:</td>
 		<td class="table_cell">
-			<fmt:formatDate value="${newStudy.datePlannedEnd}" pattern="${dteFormat}" />
+			<cc-fmt:formatDate value="${newStudy.datePlannedEnd}" dateTimeZone="${userBean.userTimeZoneId}" />
 		</td>
 	</tr>
 

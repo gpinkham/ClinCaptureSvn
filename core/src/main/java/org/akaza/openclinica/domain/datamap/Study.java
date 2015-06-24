@@ -177,7 +177,7 @@ public class Study extends DataMapDomainObject {
         this.summary = summary;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_planned_start", length = 4)
     public Date getDatePlannedStart() {
         return this.datePlannedStart;
@@ -187,7 +187,7 @@ public class Study extends DataMapDomainObject {
         this.datePlannedStart = datePlannedStart;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_planned_end", length = 4)
     public Date getDatePlannedEnd() {
         return this.datePlannedEnd;
@@ -197,7 +197,7 @@ public class Study extends DataMapDomainObject {
         this.datePlannedEnd = datePlannedEnd;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_created", length = 4)
     public Date getDateCreated() {
         return this.dateCreated;
@@ -207,7 +207,7 @@ public class Study extends DataMapDomainObject {
         this.dateCreated = dateCreated;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_updated", length = 4)
     public Date getDateUpdated() {
         return this.dateUpdated;
@@ -343,7 +343,7 @@ public class Study extends DataMapDomainObject {
         this.protocolDescription = protocolDescription;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "protocol_date_verification", length = 4)
     public Date getProtocolDateVerification() {
         return this.protocolDateVerification;

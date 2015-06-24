@@ -32,6 +32,7 @@ import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -445,6 +446,38 @@ public class FormProcessor {
 	 */
 	public Date getDateInputWithServerTimeOfDay(String fieldName) {
 		return getDateInputWithServerTimeOfDay(fieldName, false);
+	}
+
+	/**
+	 * Parses date from the input date string, stored in the http request parameter,
+	 * and translates it from the user's time zone into the server time zone.
+	 * The date format <code>dd-Mmm-yyyy</code> is expected for input date string.
+	 * The time of the day for the result date object will be set to current server time of the day.
+	 *
+	 * @param inputDateParamName         request parameter name, which stores input date string.
+	 * @param currentValueOfDateProperty current value of date property stored in the data base.
+	 * @return <code>null</code>, if a user leave date input empty;
+	 * date object, created from the input date string, if the date input was changed by a user;
+	 * value of <code>currentValueOfDateProperty</code> parameter, if the date input was not changed.
+	 */
+	public Date getUpdatedDateProperty(String inputDateParamName, Date currentValueOfDateProperty) {
+
+		if (!StringUtil.isBlank(getString(inputDateParamName))) {
+			if (currentValueOfDateProperty != null) {
+				String printedDate = DateUtil.printDate(currentValueOfDateProperty,
+						getCurrentUser().getUserTimeZoneId(), DateUtil.DatePattern.DATE,
+						LocaleResolver.getLocale(request));
+				if (!printedDate.equals(getString(inputDateParamName))) {
+					return getDateInputWithServerTimeOfDay(inputDateParamName);
+				} else {
+					return currentValueOfDateProperty;
+				}
+			} else {
+				return getDateInputWithServerTimeOfDay(inputDateParamName);
+			}
+		} else {
+			return null;
+		}
 	}
 
 	/**

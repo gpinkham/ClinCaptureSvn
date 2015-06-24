@@ -40,9 +40,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Contains Date utility operations.
- * 
- * @author Frank
- * 
  */
 public final class DateUtil {
 

@@ -2,10 +2,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.DisplayStudyRow" />
 <c:choose>
@@ -22,7 +22,9 @@
       <td class="table_cell"><c:out value="${currRow.bean.parent.oid}"/></td>
       <td class="table_cell"><c:out value="${currRow.bean.parent.principalInvestigator}"/></td>  
       <td class="table_cell"><c:out value="${currRow.bean.parent.facilityName}"/>&nbsp;</td> 
-      <td class="table_cell"><fmt:formatDate value="${currRow.bean.parent.createdDate}" pattern="${dteFormat}"/></td>
+      <td class="table_cell">
+		  <cc-fmt:formatDate value="${currRow.bean.parent.createdDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	  </td>
       <td class="table_cell <c:out value='${className}'/>"><c:out value="${currRow.bean.parent.status.name}"/></td> 
       <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
@@ -83,7 +85,9 @@
       <td class="table_cell"><c:out value="${child.oid}"/></td>            
       <td class="table_cell"><c:out value="${child.principalInvestigator}"/></td>  
       <td class="table_cell"><c:out value="${child.facilityName}"/>&nbsp;</td> 
-      <td class="table_cell"><fmt:formatDate value="${child.createdDate}" pattern="${dteFormat}"/></td>
+      <td class="table_cell">
+		  <cc-fmt:formatDate value="${child.createdDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	  </td>
       <td class="table_cell <c:out value='${className}'/>"><c:out value="${child.status.name}"/></td>
       <td class="table_cell">
         <table border="0" cellpadding="0" cellspacing="0">

@@ -133,11 +133,6 @@ public class ListSiteServlet extends RememberLastPage {
 		table.hideColumnLink(two);
 		table.hideColumnLink(seven);
 		table.setQuery("ListSite", new HashMap());
-		// if (!studyBean.getStatus().isLocked()) {
-		// table.addLink(resword.getString("create_a_new_site"),
-		// "CreateSubStudy");
-		// }
-
 		table.setRows(allStudyRows);
 		table.computeDisplay();
 

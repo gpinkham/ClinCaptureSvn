@@ -2,13 +2,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
-
-<%--<jsp:useBean scope="session" id="panel" class="org.akaza.openclinica.view.StudyInfoPanel" />--%>
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <!-- Sidebar Contents after alert-->
@@ -77,17 +75,17 @@
 	 <c:otherwise>
 	  <c:out value="${studyEvent.location}"/>	   
 	 </c:otherwise>
-	</c:choose>    
+	</c:choose>
      <br><br>
      
      
      <b><fmt:message key="start_date1" bundle="${resword}"/></b>:
      <c:choose>
-	 <c:when test="${toc != null}">	 
-	    <fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}"/>
+	 <c:when test="${toc != null}">
+			<cc-fmt:formatDate value="${toc.studyEvent.dateStarted}" dateTimeZone="${userBean.userTimeZoneId}"/>
    	 </c:when>
 	 <c:otherwise>
-	  <fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}"/>
+			<cc-fmt:formatDate value="${studyEvent.dateStarted}" dateTimeZone="${userBean.userTimeZoneId}"/>
 	 </c:otherwise>
 	 </c:choose>
       <br><br>

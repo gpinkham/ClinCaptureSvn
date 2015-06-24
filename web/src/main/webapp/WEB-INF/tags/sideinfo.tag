@@ -2,12 +2,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<%-- begin standard study info: BWP issue 2560: this has largely been cut and pasted from the
- existing sidebar JSP--%>
+
 <c:if test="${panel.studyInfoShown}">
     <c:choose>
         <c:when test="${study.status.name != 'removed' && study.status.name != 'auto-removed'}">
@@ -33,13 +32,12 @@
 
                 <br><br>
             </c:if>
-            <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
             <b><fmt:message key="start_date" bundle="${resword}"/>:</b>&nbsp;
             <c:choose>
                 <c:when test="${study.datePlannedStart != null}">
 
-                    <fmt:formatDate value="${study.datePlannedStart}" pattern="${dteFormat}" />
+                    <cc-fmt:formatDate value="${study.datePlannedStart}" dateTimeZone="${userBean.userTimeZoneId}" />
                 </c:when>
                 <c:otherwise>
                     <fmt:message key="na" bundle="${resword}"/>
@@ -50,7 +48,7 @@
             <b><fmt:message key="end_date" bundle="${resword}"/>:</b>&nbsp;
             <c:choose>
                 <c:when test="${study.datePlannedEnd != null}">
-                    <fmt:formatDate value="${study.datePlannedEnd}" pattern="${dteFormat}"/>
+                    <cc-fmt:formatDate value="${study.datePlannedEnd}" dateTimeZone="${userBean.userTimeZoneId}" />
                 </c:when>
                 <c:otherwise>
                     <fmt:message key="na" bundle="${resword}"/>
@@ -63,7 +61,7 @@
             <br><br>
 
             <b><fmt:message key="protocol_verification" bundle="${resword}"/>:</b>&nbsp;
-            <fmt:formatDate value="${study.protocolDateVerification}" pattern="${dteFormat}"/>
+            <cc-fmt:formatDate value="${study.protocolDateVerification}" dateTimeZone="${userBean.userTimeZoneId}" />
 
             <br><br>
 

@@ -2,10 +2,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
@@ -91,17 +91,26 @@
     <c:out value="${siteToView.summary}"/>
 </td></tr>
 
-<tr valign="top"><td class="table_header_column"><fmt:message key="protocol_verification" bundle="${resword}"/>:</td><td class="table_cell">
-    <fmt:formatDate value="${siteToView.protocolDateVerification}" pattern="${dteFormat}"/>
-</td></tr>
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="protocol_verification" bundle="${resword}"/>:</td>
+        <td class="table_cell">
+            <cc-fmt:formatDate value="${siteToView.protocolDateVerification}" dateTimeZone="${userBean.userTimeZoneId}"/>
+        </td>
+    </tr>
 
-<tr valign="top"><td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/>:</td><td class="table_cell">
-    <fmt:formatDate value="${siteToView.datePlannedStart}" pattern="${dteFormat}"/>&nbsp;
-</td></tr>
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/>:</td>
+        <td class="table_cell">
+            <cc-fmt:formatDate value="${siteToView.datePlannedStart}" dateTimeZone="${userBean.userTimeZoneId}"/>&nbsp;
+        </td>
+    </tr>
 
-<tr valign="top"><td class="table_header_column"><fmt:message key="estimated_completion_date" bundle="${resword}"/>:</td><td class="table_cell">
-    <fmt:formatDate value="${siteToView.datePlannedEnd}" pattern="${dteFormat}"/>&nbsp;
-</td></tr>
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="estimated_completion_date" bundle="${resword}"/>:</td>
+        <td class="table_cell">
+            <cc-fmt:formatDate value="${siteToView.datePlannedEnd}" dateTimeZone="${userBean.userTimeZoneId}"/>&nbsp;
+        </td>
+    </tr>
 
 <tr valign="top"><td class="table_header_column"><fmt:message key="expected_total_enrollment" bundle="${resword}"/>:</td><td class="table_cell">
     <c:out value="${siteToView.expectedTotalEnrollment}"/>&nbsp;

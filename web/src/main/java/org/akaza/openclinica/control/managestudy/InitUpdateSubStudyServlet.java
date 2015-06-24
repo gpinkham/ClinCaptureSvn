@@ -20,12 +20,12 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -133,21 +133,21 @@ public class InitUpdateSubStudyServlet extends Controller {
 			request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
 			request.setAttribute("statuses", Status.toStudyUpdateMembersList());
 
-			SimpleDateFormat localDf = getLocalDf(request);
 			FormProcessor fp = new FormProcessor(request);
-			logger.info("start date:" + study.getDatePlannedEnd());
 			if (study.getDatePlannedEnd() != null) {
-				fp.addPresetValue(UpdateSubStudyServlet.INPUT_END_DATE, localDf.format(study.getDatePlannedEnd()));
+				fp.addPresetValue(UpdateSubStudyServlet.INPUT_END_DATE, DateUtil.printDate(study.getDatePlannedEnd(),
+						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
 			if (study.getDatePlannedStart() != null) {
-				fp.addPresetValue(UpdateSubStudyServlet.INPUT_START_DATE, localDf.format(study.getDatePlannedStart()));
+				fp.addPresetValue(UpdateSubStudyServlet.INPUT_START_DATE, DateUtil.printDate(study.getDatePlannedStart(),
+						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
-			setPresetValues(fp.getPresetValues(), request);
 			if (study.getProtocolDateVerification() != null) {
 				fp.addPresetValue(UpdateSubStudyServlet.INPUT_VER_DATE,
-						localDf.format(study.getProtocolDateVerification()));
+						DateUtil.printDate(study.getProtocolDateVerification(), getUserAccountBean().getUserTimeZoneId(),
+								DateUtil.DatePattern.DATE, getLocale()));
 			}
-
+			setPresetValues(fp.getPresetValues(), request);
 			forwardPage(Page.UPDATE_SUB_STUDY, request, response);
 		}
 

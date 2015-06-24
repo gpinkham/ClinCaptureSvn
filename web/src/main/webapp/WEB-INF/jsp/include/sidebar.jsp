@@ -2,10 +2,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <!-- this page will be removed soon because we have a new design for the side info panel 08-10-06 -->
 
@@ -44,22 +44,10 @@
 
 	<br><br>-->
 
-	<%--<b><fmt:message key="subjects" bundle="${resword}"/>:</b>&nbsp; 32
-
-	<br><br>
-
-	<b>Subject Groups:</b>&nbsp; links
-
-	<br><br>--%>
-	
-	<%--<b><fmt:message key="SED" bundle="${resword}"/>:</b>&nbsp; Some links here--%>
-
-	<%--<br><br>--%>
-
 	<b><fmt:message key="start_date" bundle="${resword}"/>:</b>&nbsp;
 	 <c:choose>
 	  <c:when test="${study.datePlannedStart != null}">
-        <fmt:formatDate value="${study.datePlannedStart}" pattern="${dteFormat}" />
+        <cc-fmt:formatDate value="${study.datePlannedStart}" dateTimeZone="${userBean.userTimeZoneId}" />
       </c:when>
 	  <c:otherwise>
 	   <fmt:message key="na" bundle="${resword}"/>
@@ -70,7 +58,7 @@
 	<b><fmt:message key="end_date" bundle="${resword}"/>:</b>&nbsp;
 	<c:choose>
 	  <c:when test="${study.datePlannedEnd != null}">
-	   <fmt:formatDate value="${study.datePlannedEnd}" pattern="${dteFormat}"/>
+	   <cc-fmt:formatDate value="${study.datePlannedEnd}" dateTimeZone="${userBean.userTimeZoneId}" />
 	  </c:when>
 	  <c:otherwise>
 	   <fmt:message key="na" bundle="${resword}"/>
@@ -83,19 +71,9 @@
 	<br><br>
 
 	<b><fmt:message key="protocol_verification" bundle="${resword}"/>:</b>&nbsp; 
-	<fmt:formatDate value="${study.protocolDateVerification}" pattern="${dteFormat}"/>
+	<cc-fmt:formatDate value="${study.protocolDateVerification}" dateTimeZone="${userBean.userTimeZoneId}" />
 
 	<br><br>
-	
-	<%--<b><fmt:message key="collect_subject_father_mother_information" bundle="${resword}"/>:</b>&nbsp; 
-	<c:choose>
-    <c:when test="${study.genetic == true}">
-     <fmt:message key="yes" bundle="${resword}"/>
-    </c:when>
-    <c:otherwise>
-     No
-    </c:otherwise> 
-   </c:choose>--%>
    
   	
 	<b><fmt:message key="collect_subject" bundle="${resword}"/>:</b>&nbsp;

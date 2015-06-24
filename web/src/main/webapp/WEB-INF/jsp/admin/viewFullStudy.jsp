@@ -2,13 +2,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
 <c:set var="medicalCodingApiKey" value="${studyToView.studyParameterConfig.medicalCodingApiKey}"/>
 
@@ -151,7 +151,7 @@
 		<td class="table_header_column">
 			<fmt:message key="date_created" bundle="${resword}" />:</td>
 		<td class="table_cell">
-			<fmt:formatDate value="${studyToView.createdDate}" pattern="${dteFormat}" />
+			<cc-fmt:formatDate value="${studyToView.createdDate}" dateTimeZone="${userBean.userTimeZoneId}" />
 		</td>
 	</tr>
 </table>
@@ -236,15 +236,15 @@
  </td></tr>
 
   <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate'); return false;"><fmt:message key="protocol_verification" bundle="${resword}"/></a>:</td><td class="table_cell">
-  <fmt:formatDate value="${studyToView.protocolDateVerification}" pattern="${dteFormat}"/>
+  <cc-fmt:formatDate value="${studyToView.protocolDateVerification}" dateTimeZone="${userBean.userTimeZoneId}"/>
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/>:</td><td class="table_cell">
-   <fmt:formatDate value="${studyToView.datePlannedStart}" pattern="${dteFormat}"/>
+   <cc-fmt:formatDate value="${studyToView.datePlannedStart}" dateTimeZone="${userBean.userTimeZoneId}"/>
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="estimated_completion_date" bundle="${resword}"/>:</td><td class="table_cell">
-   <fmt:formatDate value="${studyToView.datePlannedEnd}" pattern="${dteFormat}"/>&nbsp;
+   <cc-fmt:formatDate value="${studyToView.datePlannedEnd}" dateTimeZone="${userBean.userTimeZoneId}"/>&nbsp;
   </td></tr>
 
     <c:choose>

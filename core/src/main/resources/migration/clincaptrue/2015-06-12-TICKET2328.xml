@@ -1,0 +1,20 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="aram" id="2015-06-12-TICKET2328">
+		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table study</comment>
+		<modifyColumn tableName="study">
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_planned_start" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="protocol_date_verification" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="date_planned_end" type="TIMESTAMP WITH TIME ZONE"/>
+		</modifyColumn>
+	</changeSet>
+</databaseChangeLog>
+
+
+
+
+

@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.DateUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -44,8 +45,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -92,14 +91,11 @@ public class CreateSubStudyServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
 		StudyBean currentStudy = getCurrentStudy(request);
-
 		HashMap errors = getErrorsHolder(request);
-
 		FormProcessor fp = new FormProcessor(request);
 		String action = request.getParameter("action");
-
-		SimpleDateFormat localDf = getLocalDf(request);
 
 		if (StringUtil.isBlank(action)) {
 			if (currentStudy.getParentStudyId() > 0) {
@@ -169,15 +165,13 @@ public class CreateSubStudyServlet extends Controller {
 					}
 				}
 				newStudy.setStudyParameters(configs);
-
-				addPresetValues(localDf, fp);
+				addPresetValues(fp);
 				setPresetValues(fp.getPresetValues(), request);
 
 				request.getSession().setAttribute("newStudy", newStudy);
 				request.getSession().setAttribute("definitions", this.initDefinitions(newStudy));
 				request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
 				request.setAttribute("statuses", Status.toActiveArrayList());
-
 				forwardPage(Page.CREATE_SUB_STUDY, request, response);
 			}
 
@@ -188,24 +182,26 @@ public class CreateSubStudyServlet extends Controller {
 
 				StudyBean newStudy = (StudyBean) request.getSession().getAttribute("newStudy");
 				try {
-					fp.addPresetValue(INPUT_START_DATE, localDf.format(newStudy.getDatePlannedEnd()));
+					fp.addPresetValue(INPUT_START_DATE, DateUtil.printDate(newStudy.getDatePlannedStart(),
+							getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 				} catch (Exception pe) {
 					fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
 				}
 				try {
-					fp.addPresetValue(INPUT_END_DATE, localDf.format(newStudy.getDatePlannedStart()));
+					fp.addPresetValue(INPUT_END_DATE, DateUtil.printDate(newStudy.getDatePlannedEnd(),
+							getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 				} catch (Exception pe) {
 					fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 				}
 				try {
-					fp.addPresetValue(INPUT_VER_DATE, localDf.format(newStudy.getProtocolDateVerification()));
+					fp.addPresetValue(INPUT_VER_DATE, DateUtil.printDate(newStudy.getProtocolDateVerification(),
+							getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 				} catch (Exception pe) {
 					fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
 				}
 				setPresetValues(fp.getPresetValues(), request);
 				request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
 				request.setAttribute("statuses", Status.toActiveArrayList());
-
 				forwardPage(Page.CREATE_SUB_STUDY, request, response);
 			} else if ("submit".equalsIgnoreCase(action)) {
 				submitStudy(request, response);
@@ -302,14 +298,12 @@ public class CreateSubStudyServlet extends Controller {
 		request.getSession().setAttribute("newStudy", newSite);
 		request.getSession().setAttribute("definitions", this.createSiteEventDefinitions(request, parentStudy));
 
-		SimpleDateFormat localDf = getLocalDf(request);
-
 		if (errors.isEmpty()) {
 			logger.info("no errors");
 			forwardPage(Page.CONFIRM_CREATE_SUB_STUDY, request, response);
 
 		} else {
-			addPresetValues(localDf, fp);
+			addPresetValues(fp);
 			setPresetValues(fp.getPresetValues(), request);
 			logger.info("has validation errors");
 
@@ -337,38 +331,19 @@ public class CreateSubStudyServlet extends Controller {
 		study.setSummary(fp.getString("description"));
 		study.setPrincipalInvestigator(fp.getString("prinInvestigator"));
 		study.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
-
-		Date endDate;
-		Date startDate;
-		Date protocolDate;
-		SimpleDateFormat localDf = getLocalDf(request);
 		try {
-			localDf.setLenient(false);
-			startDate = localDf.parse(fp.getString("startDate"));
-
-		} catch (ParseException fe) {
-			startDate = study.getDatePlannedStart();
-			logger.info(fe.getMessage());
+			if (!StringUtil.isBlank(fp.getString(INPUT_START_DATE))) {
+				study.setDatePlannedStart(fp.getDateInputWithServerTimeOfDay(INPUT_START_DATE));
+			}
+			if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
+				study.setDatePlannedEnd(fp.getDateInputWithServerTimeOfDay(INPUT_END_DATE));
+			}
+			if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
+				study.setProtocolDateVerification(fp.getDateInputWithServerTimeOfDay(INPUT_VER_DATE));
+			}
+		} catch (IllegalArgumentException ex) {
+			//
 		}
-		study.setDatePlannedStart(startDate);
-
-		try {
-			localDf.setLenient(false);
-			endDate = localDf.parse(fp.getString("endDate"));
-
-		} catch (ParseException fe) {
-			endDate = study.getDatePlannedEnd();
-		}
-		study.setDatePlannedEnd(endDate);
-
-		try {
-			localDf.setLenient(false);
-			protocolDate = localDf.parse(fp.getString(INPUT_VER_DATE));
-
-		} catch (ParseException fe) {
-			protocolDate = study.getProtocolDateVerification();
-		}
-		study.setProtocolDateVerification(protocolDate);
 		study.setFacilityCity(fp.getString("facCity"));
 		study.setFacilityContactDegree(fp.getString("facConDrgree"));
 		study.setFacilityName(fp.getString("facName"));
@@ -720,26 +695,10 @@ public class CreateSubStudyServlet extends Controller {
 		return seds;
 	}
 
-	private void addPresetValues(SimpleDateFormat localDf, FormProcessor fp) {
-
-		try {
-			localDf.parse(fp.getString(INPUT_START_DATE));
-			fp.addPresetValue(INPUT_START_DATE, localDf.format(fp.getDate(INPUT_START_DATE)));
-		} catch (ParseException pe) {
-			fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
-		}
-		try {
-			localDf.parse(fp.getString(INPUT_END_DATE));
-			fp.addPresetValue(INPUT_END_DATE, localDf.format(fp.getDate(INPUT_END_DATE)));
-		} catch (ParseException pe) {
-			fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
-		}
-		try {
-			localDf.parse(fp.getString(INPUT_VER_DATE));
-			fp.addPresetValue(INPUT_VER_DATE, localDf.format(fp.getDate(INPUT_VER_DATE)));
-		} catch (ParseException pe) {
-			fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
-		}
+	private void addPresetValues(FormProcessor fp) {
+		fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
+		fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
+		fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
 	}
 
 	@Override

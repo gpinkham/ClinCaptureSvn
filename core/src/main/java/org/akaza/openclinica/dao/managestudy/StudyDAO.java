@@ -11,29 +11,13 @@
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
-/*
- * OpenClinica is distributed under the
- * GNU Lesser General Public License (GNU LGPL).
-
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
- */
 package org.akaza.openclinica.dao.managestudy;
-
-/**
- * <P>
- * StudyDAO.java, the data access object that users will access the database for
- * study objects, tbh.
- * 
- * @author thickerson
- * 
- * 
- */
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,6 +40,9 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
+/**
+ * StudyDAO.java, the data access object that users will access the database for study objects.
+ */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
@@ -68,8 +55,6 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		this.digester = digester;
 	}
 
-	// This constructor sets up the Locale for JUnit tests; see the locale
-	// member variable in EntityDAO, and its initializeI18nStrings() method
 	public StudyDAO(DataSource ds, DAODigester digester, Locale locale) {
 
 		this(ds, digester);
@@ -85,69 +70,70 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	public void setTypesExpected() {
 
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);// sid
-		this.setTypeExpected(2, TypeNames.INT);// parent id
-		this.setTypeExpected(3, TypeNames.STRING);// ident
-		this.setTypeExpected(4, TypeNames.STRING);// second ident
-		this.setTypeExpected(5, TypeNames.STRING);// name
-		this.setTypeExpected(6, TypeNames.STRING);// summary
-		this.setTypeExpected(7, TypeNames.DATE);// start
-		this.setTypeExpected(8, TypeNames.DATE);// end
-		this.setTypeExpected(9, TypeNames.DATE);// create
-		this.setTypeExpected(10, TypeNames.DATE);// update
-		this.setTypeExpected(11, TypeNames.INT);// owner
-		this.setTypeExpected(12, TypeNames.INT);// updater
-		this.setTypeExpected(13, TypeNames.INT);// type id
-		this.setTypeExpected(14, TypeNames.INT);// status
-		this.setTypeExpected(15, TypeNames.STRING);// pi
-		this.setTypeExpected(16, TypeNames.STRING);// fname
-		this.setTypeExpected(17, TypeNames.STRING);// fcity
-		this.setTypeExpected(18, TypeNames.STRING);// fstate
-		this.setTypeExpected(19, TypeNames.STRING);// fzip
-		this.setTypeExpected(20, TypeNames.STRING);// country
-		this.setTypeExpected(21, TypeNames.STRING);// frs
-		this.setTypeExpected(22, TypeNames.STRING);// fcn
-		this.setTypeExpected(23, TypeNames.STRING);// fcdegree
-		this.setTypeExpected(24, TypeNames.STRING);// fcphone
-		this.setTypeExpected(25, TypeNames.STRING);// fcemail
-		this.setTypeExpected(26, TypeNames.STRING);// prottype
-		this.setTypeExpected(27, TypeNames.STRING);// protdesc
-		this.setTypeExpected(28, TypeNames.DATE);// pdateverif
-		this.setTypeExpected(29, TypeNames.STRING);// phase
-		this.setTypeExpected(30, TypeNames.INT);// expectotenroll
-		// this.setTypeExpected(31, TypeNames.BOOL);//genetic
-		this.setTypeExpected(31, TypeNames.STRING);// sponsor
-		this.setTypeExpected(32, TypeNames.STRING);// collab
-		this.setTypeExpected(33, TypeNames.STRING);// medline
-		this.setTypeExpected(34, TypeNames.STRING);// url
-		this.setTypeExpected(35, TypeNames.STRING);// url-desc
-		this.setTypeExpected(36, TypeNames.STRING);// conds
-		this.setTypeExpected(37, TypeNames.STRING);// keyw
-		this.setTypeExpected(38, TypeNames.STRING);// eligible
-		this.setTypeExpected(39, TypeNames.STRING);// gender, no char avail.
-		this.setTypeExpected(40, TypeNames.STRING);// agemax
-		this.setTypeExpected(41, TypeNames.STRING);// agemin
-		this.setTypeExpected(42, TypeNames.BOOL);// healthy volunteer
-		this.setTypeExpected(43, TypeNames.STRING);// purpose
-		this.setTypeExpected(44, TypeNames.STRING);// allocation
-		this.setTypeExpected(45, TypeNames.STRING);// masking
-		this.setTypeExpected(46, TypeNames.STRING);// control
-		this.setTypeExpected(47, TypeNames.STRING);// assignment
-		this.setTypeExpected(48, TypeNames.STRING);// endpoint
-		this.setTypeExpected(49, TypeNames.STRING);// interv
-		this.setTypeExpected(50, TypeNames.STRING);// duration
-		this.setTypeExpected(51, TypeNames.STRING);// selection
-		this.setTypeExpected(52, TypeNames.STRING);// timing
-		this.setTypeExpected(53, TypeNames.STRING);// official_title
-		this.setTypeExpected(54, TypeNames.BOOL);// results_reference
-		this.setTypeExpected(55, TypeNames.STRING);// oc oid
-		this.setTypeExpected(56, TypeNames.INT);
+		int index = 1;
+		this.setTypeExpected(index++, TypeNames.INT); // sid
+		this.setTypeExpected(index++, TypeNames.INT); // parent id
+		this.setTypeExpected(index++, TypeNames.STRING); // ident
+		this.setTypeExpected(index++, TypeNames.STRING); // second ident
+		this.setTypeExpected(index++, TypeNames.STRING); // name
+		this.setTypeExpected(index++, TypeNames.STRING); // summary
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // start
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // end
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // create
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // update
+		this.setTypeExpected(index++, TypeNames.INT); // owner
+		this.setTypeExpected(index++, TypeNames.INT); // updater
+		this.setTypeExpected(index++, TypeNames.INT); // type id
+		this.setTypeExpected(index++, TypeNames.INT); // status
+		this.setTypeExpected(index++, TypeNames.STRING); // pi
+		this.setTypeExpected(index++, TypeNames.STRING); // fname
+		this.setTypeExpected(index++, TypeNames.STRING); // fcity
+		this.setTypeExpected(index++, TypeNames.STRING); // fstate
+		this.setTypeExpected(index++, TypeNames.STRING); // fzip
+		this.setTypeExpected(index++, TypeNames.STRING); // country
+		this.setTypeExpected(index++, TypeNames.STRING); // frs
+		this.setTypeExpected(index++, TypeNames.STRING); // fcn
+		this.setTypeExpected(index++, TypeNames.STRING); // fcdegree
+		this.setTypeExpected(index++, TypeNames.STRING); // fcphone
+		this.setTypeExpected(index++, TypeNames.STRING); // fcemail
+		this.setTypeExpected(index++, TypeNames.STRING); // prottype
+		this.setTypeExpected(index++, TypeNames.STRING); // protdesc
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // pdateverif
+		this.setTypeExpected(index++, TypeNames.STRING); // phase
+		this.setTypeExpected(index++, TypeNames.INT); // expectotenroll
+		this.setTypeExpected(index++, TypeNames.STRING); // sponsor
+		this.setTypeExpected(index++, TypeNames.STRING); // collab
+		this.setTypeExpected(index++, TypeNames.STRING); // medline
+		this.setTypeExpected(index++, TypeNames.STRING); // url
+		this.setTypeExpected(index++, TypeNames.STRING); // url-desc
+		this.setTypeExpected(index++, TypeNames.STRING); // conds
+		this.setTypeExpected(index++, TypeNames.STRING); // keyw
+		this.setTypeExpected(index++, TypeNames.STRING); // eligible
+		this.setTypeExpected(index++, TypeNames.STRING); // gender, no char avail.
+		this.setTypeExpected(index++, TypeNames.STRING); // agemax
+		this.setTypeExpected(index++, TypeNames.STRING); // agemin
+		this.setTypeExpected(index++, TypeNames.BOOL); // healthy volunteer
+		this.setTypeExpected(index++, TypeNames.STRING); // purpose
+		this.setTypeExpected(index++, TypeNames.STRING); // allocation
+		this.setTypeExpected(index++, TypeNames.STRING); // masking
+		this.setTypeExpected(index++, TypeNames.STRING); // control
+		this.setTypeExpected(index++, TypeNames.STRING); // assignment
+		this.setTypeExpected(index++, TypeNames.STRING); // endpoint
+		this.setTypeExpected(index++, TypeNames.STRING); // interv
+		this.setTypeExpected(index++, TypeNames.STRING); // duration
+		this.setTypeExpected(index++, TypeNames.STRING); // selection
+		this.setTypeExpected(index++, TypeNames.STRING); // timing
+		this.setTypeExpected(index++, TypeNames.STRING); // official_title
+		this.setTypeExpected(index++, TypeNames.BOOL); // results_reference
+		this.setTypeExpected(index++, TypeNames.STRING); // oc oid
+		this.setTypeExpected(index, TypeNames.INT);
 	}
 
 	/**
 	 * <b>update </b>, the method that returns an updated study bean after it updates the database. Note that we can use
 	 * the three stages from our creation use case.
-	 * 
+	 *
+	 * @param eb EntityBean
 	 * @return sb an updated study bean.
 	 */
 	public EntityBean update(EntityBean eb) {
@@ -160,7 +146,6 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	}
 
 	/**
-	 * <P>
 	 * updateStepOne, the update method for the database. This method takes the place of createStepOne, since it runs an
 	 * update and assumes you already have a primary key in the study bean object.
 	 * 
@@ -172,47 +157,53 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
 
+		int index = 1;
 		if (sb.getParentStudyId() == 0) {
-			nullVars.put(new Integer(1), new Integer(Types.INTEGER));
-			variables.put(new Integer(1), null);
+			nullVars.put(index, Types.INTEGER);
+			variables.put(index, null);
 		} else {
-			variables.put(new Integer(1), new Integer(sb.getParentStudyId()));
+			variables.put(index, sb.getParentStudyId());
 		}
-		variables.put(new Integer(2), sb.getName());
-		variables.put(new Integer(3), sb.getOfficialTitle());
-		variables.put(new Integer(4), sb.getIdentifier());
-		variables.put(new Integer(5), sb.getSecondaryIdentifier());
-		variables.put(new Integer(6), sb.getSummary());
-		variables.put(new Integer(7), sb.getPrincipalInvestigator());
+		index++;
+
+		variables.put(index++, sb.getName());
+		variables.put(index++, sb.getOfficialTitle());
+		variables.put(index++, sb.getIdentifier());
+		variables.put(index++, sb.getSecondaryIdentifier());
+		variables.put(index++, sb.getSummary());
+		variables.put(index++, sb.getPrincipalInvestigator());
+
 		if (sb.getDatePlannedStart() == null) {
-			nullVars.put(new Integer(8), new Integer(Types.DATE));
-			variables.put(new Integer(8), null);
+			nullVars.put(index, Types.TIMESTAMP);
+			variables.put(index, null);
 		} else {
-			variables.put(new Integer(8), sb.getDatePlannedStart());
+			variables.put(index, new Timestamp(sb.getDatePlannedStart().getTime()));
 		}
+		index++;
 
 		if (sb.getDatePlannedEnd() == null) {
-			nullVars.put(new Integer(9), new Integer(Types.DATE));
-			variables.put(new Integer(9), null);
+			nullVars.put(index, Types.TIMESTAMP);
+			variables.put(index, null);
 		} else {
-			variables.put(new Integer(9), sb.getDatePlannedEnd());
+			variables.put(index, new Timestamp(sb.getDatePlannedEnd().getTime()));
 		}
+		index++;
 
-		variables.put(new Integer(10), sb.getFacilityName());
-		variables.put(new Integer(11), sb.getFacilityCity());
-		variables.put(new Integer(12), sb.getFacilityState());
-		variables.put(new Integer(13), sb.getFacilityZip());
-		variables.put(new Integer(14), sb.getFacilityCountry());
-		variables.put(new Integer(15), sb.getFacilityRecruitmentStatus());
-		variables.put(new Integer(16), sb.getFacilityContactName());
-		variables.put(new Integer(17), sb.getFacilityContactDegree());
-		variables.put(new Integer(18), sb.getFacilityContactPhone());
-		variables.put(new Integer(19), sb.getFacilityContactEmail());
-		variables.put(new Integer(20), new Integer(sb.getStatus().getId()));// status
-		variables.put(new Integer(21), new Integer(sb.getUpdaterId()));// owner
-		variables.put(new Integer(22), sb.getUpdatedDate());// date updated
-		variables.put(new Integer(23), new Integer(sb.getOldStatus().getId()));// study id
-		variables.put(new Integer(24), new Integer(sb.getId()));// study id
+		variables.put(index++, sb.getFacilityName());
+		variables.put(index++, sb.getFacilityCity());
+		variables.put(index++, sb.getFacilityState());
+		variables.put(index++, sb.getFacilityZip());
+		variables.put(index++, sb.getFacilityCountry());
+		variables.put(index++, sb.getFacilityRecruitmentStatus());
+		variables.put(index++, sb.getFacilityContactName());
+		variables.put(index++, sb.getFacilityContactDegree());
+		variables.put(index++, sb.getFacilityContactPhone());
+		variables.put(index++, sb.getFacilityContactEmail());
+		variables.put(index++, sb.getStatus().getId()); // status
+		variables.put(index++, sb.getUpdaterId()); // owner
+		variables.put(index++, new Timestamp(sb.getUpdatedDate().getTime())); // date updated
+		variables.put(index++, sb.getOldStatus().getId()); // study id
+		variables.put(index, sb.getId()); // study id
 		this.execute(digester.getQuery("updateStepOne"), variables, nullVars);
 		return sb;
 	}
@@ -223,7 +214,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	 * note: create is split up into four custom functions, per the use case; we are creating the standard create
 	 * function here which calls all four functions at once, but the seperate functions may be required in the control
 	 * servlets.
-	 * 
+	 *
+	 * @param eb EntityBean
 	 * @return eb the created entity bean.
 	 */
 	public EntityBean create(EntityBean eb) {
@@ -235,19 +227,17 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		sb = this.createStepTwo(sb);
 		sb = this.createStepThree(sb);
 		sb = this.createStepFour(sb);
-
 		return sb;
 	}
 
 	/**
-	 * <P>
 	 * findNextKey, a method to return a simple int from the database.
 	 * 
 	 * @return int, which is the next primary key for creating a study.
 	 */
 	public int findNextKey() {
 		this.unsetTypeExpected();
-		Integer keyInt = new Integer(0);
+		Integer keyInt = 0;
 		this.setTypeExpected(1, TypeNames.INT);
 		ArrayList alist = this.select(digester.getQuery("findNextKey"));
 		Iterator it = alist.iterator();
@@ -255,11 +245,10 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 			HashMap key = (HashMap) it.next();
 			keyInt = (Integer) key.get("key");
 		}
-		return keyInt.intValue();
+		return keyInt;
 	}
 
 	/**
-	 * <P>
 	 * createStepOne, per the 'Detailed use case for administer system document v1.0rc1' document. We insert the study
 	 * in this method, and then update the same study in the next three steps.
 	 * <P>
@@ -273,49 +262,54 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
 		sb.setId(this.findNextKey());
-		variables.put(new Integer(1), new Integer(sb.getId()));
-		if (sb.getParentStudyId() == 0) {
-			nullVars.put(new Integer(2), new Integer(Types.INTEGER));
-			variables.put(new Integer(2), null);
-		} else {
-			variables.put(new Integer(2), new Integer(sb.getParentStudyId()));
-		}
+		int index = 1;
+		variables.put(index++, sb.getId());
 
-		variables.put(new Integer(3), sb.getName());
-		variables.put(new Integer(4), sb.getOfficialTitle());
-		variables.put(new Integer(5), sb.getIdentifier());
-		variables.put(new Integer(6), sb.getSecondaryIdentifier());
-		variables.put(new Integer(7), sb.getSummary());
-		variables.put(new Integer(8), sb.getPrincipalInvestigator());
+		if (sb.getParentStudyId() == 0) {
+			nullVars.put(index, Types.INTEGER);
+			variables.put(index, null);
+		} else {
+			variables.put(index, sb.getParentStudyId());
+		}
+		index++;
+
+		variables.put(index++, sb.getName());
+		variables.put(index++, sb.getOfficialTitle());
+		variables.put(index++, sb.getIdentifier());
+		variables.put(index++, sb.getSecondaryIdentifier());
+		variables.put(index++, sb.getSummary());
+		variables.put(index++, sb.getPrincipalInvestigator());
 
 		if (sb.getDatePlannedStart() == null) {
-			nullVars.put(new Integer(9), new Integer(Types.DATE));
-			variables.put(new Integer(9), null);
+			nullVars.put(index, Types.TIMESTAMP);
+			variables.put(index, null);
 		} else {
-			variables.put(new Integer(9), sb.getDatePlannedStart());
+			variables.put(index, new Timestamp(sb.getDatePlannedStart().getTime()));
 		}
+		index++;
 
 		if (sb.getDatePlannedEnd() == null) {
-			nullVars.put(new Integer(10), new Integer(Types.DATE));
-			variables.put(new Integer(10), null);
+			nullVars.put(index, Types.TIMESTAMP);
+			variables.put(index, null);
 		} else {
-			variables.put(new Integer(10), sb.getDatePlannedEnd());
+			variables.put(index, new Timestamp(sb.getDatePlannedEnd().getTime()));
 		}
+		index++;
 
-		variables.put(new Integer(11), sb.getFacilityName());
-		variables.put(new Integer(12), sb.getFacilityCity());
-		variables.put(new Integer(13), sb.getFacilityState());
-		variables.put(new Integer(14), sb.getFacilityZip());
-		variables.put(new Integer(15), sb.getFacilityCountry());
-		variables.put(new Integer(16), sb.getFacilityRecruitmentStatusKey());
-		variables.put(new Integer(17), sb.getFacilityContactName());
-		variables.put(new Integer(18), sb.getFacilityContactDegree());
-		variables.put(new Integer(19), sb.getFacilityContactPhone());
-		variables.put(new Integer(20), sb.getFacilityContactEmail());
-		variables.put(new Integer(21), new Integer(sb.getStatus().getId()));
-		variables.put(new Integer(22), new java.util.Date());
-		variables.put(new Integer(23), new Integer(sb.getOwnerId()));
-		variables.put(new Integer(24), getValidOid(sb));
+		variables.put(index++, sb.getFacilityName());
+		variables.put(index++, sb.getFacilityCity());
+		variables.put(index++, sb.getFacilityState());
+		variables.put(index++, sb.getFacilityZip());
+		variables.put(index++, sb.getFacilityCountry());
+		variables.put(index++, sb.getFacilityRecruitmentStatusKey());
+		variables.put(index++, sb.getFacilityContactName());
+		variables.put(index++, sb.getFacilityContactDegree());
+		variables.put(index++, sb.getFacilityContactPhone());
+		variables.put(index++, sb.getFacilityContactEmail());
+		variables.put(index++, sb.getStatus().getId());
+		variables.put(index++, new Timestamp(new Date().getTime()));
+		variables.put(index++, sb.getOwnerId());
+		variables.put(index, getValidOid(sb));
 		// replace this with the owner id
 		this.execute(digester.getQuery("createStepOne"), variables, nullVars);
 		return sb;
@@ -346,17 +340,22 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	}
 
+	/**
+	 *
+	 * @param oid String
+	 * @return StudyBean
+	 */
 	public StudyBean findByOid(String oid) {
-		StudyBean sb = null;
+		StudyBean sb;
 		this.unsetTypeExpected();
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), oid);
+		variables.put(1, oid);
 		ArrayList alist = this.select(digester.getQuery("findByOid"), variables);
 		Iterator it = alist.iterator();
 
 		if (it.hasNext()) {
-			sb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+			sb = this.getEntityFromHashMap((HashMap) it.next());
 			return sb;
 		} else {
 			logger.info("returning null from find by oid...");
@@ -365,17 +364,22 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	}
 
+	/**
+	 *
+	 * @param oid String
+	 * @return StudyBean
+	 */
 	public StudyBean findByUniqueIdentifier(String oid) {
-		StudyBean sb = null;
+		StudyBean sb;
 		this.unsetTypeExpected();
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), oid);
+		variables.put(1, oid);
 		ArrayList alist = this.select(digester.getQuery("findByUniqueIdentifier"), variables);
 		Iterator it = alist.iterator();
 
 		if (it.hasNext()) {
-			sb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+			sb = this.getEntityFromHashMap((HashMap) it.next());
 			return sb;
 		} else {
 			logger.info("returning null from find by Unique Identifier...");
@@ -383,18 +387,23 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		}
 	}
 
+	/**
+	 * @param parentUniqueIdentifier String
+	 * @param siteUniqueIdentifier   String
+	 * @return StudyBean
+	 */
 	public StudyBean findSiteByUniqueIdentifier(String parentUniqueIdentifier, String siteUniqueIdentifier) {
-		StudyBean sb = null;
+		StudyBean sb;
 		this.unsetTypeExpected();
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), parentUniqueIdentifier);
-		variables.put(new Integer(2), siteUniqueIdentifier);
+		variables.put(1, parentUniqueIdentifier);
+		variables.put(2, siteUniqueIdentifier);
 		ArrayList alist = this.select(digester.getQuery("findSiteByUniqueIdentifier"), variables);
 		Iterator it = alist.iterator();
 
 		if (it.hasNext()) {
-			sb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+			sb = this.getEntityFromHashMap((HashMap) it.next());
 			return sb;
 		} else {
 			logger.info("returning null from find by Unique Identifier...");
@@ -402,80 +411,92 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		}
 	}
 
+	/**
+	 *
+	 * @param sb StudyBean
+	 * @return StudyBean
+	 */
 	public StudyBean createStepTwo(StudyBean sb) {
-		// UPDATE STUDY SET TYPE_ID=?, PROTOCOL_TYPE=?,PROTOCOL_DESCRIPTION=?,
-		// PROTOCOL_DATE_VERIFICATION=?, PHASE=?, EXPECTED_TOTAL_ENROLLMENT=?,
-		// SPONSOR=?, COLLABORATORS=?, MEDLINE_IDENTIFIER=?, URL=?,
-		// URL_DESCRIPTION=?, CONDITIONS=?, KEYWORDS=?, ELIGIBILITY=?,
-		// GENDER=?, AGE_MAX=?, AGE_MIN=?, HEALTHY_VOLUNTEER_ACCEPTED=?
-		// WHERE STUDY_ID=?
+
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
-		variables.put(new Integer(1), new Integer(sb.getType().getId()));
-		variables.put(new Integer(2), sb.getProtocolTypeKey());
-		variables.put(new Integer(3), sb.getProtocolDescription());
+		int index = 1;
+		variables.put(index++, sb.getType().getId());
+		variables.put(index++, sb.getProtocolTypeKey());
+		variables.put(index++, sb.getProtocolDescription());
 
 		if (sb.getProtocolDateVerification() == null) {
-			nullVars.put(new Integer(4), new Integer(Types.DATE));
-			variables.put(new Integer(4), null);
+			nullVars.put(index, Types.TIMESTAMP);
+			variables.put(index, null);
 		} else {
-			variables.put(new Integer(4), sb.getProtocolDateVerification());
+			variables.put(index, new Timestamp(sb.getProtocolDateVerification().getTime()));
 		}
+		index++;
 
-		variables.put(new Integer(5), sb.getPhaseKey());
-		variables.put(new Integer(6), new Integer(sb.getExpectedTotalEnrollment()));
-		variables.put(new Integer(7), sb.getSponsor());
-		variables.put(new Integer(8), sb.getCollaborators());
-		variables.put(new Integer(9), sb.getMedlineIdentifier());
-		variables.put(new Integer(10), new Boolean(sb.isResultsReference()));
-		variables.put(new Integer(11), sb.getUrl());
-		variables.put(new Integer(12), sb.getUrlDescription());
-		variables.put(new Integer(13), sb.getConditions());
-		variables.put(new Integer(14), sb.getKeywords());
-		variables.put(new Integer(15), sb.getEligibility());
-		variables.put(new Integer(16), sb.getGenderKey());
-
-		variables.put(new Integer(17), sb.getAgeMax());
-		variables.put(new Integer(18), sb.getAgeMin());
-		variables.put(new Integer(19), new Boolean(sb.getHealthyVolunteerAccepted()));
-		// variables.put(new Integer(20), new Boolean(sb.isUsingDOB()));
-		// variables.put(new Integer(21), new
-		// Boolean(sb.isDiscrepancyManagement()));
-		variables.put(new Integer(20), new Integer(sb.getId()));
+		variables.put(index++, sb.getPhaseKey());
+		variables.put(index++, sb.getExpectedTotalEnrollment());
+		variables.put(index++, sb.getSponsor());
+		variables.put(index++, sb.getCollaborators());
+		variables.put(index++, sb.getMedlineIdentifier());
+		variables.put(index++, sb.isResultsReference());
+		variables.put(index++, sb.getUrl());
+		variables.put(index++, sb.getUrlDescription());
+		variables.put(index++, sb.getConditions());
+		variables.put(index++, sb.getKeywords());
+		variables.put(index++, sb.getEligibility());
+		variables.put(index++, sb.getGenderKey());
+		variables.put(index++, sb.getAgeMax());
+		variables.put(index++, sb.getAgeMin());
+		variables.put(index++, sb.getHealthyVolunteerAccepted());
+		variables.put(index, sb.getId());
 		this.execute(digester.getQuery("createStepTwo"), variables, nullVars);
 		return sb;
 	}
 
+	/**
+	 *
+	 * @param sb StudyBean
+	 * @return StudyBean
+	 */
 	public StudyBean createStepThree(StudyBean sb) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), sb.getPurposeKey());
-		variables.put(new Integer(2), sb.getAllocationKey());
-		variables.put(new Integer(3), sb.getMaskingKey());
-		variables.put(new Integer(4), sb.getControlKey());
-		variables.put(new Integer(5), sb.getAssignmentKey());
-		variables.put(new Integer(6), sb.getEndpointKey());
-		variables.put(new Integer(7), sb.getInterventionsKey());
-		variables.put(new Integer(8), new Integer(sb.getId()));
+		int index = 1;
+		variables.put(index++, sb.getPurposeKey());
+		variables.put(index++, sb.getAllocationKey());
+		variables.put(index++, sb.getMaskingKey());
+		variables.put(index++, sb.getControlKey());
+		variables.put(index++, sb.getAssignmentKey());
+		variables.put(index++, sb.getEndpointKey());
+		variables.put(index++, sb.getInterventionsKey());
+		variables.put(index, sb.getId());
 		this.execute(digester.getQuery("createStepThree"), variables);
 		return sb;
 	}
 
+	/**
+	 *
+	 * @param sb StudyBean
+	 * @return StudyBean
+	 */
 	public StudyBean createStepFour(StudyBean sb) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), sb.getDurationKey());
-		variables.put(new Integer(2), sb.getSelectionKey());
-		variables.put(new Integer(3), sb.getTimingKey());
-		variables.put(new Integer(4), new Integer(sb.getId()));
+		int index = 1;
+		variables.put(index++, sb.getDurationKey());
+		variables.put(index++, sb.getSelectionKey());
+		variables.put(index++, sb.getTimingKey());
+		variables.put(index, sb.getId());
 		this.execute(digester.getQuery("createStepFour"), variables);
 		return sb;
 	}
 
 	/**
-	 * <p>
 	 * getEntityFromHashMap, the method that gets the object from the database query.
+	 *
+	 * @param hm HashMap
+	 * @return Object
 	 */
 	@SuppressWarnings("deprecation")
-	public Object getEntityFromHashMap(HashMap hm) {
+	public StudyBean getEntityFromHashMap(HashMap hm) {
 		StudyBean eb = new StudyBean();
 
 		// first set all the strings
@@ -521,27 +542,27 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		eb.setTiming((String) hm.get("timing"));
 		eb.setOfficialTitle((String) hm.get("official_title"));
 
-		eb.setHealthyVolunteerAccepted(((Boolean) hm.get("healthy_volunteer_accepted")).booleanValue());
-		eb.setResultsReference(((Boolean) hm.get("results_reference")).booleanValue());
+		eb.setHealthyVolunteerAccepted((Boolean) hm.get("healthy_volunteer_accepted"));
+		eb.setResultsReference((Boolean) hm.get("results_reference"));
 
 		Integer studyId = (Integer) hm.get("study_id");
-		eb.setId(studyId.intValue());
+		eb.setId(studyId);
 		Integer parentStudyId = (Integer) hm.get("parent_study_id");
 		if (parentStudyId == null) {
 			eb.setParentStudyId(0);
 		} else {
-			eb.setParentStudyId(parentStudyId.intValue());
+			eb.setParentStudyId(parentStudyId);
 		}
 		Integer ownerId = (Integer) hm.get("owner_id");
-		eb.setOwnerId(ownerId.intValue());
+		eb.setOwnerId(ownerId);
 		Integer updateId = (Integer) hm.get("update_id");
-		eb.setUpdaterId(updateId.intValue());
+		eb.setUpdaterId(updateId);
 		Integer typeId = (Integer) hm.get("type_id");
-		eb.setType(StudyType.get(typeId.intValue()));
+		eb.setType(StudyType.get(typeId));
 		Integer statusId = (Integer) hm.get("status_id");
-		eb.setStatus(Status.get(statusId.intValue()));
+		eb.setStatus(Status.get(statusId));
 		Integer expecTotalEnrollment = (Integer) hm.get("expected_total_enrollment");
-		eb.setExpectedTotalEnrollment(expecTotalEnrollment.intValue());
+		eb.setExpectedTotalEnrollment(expecTotalEnrollment);
 		Date dateCreated = (Date) hm.get("date_created");
 		Date dateUpdated = (Date) hm.get("date_updated");
 		Date datePlannedStart = (Date) hm.get("date_planned_start");
@@ -552,29 +573,38 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		eb.setUpdatedDate(dateUpdated);
 		eb.setDatePlannedStart(datePlannedStart);
 		eb.setDatePlannedEnd(datePlannedEnd);
-		eb.setProtocolDateVerification(dateProtocolVerification);// added by
-		eb.setStatus(Status.get(statusId.intValue()));
+		eb.setProtocolDateVerification(dateProtocolVerification); // added by
+		eb.setStatus(Status.get(statusId));
 		eb.setOid((String) hm.get("oc_oid"));
 		Integer oldStatusId = (Integer) hm.get("old_status_id");
 		eb.setOldStatus(Status.get(oldStatusId));
 		return eb;
 	}
 
+	/**
+	 *
+	 * @param username String
+	 * @return Collection
+	 */
 	public Collection findAllByUser(String username) {
 		this.unsetTypeExpected();
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), username);
+		variables.put(1, username);
 		ArrayList alist = this.select(digester.getQuery("findAllByUser"), variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
 
+	/**
+	 *
+	 * @param crfId int
+	 * @return ArrayList
+	 */
 	public ArrayList<Integer> getStudyIdsByCRF(int crfId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
@@ -582,100 +612,122 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		variables.put(1, crfId);
 		ArrayList alist = this.select(digester.getQuery("getStudyIdsByCRF"), variables);
 		ArrayList<Integer> al = new ArrayList<Integer>();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap h = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap h = (HashMap) anAlist;
 			al.add((Integer) h.get("study_id"));
 		}
 		return al;
 	}
 
+	/**
+	 *
+	 * @param username String
+	 * @return Collection
+	 */
 	public Collection findAllByUserNotRemoved(String username) {
 		this.unsetTypeExpected();
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), username);
+		variables.put(1, username);
 		ArrayList alist = this.select(digester.getQuery("findAllByUserNotRemoved"), variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
 
+	/**
+	 *
+	 * @param username String
+	 * @return List
+	 */
 	public List<StudyBean> findAllActiveStudiesWhereUserHasRole(String username) {
 		this.unsetTypeExpected();
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), username);
-		variables.put(new Integer(2), username);
+		variables.put(1, username);
+		variables.put(2, username);
 		List<HashMap> alist = this.select(digester.getQuery("findAllActiveStudiesWhereUserHasRole"), variables);
 		List<StudyBean> al = new ArrayList<StudyBean>();
-		Iterator<HashMap> it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap(it.next());
+		for (HashMap anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap(anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
-	
+
+	/**
+	 *
+	 * @param username String
+	 * @return List
+	 */
 	public List<StudyBean> findAllActiveWhereUserHasRole(String username) {
 		this.unsetTypeExpected();
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), username);
+		variables.put(1, username);
 		List<HashMap> alist = this.select(digester.getQuery("findAllActiveWhereUserHasRole"), variables);
 		List<StudyBean> al = new ArrayList<StudyBean>();
-		Iterator<HashMap> it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap(it.next());
+		for (HashMap anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap(anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
 
+	/**
+	 *
+	 * @param username String
+	 * @return List
+	 */
 	public List<StudyBean> findAllActiveWhereUserHasActiveRole(String username) {
 		this.unsetTypeExpected();
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), username);
+		variables.put(1, username);
 		List<HashMap> alist = this.select(digester.getQuery("findAllActiveWhereUserHasActiveRole"), variables);
 		List<StudyBean> al = new ArrayList<StudyBean>();
-		Iterator<HashMap> it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap(it.next());
+		for (HashMap anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap(anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
 
+	/**
+	 *
+	 * @param status String
+	 * @return ArrayList
+	 */
 	public ArrayList findAllByStatus(Status status) {
 		this.unsetTypeExpected();
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(status.getId()));
+		variables.put(1, status.getId());
 		String sql = digester.getQuery("findAllByStatus");
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
 
 	public Collection findAll() {
-
 		return findAllByLimit(false);
 	}
 
+	/**
+	 *
+	 * @param isLimited boolean
+	 * @return Collection
+	 */
 	public Collection findAllByLimit(boolean isLimited) {
 		this.setTypesExpected();
-		String sql = null;
-		// Updated for ORACLE and PGSQL compatibility
+		String sql;
 		if (isLimited) {
 			if (CoreResources.getDBType().equals("oracle")) {
 				sql = digester.getQuery("findAll") + " where ROWNUM <=5";
@@ -687,207 +739,206 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		}
 		ArrayList alist = this.select(sql);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
 
+	/**
+	 *
+	 * @return Collection
+	 */
 	public Collection findAllNotRemoved() {
 		this.setTypesExpected();
 		String sql = digester.getQuery("findAllNotRemoved");
 		ArrayList alist = this.select(sql);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
 
+	/**
+	 *
+	 * @return Collection
+	 */
 	public Collection findAllParents() {
 		this.setTypesExpected();
 
 		String sql = digester.getQuery("findAllParents");
 		ArrayList alist = this.select(sql);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
 
 	/**
-	 * isAParent(), finds out whether or not a study is a parent.
-	 * 
-	 * @return a boolean
+	 *
+	 * @param parentStudyId int
+	 * @return Collection
 	 */
-	public boolean isAParent(int studyId) {
-		boolean ret = false;
-		Collection col = findAllByParent(studyId);
-		if (col != null && col.size() > 0) {
-			ret = true;
-		}
-		return ret;
-	}
-
 	public Collection findAllByParent(int parentStudyId) {
 		return findAllByParentAndLimit(parentStudyId, false);
 	}
 
+	/**
+	 *
+	 * @param parentStudyId int
+	 * @param isLimited boolean
+	 * @return Collection
+	 */
 	public Collection findAllByParentAndLimit(int parentStudyId, boolean isLimited) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(parentStudyId));
-		ArrayList alist = null;
+		variables.put(1, parentStudyId);
+		ArrayList alist;
 		if (isLimited) {
 			alist = this.select(digester.getQuery("findAllByParentLimit5"), variables);
 		} else {
 			alist = this.select(digester.getQuery("findAllByParent"), variables);
 		}
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
-
 	}
 
+	/**
+	 *
+	 * @param parentStudyId int
+	 * @return List
+	 */
 	public List<StudyBean> findAllByParentAndActive(int parentStudyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(parentStudyId));
+		variables.put(1, parentStudyId);
 		List<HashMap> alist = this.select(digester.getQuery("findAllByParentAndActive"), variables);
 		List<StudyBean> al = new ArrayList<StudyBean>();
-		Iterator<HashMap> it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap(it.next());
+		for (HashMap anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap(anAlist);
 			al.add(eb);
 		}
 		return al;
-
 	}
 
+	/**
+	 *
+	 * @param studyId int
+	 * @return Collection
+	 */
 	public Collection findAll(int studyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyId));
-		variables.put(new Integer(2), new Integer(studyId));
-		ArrayList alist = null;
+		variables.put(1, studyId);
+		variables.put(2, studyId);
+		ArrayList alist;
 		alist = this.select(digester.getQuery("findAllByStudyId"), variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
-
 	}
 
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
-	public EntityBean findByPK(int ID) {
+	public EntityBean findByPK(int id) {
 		StudyBean eb = new StudyBean();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(ID));
+		variables.put(1, id);
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList alist = this.select(sql, variables);
 		Iterator it = alist.iterator();
 
 		if (it.hasNext()) {
-			eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+			eb = this.getEntityFromHashMap((HashMap) it.next());
 		}
-
 		return eb;
 	}
 
+	/**
+	 *
+	 * @param name String
+	 * @return EntityBean
+	 */
 	public EntityBean findByName(String name) {
 		StudyBean eb = new StudyBean();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), name);
+		variables.put(1, name);
 
 		String sql = digester.getQuery("findByName");
 		ArrayList alist = this.select(sql, variables);
 		Iterator it = alist.iterator();
 
 		if (it.hasNext()) {
-			eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+			eb = this.getEntityFromHashMap((HashMap) it.next());
 		}
-
 		return eb;
 	}
 
 	/**
-	 * deleteTestOnly, used only to clean up after unit testing
-	 * 
-	 * @param name
+	 * deleteTestOnly, used only to clean up after unit testing.
+	 *
+	 * @param name String
 	 */
 	public void deleteTestOnly(String name) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), name);
+		variables.put(1, name);
 		this.execute(digester.getQuery("deleteTestOnly"), variables);
 	}
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	/**
-	 * Only for use by getChildrenByParentIds
+	 * Only for use by getChildrenByParentIds.
 	 * 
-	 * @param answer
-	 * @param parentId
-	 * @param child
-	 * @return
+	 * @param answer HashMap
+	 * @param parentId int
+	 * @param child StudyBean
+	 * @return HashMap
 	 */
 	private HashMap addChildToParent(HashMap answer, int parentId, StudyBean child) {
-		Integer key = new Integer(parentId);
+		Integer key = parentId;
 		ArrayList children = (ArrayList) answer.get(key);
-
 		if (children == null) {
 			children = new ArrayList();
 		}
-
 		children.add(child);
 		answer.put(key, children);
-
 		return answer;
 	}
 
 	/**
-	 * @param allStudies
-	 *            The result of findAll().
+	 * @param allStudies The result of findAll().
 	 * @return A HashMap where the keys are Integers whose intValue are studyIds and the values are ArrayLists; each
-	 *         element of the ArrayList is a StudyBean representing a child of the study whose id is the key
-	 *         <p>
-	 *         e.g., if A has children B and C, then this will return a HashMap h where h.get(A.getId()) returns an
-	 *         ArrayList whose elements are B and C
+	 * element of the ArrayList is a StudyBean representing a child of the study whose id is the key
+	 * <p/>
+	 * e.g., if A has children B and C, then this will return a HashMap h where h.get(A.getId()) returns an
+	 * ArrayList whose elements are B and C
 	 */
 	public HashMap getChildrenByParentIds(ArrayList allStudies) {
 		HashMap answer = new HashMap();
@@ -895,98 +946,118 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		if (allStudies == null) {
 			return answer;
 		}
-
-		for (int i = 0; i < allStudies.size(); i++) {
-			StudyBean study = (StudyBean) allStudies.get(i);
-
+		for (Object allStudy : allStudies) {
+			StudyBean study = (StudyBean) allStudy;
 			int parentStudyId = study.getParentStudyId();
-			if (parentStudyId > 0) { // study is a child
+			if (parentStudyId > 0) {
 				answer = addChildToParent(answer, parentStudyId, study);
 			}
 		}
-
 		return answer;
 	}
 
+	/**
+	 *
+	 * @param study StudyBean
+	 * @return Collection
+	 */
 	public Collection<Integer> findAllSiteIdsByStudy(StudyBean study) {
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);// sid
+		this.setTypeExpected(1, TypeNames.INT); // sid
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(study.getId()));
-		variables.put(new Integer(2), new Integer(study.getId()));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
 		ArrayList alist = this.select(digester.getQuery("findAllSiteIdsByStudy"), variables);
 		ArrayList<Integer> al = new ArrayList<Integer>();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap h = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap h = (HashMap) anAlist;
 			al.add((Integer) h.get("study_id"));
 		}
 		return al;
 	}
 
+	/**
+	 *
+	 * @param study StudyBean
+	 * @return Collection
+	 */
 	public Collection<Integer> findOlnySiteIdsByStudy(StudyBean study) {
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);// sid
+		this.setTypeExpected(1, TypeNames.INT); // sid
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(study.getId()));
+		variables.put(1, study.getId());
 		ArrayList alist = this.select(digester.getQuery("findOlnySiteIdsByStudy"), variables);
 		ArrayList<Integer> al = new ArrayList<Integer>();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap h = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap h = (HashMap) anAlist;
 			al.add((Integer) h.get("study_id"));
 		}
 		return al;
 	}
 
+	/**
+	 *
+	 * @param sb StudyBean
+	 * @return StudyBean
+	 */
 	public StudyBean updateSitesStatus(StudyBean sb) {
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
-
-		variables.put(new Integer(1), sb.getStatus().getId());
-		variables.put(new Integer(2), sb.getOldStatus().getId());
-		variables.put(new Integer(3), sb.getId());
-
+		int index = 1;
+		variables.put(index++, sb.getStatus().getId());
+		variables.put(index++, sb.getOldStatus().getId());
+		variables.put(index, sb.getId());
 		this.execute(digester.getQuery("updateSitesStatus"), variables, nullVars);
 		return sb;
 	}
 
+	/**
+	 *
+	 * @param studyId int
+	 * @return int
+	 */
 	public int countLockedEvents(int studyId) {
 		int result = 0;
 
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), studyId);
+		variables.put(1, studyId);
 		String sql = digester.getQuery("countLockedEvents");
-
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
-
 		if (it.hasNext()) {
 			result = (Integer) ((HashMap) it.next()).get("count");
 		}
 		return result;
 	}
 
+	/**
+	 *
+	 * @param studyId int
+	 * @return int
+	 */
 	public int countEvents(int studyId) {
 		int result = 0;
 
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), studyId);
+		variables.put(1, studyId);
 		String sql = digester.getQuery("countEvents");
-
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
-
 		if (it.hasNext()) {
 			result = (Integer) ((HashMap) it.next()).get("count");
 		}
 		return result;
 	}
 
+	/**
+	 *
+	 * @param studies List
+	 * @return Map
+	 */
 	public Map<Integer, Map<String, Integer>> analyzeEvents(List<StudyBean> studies) {
 		Map<Integer, Map<String, Integer>> infoMap = new HashMap<Integer, Map<String, Integer>>();
 
@@ -1011,8 +1082,9 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 			try {
 				con = ds.getConnection();
 				if (con.isClosed()) {
-					if (logger.isWarnEnabled())
+					if (logger.isWarnEnabled()) {
 						logger.warn("Connection is closed: StudyDAO.analyzeEvents!");
+					}
 					throw new SQLException();
 				}
 
@@ -1042,43 +1114,54 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		return infoMap;
 	}
 
+	/**
+	 *
+	 * @param sb StudyBean
+	 * @return StudyBean
+	 */
 	public StudyBean updateStudyStatus(StudyBean sb) {
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
-
-		variables.put(new Integer(1), sb.getStatus().getId());
-		variables.put(new Integer(2), sb.getOldStatus().getId());
-		variables.put(new Integer(3), sb.getId());
-
+		int index = 1;
+		variables.put(index++, sb.getStatus().getId());
+		variables.put(index++, sb.getOldStatus().getId());
+		variables.put(index, sb.getId());
 		this.execute(digester.getQuery("updateStudyStatus"), variables, nullVars);
 		return sb;
 	}
 
+	/**
+	 *
+	 * @param studySubjectId int
+	 * @return StudyBean
+	 */
 	public StudyBean findByStudySubjectId(int studySubjectId) {
 		StudyBean sb = new StudyBean();
 		HashMap variables = new HashMap();
 		this.setTypesExpected();
-
-		variables.put(new Integer(1), studySubjectId);
-
+		variables.put(1, studySubjectId);
 		ArrayList alist = this.select(digester.getQuery("findByStudySubjectId"), variables);
 		Iterator it = alist.iterator();
 		if (it.hasNext()) {
-			sb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+			sb = this.getEntityFromHashMap((HashMap) it.next());
 		}
 		return sb;
 	}
 
+	/**
+	 *
+	 * @param parentStudyId int
+	 * @return Collection
+	 */
 	public Collection findAllByParentStudyIdOrderedByIdAsc(int parentStudyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(parentStudyId));
-		variables.put(new Integer(2), new Integer(parentStudyId));
+		variables.put(1, parentStudyId);
+		variables.put(2, parentStudyId);
 		ArrayList alist = this.select(digester.getQuery("findAllByParentStudyIdOrderedByIdAsc"), variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;

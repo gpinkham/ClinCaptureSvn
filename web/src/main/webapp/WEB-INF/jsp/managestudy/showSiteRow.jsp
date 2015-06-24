@@ -2,10 +2,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.StudyRow" />
 <c:set var="userRoleId" value="${param.userRoleId}" />
@@ -24,7 +24,9 @@
       <td class="table_cell"><c:out value="${currRow.bean.oid}"/></td>           
       <td class="table_cell"><c:out value="${currRow.bean.principalInvestigator}"/></td>
       <td class="table_cell"><c:out value="${currRow.bean.facilityName}"/>&nbsp;</td>         
-      <td class="table_cell"><fmt:formatDate value="${currRow.bean.createdDate}" pattern="${dteFormat}"/></td>
+      <td class="table_cell">
+          <cc-fmt:formatDate value="${currRow.bean.createdDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+      </td>
       <td class="table_cell <c:out value='${className}'/>"><c:out value="${currRow.bean.status.name}"/></td>
       <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">

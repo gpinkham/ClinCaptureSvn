@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,6 +31,7 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -158,19 +157,20 @@ public class UpdateStudyServletNew extends Controller {
 		}
 		setMaps(request, isInterventional, interventionArray);
 
-		SimpleDateFormat localDf = getLocalDf(request);
-
 		if (!action.equals("submit")) {
 
 			// First Load First Form
 			if (study.getDatePlannedStart() != null) {
-				fp.addPresetValue(INPUT_START_DATE, localDf.format(study.getDatePlannedStart()));
+				fp.addPresetValue(INPUT_START_DATE, DateUtil.printDate(study.getDatePlannedStart(),
+						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
 			if (study.getDatePlannedEnd() != null) {
-				fp.addPresetValue(INPUT_END_DATE, localDf.format(study.getDatePlannedEnd()));
+				fp.addPresetValue(INPUT_END_DATE, DateUtil.printDate(study.getDatePlannedEnd(),
+						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
 			if (study.getProtocolDateVerification() != null) {
-				fp.addPresetValue(INPUT_VER_DATE, localDf.format(study.getProtocolDateVerification()));
+				fp.addPresetValue(INPUT_VER_DATE, DateUtil.printDate(study.getProtocolDateVerification(),
+						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
 			setPresetValues(fp.getPresetValues(), request);
 			// first load 2nd form
@@ -294,30 +294,11 @@ public class UpdateStudyServletNew extends Controller {
 		if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
 			v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
 		}
-
-		logger.info("has validation errors");
-		SimpleDateFormat localDf = getLocalDf(fp.getRequest());
-		try {
-			localDf.parse(fp.getString(INPUT_START_DATE));
-			fp.addPresetValue(INPUT_START_DATE, localDf.format(fp.getDate(INPUT_START_DATE)));
-		} catch (ParseException pe) {
-			fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
-		}
-		try {
-			localDf.parse(fp.getString(INPUT_VER_DATE));
-			fp.addPresetValue(INPUT_VER_DATE, localDf.format(fp.getDate(INPUT_VER_DATE)));
-		} catch (ParseException pe) {
-			fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
-		}
-		try {
-			localDf.parse(fp.getString(INPUT_END_DATE));
-			fp.addPresetValue(INPUT_END_DATE, localDf.format(fp.getDate(INPUT_END_DATE)));
-		} catch (ParseException pe) {
-			fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
-		}
+		fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
+		fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
+		fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 		updateStudy2(fp, study);
 		setPresetValues(fp.getPresetValues(), fp.getRequest());
-
 	}
 
 	private void validateStudy3(FormProcessor fp, StudyBean study, Validator v, boolean isInterventional) {
@@ -603,29 +584,19 @@ public class UpdateStudyServletNew extends Controller {
 
 		study.setOldStatus(study.getStatus());
 		study.setStatus(Status.get(fp.getInt("status")));
-
-		if (StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
-			study.setProtocolDateVerification(null);
-		} else {
-			study.setProtocolDateVerification(fp.getDate(INPUT_VER_DATE));
+		try {
+			study.setProtocolDateVerification(fp.getUpdatedDateProperty(INPUT_VER_DATE, study.getProtocolDateVerification()));
+			study.setDatePlannedStart(fp.getUpdatedDateProperty(INPUT_START_DATE, study.getDatePlannedStart()));
+			study.setDatePlannedEnd(fp.getUpdatedDateProperty(INPUT_END_DATE, study.getDatePlannedEnd()));
+		} catch (IllegalArgumentException ex) {
+			//
 		}
-
-		study.setDatePlannedStart(fp.getDate(INPUT_START_DATE));
-
-		if (StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
-			study.setDatePlannedEnd(null);
-		} else {
-			study.setDatePlannedEnd(fp.getDate(INPUT_END_DATE));
-		}
-
 		study.setPhase(fp.getString("phase"));
-
 		if (fp.getInt("genetic") == 1) {
 			study.setGenetic(true);
 		} else {
 			study.setGenetic(false);
 		}
-
 		String interventional = resadmin.getString("interventional");
 		return interventional.equalsIgnoreCase(study.getProtocolType());
 	}
