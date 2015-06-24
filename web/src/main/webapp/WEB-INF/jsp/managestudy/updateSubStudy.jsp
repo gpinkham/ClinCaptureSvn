@@ -94,6 +94,7 @@ function updateThis(multiSelEle, count) {
 
 <jsp:include page="../include/alertbox.jsp" />
 <form action="UpdateSubStudy" method="post" id="updateSubStudyForm">
+<span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/><br>
 <input type="hidden" name="action" value="confirm">
 <input type="hidden" id="formWithStateFlag" value=""/>
 
@@ -113,18 +114,18 @@ function updateThis(multiSelEle, count) {
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
-<table border="0" cellpadding="0" cellspacing="0">
-  <tr valign="top"><td class="formlabel"><fmt:message key="parent_study" bundle="${resword}"/>:</td><td>
-  <c:out value="${parentName}"/>
- </td></tr>
+<table border="0" cellpadding="0" cellspacing="0" style="width: 100%">
+  <tr valign="top"><td class="formlabel"><fmt:message key="parent_study" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
+  &nbsp;<c:out value="${parentName}"/>
+ </div></td></tr>
 
-  <tr valign="top"><td class="formlabel"><fmt:message key="site_name" bundle="${resword}"/>:</td><td>
+  <tr valign="top"><td class="formlabel"><fmt:message key="site_name" bundle="${resword}"/>:</td><td style="width: 45%;">
   <div class="formfieldXL_BG"><input type="text" name="name" value="<c:out value="${newStudy.name}"/>"  class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td class="formlabel alert">*</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td class="alert" style="width: 14%;">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</td><td>
   <div class="formfieldXL_BG"><input type="text" name="uniqueProId" value="<c:out value="${newStudy.identifier}"/>"  class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td class="formlabel alert">*</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td class="alert">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds'); return false;"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b>:</a><br>(<fmt:message key="separate_by_commas" bundle="${resword}"/>)</td>
   <td><div class="formtextareaXL4_BG">
@@ -135,7 +136,7 @@ function updateThis(multiSelEle, count) {
 
   <tr valign="top"><td class="formlabel"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td>
   <div class="formfieldXL_BG"><input type="text" name="prinInvestigator" value="<c:out value="${newStudy.principalInvestigator}"/>"  class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="prinInvestigator"/></jsp:include></td><td class="formlabel alert">*</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="prinInvestigator"/></jsp:include></td><td class="alert">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><fmt:message key="brief_summary" bundle="${resword}"/>:</td><td>
   <div class="formtextareaXL4_BG"><textarea class="formtextareaXL4" name="description" rows="4" cols="50" maxlength="2000"><c:out value="${newStudy.summary}"/></textarea></div>
@@ -171,7 +172,7 @@ function updateThis(multiSelEle, count) {
   <tr valign="top"><td class="formlabel"><fmt:message key="expected_total_enrollment" bundle="${resword}"/>:</td><td>
   <div class="formfieldXL_BG"><input type="text" name="expectedTotalEnrollment" value="<c:out value="${newStudy.expectedTotalEnrollment}"/>" class="formfieldXL"></div>
    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="expectedTotalEnrollment"/></jsp:include>
-  </td><td class="formlabel alert">*</td></tr>
+  </td><td class="alert">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><fmt:message key="facility_name" bundle="${resword}"/>:</td><td>
   <div class="formfieldXL_BG"><input type="text" name="facName" value="<c:out value="${newStudy.facilityName}"/>"  class="formfieldXL"></div>
@@ -236,20 +237,23 @@ function updateThis(multiSelEle, count) {
 
    <c:set var="dis" value="${parentStudy.name!='' && !parentStudy.status.available}"/>
    <c:set var="status1" value="${newStudy.status.id}"/>
-   <div class="formfieldM_BG"><select name="statusId" class="formfieldM" <c:if test="${dis}">disabled="true" </c:if>>
-      <c:forEach var="status" items="${statuses}">
-       <c:choose>
-        <c:when test="${status1 == status.id}">
-         <option value="<c:out value="${status.id}"/>" selected><c:out value="${status.name}"/>
-        </c:when>
-        <c:otherwise>
-         <option value="<c:out value="${status.id}"/>"><c:out value="${status.name}"/>
-        </c:otherwise>
-       </c:choose>
-    </c:forEach>
-   </select></div>
+   <div>
+	   <div class="formfieldM_BG" style="float: left"><select name="statusId" class="formfieldM" <c:if test="${dis}">disabled="true" </c:if>>
+	      <c:forEach var="status" items="${statuses}">
+	       <c:choose>
+	        <c:when test="${status1 == status.id}">
+	         <option value="<c:out value="${status.id}"/>" selected><c:out value="${status.name}"/>
+	        </c:when>
+	        <c:otherwise>
+	         <option value="<c:out value="${status.id}"/>"><c:out value="${status.name}"/>
+	        </c:otherwise>
+	       </c:choose>
+	    </c:forEach>
+	   </select></div>
+	   <div><span class="alert">&nbsp;&nbsp; * </span></div>
+   </div>
 
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="statusId"/></jsp:include></td><td class="formlabel alert">*</td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="statusId"/></jsp:include></td></tr>
 
 
   <c:forEach var="config" items="${newStudy.studyParameters}">
@@ -310,7 +314,7 @@ function updateThis(multiSelEle, count) {
 	</c:when>
     <c:when test="${config.parameter.handle=='subjectPersonIdRequired'}">
 		  <tr valign="top"><td class="formlabel"><fmt:message key="subject_person_ID_required" bundle="${resword}"/>:</td>
-			<td>
+			<td colspan="2">
 				<c:set var="subjectPersonIdRequired" value=""/>
 				<c:set var="subjectPersonIdOptional" value=""/>
 				<c:set var="subjectPersonIdCopy" value=""/>

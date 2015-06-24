@@ -126,25 +126,25 @@
 	</a>
 </div>
 
-<div id="siteProperties" style="display:">
+<div id="siteProperties" style="display: all">
 
 <!-- These DIVs define shaded box borders -->
-<div style="width: 600px">
+<div style="width: 615px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
-<table border="0" cellpadding="0" cellspacing="0">
+<table border="0" cellpadding="0" cellspacing="0" style="width: 100%">
    <tr valign="top"><td class="formlabel"><fmt:message key="parent_study" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
    &nbsp;<c:out value="${study.name}"/>
   </div></td></tr>
   
-  <tr valign="top"><td class="formlabel"><fmt:message key="site_name" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
+  <tr valign="top"><td class="formlabel"><fmt:message key="site_name" bundle="${resword}"/>:</td><td style="width: 45%;"><div class="formfieldXL_BG">
   <input type="text" name="name" value="<c:out value="${newStudy.name}"/>" class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td> <span class="alert">*</span></td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td class="alert" style="width: 14%;"> *</td></tr>
   
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</td><td><div class="formfieldXL_BG">
   <input type="text" name="uniqueProId" value="<c:out value="${newStudy.identifier}"/>" class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td> <span class="alert">*</span></td></tr>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td class="alert"> *</td></tr>
   
   <tr valign="top"><td class="formlabel"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b><br>(<fmt:message key="separate_by_commas" bundle="${resword}"/>):</td><td>
   <div class="formtextareaXL4_BG"><textarea class="formtextareaXL4" name="secondProId" rows="4" cols="50"><c:out value="${newStudy.secondaryIdentifier}"/></textarea></div>
@@ -153,7 +153,7 @@
    
   <tr valign="top"><td class="formlabel"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
   <input type="text" name="prinInvestigator" value="<c:out value="${newStudy.principalInvestigator}"/>" class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="prinInvestigator"/></jsp:include></td><td> <span class="alert">*</span></td></tr> 
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="prinInvestigator"/></jsp:include></td><td class="alert"> *</td></tr> 
   
   <tr valign="top"><td class="formlabel"><fmt:message key="brief_summary" bundle="${resword}"/>:</td><td><div class="formtextareaXL4_BG">
   <textarea class="formtextareaXL4" name="description" rows="4" cols="50" maxlength="2000"><c:out value="${newStudy.summary}"/></textarea></div>
@@ -188,7 +188,7 @@
   <tr valign="top"><td class="formlabel"><fmt:message key="expected_total_enrollment" bundle="${resword}"/>:</td><td>
   <div class="formfieldXL_BG"><input type="text" name="expectedTotalEnrollment" value="<c:out value="${newStudy.expectedTotalEnrollment}"/>" class="formfieldXL"></div>
    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="expectedTotalEnrollment"/></jsp:include>
-  </td><td class="formlabel alert" style="text-align:left">*</td></tr>
+  </td><td class="alert">*</td></tr>
   
   <tr valign="top"><td class="formlabel"><fmt:message key="facility_name" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
   <input type="text" name="facName" value="<c:out value="${newStudy.facilityName}"/>" class="formfieldXL"></div>
@@ -249,7 +249,7 @@
    <input type="hidden" name="statusId" value="${study.status.id}">
 
    </div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="statusId"/></jsp:include></td><td> <span class="alert">*</span></td></tr>      
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="statusId"/></jsp:include></td><td class="alert"> *</td></tr>      
      
   <c:forEach var="config" items="${newStudy.studyParameters}">
    <c:choose>
@@ -311,7 +311,7 @@
 	<c:when test="${config.parameter.handle=='subjectPersonIdRequired'}">		
 		<tr valign="top">
 			<td class="formlabel"><fmt:message key="subject_person_ID_required" bundle="${resword}"/>:</td>
-			<td>
+			<td colspan="2">
 				<c:set var="subjectPersonIdRequired" value=""/>
 				<c:set var="subjectPersonIdOptional" value=""/>
 				<c:set var="subjectPersonIdCopy" value=""/>
