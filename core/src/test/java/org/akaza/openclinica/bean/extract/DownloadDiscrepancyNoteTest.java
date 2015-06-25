@@ -22,6 +22,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
+import org.joda.time.DateTimeZone;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +59,7 @@ public class DownloadDiscrepancyNoteTest {
 		PowerMockito.when(ResourceBundleProvider.getTermsBundle()).thenReturn(resTerm);
 		PowerMockito.when(ResourceBundleProvider.getWordsBundle()).thenReturn(resWord);
 
-		downloadDiscrepancyNote = new DownloadDiscrepancyNote(Locale.ENGLISH);
+		downloadDiscrepancyNote = new DownloadDiscrepancyNote(Locale.ENGLISH, DateTimeZone.getDefault().getID());
 		testDNThreadsList = getTestDNThreadsList();
 
 		testExportFileBodyContent = getTestExportFileBodyContent();

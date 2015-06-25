@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.bean.extract;
 
+import com.clinovo.util.DateUtil;
 import com.lowagie.text.Cell;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -64,6 +65,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 	public static final Map<Integer, String> RESOLUTION_STATUS_MAP = new HashMap<Integer, String>();
 	private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
 	private ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
+	private Locale locale;
+	private String userTimeZoneId;
 
 	static {
 		int index = 1;
@@ -78,9 +81,12 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 	 * DownloadDiscrepancyNote constructor.
 	 *
 	 * @param locale the local object for i18n
+	 * @param userTimeZoneId user time zone ID
 	 */
-	public DownloadDiscrepancyNote(Locale locale) {
+	public DownloadDiscrepancyNote(Locale locale, String userTimeZoneId) {
+		this.locale = locale;
 		ResourceBundleProvider.updateLocale(locale);
+		this.userTimeZoneId = userTimeZoneId;
 	}
 
 	/**
@@ -474,8 +480,9 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 			table.addCell(cell);
 
 			// row 2
-			cell = createCell(resword.getString("study_event_date"),
-					dnBean.getEventStart() != null ? String.valueOf(dnBean.getEventStart()) : "");
+			cell = createCell(resword.getString("study_event_date"), dnBean.getEventStart() == null
+					? "" : DateUtil.printDate(dnBean.getEventStart(), userTimeZoneId,
+					DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS, locale));
 			table.addCell(cell);
 
 			content.append(dnBean.getCrfName());

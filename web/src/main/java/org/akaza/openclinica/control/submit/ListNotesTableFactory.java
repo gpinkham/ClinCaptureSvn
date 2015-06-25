@@ -901,7 +901,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 			StudySubjectBean studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
 			Integer studySubjectId = studySubjectBean.getId();
-			downloadNotesLinkBuilder(studySubjectBean);
 
 			return builder.toString();
 		}
@@ -983,32 +982,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			html.append(value).div().style("width: 130px;").end().divEnd();
 			return html.toString();
 		}
-	}
-
-	private String downloadNotesLinkBuilder(StudySubjectBean studySubject) {
-		HtmlBuilder actionLink = new HtmlBuilder();
-		if (this.isStudyHasDiscNotes()) {
-			if (this.getResolutionStatus() >= STATUS_NEW && this.getResolutionStatus() <= STATUS_NOT_APPLICABLE) {
-				actionLink.a().href(
-						"javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId()
-								+ "&discNoteType=" + discNoteType + "&resolutionStatus=" + resolutionStatus + "')");
-				actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0")
-						.alt(resword.getString("download_discrepancy_notes"))
-						.title(resword.getString("download_discrepancy_notes"))
-						.append("hspace=\"4\" width=\"24 \" height=\"15\"").end().aEnd();
-				actionLink.append("&nbsp;&nbsp;&nbsp;");
-			} else {
-				actionLink.a().href(
-						"javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId()
-								+ "&discNoteType=" + discNoteType + "&module=" + module + "')");
-				actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0")
-						.alt(resword.getString("download_discrepancy_notes"))
-						.title(resword.getString("download_discrepancy_notes"))
-						.append("hspace=\"2\" width=\"24 \" height=\"15\"").end().aEnd();
-				actionLink.append("&nbsp;&nbsp;&nbsp;");
-			}
-		}
-		return actionLink.toString();
 	}
 
 	private class AgeDaysFilterMatcher implements FilterMatcher {

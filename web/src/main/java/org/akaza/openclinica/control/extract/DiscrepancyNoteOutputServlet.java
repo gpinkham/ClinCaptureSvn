@@ -12,7 +12,6 @@
  ******************************************************************************/
 package org.akaza.openclinica.control.extract;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +21,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote;
@@ -102,7 +102,8 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 		String format = request.getParameter("fmt");
 
 		int discNoteType = fp.getInt("discNoteType");
-		DownloadDiscrepancyNote downLoader = new DownloadDiscrepancyNote(LocaleResolver.getLocale(request));
+		DownloadDiscrepancyNote downLoader = new DownloadDiscrepancyNote(LocaleResolver.getLocale(request),
+				getUserAccountBean().getUserTimeZoneId());
 		if ("csv".equalsIgnoreCase(format)) {
 			fileName = fileName + ".csv";
 			response.setContentType(DownloadDiscrepancyNote.CSV);
@@ -173,8 +174,6 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 		Locale l = LocaleResolver.getLocale(request);
 		resword = ResourceBundleProvider.getWordsBundle(l);
 		resformat = ResourceBundleProvider.getFormatBundle(l);
-		SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"),
-				LocaleResolver.getLocale());
 		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 		StudySubjectDAO studySubjectDAO = getStudySubjectDAO();
 		StudyEventDAO sedao = getStudyEventDAO();
@@ -190,7 +189,8 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 
 		for (int i = 0; i < noteRows.size(); i++) {
 			DiscrepancyNoteBean dnb = noteRows.get(i);
-			dnb.setCreatedDateString(dnb.getCreatedDate() == null ? "" : sdf.format(dnb.getCreatedDate()));
+			dnb.setCreatedDateString(dnb.getCreatedDate() == null ? "" : DateUtil.printDate(dnb.getCreatedDate(),
+					getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			if (dnb.getParentDnId() == 0) {
 				ArrayList children = dndao.findAllByStudyAndParent(currentStudy, dnb.getId());
 				children = children == null ? new ArrayList() : children;
@@ -201,8 +201,11 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 
 				for (int j = 0; j < children.size(); j++) {
 					DiscrepancyNoteBean child = (DiscrepancyNoteBean) children.get(j);
-					child.setCreatedDateString(child.getCreatedDate() == null ? "" : sdf.format(child.getCreatedDate()));
-					child.setUpdatedDateString(child.getCreatedDate() != null ? sdf.format(child.getCreatedDate()) : "");
+					String childCreatedDate = child.getCreatedDate() == null
+							? "" : DateUtil.printDate(child.getCreatedDate(), getUserAccountBean().getUserTimeZoneId(),
+							DateUtil.DatePattern.DATE, getLocale());
+					child.setCreatedDateString(childCreatedDate);
+					child.setUpdatedDateString(childCreatedDate);
 
 					if (child.getId() > lastDnId) {
 						lastDnId = child.getId();
@@ -212,7 +215,9 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 				if (children.size() > 0) {
 					DiscrepancyNoteBean lastdn = (DiscrepancyNoteBean) children.get(lastChild);
 					dnb.setUpdatedDate(lastdn.getCreatedDate());
-					dnb.setUpdatedDateString(dnb.getUpdatedDate() != null ? sdf.format(dnb.getUpdatedDate()) : "");
+					dnb.setUpdatedDateString(dnb.getUpdatedDate() == null
+							? "" : DateUtil.printDate(dnb.getUpdatedDate(), getUserAccountBean().getUserTimeZoneId(),
+							DateUtil.DatePattern.DATE, getLocale()));
 				}
 			}
 
