@@ -365,7 +365,9 @@ public abstract class DataEntryServlet extends Controller {
 		int isFirstTimeOnSection = fp.getInt("isFirstTimeOnSection");
 		request.setAttribute("isFirstTimeOnSection", isFirstTimeOnSection + "");
 
-		request.setAttribute("expandCrfInfo", false);
+		boolean headerRequiredField = currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes")
+				|| currentStudy.getStudyParameterConfig().getInterviewDateRequired().equals("yes");
+		request.setAttribute("expandCrfInfo", headerRequiredField);
 
 		if (fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("")
 				&& fp.getString("sectionId").equals("")) {
