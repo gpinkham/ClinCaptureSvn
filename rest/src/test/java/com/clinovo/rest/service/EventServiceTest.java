@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.junit.Test;
 import org.springframework.http.MediaType;
@@ -109,7 +110,7 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsImpossibleToCreateStudyEventDefinitionIfNameIsMissing() throws Exception {
 		this.mockMvc.perform(
-				post(API_EVENT_CREATE).param("type", "scheduled!").accept(mediaType).secure(true).session(session))
+				post(API_EVENT_CREATE).param("type", "scheduled").accept(mediaType).secure(true).session(session))
 				.andExpect(status().isBadRequest());
 	}
 
@@ -143,6 +144,13 @@ public class EventServiceTest extends BaseServiceTest {
 		if (mediaType == MediaType.APPLICATION_XML) {
 			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getType(), "unscheduled");
 		}
+	}
+
+	@Test
+	public void testThatHttpGetIsNotSupportedForCreatingAStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				get(API_EVENT_CREATE).param("name", "test_event").param("type", "unscheduled").accept(mediaType)
+						.secure(true).session(session)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -304,6 +312,115 @@ public class EventServiceTest extends BaseServiceTest {
 			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().getId() > 0);
 
 		}
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateReferencedCalendaredEventIfMaxDayIsSpecified() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
+						.param("description", "test description").param("category", "test category")
+						.param("isreference", "true").param("maxday", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateReferencedCalendaredEventIfMinDayIsSpecified() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
+						.param("description", "test description").param("category", "test category")
+						.param("isreference", "true").param("minday", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateReferencedCalendaredEventIfSchDayIsSpecified() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
+						.param("description", "test description").param("category", "test category")
+						.param("isreference", "true").param("schday", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateReferencedCalendaredEventIfEmailDayIsSpecified() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
+						.param("description", "test description").param("category", "test category")
+						.param("isreference", "true").param("emailday", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateReferencedCalendaredEventIfUserNameIsSpecified() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
+						.param("description", "test description").param("category", "test category")
+						.param("isreference", "true").param("emailuser", "root").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateNonCalendaredEventIfMaxDayIsSpecified() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category")
+						.param("maxday", "1").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateNonCalendaredEventIfMinDayIsSpecified() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category")
+						.param("minday", "1").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateNonCalendaredEventIfSchDayIsSpecified() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category")
+						.param("schday", "1").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateNonCalendaredEventIfEmailDayIsSpecified() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category")
+						.param("emailday", "1").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateNonCalendaredEventIfUserNameIsSpecified() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category")
+						.param("emailuser", "root").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateReferencedNonCalendaredEvent() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category")
+						.param("isreference", "true").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateTheRepeatingCalendaredStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
+						.param("repeating", "true").param("description", "test description")
+						.param("category", "test category").param("schday", "4").param("maxday", "4")
+						.param("minday", "3").param("emailday", "2").param("emailuser", userName).accept(mediaType)
+						.secure(true).session(session)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -623,6 +740,14 @@ public class EventServiceTest extends BaseServiceTest {
 	}
 
 	@Test
+	public void testThatHttpGetIsNotSupportedForToAddingCrfToStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				get(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isInternalServerError());
+	}
+
+	@Test
 	public void testThatInfoAboutExistingStudyEventDefinitionIsReturnedCorrectly() throws Exception {
 		result = this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(status().isOk()).andReturn();
@@ -648,4 +773,452 @@ public class EventServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
+
+	@Test
+	public void testThatItIsImpossibleToEditANonExistingStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1231").param("name", "new name!").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditAStudyEventDefinitionIfIdParameterIsEmpty() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT).param("id", "").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditAStudyEventDefinitionIfIdParameterIsMissing() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT).accept(mediaType).secure(true).session(session)).andExpect(
+				status().isBadRequest());
+	}
+
+	@Test
+	public void testThatAtLeastOneNotRequiredParameterShouldBeSpecifiedDuringEditingAStudyEventDefinition()
+			throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatHttpGetMethodIsNotsupportedForEditingOfAStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				get(API_EVENT_EDIT).param("id", "1").param("name", "new name!").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditAStudyEventDefinitionThatDoesNotBelongToCurrentScope() throws Exception {
+		createNewStudy();
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("name", "new name!").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsPossibleToChangeTheNameInAStudyEventDefinition() throws Exception {
+		String newName = "new test name!";
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("name", newName).accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isOk());
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(1);
+		assertEquals(studyEventDefinitionBean.getName(), newName);
+	}
+
+	@Test
+	public void testThatItIsPossibleToChangeTheDescriptionInAStudyEventDefinition() throws Exception {
+		String newDescription = "new test description!!!!";
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("description", newDescription).accept(mediaType)
+						.secure(true).session(session)).andExpect(status().isOk());
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(1);
+		assertEquals(studyEventDefinitionBean.getDescription(), newDescription);
+	}
+
+	@Test
+	public void testThatItIsPossibleToChangeTheCategoryInAStudyEventDefinition() throws Exception {
+		String newCategory = "new test category!!!!";
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("category", newCategory).accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isOk());
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(1);
+		assertEquals(studyEventDefinitionBean.getCategory(), newCategory);
+	}
+
+	@Test
+	public void testThatItIsPossibleToChangeTheRepeatingPropertyInAStudyEventDefinition() throws Exception {
+		String repeating = "false";
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("repeating", repeating).accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isOk());
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(1);
+		assertFalse(studyEventDefinitionBean.isRepeating());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeTheMaxDayForANonCalendaredStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("maxday", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeTheMinDayForANonCalendaredStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("minday", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeTheSchDayForANonCalendaredStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("schday", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeTheEmailDayForANonCalendaredStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("emailday", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeTheEmailUserForANonCalendaredStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("emailuser", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeTheIsReferencePropertyForANonCalendaredStudyEventDefinition()
+			throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("isreference", "true").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeTheRepeatingPropertyForACalendaredStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit").param("emailuser", "root")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("repeating", "true").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeTheMaxDayForAReferencedCalendaredStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit").param("isreference", "true")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("maxday", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeTheMinDayForAReferencedCalendaredStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit").param("isreference", "true")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("minday", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeTheSchDayForAReferencedCalendaredStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit").param("isreference", "true")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("schday", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeTheEmailDayForAReferencedCalendaredStudyEventDefinition()
+			throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit").param("isreference", "true")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("emailday", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeTheEmailUserForAReferencedCalendaredStudyEventDefinition()
+			throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit").param("isreference", "true")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("emailuser", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeCalendaredStudyEventDefinitionThatIsNotReferenceEventIfSchDayMoreThenMaxDay()
+			throws Exception {
+		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit").param("emailuser", "root")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("schday", "5").param("maxday", "4").param("minday", "3")
+						.param("emailday", "2").param("emailuser", newUser.getName()).accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void xtestThatItIsImpossibleToChangeCalendaredStudyEventDefinitionThatIsNotReferenceEventIfMinDayMoreThenSchDay()
+			throws Exception {
+		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit").param("emailuser", "root")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("schday", "1").param("maxday", "4").param("minday", "3")
+						.param("emailday", "1").param("emailuser", newUser.getName()).accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeCalendaredStudyEventDefinitionThatIsNotReferenceEventIfMinDayMoreThenMaxDay()
+			throws Exception {
+		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit").param("emailuser", "root")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("schday", "5").param("maxday", "5").param("minday", "7")
+						.param("emailday", "2").param("emailuser", newUser.getName()).accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeCalendaredStudyEventDefinitionThatIsNotReferenceEventIfEmailDayMoreThenSchDay()
+			throws Exception {
+		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit").param("emailuser", "root")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("schday", "5").param("maxday", "5").param("minday", "7")
+						.param("emailday", "9").param("emailuser", newUser.getName()).accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeCalendaredStudyEventDefinitionThatIsNotReferenceEventIfEmailUserDoesNotHaveScopeRole()
+			throws Exception {
+		createNewStudy();
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
+		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit").param("emailuser", "root")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("schday", "4").param("maxday", "4").param("minday", "3")
+						.param("emailday", "2").param("emailuser", newUser.getName()).accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeStudyEventDefinitionIfTypeHasWrongType() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("type", "scheduled!!!!").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeStudyEventDefinitionIfSchDayHasWrongType() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("schday", "a").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeStudyEventDefinitionIfEmailDayHasWrongType() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("emailday", "a").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeStudyEventDefinitionIfMaxDayHasWrongType() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("maxday", "a").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeStudyEventDefinitionIfMinDayHasWrongType() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("minday", "a").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeStudyEventDefinitionIfIsReferenceHasWrongType() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("isreference", "asdfadsf").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeStudyEventDefinitionIfRepeatingHasWrongType() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("repeating", "asdfadsf").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatScheduledStudyEventDefinitionIsChangedCorrectlyToTheUnscheduledStudyEventDefinition()
+			throws Exception {
+		result = this.mockMvc
+				.perform(
+						post(API_EVENT_EDIT).param("id", "1").param("name", "test_event").param("type", "unscheduled")
+								.param("description", "test description").param("category", "test category")
+								.param("repeating", "true").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getName(), "test_event");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getType(), "unscheduled");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getDescription(),
+					"test description");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getCategory(), "test category");
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().isRepeating());
+		}
+	}
+
+	@Test
+	public void testThatScheduledStudyEventDefinitionIsChangedCorrectlyToTheCommonStudyEventDefinition()
+			throws Exception {
+		result = this.mockMvc
+				.perform(
+						post(API_EVENT_EDIT).param("id", "1").param("name", "test_event").param("type", "common")
+								.param("description", "test description").param("category", "test category")
+								.param("repeating", "true").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getName(), "test_event");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getType(), "common");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getDescription(),
+					"test description");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getCategory(), "test category");
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().isRepeating());
+		}
+	}
+
+	@Test
+	public void testThatScheduledStudyEventDefinitionIsChangedCorrectlyToTheCalendaredStudyEventDefinitionThatIsReferenceEvent()
+			throws Exception {
+
+		result = this.mockMvc
+				.perform(
+						post(API_EVENT_EDIT).param("id", "1").param("name", "test_event")
+								.param("type", "calendared_visit").param("description", "test description")
+								.param("category", "test category").param("isreference", "true").accept(mediaType)
+								.secure(true).session(session)).andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getName(), "test_event");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getType(), "calendared_visit");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getDescription(),
+					"test description");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getCategory(), "test category");
+			assertFalse(restOdmContainer.getRestData().getStudyEventDefinitionBean().isRepeating());
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().getReferenceVisit());
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().getMaxDay() == 0);
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().getMinDay() == 0);
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().getScheduleDay() == 0);
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().getEmailDay() == 0);
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().getUserEmailId() == 1);
+		}
+	}
+
+	@Test
+	public void testThatScheduledStudyEventDefinitionIsChangedCorrectlyToTheCalendaredStudyEventDefinitionThatIsNotReferenceEvent()
+			throws Exception {
+		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		result = this.mockMvc
+				.perform(
+						post(API_EVENT_EDIT).param("id", "1").param("name", "test_event")
+								.param("type", "calendared_visit").param("description", "test description")
+								.param("category", "test category").param("schday", "4").param("maxday", "4")
+								.param("minday", "3").param("emailday", "2").param("emailuser", newUser.getName())
+								.accept(mediaType).secure(true).session(session)).andExpect(status().isOk())
+				.andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getName(), "test_event");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getType(), "calendared_visit");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getDescription(),
+					"test description");
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getCategory(), "test category");
+			assertFalse(restOdmContainer.getRestData().getStudyEventDefinitionBean().isRepeating());
+			assertFalse(restOdmContainer.getRestData().getStudyEventDefinitionBean().getReferenceVisit());
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().getMaxDay() == 4);
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().getMinDay() == 3);
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().getScheduleDay() == 4);
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().getEmailDay() == 2);
+			assertTrue(restOdmContainer.getRestData().getStudyEventDefinitionBean().getUserEmailId() == newUser.getId());
+		}
+	}
+
+	@Test
+	public void testThatItIsPossibleToChangeStudyEventDefinitionIfNameHas2000Symbols() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("name", getSymbols(2000)).accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatItIsPossibleToChangeStudyEventDefinitionIfDescriptionHas2000Symbols() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("description", getSymbols(2000)).accept(mediaType)
+						.secure(true).session(session)).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatItIsPossibleToChangeStudyEventDefinitionIfCategoryHas2000Symbols() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("category", getSymbols(2000)).accept(mediaType)
+						.secure(true).session(session)).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeStudyEventDefinitionIfNameHasMoreThan2000Symbols() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("name", getSymbols(2001)).accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeStudyEventDefinitionIfDescriptionHasMoreThan2000Symbols()
+			throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("description", getSymbols(2001)).accept(mediaType)
+						.secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToChangeStudyEventDefinitionIfCategoryHasMoreThan2000Symbols() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("category", getSymbols(2001)).accept(mediaType)
+						.secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
 }

@@ -15,6 +15,7 @@
 
 package com.clinovo.rest.service;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 
 import org.jvnet.ws.wadl.Application;
@@ -49,11 +51,12 @@ import org.springframework.web.servlet.mvc.condition.ProducesRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
+
 /**
  * WadlService.
  */
 @Controller("restWadlService")
-@RequestMapping("/wadl")
 public class WadlService {
 
 	public static final String XS_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
@@ -61,9 +64,34 @@ public class WadlService {
 	@Autowired
 	private ApplicationContext applicationContext;
 
-	@RequestMapping
+	/**
+	 * Main get method.
+	 *
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @throws IOException
+	 *             the IOException
+	 */
+	@RequestMapping("/*")
+	public void restMain(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		if (request.getServletPath().equalsIgnoreCase("/rest")) {
+			String requestUri = request.getRequestURI();
+			response.sendRedirect(requestUri.concat(requestUri.endsWith("/") ? "" : "/").concat("wadl"));
+		}
+	}
+
+	/**
+	 * Wadl method.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @return Application
+	 */
+	@RequestMapping("/wadl")
 	@ResponseBody
-	public Application main(HttpServletRequest request) {
+	public Application wadl(HttpServletRequest request) {
 		Application result = new Application();
 		Doc doc = new Doc();
 		doc.setTitle("ClinCapture REST API Service WADL");
@@ -111,6 +139,7 @@ public class WadlService {
 
 				Annotation[][] annotations = javaMethod.getParameterAnnotations();
 				Class<?>[] paramTypes = javaMethod.getParameterTypes();
+				boolean ignoreDefaultValues = javaMethod.getAnnotation(RestIgnoreDefaultValues.class) != null;
 				int i = 0;
 				for (Annotation[] annotation : annotations) {
 					Class<?> paramType = paramTypes[i];
@@ -124,8 +153,10 @@ public class WadlService {
 							waldParam.setName(param2.value());
 							waldParam.setStyle(ParamStyle.QUERY);
 							waldParam.setRequired(param2.required());
-							String defaultValue = cleanDefault(param2.defaultValue());
 							if (!param2.required()) {
+								String defaultValue = param2.defaultValue();
+								defaultValue = ignoreDefaultValues ? "[not used]" : defaultValue;
+								defaultValue = cleanDefault(defaultValue);
 								waldParam.setDefault(defaultValue);
 							}
 							waldParam.setType(nm);
@@ -187,7 +218,7 @@ public class WadlService {
 			nm = new QName(XS_NAMESPACE, "integer", "xs");
 		} else if (className.contains("int")) {
 			nm = new QName(XS_NAMESPACE, "int", "xs");
-		} else if (className.contains("boolean")) {
+		} else if (className.contains("boolean") || className.contains("Boolean")) {
 			nm = new QName(XS_NAMESPACE, "boolean", "xs");
 		}
 		return nm;

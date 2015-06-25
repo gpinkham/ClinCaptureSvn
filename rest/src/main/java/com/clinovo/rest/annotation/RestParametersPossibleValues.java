@@ -25,6 +25,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Rest parameters possible values annotation.
+ * 
+ * Allows to specify possible values for a request parameters.
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

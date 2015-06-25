@@ -10,7 +10,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 public interface EventDefinitionService {
 
 	/**
-	 * Method that creates new user.
+	 * Method that creates new study event definition.
 	 *
 	 * @param studyBean
 	 *            StudyBean
@@ -20,6 +20,19 @@ public interface EventDefinitionService {
 	 *            StudyEventDefinitionBean
 	 */
 	void createStudyEventDefinition(StudyBean studyBean, String emailUser,
+			StudyEventDefinitionBean studyEventDefinitionBean);
+
+	/**
+	 * Method that updates study event definition.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param emailUser
+	 *            String
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 */
+	void updateStudyEventDefinition(StudyBean studyBean, String emailUser,
 			StudyEventDefinitionBean studyEventDefinitionBean);
 
 	/**

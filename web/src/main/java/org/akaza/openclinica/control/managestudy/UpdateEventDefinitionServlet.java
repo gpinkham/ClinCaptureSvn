@@ -106,7 +106,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 						"definition");
 				saveEventDefinitionToSession(sed, fp);
 				saveEventDefinitionCRFsToSession(fp);
-				response.sendRedirect(request.getContextPath() + "/AddCRFToDefinition");
+				forwardPage(Page.ADD_CRFTO_DEFINITION_SERVLET, request, response);
 			} else {
 				addPageMessage(respage.getString("updating_ED_is_cancelled"), request);
 				clearSession(request.getSession());
@@ -133,13 +133,14 @@ public class UpdateEventDefinitionServlet extends Controller {
 			sedForErrors.setMaxDay(fp.getInt("maxDay"));
 			sedForErrors.setMinDay(fp.getInt("minDay"));
 			sedForErrors.setScheduleDay(fp.getInt("schDay"));
+			sedForErrors.setEmailDay(fp.getInt("emailDay"));
 			sedForErrors.setReferenceVisit("true".equalsIgnoreCase(fp.getString("isReference")));
 			request.setAttribute("userNameInsteadEmail", fp.getString("emailUser"));
 			request.setAttribute("definition", sedForErrors);
 			logger.info("has errors");
 			request.setAttribute("formMessages", errors);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
-
+			return;
 		} else {
 			logger.info("no errors");
 			saveEventDefinitionToSession(sed, fp);
@@ -392,6 +393,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 		session.removeAttribute("changedReference");
 		session.removeAttribute("userNameInsteadEmail");
 		session.removeAttribute("sdvOptions");
+		session.removeAttribute("crfNameToEdcMap");
 	}
 
 }

@@ -13,11 +13,11 @@ import org.springframework.http.MediaType;
 public class AuthenticationServiceTest extends BaseServiceTest {
 
 	@Test
-	public void testThatAuthenticationServiceReturnsNotFoundIfRequestIsNotMapped() throws Exception {
+	public void testThatAuthenticationServiceReturnsWadlXmlIfRequestIsNotMapped() throws Exception {
 		this.mockMvc.perform(
-				post(API_WRONG_MAPPING).accept(mediaType).secure(true)
+				post(API_WRONG_MAPPING).accept(MediaType.APPLICATION_XML).secure(true)
 						.param("username", userName.concat(Long.toString(timestamp))).param("password", password)
-						.param("studyname", studyName)).andExpect(status().isNotFound());
+						.param("studyname", studyName)).andExpect(status().isOk());
 	}
 
 	@Test

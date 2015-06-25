@@ -24,38 +24,15 @@ import java.lang.annotation.Target;
 import org.springframework.stereotype.Component;
 
 /**
- * Rest parameter possible values annotation.
- * 
- * Allows to specify possible values for certain request parameter.
+ * RestIgnoreDefaultValues method annotation.
+ *
+ * Forbids to add new request parameters with default values if those parameters were not specified and the "required"
+ * attribute was set to false in the @RequestParam.
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Component
-public @interface RestParameterPossibleValues {
+public @interface RestIgnoreDefaultValues {
 
-	/**
-	 * Method that returns name.
-	 */
-	String name();
-
-	/**
-	 * Method that returns values.
-	 */
-	String values();
-
-	/**
-	 * Method that returns value descriptions.
-	 */
-	String valueDescriptions() default "";
-
-	/**
-	 * Method that returns multiValue.
-	 */
-	boolean multiValue() default false;
-
-	/**
-	 * Method that returns canBeNotSpecified.
-	 */
-	boolean canBeNotSpecified() default false;
 }

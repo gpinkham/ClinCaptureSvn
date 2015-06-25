@@ -140,10 +140,13 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String idString = request.getParameter("id");
+		if (request.getParameter("init") != null || idString != null) {
+			UpdateEventDefinitionServlet.clearSession(request.getSession());
+		}
 		StudyBean currentStudy = getCurrentStudy(request);
 		setUserNameInsteadEmail(request);
 		StudyEventDefinitionDAO sdao = getStudyEventDefinitionDAO();
-		String idString = request.getParameter("id");
 		logger.info("definition id: " + idString);
 		if (StringUtil.isBlank(idString)) {
 			addPageMessage(respage.getString("please_choose_a_definition_to_edit"), request);

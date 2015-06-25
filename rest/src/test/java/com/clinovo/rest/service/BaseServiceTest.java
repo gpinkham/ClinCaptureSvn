@@ -17,7 +17,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.akaza.openclinica.AbstractContextSentiveTest;
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
@@ -59,7 +59,7 @@ import com.clinovo.rest.security.PermissionChecker;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:servlet-context.xml")
 @SuppressWarnings("rawtypes")
-public class BaseServiceTest extends AbstractContextSentiveTest {
+public class BaseServiceTest extends DefaultAppContextTest {
 
 	protected MediaType mediaType = MediaType.APPLICATION_JSON;
 
@@ -91,6 +91,7 @@ public class BaseServiceTest extends AbstractContextSentiveTest {
 
 	// Managed services
 	public static final String API_EVENT = "/event";
+	public static final String API_EVENT_EDIT = "/event/edit";
 	public static final String API_EVENT_ADD_CRF = "/event/addCrf";
 	public static final String API_EVENT_CREATE = "/event/create";
 	public static final String API_WRONG_MAPPING = "/wrongmapping";

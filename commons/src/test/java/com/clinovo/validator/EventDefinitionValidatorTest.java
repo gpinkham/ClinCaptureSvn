@@ -18,14 +18,11 @@ import org.springframework.mock.web.MockHttpSession;
 
 import com.clinovo.i18n.LocaleResolver;
 
-@SuppressWarnings("static-access")
 public class EventDefinitionValidatorTest {
 
 	private MockHttpSession session;
 
 	private MockHttpServletRequest request;
-
-	private EventDefinitionValidator eventDefinitionValidator;
 
 	@Mock
 	private ResourceBundle resourceBundle;
@@ -49,7 +46,6 @@ public class EventDefinitionValidatorTest {
 	public void setUp() throws Exception {
 		lowerCaseParameterNames = false;
 		studyUserRoleBeanList = new ArrayList<StudyUserRoleBean>();
-		eventDefinitionValidator = new EventDefinitionValidator();
 		request = new MockHttpServletRequest();
 		session = new MockHttpSession();
 		request.setSession(session);
@@ -73,42 +69,44 @@ public class EventDefinitionValidatorTest {
 	@Test
 	public void testThatWrongTypeProducesError() {
 		request.setParameter("type", "scheduledX");
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
 	@Test
 	public void testThatNameShouldNotBeBlank() {
 		request.setParameter("name", "");
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
 	@Test
 	public void testThatDescriptionMayHave2000Symbols() {
+		request.setParameter("emailUser", "");
 		request.setParameter("description", getSymbols(2000));
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 0);
 	}
 
 	@Test
 	public void testThatDescriptionCannotHaveMoreThan2000Symbols() {
 		request.setParameter("description", getSymbols(2001));
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
 	@Test
 	public void testThatCategoryMayHave2000Symbols() {
+		request.setParameter("emailUser", "");
 		request.setParameter("category", getSymbols(2000));
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 0);
 	}
 
 	@Test
 	public void testThatCategoryCannotHaveMoreThan2000Symbols() {
 		request.setParameter("category", getSymbols(2001));
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
@@ -116,7 +114,7 @@ public class EventDefinitionValidatorTest {
 	public void testThatMinDayIsRequiredForCalendaredEvent() {
 		request.setParameter("type", "calendared_visit");
 		request.removeParameter("minDay");
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
@@ -124,7 +122,7 @@ public class EventDefinitionValidatorTest {
 	public void testThatMinDayShouldBeANumberForCalendaredEvent() {
 		request.setParameter("type", "calendared_visit");
 		request.setParameter("minDay", "aaa");
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
@@ -132,7 +130,7 @@ public class EventDefinitionValidatorTest {
 	public void testThatMaxDayIsRequiredForCalendaredEvent() {
 		request.setParameter("type", "calendared_visit");
 		request.removeParameter("maxDay");
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
@@ -140,7 +138,7 @@ public class EventDefinitionValidatorTest {
 	public void testThatMaxDayShouldBeANumberForCalendaredEvent() {
 		request.setParameter("type", "calendared_visit");
 		request.setParameter("maxDay", "aaa");
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
@@ -148,7 +146,7 @@ public class EventDefinitionValidatorTest {
 	public void testThatSchDayIsRequiredForCalendaredEvent() {
 		request.setParameter("type", "calendared_visit");
 		request.removeParameter("schDay");
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
@@ -156,7 +154,7 @@ public class EventDefinitionValidatorTest {
 	public void testThatSchDayShouldBeANumberForCalendaredEvent() {
 		request.setParameter("type", "calendared_visit");
 		request.setParameter("schDay", "aaa");
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
@@ -165,7 +163,7 @@ public class EventDefinitionValidatorTest {
 		request.setParameter("type", "calendared_visit");
 		request.setParameter("schDay", "5");
 		request.setParameter("maxDay", "4");
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
@@ -173,7 +171,7 @@ public class EventDefinitionValidatorTest {
 	public void testThatMinShouldBeLessThanOrEqualToSchDay() {
 		request.setParameter("type", "calendared_visit");
 		request.setParameter("minDay", "4");
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
@@ -181,7 +179,7 @@ public class EventDefinitionValidatorTest {
 	public void testThatMinDayShouldBeLessThanOrEqualToMaxDay() {
 		request.setParameter("type", "calendared_visit");
 		request.setParameter("minDay", "7");
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
@@ -189,7 +187,7 @@ public class EventDefinitionValidatorTest {
 	public void testThatEmailDayShouldBeLessThanOrEqualToSchDay() {
 		request.setParameter("type", "calendared_visit");
 		request.setParameter("emailDay", "7");
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 
@@ -197,7 +195,108 @@ public class EventDefinitionValidatorTest {
 	public void testThatErrorIsProducedForCalendaredEventThatIsReferenceEvenIfUserDoesNotExsist() {
 		request.setParameter("type", "calendared_visit");
 		request.setParameter("emailUser", "test_user".concat(Long.toString(new Date().getTime())));
-		assertTrue(eventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+				lowerCaseParameterNames).size() == 1);
+	}
+
+	@Test
+	public void testThatMaxDayIsNotUsedForReferencedCalendaredEvents() {
+		request.setParameter("type", "calendared_visit");
+		request.setParameter("isReference", "true");
+		request.setParameter("maxDay", "1");
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+				lowerCaseParameterNames).size() == 1);
+	}
+
+	@Test
+	public void testThatMinDayIsNotUsedForReferencedCalendaredEvents() {
+		request.setParameter("type", "calendared_visit");
+		request.setParameter("isReference", "true");
+		request.setParameter("minDay", "1");
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+				lowerCaseParameterNames).size() == 1);
+	}
+
+	@Test
+	public void testThatSchDayIsNotUsedForReferencedCalendaredEvents() {
+		request.setParameter("type", "calendared_visit");
+		request.setParameter("isReference", "true");
+		request.setParameter("schDay", "1");
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+				lowerCaseParameterNames).size() == 1);
+	}
+
+	@Test
+	public void testThatEmailDayIsNotUsedForReferencedCalendaredEvents() {
+		request.setParameter("type", "calendared_visit");
+		request.setParameter("isReference", "true");
+		request.setParameter("emailDay", "1");
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+				lowerCaseParameterNames).size() == 1);
+	}
+
+	@Test
+	public void testThatUserNameIsNotUsedForReferencedCalendaredEvents() {
+		request.setParameter("type", "calendared_visit");
+		request.setParameter("isReference", "true");
+		request.setParameter("emailUser", "root");
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+				lowerCaseParameterNames).size() == 1);
+	}
+
+	@Test
+	public void testThatCalendaredEventCannotBeRepeating() {
+		request.setParameter("type", "calendared_visit");
+		request.setParameter("repeating", "true");
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+				lowerCaseParameterNames).size() == 1);
+	}
+
+	@Test
+	public void testThatNotCalendaredEventCannotBeReferenced() {
+		request.setParameter("type", "scheduled");
+		request.setParameter("isReference", "true");
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+				lowerCaseParameterNames).size() == 1);
+	}
+
+	@Test
+	public void testThatMaxDayIsUsedForCalendaredEventsOnly() {
+		request.setParameter("type", "scheduled");
+		request.setParameter("maxDay", "1");
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+				lowerCaseParameterNames).size() == 1);
+	}
+
+	@Test
+	public void testThatMinDayIsUsedForCalendaredEventsOnly() {
+		request.setParameter("type", "scheduled");
+		request.setParameter("minDay", "1");
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+				lowerCaseParameterNames).size() == 1);
+	}
+
+	@Test
+	public void testThatSchDayIsUsedForCalendaredEventsOnly() {
+		request.setParameter("type", "scheduled");
+		request.setParameter("schDay", "1");
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+				lowerCaseParameterNames).size() == 1);
+	}
+
+	@Test
+	public void testThatEmailDayIsUsedForCalendaredEventsOnly() {
+		request.setParameter("type", "scheduled");
+		request.setParameter("emailDay", "1");
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
+				lowerCaseParameterNames).size() == 1);
+	}
+
+	@Test
+	public void testThatUserNameIsUsedForCalendaredEventsOnly() {
+		request.setParameter("type", "scheduled");
+		request.setParameter("emailUser", "root");
+		assertTrue(EventDefinitionValidator.validate(request, configurationDao, studyUserRoleBeanList,
 				lowerCaseParameterNames).size() == 1);
 	}
 }

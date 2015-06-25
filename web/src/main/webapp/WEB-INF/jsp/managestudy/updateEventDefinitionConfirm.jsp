@@ -188,27 +188,25 @@
 </div>
 <br>
 
+<form id="updateEventDefinition" action="UpdateEventDefinition" method="POST">
+<input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag != null ? formWithStateFlag : ''}" />
+<input type="hidden" name="action" value="submit">
 <table border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td>
-			<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'UpdateEventDefinition');"/>
+			<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="$('input[name=action]').val('');$('input[name=submit]').click();"/>
 		</td>
 
 		<td>
-			<form action="UpdateEventDefinition" method="POST">
-				<input type="hidden" name="action" value="submit">
-				<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
-			</form>
+			<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
 		</td>
 
 		<td>
-			<form action="UpdateEventDefinition" method="POST">
-				<input type="hidden" name="action" value="cancel">
-				<input type="submit" name="submit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel">
-			</form>
+			<input type="button" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onclick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');">
 		</td>
 	</tr>
 </table>
+</form>
 <br><br>
 
 <!-- EXPANDING WORKFLOW BOX -->

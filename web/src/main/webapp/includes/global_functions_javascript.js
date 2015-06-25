@@ -2572,10 +2572,7 @@ function urlParam(name){
     return results != undefined ? results[1] : undefined;
 }
 
-// when document is loaded
-$(function() {
-    // enable the ability to uncheck the radio buttons in the CRF's
-    bindRadioButtons();
+var captureFirstFormState = function() {
     if ($("#datasetForm").length > 0) {
         firstFormState = $("#datasetForm").serialize();
     } else
@@ -2585,6 +2582,13 @@ $(function() {
             $("#formWithStateFlag").val("changed");
         });
     }
+}
+
+// when document is loaded
+$(function() {
+    // enable the ability to uncheck the radio buttons in the CRF's
+    bindRadioButtons();
+    captureFirstFormState();
 });
 
 executeWhenDOMIsReady = function(code) {
@@ -3914,8 +3918,8 @@ function viewCrfByVersion(eventDefinitionCRFId, studySubjectId, crfVersionId, ev
 }
 
 function upateEventDefinitionAddCRF(){
-	$("input[type=hidden]").attr("value","addCrfs");
-	document.forms["UpdateEventDefinition"].submit();
+	$("input[name=action]").attr("value","addCrfs");
+	$("#updateEventDefinition").submit();
 }
 
 function isPhoneNumberValid(id, msg) {

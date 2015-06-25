@@ -1,14 +1,14 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
+ * <p/>
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+ * <p/>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
- * You should have received a copy of the Lesser GNU General Public License along with this program.  
- \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
+ * <p/>
+ * You should have received a copy of the Lesser GNU General Public License along with this program.
+ * \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
 /*
@@ -22,7 +22,7 @@ package org.akaza.openclinica.view;
 
 /**
  * @author jxu
- * 
+ *
  *         Provides a type-safe enumeration for JSP Page.
  */
 public final class Page {
@@ -360,6 +360,12 @@ public final class Page {
 	 */
 	public static final Page STUDY_EVENT_DEFINITION_LIST = new Page(
 			"/WEB-INF/jsp/managestudy/studyEventDefinitionList.jsp", "List all Event Definitions");
+
+	/**
+	 * Page to add CRFs to seds.
+	 */
+	public static final Page ADD_CRFTO_DEFINITION_SERVLET = new Page("/AddCRFToDefinition",
+			"Add CRFs To Study Event Definition");
 
 	/**
 	 * Page for view all seds.
@@ -789,7 +795,7 @@ public final class Page {
 
 	/**
 	 * Constructs the JSP Page instance.
-	 * 
+	 *
 	 * @param fileName
 	 *            The filename of the JSP page
 	 * @param title
@@ -802,7 +808,7 @@ public final class Page {
 
 	/**
 	 * Gets the title attribute of the Page object.
-	 * 
+	 *
 	 * @return The title value
 	 */
 	public String getTitle() {
@@ -811,7 +817,7 @@ public final class Page {
 
 	/**
 	 * Gets the fileName attribute of the Page object.
-	 * 
+	 *
 	 * @return The fileName value
 	 */
 	public String getFileName() {
@@ -824,7 +830,7 @@ public final class Page {
 
 	/**
 	 * Method sets new page.
-	 * 
+	 *
 	 * @param fileName
 	 *            String
 	 * @param title
@@ -837,7 +843,7 @@ public final class Page {
 
 	/**
 	 * Method checks that page is the DDE page.
-	 * 
+	 *
 	 * @param page
 	 *            Page
 	 * @return boolean
@@ -848,7 +854,7 @@ public final class Page {
 
 	/**
 	 * Method checks that page is the AE page.
-	 * 
+	 *
 	 * @param page
 	 *            Page
 	 * @return boolean

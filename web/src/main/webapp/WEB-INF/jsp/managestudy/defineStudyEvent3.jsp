@@ -47,27 +47,9 @@
 		<fmt:message key="define_study_event"  bundle="${resword}"/> - <fmt:message key="selected_CRFs"  bundle="${resword}"/> - <fmt:message key="selected_default_version"  bundle="${resword}"/>
 	</span>
 </h1>
-<script type="text/JavaScript" language="JavaScript">
-    
-    function myCancel() {
-
-        cancelButton=document.getElementById('cancel');
-        if ( cancelButton != null) {
-        	confirmDialog({ 
-        		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
-        		height: 150,
-        		width: 500,
-        		redirectLink: 'ListEventDefinition'
-        		});      
-         	return false;
-         }
-        return true;
-
-    }
-    
-</script>
 
 <form action="DefineStudyEvent" method="post" id="defineStudyEventForm">
+    <input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag != null ? formWithStateFlag : ''}" />
     <input type="hidden" name="actionName" value="confirm">
     
     <div style="width: 600px">
@@ -77,8 +59,8 @@
             <div class="tablebox_center">
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                     <c:set var="count" value="0"/>
-
                     <c:forEach var ="crf" items="${definition.crfs}">
+                        <c:set value="${crfNameToEdcMap[crf.name]}" var="edc"/>
                         <input type="hidden" name="crfId<c:out value="${count}"/>" value="<c:out value="${crf.id}"/>">
                         <input type="hidden" name="crfName<c:out value="${count}"/>" value="<c:out value="${crf.name}"/>">
 
@@ -90,33 +72,32 @@
 
                             <td class="table_cell">
                             	<fmt:message key="required" bundle="${resword}"/>:
-                            	<input type="checkbox" onchange="javascript:changeIcon();" checked name="requiredCRF<c:out value="${count}"/>" value="yes">
+                            	<input type="checkbox" onchange="javascript:changeIcon();" ${edc.requiredCRF ? 'checked' : ''} name="requiredCRF<c:out value="${count}"/>" value="yes">
                             </td>
 
                             <td class="table_cell">&nbsp;</td>
 
                             <td class="table_cell">
                             	<fmt:message key="password_required" bundle="${resword}"/>:
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="electronicSignature<c:out value="${count}"/>" value="yes">
+                            	<input type="checkbox" onchange="javascript:changeIcon();" ${edc.electronicSignature ? 'checked' : ''} name="electronicSignature<c:out value="${count}"/>" value="yes">
                             </td>
 
                             <td class="table_cell"><fmt:message key="default_version" bundle="${resword}"/>:
-
                                 <select name="defaultVersionId<c:out value="${count}"/>" onchange="javascript:changeIcon();">
                                     <c:forEach var="version" items="${crf.versions}">
-                                    <option value="<c:out value="${version.id}"/>"><c:out value="${version.name}"/>
-                                        </c:forEach>
+                                        <option ${edc.defaultVersionName == version.name ? 'selected' : ''} value="<c:out value="${version.id}"/>"><c:out value="${version.name}"/>
+                                    </c:forEach>
                                 </select>
                             </td></tr>
                         <tr valign="top">
                             <td class="table_cell" colspan="2">
-                            	<fmt:message key="hidden_crf" bundle="${resword}"/>:<input type="checkbox" name="hiddenCrf<c:out value="${count}"/>" onchange="javascript:changeIcon();" value="yes">
+                            	<fmt:message key="hidden_crf" bundle="${resword}"/>:<input type="checkbox" ${edc.hideCrf ? 'checked' : ''} name="hiddenCrf<c:out value="${count}"/>" onchange="javascript:changeIcon();" value="yes">
                             </td>
                     		
                             <td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
 							    <select name="sdvOption<c:out value="${count}"/>" onchange="javascript:changeIcon();">
                                     <c:forEach var="sdv" items="${crf.sdvOptions}">
-                                        <option value="${sdv.code}"><fmt:message key="${sdv.description}" bundle="${resterms}"/></option>
+                                        <option ${edc.sourceDataVerification.code == sdv.code ? 'selected' : ''} value="${sdv.code}"><fmt:message key="${sdv.description}" bundle="${resterms}"/></option>
                                     </c:forEach>
 					        	</select>
 							    </td>
@@ -125,10 +106,7 @@
                         <tr valign="top">
                             <td class="table_cell" colspan="4">
                                 <fmt:message key="acceptNewCrfVersions" bundle="${resword}"/> :
-                                <c:choose>
-                                    <c:when test="${!edc.acceptNewCrfVersions}"><input type="checkbox" name="acceptNewCrfVersions<c:out value="${count}"/>" value="yes"></c:when>
-                                    <c:otherwise><input checked="checked" type="checkbox" name="acceptNewCrfVersions<c:out value="${count}"/>" value="yes"></c:otherwise>
-                                </c:choose>
+                                <input ${edc.acceptNewCrfVersions ? 'checked' : ''} type="checkbox" name="acceptNewCrfVersions<c:out value="${count}"/>" value="yes">
                             </td>
                         </tr>
 
@@ -157,15 +135,15 @@
 						<tr valign="top">
 							<td class="table_cell" colspan="2" style="padding-bottom:9px;">
 								<fmt:message key="send_email_when" bundle="${resword}"/>:
-								<input type="radio" name="emailOnStep<c:out value="${count}"/>" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="complete" class="email_field_trigger uncheckable_radio">
+								<input type="radio" ${edc.emailStep == 'complete' ? 'checked' : ''} name="emailOnStep<c:out value="${count}"/>" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="complete" class="email_field_trigger uncheckable_radio">
 								<fmt:message key="complete" bundle="${resterms}"/>
-								<input type="radio" name="emailOnStep<c:out value="${count}"/>" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="sign" class="email_field_trigger uncheckable_radio">
+								<input type="radio" ${edc.emailStep == 'sign' ? 'checked' : ''} name="emailOnStep<c:out value="${count}"/>" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="sign" class="email_field_trigger uncheckable_radio">
 								<fmt:message key="sign" bundle="${resterms}"/>
 							</td>
 							<td class="table_cell" colspan="2">
-								<span class="email_wrapper" style="display:none">
+								<span class="email_wrapper" style="${edc.emailStep == 'complete' || edc.emailStep == 'sign' ? '' : 'display:none'}">
 									<fmt:message key="email_crf_to" bundle="${resword}"/>:
-									<input type="text" name="mailTo${count}" onchange="javascript:changeIcon();" style="width:115px;margin-left:79px" class="email_to_check_field"/>
+									<input type="text" name="mailTo${count}" onchange="javascript:changeIcon();" style="width:115px;margin-left:79px" class="email_to_check_field" value="${edc.emailTo}"/>
 								</span>
 								<span class="alert" style="display:none"><fmt:message key="enter_valid_email" bundle="${resnotes}"/></span>
 							</td>
@@ -254,13 +232,13 @@
 	<table border="0">
 		<tr>
 			<td>
-				<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'DefineStudyEvent?actionName=back1');"/> 
+				<input type="button" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="$('input[name=actionName]').val('back1');$('#defineStudyEventForm').submit();"/>
 			</td>
 			<td>
 				<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#defineStudyEventForm');">
 			</td>
 			<td>
-				<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="javascript:myCancel();"/>
+				<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 			</td>
 			<td>
 				<img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom"/>

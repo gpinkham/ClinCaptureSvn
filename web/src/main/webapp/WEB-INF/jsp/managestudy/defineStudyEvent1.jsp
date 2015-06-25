@@ -41,86 +41,7 @@
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='definition' class='org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean'/>
-<script type="text/JavaScript" language="JavaScript">
-  <!--
- function myCancel() {
- 
-    cancelButton=document.getElementById('cancel');
-    if ( cancelButton != null) {
-    	confirmDialog({ 
-    		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
-    		height: 150,
-    		width: 500,
-    		redirectLink: 'ListEventDefinition'
-    		});      
-     	return false;
-     }
-     return true;       
-  }
-   //-->
-</script>
-<script type="text/JavaScript" language="JavaScript">
-$(document).ready(function() {
-	$(".showHide").css('display', 'none');
-	$('tr[name="repeating"]').css('display', 'none');
-	
-	$('select[name="type"]').change(function() {
-		if($(this).find(":selected").val() == '') {
-			$('tr[name="repeating"]').hide();
-			$(".showHide").css('display', 'none');
-			$('input[name*="Day"]').attr('value','').attr('readonly','');
-			$('.showHide input[type="checkbox"]').attr('checked', false);
-			$('input[name="emailUser"]').attr('value','').attr('readonly','');
-		}
-		if($(this).find(":selected").val() == 'calendared_visit') {
-			$(".showHide").css('display', '');
-			$('tr[name="repeating"]').css('display', 'none');
-		} else if($(this).find(":selected").val() != '') {
-			$('tr[name="repeating"]').css('display', '');
-			$(".showHide").css('display', 'none');
-			$('input[name*="Day"]').attr('value','').attr('readonly','');
-			$('.showHide input[type="checkbox"]').attr('checked', false);
-			$('input[name="emailUser"]').attr('value','').attr('readonly','');
-		}
-	})
-
-	$('input[name="isReference"]').click(function() {
-		if ($(this).is(':checked')) {
-			$('input[name*="Day"]').attr('value','0').attr('readonly','true');
-			$('input[name="emailUser"]').attr('value','').attr('readonly','true');
-			$("tr[name^='email']").css('display', 'none');
-
-		} else {
-			$('input[name*="Day"]').attr('value','').attr('readonly','');
-			$('input[name="emailUser"]').attr('readonly','');
-			$("tr[name^='email']").css('display', '');
-
-		}
-	});
-	$('select[name="type"]').each(function() {
-		if($(this).find(":selected").val() == 'calendared_visit') {
-			$('tr[name="repeating"]').hide();
-			$(".showHide").css('display', '');
-		} else if($(this).find(":selected").val() == '') {
-			$('tr[name="repeating"]').hide();
-			$(".showHide").css('display', 'none');
-			$('input[name*="Day"]').attr('value','').attr('readonly','');
-			$('.showHide input[type="checkbox"]').attr('checked', false);
-			$('input[name="emailUser"]').attr('value','').attr('readonly','');
-		} else {
-			$('tr[name="repeating"]').css('display', '');
-		}
-	});
-	$('input[name="isReference"]').each(function() {
-		if ($(this).is(':checked')) {
-			$('tr[name="repeating"]').hide();
-			$('input[name*="Day"]').attr('value','0').attr('readonly','true');
-			$('input[name="emailUser"]').attr('value','').attr('readonly','true');
-			$("tr[name^='email']").hide();
-		}
-	});
-});
-</script>
+<script type="text/JavaScript" language="JavaScript" src="includes/js/pages/study_event_definition.js"></script>
 <h1>
 	<span class="first_level_header">
 		<fmt:message key="create_SED_for"  bundle="${resword}"/> <c:out value="${study.name}"/>
@@ -132,7 +53,8 @@ $(document).ready(function() {
 	<br>
 
 <span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/><br>
-<form action="DefineStudyEvent" method="post">
+<form id="defineStudyEventForm" action="DefineStudyEvent" method="post">
+<input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag != null ? formWithStateFlag : ''}" />
 <input type="hidden" name="actionName" value="next">
 <input type="hidden" name="pageNum" value="1">
 <div style="width: 600px">
@@ -152,45 +74,47 @@ $(document).ready(function() {
   </td></tr>
   
   <tr valign="top"><td class="formlabel"><fmt:message key="type" bundle="${resword}"/>:</td><td><table><tr><td>
-    <div class="formfieldXL_BG"><select name="type" onchange="javascript:changeIcon();" class="formfieldXL">        
-       <c:choose>
-        <c:when test="${definition.type == 'common'}">          
-         <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
-         <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
-         <option value="common" selected><fmt:message key="common" bundle="${resword}"/>
-         <option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
-		 <option value=''>
-        </c:when>        
-        <c:when test="${definition.type == 'unscheduled'}">       
-         <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
-         <option value="unscheduled" selected><fmt:message key="unscheduled" bundle="${resword}"/>
-         <option value="common"><fmt:message key="common" bundle="${resword}"/>
-         <option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
-		 <option value=''>
-        </c:when>
-        <c:when test="${definition.type == 'calendared_visit'}">       
-         <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
-         <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
-         <option value="common"><fmt:message key="common" bundle="${resword}"/>
-         <option value="calendared_visit" selected><fmt:message key="calendared_visit" bundle="${resword}"/>
-		 <option value=''>
-        </c:when>
-		<c:when test="${definition.type == 'scheduled'}">
-         <option value="scheduled" selected><fmt:message key="scheduled" bundle="${resword}"/>
-         <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
-         <option value="common"><fmt:message key="common" bundle="${resword}"/>
-         <option value="calendared_visit" ><fmt:message key="calendared_visit" bundle="${resword}"/>
-		 <option value=''>		
-		</c:when> 
-        <c:otherwise>        
-         <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
-         <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
-         <option value="common"><fmt:message key="common" bundle="${resword}"/>
-         <option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
-		 <option value='' selected>
-        </c:otherwise>
-       </c:choose>       
-    </select></div>
+    <div class="formfieldXL_BG">
+		<select name="type" onchange="javascript:changeIcon();" class="formfieldXL">
+			<c:choose>
+				<c:when test="${definition.type == 'common'}">
+			   		<option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
+				 	<option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
+				 	<option value="common" selected><fmt:message key="common" bundle="${resword}"/>
+				 	<option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
+				 	<option value=''>
+				</c:when>
+				<c:when test="${definition.type == 'unscheduled'}">
+					 <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
+					 <option value="unscheduled" selected><fmt:message key="unscheduled" bundle="${resword}"/>
+					 <option value="common"><fmt:message key="common" bundle="${resword}"/>
+					 <option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
+					 <option value=''>
+				</c:when>
+				<c:when test="${definition.type == 'calendared_visit'}">
+					 <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
+					 <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
+					 <option value="common"><fmt:message key="common" bundle="${resword}"/>
+					 <option value="calendared_visit" selected><fmt:message key="calendared_visit" bundle="${resword}"/>
+					 <option value=''>
+				</c:when>
+				<c:when test="${definition.type == 'scheduled'}">
+					 <option value="scheduled" selected><fmt:message key="scheduled" bundle="${resword}"/>
+					 <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
+					 <option value="common"><fmt:message key="common" bundle="${resword}"/>
+					 <option value="calendared_visit" ><fmt:message key="calendared_visit" bundle="${resword}"/>
+					 <option value=''>
+				</c:when>
+				<c:otherwise>
+					 <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
+					 <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
+					 <option value="common"><fmt:message key="common" bundle="${resword}"/>
+					 <option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
+					 <option value='' selected>
+				</c:otherwise>
+		   </c:choose>
+    	</select>
+	</div>
    </td><td class="formlabel alert">*</td><td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="type"/></jsp:include></td></tr></table></td></tr>
 
     <tr valign="top" name="repeating" style="height: 25px;"><td align="right"><fmt:message key="repeating" bundle="${resword}"/>:</td><td align="left">
@@ -265,11 +189,10 @@ $(document).ready(function() {
 <tr>
 
 <td>
- <%-- <input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: return checkGoBackEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');"/> --%>
 	<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
 					value="<fmt:message key="back" bundle="${resword}"/>" 
-					class="button_medium medium_back" 
-					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
+					class="button_medium medium_back"
+					onClick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 </td>
 <td>
   <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue">

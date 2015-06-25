@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 /**
  * RestRequestWrapper.
+ * 
+ * Allows to add new request parameters with default values if those parameters were not specified.
  */
 @SuppressWarnings("unchecked")
 public class RestRequestWrapper extends HttpServletRequestWrapper {

@@ -33,6 +33,25 @@
 
 	</bean>
 
+	<bean id="messageSource" class="com.clinovo.i18n.ClinCaptureResourceBundleMessageSource">
+		<property name="defaultEncoding" value="UTF-8"/>
+		<property name="basenames">
+			<list>
+				<value>org.akaza.openclinica.i18n.admin</value>
+				<value>org.akaza.openclinica.i18n.audit_events</value>
+				<value>org.akaza.openclinica.i18n.exceptions</value>
+				<value>org.akaza.openclinica.i18n.format</value>
+				<value>org.akaza.openclinica.i18n.notes</value>
+				<value>org.akaza.openclinica.i18n.page_messages</value>
+				<value>org.akaza.openclinica.i18n.terms</value>
+				<value>org.akaza.openclinica.i18n.words</value>
+				<value>org.akaza.openclinica.i18n.workflow</value>
+				<value>org.akaza.openclinica.i18n.ws_messages</value>
+				<value>org.akaza.openclinica.i18n.buildNumber</value>
+			</list>
+		</property>
+	</bean>
+
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
         <property name="validationMessageSource" ref="messageSource"/>
     </bean>

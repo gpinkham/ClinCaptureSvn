@@ -33,26 +33,6 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<%--<jsp:useBean scope="request" id="crfs" class="java.util.ArrayList"/>--%>
-
-<script type="text/JavaScript" language="JavaScript">
-  <!--
- function myCancel() {
- 
-    cancelButton=document.getElementById('cancel');
-    if ( cancelButton != null) {
-    	confirmDialog({ 
-    		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
-    		height: 150,
-    		width: 500,
-    		redirectLink: 'ListEventDefinition'
-    		});      
-     	return false;
-   	}
-    return true;       
-  }
-   //-->
-</script>
 
 <h1>
 	<span class="first_level_header">
@@ -62,6 +42,7 @@
 
 <form id="addCRFToDefinition" name="crfForm" action="AddCRFToDefinition"  method="post"
 	  onkeydown="if (event.keyCode == 13) {event.preventDefault ? event.preventDefault() : $.event.fix(event).preventDefault();} return true;">
+	<input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag != null ? formWithStateFlag : ''}" />
 	<input type="hidden" name="actionName" value="">
 	<input type="hidden" name="pageNum" value="2">
 
@@ -73,7 +54,7 @@
 	<table border="0" cellpadding="0" cellspacing="0">
 		<tr>
 			<td>
-				<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'UpdateEventDefinition');"/>
+				<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onclick="$('#addCRFToDefinition').attr('action', 'UpdateEventDefinition');$('#addCRFToDefinition').submit();"/>
 				<img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
 			</td>
 

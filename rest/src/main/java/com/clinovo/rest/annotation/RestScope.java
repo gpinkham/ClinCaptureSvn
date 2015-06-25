@@ -27,6 +27,9 @@ import com.clinovo.rest.enums.Scope;
 
 /**
  * Rest scope annotation.
+ * 
+ * Restrict the REST method scope (study - the authenticated user's study including its sites; or site - only the
+ * authenticated user's site)
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

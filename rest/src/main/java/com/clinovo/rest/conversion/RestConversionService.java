@@ -39,8 +39,11 @@ public class RestConversionService extends DefaultConversionService {
 		try {
 			return super.convert(source, sourceType, targetType);
 		} catch (ConversionFailedException ex) {
+			String targetTypeName = targetType.getType().getName();
+			targetTypeName = targetTypeName.equals("java.lang.Boolean") ? "boolean" : targetTypeName;
+			targetTypeName = targetTypeName.equals("java.lang.Integer") ? "int" : targetTypeName;
 			throw new RestException(messageSource, "rest.wrongParameterType", new Object[]{
-					targetType.getAnnotation(RequestParam.class).value(), targetType.getType().getName()},
+					targetType.getAnnotation(RequestParam.class).value(), targetTypeName},
 					HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}

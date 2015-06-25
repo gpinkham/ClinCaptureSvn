@@ -19,10 +19,13 @@ import java.util.Locale;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.springframework.context.MessageSource;
 
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.wrapper.RestRequestWrapper;
+import com.clinovo.util.RequestUtil;
 
 /**
  * EventServiceValidator.
@@ -48,14 +51,108 @@ public final class EventServiceValidator {
 	 */
 	public static void validateStudyEventDefinition(MessageSource messageSource, int id,
 			StudyEventDefinitionBean studyEventDefinitionBean, StudyBean currentStudy) throws RestException {
+		validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, currentStudy, null, false);
+	}
+
+	/**
+	 * Validates StudyEventDefinitionBean.
+	 *
+	 * @param messageSource
+	 *            MessageSource
+	 * @param id
+	 *            int
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param editMode
+	 *            boolean
+	 * @param userAccountDao
+	 *            UserAccountDAO
+	 * @throws RestException
+	 *             the RestException
+	 */
+	public static void validateStudyEventDefinition(MessageSource messageSource, int id,
+			StudyEventDefinitionBean studyEventDefinitionBean, StudyBean currentStudy, UserAccountDAO userAccountDao,
+			boolean editMode) throws RestException {
 		Locale locale = LocaleResolver.getLocale();
 		if (!(studyEventDefinitionBean.getId() > 0)) {
 			throw new RestException(messageSource.getMessage("rest.event.isNotFound", new Object[]{id}, locale));
 		} else if (!((currentStudy.getParentStudyId() > 0 && studyEventDefinitionBean.getStudyId() == currentStudy
 				.getParentStudyId()) || (currentStudy.getParentStudyId() == 0 && studyEventDefinitionBean.getStudyId() == currentStudy
 				.getId()))) {
-			throw new RestException(messageSource.getMessage("rest.event.doesNotBelongToCurrentStudy", new Object[]{id,
-					currentStudy.getId()}, locale));
+			throw new RestException(messageSource.getMessage(
+					"rest.event.studyEventDefinitionDoesNotBelongToCurrentScope",
+					new Object[]{id, currentStudy.getId()}, locale));
 		}
+		if (editMode) {
+			prepareForValidation("name", studyEventDefinitionBean.getName());
+			prepareForValidation("description", studyEventDefinitionBean.getDescription());
+			prepareForValidation("repeating", studyEventDefinitionBean.isRepeating());
+			prepareForValidation("category", studyEventDefinitionBean.getCategory());
+			if (prepareForValidation("type", studyEventDefinitionBean.getType()).equalsIgnoreCase("calendared_visit")) {
+				boolean isRreference = prepareForValidation("isreference", studyEventDefinitionBean.getReferenceVisit())
+						.equalsIgnoreCase("true");
+				prepareForValidation("schday", !isRreference ? studyEventDefinitionBean.getScheduleDay() : 0);
+				prepareForValidation("maxday", !isRreference ? studyEventDefinitionBean.getMaxDay() : 0);
+				prepareForValidation("minday", !isRreference ? studyEventDefinitionBean.getMinDay() : 0);
+				prepareForValidation("emailday", !isRreference ? studyEventDefinitionBean.getEmailDay() : 0);
+				prepareForValidation("emailuser",
+						!isRreference
+								? userAccountDao.findByPK(studyEventDefinitionBean.getUserEmailId()).getName()
+								: "");
+			}
+		}
+	}
+
+	/**
+	 * Prepares request parameters for validation.
+	 * 
+	 * @param parameterName
+	 *            String
+	 * @param objectValue
+	 *            String
+	 * @return String
+	 */
+	public static String prepareForValidation(String parameterName, String objectValue) {
+		RestRequestWrapper requestWrapper = (RestRequestWrapper) RequestUtil.getRequest();
+		String parameterValue = requestWrapper.getParameter(parameterName);
+		parameterValue = parameterValue != null ? parameterValue : objectValue;
+		requestWrapper.addParameter(parameterName, parameterValue);
+		return parameterValue;
+	}
+
+	/**
+	 * Prepares request parameters for validation.
+	 *
+	 * @param parameterName
+	 *            String
+	 * @param objectValue
+	 *            Boolean
+	 * @return String
+	 */
+	public static String prepareForValidation(String parameterName, Boolean objectValue) {
+		RestRequestWrapper requestWrapper = (RestRequestWrapper) RequestUtil.getRequest();
+		String parameterValue = requestWrapper.getParameter(parameterName);
+		parameterValue = parameterValue != null ? parameterValue : objectValue.toString();
+		requestWrapper.addParameter(parameterName, parameterValue);
+		return parameterValue;
+	}
+
+	/**
+	 * Prepares request parameters for validation.
+	 *
+	 * @param parameterName
+	 *            String
+	 * @param objectValue
+	 *            Integer
+	 * @return String
+	 */
+	public static String prepareForValidation(String parameterName, Integer objectValue) {
+		RestRequestWrapper requestWrapper = (RestRequestWrapper) RequestUtil.getRequest();
+		String parameterValue = requestWrapper.getParameter(parameterName);
+		parameterValue = parameterValue != null ? parameterValue : objectValue.toString();
+		requestWrapper.addParameter(parameterName, parameterValue);
+		return parameterValue;
 	}
 }

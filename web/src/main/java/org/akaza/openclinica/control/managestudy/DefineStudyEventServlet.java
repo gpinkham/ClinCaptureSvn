@@ -304,6 +304,7 @@ public class DefineStudyEventServlet extends Controller {
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 		ArrayList eventDefinitionCRFs = new ArrayList();
 		CRFVersionDAO cvdao = getCRFVersionDAO();
+		Map crfNameToEdcMap = (HashMap) request.getSession().getAttribute("crfNameToEdcMap");
 		for (int i = 0; i < sed.getCrfs().size(); i++) {
 			EventDefinitionCRFBean edcBean = new EventDefinitionCRFBean();
 			int crfId = fp.getInt("crfId" + i);
@@ -400,6 +401,7 @@ public class DefineStudyEventServlet extends Controller {
 			edcBean.setNullValues(nullString);
 			edcBean.setStudyId(ub.getActiveStudyId());
 			eventDefinitionCRFs.add(edcBean);
+			crfNameToEdcMap.put(edcBean.getCrfName(), edcBean);
 		}
 		request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
 		request.getSession().setAttribute("edCRFs", eventDefinitionCRFs);
@@ -442,6 +444,11 @@ public class DefineStudyEventServlet extends Controller {
 		if (tmpCRFIdMap == null) {
 			tmpCRFIdMap = new HashMap();
 		}
+		Map crfNameToEdcMap = (HashMap) request.getSession().getAttribute("crfNameToEdcMap");
+		if (crfNameToEdcMap == null) {
+			crfNameToEdcMap = new HashMap();
+			request.getSession().setAttribute("crfNameToEdcMap", crfNameToEdcMap);
+		}
 		logger.trace("confirm definition 2: tmp crf id map " + tmpCRFIdMap.toString());
 		ArrayList crfsWithVersion = (ArrayList) request.getSession().getAttribute("crfsWithVersion");
 		for (int i = 0; i < crfsWithVersion.size(); i++) {
@@ -461,6 +468,9 @@ public class DefineStudyEventServlet extends Controller {
 				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(), getItemSDVService()
 						.hasItemsToSDV(cb.getId()));
 				crfArray.add(cb);
+				if (crfNameToEdcMap.get(cb.getName()) == null) {
+					crfNameToEdcMap.put(cb.getName(), new EventDefinitionCRFBean());
+				}
 			} else {
 				if (tmpCRFIdMap.containsKey(id)) {
 					tmpCRFIdMap.remove(id);
@@ -489,6 +499,9 @@ public class DefineStudyEventServlet extends Controller {
 				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(), getItemSDVService()
 						.hasItemsToSDV(cb.getId()));
 				crfArray.add(cb);
+				if (crfNameToEdcMap.get(cb.getName()) == null) {
+					crfNameToEdcMap.put(cb.getName(), new EventDefinitionCRFBean());
+				}
 			}
 		}
 		logger.info("crf array after *second* pass: " + crfArray.toString());

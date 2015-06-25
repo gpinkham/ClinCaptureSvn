@@ -192,40 +192,26 @@
 </div>
 <br>
 
+<form id="defineStudyEventForm" action="DefineStudyEvent" method="POST">
+<input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag != null ? formWithStateFlag : ''}" />
+<input type="hidden" name="actionName" value="submit">
+<input type="hidden" name="nextAction" value="2">
 <table border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td>
-		<c:choose>
-			<c:when test="${empty eventDefinitionCRFs}">
-				<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
-						value="<fmt:message key="back" bundle="${resword}"/>" 
-						class="button_medium medium_back" 
-						onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
-			</c:when>
-			<c:otherwise>
-				<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
-						value="<fmt:message key="back" bundle="${resword}"/>" 
-						class="button_medium medium_back" 
-						onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
-			</c:otherwise>
-		</c:choose>
+			<input type="button" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onclick="$('input[name=actionName]').val('${empty eventDefinitionCRFs ? 'back1' : 'back2'}');$('input[name=submit]').click();"/>
 		</td>
 		<td>
-			<form action="DefineStudyEvent" method="POST">
-				<input type="hidden" name="actionName" value="submit">
-				<input type="hidden" name="nextAction" value="2">
-				<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
-			</form>
+			<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit"/>
 		</td>
 		<td>
-			<form action="DefineStudyEvent" method="POST">
-				<input type="hidden" name="actionName" value="submit">
-				<input type="hidden" name="nextAction" value="1">
-				<input type="submit" name="submit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel">
-			</form>
+			<input type="button" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
+
 		</td>
 	</tr>
 </table>
+</form>
+
 <br><br>
 
 <!-- EXPANDING WORKFLOW BOX -->

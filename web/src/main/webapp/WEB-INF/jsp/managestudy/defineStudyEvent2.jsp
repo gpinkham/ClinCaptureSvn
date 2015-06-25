@@ -42,25 +42,6 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="crfs" class="java.util.ArrayList"/>
 
-<script type="text/JavaScript" language="JavaScript">
-  
- function myCancel() {
- 
-    cancelButton=document.getElementById('cancel');
-    if ( cancelButton != null) {
-    	confirmDialog({ 
-    		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
-    		height: 150,
-    		width: 500,
-    		redirectLink: 'ListEventDefinition'
-    		});      
-     	return false;
-     }
-     return true;    
-   
-  }
-   
-</script>
 <h1>
 	<span class="first_level_header">
 		<fmt:message key="define_study_event"  bundle="${resword}"/> - <fmt:message key="select_CRFs"  bundle="${resword}"/>
@@ -69,8 +50,9 @@
 
 <p><fmt:message key="select_CRFs_to_define_study_event" bundle="${restext}"/></p>
 <br>
-<form name="crfForm" action="DefineStudyEvent" method="post"
+<form id="defineStudyEventForm" name="crfForm" action="DefineStudyEvent" method="post"
 	  onkeydown="if (event.keyCode == 13) {event.preventDefault ? event.preventDefault() : $.event.fix(event).preventDefault();} return true;">
+<input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag != null ? formWithStateFlag : ''}" />
 <input type="hidden" name="actionName" value="next">
 <input type="hidden" name="pageNum" value="2">
 
@@ -83,13 +65,13 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
-  <input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'DefineStudyEvent');"/>
+  <input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="$('input[name=actionName]').val('');$('#defineStudyEventForm').submit();"/>
 </td>
 <td>
   <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue">
 </td>
 <td>
-    <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="javascript:myCancel();"/>
+    <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 </td>
 <td>
   <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">

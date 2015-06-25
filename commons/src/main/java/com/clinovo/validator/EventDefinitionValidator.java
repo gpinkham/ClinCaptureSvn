@@ -45,7 +45,7 @@ import com.clinovo.util.ValidatorHelper;
  * EventDefinitionValidator.
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class EventDefinitionValidator {
+public final class EventDefinitionValidator {
 
 	public static final int INT_3 = 3;
 	public static final int INT_2000 = 2000;
@@ -54,6 +54,9 @@ public class EventDefinitionValidator {
 	public static final String SCHEDULED = "scheduled";
 	public static final String UNSCHEDULED = "unscheduled";
 	public static final String CALENDARED_VISIT = "calendared_visit";
+
+	private EventDefinitionValidator() {
+	}
 
 	private static String name(String name, boolean lowerCaseParameterNames) {
 		return lowerCaseParameterNames && name != null ? name.toLowerCase() : name;
@@ -73,6 +76,13 @@ public class EventDefinitionValidator {
 	public static HashMap validate(HttpServletRequest request, ConfigurationDao configurationDao,
 			ArrayList<StudyUserRoleBean> studyUserRoleBeanList) {
 		return validate(request, configurationDao, studyUserRoleBeanList, false);
+	}
+
+	private static ArrayList getErrorMessages(String code) {
+		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
+		ArrayList errorMessages = new ArrayList();
+		errorMessages.add(resexception.getString(code));
+		return errorMessages;
 	}
 
 	/**
@@ -103,9 +113,11 @@ public class EventDefinitionValidator {
 		validator.addValidation(name("category", lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_2000);
 
-		String calendaredVisitType = fp.getString(name("type", lowerCaseParameterNames));
-		if ("calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
-			String isReference = fp.getString(name("isReference", lowerCaseParameterNames));
+		String isReference = fp.getString(name("isReference", lowerCaseParameterNames));
+		String repeating = fp.getString(name("repeating", lowerCaseParameterNames));
+		String type = fp.getString(name("type", lowerCaseParameterNames));
+
+		if (CALENDARED_VISIT.equals(type)) {
 			validator.addValidation(name("maxDay", lowerCaseParameterNames), Validator.IS_REQUIRED);
 			validator.addValidation(name("maxDay", lowerCaseParameterNames), Validator.IS_A_FLOAT,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_3);
@@ -115,12 +127,13 @@ public class EventDefinitionValidator {
 			validator.addValidation(name("schDay", lowerCaseParameterNames), Validator.IS_REQUIRED);
 			validator.addValidation(name("schDay", lowerCaseParameterNames), Validator.IS_A_FLOAT,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_3);
-			if ("".equalsIgnoreCase(isReference)) {
-				validator.addValidation(name("emailUser", lowerCaseParameterNames), Validator.NO_BLANKS);
-			}
 			validator.addValidation(name("emailDay", lowerCaseParameterNames), Validator.IS_REQUIRED);
 			validator.addValidation(name("emailDay", lowerCaseParameterNames), Validator.IS_A_FLOAT,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_3);
+
+			if (!isReference.equalsIgnoreCase("true")) {
+				validator.addValidation(name("emailUser", lowerCaseParameterNames), Validator.NO_BLANKS);
+			}
 
 			request.getSession().setAttribute("changedReference", "true".equalsIgnoreCase(isReference));
 			request.getSession().setAttribute("showCalendaredVisitBox", true);
@@ -129,25 +142,60 @@ public class EventDefinitionValidator {
 			request.getSession().setAttribute("schDay", fp.getString(name("schDay", lowerCaseParameterNames)));
 			request.getSession().setAttribute("emailUser", fp.getString(name("emailUser", lowerCaseParameterNames)));
 			request.getSession().setAttribute("emailDay", fp.getString(name("emailDay", lowerCaseParameterNames)));
-			request.getSession()
-					.setAttribute("isReference", fp.getString(name("isReference", lowerCaseParameterNames)));
+			request.getSession().setAttribute("isReference", isReference);
 		}
 
 		HashMap errors = validator.validate();
 
-		String type = fp.getString("type");
 		if (errors.isEmpty() && !Arrays.asList(SCHEDULED, UNSCHEDULED, COMMON, CALENDARED_VISIT).contains(type)) {
-			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(resexception.getString("rest.studyEventDefinition.wrongType"));
-			errors.put("type", errorMessages);
+			errors.put(name("type", lowerCaseParameterNames), getErrorMessages("rest.studyEventDefinition.wrongType"));
+			return errors;
+		} else if (errors.isEmpty() && repeating.equals("true") && type.equals(CALENDARED_VISIT)) {
+			errors.put(name("repeating", lowerCaseParameterNames),
+					getErrorMessages("rest.studyEventDefinition.calendaredVisitCanNotBeRepeating"));
+			return errors;
+		} else if (errors.isEmpty() && !type.equals(CALENDARED_VISIT) && isReference.equalsIgnoreCase("true")) {
+			errors.put(name("isReference", lowerCaseParameterNames),
+					getErrorMessages("rest.studyEventDefinition.onlyCalendaredEventsCanBeReferenced"));
 			return errors;
 		}
 
-		int minDay = fp.getInt(name("minDay", lowerCaseParameterNames));
 		int maxDay = fp.getInt(name("maxDay", lowerCaseParameterNames));
+		int minDay = fp.getInt(name("minDay", lowerCaseParameterNames));
 		int schDay = fp.getInt(name("schDay", lowerCaseParameterNames));
 		int emailDay = fp.getInt(name("emailDay", lowerCaseParameterNames));
 		String emailUser = fp.getString(name("emailUser", lowerCaseParameterNames));
+
+		if (errors.isEmpty()
+				&& ((type.equals(CALENDARED_VISIT) && isReference.equalsIgnoreCase("true")) || !type
+						.equals(CALENDARED_VISIT))) {
+			if (maxDay != 0) {
+				errors.put(name("maxDay", lowerCaseParameterNames), getErrorMessages(type.equals(CALENDARED_VISIT)
+						? "rest.studyEventDefinition.dayMaxIsNotUsedForReferenceEvent"
+						: "rest.studyEventDefinition.dayMaxIsUsedForCalendaredEventsOnly"));
+				return errors;
+			} else if (minDay != 0) {
+				errors.put(name("minDay", lowerCaseParameterNames), getErrorMessages(type.equals(CALENDARED_VISIT)
+						? "rest.studyEventDefinition.dayMinIsNotUsedForReferenceEvent"
+						: "rest.studyEventDefinition.dayMinIsUsedForCalendaredEventsOnly"));
+				return errors;
+			} else if (schDay != 0) {
+				errors.put(name("schDay", lowerCaseParameterNames), getErrorMessages(type.equals(CALENDARED_VISIT)
+						? "rest.studyEventDefinition.dayScheduleIsNotUsedForReferenceEvent"
+						: "rest.studyEventDefinition.dayScheduleIsUsedForCalendaredEventsOnly"));
+				return errors;
+			} else if (emailDay != 0) {
+				errors.put(name("emailDay", lowerCaseParameterNames), getErrorMessages(type.equals(CALENDARED_VISIT)
+						? "rest.studyEventDefinition.dayEmailIsNotUsedForReferenceEvent"
+						: "rest.studyEventDefinition.dayEmailIsUsedForCalendaredEventsOnly"));
+				return errors;
+			} else if (!emailUser.isEmpty()) {
+				errors.put(name("emailUser", lowerCaseParameterNames), getErrorMessages(type.equals(CALENDARED_VISIT)
+						? "rest.studyEventDefinition.userNameIsNotUsedForReferenceEvent"
+						: "rest.studyEventDefinition.userNameIsUsedForCalendaredEventsOnly"));
+				return errors;
+			}
+		}
 
 		if (!(maxDay >= schDay)) {
 			Validator.addError(errors, name("maxDay", lowerCaseParameterNames),
@@ -166,8 +214,7 @@ public class EventDefinitionValidator {
 					resexception.getString("dayemail_less_or_equal_dayschedule"));
 		}
 		if (!emailUser.equals("root") && !checkUserName(studyUserRoleBeanList, emailUser)
-				&& "calendared_visit".equalsIgnoreCase(calendaredVisitType)
-				&& !"true".equalsIgnoreCase(fp.getString(name("isReference", lowerCaseParameterNames)))) {
+				&& CALENDARED_VISIT.equals(type) && !"true".equalsIgnoreCase(isReference)) {
 			Validator.addError(errors, name("emailUser", lowerCaseParameterNames),
 					resexception.getString("this_user_name_does_not_exist"));
 		}

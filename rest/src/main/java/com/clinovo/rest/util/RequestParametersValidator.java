@@ -17,6 +17,8 @@ package com.clinovo.rest.util;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.method.HandlerMethod;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
 import com.clinovo.rest.annotation.RestParametersPossibleValues;
 import com.clinovo.rest.annotation.RestScope;
@@ -40,6 +43,9 @@ import com.clinovo.rest.wrapper.RestRequestWrapper;
 
 /**
  * RequestParametersValidator.
+ *
+ * Method processes controller's annotations before the request finds an entry point. Method adds new parameters with
+ * default values if it's necessary and if parameters were not specified.
  */
 @SuppressWarnings("unused")
 public final class RequestParametersValidator {
@@ -70,7 +76,11 @@ public final class RequestParametersValidator {
 	 */
 	public static void validate(HttpServletRequest request, DataSource dataSource, MessageSource messageSource,
 			HandlerMethod handler) throws RestException {
+		int countOfRequiredParameters = 0;
+		int countOfNotRequiredParameters = 0;
+		Set<String> nullParameters = new HashSet<String>();
 		Annotation[][] annotationsHolder = handler.getMethod().getParameterAnnotations();
+		boolean ignoreDefaultValues = handler.getMethod().getAnnotation(RestIgnoreDefaultValues.class) != null;
 		if (annotationsHolder != null) {
 			for (Annotation[] annotations : annotationsHolder) {
 				if (annotations != null) {
@@ -79,6 +89,7 @@ public final class RequestParametersValidator {
 							String parameterName = ((RequestParam) annotation).value();
 							if (parameterName != null) {
 								if (((RequestParam) annotation).required()) {
+									countOfRequiredParameters++;
 									if (request.getParameter(parameterName) == null) {
 										throw new RestException(messageSource, REST
 												.concat(handler.getBean().getClass().getSimpleName().toLowerCase())
@@ -93,9 +104,13 @@ public final class RequestParametersValidator {
 												HttpServletResponse.SC_BAD_REQUEST);
 									}
 								} else {
-									if (request.getParameter(parameterName) == null) {
-										((RestRequestWrapper) request).addParameter(parameterName,
-												((RequestParam) annotation).defaultValue());
+									String parameterValue = request.getParameter(parameterName);
+									if (ignoreDefaultValues && parameterValue != null) {
+										countOfNotRequiredParameters++;
+									} else if (!ignoreDefaultValues && parameterValue == null) {
+										nullParameters.add(parameterName);
+										String defaultValue = ((RequestParam) annotation).defaultValue();
+										((RestRequestWrapper) request).addParameter(parameterName, defaultValue);
 									}
 								}
 							}
@@ -103,6 +118,9 @@ public final class RequestParametersValidator {
 					}
 				}
 			}
+		}
+		if (ignoreDefaultValues && countOfNotRequiredParameters == 0 && countOfRequiredParameters == 1) {
+			throw new RestException(messageSource, "rest.atLeastOneNotRequiredParameterShouldBeSpecified");
 		}
 		Annotation[] annotationArray = handler.getMethod().getAnnotations();
 		if (annotationArray != null) {
@@ -119,8 +137,8 @@ public final class RequestParametersValidator {
 							.value()) {
 						String parameterName = restParameterPossibleValues.name();
 						String parameterValue = request.getParameter(parameterName);
-						if (restParameterPossibleValues.canBeNotSpecified() && parameterValue != null
-								&& parameterValue.isEmpty()) {
+						if (restParameterPossibleValues.canBeNotSpecified()
+								&& (parameterValue == null || nullParameters.contains(parameterName))) {
 							continue;
 						}
 						if (parameterValue != null && restParameterPossibleValues.multiValue() ? !Arrays.asList(

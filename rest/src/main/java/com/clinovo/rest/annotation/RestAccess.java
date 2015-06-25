@@ -27,6 +27,8 @@ import com.clinovo.rest.enums.UserRole;
 
 /**
  * Rest access annotation.
+ * 
+ * Helps to manage access to rest methods for authenticated users.
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

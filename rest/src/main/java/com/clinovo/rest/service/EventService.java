@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.clinovo.rest.annotation.RestAccess;
+import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
 import com.clinovo.rest.annotation.RestParametersPossibleValues;
 import com.clinovo.rest.annotation.RestScope;
@@ -120,32 +121,31 @@ public class EventService extends BaseService {
 			@RequestParam(value = "minday", defaultValue = "0", required = false) int dayMin,
 			@RequestParam(value = "emailday", defaultValue = "0", required = false) int emailDay,
 			@RequestParam(value = "emailuser", defaultValue = "", required = false) String emailUser) throws Exception {
-		StudyBean studyBean = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 		UserAccountBean ownerUser = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
 
 		HashMap errors = EventDefinitionValidator.validate(RequestUtil.getRequest(), configurationDao,
-				new UserAccountDAO(dataSource).findAllByStudyId(studyBean.getId()), true);
+				new UserAccountDAO(dataSource).findAllByStudyId(currentStudy.getId()), true);
 
 		ValidatorUtil.checkForErrors(errors);
 
 		StudyEventDefinitionBean studyEventDefinitionBean = new StudyEventDefinitionBean();
 		studyEventDefinitionBean.setName(name);
-		studyEventDefinitionBean.setRepeating(!type.equals(EventDefinitionValidator.CALENDARED_VISIT) && repeating);
+		studyEventDefinitionBean.setRepeating(repeating);
 		studyEventDefinitionBean.setCategory(category);
 		studyEventDefinitionBean.setDescription(description);
 		studyEventDefinitionBean.setType(type);
 		studyEventDefinitionBean.setOwner(ownerUser);
-		studyEventDefinitionBean.setStudyId(studyBean.getId());
+		studyEventDefinitionBean.setStudyId(currentStudy.getId());
 		if (type.equals(EventDefinitionValidator.CALENDARED_VISIT)) {
-			studyEventDefinitionBean.setMaxDay(isReference ? 0 : dayMax);
-			studyEventDefinitionBean.setMinDay(isReference ? 0 : dayMin);
-			studyEventDefinitionBean.setScheduleDay(isReference ? 0 : schDay);
-			studyEventDefinitionBean.setEmailDay(isReference ? 0 : emailDay);
+			studyEventDefinitionBean.setMaxDay(dayMax);
+			studyEventDefinitionBean.setMinDay(dayMin);
+			studyEventDefinitionBean.setScheduleDay(schDay);
+			studyEventDefinitionBean.setEmailDay(emailDay);
 			studyEventDefinitionBean.setReferenceVisit(isReference);
 		}
 
-		eventDefinitionService.createStudyEventDefinition(studyBean, isReference ? "" : emailUser,
-				studyEventDefinitionBean);
+		eventDefinitionService.createStudyEventDefinition(currentStudy, emailUser, studyEventDefinitionBean);
 
 		if (studyEventDefinitionBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.createEvent.operationFailed");
@@ -270,6 +270,94 @@ public class EventService extends BaseService {
 				dataSource).findByPK(id);
 
 		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, currentStudy);
+
+		eventDefinitionService.fillEventDefinitionCrfs(currentStudy, studyEventDefinitionBean);
+
+		return studyEventDefinitionBean;
+	}
+
+	/**
+	 * Method that edits study event definition.
+	 *
+	 * @param id
+	 *            int
+	 * @param name
+	 *            String
+	 * @param type
+	 *            String
+	 * @param description
+	 *            String
+	 * @param repeating
+	 *            int
+	 * @param category
+	 *            String
+	 * @param isReference
+	 *            boolean
+	 * @param schDay
+	 *            int
+	 * @param dayMax
+	 *            int
+	 * @param dayMin
+	 *            int
+	 * @param emailDay
+	 *            int
+	 * @param emailUser
+	 *            String
+	 * @return StudyEventDefinitionBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RestAccess(UserRole.ANY_ADMIN)
+	@RequestMapping(value = "/edit", method = RequestMethod.POST)
+	@RestScope(Scope.STUDY)
+	@RestParametersPossibleValues({@RestParameterPossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
+	@RestIgnoreDefaultValues
+	@ResponseBody
+	public StudyEventDefinitionBean editEvent(@RequestParam(value = "id") int id,
+			@RequestParam(value = "name", required = false) String name,
+			@RequestParam(value = "type", required = false) String type,
+			@RequestParam(value = "description", required = false) String description,
+			@RequestParam(value = "repeating", required = false) Boolean repeating,
+			@RequestParam(value = "category", required = false) String category,
+			@RequestParam(value = "isreference", required = false) Boolean isReference,
+			@RequestParam(value = "schday", required = false) Integer schDay,
+			@RequestParam(value = "maxday", required = false) Integer dayMax,
+			@RequestParam(value = "minday", required = false) Integer dayMin,
+			@RequestParam(value = "emailday", required = false) Integer emailDay,
+			@RequestParam(value = "emailuser", required = false) String emailUser) throws Exception {
+		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+		UserAccountBean updaterUser = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
+
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
+				dataSource).findByPK(id);
+
+		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, currentStudy,
+				userAccountDao, true);
+
+		HashMap errors = EventDefinitionValidator.validate(RequestUtil.getRequest(), configurationDao,
+				userAccountDao.findAllByStudyId(currentStudy.getId()), true);
+
+		ValidatorUtil.checkForErrors(errors);
+
+		studyEventDefinitionBean.setName(name != null ? name : studyEventDefinitionBean.getName());
+		studyEventDefinitionBean.setType(type != null ? type : studyEventDefinitionBean.getType());
+		studyEventDefinitionBean.setDescription(description != null ? description : studyEventDefinitionBean
+				.getDescription());
+		studyEventDefinitionBean.setRepeating(repeating != null ? repeating : studyEventDefinitionBean.isRepeating());
+		studyEventDefinitionBean.setCategory(category != null ? category : studyEventDefinitionBean.getCategory());
+		studyEventDefinitionBean.setUpdater(updaterUser);
+		if (studyEventDefinitionBean.getType().equals(EventDefinitionValidator.CALENDARED_VISIT)) {
+			studyEventDefinitionBean.setReferenceVisit(isReference != null ? isReference : studyEventDefinitionBean
+					.getReferenceVisit());
+			studyEventDefinitionBean.setMaxDay(dayMax != null ? dayMax : studyEventDefinitionBean.getMaxDay());
+			studyEventDefinitionBean.setMinDay(dayMin != null ? dayMin : studyEventDefinitionBean.getMinDay());
+			studyEventDefinitionBean
+					.setScheduleDay(schDay != null ? schDay : studyEventDefinitionBean.getScheduleDay());
+			studyEventDefinitionBean.setEmailDay(emailDay != null ? emailDay : studyEventDefinitionBean.getEmailDay());
+		}
+
+		eventDefinitionService.updateStudyEventDefinition(currentStudy, emailUser, studyEventDefinitionBean);
 
 		eventDefinitionService.fillEventDefinitionCrfs(currentStudy, studyEventDefinitionBean);
 

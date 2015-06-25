@@ -52,6 +52,19 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void updateStudyEventDefinition(StudyBean studyBean, String emailUser,
+			StudyEventDefinitionBean studyEventDefinitionBean) {
+		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+		StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
+		int userId = emailUser != null ? userAccountDao.findByUserName(emailUser).getId() : 0;
+		studyEventDefinitionBean.setUserEmailId(userId != 0 ? userId : 1);
+		studyEventDefinitionBean.setUpdatedDate(new Date());
+		studyEventDefinitionDao.update(studyEventDefinitionBean);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public void addEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCrfBean) {
 		eventDefinitionCrfBean.setCreatedDate(new Date());
 		eventDefinitionCrfBean.setStatus(Status.AVAILABLE);
