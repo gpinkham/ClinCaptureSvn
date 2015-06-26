@@ -390,9 +390,11 @@ function setStacksLengths(selector, values, captionLimit) {
 		var stackWidth = parseInt(values[index], 10) * unitSize;
 
 		var result = false;
-		while (!result) {
+		var maxAttempts = 50;
+		var attempt = 0;
+		while (!result && attempt < maxAttempts) {
 			$(this).css("width", stackWidth);
-			if (tops.length != 0) {
+			if (tops.length != 0 && $(this).width() != 0) {
 				if (tops[0] < $(this).position().top) {
 					stackWidth--;
 				} else {
