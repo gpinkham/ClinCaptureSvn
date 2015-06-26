@@ -37,6 +37,7 @@ import java.util.zip.ZipFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.CommaReportBean;
@@ -465,8 +466,6 @@ public class ExportDatasetServlet extends Controller {
 		table.setRows(filterRows);
 		table.computeDisplay();
 
-		SimpleDateFormat localDf = getLocalDf(fp.getRequest());
-
 		fp.getRequest().setAttribute("table", table);
 		StudyInfoPanel panel = getStudyInfoPanel(fp.getRequest());
 		panel.reset();
@@ -474,18 +473,19 @@ public class ExportDatasetServlet extends Controller {
 		setToPanel(resword.getString("study_name"), eb.getStudy().getName(), fp.getRequest());
 		setToPanel(resword.getString("protocol_ID"), eb.getStudy().getIdentifier(), fp.getRequest());
 		setToPanel(resword.getString("dataset_name"), db.getName(), fp.getRequest());
-		setToPanel(resword.getString("created_date"), localDf.format(db.getCreatedDate()), fp.getRequest());
+		String createdDate = DateUtil.printDate(db.getCreatedDate(), getUserAccountBean().getUserTimeZoneId(),
+				DateUtil.DatePattern.DATE, getLocale());
+		setToPanel(resword.getString("created_date"), createdDate, fp.getRequest());
 		setToPanel(resword.getString("dataset_owner"), db.getOwner().getName(), fp.getRequest());
 		try {
-			// do we not set this or is it null b/c we come to the page with no
-			// session?
-			setToPanel(resword.getString("date_last_run"), localDf.format(db.getDateLastRun()), fp.getRequest());
+			String dateLastRun = DateUtil.printDate(db.getDateLastRun(), getUserAccountBean().getUserTimeZoneId(),
+					DateUtil.DatePattern.DATE, getLocale());
+			setToPanel(resword.getString("date_last_run"), dateLastRun, fp.getRequest());
 		} catch (NullPointerException npe) {
 			System.out.println("exception: " + npe.getMessage());
 		}
 
 		logger.warn("just set file list to request, sending to page");
-
 	}
 
 	private static void copyInputStream(InputStream in, OutputStream out) throws IOException {

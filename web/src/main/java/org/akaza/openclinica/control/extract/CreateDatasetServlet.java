@@ -68,6 +68,8 @@ import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.springframework.stereotype.Component;
 
 /**
@@ -562,12 +564,9 @@ public class CreateDatasetServlet extends Controller {
 	 */
 	private Date getFirstDayOfMonth(int year, int month) {
 
-		// scale month down to 0 .. 11 range
-		month--;
-		Calendar c = Calendar.getInstance();
-		c.clear();
-		c.set(year, month, 1, 0, 0, 0);
-		return new Date(c.getTimeInMillis());
+		DateTimeZone userTimeZone = DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId());
+		DateTime userLocaleStartDate = new DateTime(year, month, 1, 0, 0, 0).withZoneRetainFields(userTimeZone);
+		return userLocaleStartDate.withZone(DateTimeZone.getDefault()).toDate();
 	}
 
 	/**
@@ -577,38 +576,10 @@ public class CreateDatasetServlet extends Controller {
 	 */
 	private Date getLastDayOfMonth(int year, int month) {
 
-		// scale month down to 0 .. 11 range
-		month--;
-
-		// the idea is to get the first day of the next month
-		// then subtract a day and let the Calendar class do the real work
-
-		Calendar c = Calendar.getInstance();
-
-		c.clear();
-
-		// get the first day of the current month and year, e.g.:
-		// a. Apr. 1 2001
-		// b. Feb. 1 2000
-		// c. Feb. 1 2001
-		// d. Dec. 1 1999
-		c.set(year, month, 1, 23, 59, 59);
-
-		// get the first day of the next month, e.g.:
-		// a. May 1 2001
-		// b. Mar. 1 2000
-		// c. Mar. 1 2001
-		// d. Jan. 1 2000 (note roll-over to next year)
-		c.add(Calendar.MONTH, 1);
-
-		// get the immediately preceding date, e.g.:
-		// a. Apr. 30 2001 (note that Calendar knows April is only 30 days)
-		// b. Feb. 29 2000 (note sensitivity to the leap year)
-		// c. Feb. 28 2001
-		// d. Dec. 31 1999 (note roll-back to the previous year)
-		c.add(Calendar.DATE, -1);
-
-		return new Date(c.getTimeInMillis());
+		DateTimeZone userTimeZone = DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId());
+		DateTime userLocaleEndDate = new DateTime(year, month, 1, 23, 59, 59).plusMonths(1).minusDays(1)
+				.withZoneRetainFields(userTimeZone);
+		return userLocaleEndDate.withZone(DateTimeZone.getDefault()).toDate();
 	}
 
 	private ArrayList getMonths() {

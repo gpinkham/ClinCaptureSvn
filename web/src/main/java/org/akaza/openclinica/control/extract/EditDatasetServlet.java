@@ -22,8 +22,6 @@ package org.akaza.openclinica.control.extract;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,6 +46,8 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.springframework.stereotype.Component;
 
 /**
@@ -184,16 +184,16 @@ public class EditDatasetServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		DatasetDAO dsdao = getDatasetDAO();
 		DatasetBean db = getDatasetService().initialDatasetData(datasetId, ub);
-		Calendar calendar = GregorianCalendar.getInstance();
+		DateTimeZone userTimeZone = DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId());
 		if (db.getDateStart() != null) {
-			calendar.setTime(db.getDateStart());
-			db.setFirstMonth(calendar.get(Calendar.MONTH) + 1);
-			db.setFirstYear(calendar.get(Calendar.YEAR));
+			DateTime userLocalDateStart = new DateTime(db.getDateStart()).withZone(userTimeZone);
+			db.setFirstMonth(userLocalDateStart.getMonthOfYear());
+			db.setFirstYear(userLocalDateStart.getYear());
 		}
 		if (db.getDateEnd() != null) {
-			calendar.setTime(db.getDateEnd());
-			db.setLastMonth(calendar.get(Calendar.MONTH) + 1);
-			db.setLastYear(calendar.get(Calendar.YEAR));
+			DateTime userLocalDateEnd = new DateTime(db.getDateEnd()).withZone(userTimeZone);
+			db.setLastMonth(userLocalDateEnd.getMonthOfYear());
+			db.setLastYear(userLocalDateEnd.getYear());
 		}
 		request.getSession().setAttribute("newDataset", db);
 		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();

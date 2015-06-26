@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
@@ -69,12 +70,16 @@
 
 	<tr valign="top">
 		<td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td>
-		<td class="table_cell"><fmt:formatDate value="${dataset.createdDate}" pattern="${dteFormat}"/></td>
+		<td class="table_cell">
+			<cc-fmt:formatDate value="${dataset.createdDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+		</td>
 	</tr>
 
 	<tr valign="top">
 		<td class="table_header_column"><fmt:message key="date_last_updated" bundle="${resword}"/>:</td>
-		<td class="table_cell"><fmt:formatDate value="${dataset.updatedDate}" pattern="${dteFormat}"/>&nbsp;</td>
+		<td class="table_cell">
+			<cc-fmt:formatDate value="${dataset.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>&nbsp;
+		</td>
 	</tr>
 
 	<tr valign="top">

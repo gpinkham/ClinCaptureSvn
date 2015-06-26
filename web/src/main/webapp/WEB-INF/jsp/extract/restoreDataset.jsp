@@ -2,11 +2,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:include page="../include/extract-header.jsp"/>
 
@@ -39,21 +39,36 @@
   <c:out value="${dataset.owner.name}"/>
   </td></tr> 
  
-  <tr valign="top"><td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td><td class="table_cell">
-  <fmt:formatDate value="${dataset.createdDate}" pattern="${dteFormat}"/>
-  </td></tr>
+  <tr valign="top">
+	  <td class="table_header_column">
+		  <fmt:message key="date_created" bundle="${resword}"/>:
+	  </td>
+	  <td class="table_cell">
+		  <cc-fmt:formatDate value="${dataset.createdDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	  </td>
+  </tr>
   
-  <tr valign="top"><td class="table_header_column"><fmt:message key="date_last_updated" bundle="${resword}"/>:</td><td class="table_cell">
-  <fmt:formatDate value="${dataset.updatedDate}" pattern="${dteFormat}"/>
-  </td></tr>
+  <tr valign="top">
+	  <td class="table_header_column">
+		  <fmt:message key="date_last_updated" bundle="${resword}"/>:
+	  </td>
+	  <td class="table_cell">
+		  <cc-fmt:formatDate value="${dataset.updatedDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	  </td>
+  </tr>
   
   <tr valign="top"><td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${dataset.status.name}"/>
   </td></tr>
   
-  <tr valign="top"><td class="table_header_column"><fmt:message key="date_last_run" bundle="${resword}"/>:</td><td class="table_cell">
-  <fmt:formatDate value="${dataset.dateLastRun}" pattern="${dteFormat}"/>
-  </td></tr>
+  <tr valign="top">
+	  <td class="table_header_column">
+		  <fmt:message key="date_last_run" bundle="${resword}"/>:
+	  </td>
+	  <td class="table_cell">
+		  <cc-fmt:formatDate value="${dataset.dateLastRun}" dateTimeZone="${userBean.userTimeZoneId}"/>
+	  </td>
+  </tr>
   
   <tr valign="top"><td class="table_header_column"><fmt:message key="number_of_runs" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${dataset.numRuns}"/>

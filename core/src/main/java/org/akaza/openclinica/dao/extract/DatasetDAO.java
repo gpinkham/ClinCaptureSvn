@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.dao.extract;
 
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -101,7 +102,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date end
 		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // created
 		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // updated
-		this.setTypeExpected(index++, TypeNames.DATE); // last run
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // last run
 		this.setTypeExpected(index++, TypeNames.INT); // owner id
 		this.setTypeExpected(index++, TypeNames.INT); // approver id
 		this.setTypeExpected(index++, TypeNames.INT); // update id
@@ -131,70 +132,6 @@ public class DatasetDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Set Extract types expected.
-	 */
-	public void setExtractTypesExpected() {
-		this.unsetTypeExpected();
-		int index = 1;
-		this.setTypeExpected(index++, TypeNames.INT); // subj id
-		this.setTypeExpected(index++, TypeNames.STRING); // subj identifier
-		this.setTypeExpected(index++, TypeNames.INT); // study id
-		this.setTypeExpected(index++, TypeNames.STRING); // study ident
-		this.setTypeExpected(index++, TypeNames.INT); // event def crf id
-		this.setTypeExpected(index++, TypeNames.INT); // crf id
-		this.setTypeExpected(index++, TypeNames.STRING); // crf label
-		this.setTypeExpected(index++, TypeNames.STRING); // crf name
-		this.setTypeExpected(index++, TypeNames.INT); // version id
-		this.setTypeExpected(index++, TypeNames.STRING); // version label
-		this.setTypeExpected(index++, TypeNames.STRING); // version name
-		this.setTypeExpected(index++, TypeNames.INT); // study event id
-		this.setTypeExpected(index++, TypeNames.INT); // event crf id
-		this.setTypeExpected(index++, TypeNames.INT); // item data id
-		this.setTypeExpected(index++, TypeNames.STRING); // value
-		this.setTypeExpected(index++, TypeNames.STRING); // sed.name
-		this.setTypeExpected(index++, TypeNames.BOOL); // repeating
-		this.setTypeExpected(index++, TypeNames.INT); // sample ordinal
-		this.setTypeExpected(index++, TypeNames.INT); // item id
-		this.setTypeExpected(index++, TypeNames.STRING); // item name
-		this.setTypeExpected(index++, TypeNames.STRING); // item desc
-		this.setTypeExpected(index++, TypeNames.STRING); // item units
-		this.setTypeExpected(index++, TypeNames.DATE); // date created for item
-		this.setTypeExpected(index++, TypeNames.INT); // study event definition id
-		this.setTypeExpected(index++, TypeNames.STRING); // option stings
-		this.setTypeExpected(index++, TypeNames.STRING); // option values
-		this.setTypeExpected(index++, TypeNames.INT); // response type id
-		this.setTypeExpected(index++, TypeNames.STRING); // gender
-		this.setTypeExpected(index++, TypeNames.DATE); // dob
-		this.setTypeExpected(index++, TypeNames.INT); // s.status_id AS
-		this.setTypeExpected(index++, TypeNames.STRING); // s.unique_identifier,
-		this.setTypeExpected(index++, TypeNames.BOOL); // s.dob_collected,
-		this.setTypeExpected(index++, TypeNames.INT); // ec.completion_status_id,
-		this.setTypeExpected(index++, TypeNames.DATE); // ec.date_created AS
-		this.setTypeExpected(index++, TypeNames.INT); // crfv.status_id AS
-		this.setTypeExpected(index++, TypeNames.STRING); // ec.interviewer_name,
-		this.setTypeExpected(index++, TypeNames.DATE); // ec.date_interviewed,
-		this.setTypeExpected(index++, TypeNames.DATE); // ec.date_completed AS
-		this.setTypeExpected(index++, TypeNames.DATE); // ec.date_validate_completed
-		this.setTypeExpected(index++, TypeNames.INT); // sgmap.study_group_id,
-		this.setTypeExpected(index++, TypeNames.INT); // sgmap.study_group_class_id
-		this.setTypeExpected(index++, TypeNames.STRING); // location
-		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date start. YW,
-		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date end
-		this.setTypeExpected(index++, TypeNames.INT); // item data ordinal, added tbh
-		this.setTypeExpected(index++, TypeNames.STRING); // item group name, added
-		this.setTypeExpected(index++, TypeNames.STRING); // secondary label
-		this.setTypeExpected(index++, TypeNames.INT); // item_data_type_id
-		this.setTypeExpected(index++, TypeNames.STRING); // study_event_definition_oid
-		this.setTypeExpected(index++, TypeNames.STRING); // crf_version_oid
-		this.setTypeExpected(index++, TypeNames.STRING); // item_group_oid
-		this.setTypeExpected(index++, TypeNames.STRING); // item_oid
-		this.setTypeExpected(index++, TypeNames.STRING); // study_subject_oid
-		this.setTypeExpected(index++, TypeNames.INT); // sed_order
-		this.setTypeExpected(index++, TypeNames.INT); // crf_order
-		this.setTypeExpected(index, TypeNames.INT); // item_order
-	}
-
-	/**
 	 * Set Item types expected.
 	 */
 	public void setItemTypesExpected() {
@@ -209,8 +146,8 @@ public class DatasetDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT); // reference type id
 		this.setTypeExpected(index++, TypeNames.INT); // status id
 		this.setTypeExpected(index++, TypeNames.INT); // owner id
-		this.setTypeExpected(index++, TypeNames.DATE); // created
-		this.setTypeExpected(index++, TypeNames.DATE); // updated
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // created
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // updated
 		this.setTypeExpected(index++, TypeNames.INT); // update id
 		this.setTypeExpected(index++, TypeNames.STRING); // oc_oid
 		this.setTypeExpected(index, TypeNames.STRING); // sas_name
@@ -254,14 +191,23 @@ public class DatasetDAO extends AuditableEntityDAO {
 			nullVars.put(index, Types.NUMERIC);
 		}
 		variables.put(index++, db.getApproverId() <= 0 ? null : db.getApproverId());
+
         if (db.getDateStart() == null) {
-            nullVars.put(index, Types.DATE);
-        }
-		variables.put(index++, db.getDateStart());
+            nullVars.put(index, Types.TIMESTAMP);
+			variables.put(index, null);
+        } else {
+			variables.put(index, new Timestamp(db.getDateStart().getTime()));
+		}
+		index++;
+
         if (db.getDateEnd() == null) {
-            nullVars.put(index, Types.DATE);
-        }
-		variables.put(index++, db.getDateEnd());
+            nullVars.put(index, Types.TIMESTAMP);
+			variables.put(index, null);
+        } else {
+			variables.put(index, new Timestamp(db.getDateEnd().getTime()));
+		}
+		index++;
+
 		variables.put(index, db.getId());
 		this.execute(digester.getQuery("update"), variables, nullVars);
 		return eb;
@@ -293,14 +239,23 @@ public class DatasetDAO extends AuditableEntityDAO {
 		variables.put(index++, db.getSQLStatement());
 		variables.put(index++, db.getOwnerId());
 		variables.put(index++, db.getNumRuns());
-        if (db.getDateStart() == null) {
-            nullVars.put(index, Types.DATE);
-        }
-		variables.put(index++, db.getDateStart());
-        if (db.getDateEnd() == null) {
-            nullVars.put(index, Types.DATE);
-        }
-		variables.put(index++, db.getDateEnd());
+
+		if (db.getDateStart() == null) {
+			nullVars.put(index, Types.TIMESTAMP);
+			variables.put(index, null);
+		} else {
+			variables.put(index, new Timestamp(db.getDateStart().getTime()));
+		}
+		index++;
+
+		if (db.getDateEnd() == null) {
+			nullVars.put(index, Types.TIMESTAMP);
+			variables.put(index, null);
+		} else {
+			variables.put(index, new Timestamp(db.getDateEnd().getTime()));
+		}
+		index++;
+
 		variables.put(index++, db.isShowEventLocation());
 		variables.put(index++, db.isShowEventStart());
 		variables.put(index++, db.isShowEventEnd());
@@ -719,14 +674,23 @@ public class DatasetDAO extends AuditableEntityDAO {
 			nullVars.put(index, Types.NUMERIC);
 		}
 		variables.put(index++, db.getApproverId() <= 0 ? null : db.getApproverId());
-        if (db.getDateStart() == null) {
-            nullVars.put(index, Types.DATE);
-        }
-		variables.put(index++, db.getDateStart());
-        if (db.getDateEnd() == null) {
-            nullVars.put(index, Types.DATE);
-        }
-		variables.put(index++, db.getDateEnd());
+
+		if (db.getDateStart() == null) {
+			nullVars.put(index, Types.TIMESTAMP);
+			variables.put(index, null);
+		} else {
+			variables.put(index, new Timestamp(db.getDateStart().getTime()));
+		}
+		index++;
+
+		if (db.getDateEnd() == null) {
+			nullVars.put(index, Types.TIMESTAMP);
+			variables.put(index, null);
+		} else {
+			variables.put(index, new Timestamp(db.getDateEnd().getTime()));
+		}
+		index++;
+
 		variables.put(index++, db.isShowEventLocation());
 		variables.put(index++, db.isShowEventStart());
 		variables.put(index++, db.isShowEventEnd());

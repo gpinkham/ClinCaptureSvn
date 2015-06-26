@@ -31,12 +31,14 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.extract.FilterBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -45,6 +47,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import com.clinovo.i18n.LocaleResolver;
@@ -213,8 +216,7 @@ public class StudyInfoPanel {
 
 		Locale locale = LocaleResolver.getLocale(request);
 		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(locale);
-		SimpleDateFormat localSdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-				"date_format_string"));
+		UserAccountBean currentUser = (UserAccountBean) session.getAttribute(BaseController.USER_BEAN_NAME);
 
 		try {
 			// defaults, can be reset by mistake by running through one page,
@@ -265,12 +267,16 @@ public class StudyInfoPanel {
 				if ("01/01/1900".equals(englishSdf.format(dsb.getDateStart()))) {
 					this.setData(resword.getString("beginning_date"), resword.getString("not_specified"));
 				} else {
-					this.setData(resword.getString("beginning_date"), localSdf.format(dsb.getDateStart()));
+					String dateStart = DateUtil.printDate(dsb.getDateStart(), currentUser.getUserTimeZoneId(),
+							DateUtil.DatePattern.DATE, LocaleResolver.getLocale(request));
+					this.setData(resword.getString("beginning_date"), dateStart);
 				}
 				if ("12/31/2100".equals(englishSdf.format(dsb.getDateEnd()))) {
 					this.setData(resword.getString("ending_date"), resword.getString("not_specified"));
 				} else {
-					this.setData(resword.getString("ending_date"), localSdf.format(dsb.getDateEnd()));
+					String dateEnd = DateUtil.printDate(dsb.getDateEnd(), currentUser.getUserTimeZoneId(),
+							DateUtil.DatePattern.DATE, LocaleResolver.getLocale(request));
+					this.setData(resword.getString("ending_date"), dateEnd);
 				}
 				FilterBean fb = (FilterBean) session.getAttribute("newFilter");
 				if (fb != null) {
@@ -293,12 +299,16 @@ public class StudyInfoPanel {
 				if ("01/01/1900".equals(englishSdf.format(dsb.getDateStart()))) {
 					this.setData(resword.getString("beginning_date"), resword.getString("not_specified"));
 				} else {
-					this.setData(resword.getString("beginning_date"), localSdf.format(dsb.getDateStart()));
+					String dateStart = DateUtil.printDate(dsb.getDateStart(), currentUser.getUserTimeZoneId(),
+							DateUtil.DatePattern.DATE, LocaleResolver.getLocale(request));
+					this.setData(resword.getString("beginning_date"), dateStart);
 				}
 				if ("12/31/2100".equals(englishSdf.format(dsb.getDateEnd()))) {
 					this.setData(resword.getString("ending_date"), resword.getString("not_specified"));
 				} else {
-					this.setData(resword.getString("ending_date"), localSdf.format(dsb.getDateEnd()));
+					String dateEnd = DateUtil.printDate(dsb.getDateEnd(), currentUser.getUserTimeZoneId(),
+							DateUtil.DatePattern.DATE, LocaleResolver.getLocale(request));
+					this.setData(resword.getString("ending_date"), dateEnd);
 				}
 				FilterBean fb = (FilterBean) session.getAttribute("newFilter");
 				if (fb != null) {
@@ -370,9 +380,13 @@ public class StudyInfoPanel {
 
 				DatasetBean dsb = (DatasetBean) request.getAttribute("dataset");
 				this.setData(resword.getString("dataset_name"), dsb.getName());
-				this.setData(resword.getString("date_created"), localSdf.format(dsb.getCreatedDate()));
+				String createdDate = DateUtil.printDate(dsb.getCreatedDate(), currentUser.getUserTimeZoneId(),
+						DateUtil.DatePattern.DATE, LocaleResolver.getLocale(request));
+				this.setData(resword.getString("date_created"), createdDate);
 				this.setData(resword.getString("dataset_owner"), dsb.getOwner().getName());
-				this.setData(resword.getString("date_last_run"), localSdf.format(dsb.getDateLastRun()));
+				String dateLastRun = DateUtil.printDate(dsb.getDateLastRun(), currentUser.getUserTimeZoneId(),
+						DateUtil.DatePattern.DATE, LocaleResolver.getLocale(request));
+				this.setData(resword.getString("date_last_run"), dateLastRun);
 
 			} else if (page.equals(Page.EXPORT_DATASETS)) {
 

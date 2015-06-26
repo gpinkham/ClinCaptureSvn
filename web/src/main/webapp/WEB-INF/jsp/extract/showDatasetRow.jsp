@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
@@ -23,7 +24,9 @@
 	</td>
 	<td class="table_cell"><c:out value="${currRow.bean.description}" /></td>
 	<td class="table_cell"><c:out value="${currRow.bean.owner.name}" /></td>
-	<td class="table_cell"><fmt:formatDate value="${currRow.bean.createdDate}" pattern="${dteFormat}"/></td>
+	<td class="table_cell">
+        <cc-fmt:formatDate value="${currRow.bean.createdDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+    </td>
 	<td class="table_cell"><c:out value="${currRow.bean.status.name}" /></td>
 	
 	<%-- ACTIONS --%>
