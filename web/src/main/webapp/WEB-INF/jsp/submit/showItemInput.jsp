@@ -745,11 +745,6 @@ include the default value first in the select list --%>
     <c:set var="selectedOption" value="-1"/>
     <c:set var="count" value="0"/>
     <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-
-      <c:if test="${option.selected}">
-      	<c:set var="selectedOption" value="${count}" />
-      </c:if>
-
       <c:if test="${printDefault=='true'}">
         <c:if test="${displayItem.metadata.defaultValue == option.text || displayItem.metadata.defaultValue == option.value}">
           <c:set var="printDefault" value="false"/>
