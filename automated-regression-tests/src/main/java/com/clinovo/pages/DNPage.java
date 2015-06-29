@@ -3,7 +3,10 @@ package com.clinovo.pages;
 import net.thucydides.core.annotations.findby.FindBy;
 import net.thucydides.core.pages.WebElementFacade;
 import net.thucydides.core.webelements.Checkbox;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import com.clinovo.pages.beans.DNote;
 import com.clinovo.utils.ItemsUtil;
@@ -17,8 +20,8 @@ public class DNPage extends BasePage {
 	public static final String PAGE_NAME = "DN page";
 	public static final String PAGE_URL = "DiscrepancyNote";
 	
-	@FindBy(id = "mainForm")
-    private WebElementFacade formWithData;
+	@FindBy(xpath = ".//body")
+    private WebElementFacade bodyWithData;
 	
 	// create DN
 	@FindBy(xpath = ".//*[@name='SubmitExit']")
@@ -80,7 +83,7 @@ public class DNPage extends BasePage {
 			
 			if (sType.isCurrentlyVisible() || dn.isQuery()) sType.selectByValue(getValueByDNType(dn.getType()));
 			
-			if (sAssignToUser.isCurrentlyVisible()) sAssignToUser.selectByVisibleText(findOptionByUserName(dn.getAssignToUser()));
+			if (sAssignToUser.isCurrentlyVisible()) sAssignToUser.selectByVisibleText(findOptionByUserName(dn.getAssignToUser(), ""));
 			
 			if (cEmailAssignedUser.isCurrentlyVisible()) ItemsUtil.fillCheckbox(new Checkbox(cEmailAssignedUser), dn.getEmailAssignedUser());
 		
@@ -96,7 +99,7 @@ public class DNPage extends BasePage {
 			
 			if (sType0.isCurrentlyVisible() || dn.isQuery()) sType0.selectByValue(getValueByDNType(dn.getType()));
 			
-			if (sAssignToUser0.isCurrentlyVisible()) sAssignToUser0.selectByVisibleText(findOptionByUserName(dn.getAssignToUser()));
+			if (sAssignToUser0.isCurrentlyVisible()) sAssignToUser0.selectByVisibleText(findOptionByUserName(dn.getAssignToUser(), ""));
 			
 			if (cEmailAssignedUser0.isCurrentlyVisible()) ItemsUtil.fillCheckbox(new Checkbox(cEmailAssignedUser0), dn.getEmailAssignedUser());
 			
@@ -104,8 +107,9 @@ public class DNPage extends BasePage {
 		}
 	}
 
-	private String findOptionByUserName(String assignToUserName) {
+	private String findOptionByUserName(String assignToUserName, String dnParentID) {
 		WebElementFacade assignToUser = sAssignToUser.isCurrentlyVisible()? sAssignToUser : sAssignToUser0;
+		assignToUser = assignToUser.isCurrentlyVisible()? assignToUser : bodyWithData.find(By.xpath(".//select[@id='userAccountId"+dnParentID+"']"));;
 		if (assignToUserName.isEmpty()) return assignToUser.getSelectedValue();
 		for (String option: assignToUser.getSelectOptions()) {
 			if (option.contains("("+assignToUserName+")")) {
@@ -124,5 +128,34 @@ public class DNPage extends BasePage {
 		default: 
 			return "2";
 		}
+	}
+
+	public void findAndFillInAndClickSubmit(DNote dn) {		
+		if (dn.getParentID().isEmpty() && !dn.getParentDescription().isEmpty()) {
+			for (WebElement div: bodyWithData.findElements(By.xpath(".//b[text()='"+dn.getParentDescription()+"']/../../../../..//td[contains(text(),'ID:')]"))) {
+				dn.setParentID(div.getText());
+				// take first matching div
+				break;
+			}
+		}
+			
+		if (dn.getResolutionStatus().equals("Updated")) {
+			bodyWithData.findElement(By.xpath(".//input[@id='resStatus2"+dn.getParentID()+"']")).click();				
+		} else {
+			bodyWithData.findElement(By.xpath(".//input[@id='resStatus4"+dn.getParentID()+"']")).click();
+		}
+			
+		WebElementFacade sDescription1 = dn.getResolutionStatus().equals("Updated")? bodyWithData.find(By.xpath(".//select[@id='selectUpdateDescription"+dn.getParentID()+"']")) :
+				bodyWithData.find(By.xpath(".//select[@id='selectCloseDescription"+dn.getParentID()+"']"));
+		WebElementFacade tDetailedNote1 = bodyWithData.find(By.xpath(".//textarea[@name='detailedDes"+dn.getParentID()+"']"));
+		WebElementFacade sAssignToUser1 = bodyWithData.find(By.xpath(".//select[@id='userAccountId"+dn.getParentID()+"']"));
+		WebElementFacade cEmailAssignedUser1 = bodyWithData.find(By.xpath(".//input[@name='sendEmail"+dn.getParentID()+"']"));
+				
+		sDescription1.selectByValue(dn.getDescription());
+		tDetailedNote1.type(dn.getDetailedNote());
+		sAssignToUser1.selectByVisibleText(findOptionByUserName(dn.getAssignToUser(), dn.getParentID()));
+		ItemsUtil.fillCheckbox(new Checkbox(cEmailAssignedUser1), dn.getEmailAssignedUser());
+		
+		bodyWithData.findElement(By.xpath(".//input[@name='SubmitExit"+dn.getParentID()+"']")).click();	
 	}
 }

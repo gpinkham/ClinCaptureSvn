@@ -542,4 +542,11 @@ public class CommonSteps extends ScenarioSteps {
 		notesAndDiscrepanciesPage.checkDNPresent(dn);
 		
 	}
+	
+	@Step
+	public void update_or_close_DN(DNote dn) {
+		String oldWindowId = switch_to_another_window("");
+		dnPage.findAndFillInAndClickSubmit(dn);
+		switch_to_another_window(oldWindowId);
+	}
 }

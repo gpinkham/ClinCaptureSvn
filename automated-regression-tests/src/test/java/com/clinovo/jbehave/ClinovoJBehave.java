@@ -559,8 +559,8 @@ public class ClinovoJBehave extends BaseJBehave {
     }
     
     @SuppressWarnings("unchecked")
-	@Then("DNs are created")
-	public void dnsAreCreated() {
+	@Then("DNs are $status")
+	public void dnsAreCreatedUpdatedClosed() {
     	commonSteps.go_to_page(NotesAndDiscrepanciesPage.PAGE_NAME);
     	List<DNote> dns = (List<DNote>) Thucydides.getCurrentSession().get(DNote.DNS_TO_CHECK_EXIST);
     	for (DNote dn: dns) {
@@ -569,6 +569,27 @@ public class ClinovoJBehave extends BaseJBehave {
     	}
     
     	Thucydides.getCurrentSession().remove(DNote.DNS_TO_CHECK_EXIST);
+    }
+    
+    @Given("User $changes Query DNs for the items from CRF: $activityTable")
+    @When("User $changes Query DNs for the items from CRF: $activityTable")
+   	public void userUpdatesOrClosesDNsForItemsFromCRF(String action, ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	List<DNote> dns = new ArrayList<DNote>();
+    	DNote dn;
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		userCallsPopupOnSM(rowParams.values().get("Study Subject ID"), rowParams.values().get("Event Name"));
+    		userClicksEnterDataButtonInPopup(rowParams.values().get("CRF Name"));
+    		commonSteps.click_dn_flag_icon(commonSteps.get_flag_icon_element_by_CRF_item(rowParams.values().get("Item")));
+    		dn = DNote.fillDNoteFromTableRow(rowParams.values());
+    		commonSteps.update_or_close_DN(dn);
+    		userClicksSaveButton();
+    		dns.add(dn);
+    	}
+    	
+    	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);
     }
     
 	private void userChecksSignEventStatus(Map<String, String> values) {

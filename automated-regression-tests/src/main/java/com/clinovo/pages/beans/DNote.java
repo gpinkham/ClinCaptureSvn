@@ -7,6 +7,8 @@ public class DNote {
     
     public static final Object DNS_TO_CHECK_EXIST = "dns_to_check_exist";
 
+    private String id = "";
+    
 	private String description = "";
     
     private String detailedNote = "";
@@ -24,6 +26,16 @@ public class DNote {
 	private String crfName = "";
     
     private String item = "";
+    
+    //for updating/closing
+    
+    private String parentID = "";
+    
+    private String parentDescription = "";
+    
+    private String parentDetailedNote = "";
+	
+	private String resolutionStatus = "";
 
     public static DNote fillDNoteFromTableRow(
 			Map<String, String> row) {
@@ -66,6 +78,24 @@ public class DNote {
     		dn.setItem(row.get("Item"));
     	}
     	
+    	//for updating/closing
+    	
+    	if (row.get("Parent ID") != null) {
+			dn.setParentID(row.get("Parent ID"));
+    	}
+    	
+    	if (row.get("Parent Description") != null) {
+    		dn.setParentDescription(row.get("Parent Description"));
+    	}
+    	
+    	if (row.get("Parent Detailed Note") != null) {
+    		dn.setParentDetailedNote(row.get("Parent Detailed Note"));
+    	}
+    	
+    	if (row.get("Resolution Status") != null) {
+    		dn.setResolutionStatus(row.get("Resolution Status"));
+    	}
+    	
 		return dn;
 	}
 	
@@ -103,7 +133,15 @@ public class DNote {
 		if (!dn.getAssignToUser().isEmpty()) {
 			map.put("Assign To User", dn.getAssignToUser());
 		}
+		
+		if (!dn.getParentDescription().isEmpty()) {
+			map.put("Parent Description", dn.getParentDescription());
+		}
     	
+		if (!dn.getResolutionStatus().isEmpty()) {
+			map.put("Resolution Status", dn.getResolutionStatus());
+		}
+		
     	return map;
 	}
 
@@ -181,6 +219,46 @@ public class DNote {
 	
 	public boolean isQuery() {
 		return this.getType().trim().equals("Query");
+	}
+
+	public String getParentID() {
+		return parentID;
+	}
+
+	public void setParentID(String parentID) {
+		this.parentID = parentID;
+	}
+
+	public String getParentDescription() {
+		return parentDescription;
+	}
+
+	public void setParentDescription(String parentDescription) {
+		this.parentDescription = parentDescription;
+	}
+
+	public String getParentDetailedNote() {
+		return parentDetailedNote;
+	}
+
+	public void setParentDetailedNote(String parentDetailedNote) {
+		this.parentDetailedNote = parentDetailedNote;
+	}
+
+	public String getResolutionStatus() {
+		return resolutionStatus;
+	}
+
+	public void setResolutionStatus(String resolutionStatus) {
+		this.resolutionStatus = resolutionStatus;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 }
 

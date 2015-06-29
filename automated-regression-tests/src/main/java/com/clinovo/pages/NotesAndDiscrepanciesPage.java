@@ -100,9 +100,14 @@ public class NotesAndDiscrepanciesPage extends BasePage {
 			iFilterField.type(map.get("Entity Value"));
 		}
 		
-		if (map.containsKey("Description")) {
+		if (map.containsKey("Description") && !map.containsKey("Parent Description")) {
 			divFilterByDescription.click();
 			iFilterField.type(map.get("Description"));
+		}
+		
+		if (map.containsKey("Parent Description")) {
+			divFilterByDescription.click();
+			iFilterField.type(map.get("Parent Description"));
 		}
 		
 		if (map.containsKey("Type")) {

@@ -389,9 +389,49 @@ When User creates DNs for the items from CRF:
 |Study Subject ID|Event Name|CRF Name            |Item  |Type      |Description|Detailed Note   |Assign to User|Email Assigned User|
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|input1|Annotation|test DN 1  |peace of text...|              |                   |
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|input2|Query     |test DN 2  |peace of text...|demo_pi       |                   |
-|StSubj_2        |Event B   |CRF_w_basic_fields_1|input3|Query     |test DN 2  |peace of text...|demo_crc      |                   |
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|input3|Query     |test DN 3  |peace of text...|demo_crc      |                   |
 
 Then DNs are created
+
+
+Scenario: 19.2 "Study Admin" begins new thread DN in CRF
+
+Given User logs in as "Study Admin"
+And User goes to SM page
+When User creates DNs for the items from CRF: 
+|Study Subject ID|Event Name|CRF Name            |Item  |Type      |Description         |Detailed Note   |Assign to User|Email Assigned User|
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|input3|Annotation|test new thread DN 1|peace of text...|              |                   |
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|input1|Query     |test new thread DN 2|peace of text...|demo_crc      |                   |
+
+Then DNs are created
+
+
+Scenario: 19.3 "Study Admin" updates Queries
+
+Given User logs in as "Study Admin"
+And User goes to SM page
+When User updates Query DNs for the items from CRF: 
+|Study Subject ID|Event Name|CRF Name            |Item  |Parent ID|Parent Description  |Parent Detailed Note|Description                  |Detailed Note   |Resolution Status|Assign to User|Email Assigned User|
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|input1|9        |test new thread DN 2|peace of text...    |Other                        |peace of text...|Updated          |demo_crc      |                   |
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|input3|5        |test DN 3           |peace of text...    |Need additional clarification|peace of text...|Updated          |demo_pi       |                   |
+
+Then DNs are updated
+
+
+Scenario: 19.4 "Study Admin" closes Queries
+
+Given User logs in as "Study Admin"
+And User goes to SM page
+When User closes Query DNs for the items from CRF: 
+|Study Subject ID|Event Name|CRF Name            |Item  |Parent ID|Parent Description  |Parent Detailed Note|Description              |Detailed Note   |Resolution Status|Assign to User|Email Assigned User|
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|input1|9        |test new thread DN 2|peace of text...    |Other                    |peace of text...|Closed           |demo_crc      |                   |
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|input2|3        |test DN 2           |peace of text...    |CRF data change monitored|peace of text...|Closed           |demo_pi       |                   |
+
+Then DNs are closed
+
+
+
+
 
 
 
