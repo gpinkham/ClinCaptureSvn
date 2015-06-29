@@ -2037,8 +2037,12 @@ Parser.prototype.extractEventFromExpression = function(predicate) {
 		return /^(SE_.+?)(?=\.)/.exec(predicate)[1];
 };
 Parser.prototype.extractVersionFromExpression = function(predicate) {
-	if (this.isVersionified(predicate))
-		return /.*\.(F_\w+_\d+)(?=\.)/.exec(predicate)[1];
+	if (this.isVersionified(predicate)) {
+		var execResult = /.*\.(F_\w+_\d+)(?=\.)/.exec(predicate);
+		if (execResult) {
+			return execResult[1];
+		}
+	}
 };
 Parser.prototype.extractItemFromExpression = function(predicate) {
 	return /([^\.]+)$/.exec(predicate)[1];
