@@ -386,8 +386,8 @@ function DisplaySectionTabs()
 
         if (TabID != currTabID) {
             document.write('<div id="Tab' + TabID + 'NotSelected" style="display:all"><div class="tab_BG"><div class="tab_L"><div class="tab_R">');
-            document.write('<a class="tabtext" title="' + TabFullName[(TabID-1)] + '" href=' + url + ' onclick="return checkSectionStatus(this);">' + TabLabel[(TabID-1)] + '</a></div></div></div></div>');
-            document.write('<div id="Tab' + TabID + 'Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">' + TabLabel[(TabID-1)] + '</span></div></div></div></div>');
+            document.write('<a class="tabtext" title="' + TabFullName[(TabID-1)] + '" href=' + url + ' onclick="return checkSectionStatus(this, "<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>");">' + TabLabel[(TabID-1)] + '</a></div></div></div></div>');
+            document.write('<div id="Tab' + TabID + 'Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="ta, '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>'b_R_h"><span class="tabtext">' + TabLabel[(TabID-1)] + '</span></div></div></div></div>');
             document.write('</td>');
         }
         else {
@@ -402,14 +402,13 @@ function DisplaySectionTabs()
 }
 
 function gotoLink() {
-
-	objImage=document.getElementById('status_top');
 	
-    if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
+	var objButton = document.getElementsByName("submittedExit")[0];
+	if (objButton != null && objButton.className.indexOf('cancel')>0) {
     	
 		var OptionIndex=document.crfForm.sectionName.selectedIndex;
 		confirmDialog({
-			message: '<fmt:message key="you_have_unsaved_data" bundle="${resword}"/>',
+			message: ('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>',
 			height: 150,
 			width: 500,
 			pageName: document.crfForm.sectionName.options[OptionIndex].value
@@ -435,40 +434,6 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
 </table>
 <input type="hidden" name="submitted" value="1" />
 
-<script type="text/javascript" language="JavaScript">
-    
-    function checkSectionStatus(aLink) {
-
-        objImage=document.getElementById('status_top');
-        if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-        	confirmDialog({
-        		message: '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>',
-        		height: 150,
-        		width: 500,
-        		aLink: aLink
-        	});
-        	return false
-        }
-        return true
-    }
-    
-	function checkEntryStatus(strImageName, submit) {
-    	
-        objImage = MM_findObj(strImageName);
-        if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-        	confirmSubmit({
-        		message: '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>',
-        		height: 150,
-        		width: 500,
-        		submit: submit
-        	});
-        	return false
-        }
-    	
-        return true;
-    } 
-    
-</script>
 
 <c:set var="stage" value="${param.stage}"/>
 <table border="0" cellpadding="0" cellspacing="0">
@@ -555,12 +520,10 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
                                                                  
                                 <c:choose>
                                     <c:when test="${! empty formMessages}">
-                                    	<td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
-                                        <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif"></td>
+                                    	<td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="return checkGoBackEntryStatusNew('submittedExit', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
                                     </c:when>
                                     <c:otherwise>
-                                    	<td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
-                                        <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="not_changed_data" bundle="${restext}"/>" src="images/icon_UnchangedData.gif"></td>
+                                    	<td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkGoBackEntryStatusNew('submittedExit', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
                                     </c:otherwise>
                                 </c:choose>
                             </tr>
@@ -1627,12 +1590,10 @@ table-->
                     </c:if>
                     <c:choose>
                         <c:when test="${! empty formMessages}">
-                        	<td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
-                            <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif">&nbsp;</td>
+                        	<td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="return checkGoBackEntryStatusNew('submittedExit', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
                         </c:when>
                         <c:otherwise>
-                        	<td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
-                            <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="not_changed_data" bundle="${restext}"/>" src="images/icon_UnchangedData.gif">&nbsp;</td>
+                        	<td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkGoBackEntryStatusNew('submittedExit', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
                         </c:otherwise>
                     </c:choose>
                 </tr>

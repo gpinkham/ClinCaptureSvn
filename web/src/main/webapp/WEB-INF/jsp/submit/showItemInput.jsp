@@ -465,9 +465,7 @@ function hideRow(itemId) {
 
 function changeImage(name) {
 	turnOnIsDataChangedParamOfDN(name); 
-	setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); 
-	setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');
-	$('input[name=submittedExit]').removeClass("medium_back").addClass('medium_cancel').val('<fmt:message key="cancel" bundle="${resword}"/>');
+	$('input[name=submittedExit]').removeClass("medium_back").addClass("medium_cancel").val('<fmt:message key="cancel" bundle="${resword}"/>');
 	if(typeof formChanged != "undefined"){
 		formChanged = true;
 	}
