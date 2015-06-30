@@ -802,7 +802,6 @@ public class OdmExtractDAO extends DatasetDAO {
         MetaDataVersionProtocolBean protocol = metadata.getProtocol();
         HashMap<Integer, String> nullMap = new HashMap<Integer, String>();
         HashMap<String, String> nullValueCVs = new HashMap<String, String>();
-        ItemGroupMetadataBean igmBean;
         while (it.hasNext()) {
             HashMap row = (HashMap) it.next();
             Integer sedOrder = (Integer) row.get("definition_order");
