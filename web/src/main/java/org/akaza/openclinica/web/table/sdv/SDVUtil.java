@@ -708,7 +708,7 @@ public class SDVUtil {
 
 	/**
 	 * Generate the rows for the study table. Each row represents an Event CRF.
-	 * 
+	 *
 	 * @param eventCRFBeans
 	 *            List<EventCRFBean>
 	 * @param request
@@ -774,8 +774,7 @@ public class SDVUtil {
 					status = DataEntryStage.LOCKED.getId();
 				}
 
-				tempSDVBean.setCrfStatus(getCRFStatusIconPath(status, request, studySubjectBean.getId(),
-						crfBean.getId(), crfBean.getCRFVersionId()));
+				tempSDVBean.setCrfStatus(getCRFStatusIconPath(status));
 			}
 
 			tempSDVBean.setStudyEventStatus(studyEventBean.getStatus().getName());
@@ -838,6 +837,7 @@ public class SDVUtil {
 			}
 
 			actions = new StringBuilder("");
+			actions.append(getViewCrfIcon(request, crfBean.getId(), studySubjectBean.getId()));
 			if (!crfBean.isSdvStatus() && !doNotAllowToSDV) {
 				actions.append("<input type=\"image\" name=\"sdvSubmit\" ").append("src=\"")
 						.append((request.getContextPath())).append("/images/icon_DoubleCheck_Action")
@@ -856,29 +856,24 @@ public class SDVUtil {
 		return allRows;
 	}
 
-	private String getCRFStatusIconPath(int statusId, HttpServletRequest request, int studySubjectId,
-			int eventDefinitionCRFId, int crfVersionId) {
-
+	private String getViewCrfIcon(HttpServletRequest request, int eventDefinitionCRFId, int studySubjectId) {
 		HtmlBuilder html = new HtmlBuilder();
-		html.a()
-				.onclick(
-						"openDocWindow('" + request.getContextPath()
+		html.a().onclick("openDocWindow('" + request.getContextPath()
 								+ "/ViewSectionDataEntry?cw=1&eventDefinitionCRFId=&eventCRFId=" + eventDefinitionCRFId
 								+ "&tabId=1&studySubjectId=" + studySubjectId + "'); setAccessedObjected(this);")
 				.append(" data-cc-sdvCrfId='").append(eventDefinitionCRFId).append("'");
-		html.href("#").close();
+		html.href("#").close().img().append(" hspace=\"4px\" src=\"../images/bt_View.gif\" border=\"0\"").close().aEnd();
+		return html.toString();
+	}
 
-		StringBuilder builder = new StringBuilder(html.toString()).append(getIconForCrfStatusPrefix());
-
+	private String getCRFStatusIconPath(int statusId) {
+		StringBuilder builder = new StringBuilder(getIconForCrfStatusPrefix());
 		if (statusId > ZERO && statusId < EIGHT) {
-
 			builder.append(CRF_STATUS_ICONS.get(statusId));
 		} else {
 			builder.append(CRF_STATUS_ICONS.get(0));
-
 		}
 		builder.append(ICON_FORCRFSTATUS_SUFFIX);
-		builder.append("</a>");
 		builder.append(" ");
 		builder.append("<input type=\"hidden\" statusId=\"").append(statusId).append("\" />");
 		return builder.toString();
