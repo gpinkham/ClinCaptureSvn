@@ -47,11 +47,16 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Download Rule Set in XML format.
+ */
 @Component
 public class DownloadRuleSetXmlServlet extends Controller {
 
@@ -59,9 +64,7 @@ public class DownloadRuleSetXmlServlet extends Controller {
 	private static final long serialVersionUID = 5381321212952389008L;
 
 	/**
-	 *
-	 * @param request
-	 * @param response
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -84,7 +87,7 @@ public class DownloadRuleSetXmlServlet extends Controller {
 
 	}
 
-	private FileWriter handleLoadCastor(FileWriter writer, RulesPostImportContainer rpic) {
+	private OutputStreamWriter handleLoadCastor(OutputStreamWriter writer, RulesPostImportContainer rpic) {
 
 		try {
 			// Create Mapping
@@ -142,8 +145,11 @@ public class DownloadRuleSetXmlServlet extends Controller {
 		String dir = SQLInitServlet.getField("filePath") + "rules" + File.separator;
 		Long time = System.currentTimeMillis();
 		File f = new File(dir + "rules" + currentStudy.getOid() + "-" + time + ".xml");
-		FileWriter writer = new FileWriter(f);
-		handleLoadCastor(writer, prepareRulesPostImportRuleSetRuleContainer(ruleSetRuleIds));
+		OutputStreamWriter charOutput = new OutputStreamWriter(
+				new FileOutputStream(f),
+				Charset.forName("UTF-8").newEncoder()
+		);
+		handleLoadCastor(charOutput, prepareRulesPostImportRuleSetRuleContainer(ruleSetRuleIds));
 
 		response.setHeader("Content-disposition", "attachment; filename=\"" + "rules" + currentStudy.getOid() + "-"
 				+ time + ".xml" + "\";");
@@ -151,6 +157,7 @@ public class DownloadRuleSetXmlServlet extends Controller {
 		response.setHeader("Pragma", "public");
 
 		ServletOutputStream op = response.getOutputStream();
+
 
 		DataInputStream in = null;
 		try {
@@ -161,7 +168,7 @@ public class DownloadRuleSetXmlServlet extends Controller {
 			byte[] bbuf = new byte[(int) f.length()];
 			in = new DataInputStream(new FileInputStream(f));
 			int length;
-			while ((in != null) && ((length = in.read(bbuf)) != -1)) {
+			while ((length = in.read(bbuf)) != -1) {
 				op.write(bbuf, 0, length);
 			}
 
