@@ -238,7 +238,8 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(25, TypeNames.STRING); // item_description
         this.setTypeExpected(26, TypeNames.INT); // section_id
         this.setTypeExpected(27, TypeNames.STRING); // question_number_label
-        this.setTypeExpected(28, TypeNames.STRING); // mu_oid
+        this.setTypeExpected(28, TypeNames.BOOL); //repeating_group
+        this.setTypeExpected(29, TypeNames.STRING); // mu_oid
     }
 
     public void setItemGroupAndItemMetaOC1_3TypesExpected() {
@@ -368,6 +369,7 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(11, TypeNames.INT); // item_data_id
         this.setTypeExpected(12, TypeNames.STRING); // mu_oid
         this.setTypeExpected(13, TypeNames.INT); // study_event_definition_id
+        this.setTypeExpected(14, TypeNames.BOOL); //repeating_group
     }
 
     public void setEventCrfIdsByItemDataTypesExpected() {
@@ -870,8 +872,6 @@ public class OdmExtractDAO extends DatasetDAO {
 
         this.setItemGroupAndItemMetaWithUnitTypesExpected();
         rows.clear();
-        logger.debug("Begin to execute GetItemGroupAndItemMetaWithUnitSql");
-        logger.debug("getItemGroupandItemMetaWithUnitsql= " + this.getItemGroupAndItemMetaWithUnitSql(cvIds));
         rows = select(this.getItemGroupAndItemMetaWithUnitSql(cvIds));
         it = rows.iterator();
         ArrayList<ItemGroupDefBean> itemGroupDefs = (ArrayList<ItemGroupDefBean>) metadata.getItemGroupDefs();
@@ -924,6 +924,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String igHeader = (String) row.get("item_group_header");
             String itDesc = (String) row.get("item_description");
             String itQuesNum = (String) row.get("question_number_label");
+            Boolean repeatingGroup = (Boolean) row.get("repeating_group");
             String muOid = (String) row.get("mu_oid");
             if (cvprev != cvId) {
                 // at this point, itemGroupRefs is for old cvId
@@ -957,9 +958,8 @@ public class OdmExtractDAO extends DatasetDAO {
                     igMandatories.put(igdprev, itMandatory);
                     isLatest = true;
                     igdef.setOid(igOID);
-                    igmBean = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(itId, cvId);
-                    igdef.setName(igmBean.isRepeatingGroup() ? igName : igOID);
-                    igdef.setRepeating(igmBean.isRepeatingGroup() ? "Yes" : "No");
+                    igdef.setName(repeatingGroup ? igName : igOID);
+                    igdef.setRepeating(repeatingGroup ? "Yes" : "No");
                     igdef.setComment(igHeader);
                     igdef.setPreSASDatasetName(igName.toUpperCase());
                     itemGroupDefs.add(igdef);
@@ -1267,11 +1267,11 @@ public class OdmExtractDAO extends DatasetDAO {
                 FormDetailsBean formDetail = formDetails.get(cvOID);
                 PresentInEventDefinitionBean p = new PresentInEventDefinitionBean();
                 p.setStudyEventOid(sedOID);
-                p.setDoubleDataEntry(doubleEntry == false ? "No" : "Yes");
-                p.setHideCrf(hideCrf == false ? "No" : "Yes");
+                p.setDoubleDataEntry(!doubleEntry ? "No" : "Yes");
+                p.setHideCrf(!hideCrf ? "No" : "Yes");
                 p.setIsDefaultVersion(cvId.equals(dvId) ? "Yes" : "No");
                 p.setNullValues(nullValue);
-                p.setPasswordRequired(pwdRequired == false ? "No" : "Yes");
+                p.setPasswordRequired(!pwdRequired ? "No" : "Yes");
                 p.setSourceDataVerification(SourceDataVerification.getByCode(sdvId > 0 ? sdvId : 3).getDescription());
                 formDetail.getPresentInEventDefinitions().add(p);
             } else {
@@ -1321,8 +1321,6 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<Integer, String> sectionLabels = this.getSectionLabels(metadata.getSectionIds());
         HashMap<Integer, String> parentItemOIDs = this.getParentItemOIDs(cvIds);
         this.setItemGroupAndItemMetaOC1_3TypesExpected();
-        logger.debug("Begin to execute GetItemGroupAndItemMetaWithUnitSql");
-        logger.debug("getItemGroupandItemMetaWithUnitsql= " + this.getItemGroupAndItemMetaOC1_3Sql(cvIds));
         ArrayList rows = select(this.getItemGroupAndItemMetaOC1_3Sql(cvIds));
         Iterator iter = rows.iterator();
         while (iter.hasNext()) {
@@ -1336,8 +1334,8 @@ public class OdmExtractDAO extends DatasetDAO {
             Integer igRepeatNum = (Integer) row.get("repeat_number");
             Integer igRepeatMax = (Integer) row.get("repeat_max");
             Boolean showGroup = (Boolean) row.get("show_group");
-            String itemGroupHeader = (String)row.get("item_group_header");
-            Integer orderInForm = (Integer)row.get("item_order");
+            String itemGroupHeader = (String) row.get("item_group_header");
+            Integer orderInForm = (Integer) row.get("item_order");
 
             String itHeader = (String) row.get("item_header");
             String left = (String) row.get("left_item_text");
@@ -1365,7 +1363,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 igr.setRepeatMax(igRepeatMax);
                 igr.setRepeatNumber(igRepeatNum);
                 inForm.setItemGroupRepeatBean(igr);
-                inForm.setShowGroup(showGroup == true ? "Yes" : "No");
+                inForm.setShowGroup(showGroup ? "Yes" : "No");
                 inForm.setItemGroupHeader(itemGroupHeader);
                 igDetail.getPresentInForms().add(inForm);
             }
@@ -1384,9 +1382,9 @@ public class OdmExtractDAO extends DatasetDAO {
             itInForm.setPageNumber(itpgNum);
             itInForm.setParentItemOid(parentItemOIDs.get(itPId));
             itInForm.setSectionLabel(sectionLabels.get(itSecId));
-            itInForm.setPhi(phi == false ? "No" : "Yes");
+            itInForm.setPhi(!phi ? "No" : "Yes");
             itInForm.setOrderInForm(orderInForm);
-            itInForm.setShowItem(showItem==true?"Yes":"No");
+            itInForm.setShowItem(showItem ? "Yes" : "No");
             ItemResponseBean itemResponse = new ItemResponseBean();
             itemResponse.setResponseLayout(layout);
             itemResponse.setResponseType(ResponseType.get(rsTypeId).getName());
@@ -1659,7 +1657,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 Integer datatypeid = (Integer) row.get("item_data_type_id");
                 Integer idataId = (Integer) row.get("item_data_id");
                 String muOid = (String) row.get("mu_oid");
-
+                Boolean repeatingGroup = (Boolean) row.get("repeating_group");
                 String key = "";
                 if (ecId != ecprev) {
                     logger.debug("Found ecId=" + ecId + " in subjectEventFormSql is:" + oidPoses.containsKey(ecId));
@@ -1676,14 +1674,12 @@ public class OdmExtractDAO extends DatasetDAO {
                 }
                 if (goon) {
                     ImportItemGroupDataBean ig = new ImportItemGroupDataBean();
-                    ItemGroupMetadataBean igmBean;
                     key = ecId + "-" + igId;
                     if (!igprev.equals(key) || !igpos.containsKey(key + itDataOrdinal)) {
                         igpos.put(key + itDataOrdinal, form.getItemGroupData().size());
                         igprev = key;
                         ig.setItemGroupOID(igOID + "");
-                        igmBean = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(itId, cvId);
-                        ig.setItemGroupRepeatKey(igmBean.isRepeatingGroup() ? itDataOrdinal + "" : "-1");
+                        ig.setItemGroupRepeatKey(repeatingGroup ? itDataOrdinal + "" : "-1");
                         form.getItemGroupData().add(ig);
                     } else {
                         ig = form.getItemGroupData().get(igpos.get(key + itDataOrdinal));
@@ -2790,12 +2786,12 @@ public class OdmExtractDAO extends DatasetDAO {
                 + " ig.name as item_group_name, item.name as item_name, item.item_data_type_id, ifm.item_header, ifm.left_item_text,"
                 + " ifm.right_item_text, ifm.required as item_required, ifm.regexp, ifm.regexp_error_msg, ifm.width_decimal,"
                 + " rs.response_type_id, rs.options_text, rs.options_values, rs.label as response_label,"
-                + " igm.item_group_header, item.description as item_description, ifm.section_id, ifm.question_number_label from crf_version cv,"
+                + " igm.item_group_header, item.description as item_description, ifm.section_id, ifm.question_number_label, igm.repeating_group from crf_version cv,"
                 + " (select crf_version_id, item_id, response_set_id, header as item_header, left_item_text, right_item_text, required, regexp,"
                 + " regexp_error_msg, width_decimal, section_id, question_number_label from item_form_metadata where crf_version_id in ("
                 + crfVersionIds
                 + "))ifm, item, response_set rs,"
-                + " (select crf_version_id, item_group_id, item_id, header as item_group_header from item_group_metadata where crf_version_id in ("
+                + " (select crf_version_id, item_group_id, item_id, header as item_group_header, repeating_group from item_group_metadata where crf_version_id in ("
                 + crfVersionIds + "))igm," + " item_group ig " + this.getItemGroupAndItemMetaCondition(crfVersionIds);
     }
 
@@ -3140,7 +3136,7 @@ public class OdmExtractDAO extends DatasetDAO {
 		String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
 		String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
 		String blanksFilter = skipBlanks ? " and length(id.value) > 0 " : "";
-		return "select ec.event_crf_id, cv.crf_version_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name, i.item_id, i.oc_oid as item_oid, id.ordinal as item_data_ordinal, id.value, i.item_data_type_id, id.item_data_id, mu.oc_oid as mu_oid, sed.study_event_definition_id from event_crf ec \n"
+		return "select ec.event_crf_id, cv.crf_version_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name, i.item_id, i.oc_oid as item_oid, id.ordinal as item_data_ordinal, id.value, i.item_data_type_id, id.item_data_id, mu.oc_oid as mu_oid, sed.study_event_definition_id, igm.repeating_group from event_crf ec \n"
 				+ " join study_subject ss on ss.study_subject_id = ec.study_subject_id "
 				+ dateConstraint
 				+ " and ss.study_subject_id in ("
