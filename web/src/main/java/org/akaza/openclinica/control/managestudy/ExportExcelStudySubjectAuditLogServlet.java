@@ -8,7 +8,6 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -17,6 +16,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import jxl.CellView;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
@@ -246,7 +246,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 
 		excelRow = new String[]{studySubject != null ? studySubject.getLabel() : null,
 				studySubject != null ? studySubject.getSecondaryLabel() : null,
-				dateFormat(studySubject != null ? studySubject.getDateOfBirth() : null),
+				studySubject != null && studySubject.getDateOfBirth() != null
+						? DateUtil.printDate(studySubject.getDateOfBirth(), DateUtil.DatePattern.DATE, getLocale()) : null,
 				studySubject != null ? studySubject.getUniqueIdentifier() : null,
 				studySubject != null ? studySubject.getOwner().getName() : null,
 				studySubject != null ? studySubject.getStatus().getName() : null};
@@ -258,7 +259,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 		row++;
 
 		// Subject Audit Events
-		excelRow = new String[]{"audit_event", "date_time_of_server", "user", "value_type", "old", "new"};
+		excelRow = new String[]{"audit_event", "local_date_time", "user", "value_type", "old", "new"};
 		for (int i = 0; i < excelRow.length; i++) {
 			Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 			excelSheet.addCell(label);
@@ -378,7 +379,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 				row++;
 
 				// Audit Events for Study Event
-				excelRow = new String[]{"audit_event", "date_time_of_server", "user", "value_type", "old", "new"};
+				excelRow = new String[]{"audit_event", "local_date_time", "user", "value_type", "old", "new"};
 				for (int i = 0; i < excelRow.length; i++) {
 					label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 					excelSheet.addCell(label);
@@ -483,7 +484,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 					row++;
 					row++;
 
-					excelRow = new String[]{"audit_event", "date_time_of_server", "user", "value_type", "old", "new"};
+					excelRow = new String[]{"audit_event", "local_date_time", "user", "value_type", "old", "new"};
 					for (int i = 0; i < excelRow.length; i++) {
 						label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 						excelSheet.addCell(label);
@@ -603,9 +604,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 		if (date == null) {
 			return "";
 		} else {
-			SimpleDateFormat dteFormat = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString(
-					"date_format_string"), LocaleResolver.getLocale());
-			return dteFormat.format(date);
+			return DateUtil.printDate(date, getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE,
+					getLocale());
 		}
 	}
 
@@ -613,9 +613,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 		if (date == null) {
 			return "";
 		} else {
-			SimpleDateFormat dtetmeFormat = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString(
-					"date_time_format_string"), LocaleResolver.getLocale());
-			return dtetmeFormat.format(date);
+			return DateUtil.printDate(date, getUserAccountBean().getUserTimeZoneId(),
+					DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS, getLocale());
 		}
 	}
 
