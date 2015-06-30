@@ -18,6 +18,7 @@ package com.clinovo.tag;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.SDVUtil;
+
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -38,7 +39,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.JspWriter;
-
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.sql.DataSource;
@@ -50,6 +50,7 @@ import java.util.Locale;
 /**
  * Custom tag for building SDV Study Subject link.
  */
+@SuppressWarnings("serial")
 public class SDVStudySubjectLinkTag extends TagSupport {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SDVStudySubjectLinkTag.class);
