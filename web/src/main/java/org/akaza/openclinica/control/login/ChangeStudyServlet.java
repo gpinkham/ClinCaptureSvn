@@ -95,58 +95,51 @@ public class ChangeStudyServlet extends Controller {
 			request.setAttribute("studies", validStudies);
 			forwardPage(Page.CHANGE_STUDY, request, response);
 		} else {
-			if ("confirm".equalsIgnoreCase(action)) {
-				logger.info("confirm action");
-				confirmChangeStudy(request, response, studies);
-			} else if ("submit".equalsIgnoreCase(action)) {
-				logger.info("submit action");
-				changeStudy(request, response);
-			}
-		}
+			logger.info("confirm action");
+			changeStudy(request, response, studies);
+		} 
 	}
 
-	private void confirmChangeStudy(HttpServletRequest request, HttpServletResponse response,
-			ArrayList<StudyUserRoleBean> studies) throws Exception {
+	private void changeStudy(HttpServletRequest request, HttpServletResponse response, ArrayList<StudyUserRoleBean> studies) throws Exception {
+		
 		StudyBean currentStudy = getCurrentStudy(request);
-
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 		v.addValidation("studyId", Validator.IS_AN_INTEGER);
-
+		
 		HashMap errors = v.validate();
-
 		if (!errors.isEmpty()) {
 			request.setAttribute("studies", studies);
 			forwardPage(Page.CHANGE_STUDY, request, response);
-		} else {
-			int studyId = fp.getInt("studyId");
-			logger.info("new study id: " + studyId);
-			for (StudyUserRoleBean studyWithRole : studies) {
-				if (studyWithRole.getStudyId() == studyId) {
-					if (studyWithRole.getParentStudyId() > 0) {
-						StudyDAO studyDAO = getStudyDAO();
-						StudyBean parentStudy = (StudyBean) studyDAO.findByPK(studyWithRole.getParentStudyId());
-						request.setAttribute("parentStudyName", parentStudy.getName());
-					}
-					request.setAttribute("studyId", studyId);
-					request.getSession().setAttribute("studyWithRole", studyWithRole);
-					request.setAttribute("currentStudy", currentStudy);
-					forwardPage(Page.CHANGE_STUDY_CONFIRM, request, response);
-					return;
+			return;
+		}
+
+		int studyId = fp.getInt("studyId");
+		logger.info("new study id: " + studyId);
+		
+		boolean isStudySelected = false;
+		for (StudyUserRoleBean studyWithRole : studies) {
+			if (studyWithRole.getStudyId() == studyId) {
+				if (studyWithRole.getParentStudyId() > 0) {
+					StudyDAO studyDAO = getStudyDAO();
+					StudyBean parentStudy = (StudyBean) studyDAO.findByPK(studyWithRole.getParentStudyId());
+					request.setAttribute("parentStudyName", parentStudy.getName());
 				}
+				request.setAttribute("studyId", studyId);
+				request.getSession().setAttribute("studyWithRole", studyWithRole);
+				request.setAttribute("currentStudy", currentStudy);
+				isStudySelected = true;
 			}
+		}
+		
+		if (!isStudySelected) {
 			addPageMessage(restext.getString("no_study_selected"), request);
 			forwardPage(Page.CHANGE_STUDY, request, response);
+			return;
 		}
-	}
-
-	private void changeStudy(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
 		UserAccountBean ub = getUserAccountBean(request);
-		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
-
-		FormProcessor fp = new FormProcessor(request);
-		int studyId = fp.getInt("studyId");
 		int prevStudyId = currentStudy.getId();
 
 		ub.updateSysAdminRole(studyId, prevStudyId);

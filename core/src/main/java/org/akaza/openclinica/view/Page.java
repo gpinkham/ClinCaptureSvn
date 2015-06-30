@@ -87,8 +87,6 @@ public final class Page {
 	 * Page for changing study.
 	 */
 	public static final Page CHANGE_STUDY = new Page("/WEB-INF/jsp/login/changeStudy.jsp", "Change Study");
-	public static final Page CHANGE_STUDY_CONFIRM = new Page("/WEB-INF/jsp/login/changeStudyConfirm.jsp",
-			"Change Study Confirm");
 
 	/**
 	 * Page for user to confirm inputs of requesting password.
