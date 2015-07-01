@@ -16,10 +16,13 @@ package com.clinovo.service;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,17 +30,23 @@ import org.junit.Test;
 public class DcfServiceTest extends DefaultAppContextTest {
 
 	private StudyBean study;
+	private UserAccountBean user;
+	private Locale locale;
 
 	@Before
 	public void setUp() {
 		study = (StudyBean) studyDAO.findByPK(1);
+		user = new UserAccountBean();
+		user.setName("root");
+		user.setUserTimeZoneId(DateTimeZone.getDefault().getID());
+		locale = Locale.ENGLISH;
 	}
 
 	@Test
 	public void testThatDcfIsGeneratedWithCorrectFileName() throws Exception {
 		Map<Integer, Integer> noteIds = new HashMap<Integer, Integer>();
 		noteIds.put(1, 1);
-		String fileName = dcfService.generateDcf(study, noteIds.keySet(), "root");
+		String fileName = dcfService.generateDcf(study, noteIds.keySet(), user, locale);
 		String expectedFileName = "print" + File.separator + "dcf" + File.separator + "S_DEFAULTS1" + File.separator
 				+ "root" + File.separator + "default-study_S_DEFAULTS1_ssID1_Failed_Validation_Check_1.pdf";
 		assertTrue(fileName.endsWith(expectedFileName));
@@ -47,7 +56,7 @@ public class DcfServiceTest extends DefaultAppContextTest {
 	public void testThatDcfIsGeneratedAndSaved() throws Exception {
 		Map<Integer, Integer> noteIds = new HashMap<Integer, Integer>();
 		noteIds.put(1, 1);
-		String fileName = dcfService.generateDcf(study, noteIds.keySet(), "root");
+		String fileName = dcfService.generateDcf(study, noteIds.keySet(), user, locale);
 		String expectedFileName = "print" + File.separator + "dcf" + File.separator + "S_DEFAULTS1" + File.separator
 				+ "root" + File.separator + "default-study_S_DEFAULTS1_ssID1_Failed_Validation_Check_1.pdf";
 		assertTrue(fileName.endsWith(expectedFileName));

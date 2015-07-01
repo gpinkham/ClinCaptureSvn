@@ -15,6 +15,7 @@
 package com.clinovo.service;
 
 import java.io.FileNotFoundException;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,18 +34,15 @@ public interface DcfService {
 
 	/**
 	 * Generates DCFs for list of DNs.
-	 * 
-	 * @param study
-	 *            current study
-	 * @param noteIds
-	 *            Set of IDs of DNs for which to generate DCFs
-	 * @param username
-	 *            Current user's username
+	 *
+	 * @param study   current study
+	 * @param noteIds Set of IDs of DNs for which to generate DCFs
+	 * @param user    Current user
+	 * @param locale  User locale
 	 * @return path to generated DCF file; null if generation was not successful.
-	 * @throws FileNotFoundException
-	 *             in case CC repository path doesn't exits on the server
+	 * @throws FileNotFoundException in case CC repository path doesn't exits on the server
 	 */
-	String generateDcf(StudyBean study, Set<Integer> noteIds, String username) throws FileNotFoundException;
+	String generateDcf(StudyBean study, Set<Integer> noteIds, UserAccountBean user, Locale locale) throws FileNotFoundException;
 
 	/**
 	 * Adds DCF render type.

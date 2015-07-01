@@ -21,6 +21,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -80,14 +81,16 @@ public class DcfServiceImpl implements DcfService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String generateDcf(StudyBean study, Set<Integer> noteIds, String username) throws FileNotFoundException {
+	public String generateDcf(StudyBean study, Set<Integer> noteIds, UserAccountBean user, Locale locale) throws FileNotFoundException {
 		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(CoreResources.getSystemLocale());
 		List<DiscrepancyCorrectionForm> dcfs = getDiscrepancyNoteDAO().getDiscrepancyCorrectionFormsByNoteIds(study,
 				resword, noteIds.toArray(new Integer[0]));
 		String fileName = null;
 		if (dcfs.size() > 0) {
 			try {
-				fileName = getFileName(dcfs, username, ".pdf", study);
+				fileName = getFileName(dcfs, user.getName(), ".pdf", study);
+				dcfReportBuilder.setUserTimeZoneId(user.getUserTimeZoneId());
+				dcfReportBuilder.setLocale(locale);
 				dcfReportBuilder.buildPdf(dcfs, fileName);
 			} catch (FileNotFoundException e) {
 				logger.error(e.getMessage());

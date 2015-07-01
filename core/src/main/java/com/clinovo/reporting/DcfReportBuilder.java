@@ -41,8 +41,8 @@ import net.sf.dynamicreports.report.datasource.DRDataSource;
 import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.engine.JRDataSource;
 
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +69,29 @@ public class DcfReportBuilder {
 	private final String entityTypeStudySubject = "studySub";
 	private ResourceBundle resword;
 	private ResourceBundle resformat;
+	private Locale locale;
+	private String userTimeZoneId;
+
+	public DcfReportBuilder() {
+		this.locale = Locale.ENGLISH;
+		this.userTimeZoneId = DateTimeZone.getDefault().getID();
+	}
+
+	public Locale getLocale() {
+		return locale;
+	}
+
+	public void setLocale(Locale locale) {
+		this.locale = locale;
+	}
+
+	public String getUserTimeZoneId() {
+		return userTimeZoneId;
+	}
+
+	public void setUserTimeZoneId(String userTimeZoneId) {
+		this.userTimeZoneId = userTimeZoneId;
+	}
 
 	/**
 	 * Builds DCF based on list of DiscrepancyCorrectionForm passed and saves it as pdf.
@@ -95,9 +118,8 @@ public class DcfReportBuilder {
 	}
 
 	private void initResourceBundles() {
-		Locale locale = CoreResources.getSystemLocale();
-		this.resword = ResourceBundleProvider.getWordsBundle(locale);
-		this.resformat = ResourceBundleProvider.getFormatBundle(locale);
+		this.resword = ResourceBundleProvider.getWordsBundle(getLocale());
+		this.resformat = ResourceBundleProvider.getFormatBundle(getLocale());
 	}
 
 	private JasperReportBuilder buildSingleDcf(DiscrepancyCorrectionForm dcf) {
@@ -332,7 +354,8 @@ public class DcfReportBuilder {
 		values.put("note_type_label", resword.getString("type").concat(":"));
 		values.put("note_type_value", dcf.getNoteType());
 		values.put("note_date_label", resword.getString("date").concat(":"));
-		values.put("note_date_value", DateUtil.convertDateToString(dcf.getNoteDate()));
+		values.put("note_date_value", DateUtil.printDate(dcf.getNoteDate(), getUserTimeZoneId(),
+				DateUtil.DatePattern.DATE, getLocale()));
 		values.put("note_status_label", resword.getString("status"));
 		values.put("note_status_value", dcf.getResolutionStatus());
 		return values;

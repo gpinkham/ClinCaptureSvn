@@ -352,7 +352,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		try {
 			Map<Integer, Map<Integer, String>> noteAndEntityIds = transformSelectedNoteAndEntityIdsToInt(selectedNoteIds);
 			String dcfFile = getDcfService()
-					.generateDcf(currentStudy, noteAndEntityIds.keySet(), currentUser.getName());
+					.generateDcf(currentStudy, noteAndEntityIds.keySet(), currentUser, getLocale());
 			boolean multipleDcfs = noteAndEntityIds.keySet().size() > 1;
 			setRenderTypes(selectedRenderTypes, dcfFile, recipientEmail, multipleDcfs, request, currentStudy,
 					currentUser);

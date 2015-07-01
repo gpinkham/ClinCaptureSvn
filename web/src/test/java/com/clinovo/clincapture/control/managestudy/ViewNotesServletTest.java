@@ -216,7 +216,8 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		request.setParameter(ViewNotesServlet.DCF_RENDER_CHECKBOX_NAME, "print");
 		Set<Integer> noteIds = new HashSet<Integer>();
 		noteIds.add(1);
-		Mockito.doReturn("myfile.pdf").when(dcfService).generateDcf(currentStudy, noteIds, currentUser.getName());
+		Mockito.doReturn("myfile.pdf").when(dcfService).generateDcf(currentStudy, noteIds, currentUser,
+				LocaleResolver.getLocale(request));
 		Mockito.doCallRealMethod().when(dcfService).addDcfRenderType(Mockito.any(DcfRenderType.class));
 		Mockito.doCallRealMethod().when(dcfService).clearRenderTypes();
 		Mockito.doCallRealMethod().when(dcfService).renderDcf();
@@ -231,7 +232,8 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		request.setParameter(ViewNotesServlet.DCF_RENDER_CHECKBOX_NAME, "save");
 		Set<Integer> noteIds = new HashSet<Integer>();
 		noteIds.add(1);
-		Mockito.doReturn("myfile.pdf").when(dcfService).generateDcf(currentStudy, noteIds, currentUser.getName());
+		Mockito.doReturn("myfile.pdf").when(dcfService).generateDcf(currentStudy, noteIds, currentUser,
+				LocaleResolver.getLocale(request));
 		Mockito.doCallRealMethod().when(dcfService).addDcfRenderType(Mockito.any(DcfRenderType.class));
 		Mockito.doCallRealMethod().when(dcfService).clearRenderTypes();
 		Mockito.doCallRealMethod().when(dcfService).renderDcf();
