@@ -3,12 +3,15 @@ package com.clinovo.controller;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.CasebooksTableFactory;
 import com.clinovo.model.DownloadCasebooksTableFactory;
+import com.clinovo.service.EmailService;
+import com.clinovo.util.EmailUtil;
 import com.gargoylesoftware.htmlunit.AjaxController;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.util.Cookie;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -38,6 +41,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Controller for print subject casebooks page.
@@ -51,6 +55,9 @@ public class CasebooksController extends Redirection {
 
     @Autowired
     private MessageSource messageSource;
+
+	@Autowired
+	private EmailService emailService;
 
     public static final String CASEBOOKS_PAGE = "casebooks/studyCasebooks";
     public static final String DOWNLOADCASEBOOKS_PAGE = "casebooks/downloadCasebooks";
@@ -112,6 +119,11 @@ public class CasebooksController extends Redirection {
         return CASEBOOKS_PAGE;
     }
 
+	/**
+	 * Generate Site casebooks
+	 * @param request HttpServletRequest
+	 * @throws Exception in case of error
+	 */
     @RequestMapping("/generateSiteCasebooks")
     public void generateSiteCasebooks(HttpServletRequest request) throws Exception {
         String siteId = (String) request.getParameter("siteId");
@@ -129,13 +141,19 @@ public class CasebooksController extends Redirection {
         }
     }
 
+	/**
+	 * Generate one casebook
+	 * @param request HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @throws Exception in case of error
+	 */
     @RequestMapping("/generateCasebook")
     public void generateCasebook(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String subjectOid = request.getParameter("studySubjectOid");
         String includeAudit = request.getParameter("includeAudits");
         String includeDNs = request.getParameter("includeDNs");
-        boolean audit = includeAudit != null && !includeAudit.isEmpty() ? includeAudit.equals("y") ? true : false : false;
-        boolean notes = includeDNs != null && !includeDNs.isEmpty() ? includeDNs.equals("y") ? true : false : false;
+        boolean audit = includeAudit != null && !includeAudit.isEmpty() && (includeAudit.equals("y"));
+        boolean notes = includeDNs != null && !includeDNs.isEmpty() && (includeDNs.equals("y"));
 
         StudyBean studyBean = (StudyBean) request.getSession().getAttribute("study");
         StudyDAO studyDAO = new StudyDAO(dataSource);
@@ -169,6 +187,7 @@ public class CasebooksController extends Redirection {
             OutputStream os = new FileOutputStream(getFile(ssOid, DIR_NAME + File.separator + parentStudyBean.getOid()));
             HtmlToPdfUtil.buildPdf(reportXml, os);
         }
+		sendCompletionEmail(request, studySubjectOidString);
         return CASEBOOKS_PAGE;
     }
 
@@ -360,6 +379,25 @@ public class CasebooksController extends Redirection {
         return file;
     }
 
+	private void sendCompletionEmail(HttpServletRequest request, String subjectOID) {
+		UserAccountBean user = (UserAccountBean) request.getSession().getAttribute("userBean");
+		Locale locale = LocaleResolver.getLocale(request);
+		int listSize = subjectOID.split(",").length;
+		String subject = messageSource.getMessage("casebooks_were_generated_for", null, locale) + " " + listSize
+				+ " " + messageSource.getMessage("_subjects", null, locale) + ".";
+		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
+		String message = EmailUtil.getEmailBodyStart() + subject + "<br/><ul>"
+				+ messageSource.getMessage("job_error_mail.serverUrl", null, locale) + " " + SQLInitServlet.getSystemURL() + "</li>"
+				+ messageSource.getMessage("job_error_mail.studyName", null, locale) + " " + study.getName() + "</li></ul><br/>"
+				+ messageSource.getMessage("casebooks_download_link", null, locale) + ": <a href=\"" + SQLInitServlet.getSystemURL() + "pages/casebooks\">"
+				+ messageSource.getMessage("download_casebooks", null, locale) + "</a><br/>"
+				+ EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(locale);
+		try {
+			emailService.sendEmail(user.getEmail(), subject, message, true, request);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
     @Override
     public String getUrl() {
