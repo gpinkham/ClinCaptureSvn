@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -55,7 +56,9 @@
 <p>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 <jsp:useBean id="now" class="java.util.Date" />
-<P><I><fmt:message key="note_that_job_is_set" bundle="${resword}"/> <fmt:formatDate value="${now}" pattern="${dtetmeFormat}"/>.</I></P>
+<P><I>
+	<fmt:message key="job_is_set_to_run_on_local_time" bundle="${resword}"/> <cc-fmt:formatDate value="${now}" pattern="${dtetmeFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>.
+</I></P>
 
 <p class="text"><br/><span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/></p>
 
@@ -81,11 +84,6 @@
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyId"/></jsp:include>
 		</td>
 		<td class="text" onchange="javascript:changeIcon();">
-						<%-- <select name="studyId">
-							<c:forEach var="studyRole" items="${studies}">
-								<option value="<c:out value="${studyRole.studyId}"/>"><c:out value="${studyRole.studyName}"/>
-							</c:forEach>
-						</select> --%>
 						<select name="studyId" id="studyId">
 						<option value="0">-<fmt:message key="select" bundle="${resword}"/>-</option>
 
@@ -129,21 +127,6 @@
 		</td>
 		<td class="text"><input name="filePathDir" type=text value="${filePathDir}" onchange="javascript:changeIcon();"/></td>
 	</tr>
-
-	<%-- <tr>
-		<td class="text"><b>Start Date/Time:</b></td>
-		<td class="text">
-			<table border="0" cellpadding="0" cellspacing="0">
-			<tr>
-				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="job"/><c:param name="count" value="1"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) </td>
-			</tr>
-			<tr>
-				<td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="start"/></jsp:include></td>
-			</tr>
-			</table>
-		</td>
-	</tr>--%>
 
     <tr onchange="javascript:changeIcon();">
         <td class="text"><b><fmt:message key="start_time" bundle="${resword}"/>:</b></td>

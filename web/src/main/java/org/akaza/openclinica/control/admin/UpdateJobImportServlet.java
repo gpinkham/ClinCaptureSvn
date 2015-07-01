@@ -15,7 +15,6 @@ package org.akaza.openclinica.control.admin;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -33,6 +32,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.job.ImportSpringJob;
 import org.akaza.openclinica.web.job.TriggerService;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.quartz.JobDataMap;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -101,10 +102,10 @@ public class UpdateJobImportServlet extends Controller {
 			request.setAttribute(ImportSpringJob.HOURS, Integer.toString(hours));
 			request.setAttribute(ImportSpringJob.MINUTES, Integer.toString(minutes));
 
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(trigger.getStartTime());
-			request.setAttribute(ImportSpringJob.JOB_HOUR, "" + calendar.get(Calendar.HOUR_OF_DAY));
-			request.setAttribute(ImportSpringJob.JOB_MINUTE, "" + calendar.get(Calendar.MINUTE));
+			DateTimeZone userTimeZone = DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId());
+			DateTime userJobStartDate = new DateTime(trigger.getStartTime()).withZone(userTimeZone);
+			request.setAttribute(ImportSpringJob.JOB_HOUR, "" + userJobStartDate.getHourOfDay());
+			request.setAttribute(ImportSpringJob.JOB_MINUTE, "" + userJobStartDate.getMinuteOfHour());
 
 			StudyBean studyBean;
 			if (studyOID != null && !studyOID.trim().isEmpty()) {

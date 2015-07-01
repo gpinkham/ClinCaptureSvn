@@ -481,75 +481,12 @@ public class FormProcessor {
 	}
 
 	/**
-	 * Return datetime value. If no input for "Hour" and "Minute" and "am/pm", default time will be 12:00pm. In another
-	 * word,
-	 * <p>
-	 * Precondition:Before calling this method, it should make sure that field has been entered valid datetime data.
-	 *
-	 * @param prefix
-	 *            String
-	 * @return Date
-	 */
-	public Date getDateTime(String prefix) {
-		/*
-		 * problem with this - if the field values aren't filled in, we grab the default date instead
-		 * 
-		 * below additions stick defaults into hour, minute and half to make sure we adhere to the simpledateformat, tbh
-		 * 
-		 * changes have been made to satisfy both data_time_format_string, YW (06-2008)
-		 */
-		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
-		String date = getString(prefix + "Date");
-		String hour = getString(prefix + "Hour");
-		String minute = getString(prefix + "Minute");
-		String half = getString(prefix + "Half");
-		if (hour.startsWith("-1")) {
-			hour = "12";
-		} else if (hour.length() == 1) {
-			hour = "0" + hour;
-		}
-		if (minute.startsWith("-1")) {
-			minute = "00";
-		} else if (minute.length() == 1) {
-			minute = "0" + minute;
-		}
-		if ("".equals(half)) {
-			half = "am";
-		}
-
-		String fieldValue = date + " " + hour + ":" + minute + ":00 " + half;
-		SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_time_format_string"),
-				ResourceBundleProvider.getLocale());
-
-		sdf.setLenient(false);
-
-		java.util.Date result;
-		try {
-			logger.info("trying to parse " + fieldValue + " on the pattern "
-					+ resformat.getString("date_time_format_string"));
-			if (date.isEmpty()) {
-				result = DEFAULT_DATE;
-			} else {
-				result = sdf.parse(fieldValue);
-			}
-		} catch (Exception fe) {
-			logger.info("failed to parse");
-			fe.printStackTrace();
-			result = DEFAULT_DATE;
-			logger.info("replace with default date: " + result.toString());
-		}
-		logger.info("returning " + result.toString());
-		return result;
-	}
-
-	/**
 	 * Parses date from the input date and time strings, stored in the http request parameters,
 	 * and translates it from the user's time zone into the server time zone.
 	 * If exact time of a day is not provided, then it will default to 12:00.
 	 *
 	 * @param prefix request parameters name prefix, which store input date, hour and minute values.
 	 * @return date object, created from the input date and time strings.
-	 * @throws Exception exception
 	 */
 	public Date getDateTimeInput(String prefix) {
 

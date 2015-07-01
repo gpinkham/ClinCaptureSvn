@@ -84,6 +84,8 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -118,12 +120,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -1570,17 +1570,10 @@ public abstract class Controller extends BaseController {
 	}
 
 	protected Date getJobStartTime(HashMap errors, FormProcessor fp) {
-		Date currDate = new Date();
-		Calendar currentDateCalendar = new GregorianCalendar();
-		currentDateCalendar.setTime(currDate);
 
+		Date serverStartJobDate = null;
 		int h = fp.getInt(JOB_HOUR);
 		int m = fp.getInt(JOB_MINUTE);
-
-		Calendar calendar = new GregorianCalendar();
-		calendar.setTime(currDate);
-		calendar.set(Calendar.HOUR_OF_DAY, h);
-		calendar.set(Calendar.MINUTE, m);
 
 		if (!(h >= 0)) {
 			List<String> messages = new ArrayList<String>();
@@ -1590,9 +1583,12 @@ public abstract class Controller extends BaseController {
 			List<String> messages = new ArrayList<String>();
 			messages.add(respage.getString("select_the_start_minute"));
 			errors.put("jobHour", messages);
+		} else {
+			DateTimeZone userTimeZone = DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId());
+			DateTime userStartJobDate = new DateTime(userTimeZone).withHourOfDay(h).withMinuteOfHour(m);
+			serverStartJobDate = userStartJobDate.withZone(DateTimeZone.getDefault()).toDate();
 		}
-
-		return calendar.getTime();
+		return serverStartJobDate;
 	}
 
 	/**
