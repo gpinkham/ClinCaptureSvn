@@ -2,12 +2,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <html>
 <head>
@@ -82,7 +82,7 @@
        <fmt:message key="na" bundle="${resword}"/>
       </c:when>
      <c:otherwise>
-       <fmt:formatDate value="${eventView.firstScheduledStartDate}" pattern="${dteFormat}"/>
+       <cc-fmt:formatDate value="${eventView.firstScheduledStartDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
      </c:otherwise>
      </c:choose>), <b><fmt:message key="completed" bundle="${resword}"/></b>: <c:out value="${eventView.subjectCompleted}"/> (<fmt:message key="completion_date_of_last_event" bundle="${resword}"/>:
    <c:choose>
@@ -90,7 +90,7 @@
     <fmt:message key="na" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
-    <fmt:formatDate value="${eventView.lastCompletionDate}" pattern="${dteFormat}"/>
+    <cc-fmt:formatDate value="${eventView.lastCompletionDate}" dateTimeZone="${userBean.userTimeZoneId}"/>
    </c:otherwise>
  </c:choose>), <b><fmt:message key="discontinued" bundle="${resword}"/></b>: <c:out value="${eventView.subjectDiscontinued}"/><br></p>
 	<c:set var="events" value="${eventView.studyEvents}" scope="request" />
@@ -115,7 +115,7 @@
    </c:otherwise>
    </c:choose>
       <td class="table_cell"><c:out value="${currRow.studySubjectLabel}"/></td>
-      <td class="table_cell"><fmt:formatDate value="${currRow.dateStarted}"  type="both" timeStyle="short" pattern="${dteFormat}"/></td>
+      <td class="table_cell"><cc-fmt:formatDate value="${currRow.dateStarted}" dateTimeZone="${userBean.userTimeZoneId}"/></td>
       <td class="table_cell"><c:out value="${currRow.subjectEventStatus.name}"/></td>
 
 

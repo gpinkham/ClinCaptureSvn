@@ -328,6 +328,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 				List<StudyEventBean> evts = sedao.findAllWithSubjectLabelByStudySubjectAndDefinition(studySubject,
 						sed.getId());
 				for (StudyEventBean evt : evts) {
+					evt.setStudySubjectLabel(studySubject.getLabel());
 					events.add(evt);
 				}
 			}
