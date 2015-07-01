@@ -56,53 +56,6 @@ function checkGoBackEntryStatus(strImageName, Message, submit) {
     return true;
 }
 
-function checkGoBackEntryStatusNew(strButtonName, Message, submit) {
-    closing = false;
-    var objButton = document.getElementsByName(strButtonName)[0];
-    if(objButton != null && objButton.className.indexOf('cancel')>0){
-    	return confirmSubmit({
-			message : Message,
-			height : 150,
-			width : 500,
-			submit : submit
-		});
-    } else {
-    	$(submit).submit();
-    }
-    return true;
-} 
-
-function checkSectionStatus(aLink, message) {
-
-	var objButton = document.getElementsByName("submittedExit")[0];
-    if (objButton != null && objButton.className.indexOf('cancel')>0) {
-    	confirmDialog({
-    		message: message,
-    		height: 150,
-    		width: 500,
-    		aLink: aLink
-    	});
-    	return false
-    }
-    return true
-}
-
-function checkEntryStatus(strImageName, submit, message) {
-  	
-	var objButton = document.getElementsByName("submittedExit")[0];
-    if (objButton != null && objButton.className.indexOf('cancel')>0) {
-    	confirmSubmit({
-    		message: message,
-    		height: 150,
-    		width: 500,
-    		submit: submit
-    	});
-    	return false
-    }
-	
-    return true;
-}
-
 function checkGoToEntryStatus(strImageName, Message, Adress) {
     closing = false;        
     objImage = MM_findObj(strImageName);
