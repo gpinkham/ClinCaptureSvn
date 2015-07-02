@@ -3,15 +3,14 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
     <changeSet author="skirpichenok" id="2013-07-01-TICKET283-01">
+        <validCheckSum>82741d09b945737fa8da745d7ce3a5c</validCheckSum>
+        <validCheckSum>4d7b9786e3bbf2a5c5a1b7d5adf5bd</validCheckSum>
         <comment>Fix problems with wrong DB data for user roles</comment>
         <sql splitStatements="false">
             delete from study_user_role where NOT study_id IS NULL and role_name = 'admin';
             update user_account set user_type_id = 1 where user_type_id = 3;
         </sql>
         <comment>Resolve the role names mismatches between UI and the database. We use only the following roles: 1->system administrator, 2->study administrator, 4->investigator, 5->clinical research coordinator, 6->monitor</comment>
-        <delete tableName="study_user_role">
-            <where>role_name='director'</where>
-        </delete>
         <update tableName="user_role">
             <column name="role_name" value="system_administrator"/>
             <where>role_name='admin'</where>
@@ -31,6 +30,10 @@
         <update tableName="user_role">
             <column name="role_name" value="study_monitor"/>
             <where>role_name='monitor'</where>
+        </update>
+        <update tableName="study_user_role">
+            <column name="role_name" value="study_administrator"/>
+            <where>role_name='director'</where>
         </update>
         <update tableName="study_user_role">
             <column name="role_name" value="investigator"/>
