@@ -339,7 +339,7 @@ import com.clinovo.util.ValidatorHelper;
 // and making it more beefy (ie adding a checkIfValidated() type method to that
 // class,
 // so that the work is done there and not in this class)
-@SuppressWarnings({"unchecked", "rawtypes", "unused"})
+@SuppressWarnings({"unchecked", "rawtypes", "unused", "deprecation"})
 public class Validator {
 
 	public static final int TWENTY_FOUR = 24;

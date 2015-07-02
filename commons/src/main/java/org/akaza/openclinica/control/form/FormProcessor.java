@@ -36,8 +36,6 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author ssachs
@@ -57,7 +55,6 @@ import org.slf4j.LoggerFactory;
 public class FormProcessor {
 	private HttpServletRequest request;
 	private HashMap presetValues;
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	public static final String DEFAULT_STRING = "";
 	public static final int DEFAULT_INT = 0;

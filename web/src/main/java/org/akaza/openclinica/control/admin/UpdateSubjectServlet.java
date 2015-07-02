@@ -55,7 +55,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings({ "serial", "unchecked", "rawtypes" })
+@SuppressWarnings({ "serial", "unchecked", "rawtypes", "deprecation" })
 @Component
 public class UpdateSubjectServlet extends Controller {
 

@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Stack;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +43,7 @@ import org.springframework.stereotype.Component;
  * Servlet for creating subject matrix page.
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings("unchecked")
 @Component
 public class ListStudySubjectsServlet extends RememberLastPage {
 
