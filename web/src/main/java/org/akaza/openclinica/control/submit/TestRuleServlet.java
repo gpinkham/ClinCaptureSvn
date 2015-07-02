@@ -51,6 +51,7 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
@@ -393,6 +394,7 @@ public class TestRuleServlet extends Controller {
 
 		expressionService.setExpressionWrapper(new ExpressionObjectWrapper(getDataSource(), study, rule, ruleSet));
 		ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(expressionService);
+		ep.setTargetTimeZone(DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId()));
 		ep.setRespage(respage);
 
 		// Run expression with populated HashMap

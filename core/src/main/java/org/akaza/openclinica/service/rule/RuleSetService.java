@@ -71,6 +71,7 @@ import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -343,6 +344,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 		ruleRunner.setCurrentStudy(currentStudy);
 		ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
 		ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
+		ruleRunner.setTargetTimeZone(DateTimeZone.forID(ub.getUserTimeZoneId()));
 		ruleRunner.setExecutionMode(dryRun ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE);
 		return ruleRunner.runRules(ub, ruleSets, variableAndValue);
 	}

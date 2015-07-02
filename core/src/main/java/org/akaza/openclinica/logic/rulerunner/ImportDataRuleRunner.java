@@ -152,7 +152,7 @@ public class ImportDataRuleRunner extends RuleRunner {
 									variableAndValue));
 					try {
 						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(getDynamicsMetadataService()
-								.getExpressionService());
+								.getExpressionService(), getTargetTimeZone());
 						List<String> expressions = getExpressionService().prepareRuleExpression(
 								rule.getExpression().getValue(), ruleSet);
 						for (String expression : expressions) {

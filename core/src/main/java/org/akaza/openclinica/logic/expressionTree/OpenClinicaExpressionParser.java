@@ -26,6 +26,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +57,11 @@ public class OpenClinicaExpressionParser {
 	private Date subjectDob;
 	private Date subjectEnrollment;
 	private boolean importRulesMode = true;
+	private DateTimeZone targetTimeZone;
 
 	public OpenClinicaExpressionParser() {
 		textIO = new TextIO();
+		this.targetTimeZone = DateTimeZone.getDefault();
 	}
 
 	public HashMap<String, String> getTestValues() {
@@ -80,14 +83,15 @@ public class OpenClinicaExpressionParser {
 		this.responseTestValues = responseTestValues;
 	}
 
-	public OpenClinicaExpressionParser(ExpressionService expressionService) {
+	public OpenClinicaExpressionParser(ExpressionService expressionService, DateTimeZone targetTimeZone) {
 		textIO = new TextIO();
 		this.expressionService = expressionService;
+		this.targetTimeZone = targetTimeZone;
 	}
 
 	public OpenClinicaExpressionParser(StudyBean currentStudy, HttpServletRequest request,
-			ExpressionService expressionService) {
-		this(expressionService);
+			ExpressionService expressionService, DateTimeZone targetTimeZone) {
+		this(expressionService, targetTimeZone);
 		importRulesMode = false;
 		if (currentStudy.getStudyParameterConfig().getCollectDob().equalsIgnoreCase(ONE)) {
 			setSubjectDob(((SubjectBean) request.getAttribute(SUBJECT)).getDateOfBirth());
@@ -305,9 +309,9 @@ public class OpenClinicaExpressionParser {
 			String k = textIO.getWord();
 			logger.info("TheWord 1 is : " + k);
 			if (optimiseRuleValidator) {
-				resultNode = new OpenClinicaVariableNode(k, expressionService, optimiseRuleValidator);
+				resultNode = new OpenClinicaVariableNode(k, expressionService, targetTimeZone, optimiseRuleValidator);
 			} else {
-				resultNode = new OpenClinicaVariableNode(k, expressionService);
+				resultNode = new OpenClinicaVariableNode(k, expressionService, targetTimeZone);
 			}
 
 		} else if (String.valueOf(ch).matches("\"")) {

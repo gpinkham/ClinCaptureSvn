@@ -210,7 +210,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 									variableAndValue, ecb));
 					try {
 						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(currentStudy, request,
-								getDynamicsMetadataService().getExpressionService());
+								getDynamicsMetadataService().getExpressionService(), getTargetTimeZone());
 						List<String> expressions = getDynamicsMetadataService().getExpressionService()
 								.prepareRuleExpression(rule.getExpression().getValue(), ruleSet);
 						for (String expression : expressions) {

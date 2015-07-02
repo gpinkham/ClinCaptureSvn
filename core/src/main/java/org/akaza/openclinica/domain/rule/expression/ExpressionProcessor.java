@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.domain.rule.expression;
 
+import org.joda.time.DateTimeZone;
+
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
@@ -36,6 +38,8 @@ public interface ExpressionProcessor {
 	boolean process();
 
 	void setExpression(ExpressionBean e);
+
+	void setTargetTimeZone(DateTimeZone targetTimeZone);
 
 	String testEvaluateExpression();
 

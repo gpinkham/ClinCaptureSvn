@@ -24,6 +24,7 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.expressionTree.ExpressionNode;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,11 +48,12 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
 	DataSource ds;
 	ExpressionService expressionService;
 	ResourceBundle respage;
+	private DateTimeZone targetTimeZone;
 
 	public OpenClinicaV1ExpressionProcessor(ExpressionService expressionService) {
 		this.expressionService = expressionService;
 		this.e = expressionService.getExpressionWrapper().getExpressionBean();
-
+		this.targetTimeZone = DateTimeZone.getDefault();
 	}
 
 	public String isRuleAssignmentExpressionValid() {
@@ -75,7 +77,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
 
 	public String isRuleExpressionValid() {
 		try {
-			oep = new OpenClinicaExpressionParser(expressionService);
+			oep = new OpenClinicaExpressionParser(expressionService, targetTimeZone);
 			String result = oep.parseAndTestEvaluateExpression(e.getValue());
 			logger.info("Test Result : " + result);
 			return null;
@@ -90,7 +92,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
 
 	public String testEvaluateExpression() {
 		try {
-			oep = new OpenClinicaExpressionParser(expressionService);
+			oep = new OpenClinicaExpressionParser(expressionService, targetTimeZone);
 			String result = oep.parseAndTestEvaluateExpression(e.getValue());
 			logger.info("Test Result : " + result);
 			return "Pass : " + result;
@@ -104,7 +106,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
 
 	public HashMap<String, String> testEvaluateExpression(HashMap<String, String> testValues) {
 		try {
-			oep = new OpenClinicaExpressionParser(expressionService);
+			oep = new OpenClinicaExpressionParser(expressionService, targetTimeZone);
 			HashMap<String, String> resultAndTestValues = oep.parseAndTestEvaluateExpression(e.getValue(), testValues);
 			String returnedResult = resultAndTestValues.get("result");
 			logger.info("Test Result : " + returnedResult);
@@ -135,4 +137,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
 		this.respage = respage;
 	}
 
+	public void setTargetTimeZone(DateTimeZone targetTimeZone) {
+		this.targetTimeZone = targetTimeZone;
+	}
 }

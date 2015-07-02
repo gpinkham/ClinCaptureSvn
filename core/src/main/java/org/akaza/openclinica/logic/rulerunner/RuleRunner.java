@@ -47,6 +47,7 @@ import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -70,6 +71,7 @@ public class RuleRunner {
 
 	private String requestURLMinusServletPath;
 	private String contextPath;
+	private DateTimeZone targetTimeZone;
 
 	/**
 	 *
@@ -97,6 +99,7 @@ public class RuleRunner {
 		this.requestURLMinusServletPath = requestURLMinusServletPath;
 		this.contextPath = contextPath;
 		this.mailSender = mailSender;
+		this.targetTimeZone = DateTimeZone.getDefault();
 	}
 
 	public DataSource getDataSource() {
@@ -211,6 +214,14 @@ public class RuleRunner {
 		emailContents.put("subject", subject);
 
 		return emailContents;
+	}
+
+	public DateTimeZone getTargetTimeZone() {
+		return targetTimeZone;
+	}
+
+	public void setTargetTimeZone(DateTimeZone targetTimeZone) {
+		this.targetTimeZone = targetTimeZone;
 	}
 
 	ExpressionService getExpressionService() {

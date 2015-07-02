@@ -25,6 +25,8 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -37,18 +39,21 @@ import java.util.Date;
 @SuppressWarnings("deprecation")
 public class OpenClinicaVariableNode extends ExpressionNode {
 
-	String number;
-	Boolean optimiseRuleValidator = new Boolean(false);
+	private String number;
+	private Boolean optimiseRuleValidator = false;
+	private DateTimeZone targetTimeZone;
 
-	OpenClinicaVariableNode(String val, ExpressionService expressionService, Boolean optimiseRuleValidator) {
+	OpenClinicaVariableNode(String val, ExpressionService expressionService, DateTimeZone targetTimeZone, Boolean optimiseRuleValidator) {
 		number = val;
 		this.expressionService = expressionService;
+		this.targetTimeZone = targetTimeZone;
 		this.optimiseRuleValidator = optimiseRuleValidator;
 	}
 
-	OpenClinicaVariableNode(String val, ExpressionService expressionService) {
+	OpenClinicaVariableNode(String val, ExpressionService expressionService, DateTimeZone targetTimeZone) {
 		number = val;
 		this.expressionService = expressionService;
+		this.targetTimeZone = targetTimeZone;
 	}
 
 	@Override
@@ -163,9 +168,8 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 	private String calculateVariable() throws OpenClinicaSystemException {
 		if (number.equals("_CURRENT_DATE")) {
 			setDateParameter(true);
-			DateMidnight dm = new DateMidnight();
-			DateTimeFormatter fmt = ISODateTimeFormat.date();
-			return fmt.print(dm);
+			DateTime currentDate = new DateTime(targetTimeZone).withTimeAtStartOfDay();
+			return ISODateTimeFormat.date().print(currentDate);
 		} else if (number.equals("_SUBJECT_DOB")) {
 			setDateParameter(true);
 			if (getExpressionParser().getSubjectDob() == null) {
@@ -197,9 +201,8 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 	private String testCalculateVariable() throws OpenClinicaSystemException {
 		if (number.equals("_CURRENT_DATE")) {
 			setDateParameter(true);
-			DateMidnight dm = new DateMidnight();
-			DateTimeFormatter fmt = ISODateTimeFormat.date();
-			return fmt.print(dm);
+			DateTime currentDate = new DateTime(targetTimeZone).withTimeAtStartOfDay();
+			return ISODateTimeFormat.date().print(currentDate);
 		} else if (number.equals("_SUBJECT_DOB")) {
 			setDateParameter(true);
 			if (getExpressionParser().getSubjectDob() == null) {
