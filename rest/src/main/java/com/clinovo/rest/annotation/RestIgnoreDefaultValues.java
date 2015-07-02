@@ -21,8 +21,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.springframework.stereotype.Component;
-
 /**
  * RestIgnoreDefaultValues method annotation.
  *
@@ -32,7 +30,6 @@ import org.springframework.stereotype.Component;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Component
 public @interface RestIgnoreDefaultValues {
 
 }

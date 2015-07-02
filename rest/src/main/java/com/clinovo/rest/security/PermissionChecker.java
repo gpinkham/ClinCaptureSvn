@@ -22,8 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import com.clinovo.rest.service.OdmService;
-import com.clinovo.rest.service.WadlService;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
 import org.slf4j.Logger;
@@ -32,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.clinovo.i18n.LocaleResolver;
@@ -41,6 +38,8 @@ import com.clinovo.rest.enums.UserRole;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.service.AuthenticationService;
+import com.clinovo.rest.service.OdmService;
+import com.clinovo.rest.service.WadlService;
 import com.clinovo.rest.util.RequestParametersValidator;
 
 /**
@@ -118,11 +117,4 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 			return proceed;
 		}
 	}
-
-	@Override
-	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-			ModelAndView modelAndView) throws Exception {
-		//
-	}
-
 }

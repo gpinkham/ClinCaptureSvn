@@ -30,9 +30,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/odm")
 public class OdmService {
 
+	/**
+	 * Odm http method.
+	 * 
+	 * @return String
+	 * @throws IOException
+	 *             the IOException
+	 */
 	@RequestMapping
 	@ResponseBody
-	public String main() throws IOException {
+	public String odm() throws IOException {
 		return IOUtils.toString(new FileSystemResourceLoader().getResource(
 				"classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getInputStream());
 	}

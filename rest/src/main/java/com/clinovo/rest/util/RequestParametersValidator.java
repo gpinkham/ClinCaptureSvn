@@ -17,7 +17,9 @@ package com.clinovo.rest.util;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +49,7 @@ import com.clinovo.rest.wrapper.RestRequestWrapper;
  * Method processes controller's annotations before the request finds an entry point. Method adds new parameters with
  * default values if it's necessary and if parameters were not specified.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "unchecked"})
 public final class RequestParametersValidator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestParametersValidator.class);
@@ -56,6 +58,7 @@ public final class RequestParametersValidator {
 	public static final String DOT = ".";
 	public static final String EMPTY = ".empty.";
 	public static final String MISSING = ".missing.";
+	public static final String ACCEPT = "Accept";
 
 	private RequestParametersValidator() {
 	}
@@ -79,8 +82,13 @@ public final class RequestParametersValidator {
 		int countOfRequiredParameters = 0;
 		int countOfNotRequiredParameters = 0;
 		Set<String> nullParameters = new HashSet<String>();
+		Set<String> declaredFields = new HashSet<String>();
+		Map<String, String> declaredParams = new HashMap<String, String>();
 		Annotation[][] annotationsHolder = handler.getMethod().getParameterAnnotations();
 		boolean ignoreDefaultValues = handler.getMethod().getAnnotation(RestIgnoreDefaultValues.class) != null;
+		for (String paramName : ((Map<String, String>) request.getParameterMap()).keySet()) {
+			declaredParams.put(paramName.toLowerCase(), paramName);
+		}
 		if (annotationsHolder != null) {
 			for (Annotation[] annotations : annotationsHolder) {
 				if (annotations != null) {
@@ -88,6 +96,13 @@ public final class RequestParametersValidator {
 						if (annotation != null && annotation instanceof RequestParam) {
 							String parameterName = ((RequestParam) annotation).value();
 							if (parameterName != null) {
+								declaredFields.add(parameterName);
+								if (declaredParams.keySet().contains(parameterName)
+										&& !declaredParams.get(parameterName).equals(parameterName)) {
+									throw new RestException(messageSource, "rest.parameterShouldBeInLowercase",
+											new Object[]{declaredParams.get(parameterName)},
+											HttpServletResponse.SC_BAD_REQUEST);
+								}
 								if (((RequestParam) annotation).required()) {
 									countOfRequiredParameters++;
 									if (request.getParameter(parameterName) == null) {
@@ -116,6 +131,14 @@ public final class RequestParametersValidator {
 							}
 						}
 					}
+				}
+			}
+		}
+		if (declaredFields.size() > 0) {
+			for (String parameterName : declaredParams.keySet()) {
+				if (!declaredFields.contains(parameterName)) {
+					throw new RestException(messageSource, "rest.parameterIsNotSupported",
+							new Object[]{declaredParams.get(parameterName)}, HttpServletResponse.SC_BAD_REQUEST);
 				}
 			}
 		}

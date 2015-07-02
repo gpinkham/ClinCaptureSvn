@@ -15,7 +15,6 @@
 
 package com.clinovo.rest.service;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -23,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 
 import org.jvnet.ws.wadl.Application;
@@ -65,25 +63,7 @@ public class WadlService {
 	private ApplicationContext applicationContext;
 
 	/**
-	 * Main get method.
-	 *
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 * @throws IOException
-	 *             the IOException
-	 */
-	@RequestMapping("/*")
-	public void restMain(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		if (request.getServletPath().equalsIgnoreCase("/rest")) {
-			String requestUri = request.getRequestURI();
-			response.sendRedirect(requestUri.concat(requestUri.endsWith("/") ? "" : "/").concat("wadl"));
-		}
-	}
-
-	/**
-	 * Wadl method.
+	 * Wadl http method.
 	 * 
 	 * @param request
 	 *            HttpServletRequest

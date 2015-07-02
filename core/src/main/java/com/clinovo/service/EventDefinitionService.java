@@ -36,6 +36,14 @@ public interface EventDefinitionService {
 			StudyEventDefinitionBean studyEventDefinitionBean);
 
 	/**
+	 * Method that updates study event definition status.
+	 *
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 */
+	void updateStudyEventDefinitionStatus(StudyEventDefinitionBean studyEventDefinitionBean);
+
+	/**
 	 * Add event definition crf.
 	 * 
 	 * @param eventDefinitionCrfBean

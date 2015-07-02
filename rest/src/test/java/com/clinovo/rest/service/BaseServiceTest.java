@@ -91,6 +91,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	// Managed services
 	public static final String API_EVENT = "/event";
+	public static final String API_EVENT_REMOVE = "/event/remove";
+	public static final String API_EVENT_RESTORE = "/event/restore";
 	public static final String API_EVENT_EDIT = "/event/edit";
 	public static final String API_EVENT_ADD_CRF = "/event/addCrf";
 	public static final String API_EVENT_CREATE = "/event/create";

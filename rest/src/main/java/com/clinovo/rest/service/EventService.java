@@ -19,6 +19,7 @@ import java.util.HashMap;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -252,7 +253,7 @@ public class EventService extends BaseService {
 	}
 
 	/**
-	 * Method returns the study event definition.
+	 * Method returns info about study event definition.
 	 *
 	 * @param id
 	 *            int
@@ -263,7 +264,7 @@ public class EventService extends BaseService {
 	@RestAccess(UserRole.ANY_ADMIN)
 	@ResponseBody
 	@RequestMapping(method = RequestMethod.GET)
-	public StudyEventDefinitionBean mainGet(@RequestParam(value = "id") int id) throws Exception {
+	public StudyEventDefinitionBean getInfo(@RequestParam(value = "id") int id) throws Exception {
 		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
@@ -359,7 +360,53 @@ public class EventService extends BaseService {
 
 		eventDefinitionService.updateStudyEventDefinition(currentStudy, emailUser, studyEventDefinitionBean);
 
-		eventDefinitionService.fillEventDefinitionCrfs(currentStudy, studyEventDefinitionBean);
+		return studyEventDefinitionBean;
+	}
+
+	/**
+	 * Method removes the study event definition.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyEventDefinitionBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RestAccess(UserRole.ANY_ADMIN)
+	@ResponseBody
+	@RequestMapping(value = "/remove", method = RequestMethod.POST)
+	public StudyEventDefinitionBean remove(@RequestParam(value = "id") int id) throws Exception {
+		return changeStatus(id, Status.DELETED);
+	}
+
+	/**
+	 * Method restores the study event definition.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyEventDefinitionBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RestAccess(UserRole.ANY_ADMIN)
+	@ResponseBody
+	@RequestMapping(value = "/restore", method = RequestMethod.POST)
+	public StudyEventDefinitionBean restore(@RequestParam(value = "id") int id) throws Exception {
+		return changeStatus(id, Status.AVAILABLE);
+	}
+
+	private StudyEventDefinitionBean changeStatus(int id, Status status) throws Exception {
+		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
+
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
+				dataSource).findByPK(id);
+
+		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, currentStudy);
+
+		studyEventDefinitionBean.setUpdater(updater);
+		studyEventDefinitionBean.setStatus(status);
+		eventDefinitionService.updateStudyEventDefinitionStatus(studyEventDefinitionBean);
 
 		return studyEventDefinitionBean;
 	}

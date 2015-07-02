@@ -133,7 +133,7 @@
 
     <servlet>
         <servlet-name>rest</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <servlet-class>com.clinovo.rest.dispatcher.RestDispatcherServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

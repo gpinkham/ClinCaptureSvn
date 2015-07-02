@@ -13,15 +13,17 @@
 
 package com.clinovo.clincapture.dao.managestudy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("unchecked")
 public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
@@ -129,5 +131,17 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		StudyBean study = (StudyBean) studyDAO.findByPK(1);
 		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllAvailableWithEvaluableCRFByStudy(study);
 		assertEquals(2, result.size());
+	}
+
+	@Test
+	public void testThatUpdateStatusWorksFine() throws OpenClinicaException {
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(1);
+		assertEquals(studyEventDefinitionBean.getStatus(), Status.AVAILABLE);
+		studyEventDefinitionBean.setUpdater((UserAccountBean) userAccountDAO.findByPK(1));
+		studyEventDefinitionBean.setStatus(Status.DELETED);
+		studyEventDefinitionDAO.update(studyEventDefinitionBean);
+		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1);
+		assertEquals(studyEventDefinitionBean.getStatus(), Status.DELETED);
 	}
 }

@@ -141,6 +141,10 @@
                 DATE_UPDATED=sysdate,UPDATE_ID=?, ordinal=?, day_min=?,day_max=?,day_email=?,schedule_day=?,reference_visit=?,email_user_id=?
                 WHERE STUDY_EVENT_DEFINITION_ID=?</sql>
         </query>
+		<query>
+			<name>updateStatus</name>
+			<sql>UPDATE STUDY_EVENT_DEFINITION SET STATUS_ID=?, DATE_UPDATED=NOW(), UPDATE_ID=? WHERE STUDY_EVENT_DEFINITION_ID=?</sql>
+		</query>
         <query>
                 <name>findAllWithStudyEvent</name>
                 <sql>

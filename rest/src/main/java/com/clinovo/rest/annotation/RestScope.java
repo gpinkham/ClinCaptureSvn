@@ -21,8 +21,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.springframework.stereotype.Component;
-
 import com.clinovo.rest.enums.Scope;
 
 /**
@@ -34,7 +32,6 @@ import com.clinovo.rest.enums.Scope;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Component
 public @interface RestScope {
 
 	/**

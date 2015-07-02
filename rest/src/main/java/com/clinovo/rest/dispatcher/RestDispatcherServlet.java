@@ -13,46 +13,26 @@
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
 
-package com.clinovo.rest.annotation;
+package com.clinovo.rest.dispatcher;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.servlet.DispatcherServlet;
 
 /**
- * Rest parameter possible values annotation.
- * 
- * Allows to specify possible values for certain request parameter.
+ * RestDispatcherServlet.
  */
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface RestParameterPossibleValues {
+public class RestDispatcherServlet extends DispatcherServlet {
 
-	/**
-	 * Method that returns name.
-	 */
-	String name();
-
-	/**
-	 * Method that returns values.
-	 */
-	String values();
-
-	/**
-	 * Method that returns value descriptions.
-	 */
-	String valueDescriptions() default "";
-
-	/**
-	 * Method that returns multiValue.
-	 */
-	boolean multiValue() default false;
-
-	/**
-	 * Method that returns canBeNotSpecified.
-	 */
-	boolean canBeNotSpecified() default false;
+	@Override
+	protected void noHandlerFound(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String requestURI = request.getRequestURI().replaceAll("//*", "/");
+		requestURI = requestURI.concat(requestURI.endsWith("/") ? "" : "/");
+		if (requestURI.equals(request.getContextPath().concat(request.getServletPath()).concat("/"))) {
+			response.sendRedirect(request.getContextPath().concat(request.getServletPath()).concat("/wadl"));
+		} else {
+			super.noHandlerFound(request, response);
+		}
+	}
 }

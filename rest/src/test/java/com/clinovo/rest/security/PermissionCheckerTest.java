@@ -1,10 +1,11 @@
 package com.clinovo.rest.security;
 
-import com.clinovo.rest.service.BaseServiceTest;
-import org.junit.Test;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.Test;
+
+import com.clinovo.rest.service.BaseServiceTest;
 
 /**
  * PermissionCheckerTest.
@@ -46,7 +47,7 @@ public class PermissionCheckerTest extends BaseServiceTest {
 				post(API_USER_CREATE).param("username", userName).param("firstname", "firstname")
 						.param("lastname", "lastname").param("email", "user@gmail.com").param("phone", "111111111")
 						.param("company", "company").param("usertype", "1").param("allowsoap", "false")
-						.param("displaypassword", "true").param("scope", "1").param("role", "2").secure(true)
-						.session(session)).andExpect(status().isUnauthorized());
+						.param("displaypassword", "true").param("role", "2").secure(true).session(session)).andExpect(
+				status().isUnauthorized());
 	}
 }

@@ -30,6 +30,21 @@ public class EventServiceTest extends BaseServiceTest {
 	}
 
 	@Test
+	public void testThatCreateMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled").param("xparamX", "2")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatCreateMethodThrowsExceptionIfDescriptionParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("descRiption", "olololo!").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isBadRequest());
+	}
+
+	@Test
 	public void testThatItIsImpossibleToCreateAStudyEventDefinitionAtSiteLevel() throws Exception {
 		createNewStudy();
 		createNewSite(newStudy.getId());
@@ -539,6 +554,38 @@ public class EventServiceTest extends BaseServiceTest {
 	}
 
 	@Test
+	public void testThatAddCrfMethodThrowsExceptionIfDefaultVersionParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultvErsion", "v1.0").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isBadRequest());
+	}
+
+	@Test
+	public void testThatAddCrfMethodThrowsExceptionIfCrfNameParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfnAme", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isBadRequest());
+	}
+
+	@Test
+	public void testThatAddCrfMethodThrowsExceptionIfEventIdParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("evEntid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isBadRequest());
+	}
+
+	@Test
+	public void testThatAddCrfMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").param("xparamX", "56").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
 	public void testThatItIsImpossibleToAddCrfToStudyEventDefinitionIfCrfDoesNotExist() throws Exception {
 		this.mockMvc.perform(
 				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "xxxxxx")
@@ -775,6 +822,31 @@ public class EventServiceTest extends BaseServiceTest {
 	}
 
 	@Test
+	public void testThatGetInfoThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		this.mockMvc.perform(get(API_EVENT).param("id", "").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isBadRequest());
+	}
+
+	@Test
+	public void testThatGetInfoThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		this.mockMvc.perform(get(API_EVENT).accept(mediaType).secure(true).session(session)).andExpect(
+				status().isBadRequest());
+	}
+
+	@Test
+	public void testThatGetInfoThrowsExceptionIfIdParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(get(API_EVENT).param("Id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatGetInfoThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		this.mockMvc.perform(
+				get(API_EVENT).param("id", "1").param("xparamX", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
 	public void testThatItIsImpossibleToEditANonExistingStudyEventDefinition() throws Exception {
 		this.mockMvc.perform(
 				post(API_EVENT_EDIT).param("id", "1231").param("name", "new name!").accept(mediaType).secure(true)
@@ -801,7 +873,7 @@ public class EventServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatHttpGetMethodIsNotsupportedForEditingOfAStudyEventDefinition() throws Exception {
+	public void testThatHttpGetMethodIsNotSupportedForEditingOfAStudyEventDefinition() throws Exception {
 		this.mockMvc.perform(
 				get(API_EVENT_EDIT).param("id", "1").param("name", "new name!").accept(mediaType).secure(true)
 						.session(session)).andExpect(status().isInternalServerError());
@@ -1221,4 +1293,127 @@ public class EventServiceTest extends BaseServiceTest {
 						.secure(true).session(session)).andExpect(status().isInternalServerError());
 	}
 
+	@Test
+	public void testThatItIsImpossibleToPassASupportedParameterThatIsNotInLowerCase() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("nAme", "bla bla !").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT).param("id", "").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT).accept(mediaType).secure(true).session(session)).andExpect(
+				status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditMethodThrowsExceptionIfIdParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT).param("Id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditMethodThrowsExceptionIfNameParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("naMe", "ololo").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("xparamX", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRemoveStudyEventDefinitionThatDoesNotExist() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_REMOVE).param("id", "1345").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRemoveMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_REMOVE).accept(mediaType).secure(true).session(session)).andExpect(
+				status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE).param("id", "1").param("ololo", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveMethodThrowsExceptionIfIdParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_REMOVE).param("Id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveWorksFineForExistingStudyEventDefinition() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk());
+		assertEquals(((StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1)).getStatus(), Status.DELETED);
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRestoreStudyEventDefinitionThatDoesNotExist() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE).param("id", "1345").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRestoreMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_RESTORE).accept(mediaType).secure(true).session(session)).andExpect(
+				status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE).param("id", "1").param("ololo", "1").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreMethodThrowsExceptionIfIdParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_RESTORE).param("Id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreWorksFineForExistingStudyEventDefinition() throws Exception {
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(1);
+		studyEventDefinitionBean.setStatus(Status.DELETED);
+		studyEventDefinitionDAO.update(studyEventDefinitionBean);
+		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1);
+		assertEquals(studyEventDefinitionBean.getStatus(), Status.DELETED);
+		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk());
+		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1);
+		assertEquals(studyEventDefinitionBean.getStatus(), Status.AVAILABLE);
+	}
 }

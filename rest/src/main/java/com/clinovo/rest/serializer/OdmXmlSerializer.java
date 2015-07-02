@@ -62,18 +62,17 @@ public class OdmXmlSerializer extends Jaxb2RootElementHttpMessageConverter {
 			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 					.getRequest();
 			accept = request.getHeader(ACCEPT);
-			proceed = request.getRequestURI().equals(
-					request.getContextPath().concat(request.getServletPath()).concat("/odm"))
-					|| request.getRequestURI().equals(
-							request.getContextPath().concat(request.getServletPath()).concat("/wadl"));
-			if (proceed) {
-				setSupportedMediaTypes(Arrays.asList(MediaType.ALL, MediaType.APPLICATION_XML, MediaType.TEXT_XML,
-						new MediaType("application", "*+xml")));
+			String requestURI = request.getRequestURI();
+			requestURI = requestURI.concat(requestURI.endsWith("/") ? "" : "/");
+			proceed = requestURI.equals(request.getContextPath().concat(request.getServletPath()).concat("/odm/"))
+					|| requestURI.equals(request.getContextPath().concat(request.getServletPath()).concat("/wadl/"));
+			if (proceed && !accept.contains(MediaType.APPLICATION_XML_VALUE)) {
+				setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON));
 			}
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
 		}
-		return (accept != null && accept.equalsIgnoreCase(MediaType.APPLICATION_XML_VALUE)) || proceed;
+		return (accept != null && accept.contains(MediaType.APPLICATION_XML_VALUE)) || proceed;
 	}
 
 	@Override

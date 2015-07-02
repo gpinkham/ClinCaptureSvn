@@ -38,6 +38,9 @@ import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl
 @XmlRootElement(name = "ODM", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 public class RestOdmContainer extends ODM {
 
+	public static final int MILLISEC_IN_HOUR = 3600000;
+	public static final int MILLISEC_IN_MINUTES = 60000;
+
 	@XmlElement(name = "RestData", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private RestData restData;
 
@@ -63,8 +66,8 @@ public class RestOdmContainer extends ODM {
 			offset = -offset;
 			sign = "-";
 		}
-		int hours = offset / 3600000;
-		int minutes = (offset - hours * 3600000) / 60000;
+		int hours = offset / MILLISEC_IN_HOUR;
+		int minutes = (offset - hours * MILLISEC_IN_HOUR) / MILLISEC_IN_MINUTES;
 		DecimalFormat twoDigits = new DecimalFormat("00");
 		setFileOID("REST-Data".concat(new SimpleDateFormat("yyyyMMddHHmmssZ").format(creationDatetime)));
 		setDescription("REST Data");

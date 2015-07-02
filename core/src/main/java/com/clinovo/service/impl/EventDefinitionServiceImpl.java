@@ -65,6 +65,13 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void updateStudyEventDefinitionStatus(StudyEventDefinitionBean studyEventDefinitionBean) {
+		new StudyEventDefinitionDAO(dataSource).updateStatus(studyEventDefinitionBean);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public void addEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCrfBean) {
 		eventDefinitionCrfBean.setCreatedDate(new Date());
 		eventDefinitionCrfBean.setStatus(Status.AVAILABLE);

@@ -41,13 +41,13 @@ public class JsonSerializer extends MappingJackson2HttpMessageConverter {
 			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 					.getRequest();
 			accept = request.getHeader(ACCEPT);
-			proceed = !request.getRequestURI().equals(
-					request.getContextPath().concat(request.getServletPath()).concat("/odm"))
-					&& !request.getRequestURI().equals(
-							request.getContextPath().concat(request.getServletPath()).concat("/wadl"));
+			String requestURI = request.getRequestURI();
+			requestURI = requestURI.concat(requestURI.endsWith("/") ? "" : "/");
+			proceed = !requestURI.equals(request.getContextPath().concat(request.getServletPath()).concat("/odm/"))
+					&& !requestURI.equals(request.getContextPath().concat(request.getServletPath()).concat("/wadl/"));
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
 		}
-		return (accept == null || !accept.equalsIgnoreCase(MediaType.APPLICATION_XML_VALUE)) && proceed;
+		return (accept == null || !accept.contains(MediaType.APPLICATION_XML_VALUE)) && proceed;
 	}
 }

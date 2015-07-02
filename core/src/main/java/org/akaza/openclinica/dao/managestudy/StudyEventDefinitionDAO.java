@@ -197,6 +197,16 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	public EntityBean updateStatus(EntityBean eb) {
+		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) eb;
+		HashMap variables = new HashMap();
+		variables.put(1, sedb.getStatus().getId());
+		variables.put(2, sedb.getUpdaterId());
+		variables.put(3, sedb.getId());
+		this.execute(digester.getQuery("updateStatus"), variables);
+		return eb;
+	}
+
 	public Object getEntityFromHashMap(HashMap hm) {
 		StudyEventDefinitionBean eb = new StudyEventDefinitionBean();
 
