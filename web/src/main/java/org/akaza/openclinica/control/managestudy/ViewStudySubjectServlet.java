@@ -48,7 +48,6 @@ import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -124,7 +123,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			return;
 		}
 
-		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+		if (mayViewData(ub, currentRole)) {
 			return;
 		}
 

@@ -92,7 +92,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note")
 				+ respage.getString("change_study_contact_sysadmin");
 
-		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+		if (mayViewData(ub, currentRole)) {
 			return;
 		}
 

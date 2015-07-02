@@ -36,7 +36,6 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -88,7 +87,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		if (!ub.isSysAdmin() && !SubmitDataServlet.mayViewData(ub, currentRole)) {
+		if (!ub.isSysAdmin() && !mayViewData(ub, currentRole)) {
 			addPageMessage(
 					respage.getString("no_have_correct_privilege_current_study")
 							+ respage.getString("change_study_contact_sysadmin"), request);

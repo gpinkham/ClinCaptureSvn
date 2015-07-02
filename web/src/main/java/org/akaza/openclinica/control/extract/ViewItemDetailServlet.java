@@ -29,7 +29,6 @@ import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -66,7 +65,7 @@ public class ViewItemDetailServlet extends Controller {
         // StudyBean currentStudy = getCurrentStudy(request);
         StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+		if (mayViewData(ub, currentRole)) {
 			return;
 		}
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")

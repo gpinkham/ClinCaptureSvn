@@ -155,7 +155,7 @@ public class FindStudyEventServlet extends Controller {
 		String noAccessMessage = respage.getString("you_may_not_submit_data_for_this_study")
 				+ respage.getString("change_study_contact_sysadmin");
 
-		if (SubmitDataServlet.maySubmitData(ub, currentRole)) {
+		if (maySubmitData(ub, currentRole)) {
 			return;
 		}
 

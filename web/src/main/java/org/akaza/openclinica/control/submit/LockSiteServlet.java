@@ -46,7 +46,7 @@ public class LockSiteServlet extends Controller {
 			return;
 		}
 
-		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+		if (mayViewData(ub, currentRole)) {
 			return;
 		}
 

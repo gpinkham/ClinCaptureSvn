@@ -140,25 +140,12 @@
 			var parameterString = createParameterStringForLimit(id);
 			location.href = '${pageContext.request.contextPath}/MainMenu?' + parameterString;
 		}
-		jQuery(document).ready(function () {
-	        jQuery('#addSubject').click(function () {
-	          jQuery.blockUI({ message: jQuery('#addSubjectForm'), css: {left: "300px", top: "10px" } });
-			});
-	
-			jQuery('#cancel').click(function () {
-	          jQuery.unblockUI();
-	          return false;
-			});
-		});
 	    </script>
         <div id="popupShadowWrapper"><div class="box_T_a"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR"><div class="popupShadow"></div></div></div></div></div></div></div></div></div></div>
 	    <form action="${pageContext.request.contextPath}/ListStudySubjects">
 	      <input type="hidden" name="module" value="admin">
 	        ${findSubjectsHtml}
 	    </form>
-	  </div>
-	  <div id="addSubjectForm" style="display:none;">
-	    <c:import url="addSubjectMonitor.jsp"/>
 	  </div>
 	</c:if>
 	<c:if test="${userRole.sysAdmin || userRole.studyAdministrator || userRole.studyDirector}">	

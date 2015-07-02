@@ -110,27 +110,6 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		boolean showMoreLink;
 		showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
 
-		String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
-		// set up auto study subject id
-		if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-
-			String nextLabel = getStudySubjectDAO().findNextLabel(currentStudy);
-			request.setAttribute("label", nextLabel);
-			fp.addPresetValue("label", nextLabel);
-
-		}
-
-		if (fp.getRequest().getParameter("subjectOverlay") == null) {
-			Date today = new Date(System.currentTimeMillis());
-			String todayFormatted = getLocalDf(request).format(today);
-			if (request.getAttribute(PRESET_VALUES) != null) {
-				fp.setPresetValues((HashMap) request.getAttribute(PRESET_VALUES));
-			}
-			fp.addPresetValue(AddNewSubjectServlet.INPUT_ENROLLMENT_DATE, todayFormatted);
-			fp.addPresetValue(AddNewSubjectServlet.INPUT_EVENT_START_DATE, todayFormatted);
-			setPresetValues(fp.getPresetValues(), request);
-		}
-
 		request.setAttribute("closeInfoShowIcons", true);
 		request.setAttribute("findSubjectsHtml", createTable(request, response, showMoreLink));
 		request.setAttribute("allDefsArray", getEventDefinitionsByCurrentStudy(request));

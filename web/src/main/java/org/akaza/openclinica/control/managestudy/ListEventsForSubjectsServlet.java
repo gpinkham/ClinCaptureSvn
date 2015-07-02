@@ -35,7 +35,6 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.ListStudySubjectsServlet;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -58,7 +57,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 			return;
 		}
 
-		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+		if (mayViewData(ub, currentRole)) {
 			return;
 		}
 

@@ -28,7 +28,6 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.view.Page;
@@ -58,7 +57,7 @@ public class DownloadStudyMetadataServlet extends Controller {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+		if (mayViewData(ub, currentRole)) {
 			return;
 		}
 		addPageMessage(

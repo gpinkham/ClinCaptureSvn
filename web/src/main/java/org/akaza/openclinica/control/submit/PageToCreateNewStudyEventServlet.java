@@ -20,7 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -145,7 +144,6 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 		ArrayList eventDefinitions = CreateNewStudyEventServlet.selectNotStartedOrRepeatingSortedEventDefs(ssb,
 				studyWithEventDefinitions.getId(), seddao, sgcdao, sedao);
 
-		SimpleDateFormat localDf = getLocalDf(request);
 		if (!fp.isSubmitted()) {
 
 			HashMap presetValues = new HashMap();
@@ -464,8 +462,6 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 					studyEvent.setStartTimeFlag(true);
 				}
 				studyEvent.setDateStarted(start);
-				// comment to find bug 1389, tbh
-				logger.info("found start date: " + localDf.format(start));
 				if (!"".equals(strEnd)) {
 					if ("-1".equals(getInputEndHour(fp)) && "-1".equals(getInputEndMinute(fp))
 							&& "".equals(getInputEndHalf(fp))) {
@@ -584,7 +580,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 		String noAccessMessage = respage.getString("not_create_new_event") + " "
 				+ respage.getString("change_study_contact_sysadmin");
 
-		if (SubmitDataServlet.maySubmitData(ub, currentRole)) {
+		if (maySubmitData(ub, currentRole)) {
 			return;
 		}
 

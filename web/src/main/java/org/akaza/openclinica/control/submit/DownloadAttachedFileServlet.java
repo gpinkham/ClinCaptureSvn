@@ -79,7 +79,7 @@ public class DownloadAttachedFileServlet extends Controller {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+		if (mayViewData(ub, currentRole)) {
 			return;
 		}
 

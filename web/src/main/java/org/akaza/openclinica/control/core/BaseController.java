@@ -280,6 +280,13 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return servletContext;
 	}
 
+	/**
+	 * @param request HttpServletRequest
+	 * @return SimpleDateFormat
+	 * @deprecated use {@link com.clinovo.util.DateUtil#getDateTimeFormatter(com.clinovo.util.DateUtil.DatePattern,
+	 * java.util.Locale, org.joda.time.DateTimeZone) getDateTimeFormatter} instead.
+	 */
+	@Deprecated
 	public SimpleDateFormat getLocalDf(HttpServletRequest request) {
 		return new SimpleDateFormat(resformat.getString("date_format_string"), LocaleResolver.getLocale(request));
 	}

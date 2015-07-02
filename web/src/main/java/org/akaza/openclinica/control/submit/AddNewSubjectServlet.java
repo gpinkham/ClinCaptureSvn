@@ -481,22 +481,7 @@ public class AddNewSubjectServlet extends Controller {
 				boolean existingSubShown = fp.getBoolean(EXISTING_SUB_SHOWN);
 
 				if (!existingSubShown) {
-					Object isSubjectOverlay = fp.getRequest().getParameter("subjectOverlay");
-					if (isSubjectOverlay != null) {
-						int eventId = fp.getInt("studyEventDefinition");
-						if (eventId < 1) {
-							Validator.addError(errors, STUDY_EVENT_DEFINITION,
-									resexception.getString("input_not_acceptable_option"));
-						}
-						String location = fp.getString(LOCATION);
-						if (location == null || location.length() == 0) {
-							Validator.addError(errors, LOCATION, resexception.getString("field_not_blank"));
-						}
-						request.setAttribute("showOverlay", true);
-						forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
-					} else {
-						forwardPage(Page.ADD_NEW_SUBJECT, request, response);
-					}
+					forwardPage(Page.ADD_NEW_SUBJECT, request, response);
 				} else {
 					forwardPage(Page.ADD_EXISTING_SUBJECT, request, response);
 				}
@@ -926,7 +911,7 @@ public class AddNewSubjectServlet extends Controller {
 		String noAccessMessage = respage.getString("may_not_add_new_subject") + " "
 				+ respage.getString("change_study_contact_sysadmin");
 
-		if (SubmitDataServlet.maySubmitData(ub, currentRole)) {
+		if (maySubmitData(ub, currentRole)) {
 			return;
 		}
 

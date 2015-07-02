@@ -876,7 +876,7 @@ public class CreateNewStudyEventServlet extends Controller {
 		String noAccessMessage = respage.getString("not_create_new_event") + " "
 				+ respage.getString("change_study_contact_sysadmin");
 
-		if (SubmitDataServlet.maySubmitData(ub, currentRole)) {
+		if (maySubmitData(ub, currentRole)) {
 			return;
 		}
 

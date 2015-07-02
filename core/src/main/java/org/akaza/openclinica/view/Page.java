@@ -570,11 +570,6 @@ public final class Page {
 	public static final Page VIEW_SCHEDULER = new Page(PATH + "admin/viewScheduler.jsp", "View System Scheduler");
 	public static final Page ADMIN_SYSTEM_SERVLET = new Page("/AdminSystem", "Administer System Servlet");
 
-	public static final Page SUBMIT_DATA = new Page(PATH + "submit/index.jsp", "Submit Data Menu");
-	// public static final Page SUBMIT_DATA_SERVLET = new Page("/SubmitData",
-	// "Submit Data Menu");
-	public static final Page SUBMIT_DATA_SERVLET = new Page("/ListStudySubjectsSubmit", "Submit Data Menu");
-
 	public static final Page PAGE_TO_CREATE_NEW_STUDY_EVENT = new Page(PATH + "submit/pageToCreateNewStudyEvent.jsp",
 			"Create a New Study Event");
 	public static final Page CREATE_NEW_STUDY_EVENT = new Page(PATH + "submit/createNewStudyEvent.jsp",

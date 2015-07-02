@@ -611,11 +611,6 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>submitDataServlet</servlet-name>
-        <display-name>SubmitData</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>findStudyEventServlet</servlet-name>
         <display-name>FindStudyEvent</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -698,11 +693,6 @@
     <servlet>
         <servlet-name>listStudySubjectsServlet</servlet-name>
         <display-name>ListStudySubject</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>listStudySubjectsSubmitServlet</servlet-name>
-        <display-name>ListStudySubjectsSubmit</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
@@ -1489,10 +1479,6 @@
         <url-pattern>/AdminSystem</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>submitDataServlet</servlet-name>
-        <url-pattern>/SubmitData</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>findStudyEventServlet</servlet-name>
         <url-pattern>/FindStudyEvent</url-pattern>
     </servlet-mapping>
@@ -1688,10 +1674,6 @@
     <servlet-mapping>
         <servlet-name>restoreStudyServlet</servlet-name>
         <url-pattern>/RestoreStudy</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>listStudySubjectsSubmitServlet</servlet-name>
-        <url-pattern>/ListStudySubjectsSubmit</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>listSubjectServlet</servlet-name>

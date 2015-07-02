@@ -31,17 +31,6 @@
         var parameterString = createParameterStringForLimit(id);
         location.href = '${pageContext.request.contextPath}/ListEventsForSubjects? + module=manage&defId=' + '${defId}&' + parameterString;
     }
-
-    jQuery(document).ready(function() {
-        jQuery('#addSubject').click(function() {
-			jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
-        });
-
-        jQuery('#cancel').click(function() {
-            jQuery.unblockUI();
-            return false;
-        });
-    });
     
     jQuery(window).load(function(){
 

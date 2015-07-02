@@ -362,7 +362,9 @@ public class FormProcessor {
 	 * @param date
 	 *            String
 	 * @return Date
+	 * @deprecated use {@link #getDate(String) getDate} instead.
 	 */
+	@Deprecated
 	public static Date getDateFromString(String date) {
 		Date answer;
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
@@ -374,7 +376,6 @@ public class FormProcessor {
 		} catch (Exception e) {
 			answer = DEFAULT_DATE;
 		}
-
 		return answer;
 	}
 

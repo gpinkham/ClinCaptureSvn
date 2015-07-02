@@ -21,8 +21,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -445,8 +443,6 @@ public class CreateStudyServlet extends Controller {
 		boolean isInterventional = updateStudy2(request);
 		request.getSession().setAttribute("isInterventionalFlag", isInterventional);
 
-		SimpleDateFormat localDf = getLocalDf(request);
-
 		if (errors.isEmpty()) {
 			logger.info("no errors");
 			setMaps(request, isInterventional);
@@ -458,24 +454,9 @@ public class CreateStudyServlet extends Controller {
 
 		} else {
 			logger.info("has validation errors");
-			try {
-				localDf.parse(fp.getString(INPUT_START_DATE));
-				fp.addPresetValue(INPUT_START_DATE, localDf.format(fp.getDate(INPUT_START_DATE)));
-			} catch (ParseException pe) {
-				fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
-			}
-			try {
-				localDf.parse(fp.getString(INPUT_VER_DATE));
-				fp.addPresetValue(INPUT_VER_DATE, localDf.format(fp.getDate(INPUT_VER_DATE)));
-			} catch (ParseException pe) {
-				fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
-			}
-			try {
-				localDf.parse(fp.getString(INPUT_END_DATE));
-				fp.addPresetValue(INPUT_END_DATE, localDf.format(fp.getDate(INPUT_END_DATE)));
-			} catch (ParseException pe) {
-				fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
-			}
+			fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
+			fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
+			fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 			setPresetValues(fp.getPresetValues(), request);
 			request.setAttribute("formMessages", errors);
 			request.setAttribute("studyPhaseMap", studyPhaseMap);

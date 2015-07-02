@@ -20,7 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
@@ -59,7 +59,6 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.DataEntryServlet;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -114,7 +113,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+		if (mayViewData(ub, currentRole)) {
 			return;
 		}
 
@@ -130,8 +129,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		FormProcessor fp = new FormProcessor(request);
 		request.setAttribute("expandCrfInfo", false);
-
-		SimpleDateFormat localDF = getLocalDf(request);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
 		SectionBean sb;
@@ -260,7 +257,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			Date tmpDate = displayBean.getEventCRF().getDateInterviewed();
 			String formattedInterviewerDate;
 			try {
-				formattedInterviewerDate = localDF.format(tmpDate);
+				formattedInterviewerDate = DateUtil.printDate(tmpDate, getUserAccountBean().getUserTimeZoneId(),
+						DateUtil.DatePattern.DATE, getLocale());
 			} catch (Exception e) {
 				formattedInterviewerDate = "";
 			}

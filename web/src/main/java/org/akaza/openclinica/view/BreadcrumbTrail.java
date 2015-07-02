@@ -173,10 +173,6 @@ public class BreadcrumbTrail {
 						Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("download_data"), "ExportDataset"
 						+ this.generateURLString(request), Status.PENDING));
-			} else if (jspPage.equals(Page.SUBMIT_DATA)) {
-				trail = new ArrayList();
-				trail.add(new BreadcrumbBean(resworkflow.getString("submit_data"), "ListStudySubjectsSubmit",
-						Status.PENDING));
 			} else if (jspPage.equals(Page.VIEW_STUDY_SUBJECT)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));

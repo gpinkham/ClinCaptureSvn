@@ -59,7 +59,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -113,7 +112,7 @@ public class UpdateStudyEventServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		if (SubmitDataServlet.maySubmitData(ub, currentRole)) {
+		if (maySubmitData(ub, currentRole)) {
 			return;
 		}
 

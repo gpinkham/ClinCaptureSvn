@@ -165,6 +165,53 @@ public abstract class Controller extends BaseController {
 	public static final String COOKIE_NAME = "lastAccessedInstanceType";
 	public static final int MONTH_IN_SECONDS = 2592000;
 
+	/**
+	 * Check if user have access for data review.
+	 *
+	 * @param ub
+	 *            the user account bean.
+	 * @param currentRole
+	 *            the current study user role.
+	 * @return true if user have access for data review, false otherwise.
+	 */
+	public static boolean mayViewData(UserAccountBean ub, StudyUserRoleBean currentRole) {
+		if (currentRole != null) {
+			Role r = currentRole.getRole();
+			if (r != null
+					&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
+							|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
+							|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_CODER)
+							|| r.equals(Role.STUDY_EVALUATOR) || Role.isMonitor(r))) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if user have access for data entry.
+	 *
+	 * @param ub
+	 *            the user account bean.
+	 * @param currentRole
+	 *            the current study user role.
+	 * @return true if user have access for data entry, false otherwise.
+	 */
+	public static boolean maySubmitData(UserAccountBean ub, StudyUserRoleBean currentRole) {
+		if (currentRole != null && ub != null) {
+			Role r = currentRole.getRole();
+			if (r != null
+					&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
+							|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
+							|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_EVALUATOR))) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	protected void addPageMessage(String message, HttpServletRequest request) {
 		addPageMessage(message, request, logger);
 	}

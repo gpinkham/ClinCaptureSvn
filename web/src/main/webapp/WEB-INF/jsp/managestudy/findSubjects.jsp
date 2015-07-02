@@ -52,17 +52,6 @@
         var parameterString = createParameterStringForLimit(id);
         location.href = '${pageContext.request.contextPath}/ListStudySubjects?'+ parameterString;
     }
-
-    jQuery(document).ready(function() {
-        jQuery('#addSubject').click(function() {
-			jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
-        });
-
-        jQuery('#cancel').click(function() {
-            jQuery.unblockUI();
-            return false;
-        });
-    });
 	
 	//alignment of headers and icons
     jQuery(document).ready(function() {	
@@ -130,10 +119,3 @@
 <br>
 <input id="accessAttributeName" type="hidden" value="data-cc-subjectMatrixId">
 <jsp:include page="../include/footer.jsp"/>
-
-<script type="text/javascript">
-    <c:if test="${showOverlay}">
-        jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
-    </c:if>
-
-</script>

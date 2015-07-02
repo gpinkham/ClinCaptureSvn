@@ -304,7 +304,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 		String exceptionName = resexception.getString("no_permission_to_submit_data");
 		String noAccessMessage = respage.getString("may_not_enter_data_for_this_study");
 
-		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+		if (mayViewData(ub, currentRole)) {
 			return;
 		}
 

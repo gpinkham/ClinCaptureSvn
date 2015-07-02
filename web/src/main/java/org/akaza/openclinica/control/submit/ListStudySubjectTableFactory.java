@@ -16,6 +16,7 @@ package org.akaza.openclinica.control.submit;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.tag.SDVStudySubjectLinkTag;
 import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.DateUtil;
 import com.clinovo.util.SignUtil;
 import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.core.Role;
@@ -76,7 +77,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -191,7 +191,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn(columnNames[index]), currentStudy != null ? currentStudy
 				.getStudyParameterConfig().getStudySubjectIdLabel() : resword.getString("study_subject_ID"), null, null);
 		++index;
-		configureColumn(row.getColumn(columnNames[index]), resword.getString("subject_creation_date"), null, null);
+		configureColumn(row.getColumn(columnNames[index]), resword.getString("subject_creation_date"),
+				new DateEditor(getCurrentUser().getUserTimeZoneId()), null);
 		++index;
 		configureColumn(row.getColumn(columnNames[index]), resword.getString("subject_status"), new StatusCellEditor(),
 				new StatusDroplistFilterEditor());
@@ -1476,9 +1477,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private String formatDate(Date date) {
-		String format = resformat.getString("date_format_string");
-		SimpleDateFormat sdf = new SimpleDateFormat(format, locale);
-		return sdf.format(date);
+		return DateUtil.printDate(date, getCurrentUser().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale());
 	}
 
 	private static String calendaredEventsBuilder(StudyBean studyBean, StudySubjectBean studySubject,

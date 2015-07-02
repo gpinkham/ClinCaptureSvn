@@ -29,6 +29,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -159,10 +160,10 @@ public class MainMenuServlet extends Controller {
 
 				if (ub.getNumVisitsToMainMenu() <= 1) {
 					if (ub.getLastVisitDate() != null) {
-						addPageMessage(
-								respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". "
-										+ respage.getString("last_logged") + " "
-										+ getLocalDf(request).format(ub.getLastVisitDate()) + ". ", request);
+						addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName()
+								+ ". " + respage.getString("last_logged") + " "
+								+ DateUtil.printDate(ub.getLastVisitDate(), getUserAccountBean().getUserTimeZoneId(),
+								DateUtil.DatePattern.DATE, getLocale()) + ". ", request);
 					} else {
 						addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName()
 								+ ". ", request);
