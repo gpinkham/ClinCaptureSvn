@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -44,7 +46,9 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -69,7 +73,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Controller handles requests for item data migration between two CRF versions for specific event CRF.
- *
  */
 @Controller("changeCRFVersionController")
 @SuppressWarnings({"unchecked"})
@@ -78,8 +81,21 @@ public class ChangeCRFVersionController {
 	@Qualifier("dataSource")
 	private DataSource dataSource;
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
+	public static final int ONE = 1;
+	public static final int TWO = 2;
+	public static final int THREE = 3;
+	public static final int FOUR = 4;
+	public static final int FIVE = 5;
+	public static final int SIX = 6;
+	public static final int SEVEN = 7;
+	public static final int EIGHT = 8;
+	public static final int ZERO = 0;
+
+	/**
+	 * Public constructor for controller.
+	 */
 	public ChangeCRFVersionController() {
 	}
 
@@ -110,13 +126,11 @@ public class ChangeCRFVersionController {
 	 */
 	@RequestMapping(value = "/managestudy/chooseCRFVersion", method = RequestMethod.GET)
 	public ModelMap chooseCRFVersion(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("crfId") int crfId, @RequestParam("crfName") String crfName,
-			@RequestParam("crfversionId") int crfVersionId, @RequestParam("crfVersionName") String crfVersionName,
-			@RequestParam("studySubjectLabel") String studySubjectLabel,
-			@RequestParam("studySubjectId") int studySubjectId, @RequestParam("eventCRFId") int eventCRFId,
-			@RequestParam("eventDefinitionCRFId") int eventDefinitionCRFId)
-
-	{
+									 @RequestParam("crfId") int crfId, @RequestParam("crfName") String crfName,
+									 @RequestParam("crfversionId") int crfVersionId, @RequestParam("crfVersionName") String crfVersionName,
+									 @RequestParam("studySubjectLabel") String studySubjectLabel,
+									 @RequestParam("studySubjectId") int studySubjectId, @RequestParam("eventCRFId") int eventCRFId,
+									 @RequestParam("eventDefinitionCRFId") int eventDefinitionCRFId) {
 
 		// to be removed for aquamarine
 		if (!mayProceed(request)) {
@@ -235,8 +249,6 @@ public class ChangeCRFVersionController {
 	 *            String
 	 * @param eventOrdinal
 	 *            String
-	 * @param as
-	 *            String
 	 * @return ModelMap
 	 */
 	@RequestMapping(value = "/managestudy/confirmCRFVersionChange", method = RequestMethod.POST)
@@ -253,14 +265,14 @@ public class ChangeCRFVersionController {
 			@RequestParam(value = "selectedVersionName", required = false) String selectedVersionName,
 			@RequestParam(value = "eventName", required = false) String eventName,
 			@RequestParam(value = "eventCreateDate", required = false) String eventCreateDate,
-			@RequestParam(value = "eventOrdinal", required = false) String eventOrdinal,
-			@RequestParam("confirmCRFVersionSubmit") String as) {
+			@RequestParam(value = "eventOrdinal", required = false) String eventOrdinal) {
 
 		// add here error handling for post with no data and redirect from OC error page
 		// to be removed for aquamarine
 		if (!mayProceed(request)) {
-			if (redirect(request, response, "/MainMenu?message=authentication_failed") == null)
+			if (redirect(request, response, "/MainMenu?message=authentication_failed") == null) {
 				return null;
+			}
 		}
 		resetPanel(request);
 		request.setAttribute("eventCRFId", eventCRFId);
@@ -289,16 +301,16 @@ public class ChangeCRFVersionController {
 		}
 		if (selectedVersionId == -1) {
 			String errorMessage = resword.getString("confirm_crf_version_em_select_version"); // "Please select CRF version";
-			StringBuffer params = new StringBuffer();
-			params.append("/pages/managestudy/chooseCRFVersion?crfId=" + crfId);
-			params.append("&crfName=" + crfName);
-			params.append("&crfversionId=" + crfVersionId);
-			params.append("&crfVersionName=" + crfVersionName);
-			params.append("&studySubjectLabel=" + studySubjectLabel);
-			params.append("&studySubjectId=" + studySubjectId);
-			params.append("&eventCRFId=" + eventCRFId);
-			params.append("&eventDefinitionCRFId=" + eventDefinitionCRFId);
-			params.append("&errorMessage=" + errorMessage);
+			StringBuilder params = new StringBuilder();
+			params.append("/pages/managestudy/chooseCRFVersion?crfId=").append(crfId)
+					.append("&crfName=").append(crfName)
+					.append("&crfversionId=").append(crfVersionId)
+					.append("&crfVersionName=").append(crfVersionName)
+					.append("&studySubjectLabel=").append(studySubjectLabel)
+					.append("&studySubjectId=").append(studySubjectId)
+					.append("&eventCRFId=").append(eventCRFId)
+					.append("&eventDefinitionCRFId=").append(eventDefinitionCRFId)
+					.append("&errorMessage=").append(errorMessage);
 
 			if (redirect(request, response, params.toString()) == null) {
 				return null;
@@ -314,7 +326,6 @@ public class ChangeCRFVersionController {
 		int newCrfVersionCounter = 0;
 
 		try {
-
 			ItemDAO itemDAO = new ItemDAO(dataSource);
 			// get metadata to find repeat group or not
 			ItemGroupMetadataDAO itemGroupMetadataDAO = new ItemGroupMetadataDAO(dataSource);
@@ -323,7 +334,6 @@ public class ChangeCRFVersionController {
 			logger.debug("Size of beans found by version: " + itemFormMetaDataBeansForCurrentCrfVersion.size());
 			HashMap<Integer, ItemGroupMetadataBean> hashItemFormMetaDataForCurrentVersion = new HashMap<Integer, ItemGroupMetadataBean>(
 					itemFormMetaDataBeansForCurrentCrfVersion.size());
-			// put in hash
 
 			for (ItemGroupMetadataBean bn : itemFormMetaDataBeansForCurrentCrfVersion) {
 				hashItemFormMetaDataForCurrentVersion.put(bn.getItemId(), bn);
@@ -334,7 +344,6 @@ public class ChangeCRFVersionController {
 					.findByCrfVersion(selectedVersionId);
 			HashMap<Integer, ItemGroupMetadataBean> hashItemFormMetaDataForNewVersion = new HashMap<Integer, ItemGroupMetadataBean>(
 					itemFormMetaDataBeansForNewCrfVersion.size());
-			// put in hash
 
 			for (ItemGroupMetadataBean bn : itemFormMetaDataBeansForNewCrfVersion) {
 				hashItemFormMetaDataForNewVersion.put(bn.getItemId(), bn);
@@ -430,83 +439,93 @@ public class ChangeCRFVersionController {
 
 		if (itemFromCurrentCrfVersion == null && itemFromNewCrfVersion != null) {
 			for (ItemDataBean itemData : itemFromNewCrfVersion.getItemDataElements()) {
-				row = new String[8];
-				row[0] = row[1] = row[2] = row[3] = "";
-				row[4] = (groupMetaDataBeanForItemFromNewCrfVersion.isRepeatingGroup()) ? itemFromNewCrfVersion
+				row = new String[EIGHT];
+				row[ZERO] = "";
+				row[ONE] = "";
+				row[TWO] = "";
+				row[THREE] = "";
+				row[FOUR] = (groupMetaDataBeanForItemFromNewCrfVersion.isRepeatingGroup()) ? itemFromNewCrfVersion
 						.getName() + "(1)" : itemFromNewCrfVersion.getName();
-				row[5] = itemFromNewCrfVersion.getOid();
-				row[6] = String.valueOf(itemFromNewCrfVersion.getId());
-				row[7] = itemData.getValue();
+				row[FIVE] = itemFromNewCrfVersion.getOid();
+				row[SIX] = String.valueOf(itemFromNewCrfVersion.getId());
+				row[SEVEN] = itemData.getValue();
 				rows.add(row);
 				cycleCount++;
 				if (cycleCount > 0 && !groupMetaDataBeanForItemFromNewCrfVersion.isRepeatingGroup()) {
 					break;
 				}
 			}
-		}
-
-		else if (itemFromCurrentCrfVersion != null && itemFromNewCrfVersion == null) {
+		} else if (itemFromCurrentCrfVersion != null && itemFromNewCrfVersion == null) {
 
 			for (ItemDataBean itemData : itemFromCurrentCrfVersion.getItemDataElements()) {
-				row = new String[8];
-				row[0] = (groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup()) ? itemFromCurrentCrfVersion
+				row = new String[EIGHT];
+				row[ZERO] = (groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup()) ? itemFromCurrentCrfVersion
 						.getName() + " (" + itemData.getOrdinal() + ")" : itemFromCurrentCrfVersion.getName();
-				row[1] = itemFromCurrentCrfVersion.getOid();
-				row[2] = String.valueOf(itemFromCurrentCrfVersion.getId());
-				row[3] = itemData.getValue();
-				row[4] = row[6] = row[7] = row[5] = "";
+				row[ONE] = itemFromCurrentCrfVersion.getOid();
+				row[TWO] = String.valueOf(itemFromCurrentCrfVersion.getId());
+				row[THREE] = itemData.getValue();
+				row[FOUR] = "";
+				row[SIX] = "";
+				row[SEVEN] = "";
+				row[FIVE] = "";
 				rows.add(row);
 				cycleCount++;
 				if (cycleCount > 0 && !groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup()) {
 					break;
 				}
 			}
-		} else if (itemFromCurrentCrfVersion != null && itemFromNewCrfVersion != null) {
+		} else if (itemFromCurrentCrfVersion != null) {
 			// for repeating groups: 3 cases
 			// one cycle: repeating group item -> none-repeating group item
 			// second cycle -> back none-repeating to prev repeating
 			for (ItemDataBean itemData : itemFromCurrentCrfVersion.getItemDataElements()) {
-				row = new String[8];
+				row = new String[EIGHT];
 				if (!groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup() && cycleCount > 0) {
-					row[0] = row[1] = row[2] = row[3] = "";
+					row[ZERO] = "";
+					row[ONE] = "";
+					row[TWO] = "";
+					row[THREE] = "";
 				} else {
-					row[0] = (groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup())
+					row[ZERO] = (groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup())
 							? itemFromCurrentCrfVersion.getName() + " (" + itemData.getOrdinal() + ")"
 							: itemFromCurrentCrfVersion.getName();
-					row[1] = itemFromCurrentCrfVersion.getOid();
-					row[2] = String.valueOf(itemFromCurrentCrfVersion.getId());
-					row[3] = itemData.getValue();
+					row[ONE] = itemFromCurrentCrfVersion.getOid();
+					row[TWO] = String.valueOf(itemFromCurrentCrfVersion.getId());
+					row[THREE] = itemData.getValue();
 				}
 				if (groupMetaDataBeanForItemFromNewCrfVersion.isRepeatingGroup()) {
 					// case when new one is a repeating group and has data from some previous entry while current does
 					// not have a repeating group
 					if (!groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup()) {
-						row[4] = itemFromCurrentCrfVersion.getName() + " (" + itemData.getOrdinal() + ")";
+						row[FOUR] = itemFromCurrentCrfVersion.getName() + " (" + itemData.getOrdinal() + ")";
 					}
 
 					// new one is repeating & cur is repeating
 					if (groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup()) {
-						row[4] = row[0];
+						row[FOUR] = row[ZERO];
 					}
-					row[5] = itemFromNewCrfVersion.getOid();
-					row[6] = String.valueOf(itemFromNewCrfVersion.getId());
-					row[7] = itemData.getValue();
+					row[FIVE] = itemFromNewCrfVersion.getOid();
+					row[SIX] = String.valueOf(itemFromNewCrfVersion.getId());
+					row[SEVEN] = itemData.getValue();
 				} else {
 					if (cycleCount == 0) {
 
-						row[4] = row[0];
-						row[5] = itemFromNewCrfVersion.getOid();
-						row[6] = String.valueOf(itemFromNewCrfVersion.getId());
-						row[7] = itemData.getValue();
+						row[FOUR] = row[ZERO];
+						row[FIVE] = itemFromNewCrfVersion.getOid();
+						row[SIX] = String.valueOf(itemFromNewCrfVersion.getId());
+						row[SEVEN] = itemData.getValue();
 					} else {
-						row[4] = row[5] = row[6] = row[7] = "";
+						row[FOUR] = "";
+						row[FIVE] = "";
+						row[SIX] = "";
+						row[SEVEN] = "";
 					}
 				}
-				cycleCount++;
 				// do not add row if all items empty -> from data of repeat group to none-rep
-				if (!(row[0].equals("") && row[4].equals(""))) {
+				if (!(row[ZERO].equals("") && row[FOUR].equals(""))) {
 					rows.add(row);
 				}
+				cycleCount++;
 			}
 		}
 	}
@@ -518,21 +537,7 @@ public class ChangeCRFVersionController {
 	 *            HttpServletRequest
 	 * @param response
 	 *            HttpServletResponse
-	 * @param crfId
-	 *            int
-	 * @param crfName
-	 *            String
-	 * @param crfVersionId
-	 *            int
-	 * @param crfVersionName
-	 *            String
-	 * @param studySubjectLabel
-	 *            String
-	 * @param studySubjectId
-	 *            int
 	 * @param eventCRFId
-	 *            int
-	 * @param eventDefinitionCRFId
 	 *            int
 	 * @param newCRFVersionId
 	 *            int
@@ -540,17 +545,14 @@ public class ChangeCRFVersionController {
 	 */
 	@RequestMapping("/managestudy/changeCRFVersion")
 	public ModelMap changeCRFVersionAction(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("crfId") int crfId, @RequestParam("crfName") String crfName,
-			@RequestParam("crfversionId") int crfVersionId, @RequestParam("crfVersionName") String crfVersionName,
-			@RequestParam("studySubjectLabel") String studySubjectLabel,
-			@RequestParam("studySubjectId") int studySubjectId, @RequestParam("eventCRFId") int eventCRFId,
-			@RequestParam("eventDefinitionCRFId") int eventDefinitionCRFId,
+			@RequestParam("eventCRFId") int eventCRFId,
 			@RequestParam(value = "newCRFVersionId", required = true) int newCRFVersionId) {
 
 		// to be removed for aquamarine
 		if (!mayProceed(request)) {
-			if (redirect(request, response, "/MainMenu?message=authentication_failed") == null)
+			if (redirect(request, response, "/MainMenu?message=authentication_failed") == null) {
 				return null;
+			}
 		}
 
 		ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
@@ -608,6 +610,14 @@ public class ChangeCRFVersionController {
 			String msg = resword.getString("confirm_crf_version_ms");
 			org.akaza.openclinica.control.core.Controller.addPageMessage(msg, request, logger);
 			org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+			StudyDAO studyDAO = new StudyDAO(dataSource);
+			CRFVersionDAO cvdao = new CRFVersionDAO(dataSource);
+			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
+			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(dataSource);
+			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(dataSource);
+			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(studyEventBean.getStudyEventDefinitionId());
+			SubjectEventStatusUtil.determineSubjectEventStates(sedBean, studySubBean, getCurrentUser(request),
+					new DAOWrapper(studyDAO, cvdao, sedao, studySubDao, eventCRFDAO, edcdao, dndao));
 			response.sendRedirect(Navigation.getSavedUrl(request));
 		} catch (Exception e) {
 
@@ -619,15 +629,10 @@ public class ChangeCRFVersionController {
 
 	/**
 	 * ExceptionHandler for exceptions of class <code>HttpSessionRequiredException</code>.
-	 *
-	 * @param ex
-	 *            HttpSessionRequiredException
-	 * @param request
-	 *            HttpServletRequest
 	 * @return String
 	 */
 	@ExceptionHandler(HttpSessionRequiredException.class)
-	public String handleSessionRequiredException(HttpSessionRequiredException ex, HttpServletRequest request) {
+	public String handleSessionRequiredException() {
 		return "redirect:/MainMenu";
 	}
 
@@ -638,13 +643,10 @@ public class ChangeCRFVersionController {
 	 *            NullPointerException
 	 * @param request
 	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
 	 * @return String
 	 */
 	@ExceptionHandler(NullPointerException.class)
-	public String handleNullPointerException(NullPointerException ex, HttpServletRequest request,
-			HttpServletResponse response) {
+	public String handleNullPointerException(NullPointerException ex, HttpServletRequest request) {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		if (currentStudy == null) {
 			return "redirect:/MainMenu";
