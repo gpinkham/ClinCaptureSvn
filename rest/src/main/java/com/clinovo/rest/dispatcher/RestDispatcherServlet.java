@@ -23,6 +23,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 /**
  * RestDispatcherServlet.
  */
+@SuppressWarnings("serial")
 public class RestDispatcherServlet extends DispatcherServlet {
 
 	@Override
