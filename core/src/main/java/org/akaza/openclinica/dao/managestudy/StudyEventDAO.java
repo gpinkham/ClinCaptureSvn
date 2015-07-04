@@ -788,13 +788,21 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		variables.put(ind++, sb.getStudySubjectId());
 		variables.put(ind++, sb.getLocation());
 		variables.put(ind++, sb.getSampleOrdinal());
-		variables.put(ind++, new Timestamp(sb.getDateStarted().getTime()));
+
+		if (sb.getDateStarted() == null) {
+			nullVars.put(ind, TypeNames.TIMESTAMP);
+			variables.put(ind++, null);
+		} else {
+			variables.put(ind++, new Timestamp(sb.getDateStarted().getTime()));
+		}
+
 		if (sb.getDateEnded() == null) {
 			nullVars.put(ind, TypeNames.TIMESTAMP);
 			variables.put(ind++, null);
 		} else {
 			variables.put(ind++, new Timestamp(sb.getDateEnded().getTime()));
 		}
+
 		variables.put(ind++, sb.getStatus().getId());
 		variables.put(ind++, new Timestamp(new Date().getTime())); // DATE_Updated
 		if (sb.getUpdater() == null) {

@@ -360,13 +360,6 @@ public class CreateNewStudyEventServlet extends Controller {
 			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 				strEndScheduled[i] = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
 			}
-			Date start = getInputStartDate(fp);
-			Date end = null;
-			Date[] startScheduled = new Date[ADDITIONAL_SCHEDULED_NUM];
-			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
-				startScheduled[i] = getInputStartDateScheduled(fp, i);
-			}
-			Date[] endScheduled = new Date[ADDITIONAL_SCHEDULED_NUM];
 
 			discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(
 					AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -476,6 +469,12 @@ public class CreateNewStudyEventServlet extends Controller {
 				}
 			}
 
+			Date start = null;
+			Date end = null;
+			if (!strStart.equals("") && !errors.containsKey(INPUT_STARTDATE_PREFIX)) {
+				start = getInputStartDate(fp);
+			}
+
 			if (!"".equals(strEnd) && !errors.containsKey(INPUT_STARTDATE_PREFIX)
 					&& !errors.containsKey(INPUT_ENDDATE_PREFIX)) {
 				end = getInputEndDate(fp);
@@ -494,6 +493,15 @@ public class CreateNewStudyEventServlet extends Controller {
 					}
 				}
 			}
+
+			Date[] startScheduled = new Date[ADDITIONAL_SCHEDULED_NUM];
+			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
+				String strAddStartDate = fp.getDateTimeInputString(INPUT_STARTDATE_PREFIX_SCHEDULED[i]);
+				if (!strAddStartDate.equals("") && !errors.containsKey(INPUT_STARTDATE_PREFIX_SCHEDULED[i])) {
+					startScheduled[i] = getInputStartDateScheduled(fp, i);
+				}
+			}
+			Date[] endScheduled = new Date[ADDITIONAL_SCHEDULED_NUM];
 
 			String prevStartPrefix;
 			HashMap<Integer, Integer> scheduledSeds = new HashMap<Integer, Integer>();

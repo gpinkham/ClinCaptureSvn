@@ -311,11 +311,11 @@ public class UpdateStudyEventServlet extends Controller {
 				studyEvent.setStatus(Status.UNAVAILABLE);
 			}
 
-			String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
-			Date start = fp.getDateTimeInput(INPUT_STARTDATE_PREFIX);
+			Date start = null;
 			Date end = null;
-
 			String strStart = fp.getDateTimeInputString(INPUT_STARTDATE_PREFIX);
+			String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
+
 			if (!strStart.equals("")) {
 				v.addValidation(INPUT_STARTDATE_PREFIX, Validator.IS_DATE_TIME);
 				v.alwaysExecuteLastValidation(INPUT_STARTDATE_PREFIX);
@@ -328,9 +328,12 @@ public class UpdateStudyEventServlet extends Controller {
 			} else if (currentStudy.getStudyParameterConfig().getEndDateTimeRequired().equals("yes")) {
 				v.addValidation(INPUT_ENDDATE_PREFIX, Validator.NO_BLANKS);
 			}
-
-			// empty when updating a study event
 			HashMap errors = v.validate();
+
+			if (!strStart.equals("") && !errors.containsKey(INPUT_STARTDATE_PREFIX)) {
+				start = fp.getDateTimeInput(INPUT_STARTDATE_PREFIX);
+			}
+
 			if (!strEnd.equals("") && !errors.containsKey(INPUT_STARTDATE_PREFIX)
 					&& !errors.containsKey(INPUT_ENDDATE_PREFIX)) {
 				end = fp.getDateTimeInput(INPUT_ENDDATE_PREFIX);
@@ -579,32 +582,33 @@ public class UpdateStudyEventServlet extends Controller {
 
 			HashMap presetValues = new HashMap();
 			DateTimeZone userTimeZone = DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId());
-			if (studyEvent.getStartTimeFlag()) {
-				Calendar c = new GregorianCalendar();
-				c.setTime(studyEvent.getDateStarted());
-				DateTime studyEventStartDate = new DateTime(studyEvent.getDateStarted()).withZone(userTimeZone);
-				presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", studyEventStartDate.getHourOfDay());
-				presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", studyEventStartDate.getMinuteOfHour());
-				// Later it could be put to somewhere as a static method if
-				// necessary.
-				switch (c.get(Calendar.AM_PM)) {
-					case 0 :
-						presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "am");
-						break;
-					case 1 :
-						presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "pm");
-						break;
-					default :
-						presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
-						break;
+			presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", -1);
+			presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", -1);
+			presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
+			if (studyEvent.getDateStarted() != null) {
+				if (studyEvent.getStartTimeFlag()) {
+					Calendar c = new GregorianCalendar();
+					c.setTime(studyEvent.getDateStarted());
+					DateTime studyEventStartDate = new DateTime(studyEvent.getDateStarted()).withZone(userTimeZone);
+					presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", studyEventStartDate.getHourOfDay());
+					presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", studyEventStartDate.getMinuteOfHour());
+					// Later it could be put to somewhere as a static method if
+					// necessary.
+					switch (c.get(Calendar.AM_PM)) {
+						case 0 :
+							presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "am");
+							break;
+						case 1 :
+							presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "pm");
+							break;
+						default :
+							presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
+							break;
+					}
 				}
-			} else {
-				presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", -1);
-				presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", -1);
-				presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
+				presetValues.put(INPUT_STARTDATE_PREFIX + "Date", DateUtil.printDate(studyEvent.getDateStarted(),
+						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
-			presetValues.put(INPUT_STARTDATE_PREFIX + "Date", DateUtil.printDate(studyEvent.getDateStarted(),
-					getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 
 			presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", -1);
 			presetValues.put(INPUT_ENDDATE_PREFIX + "Minute", -1);
