@@ -430,7 +430,39 @@ When User closes Query DNs for the items from CRF:
 Then DNs are closed
 
 
+Scenario: 19.5 "CRC" enters data into completed CRF and creates RFC DN
 
+Given User logs in as "CRC"
+And User goes to SM page
+And User fills in CRF: 
+|Study Subject ID|Event Name|CRF Name            |input1(T)  |
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|27-Apr-2015|
+
+And User creates DNs in CRF: 
+|Item  |Type|Description            |Detailed Note   |
+|input1|RFC |Source data was missing|peace of text...|
+
+When User clicks 'Save' button
+Then User is on SM page
+And DNs are created
+
+
+Scenario: 19.6 "CRC" enters data into completed CRF, clicks 'Save' button and creates RFC DN
+
+Given User logs in as "CRC"
+And User goes to SM page
+And User fills in CRF: 
+|Study Subject ID|Event Name|CRF Name            |input2(T)  |
+|StSubj_2        |Event B   |CRF_w_basic_fields_1|13:15      |
+
+And User clicks 'Save' button
+And User creates DNs in CRF: 
+|Item  |Type|Description                  |Detailed Note   |
+|input2|RFC |Information was not available|peace of text...|
+
+When User clicks 'Save' button
+Then User is on SM page
+And DNs are created
 
 
 

@@ -30,6 +30,9 @@ public class DNPage extends BasePage {
 	@FindBy(id = "inputDescription")
     private WebElementFacade iDescription;
 	
+	@FindBy(id = "selectDescription")
+    private WebElementFacade sDescription;
+	
 	@FindBy(name = "detailedDes")
     private WebElementFacade tDetailedNote;
 	
@@ -51,6 +54,9 @@ public class DNPage extends BasePage {
 	
 	@FindBy(id = "inputDescription0")
     private WebElementFacade iDescription0;
+	
+	@FindBy(id = "selectDescription0")
+    private WebElementFacade sDescription0;
 	
 	@FindBy(name = "detailedDes0")
     private WebElementFacade tDetailedNote0;
@@ -75,13 +81,16 @@ public class DNPage extends BasePage {
 
     public void fillInAndSaveDN(DNote dn) {
 		
-		if (!beginNewThread.isCurrentlyVisible()) {
-			
-			iDescription.type(dn.getDescription());
-			
+		if (!beginNewThread.isCurrentlyVisible() && !bSubmitClose0.isCurrentlyVisible()) {
+			if (iDescription.isCurrentlyVisible() && !dn.getType().equals("RFC") && !dn.getType().equals("FVC")) {
+				iDescription.type(dn.getDescription());
+			} else {
+				sDescription.selectByVisibleText(dn.getDescription());
+			}
+
 			tDetailedNote.type(dn.getDetailedNote());
 			
-			if (sType.isCurrentlyVisible() || dn.isQuery()) sType.selectByValue(getValueByDNType(dn.getType()));
+			if (sType.isCurrentlyVisible() || dn.isQuery()) sType.selectByValue(DNote.getValueByDNType(dn.getType()));
 			
 			if (sAssignToUser.isCurrentlyVisible()) sAssignToUser.selectByVisibleText(findOptionByUserName(dn.getAssignToUser(), ""));
 			
@@ -91,13 +100,19 @@ public class DNPage extends BasePage {
 			
 		} else {
 			
-			beginNewThread.click();
+			if (beginNewThread.isCurrentlyVisible()) {
+				beginNewThread.click();
+			}
 			
-			iDescription0.type(dn.getDescription());
+			if (iDescription0.isCurrentlyVisible() && !dn.getType().equals("RFC") && !dn.getType().equals("FVC")) {
+				iDescription0.type(dn.getDescription());
+			} else {
+				sDescription0.selectByVisibleText(dn.getDescription());
+			}
 			
 			tDetailedNote0.type(dn.getDetailedNote());
 			
-			if (sType0.isCurrentlyVisible() || dn.isQuery()) sType0.selectByValue(getValueByDNType(dn.getType()));
+			if (sType0.isCurrentlyVisible() || dn.isQuery()) sType0.selectByValue(DNote.getValueByDNType(dn.getType()));
 			
 			if (sAssignToUser0.isCurrentlyVisible()) sAssignToUser0.selectByVisibleText(findOptionByUserName(dn.getAssignToUser(), ""));
 			
@@ -117,17 +132,6 @@ public class DNPage extends BasePage {
 			}
 		}
 		return "";
-	}
-
-	private String getValueByDNType(String type) {
-		switch (type){
-		case "Annotation":
-			return "2";
-		case "Query":
-			return "3";
-		default: 
-			return "2";
-		}
 	}
 
 	public void findAndFillInAndClickSubmit(DNote dn) {		

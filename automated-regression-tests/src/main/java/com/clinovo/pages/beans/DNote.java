@@ -51,7 +51,7 @@ public class DNote {
     	}
     	
     	if (row.get("Type") != null) {
-			dn.setType(row.get("Type"));
+			dn.setType(grtFullTypeName(row.get("Type")));
     	}
 		
     	if (row.get("Assign to User") != null) {
@@ -97,6 +97,32 @@ public class DNote {
     	}
     	
 		return dn;
+	}
+	
+	private static String grtFullTypeName(String type) {
+		switch (type){
+		case "RFC":
+			return "Reason for Change";
+		case "FVC":
+			return "Failed Validation Check";
+		case "Annotation":
+			return "Annotation";
+		case "Query":
+			return "Query";
+		default: 
+			return "Annotation";
+		}
+	}
+
+	public static String getValueByDNType(String type) {
+		switch (type){
+		case "Annotation":
+			return "2";
+		case "Query":
+			return "3";
+		default: 
+			return "2";
+		}
 	}
 	
 	public static Map<String, String> getMapWithFields(DNote dn) {

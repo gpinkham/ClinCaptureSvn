@@ -401,7 +401,7 @@ public class ClinovoJBehave extends BaseJBehave {
    	public void userFillsInDataIntoCRF(ExamplesTable table) {
     	boolean replaceNamedParameters = true;
     	Parameters rowParams = table.getRowAsParameters(0, replaceNamedParameters);
-    	CRF crf = CRF.fillStudyDetailsFromTableRow(rowParams.values());
+    	CRF crf = CRF.fillCRFFromTableRow(rowParams.values());
     	commonSteps.fill_in_crf(crf);
     }
     
@@ -409,18 +409,7 @@ public class ClinovoJBehave extends BaseJBehave {
     @Given("User fills in{ and|, completes and} saves CRF: $activityTable")
     @When("User fills in{ and|, completes and} saves CRF: $activityTable")
    	public void userFillsInAndSaveCRF(ExamplesTable table) {
-    	boolean replaceNamedParameters = true;
-    	Parameters rowParams;
-    	for (int i = 0; i < table.getRowCount(); i++) {
-    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
-    		userCallsPopupOnSM(rowParams.values().get("Study Subject ID"), rowParams.values().get("Event Name"));
-    		userClicksEnterDataButtonInPopup(rowParams.values().get("CRF Name"));
-    		rowParams.values().remove("Study Subject ID");
-    		rowParams.values().remove("Event Name");
-    		rowParams.values().remove("CRF Name");
-        	commonSteps.fill_in_crf(CRF.fillStudyDetailsFromTableRow(rowParams.values()));
-    		userClicksSaveButton();
-    	}
+    	userFillsInCRFAndSavesIfNeed(table, true);
     }
     
     @Given("User filters SDV table and performs SDV: $activityTable")
@@ -552,6 +541,24 @@ public class ClinovoJBehave extends BaseJBehave {
     	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);
     }
     
+    @Given("User creates DNs in CRF: $activityTable")
+    @When("User creates DNs in CRF: $activityTable")
+   	public void userCreatesDNsInCRF(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	List<DNote> dns = new ArrayList<DNote>();
+    	DNote dn;
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		commonSteps.click_dn_flag_icon(commonSteps.get_flag_icon_element_by_CRF_item(rowParams.values().get("Item")));
+    		dn = DNote.fillDNoteFromTableRow(rowParams.values());
+    		commonSteps.create_DN(dn);
+    		dns.add(dn);
+    	}
+    	
+    	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);
+    }
+    
     @Given("User saves CRF")
     @When("User saves CRF")
 	public void userSavesCRF() {
@@ -590,6 +597,27 @@ public class ClinovoJBehave extends BaseJBehave {
     	}
     	
     	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);
+    }
+    
+    @Given("User fills in CRF: $activityTable")
+    @When("User fills in CRF: $activityTable")
+   	public void userFillsInCRF(ExamplesTable table) {
+    	userFillsInCRFAndSavesIfNeed(table, false);
+    }
+    
+    private void userFillsInCRFAndSavesIfNeed(ExamplesTable table, boolean saveCRF) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		userCallsPopupOnSM(rowParams.values().get("Study Subject ID"), rowParams.values().get("Event Name"));
+    		userClicksEnterDataButtonInPopup(rowParams.values().get("CRF Name"));
+    		rowParams.values().remove("Study Subject ID");
+    		rowParams.values().remove("Event Name");
+    		rowParams.values().remove("CRF Name");
+        	commonSteps.fill_in_crf(CRF.fillCRFFromTableRow(rowParams.values()));
+    		if (saveCRF) userClicksSaveButton();
+    	}
     }
     
 	private void userChecksSignEventStatus(Map<String, String> values) {

@@ -23,7 +23,7 @@ public class CRF{
 		this.fieldNameToValueMap = fieldNameToValueMap;
 	}
 
-	public static CRF fillStudyDetailsFromTableRow(Map<String, String> values) {
+	public static CRF fillCRFFromTableRow(Map<String, String> values) {
 		CRF crf = new CRF();
 		if (values.containsKey("Mark Complete")) {
 			crf.setMarkComplete(values.get("Mark Complete"));
