@@ -287,29 +287,6 @@ public class BreadcrumbTrail {
 				trail.add(new BreadcrumbBean(resworkflow.getString("facility_information"), "#", Status.UNAVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("related_information"), "#", Status.UNAVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("confirm_and_submit"), "#", Status.UNAVAILABLE));
-			} else if (jspPage.equals(Page.CREATE_STUDY2)) {
-				advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("study_status"), "#", Status.PENDING), 1);
-				closeRestOfTrail(1);
-			} else if (jspPage.equals(Page.CREATE_STUDY3) || jspPage.equals(Page.CREATE_STUDY4)) {
-				advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("study_design"), "#", Status.PENDING), 2);
-				closeRestOfTrail(2);
-			} else if (jspPage.equals(Page.CREATE_STUDY5)) {
-				advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("conditions_and_eligibility"), "#",
-						Status.PENDING), 3);
-				closeRestOfTrail(3);
-			} else if (jspPage.equals(Page.CREATE_STUDY6)) {
-				advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("facility_information"), "#",
-						Status.PENDING), 4);
-				closeRestOfTrail(4);
-
-			} else if (jspPage.equals(Page.CREATE_STUDY7)) {
-				advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("related_information"), "#",
-						Status.PENDING), 5);
-				closeRestOfTrail(5);
-			} else if (jspPage.equals(Page.STUDY_CREATE_CONFIRM)) {
-				advanceTrail(trail,
-						new BreadcrumbBean(resworkflow.getString("confirm_and_submit"), "#", Status.PENDING), 6);
-				closeRestOfTrail(6);
 			} else if (jspPage.equals(Page.UPDATE_STUDY1)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("study_description"), "#", Status.PENDING));
@@ -323,7 +300,7 @@ public class BreadcrumbTrail {
 			} else if (jspPage.equals(Page.UPDATE_STUDY2)) {
 				advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("study_status"), "#", Status.PENDING), 1);
 				closeRestOfTrail(1);
-			} else if (jspPage.equals(Page.UPDATE_STUDY3) || jspPage.equals(Page.CREATE_STUDY4)) {
+			} else if (jspPage.equals(Page.UPDATE_STUDY3)) {
 				advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("study_design"), "#", Status.PENDING), 2);
 				closeRestOfTrail(2);
 			} else if (jspPage.equals(Page.UPDATE_STUDY5)) {

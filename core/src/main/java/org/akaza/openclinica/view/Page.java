@@ -136,26 +136,6 @@ public final class Page {
 	 */
 	public static final Page CREATE_STUDY1 = new Page("/WEB-INF/jsp/managestudy/createStudy1.jsp",
 			"Create a new Study first section");
-	public static final Page CREATE_STUDY2 = new Page("/WEB-INF/jsp/managestudy/createStudy2.jsp",
-			"Create a new Study second section");
-	public static final Page CREATE_STUDY3 = new Page("/WEB-INF/jsp/managestudy/createStudy3.jsp",
-			"Create a new Study third section");
-	public static final Page CREATE_STUDY4 = new Page("/WEB-INF/jsp/managestudy/createStudy4.jsp",
-			"Create a new Study forth section");
-	public static final Page CREATE_STUDY5 = new Page("/WEB-INF/jsp/managestudy/createStudy5.jsp",
-			"Create a new Study fifth section");
-	public static final Page CREATE_STUDY6 = new Page("/WEB-INF/jsp/managestudy/createStudy6.jsp",
-			"Create a new Study sixth section");
-	public static final Page CREATE_STUDY7 = new Page("/WEB-INF/jsp/managestudy/createStudy7.jsp",
-			"Create a new Study seventh section");
-	public static final Page CREATE_STUDY8 = new Page("/WEB-INF/jsp/managestudy/createStudy8.jsp",
-			"Create a new Study last section");
-
-	/**
-	 * Page for confirming a new study.
-	 */
-	public static final Page STUDY_CREATE_CONFIRM = new Page("/WEB-INF/jsp/managestudy/studyCreateConfirm.jsp",
-			"Confirm a new Study");
 
 	/**
 	 * Page for update a study.
