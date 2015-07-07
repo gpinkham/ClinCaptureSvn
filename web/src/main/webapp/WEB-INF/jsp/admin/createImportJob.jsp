@@ -79,6 +79,11 @@
 		</td> 
 	</tr>
 	<tr>
+		<td colspan="2">
+			<p><fmt:message key="job_note_about_scope" bundle="${resword}"/></p>
+		</td>
+	</tr>
+	<tr>
 		<td class="text">
 			<b><fmt:message key="import_job_study" bundle="${resword}"/>:</b><br>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyId"/></jsp:include>

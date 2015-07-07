@@ -43,7 +43,7 @@ import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.ValidatorHelper;
 
 /**
- * Create Job Import Servlet, by Tom Hickerson, 2009
+ * Create Job Import Servlet, by Tom Hickerson, 2009.
  * 
  * @author thickerson Purpose: to create jobs in the 'importTrigger' group, which will be meant to run the
  *         ImportStatefulJob.
@@ -67,7 +67,7 @@ public class CreateJobImportServlet extends Controller {
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 
@@ -114,6 +114,7 @@ public class CreateJobImportServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		TriggerService triggerService = new TriggerService();
 		StdScheduler scheduler = getStdScheduler();
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		String action = fp.getString("action");
 		if (StringUtil.isBlank(action)) {
 			// set up list of data sets
@@ -160,6 +161,12 @@ public class CreateJobImportServlet extends Controller {
 					addPageMessage(
 							respage.getString("you_have_successfully_created_a_new_job") + " " + trigger.getName()
 									+ " " + respage.getString("which_is_now_set_to_run"), request);
+
+					if ((currentStudy.isSite() && studyBean.getId() != currentStudy.getId())
+							|| (studyBean.isSite() && !currentStudy.isSite() && studyBean.getParentStudyId() != currentStudy.getId())
+							|| (!studyBean.isSite() && !currentStudy.isSite() && currentStudy.getId() != studyBean.getId())) {
+						addPageMessage(resword.getString("job_view_on_another_study").replace("{0}", studyBean.getName()), request);
+					}
 					forwardPage(Page.VIEW_IMPORT_JOB_SERVLET, request, response);
 				} catch (SchedulerException se) {
 					se.printStackTrace();
