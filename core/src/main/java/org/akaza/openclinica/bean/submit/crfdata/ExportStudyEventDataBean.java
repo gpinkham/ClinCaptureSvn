@@ -26,14 +26,17 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * ClinCapture event attributes have been included in addition to ODM StudyEventData attributes.
  */
 public class ExportStudyEventDataBean extends StudyEventDataBean {
     private String location;
-    private String startDate;
-    private String endDate;
+    private Date startDate;
+    private Date endDate;
+	private Boolean startTimeFlag;
+	private Boolean endTimeFlag;
     private String status;
     private Integer ageAtEvent;
     private StudyEventDefinitionBean studyEventDefinitionBean;
@@ -53,23 +56,39 @@ public class ExportStudyEventDataBean extends StudyEventDataBean {
         return this.location;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public String getStartDate() {
+    public Date getStartDate() {
         return this.startDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
-    public String getEndDate() {
+    public Date getEndDate() {
         return this.endDate;
     }
 
-    public void setStatus(String status) {
+	public Boolean getStartTimeFlag() {
+		return startTimeFlag;
+	}
+
+	public void setStartTimeFlag(Boolean startTimeFlag) {
+		this.startTimeFlag = startTimeFlag;
+	}
+
+	public Boolean getEndTimeFlag() {
+		return endTimeFlag;
+	}
+
+	public void setEndTimeFlag(Boolean endTimeFlag) {
+		this.endTimeFlag = endTimeFlag;
+	}
+
+	public void setStatus(String status) {
         this.status = status;
     }
 

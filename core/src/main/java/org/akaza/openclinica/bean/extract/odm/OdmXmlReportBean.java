@@ -26,6 +26,7 @@ import org.akaza.openclinica.bean.extract.ODMSASFormatNameValidator;
 import org.akaza.openclinica.bean.extract.SasNameValidator;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 
 public abstract class OdmXmlReportBean {
+
 	private String ODMVersion;
 	private StringBuffer xmlOutput;
 	private String xmlHeading;
@@ -45,6 +47,7 @@ public abstract class OdmXmlReportBean {
 	private SasNameValidator sasNameValidator;
 	private ODMSASFormatNameValidator sasFormatValidator;
 	private TreeSet<String> uniqueNameTable;
+	private String targetTimeZoneId;
 
 	private static String nls = "\n";
 
@@ -57,13 +60,12 @@ public abstract class OdmXmlReportBean {
 		xmlOutput = new StringBuffer();
 		xmlHeading = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 		indent = "    ";
-		// locale_df_string =
-		// ResourceBundleProvider.getFormatBundle().getString("date_format_string");
 		uniqueNameTable = new TreeSet<String>();
 		sasNameValidator = new SasNameValidator();
 		sasNameValidator.setUniqueNameTable(this.uniqueNameTable);
 		sasFormatValidator = new ODMSASFormatNameValidator();
 		sasFormatValidator.setUniqueNameTable(this.uniqueNameTable);
+		this.targetTimeZoneId = DateTimeZone.UTC.getID();
 	}
 
 	public abstract void createOdmXml(boolean isDataset);
@@ -165,5 +167,13 @@ public abstract class OdmXmlReportBean {
 
 	public String getODMVersion() {
 		return this.ODMVersion;
+	}
+
+	public String getTargetTimeZoneId() {
+		return targetTimeZoneId;
+	}
+
+	public void setTargetTimeZoneId(String targetTimeZoneId) {
+		this.targetTimeZoneId = targetTimeZoneId;
 	}
 }

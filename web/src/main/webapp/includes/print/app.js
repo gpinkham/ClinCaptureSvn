@@ -87,7 +87,9 @@ function getPrintableContent() {
     $('.spinner').css({display: "block"});
     var url = app_contextPath + '/print/metadata/json/view/' + app_studyOID + '/*/' + app_formVersionOID;
     if (app_studySubjectOID.length > 0 && app_studySubjectOID != "*") {
-        url = app_contextPath + '/print/clinicaldata/json/view/' + app_studyOID + '/' + app_studySubjectOID + '/' + app_eventOID + '/' + app_formVersionOID + '?includeAudits=' + app_displayAudits + '&includeDNs=' + app_displayDNs;
+        url = app_contextPath + '/print/clinicaldata/json/view/' + app_studyOID + '/' + app_studySubjectOID
+			+ '/' + app_eventOID + '/' + app_formVersionOID + '?includeAudits=' + app_displayAudits
+			+ '&includeDNs=' + app_displayDNs + '&localizeDatesToUserTZ=yes';
     }
     $.get(url, {}, function (data) {
         var renderString = "";

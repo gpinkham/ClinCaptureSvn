@@ -1,6 +1,5 @@
 package org.akaza.openclinica.service.extract;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -181,8 +180,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 		if (subjectBelongsToStudy(study, studySubj)) {
 			if (studySubj.getSubject().getDateOfBirth() != null) {
-				exportSubjectDataBean.setDateOfBirth(studySubj.getSubject()
-						.getDateOfBirth() + "");
+				exportSubjectDataBean.setDateOfBirth(studySubj.getSubject().getDateOfBirth());
 			}
 			exportSubjectDataBean.setSubjectGender(studySubj.getSubject().getGender() + "");
 
@@ -215,7 +213,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			}
 			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(studySubj, studyEvents, formVersionOID));
 			exportSubjectDataBean.setSubjectOID(studySubj.getOcOid());
-			exportSubjectDataBean.setEnrollmentDate(studySubj.getEnrollmentDate() + "");
+			exportSubjectDataBean.setEnrollmentDate(studySubj.getEnrollmentDate());
 		}
 		return exportSubjectDataBean;
 	}
@@ -235,27 +233,16 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private ArrayList<ExportStudyEventDataBean> setExportStudyEventDataBean(
 			StudySubject ss, List<StudyEvent> studyEvents, String formVersionOID) {
 		ArrayList<ExportStudyEventDataBean> al = new ArrayList<ExportStudyEventDataBean>();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 		for (StudyEvent se : studyEvents) {
 			if (se != null) {
 				ExportStudyEventDataBean expSEBean = new ExportStudyEventDataBean();
 				expSEBean.setLocation(se.getLocation());
 
-				if (se.getDateEnd() != null) {
-					if (se.getEndTimeFlag()) {
-						expSEBean.setEndDate(se.getDateEnd() + "");
-					} else {
-						String temp = sdf.format(se.getDateEnd());
-						expSEBean.setEndDate(temp);
-					}
-				}
-				if (se.getStartTimeFlag()) {
-					expSEBean.setStartDate(se.getDateStart() + "");
-				} else {
-					String temp = sdf.format(se.getDateStart());
-					expSEBean.setStartDate(temp);
-				}
+				expSEBean.setStartDate(se.getDateStart());
+				expSEBean.setStartTimeFlag(se.getStartTimeFlag());
+				expSEBean.setEndDate(se.getDateEnd());
+				expSEBean.setEndTimeFlag(se.getEndTimeFlag());
 				expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOcOid());
 				expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
 				if (se.getStudySubject().getSubject().getDateOfBirth() != null && se.getDateStart() != null) {
@@ -309,7 +296,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 					dataBean.setItemGroupData(fetchItemData(ecrf));
 					dataBean.setFormOID(ecrf.getCrfVersion().getOcOid());
 					if (ecrf.getDateInterviewed() != null) {
-						dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
+						dataBean.setInterviewDate(ecrf.getDateInterviewed());
 					}
 					if (ecrf.getInterviewerName() != null) {
 						dataBean.setInterviewerName(ecrf.getInterviewerName());

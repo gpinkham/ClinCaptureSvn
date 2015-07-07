@@ -82,6 +82,8 @@ public class ODMClinicaDataResource {
 	 *            include discrepancy notes flag
 	 * @param includeAudits
 	 *            include audit logs flag
+	 * @param localizeDatesToUserTZ
+	 *            flag, that determines, if dates in report should be printed in user time zone
 	 * @param request
 	 *            the request object.
 	 * @return the string with json object.
@@ -93,7 +95,9 @@ public class ODMClinicaDataResource {
 			@PathVariable("formVersionOID") String formVersionOID, @PathVariable("studyEventOID") String studyEventOID,
 			@PathVariable("studySubjectIdentifier") String studySubjectIdentifier,
 			@RequestParam(value = "includeDNs", defaultValue = "n") String includeDns,
-			@RequestParam(value = "includeAudits", defaultValue = "n") String includeAudits, HttpServletRequest request) {
+			@RequestParam(value = "includeAudits", defaultValue = "n") String includeAudits,
+			@RequestParam(value = "localizeDatesToUserTZ", defaultValue = "no") String localizeDatesToUserTZ,
+			HttpServletRequest request) {
 		LOGGER.debug("Requesting clinical data resource");
 		boolean includeDN = false;
 		boolean includeAudit = false;
@@ -109,14 +113,15 @@ public class ODMClinicaDataResource {
 		if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y")) {
 			includeAudit = true;
 		}
-		int userId = ((UserAccountBean) request.getSession().getAttribute("userBean")).getId();
+		UserAccountBean currentUser = ((UserAccountBean) request.getSession().getAttribute("userBean"));
 		XMLSerializer xmlSerializer = new XMLSerializer();
-		FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(
-				studyOID,
-				formVersionOID,
-				getClinicalDataCollectorResource().generateClinicalData(studyOID,
+		FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID,
+				formVersionOID, getClinicalDataCollectorResource().generateClinicalData(studyOID,
                         getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID, formVersionOID, includeDN,
-                        includeAudit, LocaleResolver.getLocale(request), userId));
+                        includeAudit, LocaleResolver.getLocale(request), currentUser.getId()));
+		if ("yes".equalsIgnoreCase(localizeDatesToUserTZ)) {
+			report.setTargetTimeZoneId(currentUser.getUserTimeZoneId());
+		}
 		report.createOdmXml(true);
 		xmlSerializer.setTypeHintsEnabled(true);
 		JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());

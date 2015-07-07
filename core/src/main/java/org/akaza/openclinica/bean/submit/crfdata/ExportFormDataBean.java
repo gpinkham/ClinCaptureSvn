@@ -22,6 +22,8 @@
 
 package org.akaza.openclinica.bean.submit.crfdata;
 
+import java.util.Date;
+
 /**
  * OpenClinica form attributes have been included in addition to ODM FormData attributes
  * 
@@ -31,7 +33,7 @@ package org.akaza.openclinica.bean.submit.crfdata;
 public class ExportFormDataBean extends FormDataBean {
 	private String crfVersion;
 	private String interviewerName;
-	private String interviewDate;
+	private Date interviewDate;
 	private String status;
 
 	public ExportFormDataBean() {
@@ -54,11 +56,11 @@ public class ExportFormDataBean extends FormDataBean {
 		return this.interviewerName;
 	}
 
-	public void setInterviewDate(String interviewDate) {
+	public void setInterviewDate(Date interviewDate) {
 		this.interviewDate = interviewDate;
 	}
 
-	public String getInterviewDate() {
+	public Date getInterviewDate() {
 		return this.interviewDate;
 	}
 

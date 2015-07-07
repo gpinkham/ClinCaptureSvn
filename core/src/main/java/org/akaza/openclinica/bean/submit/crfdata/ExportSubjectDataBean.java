@@ -23,6 +23,7 @@
 package org.akaza.openclinica.bean.submit.crfdata;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,9 +35,9 @@ public class ExportSubjectDataBean extends SubjectDataBean {
     private String status;
     private String secondaryId;
     private Integer yearOfBirth;
-    private String dateOfBirth;
+    private Date dateOfBirth;
     private String subjectGender;
-    private String enrollmentDate;
+    private Date enrollmentDate;
 
     private List<ExportStudyEventDataBean> exportStudyEventData;
     private List<SubjectGroupDataBean> subjectGroupData;
@@ -87,11 +88,11 @@ public class ExportSubjectDataBean extends SubjectDataBean {
         return this.yearOfBirth;
     }
 
-    public void setDateOfBirth(String dateOfBirth) {
+    public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public String getDateOfBirth() {
+    public Date getDateOfBirth() {
         return this.dateOfBirth;
     }
 
@@ -119,11 +120,11 @@ public class ExportSubjectDataBean extends SubjectDataBean {
         return this.subjectGroupData;
     }
 
-    public String getEnrollmentDate() {
+    public Date getEnrollmentDate() {
         return enrollmentDate;
     }
 
-    public void setEnrollmentDate(String enrollmentDate) {
+    public void setEnrollmentDate(Date enrollmentDate) {
         this.enrollmentDate = enrollmentDate;
     }
 }

@@ -131,6 +131,7 @@ public class FullReportBean extends OdmXmlReportBean {
 
 	public void addNodeClinicalData(OdmClinicalDataBean clinicaldata) {
 		ClinicalDataReportBean data = new ClinicalDataReportBean(clinicaldata);
+		data.setTargetTimeZoneId(getTargetTimeZoneId());
 		data.setODMVersion(this.getODMVersion());
 		data.setXmlOutput(this.getXmlOutput());
 		data.addNodeClinicalData(true, true);

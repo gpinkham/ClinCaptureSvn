@@ -323,7 +323,7 @@ public class OdmExtractDAO extends DatasetDAO {
             this.setTypeExpected(4, TypeNames.STRING); // secondary_label(study
             // subject)
             this.setTypeExpected(5, TypeNames.STRING); // gender
-            this.setTypeExpected(6, TypeNames.DATE); // date_of_birth
+            this.setTypeExpected(6, TypeNames.TIMESTAMP); // date_of_birth
             this.setTypeExpected(7, TypeNames.INT); // status_id (subject)
             this.setTypeExpected(8, TypeNames.INT); // sgc_id
             this.setTypeExpected(9, TypeNames.STRING); // sgc_name
@@ -334,9 +334,9 @@ public class OdmExtractDAO extends DatasetDAO {
             this.setTypeExpected(14, TypeNames.INT); // sample_ordinal
             this.setTypeExpected(15, TypeNames.STRING); // se_location (study
             // event)
-            this.setTypeExpected(16, TypeNames.DATE); // date_start (study
+            this.setTypeExpected(16, TypeNames.TIMESTAMP); // date_start (study
             // event)
-            this.setTypeExpected(17, TypeNames.DATE); // date_end (study
+            this.setTypeExpected(17, TypeNames.TIMESTAMP); // date_end (study
             // event)
             this.setTypeExpected(18, TypeNames.BOOL); // start_time_flag
             this.setTypeExpected(19, TypeNames.BOOL); // end_time_flag
@@ -346,9 +346,9 @@ public class OdmExtractDAO extends DatasetDAO {
             this.setTypeExpected(23, TypeNames.STRING); // crf_version
             this.setTypeExpected(24, TypeNames.INT); // cv_status_id
             this.setTypeExpected(25, TypeNames.INT); // ec_status_id
-            this.setTypeExpected(26, TypeNames.BOOL) ;// ec_sdv_status
+            this.setTypeExpected(26, TypeNames.BOOL); // ec_sdv_status
             this.setTypeExpected(27, TypeNames.INT); // event_crf_id
-            this.setTypeExpected(28, TypeNames.DATE); // date_interviewed
+            this.setTypeExpected(28, TypeNames.TIMESTAMP); // date_interviewed
             this.setTypeExpected(29, TypeNames.STRING); // interviewer_name
             this.setTypeExpected(30, TypeNames.INT); // validator_id
         }
@@ -527,7 +527,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.INT); // owner_id
         ++i;
-        this.setTypeExpected(i, TypeNames.DATE); // date_created
+        this.setTypeExpected(i, TypeNames.TIMESTAMP); // date_created
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // status
         ++i;
@@ -551,7 +551,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.INT); // owner_id
         ++i;
-        this.setTypeExpected(i, TypeNames.DATE); // date_created
+        this.setTypeExpected(i, TypeNames.TIMESTAMP); // date_created
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // status
         ++i;
@@ -573,7 +573,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.INT); // owner_id
         ++i;
-        this.setTypeExpected(i, TypeNames.DATE); // date_created
+        this.setTypeExpected(i, TypeNames.TIMESTAMP); // date_created
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // status
         ++i;
@@ -595,7 +595,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.INT); // owner_id
         ++i;
-        this.setTypeExpected(i, TypeNames.DATE); // date_created
+        this.setTypeExpected(i, TypeNames.TIMESTAMP); // date_created
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // status
         ++i;
@@ -2481,7 +2481,7 @@ public class OdmExtractDAO extends DatasetDAO {
                                 sub.setYearOfBirth(year);
                             }
                         } else {
-                            sub.setDateOfBirth(new SimpleDateFormat("yyyy-MM-dd").format(dob));
+                            sub.setDateOfBirth(dob);
                         }
                     }
                 }
@@ -2527,19 +2527,13 @@ public class OdmExtractDAO extends DatasetDAO {
                     se.setLocation((String) row.get("se_location"));
                 }
                 if (dataset.isShowEventStart() && startDate != null) {
-                    if ((Boolean) row.get("start_time_flag") == Boolean.TRUE) {
-                        se.setStartDate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(startDate));
-                    } else {
-                        se.setStartDate(new SimpleDateFormat("yyyy-MM-dd").format(startDate));
-                    }
+					se.setStartDate(startDate);
+					se.setStartTimeFlag((Boolean) row.get("start_time_flag"));
                 }
                 Date endDate = (Date) row.get("date_end");
                 if (dataset.isShowEventEnd() && endDate != null) {
-                    if ((Boolean) row.get("end_time_flag") == Boolean.TRUE) {
-                        se.setEndDate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(endDate));
-                    } else {
-                        se.setEndDate(new SimpleDateFormat("yyyy-MM-dd").format(endDate));
-                    }
+					se.setEndDate(endDate);
+					se.setEndTimeFlag((Boolean) row.get("end_time_flag"));
                 }
 
                 se.setStatus(SubjectEventStatus.get((Integer) row.get("event_status_id")).getName());
@@ -2573,8 +2567,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 }
                 if (dataset.isShowCRFinterviewerDate()) {
                     try {
-                        form.setInterviewDate(new SimpleDateFormat("yyyy-MM-dd").format((Date) row
-                                .get("date_interviewed")));
+                        form.setInterviewDate((Date) row.get("date_interviewed"));
                     } catch (NullPointerException npe) {
                         logger.debug("caught NPE for interviewDate");
                     }

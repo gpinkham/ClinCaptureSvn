@@ -254,6 +254,19 @@ public final class DateUtil {
 	 * @param dateToPrint Date date to print
 	 * @param timeZoneId  String time zone to translate to
 	 * @param datePattern DatePattern specifies output format of date
+	 * @return String string representation of a given date
+	 */
+	public static String printDate(Date dateToPrint, String timeZoneId, DatePattern datePattern) {
+		return printDate(dateToPrint, timeZoneId, datePattern, Locale.getDefault());
+	}
+
+	/**
+	 * Returns string representation of a given date, translated into specified time zone
+	 * and formatted according to specified date pattern.
+	 *
+	 * @param dateToPrint Date date to print
+	 * @param timeZoneId  String time zone to translate to
+	 * @param datePattern DatePattern specifies output format of date
 	 * @param locale      locale
 	 * @return String string representation of a given date
 	 */
@@ -367,7 +380,7 @@ public final class DateUtil {
 	/**
 	 * Enumeration <code>DateUtil.DatePattern</code> represents available date format patterns.
 	 * DATE is for pattern <code>dd-MMM-yyyy</code>
-	 * TIMESTAMP is for pattern <code>dd-MMM-yyyy HH:MM</code>
+	 * TIMESTAMP is for pattern <code>dd-MMM-yyyy HH:mm</code>
 	 * TIMESTAMP_WITH_SECONDS is for pattern <code>dd-MMM-yyyy HH:mm:ss</code>
 	 */
 	public enum DatePattern {
@@ -377,7 +390,8 @@ public final class DateUtil {
 		DATE_AND_HOUR("dd-MMM-yyyy HH"),
 		YEAR_AND_MONTH("MMM-yyyy"),
 		YEAR("yyyy"),
-		ISO_DATE("yyyy-MM-dd");
+		ISO_DATE("yyyy-MM-dd"),
+		ISO_TIMESTAMP("yyyy-MM-dd'T'HH:mm:ss");
 
 		private String pattern;
 

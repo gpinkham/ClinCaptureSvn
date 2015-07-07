@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
+import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
@@ -33,8 +34,8 @@ import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.joda.time.format.DateTimeFormat;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -45,6 +46,7 @@ import java.util.Date;
  */
 
 public class ClinicalDataReportBean extends OdmXmlReportBean {
+
 	private OdmClinicalDataBean clinicalData;
 
 	public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata) {
@@ -60,6 +62,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 	}
 
 	public void addNodeClinicalData(boolean header, boolean footer) {
+
 		String odmVersion = this.getODMVersion();
 		// when collecting data, only item with value has been collected.
 		StringBuffer xml = this.getXmlOutput();
@@ -95,7 +98,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 					xml.append("\" OpenClinica:YearOfBirth=\"" + sub.getYearOfBirth());
 				} else {
 					if (sub.getDateOfBirth() != null) {
-						xml.append("\" OpenClinica:DateOfBirth=\"" + sub.getDateOfBirth());
+						xml.append("\" OpenClinica:DateOfBirth=\""
+								+ DateTimeFormat.forPattern(DateUtil.DatePattern.ISO_DATE.getPattern())
+								.print(sub.getDateOfBirth().getTime()));
 					}
 				}
 				String gender = sub.getSubjectGender();
@@ -116,13 +121,18 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 					if (location != null && location.length() > 0) {
 						xml.append("\" OpenClinica:StudyEventLocation=\"" + StringEscapeUtils.escapeXml(location));
 					}
-					String startDate = se.getStartDate();
-					if (startDate != null && startDate.length() > 0) {
-						xml.append("\" OpenClinica:StartDate=\"" + startDate);
+					DateUtil.DatePattern datePattern;
+					if (se.getStartDate() != null) {
+						datePattern = se.getStartTimeFlag() ? DateUtil.DatePattern.ISO_TIMESTAMP
+								: DateUtil.DatePattern.ISO_DATE;
+						xml.append("\" OpenClinica:StartDate=\""
+								+ DateUtil.printDate(se.getStartDate(), getTargetTimeZoneId(), datePattern));
 					}
-					String endDate = se.getEndDate();
-					if (endDate != null && endDate.length() > 0) {
-						xml.append("\" OpenClinica:EndDate=\"" + endDate);
+					if (se.getEndDate() != null) {
+						datePattern = se.getEndTimeFlag() ? DateUtil.DatePattern.ISO_TIMESTAMP
+								: DateUtil.DatePattern.ISO_DATE;
+						xml.append("\" OpenClinica:EndDate=\""
+								+ DateUtil.printDate(se.getEndDate(), getTargetTimeZoneId(), datePattern));
 					}
 					String status = se.getStatus();
 					if (status != null && status.length() > 0) {
@@ -153,8 +163,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 							xml.append("\" OpenClinica:InterviewerName=\""
 									+ StringEscapeUtils.escapeXml(interviewerName));
 						}
-						if (form.getInterviewDate() != null && form.getInterviewDate().length() > 0) {
-							xml.append("\" OpenClinica:InterviewDate=\"" + form.getInterviewDate());
+						if (form.getInterviewDate() != null) {
+							xml.append("\" OpenClinica:InterviewDate=\"" + DateUtil.printDate(form.getInterviewDate(),
+									getTargetTimeZoneId(), DateUtil.DatePattern.ISO_DATE));
 						}
 						String status = form.getStatus();
 						if (status != null && status.length() > 0) {
@@ -358,7 +369,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 					xml.append("Name=\"" + StringEscapeUtils.escapeXml(name) + "\" ");
 				}
 				if (d != null) {
-					xml.append("DateTimeStamp=\"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(d) + "\" ");
+					xml.append("DateTimeStamp=\"" + DateUtil.printDate(d, getTargetTimeZoneId(),
+							DateUtil.DatePattern.ISO_TIMESTAMP) + "\" ");
 				}
 				if (t.length() > 0) {
 					xml.append(nls);
@@ -431,10 +443,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 			}
 		}
 		if (dn.getDateUpdated() != null) {
-			Date d = dn.getDateUpdated();
-			if (d.toString().length() > 0) {
-				xml.append("DateUpdated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(d) + "\" ");
-			}
+			xml.append("DateUpdated=\"" + DateUtil.printDate(dn.getDateUpdated(), getTargetTimeZoneId(),
+					DateUtil.DatePattern.ISO_DATE) + "\" ");
 		}
 		if (dn.getEntityName() != null) {
 			String s = dn.getEntityName();
@@ -464,10 +474,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 					}
 				}
 				if (cn.getDateCreated() != null) {
-					Date d = cn.getDateCreated();
-					if (d.toString().length() > 0) {
-						xml.append("DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(d) + "\" ");
-					}
+					xml.append("DateCreated=\"" + DateUtil.printDate(cn.getDateCreated(), getTargetTimeZoneId(),
+							DateUtil.DatePattern.ISO_DATE) + "\" ");
 				}
 				if (cn.getOwnerUserName() != "") {
 					String ownerUserName = cn.getOwnerUserName();
