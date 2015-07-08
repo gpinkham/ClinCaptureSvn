@@ -34,7 +34,6 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.StudyInfoPanel;
-import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.method.HandlerMethod;
