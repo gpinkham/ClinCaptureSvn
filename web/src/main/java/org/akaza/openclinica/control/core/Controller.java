@@ -494,7 +494,8 @@ public abstract class Controller extends BaseController {
 
 			String includeReportingVar = "includeReporting";
 			if (!SQLInitServlet.getField("pentaho.url").trim().equals("")) {
-				request.setAttribute(includeReportingVar, true);
+				//request.setAttribute(includeReportingVar, true);
+				request.setAttribute(includeReportingVar, false);
 			} else {
 				request.setAttribute(includeReportingVar, false);
 			}

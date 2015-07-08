@@ -77,7 +77,8 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 			request.setAttribute(BaseController.STUDY, currentStudy);
 			request.setAttribute(BaseController.USER_BEAN_NAME, userBean);
 			request.getSession().setAttribute(BaseController.STUDY_INFO_PANEL, new StudyInfoPanel());
-			request.setAttribute(INCLUDE_REPORTING, !SQLInitServlet.getField("pentaho.url").trim().equals(""));
+			//request.setAttribute(INCLUDE_REPORTING, !SQLInitServlet.getField("pentaho.url").trim().equals(""));
+			request.setAttribute(INCLUDE_REPORTING, false);
 			if (!ok) {
 				response.sendRedirect(request.getContextPath() + "/MainMenu");
 			} else {
