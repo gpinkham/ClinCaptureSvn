@@ -286,7 +286,7 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
- <input type="button" name="BTN_Smart_Exit" id="GoToPreviousPage" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
+ <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: return checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 </td>
 <td>
  <input type="submit" name="BTN_CaptureData" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit" title="<fmt:message key="update_study_event" bundle="${resword}"/>"/>
@@ -294,12 +294,6 @@
 <td>
  <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">
 </td>
-
-<%-- <td>
- <input type="submit" name="Submit" value="<fmt:message key="submit_changes" bundle="${resword}"/>" class="button_long">
-</td>
-<td><input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="javascript:myCancel();"/>
-</td> --%>
 
 </tr>
 </table>
