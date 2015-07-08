@@ -49,6 +49,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockRequestDispatcher;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.impl.EventCRFServiceImpl;
@@ -59,7 +61,8 @@ import com.clinovo.util.SubjectEventStatusUtil;
 
 @SuppressWarnings({"unchecked"})
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({SubjectEventStatusUtil.class, ResourceBundleProvider.class, EventDefinitionCrfServiceImpl.class})
+@PrepareForTest({SubjectEventStatusUtil.class, ResourceBundleProvider.class, EventDefinitionCrfServiceImpl.class,
+		RequestContextHolder.class})
 public class UpdateEventDefinitionServletTest {
 
 	@Spy
@@ -85,6 +88,9 @@ public class UpdateEventDefinitionServletTest {
 
 	@Mock
 	private MockRequestDispatcher mockedRequestDispatcher;
+
+	@Mock
+	private ServletRequestAttributes servletRequestAttributes;
 
 	private EventDefinitionCrfService eventDefinitionCrfService;
 
@@ -138,6 +144,10 @@ public class UpdateEventDefinitionServletTest {
 		PowerMockito.when(ResourceBundleProvider.getFormatBundle(Mockito.any(Locale.class))).thenReturn(resFormat);
 
 		PowerMockito.mockStatic(SubjectEventStatusUtil.class);
+
+		PowerMockito.mockStatic(RequestContextHolder.class);
+		Whitebox.setInternalState(servletRequestAttributes, "request", request);
+		PowerMockito.when(RequestContextHolder.currentRequestAttributes()).thenReturn(servletRequestAttributes);
 
 		// setting up DAO mocks
 		Mockito.when(mockedStudyEventDefinitionDAO.findReferenceVisitBeans()).thenReturn(

@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -69,6 +70,7 @@ public class DefineStudyEventServlet extends Controller {
 	public static final int FIVE = 5;
 	public static final int INT_2000 = 2000;
 	public static final int INT_3 = 3;
+	public static final String DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL = "defineUpdateStudyEventPage2Url";
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -219,73 +221,131 @@ public class DefineStudyEventServlet extends Controller {
 			setOrGetDefinition(request);
 			forwardPage(Page.DEFINE_STUDY_EVENT1, request, response);
 		}
-
 	}
 
-	private void prepareServletForStepTwo(FormProcessor fp, HttpServletResponse response, boolean checkForm) {
-
-		Map tmpCRFIdMap = (HashMap) fp.getRequest().getSession().getAttribute("tmpCRFIdMap");
-		if (tmpCRFIdMap == null) {
-			tmpCRFIdMap = new HashMap();
+	private boolean shouldRedirect(FormProcessor fp, HttpServletResponse response) throws IOException {
+		boolean result = false;
+		int pageNum = fp.getInt("pageNum");
+		String action = fp.getString("actionName");
+		String url = (String) fp.getRequest().getSession().getAttribute(DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL);
+		if (url != null && fp.getRequest().getQueryString() == null) {
+			if (action.equals("next") && pageNum == 1) {
+				String type = fp.getString("type");
+				boolean changed = url.contains("formWithStateFlag=changed");
+				String tail = url.replaceAll(".*&ebl_page=", "&ebl_page=");
+				url = "submitted=1"
+						.concat(changed ? "&formWithStateFlag=changed" : "")
+						.concat("&name=")
+						.concat(fp.getString("name"))
+						.concat("&actionName=next")
+						.concat("&description=")
+						.concat(fp.getString("description"))
+						.concat("&type=")
+						.concat(fp.getString("type"))
+						.concat(!type.equalsIgnoreCase("calendared_visit") ? "&repeating=".concat(fp
+								.getString("repeating")) : "").concat("&category=").concat(fp.getString("category"));
+				if (type.equalsIgnoreCase("calendared_visit")) {
+					String isReference = fp.getString("isReference");
+					url = url
+							.concat("&isReference=")
+							.concat(isReference)
+							.concat("&schDay=")
+							.concat(fp.getString("schDay"))
+							.concat("&maxDay=")
+							.concat(fp.getString("maxDay"))
+							.concat("&minDay=")
+							.concat(fp.getString("minDay"))
+							.concat("&emailDay=")
+							.concat(fp.getString("emailDay"))
+							.concat(!isReference.equalsIgnoreCase("true") ? "&emailUser=".concat(fp
+									.getString("emailUser")) : "");
+				}
+				url = url.concat("&pageNum=1").concat(tail);
+			}
+			response.sendRedirect(fp.getRequest().getContextPath().concat("/DefineStudyEvent?").concat(url));
+			result = true;
 		}
-		logger.trace("tmpCRFIdMap " + tmpCRFIdMap.toString());
-		ArrayList crfsWithVersion = (ArrayList) fp.getRequest().getSession().getAttribute("crfsWithVersion");
-		logger.trace("crf version " + crfsWithVersion.size());
-		if (checkForm) {
-			for (int i = 0; i < crfsWithVersion.size(); i++) {
-				logger.trace("in loop " + i);
-				int id = fp.getInt("id" + i);
-				String name = fp.getString("name" + i);
-				String selected = fp.getString("selected" + i);
-				if (!StringUtil.isBlank(selected) && "yes".equalsIgnoreCase(selected.trim())) {
-					logger.trace("found id: " + id + " name " + name + " selected " + selected);
-					tmpCRFIdMap.put(id, name);
-				} else {
-					// Removing the elements from session which has been deselected.
-					if (tmpCRFIdMap.containsKey(id)) {
-						tmpCRFIdMap.remove(id);
+		return result;
+	}
+
+	private void prepareServletForStepTwo(FormProcessor fp, HttpServletResponse response, boolean checkForm)
+			throws IOException {
+		if (!shouldRedirect(fp, response)) {
+			Map tmpCRFIdMap = (HashMap) fp.getRequest().getSession().getAttribute("tmpCRFIdMap");
+			if (tmpCRFIdMap == null) {
+				tmpCRFIdMap = new HashMap();
+			}
+			logger.trace("tmpCRFIdMap " + tmpCRFIdMap.toString());
+			ArrayList crfsWithVersion = (ArrayList) fp.getRequest().getSession().getAttribute("crfsWithVersion");
+			logger.trace("crf version " + crfsWithVersion.size());
+			if (checkForm) {
+				for (int i = 0; i < crfsWithVersion.size(); i++) {
+					logger.trace("in loop " + i);
+					int id = fp.getInt("id" + i);
+					String name = fp.getString("name" + i);
+					String selected = fp.getString("selected" + i);
+					if (!StringUtil.isBlank(selected) && "yes".equalsIgnoreCase(selected.trim())) {
+						logger.trace("found id: " + id + " name " + name + " selected " + selected);
+						tmpCRFIdMap.put(id, name);
+					} else {
+						// Removing the elements from session which has been deselected.
+						if (tmpCRFIdMap.containsKey(id)) {
+							tmpCRFIdMap.remove(id);
+						}
 					}
 				}
 			}
-		}
-		logger.trace("about to set tmpCRFIdMap " + tmpCRFIdMap.toString());
-		fp.getRequest().getSession().setAttribute("tmpCRFIdMap", tmpCRFIdMap);
+			logger.trace("about to set tmpCRFIdMap " + tmpCRFIdMap.toString());
+			fp.getRequest().getSession().setAttribute("tmpCRFIdMap", tmpCRFIdMap);
 
-		EntityBeanTable table = getEntityBeanTable();
-		ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
-		String[] columns = {resword.getString("CRF_name"), resword.getString("date_created"),
-				resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),
-				resword.getString("selected")};
-		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(FIVE);
-		StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) fp.getRequest().getSession()
-				.getAttribute("definition");
-		UserAccountDAO uadao = getUserAccountDAO();
-		UserAccountBean userBean = (UserAccountBean) uadao.findByPK(def1.getUserEmailId());
-		HashMap args = new HashMap();
-		args.put("actionName", "next");
-		args.put("pageNum", "1");
-		args.put("name", def1.getName());
-		args.put("repeating", Boolean.toString(def1.isRepeating()));
-		args.put("category", def1.getCategory());
-		args.put("description", def1.getDescription());
-		args.put("type", def1.getType());
-		args.put("schDay", Integer.toString(def1.getScheduleDay()));
-		args.put("maxDay", Integer.toString(def1.getMaxDay()));
-		args.put("minDay", Integer.toString(def1.getMinDay()));
-		args.put("emailDay", Integer.toString(def1.getEmailDay()));
-		args.put("emailUser", userBean.getName());
-		if ("true".equals(Boolean.toString(def1.getReferenceVisit()))) {
-			args.put("isReference", "true");
-		} else {
-			args.put("isReference", "");
-		}
-		table.setQuery("DefineStudyEvent", args);
-		table.setRows(allRows);
-		table.computeDisplay();
+			EntityBeanTable table = getEntityBeanTable();
+			ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
+			String[] columns = {resword.getString("CRF_name"), resword.getString("date_created"),
+					resword.getString("owner"), resword.getString("date_updated"),
+					resword.getString("last_updated_by"), resword.getString("selected")};
+			table.setColumns(new ArrayList(Arrays.asList(columns)));
+			table.hideColumnLink(FIVE);
+			StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) fp.getRequest().getSession()
+					.getAttribute("definition");
+			UserAccountDAO uadao = getUserAccountDAO();
+			UserAccountBean userBean = (UserAccountBean) uadao.findByPK(def1.getUserEmailId());
+			HashMap args = new HashMap();
+			args.put("actionName", "next");
+			args.put("pageNum", "1");
+			args.put("name", def1.getName());
+			args.put("repeating", Boolean.toString(def1.isRepeating()));
+			args.put("category", def1.getCategory());
+			args.put("description", def1.getDescription());
+			args.put("type", def1.getType());
+			if (def1.getType().equalsIgnoreCase("calendared_visit")) {
+				args.put("schDay", Integer.toString(def1.getScheduleDay()));
+				args.put("maxDay", Integer.toString(def1.getMaxDay()));
+				args.put("minDay", Integer.toString(def1.getMinDay()));
+				args.put("emailDay", Integer.toString(def1.getEmailDay()));
+				if ("true".equals(Boolean.toString(def1.getReferenceVisit()))) {
+					args.put("isReference", "true");
+				} else {
+					args.put("isReference", "");
+					args.put("emailUser", userBean.getName());
+				}
+			}
+			args.put("formWithStateFlag", fp.getRequest().getParameter("formWithStateFlag"));
+			table.setQuery("DefineStudyEvent", args);
+			table.setRows(allRows);
+			table.computeDisplay();
 
-		fp.getRequest().setAttribute("table", table);
-		forwardPage(Page.DEFINE_STUDY_EVENT2, fp.getRequest(), response);
+			fp.getRequest().setAttribute("table", table);
+			String queryString = fp.getRequest().getQueryString();
+			if (queryString != null) {
+				String filterKeyword = fp.getRequest().getParameter("ebl_filterKeyword");
+				fp.getRequest()
+						.getSession()
+						.setAttribute(DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL, queryString.concat(filterKeyword != null ?
+										"&ebl_filterKeyword=".concat(filterKeyword) :
+										""));
+			}
+			forwardPage(Page.DEFINE_STUDY_EVENT2, fp.getRequest(), response);
+		}
 	}
 
 	/**
@@ -569,6 +629,7 @@ public class DefineStudyEventServlet extends Controller {
 			createChildEdcs(edc, currentStudy);
 		}
 
+		request.removeAttribute("formWithStateFlag");
 		request.getSession().removeAttribute("definition");
 		request.getSession().removeAttribute("edCRFs");
 		request.getSession().removeAttribute("crfsWithVersion");
@@ -580,6 +641,8 @@ public class DefineStudyEventServlet extends Controller {
 		request.getSession().removeAttribute("emailUser");
 		request.getSession().removeAttribute("emailDay");
 		request.getSession().removeAttribute("isReference");
+		request.getSession().removeAttribute("crfNameToEdcMap");
+		request.getSession().removeAttribute(DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL);
 		checkReferenceVisit(request);
 		addPageMessage(respage.getString("the_new_event_definition_created_succesfully"), request);
 

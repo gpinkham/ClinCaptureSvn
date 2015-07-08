@@ -147,6 +147,15 @@ public class AddCRFToDefinitionServlet extends Controller {
 		request.getSession().setAttribute("tmpCRFIdMap", tmpCRFIdMap);
 
 		request.setAttribute("table", createTable(request, crfsWithVersion));
+		String queryString = fp.getRequest().getQueryString();
+		if (queryString != null) {
+			String filterKeyword = fp.getRequest().getParameter("ebl_filterKeyword");
+			fp.getRequest()
+					.getSession()
+					.setAttribute(
+							DefineStudyEventServlet.DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL,
+							queryString.concat(filterKeyword != null ? "&ebl_filterKeyword=".concat(filterKeyword) : ""));
+		}
 		forwardPage(Page.UPDATE_EVENT_DEFINITION2, request, response);
 	}
 
@@ -252,6 +261,7 @@ public class AddCRFToDefinitionServlet extends Controller {
 		table.hideColumnLink(FIVE);
 		HashMap args = new HashMap();
 		args.put("actionName", "next");
+		args.put("formWithStateFlag", request.getParameter("formWithStateFlag"));
 		table.setQuery("AddCRFToDefinition", args);
 		table.setRows(allRows);
 		table.computeDisplay();

@@ -55,6 +55,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.RequestUtil;
 import com.clinovo.util.SignStateRestorer;
 import com.clinovo.util.SubjectEventStatusUtil;
 import com.clinovo.validator.EventDefinitionValidator;
@@ -106,7 +107,13 @@ public class UpdateEventDefinitionServlet extends Controller {
 						"definition");
 				saveEventDefinitionToSession(sed, fp);
 				saveEventDefinitionCRFsToSession(fp);
-				forwardPage(Page.ADD_CRFTO_DEFINITION_SERVLET, request, response);
+				String url = (String) fp.getRequest().getSession()
+						.getAttribute(DefineStudyEventServlet.DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL);
+				if (url != null && fp.getRequest().getQueryString() == null) {
+					response.sendRedirect(fp.getRequest().getContextPath().concat("/AddCRFToDefinition?").concat(url));
+				} else {
+					forwardPage(Page.ADD_CRFTO_DEFINITION_SERVLET, request, response);
+				}
 			} else {
 				addPageMessage(respage.getString("updating_ED_is_cancelled"), request);
 				clearSession(request.getSession());
@@ -135,7 +142,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 			sedForErrors.setScheduleDay(fp.getInt("schDay"));
 			sedForErrors.setEmailDay(fp.getInt("emailDay"));
 			sedForErrors.setReferenceVisit("true".equalsIgnoreCase(fp.getString("isReference")));
-			request.setAttribute("userNameInsteadEmail", fp.getString("emailUser"));
+			request.getSession().setAttribute("userNameInsteadEmail", fp.getString("emailUser"));
 			request.setAttribute("definition", sedForErrors);
 			logger.info("has errors");
 			request.setAttribute("formMessages", errors);
@@ -368,6 +375,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 		sed.setMaxDay(fp.getInt("maxDay"));
 		sed.setMinDay(fp.getInt("minDay"));
 		sed.setScheduleDay(fp.getInt("schDay"));
+		fp.getRequest().getSession().setAttribute("userNameInsteadEmail", fp.getString("emailUser"));
 		int userId = getIdByUserName(fp.getString("emailUser"));
 		sed.setUserEmailId(userId != 0 ? userId : 1);
 		sed.setEmailDay(fp.getInt("emailDay"));
@@ -394,6 +402,9 @@ public class UpdateEventDefinitionServlet extends Controller {
 		session.removeAttribute("userNameInsteadEmail");
 		session.removeAttribute("sdvOptions");
 		session.removeAttribute("crfNameToEdcMap");
+		session.removeAttribute(DefineStudyEventServlet.DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL);
+		session.removeAttribute("userNameInsteadEmail");
+		RequestUtil.getRequest().removeAttribute("formWithStateFlag");
 	}
 
 }
