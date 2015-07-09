@@ -263,6 +263,6 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 				holder3.container, holder3.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder3.permittedEventCRFIds);
 		int countFilterAutoAdd = filterAutoAddedCount(wrappers, 0);
-		assertEquals(countFilterAutoAdd, 34);
+		assertEquals(countFilterAutoAdd, 29);
 	}
 }

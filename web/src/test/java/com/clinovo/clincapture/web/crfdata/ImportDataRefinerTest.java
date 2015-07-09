@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.junit.Before;
@@ -30,15 +32,34 @@ import org.junit.Test;
  *
  */
 public class ImportDataRefinerTest {
-	
+
 	private List<ImportItemGroupDataBean> itemGroupDataBeans;
 	private List<ItemBean> crfVersionItems;
 	private ImportItemGroupDataBean importItemGroupDataBean;
 	private ImportDataRefiner refiner;
-	
+	private List<ItemGroupBean> itemGroupBeanList;
+	private List<ItemGroupMetadataBean> itemGroupMetadataBeanList;
+	private int itemId;
+
+	private int itemGroupId;
+	private String itemGroupOid;
+
 	@Before
 	public void setUp() {
 		refiner = new ImportDataRefiner();
+
+		itemId = 1;
+		itemGroupId = 1;
+		itemGroupOid = "TEST GROUP";
+		ItemGroupBean itemGroupBean = new ItemGroupBean();
+		itemGroupBean.setId(itemGroupId);
+		itemGroupBean.setOid(itemGroupOid);
+
+		itemGroupBeanList = new ArrayList<ItemGroupBean>();
+		itemGroupBeanList.add(itemGroupBean);
+
+		itemGroupMetadataBeanList = new ArrayList<ItemGroupMetadataBean>();
+
 		initImportItemGroupDataList();
 		initCrfVersionItemsList();
 	}
@@ -68,20 +89,22 @@ public class ImportDataRefinerTest {
 	 */
 	private void initImportItemGroupDataList() {
 		itemGroupDataBeans = new ArrayList<ImportItemGroupDataBean>();
-		//Group 1
+		// Group 1
 		importItemGroupDataBean = new ImportItemGroupDataBean();
+		importItemGroupDataBean.setItemGroupOID(itemGroupOid);
 		importItemGroupDataBean.setItemData(new ArrayList<ImportItemDataBean>());
-		
+
 		initImportItemDataBean("I_21_IT_STOPDATE_DATE", "2012-12-09");
 		initImportItemDataBean("I_21_IT_MEDICATIONGENERICNAME_TX", "Omega 3");
 		initImportItemDataBean("I_21_IT_CONCOMITANTMEDICATIONNUM", "1");
 		initImportItemDataBean("I_21_IT_STARTDATEUNKNOWN_CBX", "1");
 		itemGroupDataBeans.add(importItemGroupDataBean);
-		
-		//Group 2
+
+		// Group 2
 		importItemGroupDataBean = new ImportItemGroupDataBean();
+		importItemGroupDataBean.setItemGroupOID(itemGroupOid);
 		importItemGroupDataBean.setItemData(new ArrayList<ImportItemDataBean>());
-		
+
 		initImportItemDataBean("I_21_IT_MEDICATIONGENERICNAME_TX", "ANUSOL");
 		initImportItemDataBean("I_21_IT_STARTDATEUNKNOWN_CBX", "1");
 		initImportItemDataBean("I_21_IT_STOPDATEUNKNOWN_CBX", "1");
@@ -92,6 +115,7 @@ public class ImportDataRefinerTest {
 
 	/***
 	 * Initializes ImportDataBean and adds it to list
+	 * 
 	 * @param itemOid
 	 * @param itemValue
 	 */
@@ -101,27 +125,34 @@ public class ImportDataRefinerTest {
 		importItemDataBean.setValue(itemValue);
 		importItemGroupDataBean.getItemData().add(importItemDataBean);
 	}
-	
+
 	/***
 	 * Initalizes ItemBean and adds it to list
+	 * 
 	 * @param itemOid
 	 */
 	private void initCrfVersionItems(String itemOid) {
 		ItemBean item = new ItemBean();
 		item.setOid(itemOid);
+		item.setId(itemId++);
 		crfVersionItems.add(item);
+		ItemGroupMetadataBean itemGroupMetadataBean = new ItemGroupMetadataBean();
+		itemGroupMetadataBean.setItemId(item.getId());
+		itemGroupMetadataBean.setItemGroupId(itemGroupId);
+		itemGroupMetadataBeanList.add(itemGroupMetadataBean);
 	}
-	
+
 	@Test
 	public void testThatCrfVersionItemExistsInGroupItemsIsValid() {
 		ItemBean item = new ItemBean();
 		item.setOid("I_21_IT_STOPDATE_DATE");
 		assertTrue(refiner.crfVersionItemExistsInGroupItems(item, itemGroupDataBeans.get(0).getItemData()));
 	}
-	
+
 	@Test
 	public void testThatAllCrfVersionItemsExistInAllGroupsAfterRefine() {
-		refiner.refineImportItemGroupData(itemGroupDataBeans, crfVersionItems);
+		refiner.refineImportItemGroupData(itemGroupDataBeans, crfVersionItems, itemGroupBeanList,
+				itemGroupMetadataBeanList);
 		boolean itemExists = true;
 		for (ImportItemGroupDataBean group : itemGroupDataBeans) {
 			for (ItemBean item : crfVersionItems) {
@@ -134,12 +165,15 @@ public class ImportDataRefinerTest {
 				break;
 			}
 		}
+		assertTrue(itemGroupDataBeans.get(0).getItemData().size() == 13);
+		assertTrue(itemGroupDataBeans.get(1).getItemData().size() == 13);
 		assertTrue(itemExists);
 	}
-	
+
 	@Test
 	public void testThatAllAutoAddedItemsHaveEmptyValue() {
-		refiner.refineImportItemGroupData(itemGroupDataBeans, crfVersionItems);
+		refiner.refineImportItemGroupData(itemGroupDataBeans, crfVersionItems, itemGroupBeanList,
+				itemGroupMetadataBeanList);
 		boolean valueIsEmpty = true;
 		for (ImportItemGroupDataBean group : itemGroupDataBeans) {
 			for (ImportItemDataBean item : group.getItemData()) {
@@ -148,12 +182,14 @@ public class ImportDataRefinerTest {
 					if (!valueIsEmpty) {
 						break;
 					}
-				}				
+				}
 			}
 			if (!valueIsEmpty) {
 				break;
 			}
 		}
+		assertTrue(itemGroupDataBeans.get(0).getItemData().size() == 13);
+		assertTrue(itemGroupDataBeans.get(1).getItemData().size() == 13);
 		assertTrue(valueIsEmpty);
 	}
 }

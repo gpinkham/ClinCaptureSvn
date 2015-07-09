@@ -14,9 +14,15 @@
  * =================================================================================================================================================================================================================================================================================================================================================================================================================================================================== */
 package com.clinovo.clincapture.web.crfdata;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 
@@ -27,31 +33,113 @@ import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 public class ImportDataRefiner {
 
 	/***
-	 * Refines ImportItemGroupData objects to make sure items defined in xml during data import
-	 * are consistent across all groups. This method implicitly adds items that belong to the
-	 * crf version but are not defined in the xml for each group
+	 * Refines ImportItemGroupData objects to make sure items defined in xml during data import are consistent across
+	 * all groups. This method implicitly adds items that belong to the crf version but are not defined in the xml for
+	 * each group.
+	 * 
 	 * @param itemGroupDataBeans
-	 * @param crfVersionItems 
+	 *            List<ImportItemGroupDataBean>
+	 * @param crfVersionItems
+	 *            List<ItemBean>
+	 * @param itemGroupBeans
+	 *            List<ItemGroupBean>
+	 * @param itemGroupMetadataBeans
+	 *            List<ItemGroupMetadataBean>
 	 */
-	public void refineImportItemGroupData(List<ImportItemGroupDataBean> itemGroupDataBeans, List<ItemBean> crfVersionItems) {
-		//Iterate though groups
+	public void refineImportItemGroupData(List<ImportItemGroupDataBean> itemGroupDataBeans,
+			List<ItemBean> crfVersionItems, List<ItemGroupBean> itemGroupBeans,
+			List<ItemGroupMetadataBean> itemGroupMetadataBeans) {
+		Map<String, Integer> groupOidToMaxOrdinalMap = new HashMap<String, Integer>();
+		Map<Integer, String> itemIdToItemGroupOidMap = buildItemIdToItemGroupOidMap(crfVersionItems, itemGroupBeans,
+				itemGroupMetadataBeans, groupOidToMaxOrdinalMap);
+
+		// repair missed / empty repeating groups
+		repairMissedRepeatingGroups(itemGroupDataBeans, groupOidToMaxOrdinalMap);
+
+		// Iterate though groups
 		for (ImportItemGroupDataBean group : itemGroupDataBeans) {
-			//Iterate through crfVersionItems
+			String currentItemGroupOid = group.getItemGroupOID();
+			// Iterate through crfVersionItems
 			for (ItemBean item : crfVersionItems) {
-				//If item doesn't exist in group item list from xml, add it to list
-				if (!crfVersionItemExistsInGroupItems(item, group.getItemData())) {
-					addItemsToGroup(item, group.getItemData());
+				// If item doesn't exist in group item list from xml, add it to list
+				String itemGroupOid = itemIdToItemGroupOidMap.get(item.getId());
+				if (currentItemGroupOid.equals(itemGroupOid)) {
+					if (!crfVersionItemExistsInGroupItems(item, group.getItemData())) {
+						addItemsToGroup(item, group.getItemData());
+					}
 				}
 			}
-		}	
+		}
 	}
 
-	private void addItemsToGroup(ItemBean item, List<ImportItemDataBean> groupItemData) {		 
-			ImportItemDataBean itemToAdd = new ImportItemDataBean();
-			itemToAdd.setItemOID(item.getOid());
-			itemToAdd.setValue("");
-			itemToAdd.setAutoAdded(true);
-			groupItemData.add(itemToAdd);
+	private Map<Integer, String> buildItemIdToItemGroupOidMap(List<ItemBean> crfVersionItems,
+			List<ItemGroupBean> itemGroupBeans, List<ItemGroupMetadataBean> itemGroupMetadataBeans,
+			Map<String, Integer> groupOidToMaxOrdinalMap) {
+		Map<Integer, ItemBean> itemIdToItemBeanMap = new HashMap<Integer, ItemBean>();
+		for (ItemBean itemBean : crfVersionItems) {
+			itemIdToItemBeanMap.put(itemBean.getId(), itemBean);
+		}
+		Map<Integer, String> itemGroupIdToOidMap = new HashMap<Integer, String>();
+		for (ItemGroupBean itemGroupBean : itemGroupBeans) {
+			itemGroupIdToOidMap.put(itemGroupBean.getId(), itemGroupBean.getOid());
+		}
+		Map<Integer, String> itemIdToItemGroupOidMap = new HashMap<Integer, String>();
+		for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataBeans) {
+			ItemBean itemBean = itemIdToItemBeanMap.get(itemGroupMetadataBean.getItemId());
+			if (itemBean != null) {
+				String itemGroupOid = itemGroupIdToOidMap.get(itemGroupMetadataBean.getItemGroupId());
+				itemIdToItemGroupOidMap.put(itemBean.getId(), itemGroupOid);
+				if (itemGroupMetadataBean.isRepeatingGroup()) {
+					groupOidToMaxOrdinalMap.put(itemGroupOid, itemGroupMetadataBean.getRepeatNum());
+				}
+			}
+		}
+		return itemIdToItemGroupOidMap;
+	}
+
+	private void repairMissedRepeatingGroups(List<ImportItemGroupDataBean> itemGroupDataBeans,
+			Map<String, Integer> groupOidToMaxOrdinalMap) {
+		List<ImportItemGroupDataBean> itemGroupDataBeanList = new ArrayList<ImportItemGroupDataBean>();
+		Map<String, ImportItemGroupDataBean> groupOidOrdinalKeyMap = new TreeMap<String, ImportItemGroupDataBean>();
+		for (ImportItemGroupDataBean group : itemGroupDataBeans) {
+			if (group.getItemGroupRepeatKey() != null) {
+				int ordinal = Integer.parseInt(group.getItemGroupRepeatKey());
+				groupOidOrdinalKeyMap.put(group.getItemGroupOID().concat("_").concat(group.getItemGroupRepeatKey()),
+						group);
+				Integer maxOrdinal = groupOidToMaxOrdinalMap.get(group.getItemGroupOID());
+				if (maxOrdinal == null || ordinal > maxOrdinal) {
+					groupOidToMaxOrdinalMap.put(group.getItemGroupOID(), ordinal);
+				}
+			} else {
+				itemGroupDataBeanList.add(group);
+			}
+		}
+		for (String itemGroupOid : groupOidToMaxOrdinalMap.keySet()) {
+			int maxOrdinal = groupOidToMaxOrdinalMap.get(itemGroupOid);
+			for (int i = 1; i <= maxOrdinal; i++) {
+				String currentOrdinal = Integer.toString(i);
+				String key = itemGroupOid.concat("_").concat(currentOrdinal);
+				if (groupOidOrdinalKeyMap.get(key) == null) {
+					ImportItemGroupDataBean group = new ImportItemGroupDataBean();
+					group.setItemGroupRepeatKey(currentOrdinal);
+					group.setItemGroupOID(itemGroupOid);
+					groupOidOrdinalKeyMap.put(key, group);
+				}
+			}
+		}
+		for (ImportItemGroupDataBean group : groupOidOrdinalKeyMap.values()) {
+			itemGroupDataBeanList.add(group);
+		}
+		itemGroupDataBeans.clear();
+		itemGroupDataBeans.addAll(itemGroupDataBeanList);
+	}
+
+	private void addItemsToGroup(ItemBean item, List<ImportItemDataBean> groupItemData) {
+		ImportItemDataBean itemToAdd = new ImportItemDataBean();
+		itemToAdd.setItemOID(item.getOid());
+		itemToAdd.setValue("");
+		itemToAdd.setAutoAdded(true);
+		groupItemData.add(itemToAdd);
 	}
 
 	boolean crfVersionItemExistsInGroupItems(ItemBean item, List<ImportItemDataBean> itemData) {
