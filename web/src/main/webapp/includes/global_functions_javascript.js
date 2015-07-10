@@ -4212,7 +4212,8 @@ function openDialog(params) {
 function setButtonAttributes(buttonValue){
 	
 	$('.ui-dialog-buttonpane').find('button:contains("' + buttonValue + '")')
-    .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0').css('padding','8px 0');
+    .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0')
+        .css('padding','8px 0').attr('id', 'dlgBtn' + buttonValue);
     $('.ui-dialog-buttonpane').find('button:contains("' + buttonValue + '")')
         .mouseover(function() {$(this).removeClass("ui-state-hover");})
         .focus(function () {$(this).removeClass("ui-state-focus");});
