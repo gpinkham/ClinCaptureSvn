@@ -744,16 +744,23 @@ include the default value first in the select list --%>
 
     <c:set var="selectedOption" value="-1"/>
     <c:set var="count" value="0"/>
+
+	<!-- Check if default option should be checked on user defined option -->
     <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+      <c:if test="${option.selected}">
+      	<c:set var="selectedOption" value="${count}" />
+      </c:if>
+
       <c:if test="${printDefault=='true'}">
         <c:if test="${displayItem.metadata.defaultValue == option.text || displayItem.metadata.defaultValue == option.value}">
           <c:set var="printDefault" value="false"/>
-          <c:if test="${selectedOption==-1}"><c:set var="selectedOption" value="${count}"/></c:if>
+          <c:if test="${displayItem.data.itemId == 0}"><c:set var="selectedOption" value="${count}"/></c:if>
         </c:if>
       </c:if>
 
       <c:set var="count" value="${count+1}"/>
     </c:forEach>
+
     <c:choose>
 	<c:when test="${fn:length(displayItem.scdData.scdSetsForControl)>0}">
 		<c:set var="scdPairStr" value=""/>
