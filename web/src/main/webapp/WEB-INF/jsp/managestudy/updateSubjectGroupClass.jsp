@@ -176,7 +176,7 @@
 		</td>
 		<td>
 		<c:choose>
-			<c:when test="${oldGroup.default}">
+			<c:when test="${oldGroup['default']}">
 				<c:choose>
 					<c:when test="${fields['isDefault'] == 'true'}">
 						<input type="checkbox" checked id="isDefault" name="isDefault" value="true"/>

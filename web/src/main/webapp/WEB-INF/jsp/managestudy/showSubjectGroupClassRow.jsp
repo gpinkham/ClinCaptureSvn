@@ -18,11 +18,11 @@
       <td class="table_cell"><c:out value="${currRow.bean.groupClassTypeName}"/></td>  
       <td class="table_cell"><c:out value="${currRow.bean.subjectAssignment}"/></td> 
 	  <c:choose>
-			<c:when test="${currRow.bean.default}">
-				<td class="table_cell aka_green_highlight"><c:out value="${currRow.bean.default}"/></td>	
+			<c:when test="${currRow.bean['default']}">
+				<td class="table_cell aka_green_highlight"><c:out value="${currRow.bean['default']}"/></td>	
 			</c:when>
 			<c:when test="${currRow.bean.groupClassTypeId eq DynamicGroupTypeID}">
-				<td class="table_cell"><c:out value="${currRow.bean.default}"/></td>	
+				<td class="table_cell"><c:out value="${currRow.bean['default']}"/></td>	
 			</c:when>
 			<c:otherwise>
 				<td class="table_cell"></td>	

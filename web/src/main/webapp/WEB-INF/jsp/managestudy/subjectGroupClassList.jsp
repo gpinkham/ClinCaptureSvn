@@ -135,7 +135,7 @@
 						</tr>
 						<c:forEach var="dynGroup" items="${availableDynGroups}" varStatus="status">
 						<c:choose>
-							<c:when test="${dynGroup.default}">
+							<c:when test="${dynGroup['default']}">
 								<tr id="content${status.count}">	
 									<c:set var="defaultGroupExists" value="${true}"/>
 									<td class="table_cell_left" id="order${status.count}">
