@@ -205,11 +205,12 @@
     </changeSet>
 
     <changeSet author="skirpichenok" id="2014-01-16-TICKET863-16">
+		<validCheckSum>3fdaad45852124ed9c7bae297883ae</validCheckSum>
         <update tableName="system">
             <column name="order_id" value="3"/>
             <where>name='logo'</where>
         </update>
-        <insert tableName="system"><column name="name" value="instanceType" /><column name="required" valueBoolean="false" /><column name="value" value="production" /><column name="type" value="RADIO"/><column name="type_values" value="development,training,production"/><column name="group_id" value="119"/><column name="order_id" value="2"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="instanceType" /><column name="required" valueBoolean="false" /><column name="value" value="development" /><column name="type" value="RADIO"/><column name="type_values" value="development,training,production"/><column name="group_id" value="119"/><column name="order_id" value="2"/><column name="show_description" valueBoolean="true"/></insert>
     </changeSet>
 
     <changeSet author="skirpichenok" id="2014-01-16-TICKET863-17">

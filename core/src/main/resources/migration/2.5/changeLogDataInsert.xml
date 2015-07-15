@@ -834,10 +834,11 @@
 	</insert>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-318">
+	<validCheckSum>9121e28b14904bdfdac5d11a4ea0683c</validCheckSum>
 	<insert tableName="study_parameter_value">
 	    <column name="study_parameter_value_id" valueNumeric="1"/>
 	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="1"/>
+	    <column name="value" value="3"/>
 	    <column name="parameter" value="collectDob"/>
 	</insert>
     </changeSet>
@@ -850,26 +851,29 @@
 	</insert>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-320">
+	<validCheckSum>54ec5347aa8e95564978c2d4eb9f29</validCheckSum>
 	<insert tableName="study_parameter_value">
 	    <column name="study_parameter_value_id" valueNumeric="3"/>
 	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="true"/>
+	    <column name="value" value="false"/>
 	    <column name="parameter" value="genderRequired"/>
 	</insert>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-321">
+	<validCheckSum>d6948f12486547e68d4748f8d9fd396</validCheckSum>
 	<insert tableName="study_parameter_value">
 	    <column name="study_parameter_value_id" valueNumeric="4"/>
 	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="required"/>
+	    <column name="value" value="not used"/>
 	    <column name="parameter" value="subjectPersonIdRequired"/>
 	</insert>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-322">
+	<validCheckSum>e9272a6c798b9d17fed59121f5cad3</validCheckSum>
 	<insert tableName="study_parameter_value">
 	    <column name="study_parameter_value_id" valueNumeric="5"/>
 	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="true"/>
+	    <column name="value" value="not_used"/>
 	    <column name="parameter" value="interviewerNameRequired"/>
 	</insert>
     </changeSet>
@@ -890,10 +894,11 @@
 	</insert>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-325">
+	<validCheckSum>589ef3c7f0cf3b9ef061a595c8815</validCheckSum>
 	<insert tableName="study_parameter_value">
 	    <column name="study_parameter_value_id" valueNumeric="8"/>
 	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="true"/>
+	    <column name="value" value="not_used"/>
 	    <column name="parameter" value="interviewDateRequired"/>
 	</insert>
     </changeSet>
@@ -914,10 +919,11 @@
 	</insert>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-328">
+	<validCheckSum>8c33c37d8bbe848e7cd0c659e2114675</validCheckSum>
 	<insert tableName="study_parameter_value">
 	    <column name="study_parameter_value_id" valueNumeric="11"/>
 	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="manual"/>
+	    <column name="value" value="auto editable"/>
 	    <column name="parameter" value="subjectIdGeneration"/>
 	</insert>
     </changeSet>
@@ -943,7 +949,7 @@
 	    <column name="name" value="literal"/>
 	    <column name="description"/>
 	</insert>
-    </changeSet>    
+    </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-332">
 	<insert tableName="study_user_role">
 	    <column name="role_name" value="admin"/>

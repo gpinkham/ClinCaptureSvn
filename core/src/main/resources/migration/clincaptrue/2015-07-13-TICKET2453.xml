@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-07-13-TICKET2453-1">
+		<comment>Update default value for 'secondaryIdRequired' parameter.</comment>
+		<update tableName="study_parameter">
+			<column name="default_value" value="not_used"/>
+			<where>handle = 'secondaryIdRequired'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-07-13-TICKET2453-2">
+		<comment>Update default value for 'studySubjectIdLabel' parameter.</comment>
+		<update tableName="study_parameter">
+			<column name="default_value" value="Subject ID"/>
+			<where>handle = 'studySubjectIdLabel'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-07-13-TICKET2453-3">
+		<comment>Update default value for 'dateOfEnrollmentForStudyRequired' parameter.</comment>
+		<update tableName="study_parameter">
+			<column name="default_value" value="not_used"/>
+			<where>handle = 'dateOfEnrollmentForStudyRequired'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-07-13-TICKET2453-4">
+		<comment>Update default value for 'genderRequired' parameter.</comment>
+		<update tableName="study_parameter">
+			<column name="default_value" value="false"/>
+			<where>handle = 'genderRequired'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-07-13-TICKET2453-5">
+		<comment>Update default value for 'collectDob' parameter.</comment>
+		<update tableName="study_parameter">
+			<column name="default_value" value="3"/>
+			<where>handle = 'collectDob'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-07-13-TICKET2453-6">
+		<comment>Update default value for 'subjectPersonIdRequired' parameter.</comment>
+		<update tableName="study_parameter">
+			<column name="default_value" value="not used"/>
+			<where>handle = 'subjectPersonIdRequired'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-07-13-TICKET2453-7">
+		<comment>Update default value for 'startDateTimeRequired' parameter.</comment>
+		<update tableName="study_parameter">
+			<column name="default_value" value="not_used"/>
+			<where>handle = 'startDateTimeRequired'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-07-13-TICKET2453-8">
+		<comment>Update default value for 'endDateTimeRequired' parameter.</comment>
+		<update tableName="study_parameter">
+			<column name="default_value" value="not_used"/>
+			<where>handle = 'endDateTimeRequired'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-07-13-TICKET2453-9">
+		<comment>Update default value for 'interviewerNameRequired' parameter.</comment>
+		<update tableName="study_parameter">
+			<column name="default_value" value="not_used"/>
+			<where>handle = 'interviewerNameRequired'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-07-13-TICKET2453-10">
+		<comment>Update default value for 'interviewDateRequired' parameter.</comment>
+		<update tableName="study_parameter">
+			<column name="default_value" value="not_used"/>
+			<where>handle = 'interviewDateRequired'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-07-13-TICKET2453-11">
+		<comment>Update default value for 'showYearsInCalendar' parameter.</comment>
+		<update tableName="study_parameter">
+			<column name="default_value" value="yes"/>
+			<where>handle = 'showYearsInCalendar'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-07-13-TICKET2453-12">
+		<comment>Update default value for 'allowRulesAutoScheduling' parameter.</comment>
+		<update tableName="study_parameter">
+			<column name="default_value" value="yes"/>
+			<where>handle = 'allowRulesAutoScheduling'</where>
+		</update>
+	</changeSet>
+</databaseChangeLog>
