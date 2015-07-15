@@ -60,6 +60,9 @@ public class CommonSteps extends ScenarioSteps {
 	protected ViewSubjectRecordPage viewSubjectRecordPage = getPages().get(ViewSubjectRecordPage.class);
 	protected DNPage dnPage = getPages().get(DNPage.class);
 	protected NotesAndDiscrepanciesPage notesAndDiscrepanciesPage = getPages().get(NotesAndDiscrepanciesPage.class);
+	protected ManageRulesPage manageRulesPage = getPages().get(ManageRulesPage.class);
+	protected ImportRuleDataPage importRuleDataPage = getPages().get(ImportRuleDataPage.class);
+	
 	
     private LoginPage loginPage = getPages().get(LoginPage.class);
     private HomePage homePage = getPages().get(HomePage.class);
@@ -133,76 +136,81 @@ public class CommonSteps extends ScenarioSteps {
 		should_see_task_menu();
 	}
     
-    public BasePage getPageByPageName(String page) {
-    	switch (page){
-			case LoginPage.PAGE_NAME: 
-				return loginPage;
-			case HomePage.PAGE_NAME: 
-				return homePage;
-			case SubjectMatrixPage.PAGE_NAME: 
-				return subjectMatrixPage;
-			case ViewEventPage.PAGE_NAME: 
-				return viewEventPage;
-			case ResetPasswordPage.PAGE_NAME: 
-				return resetPasswordPage;
-			case AdministerUsersPage.PAGE_NAME: 
-				return administerUsersPage;
-			case ViewUserAccountPage.PAGE_NAME: 
-				return viewUserAccountPage;
-			case BuildStudyPage.PAGE_NAME: 
-				return buildStudyPage;
-			case CreateNewSitePage.PAGE_NAME: 
-				return createNewSitePage;
-			case ConfirmCreateSitePage.PAGE_NAME: 
-				return confirmCreateSitePage;
-			case ManageSitesPage.PAGE_NAME: 
-				return manageSitesPage;
-			case CreateUserAccountPage.PAGE_NAME: 
-				return createUserAccountPage;
-			case ConfigureSystemPropertiesPage.PAGE_NAME: 
-				return configureSystemPropertiesPage;
-			case ConfirmSystemPropertiesPage.PAGE_NAME: 
-				return configureSystemPropertiesPage;
-			case UpdateStudyDetailsPage.PAGE_NAME: 
-				return updateStudyDetailsPage;
-			case CreateCRFVersionPage.PAGE_NAME: 
-				return createCRFVersionPage;
-			case PreviewCRFPage.PAGE_NAME: 
-				return previewCRFPage;	
-			case CreateCRFDataCommitedPage.PAGE_NAME: 
-				return createCRFDataCommitedPage;		
-			case CreateStudyEventDefinitionPage.PAGE_NAME: 
-				return createStudyEventDefinitionPage;	
-			case DefineStudyEventSelectCRFsPage.PAGE_NAME: 
-				return defineStudyEventSelectCRFsPage;	
-			case DefineStudyEventSelectedCRFsPage.PAGE_NAME: 
-				return defineStudyEventSelectedCRFsPage;	
-			case ConfirmEventDefinitionCreationPage.PAGE_NAME: 
-				return confirmEventDefinitionCreationPage;		
-			case ChangeStudyPage.PAGE_NAME: 
-				return changeStudyPage;	
-			case ConfirmChangeStudyPage.PAGE_NAME: 
-				return confirmChangeStudyPage;
-			case AddSubjectPage.PAGE_NAME: 
-				return addSubjectPage;	
-			case ManageEventDefinitionsPage.PAGE_NAME: 
-				return manageEventDefinitionsPage;
-			case CRFPage.PAGE_NAME:
-				return crfPage;
-			case SDVPage.PAGE_NAME:
-				return sdvPage;
-			case SignStudyEventPage.PAGE_NAME:
-				return signStudyEventPage;
-			case ViewSubjectRecordPage.PAGE_NAME:
-				return viewSubjectRecordPage;
-			case DNPage.PAGE_NAME:
-				return dnPage;	
-			case NotesAndDiscrepanciesPage.PAGE_NAME:
-				return notesAndDiscrepanciesPage;
-			
-			default: ;
-    	}
-    	
+	public BasePage getPageByPageName(String page) {
+		switch (page) {
+		case LoginPage.PAGE_NAME:
+			return loginPage;
+		case HomePage.PAGE_NAME:
+			return homePage;
+		case SubjectMatrixPage.PAGE_NAME:
+			return subjectMatrixPage;
+		case ViewEventPage.PAGE_NAME:
+			return viewEventPage;
+		case ResetPasswordPage.PAGE_NAME:
+			return resetPasswordPage;
+		case AdministerUsersPage.PAGE_NAME:
+			return administerUsersPage;
+		case ViewUserAccountPage.PAGE_NAME:
+			return viewUserAccountPage;
+		case BuildStudyPage.PAGE_NAME:
+			return buildStudyPage;
+		case CreateNewSitePage.PAGE_NAME:
+			return createNewSitePage;
+		case ConfirmCreateSitePage.PAGE_NAME:
+			return confirmCreateSitePage;
+		case ManageSitesPage.PAGE_NAME:
+			return manageSitesPage;
+		case CreateUserAccountPage.PAGE_NAME:
+			return createUserAccountPage;
+		case ConfigureSystemPropertiesPage.PAGE_NAME:
+			return configureSystemPropertiesPage;
+		case ConfirmSystemPropertiesPage.PAGE_NAME:
+			return configureSystemPropertiesPage;
+		case UpdateStudyDetailsPage.PAGE_NAME:
+			return updateStudyDetailsPage;
+		case CreateCRFVersionPage.PAGE_NAME:
+			return createCRFVersionPage;
+		case PreviewCRFPage.PAGE_NAME:
+			return previewCRFPage;
+		case CreateCRFDataCommitedPage.PAGE_NAME:
+			return createCRFDataCommitedPage;
+		case CreateStudyEventDefinitionPage.PAGE_NAME:
+			return createStudyEventDefinitionPage;
+		case DefineStudyEventSelectCRFsPage.PAGE_NAME:
+			return defineStudyEventSelectCRFsPage;
+		case DefineStudyEventSelectedCRFsPage.PAGE_NAME:
+			return defineStudyEventSelectedCRFsPage;
+		case ConfirmEventDefinitionCreationPage.PAGE_NAME:
+			return confirmEventDefinitionCreationPage;
+		case ChangeStudyPage.PAGE_NAME:
+			return changeStudyPage;
+		case ConfirmChangeStudyPage.PAGE_NAME:
+			return confirmChangeStudyPage;
+		case AddSubjectPage.PAGE_NAME:
+			return addSubjectPage;
+		case ManageEventDefinitionsPage.PAGE_NAME:
+			return manageEventDefinitionsPage;
+		case CRFPage.PAGE_NAME:
+			return crfPage;
+		case SDVPage.PAGE_NAME:
+			return sdvPage;
+		case SignStudyEventPage.PAGE_NAME:
+			return signStudyEventPage;
+		case ViewSubjectRecordPage.PAGE_NAME:
+			return viewSubjectRecordPage;
+		case DNPage.PAGE_NAME:
+			return dnPage;
+		case NotesAndDiscrepanciesPage.PAGE_NAME:
+			return notesAndDiscrepanciesPage;
+		case ManageRulesPage.PAGE_NAME:
+			return manageRulesPage;
+		case ImportRuleDataPage.PAGE_NAME:
+			return importRuleDataPage;
+
+		default:
+			;
+		}
+
 		return basePage;
 	}
     
@@ -265,40 +273,48 @@ public class CommonSteps extends ScenarioSteps {
 	
 	@Step
 	public void go_to_page(String page) {
-		
-		switch (page){
-			case AdministerUsersPage.PAGE_NAME: 
-				go_to_administer_users_page();
-				break;
-			case BuildStudyPage.PAGE_NAME: 
-				go_to_build_study_page();
-				break;
-			case ConfigureSystemPropertiesPage.PAGE_NAME: 
-				go_to_configure_system_properties_page();
-				break;
-			case UpdateStudyDetailsPage.PAGE_NAME: 
-				go_to_update_study_details_page();
-				break;
-			case ChangeStudyPage.PAGE_NAME: 
-				go_to_change_study_page();
-				break;
-			case AddSubjectPage.PAGE_NAME: 
-				go_to_add_subject_page();
-				break;
-			case SubjectMatrixPage.PAGE_NAME: 
-				go_to_subject_matrix_page();
-				break;	
-			case SDVPage.PAGE_NAME: 
-				go_to_source_data_verification_page();
-				break;		
-			case NotesAndDiscrepanciesPage.PAGE_NAME: 
-				go_to_notes_and_discrepancies_page();
-				break;
-			
-			default: ;
-		}		
+
+		switch (page) {
+		case AdministerUsersPage.PAGE_NAME:
+			go_to_administer_users_page();
+			break;
+		case BuildStudyPage.PAGE_NAME:
+			go_to_build_study_page();
+			break;
+		case ConfigureSystemPropertiesPage.PAGE_NAME:
+			go_to_configure_system_properties_page();
+			break;
+		case UpdateStudyDetailsPage.PAGE_NAME:
+			go_to_update_study_details_page();
+			break;
+		case ChangeStudyPage.PAGE_NAME:
+			go_to_change_study_page();
+			break;
+		case AddSubjectPage.PAGE_NAME:
+			go_to_add_subject_page();
+			break;
+		case SubjectMatrixPage.PAGE_NAME:
+			go_to_subject_matrix_page();
+			break;
+		case SDVPage.PAGE_NAME:
+			go_to_source_data_verification_page();
+			break;
+		case NotesAndDiscrepanciesPage.PAGE_NAME:
+			go_to_notes_and_discrepancies_page();
+			break;
+		case ManageRulesPage.PAGE_NAME:
+			go_to_manage_rules_page();
+			break;
+
+		default:
+			;
+		}
 	}
 
+	private void go_to_manage_rules_page() {
+		basePage.goToManageRulesPage();
+	}
+	
 	private void go_to_notes_and_discrepancies_page() {
 		basePage.goToNDsPage();
 	}
@@ -548,5 +564,69 @@ public class CommonSteps extends ScenarioSteps {
 		String oldWindowId = switch_to_another_window("");
 		dnPage.findAndFillInAndClickSubmit(dn);
 		switch_to_another_window(oldWindowId);
+	}
+
+	@Step
+	public void click_element_on_page(String page, String element) {
+		switch (page) {
+		case ImportRuleDataPage.PAGE_NAME:
+			switch (element) {
+			case "'Yes' button in popup":
+				importRuleDataPage.clickYesButtonInPopup();
+				break;
+			}
+			break;
+		case ManageRulesPage.PAGE_NAME:
+			switch (element) {
+			case "'Import Rules' button":
+				manageRulesPage.clickImportRulesButton();
+				break;
+			}
+			break;
+		case SignStudyEventPage.PAGE_NAME:
+			switch (element) {
+			case "'Sign' button":
+				click_sign_button_on_sign_study_event_page();
+				break;
+			}
+			break;
+		case BuildStudyPage.PAGE_NAME:
+			switch (element) {
+			case "'Add Site' button":
+				click_add_site_button();
+				break;
+			case "'Update Study' button":
+				click_update_study();
+				break;
+			case "'Add CRF' button":
+				click_add_crf_button();
+				break;
+			case "'Add Event Definitions' button":
+				click_add_event_definition_button();
+				break;
+			}
+			break;
+		case "popup":
+			switch (element) {
+			case "'Schedule Event' button":
+				click_schedule_event_button_in_popup();
+				break;
+			case "'Sign Event' button":
+				click_sign_event_button_in_popup();
+				break;
+			}
+			break;
+
+		default:
+			;
+		}
+	}
+
+	public void browse_file_with_rule(String filepath) {
+		importRuleDataPage.browseRuleFile(filepath);
+	}
+
+	public void see_message(String message) {
+		basePage.message_is_shown(message);
 	}
 }

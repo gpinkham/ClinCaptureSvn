@@ -147,13 +147,13 @@ public class ClinovoJBehave extends BaseJBehave {
         commonSteps.click_confirm_button();
     }
     
-    @Given("User clicks 'Continue' button on $page")
+    @Given(value="User clicks 'Continue' button on $page", priority=1)
     @When("User clicks 'Continue' button on $page")
     public void userClicksContinueButton(String page) {
         commonSteps.click_continue_button(page);
     }
     
-    @Given("User clicks 'Submit' button on $page")
+    @Given(value="User clicks 'Submit' button on $page", priority=1)
     @When("User clicks 'Submit' button on $page")
     public void userClicksSubmitButton(String page) {
         commonSteps.click_submit_button(page);
@@ -162,11 +162,6 @@ public class ClinovoJBehave extends BaseJBehave {
     @Given("User remembers password of created user")
     public void userRemembersPasswordOfCreatedUser() {
         commonSteps.remember_pass_of_created_user();
-    }
-    
-    @Given("User clicks 'Add Site' button")
-    public void userClicksAddSiteButton() {
-        commonSteps.click_add_site_button();
     }
     
     @Given("User fills in data to create site: $activityTable")
@@ -195,6 +190,12 @@ public class ClinovoJBehave extends BaseJBehave {
         commonSteps.go_to_page(pageName);
     }
     
+    @Given("User clicks $element on $page")
+    @When("User clicks $element on $page")
+    public void userClicksElementOnPage(String element, String pageName) {
+        commonSteps.click_element_on_page(pageName, element);
+    }
+    
     @Then("User sets Study status to $status")
     @Given("User sets Study status to $status")
     public void userSetsStudyStatus(String status) {
@@ -209,27 +210,10 @@ public class ClinovoJBehave extends BaseJBehave {
     	commonSteps.fill_in_study_details(study);
     }
     
-    @Given("User clicks 'Update Study' button")
-    public void userClicksUpdateStudyButton() {
-        commonSteps.click_update_study();
-    }
-    
-    @When("User clicks 'Add CRF' button")
-    @Given("User clicks 'Add CRF' button")
-	public void userClicksCreateCRFButton() {
-    	commonSteps.click_add_crf_button();
-    }
-    
     @When("User browses file on Create a New CRF page: <filepath>")
     @Given("User browses file on Create a New CRF page: <filepath>")
 	public void userBrowsesCRFFile(@Named("filepath") String filepath) {
     	commonSteps.browse_file_with_crf(filepath);
-    }
-    
-    @When("User clicks 'Add Event Definitions' button")
-    @Given("User clicks 'Add Event Definitions' button")
-	public void userClicksAddEventDefenitionButton() {
-    	commonSteps.click_add_event_definition_button();
     }
     
     @Given("User fills in data to create study event definition: $activityTable")
@@ -312,17 +296,11 @@ public class ClinovoJBehave extends BaseJBehave {
     	commonSteps.fill_in_popup_to_schedule_event(event);
     }
     
-    @Given("User clicks 'Schedule Event' button on popup")
-    @When("User clicks 'Schedule Event' button on popup")
-	public void userClicksScheduleEventButtonInPopup() {
-    	commonSteps.click_schedule_event_button_in_popup();
-    }
-    
     @Given("User schedules event using popup: $activityTable")
     @When("User schedules event using popup: $activityTable")
     public void userSchedulesEventUsingPopup(ExamplesTable table) {
     	userFillInPopupToScheduleEvent(table);
-    	userClicksScheduleEventButtonInPopup();
+    	commonSteps.click_schedule_event_button_in_popup();
     }
     
     @Given("Event is scheduled")
@@ -347,7 +325,7 @@ public class ClinovoJBehave extends BaseJBehave {
     			StudyEventDefinition event = StudyEventDefinition.fillStudyEventDefinitionFromTableRow(values);
     			userCallsPopupOnSM(event.getStudySubjectID(), event.getName());
     			commonSteps.fill_in_popup_to_schedule_event(event);
-    			userClicksScheduleEventButtonInPopup();
+    			commonSteps.click_schedule_event_button_in_popup();
     			events.add(event);
     		}
     	}
@@ -387,7 +365,7 @@ public class ClinovoJBehave extends BaseJBehave {
    	public void userChangesStudyProperties(ExamplesTable table) {
     	userGoesToPage(BuildStudyPage.PAGE_NAME);
     	userSetsStudyStatus("Design");
-    	userClicksUpdateStudyButton();
+    	commonSteps.click_update_study();
     	userFillsInUpdateStudyDetailsPage(table);
     }
     
@@ -458,23 +436,11 @@ public class ClinovoJBehave extends BaseJBehave {
     		}
     	}
     }
-	
-    @Given("User clicks 'Sign Event' button in popup")
-    @When("User clicks 'Sign Event' button in popup")
-	public void userClicksSignEventButtonInPopup() {
-    	commonSteps.click_sign_event_button_in_popup();
-    }
     
     @Given("User enters credentials on Sign Study Event page")
     @When("User enters credentials on Sign Study Event page")
 	public void userEntersCredentialsOnSignStudyEventPage() {
     	commonSteps.enter_credentials_on_sign_study_event_page(getCurrentUser());
-    }
-    
-    @Given("User clicks 'Sign' button on Sign Study Event page")
-    @When("User clicks 'Sign' button on Sign Study Event page")
-	public void userClicksSignButtonOnSignStudyEventPage() {
-    	commonSteps.click_sign_button_on_sign_study_event_page();
     }
     
     private void userCheckCRFSDVed() {
@@ -492,9 +458,9 @@ public class ClinovoJBehave extends BaseJBehave {
     			values.put("Event Name", eventName.trim());
     			userFiltersSMPage(values);
     			userCallsPopupOnSM(values);
-    			userClicksSignEventButtonInPopup();
+    			commonSteps.click_sign_event_button_in_popup();
     			userEntersCredentialsOnSignStudyEventPage();
-    			userClicksSignButtonOnSignStudyEventPage();
+    			commonSteps.click_sign_button_on_sign_study_event_page();
     			userGoesToPage(SubjectMatrixPage.PAGE_NAME);
     		}
     	}
@@ -618,6 +584,19 @@ public class ClinovoJBehave extends BaseJBehave {
         	commonSteps.fill_in_crf(CRF.fillCRFFromTableRow(rowParams.values()));
     		if (saveCRF) userClicksSaveButton();
     	}
+    }
+    
+    @When("User browses file on Import Rule Data page: <filepath>")
+    @Given("User browses file on Import Rule Data page: <filepath>")
+	public void userBrowsesRuleFile(@Named("filepath") String filepath) {
+    	commonSteps.browse_file_with_rule(filepath);
+    }
+    
+    @When("User sees '$message' message")
+    @Given("User sees '$message' message")
+    @Then("User sees '$message' message")
+	public void userSeesMessage(String message) {
+    	commonSteps.see_message(message);
     }
     
 	private void userChecksSignEventStatus(Map<String, String> values) {

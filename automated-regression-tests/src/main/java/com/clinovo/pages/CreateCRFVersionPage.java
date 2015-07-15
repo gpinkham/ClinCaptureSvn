@@ -21,14 +21,14 @@ public class CreateCRFVersionPage extends BasePage {
     private WebElementFacade bContinue;
     
     @FindBy(id = "excel_file_path")
-    private WebElementFacade bBrowseFile;
+    private WebElementFacade iBrowseFile;
     
     public void clickBrowseFile() {
-    	bBrowseFile.click();
+    	iBrowseFile.click();
     }
     
     public void browseCRFFile(String filepath) {
-    	upload(filepath).to(bBrowseFile);
+    	upload(filepath).to(iBrowseFile);
     }
     
     @Override

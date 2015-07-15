@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RuleImport>
+    <RuleAssignment>
+        <Target>F_CRF_W_BASIC_FIELDS_2.IG_CRF_W_UNGROUPED_0000001.I_CRF_W_VSTIM</Target>
+        <RuleRef OID="CR_01">
+            <DiscrepancyNoteAction IfExpressionEvaluates="false">
+                <Run AdministrativeDataEntry="false"
+                    InitialDataEntry="true" DoubleDataEntry="false"
+                    ImportDataEntry="false" Batch="true"/>
+                <Message>Time should not be equals to 00:00.</Message>
+            </DiscrepancyNoteAction>
+        </RuleRef>
+    </RuleAssignment>
+    <RuleDef OID="CR_01" Name="test1">
+        <Description>test1</Description>
+
+        <Expression>F_CRF_W_BASIC_FIELDS_2.IG_CRF_W_UNGROUPED_0000001.I_CRF_W_VSTIM
+            ne &quot;00:00&quot;</Expression>
+    </RuleDef>
+</RuleImport>

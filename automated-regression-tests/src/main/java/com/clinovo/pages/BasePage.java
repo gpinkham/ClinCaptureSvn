@@ -2,6 +2,8 @@ package com.clinovo.pages;
 
 import net.thucydides.core.annotations.findby.FindBy;
 import net.thucydides.core.pages.WebElementFacade;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 /**
@@ -32,7 +34,7 @@ public class BasePage extends AbstractPage {
 	@FindBy(jquery = "a[href*='ViewStudy']")
     private WebElementFacade lCurrentStudy;
 	
-    @FindBy(linkText="Rules")
+    @FindBy(jquery="a[href*='ViewRuleAssignment']")
     private WebElementFacade lRules;
 
 	@FindBy(jquery = "a[href$='AddNewSubject']")
@@ -161,5 +163,9 @@ public class BasePage extends AbstractPage {
 
 	public void goToNDsPage() {
 		lNDs.click();
+	}
+
+	public void message_is_shown(String message) {
+		assert(dAlert.find(By.xpath(".//div[contains(text(),'"+message+"')]")).isCurrentlyVisible());
 	}
 }

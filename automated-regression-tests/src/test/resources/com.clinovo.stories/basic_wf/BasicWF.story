@@ -57,7 +57,7 @@ Scenario: 4. "Root" creates default Sites
 Given User logs in as "Root"
 And User goes to Build Study page
 And User is on Build Study page
-And User clicks 'Add Site' button
+And User clicks 'Add Site' button on Build Study page
 And User is on Create a New Site page
 And User fills in data to create site:
 | Site Name | Unique Protocol ID | Principal Investigator | Expected total enrollment | Interview Date Default | Collect Interview Date | Interviewer Name Default | Collect Interviewer Name | Collect Person ID |
@@ -137,7 +137,7 @@ And User clicks 'Submit' button
 And User is on Configure System Properties page
 And User goes to Build Study page
 And User sets Study status to 'Design'
-And User clicks 'Update Study' button
+And User clicks 'Update Study' button on Build Study page
 And User fills in Update Study Details page:
 |Brief Summary|Expected total enrollment|Allow CRF evaluation|Allow medical coding|Auto-code Dictionary Name|
 |summary...   |144                      |yes                 |yes                 |alias                    |
@@ -183,7 +183,7 @@ Scenario: 11. "Root" uploads CRFs
 
 Given User logs in as "Root"
 And User goes to Build Study page
-And User clicks 'Add CRF' button
+And User clicks 'Add CRF' button on Build Study page
 And User browses file on Create a New CRF page: <filepath>
 And User clicks 'Continue' button on Create a New CRF page
 And User is on Preview CRF page
@@ -205,7 +205,7 @@ Scenario: 12. "Root" creates Study Event Definitions
 Given User logs in as "Root"
 And User goes to Build Study page
 And User is on Build Study page
-And User clicks 'Add Event Definitions' button
+And User clicks 'Add Event Definitions' button on Build Study page
 And User is on Create Study Event Definition page
 And User fills in data to create study event definition:
 | Name | Description | Type | Category | Repeating | Reference Event | Day Schedule | Day Max | Day Min | Day Email | User Name |
@@ -362,7 +362,7 @@ Scenario: 18 "PI" signs event
 Given User logs in as "PI"
 And User goes to SM page
 And User calls a popup for "StSubj_2", "Event B"
-And User clicks 'Sign Event' button in popup
+And User clicks 'Sign Event' button on popup
 And User is on Sign Study Event page
 And User enters credentials on Sign Study Event page
 When User clicks 'Sign' button on Sign Study Event page
@@ -381,7 +381,26 @@ When User filters SM table and signs events:
 Then Events are signed
 
 
-Scenario: 19.1 "Study Admin" creates DN in CRF
+Scenario: 19. "Root" uploads rule
+
+Given User logs in as "Root"
+And User goes to Manage Rules page
+And User is on Manage Rules page
+And User clicks 'Import Rules' button on Manage Rules page
+And User is on Import Rule Data page
+And User browses file on Import Rule Data page: <filepath>
+And User clicks 'Continue' button on Import Rule Data page
+And User is on Import Rule Data page
+When User clicks 'Submit' button
+And User clicks 'Yes' button in popup on Import Rule Data page
+Then User is on Build Study page
+And User sees '1 Rule(s) and 1 Rule Assignment(s) were uploaded successfully.' message
+Examples:
+|filepath                                  |
+|.\\src\\test\\resources\\Rules\\Rule_1.xml|
+
+
+Scenario: 20.1 "Study Admin" creates DN in CRF
 
 Given User logs in as "Study Admin"
 And User goes to SM page
@@ -394,7 +413,7 @@ When User creates DNs for the items from CRF:
 Then DNs are created
 
 
-Scenario: 19.2 "Study Admin" begins new thread DN in CRF
+Scenario: 20.2 "Study Admin" begins new thread DN in CRF
 
 Given User logs in as "Study Admin"
 And User goes to SM page
@@ -406,7 +425,7 @@ When User creates DNs for the items from CRF:
 Then DNs are created
 
 
-Scenario: 19.3 "Study Admin" updates Queries
+Scenario: 20.3 "Study Admin" updates Queries
 
 Given User logs in as "Study Admin"
 And User goes to SM page
@@ -418,7 +437,7 @@ When User updates Query DNs for the items from CRF:
 Then DNs are updated
 
 
-Scenario: 19.4 "Study Admin" closes Queries
+Scenario: 20.4 "Study Admin" closes Queries
 
 Given User logs in as "Study Admin"
 And User goes to SM page
@@ -430,7 +449,7 @@ When User closes Query DNs for the items from CRF:
 Then DNs are closed
 
 
-Scenario: 19.5 "CRC" enters data into completed CRF and creates RFC DN
+Scenario: 20.5 "CRC" enters data into completed CRF and creates RFC DN
 
 Given User logs in as "CRC"
 And User goes to SM page
@@ -447,7 +466,7 @@ Then User is on SM page
 And DNs are created
 
 
-Scenario: 19.6 "CRC" enters data into completed CRF, clicks 'Save' button and creates RFC DN
+Scenario: 20.6 "CRC" enters data into completed CRF, clicks 'Save' button and creates RFC DN
 
 Given User logs in as "CRC"
 And User goes to SM page
