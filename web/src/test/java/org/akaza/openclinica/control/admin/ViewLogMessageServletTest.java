@@ -1,6 +1,7 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.i18n.LocaleResolver;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -8,7 +9,6 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.hibernate.jdbc.Expectation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,12 +24,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
 import javax.sql.DataSource;
-import java.io.FileNotFoundException;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ResourceBundleProvider.class)
+@SuppressWarnings("static-access")
 public class ViewLogMessageServletTest {
 
 	@Mock
