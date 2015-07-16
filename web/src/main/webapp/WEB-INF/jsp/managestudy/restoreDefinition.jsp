@@ -123,9 +123,6 @@
    <td class="table_cell"><fmt:message key="default_version" bundle="${resword}"/>:    
     <c:out value="${crf.defaultVersionName}"/>     
    </td>
-   <td class="table_cell"><fmt:message key="null_values" bundle="${resword}"/>:    
-    <c:out value="${crf.nullValues}"/>     
-  </td>
   </tr>             
   
  </c:forEach>

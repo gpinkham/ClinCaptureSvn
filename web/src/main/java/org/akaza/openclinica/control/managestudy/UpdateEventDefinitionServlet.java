@@ -327,18 +327,6 @@ public class UpdateEventDefinitionServlet extends Controller {
 					edcBean.setEvaluatedCRF(false);
 				}
 
-				String nullString = "";
-				// process null values
-				List<NullValue> nulls = NullValue.toArrayList();
-				for (NullValue nullValue : nulls) {
-					String myNull = fp.getString(nullValue.getName().toLowerCase() + i);
-					if (!StringUtil.isBlank(myNull) && "yes".equalsIgnoreCase(myNull.trim())) {
-						nullString = nullString + nullValue.getName().toUpperCase() + ",";
-					}
-
-				}
-				nullString = (!nullString.equals("")) ? nullString.substring(0, nullString.length() - 1) : "";
-
 				if (sdvId > 0
 						&& (edcBean.getSourceDataVerification() == null || sdvId != edcBean.getSourceDataVerification()
 								.getCode())) {
@@ -357,8 +345,6 @@ public class UpdateEventDefinitionServlet extends Controller {
 					edcBean.setEmailStep("");
 				}
 
-				edcBean.setNullValues(nullString);
-				logger.info("found null values: " + nullString);
 			}
 
 		}

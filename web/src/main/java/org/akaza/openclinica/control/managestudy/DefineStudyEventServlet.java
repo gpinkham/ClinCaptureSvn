@@ -445,20 +445,7 @@ public class DefineStudyEventServlet extends Controller {
 				edcBean.setTabbingMode("leftToRight");
 			}
 
-			String nullString = "";
-			// process null values
-			ArrayList nulls = NullValue.toArrayList();
-			for (Object aNull : nulls) {
-				NullValue n = (NullValue) aNull;
-				String myNull = fp.getString(n.getName().toLowerCase() + i);
-				if (!StringUtil.isBlank(myNull) && "yes".equalsIgnoreCase(myNull.trim())) {
-					nullString = nullString + n.getName().toUpperCase() + ",";
-				}
-
-			}
-			nullString = (!nullString.equals("")) ? nullString.substring(0, nullString.length() - 1) : "";
-
-			edcBean.setNullValues(nullString);
+			edcBean.setNullValues("");
 			edcBean.setStudyId(ub.getActiveStudyId());
 			eventDefinitionCRFs.add(edcBean);
 			crfNameToEdcMap.put(edcBean.getCrfName(), edcBean);

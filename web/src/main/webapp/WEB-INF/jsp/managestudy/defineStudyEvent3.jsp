@@ -163,63 +163,7 @@
                             </td>
                         </tr>
 
-                        <tr valign="top">
-                            <td class="table_header_column" colspan="4"><fmt:message key="choose_null_values"  bundle="${resword}"/> (<a href="<fmt:message key="nullValue" bundle="${resformat}"/>" target="def_win" onClick="openDefWindow('<fmt:message key="nullValue" bundle="${resformat}"/>'); return false;"><fmt:message key="what_is_null_value"  bundle="${resword}"/></a>)</td>
-                        </tr>
-
-                        <tr valign="top">
-							<td class="table_cell">
-                            	<fmt:message key="NI" bundle="${resword}"/>
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="ni<c:out value="${count}"/>" value="yes"></td>
-
-                            <td class="table_cell">
-                            	<fmt:message key="NA" bundle="${resword}"/>
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="na<c:out value="${count}"/>" value="yes"></td>
-
-                            <td class="table_cell">
-                            	<fmt:message key="UNK" bundle="${resword}"/>
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="unk<c:out value="${count}"/>" value="yes"></td>
-
-                            <td class="table_cell">
-                            	<fmt:message key="NASK" bundle="${resword}"/>
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="nask<c:out value="${count}"/>" value="yes"></td>
-                        </tr>
-                        <tr valign="top">
-
-                            <td class="table_cell">
-                            	<fmt:message key="ASKU" bundle="${resword}"/>
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="asku<c:out value="${count}"/>" value="yes"></td>
-
-                            <td class="table_cell">
-                            	<fmt:message key="NAV" bundle="${resword}"/>
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="nav<c:out value="${count}"/>" value="yes"></td>
-
-                            <td class="table_cell">
-                            	<fmt:message key="OTH" bundle="${resword}"/>
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="oth<c:out value="${count}"/>" value="yes"></td>
-
-                            <td class="table_cell">
-                            	<fmt:message key="PINF" bundle="${resword}"/>
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="pinf<c:out value="${count}"/>" value="yes"></td>
-                        </tr>
-                        <tr valign="top">
-
-                            <td class="table_cell">
-                            	<fmt:message key="NINF" bundle="${resword}"/>
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="ninf<c:out value="${count}"/>" value="yes"></td>
-
-                            <td class="table_cell">
-                            	<fmt:message key="MSK" bundle="${resword}"/>
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="msk<c:out value="${count}"/>" value="yes"></td>
-
-                            <td class="table_cell">
-                            	<fmt:message key="NP" bundle="${resword}"/>
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="np<c:out value="${count}"/>" value="yes"></td>
-
-                            <td class="table_cell">
-                            	<fmt:message key="NPE" bundle="${resword}"/>
-                            	<input type="checkbox" onchange="javascript:changeIcon();" name="npe<c:out value="${count}"/>" value="yes"></td>
-                        </tr>
+                 
                         <c:set var="count" value="${count+1}"/>
                         <tr><td class="table_divider" colspan="4">&nbsp;</td></tr>
                     </c:forEach>

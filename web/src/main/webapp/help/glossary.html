@@ -57,7 +57,6 @@
 		<a href="#D">D</a> |
 		<a href="#E">E</a> |
 		<a href="#J">J</a> |
-		<a href="#N">N</a> |
         <a href="#P">P</a> | 
         <a href="#S">S</a> | 
         <a href="#U">U</a>
@@ -108,10 +107,6 @@
 			<a href="6.4.2_importJobs_Help.html"><b>Import Data Job</b></a> to run automatically.<p></p></td>
 		</tr>
 		<tr>
-			<td class="td_small"><b><a name ='N'></a>Null Values</b></td>
-			<td>The string that represents null values for an Event Definition—for example, N/A for Not Applicable.  The string is considered as a reserved word for the CRF.  For a complete list <a href="#nullValues" onclick="document.getElementById('nulls').style.visibility = 'visible';">click here</a>.<p></p></td>
-		</tr>
-		<tr>
 			<td class="td_small"><b><a name ='P'></a>Person ID</b></td>
 			<td>The unique identifier for a Subject that references the Subject across all Studies in the ClinCapture system.  It can be required or optional, depending on the way the Study was set up.<p></p></td>
 		</tr>
@@ -145,74 +140,6 @@
 	<a href='#top'>Back to Top</a><br />
 	<p>&nbsp;</p>
 
-<div id="nulls"><a name="nullValues" />
-<table border="1">
-    <thead>  
-	  <tr>
-        <td><b>code</b></td>
-        <td><b>name</b></td>
-		<td><b>definition</b></td>
-      </tr>
-	</thead> 
-	<tr>
-        <td>NI</td>
-        <td>No Information</td>
-        <td>No information whatsoever can be inferred from this exceptional value. This is the most general exceptional value. It is also the default exceptional value.</td>
-    </tr>
-    <tr>
-        <td>NA</td>
-        <td>not applicable</td>
-        <td>No proper value is applicable in this context (e.g., last menstrual period for a male).</td>
-    </tr>
-    <tr>
-        <td>UNK</td>
-        <td>unknown</td>
-        <td>A proper value is applicable, but not known.</td>
-    </tr>
-    <tr>
-        <td>NASK</td>
-        <td>not asked</td>
-        <td>This information has not been sought (e.g., patient was not asked)</td>
-    </tr>
-    <tr>
-        <td>ASKU</td>
-        <td>asked but unknown</td>
-        <td>Information was sought but not found (e.g., patient was asked but didn&#39;t know)</td>
-    </tr>
-    <tr>
-        <td>NAV</td>
-        <td>temporarily unavailable</td>
-        <td>Information is not available at this time but it is expected that it will be available later.</td>
-    </tr>
-    <tr>
-        <td>OTH</td>
-        <td>other</td>
-        <td>The actual value is not an element in the value domain of a variable. (e.g., concept not provided by required code system).</td>
-    </tr>
-    <tr>
-        <td>PINF</td>
-        <td>positive infinity</td>
-        <td>Positive infinity of numbers.</td>
-    </tr>
-    <tr>
-        <td>NINF</td>
-        <td>negative infinity</td>
-        <td>Negative infinity of numbers.</td>
-    </tr>
-    <tr>
-        <td>MSK</td>
-        <td>masked</td>
-        <td>There is information on this item available but it has not been provided by the sender due to security, privacy or other reasons. There may be an alternate mechanism for gaining access to this information. Note: using this null flavor does provide information that may be a breach of confidentiality. Its primary purpose is for those circumstances where it is necessary to inform the receiver that the information does exist.</td>
-    </tr>
-    <tr>
-        <td>NP</td>
-        <td>not present</td>
-        <td>Value is not present in a message. This is only defined in messages, never in application data! All values not present in the message must be replaced by the applicable default, or no-information (NI) as the default of all defaults.</td>
-    </tr>
-</table>
-	<br />
-	<a href='#top' style="color: #789EC5;">Back to Top</a><br />
-</div>
 </div>
 <!--end content-->
 

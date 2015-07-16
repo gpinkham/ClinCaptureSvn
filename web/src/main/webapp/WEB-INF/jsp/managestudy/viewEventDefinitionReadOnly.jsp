@@ -95,7 +95,7 @@
   <fmt:message key="CRFs" bundle="${resword}"/>
 </div>
 <%--<p><fmt:message key="click_the_up_down_arrow_icons" bundle="${restext}"/></p>--%>
-<div style="width: 700px">
+<div style="min-width: 700px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 
@@ -108,8 +108,7 @@
     <td valign="top" class="table_header_row"><fmt:message key="password_required" bundle="${resword}"/></td>
     <!-- <td valign="top" class="table_header_row"><fmt:message key="enforce_decision_conditions" bundle="${restext}"/></td>-->
     <td valign="top" class="table_header_row"><fmt:message key="default_version" bundle="${resword}"/></td>
-     <td valign="top" class="table_header_row"><fmt:message key="hidden_crf" bundle="${resword}"/></td>     
-     <td valign="top" class="table_header_row"><fmt:message key="null_values" bundle="${resword}"/></td>    
+     <td valign="top" class="table_header_row"><fmt:message key="hidden_crf" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="sdv_option" bundle="${resword}"/></td>
     <td valign="top" class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
     <td valign="top" class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>
@@ -155,10 +154,7 @@
    </td>
    <td class="table_cell">
     <c:out value="${crf.hideCrf}"/>
-   </td>
-   <td class="table_cell"> 
-    <c:out value="${crf.nullValues}"/> &nbsp;    
-  </td>          
+   </td>      
   <td class="table_cell"><fmt:message key="${crf.sourceDataVerification.description}" bundle="${resterm}"/></td> 
    <td class="table_cell"><c:out value="${crf.status.name}"/></td> 
    <td class="table_cell">

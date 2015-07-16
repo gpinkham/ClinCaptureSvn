@@ -88,7 +88,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">  
   <c:forEach var ="crf" items="${eventDefinitionCRFs}">   
    <tr valign="top" bgcolor="#F5F5F5">             
-    <td class="table_header_column" colspan="4"><c:out value="${crf.crfName}"/></td> 
+    <td class="table_header_column" colspan="3"><c:out value="${crf.crfName}"/></td> 
     <td class="table_header_column" colspan="1"><c:out value="${crf.status.name}"/></td>      
   </tr>  
    <tr valign="top">   
@@ -117,9 +117,6 @@
    <td class="table_cell"><fmt:message key="default_version" bundle="${resword}"/>:    
     <c:out value="${crf.defaultVersionName}"/>     
    </td>
-   <td class="table_cell"><fmt:message key="null_values" bundle="${resword}"/>:    
-    <c:out value="${crf.nullValues}"/>     
-  </td>
   </tr>             
   <tr><td class="table_divider" colspan="5">&nbsp;</td></tr>
  </c:forEach>
