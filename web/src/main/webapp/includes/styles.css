@@ -2967,3 +2967,7 @@ table.footerInnerTable {
 .itemHolderClass.aka_padding_norm.aka_cellBorders.align_left {
 	text-align: left;
 }
+
+.pl10 {
+	padding-left: 10px;
+}
