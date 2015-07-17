@@ -5,7 +5,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
 
-
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -40,28 +39,20 @@
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
-
+	<td class="sidebar_tab">
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
-
 		<div class="sidebar_tab_content">
-
 		</div>
-
-		</td>
-
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
-
+	</td>
+</tr>
+<tr id="sidebar_Instructions_closed" style="display: all">
+	<td class="sidebar_tab">
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+	</td>
+</tr>
 
-		</td>
-  </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <script language="JavaScript">
@@ -106,11 +97,11 @@
           }
         }
       }
- </script>
+</script>
 <h1>
 	<span class="first_level_header">
 		<c:choose>
-			<c:when test="${fromListSite=='yes'}">		
+			<c:when test="${fromListSite=='yes'}">
 				<fmt:message key="view_site_details" bundle="${resworkflow}"/>: <c:out value="${siteToView.name}"/>
 			</c:when>
 			<c:otherwise>
@@ -545,8 +536,7 @@
 		<c:otherwise>
 			<div id="sed<c:out value="${defCount}"/>" style="display: none">
 		</c:otherwise>
-		</c:choose>
-
+	</c:choose>
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
@@ -750,10 +740,12 @@
 		value="<fmt:message key="site_crfs" bundle="${resword}"/>" 
 		class="button_long" 
 		onclick="javascript:openDocWindow('${pageContext.request.contextPath}/print/metadata/html/print/${parentStudyOid}/*/*')"/>
+	<c:if test = "${showCasebookButton}">
     <input type="button" name="BTN_Print"
            value="<fmt:message key="print_site_casebooks" bundle="${resword}"/>"
            class="button_long"
            onclick="javascript:runCasebooks()"/>
+	</c:if>
 </c:if>
  <br><br>
 

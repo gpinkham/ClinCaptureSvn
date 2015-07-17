@@ -34,6 +34,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
@@ -114,10 +115,17 @@ public class ViewSiteServlet extends Controller {
 			request.setAttribute("parentStudyOid", parentStudyOid);
 			request.setAttribute("siteToView", study);
 			request.setAttribute("idToSort", request.getAttribute("idToSort"));
+			request.setAttribute("showCasebookButton", areSubjectsOnSite(study));
 			viewSiteEventDefinitions(request, study);
 
 			forwardPage(Page.VIEW_SITE, request, response);
 		}
+	}
+
+	private boolean areSubjectsOnSite(StudyBean study) {
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(getDataSource());
+		int countOfSubjects = studySubjectDAO.getCountofStudySubjects(study);
+		return countOfSubjects != 0;
 	}
 
 	private void viewSiteEventDefinitions(HttpServletRequest request, StudyBean siteToView) {
