@@ -421,7 +421,7 @@
       "${tabNum}" name="<c:out value="${inputName}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
     </c:when>
     <c:otherwise>
-      <select tabbed rowcount="${rowCount}"` id="<c:out value="${inputName}"/>" multiple  tabindex=
+      <select tabbed rowcount="${rowCount}" id="<c:out value="${inputName}"/>" multiple  tabindex=
       "${tabNum}" name="<c:out value="${inputName}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
     </c:otherwise>
   </c:choose>
