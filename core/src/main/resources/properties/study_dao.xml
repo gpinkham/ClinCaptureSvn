@@ -8,6 +8,10 @@
 		<name>findByName</name>
 		<sql>SELECT * FROM STUDY WHERE NAME = ?</sql>
 	</query>
+	<query>
+		<name>findStudyByName</name>
+		<sql>SELECT * FROM STUDY WHERE NAME = ? AND parent_study_id IS NULL</sql>
+	</query>
     <query>
 		<name>getStudyIdsByCRF</name>
 		<sql>select distinct study_id from event_definition_crf where crf_id=?</sql>

@@ -280,7 +280,7 @@ public class CRFMaskingController extends BaseController {
 
 		for (Map.Entry<String, ArrayList<StudyBean>> studyEntry : sitesByStudies.entrySet()) {
 			ArrayList<StudyBean> sites = studyEntry.getValue();
-			StudyBean study = (StudyBean) studyDAO.findByName(studyEntry.getKey());
+			StudyBean study = (StudyBean) studyDAO.findStudyByName(studyEntry.getKey());
 			ArrayList<StudyEventDefinitionBean> events = eventsByStudies.get(study.getId());
 
 			for (StudyBean site : sites) {

@@ -4,9 +4,13 @@
                 <name>findByPK</name>
                 <sql>SELECT * FROM STUDY WHERE STUDY_ID = ?</sql>
         </query>
-        <query>
+    <query>
 		<name>findByName</name>
 		<sql>SELECT * FROM STUDY WHERE NAME = ?</sql>
+	</query>
+	<query>
+		<name>findStudyByName</name>
+		<sql>SELECT * FROM STUDY WHERE NAME = ? AND parent_study_id IS NULL</sql>
 	</query>
         <query>
             <name>findByOid</name>

@@ -13,6 +13,17 @@
 
 package org.akaza.openclinica.dao.managestudy;
 
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyType;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,18 +38,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyType;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
 
 /**
  * StudyDAO.java, the data access object that users will access the database for study objects.
@@ -884,6 +883,28 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		variables.put(1, name);
 
 		String sql = digester.getQuery("findByName");
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
+
+		if (it.hasNext()) {
+			eb = this.getEntityFromHashMap((HashMap) it.next());
+		}
+		return eb;
+	}
+
+	/**
+	 * Find Study by name.
+	 * @param name String
+	 * @return EntityBean
+	 */
+	public EntityBean findStudyByName(String name) {
+		StudyBean eb = new StudyBean();
+		this.setTypesExpected();
+
+		HashMap variables = new HashMap();
+		variables.put(1, name);
+
+		String sql = digester.getQuery("findStudyByName");
 		ArrayList alist = this.select(sql, variables);
 		Iterator it = alist.iterator();
 
