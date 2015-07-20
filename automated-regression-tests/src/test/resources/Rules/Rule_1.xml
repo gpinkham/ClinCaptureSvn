@@ -7,7 +7,7 @@
                 <Run AdministrativeDataEntry="false"
                     InitialDataEntry="true" DoubleDataEntry="false"
                     ImportDataEntry="false" Batch="true"/>
-                <Message>Time should not be equals to 00:00.</Message>
+                <Message>Time should not be equal to 00:00.</Message>
             </DiscrepancyNoteAction>
         </RuleRef>
     </RuleAssignment>

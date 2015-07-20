@@ -11,6 +11,7 @@ import com.clinovo.pages.beans.StudyEventDefinition;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Anton on 18.07.2014.
@@ -82,7 +83,7 @@ public class SubjectMatrixPage extends BasePage {
     }
     
 	public void callPopupForSubjectAndEvent(String studySubjectID, String eventName) {
-		List<WebElement> eventIcons = tFindSubjects.findElements(By.xpath(".//td[text()='" + studySubjectID + "']"));
+		List<WebElement> eventIcons = tFindSubjects.withTimeoutOf(60, TimeUnit.SECONDS).findElements(By.xpath(".//td[text()='" + studySubjectID + "']"));
 		if (eventIcons.size() == 0) {
 			filterSMByStudySubjectID(studySubjectID);
 		}
@@ -91,18 +92,17 @@ public class SubjectMatrixPage extends BasePage {
 	}
 	
 	private void initElementsInPopup() {
-		iStartDate.waitUntilVisible();
-		iEndDate.waitUntilVisible();
-		bScheduleEvent.waitUntilVisible();
+		bScheduleEvent.withTimeoutOf(60, TimeUnit.SECONDS).waitUntilVisible();
 	}
 
 	public void fillInPopupToScheduleEvent(StudyEventDefinition event) {
 		initElementsInPopup();
-		if (!event.getStartDateTime().isEmpty()) {
+		if (iStartDate.isCurrentlyVisible() && !event.getStartDateTime().isEmpty()) {
 			iStartDate.type(event.getStartDateTime());
 		}
-		
-		iEndDate.type(event.getEndDateTime());
+		if (iEndDate.isCurrentlyVisible() && !event.getEndDateTime().isEmpty()) {
+			iEndDate.type(event.getEndDateTime());
+		}
 	}
 
 	public void clickScheduleEventButtonInPopup() {

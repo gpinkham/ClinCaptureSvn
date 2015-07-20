@@ -1,5 +1,7 @@
 package com.clinovo.pages;
 
+import java.util.concurrent.TimeUnit;
+
 import net.thucydides.core.annotations.findby.FindBy;
 import net.thucydides.core.pages.WebElementFacade;
 import net.thucydides.core.webelements.Checkbox;
@@ -26,6 +28,9 @@ public class DNPage extends BasePage {
 	// create DN
 	@FindBy(xpath = ".//*[@name='SubmitExit']")
     private WebElementFacade bSubmitClose;
+	
+	@FindBy(xpath = ".//*[@name='Submit']")
+    private WebElementFacade bSubmit;
 	
 	@FindBy(id = "inputDescription")
     private WebElementFacade iDescription;
@@ -80,7 +85,7 @@ public class DNPage extends BasePage {
 	}
 
     public void fillInAndSaveDN(DNote dn) {
-		
+    	bodyWithData.withTimeoutOf(60, TimeUnit.SECONDS).isCurrentlyVisible();
 		if (!beginNewThread.isCurrentlyVisible() && !bSubmitClose0.isCurrentlyVisible()) {
 			if (iDescription.isCurrentlyVisible() && !dn.getType().equals("RFC") && !dn.getType().equals("FVC")) {
 				iDescription.type(dn.getDescription());
@@ -96,7 +101,11 @@ public class DNPage extends BasePage {
 			
 			if (cEmailAssignedUser.isCurrentlyVisible()) ItemsUtil.fillCheckbox(new Checkbox(cEmailAssignedUser), dn.getEmailAssignedUser());
 		
-			bSubmitClose.click();
+			if (bSubmitClose.isCurrentlyVisible()) {
+				bSubmitClose.click();
+			} else {
+				bSubmit.click();
+			}
 			
 		} else {
 			

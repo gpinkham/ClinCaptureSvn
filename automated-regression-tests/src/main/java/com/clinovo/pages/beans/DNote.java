@@ -27,6 +27,8 @@ public class DNote {
     
     private String item = "";
     
+    private String entityName = "";
+    
     //for updating/closing
     
     private String parentID = "";
@@ -76,6 +78,10 @@ public class DNote {
     	
     	if (row.get("Item") != null) {
     		dn.setItem(row.get("Item"));
+    	}
+    	
+    	if (row.get("Entity Name") != null) {
+    		dn.setEntityName(row.get("Entity Name"));
     	}
     	
     	//for updating/closing
@@ -166,6 +172,10 @@ public class DNote {
     	
 		if (!dn.getResolutionStatus().isEmpty()) {
 			map.put("Resolution Status", dn.getResolutionStatus());
+		}
+		
+		if (!dn.getEntityName().isEmpty()) {
+			map.put("Entity Name", dn.getEntityName());
 		}
 		
     	return map;
@@ -285,6 +295,14 @@ public class DNote {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getEntityName() {
+		return entityName;
+	}
+
+	public void setEntityName(String entityName) {
+		this.entityName = entityName;
 	}
 }
 

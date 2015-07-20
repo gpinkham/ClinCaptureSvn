@@ -39,6 +39,17 @@ public class UpdateStudyDetailsPage extends BasePage {
 	
 	private RadioButtonGroup rCodeWithContext;
 	
+	// Subject Parameters: 
+	private RadioButtonGroup rHowToGenerateSubjectID;
+	
+	private RadioButtonGroup rCollectDateOfEnrollmentForStudy;
+	    
+	private RadioButtonGroup rCollectGender;
+		
+	private RadioButtonGroup rCollectSubjectDateOfBirth;
+		
+	private RadioButtonGroup rCollectPersonID;
+		    
 	// Data Entry Parameters:
 	private RadioButtonGroup rCollectInterviewerName;
 	
@@ -121,6 +132,13 @@ public class UpdateStudyDetailsPage extends BasePage {
     	rInterviewDateEditable = new RadioButtonGroup(formWithData.findElements(By.name("interviewDateEditable")));
     	rUseAutotabbing = new RadioButtonGroup(formWithData.findElements(By.name("autoTabbing")));
     	
+    	//Subject Parameters: 
+    	rHowToGenerateSubjectID = new RadioButtonGroup(formWithData.findElements(By.name("subjectIdGeneration")));
+    	rCollectDateOfEnrollmentForStudy = new RadioButtonGroup(formWithData.findElements(By.name("dateOfEnrollmentForStudyRequired")));
+    	rCollectGender = new RadioButtonGroup(formWithData.findElements(By.name("genderRequired")));
+    	rCollectSubjectDateOfBirth = new RadioButtonGroup(formWithData.findElements(By.name("collectDob")));
+    	rCollectPersonID = new RadioButtonGroup(formWithData.findElements(By.name("subjectPersonIdRequired")));
+    	
     	rAllowMedicalCoding = new RadioButtonGroup(formWithData.findElements(By.name("allowCodingVerification")));
     	rAllowCRFEvaluation = new RadioButtonGroup(formWithData.findElements(By.name("allowCrfEvaluation")));
     	rEvaluateWithContext = new RadioButtonGroup(formWithData.findElements(By.name("evaluateWithContext")));
@@ -142,7 +160,7 @@ public class UpdateStudyDetailsPage extends BasePage {
 			iExpectedTotalEnrollment.type(study.getExpectedTotalEnrollment());
 		}
 		
-		//Medical Coding
+		//Medical Coding:
 		if (!study.getAllowMedicalCoding().equals("")) {
 			rAllowMedicalCoding.selectByValue(study.getAllowMedicalCoding());
 		}
@@ -156,7 +174,7 @@ public class UpdateStudyDetailsPage extends BasePage {
 			iAutoCodeDictionaryName.type(study.getAutoCodeDictionaryName());
 		}
 		
-		//CRF Evaluation
+		//CRF Evaluation:
 		if (!study.getAllowCRFEvaluation().equals("")) {
 			rAllowCRFEvaluation.selectByValue(study.getAllowCRFEvaluation());
 		}
@@ -167,7 +185,7 @@ public class UpdateStudyDetailsPage extends BasePage {
 			rSASNameAnnotation.selectByValue(study.getSASNameAnnotation());
 		}
 		
-		//Data Entry Parameters
+		//Data Entry Parameters:
 		if (!study.getCollectInterviewerName().equals("")) {
 			rCollectInterviewerName.selectByValue(study.getCollectInterviewerName());
 		}
@@ -186,9 +204,25 @@ public class UpdateStudyDetailsPage extends BasePage {
 		if (!study.getInterviewDateEditable().equals("")) {
 			rInterviewDateEditable.selectByValue(study.getInterviewDateEditable());
 		}	
-		if (!study.getUseAutotabbing ().equals("")) {
+		if (!study.getUseAutotabbing().equals("")) {
 			rUseAutotabbing.selectByValue(study.getUseAutotabbing());
 		}
-		    	
+		
+		//Subject Parameters: 
+		if (!study.getHowToGenerateSubjectID().equals("")) {
+			rHowToGenerateSubjectID.selectByValue(study.getHowToGenerateSubjectID());
+		}	
+		if (!study.getCollectDateOfEnrollmentForStudy().equals("")) {
+			rCollectDateOfEnrollmentForStudy.selectByValue(study.getCollectDateOfEnrollmentForStudy());
+		}
+		if (!study.getCollectGender().equals("")) {
+			rCollectGender.selectByValue(study.getCollectGender());
+		}
+		if (!study.getCollectSubjectDateOfBirth().equals("")) {
+			rCollectSubjectDateOfBirth.selectByValue(study.getCollectSubjectDateOfBirth());
+		}	
+		if (!study.getCollectPersonID().equals("")) {
+			rCollectPersonID.selectByValue(study.getCollectPersonID());
+		}
 	}
 }

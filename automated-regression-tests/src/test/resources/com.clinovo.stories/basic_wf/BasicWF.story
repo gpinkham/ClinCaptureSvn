@@ -139,8 +139,8 @@ And User goes to Build Study page
 And User sets Study status to 'Design'
 And User clicks 'Update Study' button on Build Study page
 And User fills in Update Study Details page:
-|Brief Summary|Expected total enrollment|Allow CRF evaluation|Allow medical coding|Auto-code Dictionary Name|
-|summary...   |144                      |yes                 |yes                 |alias                    |
+|Brief Summary|Expected total enrollment|Allow CRF evaluation|Allow medical coding|Auto-code Dictionary Name|How to Generate Subject ID|Collect Date of Enrollment for Study|Collect Gender|Collect Subject Date of Birth|Collect Person ID|
+|summary...   |144                      |yes                 |yes                 |alias                    |manual                    |no                                  |true          |1                            |optional         |
 
 When User clicks 'Submit' button
 Then User is on Build Study page
@@ -254,7 +254,7 @@ Examples:
 |StSubj_6          |ss_6       |              |                              |Male    |27-May-1986    |               |
 
 
-Scenario: 14. "CRC" schedules event for subject
+Scenario: 14.1 "CRC" schedules event for subject
 
 Given User logs in as "CRC"
 And User goes to SM page
@@ -267,13 +267,13 @@ Then User is on SM page
 And Event is scheduled
 
 
-Scenario: 14.1 "CRC" schedules events for subjects
+Scenario: 14.2 "CRC" schedules events for subjects
 
 Given User logs in as "CRC"
 And User goes to SM page
 When User schedules events on SM:
 |Study Subject ID|Event Name                        |
-|StSubj_1        |Event A, Event C, Event B         |
+|StSubj_1        |Event A, Event C, Event B, Event E|
 |StSubj_2        |Event A, Event B                  |
 |StSubj_3        |Event B, Event F                  |
 |StSubj_4        |Event A, Event D, Event E         |
@@ -295,7 +295,7 @@ Then User is on Build Study page
 And User sets Study status to 'Available'
 
 
-Scenario: 16. "CRC" enters data into CRF for one subject
+Scenario: 16.1 "CRC" enters data into CRF for one subject
 
 Given User logs in as "CRC"
 And User goes to SM page
@@ -309,7 +309,7 @@ When User clicks 'Save' button
 Then User is on SM page
 
 
-Scenario: 16.1 "CRC" enters data into CRF and completes it for some subjects
+Scenario: 16.2 "CRC" enters data into CRF and completes it for some subjects
 
 Given User logs in as "CRC"
 And User goes to SM page
@@ -323,7 +323,7 @@ When User fills in, completes and saves CRF:
 Then User is on SM page
 
 
-Scenario: 16.2 "CRC" enters data into CRF and completes it for some subjects
+Scenario: 16.3 "CRC" enters data into CRFs and completes it for some subjects
 
 Given User logs in as "CRC"
 And User goes to SM page
@@ -343,7 +343,7 @@ When User fills in, completes and saves CRF:
 Then User is on SM page
 
 
-Scenario: 17 "Study Monitor" performs SDV on SDV page
+Scenario: 17. "Study Monitor" performs SDV on SDV page
  
 Given User logs in as "Study Monitor"
 And User goes to SDV page
@@ -357,7 +357,7 @@ When User filters SDV table and performs SDV:
 Then CRFs are SDVed
 
 
-Scenario: 18 "PI" signs event
+Scenario: 18.1 "PI" signs event
  
 Given User logs in as "PI"
 And User goes to SM page
@@ -369,7 +369,7 @@ When User clicks 'Sign' button on Sign Study Event page
 Then User is on View Subject Record page
 
 
-Scenario: 18.1 "PI" signs events
+Scenario: 18.2 "PI" signs events
  
 Given User logs in as "PI"
 And User goes to SM page
@@ -484,6 +484,56 @@ Then User is on SM page
 And DNs are created
 
 
+Scenario: 20.7 "CRC" enters data into CRF, clicks 'Save' button and creates FVC DN
+
+Given User logs in as "CRC"
+And User goes to SM page
+And User fills in CRF: 
+|Study Subject ID|Event Name|CRF Name            |input6(R)|input7(T)  |input8(T)|input9(R)|input11(R)|
+|StSubj_1        |Event E   |CRF_w_basic_fields_2|1        |05-Feb-2014|00:00    |1        |0         |
+
+And User clicks 'Save' button
+And User creates DNs in CRF: 
+|Item  |Type|Description                  |Detailed Note   |
+|input8|FVC |Information was not available|peace of text...|
+
+When User clicks 'Save' button
+Then User is on SM page
+And DNs are created
+
+
+Scenario: 20.8 "CRC" enters wrong data into CRF, clicks 'Save' button twice and CC creates auto FVC
+
+Given User logs in as "CRC"
+And User goes to SM page
+And User fills in CRF: 
+|Study Subject ID|Event Name|CRF Name            |input6(R)|input7(T)  |input8(T)|input9(R)|input11(R)|
+|StSubj_5        |Event D   |CRF_w_basic_fields_2|1        |20-Apr-2015|00:00    |2        |0         |
+
+And User clicks 'Save' button
+When User clicks 'Save' button
+Then User is on SM page
+And DN is created:
+|Study Subject ID|Event Name|CRF Name            |Type|Description|Entity Name|
+|StSubj_5        |Event D   |CRF_w_basic_fields_2|FVC |           |           |
+
+
+Scenario: 20.9 "CRC" enters data into completed CRF, clicks 'Save' button and creates RFC DN instead of FVC
+
+Given User logs in as "CRC"
+And User goes to SM page
+And User fills in CRF: 
+|Study Subject ID|Event Name|CRF Name            |input8(T)|
+|StSubj_5        |Event E   |CRF_w_basic_fields_2|00:00    |
+
+And User clicks 'Save' button
+And User creates DNs in CRF: 
+|Study Subject ID|Item  |Type|Description            |Detailed Note    |
+|StSubj_5        |input8|RFC |Source data was missing|Scenario 20.9 ...|
+
+When User clicks 'Save' button
+Then User is on SM page
+And DNs are created
 
 
 

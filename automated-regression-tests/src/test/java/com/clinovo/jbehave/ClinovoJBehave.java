@@ -533,7 +533,7 @@ public class ClinovoJBehave extends BaseJBehave {
     
     @SuppressWarnings("unchecked")
 	@Then("DNs are $status")
-	public void dnsAreCreatedUpdatedClosed() {
+	public void dnsAreCreatedUpdatedClosed(String status) {
     	commonSteps.go_to_page(NotesAndDiscrepanciesPage.PAGE_NAME);
     	List<DNote> dns = (List<DNote>) Thucydides.getCurrentSession().get(DNote.DNS_TO_CHECK_EXIST);
     	for (DNote dn: dns) {
@@ -542,6 +542,14 @@ public class ClinovoJBehave extends BaseJBehave {
     	}
     
     	Thucydides.getCurrentSession().remove(DNote.DNS_TO_CHECK_EXIST);
+    }
+    
+    @Then("DN is $status: $activityTable")
+	public void dnIsCreatedUpdatedClosed(String status, ExamplesTable table) {
+    	commonSteps.go_to_page(NotesAndDiscrepanciesPage.PAGE_NAME);
+    	DNote dn = DNote.fillDNoteFromTableRow(table.getRow(0));
+    	commonSteps.filter_NDs_page(dn);
+    	commonSteps.check_DN_row_is_present(dn);    
     }
     
     @Given("User $changes Query DNs for the items from CRF: $activityTable")

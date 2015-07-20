@@ -65,7 +65,9 @@ public class AddSubjectPage extends BasePage {
 
     	iPersonID.type(ssubj.getPersonID());
     	
-    	iSecondaryID.type(ssubj.getSecondaryID());
+    	if (iSecondaryID.isCurrentlyVisible()) { 
+    		iSecondaryID.type(ssubj.getSecondaryID());
+    	}
     	
     	if (!"".equals(ssubj.getDateOfEnrollmentForStudy())) { 
     		iDateOfEnrollment.type(ssubj.getDateOfEnrollmentForStudy());

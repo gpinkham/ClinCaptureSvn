@@ -10,14 +10,17 @@ public class ImportRuleDataPage extends BasePage {
 	public static final String PAGE_NAME = "Import Rule Data page";
 	public static final String PAGE_URL = "ImportRule";
 	
-	@FindBy(xpath=".//input[@class='button_medium medium_continue' and @type='submit']")
-	private WebElementFacade bContinue;
-
+	@FindBy(xpath=".//body/div[contains(@class,'ui-dialog ui-widget')]")
+	private WebElementFacade divDialog;
+	
 	@FindBy(xpath=".//*[@id='dlgBtnYes']")
-	private WebElementFacade bYesInPopup;
+	private WebElementFacade bYes;
 	
 	@FindBy(xpath=".//*[@id='dlgBtnNo']")
-	private WebElementFacade bNoInPopup;
+	private WebElementFacade bNo;
+	
+	@FindBy(xpath=".//input[@class='button_medium medium_continue' and @type='submit']")
+	private WebElementFacade bContinue;
 	
 	@FindBy(name="xml_file")
 	private WebElementFacade iBrowseFile;
@@ -40,7 +43,8 @@ public class ImportRuleDataPage extends BasePage {
 	}
 
 	public void clickYesButtonInPopup() {
-		bYesInPopup.waitUntilVisible();
-		bYesInPopup.click();
+		divDialog.waitUntilEnabled();
+		bYes.waitUntilEnabled();
+		bYes.click();
 	}
 }

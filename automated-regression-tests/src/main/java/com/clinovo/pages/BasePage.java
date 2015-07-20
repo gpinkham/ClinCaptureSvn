@@ -61,6 +61,9 @@ public class BasePage extends AbstractPage {
     @FindBy(jquery = "input[name$='ontinue'],input[id$='ontinue'],input[name$='onfirm']")
     private WebElementFacade bContinueU;
     
+    @FindBy(id = "sideBarTable")
+    protected WebElementFacade tSideBar;
+    
     @FindBy(className = "alert")
     protected WebElementFacade dAlert;
 
@@ -166,6 +169,6 @@ public class BasePage extends AbstractPage {
 	}
 
 	public void message_is_shown(String message) {
-		assert(dAlert.find(By.xpath(".//div[contains(text(),'"+message+"')]")).isCurrentlyVisible());
+		assert(tSideBar.find(By.xpath(".//div[contains(text(),'"+message+"')]")).isVisible());
 	}
 }

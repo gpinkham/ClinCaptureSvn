@@ -44,9 +44,7 @@ public class Study {
     
 	
 	
-    
-	private String collectPersonID = "";
-	
+    	
 	private String briefTitle = "";
     
 	private String officialTitle = "";
@@ -76,6 +74,17 @@ public class Study {
 	private String timing = "";
     
 	private String postalCode = "";
+	
+	//Subject Parameters:
+	private String howToGenerateSubjectID = "";
+		
+	private String collectDateOfEnrollmentForStudy = "";
+	    
+	private String collectGender = "";
+		
+	private String collectSubjectDateOfBirth = "";
+		
+	private String collectPersonID = "";
 	
 	// Data Entry Parameters:
 	private String collectInterviewerName = "";
@@ -447,6 +456,19 @@ public class Study {
     		study.setUseAutotabbing(row.get("Use autotabbing"));
     	}
     	
+    	//Subject Parameters:
+    	if (row.get("How to Generate Subject ID") != null) {
+    		study.setHowToGenerateSubjectID(row.get("How to Generate Subject ID"));
+    	}
+    	if (row.get("Collect Date of Enrollment for Study") != null) {
+    		study.setCollectDateOfEnrollmentForStudy(row.get("Collect Date of Enrollment for Study"));
+    	}
+    	if (row.get("Collect Gender") != null) {
+    		study.setCollectGender(row.get("Collect Gender"));
+    	}
+    	if (row.get("Collect Subject Date of Birth") != null) {
+    		study.setCollectSubjectDateOfBirth(row.get("Collect Subject Date of Birth"));
+    	}
     	
     	//Medical Coding: 
     	if (row.get("Allow medical coding") != null) {
@@ -674,5 +696,38 @@ public class Study {
 
 	public void setUseAutotabbing(String useAutotabbing) {
 		this.useAutotabbing = useAutotabbing;
+	}
+
+	public String getHowToGenerateSubjectID() {
+		return howToGenerateSubjectID;
+	}
+
+	public void setHowToGenerateSubjectID(String howToGenerateSubjectID) {
+		this.howToGenerateSubjectID = howToGenerateSubjectID;
+	}
+
+	public String getCollectDateOfEnrollmentForStudy() {
+		return collectDateOfEnrollmentForStudy;
+	}
+
+	public void setCollectDateOfEnrollmentForStudy(
+			String collectDateOfEnrollmentForStudy) {
+		this.collectDateOfEnrollmentForStudy = collectDateOfEnrollmentForStudy;
+	}
+
+	public String getCollectGender() {
+		return collectGender;
+	}
+
+	public void setCollectGender(String collectGender) {
+		this.collectGender = collectGender;
+	}
+
+	public String getCollectSubjectDateOfBirth() {
+		return collectSubjectDateOfBirth;
+	}
+
+	public void setCollectSubjectDateOfBirth(String collectSubjectDateOfBirth) {
+		this.collectSubjectDateOfBirth = collectSubjectDateOfBirth;
 	}
 }
