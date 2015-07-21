@@ -20,12 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -37,8 +33,6 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -49,11 +43,13 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SubjectEventStatusUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
- * Restores a removed subject to a study
+ * Restores a removed subject to a study.
  * 
  * @author jxu
  * 
@@ -95,8 +91,6 @@ public class RestoreStudySubjectServlet extends Controller {
 
 		SubjectDAO sdao = getSubjectDAO();
 		StudySubjectDAO subdao = getStudySubjectDAO();
-		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
-		DiscrepancyNoteDAO discDao = getDiscrepancyNoteDAO();
 
 		if (StringUtil.isBlank(studySubIdString) || StringUtil.isBlank(subIdString)
 				|| StringUtil.isBlank(studyIdString)) {
@@ -161,8 +155,8 @@ public class RestoreStudySubjectServlet extends Controller {
 
 						getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
 
-						SubjectEventStatusUtil.determineSubjectEventState(event, eventCRFs, new DAOWrapper(studydao,
-								getCRFVersionDAO(), sedao, subdao, ecdao, edcdao, discDao));
+						SubjectEventStatusUtil.determineSubjectEventState(event, eventCRFs, new DAOWrapper(
+								getDataSource()));
 					}
 				}
 

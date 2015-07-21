@@ -13,17 +13,10 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.DateUtil;
+import com.clinovo.util.EventCRFUtil;
+import com.clinovo.util.SignUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -79,9 +72,14 @@ import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.EventCRFUtil;
-import com.clinovo.util.SignUtil;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * ListEventsForSubjectTableFactory class.
@@ -280,9 +278,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			theItem.put("subject", subjectBean);
 			theItem.put("subject.charGender", subjectBean.getGender());
 
-			theItem.put("isSignable", SignUtil.permitSign(studySubjectBean, new DAOWrapper(getStudyDAO(),
-					getCRFVersionDAO(), getStudyEventDAO(), getStudySubjectDAO(), getEventCRFDAO(),
-					getEventDefintionCRFDAO(), getDiscrepancyNoteDAO())));
+			theItem.put("isSignable", SignUtil.permitSign(studySubjectBean, new DAOWrapper(getStudyDAO().getDs())));
 
 			// study group classes
 			SubjectGroupMapBean subjectGroupMapBean;
@@ -866,8 +862,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			for (DisplayBean display : events) {
 				eventStartDate = (Date) display.getProps().get("studySubject.createdDate");
 				url.append("<table border='0'  cellpadding='0'  cellspacing='0' ><tr valign='top' ><td>");
-				url.append(eventStartDate == null ? "" : DateUtil.printDate(eventStartDate,
-						getCurrentUser().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
+				url.append(eventStartDate == null ? "" : DateUtil.printDate(eventStartDate, getCurrentUser()
+						.getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 				url.append("</td></tr></table>");
 			}
 			return url.toString();
@@ -931,10 +927,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 	private class ActionsCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
-			return ListStudySubjectTableFactory.getSubjectActionsColumnContent(item, getCurrentUser(), getCurrentRole(),
-					getStudyBean(), new DAOWrapper(getStudyDAO(), getStudyEventDAO(), getStudySubjectDAO(),
-							getEventCRFDAO(), getEventDefintionCRFDAO(), getStudyEventDefinitionDAO(),
-							getDiscrepancyNoteDAO()), resword, getRequest());
+			return ListStudySubjectTableFactory.getSubjectActionsColumnContent(item, getCurrentUser(),
+					getCurrentRole(), getStudyBean(), new DAOWrapper(getStudyDAO().getDs()), resword, getRequest());
 		}
 	}
 
@@ -1139,8 +1133,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 							+ eventDivBuilderWrapper.studyEvents.get(0).getSampleOrdinal() + " of "
 							+ eventDivBuilderWrapper.eventOccurrencesNumber).br();
 			if (eventDivBuilderWrapper.studyEvents.size() > 0) {
-				eventDiv.append(DateUtil.printDate(eventDivBuilderWrapper.studyEvents.get(0).getDateStarted(),
-								getCurrentUser().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale())).br();
+				eventDiv.append(
+						DateUtil.printDate(eventDivBuilderWrapper.studyEvents.get(0).getDateStarted(), getCurrentUser()
+								.getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale())).br();
 
 			} else {
 				eventDiv.append(status + " : " + SubjectEventStatus.NOT_SCHEDULED.getName());

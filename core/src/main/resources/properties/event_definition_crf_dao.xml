@@ -40,9 +40,13 @@
 		<!-- Find all that have parents
 		     and currently those are for study  -->
 		<sql>SELECT * FROM EVENT_DEFINITION_CRF Where study_event_definition_id=?
-		     and parent_id is not null
-		     order by ordinal asc
+			and parent_id is not null
+			order by ordinal asc
 		</sql>
+	</query>
+	<query>
+		<name>findAllChildrenByParentId</name>
+		<sql>SELECT * FROM event_definition_crf WHERE parent_id = ? ORDER BY ordinal ASC</sql>
 	</query>
 	<query>
 		<name>findAllByDefinitionAndSiteIdAndParentStudyId</name>
@@ -86,6 +90,10 @@
            SOURCE_DATA_VERIFICATION_CODE=?, SELECTED_VERSION_IDS=?, PARENT_ID=?, EMAIL_STEP=?, EMAIL_TO=?, EVALUATED_CRF=?, TABBING_MODE=?, ACCEPT_NEW_CRF_VERSIONS=?
            WHERE EVENT_DEFINITION_CRF_ID=?
 	    </sql>
+	</query>
+	<query>
+		<name>updateStatus</name>
+		<sql>UPDATE EVENT_DEFINITION_CRF SET STATUS_ID=?, DATE_UPDATED=NOW(), UPDATE_ID=? WHERE EVENT_DEFINITION_CRF_ID=?</sql>
 	</query>
 	<query>
 		<name>findAllByEventDefinitionId</name>

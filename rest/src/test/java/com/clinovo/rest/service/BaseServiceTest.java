@@ -6,8 +6,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -22,7 +25,9 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -58,8 +63,14 @@ import com.clinovo.rest.security.PermissionChecker;
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:servlet-context.xml")
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class BaseServiceTest extends DefaultAppContextTest {
+
+	private List<Integer> edcIds = new ArrayList<Integer>();
+	private List<Integer> sedIds = new ArrayList<Integer>();
+
+	protected String mailSenderHost = null;
+	protected String additionalUserName = null;
 
 	protected MediaType mediaType = MediaType.APPLICATION_JSON;
 
@@ -91,6 +102,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	// Managed services
 	public static final String API_EVENT = "/event";
+	public static final String API_EVENT_REMOVE_CRF = "/event/removeCrf";
+	public static final String API_EVENT_RESTORE_CRF = "/event/restoreCrf";
 	public static final String API_EVENT_REMOVE = "/event/remove";
 	public static final String API_EVENT_RESTORE = "/event/restore";
 	public static final String API_EVENT_EDIT = "/event/edit";
@@ -143,7 +156,23 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		return (StudyBean) studyDAO.create(site);
 	}
 
-	private void deleteUser(UserAccountBean userAccountBean) {
+	protected void deleteEventDefinitionCrfs(List<Integer> edcIds) {
+		if (edcIds != null && edcIds.size() > 0) {
+			userAccountDAO.execute(
+					"delete from event_definition_crf where event_definition_crf_id in (".concat(
+							edcIds.toString().replaceAll("]|\\[", "")).concat(")"), new HashMap());
+		}
+	}
+
+	protected void deleteStudyEventDefinitions(List<Integer> sedIds) {
+		if (sedIds != null && sedIds.size() > 0) {
+			userAccountDAO.execute(
+					"delete from study_event_definition where study_event_definition_id in (".concat(
+							sedIds.toString().replaceAll("]|\\[", "")).concat(")"), new HashMap());
+		}
+	}
+
+	protected void deleteUser(UserAccountBean userAccountBean) {
 		userAccountDAO.execute(
 				"delete from authorities where username = '".concat(userAccountBean.getName()).concat("'"),
 				new HashMap());
@@ -247,6 +276,16 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public void before() throws Exception {
 		super.setUp();
 
+		if (this instanceof EventServiceTest) {
+			for (EventDefinitionCRFBean edc : (Collection<EventDefinitionCRFBean>) eventDefinitionCRFDAO.findAll()) {
+				edcIds.add(edc.getId());
+			}
+			for (StudyEventDefinitionBean sed : (Collection<StudyEventDefinitionBean>) studyEventDefinitionDAO
+					.findAll()) {
+				sedIds.add(sed.getId());
+			}
+		}
+
 		result = null;
 		restOdmContainer = null;
 
@@ -285,6 +324,27 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	@After
 	public void after() {
+		if (this instanceof EventServiceTest) {
+			List<Integer> allEdcIds = new ArrayList<Integer>();
+			List<Integer> allSedIds = new ArrayList<Integer>();
+			for (EventDefinitionCRFBean edc : (Collection<EventDefinitionCRFBean>) eventDefinitionCRFDAO.findAll()) {
+				allEdcIds.add(edc.getId());
+			}
+			for (StudyEventDefinitionBean sed : (Collection<StudyEventDefinitionBean>) studyEventDefinitionDAO
+					.findAll()) {
+				allSedIds.add(sed.getId());
+			}
+			allEdcIds.removeAll(edcIds);
+			allSedIds.removeAll(sedIds);
+			deleteEventDefinitionCrfs(allEdcIds);
+			deleteStudyEventDefinitions(allSedIds);
+		}
+		if (mailSenderHost != null) {
+			mailSender.setHost(mailSenderHost);
+		}
+		if (additionalUserName != null) {
+			deleteUser((UserAccountBean) userAccountDAO.findByUserName(additionalUserName));
+		}
 		if (newUser != null && newUser.getId() > 0) {
 			deleteUser(newUser);
 		}

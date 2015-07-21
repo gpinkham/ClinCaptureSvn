@@ -20,41 +20,28 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
 
 /**
- * Restores a removed study event definition and all its related data
+ * Restores a removed study event definition and all its related data.
  * 
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@SuppressWarnings({"serial"})
 @Component
 public class RestoreEventDefinitionServlet extends Controller {
 	/**
@@ -73,7 +60,8 @@ public class RestoreEventDefinitionServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
@@ -82,34 +70,14 @@ public class RestoreEventDefinitionServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-		UserAccountBean currentUser = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountBean updater = getUserAccountBean(request);
 
 		String idString = request.getParameter("id");
-
 		int defId = Integer.valueOf(idString.trim());
-		StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(getDataSource());
-		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
-		// find all CRFs
-		EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(getDataSource());
-		ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList<EventDefinitionCRFBean>) edao
-				.findAllByDefinition(defId);
-
-		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
-		CRFDAO cdao = new CRFDAO(getDataSource());
-		for (EventDefinitionCRFBean edc : eventDefinitionCRFs) {
-			ArrayList versions = (ArrayList) cvdao.findAllByCRF(edc.getCrfId());
-			edc.setVersions(versions);
-			CRFBean crf = (CRFBean) cdao.findByPK(edc.getCrfId());
-			edc.setCrfName(crf.getName());
-			CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
-			edc.setDefaultVersionName(defaultVersion.getName());
-		}
-
-		// finds all events
-		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-		ArrayList<StudyEventBean> events = (ArrayList<StudyEventBean>) sedao.findAllByDefinition(sed.getId());
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
+				.findByPK(defId);
+		studyEventDefinitionBean.setUpdater(updater);
 
 		String action = request.getParameter("action");
 		if (StringUtil.isBlank(idString)) {
@@ -117,55 +85,26 @@ public class RestoreEventDefinitionServlet extends Controller {
 			forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
-				if (!sed.getStatus().equals(Status.DELETED)) {
-					addPageMessage(respage.getString("this_SED_cannot_be_restored") + " "
+				if (!studyEventDefinitionBean.getStatus().equals(Status.DELETED)) {
+					addPageMessage(
+							respage.getString("this_SED_cannot_be_restored") + " "
 									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
 					forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 					return;
 				}
-
-				request.setAttribute("definitionToRestore", sed);
-				request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
-				request.setAttribute("events", events);
+				request.setAttribute("definitionToRestore", studyEventDefinitionBean);
+				request.setAttribute("eventDefinitionCRFs",
+						getEventDefinitionService().getAllEventDefinitionCrfs(studyEventDefinitionBean));
+				request.setAttribute("events", getEventDefinitionService().getAllStudyEvents(studyEventDefinitionBean));
 				forwardPage(Page.RESTORE_DEFINITION, request, response);
 			} else {
 				logger.info("submit to restore the definition");
-				// restore definition
-				sed.setStatus(Status.AVAILABLE);
-				sed.setUpdater(currentUser);
-				sed.setUpdatedDate(new Date());
-				sdao.update(sed);
 
-				// restore all crfs
-				for (EventDefinitionCRFBean edc : eventDefinitionCRFs) {
-					if (edc.getStatus().equals(Status.AUTO_DELETED)) {
-						edc.setStatus(Status.AVAILABLE);
-						edc.setUpdater(currentUser);
-						edc.setUpdatedDate(new Date());
-						edao.update(edc);
-					}
-				}
+				getEventDefinitionService().restoreStudyEventDefinition(studyEventDefinitionBean, updater);
 
-				// restore all events
-				EventCRFDAO ecdao = getEventCRFDAO();
-				for (StudyEventBean event : events) {
-
-					if (event.getStatus().equals(Status.AUTO_DELETED)) {
-
-						event.setStatus(Status.AVAILABLE);
-						event.setUpdater(currentUser);
-						event.setUpdatedDate(new Date());
-						sedao.update(event);
-
-						ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(event);
-
-						getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
-					}
-				}
-
-				String emailBody = new StringBuilder("").append(respage.getString("the_SED")).append(" ").append(sed.getName())
-						.append("(").append(respage.getString("and_all_associated_event_data_restored_to_study"))
-						.append(currentStudy.getName()).append(".").toString();
+				String emailBody = respage.getString("the_SED").concat(" ").concat(studyEventDefinitionBean.getName())
+						.concat("(").concat(respage.getString("and_all_associated_event_data_restored_to_study"))
+						.concat(currentStudy.getName()).concat(".");
 
 				addPageMessage(emailBody, request);
 

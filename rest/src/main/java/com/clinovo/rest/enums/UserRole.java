@@ -44,6 +44,9 @@ public enum UserRole {
 	STUDY_DIRECTOR_ADMIN(Role.STUDY_DIRECTOR.getCode(), UserType.SYSADMIN.getCode()), STUDY_DIRECTOR_USER(
 			Role.STUDY_DIRECTOR.getCode(), UserType.USER.getCode()),
 
+	SITE_MONITOR_ADMIN(Role.SITE_MONITOR.getCode(), UserType.SYSADMIN.getCode()), SITE_MONITOR_USER(Role.SITE_MONITOR
+			.getCode(), UserType.USER.getCode()),
+
 	CRC_ADMIN(Role.CLINICAL_RESEARCH_COORDINATOR.getCode(), UserType.SYSADMIN.getCode()), CRC_USER(
 			Role.CLINICAL_RESEARCH_COORDINATOR.getCode(), UserType.USER.getCode()),
 

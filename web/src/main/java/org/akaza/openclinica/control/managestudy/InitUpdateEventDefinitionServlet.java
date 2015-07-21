@@ -20,17 +20,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.NullValue;
+import com.clinovo.util.SignStateRestorer;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -38,22 +28,19 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.domain.SourceDataVerification;
-import org.akaza.openclinica.util.EventDefinitionInfo;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.SignStateRestorer;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Prepares to update study event definition.
@@ -61,7 +48,7 @@ import com.clinovo.util.SignStateRestorer;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "serial"})
 @Component
 public class InitUpdateEventDefinitionServlet extends Controller {
 
@@ -122,22 +109,6 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 
 	}
 
-	private SignStateRestorer prepareSignStateRestorer(ArrayList edcs) {
-		SignStateRestorer signStateRestorer = new SignStateRestorer();
-		for (Object object : edcs) {
-			EventDefinitionCRFBean eventDefinitionCrf = (EventDefinitionCRFBean) object;
-			if (eventDefinitionCrf.getStatus() != Status.AVAILABLE || !eventDefinitionCrf.isActive()) {
-				continue;
-			}
-			EventDefinitionInfo edi = new EventDefinitionInfo();
-			edi.id = eventDefinitionCrf.getId();
-			edi.required = eventDefinitionCrf.isRequiredCRF();
-			edi.defaultVersionId = eventDefinitionCrf.getDefaultVersionId();
-			signStateRestorer.getEventDefinitionInfoMap().put(eventDefinitionCrf.getId(), edi);
-		}
-		return signStateRestorer;
-	}
-
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String idString = request.getParameter("id");
@@ -154,9 +125,9 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 		} else {
 			// definition id
 			int defId = Integer.valueOf(idString.trim());
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
+			StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) sdao.findByPK(defId);
 
-			if (currentStudy.getId() != sed.getStudyId()) {
+			if (currentStudy.getId() != studyEventDefinitionBean.getStudyId()) {
 				addPageMessage(
 						respage.getString("no_have_correct_privilege_current_study") + " "
 								+ respage.getString("change_active_study_or_contact"), request);
@@ -164,87 +135,27 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 				return;
 			}
 
-			EventDefinitionCRFDAO edao = getEventDefinitionCRFDAO();
-			ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllParentsByDefinition(defId);
+			List<EventDefinitionCRFBean> eventDefinitionCRFs = getEventDefinitionService()
+					.getAllParentsEventDefinitionCrfs(studyEventDefinitionBean);
+
 			// Get list of child EventDefinitionCRFs for cascading actions
-			ArrayList<EventDefinitionCRFBean> childEventDefCRFs = edao.findAllChildrenByDefinition(defId);
+			List<EventDefinitionCRFBean> childEventDefCRFs = getEventDefinitionService()
+					.getAllChildrenEventDefinitionCrfs(studyEventDefinitionBean);
 
-			CRFVersionDAO cvdao = getCRFVersionDAO();
-			CRFDAO cdao = getCRFDAO();
-			ArrayList newEventDefinitionCRFs = new ArrayList();
-			for (Object eventDefinitionCRF : eventDefinitionCRFs) {
-				EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRF;
-				ArrayList versions = (ArrayList) cvdao.findAllActiveByCRF(edc.getCrfId());
-				edc.setVersions(versions);
-				CRFBean crf = (CRFBean) cdao.findByPK(edc.getCrfId());
-				edc.setCrfName(crf.getName());
-				edc.setCrf(crf);
-				// TO DO: use a better way on JSP page,eg.function tag
-				edc.setNullFlags(processNullValues(edc));
+			SignStateRestorer signStateRestorer = getEventDefinitionService().prepareSignStateRestorer(
+					eventDefinitionCRFs);
 
-				CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
-				edc.setDefaultVersionName(defaultVersion.getName());
-
-				SourceDataVerification.fillSDVStatuses(edc.getSdvOptions(),
-						getItemSDVService().hasItemsToSDV(crf.getId()));
-
-				newEventDefinitionCRFs.add(edc);
-			}
-
-			for (EventDefinitionCRFBean childEdc : childEventDefCRFs) {
-				ArrayList versions = (ArrayList) cvdao.findAllActiveByCRF(childEdc.getCrfId());
-				childEdc.setVersions(versions);
-				CRFBean crf = (CRFBean) cdao.findByPK(childEdc.getCrfId());
-				childEdc.setCrfName(crf.getName());
-				childEdc.setCrf(crf);
-				childEdc.setNullFlags(processNullValues(childEdc));
-
-				CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(childEdc.getDefaultVersionId());
-				childEdc.setDefaultVersionName(defaultVersion.getName());
-			}
-
-			request.getSession().setAttribute("definition", sed);
-			request.getSession().setAttribute("eventDefinitionCRFs", newEventDefinitionCRFs);
+			request.getSession().setAttribute("definition", studyEventDefinitionBean);
+			request.getSession().setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
 			// store child list to session
 			request.getSession().setAttribute("childEventDefCRFs", childEventDefCRFs);
 			// changed above to new list because static, in-place updating is updating all EDCs
 
-			request.getSession().setAttribute("signStateRestorer", prepareSignStateRestorer(newEventDefinitionCRFs));
+			request.getSession().setAttribute("signStateRestorer", signStateRestorer);
 
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}
 
-	}
-
-	private HashMap processNullValues(EventDefinitionCRFBean edc) {
-		HashMap flags = new LinkedHashMap();
-		String s = "";
-		// edc.getNullValues();
-		for (int j = 0; j < edc.getNullValuesList().size(); j++) {
-			NullValue nv1 = (NullValue) edc.getNullValuesList().get(j);
-			s = s + nv1.getName().toUpperCase() + ",";
-		}
-		logger.info("********:" + s);
-		for (int i = 1; i <= NullValue.toArrayList().size(); i++) {
-			String nv = NullValue.get(i).getName().toUpperCase();
-			// if (s.indexOf(nv) >= 0) {
-			// indexOf won't save us
-			// because NA and NASK will come back both positive, for example
-			// rather, we need a regexp here
-			Pattern p = Pattern.compile(nv + "\\W");
-			// find our word with a non-word character after it (,)
-			Matcher m = p.matcher(s);
-			if (m.find()) {
-				flags.put(nv, "1");
-				logger.info("********1:" + nv + " found at " + m.start() + ", " + m.end());
-			} else {
-				flags.put(nv, "0");
-				logger.info("********0:" + nv);
-			}
-
-		}
-
-		return flags;
 	}
 
 	private void setUserNameInsteadEmail(HttpServletRequest request) {

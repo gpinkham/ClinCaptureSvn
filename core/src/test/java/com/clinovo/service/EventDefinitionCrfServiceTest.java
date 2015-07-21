@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.junit.Test;
 
@@ -73,4 +76,39 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 		assertTrue(childEventDefinitionCrfBean.getSelectedVersionIds().equals("2,1"));
 	}
 
+	@Test
+	public void testThatFillEventDefinitionCrfMethodWorksCorrectly() {
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(1);
+		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		eventDefinitionCrfService.fillEventDefinitionCrf(eventDefinitionCrfBean, studyEventDefinitionBean);
+		assertTrue(eventDefinitionCrfBean.getEventName().equals(studyEventDefinitionBean.getName()));
+		assertTrue(eventDefinitionCrfBean.getCrfName().equals(
+				crfdao.findByPK(eventDefinitionCrfBean.getCrfId()).getName()));
+		assertTrue(eventDefinitionCrfBean.getDefaultVersionName().equals(
+				crfVersionDao.findByPK(eventDefinitionCrfBean.getDefaultVersionId()).getName()));
+	}
+
+	@Test
+	public void testThatRemoveEventDefinitionCrfMethodRemovesEventDefinitionCRFBeanCorrectly() throws Exception {
+		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		CRFBean crfBean = (CRFBean) crfdao.findByPK(eventDefinitionCrfBean.getCrfId());
+		eventDefinitionCrfBean.setCrf(crfBean);
+		eventDefinitionCrfService.removeEventDefinitionCrf(eventDefinitionCrfBean, userBean);
+		assertTrue(((EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1)).getStatus() == Status.DELETED);
+	}
+
+	@Test
+	public void testThatRestoreEventDefinitionCrfMethodRestoresEventDefinitionCRFBeanCorrectly() throws Exception {
+		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		CRFBean crfBean = (CRFBean) crfdao.findByPK(eventDefinitionCrfBean.getCrfId());
+		eventDefinitionCrfBean.setUpdater(userBean);
+		eventDefinitionCrfBean.setStatus(Status.DELETED);
+		eventDefinitionCrfBean.setCrf(crfBean);
+		eventDefinitionCRFDAO.update(eventDefinitionCrfBean);
+		eventDefinitionCrfService.restoreEventDefinitionCrf(eventDefinitionCrfBean, userBean);
+		assertTrue(((EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1)).getStatus() == Status.AVAILABLE);
+	}
 }

@@ -13,9 +13,13 @@
 
 package org.akaza.openclinica.bean.managestudy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.oid.OidGenerator;
+import org.akaza.openclinica.bean.oid.StudyEventDefinitionOidGenerator;
 
 import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -23,14 +27,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-
-import org.akaza.openclinica.bean.core.AuditableEntityBean;
-import org.akaza.openclinica.bean.oid.OidGenerator;
-import org.akaza.openclinica.bean.oid.StudyEventDefinitionOidGenerator;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * StudyEventDefinitionBean.
@@ -124,6 +123,7 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 	private boolean referenceVisit = false;
 
 	@JsonProperty("eventdefinitioncrfs")
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	@XmlElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private List<EventDefinitionCRFBean> eventDefinitionCrfs = new ArrayList<EventDefinitionCRFBean>();
 
@@ -137,6 +137,9 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 		return name;
 	}
 
+	/**
+	 * Default constructor.
+	 */
 	public StudyEventDefinitionBean() {
 		this.oidGenerator = new StudyEventDefinitionOidGenerator();
 	}
@@ -149,6 +152,13 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 		this.oid = oid;
 	}
 
+	/**
+	 * Returns oid generator.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @return OidGenerator
+	 */
 	public OidGenerator getOidGenerator(DataSource ds) {
 		if (oidGenerator != null) {
 			oidGenerator.setDataSource(ds);
@@ -318,6 +328,9 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 		this.crfsWithDefaultVersion = crfsWithDefaultVersion;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public int compareTo(Object o) {
 		if (o == null || !o.getClass().equals(this.getClass())) {
 			return 0;
@@ -347,40 +360,40 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 		return minDay;
 	}
 
-	public void setMinDay(int min_day) {
-		this.minDay = min_day;
+	public void setMinDay(int minDay) {
+		this.minDay = minDay;
 	}
 
 	public int getMaxDay() {
 		return maxDay;
 	}
 
-	public void setMaxDay(int max_day) {
-		this.maxDay = max_day;
+	public void setMaxDay(int maxDay) {
+		this.maxDay = maxDay;
 	}
 
 	public int getEmailDay() {
 		return emailDay;
 	}
 
-	public void setEmailDay(int email_day) {
-		this.emailDay = email_day;
+	public void setEmailDay(int emailDay) {
+		this.emailDay = emailDay;
 	}
 
 	public int getScheduleDay() {
 		return scheduleDay;
 	}
 
-	public void setScheduleDay(int schedule_day) {
-		this.scheduleDay = schedule_day;
+	public void setScheduleDay(int scheduleDay) {
+		this.scheduleDay = scheduleDay;
 	}
 
 	public int getUserEmailId() {
 		return userEmailId;
 	}
 
-	public void setUserEmailId(int user_email_id) {
-		this.userEmailId = user_email_id;
+	public void setUserEmailId(int userEmailId) {
+		this.userEmailId = userEmailId;
 	}
 
 	public boolean getReferenceVisit() {

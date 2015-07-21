@@ -13,18 +13,8 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SignUtil;
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.StudyEventAuditBean;
@@ -53,7 +43,6 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -72,8 +61,16 @@ import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SignUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Handles signing of subject casebook.
@@ -198,12 +195,8 @@ public class SignStudySubjectServlet extends Controller {
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
-		StudyDAO studyDao = new StudyDAO(getDataSource());
 		StudySubjectDAO subdao = new StudySubjectDAO(getDataSource());
 		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
-		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
 		final int four = 4;
 		final int five = 5;
@@ -221,8 +214,7 @@ public class SignStudySubjectServlet extends Controller {
 			return;
 		}
 		StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
-		if (!SignUtil.permitSign(studySub, new DAOWrapper(studyDao, getCRFVersionDAO(), sedao, subdao, ecdao, edcdao,
-				dndao))) {
+		if (!SignUtil.permitSign(studySub, new DAOWrapper(getDataSource()))) {
 			addPageMessage(respage.getString("subject_event_cannot_signed"), request);
 			// for navigation purpose (to avoid double url in stack)
 			request.getSession().setAttribute("skipURL", "true");

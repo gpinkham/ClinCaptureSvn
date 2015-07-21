@@ -27,15 +27,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
-import java.util.Date;
 import java.util.List;
 
 @Service("itemDataService")
 public class ItemDataServiceImpl implements ItemDataService {
 
-	@Autowired private DataSource dataSource;
+	@Autowired
+	private DataSource dataSource;
 
-	@Autowired private CodedItemService codedItemService;
+	@Autowired
+	private CodedItemService codedItemService;
 
 	private ItemDataDAO itemDataDAO;
 
@@ -65,8 +66,7 @@ public class ItemDataServiceImpl implements ItemDataService {
 			if (!item.getStatus().isDeleted()) {
 				item.setStatus(Status.AUTO_DELETED);
 				item.setUpdater(updater);
-				item.setUpdatedDate(new Date());
-				getItemDataDAO().update(item);
+				getItemDataDAO().updateStatus(item);
 			}
 
 			CodedItem codedItem = getCodedItemService().findCodedItem(item.getId());
@@ -87,8 +87,7 @@ public class ItemDataServiceImpl implements ItemDataService {
 			if (item.getStatus().equals(Status.AUTO_DELETED)) {
 				item.setStatus(Status.UNAVAILABLE);
 				item.setUpdater(updater);
-				item.setUpdatedDate(new Date());
-				getItemDataDAO().update(item);
+				getItemDataDAO().updateStatus(item);
 			}
 
 			CodedItem codedItem = getCodedItemService().findCodedItem(item.getId());

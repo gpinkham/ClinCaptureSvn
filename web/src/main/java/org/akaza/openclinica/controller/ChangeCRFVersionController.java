@@ -25,9 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -46,9 +43,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -70,6 +65,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * Controller handles requests for item data migration between two CRF versions for specific event CRF.
@@ -126,11 +125,11 @@ public class ChangeCRFVersionController {
 	 */
 	@RequestMapping(value = "/managestudy/chooseCRFVersion", method = RequestMethod.GET)
 	public ModelMap chooseCRFVersion(HttpServletRequest request, HttpServletResponse response,
-									 @RequestParam("crfId") int crfId, @RequestParam("crfName") String crfName,
-									 @RequestParam("crfversionId") int crfVersionId, @RequestParam("crfVersionName") String crfVersionName,
-									 @RequestParam("studySubjectLabel") String studySubjectLabel,
-									 @RequestParam("studySubjectId") int studySubjectId, @RequestParam("eventCRFId") int eventCRFId,
-									 @RequestParam("eventDefinitionCRFId") int eventDefinitionCRFId) {
+			@RequestParam("crfId") int crfId, @RequestParam("crfName") String crfName,
+			@RequestParam("crfversionId") int crfVersionId, @RequestParam("crfVersionName") String crfVersionName,
+			@RequestParam("studySubjectLabel") String studySubjectLabel,
+			@RequestParam("studySubjectId") int studySubjectId, @RequestParam("eventCRFId") int eventCRFId,
+			@RequestParam("eventDefinitionCRFId") int eventDefinitionCRFId) {
 
 		// to be removed for aquamarine
 		if (!mayProceed(request)) {
@@ -302,15 +301,12 @@ public class ChangeCRFVersionController {
 		if (selectedVersionId == -1) {
 			String errorMessage = resword.getString("confirm_crf_version_em_select_version"); // "Please select CRF version";
 			StringBuilder params = new StringBuilder();
-			params.append("/pages/managestudy/chooseCRFVersion?crfId=").append(crfId)
-					.append("&crfName=").append(crfName)
-					.append("&crfversionId=").append(crfVersionId)
-					.append("&crfVersionName=").append(crfVersionName)
-					.append("&studySubjectLabel=").append(studySubjectLabel)
-					.append("&studySubjectId=").append(studySubjectId)
-					.append("&eventCRFId=").append(eventCRFId)
-					.append("&eventDefinitionCRFId=").append(eventDefinitionCRFId)
-					.append("&errorMessage=").append(errorMessage);
+			params.append("/pages/managestudy/chooseCRFVersion?crfId=").append(crfId).append("&crfName=")
+					.append(crfName).append("&crfversionId=").append(crfVersionId).append("&crfVersionName=")
+					.append(crfVersionName).append("&studySubjectLabel=").append(studySubjectLabel)
+					.append("&studySubjectId=").append(studySubjectId).append("&eventCRFId=").append(eventCRFId)
+					.append("&eventDefinitionCRFId=").append(eventDefinitionCRFId).append("&errorMessage=")
+					.append(errorMessage);
 
 			if (redirect(request, response, params.toString()) == null) {
 				return null;
@@ -459,8 +455,9 @@ public class ChangeCRFVersionController {
 
 			for (ItemDataBean itemData : itemFromCurrentCrfVersion.getItemDataElements()) {
 				row = new String[EIGHT];
-				row[ZERO] = (groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup()) ? itemFromCurrentCrfVersion
-						.getName() + " (" + itemData.getOrdinal() + ")" : itemFromCurrentCrfVersion.getName();
+				row[ZERO] = (groupMetaDataBeanForItemFromCurrentCrfVersion.isRepeatingGroup())
+						? itemFromCurrentCrfVersion.getName() + " (" + itemData.getOrdinal() + ")"
+						: itemFromCurrentCrfVersion.getName();
 				row[ONE] = itemFromCurrentCrfVersion.getOid();
 				row[TWO] = String.valueOf(itemFromCurrentCrfVersion.getId());
 				row[THREE] = itemData.getValue();
@@ -610,14 +607,11 @@ public class ChangeCRFVersionController {
 			String msg = resword.getString("confirm_crf_version_ms");
 			org.akaza.openclinica.control.core.Controller.addPageMessage(msg, request, logger);
 			org.akaza.openclinica.control.core.Controller.storePageMessages(request);
-			StudyDAO studyDAO = new StudyDAO(dataSource);
-			CRFVersionDAO cvdao = new CRFVersionDAO(dataSource);
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
-			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(dataSource);
 			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(dataSource);
-			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(studyEventBean.getStudyEventDefinitionId());
+			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(studyEventBean
+					.getStudyEventDefinitionId());
 			SubjectEventStatusUtil.determineSubjectEventStates(sedBean, studySubBean, getCurrentUser(request),
-					new DAOWrapper(studyDAO, cvdao, sedao, studySubDao, eventCRFDAO, edcdao, dndao));
+					new DAOWrapper(dataSource));
 			response.sendRedirect(Navigation.getSavedUrl(request));
 		} catch (Exception e) {
 
@@ -629,6 +623,7 @@ public class ChangeCRFVersionController {
 
 	/**
 	 * ExceptionHandler for exceptions of class <code>HttpSessionRequiredException</code>.
+	 * 
 	 * @return String
 	 */
 	@ExceptionHandler(HttpSessionRequiredException.class)

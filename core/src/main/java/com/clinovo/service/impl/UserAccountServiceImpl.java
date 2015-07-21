@@ -15,16 +15,7 @@
 
 package com.clinovo.service.impl;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.mail.internet.MimeMessage;
-import javax.sql.DataSource;
-
+import com.clinovo.service.UserAccountService;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -45,7 +36,14 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.clinovo.service.UserAccountService;
+import javax.mail.internet.MimeMessage;
+import javax.sql.DataSource;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * UserAccountServiceImpl.
@@ -436,11 +434,12 @@ public class UserAccountServiceImpl implements UserAccountService {
 		activeStudyRole.setOwner(ownerUser);
 		userAccountBean.addRole(activeStudyRole);
 
-		userAccountBean = (UserAccountBean) userAccountDAO.create(userAccountBean);
+		userAccountDAO.create(userAccountBean);
 
 		if (userAccountBean.getId() > 0) {
 			authoritiesDao.saveOrUpdate(new AuthoritiesBean(userAccountBean.getName()));
 			if (!displayPassword) {
+				userAccountBean.setPasswd("");
 				sendEmail(userAccountBean, password,
 						new StudyDAO(dataSource).findByPK(userAccountBean.getActiveStudyId()).getName());
 			} else {

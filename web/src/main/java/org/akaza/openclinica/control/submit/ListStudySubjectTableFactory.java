@@ -191,8 +191,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn(columnNames[index]), currentStudy != null ? currentStudy
 				.getStudyParameterConfig().getStudySubjectIdLabel() : resword.getString("study_subject_ID"), null, null);
 		++index;
-		configureColumn(row.getColumn(columnNames[index]), resword.getString("subject_creation_date"),
-				new DateEditor(getCurrentUser().getUserTimeZoneId()), null);
+		configureColumn(row.getColumn(columnNames[index]), resword.getString("subject_creation_date"), new DateEditor(
+				getCurrentUser().getUserTimeZoneId()), null);
 		++index;
 		configureColumn(row.getColumn(columnNames[index]), resword.getString("subject_status"), new StatusCellEditor(),
 				new StatusDroplistFilterEditor());
@@ -330,9 +330,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			List<StudyEventBean> allStudyEventsForStudySubject = getStudyEventDAO().findAllByStudySubject(
 					studySubjectBean);
 			HashMap<Integer, List<StudyEventBean>> allStudyEventsForStudySubjectBySedId = new HashMap<Integer, List<StudyEventBean>>();
-			theItem.put("isSignable", SignUtil.permitSign(studySubjectBean, new DAOWrapper(getStudyDAO(),
-					getCrfVersionDAO(), getStudyEventDAO(), getStudySubjectDAO(), getEventCRFDAO(),
-					getEventDefintionCRFDAO(), getDiscrepancyNoteDAO())));
+			theItem.put("isSignable", SignUtil.permitSign(studySubjectBean, new DAOWrapper(getStudyDAO().getDs())));
 
 			for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
 				if (allStudyEventsForStudySubjectBySedId.get(studyEventBean.getStudyEventDefinitionId()) == null) {
@@ -920,9 +918,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private class ActionsCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
 			return getSubjectActionsColumnContent(item, currentUser, getCurrentRole(), getStudyBean(), new DAOWrapper(
-					getStudyDAO(), getStudyEventDAO(), getStudySubjectDAO(), getEventCRFDAO(),
-					getEventDefintionCRFDAO(), getStudyEventDefinitionDao(), getDiscrepancyNoteDAO()), resword,
-					getRequest());
+					getStudyDAO().getDs()), resword, getRequest());
 		}
 	}
 
@@ -1586,13 +1582,20 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	/**
 	 * Method getSubjectActionsColumnContent.
 	 *
-	 * @param item        Object item
-	 * @param currentUser UserAccountBean
-	 * @param currentRole StudyUserRoleBean
-	 * @param studyBean   StudyBean
-	 * @param daoWrapper  DAOWrapper
-	 * @param resword     ResourceBundle
-	 * @param request     HttpServletRequest
+	 * @param item
+	 *            Object item
+	 * @param currentUser
+	 *            UserAccountBean
+	 * @param currentRole
+	 *            StudyUserRoleBean
+	 * @param studyBean
+	 *            StudyBean
+	 * @param daoWrapper
+	 *            DAOWrapper
+	 * @param resword
+	 *            ResourceBundle
+	 * @param request
+	 *            HttpServletRequest
 	 * @return String
 	 */
 	public static String getSubjectActionsColumnContent(Object item, UserAccountBean currentUser,

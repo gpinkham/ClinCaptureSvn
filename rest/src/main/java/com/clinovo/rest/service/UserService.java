@@ -15,9 +15,13 @@
 
 package com.clinovo.rest.service;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
+import com.clinovo.rest.annotation.RestAccess;
+import com.clinovo.rest.annotation.RestParameterPossibleValues;
+import com.clinovo.rest.annotation.RestParametersPossibleValues;
+import com.clinovo.rest.enums.UserRole;
+import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.model.UserDetails;
+import com.clinovo.service.UserAccountService;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -32,13 +36,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.clinovo.rest.annotation.RestAccess;
-import com.clinovo.rest.annotation.RestParameterPossibleValues;
-import com.clinovo.rest.annotation.RestParametersPossibleValues;
-import com.clinovo.rest.enums.UserRole;
-import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.model.UserDetails;
-import com.clinovo.service.UserAccountService;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 /**
  * UserService.
@@ -98,8 +97,9 @@ public class UserService extends BaseService {
 	public UserAccountBean createUser(@RequestParam("username") String userName,
 			@RequestParam("firstname") String firstName, @RequestParam("lastname") String lastName,
 			@RequestParam("email") String email, @RequestParam("phone") String phone,
-			@RequestParam("company") String company, @RequestParam("usertype") int userType,
-			@RequestParam("allowsoap") boolean allowSoap, @RequestParam("displaypassword") boolean displayPassword,
+			@RequestParam("company") String company, @RequestParam(value = "usertype") int userType,
+			@RequestParam(value = "allowsoap", defaultValue = "false", required = false) boolean allowSoap,
+			@RequestParam(value = "displaypassword", defaultValue = "false", required = false) boolean displayPassword,
 			@RequestParam("role") int role) throws Exception {
 		StudyBean studyBean = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 

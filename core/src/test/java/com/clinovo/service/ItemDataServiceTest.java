@@ -1,7 +1,15 @@
 package com.clinovo.service;
 
-import com.clinovo.service.impl.CodedItemServiceImpl;
-import com.clinovo.service.impl.ItemDataServiceImpl;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.internal.util.reflection.Whitebox.setInternalState;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -10,15 +18,8 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import static org.mockito.Mockito.*;
-
-import static org.mockito.internal.util.reflection.Whitebox.*;
-
-import static org.junit.Assert.*;
+import com.clinovo.service.impl.CodedItemServiceImpl;
+import com.clinovo.service.impl.ItemDataServiceImpl;
 
 public class ItemDataServiceTest {
 
@@ -48,25 +49,25 @@ public class ItemDataServiceTest {
 
 		ItemDataList = new ArrayList<ItemDataBean>();
 
-		//0 test Item
+		// 0 test Item
 		ItemDataBean ItemDataInstance = new ItemDataBean();
 		ItemDataInstance.setId(1);
 		ItemDataInstance.setStatus(Status.AVAILABLE);
 		ItemDataList.add(ItemDataInstance);
 
-		//1 test Item
+		// 1 test Item
 		ItemDataInstance = new ItemDataBean();
 		ItemDataInstance.setId(2);
 		ItemDataInstance.setStatus(Status.DELETED);
 		ItemDataList.add(ItemDataInstance);
 
-		//2 test Item
+		// 2 test Item
 		ItemDataInstance = new ItemDataBean();
 		ItemDataInstance.setId(3);
 		ItemDataInstance.setStatus(Status.AUTO_DELETED);
 		ItemDataList.add(ItemDataInstance);
 
-		//3 test Item
+		// 3 test Item
 		ItemDataInstance = new ItemDataBean();
 		ItemDataInstance.setId(4);
 		ItemDataInstance.setStatus(Status.AVAILABLE);
@@ -85,8 +86,7 @@ public class ItemDataServiceTest {
 
 		assertTrue(ItemDataList.get(0).getStatus().equals(Status.AUTO_DELETED));
 		assertTrue(ItemDataList.get(0).getUpdater().equals(updater));
-		assertTrue(ItemDataList.get(0).getUpdatedDate().after(new Date(0)));
-		verify(mockItemDataDAO).update(ItemDataList.get(0));
+		verify(mockItemDataDAO).updateStatus(ItemDataList.get(0));
 		verify(mockCodedItemService).findCodedItem(ItemDataList.get(0).getId());
 
 		assertTrue(ItemDataList.get(1).getStatus().equals(Status.DELETED));
@@ -99,8 +99,7 @@ public class ItemDataServiceTest {
 
 		assertTrue(ItemDataList.get(3).getStatus().equals(Status.AUTO_DELETED));
 		assertTrue(ItemDataList.get(3).getUpdater().equals(updater));
-		assertTrue(ItemDataList.get(3).getUpdatedDate().after(new Date(0)));
-		verify(mockItemDataDAO).update(ItemDataList.get(3));
+		verify(mockItemDataDAO).updateStatus(ItemDataList.get(3));
 		verify(mockCodedItemService).findCodedItem(ItemDataList.get(3).getId());
 	}
 
@@ -119,8 +118,7 @@ public class ItemDataServiceTest {
 
 		assertTrue(ItemDataList.get(2).getStatus().equals(Status.UNAVAILABLE));
 		assertTrue(ItemDataList.get(2).getUpdater().equals(updater));
-		assertTrue(ItemDataList.get(2).getUpdatedDate().after(new Date(0)));
-		verify(mockItemDataDAO).update(ItemDataList.get(2));
+		verify(mockItemDataDAO).updateStatus(ItemDataList.get(2));
 		verify(mockCodedItemService).findCodedItem(ItemDataList.get(2).getId());
 
 		assertTrue(ItemDataList.get(3).getStatus().equals(Status.AVAILABLE));

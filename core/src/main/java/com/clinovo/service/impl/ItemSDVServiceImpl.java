@@ -14,15 +14,10 @@
  *******************************************************************************/
 package com.clinovo.service.impl;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
+import com.clinovo.service.ItemSDVService;
+import com.clinovo.util.CrfShortcutsAnalyzer;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -33,12 +28,8 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -51,10 +42,13 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.clinovo.service.ItemSDVService;
-import com.clinovo.util.CrfShortcutsAnalyzer;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SubjectEventStatusUtil;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Item SDV Service implementation.
@@ -80,7 +74,6 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 		EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
 		ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
 		StudyEventDAO studyEventDao = new StudyEventDAO(dataSource);
-		CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
 		ItemFormMetadataDAO itemFormMetadataDao = new ItemFormMetadataDAO(dataSource);
 		EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
 		boolean dataChanged = false;
@@ -111,9 +104,7 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 			SubjectEventStatusUtil.determineSubjectEventStates(studyEventDao
 					.findStudyEventsByCrfVersionAndSubjectEventStatus(crfVersionId, unSdvEventCrfBeans
 							? SubjectEventStatus.SOURCE_DATA_VERIFIED
-							: SubjectEventStatus.COMPLETED), userAccountBean, new DAOWrapper(new StudyDAO(dataSource),
-					crfVersionDao, studyEventDao, new StudySubjectDAO(dataSource), eventCrfDao, eventDefinitionCrfDao,
-					new DiscrepancyNoteDAO(dataSource)), null);
+							: SubjectEventStatus.COMPLETED), userAccountBean, new DAOWrapper(dataSource), null);
 		}
 	}
 
@@ -163,9 +154,7 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 			eventCrfDao.update(eventCrfBean);
 
 			StudyEventBean studyEventBean = (StudyEventBean) studyEventDao.findByPK(eventCrfBean.getStudyEventId());
-			SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, new DAOWrapper(new StudyDAO(dataSource),
-					new CRFVersionDAO(dataSource), studyEventDao, new StudySubjectDAO(dataSource), eventCrfDao,
-					new EventDefinitionCRFDAO(dataSource), new DiscrepancyNoteDAO(dataSource)));
+			SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, new DAOWrapper(dataSource));
 			studyEventBean.setUpdater(userAccountBean);
 			studyEventBean.setUpdatedDate(new Date());
 			studyEventDao.update(studyEventBean);

@@ -15,16 +15,17 @@
 
 package com.clinovo.rest.advice;
 
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.model.Error;
+import com.clinovo.rest.security.PermissionChecker;
+import com.clinovo.util.RequestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.model.Error;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * RestAdvice.
@@ -50,6 +51,9 @@ public class RestAdvice {
 		int code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		if (ex instanceof RestException) {
 			code = ((RestException) ex).getCode();
+		}
+		if (code == HttpServletResponse.SC_UNAUTHORIZED) {
+			RequestUtil.getRequest().getSession().removeAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
 		}
 		response.setStatus(code);
 		return new Error(ex, code);

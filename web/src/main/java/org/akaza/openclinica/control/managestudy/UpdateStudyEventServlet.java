@@ -20,20 +20,11 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.DateUtil;
+import com.clinovo.util.SignUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
+import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
@@ -63,7 +54,6 @@ import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -83,10 +73,17 @@ import org.joda.time.DateTimeZone;
 import org.quartz.impl.StdScheduler;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SignUtil;
-import com.clinovo.util.SubjectEventStatusUtil;
-import com.clinovo.util.ValidatorHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Performs updating study event action.
@@ -217,8 +214,7 @@ public class UpdateStudyEventServlet extends Controller {
 		// To remove signed status from the list
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-		DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(sm.getDataSource());
-		DAOWrapper daoWrapper = new DAOWrapper(null, null, null, ecdao, edcdao, null, discDao);
+		DAOWrapper daoWrapper = new DAOWrapper(sm.getDataSource());
 		ssdao = new StudySubjectDAO(sm.getDataSource());
 		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
 		StudyBean study = (StudyBean) sdao.findByPK(ssb.getStudyId());

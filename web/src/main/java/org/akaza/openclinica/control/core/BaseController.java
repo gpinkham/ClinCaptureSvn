@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
-import com.clinovo.service.DatasetService;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -75,22 +74,27 @@ import org.springframework.web.context.ServletContextAware;
 
 import com.clinovo.dao.SystemDAO;
 import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.util.RequestUtil;
 import com.clinovo.service.CRFMaskingService;
 import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DatasetService;
 import com.clinovo.service.DcfService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.EventCRFService;
 import com.clinovo.service.EventDefinitionCrfService;
+import com.clinovo.service.EventDefinitionService;
 import com.clinovo.service.ItemSDVService;
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.service.UserAccountService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
 import com.clinovo.util.CrfShortcutsAnalyzer;
+import com.clinovo.util.RequestUtil;
 import com.clinovo.util.RuleSetServiceUtil;
 
+/**
+ * BaseController.
+ */
 @SuppressWarnings({"rawtypes", "serial"})
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
 
@@ -117,7 +121,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public static final String JOB_HOUR = "jobHour";
 	public static final String JOB_MINUTE = "jobMinute";
 
-	public static final String PAGE_MESSAGE = "pageMessages";// for showing
+	public static final String PAGE_MESSAGE = "pageMessages"; // for showing
 	// page
 	// wide message
 
@@ -138,7 +142,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	// Use this variable as the key for the support url
 	public static final String SUPPORT_URL = "supportURL";
 
-	public static final String MODULE = "module";// to determine which module
+	public static final String MODULE = "module"; // to determine which module
 
 	public static final String NOT_USED = "not_used";
 
@@ -249,6 +253,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private SimpleConditionalDisplayService simpleConditionalDisplayService;
 	@Autowired
 	private DatasetService datasetService;
+	@Autowired
+	private EventDefinitionService eventDefinitionService;
 
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
@@ -281,10 +287,12 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	}
 
 	/**
-	 * @param request HttpServletRequest
+	 * @param request
+	 *            HttpServletRequest
 	 * @return SimpleDateFormat
-	 * @deprecated use {@link com.clinovo.util.DateUtil#getDateTimeFormatter(com.clinovo.util.DateUtil.DatePattern,
-	 * java.util.Locale, org.joda.time.DateTimeZone) getDateTimeFormatter} instead.
+	 * @deprecated use
+	 *             {@link com.clinovo.util.DateUtil#getDateTimeFormatter(com.clinovo.util.DateUtil.DatePattern, java.util.Locale, org.joda.time.DateTimeZone)
+	 *             getDateTimeFormatter} instead.
 	 */
 	@Deprecated
 	public SimpleDateFormat getLocalDf(HttpServletRequest request) {
@@ -633,5 +641,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public DatasetService getDatasetService() {
 		return datasetService;
+	}
+
+	public EventDefinitionService getEventDefinitionService() {
+		return eventDefinitionService;
 	}
 }

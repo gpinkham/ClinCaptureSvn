@@ -13,27 +13,11 @@
 
 package org.akaza.openclinica.web.table.sdv;
 
-import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.ItemSDVService;
+import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.DateUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -86,10 +70,24 @@ import org.jmesa.view.html.editor.HtmlCellEditor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.service.ItemSDVService;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SubjectEventStatusUtil;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
 /**
  * A utility class that implements the details of the Source Data Verification (SDV) Jmesa tables.
@@ -294,11 +292,12 @@ public class SDVUtil {
 	 *            int
 	 * @param allowSdvWithOpenQueries
 	 *            boolean
-	 * @param userId int
+	 * @param userId
+	 *            int
 	 * @return int
 	 */
-	public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, int studyId,
-			boolean allowSdvWithOpenQueries, int userId) {
+	public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, int studyId, boolean allowSdvWithOpenQueries,
+			int userId) {
 
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		return eventCRFDAO.getCountOfAvailableWithFilter(studyId, eventCRFSDVFilter, allowSdvWithOpenQueries, userId);
@@ -786,9 +785,8 @@ public class SDVUtil {
 			}
 
 			if (crfBean.getCreatedDate() != null) {
-				tempSDVBean.setEventDate(DateUtil.printDate(crfBean.getCreatedDate(),
-						getCurrentUser(request).getUserTimeZoneId(), DateUtil.DatePattern.DATE,
-						LocaleResolver.getLocale(request)));
+				tempSDVBean.setEventDate(DateUtil.printDate(crfBean.getCreatedDate(), getCurrentUser(request)
+						.getUserTimeZoneId(), DateUtil.DatePattern.DATE, LocaleResolver.getLocale(request)));
 			}
 			tempSDVBean.setEventName(crfBean.getEventName());
 			// The checkbox is next to the study subject id
@@ -821,9 +819,8 @@ public class SDVUtil {
 			}
 
 			if (crfBean.getUpdatedDate() != null) {
-				tempSDVBean.setLastUpdatedDate(DateUtil.printDate(crfBean.getUpdatedDate(),
-						getCurrentUser(request).getUserTimeZoneId(), DateUtil.DatePattern.DATE,
-						LocaleResolver.getLocale(request)));
+				tempSDVBean.setLastUpdatedDate(DateUtil.printDate(crfBean.getUpdatedDate(), getCurrentUser(request)
+						.getUserTimeZoneId(), DateUtil.DatePattern.DATE, LocaleResolver.getLocale(request)));
 			} else {
 				tempSDVBean.setLastUpdatedDate("unknown");
 
@@ -858,11 +855,14 @@ public class SDVUtil {
 
 	private String getViewCrfIcon(HttpServletRequest request, int eventDefinitionCRFId, int studySubjectId) {
 		HtmlBuilder html = new HtmlBuilder();
-		html.a().onclick("openDocWindow('" + request.getContextPath()
+		html.a()
+				.onclick(
+						"openDocWindow('" + request.getContextPath()
 								+ "/ViewSectionDataEntry?cw=1&eventDefinitionCRFId=&eventCRFId=" + eventDefinitionCRFId
 								+ "&tabId=1&studySubjectId=" + studySubjectId + "'); setAccessedObjected(this);")
 				.append(" data-cc-sdvCrfId='").append(eventDefinitionCRFId).append("'");
-		html.href("#").close().img().append(" hspace=\"4px\" src=\"../images/bt_View.gif\" border=\"0\"").close().aEnd();
+		html.href("#").close().img().append(" hspace=\"4px\" src=\"../images/bt_View.gif\" border=\"0\"").close()
+				.aEnd();
 		return html.toString();
 	}
 
@@ -1048,8 +1048,7 @@ public class SDVUtil {
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		CRFVersionDAO cvdao = new CRFVersionDAO(dataSource);
 		ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
-		DAOWrapper daoWrapper = new DAOWrapper(studyDAO, cvdao, studyEventDAO, studySubjectDAO, eventCRFDAO,
-				eventDefinitionCrfDAO, dndao);
+		DAOWrapper daoWrapper = new DAOWrapper(dataSource);
 
 		if (studySubjectIds == null || studySubjectIds.isEmpty()) {
 			return true;
@@ -1128,8 +1127,7 @@ public class SDVUtil {
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		CRFVersionDAO cvdao = new CRFVersionDAO(dataSource);
 		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
-		DAOWrapper daoWrapper = new DAOWrapper(studyDAO, cvdao, studyEventDAO, studySubjectDAO, eventCRFDAO,
-				eventDefinitionCRFDAO, dndao);
+		DAOWrapper daoWrapper = new DAOWrapper(dataSource);
 
 		for (Integer eventCrfId : eventCRFIds) {
 			try {

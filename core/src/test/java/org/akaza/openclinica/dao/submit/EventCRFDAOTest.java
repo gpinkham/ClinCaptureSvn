@@ -132,4 +132,15 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 	public void sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV() {
 		assertTrue(eventCRFDAO.sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV(1, ub.getId(), true));
 	}
+
+	@Test
+	public void testThatUpdateStatusMethodWorksFine() throws OpenClinicaException {
+		EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(2);
+		assertEquals(eventCRFBean.getStatus(), Status.AVAILABLE);
+		eventCRFBean.setUpdater((UserAccountBean) userAccountDAO.findByPK(1));
+		eventCRFBean.setStatus(Status.DELETED);
+		eventCRFDAO.updateStatus(eventCRFBean);
+		eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(2);
+		assertEquals(eventCRFBean.getStatus(), Status.DELETED);
+	}
 }

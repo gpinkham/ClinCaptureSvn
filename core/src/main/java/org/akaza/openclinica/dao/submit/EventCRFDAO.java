@@ -69,7 +69,7 @@ import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
  *         <p/>
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class EventCRFDAO extends AuditableEntityDAO {
 
 	public static final int INT_25 = 25;
@@ -254,6 +254,21 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		}
 
 		return ecb;
+	}
+
+	/**
+	 * Updates EventCRFBean's status.
+	 *
+	 * @param eventCRFBean
+	 *            EventCRFBean
+	 */
+	public void updateStatus(EventCRFBean eventCRFBean) {
+		int ind = 1;
+		HashMap variables = new HashMap();
+		variables.put(ind++, eventCRFBean.getStatus().getId());
+		variables.put(ind++, eventCRFBean.getUpdaterId());
+		variables.put(ind, eventCRFBean.getId());
+		this.execute(digester.getQuery("updateStatus"), variables);
 	}
 
 	/**
@@ -702,7 +717,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 
 		return executeFindAllQuery("findByEventSubjectVersion", variables);
 	}
-	
+
 	/**
 	 * Finds all active event crfs by study event id and crf id.
 	 * 
@@ -1129,7 +1144,8 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	 *            EventCRFSDVFilter
 	 * @param allowSdvWithOpenQueries
 	 *            boolean
-	 * @param userId int
+	 * @param userId
+	 *            int
 	 * @return Integer
 	 */
 	public Integer getCountOfAvailableWithFilter(int studyId, EventCRFSDVFilter filter,
@@ -1212,11 +1228,12 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	 *            int
 	 * @param rowEnd
 	 *            int
-	 * @param userId int can be 0.
+	 * @param userId
+	 *            int can be 0.
 	 * @return ArrayList<EventCRFBean>
 	 */
 	public ArrayList<EventCRFBean> getAvailableWithFilterAndSort(int studyId, EventCRFSDVFilter filter,
-					 EventCRFSDVSort sort, boolean allowSdvWithOpenQueries, int rowStart, int rowEnd, int userId) {
+			EventCRFSDVSort sort, boolean allowSdvWithOpenQueries, int rowStart, int rowEnd, int userId) {
 		ArrayList<EventCRFBean> eventCRFs = new ArrayList<EventCRFBean>();
 		setTypesExpected();
 
@@ -1839,8 +1856,10 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	/**
 	 * Method returns all ids with required SDV codes by study subject id.
 	 * 
-	 * @param studySujectId int
-	 * @param userId int
+	 * @param studySujectId
+	 *            int
+	 * @param userId
+	 *            int
 	 * @return ArrayList<Integer>
 	 */
 	public ArrayList<Integer> findAllIdsWithRequiredSDVCodesBySSubjectId(int studySujectId, int userId) {

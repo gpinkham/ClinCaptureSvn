@@ -101,6 +101,7 @@ import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.EventCRFService;
 import com.clinovo.service.EventDefinitionCrfService;
+import com.clinovo.service.EventDefinitionService;
 import com.clinovo.service.ItemSDVService;
 import com.clinovo.service.ReportCRFService;
 import com.clinovo.service.StudySubjectIdService;
@@ -263,6 +264,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected SimpleConditionalDisplayService simpleConditionalDisplayService;
 	@Autowired
 	protected UserAccountService userAccountService;
+	@Autowired
+	protected EventDefinitionService eventDefinitionService;
 
 	protected static PlatformTransactionManager transactionManager;
 

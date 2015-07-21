@@ -12,13 +12,6 @@
  ******************************************************************************/
 package com.clinovo.util;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -33,6 +26,13 @@ import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.util.SignedData;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * SubjectEventStatusUtil class.
@@ -259,7 +259,7 @@ public final class SubjectEventStatusUtil {
 
 	/**
 	 * Method that determines the subject event states for study events by incoming parameters.
-	 * 
+	 *
 	 * @param studyEvents
 	 *            List<StudyEventBean>
 	 * @param userAccountBean
@@ -271,6 +271,32 @@ public final class SubjectEventStatusUtil {
 	 */
 	public static void determineSubjectEventStates(List<StudyEventBean> studyEvents, UserAccountBean userAccountBean,
 			DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
+		for (StudyEventBean studyEventBean : studyEvents) {
+			determineSubjectEventState(studyEventBean, daoWrapper, signStateRestorer);
+			studyEventBean.setUpdater(userAccountBean);
+			studyEventBean.setUpdatedDate(new Date());
+			daoWrapper.getSedao().update(studyEventBean);
+		}
+	}
+
+	/**
+	 * Method that determines the subject event states for study events by incoming parameters.
+	 *
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @param userAccountBean
+	 *            UserAccountBean
+	 * @param daoWrapper
+	 *            DAOWrapper
+	 * @param signStateRestorer
+	 *            SignStateRestorer
+	 */
+	public static void determineSubjectEventStates(StudyEventDefinitionBean studyEventDefinitionBean,
+			UserAccountBean userAccountBean, DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
+		StudyBean study = (StudyBean) daoWrapper.getSdao().findByPK(studyEventDefinitionBean.getStudyId());
+		List<StudyEventBean> studyEvents = (ArrayList<StudyEventBean>) daoWrapper.getSedao()
+				.findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved(study,
+						studyEventDefinitionBean.getId());
 		for (StudyEventBean studyEventBean : studyEvents) {
 			determineSubjectEventState(studyEventBean, daoWrapper, signStateRestorer);
 			studyEventBean.setUpdater(userAccountBean);

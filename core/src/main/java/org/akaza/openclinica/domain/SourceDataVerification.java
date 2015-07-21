@@ -135,10 +135,9 @@ public enum SourceDataVerification implements CodedEnum {
 		sdvOptions.clear();
 		if (!hasItemsToSDV) {
 			sdvOptions.add(SourceDataVerification.AllREQUIRED);
-		}
-		sdvOptions.add(SourceDataVerification.PARTIALREQUIRED);
-		if (!hasItemsToSDV) {
 			sdvOptions.add(SourceDataVerification.NOTREQUIRED);
+		} else {
+			sdvOptions.add(SourceDataVerification.PARTIALREQUIRED);
 		}
 	}
 }

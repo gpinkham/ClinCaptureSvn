@@ -14,8 +14,11 @@
 package org.akaza.openclinica.dao.managestudy;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
 
 public class EventDefinitionCRFDAOTest extends DefaultAppContextTest {
@@ -55,5 +58,16 @@ public class EventDefinitionCRFDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindAllActiveByStudyIdAndCRFIdReturnsCorrectResult() {
 		assertEquals(2, eventDefinitionCRFDAO.findAllActiveByStudyIdAndCRFId(1, 1).size());
+	}
+
+	@Test
+	public void testThatUpdateStatusMethodWorksFine() throws OpenClinicaException {
+		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		assertEquals(eventDefinitionCRFBean.getStatus(), Status.AVAILABLE);
+		eventDefinitionCRFBean.setUpdater((UserAccountBean) userAccountDAO.findByPK(1));
+		eventDefinitionCRFBean.setStatus(Status.DELETED);
+		eventDefinitionCRFDAO.updateStatus(eventDefinitionCRFBean);
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		assertEquals(eventDefinitionCRFBean.getStatus(), Status.DELETED);
 	}
 }

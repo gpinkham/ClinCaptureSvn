@@ -20,32 +20,20 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.clinovo.util.RequestUtil;
+import com.clinovo.util.SignStateRestorer;
+import com.clinovo.validator.EventDefinitionValidator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
@@ -53,11 +41,12 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.RequestUtil;
-import com.clinovo.util.SignStateRestorer;
-import com.clinovo.util.SubjectEventStatusUtil;
-import com.clinovo.validator.EventDefinitionValidator;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Servlet handles update requests on study event definition bean properties and update/remove/restore requests on event
@@ -168,72 +157,15 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 		SignStateRestorer signStateRestorer = (SignStateRestorer) request.getSession()
 				.getAttribute("signStateRestorer");
-		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) request.getSession()
+				.getAttribute("definition");
 
-		StudyDAO studyDAO = getStudyDAO();
-		StudyEventDAO studyEventDAO = getStudyEventDAO();
-		StudyEventDefinitionDAO studyEventDefinitionDAO = getStudyEventDefinitionDAO();
-		EventDefinitionCRFDAO eventDefinitionCrfDAO = getEventDefinitionCRFDAO();
-		DAOWrapper daoWrapper = new DAOWrapper(studyDAO, getCRFVersionDAO(), studyEventDAO, getStudySubjectDAO(),
-				getEventCRFDAO(), eventDefinitionCrfDAO, getDiscrepancyNoteDAO());
-
-		sed.setUpdater(updater);
-		sed.setUpdatedDate(new Date());
-		sed.setStatus(Status.AVAILABLE);
-		studyEventDefinitionDAO.update(sed);
-
-		Map<Integer, EventDefinitionCRFBean> parentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
-		for (EventDefinitionCRFBean edc : eventDefinitionCRFsToUpdate) {
-			parentsMap.put(edc.getId(), edc);
-			if (edc.getId() > 0) {
-				edc.setUpdater(updater);
-				edc.setUpdatedDate(new Date());
-				eventDefinitionCrfDAO.update(edc);
-
-				if (edc.getStatus().isDeleted()) {
-					getEventCRFService().removeEventCRFsByEventDefinitionCRF(sed.getOid(), edc.getCrf().getOid(),
-							updater);
-				}
-				if (edc.getOldStatus() != null && edc.getOldStatus().equals(Status.DELETED)) {
-					getEventCRFService().restoreEventCRFsByEventDefinitionCRF(sed.getOid(), edc.getCrf().getOid(),
-							updater);
-				}
-			} else {
-				edc.setOwner(updater);
-				edc.setCreatedDate(new Date());
-				edc.setStatus(Status.AVAILABLE);
-				EventDefinitionCRFBean createdEdc = (EventDefinitionCRFBean) eventDefinitionCrfDAO.create(edc);
-				createChildEdcs(createdEdc, currentStudy);
-			}
-		}
-
-		getEventDefinitionCrfService().updateChildEventDefinitionCRFs(childEventDefinitionCRFsToUpdate, parentsMap,
-				updater);
-
-		StudyBean study = (StudyBean) studyDAO.findByPK(sed.getStudyId());
-		List<StudyEventBean> studyEventList = (ArrayList<StudyEventBean>) studyEventDAO
-				.findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved(study, sed.getId());
-		SubjectEventStatusUtil.determineSubjectEventStates(studyEventList, updater, daoWrapper, signStateRestorer);
+		getEventDefinitionService().updateTheWholeStudyEventDefinition(currentStudy, updater, studyEventDefinitionBean,
+				eventDefinitionCRFsToUpdate, childEventDefinitionCRFsToUpdate, signStateRestorer);
 
 		clearSession(request.getSession());
 		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"), request);
 		forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
-	}
-
-	private void createChildEdcs(EventDefinitionCRFBean createdEdc, StudyBean currentStudy) {
-
-		StudyDAO studyDao = new StudyDAO(getDataSource());
-		EventDefinitionCRFDAO cdao = new EventDefinitionCRFDAO(getDataSource());
-		Collection<Integer> siteIds = studyDao.findAllSiteIdsByStudy(currentStudy);
-		siteIds.remove(currentStudy.getId());
-		int parentId = createdEdc.getId();
-
-		for (int siteId : siteIds) {
-			EventDefinitionCRFBean childEdc = createdEdc;
-			childEdc.setStudyId(siteId);
-			childEdc.setParentId(parentId);
-			cdao.create(childEdc);
-		}
 	}
 
 	private void checkReferenceVisit(HttpServletRequest request) {

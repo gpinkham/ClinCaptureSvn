@@ -18,33 +18,23 @@ package com.clinovo.tag;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.SDVUtil;
-
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.core.BaseController;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.sql.DataSource;
-
-import org.springframework.context.MessageSource;
-
 import java.util.Locale;
 
 /**
@@ -95,7 +85,8 @@ public class SDVStudySubjectLinkTag extends TagSupport {
 		this.request = request;
 	}
 
-	@Override public int doStartTag() throws JspException {
+	@Override
+	public int doStartTag() throws JspException {
 
 		JspWriter writer = pageContext.getOut();
 		try {
@@ -108,9 +99,8 @@ public class SDVStudySubjectLinkTag extends TagSupport {
 	}
 
 	/**
-	 * Returns HTML href to SDV page for a specific study subject,
-	 * if study subject is ready for SDV and current user has permissions to perform SDV;
-	 * Returns transparent icon-gag otherwise.
+	 * Returns HTML href to SDV page for a specific study subject, if study subject is ready for SDV and current user
+	 * has permissions to perform SDV; Returns transparent icon-gag otherwise.
 	 *
 	 * @return String
 	 */
@@ -120,15 +110,13 @@ public class SDVStudySubjectLinkTag extends TagSupport {
 		HttpSession session = request.getSession();
 		StudyBean currentStudy = (StudyBean) session.getAttribute(BaseController.STUDY);
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute(BaseController.USER_ROLE);
-		WebApplicationContext appContext =
-				WebApplicationContextUtils.getRequiredWebApplicationContext(session.getServletContext());
+		WebApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(session
+				.getServletContext());
 		DataSource dataSource = (DataSource) appContext.getBean("dataSource");
 		MessageSource messageSource = (MessageSource) appContext.getBean("messageSource");
 		Locale locale = LocaleResolver.getLocale(request);
 
-		DAOWrapper daoWrapper = new DAOWrapper(new StudyDAO(dataSource), new StudyEventDAO(dataSource),
-				new StudySubjectDAO(dataSource), new EventCRFDAO(dataSource), new EventDefinitionCRFDAO(dataSource),
-				new StudyEventDefinitionDAO(dataSource), new DiscrepancyNoteDAO(dataSource));
+		DAOWrapper daoWrapper = new DAOWrapper(dataSource);
 		boolean isStudySubjectReadyForSDV = SDVUtil.permitSDV(getStudySubject(), daoWrapper);
 		boolean isStudyStatusAllowsSDV = !currentStudy.getStatus().isFrozen() && !currentStudy.getStatus().isLocked();
 		String allowSdvWithOpenQueries = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries();
@@ -136,8 +124,8 @@ public class SDVStudySubjectLinkTag extends TagSupport {
 				|| (allowSdvWithOpenQueries.equalsIgnoreCase("no") && !isStudySubjectHasUnclosedDNs());
 		StringBuilder sdvLink = new StringBuilder("");
 
-		if (isStudySubjectReadyForSDV && !getStudySubject().getStatus().isDeleted()
-				&& isStudyStatusAllowsSDV && currentRole.isCanSDV() && isSDVAllowedIfSubjectHasUnclosedDNs) {
+		if (isStudySubjectReadyForSDV && !getStudySubject().getStatus().isDeleted() && isStudyStatusAllowsSDV
+				&& currentRole.isCanSDV() && isSDVAllowedIfSubjectHasUnclosedDNs) {
 
 			if (Page.CRF_LIST_FOR_STUDY_EVENT.getFileName().equals(page.getFileName())) {
 				sdvLink.append("<c:set var=\"hideCol5\" value=\"false\"/>\n");
@@ -176,10 +164,9 @@ public class SDVStudySubjectLinkTag extends TagSupport {
 		request = null;
 	}
 
-	@Override public void release() {
+	@Override
+	public void release() {
 		reset();
 		super.release();
 	}
 }
-
-

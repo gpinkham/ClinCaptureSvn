@@ -15,14 +15,14 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatRestAPIReturns404IfRequestIsNotMapped() throws Exception {
 		this.mockMvc.perform(
-				post(API_WRONG_MAPPING).accept(MediaType.APPLICATION_XML).secure(true)
+				post(API_WRONG_MAPPING).accept(MediaType.APPLICATION_XML).secure(true).session(session)
 						.param("username", userName.concat(Long.toString(timestamp))).param("password", password)
 						.param("studyname", studyName)).andExpect(status().isNotFound());
 	}
 	@Test
 	public void testThatAuthenticationServiceReturnsUnauthorizedIfUsernameIsWrong() throws Exception {
 		this.mockMvc.perform(
-				post(API_AUTHENTICATION).accept(mediaType).secure(true)
+				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
 						.param("username", userName.concat(Long.toString(timestamp))).param("password", password)
 						.param("studyname", studyName)).andExpect(status().isUnauthorized());
 	}
@@ -30,14 +30,14 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatAuthenticationServiceReturnsBadRequestIfUsernameIsEmpty() throws Exception {
 		this.mockMvc.perform(
-				post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", "")
+				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session).param("username", "")
 						.param("password", password).param("studyname", studyName)).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatAuthenticationServiceReturnsUnauthorizedIfPasswordIsWrong() throws Exception {
 		this.mockMvc.perform(
-				post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", userName)
+				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session).param("username", userName)
 						.param("password", password.concat(Long.toString(timestamp))).param("studyname", studyName))
 				.andExpect(status().isUnauthorized());
 	}
@@ -45,14 +45,14 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatAuthenticationServiceReturnsBadRequestIfPasswordIsEmpty() throws Exception {
 		this.mockMvc.perform(
-				post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", userName)
+				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session).param("username", userName)
 						.param("password", "").param("studyname", studyName)).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatAuthenticationServiceReturnsUnauthorizedIfStudynameIsWrong() throws Exception {
 		this.mockMvc.perform(
-				post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", userName)
+				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session).param("username", userName)
 						.param("password", password).param("studyname", studyName.concat(Long.toString(timestamp))))
 				.andExpect(status().isUnauthorized());
 	}
@@ -60,7 +60,7 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatAuthenticationServiceReturnsBadRequestIfStudyNameIsEmpty() throws Exception {
 		this.mockMvc.perform(
-				post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", userName)
+				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session).param("username", userName)
 						.param("password", password).param("studyname", "")).andExpect(status().isBadRequest());
 	}
 
@@ -68,9 +68,9 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	public void testThatAuthenticationServiceReturnsUnauthorizedForUserThatIsNotAssignedToAnyStudy() throws Exception {
 		createUserWithoutRole(UserType.SYSADMIN, studyBean.getId());
 		this.mockMvc.perform(
-				post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", newUser.getName())
-						.param("password", newUser.getPasswd()).param("studyname", studyBean.getName())).andExpect(
-				status().isUnauthorized());
+				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+						.param("username", newUser.getName()).param("password", newUser.getPasswd())
+						.param("studyname", studyBean.getName())).andExpect(status().isUnauthorized());
 	}
 
 	@Test
@@ -78,8 +78,9 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
 				.perform(
-						post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", newUser.getName())
-								.param("password", newUser.getPasswd()).param("studyname", studyBean.getName()))
+						post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+								.param("username", newUser.getName()).param("password", newUser.getPasswd())
+								.param("studyname", studyBean.getName()))
 				.andExpect(status().isOk())
 				.andExpect(
 						content().string(
@@ -87,9 +88,8 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 										.containsString("{\"username\":\"".concat(newUser.getName())
 												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
 												.concat("\",\"studyname\":\"").concat(studyBean.getName())
-												.concat("\",\"studystatus\":\"")
-												.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"")
-												.concat(Role.STUDY_ADMINISTRATOR.getCode())
+												.concat("\",\"studystatus\":\"").concat(studyBean.getStatus().getName())
+												.concat("\",\"role\":\"").concat(Role.STUDY_ADMINISTRATOR.getCode())
 												.concat("\",\"usertype\":\"").concat(UserType.SYSADMIN.getCode())
 												.concat("\"}")) : StringContains
 										.containsString("<ODM Description=\"REST Data\"")));
@@ -100,8 +100,9 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 		createNewUser(UserType.SYSADMIN, Role.STUDY_MONITOR);
 		this.mockMvc
 				.perform(
-						post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", newUser.getName())
-								.param("password", newUser.getPasswd()).param("studyname", studyBean.getName()))
+						post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+								.param("username", newUser.getName()).param("password", newUser.getPasswd())
+								.param("studyname", studyBean.getName()))
 				.andExpect(status().isOk())
 				.andExpect(
 						content().string(
@@ -109,10 +110,10 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 										.containsString("{\"username\":\"".concat(newUser.getName())
 												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
 												.concat("\",\"studyname\":\"").concat(studyBean.getName())
-												.concat("\",\"studystatus\":\"")
-												.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"")
-												.concat(Role.STUDY_MONITOR.getCode()).concat("\",\"usertype\":\"")
-												.concat(UserType.SYSADMIN.getCode()).concat("\"}")) : StringContains
+												.concat("\",\"studystatus\":\"").concat(studyBean.getStatus().getName())
+												.concat("\",\"role\":\"").concat(Role.STUDY_MONITOR.getCode())
+												.concat("\",\"usertype\":\"").concat(UserType.SYSADMIN.getCode())
+												.concat("\"}")) : StringContains
 										.containsString("<ODM Description=\"REST Data\"")));
 	}
 
@@ -121,8 +122,9 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 		createNewUser(UserType.SYSADMIN, Role.STUDY_EVALUATOR);
 		this.mockMvc
 				.perform(
-						post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", newUser.getName())
-								.param("password", newUser.getPasswd()).param("studyname", studyBean.getName()))
+						post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+								.param("username", newUser.getName()).param("password", newUser.getPasswd())
+								.param("studyname", studyBean.getName()))
 				.andExpect(status().isOk())
 				.andExpect(
 						content().string(
@@ -130,10 +132,10 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 										.containsString("{\"username\":\"".concat(newUser.getName())
 												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
 												.concat("\",\"studyname\":\"").concat(studyBean.getName())
-												.concat("\",\"studystatus\":\"")
-												.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"")
-												.concat(Role.STUDY_EVALUATOR.getCode()).concat("\",\"usertype\":\"")
-												.concat(UserType.SYSADMIN.getCode()).concat("\"}")) : StringContains
+												.concat("\",\"studystatus\":\"").concat(studyBean.getStatus().getName())
+												.concat("\",\"role\":\"").concat(Role.STUDY_EVALUATOR.getCode())
+												.concat("\",\"usertype\":\"").concat(UserType.SYSADMIN.getCode())
+												.concat("\"}")) : StringContains
 										.containsString("<ODM Description=\"REST Data\"")));
 	}
 
@@ -142,8 +144,9 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 		createNewUser(UserType.SYSADMIN, Role.STUDY_CODER);
 		this.mockMvc
 				.perform(
-						post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", newUser.getName())
-								.param("password", newUser.getPasswd()).param("studyname", studyBean.getName()))
+						post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+								.param("username", newUser.getName()).param("password", newUser.getPasswd())
+								.param("studyname", studyBean.getName()))
 				.andExpect(status().isOk())
 				.andExpect(
 						content().string(
@@ -151,10 +154,34 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 										.containsString("{\"username\":\"".concat(newUser.getName())
 												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
 												.concat("\",\"studyname\":\"").concat(studyBean.getName())
-												.concat("\",\"studystatus\":\"")
-												.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"")
-												.concat(Role.STUDY_CODER.getCode()).concat("\",\"usertype\":\"")
-												.concat(UserType.SYSADMIN.getCode()).concat("\"}")) : StringContains
+												.concat("\",\"studystatus\":\"").concat(studyBean.getStatus().getName())
+												.concat("\",\"role\":\"").concat(Role.STUDY_CODER.getCode())
+												.concat("\",\"usertype\":\"").concat(UserType.SYSADMIN.getCode())
+												.concat("\"}")) : StringContains
+										.containsString("<ODM Description=\"REST Data\"")));
+	}
+
+	@Test
+	public void testThatAuthenticationServiceReturnsOkForNewlyCreatedSiteMonitor() throws Exception {
+		createNewSite(studyBean.getId());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
+		createNewUser(UserType.USER, Role.SITE_MONITOR);
+		this.mockMvc
+				.perform(
+						post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+								.param("username", newUser.getName()).param("password", newUser.getPasswd())
+								.param("studyname", newSite.getName()))
+				.andExpect(status().isOk())
+				.andExpect(
+						content().string(
+								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
+										.containsString("{\"username\":\"".concat(newUser.getName())
+												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
+												.concat("\",\"studyname\":\"").concat(newSite.getName())
+												.concat("\",\"studystatus\":\"").concat(newSite.getStatus().getName())
+												.concat("\",\"role\":\"").concat(Role.SITE_MONITOR.getCode())
+												.concat("\",\"usertype\":\"").concat(UserType.USER.getCode())
+												.concat("\"}")) : StringContains
 										.containsString("<ODM Description=\"REST Data\"")));
 	}
 
@@ -165,8 +192,9 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 		createNewUser(UserType.USER, Role.CLINICAL_RESEARCH_COORDINATOR);
 		this.mockMvc
 				.perform(
-						post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", newUser.getName())
-								.param("password", newUser.getPasswd()).param("studyname", newSite.getName()))
+						post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+								.param("username", newUser.getName()).param("password", newUser.getPasswd())
+								.param("studyname", newSite.getName()))
 				.andExpect(status().isOk())
 				.andExpect(
 						content().string(
@@ -189,8 +217,9 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 		createNewUser(UserType.USER, Role.INVESTIGATOR);
 		this.mockMvc
 				.perform(
-						post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", newUser.getName())
-								.param("password", newUser.getPasswd()).param("studyname", newSite.getName()))
+						post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+								.param("username", newUser.getName()).param("password", newUser.getPasswd())
+								.param("studyname", newSite.getName()))
 				.andExpect(status().isOk())
 				.andExpect(
 						content().string(
@@ -205,4 +234,132 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 										.containsString("<ODM Description=\"REST Data\"")));
 	}
 
+	@Test
+	public void testThatNewlyCreatedStudyAdministratorIsAbleToLoginOnSite() throws Exception {
+		createNewSite(studyBean.getId());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
+		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		this.mockMvc
+				.perform(
+						post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+								.param("username", newUser.getName()).param("password", newUser.getPasswd())
+								.param("studyname", newSite.getName()))
+				.andExpect(status().isOk())
+				.andExpect(
+						content().string(
+								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
+										.containsString("{\"username\":\"".concat(newUser.getName())
+												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
+												.concat("\",\"studyname\":\"").concat(newSite.getName())
+												.concat("\",\"studystatus\":\"").concat(newSite.getStatus().getName())
+												.concat("\",\"role\":\"").concat(Role.STUDY_ADMINISTRATOR.getCode())
+												.concat("\",\"usertype\":\"").concat(UserType.USER.getCode())
+												.concat("\"}")) : StringContains
+										.containsString("<ODM Description=\"REST Data\"")));
+	}
+
+	@Test
+	public void testThatNewlyCreatedStudyCoderIsAbleToLoginOnSite() throws Exception {
+		createNewSite(studyBean.getId());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
+		createNewUser(UserType.USER, Role.STUDY_CODER);
+		this.mockMvc
+				.perform(
+						post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+								.param("username", newUser.getName()).param("password", newUser.getPasswd())
+								.param("studyname", newSite.getName()))
+				.andExpect(status().isOk())
+				.andExpect(
+						content().string(
+								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
+										.containsString("{\"username\":\"".concat(newUser.getName())
+												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
+												.concat("\",\"studyname\":\"").concat(newSite.getName())
+												.concat("\",\"studystatus\":\"").concat(newSite.getStatus().getName())
+												.concat("\",\"role\":\"").concat(Role.STUDY_CODER.getCode())
+												.concat("\",\"usertype\":\"").concat(UserType.USER.getCode())
+												.concat("\"}")) : StringContains
+										.containsString("<ODM Description=\"REST Data\"")));
+	}
+
+	@Test
+	public void testThatNewlyCreatedStudyEvaludatorIsAbleToLoginOnSite() throws Exception {
+		createNewSite(studyBean.getId());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
+		createNewUser(UserType.USER, Role.STUDY_EVALUATOR);
+		this.mockMvc
+				.perform(
+						post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+								.param("username", newUser.getName()).param("password", newUser.getPasswd())
+								.param("studyname", newSite.getName()))
+				.andExpect(status().isOk())
+				.andExpect(
+						content().string(
+								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
+										.containsString("{\"username\":\"".concat(newUser.getName())
+												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
+												.concat("\",\"studyname\":\"").concat(newSite.getName())
+												.concat("\",\"studystatus\":\"").concat(newSite.getStatus().getName())
+												.concat("\",\"role\":\"").concat(Role.STUDY_EVALUATOR.getCode())
+												.concat("\",\"usertype\":\"").concat(UserType.USER.getCode())
+												.concat("\"}")) : StringContains
+										.containsString("<ODM Description=\"REST Data\"")));
+	}
+
+	@Test
+	public void testThatNewlyCreatedStudyMonitorIsAbleToLoginOnSite() throws Exception {
+		createNewSite(studyBean.getId());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
+		createNewUser(UserType.USER, Role.STUDY_MONITOR);
+		this.mockMvc
+				.perform(
+						post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+								.param("username", newUser.getName()).param("password", newUser.getPasswd())
+								.param("studyname", newSite.getName()))
+				.andExpect(status().isOk())
+				.andExpect(
+						content().string(
+								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
+										.containsString("{\"username\":\"".concat(newUser.getName())
+												.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
+												.concat("\",\"studyname\":\"").concat(newSite.getName())
+												.concat("\",\"studystatus\":\"").concat(newSite.getStatus().getName())
+												.concat("\",\"role\":\"").concat(Role.STUDY_MONITOR.getCode())
+												.concat("\",\"usertype\":\"").concat(UserType.USER.getCode())
+												.concat("\"}")) : StringContains
+										.containsString("<ODM Description=\"REST Data\"")));
+	}
+
+	@Test
+	public void testThatNewlyCreatedInvestigatorIsNotAbleToLoginOnStudy() throws Exception {
+		createNewSite(studyBean.getId());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
+		createNewUser(UserType.USER, Role.INVESTIGATOR);
+		this.mockMvc.perform(
+				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+						.param("username", newUser.getName()).param("password", newUser.getPasswd())
+						.param("studyname", studyName)).andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	public void testThatNewlyCreatedCrcIsNotAbleToLoginOnStudy() throws Exception {
+		createNewSite(studyBean.getId());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
+		createNewUser(UserType.USER, Role.CLINICAL_RESEARCH_COORDINATOR);
+		this.mockMvc.perform(
+				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+						.param("username", newUser.getName()).param("password", newUser.getPasswd())
+						.param("studyname", studyName)).andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	public void testThatNewlyCreatedSiteMonitorIsNotAbleToLoginOnStudy() throws Exception {
+		createNewSite(studyBean.getId());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
+		createNewUser(UserType.USER, Role.SITE_MONITOR);
+		this.mockMvc.perform(
+				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+						.param("username", newUser.getName()).param("password", newUser.getPasswd())
+						.param("studyname", studyName)).andExpect(status().isUnauthorized());
+	}
 }

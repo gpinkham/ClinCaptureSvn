@@ -205,7 +205,7 @@
 	</query>
 	<query>
 		<name>updateStatus</name>
-		<sql>UPDATE item_data SET status_id=? WHERE item_data_id=?</sql>
+		<sql>UPDATE item_data SET status_id=?, date_updated = NOW(), update_id=? WHERE item_data_id=?</sql>
 	</query>
 	<query>
 		<name>countOfItemsToSDV</name>

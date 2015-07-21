@@ -194,8 +194,7 @@ public class DeleteEventCRFServlet extends Controller {
 				// delete
 				ecdao.delete(eventCRF.getId());
 
-				SubjectEventStatusUtil.determineSubjectEventState(event, new DAOWrapper(sdao, cvdao, sedao, subdao,
-						ecdao, edcdao, dnDao));
+				SubjectEventStatusUtil.determineSubjectEventState(event, new DAOWrapper(getDataSource()));
 				event = (StudyEventBean) sedao.update(event);
 
 				String emailBody = respage.getString("the_event_CRF") + cb.getName()

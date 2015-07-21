@@ -13,29 +13,13 @@
 
 package org.akaza.openclinica.web.job;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.sql.Connection;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.sql.DataSource;
-import javax.xml.bind.JAXBContext;
-import javax.xml.transform.sax.SAXSource;
-
+import com.clinovo.service.ItemSDVService;
+import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.EmailUtil;
+import com.clinovo.util.RuleSetServiceUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
+import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -68,7 +52,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -100,13 +83,27 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import com.clinovo.service.ItemSDVService;
-import com.clinovo.service.StudySubjectIdService;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.EmailUtil;
-import com.clinovo.util.RuleSetServiceUtil;
-import com.clinovo.util.SubjectEventStatusUtil;
-import com.clinovo.util.ValidatorHelper;
+import javax.sql.DataSource;
+import javax.xml.bind.JAXBContext;
+import javax.xml.transform.sax.SAXSource;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Connection;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * Import Spring Job, a job running asynchronously on the Tomcat server using Spring and Quartz.
@@ -153,11 +150,8 @@ public class ImportSpringJob extends QuartzJobBean {
 
 	private StudyDAO sdao;
 	private EventCRFDAO ecdao;
-	private CRFVersionDAO cvdao;
 	private StudyEventDAO sedao;
-	private StudySubjectDAO ssdao;
 	private ItemDataDAO itemDataDao;
-	private DiscrepancyNoteDAO dndao;
 	private AuditEventDAO auditEventDAO;
 	private EventDefinitionCRFDAO edcdao;
 
@@ -224,11 +218,8 @@ public class ImportSpringJob extends QuartzJobBean {
 
 			sdao = new StudyDAO(dataSource);
 			ecdao = new EventCRFDAO(dataSource);
-			cvdao = new CRFVersionDAO(dataSource);
 			sedao = new StudyEventDAO(dataSource);
-			ssdao = new StudySubjectDAO(dataSource);
 			itemDataDao = new ItemDataDAO(dataSource);
-			dndao = new DiscrepancyNoteDAO(dataSource);
 			AuditDAO auditDAO = new AuditDAO(dataSource);
 			auditEventDAO = new AuditEventDAO(dataSource);
 			edcdao = new EventDefinitionCRFDAO(dataSource);
@@ -736,8 +727,7 @@ public class ImportSpringJob extends QuartzJobBean {
 					if (studyEventId > 0) {
 						StudyEventBean seb = (StudyEventBean) sedao.findByPK(studyEventId);
 
-						SubjectEventStatusUtil.determineSubjectEventState(seb, new DAOWrapper(sdao, cvdao, sedao,
-								ssdao, ecdao, edcdao, dndao));
+						SubjectEventStatusUtil.determineSubjectEventState(seb, new DAOWrapper(dataSource));
 
 						seb.setUpdatedDate(new Date());
 						seb.setUpdater(ub);

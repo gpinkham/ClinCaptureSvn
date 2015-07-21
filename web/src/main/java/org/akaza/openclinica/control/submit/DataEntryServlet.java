@@ -43,7 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -150,6 +149,7 @@ import com.clinovo.service.ReportCRFService;
 import com.clinovo.util.CrfShortcutsAnalyzer;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.DateUtil;
+import com.clinovo.util.EmailUtil;
 import com.clinovo.util.SubjectEventStatusUtil;
 import com.clinovo.util.ValidatorHelper;
 
@@ -595,8 +595,8 @@ public abstract class DataEntryServlet extends Controller {
 		// set up interviewer name and date
 		fp.addPresetValue(INPUT_INTERVIEWER, ecb.getInterviewerName());
 		if (ecb.getDateInterviewed() != null) {
-			fp.addPresetValue(INPUT_INTERVIEW_DATE, DateUtil.printDate(ecb.getDateInterviewed(), ub.getUserTimeZoneId(),
-					DateUtil.DatePattern.DATE, getLocale()));
+			fp.addPresetValue(INPUT_INTERVIEW_DATE, DateUtil.printDate(ecb.getDateInterviewed(),
+					ub.getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 		} else {
 			fp.addPresetValue(INPUT_INTERVIEW_DATE, "");
 		}
@@ -1336,8 +1336,8 @@ public abstract class DataEntryServlet extends Controller {
 				if (!StringUtil.isBlank(fp.getString(INPUT_INTERVIEW_DATE))) {
 
 					if (ecb.getDateInterviewed() != null) {
-						String actualDateInterviewed = DateUtil.printDate(ecb.getDateInterviewed(), ub.getUserTimeZoneId(),
-								DateUtil.DatePattern.DATE, getLocale());
+						String actualDateInterviewed = DateUtil.printDate(ecb.getDateInterviewed(),
+								ub.getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale());
 						if (!actualDateInterviewed.equals(fp.getString(INPUT_INTERVIEW_DATE))) {
 							ecb.setDateInterviewed(fp.getDateInputWithServerTimeOfDay(INPUT_INTERVIEW_DATE));
 						}
@@ -1408,8 +1408,7 @@ public abstract class DataEntryServlet extends Controller {
 
 				StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(studyEventBean
 						.getStudyEventDefinitionId());
-				SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, new DAOWrapper(studydao, cvdao,
-						seDao, ssdao, ecdao, edcdao, dndao));
+				SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, new DAOWrapper(getDataSource()));
 				studyEventBean = (StudyEventBean) seDao.update(studyEventBean);
 
 				// save discrepancy notes into DB
@@ -1907,8 +1906,7 @@ public abstract class DataEntryServlet extends Controller {
 					}
 				}
 
-				SubjectEventStatusUtil.determineSubjectEventStates(sedb, ssb, ub, new DAOWrapper(studydao, cvdao,
-						seDao, ssdao, ecdao, edcdao, dndao));
+				SubjectEventStatusUtil.determineSubjectEventStates(sedb, ssb, ub, new DAOWrapper(getDataSource()));
 			}
 		}
 	}
@@ -1930,7 +1928,7 @@ public abstract class DataEntryServlet extends Controller {
 		if (redirectPath != null) {
 			response.sendRedirect(redirectPath);
 		} else {
-			if( Navigation.getSavedUrl(request).contains("AddNewSubject")) {
+			if (Navigation.getSavedUrl(request).contains("AddNewSubject")) {
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			} else {
 				response.sendRedirect(Navigation.getLastVisitedURL(request));
@@ -1985,7 +1983,8 @@ public abstract class DataEntryServlet extends Controller {
 			String urlPath = request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
 			String sysPath = this.getServletContext().getRealPath("/");
 			String studyOid = currentStudy.isSite() ? currentStudy.getParentStudyOid() : currentStudy.getOid();
-			String dataPath = SQLInitServlet.getField("filePath") + ReportCRFService.CRF_REPORT_DIR + File.separator + studyOid + File.separator;
+			String dataPath = SQLInitServlet.getField("filePath") + ReportCRFService.CRF_REPORT_DIR + File.separator
+					+ studyOid + File.separator;
 
 			reportCRFService.setUrlPath(urlPath);
 			reportCRFService.setSysPath(sysPath);
@@ -2125,8 +2124,7 @@ public abstract class DataEntryServlet extends Controller {
 			// for RFC we need to show validation error-message
 			if (!transformedSavedDNIds.contains(dn.getId()) && dn.getId() > 0) {
 				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.ANNOTATION.getId()) {
-					DiscrepancyNoteUtil.transformSavedAnnotationToFVC(dn, ub, ResolutionStatus.UPDATED.getId(),
-							dndao);
+					DiscrepancyNoteUtil.transformSavedAnnotationToFVC(dn, ub, ResolutionStatus.UPDATED.getId(), dndao);
 				}
 				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
 					DiscrepancyNoteUtil.transformSavedRFCToFVC(dn, ub, ResolutionStatus.UPDATED.getId(), dndao);
@@ -3568,8 +3566,7 @@ public abstract class DataEntryServlet extends Controller {
 					dbChildNotes = filterNotesByUserRole(dbChildNotes, request);
 
 					childNotes.addAll(dbNotes);
-					noteThreads = dNoteUtil
-							.createThreadsOfParents(notes, currentStudy, null, -1);
+					noteThreads = dNoteUtil.createThreadsOfParents(notes, currentStudy, null, -1);
 					discNotes.setNumExistingFieldNotes(childInputFieldName, dbChildNotes.size());
 					child.setNumDiscrepancyNotes(dbChildNotes.size() + childNotes.size());
 					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(request, dndao, childItemDataId,
@@ -3791,8 +3788,7 @@ public abstract class DataEntryServlet extends Controller {
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 		DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(getDataSource());
 		StudyBean study = (StudyBean) session.getAttribute("study");
-		SubjectEventStatusUtil.determineSubjectEventState(seb, new DAOWrapper(sdao, getCRFVersionDAO(), sedao, ssdao,
-				ecdao, edcdao, discDao));
+		SubjectEventStatusUtil.determineSubjectEventState(seb, new DAOWrapper(getDataSource()));
 		seb = (StudyEventBean) sedao.update(seb);
 
 		// Clinovo calendar func
@@ -5152,8 +5148,7 @@ public abstract class DataEntryServlet extends Controller {
 		return ids;
 	}
 
-	private int sectionIndexInToc(SectionBean sb, DisplayTableOfContentsBean toc,
-			LinkedList<Integer> sectionIdsInToc) {
+	private int sectionIndexInToc(SectionBean sb, DisplayTableOfContentsBean toc, LinkedList<Integer> sectionIdsInToc) {
 		ArrayList<SectionBean> sectionBeans = new ArrayList<SectionBean>();
 		int index = -1;
 		if (toc != null) {

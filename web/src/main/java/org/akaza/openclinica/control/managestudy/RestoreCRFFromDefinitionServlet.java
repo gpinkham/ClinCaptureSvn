@@ -20,11 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -40,7 +35,11 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({ "serial", "unchecked" })
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
+@SuppressWarnings({"serial", "unchecked"})
 @Component
 public class RestoreCRFFromDefinitionServlet extends Controller {
 	/**
@@ -74,7 +73,7 @@ public class RestoreCRFFromDefinitionServlet extends Controller {
 				"eventDefinitionCRFs");
 		List<EventDefinitionCRFBean> childEdcs = (List<EventDefinitionCRFBean>) request.getSession().getAttribute(
 				"childEventDefCRFs");
- 
+
 		String crfName;
 		String pageMessage = respage.getString("please_choose_a_CRF_to_restore");
 
@@ -100,8 +99,8 @@ public class RestoreCRFFromDefinitionServlet extends Controller {
 					} else {
 						edc.setStatus(Status.AVAILABLE);
 						edc.setOldStatus(Status.DELETED);
-						//Restore children if any
-						restoreRemovedChildEdcs(childEdcs, edc, cvdao);
+						// Restore children if any
+						restoreRemovedChildEdcs(childEdcs, edc);
 						crfName = edc.getCrfName();
 						pageMessage = crfName + " " + respage.getString("has_been_restored");
 					}
@@ -111,32 +110,20 @@ public class RestoreCRFFromDefinitionServlet extends Controller {
 					edc.setOldStatus(Status.DELETED);
 				}
 			}
-			
+
 			request.getSession().setAttribute("eventDefinitionCRFs", edcs);
 			request.getSession().setAttribute("childEventDefCRFs", childEdcs);
 			addPageMessage(pageMessage, request);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}
 	}
-	
-	/**
-	 * Restores child edcs that were auto-removed during parent removal
-	 * @param childEdcs
-	 * @param parentEdc
-	 * @param updatedEdcs
-	 * @param cvdao
-	 */
-	private void restoreRemovedChildEdcs (List<EventDefinitionCRFBean> childEdcs, EventDefinitionCRFBean parentEdc, CRFVersionDAO cvdao) {
+
+	private void restoreRemovedChildEdcs(List<EventDefinitionCRFBean> childEdcs, EventDefinitionCRFBean parentEdc) {
 		for (EventDefinitionCRFBean childEdc : childEdcs) {
 			if (childEdc.getParentId() == parentEdc.getId()) {
-				//Get default version of child edc
-				CRFVersionBean defaultCrfVersion = (CRFVersionBean) cvdao.findByPK(childEdc.getDefaultVersionId());
-				//Restore childEdc if its default crf version is available
-				if (defaultCrfVersion.getStatusId() == Status.AVAILABLE.getId()){
-					childEdc.setStatus(Status.AVAILABLE);
-					childEdc.setOldStatus(Status.AUTO_DELETED);
-				}
+				childEdc.setStatus(Status.AVAILABLE);
+				childEdc.setOldStatus(Status.DELETED);
 			}
 		}
-	} 
+	}
 }

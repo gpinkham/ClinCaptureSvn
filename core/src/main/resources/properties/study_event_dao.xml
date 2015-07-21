@@ -167,6 +167,10 @@
         </sql>
     </query>
     <query>
+        <name>updateStatus</name>
+        <sql>UPDATE STUDY_EVENT SET STATUS_ID=?, DATE_UPDATED=NOW(), UPDATE_ID=? WHERE STUDY_EVENT_ID=?</sql>
+    </query>
+    <query>
         <name>getCurrentPrimaryKey</name>
         <sql>SELECT currval('study_event_study_event_id_seq') AS key</sql>
     </query>

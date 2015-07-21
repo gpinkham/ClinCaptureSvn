@@ -13,21 +13,24 @@
 
 package org.akaza.openclinica.service.crfdata;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.EventCRFUtil;
-import com.clinovo.util.SubjectEventStatusUtil;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
@@ -43,13 +46,14 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -57,27 +61,27 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.EventCRFUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-@SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
 public class DynamicsMetadataService implements MetadataServiceInterface {
+	public static final int FOUR = 4;
+	public static final int THREE = 3;
+	public static final int TWO = 2;
+	public static final int ONE = 1;
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private static final String ESCAPED_SEPERATOR = "\\.";
 	private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
@@ -134,12 +138,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		if (dynamicsMetadataBean == null) {
 			return false;
 		}
-		if (dynamicsMetadataBean.getPassedDde() > 0) {
-			return true;
-		} else {
-			return false;
-		}
-
+		return dynamicsMetadataBean.getPassedDde() > 0;
 	}
 
 	public boolean isShown(Integer itemId, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
@@ -147,11 +146,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 				eventCrfBean.getCRFVersionId());
 		DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean,
 				eventCrfBean, itemDataBean);
-		if (dynamicsMetadataBean != null) {
-			return dynamicsMetadataBean.isShowItem();
-		} else {
-			return false;
-		}
+		return dynamicsMetadataBean != null && dynamicsMetadataBean.isShowItem();
 	}
 
 	public DynamicsItemFormMetadataBean getDynamicsItemFormMetadataBean(Integer itemId, EventCRFBean eventCrfBean,
@@ -184,11 +179,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		if (dynamicsMetadataBean == null) {
 			return false;
 		}
-		if (dynamicsMetadataBean.getPassedDde() > 0) {
-			return true;
-		} else {
-			return false;
-		}
+		return dynamicsMetadataBean.getPassedDde() > 0;
 	}
 
 	private DynamicsItemFormMetadataBean getDynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean,
@@ -250,7 +241,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		ItemFormMetadataBean itemFormMetadataBean = metadataBean;
 		DynamicsItemFormMetadataBean dynamicsMetadataBean = this.getDynamicsItemFormMetadataDao().findByItemDataBean(
 				itemDataBean);
-		dynamicsMetadataBean = dynamicsMetadataBean != null && dynamicsMetadataBean.getId() > 0 ? dynamicsMetadataBean
+		dynamicsMetadataBean = dynamicsMetadataBean != null && dynamicsMetadataBean.getId() > 0
+				? dynamicsMetadataBean
 				: new DynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);
 		dynamicsMetadataBean.setShowItem(false);
 		getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
@@ -370,7 +362,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		} else {
 			List<ItemBean> items = getItemDAO().findAllItemsByGroupId(itemGroupBeanB.getId(),
 					eventCrfBeanB.getCRFVersionId());
-			int number = itemGroupMetadataBeanB.getRepeatNum() > index ? itemGroupMetadataBeanB.getRepeatNum()
+			int number = itemGroupMetadataBeanB.getRepeatNum() > index
+					? itemGroupMetadataBeanB.getRepeatNum()
 					: index <= itemGroupMetadataBeanB.getRepeatMax() ? index : 0;
 			for (int ordinal = 1 + maxOrdinal; ordinal <= number + maxOrdinal - size; ordinal++) {
 				for (ItemBean itemBeanX : items) {
@@ -487,16 +480,18 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 	}
 
-	public void insert(Integer sourceItemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet,
-			Connection con) {
+	public void insert(Integer sourceItemDataId, List<PropertyBean> properties, UserAccountBean ub,
+			RuleSetBean ruleSet, Connection con) {
 
 		ItemDataBean sourceItemDataBean = (ItemDataBean) getItemDataDAO().findByPK(sourceItemDataId);
 		EventCRFBean sourceEventCrfBean = (EventCRFBean) getEventCRFDAO().findByPK(sourceItemDataBean.getEventCRFId());
-		StudyEventBean sourceStudyEventBean = (StudyEventBean) getStudyEventDAO().findByPK(sourceEventCrfBean.getStudyEventId());
+		StudyEventBean sourceStudyEventBean = (StudyEventBean) getStudyEventDAO().findByPK(
+				sourceEventCrfBean.getStudyEventId());
 		StudyDAO sdao = getStudyDAO();
 		StudySubjectDAO ssdao = getStudySubjectDAO();
 		StudyBean subjectStudy = sdao.findByStudySubjectId(sourceStudyEventBean.getStudySubjectId());
-		StudySubjectBean studySubject = ssdao.findBySubjectIdAndStudy(sourceStudyEventBean.getStudySubjectId(), subjectStudy);
+		StudySubjectBean studySubject = ssdao.findBySubjectIdAndStudy(sourceStudyEventBean.getStudySubjectId(),
+				subjectStudy);
 
 		for (PropertyBean propertyBean : properties) {
 			String expression = getExpressionService().constructFullExpressionFromPartial(propertyBean.getOid(),
@@ -504,14 +499,15 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 			ItemBean destinationItemBean = getExpressionService().getItemBeanFromExpression(expression);
 
 			String studyEventDefinitionOid = getExpressionService().getStudyEventDefenitionOid(expression);
-			StudyEventDefinitionBean destinationStudyEventDefinitionBean = studyEventDefinitionOid == null ? null
+			StudyEventDefinitionBean destinationStudyEventDefinitionBean = studyEventDefinitionOid == null
+					? null
 					: getStudyEventDefinitionDAO().findByOid(studyEventDefinitionOid);
 
 			StudyEventBean destinationStudyEventBean;
 			if (destinationStudyEventDefinitionBean != null) {
-				destinationStudyEventBean = (StudyEventBean) getStudyEventDAO().findByStudySubjectIdAndDefinitionIdAndOrdinal(
-						sourceEventCrfBean.getStudySubjectId(), destinationStudyEventDefinitionBean.getId(),
-						sourceStudyEventBean.getSampleOrdinal());
+				destinationStudyEventBean = (StudyEventBean) getStudyEventDAO()
+						.findByStudySubjectIdAndDefinitionIdAndOrdinal(sourceEventCrfBean.getStudySubjectId(),
+								destinationStudyEventDefinitionBean.getId(), sourceStudyEventBean.getSampleOrdinal());
 				// event not scheduled
 				if (destinationStudyEventBean.getId() == 0) {
 					StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
@@ -521,8 +517,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 							.findByHandleAndStudy(subjectStudy.getId(), "allowRulesAutoScheduling").getValue()
 							.equalsIgnoreCase("yes");
 					if (allowScheduleEvent) {
-						destinationStudyEventBean = scheduleEvent(sourceStudyEventBean, destinationStudyEventBean, destinationStudyEventDefinitionBean,
-								subjectStudy);
+						destinationStudyEventBean = scheduleEvent(sourceStudyEventBean, destinationStudyEventBean,
+								destinationStudyEventDefinitionBean, subjectStudy);
 					} else {
 						return;
 					}
@@ -531,8 +527,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 				destinationStudyEventBean = sourceStudyEventBean;
 			}
 
-			Boolean isItemInSameForm = getItemFormMetadataDAO().findByItemIdAndCRFVersionId(destinationItemBean.getId(),
-					sourceEventCrfBean.getCRFVersionId()).getId() != 0
+			Boolean isItemInSameForm = getItemFormMetadataDAO().findByItemIdAndCRFVersionId(
+					destinationItemBean.getId(), sourceEventCrfBean.getCRFVersionId()).getId() != 0
 					&& sourceStudyEventBean.equals(destinationStudyEventBean);
 			// Item Does not below to same form
 			if (!isItemInSameForm) {
@@ -540,14 +536,16 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 						destinationStudyEventBean, getExpressionService().getCrfOid(expression));
 				if (eventCrfs.size() == 0) {
 					createNewEventCRF(propertyBean, subjectStudy, sourceEventCrfBean, destinationStudyEventBean,
-									sourceItemDataBean, destinationItemBean, expression, ruleSet, ub, con);
+							sourceItemDataBean, destinationItemBean, expression, ruleSet, ub, con);
 				} else {
-					updateDestinationEventCRF(studySubject, propertyBean, subjectStudy, sourceEventCrfBean, eventCrfs.get(0),
-							destinationStudyEventBean, sourceItemDataBean, destinationItemBean, expression, ruleSet, ub, con);
+					updateDestinationEventCRF(studySubject, propertyBean, subjectStudy, sourceEventCrfBean,
+							eventCrfs.get(0), destinationStudyEventBean, sourceItemDataBean, destinationItemBean,
+							expression, ruleSet, ub, con);
 				}
 			} else {
 				updateSourceEventCRF(studySubject, propertyBean, subjectStudy, sourceEventCrfBean,
-						destinationStudyEventBean, sourceItemDataBean, destinationItemBean, expression, ruleSet, ub, con);
+						destinationStudyEventBean, sourceItemDataBean, destinationItemBean, expression, ruleSet, ub,
+						con);
 			}
 		}
 	}
@@ -583,12 +581,13 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		CRFVersionBean destinationCrfVersion = getExpressionService().getCRFVersionFromExpression(expression);
 		CRFBean crf = getExpressionService().getCRFFromExpression(expression);
 		int destinationCrfVersionId = 0;
-		EventDefinitionCRFBean destinationEventDefinitionCRFBean =
-				getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFId(subjectStudy,
+		EventDefinitionCRFBean destinationEventDefinitionCRFBean = getEventDefinitionCRFDAO()
+				.findByStudyEventDefinitionIdAndCRFId(subjectStudy,
 						destinationStudyEventBean.getStudyEventDefinitionId(), crf.getId());
 		if (destinationEventDefinitionCRFBean.isActive()) {
 			destinationCrfVersionId = destinationCrfVersion != null
-					? destinationCrfVersion.getId() : destinationEventDefinitionCRFBean.getDefaultVersionId();
+					? destinationCrfVersion.getId()
+					: destinationEventDefinitionCRFBean.getDefaultVersionId();
 		}
 		SubjectEventStatus destinationStudyEventStatus = destinationStudyEventBean.getSubjectEventStatus();
 		destinationCrfVersion = (CRFVersionBean) crfVersionDAO.findByPK(destinationCrfVersionId);
@@ -597,8 +596,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		boolean isDestinationCrfVersionAvailable = destinationCrfVersion.isActive()
 				&& destinationCrfVersion.getStatus().isAvailable();
 		boolean isDestinationStudyEventBeanAvailable = !(destinationStudyEventStatus.isRemoved()
-				|| destinationStudyEventStatus.isLocked() || destinationStudyEventStatus.isStopped()
-				|| destinationStudyEventStatus.isSkipped());
+				|| destinationStudyEventStatus.isLocked() || destinationStudyEventStatus.isStopped() || destinationStudyEventStatus
+				.isSkipped());
 		boolean isAnotherVersionStarted = isAnotherVersionStarted(destinationStudyEventBean, expression);
 
 		if (isDestinationEventDefinitionCRFBeanAvailable && isDestinationCrfVersionAvailable
@@ -617,9 +616,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 			destinationEventCrfBean.setOwner(ub);
 			destinationEventCrfBean = (EventCRFBean) getEventCRFDAO().create(destinationEventCrfBean);
 
-			SubjectEventStatusUtil.determineSubjectEventState(destinationStudyEventBean,
-					new DAOWrapper(getStudyDAO(), crfVersionDAO, studyEventDAO, getStudySubjectDAO(), getEventCRFDAO(),
-							getEventDefinitionCRFDAO(), getDiscrepancyNoteDAO()));
+			SubjectEventStatusUtil.determineSubjectEventState(destinationStudyEventBean, new DAOWrapper(ds));
 			studyEventDAO.update(destinationStudyEventBean);
 
 			insertValueIntoTheDestinationItem(propertyBean, sourceEventCrfBean, destinationEventCrfBean,
@@ -632,7 +629,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		List<EventCRFBean> eventCRFBeanList = getEventCRFDAO().findAllByStudyEvent(destinationStudyEventBean);
 		List<CRFBean> startedCRFBeanList = new ArrayList<CRFBean>();
 
-		for (EventCRFBean eventCRFBean: eventCRFBeanList) {
+		for (EventCRFBean eventCRFBean : eventCRFBeanList) {
 			if (eventCRFBean.isNotStarted()) {
 				getEventCRFDAO().delete(eventCRFBean.getId());
 			} else {
@@ -650,13 +647,12 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		return false;
 	}
 
-	private void updateDestinationEventCRF(StudySubjectBean studySubject, PropertyBean propertyBean, StudyBean subjectStudy,
-			EventCRFBean sourceEventCrfBean, EventCRFBean destinationEventCrfBean,
+	private void updateDestinationEventCRF(StudySubjectBean studySubject, PropertyBean propertyBean,
+			StudyBean subjectStudy, EventCRFBean sourceEventCrfBean, EventCRFBean destinationEventCrfBean,
 			StudyEventBean destinationStudyEventBean, ItemDataBean sourceItemDataBean, ItemBean destinationItemBean,
 			String expression, RuleSetBean ruleSet, UserAccountBean ub, Connection con) {
 
 		StudyEventDAO studyEventDAO = getStudyEventDAO();
-		EventDefinitionCRFDAO eventDefCRFDAO = getEventDefinitionCRFDAO();
 		boolean createReasonForChangeIfNeeded = false;
 		Status destinationEventCRFStatus = getEventCRFStatus(studySubject, subjectStudy, destinationEventCrfBean,
 				destinationStudyEventBean, expression);
@@ -681,16 +677,13 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 				}
 			}
 
-			boolean isAllowedToInsertDataIntoDestinationEventCRF =
-					insertValueIntoTheDestinationItem(propertyBean, sourceEventCrfBean, destinationEventCrfBean,
-					destinationItemBean, sourceItemDataBean, expression, ruleSet, ub, subjectStudy, con,
-					createReasonForChangeIfNeeded);
+			boolean isAllowedToInsertDataIntoDestinationEventCRF = insertValueIntoTheDestinationItem(propertyBean,
+					sourceEventCrfBean, destinationEventCrfBean, destinationItemBean, sourceItemDataBean, expression,
+					ruleSet, ub, subjectStudy, con, createReasonForChangeIfNeeded);
 
 			if (isAllowedToInsertDataIntoDestinationEventCRF) {
 				getEventCRFDAO().update(destinationEventCrfBean);
-				SubjectEventStatusUtil.determineSubjectEventState(destinationStudyEventBean,
-						new DAOWrapper(getStudyDAO(), getCRFVersionDAO(), studyEventDAO, getStudySubjectDAO(),
-								getEventCRFDAO(), eventDefCRFDAO, getDiscrepancyNoteDAO()));
+				SubjectEventStatusUtil.determineSubjectEventState(destinationStudyEventBean, new DAOWrapper(ds));
 				studyEventDAO.update(destinationStudyEventBean);
 			}
 		}
@@ -702,9 +695,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 		Status destinationEventCRFStatus = getEventCRFStatus(studySubject, subjectStudy, sourceEventCrfBean,
 				sourceStudyEventBean, expression);
-		boolean createReasonForChangeIfNeeded =  destinationEventCRFStatus.isCompleted()
-				|| destinationEventCRFStatus.isSDVed()
-				|| destinationEventCRFStatus.isSigned();
+		boolean createReasonForChangeIfNeeded = destinationEventCRFStatus.isCompleted()
+				|| destinationEventCRFStatus.isSDVed() || destinationEventCRFStatus.isSigned();
 		insertValueIntoTheDestinationItem(propertyBean, sourceEventCrfBean, sourceEventCrfBean, destinationItemBean,
 				sourceItemDataBean, expression, ruleSet, ub, subjectStudy, con, createReasonForChangeIfNeeded);
 	}
@@ -714,9 +706,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 		EventDefinitionCRFDAO eventDefCRFDAO = getEventDefinitionCRFDAO();
 		CRFBean crf = getExpressionService().getCRFFromExpression(expression);
-		EventDefinitionCRFBean destinationEventDefinitionCRFBean =
-				eventDefCRFDAO.findByStudyEventDefinitionIdAndCRFId(subjectStudy,
-						sourceStudyEventBean.getStudyEventDefinitionId(), crf.getId());
+		EventDefinitionCRFBean destinationEventDefinitionCRFBean = eventDefCRFDAO.findByStudyEventDefinitionIdAndCRFId(
+				subjectStudy, sourceStudyEventBean.getStudyEventDefinitionId(), crf.getId());
 		return EventCRFUtil.getEventCRFCurrentStatus(studySubject, sourceStudyEventBean,
 				destinationEventDefinitionCRFBean, sourceEventCrfBean, getCRFVersionDAO(), eventDefCRFDAO);
 	}
@@ -793,15 +784,16 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 				destinationItemDataBean.setValue(valueToInsert);
 				getItemDataDAO().updateValue(destinationItemDataBean, "yyyy-MM-dd", con);
 				if (createReasonForChangeIfNeeded) {
-					generateRFCsForDestinationItemDataBean(destinationItemBean, destinationItemDataBean, ub, subjectStudy);
+					generateRFCsForDestinationItemDataBean(destinationItemBean, destinationItemDataBean, ub,
+							subjectStudy);
 				}
 			}
 		}
 		return isAllowedToInsertDataIntoDestinationEventCRF;
 	}
 
-	private void generateRFCsForDestinationItemDataBean(ItemBean destinationItemBean, ItemDataBean destinationItemDataBean,
-			UserAccountBean assignedUser, StudyBean subjectStudy) {
+	private void generateRFCsForDestinationItemDataBean(ItemBean destinationItemBean,
+			ItemDataBean destinationItemDataBean, UserAccountBean assignedUser, StudyBean subjectStudy) {
 
 		DisplayItemBean displayItem = new DisplayItemBean();
 		displayItem.setItem(destinationItemBean);
@@ -1037,36 +1029,36 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 	private ItemOrItemGroupHolder getItemOrItemGroup(String oid) {
 		int igPos = 0;
+		ItemGroupBean itemGroup;
 		String[] theOid = oid.split(ESCAPED_SEPERATOR);
 		switch (theOid.length) {
-		case 4:
-			igPos++;
-		case 3:
-			igPos++;
-		case 2: {
-			ItemGroupBean itemGroup = getItemGroupDAO().findByOid(theOid[igPos].trim());
-			if (itemGroup != null) {
-				ItemBean item = getItemDAO().findItemByGroupIdandItemOid(itemGroup.getId(), theOid[igPos + 1].trim());
-				if (item != null) {
-					return new ItemOrItemGroupHolder(item, itemGroup);
+			case FOUR :
+				igPos++;
+			case THREE :
+				igPos++;
+			case TWO :
+				itemGroup = getItemGroupDAO().findByOid(theOid[igPos].trim());
+				if (itemGroup != null) {
+					ItemBean item = getItemDAO().findItemByGroupIdandItemOid(itemGroup.getId(),
+							theOid[igPos + 1].trim());
+					if (item != null) {
+						return new ItemOrItemGroupHolder(item, itemGroup);
+					}
 				}
-			}
-		}
-		case 1: {
-			ItemGroupBean itemGroup = getItemGroupDAO().findByOid(theOid[igPos]);
-			if (itemGroup != null) {
-				return new ItemOrItemGroupHolder(null, itemGroup);
-			}
+			case ONE :
+				itemGroup = getItemGroupDAO().findByOid(theOid[igPos]);
+				if (itemGroup != null) {
+					return new ItemOrItemGroupHolder(null, itemGroup);
+				}
 
-			List<ItemBean> items = getItemDAO().findByOid(theOid[igPos]);
-			ItemBean item = items.size() > 0 ? items.get(0) : null;
-			if (item != null) {
-				return new ItemOrItemGroupHolder(item, null);
-			}
-		}
-		default: {
-			return new ItemOrItemGroupHolder(null, null);
-		}
+				List<ItemBean> items = getItemDAO().findByOid(theOid[igPos]);
+				ItemBean item = items.size() > 0 ? items.get(0) : null;
+				if (item != null) {
+					return new ItemOrItemGroupHolder(item, null);
+				}
+			default :
+				return new ItemOrItemGroupHolder(null, null);
+
 		}
 	}
 

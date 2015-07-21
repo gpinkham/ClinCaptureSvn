@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -280,8 +281,13 @@ public final class EventDefinitionValidator {
 			errors.put("eventid", errorMessages);
 		} else if (crfVersionBean.getId() == 0) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfIsNotFound", new Object[]{crfName,
+			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotFound", new Object[]{crfName,
 					versionName}, locale));
+			errors.put("crfname", errorMessages);
+		} else if (!crfVersionBean.getStatus().equals(Status.AVAILABLE)) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotAvailable", new Object[]{
+					crfName, versionName}, locale));
 			errors.put("crfname", errorMessages);
 		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
 			ArrayList errorMessages = new ArrayList();

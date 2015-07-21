@@ -2,6 +2,8 @@ package com.clinovo.rest.validator;
 
 import java.util.Locale;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -33,6 +35,10 @@ public class EventServiceValidatorTest {
 
 	private StudyEventDefinitionBean studyEventDefinitionBean;
 
+	private EventDefinitionCRFBean eventDefinitionCRFBean;
+
+	private CRFBean crfBean;
+
 	@Mock
 	private MessageSource messageSource;
 
@@ -43,6 +49,19 @@ public class EventServiceValidatorTest {
 	public void before() throws Exception {
 		currentStudy = new StudyBean();
 		currentStudy.setId(1);
+
+		StudyBean anotherStudy = new StudyBean();
+		anotherStudy.setId(88);
+
+		crfBean = new CRFBean();
+		crfBean.setId(1);
+		crfBean.setName("Agent Administration");
+
+		eventDefinitionCRFBean = new EventDefinitionCRFBean();
+		eventDefinitionCRFBean.setId(1);
+		eventDefinitionCRFBean.setCrfId(1);
+		eventDefinitionCRFBean.setCrf(crfBean);
+		eventDefinitionCRFBean.setStudyEventDefinitionId(1);
 
 		studyEventDefinitionBean = new StudyEventDefinitionBean();
 		studyEventDefinitionBean.setId(1);
@@ -80,4 +99,38 @@ public class EventServiceValidatorTest {
 		EventServiceValidator.validateStudyEventDefinition(messageSource, 1, studyEventDefinitionBean, currentStudy);
 	}
 
+	@Test
+	public void testThatValidateStudyEventDefinitionAndEventDefinitionCrfDoesNotThrowAnyException() throws Exception {
+		EventServiceValidator.validateStudyEventDefinitionAndEventDefinitionCrf(messageSource, 1,
+				"Agent Administration", crfBean, eventDefinitionCRFBean, studyEventDefinitionBean, currentStudy);
+	}
+
+	@Test(expected = RestException.class)
+	public void testThatValidateStudyEventDefinitionAndEventDefinitionCrfThrowsAnExceptionIfEventDefinitionCrfIdIsZero()
+			throws Exception {
+		EventServiceValidator.validateStudyEventDefinitionAndEventDefinitionCrf(messageSource, 1,
+				"Agent Administration", crfBean, new EventDefinitionCRFBean(), studyEventDefinitionBean, currentStudy);
+	}
+
+	@Test(expected = RestException.class)
+	public void testThatValidateStudyEventDefinitionAndEventDefinitionCrfThrowsAnExceptionIfStudyEventDefinitionStudyIdBelongsToAnotherScope()
+			throws Exception {
+		studyEventDefinitionBean.setStudyId(88);
+		EventServiceValidator.validateStudyEventDefinitionAndEventDefinitionCrf(messageSource, 1,
+				"Agent Administration", crfBean, eventDefinitionCRFBean, studyEventDefinitionBean, currentStudy);
+	}
+
+	@Test(expected = RestException.class)
+	public void xxxxtestThatValidateStudyEventDefinitionAndEventDefinitionCrfThrowsAnExceptionIfStudyEventDefinitionStudyIdIsZero()
+			throws Exception {
+		EventServiceValidator.validateStudyEventDefinitionAndEventDefinitionCrf(messageSource, 1,
+				"Agent Administration", crfBean, eventDefinitionCRFBean, new StudyEventDefinitionBean(), currentStudy);
+	}
+
+	@Test(expected = RestException.class)
+	public void testThatValidateStudyEventDefinitionAndEventDefinitionCrfThrowsAnExceptionIfCrfIdIsZero()
+			throws Exception {
+		EventServiceValidator.validateStudyEventDefinitionAndEventDefinitionCrf(messageSource, 1,
+				"Agent Administration", new CRFBean(), eventDefinitionCRFBean, studyEventDefinitionBean, currentStudy);
+	}
 }

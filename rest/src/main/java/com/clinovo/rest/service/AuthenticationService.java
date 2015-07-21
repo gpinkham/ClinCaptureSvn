@@ -15,9 +15,10 @@
 
 package com.clinovo.rest.service;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
+import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.model.UserDetails;
+import com.clinovo.rest.security.PermissionChecker;
+import com.clinovo.util.RequestUtil;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -35,10 +36,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.model.UserDetails;
-import com.clinovo.rest.security.PermissionChecker;
-import com.clinovo.util.RequestUtil;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 /**
  * AuthenticationService.
@@ -87,6 +86,10 @@ public class AuthenticationService extends BaseService {
 					StudyUserRoleBean surBean = userAccountBean.getSysAdminRole();
 					if (surBean == null) {
 						surBean = userAccountDao.findRoleByUserNameAndStudyId(userName, studyBean.getId());
+						if (surBean.isInvalid() && studyBean.getParentStudyId() > 0) {
+							surBean = userAccountDao.findRoleByUserNameAndStudyId(userName,
+									studyBean.getParentStudyId());
+						}
 					}
 					if (surBean != null && surBean.getId() > 0) {
 						userDetails = new UserDetails();

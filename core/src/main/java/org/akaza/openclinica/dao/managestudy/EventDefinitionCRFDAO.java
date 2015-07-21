@@ -270,7 +270,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Find all EventDefinitionCRFBean which have no parent EventDefinitionCRFBean.
+	 * Find all EventDefinitionCRFBeans which have no parent EventDefinitionCRFBean.
 	 * 
 	 * @param definitionId
 	 *            int
@@ -290,6 +290,26 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 			al.add(eb);
 		}
 		return al;
+	}
+
+	/**
+	 * Find all EventDefinitionCRFBeans by parent id..
+	 *
+	 * @param parentId
+	 *            int
+	 * @return List<EventDefinitionCRFBean>
+	 */
+	public List<EventDefinitionCRFBean> findAllChildrenByParentId(int parentId) {
+		setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, parentId);
+		String sql = digester.getQuery("findAllChildrenByParentId");
+		List<HashMap> resultSet = this.select(sql, variables);
+		List<EventDefinitionCRFBean> eventDefinitionCRFBeanList = new ArrayList<EventDefinitionCRFBean>();
+		for (HashMap map : resultSet) {
+			eventDefinitionCRFBeanList.add((EventDefinitionCRFBean) this.getEntityFromHashMap(map));
+		}
+		return eventDefinitionCRFBeanList;
 	}
 
 	/**
@@ -527,6 +547,21 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
+	 * Updates EventDefinitionCRFBean's status.
+	 *
+	 * @param eventDefinitionCRFBean
+	 *            EventDefinitionCRFBean
+	 */
+	public void updateStatus(EventDefinitionCRFBean eventDefinitionCRFBean) {
+		int ind = 1;
+		HashMap variables = new HashMap();
+		variables.put(ind++, eventDefinitionCRFBean.getStatus().getId());
+		variables.put(ind++, eventDefinitionCRFBean.getUpdaterId());
+		variables.put(ind, eventDefinitionCRFBean.getId());
+		this.execute(digester.getQuery("updateStatus"), variables);
+	}
+
+	/**
 	 * Method that finds all event definition crfs by incoming parameters.
 	 *
 	 * @param objCurrentUser
@@ -701,8 +736,10 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	/**
 	 * Method that returns list of event definition crfs by studyId and crfId.
 	 *
-	 * @param studyId int
-	 * @param crfId int
+	 * @param studyId
+	 *            int
+	 * @param crfId
+	 *            int
 	 * @return ArrayList
 	 */
 	public ArrayList findAllActiveByStudyIdAndCRFId(int studyId, int crfId) {
@@ -1179,8 +1216,11 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
 	/**
 	 * Find all Event Definition CRFs in the EventDefinition on the Study.
-	 * @param definitionId StudyEventDefinition Id
-	 * @param siteId StudyBean Id
+	 * 
+	 * @param definitionId
+	 *            StudyEventDefinition Id
+	 * @param siteId
+	 *            StudyBean Id
 	 * @return Collection of EventDefinitionCRFBeans
 	 */
 	public Collection findAllActiveByDefinitionAndSiteId(int definitionId, int siteId) {

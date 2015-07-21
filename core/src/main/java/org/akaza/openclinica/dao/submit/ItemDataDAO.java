@@ -20,17 +20,6 @@
  */
 package org.akaza.openclinica.dao.submit;
 
-import java.sql.Connection;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
@@ -49,6 +38,16 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * ItemDataDAO.java, the equivalent to AnswerDAO in the original code base. Modified by ywang (12-07-2007) to convert
@@ -303,28 +302,18 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * This method will update only item data status.
-	 * 
-	 * @param eb
-	 *            <code>ItemDataBean</code> that will be updated.
-	 * @return updated <code>ItemDataBean</code>
+	 * Updates ItemDataBean's status.
+	 *
+	 * @param itemDataBean
+	 *            ItemDataBean
 	 */
-	public EntityBean updateStatus(EntityBean eb) {
-
-		ItemDataBean idb = (ItemDataBean) eb;
-		idb.setActive(false);
-		int index = 1;
-
-		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(index++, idb.getStatus().getId());
-		variables.put(index, idb.getId());
+	public void updateStatus(ItemDataBean itemDataBean) {
+		int ind = 1;
+		HashMap variables = new HashMap();
+		variables.put(ind++, itemDataBean.getStatus().getId());
+		variables.put(ind++, itemDataBean.getUpdaterId());
+		variables.put(ind, itemDataBean.getId());
 		this.execute(digester.getQuery("updateStatus"), variables);
-
-		if (isQuerySuccessful()) {
-			idb.setActive(true);
-		}
-
-		return idb;
 	}
 
 	/**

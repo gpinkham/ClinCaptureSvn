@@ -20,11 +20,15 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.service.CRFMaskingService;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SDVUtil;
-import com.clinovo.util.SignUtil;
-import com.clinovo.util.SubjectEventStatusUtil;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -57,13 +61,11 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.clinovo.service.CRFMaskingService;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SDVUtil;
+import com.clinovo.util.SignUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * copy of the EnterDataForStudyEventServlet.
@@ -157,10 +159,7 @@ public class CRFListForStudyEventServlet extends Controller {
 		// so we can display the event for which we're entering data
 		StudyEventBean seb = getStudyEvent(request, eventId);
 
-		StudyDAO sdao = getStudyDAO();
 		StudyEventDAO sedao = getStudyEventDAO();
-		DiscrepancyNoteDAO discDao = getDiscrepancyNoteDAO();
-		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 
 		// so we can display the subject's label
 		StudySubjectDAO ssdao = getStudySubjectDAO();
@@ -303,7 +302,9 @@ public class CRFListForStudyEventServlet extends Controller {
 				String crfName = displayEventCRFBean.getEventCRF().getCrf().getName();
 				Integer crfId = displayEventCRFBean.getEventCRF().getCrf().getId();
 
-				if (!getMaskingService().isEventDefinitionCRFMasked(displayEventCRFBean.getEventDefinitionCRF().getId(), ub.getId(), displayEventCRFBean.getEventDefinitionCRF().getStudyId())) {
+				if (!getMaskingService().isEventDefinitionCRFMasked(
+						displayEventCRFBean.getEventDefinitionCRF().getId(), ub.getId(),
+						displayEventCRFBean.getEventDefinitionCRF().getStudyId())) {
 					if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
 							studySubjectBean.getLabel(), crfName)) {
 						String crfFlagColor = "yellow";
@@ -321,7 +322,8 @@ public class CRFListForStudyEventServlet extends Controller {
 				String crfName = displayEventDefinitionCRFBean.getEdc().getCrf().getName();
 				Integer crfId = displayEventDefinitionCRFBean.getEdc().getCrf().getId();
 
-				if (!getMaskingService().isEventDefinitionCRFMasked(displayEventDefinitionCRFBean.getEdc().getId(), ub.getId(), displayEventDefinitionCRFBean.getEdc().getStudyId())) {
+				if (!getMaskingService().isEventDefinitionCRFMasked(displayEventDefinitionCRFBean.getEdc().getId(),
+						ub.getId(), displayEventDefinitionCRFBean.getEdc().getStudyId())) {
 					if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
 							studySubjectBean.getLabel(), crfName)) {
 						String crfFlagColor = "yellow";
@@ -348,13 +350,12 @@ public class CRFListForStudyEventServlet extends Controller {
 		// Make available the study
 		request.setAttribute("study", currentStudy);
 
-		DAOWrapper daoWrapper = new DAOWrapper(sdao, sedao, ssdao, ecdao, edcdao, seddao, discDao);
+		DAOWrapper daoWrapper = new DAOWrapper(getDataSource());
 		request.setAttribute(SHOW_SIGN_BUTTON, SignUtil.permitSign(seb, study, daoWrapper));
 		request.setAttribute(SHOW_SUBJECT_SIGN_BUTTON, SignUtil.permitSign(studySubjectBean, daoWrapper));
-		request.setAttribute(
-				SHOW_SDV_BUTTON,
-				SDVUtil.permitSDV(seb, studySubjectBean.getStudyId(), daoWrapper, currentStudy
-						.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes"), notedMap, ub.getId(), maskingService));
+		request.setAttribute(SHOW_SDV_BUTTON, SDVUtil.permitSDV(seb, studySubjectBean.getStudyId(), daoWrapper,
+				currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes"), notedMap,
+				ub.getId(), maskingService));
 		request.setAttribute(PAGE_TO_RENDER, Page.CRF_LIST_FOR_STUDY_EVENT);
 
 		boolean allLocked = true;

@@ -20,12 +20,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.util.ArrayList;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -34,23 +30,21 @@ import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SubjectEventStatusUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
- * Restores a subject to system, also restore all the related data
+ * Restores a subject to system, also restore all the related data.
  *
  * @author jxu
  */
@@ -102,7 +96,6 @@ public class RestoreSubjectServlet extends Controller {
 			// find all study subjects
 			StudySubjectDAO ssdao = getStudySubjectDAO();
 			ArrayList studySubs = ssdao.findAllBySubjectId(subjectId);
-			StudyDAO studydao = getStudyDAO();
 
 			// find study events
 			StudyEventDAO sedao = getStudyEventDAO();
@@ -132,10 +125,6 @@ public class RestoreSubjectServlet extends Controller {
 				}
 
 				EventCRFDAO ecdao = getEventCRFDAO();
-				CRFVersionDAO cvdao = getCRFVersionDAO();
-				StudySubjectDAO subdao = getStudySubjectDAO();
-				EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
-				DiscrepancyNoteDAO discDao = getDiscrepancyNoteDAO();
 
 				for (Object event1 : events) {
 					StudyEventBean event = (StudyEventBean) event1;
@@ -149,8 +138,8 @@ public class RestoreSubjectServlet extends Controller {
 
 						getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
 
-						SubjectEventStatusUtil.determineSubjectEventState(event, eventCRFs, new DAOWrapper(studydao,
-								cvdao, sedao, subdao, ecdao, edcdao, discDao));
+						SubjectEventStatusUtil.determineSubjectEventState(event, eventCRFs, new DAOWrapper(
+								getDataSource()));
 					}
 				}
 

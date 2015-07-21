@@ -15,29 +15,6 @@
 
 package com.clinovo.rest.service;
 
-import java.util.HashMap;
-
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.domain.SourceDataVerification;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.clinovo.rest.annotation.RestAccess;
 import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
@@ -49,10 +26,35 @@ import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.util.ValidatorUtil;
 import com.clinovo.rest.validator.EventServiceValidator;
+import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.EventDefinitionService;
 import com.clinovo.service.ItemSDVService;
 import com.clinovo.util.RequestUtil;
 import com.clinovo.validator.EventDefinitionValidator;
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.domain.SourceDataVerification;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.sql.DataSource;
+import java.util.HashMap;
 
 /**
  * RestEventService.
@@ -64,6 +66,9 @@ public class EventService extends BaseService {
 
 	@Autowired
 	private EventDefinitionService eventDefinitionService;
+
+	@Autowired
+	private EventDefinitionCrfService eventDefinitionCrfService;
 
 	@Autowired
 	private ConfigurationDao configurationDao;
@@ -106,7 +111,7 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess(UserRole.ANY_ADMIN)
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@ResponseBody
 	@RestScope(Scope.STUDY)
@@ -186,7 +191,7 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess(UserRole.ANY_ADMIN)
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/addCrf", method = RequestMethod.POST)
 	@ResponseBody
 	@RestScope(Scope.STUDY)
@@ -261,8 +266,9 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess(UserRole.ANY_ADMIN)
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@ResponseBody
+	@RestScope(Scope.STUDY)
 	@RequestMapping(method = RequestMethod.GET)
 	public StudyEventDefinitionBean getInfo(@RequestParam(value = "id") int id) throws Exception {
 		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
@@ -308,7 +314,7 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess(UserRole.ANY_ADMIN)
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/edit", method = RequestMethod.POST)
 	@RestScope(Scope.STUDY)
 	@RestParametersPossibleValues({@RestParameterPossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
@@ -357,8 +363,10 @@ public class EventService extends BaseService {
 					.setScheduleDay(schDay != null ? schDay : studyEventDefinitionBean.getScheduleDay());
 			studyEventDefinitionBean.setEmailDay(emailDay != null ? emailDay : studyEventDefinitionBean.getEmailDay());
 		}
+		int userId = emailUser != null ? userAccountDao.findByUserName(emailUser).getId() : 0;
+		studyEventDefinitionBean.setUserEmailId(userId != 0 ? userId : 1);
 
-		eventDefinitionService.updateStudyEventDefinition(currentStudy, emailUser, studyEventDefinitionBean);
+		eventDefinitionService.updateOnlyTheStudyEventDefinition(studyEventDefinitionBean);
 
 		return studyEventDefinitionBean;
 	}
@@ -372,11 +380,15 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess(UserRole.ANY_ADMIN)
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@ResponseBody
+	@RestScope(Scope.STUDY)
 	@RequestMapping(value = "/remove", method = RequestMethod.POST)
 	public StudyEventDefinitionBean remove(@RequestParam(value = "id") int id) throws Exception {
-		return changeStatus(id, Status.DELETED);
+		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
+		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(id);
+		eventDefinitionService.removeStudyEventDefinition(studyEventDefinitionBean, updater);
+		return studyEventDefinitionBean;
 	}
 
 	/**
@@ -388,26 +400,93 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess(UserRole.ANY_ADMIN)
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@ResponseBody
+	@RestScope(Scope.STUDY)
 	@RequestMapping(value = "/restore", method = RequestMethod.POST)
 	public StudyEventDefinitionBean restore(@RequestParam(value = "id") int id) throws Exception {
-		return changeStatus(id, Status.AVAILABLE);
+		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
+		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(id);
+		eventDefinitionService.restoreStudyEventDefinition(studyEventDefinitionBean, updater);
+		return studyEventDefinitionBean;
 	}
 
-	private StudyEventDefinitionBean changeStatus(int id, Status status) throws Exception {
-		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+	/**
+	 * Method removes the event definition crf.
+	 *
+	 * @param eventId
+	 *            int
+	 * @param crfName
+	 *            String
+	 * @return EventDefinitionCRFBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
+	@ResponseBody
+	@RestScope(Scope.STUDY)
+	@RequestMapping(value = "/removeCrf", method = RequestMethod.POST)
+	public EventDefinitionCRFBean removeCrf(@RequestParam("eventid") int eventId,
+			@RequestParam("crfname") String crfName) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
+		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCrf(eventId, crfName);
+		eventDefinitionCrfService.removeEventDefinitionCrf(eventDefinitionCRFBean, updater);
+		return eventDefinitionCRFBean;
+	}
+
+	/**
+	 * Method restores the event definition crf.
+	 *
+	 * @param eventId
+	 *            int
+	 * @param crfName
+	 *            String
+	 * @return EventDefinitionCRFBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
+	@ResponseBody
+	@RestScope(Scope.STUDY)
+	@RequestMapping(value = "/restoreCrf", method = RequestMethod.POST)
+	public EventDefinitionCRFBean restoreCrf(@RequestParam("eventid") int eventId,
+			@RequestParam("crfname") String crfName) throws Exception {
+		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
+		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCrf(eventId, crfName);
+		eventDefinitionCrfService.restoreEventDefinitionCrf(eventDefinitionCRFBean, updater);
+		return eventDefinitionCRFBean;
+	}
+
+	private StudyEventDefinitionBean getStudyEventDefinition(int id) throws Exception {
+		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
 				dataSource).findByPK(id);
 
 		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, currentStudy);
 
-		studyEventDefinitionBean.setUpdater(updater);
-		studyEventDefinitionBean.setStatus(status);
-		eventDefinitionService.updateStudyEventDefinitionStatus(studyEventDefinitionBean);
-
 		return studyEventDefinitionBean;
+	}
+
+	private EventDefinitionCRFBean getEventDefinitionCrf(int eventId, String crfName) throws Exception {
+		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+
+		CRFBean crfBean = (CRFBean) new CRFDAO(dataSource).findByName(crfName);
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
+				dataSource).findByPK(eventId);
+
+		if (!studyEventDefinitionBean.getStatus().equals(Status.AVAILABLE)) {
+			throw new RestException(messageSource, "rest.event.cannotPerformOperationOnEDCBecauseTheSEDIsNotAvailable");
+		}
+
+		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFDAO(dataSource)
+				.findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventId, crfBean.getId(), currentStudy.getId());
+
+		EventServiceValidator.validateStudyEventDefinitionAndEventDefinitionCrf(messageSource, eventId, crfName,
+				crfBean, eventDefinitionCRFBean, studyEventDefinitionBean, currentStudy);
+
+		eventDefinitionCrfService.fillEventDefinitionCrf(eventDefinitionCRFBean, studyEventDefinitionBean);
+
+		return eventDefinitionCRFBean;
 	}
 }

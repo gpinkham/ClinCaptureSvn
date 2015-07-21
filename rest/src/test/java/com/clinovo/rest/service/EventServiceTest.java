@@ -7,10 +7,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.junit.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 public class EventServiceTest extends BaseServiceTest {
 
@@ -599,6 +603,34 @@ public class EventServiceTest extends BaseServiceTest {
 				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
 						.param("defaultversion", "v1.000000").accept(mediaType).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToAddCrfToStudyEventDefinitionIfCrfVersionIsLocked() throws Exception {
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(5);
+		crfVersionBean.setUpdater((UserAccountBean) userAccountDAO.findByPK(1));
+		crfVersionBean.setStatus(Status.LOCKED);
+		crfVersionDao.update(crfVersionBean);
+		crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(5);
+		assertTrue(crfVersionBean.getStatus().equals(Status.LOCKED));
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", crfVersionBean.getName()).accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToAddCrfToStudyEventDefinitionIfCrfVersionIsDeleted() throws Exception {
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(5);
+		crfVersionBean.setUpdater((UserAccountBean) userAccountDAO.findByPK(1));
+		crfVersionBean.setStatus(Status.DELETED);
+		crfVersionDao.update(crfVersionBean);
+		crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(5);
+		assertTrue(crfVersionBean.getStatus().equals(Status.DELETED));
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", crfVersionBean.getName()).accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -1197,7 +1229,6 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatScheduledStudyEventDefinitionIsChangedCorrectlyToTheCalendaredStudyEventDefinitionThatIsReferenceEvent()
 			throws Exception {
-
 		result = this.mockMvc
 				.perform(
 						post(API_EVENT_EDIT).param("id", "1").param("name", "test_event")
@@ -1365,7 +1396,7 @@ public class EventServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatRemoveWorksFineForExistingStudyEventDefinition() throws Exception {
+	public void testThatRemoveMethodWorksFineForExistingStudyEventDefinition() throws Exception {
 		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(status().isOk());
 		assertEquals(((StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1)).getStatus(), Status.DELETED);
@@ -1404,16 +1435,413 @@ public class EventServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatRestoreWorksFineForExistingStudyEventDefinition() throws Exception {
+	public void testThatRestoreMethodWorksFineForExistingStudyEventDefinition() throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
 				.findByPK(1);
 		studyEventDefinitionBean.setStatus(Status.DELETED);
-		studyEventDefinitionDAO.update(studyEventDefinitionBean);
+		studyEventDefinitionBean.setUpdater(userBean);
+		studyEventDefinitionDAO.updateStatus(studyEventDefinitionBean);
 		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1);
 		assertEquals(studyEventDefinitionBean.getStatus(), Status.DELETED);
 		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(status().isOk());
 		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1);
 		assertEquals(studyEventDefinitionBean.getStatus(), Status.AVAILABLE);
+	}
+
+	@Test
+	public void testThatStudyAdministratorWithoutAdministrativePrivilegesIsAbleToCallEventAPI() throws Exception {
+		ResultMatcher expectStatus = status().isOk();
+		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		login(newUser.getName(), UserType.USER, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), studyName);
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category").accept(mediaType)
+						.secure(true).session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("name", "new_test_event").accept(mediaType).secure(true)
+						.session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session)).andExpect(
+				expectStatus);
+		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+	}
+
+	@Test
+	public void testThatStudyAdministratorWithAdministrativePrivilegesIsAbleToCallEventAPI() throws Exception {
+		ResultMatcher expectStatus = status().isOk();
+		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), studyName);
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category").accept(mediaType)
+						.secure(true).session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("name", "new_test_event").accept(mediaType).secure(true)
+						.session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session)).andExpect(
+				expectStatus);
+		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+	}
+
+	@Test
+	public void testThatStudyCodeIsNotAbleToCallEventAPI() throws Exception {
+		ResultMatcher expectStatus = status().isForbidden();
+		createNewUser(UserType.SYSADMIN, Role.STUDY_CODER);
+		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_CODER, newUser.getPasswd(), studyName);
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category").accept(mediaType)
+						.secure(true).session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("name", "new_test_event").accept(mediaType).secure(true)
+						.session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session)).andExpect(
+				expectStatus);
+		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+	}
+
+	@Test
+	public void testThatStudyEvaluatorIsNotAbleToCallEventAPI() throws Exception {
+		ResultMatcher expectStatus = status().isForbidden();
+		createNewUser(UserType.SYSADMIN, Role.STUDY_EVALUATOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_EVALUATOR, newUser.getPasswd(), studyName);
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category").accept(mediaType)
+						.secure(true).session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("name", "new_test_event").accept(mediaType).secure(true)
+						.session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session)).andExpect(
+				expectStatus);
+		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+	}
+
+	@Test
+	public void testThatStudyMonitorIsNotAbleToCallEventAPI() throws Exception {
+		ResultMatcher expectStatus = status().isForbidden();
+		createNewUser(UserType.SYSADMIN, Role.STUDY_MONITOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_MONITOR, newUser.getPasswd(), studyName);
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category").accept(mediaType)
+						.secure(true).session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("name", "new_test_event").accept(mediaType).secure(true)
+						.session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session)).andExpect(
+				expectStatus);
+		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+	}
+
+	@Test
+	public void testThatCRCIsNotAbleToCallEventAPI() throws Exception {
+		ResultMatcher expectStatus = status().isInternalServerError();
+		createNewSite(studyBean.getId());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
+		createNewUser(UserType.SYSADMIN, Role.CLINICAL_RESEARCH_COORDINATOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.CLINICAL_RESEARCH_COORDINATOR, newUser.getPasswd(),
+				newSite.getName());
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category").accept(mediaType)
+						.secure(true).session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("name", "new_test_event").accept(mediaType).secure(true)
+						.session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isInternalServerError());
+		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+	}
+
+	@Test
+	public void testThatInvestigatorIsNotAbleToCallEventAPI() throws Exception {
+		ResultMatcher expectStatus = status().isInternalServerError();
+		createNewSite(studyBean.getId());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
+		createNewUser(UserType.SYSADMIN, Role.INVESTIGATOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.INVESTIGATOR, newUser.getPasswd(), newSite.getName());
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category").accept(mediaType)
+						.secure(true).session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("name", "new_test_event").accept(mediaType).secure(true)
+						.session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isInternalServerError());
+		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+	}
+
+	@Test
+	public void testThatSiteMonitorIsNotAbleToCallEventAPI() throws Exception {
+		ResultMatcher expectStatus = status().isInternalServerError();
+		createNewSite(studyBean.getId());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
+		createNewUser(UserType.SYSADMIN, Role.SITE_MONITOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.SITE_MONITOR, newUser.getPasswd(), newSite.getName());
+		this.mockMvc.perform(
+				post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
+						.param("description", "test description").param("category", "test category").accept(mediaType)
+						.secure(true).session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT).param("id", "1").param("name", "new_test_event").accept(mediaType).secure(true)
+						.session(session)).andExpect(expectStatus);
+		this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(
+				post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isInternalServerError());
+		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRemoveEventDefinitionCrfFromStudyEventDefinitionThatDoesNotExist()
+			throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE_CRF).param("eventid", "1345").param("crfname", "Agent Administration")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRemoveEventDefinitionCrfThatDoesNotExist() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE_CRF).param("eventid", "1").param("crfname", "Another CRF").accept(mediaType)
+						.secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRemoveEventDefinitionCrfForCrfThatDoesNotExist() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE_CRF).param("eventid", "1").param("crfname", "XXXXXXXXXX").accept(mediaType)
+						.secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodThrowsExceptionIfEventIdParameterIsMissing() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE_CRF).param("crfname", "Agent Administration").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodThrowsExceptionIfCrfNameParameterIsMissing() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE_CRF).param("eventid", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodThrowsExceptionIfEventIdParameterIsEmpty() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE_CRF).param("eventid", "").param("crfname", "Agent Administration")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodThrowsExceptionIfCrfNameParameterIsEmpty() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE_CRF).param("eventid", "1").param("crfname", "").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE_CRF).param("eventid", "1").param("crfname", "Agent Administration")
+						.param("ololo", "1").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodThrowsExceptionIfEventIdParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE_CRF).param("eventId", "1").param("crfname", "Agent Administration")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodThrowsExceptionIfCrfNameParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE_CRF).param("eventid", "1").param("crfName", "Agent Administration")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodWorksFineForExistingEventDefinitionCrf() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE_CRF).param("eventid", "1").param("crfname", "Agent Administration")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		assertEquals(((EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1)).getStatus(), Status.DELETED);
+	}
+
+	@Test
+	public void testThatItIsImpossibleToMakeRemoveOperationOnEventDefinitionCrfIfStudyEventDefinitionIsNotAvailable()
+			throws Exception {
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(1);
+		studyEventDefinitionBean.setStatus(Status.DELETED);
+		studyEventDefinitionBean.setUpdater(userBean);
+		studyEventDefinitionDAO.updateStatus(studyEventDefinitionBean);
+		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1);
+		assertEquals(studyEventDefinitionBean.getStatus(), Status.DELETED);
+		this.mockMvc.perform(
+				post(API_EVENT_REMOVE_CRF).param("eventid", "1").param("crfname", "Agent Administration")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRestoreEventDefinitionCrfFromStudyEventDefinitionThatDoesNotExist()
+			throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE_CRF).param("eventid", "1345").param("crfname", "Agent Administration")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRestoreEventDefinitionCrfThatDoesNotExist() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE_CRF).param("eventid", "1").param("crfname", "Another CRF").accept(mediaType)
+						.secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRestoreEventDefinitionCrfForCrfThatDoesNotExist() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE_CRF).param("eventid", "1").param("crfname", "XXXXXXXXXX").accept(mediaType)
+						.secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodThrowsExceptionIfEventIdParameterIsMissing() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE_CRF).param("crfname", "Agent Administration").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodThrowsExceptionIfCrfNameParameterIsMissing() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE_CRF).param("eventid", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodThrowsExceptionIfEventIdParameterIsEmpty() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE_CRF).param("eventid", "").param("crfname", "Agent Administration")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodThrowsExceptionIfCrfNameParameterIsEmpty() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE_CRF).param("eventid", "1").param("crfname", "").accept(mediaType).secure(true)
+						.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE_CRF).param("eventid", "1").param("crfname", "Agent Administration")
+						.param("ololo", "1").accept(mediaType).secure(true).session(session)).andExpect(
+				status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodThrowsExceptionIfEventIdParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE_CRF).param("eventId", "1").param("crfname", "Agent Administration")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodThrowsExceptionIfCrfNameParameterIsInWrongCase() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE_CRF).param("eventid", "1").param("crfName", "Agent Administration")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodWorksFineForExistingEventDefinitionCrf() throws Exception {
+		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		eventDefinitionCRFBean.setStatus(Status.DELETED);
+		eventDefinitionCRFBean.setUpdater(userBean);
+		eventDefinitionCRFDAO.updateStatus(eventDefinitionCRFBean);
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		assertEquals(eventDefinitionCRFBean.getStatus(), Status.DELETED);
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE_CRF).param("eventid", "1").param("crfname", "Agent Administration")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		assertEquals(eventDefinitionCRFBean.getStatus(), Status.AVAILABLE);
+	}
+
+	@Test
+	public void testThatItIsImpossibleToMakeRestoreOperationOnEventDefinitionCrfIfStudyEventDefinitionIsNotAvailable()
+			throws Exception {
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(1);
+		studyEventDefinitionBean.setStatus(Status.DELETED);
+		studyEventDefinitionBean.setUpdater(userBean);
+		studyEventDefinitionDAO.updateStatus(studyEventDefinitionBean);
+		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1);
+		assertEquals(studyEventDefinitionBean.getStatus(), Status.DELETED);
+		this.mockMvc.perform(
+				post(API_EVENT_RESTORE_CRF).param("eventid", "1").param("crfname", "Agent Administration")
+						.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
 	}
 }

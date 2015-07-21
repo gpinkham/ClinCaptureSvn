@@ -29,12 +29,12 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 public class DAOWrapper {
 
 	private StudyDAO sdao;
+	private EventCRFDAO ecdao;
 	private CRFVersionDAO cvdao;
 	private StudyEventDAO sedao;
 	private StudySubjectDAO ssdao;
-	private EventCRFDAO ecdao;
-	private EventDefinitionCRFDAO edcdao;
 	private DiscrepancyNoteDAO discDao;
+	private EventDefinitionCRFDAO edcdao;
 	private StudyEventDefinitionDAO seddao;
 
 	/**
@@ -45,51 +45,13 @@ public class DAOWrapper {
 	 */
 	public DAOWrapper(DataSource ds) {
 		this.sdao = new StudyDAO(ds);
+		this.ecdao = new EventCRFDAO(ds);
+		this.cvdao = new CRFVersionDAO(ds);
 		this.sedao = new StudyEventDAO(ds);
 		this.ssdao = new StudySubjectDAO(ds);
-		this.ecdao = new EventCRFDAO(ds);
-		this.edcdao = new EventDefinitionCRFDAO(ds);
 		this.discDao = new DiscrepancyNoteDAO(ds);
-	}
-
-	/**
-	 * DAOWrapper constructor.
-	 * 
-	 * @param sdao
-	 *            StudyDAO
-	 * @param cvdao
-	 *            CRFVersionDAO
-	 * @param sedao
-	 *            StudyEventDAO
-	 * @param ssdao
-	 *            StudySubjectDAO
-	 * @param ecdao
-	 *            EventCRFDAO
-	 * @param edcdao
-	 *            EventDefinitionCRFDAO
-	 * @param discDao
-	 *            DiscrepancyNoteDAO
-	 */
-	public DAOWrapper(StudyDAO sdao, CRFVersionDAO cvdao, StudyEventDAO sedao, StudySubjectDAO ssdao,
-			EventCRFDAO ecdao, EventDefinitionCRFDAO edcdao, DiscrepancyNoteDAO discDao) {
-		this.sdao = sdao;
-		this.cvdao = cvdao;
-		this.sedao = sedao;
-		this.ssdao = ssdao;
-		this.ecdao = ecdao;
-		this.edcdao = edcdao;
-		this.discDao = discDao;
-	}
-
-	public DAOWrapper(StudyDAO sdao, StudyEventDAO sedao, StudySubjectDAO ssdao, EventCRFDAO ecdao,
-			EventDefinitionCRFDAO edcdao, StudyEventDefinitionDAO seddao, DiscrepancyNoteDAO discDao) {
-		this.sdao = sdao;
-		this.sedao = sedao;
-		this.ssdao = ssdao;
-		this.ecdao = ecdao;
-		this.edcdao = edcdao;
-		this.seddao = seddao;
-		this.discDao = discDao;
+		this.edcdao = new EventDefinitionCRFDAO(ds);
+		this.seddao = new StudyEventDefinitionDAO(ds);
 	}
 
 	public StudyDAO getSdao() {

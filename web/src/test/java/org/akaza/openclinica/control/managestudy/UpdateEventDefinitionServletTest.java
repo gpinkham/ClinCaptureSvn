@@ -13,13 +13,12 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
+import com.clinovo.service.impl.EventCRFServiceImpl;
+import com.clinovo.service.impl.EventDefinitionCrfServiceImpl;
+import com.clinovo.service.impl.EventDefinitionServiceImpl;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SignStateRestorer;
+import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -52,21 +51,24 @@ import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.clinovo.service.EventDefinitionCrfService;
-import com.clinovo.service.impl.EventCRFServiceImpl;
-import com.clinovo.service.impl.EventDefinitionCrfServiceImpl;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SignStateRestorer;
-import com.clinovo.util.SubjectEventStatusUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings({"unchecked"})
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({SubjectEventStatusUtil.class, ResourceBundleProvider.class, EventDefinitionCrfServiceImpl.class,
-		RequestContextHolder.class})
+@PrepareForTest({SubjectEventStatusUtil.class, ResourceBundleProvider.class, EventDefinitionServiceImpl.class,
+		EventDefinitionCrfServiceImpl.class, RequestContextHolder.class, EventDefinitionCRFDAO.class})
 public class UpdateEventDefinitionServletTest {
 
 	@Spy
 	private UpdateEventDefinitionServlet spyUpdateEventDefinitionServlet = new UpdateEventDefinitionServlet();
+
+	@Spy
+	private EventDefinitionServiceImpl mockedEventDefinitionService = new EventDefinitionServiceImpl();
 
 	@Mock
 	private EventCRFServiceImpl mockedEventCRFService;
@@ -92,7 +94,8 @@ public class UpdateEventDefinitionServletTest {
 	@Mock
 	private ServletRequestAttributes servletRequestAttributes;
 
-	private EventDefinitionCrfService eventDefinitionCrfService;
+	@Spy
+	private EventDefinitionCrfServiceImpl eventDefinitionCrfService = new EventDefinitionCrfServiceImpl();
 
 	private MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -106,8 +109,11 @@ public class UpdateEventDefinitionServletTest {
 
 	@Before
 	public void beforeTestCaseRun() throws Exception {
-		eventDefinitionCrfService = PowerMockito.spy(new EventDefinitionCrfServiceImpl());
 		PowerMockito.whenNew(EventDefinitionCRFDAO.class).withAnyArguments().thenReturn(mockedEventDefinitionCRFDAO);
+		PowerMockito.whenNew(StudyEventDefinitionDAO.class).withAnyArguments()
+				.thenReturn(mockedStudyEventDefinitionDAO);
+
+		Whitebox.setInternalState(mockedEventDefinitionService, "eventDefinitionCrfService", eventDefinitionCrfService);
 
 		// setting up servlet context
 		Mockito.when(mockedServletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(
@@ -155,6 +161,7 @@ public class UpdateEventDefinitionServletTest {
 
 		// setting up spied UpdateEventDefinitionServlet
 		Whitebox.setInternalState(spyUpdateEventDefinitionServlet, "respage", resPage);
+		Whitebox.setInternalState(mockedEventDefinitionService, "eventCRFService", mockedEventCRFService);
 		Mockito.doReturn(mockedServletContext).when(spyUpdateEventDefinitionServlet).getServletContext();
 		Mockito.doReturn(currentUser).when(spyUpdateEventDefinitionServlet).getUserAccountBean(request);
 		Mockito.doReturn(mockedStudyDAO).when(spyUpdateEventDefinitionServlet).getStudyDAO();
@@ -162,9 +169,12 @@ public class UpdateEventDefinitionServletTest {
 		Mockito.doReturn(mockedStudyEventDefinitionDAO).when(spyUpdateEventDefinitionServlet)
 				.getStudyEventDefinitionDAO();
 		Mockito.doReturn(mockedEventDefinitionCRFDAO).when(spyUpdateEventDefinitionServlet).getEventDefinitionCRFDAO();
-		Mockito.doReturn(mockedEventCRFService).when(spyUpdateEventDefinitionServlet).getEventCRFService();
+		Mockito.doReturn(mockedEventDefinitionService).when(spyUpdateEventDefinitionServlet)
+				.getEventDefinitionService();
 		Mockito.doReturn(eventDefinitionCrfService).when(spyUpdateEventDefinitionServlet)
 				.getEventDefinitionCrfService();
+		Mockito.doReturn(mockedEventDefinitionService).when(spyUpdateEventDefinitionServlet)
+				.getEventDefinitionService();
 	}
 
 	@Test
@@ -212,8 +222,9 @@ public class UpdateEventDefinitionServletTest {
 
 		PowerMockito.verifyStatic();
 		SubjectEventStatusUtil
-				.determineSubjectEventStates(Mockito.any(ArrayList.class), Mockito.any(UserAccountBean.class),
-						Mockito.any(DAOWrapper.class), Mockito.any(SignStateRestorer.class));
+				.determineSubjectEventStates(Mockito.any(StudyEventDefinitionBean.class),
+						Mockito.any(UserAccountBean.class), Mockito.any(DAOWrapper.class),
+						Mockito.any(SignStateRestorer.class));
 
 		List<String> pageMessages = (List<String>) request.getAttribute("pageMessages");
 		Assert.assertTrue(pageMessages.contains(resPage.getString("the_ED_has_been_updated_succesfully")));
@@ -267,8 +278,9 @@ public class UpdateEventDefinitionServletTest {
 
 		PowerMockito.verifyStatic();
 		SubjectEventStatusUtil
-				.determineSubjectEventStates(Mockito.any(ArrayList.class), Mockito.any(UserAccountBean.class),
-						Mockito.any(DAOWrapper.class), Mockito.any(SignStateRestorer.class));
+				.determineSubjectEventStates(Mockito.any(StudyEventDefinitionBean.class),
+						Mockito.any(UserAccountBean.class), Mockito.any(DAOWrapper.class),
+						Mockito.any(SignStateRestorer.class));
 
 		List<String> pageMessages = (List<String>) request.getAttribute("pageMessages");
 		Assert.assertTrue(pageMessages.contains(resPage.getString("the_ED_has_been_updated_succesfully")));

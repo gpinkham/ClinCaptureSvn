@@ -20,20 +20,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -58,7 +46,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -73,8 +60,18 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SubjectEventStatusUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system and what is not.
@@ -243,12 +240,9 @@ public class VerifyImportedCRFDataServlet extends Controller {
 			con = getDataSource().getConnection();
 			con.setAutoCommit(false);
 			System.out.println("JDBC open connection for transaction");
-			StudyDAO sdao = new StudyDAO(getDataSource());
 			EventCRFDAO ecdao = new EventCRFDAO(getDataSource(), con);
-			StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 			StudyEventDAO sedao = new StudyEventDAO(getDataSource(), con);
 			ItemDataDAO itemDataDao = new ItemDataDAO(getDataSource(), con);
-			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource(), con);
 			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 			String action = request.getParameter("action");
 			FormProcessor fp = new FormProcessor(request);
@@ -429,8 +423,7 @@ public class VerifyImportedCRFDataServlet extends Controller {
 					if (studyEventId > 0) {
 						StudyEventBean seb = (StudyEventBean) sedao.findByPK(studyEventId);
 
-						SubjectEventStatusUtil.determineSubjectEventState(seb, new DAOWrapper(sdao, getCRFVersionDAO(),
-								sedao, ssdao, ecdao, edcdao, dndao));
+						SubjectEventStatusUtil.determineSubjectEventState(seb, new DAOWrapper(getDataSource()));
 
 						sedao.update(seb, con);
 					}

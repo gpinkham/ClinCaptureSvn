@@ -123,14 +123,14 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatUpdateStatusReturnsUpdatedItemDataBean() {
-
+	public void testThatUpdateStatusMethodUpdatesItemDataBeanStatus() {
 		ItemDataBean item = (ItemDataBean) itemDataDAO.findByPK(ITEM_ID);
+		assertEquals(Status.AVAILABLE, item.getStatus());
 		item.setStatus(Status.DELETED);
-		ItemDataBean updatedItem = (ItemDataBean) itemDataDAO.updateStatus(item);
-
-		assertNotNull(updatedItem);
-		assertEquals(Status.DELETED, updatedItem.getStatus());
+		item.setUpdater((UserAccountBean) userAccountDAO.findByPK(1));
+		itemDataDAO.updateStatus(item);
+		item = (ItemDataBean) itemDataDAO.findByPK(ITEM_ID);
+		assertEquals(Status.DELETED, item.getStatus());
 	}
 
 	@Test

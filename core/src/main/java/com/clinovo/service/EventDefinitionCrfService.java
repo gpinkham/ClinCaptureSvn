@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 
 /**
@@ -28,7 +29,7 @@ public interface EventDefinitionCrfService {
 
 	/**
 	 * Method updates chiild event definition crfs for new crf version.
-	 * 
+	 *
 	 * @param crfVersionBean
 	 *            CRFVersionBean
 	 * @param updater
@@ -38,7 +39,7 @@ public interface EventDefinitionCrfService {
 
 	/**
 	 * Method updates child event definition crfs.
-	 * 
+	 *
 	 * @param childEventDefinitionCRFsToUpdate
 	 *            List<EventDefinitionCRFBean>
 	 * @param parentsMap
@@ -48,4 +49,42 @@ public interface EventDefinitionCrfService {
 	 */
 	void updateChildEventDefinitionCRFs(List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate,
 			Map<Integer, EventDefinitionCRFBean> parentsMap, UserAccountBean updater);
+
+	/**
+	 * Fills info for EventDefinitionCRFBean.
+	 *
+	 * @param eventDefinitionCRFBean
+	 *            EventDefinitionCRFBean
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 */
+	void fillEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean,
+			StudyEventDefinitionBean studyEventDefinitionBean);
+
+	/**
+	 * Method that removes study event definition crf.
+	 *
+	 * @param eventDefinitionCRFBean
+	 *            EventDefinitionCRFBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void removeEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean, UserAccountBean updater)
+			throws Exception;
+
+	/**
+	 * Method that restores event definition crf.
+	 *
+	 * @param eventDefinitionCRFBean
+	 *            EventDefinitionCRFBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void restoreEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean, UserAccountBean updater)
+			throws Exception;
+
 }

@@ -1,10 +1,5 @@
 package com.clinovo.util;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -18,11 +13,17 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * SignUtilTest class.
@@ -98,8 +99,17 @@ public class SignUtilTest {
 		EventDefinitionCRFDAO edcdao = Mockito.mock(EventDefinitionCRFDAO.class);
 		DiscrepancyNoteDAO discDao = Mockito.mock(DiscrepancyNoteDAO.class);
 		StudyEventDefinitionDAO seddao = Mockito.mock(StudyEventDefinitionDAO.class);
+		CRFVersionDAO cvdao = Mockito.mock(CRFVersionDAO.class);
 
-		daoWrapper = new DAOWrapper(sdao, sedao, ssdao, ecdao, edcdao, seddao, discDao);
+		daoWrapper = Mockito.mock(DAOWrapper.class);
+		Mockito.when(daoWrapper.getCvdao()).thenReturn(cvdao);
+		Mockito.when(daoWrapper.getDiscDao()).thenReturn(discDao);
+		Mockito.when(daoWrapper.getEcdao()).thenReturn(ecdao);
+		Mockito.when(daoWrapper.getEdcdao()).thenReturn(edcdao);
+		Mockito.when(daoWrapper.getSdao()).thenReturn(sdao);
+		Mockito.when(daoWrapper.getSedao()).thenReturn(sedao);
+		Mockito.when(daoWrapper.getSeddao()).thenReturn(seddao);
+		Mockito.when(daoWrapper.getSsdao()).thenReturn(ssdao);
 
 		int studySubjectId = 1;
 

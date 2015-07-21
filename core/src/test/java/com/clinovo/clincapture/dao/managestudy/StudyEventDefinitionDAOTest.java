@@ -13,9 +13,6 @@
 
 package com.clinovo.clincapture.dao.managestudy;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -24,6 +21,9 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("unchecked")
 public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
@@ -140,7 +140,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		assertEquals(studyEventDefinitionBean.getStatus(), Status.AVAILABLE);
 		studyEventDefinitionBean.setUpdater((UserAccountBean) userAccountDAO.findByPK(1));
 		studyEventDefinitionBean.setStatus(Status.DELETED);
-		studyEventDefinitionDAO.update(studyEventDefinitionBean);
+		studyEventDefinitionDAO.updateStatus(studyEventDefinitionBean);
 		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1);
 		assertEquals(studyEventDefinitionBean.getStatus(), Status.DELETED);
 	}
