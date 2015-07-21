@@ -343,7 +343,7 @@ public class StudyInfoPanel {
 				this.setCreateDataset(false);
 				this.setIconInfoShown(false);
 
-			} else if (page.equals(Page.INTERVIEWER) || page.equals(Page.INITIAL_DATA_ENTRY)
+			} else if (page.equals(Page.INTERVIEWER) || page.equals(Page.INITIAL_DATA_ENTRY_NW)
 					|| page.equals(Page.INITIAL_DATA_ENTRY_SERVLET) || page.equals(Page.DOUBLE_DATA_ENTRY)
 					|| page.equals(Page.DOUBLE_DATA_ENTRY_SERVLET) || page.equals(Page.ADMIN_EDIT)
 					|| page.equals(Page.ADMIN_EDIT_SERVLET)) {

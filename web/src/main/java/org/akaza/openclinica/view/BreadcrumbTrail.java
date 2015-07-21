@@ -267,7 +267,7 @@ public class BreadcrumbTrail {
 							"MarkEventCRFComplete", Status.UNAVAILABLE));
 				}
 				closeRestOfTrail(ordinal);
-			} else if (jspPage.equals(Page.INITIAL_DATA_ENTRY)) {
+			} else if (jspPage.equals(Page.INITIAL_DATA_ENTRY_NW)) {
 				int ordinal = trail.size() - 2;
 				trail = advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("data_entry"), "InitialDataEntry"
 						+ this.generateURLString(request), Status.PENDING), ordinal);

@@ -624,7 +624,7 @@ public abstract class DataEntryServlet extends Controller {
 			if (section.getSection().hasSCDItem()) {
 				section = SCDItemDisplayInfo.generateSCDDisplayInfo(
 						section,
-						this.getServletPage(request).equals(Page.INITIAL_DATA_ENTRY)
+						this.getServletPage(request).equals(Page.INITIAL_DATA_ENTRY_SERVLET)
 								|| this.getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)
 								&& !this.isAdminForcedReasonForChange(request));
 			}
@@ -1170,7 +1170,7 @@ public abstract class DataEntryServlet extends Controller {
 			if (section.getSection().hasSCDItem()) {
 				section = SCDItemDisplayInfo.generateSCDDisplayInfo(
 						section,
-						this.getServletPage(request).equals(Page.INITIAL_DATA_ENTRY)
+						this.getServletPage(request).equals(Page.INITIAL_DATA_ENTRY_SERVLET)
 								|| this.getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)
 								&& !this.isAdminForcedReasonForChange(request));
 			}

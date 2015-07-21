@@ -583,8 +583,9 @@ public final class Page {
 			"Enter Data for a Study Event");
 	public static final Page INTERVIEWER = new Page(PATH + "submit/interviewer.jsp",
 			"Event CRF Interview Info Submission");
-
-	public static final Page INITIAL_DATA_ENTRY = new Page(PATH + "submit/initialDataEntry.jsp", "Initial Data Entry");
+	
+	public static final Page INITIAL_DATA_ENTRY_NW = new Page(PATH + "submit/initialDataEntryNw.jsp",
+			"Initial Data Entry");
 	public static final Page INITIAL_DATA_ENTRY_SERVLET = new Page("/InitialDataEntry", "Initial Data Entry");
 
 	public static final Page DOUBLE_DATA_ENTRY = new Page(PATH + "submit/doubleDataEntry.jsp", "Double Data Entry");
@@ -725,8 +726,7 @@ public final class Page {
 			"List Selected Event For Subjects");
 	public static final Page LIST_EVENTS_FOR_SUBJECTS = new Page("/WEB-INF/jsp/managestudy/listEventsForSubjects.jsp",
 			"List Selected Event For Subjects");
-	public static final Page INITIAL_DATA_ENTRY_NW = new Page("/WEB-INF/jsp/submit/initialDataEntryNw.jsp",
-			"Data Entry");
+
 	public static final Page VIEW_SECTION_DATA_ENTRY_PRINT_GROUPS = new Page(
 			"/WEB-INF/jsp/managestudy/viewGroupSectionsPrint.jsp", "Print View for Group Tables");
 

@@ -39,10 +39,8 @@
     <ui:theme/>
 </head>
 <body class="aka_bodywidth" onload="" onunload="javascript:clsWin();">
-<c:if test='${popUpURL != ""}'>    <script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script></c:if>
-<%-- BWP:
- onload=  "document.getElementById('centralContainer').style.display='none'; new Effect.Appear('centralContainer', {duration:1});<jsp:include page="../include/showPopUp2.jsp"/>"
-  TabsForwardByNum(<c:out value="${tabId}"/>); alert(self.screen.availWidth);margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
+<c:if test='${popUpURL != ""}'><script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script></c:if>
+
 <c:set var="markCRFMethodName" value="displayMessageFromCheckbox(this, undefined)"/>
 
 <div id="centralContainer" style=  "padding-left:3em; margin-top:1em;background-color: white; color:black;">
@@ -245,12 +243,6 @@
     </c:if><%-- error messages are not null --%>
 </td></tr>
 <tr>
-<!--
-<td align="right" valign="middle" style="padding-left: 12px; display: none" id="TabsBack">
-    <a href="javascript:TabsBack()"><img src="images/arrow_back.gif" border="0" style="margin-top:10px"></a></td>
-<td align="right" style="padding-left: 12px" id="TabsBackDis">
-    <img src="images/arrow_back_dis.gif" border="0"/></td>
--->
 
 <script type="text/JavaScript" language="JavaScript">
 
@@ -290,7 +282,7 @@
 
             if (TabID != currTabID) {
                 document.write('<div id="Tab' + TabID + 'NotSelected" style="display:all"><div class="tab_BG"><div class="tab_L"><div class="tab_R">');
-                document.write('<a class="tabtext" title="' + TabFullName[(TabID-1)] + '" href=' + url + ' onclick="return checkSectionStatus(this);">' + TabLabel[(TabID-1)] + '</a></div></div></div></div>');
+                document.write('<a class="tabtext" title="' + TabFullName[(TabID-1)] + '" href=' + url + ' onclick="return checkSectionStatus(this, ' + "'<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>'" + ');">' + TabLabel[(TabID-1)] + '</a></div></div></div></div>');
                 document.write('<div id="Tab' + TabID + 'Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">' + TabLabel[(TabID-1)] + '</span></div></div></div></div>');
                 document.write('</td>');
             }
@@ -303,82 +295,20 @@
             TabID++;
         }
     }
-
-    function gotoLink() {
-
-    	objImage=document.getElementById('status_top');
-    	
-        if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-        	
-    		var OptionIndex=document.crfForm.sectionName.selectedIndex;
-    		confirmDialog({
-    			message: '<fmt:message key="you_have_unsaved_data" bundle="${resword}"/>',
-    			height: 150,
-    			width: 500,
-    			pageName: document.crfForm.sectionName.options[OptionIndex].value
-    		});
-        }
-    }
     
   	function setParameterForDN(field, parameterName, value) {
     	setParameterForDNWithPath('0', field, parameterName, value, '${pageContext.request.contextPath}');
  	};
 </script>
-<%--
-<td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
-<td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0" style=
-  "margin-top:10px;margin-right:6px"/></a></td>
-<td>&nbsp;
-    <div class="formfieldM_BG_noMargin"><select class="formfieldM" name="sectionName" size="1" onchange="gotoLink();">
-        <c:set var="tabCount" value="1"/>
-        <option selected>-- <fmt:message key="select_to_jump" bundle="${resword}"/> --</option>
-        <c:forEach var="sec" items="${toc.sections}" >
-            <c:set var="tabUrl" value = "AdministrativeEditing?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tabId=${tabCount}"/>
-            <option value="<c:out value="${tabUrl}"/>"><c:out value="${sec.name}"/></option>
-            <c:set var="tabCount" value="${tabCount+1}"/>
-        </c:forEach>
-    </select>
-    </div>
-</td>
---%>
+
 </tr>
 </table>
 <input type="hidden" name="submitted" value="1" />
 
 <script type="text/javascript" language="JavaScript">
     
-    function checkSectionStatus(aLink) {
 
-        objImage=document.getElementById('status_top');
-        if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-        	confirmDialog({
-        		message: '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>',
-        		height: 150,
-        		width: 500,
-        		aLink: aLink
-        	});
-        	return false
-        }
-        return true
-    }
-
-    function checkEntryStatus(strImageName, submit) {
-    	
-        objImage = MM_findObj(strImageName);
-        if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-        	confirmSubmit({
-        		message: '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>',
-        		height: 150,
-        		width: 500,
-        		submit: submit
-        	});
-        	return false
-        }
-    	
-        return true;
-    } 
-
-    function disableSubmit(strImageName) {
+    function disableSubmit() {
 		var srh = document.getElementById('srh');
 		var srm = document.getElementById('srm');
 		var srl = document.getElementById('srl');
@@ -448,30 +378,15 @@
                     <td align="right" valign="bottom">
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                    <%-- for administrative editing, this is no longer needed, tbh 112007 --%>
-
-                                    <%--<c:choose>
-                                      <c:when test="${stage !='adminEdit' && section.lastSection}">
-                                        <td valign="bottom">  <input type="checkbox" name="markComplete" value="Yes"
-                                                                     onclick="${markCRFMethodName}">
-                                        </td>
-                                        <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/> &nbsp;&nbsp;&nbsp;</td>
-                                      </c:when>
-                                      <c:otherwise>
-                                        <td colspan="2">&nbsp;</td>
-                                      </c:otherwise>
-                                    </c:choose>--%>
                                 <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
-                                  "button_medium medium_submit" onClick="disableSubmit('DataStatus_top'); this.form.submit();"/></td>
+                                  "button_medium medium_submit" onClick="disableSubmit(); this.form.submit();"/></td>
                                 
                                 <c:choose>
                                     <c:when test="${! empty formMessages}">
-                                    	<td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
-                                        <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif"></td>
+                                    	<td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="return checkGoBackEntryStatus('submittedExit', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
                                     </c:when>
                                     <c:otherwise>
-                                    	<td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
-                                        <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="not_changed_data" bundle="${restext}"/>" src="images/icon_UnchangedData.gif"></td>
+                                    	<td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkGoBackEntryStatus('submittedExit', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
                                     </c:otherwise>
                                 </c:choose>
 
@@ -498,9 +413,9 @@
                     <td align="right" valign="bottom">
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                <td><input type="submit" id="srm" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class="button_medium medium_submit" onClick="disableSubmit('DataStatus_top'); this.form.submit();"/></td>
+                                <td><input type="submit" id="srm" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class="button_medium medium_submit" onClick="disableSubmit(); this.form.submit();"/></td>
                                 <td>
-                                    <input type="submit" id="sem" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkEntryStatus('DataStatus_top', this);" />
+                                    <input type="submit" id="sem" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkGoBackEntryStatus('submittedExit', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" />
                                 </td>
                             </tr>
                         </table>
@@ -1387,12 +1302,10 @@ table-->
                       <input type="hidden" name="fromResolvingNotes" value="${fromResolvingNotes}"/>                   
                     <c:choose>
                         <c:when test="${! empty formMessages}">
-                        	<input type="submit" id="sel" name="submittedExit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
-                            <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif">&nbsp;</td>
+                        	<input type="submit" id="sel" name="submittedExit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="return checkGoBackEntryStatus('submittedExit', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>                            
                         </c:when>
                         <c:otherwise>
-                        	<input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>
-                            <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="not_changed_data" bundle="${restext}"/>" src="images/icon_UnchangedData.gif">&nbsp;</td>
+                        	<input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium medium_back" onClick="return checkGoBackEntryStatus('submittedExit', '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>', this);" /></td>                           
                         </c:otherwise>
                     </c:choose>
                 </tr>
