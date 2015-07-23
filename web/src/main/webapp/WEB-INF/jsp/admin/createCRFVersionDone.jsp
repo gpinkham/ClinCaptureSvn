@@ -74,6 +74,9 @@
 <td> 
  <input id="ViewCRFMetadata" class="button_medium" type="button" name="BTN_View_Metadata" title="<fmt:message key="view_CRF_metadata" bundle="${resword}"/>" value="<fmt:message key="view_CRF_metadata" bundle="${resword}"/>" onclick="window.location.href=('ViewCRFVersion?id=${crfVersionId}');"/>
 </td>
+	<td>
+		<input id="GoToEventsList" class="button_medium" type="button" name="BTN_View_Events" title=""<fmt:message key="nav_view_events" bundle="${restext}"/>"" value="<fmt:message key="nav_view_events" bundle="${resword}"/>" onclick="window.location.href=('ListEventDefinition');"/>
+	</td>
 </table>
 
 <c:choose>

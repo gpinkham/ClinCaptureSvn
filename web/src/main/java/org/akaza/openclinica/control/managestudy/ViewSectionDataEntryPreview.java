@@ -306,6 +306,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 			logger.info("has group, new_table is true");
 			request.setAttribute("new_table", true);
 		}
+		request.setAttribute("crfNameForTitle", crfName);
 		forwardPage(Page.CREATE_CRF_VERSION_CONFIRM, request, response);
 
 	}

@@ -59,7 +59,8 @@
 <c:when test="${empty excelErrors}">
  <h1>
  	<span class="first_level_header">
- 		<fmt:message key="preview_CRF" bundle="${resword}"/>
+ 		<fmt:message key="preview_CRF" bundle="${resword}"/>. <br/>
+		<span class="crf_name">${crfNameForTitle}</span> <span class="version_name">${version.name}</span>.
  	</span>
  </h1>
  <c:if test="${!empty warnings}">
