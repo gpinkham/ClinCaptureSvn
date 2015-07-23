@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -51,17 +52,14 @@ import org.akaza.openclinica.web.bean.StudyEventDefinitionRow;
 import org.springframework.stereotype.Component;
 
 /**
- * Processes user reuqest to generate study event definition list
- * 
- * @author jxu
- * 
+ * Processes user reuqest to generate study event definition list.
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ListEventDefinitionServlet extends Controller {
 
 	/**
-	 * Checks whether the user has the correct privilege
+	 * Checks whether the user has the correct privilege.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
@@ -90,11 +88,10 @@ public class ListEventDefinitionServlet extends Controller {
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
-
 	}
 
 	/**
-	 * Processes the request
+	 * Processes the request.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
@@ -119,11 +116,12 @@ public class ListEventDefinitionServlet extends Controller {
 			for (Object anEventDefinitionCRFlist : eventDefinitionCRFlist) {
 				// FIXME can this be reduced to a non - N^2 loop?
 				EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) anEventDefinitionCRFlist;
-				CRFBean crfBean = (CRFBean) crfDao.findByPK(edcBean.getCrfId());
-				CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(edcBean.getDefaultVersionId());
-				logger.info("ED[" + sed.getName() + "]crf[" + crfBean.getName() + "]dv[" + crfVersionBean.getName()
-						+ "]");
-				crfWithDefaultVersion.put(crfBean.getName(), crfVersionBean.getName());
+				if (edcBean.getStatus() != Status.AUTO_DELETED && edcBean.getStatus() != Status.DELETED) {
+					CRFBean crfBean = (CRFBean) crfDao.findByPK(edcBean.getCrfId());
+					CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(edcBean.getDefaultVersionId());
+					logger.info("ED[" + sed.getName() + "]crf[" + crfBean.getName() + "]dv[" + crfVersionBean.getName() + "]");
+					crfWithDefaultVersion.put(crfBean.getName(), crfVersionBean.getName());
+				}
 			}
 			sed.setCrfsWithDefaultVersion(crfWithDefaultVersion);
 			logger.info("CRF size [" + sed.getCrfs().size() + "]");
@@ -144,17 +142,18 @@ public class ListEventDefinitionServlet extends Controller {
 				resword.getString("populated"), resword.getString("date_created"), resword.getString("date_updated"),
 				resword.getString("CRFs"), resword.getString("default_version"), resword.getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		// >> tbh #4169 09/2009
-		table.hideColumnLink(2);
-		table.hideColumnLink(3);
-		table.hideColumnLink(4);
-		table.hideColumnLink(6);
-		table.hideColumnLink(7);
-		table.hideColumnLink(8);
-		table.hideColumnLink(9);
-		table.hideColumnLink(10); // crfs, tbh
-		table.hideColumnLink(11);
-		table.hideColumnLink(12);
+		int index = 2;
+		table.hideColumnLink(index++);
+		table.hideColumnLink(index++);
+		table.hideColumnLink(index++);
+		index++;
+		table.hideColumnLink(index++);
+		table.hideColumnLink(index++);
+		table.hideColumnLink(index++);
+		table.hideColumnLink(index++);
+		table.hideColumnLink(index++); // crfs, tbh
+		table.hideColumnLink(index++);
+		table.hideColumnLink(index);
 		table.setQuery("ListEventDefinition", new HashMap());
 
 		table.setRows(allStudyRows);
@@ -173,7 +172,7 @@ public class ListEventDefinitionServlet extends Controller {
 	}
 
 	/**
-	 * Checked whether a definition is available to be locked
+	 * Checked whether a definition is available to be locked.
 	 * 
 	 * @param sed
 	 *            StudyEventDefinitionBean
