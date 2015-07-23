@@ -20,6 +20,11 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -30,10 +35,6 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 
 /**
  * Remove the reference to a CRF from a study event definition
@@ -56,13 +57,13 @@ public class RemoveCRFFromDefinitionServlet extends Controller {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR)
+				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_permission_to_update_study_event_definition")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -70,40 +71,34 @@ public class RemoveCRFFromDefinitionServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		ArrayList<EventDefinitionCRFBean> edcs = (ArrayList<EventDefinitionCRFBean>) request.getSession().getAttribute(
-				"eventDefinitionCRFs");
+		ArrayList<EventDefinitionCRFBean> edcs = (ArrayList<EventDefinitionCRFBean>) request.getSession()
+				.getAttribute("eventDefinitionCRFs");
 		ArrayList<EventDefinitionCRFBean> childEdcs = (ArrayList<EventDefinitionCRFBean>) request.getSession()
 				.getAttribute("childEventDefCRFs");
 		ArrayList updatedEdcs = new ArrayList();
-		if (edcs != null && edcs.size() > 1) {
-			String idString = request.getParameter("id");
-			logger.info("crf id:" + idString);
-			if (StringUtil.isBlank(idString)) {
-				addPageMessage(respage.getString("please_choose_a_crf_to_remove"), request);
-				forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
-			} else {
-				// crf id
-				int id = Integer.valueOf(idString.trim());
-				for (EventDefinitionCRFBean edc : edcs) {
-					// Set edc status to deleted. Also make sure its child rows are also updated
-					if (edc.getCrfId() == id) {
-						edc.setStatus(Status.DELETED);
-						// Update children if any
-						setChildEdcsToRemoved(childEdcs, edc);
-					}
-					if (edc.getId() > 0 || !edc.getStatus().equals(Status.DELETED)) {
-						updatedEdcs.add(edc);
-						logger.info("\nversion:" + edc.getDefaultVersionId());
-					}
-				}
-				request.getSession().setAttribute("eventDefinitionCRFs", updatedEdcs);
-				request.getSession().setAttribute("childEventDefCRFs", childEdcs);
-				addPageMessage(respage.getString("has_been_removed_need_confirmation"), request);
-				forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
-			}
-
+		String idString = request.getParameter("id");
+		logger.info("crf id:" + idString);
+		if (StringUtil.isBlank(idString)) {
+			addPageMessage(respage.getString("please_choose_a_crf_to_remove"), request);
+			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		} else {
-			addPageMessage(respage.getString("an_ED_needs_to_have_least_one_CRF"), request);
+			// crf id
+			int id = Integer.valueOf(idString.trim());
+			for (EventDefinitionCRFBean edc : edcs) {
+				// Set edc status to deleted. Also make sure its child rows are also updated
+				if (edc.getCrfId() == id) {
+					edc.setStatus(Status.DELETED);
+					// Update children if any
+					setChildEdcsToRemoved(childEdcs, edc);
+				}
+				if (edc.getId() > 0 || !edc.getStatus().equals(Status.DELETED)) {
+					updatedEdcs.add(edc);
+					logger.info("\nversion:" + edc.getDefaultVersionId());
+				}
+			}
+			request.getSession().setAttribute("eventDefinitionCRFs", updatedEdcs);
+			request.getSession().setAttribute("childEventDefCRFs", childEdcs);
+			addPageMessage(respage.getString("has_been_removed_need_confirmation"), request);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}
 	}
