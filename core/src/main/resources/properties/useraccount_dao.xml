@@ -46,6 +46,10 @@
 			enabled=?, time_zone_id=?
 			where user_id=?</sql>
 	</query>
+	<query>
+		<name>updateStatus</name>
+		<sql>update user_account set status_id=?, date_updated=now(), update_id=? where user_id=?</sql>
+	</query>
     <query>
         <name>updateUserType</name>
         <sql>update user_account set user_type_id = ? where user_id = ?</sql>
@@ -98,6 +102,10 @@
 	<query>
 		<name>findAllRolesByUserName</name>
 		<sql>select * from study_user_role where user_name=?</sql>
+	</query>
+	<query>
+		<name>isUserPresentInStudy</name>
+		<sql>select distinct sur.* from study_user_role sur, study s where sur.user_name = ? and (sur.user_name = 'root' or (s.study_id = sur.study_id and (s.study_id = ? or s.parent_study_id = ?)))</sql>
 	</query>
 	<query>
 		<name>findRole</name>

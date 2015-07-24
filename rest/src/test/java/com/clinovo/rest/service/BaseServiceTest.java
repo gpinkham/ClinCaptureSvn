@@ -111,6 +111,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public static final String API_EVENT_CREATE = "/event/create";
 	public static final String API_WRONG_MAPPING = "/wrongmapping";
 	public static final String API_USER_CREATE = "/user/create";
+	public static final String API_USER_REMOVE = "/user/remove";
+	public static final String API_USER_RESTORE = "/user/restore";
 	public static final String API_AUTHENTICATION = "/authentication";
 	public static final String API_WADL = "/wadl";
 	public static final String API_ODM = "/odm";
@@ -158,17 +160,15 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	protected void deleteEventDefinitionCrfs(List<Integer> edcIds) {
 		if (edcIds != null && edcIds.size() > 0) {
-			userAccountDAO.execute(
-					"delete from event_definition_crf where event_definition_crf_id in (".concat(
-							edcIds.toString().replaceAll("]|\\[", "")).concat(")"), new HashMap());
+			userAccountDAO.execute("delete from event_definition_crf where event_definition_crf_id in ("
+					.concat(edcIds.toString().replaceAll("]|\\[", "")).concat(")"), new HashMap());
 		}
 	}
 
 	protected void deleteStudyEventDefinitions(List<Integer> sedIds) {
 		if (sedIds != null && sedIds.size() > 0) {
-			userAccountDAO.execute(
-					"delete from study_event_definition where study_event_definition_id in (".concat(
-							sedIds.toString().replaceAll("]|\\[", "")).concat(")"), new HashMap());
+			userAccountDAO.execute("delete from study_event_definition where study_event_definition_id in ("
+					.concat(sedIds.toString().replaceAll("]|\\[", "")).concat(")"), new HashMap());
 		}
 	}
 
@@ -176,8 +176,9 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		userAccountDAO.execute(
 				"delete from authorities where username = '".concat(userAccountBean.getName()).concat("'"),
 				new HashMap());
-		userAccountDAO.execute("delete from study_user_role where user_name = '".concat(userAccountBean.getName())
-				.concat("'"), new HashMap());
+		userAccountDAO.execute(
+				"delete from study_user_role where user_name = '".concat(userAccountBean.getName()).concat("'"),
+				new HashMap());
 		userAccountDAO.execute(
 				"delete from user_account where user_name = '".concat(userAccountBean.getName()).concat("'"),
 				new HashMap());
@@ -205,14 +206,12 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		String email = "email@gmail.com";
 		String phone = "375295676363";
 		String company = "home";
-		MvcResult result = this.mockMvc
-				.perform(
-						post(API_USER_CREATE).accept(mediaType).param("username", userName)
-								.param("firstname", firstName).param("lastname", lastName).param("email", email)
-								.param("phone", phone).param("company", company)
-								.param("usertype", Integer.toString(userType.getId())).param("allowsoap", "true")
-								.param("displaypassword", "true").param("role", Integer.toString(role.getId()))
-								.secure(true).session(session)).andExpect(status().isOk()).andReturn();
+		MvcResult result = this.mockMvc.perform(post(API_USER_CREATE).accept(mediaType).param("username", userName)
+				.param("firstname", firstName).param("lastname", lastName).param("email", email).param("phone", phone)
+				.param("company", company).param("usertype", Integer.toString(userType.getId()))
+				.param("allowsoap", "true").param("displaypassword", "true")
+				.param("role", Integer.toString(role.getId())).secure(true).session(session)).andExpect(status().isOk())
+				.andReturn();
 		String password = mediaType.equals(MediaType.APPLICATION_JSON)
 				? (String) new JSONObject(result.getResponse().getContentAsString()).get("password")
 				: result.getResponse().getContentAsString().split("<Password>")[1].split("</Password>")[0];
@@ -252,24 +251,21 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		userBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
 		session.clearAttributes();
 		this.mockMvc
-				.perform(
-						post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", userName)
-								.param("password", password).param("studyname", studyName).session(session))
+				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", userName)
+						.param("password", password).param("studyname", studyName).session(session))
 				.andExpect(status().isOk())
 				.andExpect(
-						MockMvcResultMatchers.request().sessionAttribute(
-								PermissionChecker.API_AUTHENTICATED_USER_DETAILS, IsInstanceOf.any(UserDetails.class)))
-				.andExpect(
-						content().string(
-								mediaType.equals(MediaType.APPLICATION_JSON) ? StringContains
-										.containsString("{\"username\":\"".concat(userName)
-												.concat("\",\"userstatus\":\"").concat(userBean.getStatus().getName())
-												.concat("\",\"studyname\":\"").concat(studyName)
-												.concat("\",\"studystatus\":\"")
-												.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"")
-												.concat(role.getCode()).concat("\",\"usertype\":\"")
-												.concat(userType.getCode()).concat("\"}")) : StringContains
-										.containsString("<ODM Description=\"REST Data\"")));
+						MockMvcResultMatchers.request()
+								.sessionAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS,
+										IsInstanceOf
+												.any(UserDetails.class)))
+				.andExpect(content().string(mediaType.equals(MediaType.APPLICATION_JSON)
+						? StringContains.containsString("{\"username\":\"".concat(userName)
+								.concat("\",\"userstatus\":\"").concat(userBean.getStatus().getName())
+								.concat("\",\"studyname\":\"").concat(studyName).concat("\",\"studystatus\":\"")
+								.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"").concat(role.getCode())
+								.concat("\",\"usertype\":\"").concat(userType.getCode()).concat("\"}"))
+						: StringContains.containsString("<ODM Description=\"REST Data\"")));
 	}
 
 	@Before
@@ -289,9 +285,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		result = null;
 		restOdmContainer = null;
 
-		schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
-				new FileSystemResourceLoader().getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd")
-						.getURL());
+		schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new FileSystemResourceLoader()
+				.getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getURL());
 
 		setTestProperties();
 
@@ -313,8 +308,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 				JAXBContext jaxbContext = JAXBContext.newInstance(ODM.class, RestOdmContainer.class);
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 				jaxbUnmarshaller.setSchema(schema);
-				restOdmContainer = (RestOdmContainer) jaxbUnmarshaller.unmarshal(new StringReader(result.getResponse()
-						.getContentAsString()));
+				restOdmContainer = (RestOdmContainer) jaxbUnmarshaller
+						.unmarshal(new StringReader(result.getResponse().getContentAsString()));
 			} catch (Exception ex) {
 				//
 			}
@@ -348,11 +343,11 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		if (newUser != null && newUser.getId() > 0) {
 			deleteUser(newUser);
 		}
-		if (newStudy != null && newStudy.getId() > 0) {
-			deleteStudy(newStudy);
-		}
 		if (newSite != null && newSite.getId() > 0) {
 			deleteStudy(newSite);
+		}
+		if (newStudy != null && newStudy.getId() > 0) {
+			deleteStudy(newStudy);
 		}
 		unmarshalResult();
 	}

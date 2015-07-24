@@ -92,28 +92,29 @@ public class EventDefinitionServiceTest extends DefaultAppContextTest {
 		eventDefinitionService.fillEventDefinitionCrfs(studyBean, studyEventDefinitionBean);
 		assertTrue(studyEventDefinitionBean.getEventDefinitionCrfs().get(0).getEventName()
 				.equals(studyEventDefinitionBean.getName()));
-		assertTrue(studyEventDefinitionBean.getEventDefinitionCrfs().get(0).getCrfName()
-				.equals(crfdao.findByPK(studyEventDefinitionBean.getEventDefinitionCrfs().get(0).getCrfId()).getName()));
-		assertTrue(studyEventDefinitionBean
-				.getEventDefinitionCrfs()
-				.get(0)
-				.getDefaultVersionName()
-				.equals(crfVersionDao.findByPK(
-						studyEventDefinitionBean.getEventDefinitionCrfs().get(0).getDefaultVersionId()).getName()));
+		assertTrue(studyEventDefinitionBean.getEventDefinitionCrfs().get(0).getCrfName().equals(
+				crfdao.findByPK(studyEventDefinitionBean.getEventDefinitionCrfs().get(0).getCrfId()).getName()));
+		assertTrue(studyEventDefinitionBean.getEventDefinitionCrfs().get(0).getDefaultVersionName().equals(crfVersionDao
+				.findByPK(studyEventDefinitionBean.getEventDefinitionCrfs().get(0).getDefaultVersionId()).getName()));
 	}
 
 	@Test
 	public void testThatRemoveStudyEventDefinitionMethodRemovesStudyEventDefinitionBeanCorrectly() throws Exception {
+		assertTrue(studyEventDefinitionBean.getStatus() == Status.AVAILABLE);
 		eventDefinitionService.removeStudyEventDefinition(studyEventDefinitionBean, userBean);
-		assertTrue(((StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1)).getStatus() == Status.DELETED);
+		studyEventDefinitionBean = ((StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1));
+		assertTrue(studyEventDefinitionBean.getStatus() == Status.DELETED);
 	}
 
 	@Test
 	public void testThatRestoreStudyEventDefinitionMethodRestoresStudyEventDefinitionBeanCorrectly() throws Exception {
 		studyEventDefinitionBean.setStatus(Status.DELETED);
 		studyEventDefinitionDAO.updateStatus(studyEventDefinitionBean);
+		studyEventDefinitionBean = ((StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1));
+		assertTrue(studyEventDefinitionBean.getStatus() == Status.DELETED);
 		eventDefinitionService.restoreStudyEventDefinition(studyEventDefinitionBean, userBean);
-		assertTrue(((StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1)).getStatus() == Status.AVAILABLE);
+		studyEventDefinitionBean = ((StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1));
+		assertTrue(studyEventDefinitionBean.getStatus() == Status.AVAILABLE);
 	}
 
 	@Test

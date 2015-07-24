@@ -15,7 +15,16 @@
 
 package com.clinovo.service.impl;
 
-import com.clinovo.service.UserAccountService;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.mail.internet.MimeMessage;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -36,14 +45,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import javax.mail.internet.MimeMessage;
-import javax.sql.DataSource;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.service.UserAccountService;
 
 /**
  * UserAccountServiceImpl.
@@ -156,9 +158,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 			StudyUserRoleBean studyUserRole = getUserAccountDAO().findRoleByUserNameAndStudyId(user.getName(), studyId);
 
-			if (studyUserRole.isActive()
-					&& !(currentUser.getId() == user.getId() && currentUser.getActiveStudyId() == studyUserRole
-							.getStudyId())) {
+			if (studyUserRole.isActive() && !(currentUser.getId() == user.getId()
+					&& currentUser.getActiveStudyId() == studyUserRole.getStudyId())) {
 
 				getUserAccountDAO().deleteUserRole(studyUserRole);
 
@@ -191,9 +192,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 			StudyUserRoleBean studyUserRole = getUserAccountDAO().findRoleByUserNameAndStudyId(user.getName(), studyId);
 
-			if (studyUserRole.isActive()
-					&& !(currentUser.getId() == user.getId() && currentUser.getActiveStudyId() == studyUserRole
-							.getStudyId())) {
+			if (studyUserRole.isActive() && !(currentUser.getId() == user.getId()
+					&& currentUser.getActiveStudyId() == studyUserRole.getStudyId())) {
 
 				if (removeRole(studyUserRole, currentUser, false)) {
 
@@ -224,7 +224,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 		boolean operationSucceeded = false;
 
-		if (!studyUserRole.getStatus().equals(Status.DELETED) && !studyUserRole.getStatus().equals(Status.AUTO_DELETED)) {
+		if (!studyUserRole.getStatus().equals(Status.DELETED)
+				&& !studyUserRole.getStatus().equals(Status.AUTO_DELETED)) {
 
 			UserAccountBean user = (UserAccountBean) getUserAccountDAO().findByUserName(studyUserRole.getUserName());
 
@@ -261,9 +262,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 			StudyUserRoleBean studyUserRole = getUserAccountDAO().findRoleByUserNameAndStudyId(user.getName(), studyId);
 
-			if (studyUserRole.isActive()
-					&& !(currentUser.getId() == user.getId() && currentUser.getActiveStudyId() == studyUserRole
-							.getStudyId())) {
+			if (studyUserRole.isActive() && !(currentUser.getId() == user.getId()
+					&& currentUser.getActiveStudyId() == studyUserRole.getStudyId())) {
 
 				if (restoreRole(studyUserRole, currentUser, message, respage, false)) {
 
@@ -284,7 +284,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void autoRestoreStudyUserRole(StudyUserRoleBean studyUserRole, UserAccountBean currentUser) throws Exception {
+	public void autoRestoreStudyUserRole(StudyUserRoleBean studyUserRole, UserAccountBean currentUser)
+			throws Exception {
 
 		restoreRole(studyUserRole, currentUser, null, null, true);
 	}
@@ -294,8 +295,10 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 		boolean operationSucceeded = false;
 
-		boolean checkRoleStatus = autoRestore ? studyUserRole.getStatus().equals(Status.AUTO_DELETED) : (studyUserRole
-				.getStatus().equals(Status.AUTO_DELETED) || studyUserRole.getStatus().equals(Status.DELETED));
+		boolean checkRoleStatus = autoRestore
+				? studyUserRole.getStatus().equals(Status.AUTO_DELETED)
+				: (studyUserRole.getStatus().equals(Status.AUTO_DELETED)
+						|| studyUserRole.getStatus().equals(Status.DELETED));
 
 		if (checkRoleStatus) {
 
@@ -382,31 +385,21 @@ public class UserAccountServiceImpl implements UserAccountService {
 			helper.setTo(userAccountBean.getEmail());
 			helper.setSubject(messageSource.getMessage("your_new_openclinica_account", null, locale));
 			helper.setText(
-					"".concat("<html><body>")
-							.concat(messageSource.getMessage("dear", null, locale))
-							.concat(" ")
-							.concat(userAccountBean.getFirstName())
-							.concat(" ")
-							.concat(userAccountBean.getLastName())
+					"".concat("<html><body>").concat(messageSource.getMessage("dear", null, locale)).concat(" ")
+							.concat(userAccountBean.getFirstName()).concat(" ").concat(userAccountBean.getLastName())
 							.concat(",<br><br>")
 							.concat(messageSource.getMessage("a_new_user_account_has_been_created_for_you", null,
 									locale))
+							.concat("<br><br>").concat(messageSource.getMessage("user_name", null, locale)).concat(": ")
+							.concat(userAccountBean.getName()).concat("<br>")
+							.concat(messageSource.getMessage("password", null, locale)).concat(": ").concat(password)
 							.concat("<br><br>")
-							.concat(messageSource.getMessage("user_name", null, locale))
-							.concat(": ")
-							.concat(userAccountBean.getName())
-							.concat("<br>")
-							.concat(messageSource.getMessage("password", null, locale))
-							.concat(": ")
-							.concat(password)
-							.concat("<br><br>")
-							.concat(messageSource
-									.getMessage("please_test_your_login_information_and_let", null, locale))
-							.concat("<br>")
-							.concat(CoreResources.getSystemURL())
-							.concat(" . <br><br> ")
-							.concat(messageSource.getMessage("best_system_administrator", null, locale).replace("{0}",
-									studyName)).concat("</body></html>"), true);
+							.concat(messageSource.getMessage("please_test_your_login_information_and_let", null,
+									locale))
+					.concat("<br>")
+					.concat(CoreResources.getSystemURL()).concat(" . <br><br> ").concat(messageSource
+							.getMessage("best_system_administrator", null, locale).replace("{0}", studyName))
+					.concat("</body></html>"), true);
 			mailSender.send(mimeMessage);
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
@@ -465,5 +458,23 @@ public class UserAccountServiceImpl implements UserAccountService {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeUser(UserAccountBean userAccountBean, UserAccountBean updater) {
+		userAccountBean.setUpdater(updater);
+		userAccountBean.setStatus(Status.DELETED);
+		getUserAccountDAO().updateStatus(userAccountBean);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreUser(UserAccountBean userAccountBean, UserAccountBean updater) {
+		userAccountBean.setUpdater(updater);
+		userAccountBean.setStatus(Status.AVAILABLE);
+		getUserAccountDAO().updateStatus(userAccountBean);
 	}
 }

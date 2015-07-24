@@ -15,22 +15,10 @@
 
 package com.clinovo.rest.service;
 
-import com.clinovo.rest.annotation.RestAccess;
-import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
-import com.clinovo.rest.annotation.RestParameterPossibleValues;
-import com.clinovo.rest.annotation.RestParametersPossibleValues;
-import com.clinovo.rest.annotation.RestScope;
-import com.clinovo.rest.enums.Scope;
-import com.clinovo.rest.enums.UserRole;
-import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.model.UserDetails;
-import com.clinovo.rest.util.ValidatorUtil;
-import com.clinovo.rest.validator.EventServiceValidator;
-import com.clinovo.service.EventDefinitionCrfService;
-import com.clinovo.service.EventDefinitionService;
-import com.clinovo.service.ItemSDVService;
-import com.clinovo.util.RequestUtil;
-import com.clinovo.validator.EventDefinitionValidator;
+import java.util.HashMap;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -53,8 +41,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.sql.DataSource;
-import java.util.HashMap;
+import com.clinovo.rest.annotation.RestAccess;
+import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
+import com.clinovo.rest.annotation.RestParameterPossibleValues;
+import com.clinovo.rest.annotation.RestParametersPossibleValues;
+import com.clinovo.rest.annotation.RestScope;
+import com.clinovo.rest.enums.Scope;
+import com.clinovo.rest.enums.UserRole;
+import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.model.UserDetails;
+import com.clinovo.rest.util.ValidatorUtil;
+import com.clinovo.rest.validator.EventServiceValidator;
+import com.clinovo.service.EventDefinitionCrfService;
+import com.clinovo.service.EventDefinitionService;
+import com.clinovo.service.ItemSDVService;
+import com.clinovo.util.RequestUtil;
+import com.clinovo.validator.EventDefinitionValidator;
 
 /**
  * RestEventService.
@@ -115,7 +117,8 @@ public class EventService extends BaseService {
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@ResponseBody
 	@RestScope(Scope.STUDY)
-	@RestParametersPossibleValues({@RestParameterPossibleValues(name = "type", values = "scheduled,unscheduled,common,calendared_visit")})
+	@RestParametersPossibleValues({
+			@RestParameterPossibleValues(name = "type", values = "scheduled,unscheduled,common,calendared_visit")})
 	public StudyEventDefinitionBean createEvent(@RequestParam("name") String name,
 			@RequestParam(value = "type") String type,
 			@RequestParam(value = "description", defaultValue = "", required = false) String description,
@@ -200,10 +203,8 @@ public class EventService extends BaseService {
 			@RestParameterPossibleValues(name = "dataentryquality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "dde -> Double Data Entry, evaluation -> CRF data evaluation"),
 			@RestParameterPossibleValues(name = "emailwhen", canBeNotSpecified = true, values = "complete,sign"),
 			@RestParameterPossibleValues(name = "tabbing", values = "leftToRight,topToBottom")})
-	public EventDefinitionCRFBean addCrf(
-			@RequestParam(value = "eventid") int eventId,
-			@RequestParam("crfname") String crfName,
-			@RequestParam("defaultversion") String defaultVersion,
+	public EventDefinitionCRFBean addCrf(@RequestParam(value = "eventid") int eventId,
+			@RequestParam("crfname") String crfName, @RequestParam("defaultversion") String defaultVersion,
 			@RequestParam(value = "required", defaultValue = "true", required = false) boolean required,
 			@RequestParam(value = "passwordrequired", defaultValue = "false", required = false) boolean passwordRequired,
 			@RequestParam(value = "hide", defaultValue = "false", required = false) boolean hide,
@@ -213,7 +214,7 @@ public class EventService extends BaseService {
 			@RequestParam(value = "email", defaultValue = "", required = false) String email,
 			@RequestParam(value = "tabbing", defaultValue = "leftToRight", required = false) String tabbing,
 			@RequestParam(value = "acceptnewcrfversions", defaultValue = "false", required = false) boolean acceptNewCrfVersions)
-			throws Exception {
+					throws Exception {
 		UserAccountBean currentUser = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
 		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 
@@ -253,6 +254,10 @@ public class EventService extends BaseService {
 		eventDefinitionCrfBean.setOwner(currentUser);
 
 		eventDefinitionService.addEventDefinitionCrf(eventDefinitionCrfBean);
+
+		if (eventDefinitionCrfBean.getId() == 0) {
+			throw new RestException(messageSource, "rest.addCrf.operationFailed");
+		}
 
 		return eventDefinitionCrfBean;
 	}
@@ -317,7 +322,8 @@ public class EventService extends BaseService {
 	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/edit", method = RequestMethod.POST)
 	@RestScope(Scope.STUDY)
-	@RestParametersPossibleValues({@RestParameterPossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
+	@RestParametersPossibleValues({
+			@RestParameterPossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
 	@RestIgnoreDefaultValues
 	@ResponseBody
 	public StudyEventDefinitionBean editEvent(@RequestParam(value = "id") int id,
@@ -349,14 +355,14 @@ public class EventService extends BaseService {
 
 		studyEventDefinitionBean.setName(name != null ? name : studyEventDefinitionBean.getName());
 		studyEventDefinitionBean.setType(type != null ? type : studyEventDefinitionBean.getType());
-		studyEventDefinitionBean.setDescription(description != null ? description : studyEventDefinitionBean
-				.getDescription());
+		studyEventDefinitionBean
+				.setDescription(description != null ? description : studyEventDefinitionBean.getDescription());
 		studyEventDefinitionBean.setRepeating(repeating != null ? repeating : studyEventDefinitionBean.isRepeating());
 		studyEventDefinitionBean.setCategory(category != null ? category : studyEventDefinitionBean.getCategory());
 		studyEventDefinitionBean.setUpdater(updaterUser);
 		if (studyEventDefinitionBean.getType().equals(EventDefinitionValidator.CALENDARED_VISIT)) {
-			studyEventDefinitionBean.setReferenceVisit(isReference != null ? isReference : studyEventDefinitionBean
-					.getReferenceVisit());
+			studyEventDefinitionBean.setReferenceVisit(
+					isReference != null ? isReference : studyEventDefinitionBean.getReferenceVisit());
 			studyEventDefinitionBean.setMaxDay(dayMax != null ? dayMax : studyEventDefinitionBean.getMaxDay());
 			studyEventDefinitionBean.setMinDay(dayMin != null ? dayMin : studyEventDefinitionBean.getMinDay());
 			studyEventDefinitionBean

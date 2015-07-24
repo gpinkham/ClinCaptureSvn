@@ -1,11 +1,14 @@
 package com.clinovo.service.impl;
 
-import com.clinovo.service.EventCRFService;
-import com.clinovo.service.EventDefinitionCrfService;
-import com.clinovo.service.EventDefinitionService;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SignStateRestorer;
-import com.clinovo.util.SubjectEventStatusUtil;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -21,13 +24,12 @@ import org.akaza.openclinica.util.EventDefinitionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.clinovo.service.EventCRFService;
+import com.clinovo.service.EventDefinitionCrfService;
+import com.clinovo.service.EventDefinitionService;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SignStateRestorer;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * EventDefinitionServiceImpl.
@@ -52,8 +54,9 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 			StudyEventDefinitionBean studyEventDefinitionBean) {
 		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
 		ArrayList defs = studyEventDefinitionDao.findAllByStudy(studyBean);
-		studyEventDefinitionBean.setOrdinal(defs == null || defs.isEmpty() ? 1 : ((StudyEventDefinitionBean) defs
-				.get(defs.size() - 1)).getOrdinal() + 1);
+		studyEventDefinitionBean.setOrdinal(defs == null || defs.isEmpty()
+				? 1
+				: ((StudyEventDefinitionBean) defs.get(defs.size() - 1)).getOrdinal() + 1);
 		int userId = getUserAccountDAO().findByUserName(emailUser).getId();
 		studyEventDefinitionBean.setUserEmailId(userId != 0 ? userId : 1);
 		studyEventDefinitionBean.setCreatedDate(new Date());
@@ -65,10 +68,9 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	 * {@inheritDoc}
 	 */
 	public void updateTheWholeStudyEventDefinition(StudyBean studyBean, UserAccountBean updater,
-			StudyEventDefinitionBean studyEventDefinitionBean,
-			List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate,
+			StudyEventDefinitionBean studyEventDefinitionBean, List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate,
 			List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate, SignStateRestorer signStateRestorer)
-			throws Exception {
+					throws Exception {
 		studyEventDefinitionBean.setUpdater(updater);
 		studyEventDefinitionBean.setUpdatedDate(new Date());
 		studyEventDefinitionBean.setStatus(Status.AVAILABLE);
@@ -84,8 +86,9 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 				if (eventDefinitionCRFBean.getStatus().isDeleted()) {
 					eventCRFService.removeEventCRFsByEventDefinitionCRF(studyEventDefinitionBean.getOid(),
 							eventDefinitionCRFBean.getCrf().getOid(), updater);
-				} else if (eventDefinitionCRFBean.getOldStatus() != null
-						&& eventDefinitionCRFBean.getOldStatus().equals(Status.DELETED)) {
+				} else
+					if (eventDefinitionCRFBean.getOldStatus() != null
+							&& eventDefinitionCRFBean.getOldStatus().equals(Status.DELETED)) {
 					eventCRFService.restoreEventCRFsByEventDefinitionCRF(studyEventDefinitionBean.getOid(),
 							eventDefinitionCRFBean.getCrf().getOid(), updater);
 				}
@@ -107,7 +110,8 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	 * {@inheritDoc}
 	 */
 	public void updateOnlyTheStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean) {
-		SignStateRestorer signStateRestorer = prepareSignStateRestorer(getAllParentsEventDefinitionCrfs(studyEventDefinitionBean));
+		SignStateRestorer signStateRestorer = prepareSignStateRestorer(
+				getAllParentsEventDefinitionCrfs(studyEventDefinitionBean));
 		studyEventDefinitionBean.setUpdatedDate(new Date());
 		studyEventDefinitionBean.setStatus(Status.AVAILABLE);
 		getStudyEventDefinitionDAO().update(studyEventDefinitionBean);
@@ -157,8 +161,8 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	 */
 	public List<EventDefinitionCRFBean> getAllChildrenEventDefinitionCrfs(
 			StudyEventDefinitionBean studyEventDefinitionBean) {
-		List<EventDefinitionCRFBean> eventDefinitionCrfs = getEventDefinitionCRFDAO().findAllChildrenByDefinition(
-				studyEventDefinitionBean.getId());
+		List<EventDefinitionCRFBean> eventDefinitionCrfs = getEventDefinitionCRFDAO()
+				.findAllChildrenByDefinition(studyEventDefinitionBean.getId());
 		fillEventDefinitionCrfs(studyEventDefinitionBean, eventDefinitionCrfs);
 		return eventDefinitionCrfs;
 	}
@@ -201,7 +205,6 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 
 		studyEventDefinitionBean.setUpdater(updater);
 		studyEventDefinitionBean.setStatus(Status.DELETED);
-		studyEventDefinitionBean.setUpdatedDate(new Date());
 		getStudyEventDefinitionDAO().updateStatus(studyEventDefinitionBean);
 
 		List<EventDefinitionCRFBean> eventDefinitionCRFBeanList = (List<EventDefinitionCRFBean>) eventDefinitionCrfDao
@@ -209,7 +212,6 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefinitionCRFBeanList) {
 			if (!eventDefinitionCRFBean.getStatus().equals(Status.DELETED)) {
 				eventDefinitionCRFBean.setUpdater(updater);
-				eventDefinitionCRFBean.setUpdatedDate(new Date());
 				eventDefinitionCRFBean.setStatus(Status.AUTO_DELETED);
 				eventDefinitionCrfDao.updateStatus(eventDefinitionCRFBean);
 			}
@@ -220,7 +222,6 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		for (StudyEventBean studyEventBean : studyEventBeanList) {
 			if (!studyEventBean.getStatus().equals(Status.DELETED)) {
 				studyEventBean.setUpdater(updater);
-				studyEventBean.setUpdatedDate(new Date());
 				studyEventBean.setStatus(Status.AUTO_DELETED);
 				studyEventDao.updateStatus(studyEventBean);
 				eventCRFService.removeEventCRFsByStudyEvent(studyEventBean, updater);
@@ -240,7 +241,6 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
 
 		studyEventDefinitionBean.setUpdater(updater);
-		studyEventDefinitionBean.setUpdatedDate(new Date());
 		studyEventDefinitionBean.setStatus(Status.AVAILABLE);
 		getStudyEventDefinitionDAO().updateStatus(studyEventDefinitionBean);
 
@@ -249,7 +249,6 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefinitionCRFBeanList) {
 			if (eventDefinitionCRFBean.getStatus().equals(Status.AUTO_DELETED)) {
 				eventDefinitionCRFBean.setUpdater(updater);
-				eventDefinitionCRFBean.setUpdatedDate(new Date());
 				eventDefinitionCRFBean.setStatus(Status.AVAILABLE);
 				eventDefinitionCrfDao.updateStatus(eventDefinitionCRFBean);
 			}
@@ -260,7 +259,6 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		for (StudyEventBean studyEventBean : studyEventBeanList) {
 			if (studyEventBean.getStatus().equals(Status.AUTO_DELETED)) {
 				studyEventBean.setUpdater(updater);
-				studyEventBean.setUpdatedDate(new Date());
 				studyEventBean.setStatus(Status.AVAILABLE);
 				studyEventDao.updateStatus(studyEventBean);
 				eventCRFService.restoreEventCRFsByStudyEvent(studyEventBean, updater);

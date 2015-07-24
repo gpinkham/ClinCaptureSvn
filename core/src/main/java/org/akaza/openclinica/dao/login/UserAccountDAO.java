@@ -20,6 +20,16 @@
  */
 package org.akaza.openclinica.dao.login;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Privilege;
 import org.akaza.openclinica.bean.core.Role;
@@ -36,15 +46,6 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
-import javax.sql.DataSource;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-
 /**
  * <p/>
  * UserAccountDAO, the data access object for the User_Account table in the OpenClinica 2.0 database.
@@ -59,7 +60,7 @@ import java.util.Locale;
  *         <p/>
  *         expand on query to get all that from a select star?
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class UserAccountDAO extends AuditableEntityDAO {
 
 	@Override
@@ -75,7 +76,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Create User account DAO and set DataSource to it.
 	 *
-	 * @param ds the DataSource to set.
+	 * @param ds
+	 *            the DataSource to set.
 	 */
 	public UserAccountDAO(DataSource ds) {
 		super(ds);
@@ -85,8 +87,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Create User account DAO and set DataSource and DAODigester to it.
 	 *
-	 * @param ds       the DataSource to set.
-	 * @param digester the Digister to set.
+	 * @param ds
+	 *            the DataSource to set.
+	 * @param digester
+	 *            the Digister to set.
 	 */
 	public UserAccountDAO(DataSource ds, DAODigester digester) {
 		super(ds);
@@ -164,7 +168,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * This method is used to update pentaho auto login params for user.
 	 *
-	 * @param ub the UserAccount
+	 * @param ub
+	 *            the UserAccount
 	 * @return result of check if query successful
 	 */
 	public boolean updatePentahoAutoLoginParams(UserAccountBean ub) {
@@ -183,7 +188,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Update UserAccountBean.
 	 *
-	 * @param eb - the UserAccountBean to update.
+	 * @param eb
+	 *            - the UserAccountBean to update.
 	 * @return updated UserAccountBean.
 	 */
 	public EntityBean update(EntityBean eb) {
@@ -251,9 +257,25 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	}
 
 	/**
+	 * Updates UserAccountBean's status.
+	 *
+	 * @param userAccountBean
+	 *            UserAccountBean
+	 */
+	public void updateStatus(UserAccountBean userAccountBean) {
+		int ind = 1;
+		HashMap variables = new HashMap();
+		variables.put(ind++, userAccountBean.getStatus().getId());
+		variables.put(ind++, userAccountBean.getUpdaterId());
+		variables.put(ind, userAccountBean.getId());
+		this.execute(digester.getQuery("updateStatus"), variables);
+	}
+
+	/**
 	 * DeleteTestOnly, used only to clean up after unit testing.
 	 *
-	 * @param name String
+	 * @param name
+	 *            String
 	 */
 	public void deleteTestOnly(String name) {
 		HashMap variables = new HashMap();
@@ -264,7 +286,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * This method is used to delete UserAccountBean.
 	 *
-	 * @param u the UserAccountBean to delete.
+	 * @param u
+	 *            the UserAccountBean to delete.
 	 */
 	public void delete(UserAccountBean u) {
 		HashMap variables;
@@ -282,7 +305,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Restore UserAccountBean.
 	 *
-	 * @param u the UserAccountBean to restore.
+	 * @param u
+	 *            the UserAccountBean to restore.
 	 */
 	public void restore(UserAccountBean u) {
 		HashMap variables = new HashMap();
@@ -301,8 +325,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Set new count number for UserAccountBean by id.
 	 *
-	 * @param id               the user id.
-	 * @param newCounterNumber the new counter number to set.
+	 * @param id
+	 *            the user id.
+	 * @param newCounterNumber
+	 *            the new counter number to set.
 	 */
 	public void updateLockCounter(Integer id, Integer newCounterNumber) {
 		HashMap variables = new HashMap();
@@ -315,7 +341,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Lock UserAccountBean.
 	 *
-	 * @param id the ID of the user, which will be locked.
+	 * @param id
+	 *            the ID of the user, which will be locked.
 	 */
 	public void lockUser(Integer id) {
 		HashMap variables = new HashMap();
@@ -329,7 +356,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Create UserAccountBean.
 	 *
-	 * @param eb - the UserAccountBean to create.
+	 * @param eb
+	 *            - the UserAccountBean to create.
 	 * @return created UserAccountBean.
 	 */
 	public EntityBean create(EntityBean eb) {
@@ -380,8 +408,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Create StudyUserRoleBean for user.
 	 *
-	 * @param user      for which role will be created.
-	 * @param studyRole which will be created.
+	 * @param user
+	 *            for which role will be created.
+	 * @param studyRole
+	 *            which will be created.
 	 * @return created StudyUserRoleBean.
 	 */
 	public StudyUserRoleBean createStudyUserRole(UserAccountBean user, StudyUserRoleBean studyRole) {
@@ -402,8 +432,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * This method is used to check if UserAccountBeanHave any role in the study.
 	 *
-	 * @param user      for which role will be searched.
-	 * @param studyRole which will be searched..
+	 * @param user
+	 *            for which role will be searched.
+	 * @param studyRole
+	 *            which will be searched..
 	 * @return the UserAccountBean.
 	 */
 	public UserAccountBean findStudyUserRole(UserAccountBean user, StudyUserRoleBean studyRole) {
@@ -436,7 +468,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Get UserAccountBean from HashMap.
 	 *
-	 * @param hm the HashMap from which UserAccountBean will be taken.
+	 * @param hm
+	 *            the HashMap from which UserAccountBean will be taken.
 	 * @return the UserAccountBean.
 	 */
 	public Object getEntityFromHashMap(HashMap hm) {
@@ -446,7 +479,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Get StudyUserRoleBean from HashMap.
 	 *
-	 * @param hm the HashMap from which StudyUserRoleBean will be taken.
+	 * @param hm
+	 *            the HashMap from which StudyUserRoleBean will be taken.
 	 * @return the StudyUserRoleBean.
 	 */
 	public StudyUserRoleBean getRoleFromHashMap(HashMap hm) {
@@ -470,7 +504,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Get Privilege from HashMap.
 	 *
-	 * @param hm the HashMap from which Privilege will be taken.
+	 * @param hm
+	 *            the HashMap from which Privilege will be taken.
 	 * @return the Privilege.
 	 */
 	public Privilege getPrivilegeFromHashMap(HashMap hm) {
@@ -482,8 +517,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Get UserAccountBean from HashMap.
 	 *
-	 * @param hm        the HashMap from which UserAccountBean will be taken.
-	 * @param findOwner the boolean marker to check if owner should be found to.
+	 * @param hm
+	 *            the HashMap from which UserAccountBean will be taken.
+	 * @param findOwner
+	 *            the boolean marker to check if owner should be found to.
 	 * @return the UserAccountBean.
 	 */
 	@SuppressWarnings("deprecation")
@@ -563,7 +600,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find all UserAccountBeans with limit.
 	 *
-	 * @param hasLimit the boolean parameter to check if there are some limit.
+	 * @param hasLimit
+	 *            the boolean parameter to check if there are some limit.
 	 * @return the Collection of the UserAccountBeans.
 	 */
 	public Collection findAllByLimit(boolean hasLimit) {
@@ -585,9 +623,12 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find all UserAccountBean.
 	 *
-	 * @param strOrderByColumn the Column using which result will be ordered.
-	 * @param blnAscendingSort the boolean parameter.
-	 * @param strSearchPhrase  the search phrase.
+	 * @param strOrderByColumn
+	 *            the Column using which result will be ordered.
+	 * @param blnAscendingSort
+	 *            the boolean parameter.
+	 * @param strSearchPhrase
+	 *            the search phrase.
 	 * @return ArrayList.
 	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
@@ -597,7 +638,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find UserAccountBean by ID (PK).
 	 *
-	 * @param id the ID to search.
+	 * @param id
+	 *            the ID to search.
 	 * @return the UserAccountBean.
 	 */
 	public EntityBean findByPK(int id) {
@@ -621,8 +663,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find UserAccountBean by ID (PK).
 	 *
-	 * @param id        the ID to search.
-	 * @param findOwner the boolean marker to check if owner should be found to.
+	 * @param id
+	 *            the ID to search.
+	 * @param findOwner
+	 *            the boolean marker to check if owner should be found to.
 	 * @return the UserAccountBean.
 	 */
 	public EntityBean findByPK(int id, boolean findOwner) {
@@ -641,7 +685,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find UserAccountBean by user name.
 	 *
-	 * @param name the user name by which user will be found.
+	 * @param name
+	 *            the user name by which user will be found.
 	 * @return the UserAccountBean.
 	 */
 	public EntityBean findByUserName(String name) {
@@ -662,8 +707,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Finds all the studies with roles for a user.
 	 *
-	 * @param user       UserAccountBean
-	 * @param allStudies The result of calling StudyDAO.findAll();
+	 * @param user
+	 *            UserAccountBean
+	 * @param allStudies
+	 *            The result of calling StudyDAO.findAll();
 	 * @return the UserAccountBean.
 	 */
 	public ArrayList findStudyByUser(UserAccountBean user, ArrayList allStudies) {
@@ -680,7 +727,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
 		for (Object anAlist : alist) {
 			HashMap hm = (HashMap) anAlist;
-			String roleName = user.getName().equals(UserAccountBean.ROOT) ? user.getSysAdminRole().getRoleCode()
+			String roleName = user.getName().equals(UserAccountBean.ROOT)
+					? user.getSysAdminRole().getRoleCode()
 					: (String) hm.get("role_name");
 			String studyName = (String) hm.get("name");
 			Integer studyId = (Integer) hm.get("study_id");
@@ -688,8 +736,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
 			sur.setRoleName(roleName);
 			sur.setStudyId(studyId);
 			sur.setStudyName(studyName);
-			sur.setRole(user.getName().equals(UserAccountBean.ROOT) ? user.getSysAdminRole().getRole() : Role
-					.getByName(roleName));
+			sur.setRole(user.getName().equals(UserAccountBean.ROOT)
+					? user.getSysAdminRole().getRole()
+					: Role.getByName(roleName));
 			allStudyUserRoleBeans.put(studyId, sur);
 		}
 
@@ -766,7 +815,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * This method is used to find all StudyUserRoleBeans for some user.
 	 *
-	 * @param userName the name of the user for which all StudyUserRoleBeans will be found.
+	 * @param userName
+	 *            the name of the user for which all StudyUserRoleBeans will be found.
 	 * @return the Collection of the StudyUserRoleBeans.
 	 */
 	public Collection findAllRolesByUserName(String userName) {
@@ -787,7 +837,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Finds all user and roles in a study.
 	 *
-	 * @param studyId int.
+	 * @param studyId
+	 *            int.
 	 * @return ArrayList of UserAccountBeans.
 	 */
 	public ArrayList findAllByStudyId(int studyId) {
@@ -798,8 +849,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Finds all user and roles in a study.
 	 *
-	 * @param studyId   the ID of the study.
-	 * @param isLimited boolean
+	 * @param studyId
+	 *            the ID of the study.
+	 * @param isLimited
+	 *            boolean
 	 * @return ArrayList of UserAccountBeans.
 	 */
 	public ArrayList findAllUsersByStudyIdAndLimit(int studyId, boolean isLimited) {
@@ -826,7 +879,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Delete StudyUserRoleBean.
 	 *
-	 * @param role the StudyUserRoleBean to delete.
+	 * @param role
+	 *            the StudyUserRoleBean to delete.
 	 */
 	public void deleteUserRole(StudyUserRoleBean role) {
 		HashMap variables = new HashMap();
@@ -841,7 +895,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Finds all user and roles in a study.
 	 *
-	 * @param studyId int
+	 * @param studyId
+	 *            int
 	 * @return ArrayList of UserAccountBeans.
 	 */
 	public ArrayList findAllUsersByStudy(int studyId) {
@@ -890,7 +945,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Finds all roles (including roles with status Removed) in a study.
 	 *
-	 * @param studyId int.
+	 * @param studyId
+	 *            int.
 	 * @return ArrayList of UserAccountBeans.
 	 */
 	public ArrayList findAllRolesByStudy(int studyId) {
@@ -939,9 +995,12 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find all StudyUserRoleBeans by Study or Site.
 	 *
-	 * @param studyId        the ID of the study.
-	 * @param parentStudyId  the ID of the parent study if exists.
-	 * @param studySubjectId the study subject ID to search by.
+	 * @param studyId
+	 *            the ID of the study.
+	 * @param parentStudyId
+	 *            the ID of the parent study if exists.
+	 * @param studySubjectId
+	 *            the study subject ID to search by.
 	 * @return the ArrayList of the UserAccountBeans.
 	 */
 	public ArrayList findAllUsersByStudyOrSite(int studyId, int parentStudyId, int studySubjectId) {
@@ -990,7 +1049,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find all privileges by role ID.
 	 *
-	 * @param roleId the ID of the role to search by.
+	 * @param roleId
+	 *            the ID of the role to search by.
 	 * @return Collection of the Privileges.
 	 */
 	public Collection findPrivilegesByRole(int roleId) {
@@ -1009,7 +1069,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find all privileges by role name.
 	 *
-	 * @param roleName the name of the role to search by.
+	 * @param roleName
+	 *            the name of the role to search by.
 	 * @return Collection of the Privileges.
 	 */
 	public Collection findPrivilegesByRoleName(String roleName) {
@@ -1028,11 +1089,16 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find all by permission.
 	 *
-	 * @param objCurrentUser   the user to search.
-	 * @param intActionType    the action type.
-	 * @param strOrderByColumn the Column using which result will be ordered.
-	 * @param blnAscendingSort the boolean parameter.
-	 * @param strSearchPhrase  the search phrase.
+	 * @param objCurrentUser
+	 *            the user to search.
+	 * @param intActionType
+	 *            the action type.
+	 * @param strOrderByColumn
+	 *            the Column using which result will be ordered.
+	 * @param blnAscendingSort
+	 *            the boolean parameter.
+	 * @param strSearchPhrase
+	 *            the search phrase.
 	 * @return Collection
 	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
@@ -1043,8 +1109,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find all by permission.
 	 *
-	 * @param objCurrentUser the user to search.
-	 * @param intActionType  the action type.
+	 * @param objCurrentUser
+	 *            the user to search.
+	 * @param intActionType
+	 *            the action type.
 	 * @return Collection.
 	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
@@ -1054,8 +1122,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Update StudyUserRoleBean.
 	 *
-	 * @param s        the StudyUserRoleBean to update.
-	 * @param userName the the name of the user for which all StudyUserRoleBeans will be updated.
+	 * @param s
+	 *            the StudyUserRoleBean to update.
+	 * @param userName
+	 *            the the name of the user for which all StudyUserRoleBeans will be updated.
 	 * @return updated StudyUserRoleBean.
 	 */
 	public StudyUserRoleBean updateStudyUserRole(StudyUserRoleBean s, String userName) {
@@ -1076,8 +1146,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find StudyUserRoleBean by user name and study ID.
 	 *
-	 * @param userName the name of the user for which StudyUserRoleBean will be found.
-	 * @param studyId  the ID of the study.
+	 * @param userName
+	 *            the name of the user for which StudyUserRoleBean will be found.
+	 * @param studyId
+	 *            the ID of the study.
 	 * @return StudyUserRoleBean.
 	 */
 	public StudyUserRoleBean findRoleByUserNameAndStudyId(String userName, int studyId) {
@@ -1098,9 +1170,12 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find count of the roles for user by user name, study ID and site ID.
 	 *
-	 * @param userName     the name of the user for which all StudyUserRoleBeans will be found.
-	 * @param studyId      the ID of the study.
-	 * @param childStudyId the ID of the site.
+	 * @param userName
+	 *            the name of the user for which all StudyUserRoleBeans will be found.
+	 * @param studyId
+	 *            the ID of the study.
+	 * @param childStudyId
+	 *            the ID of the site.
 	 * @return count of the roles.
 	 */
 	public int findRoleCountByUserNameAndStudyId(String userName, int studyId, int childStudyId) {
@@ -1124,8 +1199,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Set sysadmin role for UserAccountBean.
 	 *
-	 * @param uab      the UserAccountBean for which role will be set.
-	 * @param creating the boolean param to check if user should be updated or created.
+	 * @param uab
+	 *            the UserAccountBean for which role will be set.
+	 * @param creating
+	 *            the boolean param to check if user should be updated or created.
 	 */
 	public void setSysAdminRole(UserAccountBean uab, boolean creating) {
 		HashMap variables = new HashMap();
@@ -1148,7 +1225,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find all UserAccountBeans by role name.
 	 *
-	 * @param role the name of the role.
+	 * @param role
+	 *            the name of the role.
 	 * @return collection of the UserAccountBeans.
 	 */
 	public Collection findAllByRole(String role) {
@@ -1158,8 +1236,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find all UserAccountBeans by role names.
 	 *
-	 * @param role1 the name of the role.
-	 * @param role2 the name of the role.
+	 * @param role1
+	 *            the name of the role.
+	 * @param role2
+	 *            the name of the role.
 	 * @return collection of the UserAccountBeans.
 	 */
 	public Collection findAllByRole(String role1, String role2) {
@@ -1195,7 +1275,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Get Password History from the HashMap.
 	 *
-	 * @param hm the HashMap from which Password History will be taken.
+	 * @param hm
+	 *            the HashMap from which Password History will be taken.
 	 * @return the Password History.
 	 */
 	public PasswordHistoryBean getPasswdHistoryFromHashMap(HashMap hm) {
@@ -1211,7 +1292,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Update Password History for the UserAccountBean.
 	 *
-	 * @param uab the the UserAccountBean for which history will be updated.
+	 * @param uab
+	 *            the the UserAccountBean for which history will be updated.
 	 */
 	public void updatePasswdHistory(UserAccountBean uab) {
 		if (getPasswdHistory(uab.getName(), uab.getPasswd()) == null) { // there is no record for current password
@@ -1229,7 +1311,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Insert password history.
 	 *
-	 * @param uab the the UserAccountBean for which history will be inserted.
+	 * @param uab
+	 *            the the UserAccountBean for which history will be inserted.
 	 */
 	public void insertPasswdHistory(UserAccountBean uab) {
 		HashMap variables = new HashMap();
@@ -1251,8 +1334,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Get password history for a user.
 	 *
-	 * @param userName the name of the user for which PasswordHistory will be found.
-	 * @param password the password.
+	 * @param userName
+	 *            the name of the user for which PasswordHistory will be found.
+	 * @param password
+	 *            the password.
 	 * @return the PasswordHistoryBean.
 	 */
 	public PasswordHistoryBean getPasswdHistory(String userName, String password) {
@@ -1277,8 +1362,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Get date last used from password history.
 	 *
-	 * @param userName the name of the user for which PasswordHistory will be found.
-	 * @param password the password.
+	 * @param userName
+	 *            the name of the user for which PasswordHistory will be found.
+	 * @param password
+	 *            the password.
 	 * @return the Date of the last use.
 	 */
 	public Date getDateLastUsedFromPasswdHistory(String userName, String password) {
@@ -1292,7 +1379,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Find user by email.
 	 *
-	 * @param email the email by which user will be found.
+	 * @param email
+	 *            the email by which user will be found.
 	 * @return the UserAccountBean.
 	 */
 	public EntityBean findByUserEmail(String email) {
@@ -1310,6 +1398,13 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		return eb;
 	}
 
+	/**
+	 * Returns users assigned metric.
+	 * 
+	 * @param studyId
+	 *            int
+	 * @return int
+	 */
 	public int getUsersAssignedMetric(int studyId) {
 		int usersAssigned = 0;
 		unsetTypeExpected();
@@ -1323,5 +1418,25 @@ public class UserAccountDAO extends AuditableEntityDAO {
 			usersAssigned = (Integer) ((HashMap) it.next()).get("count");
 		}
 		return usersAssigned;
+	}
+
+	/**
+	 * Method checks that user is present in study.
+	 * 
+	 * @param userName
+	 *            String
+	 * @param studyId
+	 *            int
+	 * @return boolean
+	 */
+	public boolean isUserPresentInStudy(String userName, int studyId) {
+		this.setRoleTypesExpected();
+		HashMap variables = new HashMap();
+		int ind = 1;
+		variables.put(ind++, userName);
+		variables.put(ind++, studyId);
+		variables.put(ind, studyId);
+		ArrayList resultList = this.select(digester.getQuery("isUserPresentInStudy"), variables);
+		return resultList.size() > 0;
 	}
 }

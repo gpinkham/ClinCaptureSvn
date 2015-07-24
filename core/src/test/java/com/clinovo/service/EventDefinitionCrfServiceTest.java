@@ -83,10 +83,10 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		eventDefinitionCrfService.fillEventDefinitionCrf(eventDefinitionCrfBean, studyEventDefinitionBean);
 		assertTrue(eventDefinitionCrfBean.getEventName().equals(studyEventDefinitionBean.getName()));
-		assertTrue(eventDefinitionCrfBean.getCrfName().equals(
-				crfdao.findByPK(eventDefinitionCrfBean.getCrfId()).getName()));
-		assertTrue(eventDefinitionCrfBean.getDefaultVersionName().equals(
-				crfVersionDao.findByPK(eventDefinitionCrfBean.getDefaultVersionId()).getName()));
+		assertTrue(eventDefinitionCrfBean.getCrfName()
+				.equals(crfdao.findByPK(eventDefinitionCrfBean.getCrfId()).getName()));
+		assertTrue(eventDefinitionCrfBean.getDefaultVersionName()
+				.equals(crfVersionDao.findByPK(eventDefinitionCrfBean.getDefaultVersionId()).getName()));
 	}
 
 	@Test
@@ -95,8 +95,10 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		CRFBean crfBean = (CRFBean) crfdao.findByPK(eventDefinitionCrfBean.getCrfId());
 		eventDefinitionCrfBean.setCrf(crfBean);
+		assertTrue(eventDefinitionCrfBean.getStatus() == Status.AVAILABLE);
 		eventDefinitionCrfService.removeEventDefinitionCrf(eventDefinitionCrfBean, userBean);
-		assertTrue(((EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1)).getStatus() == Status.DELETED);
+		eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		assertTrue(eventDefinitionCrfBean.getStatus() == Status.DELETED);
 	}
 
 	@Test
@@ -106,9 +108,12 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 		CRFBean crfBean = (CRFBean) crfdao.findByPK(eventDefinitionCrfBean.getCrfId());
 		eventDefinitionCrfBean.setUpdater(userBean);
 		eventDefinitionCrfBean.setStatus(Status.DELETED);
+		eventDefinitionCRFDAO.updateStatus(eventDefinitionCrfBean);
+		eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		eventDefinitionCrfBean.setCrf(crfBean);
-		eventDefinitionCRFDAO.update(eventDefinitionCrfBean);
+		assertTrue(eventDefinitionCrfBean.getStatus() == Status.DELETED);
 		eventDefinitionCrfService.restoreEventDefinitionCrf(eventDefinitionCrfBean, userBean);
-		assertTrue(((EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1)).getStatus() == Status.AVAILABLE);
+		eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		assertTrue(eventDefinitionCrfBean.getStatus() == Status.AVAILABLE);
 	}
 }

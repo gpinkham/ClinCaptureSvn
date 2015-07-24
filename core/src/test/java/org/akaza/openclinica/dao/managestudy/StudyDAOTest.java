@@ -13,6 +13,8 @@
 
 package org.akaza.openclinica.dao.managestudy;
 
+import java.util.HashMap;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -22,6 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("rawtypes")
 public class StudyDAOTest extends DefaultAppContextTest {
 
 	private UserAccountBean user;
@@ -48,7 +51,7 @@ public class StudyDAOTest extends DefaultAppContextTest {
 	public void testFindByPKNotReturnNull() throws OpenClinicaException {
 		assertNotNull(studyDAO.findByPK(1));
 	}
-	
+
 	@Test
 	public void testFindByPKReturnsCorrectValue() throws OpenClinicaException {
 		assertEquals("Default Study", studyDAO.findByPK(1).getName());
@@ -68,7 +71,11 @@ public class StudyDAOTest extends DefaultAppContextTest {
 
 	@After
 	public void cleanup() {
-		userAccountDAO.delete(user);
-		userAccountDAO.deleteUserRole(sur);
+		userAccountDAO.execute("delete from authorities where username = '".concat(user.getName()).concat("'"),
+				new HashMap());
+		userAccountDAO.execute("delete from study_user_role where user_name = '".concat(user.getName()).concat("'"),
+				new HashMap());
+		userAccountDAO.execute("delete from user_account where user_name = '".concat(user.getName()).concat("'"),
+				new HashMap());
 	}
 }

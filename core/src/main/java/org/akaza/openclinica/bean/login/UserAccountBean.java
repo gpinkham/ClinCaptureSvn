@@ -40,6 +40,7 @@ import org.joda.time.DateTimeZone;
 
 import com.clinovo.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -60,6 +61,7 @@ public class UserAccountBean extends AuditableEntityBean {
 	@XmlElement(name = "UserName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String name = "";
 	@JsonProperty("role")
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	@XmlElement(name = "Role", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String roleCode;
 	@JsonProperty("usertype")
@@ -67,6 +69,7 @@ public class UserAccountBean extends AuditableEntityBean {
 	private String userTypeCode;
 
 	@JsonProperty("password")
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	@XmlElement(name = "Password", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String passwd;
 	@JsonProperty("firstname")
@@ -658,7 +661,8 @@ public class UserAccountBean extends AuditableEntityBean {
 	}
 
 	public void setUserTimeZoneId(String userTimeZoneId) {
-		this.userTimeZoneId = DateUtil.isValidTimeZoneId(userTimeZoneId) ? userTimeZoneId : DateTimeZone.getDefault()
-				.getID();
+		this.userTimeZoneId = DateUtil.isValidTimeZoneId(userTimeZoneId)
+				? userTimeZoneId
+				: DateTimeZone.getDefault().getID();
 	}
 }

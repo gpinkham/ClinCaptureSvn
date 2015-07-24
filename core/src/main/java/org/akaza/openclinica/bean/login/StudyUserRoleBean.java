@@ -273,8 +273,8 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
 	public boolean isStudyLevelRole() {
 		return this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
-				|| this.role == Role.STUDY_MONITOR || this.role == Role.STUDY_CODER
-				|| this.role == Role.STUDY_EVALUATOR;
+				|| this.role == Role.STUDY_MONITOR || this.role == Role.STUDY_CODER || this.role == Role.STUDY_EVALUATOR
+				|| this.role == Role.STUDY_DIRECTOR;
 	}
 
 	public boolean isCanGenerateDCF() {
@@ -307,7 +307,8 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	 *            StudyBean
 	 * @return StudyUserRoleBean in currentStudy
 	 */
-	public static StudyUserRoleBean getStudyUserRoleInCurrentStudy(UserAccountBean currentUser, StudyBean currentStudy) {
+	public static StudyUserRoleBean getStudyUserRoleInCurrentStudy(UserAccountBean currentUser,
+			StudyBean currentStudy) {
 		StudyUserRoleBean surb = currentUser.getRoleByStudy(currentStudy.getId());
 		if (!surb.getRole().equals(Role.INVALID)) {
 			return surb;

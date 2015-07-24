@@ -1,6 +1,14 @@
 package com.clinovo.service;
 
-import com.clinovo.service.impl.UserAccountServiceImpl;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Role;
@@ -15,14 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.powermock.api.mockito.PowerMockito;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import com.clinovo.service.impl.UserAccountServiceImpl;
 
 public class UserAccountServiceTest extends DefaultAppContextTest {
 
@@ -483,8 +484,8 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 				removedStudyId);
 		doReturn(removedStudy).when(spyStudyDAO).findByPK(removedStudyId);
 
-		assertFalse(spyUserAccountService.restoreStudyUserRole(userId, removedStudyId, currentUser, new StringBuilder(
-				""), respage));
+		assertFalse(spyUserAccountService.restoreStudyUserRole(userId, removedStudyId, currentUser,
+				new StringBuilder(""), respage));
 
 		verify(spyUserAccountDAO, never()).updateStudyUserRole(user.getRoles().get(0), user.getName());
 		verify(spyUserAccountDAO, never()).update(user);
@@ -602,5 +603,32 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 	public void testThatIsSiteLevelUserDoNotThrowsAnExceptionIfThereAreNoRolesForUser() {
 		UserAccountBean ub = new UserAccountBean();
 		assertTrue(!userAccountService.isSiteLevelUser(ub));
+	}
+
+	@Test
+	public void testThatRemoveEventDefinitionCrfMethodRemovesEventDefinitionCRFBeanCorrectly() throws Exception {
+		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		userAccountService.removeUser(userBean, userBean);
+		userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		assertTrue(userBean.getStatus() == Status.DELETED);
+		// need to restore user status back to available
+		userBean.setStatus(Status.AVAILABLE);
+		userBean.setUpdater(userBean);
+		userAccountDAO.updateStatus(userBean);
+		userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		assertTrue(userBean.getStatus() == Status.AVAILABLE);
+	}
+
+	@Test
+	public void testThatRestoreEventDefinitionCrfMethodRestoresEventDefinitionCRFBeanCorrectly() throws Exception {
+		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		userBean.setStatus(Status.DELETED);
+		userBean.setUpdater(userBean);
+		userAccountDAO.updateStatus(userBean);
+		userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		assertTrue(userBean.getStatus() == Status.DELETED);
+		userAccountService.restoreUser(userBean, userBean);
+		userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		assertTrue(userBean.getStatus() == Status.AVAILABLE);
 	}
 }

@@ -129,8 +129,8 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 			StudyEventDefinitionBean studyEventDefinitionBean) {
 		CRFDAO crfDao = getCRFDAO();
 		CRFVersionDAO crfVersionDao = getCRFVersionDAO();
-		CRFVersionBean crfBeanVersion = (CRFVersionBean) crfVersionDao.findByPK(eventDefinitionCRFBean
-				.getDefaultVersionId());
+		CRFVersionBean crfBeanVersion = (CRFVersionBean) crfVersionDao
+				.findByPK(eventDefinitionCRFBean.getDefaultVersionId());
 		CRFBean crfBean = (CRFBean) crfDao.findByPK(eventDefinitionCRFBean.getCrfId());
 		ArrayList versions = (ArrayList) crfVersionDao.findAllActiveByCRF(eventDefinitionCRFBean.getCrfId());
 		SourceDataVerification.fillSDVStatuses(eventDefinitionCRFBean.getSdvOptions(),
@@ -154,7 +154,6 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 
 		parentEventDefinitionCRFBean.setUpdater(updater);
 		parentEventDefinitionCRFBean.setStatus(Status.DELETED);
-		parentEventDefinitionCRFBean.setUpdatedDate(new Date());
 		eventDefinitionCrfDao.updateStatus(parentEventDefinitionCRFBean);
 		eventCRFService.removeEventCRFsByEventDefinitionCRF(studyEventDefinitionBean.getOid(),
 				parentEventDefinitionCRFBean.getCrf().getOid(), updater);
@@ -164,7 +163,6 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 		for (EventDefinitionCRFBean childEventDefinitionCRFBean : childEventDefinitionCRFBeanList) {
 			childEventDefinitionCRFBean.setUpdater(updater);
 			childEventDefinitionCRFBean.setStatus(Status.DELETED);
-			childEventDefinitionCRFBean.setUpdatedDate(new Date());
 			eventDefinitionCrfDao.updateStatus(childEventDefinitionCRFBean);
 			eventCRFService.removeEventCRFsByEventDefinitionCRF(studyEventDefinitionBean.getOid(),
 					parentEventDefinitionCRFBean.getCrf().getOid(), updater);
@@ -184,7 +182,6 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 				.findByPK(parentEventDefinitionCRFBean.getStudyEventDefinitionId());
 
 		parentEventDefinitionCRFBean.setUpdater(updater);
-		parentEventDefinitionCRFBean.setUpdatedDate(new Date());
 		parentEventDefinitionCRFBean.setStatus(Status.AVAILABLE);
 		eventDefinitionCrfDao.updateStatus(parentEventDefinitionCRFBean);
 		eventCRFService.restoreEventCRFsByEventDefinitionCRF(studyEventDefinitionBean.getOid(),
@@ -194,7 +191,6 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 				.findAllChildrenByParentId(parentEventDefinitionCRFBean.getId());
 		for (EventDefinitionCRFBean childEventDefinitionCRFBean : childEventDefinitionCRFBeanList) {
 			childEventDefinitionCRFBean.setUpdater(updater);
-			childEventDefinitionCRFBean.setUpdatedDate(new Date());
 			childEventDefinitionCRFBean.setStatus(Status.AVAILABLE);
 			eventDefinitionCrfDao.updateStatus(childEventDefinitionCRFBean);
 			eventCRFService.restoreEventCRFsByEventDefinitionCRF(studyEventDefinitionBean.getOid(),

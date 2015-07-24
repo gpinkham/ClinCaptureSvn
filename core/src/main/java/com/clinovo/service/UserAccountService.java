@@ -198,4 +198,24 @@ public interface UserAccountService {
 	 * @return boolean result
 	 */
 	boolean isSiteLevelUser(UserAccountBean ub);
+
+	/**
+	 * Removes user.
+	 * 
+	 * @param userAccountBean
+	 *            UserAccountBean
+	 * @param updater
+	 *            UserAccountBean
+	 */
+	void removeUser(UserAccountBean userAccountBean, UserAccountBean updater);
+
+	/**
+	 * Restores user.
+	 * 
+	 * @param userAccountBean
+	 *            UserAccountBean
+	 * @param updater
+	 *            UserAccountBean
+	 */
+	void restoreUser(UserAccountBean userAccountBean, UserAccountBean updater);
 }
