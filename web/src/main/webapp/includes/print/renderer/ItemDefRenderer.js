@@ -2,7 +2,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber,
     this.json = json;
     this.itemDetails = itemDetails;
     this.mandatory = mandatory;
-    this.name =     this.name = this.itemDetails["OpenClinica:LeftItemText"] !== undefined && this.itemDetails["OpenClinica:LeftItemText"].toLowerCase().indexOf("img") > -1 ?
+    this.name = this.itemDetails["OpenClinica:LeftItemText"] !== undefined && this.itemDetails["OpenClinica:LeftItemText"] !== null && this.itemDetails["OpenClinica:LeftItemText"].toLowerCase().indexOf("img") > -1 ?
         window.location.href.indexOf("clinicaldata") > -1 ? this.itemDetails["OpenClinica:LeftItemText"].replace("images/", "../../../../../../../images/")
             : window.location.href.indexOf("metadata") > -1 ? this.itemDetails["OpenClinica:LeftItemText"].replace("images/", "../../../../../../images/")
             : this.itemDetails["OpenClinica:LeftItemText"] : this.itemDetails["OpenClinica:LeftItemText"];
