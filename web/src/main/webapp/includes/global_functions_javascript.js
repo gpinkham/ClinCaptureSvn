@@ -4400,9 +4400,7 @@ function setAccessedObjected(element) {
 	setIdByAttributeName(attrName, idValue);
 	clearHighlight();
 	$(tr).find('td').each(function(){
-		if($(this).is(":visible")) {
-			$(this).addClass("borderHighlight");
-		}		
+		$(this).addClass("borderHighlight");
 	});	
 	
 	//Remove inherited border highlight from cell contents
