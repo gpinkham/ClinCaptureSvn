@@ -13,6 +13,10 @@
         </sql>
     </query>
     <query>
+        <name>findAllByDefinitionWithNotRemovedStudySubject</name>
+        <sql>SELECT DISTINCT SE.* FROM STUDY_EVENT SE, STUDY_SUBJECT SS  WHERE SE.STUDY_SUBJECT_ID = SS.STUDY_SUBJECT_ID AND NOT(SS.STATUS_ID IN (7,5)) AND SE.STUDY_EVENT_DEFINITION_ID = ?</sql>
+    </query>
+    <query>
         <name>findAllWithSubjectLabelByDefinition</name>
         <sql>
             select se.*, ss.label from study_event se, study_subject ss

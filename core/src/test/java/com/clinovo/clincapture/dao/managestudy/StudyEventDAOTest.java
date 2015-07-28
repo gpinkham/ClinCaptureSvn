@@ -1,5 +1,7 @@
 package com.clinovo.clincapture.dao.managestudy;
 
+import java.util.Date;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -7,8 +9,6 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
-
-import java.util.Date;
 
 public class StudyEventDAOTest extends DefaultAppContextTest {
 
@@ -43,9 +43,9 @@ public class StudyEventDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindStudyEventsByCrfVersionAndSubjectEventStatusReturnsCorrectSize()
 			throws OpenClinicaException {
-		assertEquals(
-				studyEventDao.findStudyEventsByCrfVersionAndSubjectEventStatus(1,
-						SubjectEventStatus.SOURCE_DATA_VERIFIED).size(), 0);
+		assertEquals(studyEventDao
+				.findStudyEventsByCrfVersionAndSubjectEventStatus(1, SubjectEventStatus.SOURCE_DATA_VERIFIED).size(),
+				0);
 	}
 
 	@Test
@@ -57,5 +57,10 @@ public class StudyEventDAOTest extends DefaultAppContextTest {
 		studyEventDao.updateStatus(studyEventBean);
 		studyEventBean = (StudyEventBean) studyEventDao.findByPK(4);
 		assertEquals(studyEventBean.getStatus(), Status.DELETED);
+	}
+
+	@Test
+	public void testThatFindAllByDefinitionWithNotRemovedStudySubjectMethodWorksFine() {
+		assertEquals(studyEventDao.findAllByDefinitionWithNotRemovedStudySubject(1).size(), 3);
 	}
 }

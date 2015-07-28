@@ -254,8 +254,8 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 			}
 		}
 
-		List<StudyEventBean> studyEventBeanList = (List<StudyEventBean>) studyEventDao
-				.findAllByDefinition(studyEventDefinitionBean.getId());
+		List<StudyEventBean> studyEventBeanList = studyEventDao
+				.findAllByDefinitionWithNotRemovedStudySubject(studyEventDefinitionBean.getId());
 		for (StudyEventBean studyEventBean : studyEventBeanList) {
 			if (studyEventBean.getStatus().equals(Status.AUTO_DELETED)) {
 				studyEventBean.setUpdater(updater);
