@@ -179,7 +179,7 @@ When User changes old password to new
 Then User is on Home page
 
 
-Scenario: 11. "Root" uploads CRFs
+Scenario: 11.1 "Root" uploads CRF
 
 Given User logs in as "Root"
 And User goes to Build Study page
@@ -193,11 +193,21 @@ Examples:
 {scope=Scenario}
 |filepath                                                |
 |.\\src\\test\\resources\\eCRFs\\CRF_w_basic_fields_1.xls|
+
+
+Scenario: 11.2 "Root" uploads CRFs
+
+Given User logs in as "Root"
+And User goes to Administer CRFs page
+When User uploads CRFs: 
+|filepath                                                |
 |.\\src\\test\\resources\\eCRFs\\CRF_w_basic_fields_2.xls|
 |.\\src\\test\\resources\\eCRFs\\CRF_w_basic_fields_3.xls|
 |.\\src\\test\\resources\\eCRFs\\CRF_w_file_1.xls        |
 |.\\src\\test\\resources\\eCRFs\\CRF_w_group_1.xlsx      |
 |.\\src\\test\\resources\\eCRFs\\CRF_w_sections_1.xls    |
+
+Then CRFs are uploaded
 
 
 Scenario: 12. "Root" creates Study Event Definitions

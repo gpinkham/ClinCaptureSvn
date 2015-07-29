@@ -62,6 +62,7 @@ public class CommonSteps extends ScenarioSteps {
 	protected NotesAndDiscrepanciesPage notesAndDiscrepanciesPage = getPages().get(NotesAndDiscrepanciesPage.class);
 	protected ManageRulesPage manageRulesPage = getPages().get(ManageRulesPage.class);
 	protected ImportRuleDataPage importRuleDataPage = getPages().get(ImportRuleDataPage.class);
+	protected AdministerCRFsPage administerCRFsPage = getPages().get(AdministerCRFsPage.class);
 	
 	
     private LoginPage loginPage = getPages().get(LoginPage.class);
@@ -206,7 +207,9 @@ public class CommonSteps extends ScenarioSteps {
 			return manageRulesPage;
 		case ImportRuleDataPage.PAGE_NAME:
 			return importRuleDataPage;
-
+		case AdministerCRFsPage.PAGE_NAME:
+			return administerCRFsPage;
+			
 		default:
 			;
 		}
@@ -305,10 +308,17 @@ public class CommonSteps extends ScenarioSteps {
 		case ManageRulesPage.PAGE_NAME:
 			go_to_manage_rules_page();
 			break;
+		case AdministerCRFsPage.PAGE_NAME:
+			go_to_administer_CRFs_page();
+			break;
 
 		default:
 			;
 		}
+	}
+
+	private void go_to_administer_CRFs_page() {
+		basePage.goToAdministerCRFsPage();
 	}
 
 	private void go_to_manage_rules_page() {
@@ -556,7 +566,6 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void check_DN_row_is_present(DNote dn) {
 		notesAndDiscrepanciesPage.checkDNPresent(dn);
-		
 	}
 	
 	@Step
@@ -569,6 +578,26 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void click_element_on_page(String page, String element) {
 		switch (page) {
+		case CreateCRFDataCommitedPage.PAGE_NAME:
+			switch (element) {
+			case "'Exit' button":
+				createCRFDataCommitedPage.clickExitButton();
+				break;
+			case "'View CRF' button":
+				createCRFDataCommitedPage.clickViewCRFButton();
+				break;
+			case "'View CRF Metadata' button":
+				createCRFDataCommitedPage.clickViewCRFMetadataButton();
+				break;
+			}
+			break;
+		case AdministerCRFsPage.PAGE_NAME:
+			switch (element) {
+			case "'Create CRF' button":
+				administerCRFsPage.clickCreateCRFButton();
+				break;
+			}
+			break;
 		case ImportRuleDataPage.PAGE_NAME:
 			switch (element) {
 			case "'Yes' button in popup":
@@ -628,5 +657,17 @@ public class CommonSteps extends ScenarioSteps {
 
 	public void see_message(String message) {
 		basePage.message_is_shown(message);
+	}
+
+	public void filter_administer_CRFs_page(CRF crf) {
+		administerCRFsPage.filter(crf);
+	}
+
+	public void check_CRF_row_is_present(CRF crf) {
+		administerCRFsPage.checkCRFRowIsPresent(crf);
+	}
+
+	public void set_CRF_parameters(CRF crf) {
+		previewCRFPage.setCRFParameters(crf);
 	}
 }

@@ -10,8 +10,12 @@ public class CRF{
 	
 	public static final String CRFS_TO_CHECK_SDV_STATUS = "CRFs to check SDV tatus";
 
+	public static final Object CRFS_TO_CHECK_EXIST = "CRFs to check for existence";
+
 	public static ComparatorForItemOIDs comparatorForItemOIDs = new ComparatorForItemOIDs();
 	
+	private String version = "";
+	private String name = "";
 	private Map<String, String> fieldNameToValueMap;
 	private String markComplete = "no";
 
@@ -64,6 +68,22 @@ public class CRF{
 
 	public void setMarkComplete(String markComplete) {
 		this.markComplete = markComplete;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }
 

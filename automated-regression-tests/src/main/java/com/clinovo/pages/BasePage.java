@@ -25,6 +25,9 @@ public class BasePage extends AbstractPage {
 	@FindBy(jquery = "a[href$='ListUserAccounts']")
     private WebElementFacade lUsers;
 	
+	@FindBy(jquery = "a[href='ListCRF']")
+    private WebElementFacade lCRFs;
+	
 	@FindBy(jquery = "a[href$='ChangeStudy']")
     private WebElementFacade lChangeStudy;
 	
@@ -103,6 +106,11 @@ public class BasePage extends AbstractPage {
     public void goToAdministerUsersPage() {
     	lTasksMenu.click();
     	lUsers.click();
+    }
+    
+    public void goToAdministerCRFsPage() {
+    	lTasksMenu.click();
+    	lCRFs.click();
     }
     
     public void clickSubmit() {

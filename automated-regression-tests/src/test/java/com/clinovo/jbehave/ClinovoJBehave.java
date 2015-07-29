@@ -5,10 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.clinovo.pages.AdministerCRFsPage;
 import com.clinovo.pages.BuildStudyPage;
 import com.clinovo.pages.ChangeStudyPage;
 import com.clinovo.pages.ConfirmChangeStudyPage;
+import com.clinovo.pages.CreateCRFDataCommitedPage;
+import com.clinovo.pages.CreateCRFVersionPage;
 import com.clinovo.pages.NotesAndDiscrepanciesPage;
+import com.clinovo.pages.PreviewCRFPage;
 import com.clinovo.pages.SubjectMatrixPage;
 import com.clinovo.steps.CommonSteps;
 import com.clinovo.pages.beans.CRF;
@@ -544,6 +548,22 @@ public class ClinovoJBehave extends BaseJBehave {
     	Thucydides.getCurrentSession().remove(DNote.DNS_TO_CHECK_EXIST);
     }
     
+    @SuppressWarnings("unchecked")
+	@Then("CRFs are uploaded")
+	public void crfsUploaded() {
+    	if (!commonSteps.getPageByPageName(AdministerCRFsPage.PAGE_NAME).isOnPage(commonSteps.getDriver())) {
+    		commonSteps.go_to_page(AdministerCRFsPage.PAGE_NAME);
+    	}
+    	
+    	List<CRF> crfs = (List<CRF>) Thucydides.getCurrentSession().get(CRF.CRFS_TO_CHECK_EXIST);
+    	for (CRF crf: crfs) {
+    		commonSteps.filter_administer_CRFs_page(crf);
+    		commonSteps.check_CRF_row_is_present(crf);
+    	}
+    
+    	Thucydides.getCurrentSession().remove(CRF.CRFS_TO_CHECK_EXIST);
+    }
+    
     @Then("DN is $status: $activityTable")
 	public void dnIsCreatedUpdatedClosed(String status, ExamplesTable table) {
     	commonSteps.go_to_page(NotesAndDiscrepanciesPage.PAGE_NAME);
@@ -605,6 +625,29 @@ public class ClinovoJBehave extends BaseJBehave {
     @Then("User sees '$message' message")
 	public void userSeesMessage(String message) {
     	commonSteps.see_message(message);
+    }
+    
+    @Given("User uploads CRFs: $activityTable")
+    @When("User uploads CRFs: $activityTable")
+   	public void userUploadsCRFs(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	List<CRF> crfs = new ArrayList<CRF>();
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		CRF crf = new CRF();
+    		commonSteps.click_element_on_page(AdministerCRFsPage.PAGE_NAME, "'Create CRF' button");
+    		commonSteps.browse_file_with_crf(rowParams.values().get("filepath"));
+    		commonSteps.click_continue_button(CreateCRFVersionPage.PAGE_NAME);
+    		commonSteps.user_is_on_page(PreviewCRFPage.PAGE_NAME);
+    		commonSteps.set_CRF_parameters(crf);
+    		crfs.add(crf);
+    		commonSteps.click_submit_button();
+    		commonSteps.user_is_on_page(CreateCRFDataCommitedPage.PAGE_NAME);
+    		commonSteps.click_element_on_page(CreateCRFDataCommitedPage.PAGE_NAME, "'Exit' button");
+    	}
+    	
+    	Thucydides.getCurrentSession().put(CRF.CRFS_TO_CHECK_EXIST, crfs);
     }
     
 	private void userChecksSignEventStatus(Map<String, String> values) {
