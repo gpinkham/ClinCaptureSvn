@@ -62,7 +62,17 @@
       <td class="text"><c:out value="${studySubject.owner.name}"/></td> 
       <td class="text"><c:out value="${studySubject.updatedDate}"/></td> 
       <td class="text"><c:out value="${studySubject.updater.name}"/></td> 
-      <td class="text"><c:out value="${studySubject.status.name}"/></td>
+      <c:choose>
+			<c:when test="${studySubject.status.available}">
+				<td class="table_cell aka_green_highlight"><c:out value="${studySubject.status.name}"/></td>	
+			</c:when>
+			<c:when test="${studySubject.status.deleted || studySubject.status.locked}">
+				<td class="table_cell aka_red_highlight"><c:out value="${studySubject.status.name}"/></td>	
+			</c:when>
+			<c:otherwise>
+				<td class="table_cell"><c:out value="${studySubject.status.name}"/></td>	
+			</c:otherwise>
+		</c:choose>
       <td>
       <a href="ViewStudySubject?id=<c:out value="${studySubject.id}"/>&subjectId=<c:out value="${studySubject.subjectId}"/>&studyId=<c:out value="${studySubject.studyId}"/>"><fmt:message key="view" bundle="${resword}"/></a>
       <c:choose>

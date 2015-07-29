@@ -11,13 +11,17 @@
 <c:set var="userRoleId" value="${param.userRoleId}" />
 
 <c:choose>
-  <c:when test="${currRow.bean.status.name eq 'available'}">
+  <c:when test="${currRow.bean.status.available}">
     <c:set var="className" value="aka_green_highlight"/>
   </c:when>
-  <c:when test="${currRow.bean.status.name eq 'removed'}">
+  <c:when test="${currRow.bean.status.deleted || currRow.bean.status.locked}">
     <c:set var="className" value="aka_red_highlight"/>
   </c:when>
+  <c:otherwise>
+		<c:set var="className" value=""/>
+	</c:otherwise>
 </c:choose>
+
 <tr valign="top">   
       <td class="table_cell_left"><c:out value="${currRow.bean.name}"/></td>
       <td class="table_cell"><c:out value="${currRow.bean.identifier}"/></td>

@@ -9,12 +9,15 @@
 
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.DisplayStudyRow" />
 <c:choose>
-  <c:when test="${currRow.bean.parent.status.name eq 'available'}">
+  <c:when test="${currRow.bean.parent.status.available}">
     <c:set var="className" value="aka_green_highlight"/>
   </c:when>
-  <c:when test="${currRow.bean.parent.status.name eq 'removed'}">
+  <c:when test="${currRow.bean.parent.status.deleted || currRow.bean.parent.status.locked}">
     <c:set var="className" value="aka_red_highlight"/>
   </c:when>
+  <c:otherwise>
+		<c:set var="className" value=""/>
+	</c:otherwise>
 </c:choose>
 <tr valign="top" bgcolor="#F5F5F5">
       <td class="table_cell_left"><b><c:out value="${currRow.bean.parent.name}"/></b></td>
@@ -71,14 +74,17 @@
    </tr>
    <c:forEach var="child" items="${currRow.bean.children}">
      <%-- color-coded statuses...--%>
-  <c:choose>
-    <c:when test="${child.status.name eq 'available'}">
-      <c:set var="className" value="aka_green_highlight"/>
-    </c:when>
-    <c:when test="${child.status.name eq 'removed'}">
-      <c:set var="className" value="aka_red_highlight"/>
-    </c:when>
-  </c:choose>
+   <c:choose>
+	  <c:when test="${child.status.available}">
+	    <c:set var="className" value="aka_green_highlight"/>
+	  </c:when>
+	  <c:when test="${child.status.deleted || child.status.locked}">
+	    <c:set var="className" value="aka_red_highlight"/>
+	  </c:when>
+	  <c:otherwise>
+			<c:set var="className" value=""/>
+		</c:otherwise>
+	</c:choose>
     <tr>
       <td class="table_cell_left"><div class="homebox_bullets"><c:out value="${child.name}"/></div></td>
       <td class="table_cell"><c:out value="${child.identifier}"/></td>

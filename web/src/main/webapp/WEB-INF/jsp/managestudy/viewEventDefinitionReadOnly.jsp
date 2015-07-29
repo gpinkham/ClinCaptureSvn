@@ -156,7 +156,17 @@
     <c:out value="${crf.hideCrf}"/>
    </td>      
   <td class="table_cell"><fmt:message key="${crf.sourceDataVerification.description}" bundle="${resterm}"/></td> 
-   <td class="table_cell"><c:out value="${crf.status.name}"/></td> 
+  <c:choose>
+		<c:when test="${crf.status.available}">
+			<td class="table_cell aka_green_highlight"><c:out value="${crf.status.name}"/></td>	
+		</c:when>
+		<c:when test="${crf.status.deleted || crf.status.locked}">
+			<td class="table_cell aka_red_highlight"><c:out value="${crf.status.name}"/></td>	
+		</c:when>
+		<c:otherwise>
+			<td class="table_cell"><c:out value="${crf.status.name}"/></td>	
+		</c:otherwise>
+	</c:choose>
    <td class="table_cell">
      <table border="0" cellpadding="0" cellspacing="0">
 	  <tr class="innerTable">

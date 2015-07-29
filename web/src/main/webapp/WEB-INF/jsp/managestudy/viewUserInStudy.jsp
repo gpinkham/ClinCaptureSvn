@@ -69,7 +69,18 @@
   </c:otherwise>
   </c:choose>
   </td></tr>   
-  <tr><td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${user.status.name}"/></td></tr>
+  <tr><td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td>
+  <c:choose>
+		<c:when test="${user.status.available}">
+			<td class="table_cell aka_green_highlight"><c:out value="${user.status.name}"/></td>	
+		</c:when>
+		<c:when test="${user.status.deleted || user.status.locked}">
+			<td class="table_cell aka_red_highlight"><c:out value="${user.status.name}"/></td>	
+		</c:when>
+		<c:otherwise>
+			<td class="table_cell"><c:out value="${user.status.name}"/></td>	
+		</c:otherwise>
+	</c:choose></tr>
   <tr><td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${user.createdDate}" type="date" pattern="${dteFormat}"/></td></tr>
   <tr><td class="table_header_column"><fmt:message key="created_by" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${user.owner.name}"/></td></tr>
   <tr><td class="table_header_column"><fmt:message key="date_updated" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${user.updatedDate}" type="date" pattern="${dteFormat}"/>&nbsp;</td></tr>

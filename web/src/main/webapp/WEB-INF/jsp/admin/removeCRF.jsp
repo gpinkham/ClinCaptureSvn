@@ -92,7 +92,17 @@
 			<td><c:out value="${crfToRemove.name}"/></td>
 			<td><c:out value="${version.name}"/></td>
 			<td><c:out value="${version.description}"/></td>
-			<td><c:out value="${version.status.name}"/></td>
+			<c:choose>
+				<c:when test="${version.status.available}">
+					<td class="aka_green_highlight"><c:out value="${version.status.name}"/></td>	
+				</c:when>
+				<c:when test="${version.status.deleted || version.status.locked}">
+					<td class="aka_red_highlight"><c:out value="${version.status.name}"/></td>	
+				</c:when>
+				<c:otherwise>
+					<td><c:out value="${version.status.name}"/></td>	
+				</c:otherwise>
+			</c:choose>
 			<td><c:out value="${version.revisionNotes}"/></td>
 		</tr>
 		</c:forEach>
@@ -123,7 +133,17 @@
 			<td>
 				<cc-fmt:formatDate value="${eventCRF.dateInterviewed}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
 			</td>
-			<td><c:out value="${eventCRF.status.name}"/></td>
+			<c:choose>
+				<c:when test="${eventCRF.status.available}">
+					<td class="aka_green_highlight"><c:out value="${eventCRF.status.name}"/></td>	
+				</c:when>
+				<c:when test="${eventCRF.status.deleted || eventCRF.status.locked}">
+					<td class="aka_red_highlight"><c:out value="${eventCRF.status.name}"/></td>	
+				</c:when>
+				<c:otherwise>
+					<td><c:out value="${eventCRF.status.name}"/></td>	
+				</c:otherwise>
+			</c:choose>
 		</tr>
 		</c:forEach>
 	</table>

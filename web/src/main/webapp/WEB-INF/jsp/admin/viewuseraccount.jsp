@@ -90,7 +90,17 @@
 	</tr>
 	<tr>
 		<td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td>
-		<td class="table_cell"><c:out value="${user.status.name}" />&nbsp;</td>
+		<c:choose>
+			<c:when test="${user.status.available}">
+				<td class="table_cell aka_green_highlight"><c:out value="${user.status.name}"/>&nbsp;</td>	
+			</c:when>
+			<c:when test="${user.status.deleted || user.status.locked}">
+				<td class="table_cell aka_red_highlight"><c:out value="${user.status.name}"/>&nbsp;</td>	
+			</c:when>
+			<c:otherwise>
+				<td class="table_cell"><c:out value="${user.status.name}"/>&nbsp;</td>	
+			</c:otherwise>
+		</c:choose>
 	</tr>
 	<tr>
     <td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td>

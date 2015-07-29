@@ -32,7 +32,17 @@
     </td>
 	<td class="table_cell"><c:out value="${currRow.bean.firstName}" /></td>
 	<td class="table_cell"><c:out value="${currRow.bean.lastName}" /></td>
-	<td class="table_cell"><c:out value="${currRow.bean.status.name}" /></td>
+	<c:choose>
+		<c:when test="${currRow.bean.status.available}">
+			<td class="table_cell aka_green_highlight"><c:out value="${currRow.bean.status.name}"/></td>	
+		</c:when>
+		<c:when test="${currRow.bean.status.deleted || currRow.bean.status.locked}">
+			<td class="table_cell aka_red_highlight"><c:out value="${currRow.bean.status.name}"/></td>	
+		</c:when>
+		<c:otherwise>
+			<td class="table_cell"><c:out value="${currRow.bean.status.name}"/></td>	
+		</c:otherwise>
+	</c:choose>
 	
 	<%-- ACTIONS --%>
 	<td class="table_cell">

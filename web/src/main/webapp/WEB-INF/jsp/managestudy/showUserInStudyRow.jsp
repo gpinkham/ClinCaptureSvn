@@ -15,7 +15,17 @@
           <fmt:message key="${roleMap[currRow.bean.role.id] }" bundle="${resterm}"></fmt:message>
       </td>
       <td class="table_cell"><c:out value="${currRow.bean.studyName}"/></td>
-      <td class="table_cell"><c:out value="${currRow.bean.status.name}"/></td>
+      <c:choose>
+			<c:when test="${currRow.bean.status.available}">
+				<td class="table_cell aka_green_highlight"><c:out value="${currRow.bean.status.name}"/></td>	
+			</c:when>
+			<c:when test="${currRow.bean.status.deleted || currRow.bean.status.locked}">
+				<td class="table_cell aka_red_highlight"><c:out value="${currRow.bean.status.name}"/></td>	
+			</c:when>
+			<c:otherwise>
+				<td class="table_cell"><c:out value="${currRow.bean.status.name}"/></td>	
+			</c:otherwise>
+		</c:choose>
       <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
 		<tr class="innerTable">

@@ -1404,8 +1404,17 @@
 			<c:out value="${site.oid}"/></td>
 		<td class="table_cell">
 			<c:out value="${site.principalInvestigator}"/></td>
-		<td class="table_cell">
-			<c:out value="${site.status.name}"/></td>
+		<c:choose>
+			<c:when test="${site.status.available}">
+				<td class="table_cell aka_green_highlight"><c:out value="${site.status.name}"/></td>	
+			</c:when>
+			<c:when test="${site.status.deleted || site.status.locked}">
+				<td class="table_cell aka_red_highlight"><c:out value="${site.status.name}"/></td>	
+			</c:when>
+			<c:otherwise>
+				<td class="table_cell"><c:out value="${site.status.name}"/></td>	
+			</c:otherwise>
+		</c:choose>
 		<td class="table_cell">
 			<c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
 				<a href="ViewSite?id=<c:out value="${site.id}"/>"

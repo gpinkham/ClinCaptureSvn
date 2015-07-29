@@ -116,7 +116,17 @@
                         <td class="table_cell_left"><c:out value="${version.name}"/></td>
                         <td class="table_cell"><c:out value="${version.oid}"/></td>
                         <td class="table_cell"><c:out value="${version.description}"/></td>
-                        <td class="table_cell"><c:out value="${version.status.name}"/></td>
+                        <c:choose>
+							<c:when test="${version.status.available}">
+								<td class="table_cell aka_green_highlight"><c:out value="${version.status.name}"/></td>	
+							</c:when>
+							<c:when test="${version.status.deleted || version.status.locked}">
+								<td class="table_cell aka_red_highlight"><c:out value="${version.status.name}"/></td>	
+							</c:when>
+							<c:otherwise>
+								<td class="table_cell"><c:out value="${version.status.name}"/></td>	
+							</c:otherwise>
+						</c:choose>
                         <td class="table_cell"><c:out value="${version.revisionNotes}"/></td>
                         <td class="table_cell">
                             <table border="0" cellpadding="0" cellspacing="0">

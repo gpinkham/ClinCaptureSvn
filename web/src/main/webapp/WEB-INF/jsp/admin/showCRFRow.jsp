@@ -17,9 +17,13 @@
   <c:when test="${currRow.bean.status.available}">
     <c:set var="className" value="aka_green_highlight"/>
   </c:when>
-  <c:when test="${currRow.bean.status.deleted}">
+  <c:when test="${currRow.bean.status.deleted || currRow.bean.status.locked}">
     <c:set var="className" value="aka_red_highlight"/>
   </c:when>
+  <c:otherwise>
+		<c:set var="className" value=""/>	
+  </c:otherwise>
+  
 </c:choose>
 <tr valign="top" bgcolor="#F5F5F5">
   <td rowspan="<c:out value="${count}"/>" class="table_cell_left"><c:out value="${currRow.bean.name}"/></td>
@@ -108,9 +112,12 @@
     <c:when test="${version.status.available}">
       <c:set var="className" value="aka_green_highlight"/>
     </c:when>
-    <c:when test="${version.status.deleted}">
+    <c:when test="${version.status.deleted || version.status.locked}">
       <c:set var="className" value="aka_red_highlight"/>
     </c:when>
+    <c:otherwise>
+		<c:set var="className" value=""/>	
+  </c:otherwise>
   </c:choose>
   <tr valign="top">
     <td class="table_cell"><c:out value="${version.name}"/></td>

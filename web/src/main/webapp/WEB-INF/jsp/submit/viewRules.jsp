@@ -93,14 +93,6 @@ function confirmRemove(){
 
 </div></td></tr></table>
 <br>
-<c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
-<span class="table_title_Admin">
-</c:when>
-<c:otherwise>
-<span class="table_title_Manage">
-</c:otherwise>
-</c:choose>
 <div>
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
@@ -134,7 +126,7 @@ function confirmRemove(){
     <td rowspan="${count +1}" class="table_cell_left"><c:out value="${ruleSetRule.ruleBean.name}"/></td>
     <td rowspan="${count +1}" class="table_cell"><c:out value="${ruleSetRule.ruleBean.oid}"/></td>
     <td rowspan="${count +1}" class="table_cell rule-table-expression-td"><c:out value="${ruleSetRule.ruleBean.expression.value}"/></td>
-    <td rowspan="${count +1}" class="table_cell <c:out value='${className}'/>">${ruleSetRule.status.description}</td>
+    <td rowspan="${count +1}" class="table_cell <c:out value='${className}'/>" style="font-weight: normal;">${ruleSetRule.status.description}</td>
     <td class="table_cell"></td>
     <td class="table_cell">&nbsp;</td>
     <td class="table_cell">
