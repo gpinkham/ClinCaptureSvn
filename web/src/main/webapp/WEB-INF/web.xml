@@ -1168,11 +1168,6 @@
         <display-name>PrintAllEventCRFServlet</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>ViewStudySubjectjsp</servlet-name>
-        <display-name>viewStudySubjectjsp</display-name>
-        <jsp-file>/WEB-INF/jsp/manageStudy/viewStudySubject.jsp</jsp-file>
-    </servlet>
 
     <servlet-mapping>
         <servlet-name>lockCRFVersionServlet</servlet-name>
@@ -1932,10 +1927,6 @@
     <servlet-mapping>
         <servlet-name>uploadFileServlet</servlet-name>
         <url-pattern>/UploadFile</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ViewStudySubjectjsp</servlet-name>
-        <url-pattern>/ViewStudySubject1</url-pattern>
     </servlet-mapping>
     <!-- just for testing purposes -->
     <servlet-mapping>
