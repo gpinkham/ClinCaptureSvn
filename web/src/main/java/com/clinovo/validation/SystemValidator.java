@@ -31,11 +31,16 @@ import org.springframework.validation.Validator;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * System page validator class.
+ *
+ */
 @Component
 @SuppressWarnings("unused")
 public class SystemValidator {
 
 	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SystemValidator.class);
+	public static final int LOGO_MAX_SIZE = 20000;
 
 	@Autowired
 	@Qualifier("validator")
@@ -51,11 +56,13 @@ public class SystemValidator {
 	 *            command
 	 * @param errors
 	 *            errors
+	 * @param locale
+	 *            Locale to be used
 	 */
 	public void validate(SystemCommand command, Errors errors, Locale locale) {
 		validator.validate(command, errors);
 		if (!errors.hasErrors() && command.getLogoFile() != null && command.getLogoFile().getSize() != 0) {
-			if (command.getLogoFile().getSize() > 20000) {
+			if (command.getLogoFile().getSize() > LOGO_MAX_SIZE) {
 				errors.rejectValue("logoFile", "error.systemProperty.logoFile.maxFileSizeExceeded");
 			} else if (!command.getLogoFile().getOriginalFilename().toLowerCase().endsWith(".jpg")
 					&& !command.getLogoFile().getOriginalFilename().toLowerCase().endsWith(".jpeg")) {
@@ -127,10 +134,12 @@ public class SystemValidator {
 				for (com.clinovo.model.System property : properties) {
 
 					if (property.getName().equals("defaultBioontologyURL")) {
+						property.setValue(property.getValue().trim());
 						defaultBioontologyURL = property.getValue();
 						pathForBioontologyURL = path + ".systemProperties['" + properties.indexOf(property)
 								+ "'].value";
 					} else if (property.getName().equals("medicalCodingApiKey")) {
+						property.setValue(property.getValue().trim());
 						medicalCodingApiKey = property.getValue();
 						pathForCodingApiKey = path + ".systemProperties['" + properties.indexOf(property) + "'].value";
 					}
@@ -146,8 +155,7 @@ public class SystemValidator {
 	private boolean performValidation(Errors errors, String defaultBioontologyURL, String medicalCodingApiKey,
 			String pathForBioontologyURL, String pathForCodingApiKey) {
 		boolean valid = true;
-		if (!defaultBioontologyURL.trim().isEmpty()) {
-
+		if (!defaultBioontologyURL.isEmpty()) {
 			if (!StringValidator.isValidURL(defaultBioontologyURL)) {
 				errors.rejectValue(pathForBioontologyURL, "please_provide_a_valid_url");
 				valid = false;
