@@ -1132,34 +1132,6 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method that finds EventDefinitionCRFBean by eventCrfId and studyId.
-	 * 
-	 * @param eventCrfId
-	 *            int
-	 * @param studyId
-	 *            int
-	 * @return EventDefinitionCRFBean
-	 */
-	public EventDefinitionCRFBean findByEventCrfIdAndStudyId(int eventCrfId, int studyId) {
-		EventDefinitionCRFBean eb = new EventDefinitionCRFBean();
-		this.setTypesExpected();
-
-		HashMap variables = new HashMap();
-		variables.put(1, eventCrfId);
-		variables.put(2, studyId);
-
-		String sql = digester.getQuery("findByEventCrfIdAndStudyId");
-		List<HashMap> aList = this.select(sql, variables);
-		Iterator<HashMap> it = aList.iterator();
-
-		if (it.hasNext()) {
-			eb = (EventDefinitionCRFBean) this.getEntityFromHashMap(it.next());
-		}
-
-		return eb;
-	}
-
-	/**
 	 * Method updates the source data verification code for event definition crfs.
 	 *
 	 * @param crfVersionId

@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 
 import java.util.ArrayList;
@@ -86,6 +87,14 @@ public interface CRFMaskingService {
 	 */
 	void updateMasksOnUserRoleUpdate(Role oldRole, Role newRole, StudyBean study, int userId);
 
+	/**
+	 * Test is event CRF is masked for this user.
+	 * @param eventCRFId int EventCRFBean Id
+	 * @param userId int UserAccountBean Id
+	 * @param studyId StudyBean ID
+	 * @return boolean
+	 */
+	boolean isEventCRFMasked(int eventCRFId, int userId, int studyId);
 	/**
 	 * This method will remove all masked dedc Beans from the list.
 	 *

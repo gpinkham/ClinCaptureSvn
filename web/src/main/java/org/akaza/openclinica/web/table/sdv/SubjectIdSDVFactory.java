@@ -186,12 +186,11 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
 		UserAccountBean ub = (UserAccountBean) tableFacade.getWebContext().getSessionAttribute("userBean");
+		int totalRows = getTotalRowCount(currentStudy, studySubjectSDVFilter, ub.getId());
 
 		if (!limit.isComplete()) {
-			int totalRows = getTotalRowCount(currentStudy, studySubjectSDVFilter);
 			tableFacade.setTotalRows(totalRows);
 		} else {
-			int totalRows = getTotalRowCount(currentStudy, studySubjectSDVFilter);
 			int pageNum = limit.getRowSelect().getPage();
 			int maxRows = limit.getRowSelect().getMaxRows();
 			tableFacade.setMaxRows(maxRows);
@@ -244,11 +243,12 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 	 *            StudyBean
 	 * @param studySubjectSDVFilter
 	 *            StudySubjectSDVFilter
+	 * @param userId int
 	 * @return int
 	 */
-	public int getTotalRowCount(StudyBean currentStudy, StudySubjectSDVFilter studySubjectSDVFilter) {
+	public int getTotalRowCount(StudyBean currentStudy, StudySubjectSDVFilter studySubjectSDVFilter, int userId) {
 		StudySubjectDAO studySubDAO = new StudySubjectDAO(dataSource);
-		return studySubDAO.countAllByStudySDV(currentStudy, studySubjectSDVFilter);
+		return studySubDAO.countAllByStudySDV(currentStudy, studySubjectSDVFilter, userId);
 	}
 
 	@Override
@@ -264,7 +264,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 			sortSet.addSort("studySubject.createdDate", "desc");
 		}
 		List<StudySubjectBean> studySubjectBeans = studySubjectDAO.findAllByStudySDV(currentStudy, filterSet, sortSet,
-				rowStart, rowEnd);
+				rowStart, rowEnd, ub.getId());
 
 		for (StudySubjectBean studSubjBean : studySubjectBeans) {
 			rows.add(getRow(studSubjBean, currentStudy, ub));

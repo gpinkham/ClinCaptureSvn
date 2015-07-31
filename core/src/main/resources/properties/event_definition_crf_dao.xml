@@ -293,14 +293,6 @@
          order by ordinal asc
         </sql>
     </query>
-    <query>
-        <name>findByEventCrfIdAndStudyId</name>
-        <sql>
-            select edc.* from event_definition_crf edc, event_crf ec, study_event se, study_event_definition sed, study_subject ss, study s, crf_version cv, crf c where c.crf_id = cv.crf_id and cv.crf_version_id = ec.crf_version_id and ec.study_event_id = se.study_event_id and se.study_subject_id = ss.study_subject_id and s.study_id = ss.study_id
-            and ec.event_crfId = ? and ec.not_started = false and c.status_id = 1 and cv.status_id = 1 and edc.status_id = 1 and sed.status_id = 1 and sed.study_event_definition_id = se.study_event_definition_id and se.study_event_definition_id = edc.study_event_definition_id and edc.crf_id = cv.crf_id and edc.evaluated_crf = true and edc.hide_crf = false and ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id)))
-            and (s.study_id = ? or s.parent_study_id = ?)
-        </sql>
-    </query>
 	<query>
 		<name>updateEDCThatHasItemsToSDV</name>
 		<sql>

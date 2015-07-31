@@ -138,6 +138,23 @@ public class EventCRFSDVFilter implements CriteriaCommand {
 		return builder.toString();
 	}
 
+	/**
+	 * Add filter for masked CRFs if EDC table is in query.
+	 * @param userId int
+	 * @return filter
+	 */
+	public static String getMaskedCRFsFilterWithEDC(int userId) {
+		StringBuilder builder = new StringBuilder("");
+		if (userId != 0) {
+			builder = builder.append("and ((SELECT COUNT (*) ")
+					.append("FROM crfs_masking ")
+					.append("WHERE event_definition_crf_id = edc.event_definition_crf_id ")
+					.append("AND study_id = edc.study_id ")
+					.append("AND user_id = ").append(userId).append(") = 0)");
+		}
+		return builder.toString();
+	}
+
 	private static class Filter {
 		private final String property;
 		private final Object value;

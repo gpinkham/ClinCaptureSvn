@@ -362,10 +362,11 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	 *            rowStart
 	 * @param rowEnd
 	 *            rowEnd
+	 * @param userId int
 	 * @return boolean
 	 */
 	public ArrayList findAllByStudySDV(StudyBean currentStudy, StudySubjectSDVFilter filter, StudySubjectSDVSort sort,
-			int rowStart, int rowEnd) {
+			int rowStart, int rowEnd, int userId) {
 		this.setTypesExpected();
 
 		int studyId = currentStudy.getId();
@@ -382,7 +383,16 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		String sql = "SELECT distinct mss.*, s.unique_identifier FROM study_subject mss"
 				+ " INNER JOIN study_event ON study_event.study_subject_id = mss.study_subject_id "
 				+ " INNER JOIN event_crf ON event_crf.study_event_id = study_event.study_event_id "
-				+ " LEFT JOIN study s on s.study_id = mss.study_id WHERE event_crf.status_id = 2 AND mss.study_subject_id IN ("
+				+ " INNER JOIN crf_version cv ON event_crf.crf_version_id = cv.crf_version_id "
+				+ " LEFT JOIN event_definition_crf edc  ON study_event.study_event_definition_id = edc.study_event_definition_id "
+				+ " AND cv.crf_id = edc.crf_id "
+				+ " AND mss.study_id = edc.study_id "
+				+ " LEFT JOIN study s on s.study_id = mss.study_id "
+				+ " WHERE event_crf.status_id = 2 "
+				+ " AND (SELECT COUNT (*) FROM crfs_masking "
+					+ "WHERE edc.event_definition_crf_id = crfs_masking.event_definition_crf_id AND user_id = " + userId
+					+ " AND mss.study_id = crfs_masking.study_id) = 0 "
+				+ " AND mss.study_subject_id IN ("
 		.concat(digester.getQuery("findAllByStudySDV"));
 		
 		if (withoutDns) {
@@ -455,9 +465,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	 *            StudyBean
 	 * @param filter
 	 *            StudySubjectSDVFilter
+	 * @param userId int
 	 * @return int
 	 */
-	public int countAllByStudySDV(StudyBean currentStudy, StudySubjectSDVFilter filter) {
+	public int countAllByStudySDV(StudyBean currentStudy, StudySubjectSDVFilter filter, int userId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 
@@ -475,7 +486,16 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		String sql = "SELECT count(distinct mss.study_subject_id) FROM study_subject mss"
 				+ " INNER JOIN study_event ON study_event.study_subject_id = mss.study_subject_id "
 				+ " INNER JOIN event_crf ON event_crf.study_event_id = study_event.study_event_id "
-				+ " LEFT JOIN study s on s.study_id = mss.study_id WHERE event_crf.status_id = 2 AND mss.study_subject_id IN ("
+				+ " INNER JOIN crf_version cv ON event_crf.crf_version_id = cv.crf_version_id "
+				+ " LEFT JOIN event_definition_crf edc  ON study_event.study_event_definition_id = edc.study_event_definition_id "
+					+ " AND cv.crf_id = edc.crf_id "
+					+ " AND mss.study_id = edc.study_id "
+				+ " LEFT JOIN study s on s.study_id = mss.study_id "
+				+ " WHERE event_crf.status_id = 2 "
+				+ " AND (SELECT COUNT (*) FROM crfs_masking "
+					+ " WHERE edc.event_definition_crf_id = crfs_masking.event_definition_crf_id "
+					+ " AND user_id = " + userId + " AND mss.study_id = crfs_masking.study_id) = 0 "
+				+ " AND mss.study_subject_id IN ("
 		.concat(digester.getQuery("findAllByStudySDV"));
 		if (withoutDns) {
 			sql = sql.concat(" ").concat(digester.getQuery("withoutDns"));

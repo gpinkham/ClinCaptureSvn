@@ -1873,7 +1873,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(ind++, 1);
 		variables.put(ind, 2);
 		String sql = digester.getQuery("findAllIdsWithSDVCodesBySSubjectId");
-		sql += EventCRFSDVFilter.getMaskedCRFsFilter(userId);
+		sql += EventCRFSDVFilter.getMaskedCRFsFilterWithEDC(userId);
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
 		for (Object anAlist : alist) {

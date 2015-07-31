@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.domain.datamap.EventCrf;
@@ -86,6 +87,15 @@ public class CRFMaskingServiceImpl implements CRFMaskingService {
 	 */
 	public boolean isEventDefinitionCRFMasked(int crfId, int userId, int studyId) {
 		return findActiveByUserIdSiteIdAndCRFId(userId, studyId, crfId) != null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isEventCRFMasked(int eventCrfId, int userId, int studyId) {
+		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
+		EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO.findForSiteByEventCrfId(eventCrfId);
+		return isEventDefinitionCRFMasked(eventDefinitionCRF.getId(), userId, studyId);
 	}
 
 	/**

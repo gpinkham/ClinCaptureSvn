@@ -14,6 +14,7 @@
 package org.akaza.openclinica.web.table.sdv;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.CRFMaskingService;
 import com.clinovo.service.ItemSDVService;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.DateUtil;
@@ -109,6 +110,9 @@ public class SDVUtil {
 
 	private ResourceBundle resformat;
 	private String pathPrefix;
+
+	@Autowired
+	private CRFMaskingService maskingService;
 
 	private class ColumnsInfo {
 		private String[] allTitles;
@@ -1076,7 +1080,7 @@ public class SDVUtil {
 			for (EventCRFBean eventCRFBean : eventCrfs) {
 				if (ignoredStudyEvents.contains(eventCRFBean.getStudyEventId())
 						|| (!isSdvWithOpenQueriesAllowed && exceptedEventCrfIdForSubjectList.contains(eventCRFBean
-								.getId()))) {
+								.getId())) || maskingService.isEventCRFMasked(eventCRFBean.getId(), userAccountBean.getId(), userAccountBean.getActiveStudyId())) {
 					continue;
 				}
 				try {

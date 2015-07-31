@@ -92,9 +92,10 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 		currentStudy.setId(1);
 		final int rowEnd = 15;
 		final int rowStart = 0;
+		final int userId = 1;
 		StudySubjectSDVSort sort = new StudySubjectSDVSort();
 		StudySubjectSDVFilter filter = new StudySubjectSDVFilter();
-		ArrayList result = studySubjectDAO.findAllByStudySDV(currentStudy, filter, sort, rowStart, rowEnd);
+		ArrayList result = studySubjectDAO.findAllByStudySDV(currentStudy, filter, sort, rowStart, rowEnd, userId);
 		assertEquals(result.size(), 0);
 	}
 
@@ -109,7 +110,7 @@ public class StudySubjectDaoTest extends DefaultAppContextTest {
 		StudyBean currentStudy = new StudyBean();
 		currentStudy.setId(1);
 		StudySubjectSDVFilter filter = new StudySubjectSDVFilter();
-		int result = studySubjectDAO.countAllByStudySDV(currentStudy, filter);
+		int result = studySubjectDAO.countAllByStudySDV(currentStudy, filter, 1);
 		assertEquals(result, 0);
 	}
 

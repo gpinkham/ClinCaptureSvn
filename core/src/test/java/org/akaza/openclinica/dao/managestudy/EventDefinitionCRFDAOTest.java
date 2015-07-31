@@ -24,11 +24,6 @@ import org.junit.Test;
 public class EventDefinitionCRFDAOTest extends DefaultAppContextTest {
 
 	@Test
-	public void testThatFindByEventCrfIdAndStudyIdDoesNotReturnNull() {
-		assertNotNull(eventDefinitionCRFDAO.findByEventCrfIdAndStudyId(1, 1));
-	}
-
-	@Test
 	public void testThatUpdateEDCThatHasItemsToSDVReturnsCorrectValue() {
 		assertTrue(eventDefinitionCRFDAO.updateEDCThatHasItemsToSDV(1, SourceDataVerification.AllREQUIRED));
 	}
