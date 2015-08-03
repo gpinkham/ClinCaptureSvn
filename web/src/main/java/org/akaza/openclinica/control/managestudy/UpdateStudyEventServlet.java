@@ -326,8 +326,9 @@ public class UpdateStudyEventServlet extends Controller {
 			}
 			HashMap errors = v.validate();
 
-			if (!strStart.equals("") && !errors.containsKey(INPUT_STARTDATE_PREFIX)) {
-				start = fp.getDateTimeInput(INPUT_STARTDATE_PREFIX);
+			if (!errors.containsKey(INPUT_STARTDATE_PREFIX)) {
+				start = fp.getString(INPUT_STARTDATE_PREFIX + "Date").isEmpty()
+						? studyEvent.getDateStarted() : fp.getDateTimeInput(INPUT_STARTDATE_PREFIX);
 			}
 
 			if (!strEnd.equals("") && !errors.containsKey(INPUT_STARTDATE_PREFIX)

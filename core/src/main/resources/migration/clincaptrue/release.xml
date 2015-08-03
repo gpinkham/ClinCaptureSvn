@@ -173,4 +173,5 @@
 	<include file="migration/clincaptrue/2015-06-12-TICKET2328.xml" />
     <include file="migration/clincaptrue/2015-06-23-TICKET2421.xml" />
 	<include file="migration/clincaptrue/2015-07-13-TICKET2453.xml" />
+    <include file="migration/clincaptrue/2015-07-31-TICKET2515.xml" />
 </databaseChangeLog>

@@ -471,8 +471,8 @@ public class CreateNewStudyEventServlet extends Controller {
 
 			Date start = null;
 			Date end = null;
-			if (!strStart.equals("") && !errors.containsKey(INPUT_STARTDATE_PREFIX)) {
-				start = getInputStartDate(fp);
+			if (!errors.containsKey(INPUT_STARTDATE_PREFIX)) {
+				start = fp.getString(INPUT_STARTDATE_PREFIX + "Date").isEmpty() ? new Date() : getInputStartDate(fp);
 			}
 
 			if (!"".equals(strEnd) && !errors.containsKey(INPUT_STARTDATE_PREFIX)
@@ -496,9 +496,9 @@ public class CreateNewStudyEventServlet extends Controller {
 
 			Date[] startScheduled = new Date[ADDITIONAL_SCHEDULED_NUM];
 			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
-				String strAddStartDate = fp.getDateTimeInputString(INPUT_STARTDATE_PREFIX_SCHEDULED[i]);
-				if (!strAddStartDate.equals("") && !errors.containsKey(INPUT_STARTDATE_PREFIX_SCHEDULED[i])) {
-					startScheduled[i] = getInputStartDateScheduled(fp, i);
+				if (!errors.containsKey(INPUT_STARTDATE_PREFIX_SCHEDULED[i])) {
+					startScheduled[i] = fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date").isEmpty()
+							? new Date() : getInputStartDateScheduled(fp, i);
 				}
 			}
 			Date[] endScheduled = new Date[ADDITIONAL_SCHEDULED_NUM];
@@ -615,10 +615,7 @@ public class CreateNewStudyEventServlet extends Controller {
 					studyEvent.setStartTimeFlag(true);
 				}
 				studyEvent.setDateStarted(start);
-				Date[] startScheduled2 = new Date[ADDITIONAL_SCHEDULED_NUM];
-				for (int i = 0; i < startScheduled2.length; ++i) {
-					startScheduled2[i] = getInputStartDateScheduled(fp, i);
-				}
+
 				if (!"".equals(strEnd)) {
 					if ("-1".equals(getInputEndHour(fp)) && "-1".equals(getInputEndMinute(fp))
 							&& "".equals(getInputEndHalf(fp))) {
