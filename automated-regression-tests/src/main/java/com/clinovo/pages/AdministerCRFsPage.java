@@ -3,6 +3,7 @@ package com.clinovo.pages;
 import net.thucydides.core.annotations.findby.FindBy;
 import net.thucydides.core.pages.WebElementFacade;
 
+import org.junit.Assert;
 import org.openqa.selenium.WebDriver;
 
 import com.clinovo.pages.beans.CRF;
@@ -21,8 +22,11 @@ public class AdministerCRFsPage extends BasePage {
     @FindBy(xpath = ".//input[@class='button_search']")
     private WebElementFacade iFindButton;
     
-    @FindBy(xpath = ".//*[@id='contentTable']/tbody/tr[2]")
-    private WebElementFacade rowFirst;
+    @FindBy(xpath = ".//*[@id='contentTable']/tbody/tr[2]/td[1]")
+    private WebElementFacade tdWithCRFName;
+    
+    @FindBy(xpath = ".//*[@id='contentTable']/tbody/tr[2]/td[2]")
+    private WebElementFacade tdWithCRFDateUpdated;
     
     public AdministerCRFsPage (WebDriver driver) {
         super(driver);
@@ -43,6 +47,7 @@ public class AdministerCRFsPage extends BasePage {
 	}
 
 	public void checkCRFRowIsPresent(CRF crf) {
-		rowFirst.isCurrentlyVisible();
+		tdWithCRFDateUpdated.isCurrentlyVisible();
+		Assert.assertEquals(crf.getName().trim(), tdWithCRFName.getText().trim());
 	}
 }

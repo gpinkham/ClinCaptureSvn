@@ -132,8 +132,8 @@
                 <sql-maven-plugin.user>clincapture</sql-maven-plugin.user>
                 <sql-maven-plugin.password>clincapture</sql-maven-plugin.password>
 
-                <!-- tomcat6x servlet container properties -->
-                <tomcat.containerId>tomcat6x</tomcat.containerId>
+                <!-- tomcat7x servlet container properties -->
+                <tomcat.containerId>tomcat7x</tomcat.containerId>
                 <tomcat.servletPort>7070</tomcat.servletPort>
                 <tomcat.ajpPort>7009</tomcat.ajpPort>
                 <!-- "CATALINA_HOME" variable must be specified in the system properties-->

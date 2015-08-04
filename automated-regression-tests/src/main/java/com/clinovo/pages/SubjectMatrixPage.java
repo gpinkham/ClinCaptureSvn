@@ -4,6 +4,7 @@ import net.thucydides.core.annotations.findby.By;
 import net.thucydides.core.annotations.findby.FindBy;
 import net.thucydides.core.pages.WebElementFacade;
 
+import org.junit.Assert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -112,7 +113,7 @@ public class SubjectMatrixPage extends BasePage {
 
 	public void eventIsScheduled(StudyEventDefinition event) {
 		WebElementFacade eventIcon = findEventIconOnSM(event.getStudySubjectID(), event.getName());		
-		assert(eventIcon.getAttribute("src").endsWith("icon_Scheduled.gif"));
+		Assert.assertTrue(eventIcon.getAttribute("src").endsWith("icon_Scheduled.gif"));
 	}
 
 	public void clickEnterDataButtonInPopup(String aCRFName) { 
@@ -142,7 +143,7 @@ public class SubjectMatrixPage extends BasePage {
 	public void checkSignEventStatus(Map<String, String> values) {
 		if (values.containsKey("Study Subject ID") && values.containsKey("Event Name")) {
 			WebElementFacade eventIcon = findEventIconOnSM(values.get("Study Subject ID"), values.get("Event Name"));		
-			assert(eventIcon.getAttribute("src").endsWith("icon_Signed.gif"));
+			Assert.assertTrue(eventIcon.getAttribute("src").endsWith("icon_Signed.gif"));
 		}
 	}
 	

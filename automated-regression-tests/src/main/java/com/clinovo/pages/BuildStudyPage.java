@@ -32,6 +32,9 @@ public class BuildStudyPage extends BasePage {
     @FindBy(jquery = "a[href$='DefineStudyEvent?actionName=init']")
     private WebElementFacade bCreateStudyEventDefinition;
 
+    @FindBy(jquery = "a[href$='ListEventDefinition']")
+    private WebElementFacade bViewStudyEventDefinitions;
+    
     @FindBy(name = "studyStatus")
     private WebElementFacade sStudyStatus;
     
@@ -57,6 +60,10 @@ public class BuildStudyPage extends BasePage {
     
     public void clickAddStudyEventDefinition() {
     	bCreateStudyEventDefinition.click();
+    }
+    
+    public void clickViewStudyEventDefinitions() {
+    	bViewStudyEventDefinitions.click();
     }
     
     public void clickUpdateStudy() {

@@ -14,6 +14,8 @@ public class StudyEventDefinition {
 
 	public static final String EVENTS_TO_CHECK_SIGN_STATUS = "events_to_check_sign_status";
 
+	public static final Object NEW_CREATED_EVENTS = "new_created_events";
+
 	private String name = "";
     
     private String description = "";
@@ -118,6 +120,10 @@ public class StudyEventDefinition {
     	
     	if (row.get("Event OID") != null) {
 			event.setEventOID(row.get("Event OID"));
+    	}
+    	
+    	if (row.get("eCRFs") != null) {
+        	event.setCRFList(StudyEventDefinition.generateCRFList(row.get("eCRFs")));    	
     	}
     	
 		return event;

@@ -3,6 +3,7 @@ package com.clinovo.pages;
 import net.thucydides.core.annotations.findby.FindBy;
 import net.thucydides.core.pages.WebElementFacade;
 
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -165,7 +166,7 @@ public class BasePage extends AbstractPage {
 	}
 
 	public void isOnStudyLevel() {
-		assert(!lCurrentSite.isCurrentlyVisible());
+		Assert.assertTrue(!lCurrentSite.isCurrentlyVisible());
 	}
 
 	public void clickAddSubjectLink() {
@@ -177,6 +178,6 @@ public class BasePage extends AbstractPage {
 	}
 
 	public void message_is_shown(String message) {
-		assert(tSideBar.find(By.xpath(".//div[contains(text(),'"+message+"')]")).isVisible());
+		Assert.assertTrue(tSideBar.find(By.xpath(".//div[contains(text(),'"+message+"')]")).isVisible());
 	}
 }

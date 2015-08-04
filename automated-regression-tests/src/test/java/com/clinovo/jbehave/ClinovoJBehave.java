@@ -9,8 +9,13 @@ import com.clinovo.pages.AdministerCRFsPage;
 import com.clinovo.pages.BuildStudyPage;
 import com.clinovo.pages.ChangeStudyPage;
 import com.clinovo.pages.ConfirmChangeStudyPage;
+import com.clinovo.pages.ConfirmEventDefinitionCreationPage;
 import com.clinovo.pages.CreateCRFDataCommitedPage;
 import com.clinovo.pages.CreateCRFVersionPage;
+import com.clinovo.pages.CreateStudyEventDefinitionPage;
+import com.clinovo.pages.DefineStudyEventSelectCRFsPage;
+import com.clinovo.pages.DefineStudyEventSelectedCRFsPage;
+import com.clinovo.pages.ManageEventDefinitionsPage;
 import com.clinovo.pages.NotesAndDiscrepanciesPage;
 import com.clinovo.pages.PreviewCRFPage;
 import com.clinovo.pages.SubjectMatrixPage;
@@ -230,7 +235,7 @@ public class ClinovoJBehave extends BaseJBehave {
     }
     
     @Given("User selects CRFs on Define Study Event page: $eCRFsTable")
-    public void userSelectsCRFsPage(ExamplesTable table) {
+    public void userSelectsCRFsOnDefineStudyEventPage(ExamplesTable table) {
     	boolean replaceNamedParameters = true;
     	Parameters rowParams = table.getRowAsParameters(0, replaceNamedParameters);
     	StudyEventDefinition event = (StudyEventDefinition) Thucydides.getCurrentSession().get(StudyEventDefinition.NEW_CREATED_EVENT);
@@ -648,6 +653,43 @@ public class ClinovoJBehave extends BaseJBehave {
     	}
     	
     	Thucydides.getCurrentSession().put(CRF.CRFS_TO_CHECK_EXIST, crfs);
+    }
+    
+    @Given("User creates study event definitions: $activityTable")
+    @When("User creates study event definitions: $activityTable")
+    public void userCreatesStudyEventDefinitions(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	List<StudyEventDefinition> events = new ArrayList<StudyEventDefinition>();
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		Parameters rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		StudyEventDefinition event = StudyEventDefinition.fillStudyEventDefinitionFromTableRow(rowParams.values());
+    		commonSteps.user_is_on_page(CreateStudyEventDefinitionPage.PAGE_NAME);
+    		commonSteps.fill_in_study_event_definition(event);
+    		userClicksConfirmButton();
+    		commonSteps.user_is_on_page(DefineStudyEventSelectCRFsPage.PAGE_NAME);
+    		commonSteps.select_CRFs_for_study_event_definition(event);
+    		userClicksConfirmButton();
+    		commonSteps.user_is_on_page(DefineStudyEventSelectedCRFsPage.PAGE_NAME);
+    		userClicksConfirmButton();
+    		commonSteps.user_is_on_page(ConfirmEventDefinitionCreationPage.PAGE_NAME);
+    		userClicksSubmitButton();
+    		events.add(event);
+    	}
+    	
+    	Thucydides.getCurrentSession().put(StudyEventDefinition.NEW_CREATED_EVENTS, events);
+    }
+    
+    @SuppressWarnings("unchecked")
+	@Then("Study event definitions are created")
+	public void studyEventDefinitionsAreCreated() {
+    	List<StudyEventDefinition> events = (List<StudyEventDefinition>) Thucydides.getCurrentSession().get(StudyEventDefinition.NEW_CREATED_EVENTS);
+    	commonSteps.go_to_page(ManageEventDefinitionsPage.PAGE_NAME);
+    	for (StudyEventDefinition event: events) {
+    		commonSteps.filter_manage_event_definitions_page(event);
+    		commonSteps.check_event_row_is_present(event);
+    	}
+    	
+    	Thucydides.getCurrentSession().remove(StudyEventDefinition.NEW_CREATED_EVENTS);
     }
     
 	private void userChecksSignEventStatus(Map<String, String> values) {

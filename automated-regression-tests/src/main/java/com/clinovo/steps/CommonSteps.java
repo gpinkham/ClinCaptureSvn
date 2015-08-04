@@ -3,6 +3,7 @@ package com.clinovo.steps;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.openqa.selenium.WebElement;
 
 import com.clinovo.pages.*;
@@ -311,10 +312,26 @@ public class CommonSteps extends ScenarioSteps {
 		case AdministerCRFsPage.PAGE_NAME:
 			go_to_administer_CRFs_page();
 			break;
-
+		case CreateStudyEventDefinitionPage.PAGE_NAME:
+			go_to_create_study_event_definition_page();
+			break;
+		case ManageEventDefinitionsPage.PAGE_NAME:
+			go_to_manage_event_definitions_page();
+			break;
+		
 		default:
 			;
 		}
+	}
+
+	private void go_to_manage_event_definitions_page() {
+		basePage.goToBuildStudyPage();
+		buildStudyPage.clickViewStudyEventDefinitions();
+	}
+
+	private void go_to_create_study_event_definition_page() {
+		basePage.goToBuildStudyPage();
+		click_add_event_definition_button();
 	}
 
 	private void go_to_administer_CRFs_page() {
@@ -413,7 +430,7 @@ public class CommonSteps extends ScenarioSteps {
     
     @Step
 	public void current_study_is(String studyName) {
-		assert(studyName.equals(basePage.getCurrentStudyName()));
+    	Assert.assertEquals(studyName, basePage.getCurrentStudyName());
 	}
     
     @Step
@@ -669,5 +686,13 @@ public class CommonSteps extends ScenarioSteps {
 
 	public void set_CRF_parameters(CRF crf) {
 		previewCRFPage.setCRFParameters(crf);
+	}
+
+	public void filter_manage_event_definitions_page(StudyEventDefinition event) {
+		manageEventDefinitionsPage.filter(event);
+	}
+
+	public void check_event_row_is_present(StudyEventDefinition event) {
+		manageEventDefinitionsPage.checkEventRowIsPresent(event);
 	}
 }

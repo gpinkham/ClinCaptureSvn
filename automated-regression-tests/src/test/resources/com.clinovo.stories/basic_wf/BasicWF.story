@@ -210,7 +210,7 @@ When User uploads CRFs:
 Then CRFs are uploaded
 
 
-Scenario: 12. "Root" creates Study Event Definitions
+Scenario: 12.1 "Root" creates Study Event Definitions
 
 Given User logs in as "Root"
 And User goes to Build Study page
@@ -234,13 +234,23 @@ Then User is on Create Study Event Definition page
 
 Examples:
 {scope=Scenario}
-|<Name>      |<Description>|<Type>     |<Category>|<Repeating>|<eCRFs>                                   |
-|Event A     |             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_file_1        |
-|Event B     |             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_group_1       |
-|Event C     |             |Unscheduled|          |No         |CRF_w_group_1, CRF_w_file_1               |
-|Event D     |             |Unscheduled|          |No         |CRF_w_basic_fields_2, CRF_w_sections_1    |
-|Event E     |             |Unscheduled|          |No         |CRF_w_basic_fields_2, CRF_w_basic_fields_3|
-|Event F     |             |Unscheduled|          |No         |CRF_w_group_1, CRF_w_sections_1           |
+|<Name> |<Description>|<Type>     |<Category>|<Repeating>|<eCRFs>                           |
+|Event A|             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_file_1|
+
+
+Scenario: 12.2 "Root" creates Study Event Definitions
+
+Given User logs in as "Root"
+And User goes to Create Study Event Definition page
+When User creates study event definitions:
+|Name   |Description|Type       |Category|Repeating|Reference Event|Day Schedule|Day Max|Day Min|Day Email|User Name|eCRFs                                     |
+|Event B|           |Unscheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_1, CRF_w_group_1       |
+|Event C|           |Unscheduled|        |No       |               |            |       |       |         |         |CRF_w_group_1, CRF_w_file_1               |
+|Event D|           |Unscheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_2, CRF_w_sections_1    |
+|Event E|           |Unscheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_2, CRF_w_basic_fields_3|
+|Event F|           |Unscheduled|        |No       |               |            |       |       |         |         |CRF_w_group_1, CRF_w_sections_1           |
+
+Then Study event definitions are created
 
 
 Scenario: 13. "CRC" creates subjects
