@@ -4,7 +4,6 @@ import net.thucydides.core.annotations.findby.FindBy;
 import net.thucydides.core.pages.WebElementFacade;
 
 import org.openqa.selenium.WebDriver;
-import org.junit.Assert;
 import com.clinovo.pages.beans.StudyEventDefinition;
 
 public class ManageEventDefinitionsPage extends BasePage {
