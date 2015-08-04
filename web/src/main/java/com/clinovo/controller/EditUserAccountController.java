@@ -1,20 +1,17 @@
 package com.clinovo.controller;
 
-import com.clinovo.controller.base.BaseController;
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.service.EmailService;
-import com.clinovo.service.UserAccountService;
-import com.clinovo.util.DateUtil;
-import com.clinovo.util.EmailUtil;
-import com.clinovo.util.PageMessagesUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Set;
 
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -33,13 +30,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletRequest;
-
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Set;
+import com.clinovo.controller.base.BaseController;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.EmailService;
+import com.clinovo.service.UserAccountService;
+import com.clinovo.util.DateUtil;
+import com.clinovo.util.EmailUtil;
+import com.clinovo.util.PageMessagesUtil;
+import com.clinovo.validator.UserValidator;
 
 /**
  * Edit User Account Controller class.
@@ -49,38 +47,34 @@ import java.util.Set;
 @SuppressWarnings("rawtypes")
 public class EditUserAccountController extends BaseController {
 
+	public static final Logger LOGGER = LoggerFactory.getLogger(CRFEvaluationController.class);
+
 	@Autowired
 	private EmailService mailer;
 
 	@Autowired
 	private UserAccountService userAccountService;
 
-	private Locale locale;
-	private UserAccountDAO userAccountDAO;
-
-	public static final Logger LOGGER = LoggerFactory.getLogger(CRFEvaluationController.class);
 	public static final String INPUT_FIRST_NAME = "firstName";
 	public static final String INPUT_LAST_NAME = "lastName";
 	public static final String INPUT_EMAIL = "email";
 	public static final String INPUT_PHONE = "phone";
-	public static final String INPUT_INSTITUTION = "institutionalAffiliation";
+	public static final String INPUT_COMPANY = "company";
 	public static final String INPUT_RESET_PASSWORD = "resetPassword";
 	public static final String INPUT_USER_TYPE = "userType";
-	public static final String INPUT_DISPLAY_PWD = "displayPwd";
+	public static final String INPUT_DISPLAY_PASSWORD = "displayPassword";
 	public static final String PATH = "EditUserAccount";
 	public static final String ARG_USERID = "userId";
-	public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
+	public static final String INPUT_ALLOW_SOAP = "allowSoap";
 	public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
 	public static final String EMAIL = "contactEmail";
 	public static final String USER_ID = "user_id";
-	public static final int FIFTY = 50;
-	public static final int ONE_H_TWENTY = 120;
-	public static final int TWO_H_FIFTY_FIVE = 55;
 
 	/**
 	 * Get link to the current page.
 	 *
-	 * @param userId int.
+	 * @param userId
+	 *            int.
 	 * @return String
 	 */
 	public static String getLink(int userId) {
@@ -90,8 +84,10 @@ public class EditUserAccountController extends BaseController {
 	/**
 	 * Main method that is launched on page initialization.
 	 *
-	 * @param request HttpServletRequest
-	 * @param model   Model
+	 * @param request
+	 *            HttpServletRequest
+	 * @param model
+	 *            Model
 	 * @return String page
 	 */
 	@RequestMapping(method = RequestMethod.GET)
@@ -101,14 +97,13 @@ public class EditUserAccountController extends BaseController {
 			page = "redirect:/MainMenu?message=system_no_permission";
 		} else {
 			org.akaza.openclinica.control.core.Controller.restorePageMessages(request);
-			locale = LocaleResolver.getLocale(request);
 			FormProcessor fp = new FormProcessor(request);
 			// because we need to use this in the confirmation and error parts too
 			ArrayList studies = getAllStudies();
 			model.addAttribute("studies", studies);
 
 			int userId = fp.getInt(ARG_USERID);
-			userAccountDAO = new UserAccountDAO(dataSource);
+			UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
 			UserAccountBean user = (UserAccountBean) userAccountDAO.findByPK(userId);
 			model.addAttribute("editedUser", user);
 			model.addAttribute("isSiteLevelUser", userAccountService.isSiteLevelUser(user));
@@ -127,8 +122,10 @@ public class EditUserAccountController extends BaseController {
 	/**
 	 * Method that is used to initialize "Summary" page.
 	 *
-	 * @param request HttpServletRequest
-	 * @param model   Model
+	 * @param request
+	 *            HttpServletRequest
+	 * @param model
+	 *            Model
 	 * @return String page
 	 */
 	@RequestMapping(method = RequestMethod.POST, params = "continue")
@@ -139,11 +136,10 @@ public class EditUserAccountController extends BaseController {
 		} else {
 			FormProcessor fp = new FormProcessor(request);
 			int userId = fp.getInt(ARG_USERID);
-			userAccountDAO = new UserAccountDAO(dataSource);
-			UserAccountBean user = (UserAccountBean) userAccountDAO.findByPK(userId);
+			UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+			UserAccountBean user = (UserAccountBean) userAccountDao.findByPK(userId);
 
-			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
-			HashMap errors = validateEditPage(v);
+			HashMap errors = UserValidator.validateUserEdit(getConfigurationDao());
 
 			if (errors.isEmpty()) {
 				loadPresetValuesFromForm(fp);
@@ -151,6 +147,7 @@ public class EditUserAccountController extends BaseController {
 				model.addAttribute("userName", user.getName());
 				page = "admin/edituseraccountconfirm";
 			} else {
+				Locale locale = LocaleResolver.getLocale(request);
 				loadPresetValuesFromForm(fp);
 				setInputMessages(errors, request);
 				model.addAttribute("presetValues", fp.getPresetValues());
@@ -169,9 +166,11 @@ public class EditUserAccountController extends BaseController {
 	/**
 	 * Method that is used to save all changes.
 	 *
-	 * @param request HttpServletRequest
+	 * @param request
+	 *            HttpServletRequest
 	 * @return String name of the page
-	 * @throws NoSuchAlgorithmException in case if algorithm not exists
+	 * @throws NoSuchAlgorithmException
+	 *             in case if algorithm not exists
 	 */
 	@RequestMapping(method = RequestMethod.POST, params = "submit")
 	public String editUserAccountSubmit(HttpServletRequest request) throws NoSuchAlgorithmException {
@@ -184,11 +183,12 @@ public class EditUserAccountController extends BaseController {
 			UserAccountBean ub = getUserAccountBean(request);
 			FormProcessor fp = new FormProcessor(request);
 			int userId = fp.getInt(ARG_USERID);
-			userAccountDAO = new UserAccountDAO(dataSource);
-			UserAccountBean user = (UserAccountBean) userAccountDAO.findByPK(userId);
+			UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+			UserAccountBean user = (UserAccountBean) userAccountDao.findByPK(userId);
 			boolean wasSysAdmin = user.isSysAdmin();
 			updateMainFieldsForEditedUser(user, fp, request);
 			updateCalendarEmailJob(user);
+			Locale locale = LocaleResolver.getLocale(request);
 			PageMessagesUtil.addPageMessage(request,
 					messageSource.getMessage("the_user_account", null, locale) + " \"" + user.getName() + "\" "
 							+ messageSource.getMessage("was_updated_succesfully", null, locale));
@@ -197,8 +197,7 @@ public class EditUserAccountController extends BaseController {
 				if (wasSysAdmin && !user.isSysAdmin()) {
 					page = "redirect:/MainMenu";
 					PageMessagesUtil.addPageMessage(request,
-							messageSource
-									.getMessage("you_may_not_perform_administrative_functions", null, locale));
+							messageSource.getMessage("you_may_not_perform_administrative_functions", null, locale));
 				}
 			}
 		}
@@ -209,8 +208,10 @@ public class EditUserAccountController extends BaseController {
 	/**
 	 * Method that is used to implement back button function.
 	 *
-	 * @param request HttpServletRequest
-	 * @param model   Model
+	 * @param request
+	 *            HttpServletRequest
+	 * @param model
+	 *            Model
 	 * @return String name of the page.
 	 */
 	@RequestMapping(method = RequestMethod.POST, params = "submit_and_restore")
@@ -219,11 +220,10 @@ public class EditUserAccountController extends BaseController {
 		if (!isAdmin(request)) {
 			page = "redirect:/MainMenu?message=system_no_permission";
 		} else {
-			locale = LocaleResolver.getLocale(request);
 			FormProcessor fp = new FormProcessor(request);
 			int userId = fp.getInt(ARG_USERID);
-			userAccountDAO = new UserAccountDAO(dataSource);
-			UserAccountBean user = (UserAccountBean) userAccountDAO.findByPK(userId);
+			UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+			UserAccountBean user = (UserAccountBean) userAccountDao.findByPK(userId);
 			loadPresetValuesFromForm(fp);
 			model.addAttribute("presetValues", fp.getPresetValues());
 			model.addAttribute("userTypes", getUserTypes());
@@ -238,7 +238,7 @@ public class EditUserAccountController extends BaseController {
 		fp.addPresetValue(INPUT_LAST_NAME, user.getLastName());
 		fp.addPresetValue(INPUT_EMAIL, user.getEmail());
 		fp.addPresetValue(INPUT_PHONE, user.getPhone());
-		fp.addPresetValue(INPUT_INSTITUTION, user.getInstitutionalAffiliation());
+		fp.addPresetValue(INPUT_COMPANY, user.getInstitutionalAffiliation());
 		int userTypeId = UserType.USER.getId();
 		if (user.isTechAdmin()) {
 			userTypeId = UserType.TECHADMIN.getId();
@@ -247,8 +247,8 @@ public class EditUserAccountController extends BaseController {
 		}
 		fp.addPresetValue(INPUT_USER_TYPE, userTypeId);
 		fp.addPresetValue(ARG_USERID, user.getId());
-		fp.addPresetValue(INPUT_RUN_WEBSERVICES, user.getRunWebservices() ? 1 : 0);
-		fp.addPresetValue(INPUT_USER_TIME_ZONE_ID, user.getUserTimeZoneId());
+		fp.addPresetValue(INPUT_ALLOW_SOAP, user.getRunWebservices());
+		fp.addPresetValue(INPUT_TIME_ZONE, user.getUserTimeZoneId());
 
 		String sendPwd = SQLInitServlet.getField("user_account_notification");
 		fp.addPresetValue(USER_ACCOUNT_NOTIFICATION, sendPwd);
@@ -257,11 +257,11 @@ public class EditUserAccountController extends BaseController {
 	private void loadPresetValuesFromForm(FormProcessor fp) {
 		fp.clearPresetValues();
 
-		String[] textFields = { ARG_USERID, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
-				INPUT_INSTITUTION, INPUT_DISPLAY_PWD, INPUT_USER_TIME_ZONE_ID };
+		String[] textFields = {ARG_USERID, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL, INPUT_COMPANY,
+				INPUT_DISPLAY_PASSWORD, INPUT_ALLOW_SOAP, INPUT_TIME_ZONE};
 		fp.setCurrentStringValuesAsPreset(textFields);
 
-		String[] ddlbFields = { INPUT_USER_TYPE, INPUT_RESET_PASSWORD, INPUT_RUN_WEBSERVICES };
+		String[] ddlbFields = {INPUT_USER_TYPE, INPUT_RESET_PASSWORD};
 		fp.setCurrentIntValuesAsPreset(ddlbFields);
 	}
 
@@ -279,6 +279,8 @@ public class EditUserAccountController extends BaseController {
 		StudyBean currentStudy = getCurrentStudy(request);
 
 		LOGGER.info("Sending password reset notification to " + user.getName());
+
+		Locale locale = LocaleResolver.getLocale(request);
 
 		String body = EmailUtil.getEmailBodyStart();
 		body += messageSource.getMessage("dear", null, locale) + " " + user.getFirstName() + " " + user.getLastName()
@@ -344,39 +346,17 @@ public class EditUserAccountController extends BaseController {
 		return (UserAccountBean) request.getSession().getAttribute("userBean");
 	}
 
-	/**
-	 * This method checks if any field on Edit page contains incorrect data.
-	 *
-	 * @param v Validator
-	 * @return HashMap of errors
-	 */
-	private HashMap validateEditPage(Validator v) {
-		v.addValidation(INPUT_FIRST_NAME, Validator.NO_BLANKS);
-		v.addValidation(INPUT_LAST_NAME, Validator.NO_BLANKS);
-		v.addValidation(INPUT_FIRST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, FIFTY);
-		v.addValidation(INPUT_LAST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, FIFTY);
-		v.addValidation(INPUT_EMAIL, Validator.NO_BLANKS);
-		v.addValidation(INPUT_EMAIL, Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, ONE_H_TWENTY);
-		v.addValidation(INPUT_EMAIL, Validator.IS_A_EMAIL);
-		v.addValidation(INPUT_INSTITUTION, Validator.NO_BLANKS);
-		v.addValidation(INPUT_INSTITUTION, Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, TWO_H_FIFTY_FIVE);
-		return v.validate();
-	}
-
 	private void updateMainFieldsForEditedUser(UserAccountBean user, FormProcessor fp, HttpServletRequest request) {
+		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
 		UserAccountBean ub = getUserAccountBean(request);
 		user.setFirstName(fp.getString(INPUT_FIRST_NAME));
 		user.setLastName(fp.getString(INPUT_LAST_NAME));
 		user.setEmail(fp.getString(INPUT_EMAIL));
 		user.setPhone(fp.getString(INPUT_PHONE));
-		user.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
+		user.setInstitutionalAffiliation(fp.getString(INPUT_COMPANY));
 		user.setUpdater(ub);
-		user.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
-		user.setUserTimeZoneId(fp.getString(INPUT_USER_TIME_ZONE_ID));
+		user.setRunWebservices(fp.getString(INPUT_ALLOW_SOAP).equalsIgnoreCase("true"));
+		user.setUserTimeZoneId(fp.getString(INPUT_TIME_ZONE));
 		if (!user.getName().equalsIgnoreCase("root")) {
 			UserType ut = UserType.get(fp.getInt(INPUT_USER_TYPE));
 			if (ut.equals(UserType.SYSADMIN)) {
@@ -401,26 +381,25 @@ public class EditUserAccountController extends BaseController {
 			}
 			user.setPasswd(passwordHash);
 			user.setPasswdTimestamp(null);
-			userAccountDAO.update(user);
+			userAccountDao.update(user);
 
-			if ("no".equalsIgnoreCase(fp.getString(INPUT_DISPLAY_PWD))) {
+			Locale locale = LocaleResolver.getLocale(request);
+
+			if (!"true".equalsIgnoreCase(fp.getString(INPUT_DISPLAY_PASSWORD))) {
 				LOGGER.info("displayPwd is no");
 				try {
 					sendResetPasswordEmail(request, user, password);
 				} catch (Exception e) {
-					PageMessagesUtil.addPageMessage(request, messageSource.getMessage(
-							"there_was_an_error_sending_reset_email_try_reset", null, locale));
+					PageMessagesUtil.addPageMessage(request,
+							messageSource.getMessage("there_was_an_error_sending_reset_email_try_reset", null, locale));
 				}
 			} else {
 				PageMessagesUtil.addPageMessage(request,
-						messageSource.getMessage("new_user_password", null, locale) + ":<br/> " + password
-								+ "<br/>"
-								+ messageSource
-								.getMessage("please_write_down_the_password_and_provide", null,
-										locale));
+						messageSource.getMessage("new_user_password", null, locale) + ":<br/> " + password + "<br/>"
+								+ messageSource.getMessage("please_write_down_the_password_and_provide", null, locale));
 			}
 		} else {
-			userAccountDAO.update(user);
+			userAccountDao.update(user);
 		}
 	}
 

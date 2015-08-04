@@ -55,7 +55,6 @@ import com.clinovo.rest.validator.EventServiceValidator;
 import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.EventDefinitionService;
 import com.clinovo.service.ItemSDVService;
-import com.clinovo.util.RequestUtil;
 import com.clinovo.validator.EventDefinitionValidator;
 
 /**
@@ -63,7 +62,7 @@ import com.clinovo.validator.EventDefinitionValidator;
  */
 @Controller("restEventService")
 @RequestMapping("/event")
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings("rawtypes")
 public class EventService extends BaseService {
 
 	@Autowired
@@ -133,8 +132,8 @@ public class EventService extends BaseService {
 		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 		UserAccountBean ownerUser = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
 
-		HashMap errors = EventDefinitionValidator.validate(RequestUtil.getRequest(), configurationDao,
-				new UserAccountDAO(dataSource).findAllByStudyId(currentStudy.getId()), true);
+		HashMap errors = EventDefinitionValidator.validate(configurationDao, new UserAccountDAO(dataSource),
+				currentStudy, true);
 
 		ValidatorUtil.checkForErrors(errors);
 
@@ -348,8 +347,7 @@ public class EventService extends BaseService {
 		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, currentStudy,
 				userAccountDao, true);
 
-		HashMap errors = EventDefinitionValidator.validate(RequestUtil.getRequest(), configurationDao,
-				userAccountDao.findAllByStudyId(currentStudy.getId()), true);
+		HashMap errors = EventDefinitionValidator.validate(configurationDao, userAccountDao, currentStudy, true);
 
 		ValidatorUtil.checkForErrors(errors);
 

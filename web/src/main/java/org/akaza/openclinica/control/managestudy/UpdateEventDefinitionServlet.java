@@ -20,9 +20,14 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.RequestUtil;
-import com.clinovo.util.SignStateRestorer;
-import com.clinovo.validator.EventDefinitionValidator;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -41,12 +46,9 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import com.clinovo.util.RequestUtil;
+import com.clinovo.util.SignStateRestorer;
+import com.clinovo.validator.EventDefinitionValidator;
 
 /**
  * Servlet handles update requests on study event definition bean properties and update/remove/restore requests on event
@@ -70,9 +72,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(
-				respage.getString("no_have_permission_to_update_study_event_definition") + "<br>"
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition") + "<br>"
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
 	}
@@ -91,8 +92,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 				submitDefinition(request, response);
 			} else if ("addCrfs".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute(
-						"definition");
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession()
+						.getAttribute("definition");
 				saveEventDefinitionToSession(sed, fp);
 				saveEventDefinitionCRFsToSession(fp);
 				String url = (String) fp.getRequest().getSession()
@@ -115,8 +116,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 
-		HashMap errors = EventDefinitionValidator.validate(request, getConfigurationDao(), getUserAccountDAO()
-				.findAllByStudyId(getCurrentStudy().getId()));
+		HashMap errors = EventDefinitionValidator.validate(getConfigurationDao(), getUserAccountDAO(),
+				getCurrentStudy());
 
 		if (!errors.isEmpty()) {
 			StudyEventDefinitionBean sedForErrors = new StudyEventDefinitionBean();
@@ -210,9 +211,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 				String emailTo = fp.getString("mailTo" + i);
 				String tabbingMode = fp.getString("tabbingMode" + i);
 
-				if (!StringUtil.isBlank(tabbingMode)
-						&& ("leftToRight".equalsIgnoreCase(tabbingMode.trim()) || "topToBottom"
-								.equalsIgnoreCase(tabbingMode.trim()))) {
+				if (!StringUtil.isBlank(tabbingMode) && ("leftToRight".equalsIgnoreCase(tabbingMode.trim())
+						|| "topToBottom".equalsIgnoreCase(tabbingMode.trim()))) {
 					edcBean.setTabbingMode(tabbingMode);
 				} else {
 					edcBean.setTabbingMode("leftToRight");
@@ -258,9 +258,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 					edcBean.setEvaluatedCRF(false);
 				}
 
-				if (sdvId > 0
-						&& (edcBean.getSourceDataVerification() == null || sdvId != edcBean.getSourceDataVerification()
-								.getCode())) {
+				if (sdvId > 0 && (edcBean.getSourceDataVerification() == null
+						|| sdvId != edcBean.getSourceDataVerification().getCode())) {
 					edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
 				}
 

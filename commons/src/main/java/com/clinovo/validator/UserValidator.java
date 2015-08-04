@@ -167,8 +167,6 @@ public final class UserValidator {
 		validator.addValidation(name(INPUT_EMAIL, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, EMAIL_LENGTH);
 		validator.addValidation(name(INPUT_EMAIL, lowerCaseParameterNames), Validator.IS_A_EMAIL);
-		validator.addValidation(name(INPUT_PHONE, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_PHONE, lowerCaseParameterNames), Validator.IS_A_PHONE_NUMBER);
 		validator.addValidation(name(INPUT_COMPANY, lowerCaseParameterNames), Validator.NO_BLANKS);
 		validator.addValidation(name(INPUT_COMPANY, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INPUT_COMPANY_LENGTH);
@@ -177,6 +175,10 @@ public final class UserValidator {
 					studyDao);
 		}
 		validator.addValidation(name(INPUT_ROLE, lowerCaseParameterNames), Validator.IS_VALID_TERM, TermType.ROLE);
+		String phone = fp.getString(name(INPUT_PHONE, lowerCaseParameterNames));
+		if (!phone.isEmpty()) {
+			validator.addValidation(name(INPUT_PHONE, lowerCaseParameterNames), Validator.IS_A_PHONE_NUMBER);
+		}
 
 		HashMap errors = validator.validate();
 
@@ -209,6 +211,7 @@ public final class UserValidator {
 	 */
 	public static HashMap validateUserEdit(ConfigurationDao configurationDao, boolean lowerCaseParameterNames) {
 		HttpServletRequest request = RequestUtil.getRequest();
+		FormProcessor fp = new FormProcessor(request);
 
 		Validator validator = new Validator(new ValidatorHelper(request, configurationDao));
 
@@ -222,11 +225,13 @@ public final class UserValidator {
 		validator.addValidation(name(INPUT_EMAIL, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, EMAIL_LENGTH);
 		validator.addValidation(name(INPUT_EMAIL, lowerCaseParameterNames), Validator.IS_A_EMAIL);
-		validator.addValidation(name(INPUT_PHONE, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_PHONE, lowerCaseParameterNames), Validator.IS_A_PHONE_NUMBER);
 		validator.addValidation(name(INPUT_COMPANY, lowerCaseParameterNames), Validator.NO_BLANKS);
 		validator.addValidation(name(INPUT_COMPANY, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INPUT_COMPANY_LENGTH);
+		String phone = fp.getString(name(INPUT_PHONE, lowerCaseParameterNames));
+		if (!phone.isEmpty()) {
+			validator.addValidation(name(INPUT_PHONE, lowerCaseParameterNames), Validator.IS_A_PHONE_NUMBER);
+		}
 
 		return validator.validate();
 	}
@@ -293,8 +298,10 @@ public final class UserValidator {
 		validator.addValidation(name(INPUT_PASSWD_CHALLENGE_QUESTION, lowerCaseParameterNames), Validator.NO_BLANKS);
 		validator.addValidation(name(INPUT_PASSWD_CHALLENGE_ANSWER, lowerCaseParameterNames), Validator.NO_BLANKS);
 		validator.addValidation(name(INPUT_OLD_PASSWD, lowerCaseParameterNames), Validator.NO_BLANKS); // old password
-		validator.addValidation(name(INPUT_PHONE, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_PHONE, lowerCaseParameterNames), Validator.IS_A_PHONE_NUMBER);
+		String phone = fp.getString(name(INPUT_PHONE, lowerCaseParameterNames));
+		if (!phone.isEmpty()) {
+			validator.addValidation(name(INPUT_PHONE, lowerCaseParameterNames), Validator.IS_A_PHONE_NUMBER);
+		}
 
 		String password = fp.getString(name(INPUT_PASSWD, lowerCaseParameterNames)).trim();
 		String oldPass = fp.getString(name(INPUT_OLD_PASSWD, lowerCaseParameterNames)).trim();

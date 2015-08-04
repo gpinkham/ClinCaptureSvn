@@ -59,6 +59,7 @@
     <xs:element name="AllowSoap" type="xs:boolean"/>
     <xs:element name="Company" type="xs:string"/>
     <xs:element name="Id" type="xs:int"/>
+    <xs:element name="TimeZone" type="xs:string"/>
     <xs:element name="Scope" type="xs:int"/>
 
     <xs:complexType name="userAccountBean">
@@ -75,6 +76,7 @@
             <xs:element ref="Company" minOccurs="0"/>
             <xs:element ref="Phone" minOccurs="0"/>
             <xs:element ref="AllowSoap" minOccurs="0"/>
+            <xs:element ref="TimeZone" minOccurs="0"/>
             <xs:element ref="Scope" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>

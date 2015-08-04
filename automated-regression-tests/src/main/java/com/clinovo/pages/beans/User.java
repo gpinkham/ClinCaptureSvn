@@ -14,7 +14,8 @@ public class User {
 	public static final User CRC = new User("demo_crc", "demo_crc@123", UserRole.CRC);
 	public static final User PI = new User("demo_pi", "demo_pi@123", UserRole.PI);
 	public static final User SITE_MONITOR = new User("demo_site_mon", "demo_site_mon@123", UserRole.SITE_MONITOR);
-	public static final User STUDY_LEVEL_USER = new User("demo_study_user", "demo_study_user@123", UserRole.STUDY_LEVEL_USER);
+	public static final User STUDY_LEVEL_USER = new User("demo_study_user", "demo_study_user@123",
+			UserRole.STUDY_LEVEL_USER);
 	public static final User USER = new User("demo_user", "demo_user@123", UserRole.USER);
 	public static final String SAVED_USER_NAME = "saved_user_name";
 	public static final String SAVED_USER_PASS = "saved_user_pass";
@@ -26,7 +27,7 @@ public class User {
 		SYSTEM_ADMIN.setOldPassword("12345678");
 		SYSTEM_ADMIN.setChallengeQuestionIndex(1);
 		SYSTEM_ADMIN.setChallengeAnswer("A");
-		
+
 		STUDY_ADMIN.setChallengeQuestionIndex(1);
 		STUDY_ADMIN.setChallengeAnswer("A");
 		STUDY_ADMIN.setFirstName("Jon");
@@ -38,8 +39,8 @@ public class User {
 		STUDY_ADMIN.setRoleValue(Integer.toString(UserRole.STUDY_ADMIN.getUserRoleCCId()));
 		STUDY_ADMIN.setUserTypeValue("1");
 		STUDY_ADMIN.setAuthorizeSOAP("false");
-		STUDY_ADMIN.setShowUserPasswordValue("yes");
-		
+		STUDY_ADMIN.setShowUserPasswordValue("true");
+
 		STUDY_MONITOR.setChallengeQuestionIndex(1);
 		STUDY_MONITOR.setChallengeAnswer("B");
 		STUDY_MONITOR.setFirstName("Bob");
@@ -51,8 +52,8 @@ public class User {
 		STUDY_MONITOR.setRoleValue(Integer.toString(UserRole.STUDY_MONITOR.getUserRoleCCId()));
 		STUDY_MONITOR.setUserTypeValue("1");
 		STUDY_MONITOR.setAuthorizeSOAP("false");
-		STUDY_MONITOR.setShowUserPasswordValue("yes");
-		
+		STUDY_MONITOR.setShowUserPasswordValue("true");
+
 		PI.setChallengeQuestionIndex(1);
 		PI.setChallengeAnswer("A");
 		PI.setFirstName("Jake");
@@ -64,8 +65,8 @@ public class User {
 		PI.setRoleValue(Integer.toString(UserRole.PI.getUserRoleCCId()));
 		PI.setUserTypeValue("2");
 		PI.setAuthorizeSOAP("false");
-		PI.setShowUserPasswordValue("yes");
-		
+		PI.setShowUserPasswordValue("true");
+
 		CRC.setChallengeQuestionIndex(1);
 		CRC.setChallengeAnswer("A");
 		CRC.setFirstName("Denis");
@@ -77,8 +78,8 @@ public class User {
 		CRC.setRoleValue(Integer.toString(UserRole.CRC.getUserRoleCCId()));
 		CRC.setUserTypeValue("2");
 		CRC.setAuthorizeSOAP("false");
-		CRC.setShowUserPasswordValue("yes");
-		
+		CRC.setShowUserPasswordValue("true");
+
 		STUDY_CODER.setChallengeQuestionIndex(1);
 		STUDY_CODER.setChallengeAnswer("C");
 		STUDY_CODER.setFirstName("Rob");
@@ -90,8 +91,8 @@ public class User {
 		STUDY_CODER.setRoleValue(Integer.toString(UserRole.STUDY_CODER.getUserRoleCCId()));
 		STUDY_CODER.setUserTypeValue("1");
 		STUDY_CODER.setAuthorizeSOAP("false");
-		STUDY_CODER.setShowUserPasswordValue("yes");
-		
+		STUDY_CODER.setShowUserPasswordValue("true");
+
 		STUDY_EVALUATOR.setChallengeQuestionIndex(1);
 		STUDY_EVALUATOR.setChallengeAnswer("B");
 		STUDY_EVALUATOR.setFirstName("Nob");
@@ -103,8 +104,8 @@ public class User {
 		STUDY_EVALUATOR.setRoleValue(Integer.toString(UserRole.STUDY_EVALUATOR.getUserRoleCCId()));
 		STUDY_EVALUATOR.setUserTypeValue("1");
 		STUDY_EVALUATOR.setAuthorizeSOAP("false");
-		STUDY_EVALUATOR.setShowUserPasswordValue("yes");
-		
+		STUDY_EVALUATOR.setShowUserPasswordValue("true");
+
 		SITE_MONITOR.setChallengeQuestionIndex(1);
 		SITE_MONITOR.setChallengeAnswer("A");
 		SITE_MONITOR.setFirstName("Alex");
@@ -116,38 +117,37 @@ public class User {
 		SITE_MONITOR.setRoleValue(Integer.toString(UserRole.SITE_MONITOR.getUserRoleCCId()));
 		SITE_MONITOR.setUserTypeValue("2");
 		SITE_MONITOR.setAuthorizeSOAP("false");
-		SITE_MONITOR.setShowUserPasswordValue("yes");
+		SITE_MONITOR.setShowUserPasswordValue("true");
 	}
-	
+
 	private String userName;
 	private String password;
 	private String oldPassword;
 	private UserRole userRole;
-	
+
 	private String firstName;
 	private String lastName;
 	private String email;
 	private String phone;
 	private String institutionalAffiliation;
-	
+
 	private int activeStudyIndex;
 	private String activeStudyName;
-	
+
 	private String roleName;
 	private String roleValue;
-	
-	
+
 	private String userTypeValue;
 	private String userTypeName;
-	
+
 	private String authorizeSOAP;
 	private String showUserPasswordValue;
-	
+
 	private int challengeQuestionIndex;
 	private String challengeQuestion;
-	
+
 	private String challengeAnswer;
-	
+
 	public User(String userName, String password, UserRole userRole) {
 		this.setUserName(userName);
 		this.setPassword(password);
@@ -301,80 +301,80 @@ public class User {
 
 	public static User fillUserFromTableRow(String userRoleName, Map<String, String> row) {
 		User user = new User("", "", UserRole.USER);
-		
+
 		if (row.get("User Name") != null) {
-    		user.setUserName(row.get("User Name"));
-    	}
-		
+			user.setUserName(row.get("User Name"));
+		}
+
 		if (row.get("Password") != null) {
-    		user.setPassword(row.get("Password"));
-    	}
-		
+			user.setPassword(row.get("Password"));
+		}
+
 		if (row.get("Old Password") != null) {
-    		user.setOldPassword(row.get("Old Password"));
-    	}
-		
+			user.setOldPassword(row.get("Old Password"));
+		}
+
 		if (row.get("Challenge Question") != null) {
-    		user.setChallengeQuestion(row.get("Challenge Question"));
-    	} else if (row.get("Challenge Question Index") != null) {
-    		user.setChallengeQuestionIndex(Integer.parseInt(row.get("Challenge Question Index")));
-    	}
-		
+			user.setChallengeQuestion(row.get("Challenge Question"));
+		} else if (row.get("Challenge Question Index") != null) {
+			user.setChallengeQuestionIndex(Integer.parseInt(row.get("Challenge Question Index")));
+		}
+
 		if (row.get("Challenge Answer") != null) {
-    		user.setChallengeAnswer(row.get("Challenge Answer"));
-    	}
-		
+			user.setChallengeAnswer(row.get("Challenge Answer"));
+		}
+
 		if (row.get("First Name") != null) {
-    		user.setFirstName(row.get("First Name"));
-    	}
-		
+			user.setFirstName(row.get("First Name"));
+		}
+
 		if (row.get("Last Name") != null) {
-    		user.setLastName(row.get("Last Name"));
-    	}
-		
+			user.setLastName(row.get("Last Name"));
+		}
+
 		if (row.get("Email") != null) {
-    		user.setEmail(row.get("Email"));
-    	}
-		
+			user.setEmail(row.get("Email"));
+		}
+
 		if (row.get("Phone") != null) {
-    		user.setPhone(row.get("Phone"));
-    	}
-		
+			user.setPhone(row.get("Phone"));
+		}
+
 		if (row.get("Institutional Affiliation") != null) {
-    		user.setInstitutionalAffiliation(row.get("Institutional Affiliation"));
-    	}
-		
+			user.setInstitutionalAffiliation(row.get("Institutional Affiliation"));
+		}
+
 		if (row.get("Active Study") != null) {
-    		user.setActiveStudyName(row.get("Active Study"));
-    	}
-		
+			user.setActiveStudyName(row.get("Active Study"));
+		}
+
 		if (row.get("Role") != null) {
-    		user.setRoleName(row.get("Role"));
-    		user.setUserRole(UserRole.getRoleByFullRoleName(user.getRoleName()));
-    		user.setRoleValue(Integer.toString(user.getUserRole().getUserRoleCCId()));
-    	} else if (row.get("Role Value") != null) {
-    		user.setRoleValue(row.get("Role Value"));
-    		user.setUserRole(UserRole.getRoleByCCId(Integer.parseInt(user.getRoleValue())));
-    	}
-		
+			user.setRoleName(row.get("Role"));
+			user.setUserRole(UserRole.getRoleByFullRoleName(user.getRoleName()));
+			user.setRoleValue(Integer.toString(user.getUserRole().getUserRoleCCId()));
+		} else if (row.get("Role Value") != null) {
+			user.setRoleValue(row.get("Role Value"));
+			user.setUserRole(UserRole.getRoleByCCId(Integer.parseInt(user.getRoleValue())));
+		}
+
 		if (row.get("User Type") != null) {
-    		user.setUserTypeName(row.get("User Type"));    		
+			user.setUserTypeName(row.get("User Type"));
 		} else if (row.get("User Type Value") != null) {
-    		user.setUserTypeValue(row.get("User Type Value"));
-		} 
-		
+			user.setUserTypeValue(row.get("User Type Value"));
+		}
+
 		if (row.get("Authorize SOAP") != null) {
-    		user.setAuthorizeSOAP(row.get("Authorize SOAP"));
-    	}
-		
+			user.setAuthorizeSOAP(row.get("Authorize SOAP"));
+		}
+
 		if (row.get("Show User Password") != null) {
-    		user.setShowUserPasswordValue(row.get("Show User Password"));
-    	}
-		
+			user.setShowUserPasswordValue(row.get("Show User Password"));
+		}
+
 		if (user.getUserRole() == UserRole.USER) {
-    		user.setUserRole(defineDefaultUser(userRoleName).getUserRole());
-    	}
-		
+			user.setUserRole(defineDefaultUser(userRoleName).getUserRole());
+		}
+
 		return user;
 	}
 
@@ -385,32 +385,32 @@ public class User {
 	public void setUserTypeName(String userTypeName) {
 		this.userTypeName = userTypeName;
 	}
-	
+
 	public static User defineDefaultUser(String user) {
 		User currentUser;
-		
-		if (user.startsWith(UserRole.SYSTEM_ADMIN.getUserRoleName())) { 
-   			currentUser = User.SYSTEM_ADMIN;
-   		} else if (user.startsWith(UserRole.STUDY_ADMIN.getUserRoleName())) { 
-       		currentUser = User.STUDY_ADMIN;
-   		} else if (user.startsWith(UserRole.STUDY_MONITOR.getUserRoleName())) {
-       		currentUser = User.STUDY_MONITOR;
-   		} else if (user.startsWith(UserRole.STUDY_EVALUATOR.getUserRoleName())) { 
-       		currentUser = User.STUDY_EVALUATOR;
-   		} else if (user.startsWith(UserRole.STUDY_CODER.getUserRoleName())) {
-       		currentUser = User.STUDY_CODER;
-   		} else if (user.startsWith(UserRole.PI.getUserRoleName())) { 
-       		currentUser =  User.PI;
-   		} else if (user.startsWith(UserRole.SITE_MONITOR.getUserRoleName())) {  
-       		currentUser = User.SITE_MONITOR;
-		} else if (user.startsWith(UserRole.CRC.getUserRoleName())) {  
-       		currentUser = User.CRC;
-       	} else if (user.startsWith(UserRole.STUDY_LEVEL_USER.getUserRoleName())) {  
-       		currentUser = User.STUDY_LEVEL_USER;
-       	} else {
-       		currentUser = User.USER;
-       	}
-		
+
+		if (user.startsWith(UserRole.SYSTEM_ADMIN.getUserRoleName())) {
+			currentUser = User.SYSTEM_ADMIN;
+		} else if (user.startsWith(UserRole.STUDY_ADMIN.getUserRoleName())) {
+			currentUser = User.STUDY_ADMIN;
+		} else if (user.startsWith(UserRole.STUDY_MONITOR.getUserRoleName())) {
+			currentUser = User.STUDY_MONITOR;
+		} else if (user.startsWith(UserRole.STUDY_EVALUATOR.getUserRoleName())) {
+			currentUser = User.STUDY_EVALUATOR;
+		} else if (user.startsWith(UserRole.STUDY_CODER.getUserRoleName())) {
+			currentUser = User.STUDY_CODER;
+		} else if (user.startsWith(UserRole.PI.getUserRoleName())) {
+			currentUser = User.PI;
+		} else if (user.startsWith(UserRole.SITE_MONITOR.getUserRoleName())) {
+			currentUser = User.SITE_MONITOR;
+		} else if (user.startsWith(UserRole.CRC.getUserRoleName())) {
+			currentUser = User.CRC;
+		} else if (user.startsWith(UserRole.STUDY_LEVEL_USER.getUserRoleName())) {
+			currentUser = User.STUDY_LEVEL_USER;
+		} else {
+			currentUser = User.USER;
+		}
+
 		return currentUser;
 	}
 
@@ -422,4 +422,3 @@ public class User {
 		this.roleName = roleName;
 	}
 }
-    

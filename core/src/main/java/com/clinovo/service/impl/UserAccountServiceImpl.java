@@ -43,9 +43,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.clinovo.service.UserAccountService;
+import com.clinovo.util.EmailUtil;
 
 /**
  * UserAccountServiceImpl.
@@ -67,6 +69,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 	@Autowired
 	private JavaMailSenderImpl mailSender;
 
+	@Autowired
+	private org.akaza.openclinica.core.SecurityManager securityManager;
+
 	private MessageFormat messageFormat = new MessageFormat("");
 
 	public UserAccountDAO getUserAccountDAO() {
@@ -75,10 +80,6 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 	public StudyDAO getStudyDAO() {
 		return new StudyDAO(dataSource);
-	}
-
-	public MessageFormat getMessageFormat() {
-		return messageFormat;
 	}
 
 	/**
@@ -170,8 +171,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 				Object[] argsForMessageFormat = {studyUserRole.getRoleName(), user.getName(),
 						(getStudyDAO().findByPK(studyId)).getName()};
 
-				getMessageFormat().applyPattern(respage.getString("the_study_user_role_deleted"));
-				message.append(getMessageFormat().format(argsForMessageFormat));
+				MessageFormat messageFormat = new MessageFormat("");
+				messageFormat.applyPattern(respage.getString("the_study_user_role_deleted"));
+				message.append(messageFormat.format(argsForMessageFormat));
 				operationSucceeded = true;
 			}
 		}
@@ -200,8 +202,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 					Object[] argsForMessageFormat = {studyUserRole.getRoleName(), user.getName(),
 							(getStudyDAO().findByPK(studyId)).getName()};
 
-					getMessageFormat().applyPattern(respage.getString("the_study_user_role_removed"));
-					message.append(getMessageFormat().format(argsForMessageFormat));
+					MessageFormat messageFormat = new MessageFormat("");
+					messageFormat.applyPattern(respage.getString("the_study_user_role_removed"));
+					message.append(messageFormat.format(argsForMessageFormat));
 					operationSucceeded = true;
 
 				}
@@ -270,8 +273,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 					Object[] argsForMessageFormat = {studyUserRole.getRoleName(), user.getName(),
 							(getStudyDAO().findByPK(studyId)).getName()};
 
-					getMessageFormat().applyPattern(respage.getString("the_study_user_role_restored"));
-					message.append(getMessageFormat().format(argsForMessageFormat));
+					MessageFormat messageFormat = new MessageFormat("");
+					messageFormat.applyPattern(respage.getString("the_study_user_role_restored"));
+					message.append(messageFormat.format(argsForMessageFormat));
 					operationSucceeded = true;
 				}
 			}
@@ -385,7 +389,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 			helper.setTo(userAccountBean.getEmail());
 			helper.setSubject(messageSource.getMessage("your_new_openclinica_account", null, locale));
 			helper.setText(
-					"".concat("<html><body>").concat(messageSource.getMessage("dear", null, locale)).concat(" ")
+					EmailUtil.getEmailBodyStart().concat(messageSource.getMessage("dear", null, locale)).concat(" ")
 							.concat(userAccountBean.getFirstName()).concat(" ").concat(userAccountBean.getLastName())
 							.concat(",<br><br>")
 							.concat(messageSource.getMessage("a_new_user_account_has_been_created_for_you", null,
@@ -396,10 +400,12 @@ public class UserAccountServiceImpl implements UserAccountService {
 							.concat("<br><br>")
 							.concat(messageSource.getMessage("please_test_your_login_information_and_let", null,
 									locale))
-					.concat("<br>")
-					.concat(CoreResources.getSystemURL()).concat(" . <br><br> ").concat(messageSource
-							.getMessage("best_system_administrator", null, locale).replace("{0}", studyName))
-					.concat("</body></html>"), true);
+							.concat("<br>").concat(CoreResources.getSystemURL()).concat(" . <br><br> ")
+							.concat(messageSource.getMessage("best_system_administrator", null, locale).replace("{0}",
+									studyName))
+							.concat(EmailUtil.getEmailBodyEnd())
+							.concat(EmailUtil.getEmailFooter(CoreResources.getSystemLocale())),
+					true);
 			mailSender.send(mimeMessage);
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
@@ -409,10 +415,20 @@ public class UserAccountServiceImpl implements UserAccountService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void createUser(UserAccountBean ownerUser, UserAccountBean userAccountBean, Role role,
-			boolean displayPassword, String password) {
+	public void createUser(UserAccountBean ownerUser, UserAccountBean userAccountBean, Role role, boolean sendEmail)
+			throws Exception {
+		createUser(ownerUser, userAccountBean, role, sendEmail, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void createUser(UserAccountBean ownerUser, UserAccountBean userAccountBean, Role role, boolean sendEmail,
+			UserDetails userDetails) throws Exception {
 		UserAccountDAO userAccountDAO = getUserAccountDAO();
 
+		userAccountBean.setRealPassword(securityManager.genPassword());
+		userAccountBean.setPasswd(securityManager.encryptPassword(userAccountBean.getRealPassword(), userDetails));
 		userAccountBean.setPasswdTimestamp(null);
 		userAccountBean.setLastVisitDate(null);
 		userAccountBean.setStatus(Status.AVAILABLE);
@@ -431,12 +447,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 		if (userAccountBean.getId() > 0) {
 			authoritiesDao.saveOrUpdate(new AuthoritiesBean(userAccountBean.getName()));
-			if (!displayPassword) {
-				userAccountBean.setPasswd("");
-				sendEmail(userAccountBean, password,
+			if (sendEmail) {
+				sendEmail(userAccountBean, userAccountBean.getRealPassword(),
 						new StudyDAO(dataSource).findByPK(userAccountBean.getActiveStudyId()).getName());
-			} else {
-				userAccountBean.setPasswd(password);
 			}
 		}
 	}
@@ -464,17 +477,32 @@ public class UserAccountServiceImpl implements UserAccountService {
 	 * {@inheritDoc}
 	 */
 	public void removeUser(UserAccountBean userAccountBean, UserAccountBean updater) {
+		UserAccountDAO userAccountDao = getUserAccountDAO();
 		userAccountBean.setUpdater(updater);
 		userAccountBean.setStatus(Status.DELETED);
-		getUserAccountDAO().updateStatus(userAccountBean);
+		userAccountDao.delete(userAccountBean);
+		userAccountBean.setActive(userAccountDao.isQuerySuccessful());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void restoreUser(UserAccountBean userAccountBean, UserAccountBean updater) {
+	public void restoreUser(UserAccountBean userAccountBean, UserAccountBean updater) throws Exception {
+		restoreUser(userAccountBean, updater, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreUser(UserAccountBean userAccountBean, UserAccountBean updater, UserDetails userDetails)
+			throws Exception {
+		UserAccountDAO userAccountDao = getUserAccountDAO();
+		userAccountBean.setRealPassword(securityManager.genPassword());
+		userAccountBean.setPasswd(securityManager.encryptPassword(userAccountBean.getRealPassword(), userDetails));
+		userAccountBean.setPasswdTimestamp(null);
 		userAccountBean.setUpdater(updater);
 		userAccountBean.setStatus(Status.AVAILABLE);
-		getUserAccountDAO().updateStatus(userAccountBean);
+		userAccountDao.restore(userAccountBean);
+		userAccountBean.setActive(userAccountDao.isQuerySuccessful());
 	}
 }

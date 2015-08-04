@@ -63,7 +63,7 @@
     </c:if>
     &nbsp;<fmt:message key="language" bundle="${resword}"/></strong>
 <br><br>
-<form action="UpdateProfile" method="post" onsubmit="return isPhoneNumberValid('phone', '<fmt:message key="invalid_phone_number_format" bundle="${resword}"/>');">
+<form action="UpdateProfile" method="post">
     <span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/><br>
     <input type="hidden" name="action" value="confirm">
     <!-- These DIVs define shaded box borders -->
@@ -78,8 +78,8 @@
                         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="lastName"/></jsp:include></td><td class="formlabel alert">*</td></tr>
                     <tr><td class="formlabel"><fmt:message key="email" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" type="text" name="email" value="<c:out value="${userBean1.email}"/>" class="formfieldXL"></div>
                         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="email"/></jsp:include></td><td class="formlabel alert">*</td></tr>
-                    <tr valign="bottom"><td class="formlabel"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" type="text" name="institutionalAffiliation" value="<c:out value="${userBean1.institutionalAffiliation}"/>" class="formfieldXL"></div>
-                        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="institutionalAffiliation"/></jsp:include></td><td class="formlabel alert">*</td></tr>
+                    <tr valign="bottom"><td class="formlabel"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" type="text" name="company" value="<c:out value="${userBean1.institutionalAffiliation}"/>" class="formfieldXL"></div>
+                        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="company"/></jsp:include></td><td class="formlabel alert">*</td></tr>
 
 					<tr>
 						<td class="formlabel">
@@ -87,7 +87,7 @@
 						</td>
 						<td>
 							<div class="formfieldXL_BG">
-								<select id="userTimeZoneID" name="userTimeZoneID" class="formfieldXL"
+								<select id="timeZone" name="timeZone" class="formfieldXL"
 										onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
 									<c:forEach var="timeZoneID" items="${timeZoneIDsSorted}">
 										<option value='<c:out value="${timeZoneID.key}" />' <c:if test="${timeZoneID.key == userBean1.userTimeZoneId}">selected</c:if>>
@@ -158,7 +158,7 @@
                         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd"/></jsp:include></td></tr>
                     <tr><td class="formlabel"><fmt:message key="confirm_new_password" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" type="password" name="passwd1" value="" class="formfieldXL"></div>
                         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd1"/></jsp:include></td></tr>
-                    <tr><td class="formlabel"><fmt:message key="phone" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" type="text" id="phone" name="phone" maxlength="20" value="<c:out value="${userBean1.phone}"/>" class="formfieldXL"></div><span style="white-space: nowrap;">(<fmt:message key="phone_number_format_ex" bundle="${resword}"/>)</span><br/>
+                    <tr><td class="formlabel"><fmt:message key="phone" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" type="text" id="phone" name="phone" maxlength="20" value="<c:out value="${userBean1.phone}"/>" class="formfieldXL"></div><span style="white-space: nowrap;">(<fmt:message key="phone_number_format_ex" bundle="${resword}"/> <fmt:message key="phone_format" bundle="${resformat}"/>)</span><br/>
                         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="phone"/></jsp:include></td><td class="formlabel"></td></tr>
 
                 </table>

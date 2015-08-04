@@ -46,6 +46,7 @@ import org.springframework.stereotype.Component;
 
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.ValidatorHelper;
+import com.clinovo.validator.PasswordValidator;
 
 /**
  * Reset expired password
@@ -95,9 +96,8 @@ public class ResetPasswordServlet extends Controller {
 		if ("yes".equalsIgnoreCase(mustChangePwd)) {
 			addPageMessage(respage.getString("your_password_has_expired_must_change"), request);
 		} else {
-			addPageMessage(
-					respage.getString("password_expired") + " "
-							+ respage.getString("if_you_do_not_want_change_leave_blank"), request);
+			addPageMessage(respage.getString("password_expired") + " "
+					+ respage.getString("if_you_do_not_want_change_leave_blank"), request);
 		}
 		request.setAttribute("mustChangePass", mustChangePwd);
 

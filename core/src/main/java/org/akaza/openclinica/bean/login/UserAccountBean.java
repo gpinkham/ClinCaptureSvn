@@ -49,8 +49,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "UserAccount", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"id", "username", "firstname", "lastname", "email", "phone", "scope", "password", "company",
-		"allowsoap", "role", "usertype", "status"})
+@JsonPropertyOrder({"id", "username", "firstname", "lastname", "email", "phone", "timezone", "scope", "password",
+		"company", "allowsoap", "role", "usertype", "status"})
 public class UserAccountBean extends AuditableEntityBean {
 
 	private static final long serialVersionUID = -7373737639499260727L;
@@ -117,9 +117,13 @@ public class UserAccountBean extends AuditableEntityBean {
 	@JsonIgnore
 	@XmlTransient
 	private Date pentahoTokenDate;
+	@JsonProperty("timezone")
+	@XmlElement(name = "TimeZone", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String userTimeZoneId;
+
 	@JsonIgnore
 	@XmlTransient
-	private String userTimeZoneId;
+	private String realPassword;
 
 	/**
 	 * Counts the number of times the user visited Main Menu servlet.
@@ -664,5 +668,13 @@ public class UserAccountBean extends AuditableEntityBean {
 		this.userTimeZoneId = DateUtil.isValidTimeZoneId(userTimeZoneId)
 				? userTimeZoneId
 				: DateTimeZone.getDefault().getID();
+	}
+
+	public String getRealPassword() {
+		return realPassword;
+	}
+
+	public void setRealPassword(String realPassword) {
+		this.realPassword = realPassword;
 	}
 }

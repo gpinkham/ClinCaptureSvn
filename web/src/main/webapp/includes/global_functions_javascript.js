@@ -3938,17 +3938,6 @@ function upateEventDefinitionAddCRF(){
 	$("#updateEventDefinition").submit();
 }
 
-function isPhoneNumberValid(id, msg) {
-  var valid = $("#" + id).val().replace(/\+{0,1}\d{1,}/, '') == '';
-  if (!valid) {
-    $("#spanAlert-phone").html(msg);
-    if ($("#spanAlert-phone").siblings("br").length == 0) {
-      $("#spanAlert-phone").parent().append("<br/><br/>");
-    }
-  }
-  return valid;
-}
-
 function chooseHomePageVersion(){
 	if($.browser.msie && parseFloat($.browser.version) < 8){
 		$(".new_home_page").remove();

@@ -42,10 +42,10 @@
 <c:set var="lastName" value="" />
 <c:set var="email" value="" />
 <c:set var="phone" value="" />
-<c:set var="institutionalAffiliation" value="" />
+<c:set var="company" value="" />
 <c:set var="userTypeId" value="${0}" />
 <c:set var="resetPassword" value="${0}" />
-<c:set var="displayPwd" value="no" />
+<c:set var="displayPassword" value="false" />
 
 <c:forEach var="presetValue" items="${presetValues}">
     <c:if test='${presetValue.key == "stepNum"}'>
@@ -66,8 +66,8 @@
     <c:if test='${presetValue.key == "phone"}'>
       <c:set var="phone" value="${presetValue.value}" />
     </c:if>
-    <c:if test='${presetValue.key == "institutionalAffiliation"}'>
-        <c:set var="institutionalAffiliation" value="${presetValue.value}" />
+    <c:if test='${presetValue.key == "company"}'>
+        <c:set var="company" value="${presetValue.value}" />
     </c:if>
     <c:if test='${presetValue.key == "userType"}'>
         <c:set var="userType" value="${presetValue.value}" />
@@ -75,14 +75,14 @@
     <c:if test='${presetValue.key == "resetPassword"}'>
         <c:set var="resetPassword" value="${presetValue.value}" />
     </c:if>
-    <c:if test='${presetValue.key == "displayPwd"}'>
-        <c:set var="displayPwd" value="${presetValue.value}" />
+    <c:if test='${presetValue.key == "displayPassword"}'>
+        <c:set var="displayPassword" value="${presetValue.value}" />
     </c:if>
-    <c:if test='${presetValue.key == "runWebServices"}'>
-        <c:set var="runWebServices" value="${presetValue.value}" />
+    <c:if test='${presetValue.key == "allowSoap"}'>
+        <c:set var="allowSoap" value="${presetValue.value}" />
     </c:if>
-	<c:if test='${presetValue.key == "userTimeZoneID"}'>
-		<c:set var="userTimeZoneID" value="${presetValue.value}"/>
+	<c:if test='${presetValue.key == "timeZone"}'>
+		<c:set var="timeZone" value="${presetValue.value}"/>
 	</c:if>
 </c:forEach>
 <script type="text/JavaScript" language="JavaScript">
@@ -118,12 +118,12 @@
 <input type="hidden" name="lastName" value='<c:out value="${lastName}"/>'/>
 <input type="hidden" name="email" value='<c:out value="${email}"/>'/>
 <input type="hidden" name="phone" value='<c:out value="${phone}"/>'/>
-<input type="hidden" name="institutionalAffiliation" value='<c:out value="${institutionalAffiliation}"/>'/>
+<input type="hidden" name="company" value='<c:out value="${company}"/>'/>
 <input type="hidden" name="userType" value='<c:out value="${userType}"/>'/>
 <input type="hidden" name="resetPassword" value='<c:out value="${resetPassword}"/>'/>
-<input type="hidden" name="displayPwd" value='<c:out value="${displayPwd}"/>'/>
-<input type="hidden" name="runWebServices" value='<c:out value="${runWebServices}"/>'/>
-	<input type="hidden" name="userTimeZoneID" value='<c:out value="${userTimeZoneID}"/>'/>
+<input type="hidden" name="displayPassword" value='<c:out value="${displayPassword}"/>'/>
+<input type="hidden" name="allowSoap" value='<c:out value="${allowSoap}"/>'/>
+<input type="hidden" name="timeZone" value='<c:out value="${timeZone}"/>'/>
 
 <div style="width: 400px">
 
@@ -164,12 +164,12 @@
 
   <tr valign="bottom">
     <td class="table_header_column"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td>
-    <td class="table_cell"><c:out value="${institutionalAffiliation}" /></td>
+    <td class="table_cell"><c:out value="${company}" /></td>
   </tr>
 
 	<tr valign="bottom">
 		<td class="table_header_column"><fmt:message key="time_zone" bundle="${resword}"/>:</td>
-		<td class="table_cell"><c:out value="${userTimeZoneID}"/></td>
+		<td class="table_cell"><c:out value="${timeZone}"/></td>
 	</tr>
 
   <tr valign="bottom">
@@ -193,7 +193,7 @@
         <td class="table_header_column"><fmt:message key="authorized_run_web_services" bundle="${resword}"/>?</td>
         <td class="table_cell">
             <c:choose>
-                <c:when test="${runWebServices == 1}">
+                <c:when test="${allowSoap}">
                     <fmt:message key="yes" bundle="${resword}"/>
                 </c:when>
                 <c:otherwise>
@@ -210,7 +210,7 @@
                 <c:when test="${resetPassword == 1}">
                     <fmt:message key="yes" bundle="${resword}"/>,
                     <c:choose>
-                      <c:when test="${displayPwd == 'no'}">
+                      <c:when test="${!displayPassword}">
                        <fmt:message key="and_send_password_to_user_via_email" bundle="${resword}"/>
                       </c:when>
                       <c:otherwise>

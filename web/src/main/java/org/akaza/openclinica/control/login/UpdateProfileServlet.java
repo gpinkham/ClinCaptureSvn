@@ -23,27 +23,19 @@ package org.akaza.openclinica.control.login;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
-import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
@@ -56,10 +48,12 @@ import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.util.ValidatorHelper;
+import com.clinovo.util.DateUtil;
+import com.clinovo.validator.UserValidator;
 
 /**
+ * UpdateProfileServlet.
+ * 
  * @author jxu
  * @version CVS: $Id: UpdateProfileServlet.java,v 1.9 2005/02/23 18:58:11 jxu Exp $
  * 
@@ -107,7 +101,7 @@ public class UpdateProfileServlet extends Controller {
 			if ("confirm".equalsIgnoreCase(action)) {
 				logger.info("confirm");
 				request.setAttribute("studies", studies);
-				confirmProfile(request, response, userBean1, udao);
+				confirmProfile(request, response, userBean1);
 
 			} else if ("submit".equalsIgnoreCase(action)) {
 				logger.info("submit");
@@ -122,77 +116,41 @@ public class UpdateProfileServlet extends Controller {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void confirmProfile(HttpServletRequest request, HttpServletResponse response, UserAccountBean userBean1,
-			UserAccountDAO udao) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
-
-		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
+	private void confirmProfile(HttpServletRequest request, HttpServletResponse response, UserAccountBean userBean1)
+			throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 
-		v.addValidation("firstName", Validator.NO_BLANKS);
-		v.addValidation("lastName", Validator.NO_BLANKS);
-		v.addValidation("email", Validator.IS_A_EMAIL);
-		v.addValidation("passwdChallengeQuestion", Validator.NO_BLANKS);
-		v.addValidation("passwdChallengeAnswer", Validator.NO_BLANKS);
-		v.addValidation("oldPasswd", Validator.NO_BLANKS); // old password
 		String password = fp.getString("passwd").trim();
-
-		ConfigurationDao configurationDao = getConfigurationDao();
-
-		org.akaza.openclinica.core.SecurityManager sm = getSecurityManager();
-
-		String newDigestPass = sm.encryptPassword(password, getUserDetails());
-		List<String> pwdErrors = new ArrayList<String>();
-
-		if (!StringUtils.isBlank(password)) {
-			v.addValidation("passwd", Validator.IS_A_PASSWORD); // new password
-			v.addValidation("passwd1", Validator.CHECK_SAME, "passwd"); // confirm
-			// password
-
-			PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
-			Locale locale = LocaleResolver.getLocale(request);
-			ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
-
-			pwdErrors = PasswordValidator.validatePassword(passwordRequirementsDao, udao, userBean1.getId(), password,
-					newDigestPass, resexception);
-		}
-		HashMap errors = v.validate();
-		for (String err : pwdErrors) {
-			Validator.addError(errors, "passwd", err);
-		}
+		String newDigestPass = getSecurityManager().encryptPassword(password, getUserDetails());
 
 		userBean1.setFirstName(fp.getString("firstName"));
 		userBean1.setLastName(fp.getString("lastName"));
 		userBean1.setEmail(fp.getString("email"));
-		userBean1.setInstitutionalAffiliation(fp.getString("institutionalAffiliation"));
+		userBean1.setInstitutionalAffiliation(fp.getString("company"));
 		userBean1.setPasswdChallengeQuestion(fp.getString("passwdChallengeQuestion"));
 		userBean1.setPasswdChallengeAnswer(fp.getString("passwdChallengeAnswer"));
 		userBean1.setPhone(fp.getString("phone"));
 		userBean1.setActiveStudyId(fp.getInt("activeStudyId"));
-		userBean1.setUserTimeZoneId(fp.getString(INPUT_USER_TIME_ZONE_ID));
-		StudyDAO sdao = getStudyDAO();
+		userBean1.setUserTimeZoneId(fp.getString(INPUT_TIME_ZONE));
 
-		StudyBean newActiveStudy = (StudyBean) sdao.findByPK(userBean1.getActiveStudyId());
+		StudyDAO studyDao = getStudyDAO();
+		UserAccountDAO userAccountDao = getUserAccountDAO();
+
+		StudyBean newActiveStudy = (StudyBean) studyDao.findByPK(userBean1.getActiveStudyId());
 		request.setAttribute("newActiveStudy", newActiveStudy);
+
+		HashMap errors = UserValidator.validateUpdateProfile(getConfigurationDao(), userAccountDao, newDigestPass,
+				userBean1, getUserDetails(), getSecurityManager());
 
 		if (errors.isEmpty()) {
 			logger.info("no errors");
-
 			request.getSession().setAttribute("userBean1", userBean1);
-			String oldPass = fp.getString("oldPasswd").trim();
-
-			if (!sm.isPasswordValid(ub.getPasswd(), oldPass, getUserDetails())) {
-				Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
-				request.setAttribute("formMessages", errors);
-				forwardPage(Page.UPDATE_PROFILE, request, response);
-			} else {
-				if (!StringUtils.isBlank(fp.getString("passwd"))) {
-					userBean1.setPasswd(newDigestPass);
-					userBean1.setPasswdTimestamp(new Date());
-				}
-				request.getSession().setAttribute("userBean1", userBean1);
-				forwardPage(Page.UPDATE_PROFILE_CONFIRM, request, response);
+			if (!StringUtils.isBlank(fp.getString("passwd"))) {
+				userBean1.setPasswd(newDigestPass);
+				userBean1.setPasswdTimestamp(new Date());
 			}
+			request.getSession().setAttribute("userBean1", userBean1);
+			forwardPage(Page.UPDATE_PROFILE_CONFIRM, request, response);
 
 		} else {
 			logger.info("has validation errors");
@@ -204,10 +162,6 @@ public class UpdateProfileServlet extends Controller {
 
 	}
 
-	/**
-	 * Updates user new profile.
-	 * 
-	 */
 	private void submitProfile(UserAccountDAO udao, HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		logger.info("user bean to be updated:" + ub.getId() + ub.getFirstName());
@@ -225,22 +179,21 @@ public class UpdateProfileServlet extends Controller {
 		}
 	}
 
-	@SuppressWarnings("null")
 	private void updateCalendarEmailJob(UserAccountBean uaBean) {
 		String triggerGroup = "CALENDAR";
 		StdScheduler scheduler = getStdScheduler();
 		try {
 			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
-			if (legacyTriggers == null && legacyTriggers.size() == 0) {
+			if (legacyTriggers == null || legacyTriggers.size() == 0) {
 				return;
 			}
 			for (TriggerKey triggerKey : legacyTriggers) {
 				Trigger trigger = scheduler.getTrigger(triggerKey);
 				JobDataMap dataMap = trigger.getJobDataMap();
-				String contactEmail = dataMap.getString(EMAIL).toString();
-				int userId = (Integer) dataMap.getInt(USER_ID);
+				String contactEmail = dataMap.getString(EMAIL);
+				int userId = dataMap.getInt(USER_ID);
 				logger.info("contact email from calendared " + contactEmail + " for user userId " + userId);
-				logger.info("Old email " + dataMap.getString(EMAIL).toString());
+				logger.info("Old email " + dataMap.getString(EMAIL));
 				if (uaBean.getId() == userId) {
 					dataMap.put(EMAIL, uaBean.getEmail());
 					JobDetailImpl jobDetailBean = new JobDetailImpl();
@@ -250,13 +203,12 @@ public class UpdateProfileServlet extends Controller {
 					jobDetailBean.setName(triggerKey.getName());
 					jobDetailBean.setJobClass(org.akaza.openclinica.service.calendar.EmailStatefulJob.class);
 					jobDetailBean.setJobDataMap(dataMap);
-					logger.info("New email " + dataMap.getString(EMAIL).toString());
+					logger.info("New email " + dataMap.getString(EMAIL));
 					jobDetailBean.setDurability(true);
 					scheduler.addJob(jobDetailBean, true);
 				}
 			}
 		} catch (SchedulerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

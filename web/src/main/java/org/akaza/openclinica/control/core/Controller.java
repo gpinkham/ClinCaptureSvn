@@ -155,7 +155,7 @@ public abstract class Controller extends BaseController {
 	public static final String BOOSTRAP_DATE_FORMAT = "bootstrapDateFormat";
 	public static final String BOOTSTRAP_DATAPICKER_DATE_FORMAT = "bootstrap_datapicker_date_format";
 	public static final String TIME_ZONE_IDS_SORTED_REQUEST_ATR = "timeZoneIDsSorted";
-	public static final String INPUT_USER_TIME_ZONE_ID = "userTimeZoneID";
+	public static final String INPUT_TIME_ZONE = "timeZone";
 
 	// entity bean list field names
 	public static final String EBL_PAGE = "ebl_page";
@@ -179,11 +179,10 @@ public abstract class Controller extends BaseController {
 	public static boolean mayViewData(UserAccountBean ub, StudyUserRoleBean currentRole) {
 		if (currentRole != null) {
 			Role r = currentRole.getRole();
-			if (r != null
-					&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
-							|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
-							|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_CODER)
-							|| r.equals(Role.STUDY_EVALUATOR) || Role.isMonitor(r))) {
+			if (r != null && (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
+					|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
+					|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_CODER)
+					|| r.equals(Role.STUDY_EVALUATOR) || Role.isMonitor(r))) {
 				return true;
 			}
 		}
@@ -203,10 +202,9 @@ public abstract class Controller extends BaseController {
 	public static boolean maySubmitData(UserAccountBean ub, StudyUserRoleBean currentRole) {
 		if (currentRole != null && ub != null) {
 			Role r = currentRole.getRole();
-			if (r != null
-					&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
-							|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
-							|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_EVALUATOR))) {
+			if (r != null && (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
+					|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
+					|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_EVALUATOR))) {
 				return true;
 			}
 		}
@@ -351,8 +349,8 @@ public abstract class Controller extends BaseController {
 		try {
 			if (jobName != null && groupName != null) {
 				logger.info("trying to retrieve status on " + jobName + " " + groupName);
-				Trigger.TriggerState state = getStdScheduler().getTriggerState(
-						TriggerKey.triggerKey(jobName, groupName));
+				Trigger.TriggerState state = getStdScheduler()
+						.getTriggerState(TriggerKey.triggerKey(jobName, groupName));
 				logger.info("found state: " + state);
 				org.quartz.JobDetail details = getStdScheduler().getJobDetail(JobKey.jobKey(jobName, groupName));
 				org.quartz.JobDataMap dataMap = details.getJobDataMap();
@@ -365,9 +363,8 @@ public abstract class Controller extends BaseController {
 						// The extract data job failed with the message:
 						// ERROR: relation "demographics" already exists
 						// More information may be available in the log files.
-						addPageMessage(
-								respage.getString("the_extract_data_job_failed") + failMessage
-										+ respage.getString("more_information_may_be_available"), request);
+						addPageMessage(respage.getString("the_extract_data_job_failed") + failMessage
+								+ respage.getString("more_information_may_be_available"), request);
 						request.getSession().removeAttribute("jobName");
 						request.getSession().removeAttribute("groupName");
 						request.getSession().removeAttribute("datasetId");
@@ -383,10 +380,9 @@ public abstract class Controller extends BaseController {
 							if (successMsg != null && !successMsg.isEmpty()) {
 								addPageMessage(successMsg, request);
 							} else {
-								addPageMessage(
-										respage.getString("your_extract_is_now_completed")
-												+ " <a href='ExportDataset?datasetId=" + datasetId + "'>"
-												+ resword.getString("here_lower_case") + "</a>.", request);
+								addPageMessage(respage.getString("your_extract_is_now_completed")
+										+ " <a href='ExportDataset?datasetId=" + datasetId + "'>"
+										+ resword.getString("here_lower_case") + "</a>.", request);
 							}
 							request.getSession().removeAttribute("jobName");
 							request.getSession().removeAttribute("groupName");
@@ -408,9 +404,9 @@ public abstract class Controller extends BaseController {
 		ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
 
 		if (fileBeans.size() > 0) {
-			successMsg = successMsg.replace("$linkURL", "<a href=\"" + SQLInitServlet.getSystemURL()
-					+ "AccessFile?fileId=" + fileBeans.get(0).getId() + "\">" + resword.getString("here_lower_case")
-					+ "</a>");
+			successMsg = successMsg.replace("$linkURL",
+					"<a href=\"" + SQLInitServlet.getSystemURL() + "AccessFile?fileId=" + fileBeans.get(0).getId()
+							+ "\">" + resword.getString("here_lower_case") + "</a>");
 		}
 		return successMsg;
 	}
@@ -436,8 +432,8 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
-	private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
-			UnsupportedEncodingException {
+	private void process(HttpServletRequest request, HttpServletResponse response)
+			throws OpenClinicaException, UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
 		HttpSession session = request.getSession();
 		reloadUserBean(session, getUserAccountDAO());
@@ -545,8 +541,9 @@ public abstract class Controller extends BaseController {
 			String randomizationEnviroment = currentStudy.getStudyParameterConfig().getRandomizationEnviroment();
 			session.setAttribute("randomizationEnviroment", randomizationEnviroment);
 
-			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
-					.getId();
+			int currentStudyId = currentStudy.getParentStudyId() > 0
+					? currentStudy.getParentStudyId()
+					: currentStudy.getId();
 			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
 					currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
 			request.getSession().setAttribute(EVALUATION_ENABLED, isEvaluationEnabled);
@@ -571,7 +568,8 @@ public abstract class Controller extends BaseController {
 			if (currentRole == null || currentRole.getId() <= 0) {
 				// if current study has been "removed", current role will be
 				// kept as "invalid"
-				if (ub.getId() > 0 && currentStudy.getId() > 0 && !currentStudy.getStatus().getName().equals("removed")) {
+				if (ub.getId() > 0 && currentStudy.getId() > 0
+						&& !currentStudy.getStatus().getName().equals("removed")) {
 					currentRole = ub.getRoleByStudy(currentStudy.getId());
 					if (currentStudy.getParentStudyId() > 0) {
 						// Checking if currentStudy has been removed or not will
@@ -588,9 +586,8 @@ public abstract class Controller extends BaseController {
 			} else {
 				// For the case that current role is not "invalid" but current
 				// active study has been removed.
-				if (currentRole.getId() > 0
-						&& (currentStudy.getStatus().equals(Status.DELETED) || currentStudy.getStatus().equals(
-								Status.AUTO_DELETED))) {
+				if (currentRole.getId() > 0 && (currentStudy.getStatus().equals(Status.DELETED)
+						|| currentStudy.getStatus().equals(Status.AUTO_DELETED))) {
 					currentRole.setRole(Role.INVALID);
 					currentRole.setStatus(Status.DELETED);
 					session.setAttribute("userRole", currentRole);
@@ -629,8 +626,8 @@ public abstract class Controller extends BaseController {
 			forwardPage(ise.getGoTo(), request, response);
 		} catch (InsufficientPermissionException ipe) {
 			ipe.printStackTrace();
-			logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.Controller: "
-					+ ipe.getMessage());
+			logger.warn(
+					"InsufficientPermissionException: org.akaza.openclinica.control.Controller: " + ipe.getMessage());
 			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
 				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			}
@@ -767,8 +764,8 @@ public abstract class Controller extends BaseController {
 	 * @throws IOException
 	 *             will be thrown in case of failed or interrupted I/O operations.
 	 */
-	public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		if (request.getMethod().equalsIgnoreCase("GET")) {
 			doGet(request, response);
 		} else if (request.getMethod().equalsIgnoreCase("POST")) {
@@ -789,8 +786,8 @@ public abstract class Controller extends BaseController {
 	 *             will be thrown in case of failed or interrupted I/O operations.
 	 */
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			java.io.IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, java.io.IOException {
 		try {
 			Navigation.addToNavigationStack(request);
 			logger.debug("Request");
@@ -816,8 +813,8 @@ public abstract class Controller extends BaseController {
 	 *             will be thrown in case of failed or interrupted I/O operations.
 	 */
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			java.io.IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, java.io.IOException {
 		try {
 			Navigation.addToNavigationStack(request);
 			logger.debug("Post");
@@ -1167,8 +1164,8 @@ public abstract class Controller extends BaseController {
 		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
 		List<StudyGroupClassBean> dynamicGroupClasses = studyGroupClassDAO.findAllActiveDynamicGroupsByStudyId(studyId);
 		for (StudyGroupClassBean dynGroup : dynamicGroupClasses) {
-			dynGroup.setEventDefinitions(studyEventDefinitionDao.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup
-					.getId()));
+			dynGroup.setEventDefinitions(
+					studyEventDefinitionDao.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup.getId()));
 		}
 
 		it = dynamicGroupClasses.listIterator();
@@ -1299,7 +1296,7 @@ public abstract class Controller extends BaseController {
 	 */
 	public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail,
 			String successMessage, String failMessage, Boolean sendMessage, HttpServletRequest request)
-			throws Exception {
+					throws Exception {
 		return sendEmailWithAttach(to, from, subject, body, htmlEmail, successMessage, failMessage, sendMessage,
 				new String[0], request);
 	}
@@ -1333,7 +1330,7 @@ public abstract class Controller extends BaseController {
 	 */
 	public Boolean sendEmailWithAttach(String to, String from, String subject, String body, Boolean htmlEmail,
 			String successMessage, String failMessage, Boolean sendMessage, String[] files, HttpServletRequest request)
-			throws Exception {
+					throws Exception {
 		Boolean messageSent = true;
 		if (allRequiredAttributesNotEmpty(to, from)) {
 			try {
@@ -1612,9 +1609,8 @@ public abstract class Controller extends BaseController {
 			siteUserRole = ub.getRoleByStudy(siteId);
 		}
 		if (studyUserRole.getRole().equals(Role.INVALID) && siteUserRole.getRole().equals(Role.INVALID)) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+					+ respage.getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 		}
 	}
@@ -1842,8 +1838,8 @@ public abstract class Controller extends BaseController {
 		answer.setSections(sections);
 
 		// get metadata
-		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(
-				seb.getStudyEventDefinitionId());
+		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
+				.findByPK(seb.getStudyEventDefinitionId());
 		answer.setStudyEventDefinition(sedb);
 
 		CRFVersionBean cvb = (CRFVersionBean) getCRFVersionDAO().findByPK(ecb.getCRFVersionId());
@@ -1853,8 +1849,8 @@ public abstract class Controller extends BaseController {
 		answer.setCrf(cb);
 
 		StudyBean studyForStudySubject = getStudyDAO().findByStudySubjectId(ssb.getId());
-		EventDefinitionCRFBean edcb = getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFId(
-				studyForStudySubject, sedb.getId(), cb.getId());
+		EventDefinitionCRFBean edcb = getEventDefinitionCRFDAO()
+				.findByStudyEventDefinitionIdAndCRFId(studyForStudySubject, sedb.getId(), cb.getId());
 		answer.setEventDefinitionCRF(edcb);
 
 		answer.setAction(getActionForStage(ecb.getStage()));
@@ -1889,8 +1885,8 @@ public abstract class Controller extends BaseController {
 					showSections.add(s);
 				} else {
 					// for section contains dynamics, does it contain showing item_group/item?
-					if (dynamicsMetadataService
-							.hasShowingDynGroupInSection(s.getId(), s.getCRFVersionId(), ecb.getId())) {
+					if (dynamicsMetadataService.hasShowingDynGroupInSection(s.getId(), s.getCRFVersionId(),
+							ecb.getId())) {
 						showSections.add(s);
 					} else {
 						if (dynamicsMetadataService.hasShowingDynItemInSection(s.getId(), s.getCRFVersionId(),
@@ -2138,8 +2134,8 @@ public abstract class Controller extends BaseController {
 			for (DiscrepancyNoteBean discrepancyNote : notes) {
 
 				UserAccountBean owner = (UserAccountBean) getUserAccountDAO().findByPK(discrepancyNote.getOwnerId());
-				UserAccountBean assignedUser = (UserAccountBean) getUserAccountDAO().findByPK(
-						discrepancyNote.getAssignedUserId());
+				UserAccountBean assignedUser = (UserAccountBean) getUserAccountDAO()
+						.findByPK(discrepancyNote.getAssignedUserId());
 
 				if (isCoder(assignedUser, request) || isCoder(owner, request)) {
 
@@ -2257,8 +2253,8 @@ public abstract class Controller extends BaseController {
 		}
 		Collections.sort(studyEvents, new Comparator<StudyEventBean>() {
 			public int compare(StudyEventBean se1, StudyEventBean se2) {
-				int result = new Integer(se1.getStudyEventDefinitionOrdinal()).compareTo(se2
-						.getStudyEventDefinitionOrdinal());
+				int result = new Integer(se1.getStudyEventDefinitionOrdinal())
+						.compareTo(se2.getStudyEventDefinitionOrdinal());
 				if (result == 0) {
 					result = new Integer(se1.getSampleOrdinal()).compareTo(se2.getSampleOrdinal());
 					if (result == 0) {

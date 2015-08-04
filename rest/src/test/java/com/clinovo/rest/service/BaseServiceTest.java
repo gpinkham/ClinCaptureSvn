@@ -204,7 +204,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		String firstName = "firstName_".concat(Long.toString(timestamp));
 		String lastName = "lastName_".concat(Long.toString(timestamp));
 		String email = "email@gmail.com";
-		String phone = "375295676363";
+		String phone = "+375232345678";
 		String company = "home";
 		MvcResult result = this.mockMvc.perform(post(API_USER_CREATE).accept(mediaType).param("username", userName)
 				.param("firstname", firstName).param("lastname", lastName).param("email", email).param("phone", phone)
@@ -228,7 +228,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		userAccountBean.setFirstName("john");
 		userAccountBean.setLastName("dong");
 		userAccountBean.setEmail("jd@gmail.com");
-		userAccountBean.setPhone("234234234234");
+		userAccountBean.setPhone("+375232345678");
 		userAccountBean.setInstitutionalAffiliation("Clinovo");
 		userAccountBean.setActiveStudyId(studyId);
 		userAccountBean.setPasswd(securityManager.encryptPassword(password, null));

@@ -5,6 +5,7 @@
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <jsp:include page="../include/managestudy_top_pages.jsp" />
 
@@ -39,10 +40,11 @@
 <c:set var="lastName" value="" />
 <c:set var="email" value="" />
 <c:set var="phone" value="" />
-<c:set var="institutionalAffiliation" value="" />
+<c:set var="company" value="" />
 <c:set var="userTypeId" value="${0}" />
 <c:set var="resetPassword" value="${0}" />
-<c:set var="displayPwd" value="no" />
+<c:set var="allowSoap" value="false"/>
+<c:set var="displayPassword" value="false"/>
 
 <c:forEach var="presetValue" items="${presetValues}">
     <c:if test='${presetValue.key == "firstName"}'>
@@ -57,8 +59,8 @@
     <c:if test='${presetValue.key == "phone"}'>
       <c:set var="phone" value="${presetValue.value}" />
     </c:if>
-    <c:if test='${presetValue.key == "institutionalAffiliation"}'>
-        <c:set var="institutionalAffiliation" value="${presetValue.value}" />
+    <c:if test='${presetValue.key == "company"}'>
+        <c:set var="company" value="${presetValue.value}" />
     </c:if>
     <c:if test='${presetValue.key == "userType"}'>
         <c:set var="userTypeId" value="${presetValue.value}" />
@@ -66,17 +68,17 @@
     <c:if test='${presetValue.key == "resetPassword"}'>
         <c:set var="resetPassword" value="${presetValue.value}" />
     </c:if>
-    <c:if test='${presetValue.key == "displayPwd"}'>
-        <c:set var="displayPwd" value="${presetValue.value}" />
+    <c:if test='${presetValue.key == "displayPassword"}'>
+        <c:set var="displayPassword" value="${presetValue.value}" />
     </c:if>
-    <c:if test='${presetValue.key == "runWebServices"}'>
-        <c:set var="runWebServices" value="${presetValue.value}" />
+    <c:if test='${presetValue.key == "allowSoap"}'>
+        <c:set var="allowSoap" value="${presetValue.value}" />
     </c:if>
     <c:if test='${presetValue.key == "notifyPassword"}'>
         <c:set var="notifyPassword" value="${presetValue.value}" />
     </c:if>
-	<c:if test='${presetValue.key == "userTimeZoneID"}'>
-		<c:set var="userTimeZoneID" value="${presetValue.value}"/>
+	<c:if test='${presetValue.key == "timeZone"}'>
+		<c:set var="timeZone" value="${presetValue.value}"/>
 	</c:if>
 </c:forEach>
 <h1>
@@ -85,7 +87,7 @@
 	</span>
 </h1>
 
-<form action="EditUserAccount" id="edit_user" method="post" onsubmit="return isPhoneNumberValid('phone', '<fmt:message key="invalid_phone_number_format" bundle="${resword}"/>');">
+<form action="EditUserAccount" id="edit_user" method="post">
 <jsp:include page="../include/showSubmitted.jsp" />
 <jsp:include page="../include/showHiddenInput.jsp"><jsp:param name="fieldName" value="userId" /></jsp:include>
 <jsp:include page="../include/showHiddenInput.jsp"><jsp:param name="fieldName" value="stepNum" /></jsp:include>
@@ -194,8 +196,7 @@
 						       class="formfieldM"/>
 					</div>
 				</td>
-				<td><span style="white-space: nowrap;">(<fmt:message key="phone_number_format_ex"
-				                                                     bundle="${resword}"/>)</span><br/>&nbsp;
+				<td><span style="white-space: nowrap;">(<fmt:message key="phone_number_format_ex" bundle="${resword}"/> <fmt:message key="phone_format" bundle="${resformat}"/>)</span><br/>&nbsp;
 				</td>
 			</tr>
 			<tr>
@@ -216,8 +217,8 @@
 			<tr>
 				<td valign="top">
 					<div class="formfieldM_BG">
-						<input type="text" name="institutionalAffiliation"
-						       value="<c:out value="${institutionalAffiliation}"/>" size="20"
+						<input type="text" name="company"
+						       value="<c:out value="${company}"/>" size="20"
 						       class="formfieldM"/>
 					</div>
 				</td>
@@ -226,7 +227,7 @@
 			<tr>
 				<td colspan="2">
 					<jsp:include page="../showMessage.jsp">
-						<jsp:param name="key" value="institutionalAffiliation"/>
+						<jsp:param name="key" value="company"/>
 					</jsp:include>
 				</td>
 			</tr>
@@ -241,9 +242,9 @@
 				<tr>
 					<td valign="top">
 						<div class="formfieldXL_BG">
-							<select id="userTimeZoneID" name="userTimeZoneID" class="formfieldXL">
+							<select id="timeZone" name="timeZone" class="formfieldXL">
 								<c:forEach var="timeZoneID" items="${timeZoneIDsSorted}">
-									<option value='<c:out value="${timeZoneID.key}" />' <c:if test="${timeZoneID.key == userTimeZoneID}">selected</c:if>>
+									<option value='<c:out value="${timeZoneID.key}" />' <c:if test="${timeZoneID.key == timeZone}">selected</c:if>>
 										<c:out value="${timeZoneID.value}"/>
 									</option>
 								</c:forEach>
@@ -306,16 +307,15 @@
 		<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<td valign="top">
-					<input type="checkbox" name="runWebServices" id="runWebServices" value="1"
-					       <c:if test="${runWebServices != 0}">checked</c:if>
-							>
+					<input type="checkbox" name="allowSoap" id="allowSoap" value="true"
+					       <c:if test="${allowSoap}">checked</c:if>/>
 				</td>
 				<td></td>
 			</tr>
 			<tr>
 				<td colspan="2">
 					<jsp:include page="../showMessage.jsp">
-						<jsp:param name="key" value="runWebServices"/>
+						<jsp:param name="key" value="allowSoap"/>
 					</jsp:include>
 				</td>
 			</tr>
@@ -335,16 +335,16 @@
 <tr>
 	<td colspan="2">
 		<c:choose>
-			<c:when test="${displayPwd == 'no'}">
-				<input type="radio" name="displayPwd" id="displayPwd0" value="no" checked
+			<c:when test="${!displayPassword}">
+				<input type="radio" name="displayPassword" id="displayPwd0" value="false" checked
 				       disabled="true"><fmt:message key="send_user_password_via_email" bundle="${resword}"/>
-				<input type="radio" name="displayPwd" id="displayPwd1" value="yes"
+				<input type="radio" name="displayPassword" id="displayPwd1" value="true"
 				       disabled="true"><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
 			</c:when>
 			<c:otherwise>
-				<input type="radio" name="displayPwd" id="displayPwd0" value="no"
+				<input type="radio" name="displayPassword" id="displayPwd0" value="false"
 				       disabled="true"><fmt:message key="send_user_password_via_email" bundle="${resword}"/>
-				<input type="radio" checked name="displayPwd" id="displayPwd1" value="yes"
+				<input type="radio" checked name="displayPassword" id="displayPwd1" value="true"
 				       disabled="true"><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
 			</c:otherwise>
 		</c:choose>

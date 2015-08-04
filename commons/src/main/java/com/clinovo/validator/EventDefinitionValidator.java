@@ -34,12 +34,14 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.context.MessageSource;
 
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.EmailUtil;
+import com.clinovo.util.RequestUtil;
 import com.clinovo.util.ValidatorHelper;
 
 /**
@@ -65,18 +67,18 @@ public final class EventDefinitionValidator {
 
 	/**
 	 * Method perform validation.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
+	 *
 	 * @param configurationDao
 	 *            ConfigurationDao
-	 * @param studyUserRoleBeanList
-	 *            List of StudyUserRoleBeans
+	 * @param userAccountDao
+	 *            UserAccountDAO
+	 * @param currentStudy
+	 *            StudyBean
 	 * @return HashMap
 	 */
-	public static HashMap validate(HttpServletRequest request, ConfigurationDao configurationDao,
-			ArrayList<StudyUserRoleBean> studyUserRoleBeanList) {
-		return validate(request, configurationDao, studyUserRoleBeanList, false);
+	public static HashMap validate(ConfigurationDao configurationDao, UserAccountDAO userAccountDao,
+			StudyBean currentStudy) {
+		return validate(configurationDao, userAccountDao, currentStudy, false);
 	}
 
 	private static ArrayList getErrorMessages(String code) {
@@ -89,20 +91,24 @@ public final class EventDefinitionValidator {
 	/**
 	 * Method perform validation.
 	 *
-	 * @param request
-	 *            HttpServletRequest
 	 * @param configurationDao
 	 *            ConfigurationDao
-	 * @param studyUserRoleBeanList
-	 *            List of StudyUserRoleBeans
+	 * @param userAccountDao
+	 *            UserAccountDAO
+	 * @param currentStudy
+	 *            StudyBean
 	 * @param lowerCaseParameterNames
 	 *            boolean
 	 * @return HashMap
 	 */
-	public static HashMap validate(HttpServletRequest request, ConfigurationDao configurationDao,
-			ArrayList<StudyUserRoleBean> studyUserRoleBeanList, boolean lowerCaseParameterNames) {
+	public static HashMap validate(ConfigurationDao configurationDao, UserAccountDAO userAccountDao,
+			StudyBean currentStudy, boolean lowerCaseParameterNames) {
+		HttpServletRequest request = RequestUtil.getRequest();
 		FormProcessor fp = new FormProcessor(request);
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
+
+		ArrayList<StudyUserRoleBean> studyUserRoleBeanList = userAccountDao.findAllByStudyId(currentStudy.getId());
+
 		Validator validator = new Validator(new ValidatorHelper(request, configurationDao));
 
 		validator.addValidation(name("name", lowerCaseParameterNames), Validator.NO_BLANKS);
@@ -167,33 +173,37 @@ public final class EventDefinitionValidator {
 		int emailDay = fp.getInt(name("emailDay", lowerCaseParameterNames));
 		String emailUser = fp.getString(name("emailUser", lowerCaseParameterNames));
 
-		if (errors.isEmpty()
-				&& ((type.equals(CALENDARED_VISIT) && isReference.equalsIgnoreCase("true")) || !type
-						.equals(CALENDARED_VISIT))) {
+		if (errors.isEmpty() && ((type.equals(CALENDARED_VISIT) && isReference.equalsIgnoreCase("true"))
+				|| !type.equals(CALENDARED_VISIT))) {
 			if (maxDay != 0) {
-				errors.put(name("maxDay", lowerCaseParameterNames), getErrorMessages(type.equals(CALENDARED_VISIT)
-						? "rest.studyEventDefinition.dayMaxIsNotUsedForReferenceEvent"
-						: "rest.studyEventDefinition.dayMaxIsUsedForCalendaredEventsOnly"));
+				errors.put(name("maxDay", lowerCaseParameterNames),
+						getErrorMessages(type.equals(CALENDARED_VISIT)
+								? "rest.studyEventDefinition.dayMaxIsNotUsedForReferenceEvent"
+								: "rest.studyEventDefinition.dayMaxIsUsedForCalendaredEventsOnly"));
 				return errors;
 			} else if (minDay != 0) {
-				errors.put(name("minDay", lowerCaseParameterNames), getErrorMessages(type.equals(CALENDARED_VISIT)
-						? "rest.studyEventDefinition.dayMinIsNotUsedForReferenceEvent"
-						: "rest.studyEventDefinition.dayMinIsUsedForCalendaredEventsOnly"));
+				errors.put(name("minDay", lowerCaseParameterNames),
+						getErrorMessages(type.equals(CALENDARED_VISIT)
+								? "rest.studyEventDefinition.dayMinIsNotUsedForReferenceEvent"
+								: "rest.studyEventDefinition.dayMinIsUsedForCalendaredEventsOnly"));
 				return errors;
 			} else if (schDay != 0) {
-				errors.put(name("schDay", lowerCaseParameterNames), getErrorMessages(type.equals(CALENDARED_VISIT)
-						? "rest.studyEventDefinition.dayScheduleIsNotUsedForReferenceEvent"
-						: "rest.studyEventDefinition.dayScheduleIsUsedForCalendaredEventsOnly"));
+				errors.put(name("schDay", lowerCaseParameterNames),
+						getErrorMessages(type.equals(CALENDARED_VISIT)
+								? "rest.studyEventDefinition.dayScheduleIsNotUsedForReferenceEvent"
+								: "rest.studyEventDefinition.dayScheduleIsUsedForCalendaredEventsOnly"));
 				return errors;
 			} else if (emailDay != 0) {
-				errors.put(name("emailDay", lowerCaseParameterNames), getErrorMessages(type.equals(CALENDARED_VISIT)
-						? "rest.studyEventDefinition.dayEmailIsNotUsedForReferenceEvent"
-						: "rest.studyEventDefinition.dayEmailIsUsedForCalendaredEventsOnly"));
+				errors.put(name("emailDay", lowerCaseParameterNames),
+						getErrorMessages(type.equals(CALENDARED_VISIT)
+								? "rest.studyEventDefinition.dayEmailIsNotUsedForReferenceEvent"
+								: "rest.studyEventDefinition.dayEmailIsUsedForCalendaredEventsOnly"));
 				return errors;
 			} else if (!emailUser.isEmpty()) {
-				errors.put(name("emailUser", lowerCaseParameterNames), getErrorMessages(type.equals(CALENDARED_VISIT)
-						? "rest.studyEventDefinition.userNameIsNotUsedForReferenceEvent"
-						: "rest.studyEventDefinition.userNameIsUsedForCalendaredEventsOnly"));
+				errors.put(name("emailUser", lowerCaseParameterNames),
+						getErrorMessages(type.equals(CALENDARED_VISIT)
+								? "rest.studyEventDefinition.userNameIsNotUsedForReferenceEvent"
+								: "rest.studyEventDefinition.userNameIsUsedForCalendaredEventsOnly"));
 				return errors;
 			}
 		}
@@ -281,23 +291,23 @@ public final class EventDefinitionValidator {
 			errors.put("eventid", errorMessages);
 		} else if (crfVersionBean.getId() == 0) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotFound", new Object[]{crfName,
-					versionName}, locale));
+			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotFound",
+					new Object[]{crfName, versionName}, locale));
 			errors.put("crfname", errorMessages);
 		} else if (!crfVersionBean.getStatus().equals(Status.AVAILABLE)) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotAvailable", new Object[]{
-					crfName, versionName}, locale));
+			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotAvailable",
+					new Object[]{crfName, versionName}, locale));
 			errors.put("crfname", errorMessages);
 		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.doesNotBelongToCurrentStudy", new Object[]{eventId,
-					currentStudy.getId()}, locale));
+			errorMessages.add(messageSource.getMessage("rest.event.doesNotBelongToCurrentStudy",
+					new Object[]{eventId, currentStudy.getId()}, locale));
 			errors.put("eventid", errorMessages);
 		} else if (eventDefinitionCrfBean.getId() > 0) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.eventDefinitionCrfAlreadyExists", new Object[]{
-					crfVersionBean.getCrfId(), eventId}, locale));
+			errorMessages.add(messageSource.getMessage("rest.event.eventDefinitionCrfAlreadyExists",
+					new Object[]{crfVersionBean.getCrfId(), eventId}, locale));
 			errors.put("eventid", errorMessages);
 		} else if (hasSDVRequiredItems && sdvCode != 2) {
 			ArrayList errorMessages = new ArrayList();

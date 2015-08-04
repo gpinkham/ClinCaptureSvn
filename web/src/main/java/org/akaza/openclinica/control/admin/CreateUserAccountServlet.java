@@ -29,11 +29,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.util.DateUtil;
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.TermType;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -41,22 +38,19 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.util.DateUtil;
 import com.clinovo.util.EmailUtil;
 import com.clinovo.util.StudyParameterPriorityUtil;
-import com.clinovo.util.ValidatorHelper;
+import com.clinovo.validator.UserValidator;
 
 /**
  * Servlet for creating a user account.
@@ -72,17 +66,13 @@ public class CreateUserAccountServlet extends Controller {
 	public static final String INPUT_LAST_NAME = "lastName";
 	public static final String INPUT_EMAIL = "email";
 	public static final String INPUT_PHONE = "phone";
-	public static final String INPUT_INSTITUTION = "institutionalAffiliation";
+	public static final String INPUT_COMPANY = "company";
 	public static final String INPUT_STUDY = "activeStudy";
 	public static final String INPUT_ROLE = "role";
 	public static final String INPUT_TYPE = "type";
-	public static final String INPUT_DISPLAY_PWD = "displayPwd";
-	public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
+	public static final String INPUT_DISPLAY_PASSWORD = "displayPassword";
+	public static final String INPUT_ALLOW_SOAP = "allowSoap";
 	public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
-	public static final int USERNAME_LENGTH = 64;
-	public static final int NAMES_LENGTH = 50;
-	public static final int EMAIL_LENGTH = 120;
-	public static final int INPUT_INSTITUTION_LENGTH = 255;
 	public static final String DEFAULT_TIME_ZONE_ID_REQUEST_ATR = "defaultTimeZoneID";
 
 	@Override
@@ -130,16 +120,16 @@ public class CreateUserAccountServlet extends Controller {
 		Boolean changeRoles = request.getParameter("changeRoles") != null
 				&& Boolean.parseBoolean(request.getParameter("changeRoles"));
 		int activeStudy = fp.getInt(INPUT_STUDY);
-		StudyBean study = (StudyBean) sdao.findByPK(activeStudy);
+		StudyBean studyBean = (StudyBean) sdao.findByPK(activeStudy);
 		request.setAttribute("roles", roleMap);
 		request.setAttribute("activeStudy", activeStudy);
-		request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
+		request.setAttribute("isThisStudy", !(studyBean.getParentStudyId() > 0));
 
 		if (!fp.isSubmitted() || changeRoles) {
 			String[] textFields = {INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
-					INPUT_INSTITUTION, INPUT_DISPLAY_PWD, INPUT_USER_TIME_ZONE_ID};
+					INPUT_COMPANY, INPUT_DISPLAY_PASSWORD, INPUT_ALLOW_SOAP, INPUT_TIME_ZONE};
 			fp.setCurrentStringValuesAsPreset(textFields);
-			String[] ddlbFields = {INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES};
+			String[] ddlbFields = {INPUT_STUDY, INPUT_ROLE, INPUT_TYPE};
 			fp.setCurrentIntValuesAsPreset(ddlbFields);
 			HashMap presetValues = fp.getPresetValues();
 			String sendPwd = SQLInitServlet.getField("user_account_notification");
@@ -152,9 +142,9 @@ public class CreateUserAccountServlet extends Controller {
 		} else {
 			UserType type = UserType.get(fp.getInt("type"));
 
-			UserAccountDAO udao = new UserAccountDAO(getDataSource());
-			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
-			HashMap errors = validatePageValues(v, udao, sdao);
+			UserAccountDAO userAccountDao = getUserAccountDAO();
+			HashMap errors = UserValidator.validateUserCreate(getConfigurationDao(), userAccountDao, getStudyDAO(),
+					studyBean);
 
 			if (errors.isEmpty()) {
 				UserAccountBean createdUserAccountBean = new UserAccountBean();
@@ -163,41 +153,26 @@ public class CreateUserAccountServlet extends Controller {
 				createdUserAccountBean.setLastName(fp.getString(INPUT_LAST_NAME));
 				createdUserAccountBean.setEmail(fp.getString(INPUT_EMAIL));
 				createdUserAccountBean.setPhone(fp.getString(INPUT_PHONE));
-				createdUserAccountBean.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
-
-				SecurityManager secm = getSecurityManager();
-				String password = secm.genPassword();
-				String passwordHash = secm.encryptPassword(password, getUserDetails());
-
-				createdUserAccountBean.setPasswd(passwordHash);
-
-				createdUserAccountBean.setPasswdTimestamp(null);
-				createdUserAccountBean.setLastVisitDate(null);
-
-				createdUserAccountBean.setStatus(Status.AVAILABLE);
-				createdUserAccountBean.setPasswdChallengeQuestion("");
-				createdUserAccountBean.setPasswdChallengeAnswer("");
-				createdUserAccountBean.setOwner(ub);
-				createdUserAccountBean.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
-				createdUserAccountBean.setUserTimeZoneId(fp.getString(INPUT_USER_TIME_ZONE_ID));
+				createdUserAccountBean.setInstitutionalAffiliation(fp.getString(INPUT_COMPANY));
+				createdUserAccountBean.setRunWebservices(fp.getString(INPUT_ALLOW_SOAP).equalsIgnoreCase("true"));
+				createdUserAccountBean.setUserTimeZoneId(fp.getString(INPUT_TIME_ZONE));
 
 				int studyId = fp.getInt(INPUT_STUDY);
 				int roleId = fp.getInt(INPUT_ROLE);
-
-				createdUserAccountBean = addActiveStudyRole(request, createdUserAccountBean, studyId, Role.get(roleId));
+				StudyUserRoleBean studyUserRole = addActiveStudyRole(request, createdUserAccountBean, studyId,
+						Role.get(roleId));
 
 				logger.warn("*** found type: " + fp.getInt("type"));
 				logger.warn("*** setting type: " + type.getDescription());
 				createdUserAccountBean.addUserType(type);
-				createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean);
-				AuthoritiesDao authoritiesDao = getAuthoritiesDao();
-				authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
-				String displayPwd = fp.getString(INPUT_DISPLAY_PWD);
+
+				getUserAccountService().createUser(ub, createdUserAccountBean, studyUserRole.getRole(), false,
+						getUserDetails());
 
 				if (createdUserAccountBean.isActive()) {
 					addPageMessage(respage.getString("the_user_account") + "\"" + createdUserAccountBean.getName()
 							+ "\"" + respage.getString("was_created_succesfully"), request);
-					if ("no".equalsIgnoreCase(displayPwd)) {
+					if (!"true".equalsIgnoreCase(fp.getString(INPUT_DISPLAY_PASSWORD))) {
 						try {
 							StudyBean emailParentStudy;
 							if (currentStudy.getParentStudyId() > 0) {
@@ -205,15 +180,16 @@ public class CreateUserAccountServlet extends Controller {
 							} else {
 								emailParentStudy = currentStudy;
 							}
-							sendNewAccountEmail(request, createdUserAccountBean, password, emailParentStudy.getName());
+							sendNewAccountEmail(request, createdUserAccountBean, emailParentStudy.getName());
 						} catch (Exception e) {
 							addPageMessage(respage.getString("there_was_an_error_sending_account_creating_mail"),
 									request);
 						}
 					} else {
 						addPageMessage(
-								respage.getString("user_password") + "<br/>" + password + "<br/> "
-										+ respage.getString("please_write_down_the_password_and_provide"), request);
+								respage.getString("user_password") + "<br/>" + createdUserAccountBean.getRealPassword()
+										+ "<br/> " + respage.getString("please_write_down_the_password_and_provide"),
+								request);
 					}
 				} else {
 					addPageMessage(respage.getString("the_user_account") + "\"" + createdUserAccountBean.getName()
@@ -229,10 +205,10 @@ public class CreateUserAccountServlet extends Controller {
 				}
 			} else {
 				String[] textFields = {INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
-						INPUT_INSTITUTION, INPUT_DISPLAY_PWD, INPUT_USER_TIME_ZONE_ID};
+						INPUT_COMPANY, INPUT_DISPLAY_PASSWORD, INPUT_ALLOW_SOAP, INPUT_TIME_ZONE};
 				fp.setCurrentStringValuesAsPreset(textFields);
 
-				String[] ddlbFields = {INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES};
+				String[] ddlbFields = {INPUT_STUDY, INPUT_ROLE, INPUT_TYPE};
 				fp.setCurrentIntValuesAsPreset(ddlbFields);
 
 				HashMap presetValues = fp.getPresetValues();
@@ -240,7 +216,7 @@ public class CreateUserAccountServlet extends Controller {
 
 				setInputMessages(errors, request);
 				addPageMessage(respage.getString("there_were_some_errors_submission")
-								+ respage.getString("see_below_for_details"), request);
+						+ respage.getString("see_below_for_details"), request);
 
 				request.setAttribute(TIME_ZONE_IDS_SORTED_REQUEST_ATR, DateUtil.getAvailableTimeZoneIDsSorted());
 				forwardPage(Page.CREATE_ACCOUNT, request, response);
@@ -262,40 +238,15 @@ public class CreateUserAccountServlet extends Controller {
 		int parentStudyId = selectedStudyBean.getParentStudyId() > 0
 				? selectedStudyBean.getParentStudyId()
 				: selectedStudyBean.getId();
-		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
-				parentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation", parentStudyId,
+				getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
 		if (!isEvaluationEnabled) {
 			roleMap.remove(Role.STUDY_EVALUATOR.getId());
 		}
 		return roleMap;
 	}
 
-	private HashMap validatePageValues(Validator v, UserAccountDAO udao, StudyDAO sdao) {
-
-		v.addValidation(INPUT_USERNAME, Validator.NO_BLANKS);
-		v.addValidation(INPUT_USERNAME, Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, USERNAME_LENGTH);
-		v.addValidation(INPUT_USERNAME, Validator.IS_A_USERNAME);
-		v.addValidation(INPUT_USERNAME, Validator.USERNAME_UNIQUE, udao);
-		v.addValidation(INPUT_FIRST_NAME, Validator.NO_BLANKS);
-		v.addValidation(INPUT_LAST_NAME, Validator.NO_BLANKS);
-		v.addValidation(INPUT_FIRST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, NAMES_LENGTH);
-		v.addValidation(INPUT_LAST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, NAMES_LENGTH);
-		v.addValidation(INPUT_EMAIL, Validator.NO_BLANKS);
-		v.addValidation(INPUT_EMAIL, Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, EMAIL_LENGTH);
-		v.addValidation(INPUT_EMAIL, Validator.IS_A_EMAIL);
-		v.addValidation(INPUT_INSTITUTION, Validator.NO_BLANKS);
-		v.addValidation(INPUT_INSTITUTION, Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INPUT_INSTITUTION_LENGTH);
-		v.addValidation(INPUT_STUDY, Validator.ENTITY_EXISTS, sdao);
-		v.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
-		return v.validate();
-	}
-
-	private UserAccountBean addActiveStudyRole(HttpServletRequest request, UserAccountBean createdUserAccountBean,
+	private StudyUserRoleBean addActiveStudyRole(HttpServletRequest request, UserAccountBean createdUserAccountBean,
 			int studyId, Role r) {
 		UserAccountBean ub = getUserAccountBean(request);
 		createdUserAccountBean.setActiveStudyId(studyId);
@@ -309,11 +260,11 @@ public class CreateUserAccountServlet extends Controller {
 
 		createdUserAccountBean.addRole(activeStudyRole);
 
-		return createdUserAccountBean;
+		return activeStudyRole;
 	}
 
 	private void sendNewAccountEmail(HttpServletRequest request, UserAccountBean createdUserAccountBean,
-			String password, String studyName) throws Exception {
+			String studyName) throws Exception {
 		StringBuilder sb = new StringBuilder("");
 		logger.info("Sending account creation notification to " + createdUserAccountBean.getName());
 		String body = sb.append(EmailUtil.getEmailBodyStart()).append(resword.getString("dear")).append(" ")
@@ -321,13 +272,12 @@ public class CreateUserAccountServlet extends Controller {
 				.append(",<br><br>").append(restext.getString("a_new_user_account_has_been_created_for_you"))
 				.append("<br><br>").append(resword.getString("user_name")).append(": ")
 				.append(createdUserAccountBean.getName()).append("<br>").append(resword.getString("password"))
-				.append(": ").append(password).append("<br><br>")
+				.append(": ").append(createdUserAccountBean.getRealPassword()).append("<br><br>")
 				.append(restext.getString("please_test_your_login_information_and_let")).append("<br>")
 				.append(SQLInitServlet.getSystemURL()).append(" . <br><br> ")
 				.append(respage.getString("best_system_administrator").replace("{0}", studyName))
 				.append(EmailUtil.getEmailBodyEnd()).append(EmailUtil.getEmailFooter(CoreResources.getSystemLocale()))
 				.toString();
-
 		sendEmail(createdUserAccountBean.getEmail().trim(), restext.getString("your_new_openclinica_account"), body,
 				false, request);
 	}

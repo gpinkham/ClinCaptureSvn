@@ -47,7 +47,7 @@
 	<input type="hidden" name="lastName" value="${lastName}"/>
 	<input type="hidden" name="email" value="${email}"/>
 	<input type="hidden" name="phone" value="${phone}"/>
-	<input type="hidden" name="institutionalAffiliation" value="${institutionalAffiliation}"/>
+	<input type="hidden" name="company" value="${company}"/>
 	<input type="hidden" name="userType" value="${userType}"/>
 
 	<c:forEach var="sites" items="${sitesByStudies}" varStatus="studyNum">

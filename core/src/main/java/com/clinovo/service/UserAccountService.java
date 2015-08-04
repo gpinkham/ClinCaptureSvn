@@ -22,6 +22,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * UserAccountService.
@@ -175,6 +176,23 @@ public interface UserAccountService {
 
 	/**
 	 * Method that creates new user.
+	 *
+	 * @param ownerUser
+	 *            UserAccountBean
+	 * @param userAccountBean
+	 *            UserAccountBean
+	 * @param role
+	 *            Role
+	 * @param sendEmail
+	 *            boolean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void createUser(UserAccountBean ownerUser, UserAccountBean userAccountBean, Role role, boolean sendEmail)
+			throws Exception;
+
+	/**
+	 * Method that creates new user.
 	 * 
 	 * @param ownerUser
 	 *            UserAccountBean
@@ -182,13 +200,15 @@ public interface UserAccountService {
 	 *            UserAccountBean
 	 * @param role
 	 *            Role
-	 * @param displayPassword
+	 * @param sendEmail
 	 *            boolean
-	 * @param password
-	 *            String
+	 * @param userDetails
+	 *            UserDetails
+	 * @throws Exception
+	 *             an Exception
 	 */
-	void createUser(UserAccountBean ownerUser, UserAccountBean userAccountBean, Role role, boolean displayPassword,
-			String password);
+	void createUser(UserAccountBean ownerUser, UserAccountBean userAccountBean, Role role, boolean sendEmail,
+			UserDetails userDetails) throws Exception;
 
 	/**
 	 * Check if user has site-level roles or study level roles.
@@ -211,11 +231,28 @@ public interface UserAccountService {
 
 	/**
 	 * Restores user.
+	 *
+	 * @param userAccountBean
+	 *            UserAccountBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void restoreUser(UserAccountBean userAccountBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Restores user.
 	 * 
 	 * @param userAccountBean
 	 *            UserAccountBean
 	 * @param updater
 	 *            UserAccountBean
+	 * @param userDetails
+	 *            UserDetails
+	 * @throws Exception
+	 *             an Exception
 	 */
-	void restoreUser(UserAccountBean userAccountBean, UserAccountBean updater);
+	void restoreUser(UserAccountBean userAccountBean, UserAccountBean updater, UserDetails userDetails)
+			throws Exception;
 }

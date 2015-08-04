@@ -1,5 +1,11 @@
 package com.clinovo.controller.base;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -10,12 +16,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 @Component
 @SuppressWarnings("rawtypes")
@@ -38,8 +38,8 @@ public class BaseController {
 
 	public static final String INPUT_MESSAGES = "formMessages";
 	public static final String TIME_ZONE_IDS_SORTED_REQUEST_ATR = "timeZoneIDsSorted";
-	public static final String INPUT_USER_TIME_ZONE_ID = "userTimeZoneID";
-	
+	public static final String INPUT_TIME_ZONE = "timeZone";
+
 	public ArrayList getAllStudies() {
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		return (ArrayList) studyDAO.findAll();

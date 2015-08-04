@@ -14,6 +14,7 @@
       <Company>home</Company>
       <Phone>12341341334</Phone>
       <AllowSoap>true</AllowSoap>
+      <TimeZone>Etc/GMT+11</TimeZone>
       <Scope>1</Scope>
     </UserAccount>
   </RestData>

@@ -81,9 +81,8 @@ public class DefineStudyEventServlet extends Controller {
 		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
 
 		if (currentStudy.getParentStudyId() > 0) {
-			addPageMessage(
-					respage.getString("SED_may_only_added_top_level")
-							+ respage.getString("please_contact_sysadmin_questions"), request);
+			addPageMessage(respage.getString("SED_may_only_added_top_level")
+					+ respage.getString("please_contact_sysadmin_questions"), request);
 			throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST,
 					resexception.getString("not_top_study"), "1");
 		}
@@ -92,9 +91,8 @@ public class DefineStudyEventServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_persmission_add_SED_to_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_persmission_add_SED_to_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST,
 				resexception.getString("not_study_director"), "1");
 	}
@@ -208,8 +206,8 @@ public class DefineStudyEventServlet extends Controller {
 	private void confirmDefinition1(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.getSession().setAttribute("definition", createStudyEventDefinition(request));
 
-		HashMap errors = EventDefinitionValidator.validate(request, getConfigurationDao(), getUserAccountDAO()
-				.findAllByStudyId(getCurrentStudy().getId()));
+		HashMap errors = EventDefinitionValidator.validate(getConfigurationDao(), getUserAccountDAO(),
+				getCurrentStudy());
 
 		if (errors.isEmpty()) {
 			logger.info("no errors in the first section");
@@ -232,32 +230,21 @@ public class DefineStudyEventServlet extends Controller {
 				String type = fp.getString("type");
 				boolean changed = url.contains("formWithStateFlag=changed");
 				String tail = url.replaceAll(".*&ebl_page=", "&ebl_page=");
-				url = "submitted=1"
-						.concat(changed ? "&formWithStateFlag=changed" : "")
-						.concat("&name=")
-						.concat(fp.getString("name"))
-						.concat("&actionName=next")
-						.concat("&description=")
-						.concat(fp.getString("description"))
-						.concat("&type=")
-						.concat(fp.getString("type"))
-						.concat(!type.equalsIgnoreCase("calendared_visit") ? "&repeating=".concat(fp
-								.getString("repeating")) : "").concat("&category=").concat(fp.getString("category"));
+				url = "submitted=1".concat(changed ? "&formWithStateFlag=changed" : "").concat("&name=")
+						.concat(fp.getString("name")).concat("&actionName=next").concat("&description=")
+						.concat(fp.getString("description")).concat("&type=").concat(fp.getString("type"))
+						.concat(!type.equalsIgnoreCase("calendared_visit")
+								? "&repeating=".concat(fp.getString("repeating"))
+								: "")
+						.concat("&category=").concat(fp.getString("category"));
 				if (type.equalsIgnoreCase("calendared_visit")) {
 					String isReference = fp.getString("isReference");
-					url = url
-							.concat("&isReference=")
-							.concat(isReference)
-							.concat("&schDay=")
-							.concat(fp.getString("schDay"))
-							.concat("&maxDay=")
-							.concat(fp.getString("maxDay"))
-							.concat("&minDay=")
-							.concat(fp.getString("minDay"))
-							.concat("&emailDay=")
-							.concat(fp.getString("emailDay"))
-							.concat(!isReference.equalsIgnoreCase("true") ? "&emailUser=".concat(fp
-									.getString("emailUser")) : "");
+					url = url.concat("&isReference=").concat(isReference).concat("&schDay=")
+							.concat(fp.getString("schDay")).concat("&maxDay=").concat(fp.getString("maxDay"))
+							.concat("&minDay=").concat(fp.getString("minDay")).concat("&emailDay=")
+							.concat(fp.getString("emailDay")).concat(!isReference.equalsIgnoreCase("true")
+									? "&emailUser=".concat(fp.getString("emailUser"))
+									: "");
 				}
 				url = url.concat("&pageNum=1").concat(tail);
 			}
@@ -300,8 +287,8 @@ public class DefineStudyEventServlet extends Controller {
 			EntityBeanTable table = getEntityBeanTable();
 			ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
 			String[] columns = {resword.getString("CRF_name"), resword.getString("date_created"),
-					resword.getString("owner"), resword.getString("date_updated"),
-					resword.getString("last_updated_by"), resword.getString("selected")};
+					resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),
+					resword.getString("selected")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(FIVE);
 			StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) fp.getRequest().getSession()
@@ -337,11 +324,8 @@ public class DefineStudyEventServlet extends Controller {
 			String queryString = fp.getRequest().getQueryString();
 			if (queryString != null) {
 				String filterKeyword = fp.getRequest().getParameter("ebl_filterKeyword");
-				fp.getRequest()
-						.getSession()
-						.setAttribute(DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL, queryString.concat(filterKeyword != null ?
-										"&ebl_filterKeyword=".concat(filterKeyword) :
-										""));
+				fp.getRequest().getSession().setAttribute(DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL,
+						queryString.concat(filterKeyword != null ? "&ebl_filterKeyword=".concat(filterKeyword) : ""));
 			}
 			forwardPage(Page.DEFINE_STUDY_EVENT2, fp.getRequest(), response);
 		}
@@ -436,9 +420,8 @@ public class DefineStudyEventServlet extends Controller {
 			} else {
 				edcBean.setEvaluatedCRF(false);
 			}
-			if (!StringUtil.isBlank(tabbingMode)
-					&& ("leftToRight".equalsIgnoreCase(tabbingMode.trim()) || "topToBottom"
-							.equalsIgnoreCase(tabbingMode.trim()))) {
+			if (!StringUtil.isBlank(tabbingMode) && ("leftToRight".equalsIgnoreCase(tabbingMode.trim())
+					|| "topToBottom".equalsIgnoreCase(tabbingMode.trim()))) {
 				edcBean.setTabbingMode(tabbingMode);
 			} else {
 				edcBean.setTabbingMode("leftToRight");
@@ -511,8 +494,8 @@ public class DefineStudyEventServlet extends Controller {
 				// only find active versions
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
-				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(), getItemSDVService()
-						.hasItemsToSDV(cb.getId()));
+				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(),
+						getItemSDVService().hasItemsToSDV(cb.getId()));
 				crfArray.add(cb);
 				if (crfNameToEdcMap.get(cb.getName()) == null) {
 					crfNameToEdcMap.put(cb.getName(), new EventDefinitionCRFBean());
@@ -542,8 +525,8 @@ public class DefineStudyEventServlet extends Controller {
 
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
-				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(), getItemSDVService()
-						.hasItemsToSDV(cb.getId()));
+				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(),
+						getItemSDVService().hasItemsToSDV(cb.getId()));
 				crfArray.add(cb);
 				if (crfNameToEdcMap.get(cb.getName()) == null) {
 					crfNameToEdcMap.put(cb.getName(), new EventDefinitionCRFBean());

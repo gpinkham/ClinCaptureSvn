@@ -28,9 +28,9 @@ function saveEditUserFormState(stateHolder) {
 	stateHolder.lastName = $("input[name=lastName]").val();
 	stateHolder.email = $("input[name=email]").val();
 	stateHolder.phone = $("input[name=phone]").val();
-	stateHolder.institutionalAffiliation = $("input[name=institutionalAffiliation]").val();
+	stateHolder.company = $("input[name=company]").val();
 	stateHolder.userType = $("select[name=userType]").val();
-	stateHolder.runWebServices = $("input[name=runWebServices]").val();
+	stateHolder.allowSoap = $("input[name=allowSoap]").val();
 	stateHolder.resetPassword = $("input[name=resetPassword]").val();
 }
 
@@ -38,7 +38,7 @@ function back_checkEditUserFormState() {
 	var newState = {};
 	saveEditUserFormState(newState);
 	if (editUserFormState.firstName != newState.firstName || editUserFormState.lastName != newState.lastName || editUserFormState.phone != newState.phone || editUserFormState.email != newState.email ||
-		editUserFormState.institutionalAffiliation != newState.institutionalAffiliation || editUserFormState.userType != newState.userType || editUserFormState.runWebServices != newState.runWebServices ||
+		editUserFormState.company != newState.company || editUserFormState.userType != newState.userType || editUserFormState.allowSoap != newState.allowSoap ||
 		editUserFormState.resetPassword != newState.resetPassword) {
 		confirmBackSmart($("#you_have_unsaved_data2").val(), $("#navigationURL").val(), $("#defaultURL").val());
 	}

@@ -19,6 +19,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.powermock.api.mockito.PowerMockito;
@@ -36,6 +37,8 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 	private ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
 
 	private UserAccountBean currentUser;
+
+	private String oldPassword;
 
 	@Before
 	public void setUp() throws Exception {
@@ -622,6 +625,7 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 	@Test
 	public void testThatRestoreEventDefinitionCrfMethodRestoresEventDefinitionCRFBeanCorrectly() throws Exception {
 		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		oldPassword = userBean.getPasswd();
 		userBean.setStatus(Status.DELETED);
 		userBean.setUpdater(userBean);
 		userAccountDAO.updateStatus(userBean);
@@ -630,5 +634,15 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		userAccountService.restoreUser(userBean, userBean);
 		userBean = (UserAccountBean) userAccountDAO.findByPK(1);
 		assertTrue(userBean.getStatus() == Status.AVAILABLE);
+	}
+
+	@After
+	public void after() {
+		if (oldPassword != null) {
+			UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+			userBean.setPasswd(oldPassword);
+			userBean.setUpdater(userBean);
+			userAccountDAO.update(userBean);
+		}
 	}
 }

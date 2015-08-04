@@ -21,7 +21,7 @@ public class UserServiceTest extends BaseServiceTest {
 				.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
 						.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 						.param("lastname", "lastname_".concat(Long.toString(timestamp)))
-						.param("email", "test@gmail.com").param("phone", "111111111111").param("company", "clinovo")
+						.param("email", "test@gmail.com").param("phone", "+375232345678").param("company", "clinovo")
 						.param("usertype", "123").param("allowsoap", "true").param("displaypassword", "true")
 						.param("role", Integer.toString(3456)).accept(mediaType).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
@@ -32,7 +32,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
 				.param("displaypassword", "true").param("role", "123123").accept(mediaType).secure(true)
 				.session(session)).andExpect(status().isInternalServerError());
@@ -43,7 +43,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
 				.param("displaypassword", "true").param("role", Integer.toString(3456)).accept(mediaType).secure(true)
 				.session(session)).andExpect(status().isInternalServerError());
@@ -57,7 +57,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
 				.param("displaypassword", "true").param("role", Integer.toString(Role.STUDY_CODER.getId()))
 				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
@@ -71,7 +71,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
 				.param("displaypassword", "true").param("role", Integer.toString(Role.STUDY_EVALUATOR.getId()))
 				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
@@ -85,7 +85,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
 				.param("displaypassword", "true").param("role", Integer.toString(Role.STUDY_MONITOR.getId()))
 				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
@@ -99,7 +99,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
 				.param("displaypassword", "true").param("role", Integer.toString(Role.STUDY_DIRECTOR.getId()))
 				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
@@ -113,7 +113,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
 				.param("displaypassword", "true").param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId()))
 				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
@@ -124,7 +124,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
 				.param("displaypassword", "true").param("role", Integer.toString(Role.SITE_MONITOR.getId()))
 				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
@@ -135,7 +135,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
 				.param("displaypassword", "true")
 				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
@@ -147,7 +147,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
 				.param("displaypassword", "true").param("role", Integer.toString(Role.INVESTIGATOR.getId()))
 				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
@@ -493,7 +493,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "testgmailcom")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
 				.param("displaypassword", "true").param("role", Integer.toString(Role.STUDY_MONITOR.getId()))
 				.secure(true).session(session)).andExpect(status().isInternalServerError());
@@ -501,14 +501,16 @@ public class UserServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatItIsPossibleToCreateUserIfAllParametersAreSpecified() throws Exception {
+		String timeZone = "Etc/GMT+11";
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
 		additionalUserName = "new_user_".concat(Long.toString(timestamp));
 		result = this.mockMvc.perform(post(API_USER_CREATE).param("username", additionalUserName)
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "111111111111").param("allowsoap", "true").param("displaypassword", "true")
-				.param("company", "clinovo").param("usertype", Integer.toString(UserType.SYSADMIN.getId()))
+				.param("phone", "+375232345678").param("allowsoap", "true").param("displaypassword", "true")
+				.param("company", "clinovo").param("timezone", timeZone)
+				.param("usertype", Integer.toString(UserType.SYSADMIN.getId()))
 				.param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId())).accept(mediaType).secure(true)
 				.session(session)).andExpect(status().isOk()).andReturn();
 		unmarshalResult();
@@ -519,6 +521,7 @@ public class UserServiceTest extends BaseServiceTest {
 					.equals(UserType.USER.getCode()));
 			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getUserTypeCode()
 					.equals(UserType.SYSADMIN.getCode()));
+			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getUserTimeZoneId().equals(timeZone));
 		}
 	}
 
@@ -530,7 +533,7 @@ public class UserServiceTest extends BaseServiceTest {
 		result = this.mockMvc.perform(post(API_USER_CREATE).param("username", additionalUserName)
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId()))
 				.param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId())).accept(mediaType).secure(true)
 				.session(session)).andExpect(status().isOk()).andReturn();
@@ -558,7 +561,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", additionalUserName)
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "new_test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId()))
 				.param("role", Integer.toString(Role.INVESTIGATOR.getId())).accept(mediaType).secure(true)
 				.session(session)).andExpect(status().isOk());
@@ -577,7 +580,7 @@ public class UserServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", additionalUserName)
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "new_test@gmail.com")
-				.param("phone", "111111111111").param("company", "clinovo")
+				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("usertype", Integer.toString(UserType.USER.getId()))
 				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
 				.secure(true).session(session)).andExpect(status().isOk());

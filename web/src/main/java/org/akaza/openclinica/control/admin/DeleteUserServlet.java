@@ -30,7 +30,6 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -71,9 +70,8 @@ public class DeleteUserServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study")
-							+ respage.getString("change_study_contact_sysadmin"), request);
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+					+ respage.getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
@@ -81,41 +79,35 @@ public class DeleteUserServlet extends Controller {
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
-
-		UserAccountDAO udao = getUserAccountDAO();
+		UserAccountBean updater = getUserAccountBean(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		int userId = fp.getInt(ARG_USERID);
 		int action = fp.getInt(ARG_ACTION);
 
+		UserAccountDAO udao = getUserAccountDAO();
 		UserAccountBean u = (UserAccountBean) udao.findByPK(userId);
 
+		String message;
 		MessageFormat messageFormat = new MessageFormat("");
 
-		String message;
 		if (!u.isActive()) {
-
 			messageFormat.applyPattern(respage.getString("the_specified_user_not_exits"));
 			message = messageFormat.format(new Object[]{userId});
-
 		} else if (!EntityAction.contains(action)) {
 			message = respage.getString("the_specified_action_on_the_user_is_invalid");
-		} else if (!EntityAction.get(action).equals(EntityAction.DELETE)
-				&& !EntityAction.get(action).equals(EntityAction.RESTORE)) {
+		} else
+			if (!EntityAction.get(action).equals(EntityAction.DELETE)
+					&& !EntityAction.get(action).equals(EntityAction.RESTORE)) {
 			message = respage.getString("the_specified_action_is_not_allowed");
 		} else {
 			EntityAction desiredAction = EntityAction.get(action);
-			u.setUpdater(ub);
-
 			if (desiredAction.equals(EntityAction.DELETE)) {
-				udao.delete(u);
-
-				if (udao.isQuerySuccessful()) {
+				getUserAccountService().removeUser(u, updater);
+				if (u.isActive()) {
 					message = respage.getString("the_user_has_been_removed_successfully");
-
 					try {
-						sendRestoreEmail(request, u, null, desiredAction);
+						sendRestoreEmail(request, u, desiredAction);
 					} catch (Exception e) {
 						message += respage.getString("however_was_error_sending_user_email_regarding");
 					}
@@ -123,25 +115,16 @@ public class DeleteUserServlet extends Controller {
 					message = respage.getString("the_user_could_not_be_deleted_due_database_error");
 				}
 			} else {
-				SecurityManager sm = getSecurityManager();
-				String password = sm.genPassword();
-				String passwordHash = sm.encryptPassword(password, getUserDetails());
-
-				u.setPasswd(passwordHash);
-				u.setPasswdTimestamp(null);
-
-				udao.restore(u);
-
-				if (udao.isQuerySuccessful()) {
+				getUserAccountService().restoreUser(u, updater, getUserDetails());
+				if (u.isActive()) {
 					message = respage.getString("the_user_has_been_restored");
-
 					try {
-						sendRestoreEmail(request, u, password, desiredAction);
+						sendRestoreEmail(request, u, desiredAction);
 					} catch (Exception e) {
 						message += respage.getString("however_was_error_sending_user_email_regarding");
 					}
 				} else {
-					message = respage.getString("the_user_could_not_be_deleted_due_database_error");
+					message = respage.getString("the_user_could_not_be_restored_due_database_error");
 				}
 			}
 		}
@@ -150,14 +133,14 @@ public class DeleteUserServlet extends Controller {
 		forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 	}
 
-	private void sendRestoreEmail(HttpServletRequest request, UserAccountBean u, String password,
-			EntityAction desiredAction) throws Exception {
+	private void sendRestoreEmail(HttpServletRequest request, UserAccountBean u, EntityAction desiredAction)
+			throws Exception {
 		StudyBean currentStudy = getCurrentStudy(request);
-		String body = "";
+		String body;
 		String subject = "";
 		StudyDAO sdao = getStudyDAO();
 		StudyBean emailParentStudy;
-		Object arguments[] = {};
+		Object[] arguments = {};
 		MessageFormat msg = new MessageFormat("");
 
 		if (currentStudy.getParentStudyId() > 0) {
@@ -175,7 +158,7 @@ public class DeleteUserServlet extends Controller {
 			logger.info("Sending restore and password reset notification to " + u.getName());
 			subject = restext.getString("your_new_openclinica_account_has_been_restored");
 			msg.applyPattern(restext.getString("your_account_has_been_restored_and_password_reset_email_message_html"));
-			arguments = new Object[]{u.getFirstName() + " " + u.getLastName(), u.getName(), password,
+			arguments = new Object[]{u.getFirstName() + " " + u.getLastName(), u.getName(), u.getRealPassword(),
 					SQLInitServlet.getSystemURL(), emailParentStudy.getName()};
 		}
 		body = EmailUtil.getEmailBodyStart();
