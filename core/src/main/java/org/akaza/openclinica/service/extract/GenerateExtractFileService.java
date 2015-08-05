@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -574,7 +575,7 @@ public class GenerateExtractFileService {
 			// File
 			newFile.setLastModified(System.currentTimeMillis());
 
-			w = new BufferedWriter(new FileWriter(newFile, true));
+			w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newFile, true), "UTF-8"));
 			w.write(content);
 			w.close();
 			logger.info("finished writing the text file...");

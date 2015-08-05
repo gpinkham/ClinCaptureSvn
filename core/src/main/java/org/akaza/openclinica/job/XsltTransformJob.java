@@ -41,6 +41,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.sql.DataSource;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -143,10 +144,6 @@ public class XsltTransformJob extends QuartzJobBean {
 	public static final String POST_PROC_LOCATION = "postProcLocation";
 	public static final String POST_PROC_EXPORT_NAME = "postProcExportName";
 	private static final long KILOBYTE = 1024;
-
-	private static final int UTF8_ENCODING_BYTE_1 = 239;
-	private static final int UTF8_ENCODING_BYTE_2 = 187;
-	private static final int UTF8_ENCODING_BYTE_3 = 191;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private ResourceBundle words;
@@ -473,12 +470,11 @@ public class XsltTransformJob extends QuartzJobBean {
 					in = new java.io.FileInputStream(xsltPath);
 
 					Transformer transformer = tFactory.newTransformer(new StreamSource(in));
+					transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
 					endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
 
 					endFileStream = new FileOutputStream(endFile);
-					endFileStream.write(UTF8_ENCODING_BYTE_1);
-					endFileStream.write(UTF8_ENCODING_BYTE_2);
-					endFileStream.write(UTF8_ENCODING_BYTE_3);
 					transformer.transform(new StreamSource(xmlFilePath), new StreamResult(endFileStream));
 
 					in.close();
