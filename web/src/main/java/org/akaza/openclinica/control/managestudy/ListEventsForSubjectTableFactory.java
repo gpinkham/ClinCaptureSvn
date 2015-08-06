@@ -17,6 +17,7 @@ import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.EventCRFUtil;
 import com.clinovo.util.SignUtil;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -73,6 +74,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -1280,5 +1282,10 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		}
 
 		return true;
+	}
+	
+	@Override
+	public int[] getMaxRowIncrements() {
+		return new int[]{1, 5, 15, 25, 50};
 	}
 }

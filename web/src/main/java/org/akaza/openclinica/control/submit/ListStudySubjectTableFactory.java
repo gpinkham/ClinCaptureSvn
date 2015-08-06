@@ -1674,4 +1674,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		value = "</div>" + url.toString();
 		return value;
 	}
+
+	@Override
+	public int[] getMaxRowIncrements() {
+		return new int[]{1, 5, 15, 25, 50};
+	}
 }
