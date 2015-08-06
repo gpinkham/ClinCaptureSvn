@@ -6,8 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +19,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
@@ -28,8 +28,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.cdisc.ns.odm.v130.ODM;
 import org.hamcrest.core.IsInstanceOf;
@@ -66,39 +65,7 @@ import com.clinovo.rest.security.PermissionChecker;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class BaseServiceTest extends DefaultAppContextTest {
 
-	private List<Integer> edcIds = new ArrayList<Integer>();
-	private List<Integer> sedIds = new ArrayList<Integer>();
-
-	protected String mailSenderHost = null;
-	protected String additionalUserName = null;
-
-	protected MediaType mediaType = MediaType.APPLICATION_JSON;
-
-	protected MvcResult result;
-
-	protected RestOdmContainer restOdmContainer;
-
-	protected Schema schema;
-
-	protected StudyDAO studyDAO;
-	protected UserAccountDAO userAccountDAO;
-
-	protected MockMvc mockMvc;
-
-	protected String userName;
-	protected String password;
-	protected String studyName;
-	protected long timestamp;
-
-	protected StudyBean studyBean;
-	protected UserAccountBean userBean;
-
-	protected StudyBean newSite;
-	protected StudyBean newStudy;
-	protected UserAccountBean newUser;
-
-	protected MockHttpServletRequest request = new MockHttpServletRequest();
-	protected MockHttpSession session = new MockHttpSession();
+	public static final Locale LOCALE = new Locale("en");
 
 	// Managed services
 	public static final String API_EVENT = "/event";
@@ -117,7 +84,41 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public static final String API_WADL = "/wadl";
 	public static final String API_ODM = "/odm";
 
-	public static final Locale LOCALE = new Locale("en");
+	private List<CRFBean> crfBeanList;
+	private List<StudyBean> studyBeanList;
+	private List<CRFVersionBean> crfVersionBeanList;
+	private List<UserAccountBean> userAccountBeanList;
+	private List<EventDefinitionCRFBean> eventDefinitionCRFBeanList;
+	private List<StudyEventDefinitionBean> studyEventDefinitionBeanList;
+
+	protected Schema schema;
+
+	protected MockMvc mockMvc;
+
+	protected MvcResult result;
+
+	protected static boolean dbRestored;
+
+	protected String mailSenderHost = null;
+
+	protected RestOdmContainer restOdmContainer;
+
+	protected MediaType mediaType = MediaType.APPLICATION_JSON;
+
+	protected long timestamp;
+	protected String userName;
+	protected String password;
+	protected String studyName;
+
+	protected StudyBean studyBean;
+	protected UserAccountBean userBean;
+
+	protected StudyBean newSite;
+	protected StudyBean newStudy;
+	protected UserAccountBean newUser;
+
+	protected MockHttpSession session = new MockHttpSession();
+	protected MockHttpServletRequest request = new MockHttpServletRequest();
 
 	@Autowired
 	protected WebApplicationContext wac;
@@ -158,35 +159,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		return (StudyBean) studyDAO.create(site);
 	}
 
-	protected void deleteEventDefinitionCrfs(List<Integer> edcIds) {
-		if (edcIds != null && edcIds.size() > 0) {
-			userAccountDAO.execute("delete from event_definition_crf where event_definition_crf_id in ("
-					.concat(edcIds.toString().replaceAll("]|\\[", "")).concat(")"), new HashMap());
-		}
-	}
-
-	protected void deleteStudyEventDefinitions(List<Integer> sedIds) {
-		if (sedIds != null && sedIds.size() > 0) {
-			userAccountDAO.execute("delete from study_event_definition where study_event_definition_id in ("
-					.concat(sedIds.toString().replaceAll("]|\\[", "")).concat(")"), new HashMap());
-		}
-	}
-
-	protected void deleteUser(UserAccountBean userAccountBean) {
-		userAccountDAO.execute(
-				"delete from authorities where username = '".concat(userAccountBean.getName()).concat("'"),
-				new HashMap());
-		userAccountDAO.execute(
-				"delete from study_user_role where user_name = '".concat(userAccountBean.getName()).concat("'"),
-				new HashMap());
-		userAccountDAO.execute(
-				"delete from user_account where user_name = '".concat(userAccountBean.getName()).concat("'"),
-				new HashMap());
-	}
-
-	private void deleteStudy(StudyBean studyBean) {
-		studyDAO.execute("delete from study where study_id = ".concat(Integer.toString(studyBean.getId())),
-				new HashMap());
+	protected int getMaxId(EntityBean entityBean, int max) {
+		return entityBean.getId() > max ? entityBean.getId() : max;
 	}
 
 	protected void createNewStudy() throws Exception {
@@ -268,19 +242,81 @@ public class BaseServiceTest extends DefaultAppContextTest {
 						: StringContains.containsString("<ODM Description=\"REST Data\"")));
 	}
 
+	private void backupEntities() {
+		crfVersionBeanList = crfVersionDao.findAll();
+		crfBeanList = (List<CRFBean>) crfdao.findAll();
+		studyBeanList = (List<StudyBean>) studyDAO.findAll();
+		userAccountBeanList = (List<UserAccountBean>) userAccountDAO.findAll();
+		eventDefinitionCRFBeanList = (List<EventDefinitionCRFBean>) eventDefinitionCRFDAO.findAll();
+		studyEventDefinitionBeanList = (List<StudyEventDefinitionBean>) studyEventDefinitionDAO.findAll();
+	}
+
+	private void restoreEntities() {
+		int max = 0;
+		UserAccountBean updater = (UserAccountBean) userAccountDAO.findByPK(1);
+		for (CRFBean crfBean : crfBeanList) {
+			max = getMaxId(crfBean, max);
+			crfBean.setUpdater(updater);
+			crfdao.update(crfBean);
+		}
+		max = 0;
+		for (CRFVersionBean crfVersionBean : crfVersionBeanList) {
+			max = getMaxId(crfVersionBean, max);
+			crfVersionBean.setUpdater(updater);
+			crfVersionDao.update(crfVersionBean);
+		}
+		max = 0;
+		for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefinitionCRFBeanList) {
+			max = getMaxId(eventDefinitionCRFBean, max);
+			eventDefinitionCRFBean.setUpdater(updater);
+			eventDefinitionCRFDAO.update(eventDefinitionCRFBean);
+		}
+		eventDefinitionCRFDAO.execute(
+				"delete from event_definition_crf where event_definition_crf_id > ".concat(Integer.toString(max)),
+				new HashMap());
+		max = 0;
+		for (StudyEventDefinitionBean studyEventDefinitionBean : studyEventDefinitionBeanList) {
+			max = getMaxId(studyEventDefinitionBean, max);
+			studyEventDefinitionBean.setUpdater(updater);
+			studyEventDefinitionDAO.update(studyEventDefinitionBean);
+		}
+		studyEventDefinitionDAO.execute(
+				"delete from study_event_definition where study_event_definition_id > ".concat(Integer.toString(max)),
+				new HashMap());
+		max = 0;
+		for (UserAccountBean userAccountBean : userAccountBeanList) {
+			max = getMaxId(userAccountBean, max);
+			userAccountBean.setUpdater(updater);
+			userAccountDAO.update(userAccountBean);
+		}
+		userAccountDAO.execute("delete from authorities where username in ("
+				.concat("select user_name from user_account where user_id > ".concat(Integer.toString(max)))
+				.concat(")"), new HashMap());
+		userAccountDAO.execute("delete from study_user_role where user_name in ("
+				.concat("select user_name from user_account where user_id > ".concat(Integer.toString(max)))
+				.concat(")"), new HashMap());
+		userAccountDAO.execute("delete from user_account where user_id > ".concat(Integer.toString(max)),
+				new HashMap());
+		max = 0;
+		for (StudyBean studyBean : studyBeanList) {
+			max = getMaxId(studyBean, max);
+			studyBean.setUpdater(updater);
+			studyDAO.update(studyBean);
+		}
+		studyDAO.execute("delete from study where study_id > ".concat(Integer.toString(max)), new HashMap());
+	}
+
+	@Override
+	protected void restoreDb() throws Exception {
+		if (!dbRestored) {
+			dbRestored = true;
+			super.setUp();
+		}
+	}
+
 	@Before
 	public void before() throws Exception {
-		super.setUp();
-
-		if (this instanceof EventServiceTest) {
-			for (EventDefinitionCRFBean edc : (Collection<EventDefinitionCRFBean>) eventDefinitionCRFDAO.findAll()) {
-				edcIds.add(edc.getId());
-			}
-			for (StudyEventDefinitionBean sed : (Collection<StudyEventDefinitionBean>) studyEventDefinitionDAO
-					.findAll()) {
-				sedIds.add(sed.getId());
-			}
-		}
+		backupEntities();
 
 		result = null;
 		restOdmContainer = null;
@@ -289,9 +325,6 @@ public class BaseServiceTest extends DefaultAppContextTest {
 				.getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getURL());
 
 		setTestProperties();
-
-		studyDAO = new StudyDAO(dataSource);
-		userAccountDAO = new UserAccountDAO(dataSource);
 
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilters(new RestFilter()).build();
 
@@ -319,35 +352,9 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	@After
 	public void after() {
-		if (this instanceof EventServiceTest) {
-			List<Integer> allEdcIds = new ArrayList<Integer>();
-			List<Integer> allSedIds = new ArrayList<Integer>();
-			for (EventDefinitionCRFBean edc : (Collection<EventDefinitionCRFBean>) eventDefinitionCRFDAO.findAll()) {
-				allEdcIds.add(edc.getId());
-			}
-			for (StudyEventDefinitionBean sed : (Collection<StudyEventDefinitionBean>) studyEventDefinitionDAO
-					.findAll()) {
-				allSedIds.add(sed.getId());
-			}
-			allEdcIds.removeAll(edcIds);
-			allSedIds.removeAll(sedIds);
-			deleteEventDefinitionCrfs(allEdcIds);
-			deleteStudyEventDefinitions(allSedIds);
-		}
+		restoreEntities();
 		if (mailSenderHost != null) {
 			mailSender.setHost(mailSenderHost);
-		}
-		if (additionalUserName != null) {
-			deleteUser((UserAccountBean) userAccountDAO.findByUserName(additionalUserName));
-		}
-		if (newUser != null && newUser.getId() > 0) {
-			deleteUser(newUser);
-		}
-		if (newSite != null && newSite.getId() > 0) {
-			deleteStudy(newSite);
-		}
-		if (newStudy != null && newStudy.getId() > 0) {
-			deleteStudy(newStudy);
 		}
 		unmarshalResult();
 	}

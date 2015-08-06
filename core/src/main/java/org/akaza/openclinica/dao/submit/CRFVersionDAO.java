@@ -21,6 +21,15 @@
  */
 package org.akaza.openclinica.dao.submit;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -29,14 +38,6 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
-import javax.sql.DataSource;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-
 /**
  * <p>
  * CRFVersionDAO.java, the data access object for versions of instruments in the database. Each of these are related to
@@ -44,7 +45,7 @@ import java.util.Locale;
  * 
  * @author thickerson
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
 public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO {
 
 	@Override
@@ -158,8 +159,15 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 	/**
 	 * {@inheritDoc}
 	 */
-	public Collection findAll() {
-		return new ArrayList();
+	public List<CRFVersionBean> findAll() {
+		this.setTypesExpected();
+		ArrayList alist = this.select(digester.getQuery("findAll"));
+		ArrayList al = new ArrayList();
+		for (Object anAlist : alist) {
+			CRFVersionBean eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			al.add(eb);
+		}
+		return al;
 	}
 
 	/**
@@ -420,7 +428,6 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 			sqls.add(sql);
 		}
 
-
 		for (Object item1 : items) {
 			ItemBean item = (ItemBean) item1;
 			sql = digester.getQuery("deleteItemsByVersion") + item.getId();
@@ -443,8 +450,9 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 
 		String oid;
 		try {
-			oid = crfVersion.getOid() != null ? crfVersion.getOid() : crfVersion.getOidGenerator(ds).generateOid(
-					crfName, crfVersionName);
+			oid = crfVersion.getOid() != null
+					? crfVersion.getOid()
+					: crfVersion.getOidGenerator(ds).generateOid(crfName, crfVersionName);
 			return oid;
 		} catch (Exception e) {
 			throw new RuntimeException("CANNOT GENERATE OID");
@@ -591,7 +599,9 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 
 	/**
 	 * Find new CRF Version instead of deleted.
-	 * @param deletedCRFVersionId int
+	 * 
+	 * @param deletedCRFVersionId
+	 *            int
 	 * @return CRFVersionBean to be set instead of deleted
 	 */
 	public CRFVersionBean findLatestAfterDeleted(int deletedCRFVersionId) {

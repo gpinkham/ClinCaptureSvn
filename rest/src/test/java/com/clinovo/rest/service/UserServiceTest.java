@@ -160,7 +160,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
 		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.USER, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newStudy.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", additionalUserName)
 				.param("firstname", newUser.getFirstName()).param("lastname", newUser.getLastName())
 				.param("email", newUser.getEmail()).param("phone", newUser.getPhone())
@@ -183,7 +183,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
 		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newStudy.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", additionalUserName)
 				.param("firstname", newUser.getFirstName()).param("lastname", newUser.getLastName())
 				.param("email", newUser.getEmail()).param("phone", newUser.getPhone())
@@ -204,7 +204,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
 		createNewUser(UserType.USER, Role.STUDY_CODER);
 		login(newUser.getName(), UserType.USER, Role.STUDY_CODER, newUser.getPasswd(), newStudy.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
 						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
@@ -226,7 +226,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
 		createNewUser(UserType.SYSADMIN, Role.STUDY_CODER);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_CODER, newUser.getPasswd(), newStudy.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
 						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
@@ -248,7 +248,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
 		createNewUser(UserType.USER, Role.STUDY_EVALUATOR);
 		login(newUser.getName(), UserType.USER, Role.STUDY_EVALUATOR, newUser.getPasswd(), newStudy.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
 						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
@@ -270,7 +270,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
 		createNewUser(UserType.SYSADMIN, Role.STUDY_EVALUATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_EVALUATOR, newUser.getPasswd(), newStudy.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
 						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
@@ -294,7 +294,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
 		createNewUser(UserType.SYSADMIN, Role.STUDY_MONITOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_MONITOR, newUser.getPasswd(), newStudy.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
 						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
@@ -316,7 +316,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
 		createNewUser(UserType.USER, Role.STUDY_MONITOR);
 		login(newUser.getName(), UserType.USER, Role.STUDY_MONITOR, newUser.getPasswd(), newStudy.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
 						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
@@ -340,7 +340,7 @@ public class UserServiceTest extends BaseServiceTest {
 		createNewUser(UserType.USER, Role.CLINICAL_RESEARCH_COORDINATOR);
 		login(newUser.getName(), UserType.USER, Role.CLINICAL_RESEARCH_COORDINATOR, newUser.getPasswd(),
 				newSite.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
 						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
@@ -365,7 +365,7 @@ public class UserServiceTest extends BaseServiceTest {
 		createNewUser(UserType.SYSADMIN, Role.CLINICAL_RESEARCH_COORDINATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.CLINICAL_RESEARCH_COORDINATOR, newUser.getPasswd(),
 				newSite.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
 						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
@@ -389,7 +389,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
 		createNewUser(UserType.USER, Role.INVESTIGATOR);
 		login(newUser.getName(), UserType.USER, Role.INVESTIGATOR, newUser.getPasswd(), newSite.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
 						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
@@ -412,7 +412,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
 		createNewUser(UserType.SYSADMIN, Role.INVESTIGATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.INVESTIGATOR, newUser.getPasswd(), newSite.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
 						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
@@ -435,7 +435,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
 		createNewUser(UserType.USER, Role.SITE_MONITOR);
 		login(newUser.getName(), UserType.USER, Role.SITE_MONITOR, newUser.getPasswd(), newSite.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
 						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
@@ -458,7 +458,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
 		createNewUser(UserType.SYSADMIN, Role.SITE_MONITOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.SITE_MONITOR, newUser.getPasswd(), newSite.getName());
-		additionalUserName = "new_".concat(newUser.getName());
+		String additionalUserName = "new_".concat(newUser.getName());
 		this.mockMvc.perform(
 				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
 						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
@@ -504,7 +504,7 @@ public class UserServiceTest extends BaseServiceTest {
 		String timeZone = "Etc/GMT+11";
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
-		additionalUserName = "new_user_".concat(Long.toString(timestamp));
+		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
 		result = this.mockMvc.perform(post(API_USER_CREATE).param("username", additionalUserName)
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
@@ -527,7 +527,7 @@ public class UserServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatItIsPossibleToCreateUserIfOnlyRequiredParametersAreSpecified() throws Exception {
-		additionalUserName = "new_user_".concat(Long.toString(timestamp));
+		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
 		result = this.mockMvc.perform(post(API_USER_CREATE).param("username", additionalUserName)
@@ -557,7 +557,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
 		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newSite.getName());
-		additionalUserName = newUser.getName().concat("_").concat(Long.toString(new Date().getTime()));
+		String additionalUserName = newUser.getName().concat("_").concat(Long.toString(new Date().getTime()));
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", additionalUserName)
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "new_test@gmail.com")
@@ -576,7 +576,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
 		createNewUser(UserType.SYSADMIN, Role.STUDY_MONITOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_MONITOR, newUser.getPasswd(), newSite.getName());
-		additionalUserName = newUser.getName().concat("_").concat(Long.toString(new Date().getTime()));
+		String additionalUserName = newUser.getName().concat("_").concat(Long.toString(new Date().getTime()));
 		this.mockMvc.perform(post(API_USER_CREATE).param("username", additionalUserName)
 				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "new_test@gmail.com")
@@ -634,7 +634,7 @@ public class UserServiceTest extends BaseServiceTest {
 	public void testThatRemoveUserMethodThrowsExceptionIfYouAreTryingToRemoveUserThatDoesNotBelongToCurrentScope()
 			throws Exception {
 		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
-		additionalUserName = newUser.getName();
+		String additionalUserName = newUser.getName();
 		String additionalUserPassword = newUser.getPasswd();
 		createNewStudy();
 		createNewSite(newStudy.getId());
@@ -704,7 +704,7 @@ public class UserServiceTest extends BaseServiceTest {
 	public void testThatRestoreUserMethodThrowsExceptionIfYouAreTryingToRestoreUserThatDoesNotBelongToCurrentScope()
 			throws Exception {
 		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
-		additionalUserName = newUser.getName();
+		String additionalUserName = newUser.getName();
 		String additionalUserPassword = newUser.getPasswd();
 		createNewStudy();
 		createNewSite(newStudy.getId());
