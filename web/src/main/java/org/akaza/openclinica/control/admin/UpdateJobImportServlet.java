@@ -53,9 +53,6 @@ public class UpdateJobImportServlet extends Controller {
 
 	private static final String TRIGGER_IMPORT_GROUP = "importTrigger";
 
-	private static final String IMPORT_DIR = SQLInitServlet.getField(ImportSpringJob.FILE_PATH)
-			+ ImportSpringJob.DIR_PATH + File.separator;
-
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -79,7 +76,8 @@ public class UpdateJobImportServlet extends Controller {
 
 		StudyDAO sdao = getStudyDAO();
 
-		request.setAttribute(ImportSpringJob.FIRST_FILE_PATH, IMPORT_DIR);
+		request.setAttribute(ImportSpringJob.FIRST_FILE_PATH, SQLInitServlet.getField(ImportSpringJob.FILE_PATH)
+				+ ImportSpringJob.DIR_PATH + File.separator);
 
 		if (trigger != null) {
 			request.setAttribute(ImportSpringJob.TNAME, trigger.getKey().getName());
