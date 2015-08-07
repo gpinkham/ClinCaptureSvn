@@ -113,7 +113,7 @@
 			<fmt:message key="default" bundle="${resword}"/>:
 		</td>
 		<td class="table_cell">
-			<c:out value="${group.default}"/> 
+			<c:out value="${group['default']}"/>
 		</td>
 	</tr>  
 	</c:when>
