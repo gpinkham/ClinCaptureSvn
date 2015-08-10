@@ -122,7 +122,8 @@
 																<td>
 																	<div class="formfieldXL_BG">
 																		<input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL"
-																				onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
+																				onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"
+																				${study.studyParameterConfig.subjectIdGeneration eq 'auto non-editable' ? 'readonly' : ''}>
 																	</div> 
 																	<br> 
 																	<jsp:include page="../showMessage.jsp">

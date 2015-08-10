@@ -256,20 +256,8 @@ public class UpdateStudySubjectServlet extends Controller {
 		}
 		HashMap errors = v.validate();
 
-		if (!StringUtil.isBlank(fp.getString("label"))) {
+		updateSubjectLabel(fp, subjectToUpdate, currentStudy, errors);
 
-			StudySubjectDAO ssdao = getStudySubjectDAO();
-			StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(fp.getString("label").trim(),
-					currentStudy.getId(), subjectToUpdate.getId());
-			if (sub1.getId() == 0) {
-				sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabelInSites(fp.getString("label").trim(),
-						currentStudy.getId(), subjectToUpdate.getId());
-			}
-			if (sub1.getId() > 0) {
-				Validator.addError(errors, "label", resexception.getString("subject_ID_used_by_another_choose_unique"));
-			}
-		}
-		subjectToUpdate.setLabel(fp.getString("label"));
 		subjectToUpdate.setSecondaryLabel(fp.getString("secondaryLabel"));
 
 		if (!StringUtil.isBlank(eDateString)) {
@@ -330,6 +318,28 @@ public class UpdateStudySubjectServlet extends Controller {
 		} else {
 			forwardPage(Page.UPDATE_STUDY_SUBJECT_CONFIRM, request, response);
 		}
+	}
+
+	private void updateSubjectLabel(FormProcessor fp, StudySubjectBean subjectToUpdate, StudyBean currentStudy, HashMap<String, Object> errors) {
+
+		if (currentStudy.getStudyParameterConfig().getSubjectIdGeneration().equals("auto non-editable")) {
+			return;
+		}
+
+		if (!StringUtil.isBlank(fp.getString("label"))) {
+
+			StudySubjectDAO ssdao = getStudySubjectDAO();
+			StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(fp.getString("label").trim(),
+					currentStudy.getId(), subjectToUpdate.getId());
+			if (sub1.getId() == 0) {
+				sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabelInSites(fp.getString("label").trim(),
+						currentStudy.getId(), subjectToUpdate.getId());
+			}
+			if (sub1.getId() > 0) {
+				Validator.addError(errors, "label", resexception.getString("subject_ID_used_by_another_choose_unique"));
+			}
+		}
+		subjectToUpdate.setLabel(fp.getString("label"));
 	}
 
 	private void submit(HttpServletRequest request, HttpServletResponse response) throws Exception {
