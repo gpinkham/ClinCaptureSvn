@@ -30,7 +30,7 @@
                 </td>
 				<td width="80" align="right" valign="bottom" nowrap> 
 					&nbsp;&nbsp;
-					<a href="http://www.clinovo.com/" target="_blank"><img src="<c:url value='${logoUrl}'/>" width="150" height="50" border="0" ></a>
+					<a href="http://www.clinovo.com/" target="_blank"><img src="<c:url value='${logoUrl}'/>" width="150" border="0" ></a>
 					&nbsp;&nbsp;
 				</td>
             </tr>
