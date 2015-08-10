@@ -56,7 +56,7 @@ public final class Navigation {
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
 			"/ChangeDefinitionCRFOrdinal", "/CreateOneDiscrepancyNote", "/MatchPassword", "/pages/handleSDVPost",
 			"/pages/handleSDVRemove", "/pages/sdvStudySubjects", "/UploadFile", "/DownloadAttachedFile",
-			"/pages/CRFsMasking", "/print/getPdf", "/pages/downloadCasebooks"));
+			"/pages/CRFsMasking", "/print/getPdf", "/pages/downloadCasebooks", "/pages/sdvStudySubject"));
 	// set of pages with special processing
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
 			"/ListStudySubjects", "/EnterDataForStudyEvent", "/ViewSectionDataEntry", "/pages/crfEvaluation"));
